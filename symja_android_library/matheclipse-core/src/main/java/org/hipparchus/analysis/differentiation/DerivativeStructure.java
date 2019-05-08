@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.differentiation;
 
 import org.hipparchus.Field;
@@ -21,6 +26,7 @@ import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.FastMath;
+import org.hipparchus.util.FieldSinCos;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 
@@ -83,7 +89,18 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
      */
     DerivativeStructure(final DSFactory factory, final double[] data) {
         this.factory = factory;
-        this.data = data;
+        this.data = data.clone();
+    }
+
+    /**
+     * Build an instance with all values and derivatives set to 0.
+     *
+     * @param factory factory that built the instance
+     * @since 1.4
+     */
+    DerivativeStructure(final DSFactory factory) {
+        this.factory = factory;
+        this.data = new double[factory.getCompiler().getSize()];
     }
 
     /**
@@ -235,7 +252,7 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
      * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
      * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
      * avoiding intermediate overflow or underflow.
-     * <p>
+     *
      * <ul>
      * <li> If either argument is infinite, then the result is positive infinity.</li>
      * <li> else, if either argument is NaN then the result is NaN.</li>
@@ -243,7 +260,7 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
      *
      * @param x a value
      * @param y a value
-     * @return sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
+     * @return sqrt(< i > x < / i > < sup > 2 < / sup > & nbsp ; + < i > y < / i > < sup > 2 < / sup >)
      * @throws MathIllegalArgumentException if number of free parameters
      *                                      or orders do not match
      */
@@ -323,48 +340,28 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
     }
 
     /**
+     * Set a derivative component.
+     * <p>
+     * This method is package-private (no modifier specified), as it is intended
+     * to be used only by {@link DSFactory} since it relied on the ordering of
+     * derivatives within the class. This allows avoiding checks on the index,
+     * for performance reasons.
+     * </p>
+     *
+     * @param index index of the derivative
+     * @param value of the derivative to set
+     * @since 1.4
+     */
+    void setDerivativeComponent(final int index, final double value) {
+        data[index] = value;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public double getReal() {
         return data[0];
-    }
-
-    /**
-     * Get the value part of the derivative structure.
-     *
-     * @return value part of the derivative structure
-     * @see #getPartialDerivative(int...)
-     */
-    public double getValue() {
-        return data[0];
-    }
-
-    /**
-     * Get a partial derivative.
-     *
-     * @param orders derivation orders with respect to each variable (if all orders are 0,
-     *               the value is returned)
-     * @return partial derivative
-     * @throws MathIllegalArgumentException if the numbers of variables does not
-     *                                      match the instance
-     * @throws MathIllegalArgumentException if sum of derivation orders is larger
-     *                                      than the instance limits
-     * @see #getValue()
-     */
-    public double getPartialDerivative(final int... orders)
-            throws MathIllegalArgumentException {
-        return data[getFactory().getCompiler().getPartialDerivativeIndex(orders)];
-    }
-
-    /**
-     * Get all partial derivatives.
-     *
-     * @return a fresh copy of partial derivatives, in an array sorted according to
-     * {@link DSCompiler#getPartialDerivativeIndex(int...)}
-     */
-    public double[] getAllDerivatives() {
-        return data.clone();
     }
 
     /**
@@ -380,48 +377,10 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
 
     /**
      * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if number of free parameters
-     *                                      or orders do not match
-     */
-    @Override
-    public DerivativeStructure add(final DerivativeStructure a)
-            throws MathIllegalArgumentException {
-        factory.checkCompatibility(a.factory);
-        final DerivativeStructure ds = factory.build();
-        factory.getCompiler().add(data, 0, a.data, 0, ds.data, 0);
-        return ds;
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public DerivativeStructure subtract(final double a) {
         return add(-a);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if number of free parameters
-     *                                      or orders do not match
-     */
-    @Override
-    public DerivativeStructure subtract(final DerivativeStructure a)
-            throws MathIllegalArgumentException {
-        factory.checkCompatibility(a.factory);
-        final DerivativeStructure ds = factory.build();
-        factory.getCompiler().subtract(data, 0, a.data, 0, ds.data, 0);
-        return ds;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DerivativeStructure multiply(final int n) {
-        return multiply((double) n);
     }
 
     /**
@@ -438,21 +397,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
 
     /**
      * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if number of free parameters
-     *                                      or orders do not match
-     */
-    @Override
-    public DerivativeStructure multiply(final DerivativeStructure a)
-            throws MathIllegalArgumentException {
-        factory.checkCompatibility(a.factory);
-        final DerivativeStructure result = factory.build();
-        factory.getCompiler().multiply(data, 0, a.data, 0, result.data, 0);
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public DerivativeStructure divide(final double a) {
@@ -462,21 +406,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
             ds.data[i] = data[i] * inv;
         }
         return ds;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if number of free parameters
-     *                                      or orders do not match
-     */
-    @Override
-    public DerivativeStructure divide(final DerivativeStructure a)
-            throws MathIllegalArgumentException {
-        factory.checkCompatibility(a.factory);
-        final DerivativeStructure result = factory.build();
-        factory.getCompiler().divide(data, 0, a.data, 0, result.data, 0);
-        return result;
     }
 
     /**
@@ -503,18 +432,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
         final DerivativeStructure result = factory.build();
         factory.getCompiler().remainder(data, 0, a.data, 0, result.data, 0);
         return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DerivativeStructure negate() {
-        final DerivativeStructure ds = factory.build();
-        for (int i = 0; i < ds.data.length; ++i) {
-            ds.data[i] = -data[i];
-        }
-        return ds;
     }
 
     /**
@@ -597,19 +514,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
     }
 
     /**
-     * Return the exponent of the instance value, removing the bias.
-     * <p>
-     * For double numbers of the form 2<sup>x</sup>, the unbiased
-     * exponent is exactly x.
-     * </p>
-     *
-     * @return exponent for instance in IEEE754 representation, without bias
-     */
-    public int getExponent() {
-        return FastMath.getExponent(data[0]);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -669,25 +573,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
     }
 
     /**
-     * Compute composition of the instance by a univariate function.
-     *
-     * @param f array of value and derivatives of the function at
-     *          the current point (i.e. [f({@link #getValue()}),
-     *          f'({@link #getValue()}), f''({@link #getValue()})...]).
-     * @return f(this)
-     * @throws MathIllegalArgumentException if the number of derivatives
-     *                                      in the array is not equal to {@link #getOrder() order} + 1
-     */
-    public DerivativeStructure compose(final double... f)
-            throws MathIllegalArgumentException {
-
-        MathUtils.checkDimension(f.length, getOrder() + 1);
-        final DerivativeStructure result = factory.build();
-        factory.getCompiler().compose(data, 0, f, result.data, 0);
-        return result;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -721,14 +606,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
         final DerivativeStructure result = factory.build();
         factory.getCompiler().rootN(data, 0, n, result.data, 0);
         return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Field<DerivativeStructure> getField() {
-        return factory.getDerivativeField();
     }
 
     /**
@@ -842,6 +719,17 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
      * {@inheritDoc}
      */
     @Override
+    public FieldSinCos<DerivativeStructure> sinCos() {
+        final DerivativeStructure sin = factory.build();
+        final DerivativeStructure cos = factory.build();
+        factory.getCompiler().sinCos(data, 0, sin.data, 0, cos.data, 0);
+        return new FieldSinCos<>(sin, cos);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DerivativeStructure tan() {
         final DerivativeStructure result = factory.build();
         factory.getCompiler().tan(data, 0, result.data, 0);
@@ -948,43 +836,6 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
         final DerivativeStructure result = factory.build();
         factory.getCompiler().atanh(data, 0, result.data, 0);
         return result;
-    }
-
-    /**
-     * Convert radians to degrees, with error of less than 0.5 ULP
-     *
-     * @return instance converted into degrees
-     */
-    public DerivativeStructure toDegrees() {
-        final DerivativeStructure ds = factory.build();
-        for (int i = 0; i < ds.data.length; ++i) {
-            ds.data[i] = FastMath.toDegrees(data[i]);
-        }
-        return ds;
-    }
-
-    /**
-     * Convert degrees to radians, with error of less than 0.5 ULP
-     *
-     * @return instance converted into radians
-     */
-    public DerivativeStructure toRadians() {
-        final DerivativeStructure ds = factory.build();
-        for (int i = 0; i < ds.data.length; ++i) {
-            ds.data[i] = FastMath.toRadians(data[i]);
-        }
-        return ds;
-    }
-
-    /**
-     * Evaluate Taylor expansion a derivative structure.
-     *
-     * @param delta parameters offsets (&Delta;x, &Delta;y, ...)
-     * @return value of the Taylor expansion at x + &Delta;x, y + &Delta;y, ...
-     * @throws MathRuntimeException if factorials becomes too large
-     */
-    public double taylor(final double... delta) throws MathRuntimeException {
-        return factory.getCompiler().taylor(data, 0, delta);
     }
 
     /**
@@ -1211,6 +1062,200 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
         all[0] = accurateValue;
         return factory.build(all);
 
+    }
+
+    /**
+     * Get the value part of the derivative structure.
+     *
+     * @return value part of the derivative structure
+     * @see #getPartialDerivative(int...)
+     */
+    public double getValue() {
+        return data[0];
+    }
+
+    /**
+     * Get a partial derivative.
+     *
+     * @param orders derivation orders with respect to each variable (if all orders are 0,
+     *               the value is returned)
+     * @return partial derivative
+     * @throws MathIllegalArgumentException if the numbers of variables does not
+     *                                      match the instance
+     * @throws MathIllegalArgumentException if sum of derivation orders is larger
+     *                                      than the instance limits
+     * @see #getValue()
+     */
+    public double getPartialDerivative(final int... orders)
+            throws MathIllegalArgumentException {
+        return data[getFactory().getCompiler().getPartialDerivativeIndex(orders)];
+    }
+
+    /**
+     * Get all partial derivatives.
+     *
+     * @return a fresh copy of partial derivatives, in an array sorted according to
+     * {@link DSCompiler#getPartialDerivativeIndex(int...)}
+     */
+    public double[] getAllDerivatives() {
+        return data.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if number of free parameters
+     *                                      or orders do not match
+     */
+    @Override
+    public DerivativeStructure add(final DerivativeStructure a)
+            throws MathIllegalArgumentException {
+        factory.checkCompatibility(a.factory);
+        final DerivativeStructure ds = factory.build();
+        factory.getCompiler().add(data, 0, a.data, 0, ds.data, 0);
+        return ds;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if number of free parameters
+     *                                      or orders do not match
+     */
+    @Override
+    public DerivativeStructure subtract(final DerivativeStructure a)
+            throws MathIllegalArgumentException {
+        factory.checkCompatibility(a.factory);
+        final DerivativeStructure ds = factory.build();
+        factory.getCompiler().subtract(data, 0, a.data, 0, ds.data, 0);
+        return ds;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DerivativeStructure negate() {
+        final DerivativeStructure ds = factory.build();
+        for (int i = 0; i < ds.data.length; ++i) {
+            ds.data[i] = -data[i];
+        }
+        return ds;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DerivativeStructure multiply(final int n) {
+        return multiply((double) n);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if number of free parameters
+     *                                      or orders do not match
+     */
+    @Override
+    public DerivativeStructure multiply(final DerivativeStructure a)
+            throws MathIllegalArgumentException {
+        factory.checkCompatibility(a.factory);
+        final DerivativeStructure result = factory.build();
+        factory.getCompiler().multiply(data, 0, a.data, 0, result.data, 0);
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if number of free parameters
+     *                                      or orders do not match
+     */
+    @Override
+    public DerivativeStructure divide(final DerivativeStructure a)
+            throws MathIllegalArgumentException {
+        factory.checkCompatibility(a.factory);
+        final DerivativeStructure result = factory.build();
+        factory.getCompiler().divide(data, 0, a.data, 0, result.data, 0);
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Field<DerivativeStructure> getField() {
+        return factory.getDerivativeField();
+    }
+
+    /**
+     * Return the exponent of the instance value, removing the bias.
+     * <p>
+     * For double numbers of the form 2<sup>x</sup>, the unbiased
+     * exponent is exactly x.
+     * </p>
+     *
+     * @return exponent for instance in IEEE754 representation, without bias
+     */
+    public int getExponent() {
+        return FastMath.getExponent(data[0]);
+    }
+
+    /**
+     * Compute composition of the instance by a univariate function.
+     *
+     * @param f array of value and derivatives of the function at
+     *          the current point (i.e. [f({@link #getValue()}),
+     *          f'({@link #getValue()}), f''({@link #getValue()})...]).
+     * @return f(this)
+     * @throws MathIllegalArgumentException if the number of derivatives
+     *                                      in the array is not equal to {@link #getOrder() order} + 1
+     */
+    public DerivativeStructure compose(final double... f)
+            throws MathIllegalArgumentException {
+
+        MathUtils.checkDimension(f.length, getOrder() + 1);
+        final DerivativeStructure result = factory.build();
+        factory.getCompiler().compose(data, 0, f, result.data, 0);
+        return result;
+    }
+
+    /**
+     * Convert radians to degrees, with error of less than 0.5 ULP
+     *
+     * @return instance converted into degrees
+     */
+    public DerivativeStructure toDegrees() {
+        final DerivativeStructure ds = factory.build();
+        for (int i = 0; i < ds.data.length; ++i) {
+            ds.data[i] = FastMath.toDegrees(data[i]);
+        }
+        return ds;
+    }
+
+    /**
+     * Convert degrees to radians, with error of less than 0.5 ULP
+     *
+     * @return instance converted into radians
+     */
+    public DerivativeStructure toRadians() {
+        final DerivativeStructure ds = factory.build();
+        for (int i = 0; i < ds.data.length; ++i) {
+            ds.data[i] = FastMath.toRadians(data[i]);
+        }
+        return ds;
+    }
+
+    /**
+     * Evaluate Taylor expansion a derivative structure.
+     *
+     * @param delta parameters offsets (&Delta;x, &Delta;y, ...)
+     * @return value of the Taylor expansion at x + &Delta;x, y + &Delta;y, ...
+     * @throws MathRuntimeException if factorials becomes too large
+     */
+    public double taylor(final double... delta) throws MathRuntimeException {
+        return factory.getCompiler().taylor(data, 0, delta);
     }
 
     /**

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -32,10 +37,10 @@ import org.hipparchus.util.MathUtils;
  * rely on the default, but rather carefully consider values that match
  * user's expectations, as well as the specifics of each implementation.
  *
- * @param <FUNC> Type of function to solve.
+ * @param <F> Type of function to solve.
  */
-public abstract class BaseAbstractUnivariateSolver<FUNC extends UnivariateFunction>
-        implements BaseUnivariateSolver<FUNC> {
+public abstract class BaseAbstractUnivariateSolver<F extends UnivariateFunction>
+        implements BaseUnivariateSolver<F> {
     /**
      * Default relative accuracy.
      */
@@ -75,7 +80,7 @@ public abstract class BaseAbstractUnivariateSolver<FUNC extends UnivariateFuncti
     /**
      * Function to solve.
      */
-    private FUNC function;
+    private F function;
 
     /**
      * Construct a solver with given absolute accuracy.
@@ -133,27 +138,6 @@ public abstract class BaseAbstractUnivariateSolver<FUNC extends UnivariateFuncti
     }
 
     /**
-     * @return the lower end of the search interval.
-     */
-    public double getMin() {
-        return searchMin;
-    }
-
-    /**
-     * @return the higher end of the search interval.
-     */
-    public double getMax() {
-        return searchMax;
-    }
-
-    /**
-     * @return the initial guess.
-     */
-    public double getStartValue() {
-        return searchStart;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -175,6 +159,57 @@ public abstract class BaseAbstractUnivariateSolver<FUNC extends UnivariateFuncti
     @Override
     public double getFunctionValueAccuracy() {
         return functionValueAccuracy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double solve(int maxEval, F f, double min, double max) {
+        return solve(maxEval, f, min, max, min + 0.5 * (max - min));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double solve(int maxEval, F f, double min, double max, double startValue)
+            throws MathIllegalArgumentException, MathIllegalStateException {
+        // Initialization.
+        setup(maxEval, f, min, max, startValue);
+
+        // Perform computation.
+        return doSolve();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double solve(int maxEval, F f, double startValue)
+            throws MathIllegalArgumentException, MathIllegalStateException {
+        return solve(maxEval, f, Double.NaN, Double.NaN, startValue);
+    }
+
+    /**
+     * @return the lower end of the search interval.
+     */
+    public double getMin() {
+        return searchMin;
+    }
+
+    /**
+     * @return the higher end of the search interval.
+     */
+    public double getMax() {
+        return searchMax;
+    }
+
+    /**
+     * @return the initial guess.
+     */
+    public double getStartValue() {
+        return searchStart;
     }
 
     /**
@@ -204,7 +239,7 @@ public abstract class BaseAbstractUnivariateSolver<FUNC extends UnivariateFuncti
      * @throws NullArgumentException if f is null
      */
     protected void setup(int maxEval,
-                         FUNC f,
+                         F f,
                          double min, double max,
                          double startValue)
             throws NullArgumentException {
@@ -217,36 +252,6 @@ public abstract class BaseAbstractUnivariateSolver<FUNC extends UnivariateFuncti
         searchStart = startValue;
         function = f;
         evaluations = evaluations.withMaximalCount(maxEval);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double solve(int maxEval, FUNC f, double min, double max, double startValue)
-            throws MathIllegalArgumentException, MathIllegalStateException {
-        // Initialization.
-        setup(maxEval, f, min, max, startValue);
-
-        // Perform computation.
-        return doSolve();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double solve(int maxEval, FUNC f, double min, double max) {
-        return solve(maxEval, f, min, max, min + 0.5 * (max - min));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double solve(int maxEval, FUNC f, double startValue)
-            throws MathIllegalArgumentException, MathIllegalStateException {
-        return solve(maxEval, f, Double.NaN, Double.NaN, startValue);
     }
 
     /**

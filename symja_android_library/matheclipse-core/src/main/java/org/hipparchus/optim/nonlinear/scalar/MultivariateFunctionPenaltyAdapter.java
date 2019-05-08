@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.scalar;
 
 import org.hipparchus.analysis.MultivariateFunction;
@@ -25,7 +30,7 @@ import org.hipparchus.util.MathUtils;
 /**
  * <p>Adapter extending bounded {@link MultivariateFunction} to an unbouded
  * domain using a penalty function.</p>
- * <p>
+ *
  * <p>
  * This adapter can be used to wrap functions subject to simple bounds on
  * parameters so they can be used by optimizers that do <em>not</em> directly
@@ -145,8 +150,7 @@ public class MultivariateFunctionPenaltyAdapter
                     lower.length, scale.length);
         }
         for (int i = 0; i < lower.length; ++i) {
-            // note the following test is written in such a way it also fails for NaN
-            if (!(upper[i] >= lower[i])) {
+            if (!(upper[i] >= lower[i])) { // NOPMD - the test is written in such a way it also fails for NaN
                 throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL,
                         upper[i], lower[i]);
             }

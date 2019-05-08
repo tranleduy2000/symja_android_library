@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.optim;
 
 /**
@@ -34,12 +39,12 @@ package org.hipparchus.optim;
  * set does not change much anymore, it does not use objective function value
  * at all.
  *
- * @param <PAIR> Type of the (point, objective value) pair.
+ * @param <P> Type of the (point, objective value) pair.
  * @see org.hipparchus.optim.SimplePointChecker
  * @see org.hipparchus.optim.SimpleValueChecker
  * @see org.hipparchus.optim.SimpleVectorValueChecker
  */
-public interface ConvergenceChecker<PAIR> {
+public interface ConvergenceChecker<P> {
     /**
      * Check if the optimization algorithm has converged.
      *
@@ -48,5 +53,5 @@ public interface ConvergenceChecker<PAIR> {
      * @param current   Best point in the current iteration.
      * @return {@code true} if the algorithm is considered to have converged.
      */
-    boolean converged(int iteration, PAIR previous, PAIR current);
+    boolean converged(int iteration, P previous, P current);
 }

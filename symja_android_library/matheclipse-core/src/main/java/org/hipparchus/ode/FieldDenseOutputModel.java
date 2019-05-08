@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode;
 
 import org.hipparchus.RealFieldElement;
@@ -23,7 +28,6 @@ import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.sampling.FieldODEStateInterpolator;
 import org.hipparchus.ode.sampling.FieldODEStepHandler;
-import org.hipparchus.ode.sampling.FieldODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 
 import java.util.ArrayList;
@@ -33,7 +37,7 @@ import java.util.List;
  * This class stores all information provided by an ODE integrator
  * during the integration process and build a continuous model of the
  * solution from this.
- * <p>
+ *
  * <p>This class act as a step handler from the integrator point of
  * view. It is called iteratively during the integration process and
  * stores a copy of all steps information in a sorted collection for
@@ -43,14 +47,14 @@ import java.util.List;
  * for the integration to be over before attempting to call {@link
  * #getInterpolatedState(RealFieldElement)} because some internal
  * variables are set only once the last step has been handled.</p>
- * <p>
+ *
  * <p>This is useful for example if the main loop of the user
  * application should remain independent from the integration process
  * or if one needs to mimic the behaviour of an analytical model
  * despite a numerical model is used (i.e. one needs the ability to
  * get the model value at any time or to navigate through the
  * data).</p>
- * <p>
+ *
  * <p>If problem modeling is done with several separate
  * integration phases for contiguous intervals, the same
  * ContinuousOutputModel can be used as step handler for all
@@ -64,7 +68,7 @@ import java.util.List;
  * output model handles the steps of all integration phases, the user
  * do not need to bother when the maneuver begins or ends, he has all
  * the data available in a transparent manner.</p>
- * <p>
+ *
  * <p>One should be aware that the amount of data stored in a
  * ContinuousOutputFieldModel instance can be important if the state vector
  * is large, if the integration interval is long or if the steps are
@@ -78,7 +82,6 @@ import java.util.List;
  */
 
 public class FieldDenseOutputModel<T extends RealFieldElement<T>>
-        extends FieldODEStepHandlerImpl<T>
         implements FieldODEStepHandler<T> {
 
     /**
@@ -111,7 +114,7 @@ public class FieldDenseOutputModel<T extends RealFieldElement<T>>
      * Build an empty continuous output model.
      */
     public FieldDenseOutputModel() {
-        steps = new ArrayList<FieldODEStateInterpolator<T>>();
+        steps = new ArrayList<>();
         initialTime = null;
         finalTime = null;
         forward = true;
@@ -133,11 +136,11 @@ public class FieldDenseOutputModel<T extends RealFieldElement<T>>
     public void append(final FieldDenseOutputModel<T> model)
             throws MathIllegalArgumentException, MathIllegalStateException {
 
-        if (model.steps.size() == 0) {
+        if (model.steps.isEmpty()) {
             return;
         }
 
-        if (steps.size() == 0) {
+        if (steps.isEmpty()) {
             initialTime = model.initialTime;
             forward = model.forward;
         } else {
@@ -213,10 +216,11 @@ public class FieldDenseOutputModel<T extends RealFieldElement<T>>
      * @throws MathIllegalStateException if the number of functions evaluations is exceeded
      *                                   during step finalization
      */
+    @Override
     public void handleStep(final FieldODEStateInterpolator<T> interpolator, final boolean isLast)
             throws MathIllegalStateException {
 
-        if (steps.size() == 0) {
+        if (steps.isEmpty()) {
             initialTime = interpolator.getPreviousState().getTime();
             forward = interpolator.isForward();
         }

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.summary;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -79,52 +84,6 @@ public class Sum extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        value += d;
-        n++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return n;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        value = 0;
-        n = 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void aggregate(Sum other) {
-        MathUtils.checkNotNull(other);
-        if (other.n > 0) {
-            this.n += other.n;
-            this.value += other.value;
-        }
-    }
-
-    /**
      * The sum of the entries in the specified portion of the input array,
      * or 0 if the designated subarray is empty.
      *
@@ -147,6 +106,14 @@ public class Sum extends AbstractStorelessUnivariateStatistic
             }
         }
         return sum;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getN() {
+        return n;
     }
 
     /**
@@ -194,6 +161,32 @@ public class Sum extends AbstractStorelessUnivariateStatistic
     @Override
     public Sum copy() {
         return new Sum(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void increment(final double d) {
+        value += d;
+        n++;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        value = 0;
+        n = 0;
     }
 
 }

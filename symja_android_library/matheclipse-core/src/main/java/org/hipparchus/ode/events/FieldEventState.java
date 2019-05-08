@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.events;
 
 import org.hipparchus.RealFieldElement;
@@ -32,7 +37,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class handles the state for one {@link FieldODEEventHandler
  * event handler} during integration steps.
- * <p>
+ *
  * <p>Each time the integrator proposes a step, the event handler
  * switching function should be checked. This class handles the state
  * of one handler during one integration step, with references to the
@@ -304,7 +309,7 @@ public class FieldEventState<T extends RealFieldElement<T>> {
 
     /**
      * Find a root in a bracketing interval.
-     * <p>
+     *
      * <p> When calling this method one of the following must be true. Either ga == 0, gb
      * == 0, (ga < 0  and gb > 0), or (ga > 0 and gb < 0).
      *
@@ -439,7 +444,7 @@ public class FieldEventState<T extends RealFieldElement<T>> {
 
     /**
      * Try to accept the current history up to the given time.
-     * <p>
+     *
      * <p> It is not necessary to call this method before calling {@link
      * #doEvent(FieldODEStateAndDerivative)} with the same state. It is necessary to call this
      * method before you call {@link #doEvent(FieldODEStateAndDerivative)} on some other event
@@ -529,7 +534,7 @@ public class FieldEventState<T extends RealFieldElement<T>> {
 
     /**
      * Get the next number after the given number in the current propagation direction.
-     * <p>
+     *
      * <p> Assumes T has the same precision as a double.
      *
      * @param t input time

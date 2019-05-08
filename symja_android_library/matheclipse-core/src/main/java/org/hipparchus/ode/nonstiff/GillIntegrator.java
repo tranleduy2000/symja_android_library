@@ -25,7 +25,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements the Gill fourth order Runge-Kutta
  * integrator for Ordinary Differential Equations .
- * <p>
+ *
  * <p>This method is an explicit Runge-Kutta method, its Butcher-array
  * is the following one :
  * <pre>

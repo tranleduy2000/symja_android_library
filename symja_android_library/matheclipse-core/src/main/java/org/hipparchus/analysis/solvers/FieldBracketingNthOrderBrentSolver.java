@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.solvers;
 
 
@@ -44,7 +49,6 @@ import org.hipparchus.util.MathUtils;
  * @param <T> the type of the field elements
  */
 public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
-        extends BracketedRealFieldUnivariateSolverImpl<T>
         implements BracketedRealFieldUnivariateSolver<T> {
 
     /**
@@ -122,6 +126,7 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      *
      * @return the maximal number of function evaluations.
      */
+    @Override
     public int getMaxEvaluations() {
         return evaluations.getMaximalCount();
     }
@@ -134,6 +139,7 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      *
      * @return the number of evaluations of the objective function.
      */
+    @Override
     public int getEvaluations() {
         return evaluations.getCount();
     }
@@ -143,6 +149,7 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      *
      * @return absolute accuracy
      */
+    @Override
     public T getAbsoluteAccuracy() {
         return absoluteAccuracy;
     }
@@ -152,6 +159,7 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      *
      * @return relative accuracy
      */
+    @Override
     public T getRelativeAccuracy() {
         return relativeAccuracy;
     }
@@ -161,6 +169,7 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      *
      * @return function accuracy
      */
+    @Override
     public T getFunctionValueAccuracy() {
         return functionValueAccuracy;
     }
@@ -181,6 +190,7 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      * @throws NullArgumentException        if f is null.
      * @throws MathIllegalArgumentException if root cannot be bracketed
      */
+    @Override
     public T solve(final int maxEval, final RealFieldUnivariateFunction<T> f,
                    final T min, final T max, final AllowedSolution allowedSolution)
             throws MathIllegalArgumentException, NullArgumentException {
@@ -204,12 +214,18 @@ public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
      * @throws NullArgumentException        if f is null.
      * @throws MathIllegalArgumentException if root cannot be bracketed
      */
+    @Override
     public T solve(final int maxEval, final RealFieldUnivariateFunction<T> f,
                    final T min, final T max, final T startValue,
                    final AllowedSolution allowedSolution)
             throws MathIllegalArgumentException, NullArgumentException {
         // find interval containing root
         return solveInterval(maxEval, f, min, max, startValue).getSide(allowedSolution);
+    }
+
+    @Override
+    public Interval<T> solveInterval(int maxEval, RealFieldUnivariateFunction<T> f, T min, T max) throws MathIllegalArgumentException, MathIllegalStateException {
+        return this.solveInterval(maxEval, f, min, max, min.add(max.subtract(min).multiply(0.5)));
     }
 
     /**

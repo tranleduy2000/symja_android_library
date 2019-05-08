@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -35,7 +40,7 @@ import java.util.Arrays;
 /**
  * This class implements implicit Adams-Moulton integrators for Ordinary
  * Differential Equations.
- * <p>
+ *
  * <p>Adams-Moulton methods (in fact due to Adams alone) are implicit
  * multistep ODE solvers. This implementation is a variation of the classical
  * one: it uses adaptive stepsize to implement error control, whereas
@@ -54,18 +59,18 @@ import java.util.Arrays;
  * <li>k = 4: y<sub>n+1</sub> = y<sub>n</sub> + h (9y'<sub>n+1</sub>+19y'<sub>n</sub>-5y'<sub>n-1</sub>+y'<sub>n-2</sub>)/24</li>
  * <li>...</li>
  * </ul>
- * <p>
+ *
  * <p>A k-steps Adams-Moulton method is of order k+1.</p>
- * <p>
+ *
  * <p> There must be sufficient time for the {@link #setStarterIntegrator(org.hipparchus.ode.FieldODEIntegrator)
  * starter integrator} to take several steps between the the last reset event, and the end
  * of integration, otherwise an exception may be thrown during integration. The user can
  * adjust the end date of integration, or the step size of the starter integrator to
  * ensure a sufficient number of steps can be completed before the end of integration.
  * </p>
- * <p>
+ *
  * <h3>Implementation details</h3>
- * <p>
+ *
  * <p>We define scaled derivatives s<sub>i</sub>(n) at step n as:
  * <pre>
  * s<sub>1</sub>(n) = h y'<sub>n</sub> for first derivative
@@ -89,7 +94,7 @@ import java.util.Arrays;
  * <li>k = 4: y<sub>n+1</sub> = y<sub>n</sub> + 9/24 s<sub>1</sub>(n+1) + [ 19/24 -5/24 1/24 ] q<sub>n+1</sub></li>
  * <li>...</li>
  * </ul></p>
- * <p>
+ *
  * <p>Instead of using the classical representation with first derivatives only (y<sub>n</sub>,
  * s<sub>1</sub>(n+1) and q<sub>n+1</sub>), our implementation uses the Nordsieck vector with
  * higher degrees scaled derivatives all taken at the same step (y<sub>n</sub>, s<sub>1</sub>(n)
@@ -99,7 +104,7 @@ import java.util.Arrays;
  * </pre>
  * (here again we omit the k index in the notation for clarity)
  * </p>
- * <p>
+ *
  * <p>Taylor series formulas show that for any index offset i, s<sub>1</sub>(n-i) can be
  * computed from s<sub>1</sub>(n), s<sub>2</sub>(n) ... s<sub>k</sub>(n), the formula being exact
  * for degree k polynomials.
@@ -158,7 +163,7 @@ import java.util.Arrays;
  * where the upper case Y<sub>n+1</sub>, S<sub>1</sub>(n+1) and R<sub>n+1</sub> represent the
  * predicted states whereas the lower case y<sub>n+1</sub>, s<sub>n+1</sub> and r<sub>n+1</sub>
  * represent the corrected states.</p>
- * <p>
+ *
  * <p>The P<sup>-1</sup>u vector and the P<sup>-1</sup> A P matrix do not depend on the state,
  * they only depend on k and therefore are precomputed once for all.</p>
  *
@@ -292,8 +297,8 @@ public class AdamsMoultonFieldIntegrator<T extends RealFieldElement<T>> extends 
             updateHighOrderDerivativesPhase2(predictedScaled, correctedScaled, predictedNordsieck);
 
             // discrete events handling
-            stepEnd = new FieldODEStateAndDerivative<T>(stepEnd.getTime(), predictedY, correctedYDot);
-            setStepStart(acceptStep(new AdamsFieldStateInterpolator<T>(getStepSize(), stepEnd,
+            stepEnd = new FieldODEStateAndDerivative<>(stepEnd.getTime(), predictedY, correctedYDot);
+            setStepStart(acceptStep(new AdamsFieldStateInterpolator<>(getStepSize(), stepEnd,
                             correctedScaled, predictedNordsieck, forward,
                             getStepStart(), stepEnd,
                             equations.getMapper()),
@@ -390,12 +395,15 @@ public class AdamsMoultonFieldIntegrator<T extends RealFieldElement<T>> extends 
 
         /**
          * Simple constructor.
+         * <p>
+         * All arrays will be stored by reference to caller arrays.
+         * </p>
          *
          * @param previous previous state
          * @param scaled   current scaled first derivative
          * @param state    state to correct (will be overwritten after visit)
          */
-        Corrector(final T[] previous, final T[] scaled, final T[] state) {
+        Corrector(final T[] previous, final T[] scaled, final T[] state) { // NOPMD - array reference storage is intentional and documented here
             this.previous = previous;
             this.scaled = scaled;
             this.after = state;
@@ -433,6 +441,7 @@ public class AdamsMoultonFieldIntegrator<T extends RealFieldElement<T>> extends 
          * @return the normalized correction, if greater than 1, the step
          * must be rejected
          */
+        @Override
         public T end() {
 
             T error = getField().getZero();

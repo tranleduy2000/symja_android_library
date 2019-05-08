@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.dfp;
 
 import org.hipparchus.Field;
@@ -256,28 +261,30 @@ public class DfpField implements Field<Dfp> {
      * @param highPrecisionDecimalDigits precision at which the string constants mus be computed
      */
     private static void computeStringConstants(final int highPrecisionDecimalDigits) {
-        if (sqr2String == null || sqr2String.length() < highPrecisionDecimalDigits - 3) {
+        synchronized (DfpField.class) {
+            if (sqr2String == null || sqr2String.length() < highPrecisionDecimalDigits - 3) {
 
-            // recompute the string representation of the transcendental constants
-            final DfpField highPrecisionField = new DfpField(highPrecisionDecimalDigits, false);
-            final Dfp highPrecisionOne = new Dfp(highPrecisionField, 1);
-            final Dfp highPrecisionTwo = new Dfp(highPrecisionField, 2);
-            final Dfp highPrecisionThree = new Dfp(highPrecisionField, 3);
+                // recompute the string representation of the transcendental constants
+                final DfpField highPrecisionField = new DfpField(highPrecisionDecimalDigits, false);
+                final Dfp highPrecisionOne = new Dfp(highPrecisionField, 1);
+                final Dfp highPrecisionTwo = new Dfp(highPrecisionField, 2);
+                final Dfp highPrecisionThree = new Dfp(highPrecisionField, 3);
 
-            final Dfp highPrecisionSqr2 = highPrecisionTwo.sqrt();
-            sqr2String = highPrecisionSqr2.toString();
-            sqr2ReciprocalString = highPrecisionOne.divide(highPrecisionSqr2).toString();
+                final Dfp highPrecisionSqr2 = highPrecisionTwo.sqrt();
+                sqr2String = highPrecisionSqr2.toString();
+                sqr2ReciprocalString = highPrecisionOne.divide(highPrecisionSqr2).toString();
 
-            final Dfp highPrecisionSqr3 = highPrecisionThree.sqrt();
-            sqr3String = highPrecisionSqr3.toString();
-            sqr3ReciprocalString = highPrecisionOne.divide(highPrecisionSqr3).toString();
+                final Dfp highPrecisionSqr3 = highPrecisionThree.sqrt();
+                sqr3String = highPrecisionSqr3.toString();
+                sqr3ReciprocalString = highPrecisionOne.divide(highPrecisionSqr3).toString();
 
-            piString = computePi(highPrecisionOne, highPrecisionTwo, highPrecisionThree).toString();
-            eString = computeExp(highPrecisionOne, highPrecisionOne).toString();
-            ln2String = computeLn(highPrecisionTwo, highPrecisionOne, highPrecisionTwo).toString();
-            ln5String = computeLn(new Dfp(highPrecisionField, 5), highPrecisionOne, highPrecisionTwo).toString();
-            ln10String = computeLn(new Dfp(highPrecisionField, 10), highPrecisionOne, highPrecisionTwo).toString();
+                piString = computePi(highPrecisionOne, highPrecisionTwo, highPrecisionThree).toString();
+                eString = computeExp(highPrecisionOne, highPrecisionOne).toString();
+                ln2String = computeLn(highPrecisionTwo, highPrecisionOne, highPrecisionTwo).toString();
+                ln5String = computeLn(new Dfp(highPrecisionField, 5), highPrecisionOne, highPrecisionTwo).toString();
+                ln10String = computeLn(new Dfp(highPrecisionField, 10), highPrecisionOne, highPrecisionTwo).toString();
 
+            }
         }
     }
 
@@ -365,7 +372,7 @@ public class DfpField implements Field<Dfp> {
      * <p>
      * -----          n+1         n
      * f(x) =   \           (-1)    (x - 1)
-     * /          ----------------    for 1 <= n <= infinity
+     * /          ----------------    for 1 &lt;= n &lt;= infinity
      * -----             n
      * <p>
      * or
@@ -823,21 +830,22 @@ public class DfpField implements Field<Dfp> {
      * @return an array of two {@link Dfp Dfp} instances which sum equals a
      */
     private Dfp[] split(final String a) {
-        Dfp result[] = new Dfp[2];
+        Dfp[] result = new Dfp[2];
         boolean leading = true;
         int sp = 0;
         int sig = 0;
 
-        char[] buf = new char[a.length()];
+        StringBuilder builder1 = new StringBuilder(a.length());
 
-        for (int i = 0; i < buf.length; i++) {
-            buf[i] = a.charAt(i);
+        for (int i = 0; i < a.length(); i++) {
+            final char c = a.charAt(i);
+            builder1.append(c);
 
-            if (buf[i] >= '1' && buf[i] <= '9') {
+            if (c >= '1' && c <= '9') {
                 leading = false;
             }
 
-            if (buf[i] == '.') {
+            if (c == '.') {
                 sig += (400 - sig) % 4;
                 leading = false;
             }
@@ -847,21 +855,24 @@ public class DfpField implements Field<Dfp> {
                 break;
             }
 
-            if (buf[i] >= '0' && buf[i] <= '9' && !leading) {
+            if (c >= '0' && c <= '9' && !leading) {
                 sig++;
             }
         }
 
-        result[0] = new Dfp(this, new String(buf, 0, sp));
+        result[0] = new Dfp(this, builder1.substring(0, sp));
 
-        for (int i = 0; i < buf.length; i++) {
-            buf[i] = a.charAt(i);
-            if (buf[i] >= '0' && buf[i] <= '9' && i < sp) {
-                buf[i] = '0';
+        StringBuilder builder2 = new StringBuilder(a.length());
+        for (int i = 0; i < a.length(); i++) {
+            final char c = a.charAt(i);
+            if (c >= '0' && c <= '9' && i < sp) {
+                builder2.append('0');
+            } else {
+                builder2.append(c);
             }
         }
 
-        result[1] = new Dfp(this, new String(buf));
+        result[1] = new Dfp(this, builder2.toString());
 
         return result;
 

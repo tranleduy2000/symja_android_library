@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -31,7 +36,7 @@ import org.hipparchus.util.MathUtils;
 /**
  * This class implements the common part of all embedded Runge-Kutta
  * integrators for Ordinary Differential Equations.
- * <p>
+ *
  * <p>These methods are embedded explicit Runge-Kutta methods with two
  * sets of coefficients allowing to estimate the error, their Butcher
  * arrays are as follows :
@@ -46,11 +51,11 @@ import org.hipparchus.util.MathUtils;
  *       |  b'1  b'2 ...   b's-1 b's
  * </pre>
  * </p>
- * <p>
+ *
  * <p>In fact, we rather use the array defined by ej = bj - b'j to
  * compute directly the error rather than computing two estimates and
  * then comparing them.</p>
- * <p>
+ *
  * <p>Some methods are qualified as <i>fsal</i> (first same as last)
  * methods. This means the last evaluation of the derivatives in one
  * step is the same as the first in the next step. Then, this
@@ -213,8 +218,8 @@ public abstract class EmbeddedRungeKuttaFieldIntegrator<T extends RealFieldEleme
      * @return external weights for the high order method from Butcher array
      */
     protected abstract RungeKuttaFieldStateInterpolator<T> createInterpolator(boolean forward, T[][] yDotK,
-                                                                              final FieldODEStateAndDerivative<T> globalPreviousState,
-                                                                              final FieldODEStateAndDerivative<T> globalCurrentState,
+                                                                              FieldODEStateAndDerivative<T> globalPreviousState,
+                                                                              FieldODEStateAndDerivative<T> globalCurrentState,
                                                                               FieldEquationsMapper<T> mapper);
 
     /**

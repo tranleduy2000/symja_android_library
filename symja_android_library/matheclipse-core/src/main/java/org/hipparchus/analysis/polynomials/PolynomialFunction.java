@@ -14,9 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.polynomials;
 
+import org.hipparchus.Field;
+import org.hipparchus.RealFieldElement;
+import org.hipparchus.analysis.FieldUnivariateFunction;
 import org.hipparchus.analysis.ParametricUnivariateFunction;
+import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.analysis.differentiation.DerivativeStructure;
 import org.hipparchus.analysis.differentiation.UnivariateDifferentiableFunction;
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -34,7 +43,7 @@ import java.util.Arrays;
  * <a href="http://mathworld.wolfram.com/HornersMethod.html">Horner's Method</a>
  * is used to evaluate the function.</p>
  */
-public class PolynomialFunction implements UnivariateDifferentiableFunction, Serializable {
+public class PolynomialFunction implements UnivariateDifferentiableFunction, FieldUnivariateFunction, Serializable {
     /**
      * Serialization identifier
      */
@@ -44,7 +53,7 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
      * coefficients[0] is the constant term and coefficients[n] is the
      * coefficient of x^n where n is the degree of the polynomial.
      */
-    private final double coefficients[];
+    private final double[] coefficients;
 
     /**
      * Construct a polynomial with the given coefficients.  The first element
@@ -60,7 +69,7 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
      * @throws NullArgumentException        if {@code c} is {@code null}.
      * @throws MathIllegalArgumentException if {@code c} is empty.
      */
-    public PolynomialFunction(double c[])
+    public PolynomialFunction(double[] c)
             throws MathIllegalArgumentException, NullArgumentException {
         super();
         MathUtils.checkNotNull(c);
@@ -191,6 +200,38 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
             throw new MathIllegalArgumentException(LocalizedCoreFormats.EMPTY_POLYNOMIALS_COEFFICIENTS_ARRAY);
         }
         DerivativeStructure result = t.getFactory().constant(coefficients[n - 1]);
+        for (int j = n - 2; j >= 0; j--) {
+            result = result.multiply(t).add(coefficients[j]);
+        }
+        return result;
+    }
+
+    @Override
+    public <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
+        return new RealFieldUnivariateFunction<T>() {
+            @Override
+            public T value(T x) {
+                return PolynomialFunction.this.value(x);
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@code coefficients} is empty.
+     * @throws NullArgumentException        if {@code coefficients} is {@code null}.
+     * @since 1.3
+     */
+    @Override
+    public <T extends RealFieldElement<T>> T value(final T t)
+            throws MathIllegalArgumentException, NullArgumentException {
+        MathUtils.checkNotNull(coefficients);
+        int n = coefficients.length;
+        if (n == 0) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.EMPTY_POLYNOMIALS_COEFFICIENTS_ARRAY);
+        }
+        T result = t.getField().getZero().add(coefficients[n - 1]);
         for (int j = n - 2; j >= 0; j--) {
             result = result.multiply(t).add(coefficients[j]);
         }
@@ -331,8 +372,34 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof PolynomialFunction)) {
+            return false;
+        }
+        PolynomialFunction other = (PolynomialFunction) obj;
+        return Arrays.equals(coefficients, other.coefficients);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(coefficients);
+        return result;
+    }
+
+    /**
      * Returns a string representation of the polynomial.
-     * <p>
+     *
      * <p>The representation is user oriented. Terms are displayed lowest
      * degrees first. The multiplications signs, coefficients equals to
      * one and null terms are not displayed (except if the polynomial is 0,
@@ -366,7 +433,7 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
                     }
                 } else {
                     if (coefficients[i] < 0) {
-                        s.append("-");
+                        s.append('-');
                     }
                 }
 
@@ -376,10 +443,10 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
                     s.append(' ');
                 }
 
-                s.append("x");
+                s.append('x');
                 if (i > 1) {
                     s.append('^');
-                    s.append(Integer.toString(i));
+                    s.append(i);
                 }
             }
         }
@@ -388,35 +455,18 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(coefficients);
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof PolynomialFunction)) {
-            return false;
-        }
-        PolynomialFunction other = (PolynomialFunction) obj;
-        return Arrays.equals(coefficients, other.coefficients);
-    }
-
-    /**
      * Dedicated parametric polynomial class.
      */
     public static class Parametric implements ParametricUnivariateFunction {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double value(final double x, final double... parameters)
+                throws MathIllegalArgumentException {
+            return PolynomialFunction.evaluate(parameters, x);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -429,15 +479,6 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Ser
                 xn *= x;
             }
             return gradient;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double value(final double x, final double... parameters)
-                throws MathIllegalArgumentException {
-            return PolynomialFunction.evaluate(parameters, x);
         }
     }
 }

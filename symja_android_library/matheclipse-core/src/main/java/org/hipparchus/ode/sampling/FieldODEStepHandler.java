@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.sampling;
 
 import org.hipparchus.RealFieldElement;
@@ -24,7 +29,7 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
 /**
  * This interface represents a handler that should be called after
  * each successful step.
- * <p>
+ *
  * <p>The ODE integrators compute the evolution of the state vector at
  * some grid points that depend on their own internal algorithm. Once
  * they have found a new grid point (possibly after having computed
@@ -65,8 +70,8 @@ public interface FieldODEStepHandler<T extends RealFieldElement<T>> {
      *                     object on each call, so if the instance wants to keep it across
      *                     all calls (for example to provide at the end of the integration a
      *                     continuous model valid throughout the integration range, as the
-     *                     {@link org.hipparchus.migration.ode.ContinuousOutputModel
-     *                     ContinuousOutputModel} class does), it should build a local copy
+     *                     {@link org.hipparchus.ode.DenseOutputModel
+     *                     DenseOutputModel} class does), it should build a local copy
      *                     using the clone method of the interpolator and store this copy.
      *                     Keeping only a reference to the interpolator and reusing it will
      *                     result in unpredictable behavior (potentially crashing the application).

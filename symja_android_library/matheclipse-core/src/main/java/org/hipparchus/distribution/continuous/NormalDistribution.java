@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -106,16 +111,6 @@ public class NormalDistribution extends AbstractRealDistribution {
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    public double logDensity(double x) {
-        final double x0 = x - mean;
-        final double x1 = x0 / standardDeviation;
-        return -0.5 * x1 * x1 - logStandardDeviationPlusHalfLog2Pi;
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
      * If {@code x} is more than 40 standard deviations from the mean, 0 or 1
      * is returned, as in these cases the actual value is within
@@ -128,32 +123,6 @@ public class NormalDistribution extends AbstractRealDistribution {
             return dev < 0 ? 0.0d : 1.0d;
         }
         return 0.5 * Erf.erfc(-dev / (standardDeviation * SQRT2));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double inverseCumulativeProbability(final double p) throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-        return mean + standardDeviation * SQRT2 * Erf.erfInv(2 * p - 1);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double probability(double x0,
-                              double x1)
-            throws MathIllegalArgumentException {
-        if (x0 > x1) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.LOWER_ENDPOINT_ABOVE_UPPER_ENDPOINT,
-                    x0, x1, true);
-        }
-        final double denom = standardDeviation * SQRT2;
-        final double v0 = (x0 - mean) / denom;
-        final double v1 = (x1 - mean) / denom;
-        return 0.5 * Erf.erf(v0, v1);
     }
 
     /**
@@ -215,5 +184,41 @@ public class NormalDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double probability(double x0,
+                              double x1)
+            throws MathIllegalArgumentException {
+        if (x0 > x1) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.LOWER_ENDPOINT_ABOVE_UPPER_ENDPOINT,
+                    x0, x1, true);
+        }
+        final double denom = standardDeviation * SQRT2;
+        final double v0 = (x0 - mean) / denom;
+        final double v1 = (x1 - mean) / denom;
+        return 0.5 * Erf.erf(v0, v1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double inverseCumulativeProbability(final double p) throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+        return mean + standardDeviation * SQRT2 * Erf.erfInv(2 * p - 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logDensity(double x) {
+        final double x0 = x - mean;
+        final double x1 = x0 / standardDeviation;
+        return -0.5 * x1 * x1 - logStandardDeviationPlusHalfLog2Pi;
     }
 }

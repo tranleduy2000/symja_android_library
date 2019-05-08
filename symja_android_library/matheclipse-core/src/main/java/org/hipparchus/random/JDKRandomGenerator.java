@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.random;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -25,7 +30,7 @@ import java.util.Random;
 
 /**
  * A {@link RandomGenerator} adapter that delegates the random number
- * generation to the standard {@link Random} class.
+ * generation to the standard {@link java.util.Random} class.
  */
 public class JDKRandomGenerator extends IntRandomGenerator implements Serializable {
 
@@ -106,6 +111,27 @@ public class JDKRandomGenerator extends IntRandomGenerator implements Serializab
      * {@inheritDoc}
      */
     @Override
+    public int nextInt(int n) {
+        try {
+            return delegate.nextInt(n);
+        } catch (IllegalArgumentException e) {
+            throw new MathIllegalArgumentException(e, LocalizedCoreFormats.NUMBER_TOO_SMALL_BOUND_EXCLUDED,
+                    n, 0);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double nextGaussian() {
+        return delegate.nextGaussian();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setSeed(int[] seed) {
         delegate.setSeed(convertToLong(seed));
     }
@@ -156,27 +182,6 @@ public class JDKRandomGenerator extends IntRandomGenerator implements Serializab
     @Override
     public double nextDouble() {
         return delegate.nextDouble();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double nextGaussian() {
-        return delegate.nextGaussian();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int nextInt(int n) {
-        try {
-            return delegate.nextInt(n);
-        } catch (IllegalArgumentException e) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL_BOUND_EXCLUDED,
-                    n, 0);
-        }
     }
 
 }

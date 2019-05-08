@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -277,49 +282,13 @@ public class LUDecomposition {
      * @return a solver
      */
     public DecompositionSolver getSolver() {
-        return new Solver(lu, pivot, singular);
+        return new Solver();
     }
 
     /**
      * Specialized solver.
      */
-    private static class Solver implements DecompositionSolver {
-
-        /**
-         * Entries of LU decomposition.
-         */
-        private final double[][] lu;
-
-        /**
-         * Pivot permutation associated with LU decomposition.
-         */
-        private final int[] pivot;
-
-        /**
-         * Singularity indicator.
-         */
-        private final boolean singular;
-
-        /**
-         * Build a solver from decomposed matrix.
-         *
-         * @param lu       entries of LU decomposition
-         * @param pivot    pivot permutation associated with LU decomposition
-         * @param singular singularity indicator
-         */
-        private Solver(final double[][] lu, final int[] pivot, final boolean singular) {
-            this.lu = lu;
-            this.pivot = pivot;
-            this.singular = singular;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            return !singular;
-        }
+    private class Solver implements DecompositionSolver {
 
         /**
          * {@inheritDoc}
@@ -418,6 +387,14 @@ public class LUDecomposition {
             }
 
             return new Array2DRowRealMatrix(bp, false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isNonSingular() {
+            return !singular;
         }
 
         /**

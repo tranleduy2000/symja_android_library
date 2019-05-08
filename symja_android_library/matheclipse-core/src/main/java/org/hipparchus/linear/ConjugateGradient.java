@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -52,7 +57,7 @@ import org.hipparchus.util.IterationManager;
  * <ul>
  * <li>key {@code "operator"} points to the offending linear operator, say L,</li>
  * <li>key {@code "vector"} points to the offending vector, say x, such that
- * x<sup>T</sup> &middot; L &middot; x < 0.</li>
+ * x<sup>T</sup> &middot; L &middot; x &lt; 0.</li>
  * </ul>
  * </p>
  * <h3>References</h3>
@@ -133,8 +138,21 @@ public class ConjugateGradient
      * matrix and preconditioner.
      *
      * @return {@code true} if the tests are to be performed
+     * @deprecated as of 1.4, replaced by {@link #shouldCheck()}
      */
-    public final boolean getCheck() {
+    @Deprecated
+    public final boolean getCheck() { // NOPMD - violation addressed by renaming method as of 1.4
+        return shouldCheck();
+    }
+
+    /**
+     * Returns {@code true} if positive-definiteness should be checked for both
+     * matrix and preconditioner.
+     *
+     * @return {@code true} if the tests are to be performed
+     * @since 1.4
+     */
+    public final boolean shouldCheck() {
         return check;
     }
 

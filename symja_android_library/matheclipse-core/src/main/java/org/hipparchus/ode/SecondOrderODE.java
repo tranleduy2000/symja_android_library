@@ -20,11 +20,11 @@ package org.hipparchus.ode;
 
 /**
  * This interface represents a second order differential equations set.
- * <p>
+ *
  * <p>This interface should be implemented by all real second order
  * differential equation problems before they can be handled by the
  * integrators {@link FirstOrderConverter converter to first order}.</p>
- * <p>
+ *
  * <p>A second order differential equations problem, as seen by an
  * integrator is the second time derivative <code>d2Y/dt^2</code> of a
  * state vector <code>Y</code>, both being one dimensional
@@ -32,7 +32,7 @@ package org.hipparchus.ode;
  * only on the current time <code>t</code>, on the state vector
  * <code>Y</code> and on the first time derivative of the state
  * vector.</p>
- * <p>
+ *
  * <p>For real problems, the derivative depends also on parameters
  * that do not belong to the state vector (dynamical model constants
  * for example). These constants are completely outside of the scope

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 /**
@@ -72,14 +77,6 @@ public class ChiSquaredDistribution extends AbstractRealDistribution {
     @Override
     public double density(double x) {
         return gamma.density(x);
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double logDensity(double x) {
-        return gamma.logDensity(x);
     }
 
     /**
@@ -146,5 +143,13 @@ public class ChiSquaredDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double logDensity(double x) {
+        return gamma.logDensity(x);
     }
 }

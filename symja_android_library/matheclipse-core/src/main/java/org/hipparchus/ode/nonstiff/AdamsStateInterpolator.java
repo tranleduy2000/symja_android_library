@@ -25,12 +25,12 @@ import org.hipparchus.util.FastMath;
 
 /**
  * This class implements an interpolator for integrators using Nordsieck representation.
- * <p>
+ *
  * <p>This interpolator computes dense output around the current point.
  * The interpolation equation is based on Taylor series formulas.
  *
  * @see org.hipparchus.ode.nonstiff.AdamsBashforthIntegrator
- * @see AdamsMoultonIntegrator
+ * @see org.hipparchus.ode.nonstiff.AdamsMoultonIntegrator
  */
 
 class AdamsStateInterpolator extends AbstractODEStateInterpolator {
@@ -173,6 +173,7 @@ class AdamsStateInterpolator extends AbstractODEStateInterpolator {
      * @param newMapper              equations mapper for the all equations
      * @return a new instance
      */
+    @Override
     protected AdamsStateInterpolator create(boolean newForward,
                                             ODEStateAndDerivative newGlobalPreviousState,
                                             ODEStateAndDerivative newGlobalCurrentState,

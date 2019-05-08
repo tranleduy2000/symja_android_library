@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.complex;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -34,6 +39,8 @@ import java.util.Locale;
  * be replaced with 'j' (or anything else), and the number format for both real
  * and imaginary parts can be configured.
  */
+@SuppressWarnings("PMD.SingleMethodSingleton")
+// the violations have been taken care of as of 1.4, they correspond to deprecated methods
 public class ComplexFormat {
 
     /**
@@ -175,9 +182,21 @@ public class ComplexFormat {
      * Returns the default complex format for the current locale.
      *
      * @return the default complex format.
+     * @since 1.4
      */
+    public static ComplexFormat getComplexFormat() {
+        return getComplexFormat(Locale.getDefault());
+    }
+
+    /**
+     * Returns the default complex format for the current locale.
+     *
+     * @return the default complex format.
+     * @deprecated as of 1.4, replaced by {@link #getComplexFormat()}
+     */
+    @Deprecated
     public static ComplexFormat getInstance() {
-        return getInstance(Locale.getDefault());
+        return getComplexFormat();
     }
 
     /**
@@ -185,10 +204,23 @@ public class ComplexFormat {
      *
      * @param locale the specific locale used by the format.
      * @return the complex format specific to the given locale.
+     * @since 1.4
      */
-    public static ComplexFormat getInstance(Locale locale) {
+    public static ComplexFormat getComplexFormat(Locale locale) {
         NumberFormat f = CompositeFormat.getDefaultNumberFormat(locale);
         return new ComplexFormat(f);
+    }
+
+    /**
+     * Returns the default complex format for the given locale.
+     *
+     * @param locale the specific locale used by the format.
+     * @return the complex format specific to the given locale.
+     * @deprecated as of 1.4, replaced by {@link #getComplexFormat(Locale)}
+     */
+    @Deprecated
+    public static ComplexFormat getInstance(Locale locale) {
+        return getComplexFormat(locale);
     }
 
     /**
@@ -201,11 +233,30 @@ public class ComplexFormat {
      *                                      {@code null}.
      * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
      *                                      empty string.
+     * @since 1.4
      */
-    public static ComplexFormat getInstance(String imaginaryCharacter, Locale locale)
+    public static ComplexFormat getComplexFormat(String imaginaryCharacter, Locale locale)
             throws MathIllegalArgumentException, NullArgumentException {
         NumberFormat f = CompositeFormat.getDefaultNumberFormat(locale);
         return new ComplexFormat(imaginaryCharacter, f);
+    }
+
+    /**
+     * Returns the default complex format for the given locale.
+     *
+     * @param locale             the specific locale used by the format.
+     * @param imaginaryCharacter Imaginary character.
+     * @return the complex format specific to the given locale.
+     * @throws NullArgumentException        if {@code imaginaryCharacter} is
+     *                                      {@code null}.
+     * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
+     *                                      empty string.
+     * @deprecated as of 1.4, replaced by {@link #getComplexFormat(String, Locale)}
+     */
+    @Deprecated
+    public static ComplexFormat getInstance(String imaginaryCharacter, Locale locale)
+            throws MathIllegalArgumentException, NullArgumentException {
+        return getComplexFormat(imaginaryCharacter, locale);
     }
 
     /**
@@ -299,7 +350,7 @@ public class ComplexFormat {
      *                   offsets of the alignment field
      * @return the value passed in as toAppendTo.
      * @throws MathIllegalArgumentException is {@code obj} is not a valid type.
-     * @see java.text.Format#format(Object, StringBuffer, FieldPosition)
+     * @see java.text.Format#format(java.lang.Object, java.lang.StringBuffer, java.text.FieldPosition)
      */
     public StringBuffer format(Object obj, StringBuffer toAppendTo,
                                FieldPosition pos)

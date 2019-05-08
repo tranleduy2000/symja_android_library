@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -34,11 +39,11 @@ import org.hipparchus.util.Pair;
  * {@code true} if the number of iterations has been set (see
  * {@link #SimplePointChecker(double, double, int) this constructor}).
  *
- * @param <PAIR> Type of the (point, value) pair.
- *               The type of the "value" part of the pair (not used by this class).
+ * @param <P> Type of the (point, value) pair.
+ *            The type of the "value" part of the pair (not used by this class).
  */
-public class SimplePointChecker<PAIR extends Pair<double[], ? extends Object>>
-        extends AbstractConvergenceChecker<PAIR> {
+public class SimplePointChecker<P extends Pair<double[], ? extends Object>>
+        extends AbstractConvergenceChecker<P> {
     /**
      * If {@link #maxIterationCount} is set to this value, the number of
      * iterations will never cause {@link #converged(int, Pair, Pair)}
@@ -108,8 +113,8 @@ public class SimplePointChecker<PAIR extends Pair<double[], ? extends Object>>
      */
     @Override
     public boolean converged(final int iteration,
-                             final PAIR previous,
-                             final PAIR current) {
+                             final P previous,
+                             final P current) {
         if (maxIterationCount != ITERATION_CHECK_DISABLED && iteration >= maxIterationCount) {
             return true;
         }

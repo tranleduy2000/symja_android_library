@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
-package org.hipparchus.util;
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 
+package org.hipparchus.util;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -194,7 +198,7 @@ public class MultidimensionalCounter implements Iterable<Integer> {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < dimension; i++) {
-            sb.append("[").append(getCount(i)).append("]");
+            sb.append('[').append(getCount(i)).append(']');
         }
         return sb.toString();
     }
@@ -258,6 +262,14 @@ public class MultidimensionalCounter implements Iterable<Integer> {
         }
 
         /**
+         * @throws UnsupportedOperationException
+         */
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
          * Get the current unidimensional counter slot.
          *
          * @return the index within the unidimensionl counter.
@@ -288,14 +300,6 @@ public class MultidimensionalCounter implements Iterable<Integer> {
          */
         public int getCount(int dim) {
             return counter[dim];
-        }
-
-        /**
-         * @throws UnsupportedOperationException
-         */
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
     }
 }

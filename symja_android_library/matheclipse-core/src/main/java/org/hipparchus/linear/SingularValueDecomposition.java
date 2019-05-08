@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -312,7 +317,7 @@ public class SingularValueDecomposition {
                 // indefinitely in case of NaNs because comparison on NaNs
                 // always return false, regardless of what is checked
                 // see issue MATH-947
-                if (!(FastMath.abs(e[k]) > threshold)) {
+                if (!(FastMath.abs(e[k]) > threshold)) { // NOPMD - as explained above, the way this test is written is correct
                     e[k] = 0;
                     break;
                 }
@@ -345,7 +350,7 @@ public class SingularValueDecomposition {
             }
             k++;
             // Perform the task indicated by kase.
-            switch (kase) {
+            switch (kase) { // NOPMD - breaking this complex algorithm into functions just to keep PMD happy would be artificial
                 // Deflate negligible s(p).
                 case 1: {
                     double f = e[p - 2];
@@ -623,7 +628,7 @@ public class SingularValueDecomposition {
         }, 0, dimension - 1, 0, p - 1);
 
         RealMatrix jv = new Array2DRowRealMatrix(data, false);
-        return jv.transpose().multiply(jv);
+        return jv.transposeMultiply(jv);
     }
 
     /**
@@ -736,7 +741,7 @@ public class SingularValueDecomposition {
          *
          * @param b Right-hand side of the equation A &times; X = B
          * @return a vector X that minimizes the two norm of A &times; X - B
-         * @throws MathIllegalArgumentException if the matrices dimensions do not match.
+         * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
          */
         @Override
         public RealVector solve(final RealVector b) {
@@ -752,7 +757,7 @@ public class SingularValueDecomposition {
          *
          * @param b Right-hand side of the equation A &times; X = B
          * @return a matrix X that minimizes the two norm of A &times; X - B
-         * @throws MathIllegalArgumentException if the matrices dimensions do not match.
+         * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
          */
         @Override
         public RealMatrix solve(final RealMatrix b) {

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -175,73 +180,6 @@ public class Variance extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
-     * <p>If all values are available, it is more accurate to use
-     * {@link #evaluate(double[])} rather than adding values one at a time
-     * using this method and then executing {@link #getResult}, since
-     * <code>evaluate</code> leverages the fact that is has the full
-     * list of values together to execute a two-pass algorithm.
-     * See {@link Variance}.
-     * <p>
-     * Note also that when {@link #Variance(SecondMoment)} is used to
-     * create a Variance, this method does nothing. In that case, the
-     * SecondMoment should be incremented directly.
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        if (moment.n == 0) {
-            return Double.NaN;
-        } else if (moment.n == 1) {
-            return 0d;
-        } else {
-            if (isBiasCorrected) {
-                return moment.m2 / (moment.n - 1d);
-            } else {
-                return moment.m2 / (moment.n);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return moment.getN();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void aggregate(Variance other) {
-        MathUtils.checkNotNull(other);
-        if (incMoment) {
-            this.moment.aggregate(other.moment);
-        }
-    }
-
-    /**
      * Returns the variance of the entries in the specified portion of
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.  Note that Double.NaN may also be returned if the input
@@ -277,6 +215,14 @@ public class Variance extends AbstractStorelessUnivariateStatistic
             }
         }
         return var;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getN() {
+        return moment.getN();
     }
 
     /**
@@ -569,6 +515,54 @@ public class Variance extends AbstractStorelessUnivariateStatistic
     @Override
     public Variance copy() {
         return new Variance(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>If all values are available, it is more accurate to use
+     * {@link #evaluate(double[])} rather than adding values one at a time
+     * using this method and then executing {@link #getResult}, since
+     * <code>evaluate</code> leverages the fact that is has the full
+     * list of values together to execute a two-pass algorithm.
+     * See {@link Variance}.
+     * <p>
+     * Note also that when {@link #Variance(SecondMoment)} is used to
+     * create a Variance, this method does nothing. In that case, the
+     * SecondMoment should be incremented directly.
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        if (moment.n == 0) {
+            return Double.NaN;
+        } else if (moment.n == 1) {
+            return 0d;
+        } else {
+            if (isBiasCorrected) {
+                return moment.m2 / (moment.n - 1d);
+            } else {
+                return moment.m2 / (moment.n);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
     }
 
 }

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -26,7 +31,7 @@ import org.hipparchus.util.MathArrays;
 /**
  * This class implements a second order Runge-Kutta integrator for
  * Ordinary Differential Equations.
- * <p>
+ *
  * <p>This method is an explicit Runge-Kutta method, its Butcher-array
  * is the following one :
  * <pre>

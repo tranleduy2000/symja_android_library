@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.univariate;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -79,13 +84,6 @@ public abstract class UnivariateOptimizer
     }
 
     /**
-     * @return the optimization type.
-     */
-    public GoalType getGoalType() {
-        return goal;
-    }
-
-    /**
      * Scans the list of (required and optional) optimization data that
      * characterize the problem.
      *
@@ -121,6 +119,13 @@ public abstract class UnivariateOptimizer
                 continue;
             }
         }
+    }
+
+    /**
+     * @return the optimization type.
+     */
+    public GoalType getGoalType() {
+        return goal;
     }
 
     /**

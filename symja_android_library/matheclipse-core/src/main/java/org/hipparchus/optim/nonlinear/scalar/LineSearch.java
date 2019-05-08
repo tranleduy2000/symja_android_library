@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.scalar;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -116,8 +121,7 @@ public class LineSearch {
                 for (int i = 0; i < n; i++) {
                     x[i] = startPoint[i] + alpha * direction[i];
                 }
-                final double obj = mainOptimizer.computeObjectiveValue(x);
-                return obj;
+                return mainOptimizer.computeObjectiveValue(x);
             }
         };
 

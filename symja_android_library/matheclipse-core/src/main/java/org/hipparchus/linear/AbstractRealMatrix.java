@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -37,7 +42,7 @@ public abstract class AbstractRealMatrix
     /**
      * Default format.
      */
-    private static final RealMatrixFormat DEFAULT_FORMAT = RealMatrixFormat.getInstance(Locale.US);
+    private static final RealMatrixFormat DEFAULT_FORMAT = RealMatrixFormat.getRealMatrixFormat(Locale.US);
 
     static {
         // set the minimum fraction digits to 1 to keep compatibility
@@ -48,6 +53,7 @@ public abstract class AbstractRealMatrix
      * Creates a matrix with no data
      */
     protected AbstractRealMatrix() {
+        // This constructor is intentionally empty. Nothing special is needed here.
     }
 
     /**
@@ -67,6 +73,110 @@ public abstract class AbstractRealMatrix
             throw new MathIllegalArgumentException(LocalizedCoreFormats.AT_LEAST_ONE_COLUMN);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSquare() {
+        return getColumnDimension() == getRowDimension();
+    }
+
+    /**
+     * Returns the number of rows of this matrix.
+     *
+     * @return the number of rows.
+     */
+    @Override
+    public abstract int getRowDimension();
+
+    /**
+     * Returns the number of columns of this matrix.
+     *
+     * @return the number of columns.
+     */
+    @Override
+    public abstract int getColumnDimension();
+
+    /**
+     * Returns true iff <code>object</code> is a
+     * <code>RealMatrix</code> instance with the same dimensions as this
+     * and all corresponding matrix entries are equal.
+     *
+     * @param object the object to test equality against.
+     * @return true if object equals this
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof RealMatrix)) {
+            return false;
+        }
+        RealMatrix m = (RealMatrix) object;
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        if (m.getColumnDimension() != nCols || m.getRowDimension() != nRows) {
+            return false;
+        }
+        for (int row = 0; row < nRows; ++row) {
+            for (int col = 0; col < nCols; ++col) {
+                if (getEntry(row, col) != m.getEntry(row, col)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Computes a hashcode for the matrix.
+     *
+     * @return hashcode for matrix
+     */
+    @Override
+    public int hashCode() {
+        int ret = 7;
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        ret = ret * 31 + nRows;
+        ret = ret * 31 + nCols;
+        for (int row = 0; row < nRows; ++row) {
+            for (int col = 0; col < nCols; ++col) {
+                ret = ret * 31 + (11 * (row + 1) + 17 * (col + 1)) *
+                        MathUtils.hash(getEntry(row, col));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Get a string representation for this matrix.
+     *
+     * @return a string representation for this matrix
+     */
+    @Override
+    public String toString() {
+        final StringBuilder res = new StringBuilder();
+        String fullClassName = getClass().getName();
+        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
+        res.append(shortClassName).append(DEFAULT_FORMAT.format(this));
+        return res.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract RealMatrix createMatrix(int rowDimension, int columnDimension)
+            throws MathIllegalArgumentException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract RealMatrix copy();
 
     /**
      * {@inheritDoc}
@@ -167,6 +277,16 @@ public abstract class AbstractRealMatrix
         return out;
     }
 
+    @Override
+    public RealMatrix multiplyTransposed(RealMatrix m) throws MathIllegalArgumentException {
+        return multiply(m.transpose());
+    }
+
+    @Override
+    public RealMatrix transposeMultiply(RealMatrix m) throws MathIllegalArgumentException {
+        return transpose().multiply(m);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -209,7 +329,7 @@ public abstract class AbstractRealMatrix
          */
 
         final char[] binaryRepresentation = Integer.toBinaryString(power).toCharArray();
-        final ArrayList<Integer> nonZeroPositions = new ArrayList<Integer>();
+        final ArrayList<Integer> nonZeroPositions = new ArrayList<>();
         int maxI = -1;
 
         for (int i = 0; i < binaryRepresentation.length; ++i) {
@@ -686,6 +806,20 @@ public abstract class AbstractRealMatrix
      * {@inheritDoc}
      */
     @Override
+    public abstract double getEntry(int row, int column)
+            throws MathIllegalArgumentException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract void setEntry(int row, int column, double value)
+            throws MathIllegalArgumentException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addToEntry(int row, int column, double increment)
             throws MathIllegalArgumentException {
         MatrixUtils.checkMatrixIndex(this, row, column);
@@ -722,30 +856,6 @@ public abstract class AbstractRealMatrix
 
         return out;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSquare() {
-        return getColumnDimension() == getRowDimension();
-    }
-
-    /**
-     * Returns the number of rows of this matrix.
-     *
-     * @return the number of rows.
-     */
-    @Override
-    public abstract int getRowDimension();
-
-    /**
-     * Returns the number of columns of this matrix.
-     *
-     * @return the number of columns.
-     */
-    @Override
-    public abstract int getColumnDimension();
 
     /**
      * {@inheritDoc}
@@ -796,9 +906,9 @@ public abstract class AbstractRealMatrix
     @Override
     public RealVector operate(final RealVector v)
             throws MathIllegalArgumentException {
-        try {
+        if (v instanceof ArrayRealVector) {
             return new ArrayRealVector(operate(((ArrayRealVector) v).getDataRef()), false);
-        } catch (ClassCastException cce) {
+        } else {
             final int nRows = getRowDimension();
             final int nCols = getColumnDimension();
             if (v.getDimension() != nCols) {
@@ -849,9 +959,9 @@ public abstract class AbstractRealMatrix
      */
     @Override
     public RealVector preMultiply(final RealVector v) throws MathIllegalArgumentException {
-        try {
+        if (v instanceof ArrayRealVector) {
             return new ArrayRealVector(preMultiply(((ArrayRealVector) v).getDataRef()), false);
-        } catch (ClassCastException cce) {
+        } else {
 
             final int nRows = getRowDimension();
             final int nCols = getColumnDimension();
@@ -1021,6 +1131,12 @@ public abstract class AbstractRealMatrix
         return visitor.end();
     }
 
+
+    /*
+     * Empty implementations of these methods are provided in order to allow for
+     * the use of the @Override tag with Java 1.5.
+     */
+
     /**
      * {@inheritDoc}
      */
@@ -1060,105 +1176,4 @@ public abstract class AbstractRealMatrix
             throws MathIllegalArgumentException {
         return walkInRowOrder(visitor, startRow, endRow, startColumn, endColumn);
     }
-
-    /**
-     * Get a string representation for this matrix.
-     *
-     * @return a string representation for this matrix
-     */
-    @Override
-    public String toString() {
-        final StringBuilder res = new StringBuilder();
-        String fullClassName = getClass().getName();
-        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
-        res.append(shortClassName);
-        res.append(DEFAULT_FORMAT.format(this));
-        return res.toString();
-    }
-
-    /**
-     * Returns true iff <code>object</code> is a
-     * <code>RealMatrix</code> instance with the same dimensions as this
-     * and all corresponding matrix entries are equal.
-     *
-     * @param object the object to test equality against.
-     * @return true if object equals this
-     */
-    @Override
-    public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object instanceof RealMatrix == false) {
-            return false;
-        }
-        RealMatrix m = (RealMatrix) object;
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        if (m.getColumnDimension() != nCols || m.getRowDimension() != nRows) {
-            return false;
-        }
-        for (int row = 0; row < nRows; ++row) {
-            for (int col = 0; col < nCols; ++col) {
-                if (getEntry(row, col) != m.getEntry(row, col)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Computes a hashcode for the matrix.
-     *
-     * @return hashcode for matrix
-     */
-    @Override
-    public int hashCode() {
-        int ret = 7;
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        ret = ret * 31 + nRows;
-        ret = ret * 31 + nCols;
-        for (int row = 0; row < nRows; ++row) {
-            for (int col = 0; col < nCols; ++col) {
-                ret = ret * 31 + (11 * (row + 1) + 17 * (col + 1)) *
-                        MathUtils.hash(getEntry(row, col));
-            }
-        }
-        return ret;
-    }
-
-
-    /*
-     * Empty implementations of these methods are provided in order to allow for
-     * the use of the @Override tag with Java 1.5.
-     */
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract RealMatrix createMatrix(int rowDimension, int columnDimension)
-            throws MathIllegalArgumentException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract RealMatrix copy();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract double getEntry(int row, int column)
-            throws MathIllegalArgumentException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract void setEntry(int row, int column, double value)
-            throws MathIllegalArgumentException;
 }

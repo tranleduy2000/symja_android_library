@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -97,16 +102,6 @@ public class UniformRealDistribution extends AbstractRealDistribution {
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    public double inverseCumulativeProbability(final double p)
-            throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-        return p * (upper - lower) + lower;
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
      * For lower bound {@code lower} and upper bound {@code upper}, the mean is
      * {@code 0.5 * (lower + upper)}.
@@ -164,6 +159,16 @@ public class UniformRealDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double inverseCumulativeProbability(final double p)
+            throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+        return p * (upper - lower) + lower;
     }
 
 }

@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 /**
  * An algorithm that can be applied to a non-linear least squares problem.
- *
  */
 public interface LeastSquaresOptimizer {
 
     /**
      * Solve the non-linear least squares problem.
-     *
      *
      * @param leastSquaresProblem the problem definition, including model function and
      *                            convergence criteria.

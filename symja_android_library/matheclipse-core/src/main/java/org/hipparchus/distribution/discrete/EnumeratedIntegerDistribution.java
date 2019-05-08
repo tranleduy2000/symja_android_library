@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.distribution.EnumeratedDistribution;
@@ -62,7 +67,7 @@ public class EnumeratedIntegerDistribution extends AbstractIntegerDistribution {
     public EnumeratedIntegerDistribution(final int[] singletons, final double[] probabilities)
             throws MathIllegalArgumentException {
         innerDistribution =
-                new EnumeratedDistribution<Integer>(createDistribution(singletons, probabilities));
+                new EnumeratedDistribution<>(createDistribution(singletons, probabilities));
     }
 
     /**
@@ -92,7 +97,7 @@ public class EnumeratedIntegerDistribution extends AbstractIntegerDistribution {
             index++;
         }
         innerDistribution =
-                new EnumeratedDistribution<Integer>(createDistribution(values, probabilities));
+                new EnumeratedDistribution<>(createDistribution(values, probabilities));
     }
 
     /**
@@ -224,7 +229,7 @@ public class EnumeratedIntegerDistribution extends AbstractIntegerDistribution {
     }
 
     /**
-     * Return the probability mass function as a list of <value, probability> pairs.
+     * Return the probability mass function as a list of (value, probability) pairs.
      *
      * @return the probability mass function.
      */

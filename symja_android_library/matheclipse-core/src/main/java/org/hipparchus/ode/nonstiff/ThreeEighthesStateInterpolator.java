@@ -23,7 +23,7 @@ import org.hipparchus.ode.ODEStateAndDerivative;
 /**
  * This class implements a step interpolator for the 3/8 fourth
  * order Runge-Kutta integrator.
- * <p>
+ *
  * <p>This interpolator allows to compute dense output inside the last
  * step computed. The interpolation equation is consistent with the
  * integration scheme :

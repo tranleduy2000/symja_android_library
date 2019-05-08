@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.analysis.function.Sqrt;
@@ -86,7 +91,7 @@ public class JacobiPreconditioner implements RealLinearOperator {
      * {@inheritDoc}
      */
     @Override
-    public int getColumnDimension() {
+    public int getRowDimension() {
         return diag.getDimension();
     }
 
@@ -94,7 +99,7 @@ public class JacobiPreconditioner implements RealLinearOperator {
      * {@inheritDoc}
      */
     @Override
-    public int getRowDimension() {
+    public int getColumnDimension() {
         return diag.getDimension();
     }
 
@@ -121,14 +126,6 @@ public class JacobiPreconditioner implements RealLinearOperator {
         return new RealLinearOperator() {
             /** {@inheritDoc} */
             @Override
-            public RealVector operate(final RealVector x) {
-                return new ArrayRealVector(MathArrays.ebeDivide(x.toArray(),
-                        sqrtDiag.toArray()),
-                        false);
-            }
-
-            /** {@inheritDoc} */
-            @Override
             public int getRowDimension() {
                 return sqrtDiag.getDimension();
             }
@@ -137,6 +134,14 @@ public class JacobiPreconditioner implements RealLinearOperator {
             @Override
             public int getColumnDimension() {
                 return sqrtDiag.getDimension();
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public RealVector operate(final RealVector x) {
+                return new ArrayRealVector(MathArrays.ebeDivide(x.toArray(),
+                        sqrtDiag.toArray()),
+                        false);
             }
         };
     }

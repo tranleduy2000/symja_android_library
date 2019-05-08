@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.sampling;
 
 import org.hipparchus.RealFieldElement;
@@ -25,7 +30,7 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
 /**
  * This abstract class represents an interpolator over the last step
  * during an ODE integration.
- * <p>
+ *
  * <p>The various ODE integrators provide objects extending this class
  * to the step handlers. The handlers can use these objects to
  * retrieve the state vector at intermediate times between the

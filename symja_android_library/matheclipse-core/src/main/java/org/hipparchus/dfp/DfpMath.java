@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.dfp;
 
 /**
@@ -46,22 +51,22 @@ public class DfpMath {
      * @return an array of two {@link Dfp} which sum is a
      */
     protected static Dfp[] split(final DfpField field, final String a) {
-        Dfp result[] = new Dfp[2];
-        char[] buf;
+        Dfp[] result = new Dfp[2];
         boolean leading = true;
         int sp = 0;
         int sig = 0;
 
-        buf = new char[a.length()];
+        StringBuilder builder1 = new StringBuilder(a.length());
 
-        for (int i = 0; i < buf.length; i++) {
-            buf[i] = a.charAt(i);
+        for (int i = 0; i < a.length(); i++) {
+            final char c = a.charAt(i);
+            builder1.append(c);
 
-            if (buf[i] >= '1' && buf[i] <= '9') {
+            if (c >= '1' && c <= '9') {
                 leading = false;
             }
 
-            if (buf[i] == '.') {
+            if (c == '.') {
                 sig += (400 - sig) % 4;
                 leading = false;
             }
@@ -71,21 +76,24 @@ public class DfpMath {
                 break;
             }
 
-            if (buf[i] >= '0' && buf[i] <= '9' && !leading) {
+            if (c >= '0' && c <= '9' && !leading) {
                 sig++;
             }
         }
 
-        result[0] = field.newDfp(new String(buf, 0, sp));
+        result[0] = field.newDfp(builder1.substring(0, sp));
 
-        for (int i = 0; i < buf.length; i++) {
-            buf[i] = a.charAt(i);
-            if (buf[i] >= '0' && buf[i] <= '9' && i < sp) {
-                buf[i] = '0';
+        StringBuilder builder2 = new StringBuilder(a.length());
+        for (int i = 0; i < a.length(); i++) {
+            final char c = a.charAt(i);
+            if (c >= '0' && c <= '9' && i < sp) {
+                builder2.append('0');
+            } else {
+                builder2.append(c);
             }
         }
 
-        result[1] = field.newDfp(new String(buf));
+        result[1] = field.newDfp(builder2.toString());
 
         return result;
     }
@@ -299,7 +307,7 @@ public class DfpMath {
 
     /**
      * Computes e to the given power.
-     * Where -1 < a < 1.  Use the classic Taylor series.  1 + x**2/2! + x**3/3! + x**4/4!  ...
+     * Where -1 &lt; a &lt; 1.  Use the classic Taylor series.  1 + x**2/2! + x**3/3! + x**4/4!  ...
      *
      * @param a power at which e should be raised
      * @return e<sup>a</sup>
@@ -327,7 +335,7 @@ public class DfpMath {
      * Returns the natural logarithm of a.
      * a is first split into three parts such that  a = (10000^h)(2^j)k.
      * ln(a) is computed by ln(a) = ln(5)*h + ln(2)*(h+j) + ln(k)
-     * k is in the range 2/3 < k <4/3 and is passed on to a series expansion.
+     * k is in the range 2/3 &lt; k &lt; 4/3 and is passed on to a series expansion.
      *
      * @param a number from which logarithm is requested
      * @return log(a)
@@ -403,7 +411,7 @@ public class DfpMath {
      * <p>
      * -----          n+1         n
      * f(x) =   \           (-1)    (x - 1)
-     * /          ----------------    for 1 <= n <= infinity
+     * /          ----------------    for 1 &lt;= n &lt;= infinity
      * -----             n
      * <p>
      * or
@@ -452,7 +460,7 @@ public class DfpMath {
      * @param a number from which logarithm is requested, in split form
      * @return log(a)
      */
-    protected static Dfp[] logInternal(final Dfp a[]) {
+    protected static Dfp[] logInternal(final Dfp[] a) {
 
         /* Now we want to compute x = (a-1)/(a+1) but this is prone to
          * loss of precision.  So instead, compute x = (a/4 - 1/4) / (a/4 + 1/4)
@@ -486,7 +494,7 @@ public class DfpMath {
      * Computes x to the y power.<p>
      * <p>
      * Uses the following method:<p>
-     * <p>
+     *
      * <ol>
      * <li> Set u = rint(y), v = y-u
      * <li> Compute a = v * ln(x)
@@ -494,30 +502,30 @@ public class DfpMath {
      * <li> Compute c = a - b*ln(2)
      * <li> x<sup>y</sup> = x<sup>u</sup>  *   2<sup>b</sup> * e<sup>c</sup>
      * </ol>
-     * if |y| > 1e8, then we compute by exp(y*ln(x))   <p>
-     * <p>
+     * if |y| &gt; 1e8, then we compute by exp(y*ln(x))   <p>
+     *
      * <b>Special Cases</b><p>
      * <ul>
      * <li>  if y is 0.0 or -0.0 then result is 1.0
      * <li>  if y is 1.0 then result is x
      * <li>  if y is NaN then result is NaN
      * <li>  if x is NaN and y is not zero then result is NaN
-     * <li>  if |x| > 1.0 and y is +Infinity then result is +Infinity
-     * <li>  if |x| < 1.0 and y is -Infinity then result is +Infinity
-     * <li>  if |x| > 1.0 and y is -Infinity then result is +0
-     * <li>  if |x| < 1.0 and y is +Infinity then result is +0
+     * <li>  if |x| &gt; 1.0 and y is +Infinity then result is +Infinity
+     * <li>  if |x| &lt; 1.0 and y is -Infinity then result is +Infinity
+     * <li>  if |x| &gt; 1.0 and y is -Infinity then result is +0
+     * <li>  if |x| &lt; 1.0 and y is +Infinity then result is +0
      * <li>  if |x| = 1.0 and y is +/-Infinity then result is NaN
-     * <li>  if x = +0 and y > 0 then result is +0
-     * <li>  if x = +Inf and y < 0 then result is +0
-     * <li>  if x = +0 and y < 0 then result is +Inf
-     * <li>  if x = +Inf and y > 0 then result is +Inf
-     * <li>  if x = -0 and y > 0, finite, not odd integer then result is +0
-     * <li>  if x = -0 and y < 0, finite, and odd integer then result is -Inf
-     * <li>  if x = -Inf and y > 0, finite, and odd integer then result is -Inf
-     * <li>  if x = -0 and y < 0, not finite odd integer then result is +Inf
-     * <li>  if x = -Inf and y > 0, not finite odd integer then result is +Inf
-     * <li>  if x < 0 and y > 0, finite, and odd integer then result is -(|x|<sup>y</sup>)
-     * <li>  if x < 0 and y > 0, finite, and not integer then result is NaN
+     * <li>  if x = +0 and y &gt; 0 then result is +0
+     * <li>  if x = +Inf and y &lt; 0 then result is +0
+     * <li>  if x = +0 and y &lt; 0 then result is +Inf
+     * <li>  if x = +Inf and y &gt; 0 then result is +Inf
+     * <li>  if x = -0 and y &gt; 0, finite, not odd integer then result is +0
+     * <li>  if x = -0 and y &lt; 0, finite, and odd integer then result is -Inf
+     * <li>  if x = -Inf and y &gt; 0, finite, and odd integer then result is -Inf
+     * <li>  if x = -0 and y &lt; 0, not finite odd integer then result is +Inf
+     * <li>  if x = -Inf and y &gt; 0, not finite odd integer then result is +Inf
+     * <li>  if x &lt; 0 and y &gt; 0, finite, and odd integer then result is -(|x|<sup>y</sup>)
+     * <li>  if x &lt; 0 and y &gt; 0, finite, and not integer then result is NaN
      * </ul>
      *
      * @param x base to be raised
@@ -685,13 +693,13 @@ public class DfpMath {
     }
 
     /**
-     * Computes sin(a)  Used when 0 < a < pi/4.
+     * Computes sin(a)  Used when 0 &lt; a &lt; pi/4.
      * Uses the classic Taylor series.  x - x**3/3! + x**5/5!  ...
      *
      * @param a number from which sine is desired, in split form
      * @return sin(a)
      */
-    protected static Dfp sinInternal(Dfp a[]) {
+    protected static Dfp sinInternal(Dfp[] a) {
 
         Dfp c = a[0].add(a[1]);
         Dfp y = c;
@@ -717,13 +725,13 @@ public class DfpMath {
     }
 
     /**
-     * Computes cos(a)  Used when 0 < a < pi/4.
+     * Computes cos(a)  Used when 0 &lt; a &lt; pi/4.
      * Uses the classic Taylor series for cosine.  1 - x**2/2! + x**4/4!  ...
      *
      * @param a number from which cosine is desired, in split form
      * @return cos(a)
      */
-    protected static Dfp cosInternal(Dfp a[]) {
+    protected static Dfp cosInternal(Dfp[] a) {
         final Dfp one = a[0].getOne();
 
 
@@ -785,7 +793,7 @@ public class DfpMath {
         if (x.lessThan(pi.divide(4))) {
             y = sinInternal(split(x));
         } else {
-            final Dfp c[] = new Dfp[2];
+            final Dfp[] c = new Dfp[2];
             final Dfp[] piSplit = a.getField().getPiSplit();
             c[0] = piSplit[0].divide(2).subtract(x);
             c[1] = piSplit[1].divide(2);
@@ -831,13 +839,13 @@ public class DfpMath {
 
         Dfp y;
         if (x.lessThan(pi.divide(4))) {
-            Dfp c[] = new Dfp[2];
+            Dfp[] c = new Dfp[2];
             c[0] = x;
             c[1] = zero;
 
             y = cosInternal(c);
         } else {
-            final Dfp c[] = new Dfp[2];
+            final Dfp[] c = new Dfp[2];
             final Dfp[] piSplit = a.getField().getPiSplit();
             c[0] = piSplit[0].divide(2).subtract(x);
             c[1] = piSplit[1].divide(2);
@@ -927,7 +935,7 @@ public class DfpMath {
         }
 
         if (x.greaterThan(ty)) {
-            Dfp sty[] = new Dfp[2];
+            Dfp[] sty = new Dfp[2];
             sub = true;
 
             sty[0] = sqr2Split[0].subtract(one);

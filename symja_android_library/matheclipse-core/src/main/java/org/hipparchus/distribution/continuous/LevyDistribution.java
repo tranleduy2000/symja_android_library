@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -90,22 +95,6 @@ public class LevyDistribution extends AbstractRealDistribution {
     /**
      * {@inheritDoc}
      * <p>
-     * See documentation of {@link #density(double)} for computation details.
-     */
-    @Override
-    public double logDensity(double x) {
-        if (x < mu) {
-            return Double.NaN;
-        }
-
-        final double delta = x - mu;
-        final double f = halfC / delta;
-        return 0.5 * FastMath.log(f / FastMath.PI) - f - FastMath.log(delta);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
      * From Wikipedia: the cumulative distribution function is
      * </p>
      * <pre>
@@ -118,34 +107,6 @@ public class LevyDistribution extends AbstractRealDistribution {
             return Double.NaN;
         }
         return Erf.erfc(FastMath.sqrt(halfC / (x - mu)));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double inverseCumulativeProbability(final double p) throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-        final double t = Erf.erfcInv(p);
-        return mu + halfC / (t * t);
-    }
-
-    /**
-     * Get the scale parameter of the distribution.
-     *
-     * @return scale parameter of the distribution
-     */
-    public double getScale() {
-        return c;
-    }
-
-    /**
-     * Get the location parameter of the distribution.
-     *
-     * @return location parameter of the distribution
-     */
-    public double getLocation() {
-        return mu;
     }
 
     /**
@@ -186,6 +147,50 @@ public class LevyDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double inverseCumulativeProbability(final double p) throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+        final double t = Erf.erfcInv(p);
+        return mu + halfC / (t * t);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * See documentation of {@link #density(double)} for computation details.
+     */
+    @Override
+    public double logDensity(double x) {
+        if (x < mu) {
+            return Double.NaN;
+        }
+
+        final double delta = x - mu;
+        final double f = halfC / delta;
+        return 0.5 * FastMath.log(f / FastMath.PI) - f - FastMath.log(delta);
+    }
+
+    /**
+     * Get the scale parameter of the distribution.
+     *
+     * @return scale parameter of the distribution
+     */
+    public double getScale() {
+        return c;
+    }
+
+    /**
+     * Get the location parameter of the distribution.
+     *
+     * @return location parameter of the distribution
+     */
+    public double getLocation() {
+        return mu;
     }
 
 }

@@ -22,7 +22,7 @@ import org.hipparchus.ode.ODEStateAndDerivative;
 
 /**
  * This class implements a linear interpolator for step.
- * <p>
+ *
  * <p>This interpolator computes dense output inside the last
  * step computed. The interpolation equation is consistent with the
  * integration scheme :

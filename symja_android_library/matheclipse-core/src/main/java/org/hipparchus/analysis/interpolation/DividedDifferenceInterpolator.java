@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.interpolation;
 
 import org.hipparchus.analysis.polynomials.PolynomialFunctionLagrangeForm;
@@ -57,7 +62,7 @@ public class DividedDifferenceInterpolator
      * @throws MathIllegalArgumentException if the number of points is less than 2.
      * @throws MathIllegalArgumentException if {@code x} is not sorted in strictly increasing order.
      */
-    protected static double[] computeDividedDifference(final double x[], final double y[])
+    protected static double[] computeDividedDifference(final double[] x, final double[] y)
             throws MathIllegalArgumentException {
         PolynomialFunctionLagrangeForm.verifyInterpolationArray(x, y, true);
 
@@ -89,7 +94,7 @@ public class DividedDifferenceInterpolator
      *                                      strictly increasing order.
      */
     @Override
-    public PolynomialFunctionNewtonForm interpolate(double x[], double y[])
+    public PolynomialFunctionNewtonForm interpolate(double[] x, double[] y)
             throws MathIllegalArgumentException {
         /**
          * a[] and c[] are defined in the general formula of Newton form:

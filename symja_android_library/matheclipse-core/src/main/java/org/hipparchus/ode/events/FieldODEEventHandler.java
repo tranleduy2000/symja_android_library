@@ -24,17 +24,17 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
 /**
  * This interface represents a handler for discrete events triggered
  * during ODE integration.
- * <p>
+ *
  * <p>Some events can be triggered at discrete times as an ODE problem
  * is solved. This occurs for example when the integration process
  * should be stopped as some state is reached (G-stop facility) when the
  * precise date is unknown a priori, or when the derivatives have
  * states boundaries crossings.
  * </p>
- * <p>
+ *
  * <p>These events are defined as occurring when a <code>g</code>
  * switching function sign changes.</p>
- * <p>
+ *
  * <p>Since events are only problem-dependent and are triggered by the
  * independent <i>time</i> variable and the state vector, they can
  * occur at virtually any time, unknown in advance. The integrators will
@@ -51,10 +51,25 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
  */
 public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
 
+    /**
+     * Initialize event handler at the start of an ODE integration.
+     * <p>
+     * This method is called once at the start of the integration. It
+     * may be used by the event handler to initialize some internal data
+     * if needed.
+     * </p>
+     * <p>
+     * The default implementation does nothing
+     * </p>
+     *
+     * @param initialState initial time, state vector and derivative
+     * @param finalTime    target time for the integration
+     */
+    void init(FieldODEStateAndDerivative<T> initialState, T finalTime);
 
     /**
      * Compute the value of the switching function.
-     * <p>
+     *
      * <p>The discrete events are generated when the sign of this
      * switching function changes. The integrator will take care to change
      * the stepsize in such a way these events occur exactly at step boundaries.
@@ -85,6 +100,15 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
      * back, so the solvers sees a {@code g(state)} function which behaves smoothly even
      * across events.</p>
      *
+     * <p>This method is idempotent, that is calling this multiple times with the same
+     * state will result in the same value, with two exceptions. First, the definition of
+     * the g function may change when an {@link #eventOccurred(FieldODEStateAndDerivative,
+     * boolean) event occurs} on this handler, as in the above example. Second, the
+     * definition of the g function may change when the {@link
+     * #eventOccurred(FieldODEStateAndDerivative, boolean) eventOccurred} method of any
+     * other event handler in the same integrator returns {@link Action#RESET_EVENTS},
+     * {@link Action#RESET_DERIVATIVES}, or {@link Action#RESET_STATE}.
+     *
      * @param state current value of the independent <i>time</i> variable, state vector
      *              and derivative
      * @return value of the g switching function
@@ -93,7 +117,7 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
 
     /**
      * Handle an event and choose what to do next.
-     * <p>
+     *
      * <p>This method is called when the integrator has accepted a step
      * ending exactly on a sign change of the function, just <em>before</em>
      * the step handler itself is called (see below for scheduling). It
@@ -103,7 +127,7 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
      * differential equations} to switch the derivatives computation in
      * case of discontinuity), or to direct the integrator to either stop
      * or continue integration, possibly with a reset state or derivatives.</p>
-     * <p>
+     *
      * <ul>
      * <li>if {@link Action#STOP} is returned, the step handler will be called
      * with the <code>isLast</code> flag of the {@link
@@ -115,11 +139,13 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
      * derivatives,</li>
      * <li>if {@link Action#RESET_DERIVATIVES} is returned, the integrator
      * will recompute the derivatives,
+     * <li>if {@link Action#RESET_EVENTS} is returned, the integrator
+     * will recheck all event handlers,
      * <li>if {@link Action#CONTINUE} is returned, no specific action will
      * be taken (apart from having called this method) and integration
      * will continue.</li>
      * </ul>
-     * <p>
+     *
      * <p>The scheduling between this method and the {@link
      * org.hipparchus.ode.sampling.FieldODEStepHandler FieldODEStepHandler} method {@link
      * org.hipparchus.ode.sampling.FieldODEStepHandler#handleStep
@@ -146,13 +172,14 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
      *                   to physical time, not with respect to integration which may go backward in time)
      * @return indication of what the integrator should do next, this
      * value must be one of {@link Action#STOP}, {@link Action#RESET_STATE},
-     * {@link Action#RESET_DERIVATIVES} or {@link Action#CONTINUE}
+     * {@link Action#RESET_DERIVATIVES}, {@link Action#RESET_EVENTS}, or
+     * {@link Action#CONTINUE}
      */
     Action eventOccurred(FieldODEStateAndDerivative<T> state, boolean increasing);
 
     /**
      * Reset the state prior to continue the integration.
-     * <p>
+     *
      * <p>This method is called after the step handler has returned and
      * before the next step is started, but only when {@link
      * #eventOccurred(FieldODEStateAndDerivative, boolean) eventOccurred} has itself
@@ -168,5 +195,4 @@ public interface FieldODEEventHandler<T extends RealFieldElement<T>> {
      */
     FieldODEState<T> resetState(FieldODEStateAndDerivative<T> state);
 
-    void init(FieldODEStateAndDerivative<T> s0WithDerivatives, T t);
 }

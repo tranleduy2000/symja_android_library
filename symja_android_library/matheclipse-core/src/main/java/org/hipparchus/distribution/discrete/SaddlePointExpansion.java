@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.special.Gamma;
@@ -165,7 +170,7 @@ final class SaddlePointExpansion {
      * @param n the number of trials.
      * @param p the probability of success.
      * @param q the probability of failure (1 - p).
-     * @return log(p(x)).
+     * @return log(p ( x)).
      */
     static double logBinomialProbability(int x, int n, double p, double q) {
         if (n == 0) {

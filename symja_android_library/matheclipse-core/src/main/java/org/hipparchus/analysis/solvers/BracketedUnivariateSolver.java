@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -39,16 +44,16 @@ import org.hipparchus.util.FastMath;
  * algorithms can usually only guarantee that the solution (the root that
  * was found) is around the actual root.</li>
  * </ul>
- * <p>
+ *
  * <p>For backwards compatibility, all root-finding algorithms must have
  * {@link AllowedSolution#ANY_SIDE ANY_SIDE} as default for the allowed
  * solutions.</p>
  *
- * @param <FUNC> Type of function to solve.
+ * @param <F> Type of function to solve.
  * @see AllowedSolution
  */
-public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
-        extends BaseUnivariateSolver<FUNC> {
+public interface BracketedUnivariateSolver<F extends UnivariateFunction>
+        extends BaseUnivariateSolver<F> {
 
     /**
      * Solve for a zero in the given interval.
@@ -67,7 +72,7 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @throws org.hipparchus.exception.MathIllegalStateException    if
      *                                                               the allowed number of evaluations is exceeded.
      */
-    double solve(int maxEval, FUNC f, double min, double max,
+    double solve(int maxEval, F f, double min, double max,
                  AllowedSolution allowedSolution);
 
     /**
@@ -88,13 +93,13 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @throws org.hipparchus.exception.MathIllegalStateException    if
      *                                                               the allowed number of evaluations is exceeded.
      */
-    double solve(int maxEval, FUNC f, double min, double max, double startValue,
+    double solve(int maxEval, F f, double min, double max, double startValue,
                  AllowedSolution allowedSolution);
 
     /**
      * Solve for a zero in the given interval and return a tolerance interval surrounding
      * the root.
-     * <p>
+     *
      * <p> It is required that the starting interval brackets a root or that the function
      * value at either end point is 0.0.
      *
@@ -105,9 +110,9 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @return an interval [ta, tb] such that for some t in [ta, tb] f(t) == 0.0 or has a
      * step wise discontinuity that crosses zero. Both end points also satisfy the
      * convergence criteria so either one could be used as the root. That is the interval
-     * satisfies the condition (| tb - ta | <= {@link #getAbsoluteAccuracy() absolute}
+     * satisfies the condition (| tb - ta | &lt;= {@link #getAbsoluteAccuracy() absolute}
      * accuracy + max(ta, tb) * {@link #getRelativeAccuracy() relative} accuracy) or (
-     * max(|f(ta)|, |f(tb)|) <= {@link #getFunctionValueAccuracy()}) or there are no
+     * max(|f(ta)|, |f(tb)|) &lt;= {@link #getFunctionValueAccuracy()}) or there are no
      * floating point numbers between ta and tb. The width of the interval (tb - ta) may
      * be zero.
      * @throws MathIllegalArgumentException if the arguments do not satisfy the
@@ -115,13 +120,13 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @throws MathIllegalStateException    if the allowed number of evaluations is
      *                                      exceeded.
      */
-    Interval solveInterval(int maxEval, FUNC f, double min, double max)
+     Interval solveInterval(int maxEval, F f, double min, double max)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**
      * Solve for a zero in the given interval and return a tolerance interval surrounding
      * the root.
-     * <p>
+     *
      * <p> It is required that the starting interval brackets a root or that the function
      * value at either end point is 0.0.
      *
@@ -133,9 +138,9 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @return an interval [ta, tb] such that for some t in [ta, tb] f(t) == 0.0 or has a
      * step wise discontinuity that crosses zero. Both end points also satisfy the
      * convergence criteria so either one could be used as the root. That is the interval
-     * satisfies the condition (| tb - ta | <= {@link #getAbsoluteAccuracy() absolute}
+     * satisfies the condition (| tb - ta | &lt;= {@link #getAbsoluteAccuracy() absolute}
      * accuracy + max(ta, tb) * {@link #getRelativeAccuracy() relative} accuracy) or (
-     * max(|f(ta)|, |f(tb)|) <= {@link #getFunctionValueAccuracy()}) or there are no
+     * max(|f(ta)|, |f(tb)|) &lt;= {@link #getFunctionValueAccuracy()}) or there are no
      * floating point numbers between ta and tb. The width of the interval (tb - ta) may
      * be zero.
      * @throws MathIllegalArgumentException if the arguments do not satisfy the
@@ -143,12 +148,12 @@ public interface BracketedUnivariateSolver<FUNC extends UnivariateFunction>
      * @throws MathIllegalStateException    if the allowed number of evaluations is
      *                                      exceeded.
      */
-    Interval solveInterval(int maxEval, FUNC f, double min, double max, double startValue)
+    Interval solveInterval(int maxEval, F f, double min, double max, double startValue)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**
      * An interval of a function that brackets a root.
-     * <p>
+     *
      * <p> Contains two end points and the value of the function at the two end points.
      *
      * @see #solveInterval(int, UnivariateFunction, double, double, double)

@@ -30,7 +30,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This abstract class holds the common part of all adaptive
  * stepsize integrators for Ordinary Differential Equations.
- * <p>
+ *
  * <p>These algorithms perform integration with stepsize control, which
  * means the user does not specify the integration step but rather a
  * tolerance on error. The error threshold is computed as
@@ -45,14 +45,14 @@ import org.hipparchus.util.FastMath;
  * <p>
  * If the Ordinary Differential Equations is an {@link org.hipparchus.ode.ExpandableODE
  * extended ODE} rather than a {@link
- * org.hipparchus.migration.ode.FirstOrderDifferentialEquations basic ODE}, then
+ * org.hipparchus.ode.OrdinaryDifferentialEquation basic ODE}, then
  * <em>only</em> the {@link org.hipparchus.ode.ExpandableODE#getPrimary() primary part}
  * of the state vector is used for stepsize control, not the complete state vector.
  * </p>
- * <p>
+ *
  * <p>If the estimated error for ym+1 is such that
  * <pre>
- * sqrt((sum (errEst_i / threshold_i)^2 ) / n) < 1
+ * sqrt((sum (errEst_i / threshold_i)^2 ) / n) &lt; 1
  * </pre>
  * <p>
  * (where n is the main set dimension) then the step is accepted,

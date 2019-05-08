@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -27,13 +32,13 @@ import org.hipparchus.util.MathArrays;
 /**
  * This class implements the Luther sixth order Runge-Kutta
  * integrator for Ordinary Differential Equations.
- * <p>
+ *
  * <p>
  * This method is described in H. A. Luther 1968 paper <a
  * href="http://www.ams.org/journals/mcom/1968-22-102/S0025-5718-68-99876-1/S0025-5718-68-99876-1.pdf">
  * An explicit Sixth-Order Runge-Kutta Formula</a>.
  * </p>
- * <p>
+ *
  * <p>This method is an explicit Runge-Kutta method, its Butcher-array
  * is the following one :
  * <pre>

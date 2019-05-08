@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.polynomials;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -35,17 +40,17 @@ public class PolynomialFunctionLagrangeForm implements UnivariateFunction {
     /**
      * Interpolating points (abscissas).
      */
-    private final double x[];
+    private final double[] x;
     /**
      * Function values at interpolating points.
      */
-    private final double y[];
+    private final double[] y;
     /**
      * The coefficients of the polynomial, ordered by degree -- i.e.
      * coefficients[0] is the constant term and coefficients[n] is the
      * coefficient of x^n where n is the degree of the polynomial.
      */
-    private double coefficients[];
+    private double[] coefficients;
     /**
      * Whether the polynomial coefficients are available.
      */
@@ -63,7 +68,7 @@ public class PolynomialFunctionLagrangeForm implements UnivariateFunction {
      * @throws MathIllegalArgumentException if the number of points is less than 2.
      * @throws MathIllegalArgumentException if two abscissae have the same value.
      */
-    public PolynomialFunctionLagrangeForm(double x[], double y[])
+    public PolynomialFunctionLagrangeForm(double[] x, double[] y)
             throws MathIllegalArgumentException {
         this.x = new double[x.length];
         this.y = new double[y.length];
@@ -93,7 +98,7 @@ public class PolynomialFunctionLagrangeForm implements UnivariateFunction {
      * @throws MathIllegalArgumentException if the size of {@code x} is less
      *                                      than 2.
      */
-    public static double evaluate(double x[], double y[], double z)
+    public static double evaluate(double[] x, double[] y, double z)
             throws MathIllegalArgumentException {
         if (verifyInterpolationArray(x, y, false)) {
             return evaluateInternal(x, y, z);
@@ -126,7 +131,7 @@ public class PolynomialFunctionLagrangeForm implements UnivariateFunction {
      * @throws MathIllegalArgumentException                          if the size of {@code x} is less
      *                                                               than 2.
      */
-    private static double evaluateInternal(double x[], double y[], double z) {
+    private static double evaluateInternal(double[] x, double[] y, double z) {
         int nearest = 0;
         final int n = x.length;
         final double[] c = new double[n];
@@ -186,7 +191,7 @@ public class PolynomialFunctionLagrangeForm implements UnivariateFunction {
      * @see #evaluate(double[], double[], double)
      * @see #computeCoefficients()
      */
-    public static boolean verifyInterpolationArray(double x[], double y[], boolean abort)
+    public static boolean verifyInterpolationArray(double[] x, double[] y, boolean abort)
             throws MathIllegalArgumentException {
         MathArrays.checkEqualLength(x, y);
         if (x.length < 2) {

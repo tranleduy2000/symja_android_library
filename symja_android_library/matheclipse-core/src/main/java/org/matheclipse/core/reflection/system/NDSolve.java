@@ -45,6 +45,11 @@ public class NDSolve extends AbstractFunctionEvaluator {
 		}
 
 		@Override
+		public void init(double t0, double[] y0, double finalTime) {
+			// do nothing by default
+		}
+
+		@Override
 		public double[] computeDerivatives(double t, double[] xyz) {
 			double[] xyzDot = new double[fDimension];
 			IExpr[] replacements = new IExpr[fDimension];

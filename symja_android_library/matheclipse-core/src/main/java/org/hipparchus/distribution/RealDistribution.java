@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -83,8 +88,8 @@ public interface RealDistribution {
      * variable {@code X} distributed according to this distribution, the
      * returned value is
      * <ul>
-     * <li><code>inf{x in R | P(X<=x) >= p}</code> for {@code 0 < p <= 1},</li>
-     * <li><code>inf{x in R | P(X<=x) > 0}</code> for {@code p = 0}.</li>
+     * <li><code>inf{x in R | P(X&lt;=x) &gt;= p}</code> for {@code 0 < p <= 1},</li>
+     * <li><code>inf{x in R | P(X&lt;=x) &gt; 0}</code> for {@code p = 0}.</li>
      * </ul>
      *
      * @param p the cumulative probability
@@ -116,7 +121,7 @@ public interface RealDistribution {
      * Access the lower bound of the support. This method must return the same
      * value as {@code inverseCumulativeProbability(0)}. In other words, this
      * method must return
-     * <p><code>inf {x in R | P(X <= x) > 0}</code>.</p>
+     * <p><code>inf {x in R | P(X &lt;= x) &gt; 0}</code>.</p>
      *
      * @return lower bound of the support (might be
      * {@code Double.NEGATIVE_INFINITY})
@@ -127,7 +132,7 @@ public interface RealDistribution {
      * Access the upper bound of the support. This method must return the same
      * value as {@code inverseCumulativeProbability(1)}. In other words, this
      * method must return
-     * <p><code>inf {x in R | P(X <= x) = 1}</code>.</p>
+     * <p><code>inf {x in R | P(X &lt;= x) = 1}</code>.</p>
      *
      * @return upper bound of the support (might be
      * {@code Double.POSITIVE_INFINITY})

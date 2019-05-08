@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -28,7 +33,7 @@ import org.hipparchus.util.MathUtils;
 /**
  * This class implements the 8(5,3) Dormand-Prince integrator for Ordinary
  * Differential Equations.
- * <p>
+ *
  * <p>This integrator is an embedded Runge-Kutta integrator
  * of order 8(5,3) used in local extrapolation mode (i.e. the solution
  * is computed using the high order formula) with stepsize control
@@ -41,7 +46,7 @@ import org.hipparchus.util.MathUtils;
  * <i>fsal</i>. Hence, despite we have 13 stages here, the cost is
  * really 12 evaluations per step even if no interpolation is done,
  * and the overcost of interpolation is only 3 evaluations.</p>
- * <p>
+ *
  * <p>This method is based on an 8(6) method by Dormand and Prince
  * (i.e. order 8 for the integration and order 6 for error estimation)
  * modified by Hairer and Wanner to use a 5th order error estimator

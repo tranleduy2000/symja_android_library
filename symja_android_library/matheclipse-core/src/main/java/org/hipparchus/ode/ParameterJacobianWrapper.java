@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.ode;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -28,7 +33,7 @@ import java.util.Map;
  * Wrapper class to compute Jacobian matrices by finite differences for ODE
  * which do not compute them by themselves.
  */
-class ParameterJacobianWrapper extends ODEJacobiansProviderImpl implements ODEJacobiansProvider {
+class ParameterJacobianWrapper implements ODEJacobiansProvider {
 
     /**
      * ode base ordinary differential equation for which Jacobians
@@ -67,7 +72,7 @@ class ParameterJacobianWrapper extends ODEJacobiansProviderImpl implements ODEJa
         this.ode = ode;
         this.hY = hY.clone();
         this.controller = controller;
-        this.hParam = new HashMap<String, Double>();
+        this.hParam = new HashMap<>();
 
         // set up parameters for jacobian computation
         for (final ParameterConfiguration param : paramsAndSteps) {
@@ -93,6 +98,11 @@ class ParameterJacobianWrapper extends ODEJacobiansProviderImpl implements ODEJa
     @Override
     public int getDimension() {
         return ode.getDimension();
+    }
+
+    @Override
+    public void init(double t0, double[] y0, double finalTime) {
+        // do nothing by default
     }
 
     /**

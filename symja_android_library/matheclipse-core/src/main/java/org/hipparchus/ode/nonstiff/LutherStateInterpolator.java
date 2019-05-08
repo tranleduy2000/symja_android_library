@@ -24,7 +24,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class represents an interpolator over the last step during an
  * ODE integration for the 6th order Luther integrator.
- * <p>
+ *
  * <p>This interpolator computes dense output inside the last
  * step computed. The interpolation equation is consistent with the
  * integration scheme.</p>

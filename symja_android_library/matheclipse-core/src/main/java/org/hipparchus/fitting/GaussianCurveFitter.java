@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fitting;
 
 import org.hipparchus.analysis.function.Gaussian;
@@ -33,7 +38,7 @@ import java.util.List;
 
 /**
  * Fits points to a {@link
- * Gaussian.Parametric Gaussian}
+ * org.hipparchus.analysis.function.Gaussian.Parametric Gaussian}
  * function.
  * <br/>
  * The {@link #withStartPoint(double[]) initial guess values} must be passed
@@ -44,7 +49,7 @@ import java.util.List;
  * <li>Sigma</li>
  * </ul>
  * The optimal values will be returned in the same order.
- * <p>
+ *
  * <p>
  * Usage example:
  * <pre>
@@ -105,15 +110,14 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
     private final int maxIter;
 
     /**
-     * Contructor used by the factory methods.
+     * Constructor used by the factory methods.
      *
      * @param initialGuess Initial guess. If set to {@code null}, the initial guess
      *                     will be estimated using the {@link ParameterGuesser}.
      * @param maxIter      Maximum number of iterations of the optimization algorithm.
      */
-    private GaussianCurveFitter(double[] initialGuess,
-                                int maxIter) {
-        this.initialGuess = initialGuess;
+    private GaussianCurveFitter(double[] initialGuess, int maxIter) {
+        this.initialGuess = initialGuess == null ? null : initialGuess.clone();
         this.maxIter = maxIter;
     }
 
@@ -171,8 +175,8 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
             ++i;
         }
 
-        final TheoreticalValuesFunction model =
-                new TheoreticalValuesFunction(FUNCTION, observations);
+        final AbstractCurveFitter.TheoreticalValuesFunction model =
+                new AbstractCurveFitter.TheoreticalValuesFunction(FUNCTION, observations);
 
         final double[] startPoint = initialGuess != null ?
                 initialGuess :
@@ -194,7 +198,7 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
 
     /**
      * Guesses the parameters {@code norm}, {@code mean}, and {@code sigma}
-     * of a {@link Gaussian.Parametric}
+     * of a {@link org.hipparchus.analysis.function.Gaussian.Parametric}
      * based on the specified observed points.
      */
     public static class ParameterGuesser {
@@ -257,7 +261,7 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
          * @return the input observations, sorted.
          */
         private List<WeightedObservedPoint> sortObservations(Collection<WeightedObservedPoint> unsorted) {
-            final List<WeightedObservedPoint> observations = new ArrayList<WeightedObservedPoint>(unsorted);
+            final List<WeightedObservedPoint> observations = new ArrayList<>(unsorted);
 
             final Comparator<WeightedObservedPoint> cmp = new Comparator<WeightedObservedPoint>() {
                 /** {@inheritDoc} */

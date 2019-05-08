@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -86,6 +91,16 @@ public abstract class AbstractRealDistribution
                     x0, x1, true);
         }
         return cumulativeProbability(x1) - cumulativeProbability(x0);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default implementation simply computes the logarithm of {@code density(x)}.
+     */
+    @Override
+    public double logDensity(double x) {
+        return FastMath.log(density(x));
     }
 
     /**
@@ -212,16 +227,6 @@ public abstract class AbstractRealDistribution
      */
     protected double getSolverAbsoluteAccuracy() {
         return solverAbsoluteAccuracy;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The default implementation simply computes the logarithm of {@code density(x)}.
-     */
-    @Override
-    public double logDensity(double x) {
-        return FastMath.log(density(x));
     }
 }
 

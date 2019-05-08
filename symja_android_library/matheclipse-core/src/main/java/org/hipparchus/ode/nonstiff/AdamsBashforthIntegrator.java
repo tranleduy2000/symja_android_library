@@ -31,7 +31,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements explicit Adams-Bashforth integrators for Ordinary
  * Differential Equations.
- * <p>
+ *
  * <p>Adams-Bashforth methods (in fact due to Adams alone) are explicit
  * multistep ODE solvers. This implementation is a variation of the classical
  * one: it uses adaptive stepsize to implement error control, whereas
@@ -47,18 +47,18 @@ import org.hipparchus.util.FastMath;
  * <li>k = 4: y<sub>n+1</sub> = y<sub>n</sub> + h (55y'<sub>n</sub>-59y'<sub>n-1</sub>+37y'<sub>n-2</sub>-9y'<sub>n-3</sub>)/24</li>
  * <li>...</li>
  * </ul>
- * <p>
+ *
  * <p>A k-steps Adams-Bashforth method is of order k.</p>
- * <p>
+ *
  * <p> There must be sufficient time for the {@link #setStarterIntegrator(org.hipparchus.ode.ODEIntegrator)
  * starter integrator} to take several steps between the the last reset event, and the end
  * of integration, otherwise an exception may be thrown during integration. The user can
  * adjust the end date of integration, or the step size of the starter integrator to
  * ensure a sufficient number of steps can be completed before the end of integration.
  * </p>
- * <p>
+ *
  * <h3>Implementation details</h3>
- * <p>
+ *
  * <p>We define scaled derivatives s<sub>i</sub>(n) at step n as:
  * <pre>
  * s<sub>1</sub>(n) = h y'<sub>n</sub> for first derivative
@@ -82,7 +82,7 @@ import org.hipparchus.util.FastMath;
  * <li>k = 4: y<sub>n+1</sub> = y<sub>n</sub> + 55/24 s<sub>1</sub>(n) + [ -59/24 37/24 -9/24 ] q<sub>n</sub></li>
  * <li>...</li>
  * </ul></p>
- * <p>
+ *
  * <p>Instead of using the classical representation with first derivatives only (y<sub>n</sub>,
  * s<sub>1</sub>(n) and q<sub>n</sub>), our implementation uses the Nordsieck vector with
  * higher degrees scaled derivatives all taken at the same step (y<sub>n</sub>, s<sub>1</sub>(n)
@@ -92,7 +92,7 @@ import org.hipparchus.util.FastMath;
  * </pre>
  * (here again we omit the k index in the notation for clarity)
  * </p>
- * <p>
+ *
  * <p>Taylor series formulas show that for any index offset i, s<sub>1</sub>(n-i) can be
  * computed from s<sub>1</sub>(n), s<sub>2</sub>(n) ... s<sub>k</sub>(n), the formula being exact
  * for degree k polynomials.

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.exception;
 
 /**
@@ -34,6 +39,19 @@ public class MathIllegalArgumentException extends MathRuntimeException {
      */
     public MathIllegalArgumentException(Localizable pattern, Object... args) {
         super(pattern, args);
+    }
+
+    /**
+     * Simple constructor.
+     *
+     * @param cause     root cause.
+     * @param specifier format specifier (to be translated).
+     * @param parts     parts to insert in the format (no translation).
+     * @since 1.4
+     */
+    public MathIllegalArgumentException(final Throwable cause, final Localizable specifier,
+                                        final Object... parts) {
+        super(cause, specifier, parts);
     }
 
 }

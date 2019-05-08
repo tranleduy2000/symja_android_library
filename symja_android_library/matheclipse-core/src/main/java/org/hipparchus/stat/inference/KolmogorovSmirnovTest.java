@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.stat.inference;
 
 import org.hipparchus.distribution.RealDistribution;
@@ -60,21 +65,21 @@ import java.util.HashSet;
  * follows:
  * <ul>
  * <li>For small samples (where the product of the sample sizes is less than
- * {@value #LARGE_SAMPLE_PRODUCT}), the method presented in [4] is used to compute the
+ * {@link #LARGE_SAMPLE_PRODUCT}), the method presented in [4] is used to compute the
  * exact p-value for the 2-sample test.</li>
- * <li>When the product of the sample sizes exceeds {@value #LARGE_SAMPLE_PRODUCT}, the asymptotic
+ * <li>When the product of the sample sizes exceeds {@link #LARGE_SAMPLE_PRODUCT}, the asymptotic
  * distribution of \(D_{n,m}\) is used. See {@link #approximateP(double, int, int)} for details on
  * the approximation.</li>
  * </ul>
  * <p>
- * If the product of the sample sizes is less than {@value #LARGE_SAMPLE_PRODUCT} and the sample
+ * If the product of the sample sizes is less than {@link #LARGE_SAMPLE_PRODUCT} and the sample
  * data contains ties, random jitter is added to the sample data to break ties before applying
  * the algorithm above. Alternatively, the {@link #bootstrap(double[], double[], int, boolean)}
  * method, modeled after <a href="http://sekhon.berkeley.edu/matching/ks.boot.html">ks.boot</a>
  * in the R Matching package [3], can be used if ties are known to be present in the data.
  * <p>
  * In the two-sample case, \(D_{n,m}\) has a discrete distribution. This makes the p-value
- * associated with the null hypothesis \(H_0 : D_{n,m} \ge d \) differ from \(H_0 : D_{n,m} > d \)
+ * associated with the null hypothesis \(H_0 : D_{n,m} \ge d \) differ from \(H_0 : D_{n,m} &gt; d \)
  * by the mass of the observed value \(d\). To distinguish these, the two-sample tests use a boolean
  * {@code strict} parameter. This parameter is ignored for large samples.
  * <p>
@@ -204,7 +209,7 @@ public class KolmogorovSmirnovTest {
      * @return true if x and y together contain ties
      */
     private static boolean hasTies(double[] x, double[] y) {
-        final HashSet<Double> values = new HashSet<Double>();
+        final HashSet<Double> values = new HashSet<>();
         for (int i = 0; i < x.length; i++) {
             if (!values.add(x[i])) {
                 return true;
@@ -335,13 +340,13 @@ public class KolmogorovSmirnovTest {
      * large as {@code strict = false}) as {@code kolmogorovSmirnovStatistic(x, y)}.
      * <ul>
      * <li>For small samples (where the product of the sample sizes is less than
-     * {@value #LARGE_SAMPLE_PRODUCT}), the exact p-value is computed using the method presented
+     * {@link #LARGE_SAMPLE_PRODUCT}), the exact p-value is computed using the method presented
      * in [4], implemented in {@link #exactP(double, int, int, boolean)}. </li>
-     * <li>When the product of the sample sizes exceeds {@value #LARGE_SAMPLE_PRODUCT}, the
+     * <li>When the product of the sample sizes exceeds {@link #LARGE_SAMPLE_PRODUCT}, the
      * asymptotic distribution of \(D_{n,m}\) is used. See {@link #approximateP(double, int, int)}
      * for details on the approximation.</li>
      * </ul><p>
-     * If {@code x.length * y.length} < {@value #LARGE_SAMPLE_PRODUCT} and the combined set of values in
+     * If {@code x.length * y.length} &lt; {@link #LARGE_SAMPLE_PRODUCT} and the combined set of values in
      * {@code x} and {@code y} contains ties, random jitter is added to {@code x} and {@code y} to
      * break ties before computing \(D_{n,m}\) and the p-value. The jitter is uniformly distributed
      * on (-minDelta / 2, minDelta / 2) where minDelta is the smallest pairwise difference between
@@ -468,41 +473,6 @@ public class KolmogorovSmirnovTest {
     }
 
     /**
-     * Computes the <i>p-value</i>, or <i>observed significance level</i>, of a one-sample <a
-     * href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test"> Kolmogorov-Smirnov test</a>
-     * evaluating the null hypothesis that {@code data} conforms to {@code distribution}.
-     *
-     * @param distribution reference distribution
-     * @param data         sample being being evaluated
-     * @return the p-value associated with the null hypothesis that {@code data} is a sample from
-     * {@code distribution}
-     * @throws MathIllegalArgumentException                   if {@code data} does not have length at least 2
-     * @throws org.hipparchus.exception.NullArgumentException if {@code data} is null
-     */
-    public double kolmogorovSmirnovTest(RealDistribution distribution, double[] data) {
-        return kolmogorovSmirnovTest(distribution, data, false);
-    }
-
-    /**
-     * Performs a <a href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test"> Kolmogorov-Smirnov
-     * test</a> evaluating the null hypothesis that {@code data} conforms to {@code distribution}.
-     *
-     * @param distribution reference distribution
-     * @param data         sample being being evaluated
-     * @param alpha        significance level of the test
-     * @return true iff the null hypothesis that {@code data} is a sample from {@code distribution}
-     * can be rejected with confidence 1 - {@code alpha}
-     * @throws MathIllegalArgumentException                   if {@code data} does not have length at least 2
-     * @throws org.hipparchus.exception.NullArgumentException if {@code data} is null
-     */
-    public boolean kolmogorovSmirnovTest(RealDistribution distribution, double[] data, double alpha) {
-        if ((alpha <= 0) || (alpha > 0.5)) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL, alpha, 0, 0.5);
-        }
-        return kolmogorovSmirnovTest(distribution, data) < alpha;
-    }
-
-    /**
      * Estimates the <i>p-value</i> of a two-sample
      * <a href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test"> Kolmogorov-Smirnov test</a>
      * evaluating the null hypothesis that {@code x} and {@code y} are samples drawn from the same
@@ -578,17 +548,17 @@ public class KolmogorovSmirnovTest {
     }
 
     /**
-     * Calculates \(P(D_n < d)\) using the method described in [1] with quick decisions for extreme
+     * Calculates {@code P(D_n < d)} using the method described in [1] with quick decisions for extreme
      * values given in [2] (see above). The result is not exact as with
      * {@link #cdfExact(double, int)} because calculations are based on
-     * {@code double} rather than {@link BigFraction}.
+     * {@code double} rather than {@link org.hipparchus.fraction.BigFraction}.
      *
      * @param d statistic
      * @param n sample size
-     * @return \(P(D_n < d)\)
+     * @return \(P(D_n &lt; d)\)
      * @throws MathRuntimeException if algorithm fails to convert {@code h} to a
-     *                              {@link BigFraction} in expressing {@code d} as \((k
-     *                              - h) / m\) for integer {@code k, m} and \(0 \le h < 1\)
+     *                              {@link org.hipparchus.fraction.BigFraction} in expressing {@code d} as \((k
+     *                              - h) / m\) for integer {@code k, m} and \(0 &lt;= h &lt; 1\)
      */
     public double cdf(double d, int n)
             throws MathRuntimeException {
@@ -604,10 +574,10 @@ public class KolmogorovSmirnovTest {
      *
      * @param d statistic
      * @param n sample size
-     * @return \(P(D_n < d)\)
+     * @return \(P(D_n &lt; d)\)
      * @throws MathRuntimeException if the algorithm fails to convert {@code h} to a
-     *                              {@link BigFraction} in expressing {@code d} as \((k
-     *                              - h) / m\) for integer {@code k, m} and \(0 \le h < 1\)
+     *                              {@link org.hipparchus.fraction.BigFraction} in expressing {@code d} as \((k
+     *                              - h) / m\) for integer {@code k, m} and \(0 &lt;= h &lt; 1\)
      */
     public double cdfExact(double d, int n)
             throws MathRuntimeException {
@@ -621,14 +591,14 @@ public class KolmogorovSmirnovTest {
      * @param d     statistic
      * @param n     sample size
      * @param exact whether the probability should be calculated exact using
-     *              {@link BigFraction} everywhere at the expense of
+     *              {@link org.hipparchus.fraction.BigFraction} everywhere at the expense of
      *              very slow execution time, or if {@code double} should be used convenient places to
      *              gain speed. Almost never choose {@code true} in real applications unless you are very
      *              sure; {@code true} is almost solely for verification purposes.
-     * @return \(P(D_n < d)\)
+     * @return \(P(D_n &lt; d)\)
      * @throws MathRuntimeException if algorithm fails to convert {@code h} to a
-     *                              {@link BigFraction} in expressing {@code d} as \((k
-     *                              - h) / m\) for integer {@code k, m} and \(0 \le h < 1\).
+     *                              {@link org.hipparchus.fraction.BigFraction} in expressing {@code d} as \((k
+     *                              - h) / m\) for integer {@code k, m} and \(0 \lt;= h &lt; 1\).
      */
     public double cdf(double d, int n, boolean exact)
             throws MathRuntimeException {
@@ -662,14 +632,14 @@ public class KolmogorovSmirnovTest {
 
     /**
      * Calculates the exact value of {@code P(D_n < d)} using the method described in [1] (reference
-     * in class javadoc above) and {@link BigFraction} (see
+     * in class javadoc above) and {@link org.hipparchus.fraction.BigFraction} (see
      * above).
      *
      * @param d statistic
      * @param n sample size
      * @return the two-sided probability of \(P(D_n < d)\)
      * @throws MathRuntimeException if algorithm fails to convert {@code h} to a
-     *                              {@link BigFraction} in expressing {@code d} as \((k
+     *                              {@link org.hipparchus.fraction.BigFraction} in expressing {@code d} as \((k
      *                              - h) / m\) for integer {@code k, m} and \(0 \le h < 1\).
      */
     private double exactK(double d, int n)
@@ -716,11 +686,11 @@ public class KolmogorovSmirnovTest {
     }
 
     /**
-     * Computes the Pelz-Good approximation for \(P(D_n < d)\) as described in [2] in the class javadoc.
+     * Computes the Pelz-Good approximation for \(P(D_n &lt; d)\) as described in [2] in the class javadoc.
      *
      * @param d value of d-statistic (x in [2])
      * @param n sample size
-     * @return \(P(D_n < d)\)
+     * @return \(P(D_n &lt; d)\)
      */
     public double pelzGood(double d, int n) {
         // Change the variable since approximation is for the distribution evaluated at d / sqrt(n)
@@ -863,7 +833,7 @@ public class KolmogorovSmirnovTest {
      * @return H matrix
      * @throws MathIllegalArgumentException if fractional part is greater than 1
      * @throws MathIllegalStateException if algorithm fails to convert {@code h} to a
-     *         {@link BigFraction} in expressing {@code d} as \((k
+     *         {@link org.hipparchus.fraction.BigFraction} in expressing {@code d} as \((k
      *         - h) / m\) for integer {@code k, m} and \(0 <= h < 1\).
      */
     private FieldMatrix<BigFraction> createExactH(double d, int n)
@@ -1080,7 +1050,7 @@ public class KolmogorovSmirnovTest {
     }
 
     /**
-     * Computes \(P(D_{n,m} > d)\) if {@code strict} is {@code true}; otherwise \(P(D_{n,m} \ge
+     * Computes \(P(D_{n,m} &gt; d)\) if {@code strict} is {@code true}; otherwise \(P(D_{n,m} \ge
      * d)\), where \(D_{n,m}\) is the 2-sample Kolmogorov-Smirnov statistic. See
      * {@link #kolmogorovSmirnovStatistic(double[], double[])} for the definition of \(D_{n,m}\).
      * <p>
@@ -1101,15 +1071,15 @@ public class KolmogorovSmirnovTest {
     }
 
     /**
-     * Uses the Kolmogorov-Smirnov distribution to approximate \(P(D_{n,m} > d)\) where \(D_{n,m}\)
+     * Uses the Kolmogorov-Smirnov distribution to approximate \(P(D_{n,m} &gt; d)\) where \(D_{n,m}\)
      * is the 2-sample Kolmogorov-Smirnov statistic. See
      * {@link #kolmogorovSmirnovStatistic(double[], double[])} for the definition of \(D_{n,m}\).
      * <p>
      * Specifically, what is returned is \(1 - k(d \sqrt{mn / (m + n)})\) where \(k(t) = 1 + 2
      * \sum_{i=1}^\infty (-1)^i e^{-2 i^2 t^2}\). See {@link #ksSum(double, double, int)} for
      * details on how convergence of the sum is determined. This implementation passes {@code ksSum}
-     * {@value #KS_SUM_CAUCHY_CRITERION} as {@code tolerance} and
-     * {@value #MAXIMUM_PARTIAL_SUM_COUNT} as {@code maxIterations}.
+     * {@link #KS_SUM_CAUCHY_CRITERION} as {@code tolerance} and
+     * {@link #MAXIMUM_PARTIAL_SUM_COUNT} as {@code maxIterations}.
      * </p>
      *
      * @param d D-statistic value

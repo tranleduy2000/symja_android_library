@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -25,7 +30,7 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
 /**
  * This class implements a step interpolator for second order
  * Runge-Kutta integrator.
- * <p>
+ *
  * <p>This interpolator computes dense output inside the last
  * step computed. The interpolation equation is consistent with the
  * integration scheme :

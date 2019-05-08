@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.linear.RealMatrix;
@@ -32,10 +37,10 @@ import org.hipparchus.optim.OptimizationProblem;
  * LeastSquaresBuilder builder} or created at once using a {@link LeastSquaresFactory
  * factory}.
  * </p>
+ *
  * @see LeastSquaresBuilder
  * @see LeastSquaresFactory
  * @see LeastSquaresAdapter
- *
  */
 public interface LeastSquaresProblem extends OptimizationProblem<LeastSquaresProblem.Evaluation> {
 
@@ -63,12 +68,10 @@ public interface LeastSquaresProblem extends OptimizationProblem<LeastSquaresPro
     /**
      * Evaluate the model at the specified point.
      *
-     *
      * @param point the parameter values.
      * @return the model's value and derivative at the given point.
-     * @throws org.hipparchus.exception.MathIllegalStateException
-     *          if the maximal number of evaluations (of the model vector function) is
-     *          exceeded.
+     * @throws org.hipparchus.exception.MathIllegalStateException if the maximal number of evaluations (of the model vector function) is
+     *                                                            exceeded.
      */
     Evaluation evaluate(RealVector point);
 
@@ -87,8 +90,7 @@ public interface LeastSquaresProblem extends OptimizationProblem<LeastSquaresPro
          *
          * @param threshold Singularity threshold.
          * @return the covariance matrix.
-         * @throws org.hipparchus.exception.MathIllegalArgumentException
-         *          if the covariance matrix cannot be computed (singular problem).
+         * @throws org.hipparchus.exception.MathIllegalArgumentException if the covariance matrix cannot be computed (singular problem).
          */
         RealMatrix getCovariances(double threshold);
 
@@ -101,8 +103,7 @@ public interface LeastSquaresProblem extends OptimizationProblem<LeastSquaresPro
          * @param covarianceSingularityThreshold Singularity threshold (see {@link
          *                                       #getCovariances(double) computeCovariances}).
          * @return an estimate of the standard deviation of the optimized parameters
-         * @throws org.hipparchus.exception.MathIllegalArgumentException
-         *          if the covariance matrix cannot be computed.
+         * @throws org.hipparchus.exception.MathIllegalArgumentException if the covariance matrix cannot be computed.
          */
         RealVector getSigma(double covarianceSingularityThreshold);
 
@@ -118,8 +119,7 @@ public interface LeastSquaresProblem extends OptimizationProblem<LeastSquaresPro
          * Get the weighted Jacobian matrix.
          *
          * @return the weighted Jacobian: W<sup>1/2</sup> J.
-         * @throws org.hipparchus.exception.MathIllegalArgumentException
-         * if the Jacobian dimension does not match problem dimension.
+         * @throws org.hipparchus.exception.MathIllegalArgumentException if the Jacobian dimension does not match problem dimension.
          */
         RealMatrix getJacobian();
 
@@ -158,8 +158,7 @@ public interface LeastSquaresProblem extends OptimizationProblem<LeastSquaresPro
          * then multiplied by the square root of the weight matrix.
          *
          * @return the weighted residuals: W<sup>1/2</sup> K.
-         * @throws org.hipparchus.exception.MathIllegalArgumentException
-         * if the residuals have the wrong length.
+         * @throws org.hipparchus.exception.MathIllegalArgumentException if the residuals have the wrong length.
          */
         RealVector getResiduals();
 

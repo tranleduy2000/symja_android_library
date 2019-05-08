@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.analysis.MultivariateMatrixFunction;
@@ -32,27 +37,40 @@ import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem.Ev
  */
 public class LeastSquaresBuilder {
 
-    /** max evaluations */
+    /**
+     * max evaluations
+     */
     private int maxEvaluations;
-    /** max iterations */
+    /**
+     * max iterations
+     */
     private int maxIterations;
-    /** convergence checker */
+    /**
+     * convergence checker
+     */
     private ConvergenceChecker<Evaluation> checker;
-    /** model function */
+    /**
+     * model function
+     */
     private MultivariateJacobianFunction model;
-    /** observed values */
+    /**
+     * observed values
+     */
     private RealVector target;
-    /** initial guess */
+    /**
+     * initial guess
+     */
     private RealVector start;
-    /** weight matrix */
+    /**
+     * weight matrix
+     */
     private RealMatrix weight;
     /**
      * Lazy evaluation.
-     *
      */
     private boolean lazyEvaluation;
-    /** Validator.
-     *
+    /**
+     * Validator.
      */
     private ParameterValidator paramValidator;
 
@@ -64,14 +82,14 @@ public class LeastSquaresBuilder {
      */
     public LeastSquaresProblem build() {
         return LeastSquaresFactory.create(model,
-                                          target,
-                                          start,
-                                          weight,
-                                          checker,
-                                          maxEvaluations,
-                                          maxIterations,
-                                          lazyEvaluation,
-                                          paramValidator);
+                target,
+                start,
+                weight,
+                checker,
+                maxEvaluations,
+                maxIterations,
+                lazyEvaluation,
+                paramValidator);
     }
 
     /**
@@ -122,7 +140,7 @@ public class LeastSquaresBuilder {
     /**
      * Configure the model function.
      *
-     * @param value the model function value
+     * @param value    the model function value
      * @param jacobian the Jacobian of {@code value}
      * @return this
      */
@@ -200,7 +218,6 @@ public class LeastSquaresBuilder {
      *
      * @param newValue Whether to perform lazy evaluation.
      * @return this object.
-     *
      */
     public LeastSquaresBuilder lazyEvaluation(final boolean newValue) {
         lazyEvaluation = newValue;
@@ -212,7 +229,6 @@ public class LeastSquaresBuilder {
      *
      * @param newValidator Parameter validator.
      * @return this object.
-     *
      */
     public LeastSquaresBuilder parameterValidator(final ParameterValidator newValidator) {
         paramValidator = newValidator;

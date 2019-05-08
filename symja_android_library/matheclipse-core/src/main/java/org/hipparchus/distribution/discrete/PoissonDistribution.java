@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.distribution.continuous.NormalDistribution;
@@ -144,24 +149,6 @@ public class PoissonDistribution extends AbstractIntegerDistribution {
      * {@inheritDoc}
      */
     @Override
-    public double logProbability(int x) {
-        double ret;
-        if (x < 0 || x == Integer.MAX_VALUE) {
-            ret = Double.NEGATIVE_INFINITY;
-        } else if (x == 0) {
-            ret = -mean;
-        } else {
-            ret = -SaddlePointExpansion.getStirlingError(x) -
-                    SaddlePointExpansion.getDeviancePart(x, mean) -
-                    0.5 * FastMath.log(MathUtils.TWO_PI) - 0.5 * FastMath.log(x);
-        }
-        return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double cumulativeProbability(int x) {
         if (x < 0) {
             return 0;
@@ -171,22 +158,6 @@ public class PoissonDistribution extends AbstractIntegerDistribution {
         }
         return Gamma.regularizedGammaQ((double) x + 1, mean, epsilon,
                 maxIterations);
-    }
-
-    /**
-     * Calculates the Poisson distribution function using a normal
-     * approximation. The {@code N(mean, sqrt(mean))} distribution is used
-     * to approximate the Poisson distribution. The computation uses
-     * "half-correction" (evaluating the normal distribution function at
-     * {@code x + 0.5}).
-     *
-     * @param x Upper bound, inclusive.
-     * @return the distribution function value calculated using a normal
-     * approximation.
-     */
-    public double normalApproximateProbability(int x) {
-        // calculate the probability using half-correction
-        return normal.cumulativeProbability(x + 0.5);
     }
 
     /**
@@ -246,5 +217,39 @@ public class PoissonDistribution extends AbstractIntegerDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logProbability(int x) {
+        double ret;
+        if (x < 0 || x == Integer.MAX_VALUE) {
+            ret = Double.NEGATIVE_INFINITY;
+        } else if (x == 0) {
+            ret = -mean;
+        } else {
+            ret = -SaddlePointExpansion.getStirlingError(x) -
+                    SaddlePointExpansion.getDeviancePart(x, mean) -
+                    0.5 * FastMath.log(MathUtils.TWO_PI) - 0.5 * FastMath.log(x);
+        }
+        return ret;
+    }
+
+    /**
+     * Calculates the Poisson distribution function using a normal
+     * approximation. The {@code N(mean, sqrt(mean))} distribution is used
+     * to approximate the Poisson distribution. The computation uses
+     * "half-correction" (evaluating the normal distribution function at
+     * {@code x + 0.5}).
+     *
+     * @param x Upper bound, inclusive.
+     * @return the distribution function value calculated using a normal
+     * approximation.
+     */
+    public double normalApproximateProbability(int x) {
+        // calculate the probability using half-correction
+        return normal.cumulativeProbability(x + 0.5);
     }
 }

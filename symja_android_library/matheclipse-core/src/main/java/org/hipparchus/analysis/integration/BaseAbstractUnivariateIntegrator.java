@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.integration;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -217,6 +222,22 @@ public abstract class BaseAbstractUnivariateIntegrator implements UnivariateInte
      * {@inheritDoc}
      */
     @Override
+    public double integrate(final int maxEval, final UnivariateFunction f,
+                            final double lower, final double upper)
+            throws MathIllegalArgumentException, MathIllegalStateException, NullArgumentException {
+
+        // Initialization.
+        setup(maxEval, f, lower, upper);
+
+        // Perform computation.
+        return doIntegrate();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getEvaluations() {
         return evaluations.getCount();
     }
@@ -284,22 +305,6 @@ public abstract class BaseAbstractUnivariateIntegrator implements UnivariateInte
         function = f;
         evaluations = evaluations.withMaximalCount(maxEval);
         iterations.reset();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double integrate(final int maxEval, final UnivariateFunction f,
-                            final double lower, final double upper)
-            throws MathIllegalArgumentException, MathIllegalStateException, NullArgumentException {
-
-        // Initialization.
-        setup(maxEval, f, lower, upper);
-
-        // Perform computation.
-        return doIntegrate();
-
     }
 
     /**

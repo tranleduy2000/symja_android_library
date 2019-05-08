@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.special;
 
 import org.hipparchus.util.FastMath;
@@ -44,13 +49,13 @@ public class Erf {
 
     /**
      * Returns the error function.
-     * <p>
+     *
      * <p>erf(x) = 2/&radic;&pi; <sub>0</sub>&int;<sup>x</sup> e<sup>-t<sup>2</sup></sup>dt </p>
-     * <p>
+     *
      * <p>This implementation computes erf(x) using the
      * {@link Gamma#regularizedGammaP(double, double, double, int) regularized gamma function},
      * following <a href="http://mathworld.wolfram.com/Erf.html"> Erf</a>, equation (3)</p>
-     * <p>
+     *
      * <p>The value returned is always between -1 and 1 (inclusive).
      * If {@code abs(x) > 40}, then {@code erf(x)} is indistinguishable from
      * either 1 or -1 as a double, so the appropriate extreme value is returned.
@@ -71,15 +76,15 @@ public class Erf {
 
     /**
      * Returns the complementary error function.
-     * <p>
+     *
      * <p>erfc(x) = 2/&radic;&pi; <sub>x</sub>&int;<sup>&infin;</sup> e<sup>-t<sup>2</sup></sup>dt
      * <br/>
      * = 1 - {@link #erf(double) erf(x)} </p>
-     * <p>
+     *
      * <p>This implementation computes erfc(x) using the
      * {@link Gamma#regularizedGammaQ(double, double, double, int) regularized gamma function},
      * following <a href="http://mathworld.wolfram.com/Erf.html"> Erf</a>, equation (3).</p>
-     * <p>
+     *
      * <p>The value returned is always between 0 and 2 (inclusive).
      * If {@code abs(x) > 40}, then {@code erf(x)} is indistinguishable from
      * either 0 or 2 as a double, so the appropriate extreme value is returned.

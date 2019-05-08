@@ -17,54 +17,11 @@
 
 package org.hipparchus.stat.descriptive;
 
-
-import org.hipparchus.exception.NullArgumentException;
-
 /**
  * An interface for statistics that can aggregate results.
  *
  * @param <T> the type of statistic
  */
 public interface AggregatableStatistic<T> {
-
-    /**
-     * Aggregates the provided instance into this instance.
-     * <p>
-     * This method can be used to combine statistics computed over partitions or
-     * subsamples - i.e., the value of this instance after this operation should
-     * be the same as if a single statistic would have been applied over the
-     * combined dataset.
-     *
-     * @param other the instance to aggregate into this instance
-     * @throws NullArgumentException if the input is null
-     */
-    void aggregate(T other) throws NullArgumentException;
-
-    /**
-     * Aggregates the results from the provided instances into this instance.
-     * <p>
-     * This method can be used to combine statistics computed over partitions or
-     * subsamples - i.e., the value of this instance after this operation should
-     * be the same as if a single statistic would have been applied over the
-     * combined dataset.
-     *
-     * @param others the other instances to aggregate into this instance
-     * @throws NullArgumentException if either others or any instance is null
-     */
-//    @SuppressWarnings("unchecked")
-//    void aggregate(T... others);
-
-    /**
-     * Aggregates the results from the provided instances into this instance.
-     * <p>
-     * This method can be used to combine statistics computed over partitions or
-     * subsamples - i.e., the value of this instance after this operation should
-     * be the same as if a single statistic would have been applied over the
-     * combined dataset.
-     *
-     * @param others the other instances to aggregate into this instance
-     * @throws NullArgumentException if either others or any instance is null
-     */
-//    void aggregate(Iterable<T> others);
 
 }

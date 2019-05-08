@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.complex.Complex;
@@ -206,7 +211,10 @@ public class EigenDecomposition {
 
         if (cachedD == null) {
             // cache the matrix for subsequent calls
-            cachedD = MatrixUtils.createRealDiagonalMatrix(realEigenvalues);
+            cachedD = MatrixUtils.createRealMatrix(realEigenvalues.length, realEigenvalues.length);
+            for (int i = 0; i < realEigenvalues.length; ++i) {
+                cachedD.setEntry(i, i, realEigenvalues[i]);
+            }
 
             for (int i = 0; i < imagEigenvalues.length; i++) {
                 if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) > 0) {
@@ -384,7 +392,7 @@ public class EigenDecomposition {
         if (hasComplexEigenvalues()) {
             throw new MathRuntimeException(LocalizedCoreFormats.UNSUPPORTED_OPERATION);
         }
-        return new Solver(realEigenvalues, imagEigenvalues, eigenvectors);
+        return new Solver();
     }
 
     /**
@@ -565,13 +573,14 @@ public class EigenDecomposition {
     private SchurTransformer transformToSchur(final RealMatrix matrix) {
         final SchurTransformer schurTransform = new SchurTransformer(matrix);
         final double[][] matT = schurTransform.getT().getData();
+        final double norm = matrix.getNorm();
 
         realEigenvalues = new double[matT.length];
         imagEigenvalues = new double[matT.length];
 
         for (int i = 0; i < realEigenvalues.length; i++) {
             if (i == (realEigenvalues.length - 1) ||
-                    Precision.equals(matT[i + 1][i], 0.0, EPSILON)) {
+                    Precision.equals(matT[i + 1][i], 0.0, norm * EPSILON)) {
                 realEigenvalues[i] = matT[i][i];
             } else {
                 final double x = matT[i + 1][i + 1];
@@ -787,34 +796,7 @@ public class EigenDecomposition {
     /**
      * Specialized solver.
      */
-    private static class Solver implements DecompositionSolver {
-        /**
-         * Real part of the realEigenvalues.
-         */
-        private final double[] realEigenvalues;
-        /**
-         * Imaginary part of the realEigenvalues.
-         */
-        private final double[] imagEigenvalues;
-        /**
-         * Eigenvectors.
-         */
-        private final ArrayRealVector[] eigenvectors;
-
-        /**
-         * Builds a solver from decomposed matrix.
-         *
-         * @param realEigenvalues Real parts of the eigenvalues.
-         * @param imagEigenvalues Imaginary parts of the eigenvalues.
-         * @param eigenvectors    Eigenvectors.
-         */
-        private Solver(final double[] realEigenvalues,
-                       final double[] imagEigenvalues,
-                       final ArrayRealVector[] eigenvectors) {
-            this.realEigenvalues = realEigenvalues;
-            this.imagEigenvalues = imagEigenvalues;
-            this.eigenvectors = eigenvectors;
-        }
+    private class Solver implements DecompositionSolver {
 
         /**
          * Solves the linear equation A &times; X = B for symmetric matrices A.
@@ -923,16 +905,6 @@ public class EigenDecomposition {
         }
 
         /**
-         * @param i which eigenvalue to find the norm of
-         * @return the norm of ith (complex) eigenvalue.
-         */
-        private double eigenvalueNorm(int i) {
-            final double re = realEigenvalues[i];
-            final double im = imagEigenvalues[i];
-            return FastMath.sqrt(re * re + im * im);
-        }
-
-        /**
          * Get the inverse of the decomposed matrix.
          *
          * @return the inverse matrix.
@@ -959,6 +931,16 @@ public class EigenDecomposition {
                 }
             }
             return MatrixUtils.createRealMatrix(invData);
+        }
+
+        /**
+         * @param i which eigenvalue to find the norm of
+         * @return the norm of ith (complex) eigenvalue.
+         */
+        private double eigenvalueNorm(int i) {
+            final double re = realEigenvalues[i];
+            final double im = imagEigenvalues[i];
+            return FastMath.sqrt(re * re + im * im);
         }
     }
 }

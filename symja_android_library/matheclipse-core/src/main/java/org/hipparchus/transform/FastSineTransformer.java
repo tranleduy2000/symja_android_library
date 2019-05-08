@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.transform;
 
 import org.hipparchus.analysis.FunctionUtils;
@@ -111,9 +116,9 @@ public class FastSineTransformer implements RealTransformer, Serializable {
      * <p>
      * This implementation enforces {@code f(x) = 0.0} at {@code x = 0.0}.
      *
-     * @throws MathIllegalArgumentException if the lower bound is greater than, or equal to the upper bound
-     * @throws MathIllegalArgumentException if the number of sample points is negative
-     * @throws MathIllegalArgumentException if the number of sample points is not a power of two
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the lower bound is greater than, or equal to the upper bound
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the number of sample points is negative
+     * @throws MathIllegalArgumentException                          if the number of sample points is not a power of two
      */
     @Override
     public double[] transform(final UnivariateFunction f,

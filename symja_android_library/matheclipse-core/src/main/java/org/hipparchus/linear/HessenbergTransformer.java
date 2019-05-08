@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -43,11 +48,11 @@ class HessenbergTransformer {
     /**
      * Householder vectors.
      */
-    private final double householderVectors[][];
+    private final double[][] householderVectors;
     /**
      * Temporary storage vector.
      */
-    private final double ort[];
+    private final double[] ort;
     /**
      * Cached value of P.
      */
@@ -180,7 +185,7 @@ class HessenbergTransformer {
      * @return the main diagonal elements of the B matrix
      */
     double[][] getHouseholderVectorsRef() {
-        return householderVectors;
+        return householderVectors; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**

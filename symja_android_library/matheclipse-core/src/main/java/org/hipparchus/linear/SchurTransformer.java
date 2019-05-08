@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -50,11 +55,11 @@ class SchurTransformer {
     /**
      * P matrix.
      */
-    private final double matrixP[][];
+    private final double[][] matrixP;
     /**
      * T matrix.
      */
-    private final double matrixT[][];
+    private final double[][] matrixT;
     /**
      * Epsilon criteria taken from JAMA code (originally was 2^-52).
      */
@@ -215,7 +220,8 @@ class SchurTransformer {
                 computeShift(il, iu, iteration, shift);
 
                 // stop transformation after too many iterations
-                if (++iteration > MAX_ITERATIONS) {
+                ++iteration;
+                if (iteration > MAX_ITERATIONS) {
                     throw new MathIllegalStateException(LocalizedCoreFormats.CONVERGENCE_FAILED,
                             MAX_ITERATIONS);
                 }

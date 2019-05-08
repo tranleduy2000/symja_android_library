@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.linear;
 
 import org.hipparchus.exception.MathIllegalStateException;
@@ -257,7 +262,7 @@ public class SimplexSolver extends LinearOptimizer {
      */
     private Integer getPivotRow(SimplexTableau tableau, final int col) {
         // create a list of all the rows that tie for the lowest score in the minimum ratio test
-        List<Integer> minRatioPositions = new ArrayList<Integer>();
+        List<Integer> minRatioPositions = new ArrayList<>();
         double minRatio = Double.MAX_VALUE;
         for (int i = tableau.getNumObjectiveFunctions(); i < tableau.getHeight(); i++) {
             final double rhs = tableau.getEntry(i, tableau.getWidth() - 1);
@@ -280,7 +285,7 @@ public class SimplexSolver extends LinearOptimizer {
             }
         }
 
-        if (minRatioPositions.size() == 0) {
+        if (minRatioPositions.isEmpty()) {
             return null;
         } else if (minRatioPositions.size() > 1) {
             // there's a degeneracy as indicated by a tie in the minimum ratio test

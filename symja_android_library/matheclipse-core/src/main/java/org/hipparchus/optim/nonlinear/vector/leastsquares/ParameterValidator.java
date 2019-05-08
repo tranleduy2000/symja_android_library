@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.linear.RealVector;
 
 /**
  * Interface for validating a set of model parameters.
- *
  */
 public interface ParameterValidator {
     /**

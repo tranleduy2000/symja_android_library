@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.interpolation;
 
 import org.hipparchus.analysis.differentiation.DerivativeStructure;
@@ -66,9 +71,9 @@ public class HermiteInterpolator implements UnivariateDifferentiableVectorFuncti
      * Create an empty interpolator.
      */
     public HermiteInterpolator() {
-        this.abscissae = new ArrayList<Double>();
-        this.topDiagonal = new ArrayList<double[]>();
-        this.bottomDiagonal = new ArrayList<double[]>();
+        this.abscissae = new ArrayList<>();
+        this.topDiagonal = new ArrayList<>();
+        this.bottomDiagonal = new ArrayList<>();
     }
 
     /**

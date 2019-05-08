@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.util;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -111,7 +116,7 @@ public class Precision {
      * @param eps the amount of error to allow when checking for equality
      * @return <ul><li>0 if  {@link #equals(double, double, double) equals(x, y, eps)}</li>
      * <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt; y</li>
-     * <li>> 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x > y or
+     * <li>&gt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &gt; y or
      * either argument is NaN</li></ul>
      */
     public static int compareTo(double x, double y, double eps) {
@@ -138,7 +143,7 @@ public class Precision {
      *                values between {@code x} and {@code y}.
      * @return <ul><li>0 if  {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
      * <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt; y</li>
-     * <li>&gt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x > y
+     * <li>&gt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &gt; y
      * or either argument is NaN</li></ul>
      */
     public static int compareTo(final double x, final double y, final int maxUlps) {

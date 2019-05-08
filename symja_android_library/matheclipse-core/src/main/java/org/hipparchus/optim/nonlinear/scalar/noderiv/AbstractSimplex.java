@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
 import org.hipparchus.analysis.MultivariateFunction;
@@ -45,12 +50,18 @@ import java.util.Comparator;
  * @see SimplexOptimizer
  */
 public abstract class AbstractSimplex implements OptimizationData {
-    /** Simplex. */
-    private PointValuePair[] simplex;
-    /** Start simplex configuration. */
-    private double[][] startConfiguration;
-    /** Simplex dimension (must be equal to {@code simplex.length - 1}). */
+    /**
+     * Simplex dimension (must be equal to {@code simplex.length - 1}).
+     */
     private final int dimension;
+    /**
+     * Simplex.
+     */
+    private PointValuePair[] simplex;
+    /**
+     * Start simplex configuration.
+     */
+    private double[][] startConfiguration;
 
     /**
      * Build a unit hypercube simplex.
@@ -64,7 +75,7 @@ public abstract class AbstractSimplex implements OptimizationData {
     /**
      * Build a hypercube simplex with the given side length.
      *
-     * @param n Dimension of the simplex.
+     * @param n          Dimension of the simplex.
      * @param sideLength Length of the sides of the hypercube.
      */
     protected AbstractSimplex(int n,
@@ -86,8 +97,8 @@ public abstract class AbstractSimplex implements OptimizationData {
      * last vertex would be set to the diagonally opposite vertex at (2, 11, 3).
      *
      * @param steps Steps along the canonical axes representing box edges. They
-     * may be negative but not zero.
-     * @throws NullArgumentException if {@code steps} is {@code null}.
+     *              may be negative but not zero.
+     * @throws NullArgumentException        if {@code steps} is {@code null}.
      * @throws MathIllegalArgumentException if one of the steps is zero.
      */
     protected AbstractSimplex(final double[] steps) {
@@ -120,15 +131,15 @@ public abstract class AbstractSimplex implements OptimizationData {
      *
      * @param referenceSimplex Reference simplex.
      * @throws MathIllegalArgumentException if the reference simplex does not
-     * contain at least one point.
+     *                                      contain at least one point.
      * @throws MathIllegalArgumentException if there is a dimension mismatch
-     * in the reference simplex.
-     * @throws IllegalArgumentException if one of its vertices is duplicated.
+     *                                      in the reference simplex.
+     * @throws IllegalArgumentException     if one of its vertices is duplicated.
      */
     protected AbstractSimplex(final double[][] referenceSimplex) {
         if (referenceSimplex.length <= 0) {
             throw new MathIllegalArgumentException(LocalizedOptimFormats.SIMPLEX_NEED_ONE_POINT,
-                                                   referenceSimplex.length);
+                    referenceSimplex.length);
         }
         dimension = referenceSimplex.length - 1;
 
@@ -144,7 +155,7 @@ public abstract class AbstractSimplex implements OptimizationData {
             // Safety checks.
             if (refI.length != dimension) {
                 throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                                                       refI.length, dimension);
+                        refI.length, dimension);
             }
             for (int j = 0; j < i; j++) {
                 final double[] refJ = referenceSimplex[j];
@@ -157,7 +168,7 @@ public abstract class AbstractSimplex implements OptimizationData {
                 }
                 if (allEquals) {
                     throw new MathIllegalArgumentException(LocalizedOptimFormats.EQUAL_VERTICES_IN_SIMPLEX,
-                                                           i, j);
+                            i, j);
                 }
             }
 
@@ -169,6 +180,22 @@ public abstract class AbstractSimplex implements OptimizationData {
                 }
             }
         }
+    }
+
+    /**
+     * Create steps for a unit hypercube.
+     *
+     * @param n          Dimension of the hypercube.
+     * @param sideLength Length of the sides of the hypercube.
+     * @return the steps.
+     */
+    private static double[] createHypercubeSteps(int n,
+                                                 double sideLength) {
+        final double[] steps = new double[n];
+        for (int i = 0; i < n; i++) {
+            steps[i] = sideLength;
+        }
+        return steps;
     }
 
     /**
@@ -195,25 +222,24 @@ public abstract class AbstractSimplex implements OptimizationData {
      * Compute the next simplex of the algorithm.
      *
      * @param evaluationFunction Evaluation function.
-     * @param comparator Comparator to use to sort simplex vertices from best
-     * to worst.
-     * @throws org.hipparchus.exception.MathIllegalStateException
-     * if the algorithm fails to converge.
+     * @param comparator         Comparator to use to sort simplex vertices from best
+     *                           to worst.
+     * @throws org.hipparchus.exception.MathIllegalStateException if the algorithm fails to converge.
      */
-    public abstract void iterate(final MultivariateFunction evaluationFunction,
-                                 final Comparator<PointValuePair> comparator);
+    public abstract void iterate(MultivariateFunction evaluationFunction,
+                                 Comparator<PointValuePair> comparator);
 
     /**
      * Build an initial simplex.
      *
      * @param startPoint First point of the simplex.
      * @throws MathIllegalArgumentException if the start point does not match
-     * simplex dimension.
+     *                                      simplex dimension.
      */
     public void build(final double[] startPoint) {
         if (dimension != startPoint.length) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                                                   dimension, startPoint.length);
+                    dimension, startPoint.length);
         }
 
         // Set first vertex.
@@ -235,9 +261,8 @@ public abstract class AbstractSimplex implements OptimizationData {
      * Evaluate all the non-evaluated points of the simplex.
      *
      * @param evaluationFunction Evaluation function.
-     * @param comparator Comparator to use to sort simplex vertices from best to worst.
-     * @throws org.hipparchus.exception.MathIllegalStateException
-     * if the maximal number of evaluations is exceeded.
+     * @param comparator         Comparator to use to sort simplex vertices from best to worst.
+     * @throws org.hipparchus.exception.MathIllegalStateException if the maximal number of evaluations is exceeded.
      */
     public void evaluate(final MultivariateFunction evaluationFunction,
                          final Comparator<PointValuePair> comparator) {
@@ -258,8 +283,8 @@ public abstract class AbstractSimplex implements OptimizationData {
      * Replace the worst point of the simplex by a new point.
      *
      * @param pointValuePair Point to insert.
-     * @param comparator Comparator to use for sorting the simplex vertices
-     * from best to worst.
+     * @param comparator     Comparator to use for sorting the simplex vertices
+     *                       from best to worst.
      */
     protected void replaceWorstPoint(PointValuePair pointValuePair,
                                      final Comparator<PointValuePair> comparator) {
@@ -285,6 +310,20 @@ public abstract class AbstractSimplex implements OptimizationData {
     }
 
     /**
+     * Replace all points.
+     * Note that no deep-copy of {@code points} is performed.
+     *
+     * @param points New Points.
+     */
+    protected void setPoints(PointValuePair[] points) {
+        if (points.length != simplex.length) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    points.length, simplex.length);
+        }
+        simplex = points.clone();
+    }
+
+    /**
      * Get the simplex point stored at the requested {@code index}.
      *
      * @param index Location.
@@ -305,35 +344,5 @@ public abstract class AbstractSimplex implements OptimizationData {
     protected void setPoint(int index, PointValuePair point) {
         MathUtils.checkRangeInclusive(index, 0, simplex.length - 1);
         simplex[index] = point;
-    }
-
-    /**
-     * Replace all points.
-     * Note that no deep-copy of {@code points} is performed.
-     *
-     * @param points New Points.
-     */
-    protected void setPoints(PointValuePair[] points) {
-        if (points.length != simplex.length) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                                                   points.length, simplex.length);
-        }
-        simplex = points;
-    }
-
-    /**
-     * Create steps for a unit hypercube.
-     *
-     * @param n Dimension of the hypercube.
-     * @param sideLength Length of the sides of the hypercube.
-     * @return the steps.
-     */
-    private static double[] createHypercubeSteps(int n,
-                                                 double sideLength) {
-        final double[] steps = new double[n];
-        for (int i = 0; i < n; i++) {
-            steps[i] = sideLength;
-        }
-        return steps;
     }
 }

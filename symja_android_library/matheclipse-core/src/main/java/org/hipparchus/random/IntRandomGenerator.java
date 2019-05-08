@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.random;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -25,46 +30,6 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * implementations.
  */
 abstract class IntRandomGenerator extends BaseRandomGenerator {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract int nextInt();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean nextBoolean() {
-        return (nextInt() >>> 31) != 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double nextDouble() {
-        final long high = ((long) (nextInt() >>> 6)) << 26;
-        final int low = nextInt() >>> 6;
-        return (high | low) * 0x1.0p-52d;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public float nextFloat() {
-        return (nextInt() >>> 9) * 0x1.0p-23f;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long nextLong() {
-        return (((long) nextInt()) << 32) | (nextInt() & 0xffffffffL);
-    }
 
     /**
      * {@inheritDoc}
@@ -91,6 +56,46 @@ abstract class IntRandomGenerator extends BaseRandomGenerator {
         }
 
         nextBytesFill(bytes, start, len);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int nextInt();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long nextLong() {
+        return (((long) nextInt()) << 32) | (nextInt() & 0xffffffffL);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean nextBoolean() {
+        return (nextInt() >>> 31) != 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public float nextFloat() {
+        return (nextInt() >>> 9) * 0x1.0p-23f;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double nextDouble() {
+        final long high = ((long) (nextInt() >>> 6)) << 26;
+        final int low = nextInt() >>> 6;
+        return (high | low) * 0x1.0p-52d;
     }
 
     /**

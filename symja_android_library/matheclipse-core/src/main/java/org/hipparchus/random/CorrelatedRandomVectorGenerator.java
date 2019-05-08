@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.random;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -87,9 +92,9 @@ public class CorrelatedRandomVectorGenerator
      *                   considered to be dependent on previous ones and are discarded
      * @param generator  underlying generator for uncorrelated normalized
      *                   components.
-     * @throws MathIllegalArgumentException if the covariance matrix is not strictly positive definite.
-     * @throws MathIllegalArgumentException if the mean and covariance
-     *                                      arrays dimensions do not match.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the covariance matrix is not strictly positive definite.
+     * @throws MathIllegalArgumentException                          if the mean and covariance
+     *                                                               arrays dimensions do not match.
      */
     public CorrelatedRandomVectorGenerator(double[] mean,
                                            RealMatrix covariance, double small,
@@ -119,7 +124,7 @@ public class CorrelatedRandomVectorGenerator
      *                   considered to be dependent on previous ones and are discarded.
      * @param generator  Underlying generator for uncorrelated normalized
      *                   components.
-     * @throws MathIllegalArgumentException if the covariance matrix is not strictly positive definite.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the covariance matrix is not strictly positive definite.
      */
     public CorrelatedRandomVectorGenerator(RealMatrix covariance, double small,
                                            NormalizedRandomGenerator generator) {

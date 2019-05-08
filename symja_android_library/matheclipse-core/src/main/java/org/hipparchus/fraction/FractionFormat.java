@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.fraction;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -44,6 +49,7 @@ public class FractionFormat extends AbstractFormat {
      * for the numerator and denominator.
      */
     public FractionFormat() {
+        // This constructor is intentionally empty. Nothing special is needed here.
     }
 
     /**
@@ -131,7 +137,7 @@ public class FractionFormat extends AbstractFormat {
 
     /**
      * Create a default number format.  The default number format is based on
-     * {@link NumberFormat#getNumberInstance(Locale)} with the only
+     * {@link NumberFormat#getNumberInstance(java.util.Locale)} with the only
      * customizing is the maximum number of fraction digits, which is set to 0.
      *
      * @return the default number format.
@@ -150,7 +156,7 @@ public class FractionFormat extends AbstractFormat {
      *                   offsets of the alignment field
      * @return the value passed in as toAppendTo.
      */
-    public StringBuffer format(final Fraction fraction,
+    public StringBuffer format(final Fraction fraction, // NOPMD - PMD false positive, we cannot have @Override here
                                final StringBuffer toAppendTo, final FieldPosition pos) {
 
         pos.setBeginIndex(0);
@@ -176,7 +182,7 @@ public class FractionFormat extends AbstractFormat {
      * @return the value passed in as toAppendTo.
      * @throws MathIllegalStateException    if the number cannot be converted to a fraction
      * @throws MathIllegalArgumentException if <code>obj</code> is not a valid type.
-     * @see java.text.Format#format(Object, StringBuffer, FieldPosition)
+     * @see java.text.Format#format(java.lang.Object, java.lang.StringBuffer, java.text.FieldPosition)
      */
     @Override
     public StringBuffer format(final Object obj,

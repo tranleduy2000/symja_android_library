@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.random;
 
 import org.hipparchus.distribution.EnumeratedDistribution;
@@ -44,9 +49,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A class for generating random data.
@@ -77,11 +82,12 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
     /**
      * Map of <classname, switch constant> for continuous distributions
      */
-    private static final Map<Class<? extends RealDistribution>, RealDistributionSampler> CONTINUOUS_SAMPLERS = new HashMap<>();
+    private static final Map<Class<? extends RealDistribution>, RealDistributionSampler> CONTINUOUS_SAMPLERS = new ConcurrentHashMap<>();
     /**
      * Map of <classname, switch constant> for discrete distributions
      */
-    private static final Map<Class<? extends IntegerDistribution>, IntegerDistributionSampler> DISCRETE_SAMPLERS = new HashMap<>();
+    private static final Map<Class<? extends IntegerDistribution>, IntegerDistributionSampler> DISCRETE_SAMPLERS = new ConcurrentHashMap<>();
+
     /**
      * The default sampler for continuous distributions using the inversion technique.
      */
@@ -92,6 +98,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
                     return dist.inverseCumulativeProbability(generator.nextDouble());
                 }
             };
+
     /**
      * The default sampler for discrete distributions using the inversion technique.
      */
@@ -175,7 +182,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
                     public double nextSample(RandomDataGenerator generator, RealDistribution dist) {
                         LogNormalDistribution logNormal = (LogNormalDistribution) dist;
                         return generator.nextLogNormal(logNormal.getShape(),
-                                logNormal.getScale());
+                                logNormal.getLocation());
                     }
                 });
 
@@ -780,7 +787,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
 
             // Make sure we add 2 hex digits for each byte
             if (hex.length() == 1) {
-                hex = "0" + hex;
+                outBuffer.append('0');
             }
             outBuffer.append(hex);
         }
@@ -901,7 +908,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
      * Generates a random sample of size sampleSize from {0, 1, ... , weights.length - 1},
      * using weights as probabilities.
      * <p>
-     * For 0 < i < weights.length, the probability that i is selected (on any draw) is weights[i].
+     * For 0 &lt; i &lt; weights.length, the probability that i is selected (on any draw) is weights[i].
      * If necessary, the weights array is normalized to sum to 1 so that weights[i] is a probability
      * and the array sums to 1.
      * <p>
@@ -941,6 +948,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
     /**
      * Interface for samplers of continuous distributions.
      */
+    @FunctionalInterface
     private interface RealDistributionSampler {
         /**
          * Return the next sample following the given distribution.
@@ -955,6 +963,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
     /**
      * Interface for samplers of discrete distributions.
      */
+    @FunctionalInterface
     private interface IntegerDistributionSampler {
         /**
          * Return the next sample following the given distribution.
@@ -968,7 +977,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
 
     /**
      * Utility class implementing Cheng's algorithms for beta distribution sampling.
-     * <p>
+     *
      * <blockquote>
      * <pre>
      * R. C. H. Cheng,
@@ -978,6 +987,13 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
      * </blockquote>
      */
     private static class ChengBetaSampler {
+
+        /**
+         * Private constructor for utility class.
+         */
+        private ChengBetaSampler() { // NOPMD - PMD fails to detect this is a utility class
+            // not called
+        }
 
         /**
          * Returns the next sample following a beta distribution
@@ -1345,7 +1361,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
         EnumeratedDistributionSampler(List<Pair<T, Double>> pmf) {
             final int numMasses = pmf.size();
             weights = new double[numMasses];
-            values = new ArrayList<T>();
+            values = new ArrayList<>();
             for (int i = 0; i < numMasses; i++) {
                 weights[i] = pmf.get(i).getSecond();
                 values.add(pmf.get(i).getFirst());

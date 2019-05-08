@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -24,7 +29,6 @@ import org.hipparchus.ode.nonstiff.AdaptiveStepsizeIntegrator;
 import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
 import org.hipparchus.ode.sampling.ODEStateInterpolator;
 import org.hipparchus.ode.sampling.ODEStepHandler;
-import org.hipparchus.ode.sampling.ODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 
 /**
@@ -267,9 +271,7 @@ public abstract class MultistepIntegrator extends AdaptiveStepsizeIntegrator {
      * @return Nordieck vector at first step (h<sup>2</sup>/2 y''<sub>n</sub>,
      * h<sup>3</sup>/6 y'''<sub>n</sub> ... h<sup>k</sup>/k! y<sup>(k)</sup><sub>n</sub>)
      */
-    protected abstract Array2DRowRealMatrix initializeHighOrderDerivatives(final double h, final double[] t,
-                                                                           final double[][] y,
-                                                                           final double[][] yDot);
+    protected abstract Array2DRowRealMatrix initializeHighOrderDerivatives(double h, double[] t, double[][] y, double[][] yDot);
 
     /**
      * Get the minimal reduction factor for stepsize control.
@@ -395,7 +397,7 @@ public abstract class MultistepIntegrator extends AdaptiveStepsizeIntegrator {
     /**
      * Specialized step handler storing the first step.
      */
-    private class NordsieckInitializer extends ODEStepHandlerImpl implements ODEStepHandler {
+    private class NordsieckInitializer implements ODEStepHandler {
 
         /**
          * First steps times.
@@ -428,6 +430,11 @@ public abstract class MultistepIntegrator extends AdaptiveStepsizeIntegrator {
             this.t = new double[nbStartPoints];
             this.y = new double[nbStartPoints][];
             this.yDot = new double[nbStartPoints][];
+        }
+
+        @Override
+        public void init(ODEStateAndDerivative initialState, double finalTime) {
+            // nothing by default
         }
 
         /**

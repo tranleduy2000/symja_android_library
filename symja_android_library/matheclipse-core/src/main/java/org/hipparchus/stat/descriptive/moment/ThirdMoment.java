@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.NullArgumentException;
@@ -107,14 +112,6 @@ class ThirdMoment extends SecondMoment implements Serializable {
      * {@inheritDoc}
      */
     @Override
-    public double getResult() {
-        return m3;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void clear() {
         super.clear();
         m3 = Double.NaN;
@@ -122,11 +119,11 @@ class ThirdMoment extends SecondMoment implements Serializable {
     }
 
     /**
-     * Throws {@link UnsupportedOperationException}.
+     * {@inheritDoc}
      */
     @Override
-    public void aggregate(SecondMoment other) {
-        throw new UnsupportedOperationException();
+    public double getResult() {
+        return m3;
     }
 
     /**

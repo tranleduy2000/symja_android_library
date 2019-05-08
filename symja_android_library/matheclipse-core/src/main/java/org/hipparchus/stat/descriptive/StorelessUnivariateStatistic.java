@@ -14,11 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive;
 
-import com.duy.lambda.DoubleConsumer;
-
 import org.hipparchus.exception.MathIllegalArgumentException;
+
+import java.util.function.DoubleConsumer;
 
 /**
  * Extends the definition of {@link UnivariateStatistic} with
@@ -33,7 +38,8 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * {@link #evaluate(double[], int, int)} methods do <b>NOT</b> alter the internal
  * state of the respective statistic.
  */
-public interface StorelessUnivariateStatistic extends UnivariateStatistic, DoubleConsumer {
+public interface StorelessUnivariateStatistic
+        extends UnivariateStatistic, DoubleConsumer {
 
     /**
      * {@inheritDoc}
@@ -59,6 +65,14 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
             throws MathIllegalArgumentException;
 
     /**
+     * Returns a copy of the statistic with the same internal state.
+     *
+     * @return a copy of the statistic
+     */
+    @Override
+    StorelessUnivariateStatistic copy();
+
+    /**
      * Updates the internal state of the statistic to reflect the addition of the new value.
      *
      * @param d the new value.
@@ -70,20 +84,6 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      */
     @Override
     void accept(double value);
-
-    /**
-     * Updates the internal state of the statistic to reflect addition of
-     * all values in the values array. Does not clear the statistic first --
-     * i.e., the values are added <strong>incrementally</strong> to the dataset.
-     * <p>
-     * The default implementation delegates to
-     * <code>incrementAll(double[], int, int)</code> in the natural way.
-     *
-     * @param values array holding the new values to add
-     * @throws MathIllegalArgumentException if the array is null
-     */
-    void incrementAll(double[] values) throws MathIllegalArgumentException;
-
 
     /**
      * Updates the internal state of the statistic to reflect addition of
@@ -101,7 +101,6 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      */
     void incrementAll(double[] values, int start, int length)
             throws MathIllegalArgumentException;
-
 
     /**
      * Returns the current value of the Statistic.
@@ -122,13 +121,5 @@ public interface StorelessUnivariateStatistic extends UnivariateStatistic, Doubl
      * Clears the internal state of the Statistic
      */
     void clear();
-
-    /**
-     * Returns a copy of the statistic with the same internal state.
-     *
-     * @return a copy of the statistic
-     */
-    @Override
-    StorelessUnivariateStatistic copy();
 
 }

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -77,17 +82,6 @@ public class ExponentialDistribution extends AbstractRealDistribution {
 
     /**
      * {@inheritDoc}
-     **/
-    @Override
-    public double logDensity(double x) {
-        if (x < 0) {
-            return Double.NEGATIVE_INFINITY;
-        }
-        return -x / mean - logMean;
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
      * The implementation of this method is based on:
      * <ul>
@@ -104,26 +98,6 @@ public class ExponentialDistribution extends AbstractRealDistribution {
         } else {
             ret = 1.0 - FastMath.exp(-x / mean);
         }
-        return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Returns {@code 0} when {@code p= = 0} and
-     * {@code Double.POSITIVE_INFINITY} when {@code p == 1}.
-     */
-    @Override
-    public double inverseCumulativeProbability(double p) throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-
-        double ret;
-        if (p == 1.0) {
-            ret = Double.POSITIVE_INFINITY;
-        } else {
-            ret = -mean * FastMath.log(1.0 - p);
-        }
-
         return ret;
     }
 
@@ -183,5 +157,36 @@ public class ExponentialDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns {@code 0} when {@code p= = 0} and
+     * {@code Double.POSITIVE_INFINITY} when {@code p == 1}.
+     */
+    @Override
+    public double inverseCumulativeProbability(double p) throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+
+        double ret;
+        if (p == 1.0) {
+            ret = Double.POSITIVE_INFINITY;
+        } else {
+            ret = -mean * FastMath.log(1.0 - p);
+        }
+
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double logDensity(double x) {
+        if (x < 0) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        return -x / mean - logMean;
     }
 }

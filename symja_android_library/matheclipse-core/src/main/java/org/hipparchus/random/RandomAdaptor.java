@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.random;
 
 import org.hipparchus.util.MathUtils;
@@ -21,7 +26,7 @@ import org.hipparchus.util.MathUtils;
 import java.util.Random;
 
 /**
- * Extension of {@link Random} wrapping a
+ * Extension of {@link java.util.Random} wrapping a
  * {@link RandomGenerator}.
  */
 public class RandomAdaptor extends Random implements RandomGenerator {
@@ -83,14 +88,6 @@ public class RandomAdaptor extends Random implements RandomGenerator {
     @Override
     public void nextBytes(byte[] bytes) {
         randomGenerator.nextBytes(bytes);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void nextBytes(byte[] bytes, int offset, int len) {
-        randomGenerator.nextBytes(bytes, offset, len);
     }
 
     /**
@@ -184,8 +181,10 @@ public class RandomAdaptor extends Random implements RandomGenerator {
      * {@inheritDoc}
      */
     @Override
-    public long nextLong(long n) {
-        return randomGenerator.nextLong(n);
+    public void setSeed(long seed) {
+        if (randomGenerator != null) {  // required to avoid NPE in constructor
+            randomGenerator.setSeed(seed);
+        }
     }
 
     /**
@@ -212,10 +211,16 @@ public class RandomAdaptor extends Random implements RandomGenerator {
      * {@inheritDoc}
      */
     @Override
-    public void setSeed(long seed) {
-        if (randomGenerator != null) {  // required to avoid NPE in constructor
-            randomGenerator.setSeed(seed);
-        }
+    public void nextBytes(byte[] bytes, int offset, int len) {
+        randomGenerator.nextBytes(bytes, offset, len);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long nextLong(long n) {
+        return randomGenerator.nextLong(n);
     }
 
 }

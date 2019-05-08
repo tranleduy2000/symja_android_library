@@ -15,15 +15,20 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode;
 
 /**
  * This class converts second order differential equations to first
  * order ones.
- * <p>
+ *
  * <p>This class is a wrapper around a {@link SecondOrderODE} which
  * allow to use a {@link ODEIntegrator} to integrate it.</p>
- * <p>
+ *
  * <p>The transformation is done by changing the n dimension state
  * vector to a 2n dimension vector, where the first n components are
  * the initial state variables and the n last components are their
@@ -31,7 +36,7 @@ package org.hipparchus.ode;
  * vector then really contains both the first and second time
  * derivative of the initial state vector, which can be handled by the
  * underlying second order equations set.</p>
- * <p>
+ *
  * <p>One should be aware that the data is duplicated during the
  * transformation process and that for each call to {@link
  * #computeDerivatives computeDerivatives}, this wrapper does copy 4n
@@ -84,6 +89,11 @@ public class FirstOrderConverter implements OrdinaryDifferentialEquation {
     @Override
     public int getDimension() {
         return 2 * dimension;
+    }
+
+    @Override
+    public void init(double t0, double[] y0, double finalTime) {
+        // do nothing by default
     }
 
     /**

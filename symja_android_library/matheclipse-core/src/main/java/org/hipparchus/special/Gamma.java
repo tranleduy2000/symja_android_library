@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.special;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -53,7 +58,7 @@ public class Gamma {
     /**
      * <a href="http://en.wikipedia.org/wiki/Euler-Mascheroni_constant">Euler-Mascheroni constant</a>
      */
-    public static final double GAMMA = 0.577215664901532860606512090082;
+    public static final double GAMMA = 0.577215664901532860606512090082; // NOPMD - the fact the function and the constant have the same name is intentional and comes from mathematics conventions
 
     /**
      * The value of the {@code g} constant in the Lanczos approximation, see
@@ -507,14 +512,14 @@ public class Gamma {
 
     /**
      * <p>Computes the digamma function of x.</p>
-     * <p>
+     *
      * <p>This is an independently written implementation of the algorithm described in
      * Jose Bernardo, Algorithm AS 103: Psi (Digamma) Function, Applied Statistics, 1976.</p>
-     * <p>
+     *
      * <p>Some of the constants have been changed to increase accuracy at the moderate expense
      * of run-time.  The result should be accurate to within 10^-8 absolute tolerance for
-     * x >= 10^-5 and within 10^-8 relative tolerance for x > 0.</p>
-     * <p>
+     * x &gt;= 10^-5 and within 10^-8 relative tolerance for x &gt; 0.</p>
+     *
      * <p>Performance for large negative values of x will be quite expensive (proportional to
      * |x|).  Accuracy for negative values of x should be about 10^-8 absolute for results
      * less than 10^5 and 10^-8 relative for results larger than that.</p>

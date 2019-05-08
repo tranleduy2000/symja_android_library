@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.vector;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -49,7 +54,7 @@ public class VectorialStorelessStatistic
      *
      * @param dimension           the vector dimension
      * @param univariateStatistic the prototype statistic
-     * @throws MathIllegalArgumentException if dimension < 1
+     * @throws MathIllegalArgumentException if dimension &lt; 1
      */
     public VectorialStorelessStatistic(int dimension,
                                        StorelessUnivariateStatistic univariateStatistic) {
@@ -116,17 +121,6 @@ public class VectorialStorelessStatistic
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(stats);
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -136,6 +130,17 @@ public class VectorialStorelessStatistic
         }
         VectorialStorelessStatistic other = (VectorialStorelessStatistic) obj;
         return Arrays.equals(stats, other.stats);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(stats);
+        return result;
     }
 
 }

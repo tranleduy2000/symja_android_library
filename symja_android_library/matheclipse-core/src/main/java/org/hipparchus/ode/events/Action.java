@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.events;
 
 /**
@@ -55,6 +60,18 @@ public enum Action {
      * eventOccurred} method when the integration should go
      * on after the event ending the current step.</p>
      */
-    CONTINUE
+    CONTINUE,
+
+    /**
+     * Reset events indicator.
+     *
+     * <p> This value should be used as the return value of the {@code eventOccurred}
+     * method when the integration should go on, but first recheck all event detectors for
+     * occurring events. Use when the {@link ODEEventHandler#eventOccurred(org.hipparchus.ode.ODEStateAndDerivative,
+     * boolean)} method of this handler has a side effect that changes the {@link
+     * ODEEventHandler#g(org.hipparchus.ode.ODEStateAndDerivative)}
+     * function of another event handler.
+     */
+    RESET_EVENTS
 
 }

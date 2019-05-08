@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.summary;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -79,52 +84,6 @@ public class Product extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        value *= d;
-        n++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return n;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        value = 1;
-        n = 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void aggregate(Product other) {
-        MathUtils.checkNotNull(other);
-        if (other.n > 0) {
-            this.n += other.n;
-            this.value *= other.value;
-        }
-    }
-
-    /**
      * Returns the product of the entries in the specified portion of
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.
@@ -147,6 +106,14 @@ public class Product extends AbstractStorelessUnivariateStatistic
             }
         }
         return product;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getN() {
+        return n;
     }
 
     /**
@@ -197,6 +164,32 @@ public class Product extends AbstractStorelessUnivariateStatistic
     @Override
     public Product copy() {
         return new Product(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void increment(final double d) {
+        value *= d;
+        n++;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        value = 1;
+        n = 0;
     }
 
 }

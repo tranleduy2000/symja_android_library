@@ -71,8 +71,8 @@ public class FieldExpandableODE<T extends RealFieldElement<T>> {
      */
     public FieldExpandableODE(final FieldOrdinaryDifferentialEquation<T> primary) {
         this.primary = primary;
-        this.components = new ArrayList<FieldSecondaryODE<T>>();
-        this.mapper = new FieldEquationsMapper<T>(null, primary.getDimension());
+        this.components = new ArrayList<>();
+        this.mapper = new FieldEquationsMapper<>(null, primary.getDimension());
     }
 
     /**
@@ -96,7 +96,7 @@ public class FieldExpandableODE<T extends RealFieldElement<T>> {
     public int addSecondaryEquations(final FieldSecondaryODE<T> secondary) {
 
         components.add(secondary);
-        mapper = new FieldEquationsMapper<T>(mapper, secondary.getDimension());
+        mapper = new FieldEquationsMapper<>(mapper, secondary.getDimension());
 
         return components.size();
 
@@ -115,14 +115,13 @@ public class FieldExpandableODE<T extends RealFieldElement<T>> {
         final T t0 = s0.getTime();
 
         // initialize primary equations
-        int index = 0;
         final T[] primary0 = s0.getPrimaryState();
-        FieldOrdinaryDifferentialEquationDefault.init(primary, t0, primary0, finalTime);
+        primary.init(t0, primary0, finalTime);
 
         // initialize secondary equations
-        while (++index < mapper.getNumberOfEquations()) {
+        for (int index = 1; index < mapper.getNumberOfEquations(); ++index) {
             final T[] secondary0 = s0.getSecondaryState(index);
-            FieldSecondaryODEDefault.init(components.get(index - 1), t0, primary0, secondary0, finalTime);
+            components.get(index - 1).init(t0, primary0, secondary0, finalTime);
         }
 
     }
@@ -142,18 +141,22 @@ public class FieldExpandableODE<T extends RealFieldElement<T>> {
         final T[] yDot = MathArrays.buildArray(t.getField(), mapper.getTotalDimension());
 
         // compute derivatives of the primary equations
-        int index = 0;
-        final T[] primaryState = mapper.extractEquationData(index, y);
+        final T[] primaryState = mapper.extractEquationData(0, y);
         final T[] primaryStateDot = primary.computeDerivatives(t, primaryState);
-        mapper.insertEquationData(index, primaryStateDot, yDot);
 
         // Add contribution for secondary equations
-        while (++index < mapper.getNumberOfEquations()) {
+        for (int index = 1; index < mapper.getNumberOfEquations(); ++index) {
             final T[] componentState = mapper.extractEquationData(index, y);
             final T[] componentStateDot = components.get(index - 1).computeDerivatives(t, primaryState, primaryStateDot,
                     componentState);
             mapper.insertEquationData(index, componentStateDot, yDot);
         }
+
+        // we retrieve the primaryStateDot array after the secondary equations have
+        // been computed in case they change the main state derivatives; this happens
+        // for example in optimal control when the secondary equations handle co-state,
+        // which changes control, and the control changes the primary state
+        mapper.insertEquationData(0, primaryStateDot, yDot);
 
         return yDot;
 

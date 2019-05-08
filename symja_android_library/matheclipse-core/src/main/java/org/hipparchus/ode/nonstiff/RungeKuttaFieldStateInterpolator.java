@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -117,7 +122,7 @@ abstract class RungeKuttaFieldStateInterpolator<T extends RealFieldElement<T>>
      */
     @SafeVarargs
     protected final T[] previousStateLinearCombination(final T... coefficients) {
-        return combine(getPreviousState().getCompleteState(),
+        return combine(getGlobalPreviousState().getCompleteState(),
                 coefficients);
     }
 
@@ -129,7 +134,7 @@ abstract class RungeKuttaFieldStateInterpolator<T extends RealFieldElement<T>>
      */
     @SuppressWarnings("unchecked")
     protected T[] currentStateLinearCombination(final T... coefficients) {
-        return combine(getCurrentState().getCompleteState(),
+        return combine(getGlobalCurrentState().getCompleteState(),
                 coefficients);
     }
 

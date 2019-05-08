@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -36,7 +41,7 @@ import java.util.Map;
  * {@link AdamsMoultonIntegrator Adams-Moulton} integrators to convert between
  * classical representation with several previous first derivatives and Nordsieck
  * representation with higher order scaled derivatives.</p>
- * <p>
+ *
  * <p>We define scaled derivatives s<sub>i</sub>(n) at step n as:
  * <pre>
  * s<sub>1</sub>(n) = h y'<sub>n</sub> for first derivative
@@ -53,7 +58,7 @@ import java.util.Map;
  *   q<sub>n</sub> = [ s<sub>1</sub>(n-1) s<sub>1</sub>(n-2) ... s<sub>1</sub>(n-(k-1)) ]<sup>T</sup>
  * </pre>
  * (we omit the k index in the notation for clarity).</p>
- * <p>
+ *
  * <p>Another possible representation uses the Nordsieck vector with
  * higher degrees scaled derivatives all taken at the same step, i.e it handles y<sub>n</sub>,
  * s<sub>1</sub>(n) and r<sub>n</sub>) where r<sub>n</sub> is defined as:
@@ -62,7 +67,7 @@ import java.util.Map;
  * </pre>
  * (here again we omit the k index in the notation for clarity)
  * </p>
- * <p>
+ *
  * <p>Taylor series formulas show that for any index offset i, s<sub>1</sub>(n-i) can be
  * computed from s<sub>1</sub>(n), s<sub>2</sub>(n) ... s<sub>k</sub>(n), the formula being exact
  * for degree k polynomials.
@@ -138,9 +143,7 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
      */
     private static final Map<Integer,
             Map<Field<? extends RealFieldElement<?>>,
-                    AdamsNordsieckFieldTransformer<? extends RealFieldElement<?>>>> CACHE =
-            new HashMap<Integer, Map<Field<? extends RealFieldElement<?>>,
-                    AdamsNordsieckFieldTransformer<? extends RealFieldElement<?>>>>();
+                    AdamsNordsieckFieldTransformer<? extends RealFieldElement<?>>>> CACHE = new HashMap<>();
 
     /**
      * Field to which the time and state vector elements belong.
@@ -188,7 +191,7 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
         }
         shiftedP[0] = MathArrays.buildArray(field, rows);
         Arrays.fill(shiftedP[0], field.getZero());
-        update = new Array2DRowFieldMatrix<T>(pSolver.solve(new Array2DRowFieldMatrix<T>(shiftedP, false)).getData());
+        update = new Array2DRowFieldMatrix<>(pSolver.solve(new Array2DRowFieldMatrix<T>(shiftedP, false)).getData());
 
     }
 
@@ -201,7 +204,7 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
      * @param <T>    the type of the field elements
      * @return Nordsieck transformer for the specified field and number of steps
      */
-    public static <T extends RealFieldElement<T>> AdamsNordsieckFieldTransformer<T>
+    public static <T extends RealFieldElement<T>> AdamsNordsieckFieldTransformer<T> // NOPMD - PMD false positive
     getInstance(final Field<T> field, final int nSteps) {
         synchronized (CACHE) {
             Map<Field<? extends RealFieldElement<?>>,
@@ -214,7 +217,7 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
             @SuppressWarnings("unchecked")
             AdamsNordsieckFieldTransformer<T> t = (AdamsNordsieckFieldTransformer<T>) map.get(field);
             if (t == null) {
-                t = new AdamsNordsieckFieldTransformer<T>(field, nSteps);
+                t = new AdamsNordsieckFieldTransformer<>(field, nSteps);
                 map.put(field, t);
             }
             return t;
@@ -319,12 +322,12 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
 
         // solve the linear system to get the best estimate of the Nordsieck vector [s2 ... sk],
         // with the additional terms s(k+1) and c grabbing the parts after the truncated Taylor expansion
-        final FieldLUDecomposition<T> decomposition = new FieldLUDecomposition<T>(new Array2DRowFieldMatrix<T>(a, false));
+        final FieldLUDecomposition<T> decomposition = new FieldLUDecomposition<>(new Array2DRowFieldMatrix<T>(a, false));
         final FieldMatrix<T> x = decomposition.getSolver().solve(new Array2DRowFieldMatrix<T>(b, false));
 
         // extract just the Nordsieck vector [s2 ... sk]
         final Array2DRowFieldMatrix<T> truncatedX =
-                new Array2DRowFieldMatrix<T>(field, x.getRowDimension() - 1, x.getColumnDimension());
+                new Array2DRowFieldMatrix<>(field, x.getRowDimension() - 1, x.getColumnDimension());
         for (int i = 0; i < truncatedX.getRowDimension(); ++i) {
             for (int j = 0; j < truncatedX.getColumnDimension(); ++j) {
                 truncatedX.setEntry(i, j, x.getEntry(i, j));

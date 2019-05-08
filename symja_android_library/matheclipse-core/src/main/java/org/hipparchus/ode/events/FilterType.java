@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.events;
 
 import org.hipparchus.exception.MathRuntimeException;
@@ -35,7 +40,7 @@ public enum FilterType {
     TRIGGER_ONLY_DECREASING_EVENTS {
         /**  {@inheritDoc} */
         @Override
-        protected boolean getTriggeredIncreasing() {
+        protected boolean isTriggeredOnIncreasing() {
             return false;
         }
 
@@ -213,7 +218,7 @@ public enum FilterType {
     TRIGGER_ONLY_INCREASING_EVENTS {
         /**  {@inheritDoc} */
         @Override
-        protected boolean getTriggeredIncreasing() {
+        protected boolean isTriggeredOnIncreasing() {
             return true;
         }
 
@@ -382,11 +387,11 @@ public enum FilterType {
     };
 
     /**
-     * Get the increasing status of triggered events.
+     * Check if triggered events are increasing events.
      *
      * @return true if triggered events are increasing events
      */
-    protected abstract boolean getTriggeredIncreasing();
+    protected abstract boolean isTriggeredOnIncreasing();
 
     /**
      * Get next function transformer in the specified direction.

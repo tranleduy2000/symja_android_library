@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.integration;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -104,8 +109,8 @@ public class RombergIntegrator extends BaseAbstractUnivariateIntegrator {
             throws MathIllegalStateException {
 
         final int m = iterations.getMaximalCount() + 1;
-        double previousRow[] = new double[m];
-        double currentRow[] = new double[m];
+        double[] previousRow = new double[m];
+        double[] currentRow = new double[m];
 
         TrapezoidIntegrator qtrap = new TrapezoidIntegrator();
         currentRow[0] = qtrap.stage(this, 0);

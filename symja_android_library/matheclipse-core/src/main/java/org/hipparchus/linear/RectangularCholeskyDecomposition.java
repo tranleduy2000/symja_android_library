@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -32,7 +37,7 @@ import org.hipparchus.util.FastMath;
  * of the traditional triangular shape) and there is a threshold to ignore
  * small diagonal elements. This is used for example to generate {@link
  * org.hipparchus.random.CorrelatedRandomVectorGenerator correlated
- * random n-dimensions vectors} in a p-dimension subspace (p < n).
+ * random n-dimensions vectors} in a p-dimension subspace (p &lt; n).
  * In other words, it allows generating random vectors from a covariance
  * matrix that is only positive semidefinite, and not positive definite.</p>
  * <p>Rectangular Cholesky decomposition is <em>not</em> suited for solving

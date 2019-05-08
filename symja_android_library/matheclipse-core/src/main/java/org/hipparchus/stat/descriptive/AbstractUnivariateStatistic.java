@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -24,7 +29,7 @@ import org.hipparchus.util.MathUtils;
  * Abstract base class for implementations of the
  * {@link UnivariateStatistic} interface.
  */
-public abstract class AbstractUnivariateStatistic extends UnivariateStatisticImpl
+public abstract class AbstractUnivariateStatistic
         implements UnivariateStatistic {
 
     /**
@@ -36,6 +41,7 @@ public abstract class AbstractUnivariateStatistic extends UnivariateStatisticImp
      * Default constructor.
      */
     protected AbstractUnivariateStatistic() {
+        // This constructor is intentionally empty. Nothing special is needed here.
     }
 
     /**
@@ -50,11 +56,17 @@ public abstract class AbstractUnivariateStatistic extends UnivariateStatisticImp
         this.storedData = original.storedData != null ? original.storedData.clone() : null;
     }
 
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public abstract double evaluate(final double[] values, final int begin, final int length)
+    public abstract double evaluate(double[] values, int begin, int length)
             throws MathIllegalArgumentException;
 
     /**
@@ -91,7 +103,7 @@ public abstract class AbstractUnivariateStatistic extends UnivariateStatisticImp
      * @return reference to the stored data array (may be null)
      */
     protected double[] getDataRef() {
-        return storedData;
+        return storedData; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**

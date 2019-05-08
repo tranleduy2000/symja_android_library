@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.util;
 
 import org.hipparchus.Field;
+import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathRuntimeException;
@@ -380,6 +386,45 @@ public class MathArrays {
      * @param a     Array.
      * @param b     Array.
      * @param abort Whether to throw an exception if the check fails.
+     * @param <T>   the type of the field elements
+     * @return {@code true} if the arrays have the same length.
+     * @throws MathIllegalArgumentException if the lengths differ and
+     *                                      {@code abort} is {@code true}.
+     * @since 1.5
+     */
+    public static <T extends RealFieldElement<T>> boolean checkEqualLength(final T[] a,
+                                                                           final T[] b,
+                                                                           boolean abort) {
+        if (a.length == b.length) {
+            return true;
+        } else {
+            if (abort) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                        a.length, b.length);
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Check that both arrays have the same length.
+     *
+     * @param a   Array.
+     * @param b   Array.
+     * @param <T> the type of the field elements
+     * @throws MathIllegalArgumentException if the lengths differ.
+     * @since 1.5
+     */
+    public static <T extends RealFieldElement<T>> void checkEqualLength(final T[] a, final T[] b) {
+        checkEqualLength(a, b, true);
+    }
+
+    /**
+     * Check that both arrays have the same length.
+     *
+     * @param a     Array.
+     * @param b     Array.
+     * @param abort Whether to throw an exception if the check fails.
      * @return {@code true} if the arrays have the same length.
      * @throws MathIllegalArgumentException if the lengths differ and
      *                                      {@code abort} is {@code true}.
@@ -468,7 +513,7 @@ public class MathArrays {
 
         // Loop early exit means wrong ordering.
         if (abort) {
-            throw new MathIllegalArgumentException(dir == OrderDirection.INCREASING ?
+            throw new MathIllegalArgumentException(dir == MathArrays.OrderDirection.INCREASING ?
                     (strict ?
                             LocalizedCoreFormats.NOT_STRICTLY_INCREASING_SEQUENCE :
                             LocalizedCoreFormats.NOT_INCREASING_SEQUENCE) :
@@ -501,6 +546,106 @@ public class MathArrays {
      * @throws MathIllegalArgumentException if the array is not sorted.
      */
     public static void checkOrder(double[] val) throws MathIllegalArgumentException {
+        checkOrder(val, OrderDirection.INCREASING, true);
+    }
+
+    /**
+     * Check that the given array is sorted.
+     *
+     * @param val    Values.
+     * @param dir    Ordering direction.
+     * @param strict Whether the order should be strict.
+     * @param abort  Whether to throw an exception if the check fails.
+     * @param <T>    the type of the field elements
+     * @return {@code true} if the array is sorted.
+     * @throws MathIllegalArgumentException if the array is not sorted
+     *                                      and {@code abort} is {@code true}.
+     * @since 1.5
+     */
+    public static <T extends RealFieldElement<T>> boolean checkOrder(T[] val, OrderDirection dir,
+                                                                     boolean strict, boolean abort)
+            throws MathIllegalArgumentException {
+        double previous = val[0].getReal();
+        final int max = val.length;
+
+        int index;
+        ITEM:
+        for (index = 1; index < max; index++) {
+            switch (dir) {
+                case INCREASING:
+                    if (strict) {
+                        if (val[index].getReal() <= previous) {
+                            break ITEM;
+                        }
+                    } else {
+                        if (val[index].getReal() < previous) {
+                            break ITEM;
+                        }
+                    }
+                    break;
+                case DECREASING:
+                    if (strict) {
+                        if (val[index].getReal() >= previous) {
+                            break ITEM;
+                        }
+                    } else {
+                        if (val[index].getReal() > previous) {
+                            break ITEM;
+                        }
+                    }
+                    break;
+                default:
+                    // Should never happen.
+                    throw MathRuntimeException.createInternalError();
+            }
+
+            previous = val[index].getReal();
+        }
+
+        if (index == max) {
+            // Loop completed.
+            return true;
+        }
+
+        // Loop early exit means wrong ordering.
+        if (abort) {
+            throw new MathIllegalArgumentException(dir == MathArrays.OrderDirection.INCREASING ?
+                    (strict ?
+                            LocalizedCoreFormats.NOT_STRICTLY_INCREASING_SEQUENCE :
+                            LocalizedCoreFormats.NOT_INCREASING_SEQUENCE) :
+                    (strict ?
+                            LocalizedCoreFormats.NOT_STRICTLY_DECREASING_SEQUENCE :
+                            LocalizedCoreFormats.NOT_DECREASING_SEQUENCE),
+                    val[index], previous, index, index - 1);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check that the given array is sorted.
+     *
+     * @param val    Values.
+     * @param dir    Ordering direction.
+     * @param strict Whether the order should be strict.
+     * @param <T>    the type of the field elements
+     * @throws MathIllegalArgumentException if the array is not sorted.
+     * @since 1.5
+     */
+    public static <T extends RealFieldElement<T>> void checkOrder(T[] val, OrderDirection dir,
+                                                                  boolean strict) throws MathIllegalArgumentException {
+        checkOrder(val, dir, strict, true);
+    }
+
+    /**
+     * Check that the given array is sorted in strictly increasing order.
+     *
+     * @param val Values.
+     * @param <T> the type of the field elements
+     * @throws MathIllegalArgumentException if the array is not sorted.
+     * @since 1.5
+     */
+    public static <T extends RealFieldElement<T>> void checkOrder(T[] val) throws MathIllegalArgumentException {
         checkOrder(val, OrderDirection.INCREASING, true);
     }
 
@@ -556,7 +701,7 @@ public class MathArrays {
     }
 
     /**
-     * Check that all entries of the input array are >= 0.
+     * Check that all entries of the input array are &gt;= 0.
      *
      * @param in Array to be tested
      * @throws MathIllegalArgumentException if any array entries are less than 0.
@@ -571,7 +716,7 @@ public class MathArrays {
     }
 
     /**
-     * Check all entries of the input array are >= 0.
+     * Check all entries of the input array are &gt;= 0.
      *
      * @param in Array to be tested
      * @throws MathIllegalArgumentException if any array entries are less than 0.
@@ -594,7 +739,7 @@ public class MathArrays {
      * The redistribution policy for MINPACK is available
      * <a href="http://www.netlib.org/minpack/disclaimer">here</a>, for
      * convenience, it is reproduced below.</p>
-     * <p>
+     *
      * <table border="0" width="80%" cellpadding="10" align="center" bgcolor="#E0E0E0">
      * <tr><td>
      * Minpack Copyright Notice (1999) University of Chicago.
@@ -762,15 +907,14 @@ public class MathArrays {
         }
 
         // Associate each abscissa "x[i]" with its index "i".
-        final List<PairDoubleInteger> list
-                = new ArrayList<PairDoubleInteger>(len);
+        final List<PairDoubleInteger> list = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             list.add(new PairDoubleInteger(x[i], i));
         }
 
         // Create comparators for increasing and decreasing orders.
         final Comparator<PairDoubleInteger> comp =
-                dir == OrderDirection.INCREASING ?
+                dir == MathArrays.OrderDirection.INCREASING ?
                         new Comparator<PairDoubleInteger>() {
                             /** {@inheritDoc} */
                             @Override
@@ -1269,7 +1413,7 @@ public class MathArrays {
      * Normalizes an array to make it sum to a specified value.
      * Returns the result of the transformation
      * <pre>
-     *    x |-> x * normalizedSum / sum
+     *    x ↦ x * normalizedSum / sum
      * </pre>
      * applied to each non-NaN element x of the input array, where sum is the
      * sum of the non-NaN entries in the input array.
@@ -1323,7 +1467,7 @@ public class MathArrays {
     /**
      * Build an array of elements.
      * <p>
-     * Arrays are filled with field.getZero()
+     * Arrays are filled with {@code field.getZero()}
      *
      * @param <T>    the type of the field elements
      * @param field  field to which array elements belong
@@ -1338,15 +1482,15 @@ public class MathArrays {
     }
 
     /**
-     * Build a double dimension  array of elements.
+     * Build a double dimension array of elements.
      * <p>
-     * Arrays are filled with field.getZero()
+     * Arrays are filled with {@code field.getZero()}
      *
      * @param <T>     the type of the field elements
      * @param field   field to which array elements belong
      * @param rows    number of rows in the array
      * @param columns number of columns (may be negative to build partial
-     *                arrays in the same way <code>new Field[rows][]</code> works)
+     *                arrays in the same way {@code new Field[rows][]} works)
      * @return a new array
      */
     @SuppressWarnings("unchecked")
@@ -1362,6 +1506,40 @@ public class MathArrays {
                     });
             for (int i = 0; i < rows; ++i) {
                 Arrays.fill(array[i], field.getZero());
+            }
+        }
+        return array;
+    }
+
+    /**
+     * Build a triple dimension array of elements.
+     * <p>
+     * Arrays are filled with {@code field.getZero()}
+     *
+     * @param <T>   the type of the field elements
+     * @param field field to which array elements belong
+     * @param l1    number of elements along first dimension
+     * @param l2    number of elements along second dimension
+     * @param l3    number of elements along third dimension (may be negative to build partial
+     *              arrays in the same way {@code new Field[l1][l2][]} works)
+     * @return a new array
+     * @since 1.4
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T[][][] buildArray(final Field<T> field, final int l1, final int l2, final int l3) {
+        final T[][][] array;
+        if (l3 < 0) {
+            T[] dummyRow = buildArray(field, 0);
+            array = (T[][][]) Array.newInstance(dummyRow.getClass(), l1, l2);
+        } else {
+            array = (T[][][]) Array.newInstance(field.getRuntimeClass(),
+                    new int[]{
+                            l1, l2, l3
+                    });
+            for (int i = 0; i < l1; ++i) {
+                for (int j = 0; j < l2; ++j) {
+                    Arrays.fill(array[i][j], field.getZero());
+                }
             }
         }
         return array;
@@ -1734,7 +1912,7 @@ public class MathArrays {
      * @throws NullPointerException if data is null
      */
     public static double[] unique(double[] data) {
-        TreeSet<Double> values = new TreeSet<Double>();
+        TreeSet<Double> values = new TreeSet<>();
         for (int i = 0; i < data.length; i++) {
             values.add(data[i]);
         }

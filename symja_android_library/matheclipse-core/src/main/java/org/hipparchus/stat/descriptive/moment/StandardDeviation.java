@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -123,38 +128,6 @@ public class StandardDeviation extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        variance.increment(d);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return variance.getN();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return FastMath.sqrt(variance.getResult());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        variance.clear();
-    }
-
-    /**
      * Returns the Standard Deviation of the entries in the specified portion of
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.
@@ -174,6 +147,14 @@ public class StandardDeviation extends AbstractStorelessUnivariateStatistic
     public double evaluate(final double[] values, final int begin, final int length)
             throws MathIllegalArgumentException {
         return FastMath.sqrt(variance.evaluate(values, begin, length));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getN() {
+        return variance.getN();
     }
 
     /**
@@ -252,6 +233,30 @@ public class StandardDeviation extends AbstractStorelessUnivariateStatistic
     @Override
     public StandardDeviation copy() {
         return new StandardDeviation(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void increment(final double d) {
+        variance.increment(d);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        return FastMath.sqrt(variance.getResult());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        variance.clear();
     }
 
 }

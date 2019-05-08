@@ -28,12 +28,12 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements a Gragg-Bulirsch-Stoer integrator for
  * Ordinary Differential Equations.
- * <p>
+ *
  * <p>The Gragg-Bulirsch-Stoer algorithm is one of the most efficient
  * ones currently available for smooth problems. It uses Richardson
  * extrapolation to estimate what would be the solution if the step
  * size could be decreased down to zero.</p>
- * <p>
+ *
  * <p>
  * This method changes both the step size and the order during
  * integration, in order to minimize computation cost. It is
@@ -49,7 +49,7 @@ import org.hipparchus.util.FastMath;
  * bodies (pleiades problem, involving quasi-collisions for which
  * <i>automatic step size control is essential</i>).
  * </p>
- * <p>
+ *
  * <p>
  * This implementation is basically a reimplementation in Java of the
  * <a
@@ -59,10 +59,10 @@ import org.hipparchus.util.FastMath;
  * href="http://www.unige.ch/~hairer/prog/licence.txt">here</a>, for
  * convenience, it is reproduced below.</p>
  * </p>
- * <p>
+ *
  * <table border="0" width="80%" cellpadding="10" align="center" bgcolor="#E0E0E0">
  * <tr><td>Copyright (c) 2004, Ernst Hairer</td></tr>
- * <p>
+ *
  * <tr><td>Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
  * conditions are met:
@@ -73,7 +73,7 @@ import org.hipparchus.util.FastMath;
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.</li>
  * </ul></td></tr>
- * <p>
+ *
  * <tr><td><strong>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
  * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -273,7 +273,7 @@ public class GraggBulirschStoerIntegrator extends AdaptiveStepsizeIntegrator {
 
     /**
      * Set the step size control factors.
-     * <p>
+     *
      * <p>The new step size hNew is computed from the old one h by:
      * <pre>
      * hNew = h * stepControl2 / (err/stepControl1)^(1/(2k + 1))
@@ -283,7 +283,7 @@ public class GraggBulirschStoerIntegrator extends AdaptiveStepsizeIntegrator {
      * 0.65 for stepControl1 and 0.94 for stepControl2.</p>
      * <p>The step size is subject to the restriction:
      * <pre>
-     * stepControl3^(1/(2k + 1))/stepControl4 <= hNew/h <= 1/stepControl3^(1/(2k + 1))
+     * stepControl3^(1/(2k + 1))/stepControl4 &lt;= hNew/h &lt;= 1/stepControl3^(1/(2k + 1))
      * </pre>
      * The default values are 0.02 for stepControl3 and 4.0 for
      * stepControl4.</p>
@@ -334,8 +334,8 @@ public class GraggBulirschStoerIntegrator extends AdaptiveStepsizeIntegrator {
      * maximal order that will be used is always even, it is twice the
      * maximal number of columns in the extrapolation table.</p>
      * <pre>
-     * order is decreased if w(k - 1) <= w(k)     * orderControl1
-     * order is increased if w(k)     <= w(k - 1) * orderControl2
+     * order is decreased if w(k - 1) &lt;= w(k)     * orderControl1
+     * order is increased if w(k)     &lt;= w(k - 1) * orderControl2
      * </pre>
      * <p>where w is the table of work per unit step for each order
      * (number of function calls divided by the step length), and k is
@@ -345,7 +345,7 @@ public class GraggBulirschStoerIntegrator extends AdaptiveStepsizeIntegrator {
      * orderControl1 and 0.9 for orderControl2.</p>
      *
      * @param maximalOrder maximal order in the extrapolation table (the
-     *                     maximal order is reset to default if order <= 6 or odd)
+     *                     maximal order is reset to default if order &lt;= 6 or odd)
      * @param control1     first order control factor (the factor is
      *                     reset to default if lower than 0.0001 or greater than 0.9999)
      * @param control2     second order control factor (the factor
@@ -425,7 +425,7 @@ public class GraggBulirschStoerIntegrator extends AdaptiveStepsizeIntegrator {
      * @param useInterpolationErrorForControl if true, interpolation error is used
      *                                        for stepsize control
      * @param mudifControlParameter           interpolation order control parameter (the parameter
-     *                                        is reset to default if <= 0 or >= 7)
+     *                                        is reset to default if &lt;= 0 or &gt;= 7)
      */
     public void setInterpolationControl(final boolean useInterpolationErrorForControl,
                                         final int mudifControlParameter) {
@@ -850,19 +850,15 @@ public class GraggBulirschStoerIntegrator extends AdaptiveStepsizeIntegrator {
                         equations.getMapper(),
                         yMidDots, mu);
 
-                if (mu >= 0) {
-
-                    if (useInterpolationError) {
-                        // use the interpolation error to limit stepsize
-                        final double interpError = interpolator.estimateError(scale);
-                        hInt = FastMath.abs(getStepSize() /
-                                FastMath.max(FastMath.pow(interpError, 1.0 / (mu + 4)), 0.01));
-                        if (interpError > 10.0) {
-                            hNew = filterStep(hInt, forward, false);
-                            reject = true;
-                        }
+                if (mu >= 0 && useInterpolationError) {
+                    // use the interpolation error to limit stepsize
+                    final double interpError = interpolator.estimateError(scale);
+                    hInt = FastMath.abs(getStepSize() /
+                            FastMath.max(FastMath.pow(interpError, 1.0 / (mu + 4)), 0.01));
+                    if (interpError > 10.0) {
+                        hNew = filterStep(hInt, forward, false);
+                        reject = true;
                     }
-
                 }
 
             } else {

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.fraction;
 
 import org.hipparchus.Field;
@@ -56,16 +61,16 @@ public class FractionField implements Field<Fraction>, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public Fraction getOne() {
-        return Fraction.ONE;
+    public Fraction getZero() {
+        return Fraction.ZERO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Fraction getZero() {
-        return Fraction.ZERO;
+    public Fraction getOne() {
+        return Fraction.ONE;
     }
 
     /**

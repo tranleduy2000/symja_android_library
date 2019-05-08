@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.Field;
@@ -131,8 +136,7 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
      * {@inheritDoc}
      */
     @Override
-    public abstract FieldMatrix<T> createMatrix(final int rowDimension,
-                                                final int columnDimension)
+    public abstract FieldMatrix<T> createMatrix(int rowDimension, int columnDimension)
             throws MathIllegalArgumentException;
 
     /**
@@ -244,6 +248,18 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
         return out;
     }
 
+    @Override
+    public FieldMatrix<T> multiplyTransposed(FieldMatrix<T> m) throws MathIllegalArgumentException {
+        return multiply(m.transpose());
+
+    }
+
+    @Override
+    public FieldMatrix<T> transposeMultiply(FieldMatrix<T> m) throws MathIllegalArgumentException {
+        return transpose().multiply(m);
+
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -284,9 +300,8 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
          * In general, the same approach is used for A^p.
          */
 
-        final char[] binaryRepresentation = Integer.toBinaryString(power)
-                .toCharArray();
-        final ArrayList<Integer> nonZeroPositions = new ArrayList<Integer>();
+        final char[] binaryRepresentation = Integer.toBinaryString(power).toCharArray();
+        final ArrayList<Integer> nonZeroPositions = new ArrayList<>();
 
         for (int i = 0; i < binaryRepresentation.length; ++i) {
             if (binaryRepresentation[i] == '1') {
@@ -295,8 +310,7 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
             }
         }
 
-        ArrayList<FieldMatrix<T>> results = new ArrayList<FieldMatrix<T>>(
-                binaryRepresentation.length);
+        ArrayList<FieldMatrix<T>> results = new ArrayList<>(binaryRepresentation.length);
 
         results.add(0, this.copy());
 
@@ -736,26 +750,6 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
      * {@inheritDoc}
      */
     @Override
-    public boolean isSquare() {
-        return getColumnDimension() == getRowDimension();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract int getRowDimension();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract int getColumnDimension();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public T getTrace() throws MathIllegalArgumentException {
         final int nRows = getRowDimension();
         final int nCols = getColumnDimension();
@@ -801,9 +795,9 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
     @Override
     public FieldVector<T> operate(final FieldVector<T> v)
             throws MathIllegalArgumentException {
-        try {
+        if (v instanceof ArrayFieldVector) {
             return new ArrayFieldVector<T>(field, operate(((ArrayFieldVector<T>) v).getDataRef()), false);
-        } catch (ClassCastException cce) {
+        } else {
             final int nRows = getRowDimension();
             final int nCols = getColumnDimension();
             if (v.getDimension() != nCols) {
@@ -855,9 +849,9 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
     @Override
     public FieldVector<T> preMultiply(final FieldVector<T> v)
             throws MathIllegalArgumentException {
-        try {
+        if (v instanceof ArrayFieldVector) {
             return new ArrayFieldVector<T>(field, preMultiply(((ArrayFieldVector<T>) v).getDataRef()), false);
-        } catch (ClassCastException cce) {
+        } else {
             final int nRows = getRowDimension();
             final int nCols = getColumnDimension();
             if (v.getDimension() != nRows) {
@@ -1065,36 +1059,24 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
     }
 
     /**
-     * Get a string representation for this matrix.
-     *
-     * @return a string representation for this matrix
+     * {@inheritDoc}
      */
     @Override
-    public String toString() {
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        final StringBuffer res = new StringBuffer();
-        String fullClassName = getClass().getName();
-        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
-        res.append(shortClassName).append("{");
-
-        for (int i = 0; i < nRows; ++i) {
-            if (i > 0) {
-                res.append(",");
-            }
-            res.append("{");
-            for (int j = 0; j < nCols; ++j) {
-                if (j > 0) {
-                    res.append(",");
-                }
-                res.append(getEntry(i, j));
-            }
-            res.append("}");
-        }
-
-        res.append("}");
-        return res.toString();
+    public boolean isSquare() {
+        return getColumnDimension() == getRowDimension();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int getRowDimension();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int getColumnDimension();
 
     /**
      * Returns true iff <code>object</code> is a
@@ -1109,7 +1091,7 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
         if (object == this) {
             return true;
         }
-        if (object instanceof FieldMatrix<?> == false) {
+        if (!(object instanceof FieldMatrix<?>)) {
             return false;
         }
         FieldMatrix<?> m = (FieldMatrix<?>) object;
@@ -1146,6 +1128,38 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
             }
         }
         return ret;
+    }
+
+    /**
+     * Get a string representation for this matrix.
+     *
+     * @return a string representation for this matrix
+     */
+    @Override
+    public String toString() {
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        final StringBuffer res = new StringBuffer();
+        String fullClassName = getClass().getName();
+        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
+        res.append(shortClassName).append('{');
+
+        for (int i = 0; i < nRows; ++i) {
+            if (i > 0) {
+                res.append(',');
+            }
+            res.append('{');
+            for (int j = 0; j < nCols; ++j) {
+                if (j > 0) {
+                    res.append(',');
+                }
+                res.append(getEntry(i, j));
+            }
+            res.append('}');
+        }
+
+        res.append('}');
+        return res.toString();
     }
 
     /**
@@ -1279,7 +1293,7 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
             throws MathIllegalArgumentException {
         if (getColumnDimension() != m.getRowDimension()) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    m.getRowDimension(), getColumnDimension());
+                    getColumnDimension(), m.getRowDimension());
         }
     }
 }

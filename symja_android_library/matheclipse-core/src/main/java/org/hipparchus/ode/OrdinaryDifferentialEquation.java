@@ -19,19 +19,19 @@ package org.hipparchus.ode;
 
 /**
  * This interface represents a first order differential equations set.
- * <p>
+ *
  * <p>This interface should be implemented by all real first order
  * differential equation problems before they can be handled by the
- * integrators {link ODEIntegrator#integrate(OrdinaryDifferentialEquation,
+ * integrators {@link ODEIntegrator#integrate(OrdinaryDifferentialEquation,
  * ODEState, double)} method.</p>
- * <p>
+ *
  * <p>A first order differential equations problem, as seen by an
  * integrator is the time derivative <code>dY/dt</code> of a state
  * vector <code>Y</code>, both being one dimensional arrays. From the
  * integrator point of view, this derivative depends only on the
  * current time <code>t</code> and on the state vector
  * <code>Y</code>.</p>
- * <p>
+ *
  * <p>For real problems, the derivative depends also on parameters
  * that do not belong to the state vector (dynamical model constants
  * for example). These constants are completely outside of the scope
@@ -50,6 +50,23 @@ public interface OrdinaryDifferentialEquation {
      * @return dimension of the problem
      */
     int getDimension();
+
+    /**
+     * Initialize equations at the start of an ODE integration.
+     * <p>
+     * This method is called once at the start of the integration. It
+     * may be used by the equations to initialize some internal data
+     * if needed.
+     * </p>
+     * <p>
+     * The default implementation does nothing.
+     * </p>
+     *
+     * @param t0        value of the independent <I>time</I> variable at integration start
+     * @param y0        array containing the value of the state vector at integration start
+     * @param finalTime target time for the integration
+     */
+    void init(double t0, double[] y0, double finalTime);
 
     /**
      * Get the current time derivative of the state vector.

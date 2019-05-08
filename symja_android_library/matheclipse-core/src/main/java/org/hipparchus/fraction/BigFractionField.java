@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.fraction;
 
 import org.hipparchus.Field;
@@ -56,16 +61,16 @@ public class BigFractionField implements Field<BigFraction>, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public BigFraction getOne() {
-        return BigFraction.ONE;
+    public BigFraction getZero() {
+        return BigFraction.ZERO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public BigFraction getZero() {
-        return BigFraction.ZERO;
+    public BigFraction getOne() {
+        return BigFraction.ONE;
     }
 
     /**

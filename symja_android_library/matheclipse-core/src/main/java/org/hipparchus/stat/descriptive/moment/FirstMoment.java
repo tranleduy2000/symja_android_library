@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.NullArgumentException;
@@ -107,40 +112,6 @@ class FirstMoment extends AbstractStorelessUnivariateStatistic
      * {@inheritDoc}
      */
     @Override
-    public void increment(final double d) {
-        if (n == 0) {
-            m1 = 0.0;
-        }
-        n++;
-        double n0 = n;
-        dev = d - m1;
-        nDev = dev / n0;
-        m1 += nDev;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        m1 = Double.NaN;
-        n = 0;
-        dev = Double.NaN;
-        nDev = Double.NaN;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return m1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public long getN() {
         return n;
     }
@@ -170,6 +141,40 @@ class FirstMoment extends AbstractStorelessUnivariateStatistic
     @Override
     public FirstMoment copy() {
         return new FirstMoment(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void increment(final double d) {
+        if (n == 0) {
+            m1 = 0.0;
+        }
+        n++;
+        double n0 = n;
+        dev = d - m1;
+        nDev = dev / n0;
+        m1 += nDev;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        return m1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        m1 = Double.NaN;
+        n = 0;
+        dev = Double.NaN;
+        nDev = Double.NaN;
     }
 
 }

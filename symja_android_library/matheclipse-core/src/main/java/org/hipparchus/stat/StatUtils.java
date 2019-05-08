@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -197,7 +202,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link SumOfLogs}.
+     * See {@link org.hipparchus.stat.descriptive.summary.SumOfLogs}.
      *
      * @param values the input array
      * @return the sum of the natural logs of the values or Double.NaN if the array is empty
@@ -213,7 +218,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link SumOfLogs}.
+     * See {@link org.hipparchus.stat.descriptive.summary.SumOfLogs}.
      *
      * @param values the input array
      * @param begin  index of the first array element to include
@@ -234,7 +239,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link Mean} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Mean} for
      * details on the computing algorithm.
      *
      * @param values the input array
@@ -252,7 +257,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link Mean Mean} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Mean Mean} for
      * details on the computing algorithm.
      *
      * @param values the input array
@@ -273,7 +278,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link GeometricMean GeometricMean}
+     * See {@link org.hipparchus.stat.descriptive.moment.GeometricMean GeometricMean}
      * for details on the computing algorithm.
      *
      * @param values the input array
@@ -291,7 +296,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link GeometricMean GeometricMean}
+     * See {@link org.hipparchus.stat.descriptive.moment.GeometricMean GeometricMean}
      * for details on the computing algorithm.
      *
      * @param values the input array
@@ -314,7 +319,7 @@ public final class StatUtils {
      * the denominator). Use {@link #populationVariance(double[])} for the non-bias-corrected
      * population variance.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -338,7 +343,7 @@ public final class StatUtils {
      * the denominator). Use {@link #populationVariance(double[], int, int)} for the non-bias-corrected
      * population variance.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -367,7 +372,7 @@ public final class StatUtils {
      * the denominator). Use {@link #populationVariance(double[], double, int, int)} for
      * the non-bias-corrected population variance.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -402,7 +407,7 @@ public final class StatUtils {
      * the denominator).  Use {@link #populationVariance(double[], double)} for the
      * non-bias-corrected population variance.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -428,7 +433,7 @@ public final class StatUtils {
      * population variance</a> of the entries in the input array, or
      * <code>Double.NaN</code> if the array is empty.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the formula and computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -449,7 +454,7 @@ public final class StatUtils {
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -475,7 +480,7 @@ public final class StatUtils {
      * the input array, using the precomputed mean value.  Returns
      * <code>Double.NaN</code> if the designated subarray is empty.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -507,7 +512,7 @@ public final class StatUtils {
      * population variance</a> of the entries in the input array, using the precomputed
      * mean value. Returns <code>Double.NaN</code> if the array is empty.
      * <p>
-     * See {@link Variance Variance} for
+     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -636,7 +641,7 @@ public final class StatUtils {
      * and less than or equal to 100)</li>
      * </ul>
      * <p>
-     * See {@link Percentile Percentile}
+     * See {@link org.hipparchus.stat.descriptive.rank.Percentile Percentile}
      * for a description of the percentile estimation algorithm used.
      *
      * @param values input array of values
@@ -664,7 +669,7 @@ public final class StatUtils {
      * and less than or equal to 100)</li>
      * </ul>
      * <p>
-     * See {@link Percentile Percentile}
+     * See {@link org.hipparchus.stat.descriptive.rank.Percentile Percentile}
      * for a description of the percentile estimation algorithm used.
      *
      * @param values array of input values
@@ -749,112 +754,6 @@ public final class StatUtils {
             sum2 += diff - meanDifference;
         }
         return (sum1 - (sum2 * sum2 / n)) / (n - 1);
-    }
-
-    /**
-     * Returns the sample mode(s).
-     * <p>
-     * The mode is the most frequently occurring value in the sample.
-     * If there is a unique value with maximum frequency, this value is returned
-     * as the only element of the output array. Otherwise, the returned array
-     * contains the maximum frequency elements in increasing order.
-     * <p>
-     * For example, if {@code sample} is {0, 12, 5, 6, 0, 13, 5, 17},
-     * the returned array will have length two, with 0 in the first element and
-     * 5 in the second.
-     * <p>
-     * NaN values are ignored when computing the mode - i.e., NaNs will never
-     * appear in the output array.  If the sample includes only NaNs or has
-     * length 0, an empty array is returned.
-     *
-     * @param sample input data
-     * @return array of array of the most frequently occurring element(s) sorted in ascending order.
-     * @throws MathIllegalArgumentException if the indices are invalid or the array is null
-     */
-    public static double[] mode(double... sample) throws MathIllegalArgumentException {
-//        MathUtils.checkNotNull(sample, LocalizedCoreFormats.INPUT_ARRAY);
-//        return getMode(sample, 0, sample.length);
-        // TODO: 10/3/2017 fix if needed
-        return null;
-    }
-
-    /**
-     * Returns the sample mode(s).
-     * <p>
-     * The mode is the most frequently occurring value in the sample.
-     * If there is a unique value with maximum frequency, this value is returned
-     * as the only element of the output array. Otherwise, the returned array
-     * contains the maximum frequency elements in increasing order.
-     * <p>
-     * For example, if {@code sample} is {0, 12, 5, 6, 0, 13, 5, 17},
-     * the returned array will have length two, with 0 in the first element and
-     * 5 in the second.
-     * <p>
-     * NaN values are ignored when computing the mode - i.e., NaNs will never
-     * appear in the output array.  If the sample includes only NaNs or has
-     * length 0, an empty array is returned.
-     *
-     * @param sample input data
-     * @param begin  index (0-based) of the first array element to include
-     * @param length the number of elements to include
-     * @return array of array of the most frequently occurring element(s) sorted in ascending order.
-     * @throws MathIllegalArgumentException if the indices are invalid or the array is null
-     */
-    public static double[] mode(double[] sample, final int begin, final int length) {
-//        MathUtils.checkNotNull(sample, LocalizedCoreFormats.INPUT_ARRAY);
-//
-//        if (begin < 0) {
-//            throw new MathIllegalArgumentException(LocalizedCoreFormats.START_POSITION, Integer.valueOf(begin));
-//        }
-//
-//        if (length < 0) {
-//            throw new MathIllegalArgumentException(LocalizedCoreFormats.LENGTH, Integer.valueOf(length));
-//        }
-//
-//        return getMode(sample, begin, length);
-        // TODO: 10/3/2017 duy: fix if needed
-        return null;
-    }
-
-    /**
-     * Private helper method.
-     * Assumes parameters have been validated.
-     *
-     * @param values input data
-     * @param begin  index (0-based) of the first array element to include
-     * @param length the number of elements to include
-     * @return array of array of the most frequently occurring element(s) sorted in ascending order.
-     */
-    private static double[] getMode(double[] values, final int begin, final int length) {
-//        // Add the values to the frequency table
-//        Frequency<Double> freq = new Frequency<>();
-//
-//        Arrays.stream(values, begin, begin + length)
-//                .filter(new DoublePredicate() {
-//                    @Override
-//                    public boolean test(double d) {
-//                        return !Double.isNaN(d);
-//                    }
-//                })
-//                .forEach(new DoubleConsumer() {
-//                    @Override
-//                    public void accept(double v) {
-//                        freq.addValue(v);
-//                    }
-//                });
-//
-//        List<Double> list = freq.getMode();
-//        // Convert the list to an array of primitive double
-//        return list.stream()
-//                .mapToDouble(new ToDoubleFunction<Double>() {
-//                    @Override
-//                    public double applyAsDouble(Double aDouble) {
-//                        return aDouble.doubleValue();
-//                    }
-//                })
-//                .toArray();
-        // FIXME: 10/3/2017  remove java8
-        return null;
     }
 
 }

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.complex;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -308,6 +313,23 @@ public final class Quaternion implements Serializable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        final String sp = " ";
+        final StringBuilder s = new StringBuilder();
+        s.append('[')
+                .append(q0).append(sp)
+                .append(q1).append(sp)
+                .append(q2).append(sp)
+                .append(q3)
+                .append(']');
+
+        return s.toString();
+    }
+
+    /**
      * Checks whether this instance is equal to another quaternion
      * within a given tolerance.
      *
@@ -457,22 +479,5 @@ public final class Quaternion implements Serializable {
                 alpha * q1,
                 alpha * q2,
                 alpha * q3);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        final String sp = " ";
-        final StringBuilder s = new StringBuilder();
-        s.append("[")
-                .append(q0).append(sp)
-                .append(q1).append(sp)
-                .append(q2).append(sp)
-                .append(q3)
-                .append("]");
-
-        return s.toString();
     }
 }

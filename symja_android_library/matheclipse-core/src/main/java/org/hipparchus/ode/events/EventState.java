@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.events;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -31,7 +36,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class handles the state for one {@link ODEEventHandler
  * event handler} during integration steps.
- * <p>
+ *
  * <p>Each time the integrator proposes a step, the event handler
  * switching function should be checked. This class handles the state
  * of one handler during one integration step, with references to the
@@ -282,7 +287,7 @@ public class EventState {
 
     /**
      * Find a root in a bracketing interval.
-     * <p>
+     *
      * <p> When calling this method one of the following must be true. Either ga == 0, gb
      * == 0, (ga < 0  and gb > 0), or (ga > 0 and gb < 0).
      *
@@ -438,7 +443,7 @@ public class EventState {
 
     /**
      * Try to accept the current history up to the given time.
-     * <p>
+     *
      * <p> It is not necessary to call this method before calling {@link
      * #doEvent(ODEStateAndDerivative)} with the same state. It is necessary to call this
      * method before you call {@link #doEvent(ODEStateAndDerivative)} on some other event

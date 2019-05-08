@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.solvers;
 
 
@@ -38,7 +43,7 @@ import org.hipparchus.util.Precision;
  * The given interval must bracket the root.</p>
  */
 public class BracketingNthOrderBrentSolver
-        extends BracketedUnivariateSolverUnivariateFunction
+        extends AbstractUnivariateSolver
         implements BracketedUnivariateSolver<UnivariateFunction> {
 
     /**
@@ -424,6 +429,12 @@ public class BracketingNthOrderBrentSolver
             throws MathIllegalArgumentException, MathIllegalStateException {
         this.allowed = allowedSolution;
         return super.solve(maxEval, f, min, max, startValue);
+
+    }
+
+    @Override
+    public Interval solveInterval(int maxEval, UnivariateFunction univariateFunction, double min, double max) throws MathIllegalArgumentException, MathIllegalStateException {
+        return this.solveInterval(maxEval, univariateFunction, min, max, min + 0.5 * (max - min));
 
     }
 

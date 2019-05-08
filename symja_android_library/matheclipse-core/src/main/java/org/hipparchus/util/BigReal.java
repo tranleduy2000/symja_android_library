@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 
@@ -291,6 +296,22 @@ public class BigReal implements FieldElement<BigReal>, Comparable<BigReal>, Seri
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+    public BigReal multiply(final int n) {
+        return new BigReal(d.multiply(new BigDecimal(n)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BigReal multiply(BigReal a) {
+        return new BigReal(d.multiply(a.d));
+    }
+
+    /**
+     * {@inheritDoc}
      *
      * @throws MathRuntimeException if {@code a} is zero
      */
@@ -300,7 +321,7 @@ public class BigReal implements FieldElement<BigReal>, Comparable<BigReal>, Seri
             return new BigReal(d.divide(a.d, scale, roundingMode));
         } catch (ArithmeticException e) {
             // Division by zero has occurred
-            throw new MathRuntimeException(LocalizedCoreFormats.ZERO_NOT_ALLOWED);
+            throw new MathRuntimeException(e, LocalizedCoreFormats.ZERO_NOT_ALLOWED);
         }
     }
 
@@ -315,7 +336,7 @@ public class BigReal implements FieldElement<BigReal>, Comparable<BigReal>, Seri
             return new BigReal(BigDecimal.ONE.divide(d, scale, roundingMode));
         } catch (ArithmeticException e) {
             // Division by zero has occurred
-            throw new MathRuntimeException(LocalizedCoreFormats.ZERO_NOT_ALLOWED);
+            throw new MathRuntimeException(e, LocalizedCoreFormats.ZERO_NOT_ALLOWED);
         }
     }
 
@@ -323,16 +344,8 @@ public class BigReal implements FieldElement<BigReal>, Comparable<BigReal>, Seri
      * {@inheritDoc}
      */
     @Override
-    public BigReal multiply(BigReal a) {
-        return new BigReal(d.multiply(a.d));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public BigReal multiply(final int n) {
-        return new BigReal(d.multiply(new BigDecimal(n)));
+    public Field<BigReal> getField() {
+        return BigRealField.getInstance();
     }
 
     /**
@@ -382,13 +395,5 @@ public class BigReal implements FieldElement<BigReal>, Comparable<BigReal>, Seri
     @Override
     public int hashCode() {
         return d.hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Field<BigReal> getField() {
-        return BigRealField.getInstance();
     }
 }

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -81,18 +86,6 @@ public class GeometricDistribution extends AbstractIntegerDistribution {
             return 0.0;
         } else {
             return FastMath.exp(log1mProbabilityOfSuccess * x) * probabilityOfSuccess;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double logProbability(int x) {
-        if (x < 0) {
-            return Double.NEGATIVE_INFINITY;
-        } else {
-            return x * log1mProbabilityOfSuccess + logProbabilityOfSuccess;
         }
     }
 
@@ -180,5 +173,17 @@ public class GeometricDistribution extends AbstractIntegerDistribution {
             return 0;
         }
         return Math.max(0, (int) Math.ceil(FastMath.log1p(-p) / log1mProbabilityOfSuccess - 1));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logProbability(int x) {
+        if (x < 0) {
+            return Double.NEGATIVE_INFINITY;
+        } else {
+            return x * log1mProbabilityOfSuccess + logProbabilityOfSuccess;
+        }
     }
 }

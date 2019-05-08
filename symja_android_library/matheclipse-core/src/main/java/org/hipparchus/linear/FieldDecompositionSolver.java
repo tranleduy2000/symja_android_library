@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.FieldElement;
@@ -47,7 +52,7 @@ public interface FieldDecompositionSolver<T extends FieldElement<T>> {
      * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match or the decomposed matrix
      *                                                               is singular.
      */
-    FieldVector<T> solve(final FieldVector<T> b);
+    FieldVector<T> solve(FieldVector<T> b);
 
     /**
      * Solve the linear equation A &times; X = B for matrices A.
@@ -59,7 +64,7 @@ public interface FieldDecompositionSolver<T extends FieldElement<T>> {
      * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match or the decomposed matrix
      *                                                               is singular.
      */
-    FieldMatrix<T> solve(final FieldMatrix<T> b);
+    FieldMatrix<T> solve(FieldMatrix<T> b);
 
     /**
      * Check if the decomposed matrix is non-singular.

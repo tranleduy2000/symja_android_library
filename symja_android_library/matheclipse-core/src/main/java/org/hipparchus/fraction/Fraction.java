@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fraction;
 
 import org.hipparchus.FieldElement;
@@ -404,31 +409,6 @@ public class Fraction
     }
 
     /**
-     * Test for the equality of two fractions.  If the lowest term
-     * numerator and denominators are the same for both fractions, the two
-     * fractions are considered to be equal.
-     *
-     * @param other fraction to test for equality to this fraction
-     * @return true if two fractions are equal, false if object is
-     * {@code null}, not an instance of {@link Fraction}, or not equal
-     * to this fraction instance.
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other instanceof Fraction) {
-            // since fractions are always in lowest terms, numerators and
-            // denominators can be compared directly for equality.
-            Fraction rhs = (Fraction) other;
-            return (numerator == rhs.numerator) &&
-                    (denominator == rhs.denominator);
-        }
-        return false;
-    }
-
-    /**
      * Gets the fraction as a {@code float}. This calculates the fraction as
      * the numerator divided by denominator.
      *
@@ -437,34 +417,6 @@ public class Fraction
     @Override
     public float floatValue() {
         return (float) doubleValue();
-    }
-
-    /**
-     * Access the denominator.
-     *
-     * @return the denominator.
-     */
-    public int getDenominator() {
-        return denominator;
-    }
-
-    /**
-     * Access the numerator.
-     *
-     * @return the numerator.
-     */
-    public int getNumerator() {
-        return numerator;
-    }
-
-    /**
-     * Gets a hashCode for the fraction.
-     *
-     * @return a hash code value for this object
-     */
-    @Override
-    public int hashCode() {
-        return 37 * (37 * 17 + numerator) + denominator;
     }
 
     /**
@@ -490,26 +442,76 @@ public class Fraction
     }
 
     /**
-     * Return the additive inverse of this fraction.
+     * Test for the equality of two fractions.  If the lowest term
+     * numerator and denominators are the same for both fractions, the two
+     * fractions are considered to be equal.
      *
-     * @return the negation of this fraction.
+     * @param other fraction to test for equality to this fraction
+     * @return true if two fractions are equal, false if object is
+     * {@code null}, not an instance of {@link Fraction}, or not equal
+     * to this fraction instance.
      */
     @Override
-    public Fraction negate() {
-        if (numerator == Integer.MIN_VALUE) {
-            throw new MathRuntimeException(LocalizedCoreFormats.OVERFLOW_IN_FRACTION, numerator, denominator);
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
         }
-        return new Fraction(-numerator, denominator);
+        if (other instanceof Fraction) {
+            // since fractions are always in lowest terms, numerators and
+            // denominators can be compared directly for equality.
+            Fraction rhs = (Fraction) other;
+            return (numerator == rhs.numerator) &&
+                    (denominator == rhs.denominator);
+        }
+        return false;
     }
 
     /**
-     * Return the multiplicative inverse of this fraction.
+     * Gets a hashCode for the fraction.
      *
-     * @return the reciprocal fraction
+     * @return a hash code value for this object
      */
     @Override
-    public Fraction reciprocal() {
-        return new Fraction(denominator, numerator);
+    public int hashCode() {
+        return 37 * (37 * 17 + numerator) + denominator;
+    }
+
+    /**
+     * Returns the {@code String} representing this fraction, ie
+     * "num / dem" or just "num" if the denominator is one.
+     *
+     * @return a string representation of the fraction.
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        String str = null;
+        if (denominator == 1) {
+            str = Integer.toString(numerator);
+        } else if (numerator == 0) {
+            str = "0";
+        } else {
+            str = numerator + " / " + denominator;
+        }
+        return str;
+    }
+
+    /**
+     * Access the denominator.
+     *
+     * @return the denominator.
+     */
+    public int getDenominator() {
+        return denominator;
+    }
+
+    /**
+     * Access the numerator.
+     *
+     * @return the numerator.
+     */
+    public int getNumerator() {
+        return numerator;
     }
 
     /**
@@ -528,16 +530,6 @@ public class Fraction
     }
 
     /**
-     * Add an integer to the fraction.
-     *
-     * @param i the {@code integer} to add.
-     * @return this + i
-     */
-    public Fraction add(final int i) {
-        return new Fraction(numerator + i * denominator, denominator);
-    }
-
-    /**
      * Subtracts the value of another fraction from the value of this one,
      * returning the result in reduced form.
      *
@@ -550,6 +542,103 @@ public class Fraction
     @Override
     public Fraction subtract(Fraction fraction) {
         return addSub(fraction, false /* subtract */);
+    }
+
+    /**
+     * Return the additive inverse of this fraction.
+     *
+     * @return the negation of this fraction.
+     */
+    @Override
+    public Fraction negate() {
+        if (numerator == Integer.MIN_VALUE) {
+            throw new MathRuntimeException(LocalizedCoreFormats.OVERFLOW_IN_FRACTION, numerator, denominator);
+        }
+        return new Fraction(-numerator, denominator);
+    }
+
+    /**
+     * Multiply the fraction by an integer.
+     *
+     * @param i the {@code integer} to multiply by.
+     * @return this * i
+     */
+    @Override
+    public Fraction multiply(final int i) {
+        return multiply(new Fraction(i));
+    }
+
+    /**
+     * Multiplies the value of this fraction by another, returning the
+     * result in reduced form.
+     *
+     * @param fraction the fraction to multiply by, must not be {@code null}
+     * @return a {@code Fraction} instance with the resulting values
+     * @throws org.hipparchus.exception.NullArgumentException if the fraction is {@code null}
+     * @throws MathRuntimeException                           if the resulting numerator or denominator exceeds
+     *                                                        {@code Integer.MAX_VALUE}
+     */
+    @Override
+    public Fraction multiply(Fraction fraction) {
+        MathUtils.checkNotNull(fraction, LocalizedCoreFormats.FRACTION);
+        if (numerator == 0 || fraction.numerator == 0) {
+            return ZERO;
+        }
+        // knuth 4.5.1
+        // make sure we don't overflow unless the result *must* overflow.
+        int d1 = ArithmeticUtils.gcd(numerator, fraction.denominator);
+        int d2 = ArithmeticUtils.gcd(fraction.numerator, denominator);
+        return getReducedFraction
+                (ArithmeticUtils.mulAndCheck(numerator / d1, fraction.numerator / d2),
+                        ArithmeticUtils.mulAndCheck(denominator / d2, fraction.denominator / d1));
+    }
+
+    /**
+     * Divide the value of this fraction by another.
+     *
+     * @param fraction the fraction to divide by, must not be {@code null}
+     * @return a {@code Fraction} instance with the resulting values
+     * @throws IllegalArgumentException if the fraction is {@code null}
+     * @throws MathRuntimeException     if the fraction to divide by is zero
+     * @throws MathRuntimeException     if the resulting numerator or denominator exceeds
+     *                                  {@code Integer.MAX_VALUE}
+     */
+    @Override
+    public Fraction divide(Fraction fraction) {
+        MathUtils.checkNotNull(fraction, LocalizedCoreFormats.FRACTION);
+        if (fraction.numerator == 0) {
+            throw new MathRuntimeException(LocalizedCoreFormats.ZERO_FRACTION_TO_DIVIDE_BY,
+                    fraction.numerator, fraction.denominator);
+        }
+        return multiply(fraction.reciprocal());
+    }
+
+    /**
+     * Return the multiplicative inverse of this fraction.
+     *
+     * @return the reciprocal fraction
+     */
+    @Override
+    public Fraction reciprocal() {
+        return new Fraction(denominator, numerator);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FractionField getField() {
+        return FractionField.getInstance();
+    }
+
+    /**
+     * Add an integer to the fraction.
+     *
+     * @param i the {@code integer} to add.
+     * @return this + i
+     */
+    public Fraction add(final int i) {
+        return new Fraction(numerator + i * denominator, denominator);
     }
 
     /**
@@ -619,62 +708,6 @@ public class Fraction
     }
 
     /**
-     * Multiplies the value of this fraction by another, returning the
-     * result in reduced form.
-     *
-     * @param fraction the fraction to multiply by, must not be {@code null}
-     * @return a {@code Fraction} instance with the resulting values
-     * @throws org.hipparchus.exception.NullArgumentException if the fraction is {@code null}
-     * @throws MathRuntimeException                           if the resulting numerator or denominator exceeds
-     *                                                        {@code Integer.MAX_VALUE}
-     */
-    @Override
-    public Fraction multiply(Fraction fraction) {
-        MathUtils.checkNotNull(fraction, LocalizedCoreFormats.FRACTION);
-        if (numerator == 0 || fraction.numerator == 0) {
-            return ZERO;
-        }
-        // knuth 4.5.1
-        // make sure we don't overflow unless the result *must* overflow.
-        int d1 = ArithmeticUtils.gcd(numerator, fraction.denominator);
-        int d2 = ArithmeticUtils.gcd(fraction.numerator, denominator);
-        return getReducedFraction
-                (ArithmeticUtils.mulAndCheck(numerator / d1, fraction.numerator / d2),
-                        ArithmeticUtils.mulAndCheck(denominator / d2, fraction.denominator / d1));
-    }
-
-    /**
-     * Multiply the fraction by an integer.
-     *
-     * @param i the {@code integer} to multiply by.
-     * @return this * i
-     */
-    @Override
-    public Fraction multiply(final int i) {
-        return multiply(new Fraction(i));
-    }
-
-    /**
-     * Divide the value of this fraction by another.
-     *
-     * @param fraction the fraction to divide by, must not be {@code null}
-     * @return a {@code Fraction} instance with the resulting values
-     * @throws IllegalArgumentException if the fraction is {@code null}
-     * @throws MathRuntimeException     if the fraction to divide by is zero
-     * @throws MathRuntimeException     if the resulting numerator or denominator exceeds
-     *                                  {@code Integer.MAX_VALUE}
-     */
-    @Override
-    public Fraction divide(Fraction fraction) {
-        MathUtils.checkNotNull(fraction, LocalizedCoreFormats.FRACTION);
-        if (fraction.numerator == 0) {
-            throw new MathRuntimeException(LocalizedCoreFormats.ZERO_FRACTION_TO_DIVIDE_BY,
-                    fraction.numerator, fraction.denominator);
-        }
-        return multiply(fraction.reciprocal());
-    }
-
-    /**
      * Divide the fraction by an integer.
      *
      * @param i the {@code integer} to divide by.
@@ -692,34 +725,6 @@ public class Fraction
      */
     public double percentageValue() {
         return 100 * doubleValue();
-    }
-
-    /**
-     * Returns the {@code String} representing this fraction, ie
-     * "num / dem" or just "num" if the denominator is one.
-     *
-     * @return a string representation of the fraction.
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        String str = null;
-        if (denominator == 1) {
-            str = Integer.toString(numerator);
-        } else if (numerator == 0) {
-            str = "0";
-        } else {
-            str = numerator + " / " + denominator;
-        }
-        return str;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FractionField getField() {
-        return FractionField.getInstance();
     }
 
 }

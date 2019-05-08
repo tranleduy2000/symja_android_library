@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode;
 
 import org.hipparchus.Field;
@@ -26,7 +31,6 @@ import org.hipparchus.ode.nonstiff.AdaptiveStepsizeFieldIntegrator;
 import org.hipparchus.ode.nonstiff.DormandPrince853FieldIntegrator;
 import org.hipparchus.ode.sampling.FieldODEStateInterpolator;
 import org.hipparchus.ode.sampling.FieldODEStepHandler;
-import org.hipparchus.ode.sampling.FieldODEStepHandlerImpl;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
@@ -137,7 +141,7 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
                     nSteps, 2, true);
         }
 
-        starter = new DormandPrince853FieldIntegrator<T>(field, minStep, maxStep,
+        starter = new DormandPrince853FieldIntegrator<>(field, minStep, maxStep,
                 scalAbsoluteTolerance,
                 scalRelativeTolerance);
         this.nSteps = nSteps;
@@ -178,7 +182,7 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
                                        final double[] vecAbsoluteTolerance,
                                        final double[] vecRelativeTolerance) {
         super(field, name, minStep, maxStep, vecAbsoluteTolerance, vecRelativeTolerance);
-        starter = new DormandPrince853FieldIntegrator<T>(field, minStep, maxStep,
+        starter = new DormandPrince853FieldIntegrator<>(field, minStep, maxStep,
                 vecAbsoluteTolerance,
                 vecRelativeTolerance);
         this.nSteps = nSteps;
@@ -275,9 +279,7 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
      * @return Nordieck vector at first step (h<sup>2</sup>/2 y''<sub>n</sub>,
      * h<sup>3</sup>/6 y'''<sub>n</sub> ... h<sup>k</sup>/k! y<sup>(k)</sup><sub>n</sub>)
      */
-    protected abstract Array2DRowFieldMatrix<T> initializeHighOrderDerivatives(final T h, final T[] t,
-                                                                               final T[][] y,
-                                                                               final T[][] yDot);
+    protected abstract Array2DRowFieldMatrix<T> initializeHighOrderDerivatives(T h, T[] t, T[][] y, T[][] yDot);
 
     /**
      * Get the minimal reduction factor for stepsize control.
@@ -405,9 +407,7 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
     /**
      * Specialized step handler storing the first step.
      */
-    private class FieldNordsieckInitializer
-            extends FieldODEStepHandlerImpl<T>
-            implements FieldODEStepHandler<T> {
+    private class FieldNordsieckInitializer implements FieldODEStepHandler<T> {
 
         /**
          * First steps times.
@@ -440,6 +440,14 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
             this.t = MathArrays.buildArray(getField(), nbStartPoints);
             this.y = MathArrays.buildArray(getField(), nbStartPoints, -1);
             this.yDot = MathArrays.buildArray(getField(), nbStartPoints, -1);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void init(final FieldODEStateAndDerivative<T> initialState, T finalTime) {
+            // nothing to do
         }
 
         /**
@@ -487,14 +495,6 @@ public abstract class MultistepFieldIntegrator<T extends RealFieldElement<T>>
 
             }
 
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void init(final FieldODEStateAndDerivative<T> initialState, T finalTime) {
-            // nothing to do
         }
 
     }

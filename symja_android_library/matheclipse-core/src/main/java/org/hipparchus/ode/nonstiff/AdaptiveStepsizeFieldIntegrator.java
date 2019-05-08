@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -34,7 +39,7 @@ import org.hipparchus.util.MathUtils;
 /**
  * This abstract class holds the common part of all adaptive
  * stepsize integrators for Ordinary Differential Equations.
- * <p>
+ *
  * <p>These algorithms perform integration with stepsize control, which
  * means the user does not specify the integration step but rather a
  * tolerance on error. The error threshold is computed as
@@ -52,10 +57,10 @@ import org.hipparchus.util.MathUtils;
  * FieldODEState#getSecondaryState(int) secondary parts} of the state
  * vector are explicitly ignored for stepsize control.
  * </p>
- * <p>
+ *
  * <p>If the estimated error for ym+1 is such that
  * <pre>
- * sqrt((sum (errEst_i / threshold_i)^2 ) / n) < 1
+ * sqrt((sum (errEst_i / threshold_i)^2 ) / n) &lt; 1
  * </pre>
  * <p>
  * (where n is the main set dimension) then the step is accepted,

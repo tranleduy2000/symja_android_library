@@ -22,13 +22,16 @@ import org.hipparchus.util.Precision;
 
 /**
  * Check if an optimization has converged based on the change in computed RMS.
- *
  */
 public class EvaluationRmsChecker implements ConvergenceChecker<Evaluation> {
 
-    /** relative tolerance for comparisons. */
+    /**
+     * relative tolerance for comparisons.
+     */
     private final double relTol;
-    /** absolute tolerance for comparisons. */
+    /**
+     * absolute tolerance for comparisons.
+     */
     private final double absTol;
 
     /**
@@ -61,7 +64,9 @@ public class EvaluationRmsChecker implements ConvergenceChecker<Evaluation> {
         this.absTol = absTol;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean converged(final int iteration,
                              final Evaluation previous,

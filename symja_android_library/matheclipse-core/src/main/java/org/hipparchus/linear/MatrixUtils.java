@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.Field;
@@ -30,6 +35,9 @@ import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 /**
@@ -40,7 +48,7 @@ public class MatrixUtils {
     /**
      * The default format for {@link RealMatrix} objects.
      */
-    public static final RealMatrixFormat DEFAULT_FORMAT = RealMatrixFormat.getInstance();
+    public static final RealMatrixFormat DEFAULT_FORMAT = RealMatrixFormat.getRealMatrixFormat();
 
     /**
      * A format for {@link RealMatrix} objects compatible with octave.
@@ -107,11 +115,11 @@ public class MatrixUtils {
      *
      * @param data input array
      * @return RealMatrix containing the values of the array
-     * @throws MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
-     * @throws MathIllegalArgumentException if a row or column is empty.
-     * @throws NullArgumentException        if either {@code data} or {@code data[0]}
-     *                                      is {@code null}.
-     * @throws MathIllegalArgumentException if {@code data} is not rectangular.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
+     * @throws MathIllegalArgumentException                          if a row or column is empty.
+     * @throws NullArgumentException                                 if either {@code data} or {@code data[0]}
+     *                                                               is {@code null}.
+     * @throws MathIllegalArgumentException                          if {@code data} is not rectangular.
      * @see #createRealMatrix(int, int)
      */
     public static RealMatrix createRealMatrix(double[][] data)
@@ -136,10 +144,10 @@ public class MatrixUtils {
      * @param <T>  the type of the field elements
      * @param data input array
      * @return a matrix containing the values of the array.
-     * @throws MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
-     * @throws MathIllegalArgumentException if a row or column is empty.
-     * @throws NullArgumentException        if either {@code data} or {@code data[0]}
-     *                                      is {@code null}.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
+     * @throws MathIllegalArgumentException                          if a row or column is empty.
+     * @throws NullArgumentException                                 if either {@code data} or {@code data[0]}
+     *                                                               is {@code null}.
      * @see #createFieldMatrix(Field, int, int)
      */
     public static <T extends FieldElement<T>> FieldMatrix<T> createFieldMatrix(T[][] data)
@@ -239,6 +247,17 @@ public class MatrixUtils {
     }
 
     /**
+     * Creates a {@link RealVector} with specified dimensions.
+     *
+     * @param dimension dimension of the vector
+     * @return a new vector
+     * @since 1.3
+     */
+    public static RealVector createRealVector(final int dimension) {
+        return new ArrayRealVector(new double[dimension]);
+    }
+
+    /**
      * Creates a {@link FieldVector} using the data from the input array.
      *
      * @param <T>  the type of the field elements
@@ -257,6 +276,19 @@ public class MatrixUtils {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.VECTOR_MUST_HAVE_AT_LEAST_ONE_ELEMENT);
         }
         return new ArrayFieldVector<T>(data[0].getField(), data, true);
+    }
+
+    /**
+     * Creates a {@link FieldVector} with specified dimensions.
+     *
+     * @param <T>       the type of the field elements
+     * @param field     field to which array elements belong
+     * @param dimension dimension of the vector
+     * @return a new vector
+     * @since 1.3
+     */
+    public static <T extends FieldElement<T>> FieldVector<T> createFieldVector(final Field<T> field, final int dimension) {
+        return new ArrayFieldVector<>(MathArrays.buildArray(field, dimension));
     }
 
     /**
@@ -588,10 +620,41 @@ public class MatrixUtils {
      */
     public static void checkMultiplicationCompatible(final AnyMatrix left, final AnyMatrix right)
             throws MathIllegalArgumentException {
-
         if (left.getColumnDimension() != right.getRowDimension()) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
                     left.getColumnDimension(), right.getRowDimension());
+        }
+    }
+
+    /**
+     * Check if matrices have the same number of columns.
+     *
+     * @param left  Left hand side matrix.
+     * @param right Right hand side matrix.
+     * @throws MathIllegalArgumentException if matrices don't have the same number of columns.
+     * @since 1.3
+     */
+    public static void checkSameColumnDimension(final AnyMatrix left, final AnyMatrix right)
+            throws MathIllegalArgumentException {
+        if (left.getColumnDimension() != right.getColumnDimension()) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    left.getColumnDimension(), right.getColumnDimension());
+        }
+    }
+
+    /**
+     * Check if matrices have the same number of rows.
+     *
+     * @param left  Left hand side matrix.
+     * @param right Right hand side matrix.
+     * @throws MathIllegalArgumentException if matrices don't have the same number of rows.
+     * @since 1.3
+     */
+    public static void checkSameRowDimension(final AnyMatrix left, final AnyMatrix right)
+            throws MathIllegalArgumentException {
+        if (left.getRowDimension() != right.getRowDimension()) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    left.getRowDimension(), right.getRowDimension());
         }
     }
 
@@ -617,6 +680,213 @@ public class MatrixUtils {
         final BigFractionMatrixConverter converter = new BigFractionMatrixConverter();
         m.walkInOptimizedOrder(converter);
         return converter.getConvertedMatrix();
+    }
+
+    /**
+     * Serialize a {@link RealVector}.
+     * <p>
+     * This method is intended to be called from within a private
+     * <code>writeObject</code> method (after a call to
+     * <code>oos.defaultWriteObject()</code>) in a class that has a
+     * {@link RealVector} field, which should be declared <code>transient</code>.
+     * This way, the default handling does not serialize the vector (the {@link
+     * RealVector} interface is not serializable by default) but this method does
+     * serialize it specifically.
+     * </p>
+     * <p>
+     * The following example shows how a simple class with a name and a real vector
+     * should be written:
+     * <pre><code>
+     * public class NamedVector implements Serializable {
+     *
+     *     private final String name;
+     *     private final transient RealVector coefficients;
+     *
+     *     // omitted constructors, getters ...
+     *
+     *     private void writeObject(ObjectOutputStream oos) throws IOException {
+     *         oos.defaultWriteObject();  // takes care of name field
+     *         MatrixUtils.serializeRealVector(coefficients, oos);
+     *     }
+     *
+     *     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+     *         ois.defaultReadObject();  // takes care of name field
+     *         MatrixUtils.deserializeRealVector(this, "coefficients", ois);
+     *     }
+     *
+     * }
+     * </code></pre>
+     * </p>
+     *
+     * @param vector real vector to serialize
+     * @param oos    stream where the real vector should be written
+     * @throws IOException if object cannot be written to stream
+     * @see #deserializeRealVector(Object, String, ObjectInputStream)
+     */
+    public static void serializeRealVector(final RealVector vector,
+                                           final ObjectOutputStream oos)
+            throws IOException {
+        final int n = vector.getDimension();
+        oos.writeInt(n);
+        for (int i = 0; i < n; ++i) {
+            oos.writeDouble(vector.getEntry(i));
+        }
+    }
+
+    /**
+     * Deserialize  a {@link RealVector} field in a class.
+     * <p>
+     * This method is intended to be called from within a private
+     * <code>readObject</code> method (after a call to
+     * <code>ois.defaultReadObject()</code>) in a class that has a
+     * {@link RealVector} field, which should be declared <code>transient</code>.
+     * This way, the default handling does not deserialize the vector (the {@link
+     * RealVector} interface is not serializable by default) but this method does
+     * deserialize it specifically.
+     * </p>
+     *
+     * @param instance  instance in which the field must be set up
+     * @param fieldName name of the field within the class (may be private and final)
+     * @param ois       stream from which the real vector should be read
+     * @throws ClassNotFoundException if a class in the stream cannot be found
+     * @throws IOException            if object cannot be read from the stream
+     * @see #serializeRealVector(RealVector, ObjectOutputStream)
+     */
+    public static void deserializeRealVector(final Object instance,
+                                             final String fieldName,
+                                             final ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
+        try {
+
+            // read the vector data
+            final int n = ois.readInt();
+            final double[] data = new double[n];
+            for (int i = 0; i < n; ++i) {
+                data[i] = ois.readDouble();
+            }
+
+            // create the instance
+            final RealVector vector = new ArrayRealVector(data, false);
+
+            // set up the field
+            final java.lang.reflect.Field f =
+                    instance.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            f.set(instance, vector);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
+        }
+
+    }
+
+    /**
+     * Serialize a {@link RealMatrix}.
+     * <p>
+     * This method is intended to be called from within a private
+     * <code>writeObject</code> method (after a call to
+     * <code>oos.defaultWriteObject()</code>) in a class that has a
+     * {@link RealMatrix} field, which should be declared <code>transient</code>.
+     * This way, the default handling does not serialize the matrix (the {@link
+     * RealMatrix} interface is not serializable by default) but this method does
+     * serialize it specifically.
+     * </p>
+     * <p>
+     * The following example shows how a simple class with a name and a real matrix
+     * should be written:
+     * <pre><code>
+     * public class NamedMatrix implements Serializable {
+     *
+     *     private final String name;
+     *     private final transient RealMatrix coefficients;
+     *
+     *     // omitted constructors, getters ...
+     *
+     *     private void writeObject(ObjectOutputStream oos) throws IOException {
+     *         oos.defaultWriteObject();  // takes care of name field
+     *         MatrixUtils.serializeRealMatrix(coefficients, oos);
+     *     }
+     *
+     *     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+     *         ois.defaultReadObject();  // takes care of name field
+     *         MatrixUtils.deserializeRealMatrix(this, "coefficients", ois);
+     *     }
+     *
+     * }
+     * </code></pre>
+     * </p>
+     *
+     * @param matrix real matrix to serialize
+     * @param oos    stream where the real matrix should be written
+     * @throws IOException if object cannot be written to stream
+     * @see #deserializeRealMatrix(Object, String, ObjectInputStream)
+     */
+    public static void serializeRealMatrix(final RealMatrix matrix,
+                                           final ObjectOutputStream oos)
+            throws IOException {
+        final int n = matrix.getRowDimension();
+        final int m = matrix.getColumnDimension();
+        oos.writeInt(n);
+        oos.writeInt(m);
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                oos.writeDouble(matrix.getEntry(i, j));
+            }
+        }
+    }
+
+    /**
+     * Deserialize  a {@link RealMatrix} field in a class.
+     * <p>
+     * This method is intended to be called from within a private
+     * <code>readObject</code> method (after a call to
+     * <code>ois.defaultReadObject()</code>) in a class that has a
+     * {@link RealMatrix} field, which should be declared <code>transient</code>.
+     * This way, the default handling does not deserialize the matrix (the {@link
+     * RealMatrix} interface is not serializable by default) but this method does
+     * deserialize it specifically.
+     * </p>
+     *
+     * @param instance  instance in which the field must be set up
+     * @param fieldName name of the field within the class (may be private and final)
+     * @param ois       stream from which the real matrix should be read
+     * @throws ClassNotFoundException if a class in the stream cannot be found
+     * @throws IOException            if object cannot be read from the stream
+     * @see #serializeRealMatrix(RealMatrix, ObjectOutputStream)
+     */
+    public static void deserializeRealMatrix(final Object instance,
+                                             final String fieldName,
+                                             final ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
+        try {
+
+            // read the matrix data
+            final int n = ois.readInt();
+            final int m = ois.readInt();
+            final double[][] data = new double[n][m];
+            for (int i = 0; i < n; ++i) {
+                final double[] dataI = data[i];
+                for (int j = 0; j < m; ++j) {
+                    dataI[j] = ois.readDouble();
+                }
+            }
+
+            // create the instance
+            final RealMatrix matrix = new Array2DRowRealMatrix(data, false);
+
+            // set up the field
+            final java.lang.reflect.Field f =
+                    instance.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            f.set(instance, matrix);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
+        }
     }
 
     /**

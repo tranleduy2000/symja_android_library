@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -29,15 +34,15 @@ import org.hipparchus.random.RandomVectorGenerator;
  * in a local extremum when looking for a global one).
  * <em>It is not a "user" class.</em>
  *
- * @param <PAIR> Type of the point/value pair returned by the optimization
- *               algorithm.
+ * @param <P> Type of the point/value pair returned by the optimization
+ *            algorithm.
  */
-public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
-        extends BaseMultivariateOptimizer<PAIR> {
+public abstract class BaseMultiStartMultivariateOptimizer<P>
+        extends BaseMultivariateOptimizer<P> {
     /**
      * Underlying classical optimizer.
      */
-    private final BaseMultivariateOptimizer<PAIR> optimizer;
+    private final BaseMultivariateOptimizer<P> optimizer;
     /**
      * Number of evaluations already performed for all starts.
      */
@@ -84,7 +89,7 @@ public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
      * @param generator Random vector generator to use for restarts.
      * @throws MathIllegalArgumentException if {@code starts < 1}.
      */
-    public BaseMultiStartMultivariateOptimizer(final BaseMultivariateOptimizer<PAIR> optimizer,
+    public BaseMultiStartMultivariateOptimizer(final BaseMultivariateOptimizer<P> optimizer,
                                                final int starts,
                                                final RandomVectorGenerator generator) {
         super(optimizer.getConvergenceChecker());
@@ -108,49 +113,10 @@ public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
     }
 
     /**
-     * Gets all the optima found during the last call to {@code optimize}.
-     * The optimizer stores all the optima found during a set of
-     * restarts. The {@code optimize} method returns the best point only.
-     * This method returns all the points found at the end of each starts,
-     * including the best one already returned by the {@code optimize} method.
-     * <br/>
-     * The returned array as one element for each start as specified
-     * in the constructor. It is ordered with the results from the
-     * runs that did converge first, sorted from best to worst
-     * objective value (i.e in ascending order if minimizing and in
-     * descending order if maximizing), followed by {@code null} elements
-     * corresponding to the runs that did not converge. This means all
-     * elements will be {@code null} if the {@code optimize} method did throw
-     * an exception.
-     * This also means that if the first element is not {@code null}, it is
-     * the best point found across all starts.
-     * <br/>
-     * The behaviour is undefined if this method is called before
-     * {@code optimize}; it will likely throw {@code NullPointerException}.
-     *
-     * @return an array containing the optima sorted from best to worst.
-     */
-    public abstract PAIR[] getOptima();
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalStateException if {@code optData} does not contain an
-     *                                   instance of {@link MaxEval} or {@link InitialGuess}.
-     */
-    @Override
-    public PAIR optimize(OptimizationData... optData) {
-        // Store arguments in order to pass them to the internal optimizer.
-        optimData = optData;
-        // Set up base class and perform computations.
-        return super.optimize(optData);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    protected PAIR doOptimize() {
+    protected P doOptimize() {
         // Remove all instances of "MaxEval" and "InitialGuess" from the
         // array that will be passed to the internal optimizer.
         // The former is to enforce smaller numbers of allowed evaluations
@@ -196,7 +162,7 @@ public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
                 } else {
                     int attempts = 0;
                     while (s == null) {
-                        if (attempts++ >= getMaxEvaluations()) {
+                        if (attempts >= getMaxEvaluations()) {
                             throw new MathIllegalStateException(LocalizedCoreFormats.MAX_COUNT_EXCEEDED,
                                     getMaxEvaluations());
                         }
@@ -207,13 +173,14 @@ public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
                                 s = null;
                             }
                         }
+                        ++attempts;
                     }
                 }
                 optimData[initialGuessIndex] = new InitialGuess(s);
                 // Optimize.
-                final PAIR result = optimizer.optimize(optimData);
+                final P result = optimizer.optimize(optimData);
                 store(result);
-            } catch (RuntimeException mue) {
+            } catch (RuntimeException mue) { // NOPMD - caching a RuntimeException is intentional here, it will be rethrown later
                 lastException = mue;
             }
             // CHECKSTYLE: resume IllegalCatch
@@ -221,7 +188,7 @@ public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
             totalEvaluations += optimizer.getEvaluations();
         }
 
-        final PAIR[] optima = getOptima();
+        final P[] optima = getOptima();
         if (optima.length == 0) {
             // All runs failed.
             throw lastException; // Cannot be null if starts >= 1.
@@ -232,11 +199,50 @@ public abstract class BaseMultiStartMultivariateOptimizer<PAIR>
     }
 
     /**
+     * Gets all the optima found during the last call to {@code optimize}.
+     * The optimizer stores all the optima found during a set of
+     * restarts. The {@code optimize} method returns the best point only.
+     * This method returns all the points found at the end of each starts,
+     * including the best one already returned by the {@code optimize} method.
+     * <br/>
+     * The returned array as one element for each start as specified
+     * in the constructor. It is ordered with the results from the
+     * runs that did converge first, sorted from best to worst
+     * objective value (i.e in ascending order if minimizing and in
+     * descending order if maximizing), followed by {@code null} elements
+     * corresponding to the runs that did not converge. This means all
+     * elements will be {@code null} if the {@code optimize} method did throw
+     * an exception.
+     * This also means that if the first element is not {@code null}, it is
+     * the best point found across all starts.
+     * <br/>
+     * The behaviour is undefined if this method is called before
+     * {@code optimize}; it will likely throw {@code NullPointerException}.
+     *
+     * @return an array containing the optima sorted from best to worst.
+     */
+    public abstract P[] getOptima();
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalStateException if {@code optData} does not contain an
+     *                                   instance of {@link MaxEval} or {@link InitialGuess}.
+     */
+    @Override
+    public P optimize(OptimizationData... optData) {
+        // Store arguments in order to pass them to the internal optimizer.
+        optimData = optData.clone();
+        // Set up base class and perform computations.
+        return super.optimize(optData);
+    }
+
+    /**
      * Method that will be called in order to store each found optimum.
      *
      * @param optimum Result of an optimization run.
      */
-    protected abstract void store(PAIR optimum);
+    protected abstract void store(P optimum);
 
     /**
      * Method that will called in order to clear all stored optima.

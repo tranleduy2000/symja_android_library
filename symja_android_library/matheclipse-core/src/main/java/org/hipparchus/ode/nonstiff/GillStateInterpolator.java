@@ -24,7 +24,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements a step interpolator for the Gill fourth
  * order Runge-Kutta integrator.
- * <p>
+ *
  * <p>This interpolator allows to compute dense output inside the last
  * step computed. The interpolation equation is consistent with the
  * integration scheme :

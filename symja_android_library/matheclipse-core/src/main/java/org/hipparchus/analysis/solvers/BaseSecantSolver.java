@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
 
 import org.hipparchus.analysis.UnivariateFunction;
@@ -27,26 +32,26 @@ import org.hipparchus.util.FastMath;
 /**
  * Base class for all bracketing <em>Secant</em>-based methods for root-finding
  * (approximating a zero of a univariate real function).
- * <p>
+ *
  * <p>Implementation of the {@link RegulaFalsiSolver <em>Regula Falsi</em>} and
  * {@link IllinoisSolver <em>Illinois</em>} methods is based on the
  * following article: M. Dowell and P. Jarratt,
  * <em>A modified regula falsi method for computing the root of an
  * equation</em>, BIT Numerical Mathematics, volume 11, number 2,
  * pages 168-174, Springer, 1971.</p>
- * <p>
+ *
  * <p>Implementation of the {@link PegasusSolver <em>Pegasus</em>} method is
  * based on the following article: M. Dowell and P. Jarratt,
  * <em>The "Pegasus" method for computing the root of an equation</em>,
  * BIT Numerical Mathematics, volume 12, number 4, pages 503-508, Springer,
  * 1972.</p>
- * <p>
+ *
  * <p>The {@link SecantSolver <em>Secant</em>} method is <em>not</em> a
  * bracketing method, so it is not implemented here. It has a separate
  * implementation.</p>
  */
 public abstract class BaseSecantSolver
-        extends BracketedUnivariateSolverUnivariateFunction
+        extends AbstractUnivariateSolver
         implements BracketedUnivariateSolver<UnivariateFunction> {
 
     /**
@@ -131,15 +136,6 @@ public abstract class BaseSecantSolver
      * {@inheritDoc}
      */
     @Override
-    public double solve(final int maxEval, final UnivariateFunction f,
-                        final double min, final double max, final double startValue) {
-        return solve(maxEval, f, min, max, startValue, AllowedSolution.ANY_SIDE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Interval solveInterval(final int maxEval,
                                   final UnivariateFunction f,
                                   final double min,
@@ -148,6 +144,15 @@ public abstract class BaseSecantSolver
         setup(maxEval, f, min, max, startValue);
         this.allowed = null;
         return doSolveInterval();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double solve(final int maxEval, final UnivariateFunction f,
+                        final double min, final double max, final double startValue) {
+        return solve(maxEval, f, min, max, startValue, AllowedSolution.ANY_SIDE);
     }
 
     /**

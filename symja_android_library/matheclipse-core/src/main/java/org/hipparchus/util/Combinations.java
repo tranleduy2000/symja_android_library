@@ -14,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hipparchus.util;
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+package org.hipparchus.util;
 
 import org.hipparchus.exception.MathRuntimeException;
 
@@ -131,14 +135,13 @@ public class Combinations implements Iterable<int[]> {
     public Iterator<int[]> iterator() {
         if (k == 0 ||
                 k == n) {
-            return new SingletonIterator(MathArrays.natural(k));
+            return new SingletonIterator(k);
         }
 
-        switch (iterationOrder) {
-            case LEXICOGRAPHIC:
-                return new LexicographicIterator(n, k);
-            default:
-                throw MathRuntimeException.createInternalError(); // Should never happen.
+        if (iterationOrder == IterationOrder.LEXICOGRAPHIC) {
+            return new LexicographicIterator(n, k);
+        } else {
+            throw MathRuntimeException.createInternalError(); // Should never happen.
         }
     }
 
@@ -316,10 +319,10 @@ public class Combinations implements Iterable<int[]> {
         /**
          * Create a singleton iterator providing the given array.
          *
-         * @param singleton array returned by the iterator
+         * @param k number of entries (i.e. entries will be 0..k-1)
          */
-        SingletonIterator(final int[] singleton) {
-            this.singleton = singleton;
+        SingletonIterator(final int k) {
+            this.singleton = MathArrays.natural(k);
         }
 
         /**

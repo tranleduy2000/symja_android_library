@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -84,31 +89,6 @@ public class DiagonalMatrix extends AbstractRealMatrix
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if the requested dimensions are not equal.
-     */
-    @Override
-    public RealMatrix createMatrix(final int rowDimension,
-                                   final int columnDimension)
-            throws MathIllegalArgumentException {
-        if (rowDimension != columnDimension) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    rowDimension, columnDimension);
-        }
-
-        return new DiagonalMatrix(rowDimension);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealMatrix copy() {
-        return new DiagonalMatrix(data);
-    }
-
-    /**
      * Compute the sum of {@code this} and {@code m}.
      *
      * @param m Matrix to be added.
@@ -173,12 +153,7 @@ public class DiagonalMatrix extends AbstractRealMatrix
     }
 
     /**
-     * Returns the result of postmultiplying {@code this} by {@code m}.
-     *
-     * @param m matrix to postmultiply by
-     * @return {@code this * m}
-     * @throws MathIllegalArgumentException if
-     *                                      {@code columnDimension(this) != rowDimension(m)}
+     * {@inheritDoc}
      */
     @Override
     public RealMatrix multiply(final RealMatrix m)
@@ -187,15 +162,15 @@ public class DiagonalMatrix extends AbstractRealMatrix
             return multiply((DiagonalMatrix) m);
         } else {
             MatrixUtils.checkMultiplicationCompatible(this, m);
-            final int nRows = m.getRowDimension();
-            final int nCols = m.getColumnDimension();
-            final double[][] product = new double[nRows][nCols];
-            for (int r = 0; r < nRows; r++) {
-                for (int c = 0; c < nCols; c++) {
-                    product[r][c] = data[r] * m.getEntry(r, c);
+            final RealMatrix product = m.createMatrix(m.getRowDimension(), m.getColumnDimension());
+            product.walkInOptimizedOrder(new DefaultRealMatrixChangingVisitor() {
+                /** {@inheritDoc} */
+                @Override
+                public double visit(int row, int column, double value) {
+                    return data[row] * m.getEntry(row, column);
                 }
-            }
-            return new Array2DRowRealMatrix(product, false);
+            });
+            return product;
         }
     }
 
@@ -212,41 +187,6 @@ public class DiagonalMatrix extends AbstractRealMatrix
         }
 
         return out;
-    }
-
-    /**
-     * Gets a reference to the underlying data array.
-     *
-     * @return 1-dimensional array of entries.
-     */
-    public double[] getDataRef() {
-        return data;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getEntry(final int row, final int column)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkMatrixIndex(this, row, column);
-        return row == column ? data[row] : 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if {@code row != column} and value is non-zero.
-     */
-    @Override
-    public void setEntry(final int row, final int column, final double value)
-            throws MathIllegalArgumentException {
-        if (row == column) {
-            MatrixUtils.checkRowIndex(this, row);
-            data[row] = value;
-        } else {
-            ensureZero(value);
-        }
     }
 
     /**
@@ -328,6 +268,131 @@ public class DiagonalMatrix extends AbstractRealMatrix
             vectorData = v.toArray();
         }
         return MatrixUtils.createRealVector(preMultiply(vectorData));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if the requested dimensions are not equal.
+     */
+    @Override
+    public RealMatrix createMatrix(final int rowDimension,
+                                   final int columnDimension)
+            throws MathIllegalArgumentException {
+        if (rowDimension != columnDimension) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    rowDimension, columnDimension);
+        }
+
+        return new DiagonalMatrix(rowDimension);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealMatrix copy() {
+        return new DiagonalMatrix(data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getEntry(final int row, final int column)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkMatrixIndex(this, row, column);
+        return row == column ? data[row] : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@code row != column} and value is non-zero.
+     */
+    @Override
+    public void setEntry(final int row, final int column, final double value)
+            throws MathIllegalArgumentException {
+        if (row == column) {
+            MatrixUtils.checkRowIndex(this, row);
+            data[row] = value;
+        } else {
+            ensureZero(value);
+        }
+    }
+
+    /**
+     * Returns the result of postmultiplying {@code this} by {@code m^T}.
+     *
+     * @param m matrix to first transpose and second postmultiply by
+     * @return {@code this * m}
+     * @throws MathIllegalArgumentException if
+     *                                      {@code columnDimension(this) != columnDimension(m)}
+     * @since 1.3
+     */
+    public DiagonalMatrix multiplyTransposed(final DiagonalMatrix m)
+            throws MathIllegalArgumentException {
+        // transposition is no-op for diagonal matrices
+        return multiply(m);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealMatrix multiplyTransposed(final RealMatrix m)
+            throws MathIllegalArgumentException {
+        if (m instanceof DiagonalMatrix) {
+            return multiplyTransposed((DiagonalMatrix) m);
+        } else {
+            MatrixUtils.checkSameColumnDimension(this, m);
+            final RealMatrix product = m.createMatrix(m.getColumnDimension(), m.getRowDimension());
+            product.walkInOptimizedOrder(new DefaultRealMatrixChangingVisitor() {
+                /** {@inheritDoc} */
+                @Override
+                public double visit(int row, int column, double value) {
+                    return data[row] * m.getEntry(column, row);
+                }
+            });
+            return product;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealMatrix transposeMultiply(final RealMatrix m) {
+        if (m instanceof DiagonalMatrix) {
+            return transposeMultiply((DiagonalMatrix) m);
+        } else {
+            // transposition is no-op for diagonal matrices
+            return multiply(m);
+        }
+    }
+
+    /**
+     * Returns the result of postmultiplying {@code this^T} by {@code m}.
+     *
+     * @param m matrix to first transpose and second postmultiply by
+     * @return {@code this^T * m}
+     * @throws MathIllegalArgumentException if
+     *                                      {@code columnDimension(this) != columnDimension(m)}
+     * @since 1.3
+     */
+    public DiagonalMatrix transposeMultiply(final DiagonalMatrix m)
+            throws MathIllegalArgumentException {
+        // transposition is no-op for diagonal matrices
+        return multiply(m);
+    }
+
+    /**
+     * Gets a reference to the underlying data array.
+     *
+     * @return 1-dimensional array of entries.
+     */
+    public double[] getDataRef() {
+        return data; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -33,7 +38,7 @@ import java.io.Serializable;
  * Uses a {@link SumOfLogs} instance to compute sum of logs and returns
  * <code> exp( 1/n  (sum of logs) ).</code>  Therefore,
  * <ul>
- * <li>If any of values are < 0, the result is <code>NaN.</code></li>
+ * <li>If any of values are &lt; 0, the result is <code>NaN.</code></li>
  * <li>If all values are non-negative and less than
  * <code>Double.POSITIVE_INFINITY</code>,  but at least one value is 0, the
  * result is <code>0.</code></li>
@@ -136,17 +141,6 @@ public class GeometricMean extends AbstractStorelessUnivariateStatistic
     public void clear() {
         if (incSumOfLogs) {
             sumOfLogs.clear();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void aggregate(GeometricMean other) {
-        MathUtils.checkNotNull(other);
-        if (incSumOfLogs) {
-            this.sumOfLogs.aggregate(other.sumOfLogs);
         }
     }
 

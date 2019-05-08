@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -39,7 +44,7 @@ import java.util.TreeSet;
 
 /**
  * A tableau for use in the Simplex method.
- * <p>
+ *
  * <p>
  * Example:
  * <pre>
@@ -90,7 +95,7 @@ class SimplexTableau implements Serializable {
     /**
      * The variables each column represents
      */
-    private final List<String> columnLabels = new ArrayList<String>();
+    private final List<String> columnLabels;
     /**
      * Number of decision variables.
      */
@@ -167,6 +172,7 @@ class SimplexTableau implements Serializable {
         this.f = f;
         this.constraints = normalizeConstraints(constraints);
         this.restrictToNonNegative = restrictToNonNegative;
+        this.columnLabels = new ArrayList<>();
         this.epsilon = epsilon;
         this.maxUlps = maxUlps;
         this.numDecisionVariables = f.getCoefficients().getDimension() + (restrictToNonNegative ? 0 : 1);
@@ -313,7 +319,7 @@ class SimplexTableau implements Serializable {
      * @return new versions of the constraints
      */
     public List<LinearConstraint> normalizeConstraints(Collection<LinearConstraint> originalConstraints) {
-        List<LinearConstraint> normalized = new ArrayList<LinearConstraint>(originalConstraints.size());
+        List<LinearConstraint> normalized = new ArrayList<>(originalConstraints.size());
         for (LinearConstraint constraint : originalConstraints) {
             normalized.add(normalize(constraint));
         }
@@ -430,7 +436,7 @@ class SimplexTableau implements Serializable {
             return;
         }
 
-        final Set<Integer> columnsToDrop = new TreeSet<Integer>();
+        final Set<Integer> columnsToDrop = new TreeSet<>();
         columnsToDrop.add(0);
 
         // positive cost non-artificial variables
@@ -460,7 +466,7 @@ class SimplexTableau implements Serializable {
         }
 
         // remove the columns in reverse order so the indices are correct
-        Integer[] drop = columnsToDrop.toArray(new Integer[columnsToDrop.size()]);
+        Integer[] drop = columnsToDrop.toArray(new Integer[0]);
         for (int i = drop.length - 1; i >= 0; i--) {
             columnLabels.remove((int) drop[i]);
         }
@@ -506,7 +512,7 @@ class SimplexTableau implements Serializable {
         Integer negativeVarBasicRow = negativeVarColumn > 0 ? getBasicRow(negativeVarColumn) : null;
         double mostNegative = negativeVarBasicRow == null ? 0 : getEntry(negativeVarBasicRow, getRhsOffset());
 
-        final Set<Integer> usedBasicRows = new HashSet<Integer>();
+        final Set<Integer> usedBasicRows = new HashSet<>();
         final double[] coefficients = new double[getOriginalNumDecisionVariables()];
         for (int i = 0; i < coefficients.length; i++) {
             int colIndex = columnLabels.indexOf("x" + i);
@@ -765,4 +771,28 @@ class SimplexTableau implements Serializable {
                 tableau.hashCode();
     }
 
+    /**
+     * Serialize the instance.
+     *
+     * @param oos stream where object should be written
+     * @throws IOException if object cannot be written to stream
+     */
+    private void writeObject(ObjectOutputStream oos)
+            throws IOException {
+        oos.defaultWriteObject();
+        MatrixUtils.serializeRealMatrix(tableau, oos);
+    }
+
+    /**
+     * Deserialize the instance.
+     *
+     * @param ois stream from which the object should be read
+     * @throws ClassNotFoundException if a class in the stream cannot be found
+     * @throws IOException            if object cannot be read from the stream
+     */
+    private void readObject(ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        MatrixUtils.deserializeRealMatrix(this, "tableau", ois);
+    }
 }

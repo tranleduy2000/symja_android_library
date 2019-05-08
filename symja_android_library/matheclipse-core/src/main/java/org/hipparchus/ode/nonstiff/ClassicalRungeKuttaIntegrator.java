@@ -24,7 +24,7 @@ import org.hipparchus.ode.ODEStateAndDerivative;
  * This class implements the classical fourth order Runge-Kutta
  * integrator for Ordinary Differential Equations (it is the most
  * often used Runge-Kutta method).
- * <p>
+ *
  * <p>This method is an explicit Runge-Kutta method, its Butcher-array
  * is the following one :
  * <pre>

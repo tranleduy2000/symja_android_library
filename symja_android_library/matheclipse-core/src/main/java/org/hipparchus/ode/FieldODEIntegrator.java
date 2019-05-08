@@ -29,7 +29,7 @@ import java.util.Collection;
 /**
  * This interface represents a first order integrator for
  * differential equations.
- * <p>
+ *
  * <p>The classes which are devoted to solve first order differential
  * equations should implement this interface. The problems which can
  * be handled should implement the {@link
@@ -91,7 +91,7 @@ public interface FieldODEIntegrator<T extends RealFieldElement<T>> {
      * @param maxIterationCount upper limit of the iteration count in
      *                          the event time search events.
      * @see #addEventHandler(FieldODEEventHandler, double, double, int,
-     * BracketedRealFieldUnivariateSolver)
+     * org.hipparchus.analysis.solvers.BracketedRealFieldUnivariateSolver)
      * @see #getEventHandlers()
      * @see #clearEventHandlers()
      */
@@ -203,7 +203,7 @@ public interface FieldODEIntegrator<T extends RealFieldElement<T>> {
      *                     (can be set to a value smaller than {@code t0} for backward integration)
      * @return final state, its time will be the same as {@code finalTime} if
      * integration reached its target, but may be different if some {@link
-     * FieldODEEventHandler} stops it at some point.
+     * org.hipparchus.ode.events.FieldODEEventHandler} stops it at some point.
      * @throws MathIllegalArgumentException if integration step is too small
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
      * @throws MathIllegalArgumentException if the location of an event cannot be bracketed

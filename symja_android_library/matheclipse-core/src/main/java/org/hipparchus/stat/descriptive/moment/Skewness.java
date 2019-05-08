@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -35,7 +40,7 @@ import java.io.Serializable;
  * where n is the number of values, mean is the {@link Mean} and std is the
  * {@link StandardDeviation}.
  * <p>
- * Note that this statistic is undefined for n < 3.  <code>Double.Nan</code>
+ * Note that this statistic is undefined for n &lt; 3.  <code>Double.Nan</code>
  * is returned when there is not sufficient data to compute the statistic.
  * Double.NaN may also be returned if the input includes NaN and / or
  * infinite values.
@@ -97,60 +102,6 @@ public class Skewness extends AbstractStorelessUnivariateStatistic implements Se
     }
 
     /**
-     * {@inheritDoc}
-     * <p>Note that when {@link #Skewness(ThirdMoment)} is used to
-     * create a Skewness, this method does nothing. In that case, the
-     * ThirdMoment should be incremented directly.
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /**
-     * Returns the value of the statistic based on the values that have been added.
-     * <p>
-     * See {@link Skewness} for the definition used in the computation.
-     *
-     * @return the skewness of the available values.
-     */
-    @Override
-    public double getResult() {
-
-        if (moment.n < 3) {
-            return Double.NaN;
-        }
-        double variance = moment.m2 / (moment.n - 1);
-        if (variance < 10E-20) {
-            return 0.0d;
-        } else {
-            double n0 = moment.getN();
-            return (n0 * moment.m3) /
-                    ((n0 - 1) * (n0 - 2) * FastMath.sqrt(variance) * variance);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return moment.getN();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
-    }
-
-    /**
      * Returns the Skewness of the entries in the specified portion of the
      * input array.
      * <p>
@@ -209,8 +160,62 @@ public class Skewness extends AbstractStorelessUnivariateStatistic implements Se
      * {@inheritDoc}
      */
     @Override
+    public long getN() {
+        return moment.getN();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Skewness copy() {
         return new Skewness(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>Note that when {@link #Skewness(ThirdMoment)} is used to
+     * create a Skewness, this method does nothing. In that case, the
+     * ThirdMoment should be incremented directly.
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /**
+     * Returns the value of the statistic based on the values that have been added.
+     * <p>
+     * See {@link Skewness} for the definition used in the computation.
+     *
+     * @return the skewness of the available values.
+     */
+    @Override
+    public double getResult() {
+
+        if (moment.n < 3) {
+            return Double.NaN;
+        }
+        double variance = moment.m2 / (moment.n - 1);
+        if (variance < 10E-20) {
+            return 0.0d;
+        } else {
+            double n0 = moment.getN();
+            return (n0 * moment.m3) /
+                    ((n0 - 1) * (n0 - 2) * FastMath.sqrt(variance) * variance);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
     }
 
 }

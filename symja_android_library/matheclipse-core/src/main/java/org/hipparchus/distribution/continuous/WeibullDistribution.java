@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -111,55 +116,12 @@ public class WeibullDistribution extends AbstractRealDistribution {
      * {@inheritDoc}
      */
     @Override
-    public double logDensity(double x) {
-        if (x < 0) {
-            return Double.NEGATIVE_INFINITY;
-        }
-
-        final double xscale = x / scale;
-        final double logxscalepow = FastMath.log(xscale) * (shape - 1);
-
-        /*
-         * FastMath.pow(x / scale, shape) =
-         * FastMath.pow(xscale, shape) =
-         * FastMath.pow(xscale, shape - 1) * xscale
-         */
-        final double xscalepowshape = FastMath.exp(logxscalepow) * xscale;
-
-        return FastMath.log(shape / scale) + logxscalepow - xscalepowshape;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double cumulativeProbability(double x) {
         double ret;
         if (x <= 0.0) {
             ret = 0.0;
         } else {
             ret = 1.0 - FastMath.exp(-FastMath.pow(x / scale, shape));
-        }
-        return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Returns {@code 0} when {@code p == 0} and
-     * {@code Double.POSITIVE_INFINITY} when {@code p == 1}.
-     */
-    @Override
-    public double inverseCumulativeProbability(double p) {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-
-        double ret;
-        if (p == 0) {
-            ret = 0.0;
-        } else if (p == 1) {
-            ret = Double.POSITIVE_INFINITY;
-        } else {
-            ret = scale * FastMath.pow(-FastMath.log1p(-p), 1.0 / shape);
         }
         return ret;
     }
@@ -230,6 +192,49 @@ public class WeibullDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns {@code 0} when {@code p == 0} and
+     * {@code Double.POSITIVE_INFINITY} when {@code p == 1}.
+     */
+    @Override
+    public double inverseCumulativeProbability(double p) {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+
+        double ret;
+        if (p == 0) {
+            ret = 0.0;
+        } else if (p == 1) {
+            ret = Double.POSITIVE_INFINITY;
+        } else {
+            ret = scale * FastMath.pow(-FastMath.log1p(-p), 1.0 / shape);
+        }
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logDensity(double x) {
+        if (x < 0) {
+            return Double.NEGATIVE_INFINITY;
+        }
+
+        final double xscale = x / scale;
+        final double logxscalepow = FastMath.log(xscale) * (shape - 1);
+
+        /*
+         * FastMath.pow(x / scale, shape) =
+         * FastMath.pow(xscale, shape) =
+         * FastMath.pow(xscale, shape - 1) * xscale
+         */
+        final double xscalepowshape = FastMath.exp(logxscalepow) * xscale;
+
+        return FastMath.log(shape / scale) + logxscalepow - xscalepowshape;
     }
 }
 

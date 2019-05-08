@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.complex;
 
 import org.hipparchus.Field;
@@ -55,16 +60,16 @@ public class ComplexField implements Field<Complex>, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public Complex getOne() {
-        return Complex.ONE;
+    public Complex getZero() {
+        return Complex.ZERO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Complex getZero() {
-        return Complex.ZERO;
+    public Complex getOne() {
+        return Complex.ONE;
     }
 
     /**

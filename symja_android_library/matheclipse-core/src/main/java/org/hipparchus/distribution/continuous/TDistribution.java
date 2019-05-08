@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -92,16 +97,6 @@ public class TDistribution extends AbstractRealDistribution {
     @Override
     public double density(double x) {
         return FastMath.exp(logDensity(x));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double logDensity(double x) {
-        final double n = degreesOfFreedom;
-        final double nPlus1Over2 = (n + 1) / 2;
-        return factor - nPlus1Over2 * FastMath.log(1 + x * x / n);
     }
 
     /**
@@ -212,5 +207,15 @@ public class TDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logDensity(double x) {
+        final double n = degreesOfFreedom;
+        final double nPlus1Over2 = (n + 1) / 2;
+        return factor - nPlus1Over2 * FastMath.log(1 + x * x / n);
     }
 }

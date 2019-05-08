@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -93,25 +98,6 @@ public class BinomialDistribution extends AbstractIntegerDistribution {
 
     /**
      * {@inheritDoc}
-     **/
-    @Override
-    public double logProbability(int x) {
-        if (numberOfTrials == 0) {
-            return (x == 0) ? 0. : Double.NEGATIVE_INFINITY;
-        }
-        double ret;
-        if (x < 0 || x > numberOfTrials) {
-            ret = Double.NEGATIVE_INFINITY;
-        } else {
-            ret = SaddlePointExpansion.logBinomialProbability(x,
-                    numberOfTrials, probabilityOfSuccess,
-                    1.0 - probabilityOfSuccess);
-        }
-        return ret;
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public double cumulativeProbability(int x) {
@@ -186,5 +172,24 @@ public class BinomialDistribution extends AbstractIntegerDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double logProbability(int x) {
+        if (numberOfTrials == 0) {
+            return (x == 0) ? 0. : Double.NEGATIVE_INFINITY;
+        }
+        double ret;
+        if (x < 0 || x > numberOfTrials) {
+            ret = Double.NEGATIVE_INFINITY;
+        } else {
+            ret = SaddlePointExpansion.logBinomialProbability(x,
+                    numberOfTrials, probabilityOfSuccess,
+                    1.0 - probabilityOfSuccess);
+        }
+        return ret;
     }
 }

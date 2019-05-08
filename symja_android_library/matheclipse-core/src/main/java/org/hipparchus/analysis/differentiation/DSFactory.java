@@ -75,9 +75,9 @@ public class DSFactory implements Serializable {
      * @return a {@link DerivativeStructure} representing a constant value
      */
     public DerivativeStructure constant(double value) {
-        final double[] data = new double[compiler.getSize()];
-        data[0] = value;
-        return new DerivativeStructure(this, data);
+        final DerivativeStructure ds = new DerivativeStructure(this);
+        ds.setDerivativeComponent(0, value);
+        return ds;
     }
 
     /**
@@ -102,14 +102,15 @@ public class DSFactory implements Serializable {
                     index, getCompiler().getFreeParameters());
         }
 
-        final double[] data = new double[compiler.getSize()];
-        data[0] = value;
+        final DerivativeStructure ds = new DerivativeStructure(this);
+        ds.setDerivativeComponent(0, value);
+
         if (getCompiler().getOrder() > 0) {
             // the derivative of the variable with respect to itself is 1.
-            data[DSCompiler.getCompiler(index, getCompiler().getOrder()).getSize()] = 1.0;
+            ds.setDerivativeComponent(DSCompiler.getCompiler(index, getCompiler().getOrder()).getSize(), 1.0);
         }
 
-        return new DerivativeStructure(this, data);
+        return ds;
 
     }
 
@@ -128,14 +129,12 @@ public class DSFactory implements Serializable {
     public final DerivativeStructure build(final double... derivatives)
             throws MathIllegalArgumentException {
 
-        final double[] data = new double[compiler.getSize()];
-        if (derivatives.length != data.length) {
+        if (derivatives.length != compiler.getSize()) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    derivatives.length, data.length);
+                    derivatives.length, compiler.getSize());
         }
-        System.arraycopy(derivatives, 0, data, 0, data.length);
 
-        return new DerivativeStructure(this, data);
+        return new DerivativeStructure(this, derivatives);
 
     }
 
@@ -146,7 +145,7 @@ public class DSFactory implements Serializable {
      * @return a {@link DerivativeStructure} with an uninitialized array
      */
     DerivativeStructure build() {
-        return new DerivativeStructure(this, new double[compiler.getSize()]);
+        return new DerivativeStructure(this);
     }
 
     /**

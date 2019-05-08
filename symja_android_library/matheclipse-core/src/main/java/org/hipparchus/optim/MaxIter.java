@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -26,7 +31,7 @@ public class MaxIter implements OptimizationData {
     /**
      * Allowed number of evalutations.
      */
-    private final int maxIter;
+    private final int max;
 
     /**
      * @param max Allowed number of iterations.
@@ -38,7 +43,7 @@ public class MaxIter implements OptimizationData {
                     max, 0);
         }
 
-        maxIter = max;
+        this.max = max;
     }
 
     /**
@@ -58,6 +63,6 @@ public class MaxIter implements OptimizationData {
      * @return the allowed number of evaluations.
      */
     public int getMaxIter() {
-        return maxIter;
+        return max;
     }
 }

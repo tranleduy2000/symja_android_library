@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.linear.ArrayRealVector;
@@ -29,31 +34,34 @@ import org.hipparchus.util.FastMath;
  * methods implemented here use the methods that are left unimplemented.
  * <p/>
  * TODO cache results?
- *
  */
 public abstract class AbstractEvaluation implements Evaluation {
 
-    /** number of observations */
+    /**
+     * number of observations
+     */
     private final int observationSize;
 
     /**
      * Constructor.
      *
      * @param observationSize the number of observations.
-     * Needed for {@link #getRMS()} and {@link #getReducedChiSquare()}.
+     *                        Needed for {@link #getRMS()} and {@link #getReducedChiSquare()}.
      */
     AbstractEvaluation(final int observationSize) {
         this.observationSize = observationSize;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealMatrix getCovariances(double threshold) {
         // Set up the Jacobian.
         final RealMatrix j = this.getJacobian();
 
         // Compute transpose(J)J.
-        final RealMatrix jTj = j.transpose().multiply(j);
+        final RealMatrix jTj = j.transposeMultiply(j);
 
         // Compute the covariances matrix.
         final DecompositionSolver solver
@@ -61,38 +69,48 @@ public abstract class AbstractEvaluation implements Evaluation {
         return solver.getInverse();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getSigma(double covarianceSingularityThreshold) {
         final RealMatrix cov = this.getCovariances(covarianceSingularityThreshold);
         final int nC = cov.getColumnDimension();
         final RealVector sig = new ArrayRealVector(nC);
         for (int i = 0; i < nC; ++i) {
-            sig.setEntry(i, FastMath.sqrt(cov.getEntry(i,i)));
+            sig.setEntry(i, FastMath.sqrt(cov.getEntry(i, i)));
         }
         return sig;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getRMS() {
         return FastMath.sqrt(getReducedChiSquare(1));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getCost() {
         return FastMath.sqrt(getChiSquare());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getChiSquare() {
         final ArrayRealVector r = new ArrayRealVector(getResiduals());
         return r.dotProduct(r);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getReducedChiSquare(int numberOfFittedParameters) {
         return getChiSquare() / (observationSize - numberOfFittedParameters + 1);

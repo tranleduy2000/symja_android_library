@@ -25,7 +25,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements the 5(4) Higham and Hall integrator for
  * Ordinary Differential Equations.
- * <p>
+ *
  * <p>This integrator is an embedded Runge-Kutta integrator
  * of order 5(4) used in local extrapolation mode (i.e. the solution
  * is computed using the high order formula) with stepsize control

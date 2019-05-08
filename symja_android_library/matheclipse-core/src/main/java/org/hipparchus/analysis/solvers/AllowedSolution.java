@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
 
 
@@ -23,7 +28,7 @@ package org.hipparchus.analysis.solvers;
  * (bracketed univariate real) root-finding algorithm} may accept as solutions.
  * This basically controls whether or not under-approximations and
  * over-approximations are allowed.
- * <p>
+ *
  * <p>If all solutions are accepted ({@link #ANY_SIDE}), then the solution
  * that the root-finding algorithm returns for a given root may be equal to the
  * actual root, but it may also be an approximation that is slightly smaller

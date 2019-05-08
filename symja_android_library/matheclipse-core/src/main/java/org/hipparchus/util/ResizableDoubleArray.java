@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -126,14 +131,14 @@ public class ResizableDoubleArray implements Serializable {
      * The number of addressable elements in the array.  Note that this
      * has nothing to do with the length of the internal storage array.
      */
-    private int numElements = 0;
+    private int numElements;
 
     /**
      * The position of the first addressable element in the internal storage
      * array.  The addressable elements in the array are
      * {@code internalArray[startIndex],...,internalArray[startIndex + numElements - 1]}.
      */
-    private int startIndex = 0;
+    private int startIndex;
 
     /**
      * Creates an instance with default properties.
@@ -685,7 +690,7 @@ public class ResizableDoubleArray implements Serializable {
      * @return the internal storage array used by this object.
      */
     protected double[] getArrayRef() {
-        return internalArray;
+        return internalArray; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**
@@ -777,7 +782,7 @@ public class ResizableDoubleArray implements Serializable {
         if (object == this) {
             return true;
         }
-        if (object instanceof ResizableDoubleArray == false) {
+        if (!(object instanceof ResizableDoubleArray)) {
             return false;
         }
         boolean result = true;

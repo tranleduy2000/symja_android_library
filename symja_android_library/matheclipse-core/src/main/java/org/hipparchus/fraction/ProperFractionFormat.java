@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fraction;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -117,15 +122,6 @@ public class ProperFractionFormat extends FractionFormat {
     }
 
     /**
-     * Access the whole format.
-     *
-     * @return the whole format.
-     */
-    public NumberFormat getWholeFormat() {
-        return wholeFormat;
-    }
-
-    /**
      * Parses a string to produce a {@link Fraction} object.  This method
      * expects the string to be formatted as a proper fraction.
      * <p>
@@ -222,6 +218,15 @@ public class ProperFractionFormat extends FractionFormat {
         int n = num.intValue();
         int d = den.intValue();
         return new Fraction(((FastMath.abs(w) * d) + n) * MathUtils.copySign(1, w), d);
+    }
+
+    /**
+     * Access the whole format.
+     *
+     * @return the whole format.
+     */
+    public NumberFormat getWholeFormat() {
+        return wholeFormat;
     }
 
 }

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.util;
 
 import org.hipparchus.RealFieldElement;
@@ -25,8 +30,6 @@ import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.exception.NullArgumentException;
 
 import java.util.Arrays;
-
-import static java.lang.Double.doubleToLongBits;
 
 /**
  * Miscellaneous utility functions.
@@ -61,8 +64,7 @@ public final class MathUtils {
      * @return the hash code
      */
     public static int hash(double value) {
-        long bits = doubleToLongBits(value);
-        return (int) (bits ^ (bits >>> 32));
+        return Double.hashCode(value);
     }
 
     /**
@@ -74,7 +76,7 @@ public final class MathUtils {
      * @return {@code new Double(x).equals(new Double(y))}
      */
     public static boolean equals(double x, double y) {
-        return Double.valueOf(x).equals(y);
+        return new Double(x).equals(new Double(y));
     }
 
     /**
@@ -137,10 +139,10 @@ public final class MathUtils {
     /**
      * <p>Reduce {@code |a - offset|} to the primary interval
      * {@code [0, |period|)}.</p>
-     * <p>
+     *
      * <p>Specifically, the value returned is <br/>
      * {@code a - |period| * floor((a - offset) / |period|) - offset}.</p>
-     * <p>
+     *
      * <p>If any of the parameters are {@code NaN} or infinite, the result is
      * {@code NaN}.</p>
      *

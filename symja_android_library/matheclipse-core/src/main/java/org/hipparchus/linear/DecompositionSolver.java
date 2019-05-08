@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -42,10 +47,10 @@ public interface DecompositionSolver {
      *
      * @param b right-hand side of the equation A &times; X = B
      * @return a vector X that minimizes the two norm of A &times; X - B
-     * @throws MathIllegalArgumentException if the matrices dimensions do not match.
-     * @throws MathIllegalArgumentException if the decomposed matrix is singular.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
+     * @throws MathIllegalArgumentException                          if the decomposed matrix is singular.
      */
-    RealVector solve(final RealVector b) throws MathIllegalArgumentException;
+    RealVector solve(RealVector b) throws MathIllegalArgumentException;
 
     /**
      * Solve the linear equation A &times; X = B for matrices A.
@@ -55,10 +60,10 @@ public interface DecompositionSolver {
      *
      * @param b right-hand side of the equation A &times; X = B
      * @return a matrix X that minimizes the two norm of A &times; X - B
-     * @throws MathIllegalArgumentException if the matrices dimensions do not match.
-     * @throws MathIllegalArgumentException if the decomposed matrix is singular.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
+     * @throws MathIllegalArgumentException                          if the decomposed matrix is singular.
      */
-    RealMatrix solve(final RealMatrix b) throws MathIllegalArgumentException;
+    RealMatrix solve(RealMatrix b) throws MathIllegalArgumentException;
 
     /**
      * Check if the decomposed matrix is non-singular.

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.correlation;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -187,11 +192,25 @@ public class StorelessCovariance extends Covariance {
      * {@inheritDoc}
      *
      * @throws MathIllegalArgumentException if the number of observations
-     *                                      in a cell is < 2
+     *                                      in a cell is &lt; 2
      */
     @Override
     public RealMatrix getCovarianceMatrix() throws MathIllegalArgumentException {
         return MatrixUtils.createRealMatrix(getData());
+    }
+
+    /**
+     * This {@link Covariance} method is not supported by a {@link StorelessCovariance},
+     * since the number of bivariate observations does not have to be the same for different
+     * pairs of covariates - i.e., N as defined in {@link Covariance#getN()} is undefined.
+     *
+     * @return nothing as this implementation always throws a
+     * {@link MathRuntimeException}
+     * @throws MathRuntimeException in all cases
+     */
+    @Override
+    public int getN() throws MathRuntimeException {
+        throw new MathRuntimeException(LocalizedCoreFormats.UNSUPPORTED_OPERATION);
     }
 
     /**
@@ -209,19 +228,5 @@ public class StorelessCovariance extends Covariance {
             }
         }
         return data;
-    }
-
-    /**
-     * This {@link Covariance} method is not supported by a {@link StorelessCovariance},
-     * since the number of bivariate observations does not have to be the same for different
-     * pairs of covariates - i.e., N as defined in {@link Covariance#getN()} is undefined.
-     *
-     * @return nothing as this implementation always throws a
-     * {@link MathRuntimeException}
-     * @throws MathRuntimeException in all cases
-     */
-    @Override
-    public int getN() throws MathRuntimeException {
-        throw new MathRuntimeException(LocalizedCoreFormats.UNSUPPORTED_OPERATION);
     }
 }

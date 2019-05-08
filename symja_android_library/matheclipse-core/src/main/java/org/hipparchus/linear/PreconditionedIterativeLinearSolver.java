@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -152,6 +157,16 @@ public abstract class PreconditionedIterativeLinearSolver
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealVector solveInPlace(final RealLinearOperator a,
+                                   final RealVector b, final RealVector x0) throws
+            MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        return solveInPlace(a, null, b, x0);
+    }
+
+    /**
      * Returns an estimate of the solution to the linear system A &middot; x =
      * b.
      *
@@ -199,14 +214,4 @@ public abstract class PreconditionedIterativeLinearSolver
     public abstract RealVector solveInPlace(RealLinearOperator a,
                                             RealLinearOperator m, RealVector b, RealVector x0) throws
             MathIllegalArgumentException, NullArgumentException, MathIllegalStateException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealVector solveInPlace(final RealLinearOperator a,
-                                   final RealVector b, final RealVector x0) throws
-            MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
-        return solveInPlace(a, null, b, x0);
-    }
 }

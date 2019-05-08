@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.complex;
 
 import org.hipparchus.FieldElement;
@@ -34,7 +39,7 @@ import java.util.List;
  * real and imaginary part.
  * <p>
  * Implementations of arithmetic operations handle {@code NaN} and
- * infinite values according to the rules for {@link Double}, i.e.
+ * infinite values according to the rules for {@link java.lang.Double}, i.e.
  * {@link #equals} is an equivalence relation for all instances that have
  * a {@code NaN} in either real or imaginary part, e.g. the following are
  * considered equal:
@@ -261,7 +266,7 @@ public class Complex implements FieldElement<Complex>, Serializable {
      * If either {@code this} or {@code addend} has a {@code NaN} value in
      * either part, {@link #NaN} is returned; otherwise {@code Infinite}
      * and {@code NaN} values are returned in the parts of the result
-     * according to the rules for {@link Double} arithmetic.
+     * according to the rules for {@link java.lang.Double} arithmetic.
      *
      * @param addend Value to be added to this {@code Complex}.
      * @return {@code this + addend}.
@@ -276,6 +281,219 @@ public class Complex implements FieldElement<Complex>, Serializable {
 
         return createComplex(real + addend.getReal(),
                 imaginary + addend.getImaginary());
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is
+     * {@code (this - subtrahend)}.
+     * Uses the definitional formula
+     * <p>
+     * {@code (a + bi) - (c + di) = (a-c) + (b-d)i}
+     * </p>
+     * If either {@code this} or {@code subtrahend} has a {@code NaN]} value in either part,
+     * {@link #NaN} is returned; otherwise infinite and {@code NaN} values are
+     * returned in the parts of the result according to the rules for
+     * {@link java.lang.Double} arithmetic.
+     *
+     * @param subtrahend value to be subtracted from this {@code Complex}.
+     * @return {@code this - subtrahend}.
+     * @throws NullArgumentException if {@code subtrahend} is {@code null}.
+     */
+    @Override
+    public Complex subtract(Complex subtrahend)
+            throws NullArgumentException {
+        MathUtils.checkNotNull(subtrahend);
+        if (isNaN || subtrahend.isNaN) {
+            return NaN;
+        }
+
+        return createComplex(real - subtrahend.getReal(),
+                imaginary - subtrahend.getImaginary());
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is {@code (-this)}.
+     * Returns {@code NaN} if either real or imaginary
+     * part of this Complex number is {@code Double.NaN}.
+     *
+     * @return {@code -this}.
+     */
+    @Override
+    public Complex negate() {
+        if (isNaN) {
+            return NaN;
+        }
+
+        return createComplex(-real, -imaginary);
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is {@code this * factor}, with {@code factor}
+     * interpreted as a integer number.
+     *
+     * @param factor value to be multiplied by this {@code Complex}.
+     * @return {@code this * factor}.
+     * @see #multiply(Complex)
+     */
+    @Override
+    public Complex multiply(final int factor) {
+        if (isNaN) {
+            return NaN;
+        }
+        if (Double.isInfinite(real) ||
+                Double.isInfinite(imaginary)) {
+            return INF;
+        }
+        return createComplex(real * factor, imaginary * factor);
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is {@code this * factor}.
+     * Implements preliminary checks for {@code NaN} and infinity followed by
+     * the definitional formula:
+     * <p>
+     * {@code (a + bi)(c + di) = (ac - bd) + (ad + bc)i}
+     * </p>
+     * Returns {@link #NaN} if either {@code this} or {@code factor} has one or
+     * more {@code NaN} parts.
+     * <p>
+     * Returns {@link #INF} if neither {@code this} nor {@code factor} has one
+     * or more {@code NaN} parts and if either {@code this} or {@code factor}
+     * has one or more infinite parts (same result is returned regardless of
+     * the sign of the components).
+     * </p><p>
+     * Returns finite values in components of the result per the definitional
+     * formula in all remaining cases.</p>
+     *
+     * @param factor value to be multiplied by this {@code Complex}.
+     * @return {@code this * factor}.
+     * @throws NullArgumentException if {@code factor} is {@code null}.
+     */
+    @Override
+    public Complex multiply(Complex factor)
+            throws NullArgumentException {
+        MathUtils.checkNotNull(factor);
+        if (isNaN || factor.isNaN) {
+            return NaN;
+        }
+        if (Double.isInfinite(real) ||
+                Double.isInfinite(imaginary) ||
+                Double.isInfinite(factor.real) ||
+                Double.isInfinite(factor.imaginary)) {
+            // we don't use isInfinite() to avoid testing for NaN again
+            return INF;
+        }
+        return createComplex(real * factor.real - imaginary * factor.imaginary,
+                real * factor.imaginary + imaginary * factor.real);
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is
+     * {@code (this / divisor)}.
+     * Implements the definitional formula
+     * <pre>
+     *  <code>
+     *    a + bi          ac + bd + (bc - ad)i
+     *    ----------- = -------------------------
+     *    c + di         c<sup>2</sup> + d<sup>2</sup>
+     *  </code>
+     * </pre>
+     * but uses
+     * <a href="http://doi.acm.org/10.1145/1039813.1039814">
+     * prescaling of operands</a> to limit the effects of overflows and
+     * underflows in the computation.
+     * <p>
+     * {@code Infinite} and {@code NaN} values are handled according to the
+     * following rules, applied in the order presented:
+     * <ul>
+     * <li>If either {@code this} or {@code divisor} has a {@code NaN} value
+     * in either part, {@link #NaN} is returned.
+     * </li>
+     * <li>If {@code divisor} equals {@link #ZERO}, {@link #NaN} is returned.
+     * </li>
+     * <li>If {@code this} and {@code divisor} are both infinite,
+     * {@link #NaN} is returned.
+     * </li>
+     * <li>If {@code this} is finite (i.e., has no {@code Infinite} or
+     * {@code NaN} parts) and {@code divisor} is infinite (one or both parts
+     * infinite), {@link #ZERO} is returned.
+     * </li>
+     * <li>If {@code this} is infinite and {@code divisor} is finite,
+     * {@code NaN} values are returned in the parts of the result if the
+     * {@link java.lang.Double} rules applied to the definitional formula
+     * force {@code NaN} results.
+     * </li>
+     * </ul>
+     *
+     * @param divisor Value by which this {@code Complex} is to be divided.
+     * @return {@code this / divisor}.
+     * @throws NullArgumentException if {@code divisor} is {@code null}.
+     */
+    @Override
+    public Complex divide(Complex divisor)
+            throws NullArgumentException {
+        MathUtils.checkNotNull(divisor);
+        if (isNaN || divisor.isNaN) {
+            return NaN;
+        }
+
+        final double c = divisor.getReal();
+        final double d = divisor.getImaginary();
+        if (c == 0.0 && d == 0.0) {
+            return NaN;
+        }
+
+        if (divisor.isInfinite() && !isInfinite()) {
+            return ZERO;
+        }
+
+        if (FastMath.abs(c) < FastMath.abs(d)) {
+            double q = c / d;
+            double denominator = c * q + d;
+            return createComplex((real * q + imaginary) / denominator,
+                    (imaginary * q - real) / denominator);
+        } else {
+            double q = d / c;
+            double denominator = d * q + c;
+            return createComplex((imaginary * q + real) / denominator,
+                    (imaginary - real * q) / denominator);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Complex reciprocal() {
+        if (isNaN) {
+            return NaN;
+        }
+
+        if (real == 0.0 && imaginary == 0.0) {
+            return INF;
+        }
+
+        if (isInfinite) {
+            return ZERO;
+        }
+
+        if (FastMath.abs(real) < FastMath.abs(imaginary)) {
+            double q = real / imaginary;
+            double scale = 1. / (real * q + imaginary);
+            return createComplex(scale * q, -scale);
+        } else {
+            double q = imaginary / real;
+            double scale = 1. / (imaginary * q + real);
+            return createComplex(scale, -scale * q);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ComplexField getField() {
+        return ComplexField.getInstance();
     }
 
     /**
@@ -318,79 +536,6 @@ public class Complex implements FieldElement<Complex>, Serializable {
     }
 
     /**
-     * Returns a {@code Complex} whose value is
-     * {@code (this / divisor)}.
-     * Implements the definitional formula
-     * <pre>
-     *  <code>
-     *    a + bi          ac + bd + (bc - ad)i
-     *    ----------- = -------------------------
-     *    c + di         c<sup>2</sup> + d<sup>2</sup>
-     *  </code>
-     * </pre>
-     * but uses
-     * <a href="http://doi.acm.org/10.1145/1039813.1039814">
-     * prescaling of operands</a> to limit the effects of overflows and
-     * underflows in the computation.
-     * <p>
-     * {@code Infinite} and {@code NaN} values are handled according to the
-     * following rules, applied in the order presented:
-     * <ul>
-     * <li>If either {@code this} or {@code divisor} has a {@code NaN} value
-     * in either part, {@link #NaN} is returned.
-     * </li>
-     * <li>If {@code divisor} equals {@link #ZERO}, {@link #NaN} is returned.
-     * </li>
-     * <li>If {@code this} and {@code divisor} are both infinite,
-     * {@link #NaN} is returned.
-     * </li>
-     * <li>If {@code this} is finite (i.e., has no {@code Infinite} or
-     * {@code NaN} parts) and {@code divisor} is infinite (one or both parts
-     * infinite), {@link #ZERO} is returned.
-     * </li>
-     * <li>If {@code this} is infinite and {@code divisor} is finite,
-     * {@code NaN} values are returned in the parts of the result if the
-     * {@link Double} rules applied to the definitional formula
-     * force {@code NaN} results.
-     * </li>
-     * </ul>
-     *
-     * @param divisor Value by which this {@code Complex} is to be divided.
-     * @return {@code this / divisor}.
-     * @throws NullArgumentException if {@code divisor} is {@code null}.
-     */
-    @Override
-    public Complex divide(Complex divisor)
-            throws NullArgumentException {
-        MathUtils.checkNotNull(divisor);
-        if (isNaN || divisor.isNaN) {
-            return NaN;
-        }
-
-        final double c = divisor.getReal();
-        final double d = divisor.getImaginary();
-        if (c == 0.0 && d == 0.0) {
-            return NaN;
-        }
-
-        if (divisor.isInfinite() && !isInfinite()) {
-            return ZERO;
-        }
-
-        if (FastMath.abs(c) < FastMath.abs(d)) {
-            double q = c / d;
-            double denominator = c * q + d;
-            return createComplex((real * q + imaginary) / denominator,
-                    (imaginary * q - real) / denominator);
-        } else {
-            double q = d / c;
-            double denominator = d * q + c;
-            return createComplex((imaginary * q + real) / denominator,
-                    (imaginary - real * q) / denominator);
-        }
-    }
-
-    /**
      * Returns a {@code Complex} whose value is {@code (this / divisor)},
      * with {@code divisor} interpreted as a real number.
      *
@@ -410,34 +555,6 @@ public class Complex implements FieldElement<Complex>, Serializable {
         }
         return createComplex(real / divisor,
                 imaginary / divisor);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Complex reciprocal() {
-        if (isNaN) {
-            return NaN;
-        }
-
-        if (real == 0.0 && imaginary == 0.0) {
-            return INF;
-        }
-
-        if (isInfinite) {
-            return ZERO;
-        }
-
-        if (FastMath.abs(real) < FastMath.abs(imaginary)) {
-            double q = real / imaginary;
-            double scale = 1. / (real * q + imaginary);
-            return createComplex(scale * q, -scale);
-        } else {
-            double q = imaginary / real;
-            double scale = 1. / (imaginary * q + real);
-            return createComplex(scale, -scale * q);
-        }
     }
 
     /**
@@ -498,6 +615,14 @@ public class Complex implements FieldElement<Complex>, Serializable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "(" + real + ", " + imaginary + ")";
+    }
+
+    /**
      * Access the imaginary part.
      *
      * @return the imaginary part.
@@ -540,66 +665,6 @@ public class Complex implements FieldElement<Complex>, Serializable {
     }
 
     /**
-     * Returns a {@code Complex} whose value is {@code this * factor}.
-     * Implements preliminary checks for {@code NaN} and infinity followed by
-     * the definitional formula:
-     * <p>
-     * {@code (a + bi)(c + di) = (ac - bd) + (ad + bc)i}
-     * </p>
-     * Returns {@link #NaN} if either {@code this} or {@code factor} has one or
-     * more {@code NaN} parts.
-     * <p>
-     * Returns {@link #INF} if neither {@code this} nor {@code factor} has one
-     * or more {@code NaN} parts and if either {@code this} or {@code factor}
-     * has one or more infinite parts (same result is returned regardless of
-     * the sign of the components).
-     * </p><p>
-     * Returns finite values in components of the result per the definitional
-     * formula in all remaining cases.</p>
-     *
-     * @param factor value to be multiplied by this {@code Complex}.
-     * @return {@code this * factor}.
-     * @throws NullArgumentException if {@code factor} is {@code null}.
-     */
-    @Override
-    public Complex multiply(Complex factor)
-            throws NullArgumentException {
-        MathUtils.checkNotNull(factor);
-        if (isNaN || factor.isNaN) {
-            return NaN;
-        }
-        if (Double.isInfinite(real) ||
-                Double.isInfinite(imaginary) ||
-                Double.isInfinite(factor.real) ||
-                Double.isInfinite(factor.imaginary)) {
-            // we don't use isInfinite() to avoid testing for NaN again
-            return INF;
-        }
-        return createComplex(real * factor.real - imaginary * factor.imaginary,
-                real * factor.imaginary + imaginary * factor.real);
-    }
-
-    /**
-     * Returns a {@code Complex} whose value is {@code this * factor}, with {@code factor}
-     * interpreted as a integer number.
-     *
-     * @param factor value to be multiplied by this {@code Complex}.
-     * @return {@code this * factor}.
-     * @see #multiply(Complex)
-     */
-    @Override
-    public Complex multiply(final int factor) {
-        if (isNaN) {
-            return NaN;
-        }
-        if (Double.isInfinite(real) ||
-                Double.isInfinite(imaginary)) {
-            return INF;
-        }
-        return createComplex(real * factor, imaginary * factor);
-    }
-
-    /**
      * Returns a {@code Complex} whose value is {@code this * factor}, with {@code factor}
      * interpreted as a real number.
      *
@@ -618,50 +683,6 @@ public class Complex implements FieldElement<Complex>, Serializable {
             return INF;
         }
         return createComplex(real * factor, imaginary * factor);
-    }
-
-    /**
-     * Returns a {@code Complex} whose value is {@code (-this)}.
-     * Returns {@code NaN} if either real or imaginary
-     * part of this Complex number is {@code Double.NaN}.
-     *
-     * @return {@code -this}.
-     */
-    @Override
-    public Complex negate() {
-        if (isNaN) {
-            return NaN;
-        }
-
-        return createComplex(-real, -imaginary);
-    }
-
-    /**
-     * Returns a {@code Complex} whose value is
-     * {@code (this - subtrahend)}.
-     * Uses the definitional formula
-     * <p>
-     * {@code (a + bi) - (c + di) = (a-c) + (b-d)i}
-     * </p>
-     * If either {@code this} or {@code subtrahend} has a {@code NaN]} value in either part,
-     * {@link #NaN} is returned; otherwise infinite and {@code NaN} values are
-     * returned in the parts of the result according to the rules for
-     * {@link Double} arithmetic.
-     *
-     * @param subtrahend value to be subtracted from this {@code Complex}.
-     * @return {@code this - subtrahend}.
-     * @throws NullArgumentException if {@code subtrahend} is {@code null}.
-     */
-    @Override
-    public Complex subtract(Complex subtrahend)
-            throws NullArgumentException {
-        MathUtils.checkNotNull(subtrahend);
-        if (isNaN || subtrahend.isNaN) {
-            return NaN;
-        }
-
-        return createComplex(real - subtrahend.getReal(),
-                imaginary - subtrahend.getImaginary());
     }
 
     /**
@@ -1237,7 +1258,7 @@ public class Complex implements FieldElement<Complex>, Serializable {
                     n);
         }
 
-        final List<Complex> result = new ArrayList<Complex>();
+        final List<Complex> result = new ArrayList<>();
 
         if (isNaN) {
             result.add(NaN);
@@ -1288,22 +1309,6 @@ public class Complex implements FieldElement<Complex>, Serializable {
      */
     protected final Object readResolve() {
         return createComplex(real, imaginary);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ComplexField getField() {
-        return ComplexField.getInstance();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return "(" + real + ", " + imaginary + ")";
     }
 
 }

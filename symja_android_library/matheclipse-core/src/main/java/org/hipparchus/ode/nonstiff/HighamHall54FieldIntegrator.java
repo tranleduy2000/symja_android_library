@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -28,7 +33,7 @@ import org.hipparchus.util.MathUtils;
 /**
  * This class implements the 5(4) Higham and Hall integrator for
  * Ordinary Differential Equations.
- * <p>
+ *
  * <p>This integrator is an embedded Runge-Kutta integrator
  * of order 5(4) used in local extrapolation mode (i.e. the solution
  * is computed using the high order formula) with stepsize control

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fitting;
 
 import org.hipparchus.analysis.polynomials.PolynomialFunction;
@@ -26,7 +31,7 @@ import java.util.Collection;
 
 /**
  * Fits points to a {@link
- * PolynomialFunction.Parametric polynomial}
+ * org.hipparchus.analysis.polynomials.PolynomialFunction.Parametric polynomial}
  * function.
  * <br/>
  * The size of the {@link #withStartPoint(double[]) initial guess} array defines the
@@ -49,15 +54,14 @@ public class PolynomialCurveFitter extends AbstractCurveFitter {
     private final int maxIter;
 
     /**
-     * Contructor used by the factory methods.
+     * Constructor used by the factory methods.
      *
      * @param initialGuess Initial guess.
      * @param maxIter      Maximum number of iterations of the optimization algorithm.
      * @throws MathRuntimeException if {@code initialGuess} is {@code null}.
      */
-    private PolynomialCurveFitter(double[] initialGuess,
-                                  int maxIter) {
-        this.initialGuess = initialGuess;
+    private PolynomialCurveFitter(double[] initialGuess, int maxIter) {
+        this.initialGuess = initialGuess.clone();
         this.maxIter = maxIter;
     }
 
@@ -115,8 +119,8 @@ public class PolynomialCurveFitter extends AbstractCurveFitter {
             ++i;
         }
 
-        final TheoreticalValuesFunction model =
-                new TheoreticalValuesFunction(FUNCTION, observations);
+        final AbstractCurveFitter.TheoreticalValuesFunction model =
+                new AbstractCurveFitter.TheoreticalValuesFunction(FUNCTION, observations);
 
         if (initialGuess == null) {
             throw MathRuntimeException.createInternalError();

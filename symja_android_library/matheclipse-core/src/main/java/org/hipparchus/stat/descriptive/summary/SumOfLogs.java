@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.summary;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -29,7 +34,7 @@ import java.io.Serializable;
 /**
  * Returns the sum of the natural logs for this collection of values.
  * <p>
- * Uses {@link FastMath#log(double)} to compute the logs.
+ * Uses {@link org.hipparchus.util.FastMath#log(double)} to compute the logs.
  * Therefore,
  * <ul>
  * <li>If any of values are &lt; 0, the result is <code>NaN.</code></li>
@@ -86,52 +91,6 @@ public class SumOfLogs extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        value += FastMath.log(d);
-        n++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return n;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        value = 0d;
-        n = 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void aggregate(SumOfLogs other) {
-        MathUtils.checkNotNull(other);
-        if (other.n > 0) {
-            this.n += other.n;
-            this.value += other.value;
-        }
-    }
-
-    /**
      * Returns the sum of the natural logs of the entries in the specified portion of
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.
@@ -162,8 +121,42 @@ public class SumOfLogs extends AbstractStorelessUnivariateStatistic
      * {@inheritDoc}
      */
     @Override
+    public long getN() {
+        return n;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public SumOfLogs copy() {
         return new SumOfLogs(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void increment(final double d) {
+        value += FastMath.log(d);
+        n++;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        value = 0d;
+        n = 0;
     }
 
 }

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -102,7 +107,7 @@ public class MultivariateSummaryStatistics
     /**
      * Count of values that have been added
      */
-    private long n = 0;
+    private long n;
 
     /**
      * Construct a MultivariateSummaryStatistics instance for the given
@@ -189,38 +194,6 @@ public class MultivariateSummaryStatistics
      * {@inheritDoc}
      **/
     @Override
-    public long getN() {
-        return n;
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double[] getSum() {
-        return sumImpl.getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double[] getSumSq() {
-        return sumSqImpl.getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double[] getSumLog() {
-        return sumLogImpl.getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
     public double[] getMean() {
         return meanImpl.getResult();
     }
@@ -231,30 +204,6 @@ public class MultivariateSummaryStatistics
     @Override
     public RealMatrix getCovariance() {
         return covarianceImpl.getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double[] getMax() {
-        return maxImpl.getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double[] getMin() {
-        return minImpl.getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public double[] getGeometricMean() {
-        return geoMeanImpl.getResult();
     }
 
     /**
@@ -281,28 +230,59 @@ public class MultivariateSummaryStatistics
     }
 
     /**
-     * Generates a text report displaying
-     * summary statistics from values that
-     * have been added.
-     *
-     * @return String with line feeds displaying statistics
-     */
+     * {@inheritDoc}
+     **/
     @Override
-    public String toString() {
-        final String separator = ", ";
-        final String suffix = System.getProperty("line.separator");
-        StringBuilder outBuffer = new StringBuilder();
-        outBuffer.append("MultivariateSummaryStatistics:" + suffix);
-        outBuffer.append("n: " + getN() + suffix);
-        append(outBuffer, getMin(), "min: ", separator, suffix);
-        append(outBuffer, getMax(), "max: ", separator, suffix);
-        append(outBuffer, getMean(), "mean: ", separator, suffix);
-        append(outBuffer, getGeometricMean(), "geometric mean: ", separator, suffix);
-        append(outBuffer, getSumSq(), "sum of squares: ", separator, suffix);
-        append(outBuffer, getSumLog(), "sum of logarithms: ", separator, suffix);
-        append(outBuffer, getStandardDeviation(), "standard deviation: ", separator, suffix);
-        outBuffer.append("covariance: " + getCovariance().toString() + suffix);
-        return outBuffer.toString();
+    public double[] getMax() {
+        return maxImpl.getResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double[] getMin() {
+        return minImpl.getResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public long getN() {
+        return n;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double[] getGeometricMean() {
+        return geoMeanImpl.getResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double[] getSum() {
+        return sumImpl.getResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double[] getSumSq() {
+        return sumSqImpl.getResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double[] getSumLog() {
+        return sumLogImpl.getResult();
     }
 
     /**
@@ -338,7 +318,7 @@ public class MultivariateSummaryStatistics
         if (object == this) {
             return true;
         }
-        if (object instanceof MultivariateSummaryStatistics == false) {
+        if (!(object instanceof MultivariateSummaryStatistics)) {
             return false;
         }
         MultivariateSummaryStatistics other = (MultivariateSummaryStatistics) object;
@@ -370,6 +350,31 @@ public class MultivariateSummaryStatistics
         result = result * 31 + MathUtils.hash(getSumLog());
         result = result * 31 + getCovariance().hashCode();
         return result;
+    }
+
+    /**
+     * Generates a text report displaying
+     * summary statistics from values that
+     * have been added.
+     *
+     * @return String with line feeds displaying statistics
+     */
+    @Override
+    public String toString() {
+        final String separator = ", ";
+        final String suffix = System.getProperty("line.separator");
+        StringBuilder outBuffer = new StringBuilder(200); // the size is just a wild guess
+        outBuffer.append("MultivariateSummaryStatistics:").append(suffix).
+                append("n: ").append(getN()).append(suffix);
+        append(outBuffer, getMin(), "min: ", separator, suffix);
+        append(outBuffer, getMax(), "max: ", separator, suffix);
+        append(outBuffer, getMean(), "mean: ", separator, suffix);
+        append(outBuffer, getGeometricMean(), "geometric mean: ", separator, suffix);
+        append(outBuffer, getSumSq(), "sum of squares: ", separator, suffix);
+        append(outBuffer, getSumLog(), "sum of logarithms: ", separator, suffix);
+        append(outBuffer, getStandardDeviation(), "standard deviation: ", separator, suffix);
+        outBuffer.append("covariance: ").append(getCovariance().toString()).append(suffix);
+        return outBuffer.toString();
     }
 
 }

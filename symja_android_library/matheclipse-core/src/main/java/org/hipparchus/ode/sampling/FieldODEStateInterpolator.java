@@ -23,7 +23,7 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
 /**
  * This interface represents an interpolator over the last step
  * during an ODE integration.
- * <p>
+ *
  * <p>The various ODE integrators provide objects implementing this
  * interface to the step handlers. These objects are often custom
  * objects tightly bound to the integrator internal algorithms. The
@@ -49,7 +49,7 @@ public interface FieldODEStateInterpolator<T extends RealFieldElement<T>> {
      * Determines if the {@link #getPreviousState() previous state} is computed directly
      * by the integrator, or if it is calculated using {@link #getInterpolatedState(RealFieldElement)
      * interpolation}.
-     * <p>
+     *
      * <p> Typically the previous state is directly computed by the integrator, but when
      * events are detected the steps are shortened so that events occur on step boundaries
      * which means the previous state may be computed by the interpolator.
@@ -70,7 +70,7 @@ public interface FieldODEStateInterpolator<T extends RealFieldElement<T>> {
      * Determines if the {@link #getCurrentState() current state} is computed directly by
      * the integrator, or if it is calculated using {@link #getInterpolatedState(RealFieldElement)
      * interpolation}.
-     * <p>
+     *
      * <p> Typically the current state is directly computed by the integrator, but when
      * events are detected the steps are shortened so that events occur on step boundaries
      * which means the current state may be computed by the interpolator.

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 import java.text.FieldPosition;
@@ -45,7 +50,7 @@ public class CompositeFormat {
 
     /**
      * Create a default number format.  The default number format is based on
-     * {@link NumberFormat#getInstance(Locale)} with the only
+     * {@link NumberFormat#getInstance(java.util.Locale)} with the only
      * customizing that the maximum number of fraction digits is set to 10.
      *
      * @param locale the specific locale used by the format.
@@ -112,9 +117,7 @@ public class CompositeFormat {
         Number ret = null;
 
         StringBuilder sb = new StringBuilder();
-        sb.append('(');
-        sb.append(value);
-        sb.append(')');
+        sb.append('(').append(value).append(')');
 
         final int n = sb.length();
         final int startIndex = pos.getIndex();

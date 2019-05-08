@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -39,6 +44,8 @@ import java.util.Locale;
  * returned. In the second case, however, the parse position after parsing will be
  * just after the closing curly brace, i.e. just before the trailing space.</p>
  */
+@SuppressWarnings("PMD.SingleMethodSingleton")
+// the violations have been taken care of as of 1.4, they correspond to deprecated methods
 public class RealVectorFormat {
 
     /**
@@ -148,9 +155,21 @@ public class RealVectorFormat {
      * Returns the default real vector format for the current locale.
      *
      * @return the default real vector format.
+     * @since 1.4
      */
+    public static RealVectorFormat getRealVectorFormat() {
+        return getRealVectorFormat(Locale.getDefault());
+    }
+
+    /**
+     * Returns the default real vector format for the current locale.
+     *
+     * @return the default real vector format.
+     * @deprecated as of 1.4, replaced by {@link #getRealVectorFormat()}
+     */
+    @Deprecated
     public static RealVectorFormat getInstance() {
-        return getInstance(Locale.getDefault());
+        return getRealVectorFormat();
     }
 
     /**
@@ -158,9 +177,22 @@ public class RealVectorFormat {
      *
      * @param locale the specific locale used by the format.
      * @return the real vector format specific to the given locale.
+     * @since 1.4
      */
-    public static RealVectorFormat getInstance(final Locale locale) {
+    public static RealVectorFormat getRealVectorFormat(final Locale locale) {
         return new RealVectorFormat(CompositeFormat.getDefaultNumberFormat(locale));
+    }
+
+    /**
+     * Returns the default real vector format for the given locale.
+     *
+     * @param locale the specific locale used by the format.
+     * @return the real vector format specific to the given locale.
+     * @deprecated as of 1.4, replaced by {@link #getRealVectorFormat(Locale)}
+     */
+    @Deprecated
+    public static RealVectorFormat getInstance(final Locale locale) {
+        return getRealVectorFormat(locale);
     }
 
     /**
@@ -278,7 +310,7 @@ public class RealVectorFormat {
         }
 
         // parse components
-        List<Number> components = new ArrayList<Number>();
+        List<Number> components = new ArrayList<>();
         for (boolean loop = true; loop; ) {
 
             if (!components.isEmpty()) {

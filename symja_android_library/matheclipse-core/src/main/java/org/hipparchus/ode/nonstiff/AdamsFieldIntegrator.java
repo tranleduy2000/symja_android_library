@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
@@ -101,9 +106,9 @@ public abstract class AdamsFieldIntegrator<T extends RealFieldElement<T>> extend
      * {@inheritDoc}
      */
     @Override
-    public abstract FieldODEStateAndDerivative<T> integrate(final FieldExpandableODE<T> equations,
-                                                            final FieldODEState<T> initialState,
-                                                            final T finalTime)
+    public abstract FieldODEStateAndDerivative<T> integrate(FieldExpandableODE<T> equations,
+                                                            FieldODEState<T> initialState,
+                                                            T finalTime)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**

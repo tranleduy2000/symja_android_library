@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -102,21 +107,6 @@ public class LogisticDistribution extends AbstractRealDistribution {
      * {@inheritDoc}
      */
     @Override
-    public double inverseCumulativeProbability(double p) throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-
-        if (p == 0) {
-            return 0.0;
-        } else if (p == 1) {
-            return Double.POSITIVE_INFINITY;
-        }
-        return s * Math.log(p / (1.0 - p)) + mu;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double getNumericalMean() {
         return mu;
     }
@@ -151,6 +141,21 @@ public class LogisticDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double inverseCumulativeProbability(double p) throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+
+        if (p == 0) {
+            return 0.0;
+        } else if (p == 1) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return s * Math.log(p / (1.0 - p)) + mu;
     }
 
 }

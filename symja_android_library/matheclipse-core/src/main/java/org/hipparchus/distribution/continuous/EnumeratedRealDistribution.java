@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.distribution.EnumeratedDistribution;
@@ -78,7 +83,7 @@ public class EnumeratedRealDistribution extends AbstractRealDistribution {
             index++;
         }
         innerDistribution =
-                new EnumeratedDistribution<Double>(createDistribution(values, probabilities));
+                new EnumeratedDistribution<>(createDistribution(values, probabilities));
     }
 
     /**
@@ -97,7 +102,7 @@ public class EnumeratedRealDistribution extends AbstractRealDistribution {
             throws MathIllegalArgumentException {
         super();
         innerDistribution =
-                new EnumeratedDistribution<Double>(createDistribution(singletons, probabilities));
+                new EnumeratedDistribution<>(createDistribution(singletons, probabilities));
     }
 
 
@@ -165,31 +170,6 @@ public class EnumeratedRealDistribution extends AbstractRealDistribution {
         }
 
         return probability;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double inverseCumulativeProbability(final double p) throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-
-        double probability = 0;
-        double x = getSupportLowerBound();
-        for (final Pair<Double, Double> sample : innerDistribution.getPmf()) {
-            if (sample.getValue() == 0.0) {
-                continue;
-            }
-
-            probability += sample.getValue();
-            x = sample.getKey();
-
-            if (probability >= p) {
-                break;
-            }
-        }
-
-        return x;
     }
 
     /**
@@ -277,7 +257,32 @@ public class EnumeratedRealDistribution extends AbstractRealDistribution {
     }
 
     /**
-     * Return the probability mass function as a list of <value, probability> pairs.
+     * {@inheritDoc}
+     */
+    @Override
+    public double inverseCumulativeProbability(final double p) throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+
+        double probability = 0;
+        double x = getSupportLowerBound();
+        for (final Pair<Double, Double> sample : innerDistribution.getPmf()) {
+            if (sample.getValue() == 0.0) {
+                continue;
+            }
+
+            probability += sample.getValue();
+            x = sample.getKey();
+
+            if (probability >= p) {
+                break;
+            }
+        }
+
+        return x;
+    }
+
+    /**
+     * Return the probability mass function as a list of (value, probability) pairs.
      *
      * @return the probability mass function.
      */

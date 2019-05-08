@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -65,7 +70,7 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
     /**
      * Whether or not the numerical mean has been calculated
      */
-    private boolean numericalMeanIsCalculated = false;
+    private boolean numericalMeanIsCalculated;
     /**
      * Cached numerical variance
      */
@@ -73,7 +78,7 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
     /**
      * Whether or not the numerical variance has been calculated
      */
-    private boolean numericalVarianceIsCalculated = false;
+    private boolean numericalVarianceIsCalculated;
 
     /**
      * Create a new Zipf distribution with the given number of elements and
@@ -134,18 +139,6 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
      * {@inheritDoc}
      */
     @Override
-    public double logProbability(int x) {
-        if (x <= 0 || x > numberOfElements) {
-            return Double.NEGATIVE_INFINITY;
-        }
-
-        return -FastMath.log(x) * exponent - FastMath.log(nthHarmonic);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double cumulativeProbability(final int x) {
         if (x <= 0) {
             return 0.0;
@@ -176,21 +169,6 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
     }
 
     /**
-     * Used by {@link #getNumericalMean()}.
-     *
-     * @return the mean of this distribution
-     */
-    protected double calculateNumericalMean() {
-        final int N = getNumberOfElements();
-        final double s = getExponent();
-
-        final double Hs1 = generalizedHarmonic(N, s - 1);
-        final double Hs = nthHarmonic;
-
-        return Hs1 / Hs;
-    }
-
-    /**
      * {@inheritDoc}
      * <p>
      * For number of elements {@code N} and exponent {@code s}, the mean is
@@ -208,39 +186,6 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
             numericalVarianceIsCalculated = true;
         }
         return numericalVariance;
-    }
-
-    /**
-     * Used by {@link #getNumericalVariance()}.
-     *
-     * @return the variance of this distribution
-     */
-    protected double calculateNumericalVariance() {
-        final int N = getNumberOfElements();
-        final double s = getExponent();
-
-        final double Hs2 = generalizedHarmonic(N, s - 2);
-        final double Hs1 = generalizedHarmonic(N, s - 1);
-        final double Hs = nthHarmonic;
-
-        return (Hs2 / Hs) - ((Hs1 * Hs1) / (Hs * Hs));
-    }
-
-    /**
-     * Calculates the Nth generalized harmonic number. See
-     * <a href="http://mathworld.wolfram.com/HarmonicSeries.html">Harmonic
-     * Series</a>.
-     *
-     * @param n Term in the series to calculate (must be larger than 1)
-     * @param m Exponent (special case {@code m = 1} is the harmonic series).
-     * @return the n<sup>th</sup> generalized harmonic number.
-     */
-    private double generalizedHarmonic(final int n, final double m) {
-        double value = 0;
-        for (int k = n; k > 0; --k) {
-            value += 1.0 / FastMath.pow(k, m);
-        }
-        return value;
     }
 
     /**
@@ -277,5 +222,65 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logProbability(int x) {
+        if (x <= 0 || x > numberOfElements) {
+            return Double.NEGATIVE_INFINITY;
+        }
+
+        return -FastMath.log(x) * exponent - FastMath.log(nthHarmonic);
+    }
+
+    /**
+     * Used by {@link #getNumericalMean()}.
+     *
+     * @return the mean of this distribution
+     */
+    protected double calculateNumericalMean() {
+        final int N = getNumberOfElements();
+        final double s = getExponent();
+
+        final double Hs1 = generalizedHarmonic(N, s - 1);
+        final double Hs = nthHarmonic;
+
+        return Hs1 / Hs;
+    }
+
+    /**
+     * Used by {@link #getNumericalVariance()}.
+     *
+     * @return the variance of this distribution
+     */
+    protected double calculateNumericalVariance() {
+        final int N = getNumberOfElements();
+        final double s = getExponent();
+
+        final double Hs2 = generalizedHarmonic(N, s - 2);
+        final double Hs1 = generalizedHarmonic(N, s - 1);
+        final double Hs = nthHarmonic;
+
+        return (Hs2 / Hs) - ((Hs1 * Hs1) / (Hs * Hs));
+    }
+
+    /**
+     * Calculates the Nth generalized harmonic number. See
+     * <a href="http://mathworld.wolfram.com/HarmonicSeries.html">Harmonic
+     * Series</a>.
+     *
+     * @param n Term in the series to calculate (must be larger than 1)
+     * @param m Exponent (special case {@code m = 1} is the harmonic series).
+     * @return the n<sup>th</sup> generalized harmonic number.
+     */
+    private double generalizedHarmonic(final int n, final double m) {
+        double value = 0;
+        for (int k = n; k > 0; --k) {
+            value += 1.0 / FastMath.pow(k, m);
+        }
+        return value;
     }
 }

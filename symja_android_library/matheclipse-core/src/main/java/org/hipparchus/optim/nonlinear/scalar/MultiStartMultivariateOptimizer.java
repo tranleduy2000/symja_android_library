@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.scalar;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -43,7 +48,7 @@ public class MultiStartMultivariateOptimizer
     /**
      * Found optima.
      */
-    private final List<PointValuePair> optima = new ArrayList<PointValuePair>();
+    private final List<PointValuePair> optima;
 
     /**
      * Create a multi-start optimizer from a single-start optimizer.
@@ -63,6 +68,7 @@ public class MultiStartMultivariateOptimizer
             throws MathIllegalArgumentException, NullArgumentException {
         super(optimizer, starts, generator);
         this.optimizer = optimizer;
+        this.optima = new ArrayList<>();
     }
 
     /**

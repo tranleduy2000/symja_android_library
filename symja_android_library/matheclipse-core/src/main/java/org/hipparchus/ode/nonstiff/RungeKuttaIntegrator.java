@@ -32,7 +32,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements the common part of all fixed step Runge-Kutta
  * integrators for Ordinary Differential Equations.
- * <p>
+ *
  * <p>These methods are explicit Runge-Kutta methods, their Butcher
  * arrays are as follows :
  * <pre>

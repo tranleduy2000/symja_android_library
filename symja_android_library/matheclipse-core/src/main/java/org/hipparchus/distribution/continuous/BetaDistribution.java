@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -103,32 +108,6 @@ public class BetaDistribution extends AbstractRealDistribution {
 
     /**
      * {@inheritDoc}
-     **/
-    @Override
-    public double logDensity(double x) {
-        if (x < 0 || x > 1) {
-            return Double.NEGATIVE_INFINITY;
-        } else if (x == 0) {
-            if (alpha < 1) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.CANNOT_COMPUTE_BETA_DENSITY_AT_0_FOR_SOME_ALPHA,
-                        alpha, 1, false);
-            }
-            return Double.NEGATIVE_INFINITY;
-        } else if (x == 1) {
-            if (beta < 1) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.CANNOT_COMPUTE_BETA_DENSITY_AT_1_FOR_SOME_BETA,
-                        beta, 1, false);
-            }
-            return Double.NEGATIVE_INFINITY;
-        } else {
-            double logX = FastMath.log(x);
-            double log1mX = FastMath.log1p(-x);
-            return (alpha - 1) * logX + (beta - 1) * log1mX - z;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public double cumulativeProbability(double x) {
@@ -202,5 +181,31 @@ public class BetaDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double logDensity(double x) {
+        if (x < 0 || x > 1) {
+            return Double.NEGATIVE_INFINITY;
+        } else if (x == 0) {
+            if (alpha < 1) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.CANNOT_COMPUTE_BETA_DENSITY_AT_0_FOR_SOME_ALPHA,
+                        alpha, 1, false);
+            }
+            return Double.NEGATIVE_INFINITY;
+        } else if (x == 1) {
+            if (beta < 1) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.CANNOT_COMPUTE_BETA_DENSITY_AT_1_FOR_SOME_BETA,
+                        beta, 1, false);
+            }
+            return Double.NEGATIVE_INFINITY;
+        } else {
+            double logX = FastMath.log(x);
+            double log1mX = FastMath.log1p(-x);
+            return (alpha - 1) * logX + (beta - 1) * log1mX - z;
+        }
     }
 }

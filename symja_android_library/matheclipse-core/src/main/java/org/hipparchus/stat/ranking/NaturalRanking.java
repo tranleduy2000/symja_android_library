@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.stat.ranking;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -223,7 +228,7 @@ public class NaturalRanking implements RankingAlgorithm {
                 break;
             case FAILED:
                 nanPositions = getNanPositions(ranks);
-                if (nanPositions.size() > 0) {
+                if (!nanPositions.isEmpty()) {
                     throw new MathIllegalArgumentException(LocalizedCoreFormats.NAN_NOT_ALLOWED);
                 }
                 break;
@@ -239,7 +244,7 @@ public class NaturalRanking implements RankingAlgorithm {
         double[] out = new double[ranks.length];
         int pos = 1;  // position in sorted array
         out[ranks[0].getPosition()] = pos;
-        List<Integer> tiesTrace = new ArrayList<Integer>();
+        List<Integer> tiesTrace = new ArrayList<>();
         tiesTrace.add(ranks[0].getPosition());
         for (int i = 1; i < ranks.length; i++) {
             if (Double.compare(ranks[i].getValue(), ranks[i - 1].getValue()) > 0) {
@@ -248,7 +253,7 @@ public class NaturalRanking implements RankingAlgorithm {
                 if (tiesTrace.size() > 1) {  // if seq is nontrivial, resolve
                     resolveTie(out, tiesTrace);
                 }
-                tiesTrace = new ArrayList<Integer>();
+                tiesTrace = new ArrayList<>();
                 tiesTrace.add(ranks[i].getPosition());
             } else {
                 // tie sequence continues
@@ -402,7 +407,7 @@ public class NaturalRanking implements RankingAlgorithm {
      * @param nanPositions list of index values to set to <code>Double.NaN</code>
      */
     private void restoreNaNs(double[] ranks, List<Integer> nanPositions) {
-        if (nanPositions.size() == 0) {
+        if (nanPositions.isEmpty()) {
             return;
         }
         Iterator<Integer> iterator = nanPositions.iterator();
@@ -419,7 +424,7 @@ public class NaturalRanking implements RankingAlgorithm {
      * @return list of indexes i such that <code>ranks[i] = NaN</code>
      */
     private List<Integer> getNanPositions(IntDoublePair[] ranks) {
-        ArrayList<Integer> out = new ArrayList<Integer>();
+        ArrayList<Integer> out = new ArrayList<>();
         for (int i = 0; i < ranks.length; i++) {
             if (Double.isNaN(ranks[i].getValue())) {
                 out.add(Integer.valueOf(i));

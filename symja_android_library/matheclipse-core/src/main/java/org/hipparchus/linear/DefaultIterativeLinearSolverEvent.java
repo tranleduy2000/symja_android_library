@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -25,7 +30,9 @@ import org.hipparchus.exception.MathRuntimeException;
  */
 public class DefaultIterativeLinearSolverEvent extends IterativeLinearSolverEvent {
 
-    /** */
+    /**
+     *
+     */
     private static final long serialVersionUID = 20120129L;
 
     /**
@@ -108,6 +115,14 @@ public class DefaultIterativeLinearSolverEvent extends IterativeLinearSolverEven
      * {@inheritDoc}
      */
     @Override
+    public RealVector getRightHandSideVector() {
+        return b;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public double getNormOfResidual() {
         return rnorm;
     }
@@ -124,14 +139,6 @@ public class DefaultIterativeLinearSolverEvent extends IterativeLinearSolverEven
             return r;
         }
         throw new MathRuntimeException(LocalizedCoreFormats.UNSUPPORTED_OPERATION);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealVector getRightHandSideVector() {
-        return b;
     }
 
     /**

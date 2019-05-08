@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.exception;
 
 import java.text.MessageFormat;
@@ -90,22 +95,6 @@ public class NullArgumentException extends NullPointerException
      * {@inheritDoc}
      */
     @Override
-    public String getMessage() {
-        return getMessage(Locale.US);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getLocalizedMessage() {
-        return getMessage(Locale.getDefault());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Localizable getSpecifier() {
         return specifier;
     }
@@ -116,6 +105,22 @@ public class NullArgumentException extends NullPointerException
     @Override
     public Object[] getParts() {
         return parts.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getMessage() {
+        return getMessage(Locale.US);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLocalizedMessage() {
+        return getMessage(Locale.getDefault());
     }
 
 }

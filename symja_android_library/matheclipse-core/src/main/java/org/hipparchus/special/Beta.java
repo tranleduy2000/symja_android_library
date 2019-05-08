@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.special;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -199,6 +204,12 @@ public class Beta {
 
                 /** {@inheritDoc} */
                 @Override
+                protected double getA(int n, double x) {
+                    return 1.0;
+                }
+
+                /** {@inheritDoc} */
+                @Override
                 protected double getB(int n, double x) {
                     double ret;
                     double m;
@@ -212,12 +223,6 @@ public class Beta {
                                 ((a + (2 * m)) * (a + (2 * m) + 1.0));
                     }
                     return ret;
-                }
-
-                /** {@inheritDoc} */
-                @Override
-                protected double getA(int n, double x) {
-                    return 1.0;
                 }
             };
             ret = FastMath.exp((a * FastMath.log(x)) + (b * FastMath.log1p(-x)) -
@@ -380,7 +385,7 @@ public class Beta {
     }
 
     /**
-     * Returns the value of log B(p, q) for 0 ≤ x ≤ 1 and p, q > 0. Based on the
+     * Returns the value of log B(p, q) for 0 ≤ x ≤ 1 and p, q &gt; 0. Based on the
      * <em>NSWC Library of Mathematics Subroutines</em> implementation,
      * {@code DBETLN}.
      *

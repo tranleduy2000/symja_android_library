@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.sampling;
 
 import org.hipparchus.RealFieldElement;
@@ -26,22 +31,22 @@ import org.hipparchus.util.Precision;
 /**
  * This class wraps an object implementing {@link FieldODEFixedStepHandler}
  * into a {@link FieldODEStepHandler}.
- * <p>
+ *
  * <p>This wrapper allows to use fixed step handlers with general
  * integrators which cannot guaranty their integration steps will
  * remain constant and therefore only accept general step
  * handlers.</p>
- * <p>
+ *
  * <p>The stepsize used is selected at construction time. The {@link
  * FieldODEFixedStepHandler#handleStep handleStep} method of the underlying
  * {@link FieldODEFixedStepHandler} object is called at normalized times. The
  * normalized times can be influenced by the {@link StepNormalizerMode} and
  * {@link StepNormalizerBounds}.</p>
- * <p>
+ *
  * <p>There is no constraint on the integrator, it can use any time step
  * it needs (time steps longer or shorter than the fixed time step and
  * non-integer ratios are all allowed).</p>
- * <p>
+ *
  * <p>
  * <table border="1" align="center">
  * <tr BGCOLOR="#CCCCFF"><td colspan=6><font size="+2">Examples (step size = 0.5)</font></td></tr>
@@ -90,9 +95,7 @@ import org.hipparchus.util.Precision;
  * @see StepNormalizerBounds
  */
 
-public class FieldStepNormalizer<T extends RealFieldElement<T>>
-        extends FieldODEStepHandlerImpl<T>
-        implements FieldODEStepHandler<T> {
+public class FieldStepNormalizer<T extends RealFieldElement<T>> implements FieldODEStepHandler<T> {
 
     /**
      * Underlying step handler.
@@ -192,7 +195,7 @@ public class FieldStepNormalizer<T extends RealFieldElement<T>>
         forward = true;
 
         // initialize the underlying handler
-        FieldODEFixedStepHandlerImpl.init(handler, initialState, finalTime);
+        handler.init(initialState, finalTime);
 
     }
 
@@ -210,6 +213,7 @@ public class FieldStepNormalizer<T extends RealFieldElement<T>>
      * @throws MathIllegalStateException if the interpolator throws one because
      *                                   the number of functions evaluations is exceeded
      */
+    @Override
     public void handleStep(final FieldODEStateInterpolator<T> interpolator, final boolean isLast)
             throws MathIllegalStateException {
         // The first time, update the last state with the start information.

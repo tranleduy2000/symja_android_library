@@ -14,8 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
+import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathRuntimeException;
 
@@ -129,7 +135,7 @@ public class FastMath {
     /**
      * Coefficients for log, when input 0.99 < x < 1.01.
      */
-    private static final double LN_QUICK_COEF[][] = {
+    private static final double[][] LN_QUICK_COEF = {
             {1.0, 5.669184079525E-24},
             {-0.25, -0.25},
             {0.3333333134651184, 1.986821492305628E-8},
@@ -144,7 +150,7 @@ public class FastMath {
     /**
      * Coefficients for log in the range of 1.0 < x < 1.0 + 2^-10.
      */
-    private static final double LN_HI_PREC_COEF[][] = {
+    private static final double[][] LN_HI_PREC_COEF = {
             {1.0, -6.032174644509064E-23},
             {-0.25, -0.25},
             {0.3333333134651184, 1.9868161777724352E-8},
@@ -161,7 +167,7 @@ public class FastMath {
     /**
      * Sine table (high bits).
      */
-    private static final double SINE_TABLE_A[] =
+    private static final double[] SINE_TABLE_A =
             {
                     +0.0d,
                     +0.1246747374534607d,
@@ -182,7 +188,7 @@ public class FastMath {
     /**
      * Sine table (low bits).
      */
-    private static final double SINE_TABLE_B[] =
+    private static final double[] SINE_TABLE_B =
             {
                     +0.0d,
                     -4.068233003401932E-9d,
@@ -203,7 +209,7 @@ public class FastMath {
     /**
      * Cosine table (high bits).
      */
-    private static final double COSINE_TABLE_A[] =
+    private static final double[] COSINE_TABLE_A =
             {
                     +1.0d,
                     +0.9921976327896118d,
@@ -224,7 +230,7 @@ public class FastMath {
     /**
      * Cosine table (low bits).
      */
-    private static final double COSINE_TABLE_B[] =
+    private static final double[] COSINE_TABLE_B =
             {
                     +0.0d,
                     +3.4439717236742845E-8d,
@@ -246,7 +252,7 @@ public class FastMath {
     /**
      * Tangent table, used by atan() (high bits).
      */
-    private static final double TANGENT_TABLE_A[] =
+    private static final double[] TANGENT_TABLE_A =
             {
                     +0.0d,
                     +0.1256551444530487d,
@@ -267,7 +273,7 @@ public class FastMath {
     /**
      * Tangent table, used by atan() (low bits).
      */
-    private static final double TANGENT_TABLE_B[] =
+    private static final double[] TANGENT_TABLE_B =
             {
                     +0.0d,
                     -7.877917738262007E-9d,
@@ -288,7 +294,7 @@ public class FastMath {
     /**
      * Bits of 1/(2*pi), need for reducePayneHanek().
      */
-    private static final long RECIP_2PI[] = new long[]{
+    private static final long[] RECIP_2PI = new long[]{
             (0x28be60dbL << 32) | 0x9391054aL,
             (0x7f09d5f4L << 32) | 0x7d4d3770L,
             (0x36d8a566L << 32) | 0x4f10e410L,
@@ -311,7 +317,7 @@ public class FastMath {
     /**
      * Bits of pi/4, need for reducePayneHanek().
      */
-    private static final long PI_O_4_BITS[] = new long[]{
+    private static final long[] PI_O_4_BITS = new long[]{
             (0xc90fdaa2L << 32) | 0x2168c234L,
             (0xc4c6628bL << 32) | 0x80dc1cd1L};
 
@@ -320,12 +326,12 @@ public class FastMath {
      * This is used by sinQ, because its faster to do a table lookup than
      * a multiply in this time-critical routine
      */
-    private static final double EIGHTHS[] = {0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5, 1.625};
+    private static final double[] EIGHTHS = {0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5, 1.625};
 
     /**
      * Table of 2^((n+2)/3)
      */
-    private static final double CBRTTWO[] = {0.6299605249474366,
+    private static final double[] CBRTTWO = {0.6299605249474366,
             0.7937005259840998,
             1.0,
             1.2599210498948732,
@@ -517,7 +523,7 @@ public class FastMath {
             }
         }
 
-        final double hiPrec[] = new double[2];
+        final double[] hiPrec = new double[2];
         if (x < 0.0) {
             x = -x;
         }
@@ -601,7 +607,7 @@ public class FastMath {
         double result;
 
         if (x > 0.25) {
-            double hiPrec[] = new double[2];
+            double[] hiPrec = new double[2];
             exp(x, 0.0, hiPrec);
 
             double ya = hiPrec[0] + hiPrec[1];
@@ -636,13 +642,13 @@ public class FastMath {
             result = ya + yb;
             result *= 0.5;
         } else {
-            double hiPrec[] = new double[2];
+            double[] hiPrec = new double[2];
             expm1(x, hiPrec);
 
             double ya = hiPrec[0] + hiPrec[1];
             double yb = -(ya - hiPrec[0] - hiPrec[1]);
 
-          /* Compute expm1(-x) = -expm1(x) / (expm1(x) + 1) */
+            /* Compute expm1(-x) = -expm1(x) / (expm1(x) + 1) */
             double denom = 1.0 + ya;
             double denomr = 1.0 / denom;
             double denomb = -(denom - 1.0 - ya) + yb;
@@ -718,21 +724,21 @@ public class FastMath {
 
         double result;
         if (x >= 0.5) {
-            double hiPrec[] = new double[2];
+            double[] hiPrec = new double[2];
             // tanh(x) = (exp(2x) - 1) / (exp(2x) + 1)
             exp(x * 2.0, 0.0, hiPrec);
 
             double ya = hiPrec[0] + hiPrec[1];
             double yb = -(ya - hiPrec[0] - hiPrec[1]);
 
-          /* Numerator */
+            /* Numerator */
             double na = -1.0 + ya;
             double nb = -(na + 1.0 - ya);
             double temp = na + yb;
             nb += -(temp - na - yb);
             na = temp;
 
-          /* Denominator */
+            /* Denominator */
             double da = 1.0 + ya;
             double db = -(da - 1.0 - ya);
             temp = da + yb;
@@ -759,18 +765,18 @@ public class FastMath {
 
             result = ratioa + ratiob;
         } else {
-            double hiPrec[] = new double[2];
+            double[] hiPrec = new double[2];
             // tanh(x) = expm1(2x) / (expm1(2x) + 2)
             expm1(x * 2.0, hiPrec);
 
             double ya = hiPrec[0] + hiPrec[1];
             double yb = -(ya - hiPrec[0] - hiPrec[1]);
 
-          /* Numerator */
+            /* Numerator */
             double na = ya;
             double nb = yb;
 
-          /* Denominator */
+            /* Denominator */
             double da = 2.0 + ya;
             double db = -(da - 2.0 - ya);
             double temp = da + yb;
@@ -1120,7 +1126,7 @@ public class FastMath {
      * @param hiPrecOut receive high precision result for -1.0 < x < 1.0
      * @return exp(x) - 1
      */
-    private static double expm1(double x, double hiPrecOut[]) {
+    private static double expm1(double x, double[] hiPrecOut) {
         if (Double.isNaN(x) || x == 0.0) { // NaN or zero
             return x;
         }
@@ -1128,7 +1134,7 @@ public class FastMath {
         if (x <= -1.0 || x >= 1.0) {
             // If not between +/- 1.0
             //return exp(x) - 1.0;
-            double hiPrec[] = new double[2];
+            double[] hiPrec = new double[2];
             exp(x, 0.0, hiPrec);
             if (x > 0.0) {
                 return -1.0 + hiPrec[0] + hiPrec[1];
@@ -1546,7 +1552,7 @@ public class FastMath {
      * @return log10(x)
      */
     public static double log10(final double x) {
-        final double hiPrec[] = new double[2];
+        final double[] hiPrec = new double[2];
 
         final double lores = log(x, hiPrec);
         if (Double.isInfinite(lores)) { // don't allow this to be converted to NaN
@@ -1685,7 +1691,7 @@ public class FastMath {
                     final double yb = y - ya;
 
                     /* Compute ln(x) */
-                    final double lns[] = new double[2];
+                    final double[] lns = new double[2];
                     final double lores = log(x, lns);
                     if (Double.isInfinite(lores)) { // don't allow this to be converted to NaN
                         return lores;
@@ -1714,9 +1720,7 @@ public class FastMath {
                     z = z * lnb + 1.0;
                     z *= lnb;
 
-                    final double result = exp(lna, z, null);
-                    //result = result + result * z;
-                    return result;
+                    return exp(lna, z, null);
 
                 }
             }
@@ -1944,7 +1948,7 @@ public class FastMath {
      * @param xa        number from which sine is requested
      * @param xb        extra bits for x (may be 0.0)
      * @param cotanFlag if true, compute the cotangent instead of the tangent
-     * @return tan(xa+xb) (or cotangent, depending on cotanFlag)
+     * @return tan(xa + xb) (or cotangent, depending on cotanFlag)
      */
     private static double tanQ(double xa, double xb, boolean cotanFlag) {
 
@@ -2099,7 +2103,7 @@ public class FastMath {
      * @param x      number to reduce
      * @param result placeholder where to put the result
      */
-    private static void reducePayneHanek(double x, double result[]) {
+    private static void reducePayneHanek(double x, double[] result) {
         /* Convert input double to bits */
         long inbits = Double.doubleToRawLongBits(x);
         int exponent = (int) ((inbits >> 52) & 0x7ff) - 1023;
@@ -2347,7 +2351,7 @@ public class FastMath {
             // PI * (2**20)
             // Argument too big for CodyWaite reduction.  Must use
             // PayneHanek.
-            double reduceResults[] = new double[3];
+            double[] reduceResults = new double[3];
             reducePayneHanek(xa, reduceResults);
             quadrant = ((int) reduceResults[0]) & 3;
             xa = reduceResults[1];
@@ -2402,7 +2406,7 @@ public class FastMath {
             // PI * (2**20)
             // Argument too big for CodyWaite reduction.  Must use
             // PayneHanek.
-            double reduceResults[] = new double[3];
+            double[] reduceResults = new double[3];
             reducePayneHanek(xa, reduceResults);
             quadrant = ((int) reduceResults[0]) & 3;
             xa = reduceResults[1];
@@ -2429,6 +2433,81 @@ public class FastMath {
             default:
                 return Double.NaN;
         }
+    }
+
+    /**
+     * Combined Sine and Cosine function.
+     *
+     * @param x Argument.
+     * @return [sin(x), cos(x)]
+     */
+    public static SinCos sinCos(double x) {
+        boolean negative = false;
+        int quadrant = 0;
+        double xa;
+        double xb = 0.0;
+
+        /* Take absolute value of the input */
+        xa = x;
+        if (x < 0) {
+            negative = true;
+            xa = -xa;
+        }
+
+        /* Check for zero and negative zero */
+        if (xa == 0.0) {
+            long bits = Double.doubleToRawLongBits(x);
+            if (bits < 0) {
+                return new SinCos(-0.0, 1.0);
+            }
+            return new SinCos(0.0, 1.0);
+        }
+
+        if (xa != xa || xa == Double.POSITIVE_INFINITY) {
+            return new SinCos(Double.NaN, Double.NaN);
+        }
+
+        /* Perform any argument reduction */
+        if (xa > 3294198.0) {
+            // PI * (2**20)
+            // Argument too big for CodyWaite reduction.  Must use
+            // PayneHanek.
+            double[] reduceResults = new double[3];
+            reducePayneHanek(xa, reduceResults);
+            quadrant = ((int) reduceResults[0]) & 3;
+            xa = reduceResults[1];
+            xb = reduceResults[2];
+        } else if (xa > 1.5707963267948966) {
+            final CodyWaite cw = new CodyWaite(xa);
+            quadrant = cw.getK() & 3;
+            xa = cw.getRemA();
+            xb = cw.getRemB();
+        }
+
+        switch (quadrant) {
+            case 0:
+                return new SinCos(negative ? -sinQ(xa, xb) : sinQ(xa, xb), cosQ(xa, xb));
+            case 1:
+                return new SinCos(negative ? -cosQ(xa, xb) : cosQ(xa, xb), -sinQ(xa, xb));
+            case 2:
+                return new SinCos(negative ? sinQ(xa, xb) : -sinQ(xa, xb), -cosQ(xa, xb));
+            case 3:
+                return new SinCos(negative ? cosQ(xa, xb) : -cosQ(xa, xb), sinQ(xa, xb));
+            default:
+                return new SinCos(Double.NaN, Double.NaN);
+        }
+    }
+
+    /**
+     * Combined Sine and Cosine function.
+     *
+     * @param x   Argument.
+     * @param <T> the type of the field element
+     * @return [sin(x), cos(x)]
+     * @since 1.4
+     */
+    public static <T extends RealFieldElement<T>> FieldSinCos<T> sinCos(T x) {
+        return x.sinCos();
     }
 
     /**
@@ -2467,7 +2546,7 @@ public class FastMath {
             // PI * (2**20)
             // Argument too big for CodyWaite reduction.  Must use
             // PayneHanek.
-            double reduceResults[] = new double[3];
+            double[] reduceResults = new double[3];
             reducePayneHanek(xa, reduceResults);
             quadrant = ((int) reduceResults[0]) & 3;
             xa = reduceResults[1];
@@ -2688,7 +2767,6 @@ public class FastMath {
         if (y == 0) {
             final double result = x * y;
             final double invx = 1d / x;
-            final double invy = 1d / y;
 
             if (invx == 0) { // X is infinite
                 if (x > 0) {
@@ -2699,11 +2777,7 @@ public class FastMath {
             }
 
             if (x < 0 || invx < 0) {
-                if (y < 0 || invy < 0) {
-                    return -Math.PI;
-                } else {
-                    return Math.PI;
-                }
+                return copySign(Math.PI, y);
             } else {
                 return result;
             }
@@ -2736,35 +2810,17 @@ public class FastMath {
         }
 
         if (x == Double.POSITIVE_INFINITY) {
-            if (y > 0 || 1 / y > 0) {
-                return 0d;
-            }
-
-            if (y < 0 || 1 / y < 0) {
-                return -0d;
-            }
+            return copySign(0d, y);
         }
 
         if (x == Double.NEGATIVE_INFINITY) {
-            if (y > 0.0 || 1 / y > 0.0) {
-                return Math.PI;
-            }
-
-            if (y < 0 || 1 / y < 0) {
-                return -Math.PI;
-            }
+            return copySign(Math.PI, y);
         }
 
         // Neither y nor x can be infinite or NAN here
 
         if (x == 0) {
-            if (y > 0 || 1 / y > 0) {
-                return Math.PI * F_1_2;
-            }
-
-            if (y < 0 || 1 / y < 0) {
-                return -Math.PI * F_1_2;
-            }
+            return copySign(Math.PI * F_1_2, y);
         }
 
         // Compute ratio r = y/x
@@ -2791,9 +2847,8 @@ public class FastMath {
         }
 
         // Call atan
-        final double result = atan(ra, rb, x < 0);
+        return atan(ra, rb, x < 0);
 
-        return result;
     }
 
     /**
@@ -2823,18 +2878,18 @@ public class FastMath {
             return x;
         }
 
-      /* Compute asin(x) = atan(x/sqrt(1-x*x)) */
+        /* Compute asin(x) = atan(x/sqrt(1-x*x)) */
 
-      /* Split x */
+        /* Split x */
         double temp = x * HEX_40000000;
         final double xa = x + temp - temp;
         final double xb = x - xa;
 
-      /* Square it */
+        /* Square it */
         double ya = xa * xa;
         double yb = xa * xb * 2.0 + xb * xb;
 
-      /* Subtract from 1 */
+        /* Subtract from 1 */
         ya = -ya;
         yb = -yb;
 
@@ -2845,17 +2900,17 @@ public class FastMath {
         zb += -(temp - za - yb);
         za = temp;
 
-      /* Square root */
+        /* Square root */
         double y;
         y = sqrt(za);
         temp = y * HEX_40000000;
         ya = y + temp - temp;
         yb = y - ya;
 
-      /* Extend precision of sqrt */
+        /* Extend precision of sqrt */
         yb += (za - ya * ya - 2 * ya * yb - yb * yb) / (2.0 * y);
 
-      /* Contribution of zb to sqrt */
+        /* Contribution of zb to sqrt */
         double dx = zb / (2.0 * y);
 
         // Compute ratio r = x/y
@@ -2901,18 +2956,18 @@ public class FastMath {
             return Math.PI / 2.0;
         }
 
-      /* Compute acos(x) = atan(sqrt(1-x*x)/x) */
+        /* Compute acos(x) = atan(sqrt(1-x*x)/x) */
 
-      /* Split x */
+        /* Split x */
         double temp = x * HEX_40000000;
         final double xa = x + temp - temp;
         final double xb = x - xa;
 
-      /* Square it */
+        /* Square it */
         double ya = xa * xa;
         double yb = xa * xb * 2.0 + xb * xb;
 
-      /* Subtract from 1 */
+        /* Subtract from 1 */
         ya = -ya;
         yb = -yb;
 
@@ -2923,16 +2978,16 @@ public class FastMath {
         zb += -(temp - za - yb);
         za = temp;
 
-      /* Square root */
+        /* Square root */
         double y = sqrt(za);
         temp = y * HEX_40000000;
         ya = y + temp - temp;
         yb = y - ya;
 
-      /* Extend precision of sqrt */
+        /* Extend precision of sqrt */
         yb += (za - ya * ya - 2 * ya * yb - yb * yb) / (2.0 * y);
 
-      /* Contribution of zb to sqrt */
+        /* Contribution of zb to sqrt */
         yb += zb / (2.0 * y);
         y = ya + yb;
         yb = -(y - ya - yb);
@@ -2965,7 +3020,7 @@ public class FastMath {
      * @return cubic root of x
      */
     public static double cbrt(double x) {
-      /* Convert input double to bits */
+        /* Convert input double to bits */
         long inbits = Double.doubleToRawLongBits(x);
         int exponent = (int) ((inbits >> 52) & 0x7ff) - 1023;
         boolean subnormal = false;
@@ -2975,7 +3030,7 @@ public class FastMath {
                 return x;
             }
 
-          /* Subnormal, so normalize */
+            /* Subnormal, so normalize */
             subnormal = true;
             x *= 1.8014398509481984E16;  // 2^54
             inbits = Double.doubleToRawLongBits(x);
@@ -2987,17 +3042,17 @@ public class FastMath {
             return x;
         }
 
-      /* Divide the exponent by 3 */
+        /* Divide the exponent by 3 */
         int exp3 = exponent / 3;
 
-      /* p2 will be the nearest power of 2 to x with its exponent divided by 3 */
+        /* p2 will be the nearest power of 2 to x with its exponent divided by 3 */
         double p2 = Double.longBitsToDouble((inbits & 0x8000000000000000L) |
                 (long) (((exp3 + 1023) & 0x7ff)) << 52);
 
-      /* This will be a number between 1 and 2 */
+        /* This will be a number between 1 and 2 */
         final double mant = Double.longBitsToDouble((inbits & 0x000fffffffffffffL) | 0x3ff0000000000000L);
 
-      /* Estimate the cube root of mant by polynomial */
+        /* Estimate the cube root of mant by polynomial */
         double est = -0.010714690733195933;
         est = est * mant + 0.0875862700108075;
         est = est * mant + -0.3058015757857271;
@@ -3034,7 +3089,7 @@ public class FastMath {
 
         est += (na + nb) / (3 * est * est);
 
-      /* Scale by a power of two, so this is exact. */
+        /* Scale by a power of two, so this is exact. */
         est *= p2;
 
         if (subnormal) {
@@ -3448,7 +3503,7 @@ public class FastMath {
      * Get the largest whole number smaller than x.
      *
      * @param x number from which floor is requested
-     * @return a double number f such that f is an integer f <= x < f + 1.0
+     * @return a double number f such that f is an integer f &lt;= x &lt; f + 1.0
      */
     public static double floor(double x) {
         long y;
@@ -3477,7 +3532,7 @@ public class FastMath {
      * Get the smallest whole number larger than x.
      *
      * @param x number from which ceil is requested
-     * @return a double number c such that c is an integer c - 1.0 < x <= c
+     * @return a double number c such that c is an integer c - 1.0 &lt; x &lt;= c
      */
     public static double ceil(double x) {
         double y;
@@ -3504,7 +3559,7 @@ public class FastMath {
      * Get the whole number that is the nearest to x, or the even one if x is exactly half way between two integers.
      *
      * @param x number from which nearest whole number is requested
-     * @return a double number r such that r is an integer r - 0.5 <= x <= r + 0.5
+     * @return a double number r such that r is an integer r - 0.5 &lt;= x &lt;= r + 0.5
      */
     public static double rint(double x) {
         double y = floor(x);
@@ -3737,7 +3792,7 @@ public class FastMath {
      * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
      * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)<br/>
      * avoiding intermediate overflow or underflow.
-     * <p>
+     *
      * <ul>
      * <li> If either argument is infinite, then the result is positive infinity.</li>
      * <li> else, if either argument is NaN then the result is NaN.</li>
@@ -3745,7 +3800,7 @@ public class FastMath {
      *
      * @param x a value
      * @param y a value
-     * @return sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
+     * @return sqrt(< i > x < / i > < sup > 2 < / sup > & nbsp ; + < i > y < / i > < sup > 2 < / sup >)
      */
     public static double hypot(final double x, final double y) {
         if (Double.isInfinite(x) || Double.isInfinite(y)) {
@@ -4012,6 +4067,19 @@ public class FastMath {
      * @param b second number to multiply
      * @return a*b if no overflows occur
      * @throws MathRuntimeException if an overflow occurs
+     * @since 1.3
+     */
+    public static long multiplyExact(final long a, final int b) {
+        return multiplyExact(a, (long) b);
+    }
+
+    /**
+     * Multiply two numbers, detecting overflows.
+     *
+     * @param a first number to multiply
+     * @param b second number to multiply
+     * @return a*b if no overflows occur
+     * @throws MathRuntimeException if an overflow occurs
      */
     public static long multiplyExact(final long a, final long b) {
         if (((b > 0l) && (a > Long.MAX_VALUE / b || a < Long.MIN_VALUE / b)) ||
@@ -4023,7 +4091,69 @@ public class FastMath {
     }
 
     /**
-     * Finds q such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0.
+     * Multiply two integers and give an exact result without overflow.
+     *
+     * @param a first factor
+     * @param b second factor
+     * @return a * b exactly
+     * @since 1.3
+     */
+    public static long multiplyFull(final int a, final int b) {
+        return ((long) a) * ((long) b);
+    }
+
+    /**
+     * Multiply two long integers and give the 64 most significant bits of the result.
+     * <p>
+     * Beware that as Java primitive long are always considered to be signed, there are some
+     * intermediate values {@code a} and {@code b} for which {@code a * b} exceeds {@code Long.MAX_VALUE}
+     * but this method will still return 0l. This happens for example for {@code a = 2³¹} and
+     * {@code b = 2³²} as {@code a * b = 2⁶³ = Long.MAX_VALUE + 1}, so it exceeds the max value
+     * for a long, but still fits in 64 bits, so this method correctly returns 0l in this case,
+     * but multiplication result would be considered negative (and in fact equal to {@code Long.MIN_VALUE}
+     * </p>
+     *
+     * @param a first factor
+     * @param b second factor
+     * @return a * b / 2<sup>64</sup>
+     * @since 1.3
+     */
+    public static long multiplyHigh(final long a, final long b) {
+
+        // all computations below are performed on unsigned numbers because we start
+        // by using logical shifts (and not arithmetic shifts). We will therefore
+        // need to take care of sign before returning
+        // a negative long n between -2⁶³ and -1, interpreted as an unsigned long
+        // corresponds to 2⁶⁴ + n (which is between 2⁶³ and 2⁶⁴-1)
+        // so if this number is multiplied by p, what we really compute
+        // is (2⁶⁴ + n) * p = 2⁶⁴ * p + n * p, therefore the part above 64 bits
+        // will have an extra term p that we will need to remove
+        final long tobeRemoved = ((a < 0) ? b : 0) + ((b < 0) ? a : 0);
+
+        // split numbers in two 32 bits parts
+        final long aHigh = a >>> 32;
+        final long aLow = a & 0xFFFFFFFFl;
+        final long bHigh = b >>> 32;
+        final long bLow = b & 0xFFFFFFFFl;
+
+        // ab = aHigh * bHigh * 2⁶⁴ + (aHigh * bLow + aLow * bHigh) * 2³² + aLow * bLow
+        final long hh = aHigh * bHigh;
+        final long hl1 = aHigh * bLow;
+        final long hl2 = aLow * bHigh;
+        final long ll = aLow * bLow;
+
+        // adds up everything in the above 64 bit part, taking care to avoid overflow
+        final long hlHigh = (hl1 >>> 32) + (hl2 >>> 32);
+        final long hlLow = (hl1 & 0xFFFFFFFFl) + (hl2 & 0xFFFFFFFFl);
+        final long carry = (hlLow + (ll >>> 32)) >>> 32;
+        final long unsignedResult = hh + hlHigh + carry;
+
+        return unsignedResult - tobeRemoved;
+
+    }
+
+    /**
+     * Finds q such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code  b < 0}.
      * <p>
      * This methods returns the same value as integer division when
      * a and b are same signs, but returns a different value when
@@ -4031,7 +4161,7 @@ public class FastMath {
      *
      * @param a dividend
      * @param b divisor
-     * @return q such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0
+     * @return q such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code  b < 0}
      * @throws MathRuntimeException if b == 0
      * @see #floorMod(int, int)
      */
@@ -4053,7 +4183,7 @@ public class FastMath {
     }
 
     /**
-     * Finds q such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0.
+     * Finds q such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}.
      * <p>
      * This methods returns the same value as integer division when
      * a and b are same signs, but returns a different value when
@@ -4061,7 +4191,25 @@ public class FastMath {
      *
      * @param a dividend
      * @param b divisor
-     * @return q such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0
+     * @return q such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}
+     * @throws MathRuntimeException if b == 0
+     * @see #floorMod(long, int)
+     * @since 1.3
+     */
+    public static long floorDiv(final long a, final int b) throws MathRuntimeException {
+        return floorDiv(a, (long) b);
+    }
+
+    /**
+     * Finds q such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}.
+     * <p>
+     * This methods returns the same value as integer division when
+     * a and b are same signs, but returns a different value when
+     * they are opposite (i.e. q is negative).
+     *
+     * @param a dividend
+     * @param b divisor
+     * @return q such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}
      * @throws MathRuntimeException if b == 0
      * @see #floorMod(long, long)
      */
@@ -4083,7 +4231,7 @@ public class FastMath {
     }
 
     /**
-     * Finds r such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0.
+     * Finds r such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}.
      * <p>
      * This methods returns the same value as integer modulo when
      * a and b are same signs, but returns a different value when
@@ -4092,7 +4240,7 @@ public class FastMath {
      *
      * @param a dividend
      * @param b divisor
-     * @return r such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0
+     * @return r such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}
      * @throws MathRuntimeException if b == 0
      * @see #floorDiv(int, int)
      */
@@ -4114,7 +4262,7 @@ public class FastMath {
     }
 
     /**
-     * Finds r such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0.
+     * Finds r such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}.
      * <p>
      * This methods returns the same value as integer modulo when
      * a and b are same signs, but returns a different value when
@@ -4123,7 +4271,26 @@ public class FastMath {
      *
      * @param a dividend
      * @param b divisor
-     * @return r such that a = q b + r with 0 <= r < b if b > 0 and b < r <= 0 if b < 0
+     * @return r such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}
+     * @throws MathRuntimeException if b == 0
+     * @see #floorDiv(long, int)
+     * @since 1.3
+     */
+    public static int floorMod(final long a, final int b) {
+        return (int) floorMod(a, (long) b);
+    }
+
+    /**
+     * Finds r such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}.
+     * <p>
+     * This methods returns the same value as integer modulo when
+     * a and b are same signs, but returns a different value when
+     * they are opposite (i.e. q is negative).
+     * </p>
+     *
+     * @param a dividend
+     * @param b divisor
+     * @return r such that {@code a = q b + r} with {@code 0 <= r < b} if {@code b > 0} and {@code b < r <= 0} if {@code b < 0}
      * @throws MathRuntimeException if b == 0
      * @see #floorDiv(long, long)
      */
@@ -4214,6 +4381,564 @@ public class FastMath {
     public static int getExponent(final float f) {
         // NaN and Infinite will return the same exponent anywho so can use raw bits
         return ((Float.floatToRawIntBits(f) >>> 23) & 0xff) - 127;
+    }
+
+    /**
+     * Compute Fused-multiply-add operation a * b + c.
+     * <p>
+     * This method was introduced in the regular {@code Math} and {@code StrictMath}
+     * methods with Java 9, and then added to Hipparchus for consistency. However,
+     * a more general method was available in Hipparchus that also allow to repeat
+     * this computation across several terms: {@link MathArrays#linearCombination(double[], double[])}.
+     * The linear combination method should probably be preferred in most cases.
+     * </p>
+     *
+     * @param a first factor
+     * @param b second factor
+     * @param c additive term
+     * @return a * b + c, using extended precision in the multiplication
+     * @see MathArrays#linearCombination(double[], double[])
+     * @see MathArrays#linearCombination(double, double, double, double)
+     * @see MathArrays#linearCombination(double, double, double, double, double, double)
+     * @see MathArrays#linearCombination(double, double, double, double, double, double, double, double)
+     * @since 1.3
+     */
+    public static double fma(final double a, final double b, final double c) {
+        return MathArrays.linearCombination(a, b, 1.0, c);
+    }
+
+    /**
+     * Compute Fused-multiply-add operation a * b + c.
+     * <p>
+     * This method was introduced in the regular {@code Math} and {@code StrictMath}
+     * methods with Java 9, and then added to Hipparchus for consistency. However,
+     * a more general method was available in Hipparchus that also allow to repeat
+     * this computation across several terms: {@link MathArrays#linearCombination(double[], double[])}.
+     * The linear combination method should probably be preferred in most cases.
+     * </p>
+     *
+     * @param a first factor
+     * @param b second factor
+     * @param c additive term
+     * @return a * b + c, using extended precision in the multiplication
+     * @see MathArrays#linearCombination(double[], double[])
+     * @see MathArrays#linearCombination(double, double, double, double)
+     * @see MathArrays#linearCombination(double, double, double, double, double, double)
+     * @see MathArrays#linearCombination(double, double, double, double, double, double, double, double)
+     */
+    public static float fma(final float a, final float b, final float c) {
+        return (float) MathArrays.linearCombination(a, b, 1.0, c);
+    }
+
+    /**
+     * Compute the square root of a number.
+     *
+     * @param a   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return square root of a
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T sqrt(final T a) {
+        return a.sqrt();
+    }
+
+    /**
+     * Compute the hyperbolic cosine of a number.
+     *
+     * @param x   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return hyperbolic cosine of x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T cosh(final T x) {
+        return x.cosh();
+    }
+
+    /**
+     * Compute the hyperbolic sine of a number.
+     *
+     * @param x   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return hyperbolic sine of x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T sinh(final T x) {
+        return x.sinh();
+    }
+
+    /**
+     * Compute the hyperbolic tangent of a number.
+     *
+     * @param x   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return hyperbolic tangent of x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T tanh(final T x) {
+        return x.tanh();
+    }
+
+    /**
+     * Compute the inverse hyperbolic cosine of a number.
+     *
+     * @param a   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return inverse hyperbolic cosine of a
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T acosh(final T a) {
+        return a.acosh();
+    }
+
+    /**
+     * Compute the inverse hyperbolic sine of a number.
+     *
+     * @param a   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return inverse hyperbolic sine of a
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T asinh(final T a) {
+        return a.asinh();
+    }
+
+    /**
+     * Compute the inverse hyperbolic tangent of a number.
+     *
+     * @param a   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return inverse hyperbolic tangent of a
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T atanh(final T a) {
+        return a.atanh();
+    }
+
+    /**
+     * Compute the signum of a number.
+     * The signum is -1 for negative numbers, +1 for positive numbers and 0 otherwise
+     *
+     * @param a   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return -1.0, -0.0, +0.0, +1.0 or NaN depending on sign of a
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T signum(final T a) {
+        return a.signum();
+    }
+
+    /**
+     * Exponential function.
+     * <p>
+     * Computes exp(x), function result is nearly rounded.   It will be correctly
+     * rounded to the theoretical value for 99.9% of input values, otherwise it will
+     * have a 1 ULP error.
+     * <p>
+     * Method:
+     * Lookup intVal = exp(int(x))
+     * Lookup fracVal = exp(int(x-int(x) / 1024.0) * 1024.0 );
+     * Compute z as the exponential of the remaining bits by a polynomial minus one
+     * exp(x) = intVal * fracVal * (1 + z)
+     * <p>
+     * Accuracy:
+     * Calculation is done with 63 bits of precision, so result should be correctly
+     * rounded for 99.9% of input values, with less than 1 ULP error otherwise.
+     *
+     * @param x   a double
+     * @param <T> the type of the field element
+     * @return double e<sup>x</sup>
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T exp(final T x) {
+        return x.exp();
+    }
+
+    /**
+     * Compute exp(x) - 1
+     *
+     * @param x   number to compute shifted exponential
+     * @param <T> the type of the field element
+     * @return exp(x) - 1
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T expm1(final T x) {
+        return x.expm1();
+    }
+
+    /**
+     * Natural logarithm.
+     *
+     * @param x   a double
+     * @param <T> the type of the field element
+     * @return log(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T log(final T x) {
+        return x.log();
+    }
+
+    /**
+     * Computes log(1 + x).
+     *
+     * @param x   Number.
+     * @param <T> the type of the field element
+     * @return {@code log(1 + x)}.
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T log1p(final T x) {
+        return x.log1p();
+    }
+
+    /**
+     * Compute the base 10 logarithm.
+     *
+     * @param x   a number
+     * @param <T> the type of the field element
+     * @return log10(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T log10(final T x) {
+        return x.log10();
+    }
+
+    /**
+     * Power function.  Compute x<sup>y</sup>.
+     *
+     * @param x   a double
+     * @param y   a double
+     * @param <T> the type of the field element
+     * @return x<sup>y</sup>
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T pow(final T x, final T y) {
+        return x.pow(y);
+    }
+
+    /**
+     * Raise a double to an int power.
+     *
+     * @param d   Number to raise.
+     * @param e   Exponent.
+     * @param <T> the type of the field element
+     * @return d<sup>e</sup>
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T pow(T d, int e) {
+        return d.pow(e);
+    }
+
+    /**
+     * Sine function.
+     *
+     * @param x   Argument.
+     * @param <T> the type of the field element
+     * @return sin(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T sin(final T x) {
+        return x.sin();
+    }
+
+    /**
+     * Cosine function.
+     *
+     * @param x   Argument.
+     * @param <T> the type of the field element
+     * @return cos(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T cos(final T x) {
+        return x.cos();
+    }
+
+    /**
+     * Tangent function.
+     *
+     * @param x   Argument.
+     * @param <T> the type of the field element
+     * @return tan(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T tan(final T x) {
+        return x.tan();
+    }
+
+    /**
+     * Arctangent function
+     *
+     * @param x   a number
+     * @param <T> the type of the field element
+     * @return atan(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T atan(final T x) {
+        return x.atan();
+    }
+
+    /**
+     * Two arguments arctangent function
+     *
+     * @param y   ordinate
+     * @param x   abscissa
+     * @param <T> the type of the field element
+     * @return phase angle of point (x,y) between {@code -PI} and {@code PI}
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T atan2(final T y, final T x) {
+        return y.atan2(x);
+    }
+
+    /**
+     * Compute the arc sine of a number.
+     *
+     * @param x   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return arc sine of x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T asin(final T x) {
+        return x.asin();
+    }
+
+    /**
+     * Compute the arc cosine of a number.
+     *
+     * @param x   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return arc cosine of x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T acos(final T x) {
+        return x.acos();
+    }
+
+    /**
+     * Compute the cubic root of a number.
+     *
+     * @param x   number on which evaluation is done
+     * @param <T> the type of the field element
+     * @return cubic root of x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T cbrt(final T x) {
+        return x.cbrt();
+    }
+
+    /**
+     * Absolute value.
+     *
+     * @param x   number from which absolute value is requested
+     * @param <T> the type of the field element
+     * @return abs(x)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T abs(final T x) {
+        return x.abs();
+    }
+
+    /**
+     * Multiply a double number by a power of 2.
+     *
+     * @param d   number to multiply
+     * @param n   power of 2
+     * @param <T> the type of the field element
+     * @return d &times; 2<sup>n</sup>
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T scalb(final T d, final int n) {
+        return d.scalb(n);
+    }
+
+    /**
+     * Get the largest whole number smaller than x.
+     *
+     * @param x   number from which floor is requested
+     * @param <T> the type of the field element
+     * @return a double number f such that f is an integer f &lt;= x &lt; f + 1.0
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T floor(final T x) {
+        return x.floor();
+    }
+
+    /**
+     * Get the smallest whole number larger than x.
+     *
+     * @param x   number from which ceil is requested
+     * @param <T> the type of the field element
+     * @return a double number c such that c is an integer c - 1.0 &lt; x &lt;= c
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T ceil(final T x) {
+        return x.ceil();
+    }
+
+    /**
+     * Get the whole number that is the nearest to x, or the even one if x is exactly half way between two integers.
+     *
+     * @param x   number from which nearest whole number is requested
+     * @param <T> the type of the field element
+     * @return a double number r such that r is an integer r - 0.5 &lt;= x &lt;= r + 0.5
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T rint(final T x) {
+        return x.rint();
+    }
+
+    /**
+     * Get the closest long to x.
+     *
+     * @param x   number from which closest long is requested
+     * @param <T> the type of the field element
+     * @return closest long to x
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> long round(final T x) {
+        return x.round();
+    }
+
+    /**
+     * Compute the minimum of two values
+     *
+     * @param a   first value
+     * @param b   second value
+     * @param <T> the type of the field element
+     * @return a if a is lesser or equal to b, b otherwise
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T min(final T a, final T b) {
+        final double aR = a.getReal();
+        final double bR = b.getReal();
+        if (aR < bR) {
+            return a;
+        } else if (bR < aR) {
+            return b;
+        } else {
+            // either the numbers are equal, or one of them is a NaN
+            return Double.isNaN(aR) ? a : b;
+        }
+    }
+
+    /**
+     * Compute the maximum of two values
+     *
+     * @param a   first value
+     * @param b   second value
+     * @param <T> the type of the field element
+     * @return b if a is lesser or equal to b, a otherwise
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T max(final T a, final T b) {
+        final double aR = a.getReal();
+        final double bR = b.getReal();
+        if (aR < bR) {
+            return b;
+        } else if (bR < aR) {
+            return a;
+        } else {
+            // either the numbers are equal, or one of them is a NaN
+            return Double.isNaN(aR) ? a : b;
+        }
+    }
+
+    /**
+     * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
+     * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)<br/>
+     * avoiding intermediate overflow or underflow.
+     *
+     * <ul>
+     * <li> If either argument is infinite, then the result is positive infinity.</li>
+     * <li> else, if either argument is NaN then the result is NaN.</li>
+     * </ul>
+     *
+     * @param x   a value
+     * @param y   a value
+     * @param <T> the type of the field element
+     * @return sqrt(< i > x < / i > < sup > 2 < / sup > & nbsp ; + < i > y < / i > < sup > 2 < / sup >)
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T hypot(final T x, final T y) {
+        return x.hypot(y);
+    }
+
+    /**
+     * Computes the remainder as prescribed by the IEEE 754 standard.
+     * The remainder value is mathematically equal to {@code x - y*n}
+     * where {@code n} is the mathematical integer closest to the exact mathematical value
+     * of the quotient {@code x/y}.
+     * If two mathematical integers are equally close to {@code x/y} then
+     * {@code n} is the integer that is even.
+     * <p>
+     * <ul>
+     * <li>If either operand is NaN, the result is NaN.</li>
+     * <li>If the result is not NaN, the sign of the result equals the sign of the dividend.</li>
+     * <li>If the dividend is an infinity, or the divisor is a zero, or both, the result is NaN.</li>
+     * <li>If the dividend is finite and the divisor is an infinity, the result equals the dividend.</li>
+     * <li>If the dividend is a zero and the divisor is finite, the result equals the dividend.</li>
+     * </ul>
+     *
+     * @param dividend the number to be divided
+     * @param divisor  the number by which to divide
+     * @param <T>      the type of the field element
+     * @return the remainder, rounded
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T IEEEremainder(final T dividend, final double divisor) {
+        return dividend.remainder(divisor);
+    }
+
+    /**
+     * Computes the remainder as prescribed by the IEEE 754 standard.
+     * The remainder value is mathematically equal to {@code x - y*n}
+     * where {@code n} is the mathematical integer closest to the exact mathematical value
+     * of the quotient {@code x/y}.
+     * If two mathematical integers are equally close to {@code x/y} then
+     * {@code n} is the integer that is even.
+     * <p>
+     * <ul>
+     * <li>If either operand is NaN, the result is NaN.</li>
+     * <li>If the result is not NaN, the sign of the result equals the sign of the dividend.</li>
+     * <li>If the dividend is an infinity, or the divisor is a zero, or both, the result is NaN.</li>
+     * <li>If the dividend is finite and the divisor is an infinity, the result equals the dividend.</li>
+     * <li>If the dividend is a zero and the divisor is finite, the result equals the dividend.</li>
+     * </ul>
+     *
+     * @param dividend the number to be divided
+     * @param divisor  the number by which to divide
+     * @param <T>      the type of the field element
+     * @return the remainder, rounded
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T IEEEremainder(final T dividend, final T divisor) {
+        return dividend.remainder(divisor);
+    }
+
+    /**
+     * Returns the first argument with the sign of the second argument.
+     * A NaN {@code sign} argument is treated as positive.
+     *
+     * @param magnitude the value to return
+     * @param sign      the sign for the returned value
+     * @param <T>       the type of the field element
+     * @return the magnitude with the same sign as the {@code sign} argument
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T copySign(T magnitude, T sign) {
+        return magnitude.copySign(sign);
+    }
+
+    /**
+     * Returns the first argument with the sign of the second argument.
+     * A NaN {@code sign} argument is treated as positive.
+     *
+     * @param magnitude the value to return
+     * @param sign      the sign for the returned value
+     * @param <T>       the type of the field element
+     * @return the magnitude with the same sign as the {@code sign} argument
+     * @since 1.3
+     */
+    public static <T extends RealFieldElement<T>> T copySign(T magnitude, double sign) {
+        return magnitude.copySign(sign);
     }
 
     /**
@@ -4408,8 +5133,8 @@ public class FastMath {
                 EXP_INT_TABLE_A = new double[FastMath.EXP_INT_TABLE_LEN];
                 EXP_INT_TABLE_B = new double[FastMath.EXP_INT_TABLE_LEN];
 
-                final double tmp[] = new double[2];
-                final double recip[] = new double[2];
+                final double[] tmp = new double[2];
+                final double[] recip = new double[2];
 
                 // Populate expIntTable
                 for (int i = 0; i < FastMath.EXP_INT_TABLE_MAX_INDEX; i++) {
@@ -4452,7 +5177,7 @@ public class FastMath {
                 EXP_FRAC_TABLE_A = new double[FastMath.EXP_FRAC_TABLE_LEN];
                 EXP_FRAC_TABLE_B = new double[FastMath.EXP_FRAC_TABLE_LEN];
 
-                final double tmp[] = new double[2];
+                final double[] tmp = new double[2];
 
                 // Populate expFracTable
                 final double factor = 1d / (EXP_FRAC_TABLE_LEN - 1);
@@ -4571,4 +5296,5 @@ public class FastMath {
             return finalRemB;
         }
     }
+
 }

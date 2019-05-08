@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -142,23 +147,6 @@ public class PascalDistribution extends AbstractIntegerDistribution {
      * {@inheritDoc}
      */
     @Override
-    public double logProbability(int x) {
-        double ret;
-        if (x < 0) {
-            ret = Double.NEGATIVE_INFINITY;
-        } else {
-            ret = CombinatoricsUtils.binomialCoefficientLog(x +
-                    numberOfSuccesses - 1, numberOfSuccesses - 1) +
-                    logProbabilityOfSuccess * numberOfSuccesses +
-                    log1mProbabilityOfSuccess * x;
-        }
-        return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double cumulativeProbability(int x) {
         double ret;
         if (x < 0) {
@@ -232,5 +220,22 @@ public class PascalDistribution extends AbstractIntegerDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double logProbability(int x) {
+        double ret;
+        if (x < 0) {
+            ret = Double.NEGATIVE_INFINITY;
+        } else {
+            ret = CombinatoricsUtils.binomialCoefficientLog(x +
+                    numberOfSuccesses - 1, numberOfSuccesses - 1) +
+                    logProbabilityOfSuccess * numberOfSuccesses +
+                    log1mProbabilityOfSuccess * x;
+        }
+        return ret;
     }
 }

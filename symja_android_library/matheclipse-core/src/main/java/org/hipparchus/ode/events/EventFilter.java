@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.events;
 
 import org.hipparchus.ode.ODEState;
@@ -24,7 +29,7 @@ import java.util.Arrays;
 
 /**
  * Wrapper used to detect only increasing or decreasing events.
- * <p>
+ *
  * <p>General {@link ODEEventHandler events} are defined implicitly
  * by a {@link ODEEventHandler#g(ODEStateAndDerivative) g function} crossing
  * zero. This function needs to be continuous in the event neighborhood,
@@ -34,12 +39,12 @@ import java.util.Arrays;
  * and events for which the function decreases from positive to
  * negative values.
  * </p>
- * <p>
+ *
  * <p>Sometimes, users are only interested in one type of event (say
  * increasing events for example) and not in the other type. In these
  * cases, looking precisely for all events location and triggering
  * events that will later be ignored is a waste of computing time.</p>
- * <p>
+ *
  * <p>Users can wrap a regular {@link ODEEventHandler event handler} in
  * an instance of this class and provide this wrapping instance to
  * the {@link org.hipparchus.ode.ODEIntegrator ODE solver}
@@ -54,7 +59,7 @@ import java.util.Arrays;
  * ODEEventHandler#g(ODEStateAndDerivative) g function} will also be reduced.</p>
  */
 
-public class EventFilter extends ODEEventHandlerImpl implements ODEEventHandler {
+public class EventFilter implements ODEEventHandler {
 
     /**
      * Number of past transformers updates stored.
@@ -219,7 +224,7 @@ public class EventFilter extends ODEEventHandlerImpl implements ODEEventHandler 
     @Override
     public Action eventOccurred(final ODEStateAndDerivative state, final boolean increasing) {
         // delegate to raw handler, fixing increasing status on the fly
-        return rawHandler.eventOccurred(state, filter.getTriggeredIncreasing());
+        return rawHandler.eventOccurred(state, filter.isTriggeredOnIncreasing());
     }
 
     /**

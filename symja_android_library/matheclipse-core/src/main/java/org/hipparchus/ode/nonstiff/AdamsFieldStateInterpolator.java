@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.RealFieldElement;
@@ -28,7 +33,7 @@ import java.util.Arrays;
 
 /**
  * This class implements an interpolator for Adams integrators using Nordsieck representation.
- * <p>
+ *
  * <p>This interpolator computes dense output around the current point.
  * The interpolation equation is based on Taylor series formulas.
  *
@@ -110,7 +115,7 @@ class AdamsFieldStateInterpolator<T extends RealFieldElement<T>> extends Abstrac
         this.scalingH = stepSize;
         this.reference = reference;
         this.scaled = scaled.clone();
-        this.nordsieck = new Array2DRowFieldMatrix<T>(nordsieck.getData(), false);
+        this.nordsieck = new Array2DRowFieldMatrix<>(nordsieck.getData(), false);
     }
 
     /**
@@ -176,6 +181,7 @@ class AdamsFieldStateInterpolator<T extends RealFieldElement<T>> extends Abstrac
      * @param newMapper              equations mapper for the all equations
      * @return a new instance
      */
+    @Override
     protected AdamsFieldStateInterpolator<T> create(boolean newForward,
                                                     FieldODEStateAndDerivative<T> newGlobalPreviousState,
                                                     FieldODEStateAndDerivative<T> newGlobalCurrentState,

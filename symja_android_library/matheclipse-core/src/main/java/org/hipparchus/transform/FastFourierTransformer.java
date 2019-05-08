@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.transform;
 
 import org.hipparchus.analysis.FunctionUtils;
@@ -376,10 +381,10 @@ public class FastFourierTransformer implements Serializable {
      * @param n    the number of sample points
      * @param type the type of transform (forward, inverse) to be performed
      * @return the complex transformed array
-     * @throws MathIllegalArgumentException if the lower bound is greater than, or equal to the upper bound
-     * @throws MathIllegalArgumentException if the number of sample points {@code n} is negative
-     * @throws MathIllegalArgumentException if the number of sample points
-     *                                      {@code n} is not a power of two
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the lower bound is greater than, or equal to the upper bound
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the number of sample points {@code n} is negative
+     * @throws MathIllegalArgumentException                          if the number of sample points
+     *                                                               {@code n} is not a power of two
      */
     public Complex[] transform(final UnivariateFunction f,
                                final double min, final double max, final int n,

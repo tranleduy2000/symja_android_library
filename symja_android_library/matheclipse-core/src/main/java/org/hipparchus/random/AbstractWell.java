@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.random;
 
 import org.hipparchus.util.FastMath;
@@ -109,8 +114,7 @@ public abstract class AbstractWell extends IntRandomGenerator implements Seriali
         // of w bits blocks, w is the block size (always 32 in the original paper)
         // and p is the number of unused bits in the last block
         final int w = 32;
-        final int r = (k + w - 1) / w;
-        return r;
+        return (k + w - 1) / w;
     }
 
     /**

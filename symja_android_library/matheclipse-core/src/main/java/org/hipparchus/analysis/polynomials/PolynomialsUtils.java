@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.polynomials;
 
 import org.hipparchus.fraction.BigFraction;
@@ -59,34 +64,34 @@ public class PolynomialsUtils {
 
         // initialize recurrence for Chebyshev polynomials
         // T0(X) = 1, T1(X) = 0 + 1 * X
-        CHEBYSHEV_COEFFICIENTS = new ArrayList<BigFraction>();
+        CHEBYSHEV_COEFFICIENTS = new ArrayList<>();
         CHEBYSHEV_COEFFICIENTS.add(BigFraction.ONE);
         CHEBYSHEV_COEFFICIENTS.add(BigFraction.ZERO);
         CHEBYSHEV_COEFFICIENTS.add(BigFraction.ONE);
 
         // initialize recurrence for Hermite polynomials
         // H0(X) = 1, H1(X) = 0 + 2 * X
-        HERMITE_COEFFICIENTS = new ArrayList<BigFraction>();
+        HERMITE_COEFFICIENTS = new ArrayList<>();
         HERMITE_COEFFICIENTS.add(BigFraction.ONE);
         HERMITE_COEFFICIENTS.add(BigFraction.ZERO);
         HERMITE_COEFFICIENTS.add(BigFraction.TWO);
 
         // initialize recurrence for Laguerre polynomials
         // L0(X) = 1, L1(X) = 1 - 1 * X
-        LAGUERRE_COEFFICIENTS = new ArrayList<BigFraction>();
+        LAGUERRE_COEFFICIENTS = new ArrayList<>();
         LAGUERRE_COEFFICIENTS.add(BigFraction.ONE);
         LAGUERRE_COEFFICIENTS.add(BigFraction.ONE);
         LAGUERRE_COEFFICIENTS.add(BigFraction.MINUS_ONE);
 
         // initialize recurrence for Legendre polynomials
         // P0(X) = 1, P1(X) = 0 + 1 * X
-        LEGENDRE_COEFFICIENTS = new ArrayList<BigFraction>();
+        LEGENDRE_COEFFICIENTS = new ArrayList<>();
         LEGENDRE_COEFFICIENTS.add(BigFraction.ONE);
         LEGENDRE_COEFFICIENTS.add(BigFraction.ZERO);
         LEGENDRE_COEFFICIENTS.add(BigFraction.ONE);
 
         // initialize map for Jacobi polynomials
-        JACOBI_COEFFICIENTS = new HashMap<JacobiKey, List<BigFraction>>();
+        JACOBI_COEFFICIENTS = new HashMap<>();
 
     }
 
@@ -241,7 +246,7 @@ public class PolynomialsUtils {
         if (!JACOBI_COEFFICIENTS.containsKey(key)) {
 
             // allocate a new list for v, w
-            final List<BigFraction> list = new ArrayList<BigFraction>();
+            final List<BigFraction> list = new ArrayList<>();
             JACOBI_COEFFICIENTS.put(key, list);
 
             // Pv,w,0(x) = 1;
@@ -450,16 +455,6 @@ public class PolynomialsUtils {
         }
 
         /**
-         * Get hash code.
-         *
-         * @return hash code
-         */
-        @Override
-        public int hashCode() {
-            return (v << 16) ^ w;
-        }
-
-        /**
          * Check if the instance represent the same key as another instance.
          *
          * @param key other key
@@ -475,6 +470,16 @@ public class PolynomialsUtils {
             final JacobiKey otherK = (JacobiKey) key;
             return (v == otherK.v) && (w == otherK.w);
 
+        }
+
+        /**
+         * Get hash code.
+         *
+         * @return hash code
+         */
+        @Override
+        public int hashCode() {
+            return (v << 16) ^ w;
         }
     }
 

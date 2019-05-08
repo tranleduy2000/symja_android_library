@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.linear.RealVector;
@@ -22,11 +27,12 @@ import org.hipparchus.util.Incrementor;
 
 /**
  * An adapter that delegates to another implementation of {@link LeastSquaresProblem}.
- *
  */
 public class LeastSquaresAdapter implements LeastSquaresProblem {
 
-    /** the delegate problem */
+    /**
+     * the delegate problem
+     */
     private final LeastSquaresProblem problem;
 
     /**
@@ -38,44 +44,59 @@ public class LeastSquaresAdapter implements LeastSquaresProblem {
         this.problem = problem;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getStart() {
         return problem.getStart();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getObservationSize() {
         return problem.getObservationSize();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getParameterSize() {
         return problem.getParameterSize();
     }
 
-    /** {@inheritDoc}
-     * @param point*/
+    /**
+     * {@inheritDoc}
+     *
+     * @param point
+     */
     @Override
     public Evaluation evaluate(final RealVector point) {
         return problem.evaluate(point);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Incrementor getEvaluationCounter() {
         return problem.getEvaluationCounter();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Incrementor getIterationCounter() {
         return problem.getIterationCounter();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ConvergenceChecker<Evaluation> getConvergenceChecker() {
         return problem.getConvergenceChecker();

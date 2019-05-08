@@ -23,7 +23,7 @@ import org.hipparchus.ode.ODEStateAndDerivative;
 /**
  * This interface represents a handler for discrete events triggered
  * during ODE integration.
- * <p>
+ *
  * <p>Some events can be triggered at discrete times as an ODE problem
  * is solved. This occurs for example when the integration process
  * should be stopped as some state is reached (G-stop facility) when the
@@ -31,10 +31,10 @@ import org.hipparchus.ode.ODEStateAndDerivative;
  * discontinuities, or simply when the user wants to monitor some
  * states boundaries crossings.
  * </p>
- * <p>
+ *
  * <p>These events are defined as occurring when a <code>g</code>
  * switching function sign changes.</p>
- * <p>
+ *
  * <p>Since events are only problem-dependent and are triggered by the
  * independent <i>time</i> variable and the state vector, they can
  * occur at virtually any time, unknown in advance. The integrators will
@@ -69,18 +69,18 @@ public interface ODEEventHandler {
 
     /**
      * Compute the value of the switching function.
-     * <p>
+     *
      * <p>The discrete events are generated when the sign of this
      * switching function changes. The integrator will take care to change
      * the stepsize in such a way these events occur exactly at step boundaries.
      * The switching function must be continuous in its roots neighborhood
      * (but not necessarily smooth), as the integrator will need to find its
      * roots to locate precisely the events.</p>
-     * <p>
+     *
      * <p>Also note that for the integrator to detect an event the sign of the switching
      * function must have opposite signs just before and after the event. If this
      * consistency is not preserved the integrator may not detect any events.
-     * <p>
+     *
      * <p>This need for consistency is sometimes tricky to achieve. A typical
      * example is using an event to model a ball bouncing on the floor. The first
      * idea to represent this would be to have {@code g(state) = h(state)} where h is the
@@ -97,11 +97,15 @@ public interface ODEEventHandler {
      * {@code h(state)} is not. Basically, the event is used to <em>fold</em> {@code h(state)}
      * at bounce points, and {@code sign} is used to <em>unfold</em> it back, so the
      * solvers sees a {@code g(state)} function which behaves smoothly even across events.</p>
-     * <p>
-     * <p> Calling this multiple times with the same state will result in the same value.
-     * The definition of the g function may change when an
-     * {@link #eventOccurred(ODEStateAndDerivative, boolean) event occurs}, as in the
-     * above example.
+     *
+     * <p>This method is idempotent, that is calling this multiple times with the same
+     * state will result in the same value, with two exceptions. First, the definition of
+     * the g function may change when an {@link #eventOccurred(ODEStateAndDerivative,
+     * boolean) event occurs} on this handler, as in the above example. Second, the
+     * definition of the g function may change when the {@link
+     * #eventOccurred(ODEStateAndDerivative, boolean) eventOccurred} method of any other
+     * event handler in the same integrator returns {@link Action#RESET_EVENTS}, {@link
+     * Action#RESET_DERIVATIVES}, or {@link Action#RESET_STATE}.
      *
      * @param state current value of the independent <i>time</i> variable, state vector
      *              and derivative
@@ -112,18 +116,17 @@ public interface ODEEventHandler {
 
     /**
      * Handle an event and choose what to do next.
-     * <p>
+     *
      * <p>This method is called when the integrator has accepted a step
      * ending exactly on a sign change of the function, just <em>before</em>
      * the step handler itself is called (see below for scheduling). It
      * allows the user to update his internal data to acknowledge the fact
      * the event has been handled (for example setting a flag in the {@link
      * org.hipparchus.ode.OrdinaryDifferentialEquation
-     * org.hipparchus.migration.ode.FirstOrderDifferentialEquations
      * differential equations} to switch the derivatives computation in
      * case of discontinuity), or to direct the integrator to either stop
      * or continue integration, possibly with a reset state or derivatives.</p>
-     * <p>
+     *
      * <ul>
      * <li>if {@link Action#STOP} is returned, the step handler will be called
      * with the <code>isLast</code> flag of the {@link
@@ -135,11 +138,13 @@ public interface ODEEventHandler {
      * derivatives,</li>
      * <li>if {@link Action#RESET_DERIVATIVES} is returned, the integrator
      * will recompute the derivatives,
+     * <li>if {@link Action#RESET_EVENTS} is returned, the integrator
+     * will recheck all event handlers,
      * <li>if {@link Action#CONTINUE} is returned, no specific action will
      * be taken (apart from having called this method) and integration
      * will continue.</li>
      * </ul>
-     * <p>
+     *
      * <p>The scheduling between this method and the {@link
      * org.hipparchus.ode.sampling.ODEStepHandler ODEStepHandler} method {@link
      * org.hipparchus.ode.sampling.ODEStepHandler#handleStep(org.hipparchus.ode.sampling.ODEStateInterpolator,
@@ -170,13 +175,14 @@ public interface ODEEventHandler {
      *                   to physical time, not with respect to integration which may go backward in time)
      * @return indication of what the integrator should do next, this
      * value must be one of {@link Action#STOP}, {@link Action#RESET_STATE},
-     * {@link Action#RESET_DERIVATIVES} or {@link Action#CONTINUE}
+     * {@link Action#RESET_DERIVATIVES}, {@link Action#RESET_EVENTS}, or
+     * {@link Action#CONTINUE}
      */
     Action eventOccurred(ODEStateAndDerivative state, boolean increasing);
 
     /**
      * Reset the state prior to continue the integration.
-     * <p>
+     *
      * <p>This method is called after the step handler has returned and
      * before the next step is started, but only when {@link
      * #eventOccurred} has itself returned the {@link Action#RESET_STATE}

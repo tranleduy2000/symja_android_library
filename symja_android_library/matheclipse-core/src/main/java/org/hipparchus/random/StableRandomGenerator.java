@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.random;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -25,7 +30,7 @@ import org.hipparchus.util.MathUtils;
 /**
  * <p>This class provides a stable normalized random generator. It samples from a stable
  * distribution with location parameter 0 and scale 1.</p>
- * <p>
+ *
  * <p>The implementation uses the Chambers-Mallows-Stuck method as described in
  * <i>Handbook of computational statistics: concepts and methods</i> by
  * James E. Gentle, Wolfgang H&auml;rdle, Yuichi Mori.</p>

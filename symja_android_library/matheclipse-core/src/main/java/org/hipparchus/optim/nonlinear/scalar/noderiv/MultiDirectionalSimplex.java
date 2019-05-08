@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
 import org.hipparchus.analysis.MultivariateFunction;
@@ -23,16 +28,23 @@ import java.util.Comparator;
 
 /**
  * This class implements the multi-directional direct search method.
- *
  */
 public class MultiDirectionalSimplex extends AbstractSimplex {
-    /** Default value for {@link #khi}: {@value}. */
+    /**
+     * Default value for {@link #khi}: {@value}.
+     */
     private static final double DEFAULT_KHI = 2;
-    /** Default value for {@link #gamma}: {@value}. */
+    /**
+     * Default value for {@link #gamma}: {@value}.
+     */
     private static final double DEFAULT_GAMMA = 0.5;
-    /** Expansion coefficient. */
+    /**
+     * Expansion coefficient.
+     */
     private final double khi;
-    /** Contraction coefficient. */
+    /**
+     * Contraction coefficient.
+     */
     private final double gamma;
 
     /**
@@ -49,9 +61,9 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
      * Build a multi-directional simplex with default coefficients.
      * The default values are 2.0 for khi and 0.5 for gamma.
      *
-     * @param n Dimension of the simplex.
+     * @param n          Dimension of the simplex.
      * @param sideLength Length of the sides of the default (hypercube)
-     * simplex. See {@link AbstractSimplex#AbstractSimplex(int,double)}.
+     *                   simplex. See {@link AbstractSimplex#AbstractSimplex(int, double)}.
      */
     public MultiDirectionalSimplex(final int n, double sideLength) {
         this(n, sideLength, DEFAULT_KHI, DEFAULT_GAMMA);
@@ -60,9 +72,9 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
     /**
      * Build a multi-directional simplex with specified coefficients.
      *
-     * @param n Dimension of the simplex. See
-     * {@link AbstractSimplex#AbstractSimplex(int,double)}.
-     * @param khi Expansion coefficient.
+     * @param n     Dimension of the simplex. See
+     *              {@link AbstractSimplex#AbstractSimplex(int, double)}.
+     * @param khi   Expansion coefficient.
      * @param gamma Contraction coefficient.
      */
     public MultiDirectionalSimplex(final int n,
@@ -73,18 +85,18 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
     /**
      * Build a multi-directional simplex with specified coefficients.
      *
-     * @param n Dimension of the simplex. See
-     * {@link AbstractSimplex#AbstractSimplex(int,double)}.
+     * @param n          Dimension of the simplex. See
+     *                   {@link AbstractSimplex#AbstractSimplex(int, double)}.
      * @param sideLength Length of the sides of the default (hypercube)
-     * simplex. See {@link AbstractSimplex#AbstractSimplex(int,double)}.
-     * @param khi Expansion coefficient.
-     * @param gamma Contraction coefficient.
+     *                   simplex. See {@link AbstractSimplex#AbstractSimplex(int, double)}.
+     * @param khi        Expansion coefficient.
+     * @param gamma      Contraction coefficient.
      */
     public MultiDirectionalSimplex(final int n, double sideLength,
                                    final double khi, final double gamma) {
         super(n, sideLength);
 
-        this.khi   = khi;
+        this.khi = khi;
         this.gamma = gamma;
     }
 
@@ -93,7 +105,7 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
      * The default values are 2.0 for khi and 0.5 for gamma.
      *
      * @param steps Steps along the canonical axes representing box edges.
-     * They may be negative but not zero. See
+     *              They may be negative but not zero. See
      */
     public MultiDirectionalSimplex(final double[] steps) {
         this(steps, DEFAULT_KHI, DEFAULT_GAMMA);
@@ -103,16 +115,16 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
      * Build a multi-directional simplex with specified coefficients.
      *
      * @param steps Steps along the canonical axes representing box edges.
-     * They may be negative but not zero. See
-     * {@link AbstractSimplex#AbstractSimplex(double[])}.
-     * @param khi Expansion coefficient.
+     *              They may be negative but not zero. See
+     *              {@link AbstractSimplex#AbstractSimplex(double[])}.
+     * @param khi   Expansion coefficient.
      * @param gamma Contraction coefficient.
      */
     public MultiDirectionalSimplex(final double[] steps,
                                    final double khi, final double gamma) {
         super(steps);
 
-        this.khi   = khi;
+        this.khi = khi;
         this.gamma = gamma;
     }
 
@@ -121,7 +133,7 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
      * The default values are 2.0 for khi and 0.5 for gamma.
      *
      * @param referenceSimplex Reference simplex. See
-     * {@link AbstractSimplex#AbstractSimplex(double[][])}.
+     *                         {@link AbstractSimplex#AbstractSimplex(double[][])}.
      */
     public MultiDirectionalSimplex(final double[][] referenceSimplex) {
         this(referenceSimplex, DEFAULT_KHI, DEFAULT_GAMMA);
@@ -131,23 +143,23 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
      * Build a multi-directional simplex with specified coefficients.
      *
      * @param referenceSimplex Reference simplex. See
-     * {@link AbstractSimplex#AbstractSimplex(double[][])}.
-     * @param khi Expansion coefficient.
-     * @param gamma Contraction coefficient.
-     * @throws org.hipparchus.exception.MathIllegalArgumentException
-     * if the reference simplex does not contain at least one point.
-     * @throws org.hipparchus.exception.MathIllegalArgumentException
-     * if there is a dimension mismatch in the reference simplex.
+     *                         {@link AbstractSimplex#AbstractSimplex(double[][])}.
+     * @param khi              Expansion coefficient.
+     * @param gamma            Contraction coefficient.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the reference simplex does not contain at least one point.
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if there is a dimension mismatch in the reference simplex.
      */
     public MultiDirectionalSimplex(final double[][] referenceSimplex,
                                    final double khi, final double gamma) {
         super(referenceSimplex);
 
-        this.khi   = khi;
+        this.khi = khi;
         this.gamma = gamma;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void iterate(final MultivariateFunction evaluationFunction,
                         final Comparator<PointValuePair> comparator) {
@@ -157,12 +169,12 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
 
         // Perform a reflection step.
         final PointValuePair reflected = evaluateNewSimplex(evaluationFunction,
-                                                                original, 1, comparator);
+                original, 1, comparator);
         if (comparator.compare(reflected, best) < 0) {
             // Compute the expanded simplex.
             final PointValuePair[] reflectedSimplex = getPoints();
             final PointValuePair expanded = evaluateNewSimplex(evaluationFunction,
-                                                                   original, khi, comparator);
+                    original, khi, comparator);
             if (comparator.compare(reflected, expanded) <= 0) {
                 // Keep the reflected simplex.
                 setPoints(reflectedSimplex);
@@ -180,18 +192,17 @@ public class MultiDirectionalSimplex extends AbstractSimplex {
      * Compute and evaluate a new simplex.
      *
      * @param evaluationFunction Evaluation function.
-     * @param original Original simplex (to be preserved).
-     * @param coeff Linear coefficient.
-     * @param comparator Comparator to use to sort simplex vertices from best
-     * to poorest.
+     * @param original           Original simplex (to be preserved).
+     * @param coeff              Linear coefficient.
+     * @param comparator         Comparator to use to sort simplex vertices from best
+     *                           to poorest.
      * @return the best point in the transformed simplex.
-     * @throws org.hipparchus.exception.MathIllegalStateException
-     * if the maximal number of evaluations is exceeded.
+     * @throws org.hipparchus.exception.MathIllegalStateException if the maximal number of evaluations is exceeded.
      */
     private PointValuePair evaluateNewSimplex(final MultivariateFunction evaluationFunction,
-                                                  final PointValuePair[] original,
-                                                  final double coeff,
-                                                  final Comparator<PointValuePair> comparator) {
+                                              final PointValuePair[] original,
+                                              final double coeff,
+                                              final Comparator<PointValuePair> comparator) {
         final double[] xSmallest = original[0].getPointRef();
         // Perform a linear transformation on all the simplex points,
         // except the first one.

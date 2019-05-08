@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -22,24 +27,6 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * Weighted evaluation for statistics.
  */
 public interface WeightedEvaluation {
-
-    /**
-     * Returns the result of evaluating the statistic over the input array,
-     * using the supplied weights.
-     * <p>
-     * The default implementation delegates to
-     * <code>evaluate(double[], double[], int, int)</code> in the natural way.
-     *
-     * @param values  input array
-     * @param weights array of weights
-     * @return the value of the weighted statistic applied to the input array
-     * @throws MathIllegalArgumentException if either array is null, lengths
-     *                                      do not match, weights contain NaN, negative or infinite values, or
-     *                                      weights does not include at least on positive value
-     */
-//    default double evaluate(double[] values, double[] weights) throws MathIllegalArgumentException {
-//        return evaluate(values, weights, 0, values.length);
-//    }
 
     /**
      * Returns the result of evaluating the statistic over the specified entries

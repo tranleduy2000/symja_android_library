@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.linear.RealMatrix;
@@ -22,13 +27,16 @@ import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem.Ev
 
 /**
  * Applies a dense weight matrix to an evaluation.
- *
  */
 class DenseWeightedEvaluation extends AbstractEvaluation {
 
-    /** the unweighted evaluation */
+    /**
+     * the unweighted evaluation
+     */
     private final Evaluation unweighted;
-    /** reference to the weight square root matrix */
+    /**
+     * reference to the weight square root matrix
+     */
     private final RealMatrix weightSqrt;
 
     /**
@@ -47,13 +55,17 @@ class DenseWeightedEvaluation extends AbstractEvaluation {
 
     /* apply weights */
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealMatrix getJacobian() {
         return weightSqrt.multiply(this.unweighted.getJacobian());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getResiduals() {
         return this.weightSqrt.operate(this.unweighted.getResiduals());
@@ -61,7 +73,9 @@ class DenseWeightedEvaluation extends AbstractEvaluation {
 
     /* delegate */
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getPoint() {
         return unweighted.getPoint();

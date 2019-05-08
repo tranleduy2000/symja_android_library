@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.distribution.IntegerDistribution;
@@ -37,6 +42,74 @@ public abstract class AbstractIntegerDistribution implements IntegerDistribution
      * Serializable version identifier
      */
     private static final long serialVersionUID = 20160320L;
+
+    /**
+     * This is a utility function used by {@link
+     * #inverseCumulativeProbability(double)}. It assumes {@code 0 < p < 1} and
+     * that the inverse cumulative probability lies in the bracket {@code
+     * (lower, upper]}. The implementation does simple bisection to find the
+     * smallest {@code p}-quantile {@code inf{x in Z | P(X<=x) >= p}}.
+     *
+     * @param p     the cumulative probability
+     * @param lower a value satisfying {@code cumulativeProbability(lower) < p}
+     * @param upper a value satisfying {@code p <= cumulativeProbability(upper)}
+     * @return the smallest {@code p}-quantile of this distribution
+     */
+    protected int solveInverseCumulativeProbability(final double p, int lower, int upper) {
+        while (lower + 1 < upper) {
+            int xm = (lower + upper) / 2;
+            if (xm < lower || xm > upper) {
+                /*
+                 * Overflow.
+                 * There will never be an overflow in both calculation methods
+                 * for xm at the same time
+                 */
+                xm = lower + (upper - lower) / 2;
+            }
+
+            double pm = checkedCumulativeProbability(xm);
+            if (pm >= p) {
+                upper = xm;
+            } else {
+                lower = xm;
+            }
+        }
+        return upper;
+    }
+
+    /**
+     * Computes the cumulative probability function and checks for {@code NaN}
+     * values returned.
+     * <p>
+     * Throws {@code MathRuntimeException} if the value is {@code NaN}.
+     * Rethrows any exception encountered evaluating the cumulative
+     * probability function.
+     * Throws {@code MathRuntimeException} if the cumulative
+     * probability function returns {@code NaN}.
+     *
+     * @param argument input value
+     * @return the cumulative probability
+     * @throws MathRuntimeException if the cumulative probability is {@code NaN}
+     */
+    private double checkedCumulativeProbability(int argument)
+            throws MathRuntimeException {
+        double result = cumulativeProbability(argument);
+        if (Double.isNaN(result)) {
+            throw new MathRuntimeException(LocalizedCoreFormats.DISCRETE_CUMULATIVE_PROBABILITY_RETURNED_NAN,
+                    argument);
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default implementation simply computes the logarithm of {@code probability(x)}.
+     */
+    @Override
+    public double logProbability(int x) {
+        return FastMath.log(probability(x));
+    }
 
     /**
      * {@inheritDoc}
@@ -109,73 +182,5 @@ public abstract class AbstractIntegerDistribution implements IntegerDistribution
         }
 
         return solveInverseCumulativeProbability(p, lower, upper);
-    }
-
-    /**
-     * This is a utility function used by {@link
-     * #inverseCumulativeProbability(double)}. It assumes {@code 0 < p < 1} and
-     * that the inverse cumulative probability lies in the bracket {@code
-     * (lower, upper]}. The implementation does simple bisection to find the
-     * smallest {@code p}-quantile <code>inf{x in Z | P(X<=x) >= p}</code>.
-     *
-     * @param p     the cumulative probability
-     * @param lower a value satisfying {@code cumulativeProbability(lower) < p}
-     * @param upper a value satisfying {@code p <= cumulativeProbability(upper)}
-     * @return the smallest {@code p}-quantile of this distribution
-     */
-    protected int solveInverseCumulativeProbability(final double p, int lower, int upper) {
-        while (lower + 1 < upper) {
-            int xm = (lower + upper) / 2;
-            if (xm < lower || xm > upper) {
-                /*
-                 * Overflow.
-                 * There will never be an overflow in both calculation methods
-                 * for xm at the same time
-                 */
-                xm = lower + (upper - lower) / 2;
-            }
-
-            double pm = checkedCumulativeProbability(xm);
-            if (pm >= p) {
-                upper = xm;
-            } else {
-                lower = xm;
-            }
-        }
-        return upper;
-    }
-
-    /**
-     * Computes the cumulative probability function and checks for {@code NaN}
-     * values returned.
-     * <p>
-     * Throws {@code MathRuntimeException} if the value is {@code NaN}.
-     * Rethrows any exception encountered evaluating the cumulative
-     * probability function.
-     * Throws {@code MathRuntimeException} if the cumulative
-     * probability function returns {@code NaN}.
-     *
-     * @param argument input value
-     * @return the cumulative probability
-     * @throws MathRuntimeException if the cumulative probability is {@code NaN}
-     */
-    private double checkedCumulativeProbability(int argument)
-            throws MathRuntimeException {
-        double result = cumulativeProbability(argument);
-        if (Double.isNaN(result)) {
-            throw new MathRuntimeException(LocalizedCoreFormats.DISCRETE_CUMULATIVE_PROBABILITY_RETURNED_NAN,
-                    argument);
-        }
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The default implementation simply computes the logarithm of {@code probability(x)}.
-     */
-    @Override
-    public double logProbability(int x) {
-        return FastMath.log(probability(x));
     }
 }

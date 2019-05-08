@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.inference;
 
 import org.hipparchus.distribution.continuous.TDistribution;
@@ -21,6 +26,7 @@ import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.exception.NullArgumentException;
+import org.hipparchus.stat.LocalizedStatFormats;
 import org.hipparchus.stat.StatUtils;
 import org.hipparchus.stat.descriptive.StatisticalSummary;
 import org.hipparchus.util.FastMath;
@@ -49,7 +55,7 @@ import org.hipparchus.util.MathUtils;
  * Input to tests can be either <code>double[]</code> arrays or
  * {@link StatisticalSummary} instances.
  * <p>
- * Uses Hipparchus {@link TDistribution}
+ * Uses Hipparchus {@link org.hipparchus.distribution.continuous.TDistribution}
  * implementation to estimate exact p-values.
  */
 public class TTest {
@@ -451,7 +457,7 @@ public class TTest {
      * <li>To test the (2-sided) hypothesis <code>sample mean = mu </code> at
      * the 95% level, use <br><code>tTest(mu, sample, 0.05) </code>
      * </li>
-     * <li>To test the (one-sided) hypothesis <code> sample mean < mu </code>
+     * <li>To test the (one-sided) hypothesis <code> sample mean &lt; mu </code>
      * at the 99% level, first verify that the measured sample mean is less
      * than <code>mu</code> and then use
      * <br><code>tTest(mu, sample, 0.02) </code>
@@ -534,7 +540,7 @@ public class TTest {
      * <li>To test the (2-sided) hypothesis <code>sample mean = mu </code> at
      * the 95% level, use <br><code>tTest(mu, sampleStats, 0.05) </code>
      * </li>
-     * <li>To test the (one-sided) hypothesis <code> sample mean < mu </code>
+     * <li>To test the (one-sided) hypothesis <code> sample mean &lt; mu </code>
      * at the 99% level, first verify that the measured sample mean is less
      * than <code>mu</code> and then use
      * <br><code>tTest(mu, sampleStats, 0.02) </code>
@@ -688,7 +694,7 @@ public class TTest {
      * the 95% level,  use
      * <br><code>tTest(sample1, sample2, 0.05). </code>
      * </li>
-     * <li>To test the (one-sided) hypothesis <code> mean 1 < mean 2 </code>,
+     * <li>To test the (one-sided) hypothesis <code> mean 1 &lt; mean 2 </code>,
      * at the 99% level, first verify that the measured  mean of <code>sample 1</code>
      * is less than the mean of <code>sample 2</code> and then use
      * <br><code>tTest(sample1, sample2, 0.02) </code>
@@ -703,7 +709,7 @@ public class TTest {
      * <strong>Preconditions</strong>: <ul>
      * <li>The observed array lengths must both be at least 2.
      * </li>
-     * <li> <code> 0 < alpha < 0.5 </code>
+     * <li> <code> 0 &lt; alpha &lt; 0.5 </code>
      * </li></ul></p>
      *
      * @param sample1 array of sample data values
@@ -748,7 +754,7 @@ public class TTest {
      * <li>To test the (2-sided) hypothesis <code>mean 1 = mean 2 </code> at
      * the 95% level, use <br><code>tTest(sample1, sample2, 0.05). </code>
      * </li>
-     * <li>To test the (one-sided) hypothesis <code> mean 1 < mean 2, </code>
+     * <li>To test the (one-sided) hypothesis <code> mean 1 &lt; mean 2, </code>
      * at the 99% level, first verify that the measured mean of
      * <code>sample 1</code> is less than the mean of <code>sample 2</code>
      * and then use
@@ -764,7 +770,7 @@ public class TTest {
      * <strong>Preconditions</strong>: <ul>
      * <li>The observed array lengths must both be at least 2.
      * </li>
-     * <li> <code> 0 < alpha < 0.5 </code>
+     * <li> <code> 0 &lt; alpha &lt; 0.5 </code>
      * </li></ul></p>
      *
      * @param sample1 array of sample data values
@@ -905,7 +911,7 @@ public class TTest {
      * the 95%, use
      * <br><code>tTest(sampleStats1, sampleStats2, 0.05) </code>
      * </li>
-     * <li>To test the (one-sided) hypothesis <code> mean 1 < mean 2 </code>
+     * <li>To test the (one-sided) hypothesis <code> mean 1 &lt; mean 2 </code>
      * at the 99% level,  first verify that the measured mean of
      * <code>sample 1</code> is less than  the mean of <code>sample 2</code>
      * and then use
@@ -922,7 +928,7 @@ public class TTest {
      * <li>The datasets described by the two Univariates must each contain
      * at least 2 observations.
      * </li>
-     * <li> <code> 0 < alpha < 0.5 </code>
+     * <li> <code> 0 &lt; alpha &lt; 0.5 </code>
      * </li></ul></p>
      *
      * @param sampleStats1 StatisticalSummary describing sample data values
@@ -1102,7 +1108,7 @@ public class TTest {
             throws MathIllegalArgumentException {
 
         if (alpha <= 0 || alpha > 0.5) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.SIGNIFICANCE_LEVEL,
+            throw new MathIllegalArgumentException(LocalizedStatFormats.SIGNIFICANCE_LEVEL,
                     alpha, 0.0, 0.5);
         }
 
@@ -1121,7 +1127,7 @@ public class TTest {
         MathUtils.checkNotNull(data, LocalizedCoreFormats.INPUT_ARRAY);
         if (data.length < 2) {
             throw new MathIllegalArgumentException(
-                    LocalizedCoreFormats.INSUFFICIENT_DATA_FOR_T_STATISTIC,
+                    LocalizedStatFormats.INSUFFICIENT_DATA_FOR_T_STATISTIC,
                     data.length, 2, true);
         }
 
@@ -1140,7 +1146,7 @@ public class TTest {
         MathUtils.checkNotNull(stat);
         if (stat.getN() < 2) {
             throw new MathIllegalArgumentException(
-                    LocalizedCoreFormats.INSUFFICIENT_DATA_FOR_T_STATISTIC,
+                    LocalizedStatFormats.INSUFFICIENT_DATA_FOR_T_STATISTIC,
                     stat.getN(), 2, true);
         }
 

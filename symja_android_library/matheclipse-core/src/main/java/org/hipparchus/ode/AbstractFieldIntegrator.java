@@ -15,9 +15,12 @@
  * limitations under the License.
  */
 
-package org.hipparchus.ode;
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 
-import com.duy.util.PriorityQueue;
+package org.hipparchus.ode;
 
 import org.hipparchus.Field;
 import org.hipparchus.RealFieldElement;
@@ -39,6 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -112,10 +116,10 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
     protected AbstractFieldIntegrator(final Field<T> field, final String name) {
         this.field = field;
         this.name = name;
-        stepHandlers = new ArrayList<FieldODEStepHandler<T>>();
+        stepHandlers = new ArrayList<>();
         stepStart = null;
         stepSize = null;
-        eventsStates = new ArrayList<FieldEventState<T>>();
+        eventsStates = new ArrayList<>();
         statesInitialized = false;
         evaluations = new Incrementor();
     }
@@ -195,7 +199,7 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
      */
     @Override
     public Collection<FieldODEEventHandler<T>> getEventHandlers() {
-        final List<FieldODEEventHandler<T>> list = new ArrayList<FieldODEEventHandler<T>>(eventsStates.size());
+        final List<FieldODEEventHandler<T>> list = new ArrayList<>(eventsStates.size());
         for (FieldEventState<T> state : eventsStates) {
             list.add(state.getEventHandler());
         }
@@ -208,6 +212,14 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
     @Override
     public void clearEventHandlers() {
         eventsStates.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldODEStateAndDerivative<T> getStepStart() {
+        return stepStart;
     }
 
     /**
@@ -240,6 +252,15 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
     @Override
     public int getEvaluations() {
         return evaluations.getCount();
+    }
+
+    /**
+     * Set current step start.
+     *
+     * @param stepStart step start
+     */
+    protected void setStepStart(final FieldODEStateAndDerivative<T> stepStart) {
+        this.stepStart = stepStart;
     }
 
     /**
@@ -351,6 +372,7 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
 
         FieldODEStateAndDerivative<T> previousState = interpolator.getGlobalPreviousState();
         final FieldODEStateAndDerivative<T> currentState = interpolator.getGlobalCurrentState();
+        AbstractFieldODEStateInterpolator<T> restricted = interpolator;
 
         // initialize the events states if needed
         if (!statesInitialized) {
@@ -370,101 +392,114 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
             }
         });
 
-        for (final FieldEventState<T> state : eventsStates) {
-            if (state.evaluateStep(interpolator)) {
-                // the event occurs during the current step
-                occurringEvents.add(state);
-            }
-        }
-
-        AbstractFieldODEStateInterpolator<T> restricted = interpolator;
-
+        resetOccurred = false;
+        boolean doneWithStep = false;
+        resetEvents:
         do {
 
-            eventLoop:
-            while (!occurringEvents.isEmpty()) {
-
-                // handle the chronologically first event
-                final FieldEventState<T> currentEvent = occurringEvents.poll();
-
-                // get state at event time
-                FieldODEStateAndDerivative<T> eventState =
-                        restricted.getInterpolatedState(currentEvent.getEventTime());
-
-                // restrict the interpolator to the first part of the step, up to the event
-                restricted = restricted.restrictStep(previousState, eventState);
-
-                // try to advance all event states to current time
-                for (final FieldEventState<T> state : eventsStates) {
-                    if (state != currentEvent && state.tryAdvance(eventState, interpolator)) {
-                        // we need to handle another event first
-                        // remove event we just updated to prevent heap corruption
-                        occurringEvents.remove(state);
-                        // add it back to update its position in the heap
-                        occurringEvents.add(state);
-                        // re-queue the event we were processing
-                        occurringEvents.add(currentEvent);
-                        continue eventLoop;
-                    }
-                }
-                // all event detectors agree we can advance to the current event time
-
-                final EventOccurrence<T> occurrence = currentEvent.doEvent(eventState);
-                final Action action = occurrence.getAction();
-                isLastStep = action == Action.STOP;
-
-                if (isLastStep) {
-                    // ensure the event is after the root if it is returned STOP
-                    // this lets the user integrate to a STOP event and then restart
-                    // integration from the same time.
-                    eventState = interpolator.getInterpolatedState(occurrence.getStopTime());
-                    restricted = interpolator.restrictStep(previousState, eventState);
-                }
-
-                // handle the first part of the step, up to the event
-                for (final FieldODEStepHandler<T> handler : stepHandlers) {
-                    handler.handleStep(restricted, isLastStep);
-                }
-
-                if (isLastStep) {
-                    // the event asked to stop integration
-                    return eventState;
-                }
-
-                resetOccurred = false;
-                if (action == Action.RESET_DERIVATIVES || action == Action.RESET_STATE) {
-                    // some event handler has triggered changes that
-                    // invalidate the derivatives, we need to recompute them
-                    final FieldODEState<T> newState = occurrence.getNewState();
-                    final T[] y = newState.getCompleteState();
-                    final T[] yDot = computeDerivatives(newState.getTime(), y);
-                    resetOccurred = true;
-                    return equations.getMapper().mapStateAndDerivative(newState.getTime(), y, yDot);
-                }
-                // at this point we know action == Action.CONTINUE
-
-                // prepare handling of the remaining part of the step
-                previousState = eventState;
-                restricted = restricted.restrictStep(eventState, currentState);
-
-                // check if the same event occurs again in the remaining part of the step
-                if (currentEvent.evaluateStep(restricted)) {
-                    // the event occurs during the current step
-                    occurringEvents.add(currentEvent);
-                }
-
-            }
-
-            // last part of the step, after the last event
-            // may be a new event here if the last event modified the g function of
-            // another event detector.
+            // Evaluate all event detectors for events
+            occurringEvents.clear();
             for (final FieldEventState<T> state : eventsStates) {
-                if (state.tryAdvance(currentState, interpolator)) {
+                if (state.evaluateStep(restricted)) {
+                    // the event occurs during the current step
                     occurringEvents.add(state);
                 }
             }
 
-        } while (!occurringEvents.isEmpty());
+
+            do {
+
+                eventLoop:
+                while (!occurringEvents.isEmpty()) {
+
+                    // handle the chronologically first event
+                    final FieldEventState<T> currentEvent = occurringEvents.poll();
+
+                    // get state at event time
+                    FieldODEStateAndDerivative<T> eventState =
+                            restricted.getInterpolatedState(currentEvent.getEventTime());
+
+                    // restrict the interpolator to the first part of the step, up to the event
+                    restricted = restricted.restrictStep(previousState, eventState);
+
+                    // try to advance all event states to current time
+                    for (final FieldEventState<T> state : eventsStates) {
+                        if (state != currentEvent && state.tryAdvance(eventState, interpolator)) {
+                            // we need to handle another event first
+                            // remove event we just updated to prevent heap corruption
+                            occurringEvents.remove(state);
+                            // add it back to update its position in the heap
+                            occurringEvents.add(state);
+                            // re-queue the event we were processing
+                            occurringEvents.add(currentEvent);
+                            continue eventLoop;
+                        }
+                    }
+                    // all event detectors agree we can advance to the current event time
+
+                    final EventOccurrence<T> occurrence = currentEvent.doEvent(eventState);
+                    final Action action = occurrence.getAction();
+                    isLastStep = action == Action.STOP;
+
+                    if (isLastStep) {
+                        // ensure the event is after the root if it is returned STOP
+                        // this lets the user integrate to a STOP event and then restart
+                        // integration from the same time.
+                        eventState = interpolator.getInterpolatedState(occurrence.getStopTime());
+                        restricted = interpolator.restrictStep(previousState, eventState);
+                    }
+
+                    // handle the first part of the step, up to the event
+                    for (final FieldODEStepHandler<T> handler : stepHandlers) {
+                        handler.handleStep(restricted, isLastStep);
+                    }
+
+                    if (isLastStep) {
+                        // the event asked to stop integration
+                        return eventState;
+                    }
+
+                    if (action == Action.RESET_DERIVATIVES || action == Action.RESET_STATE) {
+                        // some event handler has triggered changes that
+                        // invalidate the derivatives, we need to recompute them
+                        final FieldODEState<T> newState = occurrence.getNewState();
+                        final T[] y = newState.getCompleteState();
+                        final T[] yDot = computeDerivatives(newState.getTime(), y);
+                        resetOccurred = true;
+                        return equations.getMapper().mapStateAndDerivative(newState.getTime(), y, yDot);
+                    }
+                    // at this point action == Action.CONTINUE or Action.RESET_EVENTS
+
+                    // prepare handling of the remaining part of the step
+                    previousState = eventState;
+                    restricted = restricted.restrictStep(eventState, currentState);
+
+                    if (action == Action.RESET_EVENTS) {
+                        continue resetEvents;
+                    }
+
+                    // at this point action == Action.CONTINUE
+                    // check if the same event occurs again in the remaining part of the step
+                    if (currentEvent.evaluateStep(restricted)) {
+                        // the event occurs during the current step
+                        occurringEvents.add(currentEvent);
+                    }
+
+                }
+
+                // last part of the step, after the last event
+                // may be a new event here if the last event modified the g function of
+                // another event detector.
+                for (final FieldEventState<T> state : eventsStates) {
+                    if (state.tryAdvance(currentState, interpolator)) {
+                        occurringEvents.add(state);
+                    }
+                }
+
+            } while (!occurringEvents.isEmpty());
+
+            doneWithStep = true;
+        } while (!doneWithStep);
 
 
         isLastStep = isLastStep || currentState.getTime().subtract(tEnd).abs().getReal() <= FastMath.ulp(tEnd.getReal());
@@ -525,23 +560,6 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
      */
     protected void setStepSize(final T stepSize) {
         this.stepSize = stepSize;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldODEStateAndDerivative<T> getStepStart() {
-        return stepStart;
-    }
-
-    /**
-     * Set current step start.
-     *
-     * @param stepStart step start
-     */
-    protected void setStepStart(final FieldODEStateAndDerivative<T> stepStart) {
-        this.stepStart = stepStart;
     }
 
     /**

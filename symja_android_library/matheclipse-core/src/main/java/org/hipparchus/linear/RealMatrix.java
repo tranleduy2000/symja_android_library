@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -100,6 +105,38 @@ public interface RealMatrix extends AnyMatrix {
             throws MathIllegalArgumentException;
 
     /**
+     * Returns the result of postmultiplying {@code this} by {@code m^T}.
+     * <p>
+     * This is equivalent to call {@link #multiply(RealMatrix) multiply}(m.{@link #transpose()}),
+     * but some implementations may avoid building the intermediate transposed matrix.
+     * </p>
+     *
+     * @param m matrix to first transpose and second postmultiply by
+     * @return {@code this * m^T}
+     * @throws MathIllegalArgumentException if
+     *                                      {@code columnDimension(this) != columnDimension(m)}
+     * @since 1.3
+     */
+    RealMatrix multiplyTransposed(final RealMatrix m)
+            throws MathIllegalArgumentException;
+
+    /**
+     * Returns the result of postmultiplying {@code this^T} by {@code m}.
+     * <p>
+     * This is equivalent to call {@link #transpose()}.{@link #multiply(RealMatrix) multiply(m)},
+     * but some implementations may avoid building the intermediate transposed matrix.
+     * </p>
+     *
+     * @param m matrix to postmultiply by
+     * @return {@code this^T * m}
+     * @throws MathIllegalArgumentException if
+     *                                      {@code columnDimension(this) != columnDimension(m)}
+     * @since 1.3
+     */
+    RealMatrix transposeMultiply(final RealMatrix m)
+            throws MathIllegalArgumentException;
+
+    /**
      * Returns the result of premultiplying {@code this} by {@code m}.
      *
      * @param m matrix to premultiply by
@@ -120,7 +157,7 @@ public interface RealMatrix extends AnyMatrix {
      * @throws MathIllegalArgumentException if {@code p < 0}
      * @throws MathIllegalArgumentException if the matrix is not square
      */
-    RealMatrix power(final int p)
+    RealMatrix power(int p)
             throws MathIllegalArgumentException;
 
     /**

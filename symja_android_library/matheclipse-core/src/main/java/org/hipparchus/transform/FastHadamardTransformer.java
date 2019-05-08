@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.transform;
 
 import org.hipparchus.analysis.FunctionUtils;
@@ -57,9 +62,9 @@ public class FastHadamardTransformer implements RealTransformer, Serializable {
     /**
      * {@inheritDoc}
      *
-     * @throws MathIllegalArgumentException if the lower bound is greater than, or equal to the upper bound
-     * @throws MathIllegalArgumentException if the number of sample points is negative
-     * @throws MathIllegalArgumentException if the number of sample points is not a power of two
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the lower bound is greater than, or equal to the upper bound
+     * @throws org.hipparchus.exception.MathIllegalArgumentException if the number of sample points is negative
+     * @throws MathIllegalArgumentException                          if the number of sample points is not a power of two
      */
     @Override
     public double[] transform(final UnivariateFunction f,
@@ -85,7 +90,7 @@ public class FastHadamardTransformer implements RealTransformer, Serializable {
     /**
      * The FHT (Fast Hadamard Transformation) which uses only subtraction and
      * addition. Requires {@code N * log2(N) = n * 2^n} additions.
-     * <p>
+     *
      * <h3>Short Table of manual calculation for N=8</h3>
      * <ol>
      * <li><b>x</b> is the input vector to be transformed,</li>
@@ -150,7 +155,7 @@ public class FastHadamardTransformer implements RealTransformer, Serializable {
      * </tr>
      * </tbody>
      * </table>
-     * <p>
+     *
      * <h3>How it works</h3>
      * <ol>
      * <li>Construct a matrix with {@code N} rows and {@code n + 1} columns,

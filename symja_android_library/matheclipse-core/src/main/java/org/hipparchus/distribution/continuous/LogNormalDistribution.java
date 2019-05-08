@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -32,7 +37,7 @@ import org.hipparchus.util.FastMath;
  * <p>
  * {@code exp(-0.5 * ((ln(x) - m) / s)^2) / (s * sqrt(2 * pi) * x)}
  * <ul>
- * <li>{@code m} is the <em>scale</em> parameter: this is the mean of the
+ * <li>{@code m} is the <em>location</em> parameter: this is the mean of the
  * normally distributed natural logarithm of this distribution,</li>
  * <li>{@code s} is the <em>shape</em> parameter: this is the standard
  * deviation of the normally distributed natural logarithm of this
@@ -62,9 +67,9 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     private static final double SQRT2 = FastMath.sqrt(2.0);
 
     /**
-     * The scale parameter of this distribution.
+     * The location parameter of this distribution (named m in MathWorld and µ in Wikipedia).
      */
-    private final double scale;
+    private final double location;
 
     /**
      * The shape parameter of this distribution.
@@ -79,7 +84,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
      * Create a log-normal distribution, where the mean and standard deviation
      * of the {@link NormalDistribution normally distributed} natural
      * logarithm of the log-normal distribution are equal to zero and one
-     * respectively. In other words, the scale of the returned distribution is
+     * respectively. In other words, the location of the returned distribution is
      * {@code 0}, while its shape is {@code 1}.
      */
     public LogNormalDistribution() {
@@ -87,27 +92,27 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     }
 
     /**
-     * Create a log-normal distribution using the specified scale and shape.
+     * Create a log-normal distribution using the specified location and shape.
      *
-     * @param scale the scale parameter of this distribution
-     * @param shape the shape parameter of this distribution
+     * @param location the location parameter of this distribution
+     * @param shape    the shape parameter of this distribution
      * @throws MathIllegalArgumentException if {@code shape <= 0}.
      */
-    public LogNormalDistribution(double scale, double shape)
+    public LogNormalDistribution(double location, double shape)
             throws MathIllegalArgumentException {
-        this(scale, shape, DEFAULT_SOLVER_ABSOLUTE_ACCURACY);
+        this(location, shape, DEFAULT_SOLVER_ABSOLUTE_ACCURACY);
     }
 
 
     /**
      * Creates a log-normal distribution.
      *
-     * @param scale              Scale parameter of this distribution.
+     * @param location           Location parameter of this distribution.
      * @param shape              Shape parameter of this distribution.
      * @param inverseCumAccuracy Inverse cumulative probability accuracy.
      * @throws MathIllegalArgumentException if {@code shape <= 0}.
      */
-    public LogNormalDistribution(double scale,
+    public LogNormalDistribution(double location,
                                  double shape,
                                  double inverseCumAccuracy)
             throws MathIllegalArgumentException {
@@ -117,7 +122,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.SHAPE, shape);
         }
 
-        this.scale = scale;
+        this.location = location;
         this.shape = shape;
         this.logShapePlusHalfLog2Pi = FastMath.log(shape) + 0.5 * FastMath.log(2 * FastMath.PI);
     }
@@ -126,9 +131,21 @@ public class LogNormalDistribution extends AbstractRealDistribution {
      * Returns the scale parameter of this distribution.
      *
      * @return the scale parameter
+     * @deprecated as of 1.4, replaced by {@link #getLocation()}
      */
+    @Deprecated
     public double getScale() {
-        return scale;
+        return getLocation();
+    }
+
+    /**
+     * Returns the location parameter of this distribution.
+     *
+     * @return the location parameter
+     * @since 1.4
+     */
+    public double getLocation() {
+        return location;
     }
 
     /**
@@ -143,7 +160,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     /**
      * {@inheritDoc}
      * <p>
-     * For scale {@code m}, and shape {@code s} of this distribution, the PDF
+     * For location {@code m}, and shape {@code s} of this distribution, the PDF
      * is given by
      * <ul>
      * <li>{@code 0} if {@code x <= 0},</li>
@@ -156,7 +173,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
         if (x <= 0) {
             return 0;
         }
-        final double x0 = FastMath.log(x) - scale;
+        final double x0 = FastMath.log(x) - location;
         final double x1 = x0 / shape;
         return FastMath.exp(-0.5 * x1 * x1) / (shape * SQRT2PI * x);
     }
@@ -164,23 +181,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     /**
      * {@inheritDoc}
      * <p>
-     * See documentation of {@link #density(double)} for computation details.
-     */
-    @Override
-    public double logDensity(double x) {
-        if (x <= 0) {
-            return Double.NEGATIVE_INFINITY;
-        }
-        final double logX = FastMath.log(x);
-        final double x0 = logX - scale;
-        final double x1 = x0 / shape;
-        return -0.5 * x1 * x1 - (logShapePlusHalfLog2Pi + logX);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * For scale {@code m}, and shape {@code s} of this distribution, the CDF
+     * For location {@code m}, and shape {@code s} of this distribution, the CDF
      * is given by
      * <ul>
      * <li>{@code 0} if {@code x <= 0},</li>
@@ -196,7 +197,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
         if (x <= 0) {
             return 0;
         }
-        final double dev = FastMath.log(x) - scale;
+        final double dev = FastMath.log(x) - location;
         if (FastMath.abs(dev) > 40 * shape) {
             return dev < 0 ? 0.0d : 1.0d;
         }
@@ -205,47 +206,27 @@ public class LogNormalDistribution extends AbstractRealDistribution {
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    public double probability(double x0,
-                              double x1)
-            throws MathIllegalArgumentException {
-        if (x0 > x1) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.LOWER_ENDPOINT_ABOVE_UPPER_ENDPOINT,
-                    x0, x1, true);
-        }
-        if (x0 <= 0 || x1 <= 0) {
-            return super.probability(x0, x1);
-        }
-        final double denom = shape * SQRT2;
-        final double v0 = (FastMath.log(x0) - scale) / denom;
-        final double v1 = (FastMath.log(x1) - scale) / denom;
-        return 0.5 * Erf.erf(v0, v1);
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
-     * For scale {@code m} and shape {@code s}, the mean is
+     * For location {@code m} and shape {@code s}, the mean is
      * {@code exp(m + s^2 / 2)}.
      */
     @Override
     public double getNumericalMean() {
         double s = shape;
-        return FastMath.exp(scale + (s * s / 2));
+        return FastMath.exp(location + (s * s / 2));
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * For scale {@code m} and shape {@code s}, the variance is
+     * For location {@code m} and shape {@code s}, the variance is
      * {@code (exp(s^2) - 1) * exp(2 * m + s^2)}.
      */
     @Override
     public double getNumericalVariance() {
         final double s = shape;
         final double ss = s * s;
-        return (FastMath.expm1(ss)) * FastMath.exp(2 * scale + ss);
+        return (FastMath.expm1(ss)) * FastMath.exp(2 * location + ss);
     }
 
     /**
@@ -284,5 +265,41 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double probability(double x0,
+                              double x1)
+            throws MathIllegalArgumentException {
+        if (x0 > x1) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.LOWER_ENDPOINT_ABOVE_UPPER_ENDPOINT,
+                    x0, x1, true);
+        }
+        if (x0 <= 0 || x1 <= 0) {
+            return super.probability(x0, x1);
+        }
+        final double denom = shape * SQRT2;
+        final double v0 = (FastMath.log(x0) - location) / denom;
+        final double v1 = (FastMath.log(x1) - location) / denom;
+        return 0.5 * Erf.erf(v0, v1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * See documentation of {@link #density(double)} for computation details.
+     */
+    @Override
+    public double logDensity(double x) {
+        if (x <= 0) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        final double logX = FastMath.log(x);
+        final double x0 = logX - location;
+        final double x1 = x0 / shape;
+        return -0.5 * x1 * x1 - (logShapePlusHalfLog2Pi + logX);
     }
 }

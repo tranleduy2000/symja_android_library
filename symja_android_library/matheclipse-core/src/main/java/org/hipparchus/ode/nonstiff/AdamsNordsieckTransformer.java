@@ -38,7 +38,7 @@ import java.util.Map;
  * {@link AdamsMoultonIntegrator Adams-Moulton} integrators to convert between
  * classical representation with several previous first derivatives and Nordsieck
  * representation with higher order scaled derivatives.</p>
- * <p>
+ *
  * <p>We define scaled derivatives s<sub>i</sub>(n) at step n as:
  * <pre>
  * s<sub>1</sub>(n) = h y'<sub>n</sub> for first derivative
@@ -55,7 +55,7 @@ import java.util.Map;
  *   q<sub>n</sub> = [ s<sub>1</sub>(n-1) s<sub>1</sub>(n-2) ... s<sub>1</sub>(n-(k-1)) ]<sup>T</sup>
  * </pre>
  * (we omit the k index in the notation for clarity).</p>
- * <p>
+ *
  * <p>Another possible representation uses the Nordsieck vector with
  * higher degrees scaled derivatives all taken at the same step, i.e it handles y<sub>n</sub>,
  * s<sub>1</sub>(n) and r<sub>n</sub>) where r<sub>n</sub> is defined as:
@@ -64,7 +64,7 @@ import java.util.Map;
  * </pre>
  * (here again we omit the k index in the notation for clarity)
  * </p>
- * <p>
+ *
  * <p>Taylor series formulas show that for any index offset i, s<sub>1</sub>(n-i) can be
  * computed from s<sub>1</sub>(n), s<sub>2</sub>(n) ... s<sub>k</sub>(n), the formula being exact
  * for degree k polynomials.
@@ -136,8 +136,7 @@ public class AdamsNordsieckTransformer {
     /**
      * Cache for already computed coefficients.
      */
-    private static final Map<Integer, AdamsNordsieckTransformer> CACHE =
-            new HashMap<Integer, AdamsNordsieckTransformer>();
+    private static final Map<Integer, AdamsNordsieckTransformer> CACHE = new HashMap<>();
 
     /**
      * Update matrix for the higher order derivatives h<sup>2</sup>/2 y'', h<sup>3</sup>/6 y''' ...
@@ -197,7 +196,7 @@ public class AdamsNordsieckTransformer {
      *               (excluding the one being computed)
      * @return Nordsieck transformer for the specified number of steps
      */
-    public static AdamsNordsieckTransformer getInstance(final int nSteps) {
+    public static AdamsNordsieckTransformer getInstance(final int nSteps) { // NOPMD - PMD false positive
         synchronized (CACHE) {
             AdamsNordsieckTransformer t = CACHE.get(nSteps);
             if (t == null) {

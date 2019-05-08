@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.fraction;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -46,6 +51,7 @@ public class BigFractionFormat extends AbstractFormat implements Serializable {
      * for the numerator and denominator.
      */
     public BigFractionFormat() {
+        // This constructor is intentionally empty. Nothing special is needed here.
     }
 
     /**
@@ -141,7 +147,7 @@ public class BigFractionFormat extends AbstractFormat implements Serializable {
      *                    offsets of the alignment field
      * @return the value passed in as toAppendTo.
      */
-    public StringBuffer format(final BigFraction BigFraction,
+    public StringBuffer format(final BigFraction BigFraction, // NOPMD - PMD false positive, we cannot have @Override here
                                final StringBuffer toAppendTo, final FieldPosition pos) {
 
         pos.setBeginIndex(0);
@@ -166,7 +172,7 @@ public class BigFractionFormat extends AbstractFormat implements Serializable {
      *                   offsets of the alignment field
      * @return the value passed in as toAppendTo.
      * @throws MathIllegalArgumentException if <code>obj</code> is not a valid type.
-     * @see java.text.Format#format(Object, StringBuffer, FieldPosition)
+     * @see java.text.Format#format(java.lang.Object, java.lang.StringBuffer, java.text.FieldPosition)
      */
     @Override
     public StringBuffer format(final Object obj,

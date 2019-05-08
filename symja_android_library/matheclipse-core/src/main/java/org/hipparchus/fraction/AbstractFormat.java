@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.fraction;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -84,7 +89,7 @@ abstract class AbstractFormat extends NumberFormat implements Serializable {
 
     /**
      * Create a default number format.  The default number format is based on
-     * {@link NumberFormat#getNumberInstance(Locale)}. The only
+     * {@link NumberFormat#getNumberInstance(java.util.Locale)}. The only
      * customization is the maximum number of BigFraction digits, which is set to 0.
      *
      * @return the default number format.
@@ -95,7 +100,7 @@ abstract class AbstractFormat extends NumberFormat implements Serializable {
 
     /**
      * Create a default number format.  The default number format is based on
-     * {@link NumberFormat#getNumberInstance(Locale)}. The only
+     * {@link NumberFormat#getNumberInstance(java.util.Locale)}. The only
      * customization is the maximum number of BigFraction digits, which is set to 0.
      *
      * @param locale the specific locale used by the format.

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.complex;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -71,7 +76,7 @@ public class ComplexUtils {
      * @return an array of {@code Complex} objects.
      */
     public static Complex[] convertToComplex(double[] real) {
-        final Complex c[] = new Complex[real.length];
+        final Complex[] c = new Complex[real.length];
         for (int i = 0; i < real.length; i++) {
             c[i] = new Complex(real[i], 0);
         }

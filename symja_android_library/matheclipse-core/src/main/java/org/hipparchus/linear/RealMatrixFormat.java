@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -38,18 +43,20 @@ import java.util.Locale;
  * <p>The prefix and suffix "{" and "}", the row prefix and suffix "{" and "}",
  * the row separator "," and the column separator "," can be replaced by any
  * user-defined strings. The number format for components can be configured.</p>
- * <p>
+ *
  * <p>White space is ignored at parse time, even if it is in the prefix, suffix
  * or separator specifications. So even if the default separator does include a space
  * character that is used at format time, both input string "{{1,1,1}}" and
  * " { { 1 , 1 , 1 } } " will be parsed without error and the same matrix will be
  * returned. In the second case, however, the parse position after parsing will be
  * just after the closing curly brace, i.e. just before the trailing space.</p>
- * <p>
+ *
  * <p><b>Note:</b> the grouping functionality of the used {@link NumberFormat} is
  * disabled to prevent problems when parsing (e.g. 1,345.34 would be a valid number
  * but conflicts with the default column separator).</p>
  */
+@SuppressWarnings("PMD.SingleMethodSingleton")
+// the violations have been taken care of as of 1.4, they correspond to deprecated methods
 public class RealMatrixFormat {
 
     /**
@@ -183,9 +190,21 @@ public class RealMatrixFormat {
      * Returns the default real vector format for the current locale.
      *
      * @return the default real vector format.
+     * @since 1.4
      */
+    public static RealMatrixFormat getRealMatrixFormat() {
+        return getRealMatrixFormat(Locale.getDefault());
+    }
+
+    /**
+     * Returns the default real vector format for the current locale.
+     *
+     * @return the default real vector format.
+     * @deprecated as of 1.4, replaced by {@link #getRealMatrixFormat()}
+     */
+    @Deprecated
     public static RealMatrixFormat getInstance() {
-        return getInstance(Locale.getDefault());
+        return getRealMatrixFormat();
     }
 
     /**
@@ -193,9 +212,22 @@ public class RealMatrixFormat {
      *
      * @param locale the specific locale used by the format.
      * @return the real vector format specific to the given locale.
+     * @since 1.4
      */
-    public static RealMatrixFormat getInstance(final Locale locale) {
+    public static RealMatrixFormat getRealMatrixFormat(final Locale locale) {
         return new RealMatrixFormat(CompositeFormat.getDefaultNumberFormat(locale));
+    }
+
+    /**
+     * Returns the default real vector format for the given locale.
+     *
+     * @param locale the specific locale used by the format.
+     * @return the real vector format specific to the given locale.
+     * @deprecated as of 1.4, replaced by {@link #getRealMatrixFormat(Locale)}
+     */
+    @Deprecated
+    public static RealMatrixFormat getInstance(final Locale locale) {
+        return getRealMatrixFormat(locale);
     }
 
     /**
@@ -354,8 +386,8 @@ public class RealMatrixFormat {
         }
 
         // parse components
-        List<List<Number>> matrix = new ArrayList<List<Number>>();
-        List<Number> rowComponents = new ArrayList<Number>();
+        List<List<Number>> matrix = new ArrayList<>();
+        List<Number> rowComponents = new ArrayList<>();
         for (boolean loop = true; loop; ) {
 
             if (!rowComponents.isEmpty()) {
@@ -368,7 +400,7 @@ public class RealMatrixFormat {
                         CompositeFormat.parseAndIgnoreWhitespace(source, pos);
                         if (CompositeFormat.parseFixedstring(source, trimmedRowSeparator, pos)) {
                             matrix.add(rowComponents);
-                            rowComponents = new ArrayList<Number>();
+                            rowComponents = new ArrayList<>();
                             continue;
                         } else {
                             loop = false;

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.differentiation;
 
 import org.hipparchus.Field;
@@ -21,9 +26,11 @@ import org.hipparchus.FieldElement;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.FastMath;
+import org.hipparchus.util.FieldSinCos;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
+import org.hipparchus.util.SinCos;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -65,7 +72,7 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      */
     private SparseGradient(final double value, final Map<Integer, Double> derivatives) {
         this.value = value;
-        this.derivatives = new HashMap<Integer, Double>();
+        this.derivatives = new HashMap<>();
         if (derivatives != null) {
             this.derivatives.putAll(derivatives);
         }
@@ -83,7 +90,7 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
     private SparseGradient(final double value, final double scale,
                            final Map<Integer, Double> derivatives) {
         this.value = value;
-        this.derivatives = new HashMap<Integer, Double>();
+        this.derivatives = new HashMap<>();
         if (derivatives != null) {
             for (final Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
                 this.derivatives.put(entry.getKey(), scale * entry.getValue());
@@ -116,7 +123,7 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
      * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
      * avoiding intermediate overflow or underflow.
-     * <p>
+     *
      * <ul>
      * <li> If either argument is infinite, then the result is positive infinity.</li>
      * <li> else, if either argument is NaN then the result is NaN.</li>
@@ -124,7 +131,7 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      *
      * @param x a value
      * @param y a value
-     * @return sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
+     * @return sqrt(< i > x < / i > < sup > 2 < / sup > & nbsp ; + < i > y < / i > < sup > 2 < / sup >)
      */
     public static SparseGradient hypot(final SparseGradient x, final SparseGradient y) {
         return x.hypot(y);
@@ -204,72 +211,8 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      * {@inheritDoc}
      */
     @Override
-    public SparseGradient add(final SparseGradient a) {
-        final SparseGradient out = new SparseGradient(value + a.value, derivatives);
-        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
-            final int id = entry.getKey();
-            final Double old = out.derivatives.get(id);
-            if (old == null) {
-                out.derivatives.put(id, entry.getValue());
-            } else {
-                out.derivatives.put(id, old + entry.getValue());
-            }
-        }
-
-        return out;
-    }
-
-    /**
-     * Add in place.
-     * <p>
-     * This method is designed to be faster when used multiple times in a loop.
-     * </p>
-     * <p>
-     * The instance is changed here, in order to not change the
-     * instance the {@link #add(SparseGradient)} method should
-     * be used.
-     * </p>
-     *
-     * @param a instance to add
-     */
-    public void addInPlace(final SparseGradient a) {
-        value += a.value;
-        for (final Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
-            final int id = entry.getKey();
-            final Double old = derivatives.get(id);
-            if (old == null) {
-                derivatives.put(id, entry.getValue());
-            } else {
-                derivatives.put(id, old + entry.getValue());
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SparseGradient add(final double c) {
-        final SparseGradient out = new SparseGradient(value + c, derivatives);
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SparseGradient subtract(final SparseGradient a) {
-        final SparseGradient out = new SparseGradient(value - a.value, derivatives);
-        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
-            final int id = entry.getKey();
-            final Double old = out.derivatives.get(id);
-            if (old == null) {
-                out.derivatives.put(id, -entry.getValue());
-            } else {
-                out.derivatives.put(id, old - entry.getValue());
-            }
-        }
-        return out;
+        return new SparseGradient(value + c, derivatives);
     }
 
     /**
@@ -284,60 +227,6 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      * {@inheritDoc}
      */
     @Override
-    public SparseGradient multiply(final SparseGradient a) {
-        final SparseGradient out =
-                new SparseGradient(value * a.value, Collections.<Integer, Double>emptyMap());
-
-        // Derivatives.
-        for (Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
-            out.derivatives.put(entry.getKey(), a.value * entry.getValue());
-        }
-        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
-            final int id = entry.getKey();
-            final Double old = out.derivatives.get(id);
-            if (old == null) {
-                out.derivatives.put(id, value * entry.getValue());
-            } else {
-                out.derivatives.put(id, old + value * entry.getValue());
-            }
-        }
-        return out;
-    }
-
-    /**
-     * Multiply in place.
-     * <p>
-     * This method is designed to be faster when used multiple times in a loop.
-     * </p>
-     * <p>
-     * The instance is changed here, in order to not change the
-     * instance the {@link #add(SparseGradient)} method should
-     * be used.
-     * </p>
-     *
-     * @param a instance to multiply
-     */
-    public void multiplyInPlace(final SparseGradient a) {
-        // Derivatives.
-        for (Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
-            derivatives.put(entry.getKey(), a.value * entry.getValue());
-        }
-        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
-            final int id = entry.getKey();
-            final Double old = derivatives.get(id);
-            if (old == null) {
-                derivatives.put(id, value * entry.getValue());
-            } else {
-                derivatives.put(id, old + value * entry.getValue());
-            }
-        }
-        value *= a.value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SparseGradient multiply(final double c) {
         return new SparseGradient(value * c, c, derivatives);
     }
@@ -346,55 +235,8 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      * {@inheritDoc}
      */
     @Override
-    public SparseGradient multiply(final int n) {
-        return new SparseGradient(value * n, n, derivatives);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SparseGradient divide(final SparseGradient a) {
-        final SparseGradient out = new SparseGradient(value / a.value, Collections.<Integer, Double>emptyMap());
-
-        // Derivatives.
-        for (Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
-            out.derivatives.put(entry.getKey(), entry.getValue() / a.value);
-        }
-        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
-            final int id = entry.getKey();
-            final Double old = out.derivatives.get(id);
-            if (old == null) {
-                out.derivatives.put(id, -out.value / a.value * entry.getValue());
-            } else {
-                out.derivatives.put(id, old - out.value / a.value * entry.getValue());
-            }
-        }
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SparseGradient divide(final double c) {
         return new SparseGradient(value / c, 1.0 / c, derivatives);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SparseGradient negate() {
-        return new SparseGradient(-value, -1.0, derivatives);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Field<SparseGradient> getField() {
-        return SparseGradientField.getInstance();
     }
 
     /**
@@ -646,6 +488,14 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient log1p() {
+        return new SparseGradient(FastMath.log1p(value), 1.0 / (1.0 + value), derivatives);
+    }
+
+    /**
      * Base 10 logarithm.
      *
      * @return base 10 logarithm of the instance
@@ -659,16 +509,9 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      * {@inheritDoc}
      */
     @Override
-    public SparseGradient log1p() {
-        return new SparseGradient(FastMath.log1p(value), 1.0 / (1.0 + value), derivatives);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SparseGradient cos() {
-        return new SparseGradient(FastMath.cos(value), -FastMath.sin(value), derivatives);
+        final SinCos sc = FastMath.sinCos(value);
+        return new SparseGradient(sc.cos(), -sc.sin(), derivatives);
     }
 
     /**
@@ -676,7 +519,18 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
      */
     @Override
     public SparseGradient sin() {
-        return new SparseGradient(FastMath.sin(value), FastMath.cos(value), derivatives);
+        final SinCos sc = FastMath.sinCos(value);
+        return new SparseGradient(sc.sin(), sc.cos(), derivatives);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldSinCos<SparseGradient> sinCos() {
+        final SinCos sc = FastMath.sinCos(value);
+        return new FieldSinCos<>(new SparseGradient(sc.sin(), sc.cos(), derivatives),
+                new SparseGradient(sc.cos(), -sc.sin(), derivatives));
     }
 
     /**
@@ -789,50 +643,6 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
     @Override
     public SparseGradient atanh() {
         return new SparseGradient(FastMath.atanh(value), 1.0 / (1.0 - value * value), derivatives);
-    }
-
-    /**
-     * Convert radians to degrees, with error of less than 0.5 ULP
-     *
-     * @return instance converted into degrees
-     */
-    public SparseGradient toDegrees() {
-        return new SparseGradient(FastMath.toDegrees(value), FastMath.toDegrees(1.0), derivatives);
-    }
-
-    /**
-     * Convert degrees to radians, with error of less than 0.5 ULP
-     *
-     * @return instance converted into radians
-     */
-    public SparseGradient toRadians() {
-        return new SparseGradient(FastMath.toRadians(value), FastMath.toRadians(1.0), derivatives);
-    }
-
-    /**
-     * Evaluate Taylor expansion of a sparse gradient.
-     *
-     * @param delta parameters offsets (&Delta;x, &Delta;y, ...)
-     * @return value of the Taylor expansion at x + &Delta;x, y + &Delta;y, ...
-     */
-    public double taylor(final double... delta) {
-        double y = value;
-        for (int i = 0; i < delta.length; ++i) {
-            y += delta[i] * getDerivative(i);
-        }
-        return y;
-    }
-
-    /**
-     * Compute composition of the instance by a univariate function.
-     *
-     * @param f0 value of the function at (i.e. f({@link #getValue()}))
-     * @param f1 first derivative of the function at
-     *           the current point (i.e. f'({@link #getValue()}))
-     * @return f(this)
-     */
-    public SparseGradient compose(final double f0, final double f1) {
-        return new SparseGradient(f0, f1, derivatives);
     }
 
     /**
@@ -1003,6 +813,214 @@ public class SparseGradient implements RealFieldElement<SparseGradient>, Seriali
 
         return out;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient add(final SparseGradient a) {
+        final SparseGradient out = new SparseGradient(value + a.value, derivatives);
+        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
+            final int id = entry.getKey();
+            final Double old = out.derivatives.get(id);
+            if (old == null) {
+                out.derivatives.put(id, entry.getValue());
+            } else {
+                out.derivatives.put(id, old + entry.getValue());
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient subtract(final SparseGradient a) {
+        final SparseGradient out = new SparseGradient(value - a.value, derivatives);
+        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
+            final int id = entry.getKey();
+            final Double old = out.derivatives.get(id);
+            if (old == null) {
+                out.derivatives.put(id, -entry.getValue());
+            } else {
+                out.derivatives.put(id, old - entry.getValue());
+            }
+        }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient negate() {
+        return new SparseGradient(-value, -1.0, derivatives);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient multiply(final int n) {
+        return new SparseGradient(value * n, n, derivatives);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient multiply(final SparseGradient a) {
+        final SparseGradient out =
+                new SparseGradient(value * a.value, Collections.<Integer, Double>emptyMap());
+
+        // Derivatives.
+        for (Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
+            out.derivatives.put(entry.getKey(), a.value * entry.getValue());
+        }
+        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
+            final int id = entry.getKey();
+            final Double old = out.derivatives.get(id);
+            if (old == null) {
+                out.derivatives.put(id, value * entry.getValue());
+            } else {
+                out.derivatives.put(id, old + value * entry.getValue());
+            }
+        }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SparseGradient divide(final SparseGradient a) {
+        final SparseGradient out = new SparseGradient(value / a.value, Collections.<Integer, Double>emptyMap());
+
+        // Derivatives.
+        for (Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
+            out.derivatives.put(entry.getKey(), entry.getValue() / a.value);
+        }
+        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
+            final int id = entry.getKey();
+            final Double old = out.derivatives.get(id);
+            if (old == null) {
+                out.derivatives.put(id, -out.value / a.value * entry.getValue());
+            } else {
+                out.derivatives.put(id, old - out.value / a.value * entry.getValue());
+            }
+        }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Field<SparseGradient> getField() {
+        return SparseGradientField.getInstance();
+    }
+
+    /**
+     * Add in place.
+     * <p>
+     * This method is designed to be faster when used multiple times in a loop.
+     * </p>
+     * <p>
+     * The instance is changed here, in order to not change the
+     * instance the {@link #add(SparseGradient)} method should
+     * be used.
+     * </p>
+     *
+     * @param a instance to add
+     */
+    public void addInPlace(final SparseGradient a) {
+        value += a.value;
+        for (final Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
+            final int id = entry.getKey();
+            final Double old = derivatives.get(id);
+            if (old == null) {
+                derivatives.put(id, entry.getValue());
+            } else {
+                derivatives.put(id, old + entry.getValue());
+            }
+        }
+    }
+
+    /**
+     * Multiply in place.
+     * <p>
+     * This method is designed to be faster when used multiple times in a loop.
+     * </p>
+     * <p>
+     * The instance is changed here, in order to not change the
+     * instance the {@link #add(SparseGradient)} method should
+     * be used.
+     * </p>
+     *
+     * @param a instance to multiply
+     */
+    public void multiplyInPlace(final SparseGradient a) {
+        // Derivatives.
+        for (Map.Entry<Integer, Double> entry : derivatives.entrySet()) {
+            derivatives.put(entry.getKey(), a.value * entry.getValue());
+        }
+        for (Map.Entry<Integer, Double> entry : a.derivatives.entrySet()) {
+            final int id = entry.getKey();
+            final Double old = derivatives.get(id);
+            if (old == null) {
+                derivatives.put(id, value * entry.getValue());
+            } else {
+                derivatives.put(id, old + value * entry.getValue());
+            }
+        }
+        value *= a.value;
+    }
+
+    /**
+     * Convert radians to degrees, with error of less than 0.5 ULP
+     *
+     * @return instance converted into degrees
+     */
+    public SparseGradient toDegrees() {
+        return new SparseGradient(FastMath.toDegrees(value), FastMath.toDegrees(1.0), derivatives);
+    }
+
+    /**
+     * Convert degrees to radians, with error of less than 0.5 ULP
+     *
+     * @return instance converted into radians
+     */
+    public SparseGradient toRadians() {
+        return new SparseGradient(FastMath.toRadians(value), FastMath.toRadians(1.0), derivatives);
+    }
+
+    /**
+     * Evaluate Taylor expansion of a sparse gradient.
+     *
+     * @param delta parameters offsets (&Delta;x, &Delta;y, ...)
+     * @return value of the Taylor expansion at x + &Delta;x, y + &Delta;y, ...
+     */
+    public double taylor(final double... delta) {
+        double y = value;
+        for (int i = 0; i < delta.length; ++i) {
+            y += delta[i] * getDerivative(i);
+        }
+        return y;
+    }
+
+    /**
+     * Compute composition of the instance by a univariate function.
+     *
+     * @param f0 value of the function at (i.e. f({@link #getValue()}))
+     * @param f1 first derivative of the function at
+     *           the current point (i.e. f'({@link #getValue()}))
+     * @return f(this)
+     */
+    public SparseGradient compose(final double f0, final double f1) {
+        return new SparseGradient(f0, f1, derivatives);
     }
 
     /**

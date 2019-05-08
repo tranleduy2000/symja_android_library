@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.interpolation;
 
 import org.hipparchus.analysis.polynomials.PolynomialFunctionLagrangeForm;
@@ -50,7 +55,7 @@ public class NevilleInterpolator implements UnivariateInterpolator,
      *                                      value.
      */
     @Override
-    public PolynomialFunctionLagrangeForm interpolate(double x[], double y[])
+    public PolynomialFunctionLagrangeForm interpolate(double[] x, double[] y)
             throws MathIllegalArgumentException {
         return new PolynomialFunctionLagrangeForm(x, y);
     }

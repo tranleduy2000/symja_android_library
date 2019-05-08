@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fitting;
 
 import org.hipparchus.analysis.function.HarmonicOscillator;
@@ -31,7 +36,7 @@ import java.util.List;
 
 /**
  * Fits points to a {@link
- * HarmonicOscillator.Parametric harmonic oscillator}
+ * org.hipparchus.analysis.function.HarmonicOscillator.Parametric harmonic oscillator}
  * function.
  * <br/>
  * The {@link #withStartPoint(double[]) initial guess values} must be passed
@@ -58,15 +63,14 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
     private final int maxIter;
 
     /**
-     * Contructor used by the factory methods.
+     * Constructor used by the factory methods.
      *
      * @param initialGuess Initial guess. If set to {@code null}, the initial guess
      *                     will be estimated using the {@link ParameterGuesser}.
      * @param maxIter      Maximum number of iterations of the optimization algorithm.
      */
-    private HarmonicCurveFitter(double[] initialGuess,
-                                int maxIter) {
-        this.initialGuess = initialGuess;
+    private HarmonicCurveFitter(double[] initialGuess, int maxIter) {
+        this.initialGuess = initialGuess == null ? null : initialGuess.clone();
         this.maxIter = maxIter;
     }
 
@@ -123,8 +127,8 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
             ++i;
         }
 
-        final TheoreticalValuesFunction model
-                = new TheoreticalValuesFunction(FUNCTION,
+        final AbstractCurveFitter.TheoreticalValuesFunction model
+                = new AbstractCurveFitter.TheoreticalValuesFunction(FUNCTION,
                 observations);
 
         final double[] startPoint = initialGuess != null ?
@@ -148,12 +152,12 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
     /**
      * This class guesses harmonic coefficients from a sample.
      * <p>The algorithm used to guess the coefficients is as follows:</p>
-     * <p>
+     *
      * <p>We know \( f(t) \) at some sampling points \( t_i \) and want
      * to find \( a \), \( \omega \) and \( \phi \) such that
      * \( f(t) = a \cos (\omega t + \phi) \).
      * </p>
-     * <p>
+     *
      * <p>From the analytical expression, we can compute two primitives :
      * \[
      * If2(t) = \int f^2 dt  = a^2 (t + S(t)) / 2
@@ -163,32 +167,32 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
      * \]
      * where \(S(t) = \frac{\sin(2 (\omega t + \phi))}{2\omega}\)
      * </p>
-     * <p>
+     *
      * <p>We can remove \(S\) between these expressions :
      * \[
      * If'2(t) = a^2 \omega^2 t - \omega^2 If2(t)
      * \]
      * </p>
-     * <p>
+     *
      * <p>The preceding expression shows that \(If'2 (t)\) is a linear
      * combination of both \(t\) and \(If2(t)\):
      * \[
      * If'2(t) = A t + B If2(t)
      * \]
      * </p>
-     * <p>
+     *
      * <p>From the primitive, we can deduce the same form for definite
      * integrals between \(t_1\) and \(t_i\) for each \(t_i\) :
      * \[
      * If2(t_i) - If2(t_1) = A (t_i - t_1) + B (If2 (t_i) - If2(t_1))
      * \]
      * </p>
-     * <p>
+     *
      * <p>We can find the coefficients \(A\) and \(B\) that best fit the sample
      * to this linear expression by computing the definite integrals for
      * each sample points.
      * </p>
-     * <p>
+     *
      * <p>For a bilinear expression \(z(x_i, y_i) = A x_i + B y_i\), the
      * coefficients \(A\) and \(B\) that minimize a least-squares criterion
      * \(\sum (z_i - z(x_i, y_i))^2\) are given by these expressions:</p>
@@ -201,7 +205,7 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
      * {\sum x_i x_i \sum y_i y_i - \sum x_i y_i \sum x_i y_i}
      * <p>
      * \]
-     * <p>
+     *
      * <p>In fact, we can assume that both \(a\) and \(\omega\) are positive and
      * compute them directly, knowing that \(A = a^2 \omega^2\) and that
      * \(B = -\omega^2\). The complete algorithm is therefore:</p>
@@ -224,7 +228,7 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
      * \omega = \sqrt{\frac{\sum x_i y_i \sum x_i z_i - \sum x_i x_i \sum y_i z_i}
      * {\sum x_i x_i \sum y_i y_i - \sum x_i y_i \sum x_i y_i}}
      * \]
-     * <p>
+     *
      * <p>Once we know \(\omega\) we can compute:
      * \[
      * fc = \omega f(t) \cos(\omega t) - f'(t) \sin(\omega t)
@@ -233,13 +237,13 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
      * fs = \omega f(t) \sin(\omega t) + f'(t) \cos(\omega t)
      * \]
      * </p>
-     * <p>
+     *
      * <p>It appears that \(fc = a \omega \cos(\phi)\) and
      * \(fs = -a \omega \sin(\phi)\), so we can use these
      * expressions to compute \(\phi\). The best estimate over the sample is
      * given by averaging these expressions.
      * </p>
-     * <p>
+     *
      * <p>Since integrals and means are involved in the preceding
      * estimations, these operations run in \(O(n)\) time, where \(n\) is the
      * number of measurements.</p>
@@ -276,7 +280,7 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
             final WeightedObservedPoint[] sorted
                     = sortObservations(observations).toArray(new WeightedObservedPoint[0]);
 
-            final double aOmega[] = guessAOmega(sorted);
+            final double[] aOmega = guessAOmega(sorted);
             a = aOmega[0];
             omega = aOmega[1];
 
@@ -304,7 +308,7 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
          * @return the input observations, sorted.
          */
         private List<WeightedObservedPoint> sortObservations(Collection<WeightedObservedPoint> unsorted) {
-            final List<WeightedObservedPoint> observations = new ArrayList<WeightedObservedPoint>(unsorted);
+            final List<WeightedObservedPoint> observations = new ArrayList<>(unsorted);
 
             // Since the samples are almost always already sorted, this
             // method is implemented as an insertion sort that reorders the
@@ -320,9 +324,10 @@ public class HarmonicCurveFitter extends AbstractCurveFitter {
                     WeightedObservedPoint mI = observations.get(i);
                     while ((i >= 0) && (curr.getX() < mI.getX())) {
                         observations.set(i + 1, mI);
-                        if (i-- != 0) {
-                            mI = observations.get(i);
+                        if (i != 0) {
+                            mI = observations.get(i - 1);
                         }
+                        --i;
                     }
                     observations.set(i + 1, curr);
                     curr = observations.get(j);

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -143,6 +148,17 @@ import org.hipparchus.util.MathUtils;
 public class SymmLQ
         extends PreconditionedIterativeLinearSolver {
 
+    /**
+     * {@code true} if symmetry of matrix and conditioner must be checked.
+     */
+    private final boolean check;
+
+    /**
+     * The value of the custom tolerance &delta; for the default stopping
+     * criterion.
+     */
+    private final double delta;
+
     /*
      * IMPLEMENTATION NOTES
      * --------------------
@@ -213,16 +229,6 @@ public class SymmLQ
      */
 
     /**
-     * {@code true} if symmetry of matrix and conditioner must be checked.
-     */
-    private final boolean check;
-    /**
-     * The value of the custom tolerance &delta; for the default stopping
-     * criterion.
-     */
-    private final double delta;
-
-    /**
      * Creates a new instance of this class, with <a href="#stopcrit">default
      * stopping criterion</a>. Note that setting {@code check} to {@code true}
      * entails an extra matrix-vector product in the initial phase.
@@ -262,22 +268,22 @@ public class SymmLQ
      * positive definiteness of the preconditioner should be checked.
      *
      * @return {@code true} if the tests are to be performed
+     * @deprecated as of 1.4, replaced by {@link #shouldCheck()}
      */
-    public final boolean getCheck() {
-        return check;
+    @Deprecated
+    public final boolean getCheck() { // NOPMD - violation addressed by renaming method as of 1.4
+        return shouldCheck();
     }
 
     /**
-     * {@inheritDoc}
+     * Returns {@code true} if symmetry of the matrix, and symmetry as well as
+     * positive definiteness of the preconditioner should be checked.
      *
+     * @return {@code true} if the tests are to be performed
+     * @since 1.4
      */
-    @Override
-    public RealVector solve(final RealLinearOperator a,
-                            final RealLinearOperator m, final RealVector b) throws
-            NullArgumentException, MathIllegalStateException, MathIllegalArgumentException {
-        MathUtils.checkNotNull(a);
-        final RealVector x = new ArrayRealVector(a.getColumnDimension());
-        return solveInPlace(a, m, b, x, false, 0.);
+    public final boolean shouldCheck() {
+        return check;
     }
 
     /**
@@ -333,6 +339,11 @@ public class SymmLQ
      *
      * @param x not meaningful in this implementation; should not be considered
      *          as an initial guess (<a href="#initguess">more</a>)
+     * @throws MathIllegalArgumentException if {@link #getCheck()} is
+     *                                      {@code true}, and {@code a} or {@code m} is not self-adjoint
+     * @throws MathIllegalArgumentException if {@code m} is not positive
+     *                                      definite
+     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solve(final RealLinearOperator a,
@@ -347,6 +358,9 @@ public class SymmLQ
     /**
      * {@inheritDoc}
      *
+     * @throws MathIllegalArgumentException if {@link #getCheck()} is
+     *                                      {@code true}, and {@code a} is not self-adjoint
+     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
      */
     @Override
     public RealVector solve(final RealLinearOperator a, final RealVector b)
@@ -355,6 +369,77 @@ public class SymmLQ
         MathUtils.checkNotNull(a);
         final RealVector x = new ArrayRealVector(a.getColumnDimension());
         x.set(0.);
+        return solveInPlace(a, null, b, x, false, 0.);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param x not meaningful in this implementation; should not be considered
+     *          as an initial guess (<a href="#initguess">more</a>)
+     * @throws MathIllegalArgumentException if {@link #getCheck()} is
+     *                                      {@code true}, and {@code a} is not self-adjoint
+     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
+     */
+    @Override
+    public RealVector solve(final RealLinearOperator a, final RealVector b,
+                            final RealVector x) throws NullArgumentException, MathIllegalArgumentException,
+            MathIllegalStateException {
+        MathUtils.checkNotNull(x);
+        return solveInPlace(a, null, b, x.copy(), false, 0.);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@link #getCheck()} is
+     *                                      {@code true}, and {@code a} or {@code m} is not self-adjoint
+     * @throws MathIllegalArgumentException if {@code m} is not
+     *                                      positive definite
+     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
+     */
+    @Override
+    public RealVector solve(final RealLinearOperator a,
+                            final RealLinearOperator m, final RealVector b) throws
+            NullArgumentException, MathIllegalStateException, MathIllegalArgumentException {
+        MathUtils.checkNotNull(a);
+        final RealVector x = new ArrayRealVector(a.getColumnDimension());
+        return solveInPlace(a, m, b, x, false, 0.);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param x the vector to be updated with the solution; {@code x} should
+     *          not be considered as an initial guess (<a href="#initguess">more</a>)
+     * @throws MathIllegalArgumentException if {@link #getCheck()} is
+     *                                      {@code true}, and {@code a} or {@code m} is not self-adjoint
+     * @throws MathIllegalArgumentException if {@code m} is not
+     *                                      positive definite
+     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
+     */
+    @Override
+    public RealVector solveInPlace(final RealLinearOperator a,
+                                   final RealLinearOperator m, final RealVector b, final RealVector x)
+            throws NullArgumentException,
+            MathIllegalArgumentException,
+            MathIllegalStateException {
+        return solveInPlace(a, m, b, x, false, 0.);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param x the vector to be updated with the solution; {@code x} should
+     *          not be considered as an initial guess (<a href="#initguess">more</a>)
+     * @throws MathIllegalArgumentException if {@link #getCheck()} is
+     *                                      {@code true}, and {@code a} is not self-adjoint
+     * @throws MathIllegalArgumentException if {@code a} is ill-conditioned
+     */
+    @Override
+    public RealVector solveInPlace(final RealLinearOperator a,
+                                   final RealVector b, final RealVector x) throws NullArgumentException, MathIllegalArgumentException,
+            MathIllegalStateException {
         return solveInPlace(a, null, b, x, false, 0.);
     }
 
@@ -399,35 +484,6 @@ public class SymmLQ
         MathUtils.checkNotNull(a);
         final RealVector x = new ArrayRealVector(a.getColumnDimension());
         return solveInPlace(a, null, b, x, goodb, shift);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param x not meaningful in this implementation; should not be considered
-     *          as an initial guess (<a href="#initguess">more</a>)
-     */
-    @Override
-    public RealVector solve(final RealLinearOperator a, final RealVector b,
-                            final RealVector x) throws NullArgumentException, MathIllegalArgumentException,
-            MathIllegalStateException {
-        MathUtils.checkNotNull(x);
-        return solveInPlace(a, null, b, x.copy(), false, 0.);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param x the vector to be updated with the solution; {@code x} should
-     *          not be considered as an initial guess (<a href="#initguess">more</a>)
-     */
-    @Override
-    public RealVector solveInPlace(final RealLinearOperator a,
-                                   final RealLinearOperator m, final RealVector b, final RealVector x)
-            throws NullArgumentException,
-            MathIllegalArgumentException,
-            MathIllegalStateException {
-        return solveInPlace(a, m, b, x, false, 0.);
     }
 
     /**
@@ -527,19 +583,6 @@ public class SymmLQ
                 state.getNormOfResidual());
         manager.fireTerminationEvent(event);
         return x;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param x the vector to be updated with the solution; {@code x} should
-     *          not be considered as an initial guess (<a href="#initguess">more</a>)
-     */
-    @Override
-    public RealVector solveInPlace(final RealLinearOperator a,
-                                   final RealVector b, final RealVector x) throws NullArgumentException, MathIllegalArgumentException,
-            MathIllegalStateException {
-        return solveInPlace(a, null, b, x, false, 0.);
     }
 
     /**
@@ -748,14 +791,12 @@ public class SymmLQ
          * x' &middot; L &middot; y = y' &middot; L &middot; x
          * (within a given accuracy), where y = L &middot; x.
          *
-         * @param l the linear operator L
          * @param x the candidate vector x
          * @param y the candidate vector y = L &middot; x
          * @param z the vector z = L &middot; y
          * @throws MathIllegalArgumentException when the test fails
          */
-        private static void checkSymmetry(final RealLinearOperator l,
-                                          final RealVector x, final RealVector y, final RealVector z)
+        private static void checkSymmetry(final RealVector x, final RealVector y, final RealVector z)
                 throws MathIllegalArgumentException {
             final double s = y.dotProduct(y);
             final double t = x.dotProduct(z);
@@ -769,12 +810,9 @@ public class SymmLQ
          * Throws a new {@link MathIllegalArgumentException} with
          * appropriate context.
          *
-         * @param l the offending linear operator
-         * @param v the offending vector
          * @throws MathIllegalArgumentException in any circumstances
          */
-        private static void throwNPDLOException(final RealLinearOperator l,
-                                                final RealVector v) throws MathIllegalArgumentException {
+        private static void throwNPDLOException() throws MathIllegalArgumentException {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NON_POSITIVE_DEFINITE_OPERATOR);
         }
 
@@ -879,12 +917,12 @@ public class SymmLQ
             this.r1 = this.b.copy();
             this.y = this.m == null ? this.b.copy() : this.m.operate(this.r1);
             if ((this.m != null) && this.check) {
-                checkSymmetry(this.m, this.r1, this.y, this.m.operate(this.y));
+                checkSymmetry(this.r1, this.y, this.m.operate(this.y));
             }
 
             this.beta1 = this.r1.dotProduct(this.y);
             if (this.beta1 < 0.) {
-                throwNPDLOException(this.m, this.y);
+                throwNPDLOException();
             }
             if (this.beta1 == 0.) {
                 /* If b = 0 exactly, stop with x = 0. */
@@ -901,7 +939,7 @@ public class SymmLQ
             final RealVector v = this.y.mapMultiply(1. / this.beta1);
             this.y = this.a.operate(v);
             if (this.check) {
-                checkSymmetry(this.a, v, this.y, this.a.operate(this.y));
+                checkSymmetry(v, this.y, this.a.operate(this.y));
             }
             /*
              * Set up y for the second Lanczos vector. y and beta will be zero
@@ -926,7 +964,7 @@ public class SymmLQ
             this.oldb = this.beta1;
             this.beta = this.r2.dotProduct(this.y);
             if (this.beta < 0.) {
-                throwNPDLOException(this.m, this.y);
+                throwNPDLOException();
             }
             this.beta = FastMath.sqrt(this.beta);
             /*
@@ -1000,7 +1038,7 @@ public class SymmLQ
             oldb = beta;
             beta = r2.dotProduct(y);
             if (beta < 0.) {
-                throwNPDLOException(m, y);
+                throwNPDLOException();
             }
             beta = FastMath.sqrt(beta);
             /*

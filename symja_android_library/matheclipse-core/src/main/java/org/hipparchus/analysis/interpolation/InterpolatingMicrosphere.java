@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.interpolation;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -104,8 +109,8 @@ public class InterpolatingMicrosphere {
         this.maxDarkFraction = maxDarkFraction;
         this.darkThreshold = darkThreshold;
         this.background = background;
-        microsphere = new ArrayList<Facet>(size);
-        microsphereData = new ArrayList<FacetData>(size);
+        microsphere = new ArrayList<>(size);
+        microsphereData = new ArrayList<>(size);
     }
 
     /**
@@ -161,7 +166,7 @@ public class InterpolatingMicrosphere {
         microsphere = other.microsphere;
 
         // Field must be copied.
-        microsphereData = new ArrayList<FacetData>(size);
+        microsphereData = new ArrayList<>(size);
         for (FacetData fd : other.microsphereData) {
             microsphereData.add(new FacetData(fd.illumination(), fd.sample()));
         }
@@ -348,7 +353,7 @@ public class InterpolatingMicrosphere {
          * @param n Normal vector characterizing a surface element
          *          of the microsphere. No copy is made.
          */
-        Facet(double[] n) {
+        Facet(double[] n) { // NOPMD - array cloning is taken care of at call site
             normal = n;
         }
 

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.inference;
 
 import org.hipparchus.distribution.continuous.ChiSquaredDistribution;
@@ -21,6 +26,7 @@ import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.exception.NullArgumentException;
+import org.hipparchus.stat.LocalizedStatFormats;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
@@ -35,13 +41,6 @@ import org.hipparchus.util.MathUtils;
  * samples come from the same underlying distribution.
  */
 public class ChiSquareTest {
-
-    /**
-     * Construct a ChiSquareTest
-     */
-    public ChiSquareTest() {
-        super();
-    }
 
     /**
      * Computes the <a href="http://www.itl.nist.gov/div898/handbook/eda/section3/eda35f.htm">
@@ -198,7 +197,7 @@ public class ChiSquareTest {
             throws MathIllegalArgumentException, MathIllegalStateException {
 
         if ((alpha <= 0) || (alpha > 0.5)) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
+            throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
                     alpha, 0, 0.5);
         }
         return chiSquareTest(expected, observed) < alpha;
@@ -346,7 +345,7 @@ public class ChiSquareTest {
             throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         if ((alpha <= 0) || (alpha > 0.5)) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
+            throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
                     alpha, 0, 0.5);
         }
         return chiSquareTest(counts) < alpha;
@@ -367,7 +366,7 @@ public class ChiSquareTest {
      * <p>
      * where
      * <p>
-     * <code>K = &sqrt;[&sum(observed2 / &sum;(observed1)]</code>
+     * <code>K = &sqrt;[&sum;(observed2 / &sum;(observed1)]</code>
      * <p>
      * This statistic can be used to perform a Chi-Square test evaluating the
      * null hypothesis that both observed counts follow the same distribution.
@@ -516,7 +515,7 @@ public class ChiSquareTest {
      * <li>Observed counts for a specific sample must not all be 0.</li>
      * <li>The arrays <code>observed1</code> and <code>observed2</code> must
      * have the same length and their common length must be at least 2.</li>
-     * <li><code> 0 < alpha < 0.5</code></li>
+     * <li><code> 0 &lt; alpha &lt; 0.5</code></li>
      * </ul>
      * <p>
      * If any of the preconditions are not met, an
@@ -543,7 +542,7 @@ public class ChiSquareTest {
 
         if (alpha <= 0 ||
                 alpha > 0.5) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
+            throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
                     alpha, 0, 0.5);
         }
         return chiSquareTestDataSetsComparison(observed1, observed2) < alpha;

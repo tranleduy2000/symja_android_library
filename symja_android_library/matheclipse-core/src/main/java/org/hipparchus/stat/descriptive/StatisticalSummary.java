@@ -14,14 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hipparchus.stat.descriptive;
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+package org.hipparchus.stat.descriptive;
 
 /**
  * Reporting interface for basic univariate statistics.
  */
 public interface StatisticalSummary {
-
 
     /**
      * Returns the <a href="http://www.xycoon.com/arithmetic_mean.htm">

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.vector;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -134,20 +139,6 @@ public class VectorialCovariance implements Serializable {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (isBiasCorrected ? 1231 : 1237);
-        result = prime * result + (int) (n ^ (n >>> 32));
-        result = prime * result + Arrays.hashCode(productsSums);
-        result = prime * result + Arrays.hashCode(sums);
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -166,6 +157,20 @@ public class VectorialCovariance implements Serializable {
             return false;
         }
         return Arrays.equals(sums, other.sums);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (isBiasCorrected ? 1231 : 1237);
+        result = prime * result + (int) (n ^ (n >>> 32));
+        result = prime * result + Arrays.hashCode(productsSums);
+        result = prime * result + Arrays.hashCode(sums);
+        return result;
     }
 
 }

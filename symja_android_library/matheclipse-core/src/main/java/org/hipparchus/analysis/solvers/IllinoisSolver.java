@@ -15,24 +15,33 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
 
+
+import org.hipparchus.analysis.UnivariateFunction;
+import org.hipparchus.exception.MathIllegalArgumentException;
+import org.hipparchus.exception.MathIllegalStateException;
 
 /**
  * Implements the <em>Illinois</em> method for root-finding (approximating
  * a zero of a univariate real function). It is a modified
  * {@link RegulaFalsiSolver <em>Regula Falsi</em>} method.
- * <p>
+ *
  * <p>Like the <em>Regula Falsi</em> method, convergence is guaranteed by
  * maintaining a bracketed solution. The <em>Illinois</em> method however,
  * should converge much faster than the original <em>Regula Falsi</em>
  * method. Furthermore, this implementation of the <em>Illinois</em> method
  * should not suffer from the same implementation issues as the <em>Regula
  * Falsi</em> method, which may fail to convergence in certain cases.</p>
- * <p>
+ *
  * <p>The <em>Illinois</em> method assumes that the function is continuous,
  * but not necessarily smooth.</p>
- * <p>
+ *
  * <p>Implementation based on the following article: M. Dowell and P. Jarratt,
  * <em>A modified regula falsi method for computing the root of an
  * equation</em>, BIT Numerical Mathematics, volume 11, number 2,
@@ -77,6 +86,12 @@ public class IllinoisSolver extends BaseSecantSolver {
     public IllinoisSolver(final double relativeAccuracy,
                           final double absoluteAccuracy,
                           final double functionValueAccuracy) {
-        super(relativeAccuracy, absoluteAccuracy, functionValueAccuracy, Method.PEGASUS);
+        super(relativeAccuracy, absoluteAccuracy, functionValueAccuracy, Method.ILLINOIS);
+    }
+
+    @Override
+    public Interval solveInterval(int maxEval, UnivariateFunction univariateFunction, double min, double max) throws MathIllegalArgumentException, MathIllegalStateException {
+        return this.solveInterval(maxEval, univariateFunction, min, max, min + 0.5 * (max - min));
+
     }
 }

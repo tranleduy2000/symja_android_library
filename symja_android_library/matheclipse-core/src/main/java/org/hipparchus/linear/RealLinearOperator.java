@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -69,39 +74,7 @@ public interface RealLinearOperator {
      * @throws MathIllegalArgumentException if the column dimension does not match
      *                                      the size of {@code x}
      */
-    RealVector operate(final RealVector x)
+    RealVector operate(RealVector x)
             throws MathIllegalArgumentException;
 
-    /**
-     * Returns the result of multiplying the transpose of {@code this} operator
-     * by the vector {@code x} (optional operation).
-     * <p>
-     * The default implementation throws an {@link UnsupportedOperationException}.
-     * Users overriding this method must also override {@link #isTransposable()}.
-     *
-     * @param x the vector to operate on
-     * @return the product of the transpose of {@code this} instance with {@code x}
-     * @throws MathIllegalArgumentException  if the row dimension does not match the
-     *                                       size of {@code x}
-     * @throws UnsupportedOperationException if this operation is not supported
-     *                                       by {@code this} operator
-     */
-//    default RealVector operateTranspose(final RealVector x)
-//            throws MathIllegalArgumentException, UnsupportedOperationException {
-//        throw new UnsupportedOperationException();
-//    }
-
-    /**
-     * Returns {@code true} if this operator supports {@link #operateTranspose(RealVector)}.
-     * <p>
-     * If {@code true} is returned, {@link #operateTranspose(RealVector)}
-     * should not throw {@code UnsupportedOperationException}.
-     * <p>
-     * The default implementation returns {@code false}.
-     *
-     * @return {@code false}
-     */
-//    default boolean isTransposable() {
-//        return false;
-//    }
 }

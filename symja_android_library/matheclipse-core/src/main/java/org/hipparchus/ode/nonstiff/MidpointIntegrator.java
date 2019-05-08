@@ -23,7 +23,7 @@ import org.hipparchus.ode.ODEStateAndDerivative;
 /**
  * This class implements a second order Runge-Kutta integrator for
  * Ordinary Differential Equations.
- * <p>
+ *
  * <p>This method is an explicit Runge-Kutta method, its Butcher-array
  * is the following one :
  * <pre>

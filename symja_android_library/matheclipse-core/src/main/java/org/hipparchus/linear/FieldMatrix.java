@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 
@@ -49,7 +54,7 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
      * @throws MathIllegalArgumentException if row or column dimension is not
      *                                      positive.
      */
-    FieldMatrix<T> createMatrix(final int rowDimension, final int columnDimension)
+    FieldMatrix<T> createMatrix(int rowDimension, int columnDimension)
             throws MathIllegalArgumentException;
 
     /**
@@ -107,6 +112,38 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
     FieldMatrix<T> multiply(FieldMatrix<T> m) throws MathIllegalArgumentException;
 
     /**
+     * Returns the result of postmultiplying {@code this} by {@code m^T}.
+     * <p>
+     * This is equivalent to call {@link #multiply(FieldMatrix) multiply}(m.{@link #transpose()}),
+     * but some implementations may avoid building the intermediate transposed matrix.
+     * </p>
+     *
+     * @param m matrix to first transpose and second postmultiply by
+     * @return {@code this * m^T}
+     * @throws MathIllegalArgumentException if
+     *                                      {@code columnDimension(this) != columnDimension(m)}
+     * @since 1.3
+     */
+     FieldMatrix<T> multiplyTransposed(final FieldMatrix<T> m)
+            throws MathIllegalArgumentException;
+
+    /**
+     * Returns the result of postmultiplying {@code this^T} by {@code m}.
+     * <p>
+     * This is equivalent to call {@link #transpose()}.{@link #multiply(FieldMatrix) multiply(m)},
+     * but some implementations may avoid building the intermediate transposed matrix.
+     * </p>
+     *
+     * @param m matrix to postmultiply by
+     * @return {@code this^T * m}
+     * @throws MathIllegalArgumentException if
+     *                                      {@code columnDimension(this) != columnDimension(m)}
+     * @since 1.3
+     */
+     FieldMatrix<T> transposeMultiply(final FieldMatrix<T> m)
+            throws MathIllegalArgumentException;
+
+    /**
      * Premultiply this matrix by {@code m}.
      *
      * @param m Matrix to premultiply by.
@@ -126,7 +163,7 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
      * @throws MathIllegalArgumentException if {@code p < 0}
      * @throws MathIllegalArgumentException if {@code this matrix} is not square
      */
-    FieldMatrix<T> power(final int p) throws MathIllegalArgumentException;
+    FieldMatrix<T> power(int p) throws MathIllegalArgumentException;
 
     /**
      * Returns matrix entries as a two-dimensional array.
@@ -213,7 +250,7 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
      * <p>
      * Example:<br>
      * Starting with
-     * <p>
+     *
      * <pre>
      * 1  2  3  4
      * 5  6  7  8
@@ -222,13 +259,13 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
      * <p>
      * and <code>subMatrix = {{3, 4} {5,6}}</code>, invoking
      * <code>setSubMatrix(subMatrix,1,1))</code> will result in
-     * <p>
+     *
      * <pre>
      * 1  2  3  4
      * 5  3  4  8
      * 9  5  6  2
      * </pre>
-     * <p>
+     *
      * </p>
      *
      * @param subMatrix Array containing the submatrix replacement data.

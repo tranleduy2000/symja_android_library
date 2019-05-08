@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.analysis.MultivariateMatrixFunction;
@@ -36,12 +41,14 @@ import org.hipparchus.util.Pair;
 
 /**
  * A Factory for creating {@link LeastSquaresProblem}s.
- *
  */
 public class LeastSquaresFactory {
 
-    /** Prevent instantiation. */
-    private LeastSquaresFactory() {}
+    /**
+     * Prevent instantiation.
+     */
+    private LeastSquaresFactory() {
+    }
 
     /**
      * Create a {@link org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem}
@@ -55,10 +62,9 @@ public class LeastSquaresFactory {
      * @param maxEvaluations the maximum number of times to evaluate the model
      * @param maxIterations  the maximum number to times to iterate in the algorithm
      * @param lazyEvaluation Whether the call to {@link Evaluation#evaluate(RealVector)}
-     * will defer the evaluation until access to the value is requested.
+     *                       will defer the evaluation until access to the value is requested.
      * @param paramValidator Model parameters validator.
      * @return the specified General Least Squares problem.
-     *
      */
     public static LeastSquaresProblem create(final MultivariateJacobianFunction model,
                                              final RealVector observed,
@@ -70,13 +76,13 @@ public class LeastSquaresFactory {
                                              final boolean lazyEvaluation,
                                              final ParameterValidator paramValidator) {
         final LeastSquaresProblem p = new LocalLeastSquaresProblem(model,
-                                                                   observed,
-                                                                   start,
-                                                                   checker,
-                                                                   maxEvaluations,
-                                                                   maxIterations,
-                                                                   lazyEvaluation,
-                                                                   paramValidator);
+                observed,
+                start,
+                checker,
+                maxEvaluations,
+                maxIterations,
+                lazyEvaluation,
+                paramValidator);
         if (weight != null) {
             return weightMatrix(p, weight);
         } else {
@@ -103,14 +109,14 @@ public class LeastSquaresFactory {
                                              final int maxEvaluations,
                                              final int maxIterations) {
         return create(model,
-                      observed,
-                      start,
-                      null,
-                      checker,
-                      maxEvaluations,
-                      maxIterations,
-                      false,
-                      null);
+                observed,
+                start,
+                null,
+                checker,
+                maxEvaluations,
+                maxIterations,
+                false,
+                null);
     }
 
     /**
@@ -134,12 +140,12 @@ public class LeastSquaresFactory {
                                              final int maxEvaluations,
                                              final int maxIterations) {
         return weightMatrix(create(model,
-                                   observed,
-                                   start,
-                                   checker,
-                                   maxEvaluations,
-                                   maxIterations),
-                            weight);
+                observed,
+                start,
+                checker,
+                maxEvaluations,
+                maxIterations),
+                weight);
     }
 
     /**
@@ -170,12 +176,12 @@ public class LeastSquaresFactory {
                                              final int maxEvaluations,
                                              final int maxIterations) {
         return create(model(model, jacobian),
-                      new ArrayRealVector(observed, false),
-                      new ArrayRealVector(start, false),
-                      weight,
-                      checker,
-                      maxEvaluations,
-                      maxIterations);
+                new ArrayRealVector(observed, false),
+                new ArrayRealVector(start, false),
+                weight,
+                checker,
+                maxEvaluations,
+                maxIterations);
     }
 
     /**
@@ -184,7 +190,7 @@ public class LeastSquaresFactory {
      * @param problem the unweighted problem
      * @param weights the matrix of weights
      * @return a new {@link LeastSquaresProblem} with the weights applied. The original
-     *         {@code problem} is not modified.
+     * {@code problem} is not modified.
      */
     public static LeastSquaresProblem weightMatrix(final LeastSquaresProblem problem,
                                                    final RealMatrix weights) {
@@ -204,7 +210,7 @@ public class LeastSquaresFactory {
      * @param problem the unweighted problem
      * @param weights the diagonal of the weight matrix
      * @return a new {@link LeastSquaresProblem} with the weights applied. The original
-     *         {@code problem} is not modified.
+     * {@code problem} is not modified.
      */
     public static LeastSquaresProblem weightDiagonal(final LeastSquaresProblem problem,
                                                      final RealVector weights) {
@@ -301,20 +307,20 @@ public class LeastSquaresFactory {
     /**
      * Combine a {@link MultivariateVectorFunction} with a {@link
      * MultivariateMatrixFunction} to produce a {@link MultivariateJacobianFunction}.
-     *
-     * @param value    the vector value function
-     * @param jacobian the Jacobian function
-     * @return a function that computes both at the same time
      */
     private static class LocalValueAndJacobianFunction
-        implements ValueAndJacobianFunction {
-        /** Model. */
+            implements ValueAndJacobianFunction {
+        /**
+         * Model.
+         */
         private final MultivariateVectorFunction value;
-        /** Model's Jacobian. */
+        /**
+         * Model's Jacobian.
+         */
         private final MultivariateMatrixFunction jacobian;
 
         /**
-         * @param value Model function.
+         * @param value    Model function.
          * @param jacobian Model's Jacobian function.
          */
         LocalValueAndJacobianFunction(final MultivariateVectorFunction value,
@@ -323,7 +329,9 @@ public class LeastSquaresFactory {
             this.jacobian = jacobian;
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Pair<RealVector, RealMatrix> value(final RealVector point) {
             //TODO get array from RealVector without copying?
@@ -331,16 +339,20 @@ public class LeastSquaresFactory {
 
             // Evaluate.
             return new Pair<RealVector, RealMatrix>(computeValue(p),
-                                                    computeJacobian(p));
+                    computeJacobian(p));
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public RealVector computeValue(final double[] params) {
             return new ArrayRealVector(value.value(params), false);
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public RealMatrix computeJacobian(final double[] params) {
             return new Array2DRowRealMatrix(jacobian.value(params), false);
@@ -356,15 +368,25 @@ public class LeastSquaresFactory {
             extends AbstractOptimizationProblem<Evaluation>
             implements LeastSquaresProblem {
 
-        /** Target values for the model function at optimum. */
+        /**
+         * Target values for the model function at optimum.
+         */
         private final RealVector target;
-        /** Model function. */
+        /**
+         * Model function.
+         */
         private final MultivariateJacobianFunction model;
-        /** Initial guess. */
+        /**
+         * Initial guess.
+         */
         private final RealVector start;
-        /** Whether to use lazy evaluation. */
+        /**
+         * Whether to use lazy evaluation.
+         */
         private final boolean lazyEvaluation;
-        /** Model parameters validator. */
+        /**
+         * Model parameters validator.
+         */
         private final ParameterValidator paramValidator;
 
         /**
@@ -377,7 +399,7 @@ public class LeastSquaresFactory {
          * @param maxEvaluations the allowed evaluations
          * @param maxIterations  the allowed iterations
          * @param lazyEvaluation Whether the call to {@link Evaluation#evaluate(RealVector)}
-         * will defer the evaluation until access to the value is requested.
+         *                       will defer the evaluation until access to the value is requested.
          * @param paramValidator Model parameters validator.
          */
         LocalLeastSquaresProblem(final MultivariateJacobianFunction model,
@@ -396,51 +418,59 @@ public class LeastSquaresFactory {
             this.paramValidator = paramValidator;
 
             if (lazyEvaluation &&
-                !(model instanceof ValueAndJacobianFunction)) {
+                    !(model instanceof ValueAndJacobianFunction)) {
                 // Lazy evaluation requires that value and Jacobian
                 // can be computed separately.
                 throw new MathIllegalStateException(LocalizedOptimFormats.INVALID_IMPLEMENTATION,
-                                                    model.getClass().getName());
+                        model.getClass().getName());
             }
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public int getObservationSize() {
-            return target.getDimension();
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public int getParameterSize() {
-            return start.getDimension();
-        }
-
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public RealVector getStart() {
             return start == null ? null : start.copy();
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getObservationSize() {
+            return target.getDimension();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getParameterSize() {
+            return start.getDimension();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Evaluation evaluate(final RealVector point) {
             // Copy so optimizer can change point without changing our instance.
             final RealVector p = paramValidator == null ?
-                point.copy() :
-                paramValidator.validate(point.copy());
+                    point.copy() :
+                    paramValidator.validate(point.copy());
 
             if (lazyEvaluation) {
                 return new LazyUnweightedEvaluation((ValueAndJacobianFunction) model,
-                                                    target,
-                                                    p);
+                        target,
+                        p);
             } else {
                 // Evaluate value and jacobian in one function call.
                 final Pair<RealVector, RealMatrix> value = model.value(p);
                 return new UnweightedEvaluation(value.getFirst(),
-                                                value.getSecond(),
-                                                target,
-                                                p);
+                        value.getSecond(),
+                        target,
+                        p);
             }
         }
 
@@ -448,11 +478,17 @@ public class LeastSquaresFactory {
          * Container with the model evaluation at a particular point.
          */
         private static class UnweightedEvaluation extends AbstractEvaluation {
-            /** Point of evaluation. */
+            /**
+             * Point of evaluation.
+             */
             private final RealVector point;
-            /** Derivative at point. */
+            /**
+             * Derivative at point.
+             */
             private final RealMatrix jacobian;
-            /** Computed residuals. */
+            /**
+             * Computed residuals.
+             */
             private final RealVector residuals;
 
             /**
@@ -473,22 +509,28 @@ public class LeastSquaresFactory {
                 this.residuals = target.subtract(values);
             }
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public RealMatrix getJacobian() {
                 return jacobian;
             }
 
-            /** {@inheritDoc} */
-            @Override
-            public RealVector getPoint() {
-                return point;
-            }
-
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public RealVector getResiduals() {
                 return residuals;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public RealVector getPoint() {
+                return point;
             }
         }
 
@@ -496,11 +538,17 @@ public class LeastSquaresFactory {
          * Container with the model <em>lazy</em> evaluation at a particular point.
          */
         private static class LazyUnweightedEvaluation extends AbstractEvaluation {
-            /** Point of evaluation. */
+            /**
+             * Point of evaluation.
+             */
             private final RealVector point;
-            /** Model and Jacobian functions. */
+            /**
+             * Model and Jacobian functions.
+             */
             private final ValueAndJacobianFunction model;
-            /** Target values for the model function at optimum. */
+            /**
+             * Target values for the model function at optimum.
+             */
             private final RealVector target;
 
             /**
@@ -520,22 +568,28 @@ public class LeastSquaresFactory {
                 this.target = target;
             }
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public RealMatrix getJacobian() {
                 return model.computeJacobian(point.toArray());
             }
 
-            /** {@inheritDoc} */
-            @Override
-            public RealVector getPoint() {
-                return point;
-            }
-
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public RealVector getResiduals() {
                 return target.subtract(model.computeValue(point.toArray()));
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public RealVector getPoint() {
+                return point;
             }
         }
     }

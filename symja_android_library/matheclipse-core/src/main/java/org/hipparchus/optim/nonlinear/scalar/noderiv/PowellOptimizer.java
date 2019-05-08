@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -49,10 +54,9 @@ import org.hipparchus.util.FastMath;
  * MultivariateFunctionMappingAdapter} or
  * {@link org.hipparchus.optim.nonlinear.scalar.MultivariateFunctionPenaltyAdapter
  * MultivariateFunctionPenaltyAdapter}.
- *
  */
 public class PowellOptimizer
-    extends MultivariateOptimizer {
+        extends MultivariateOptimizer {
     /**
      * Minimum relative tolerance.
      */
@@ -78,8 +82,8 @@ public class PowellOptimizer
      * The internal line search tolerances are set to the square-root of their
      * corresponding value in the multivariate optimizer.
      *
-     * @param rel Relative threshold.
-     * @param abs Absolute threshold.
+     * @param rel     Relative threshold.
+     * @param abs     Absolute threshold.
      * @param checker Convergence checker.
      * @throws MathIllegalArgumentException if {@code abs <= 0}.
      * @throws MathIllegalArgumentException if {@code rel < 2 * Math.ulp(1d)}.
@@ -95,8 +99,8 @@ public class PowellOptimizer
      * in addition to the parameters that control the default convergence
      * checking procedure and the line search tolerances.
      *
-     * @param rel Relative threshold for this optimizer.
-     * @param abs Absolute threshold for this optimizer.
+     * @param rel     Relative threshold for this optimizer.
+     * @param abs     Absolute threshold for this optimizer.
      * @param lineRel Relative threshold for the internal line search optimizer.
      * @param lineAbs Absolute threshold for the internal line search optimizer.
      * @param checker Convergence checker.
@@ -112,20 +116,20 @@ public class PowellOptimizer
 
         if (rel < MIN_RELATIVE_TOLERANCE) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL,
-                                                   rel, MIN_RELATIVE_TOLERANCE);
+                    rel, MIN_RELATIVE_TOLERANCE);
         }
         if (abs <= 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL_BOUND_EXCLUDED,
-                                                   abs, 0);
+                    abs, 0);
         }
         relativeThreshold = rel;
         absoluteThreshold = abs;
 
         // Create the line search optimizer.
         line = new LineSearch(this,
-                              lineRel,
-                              lineAbs,
-                              1d);
+                lineRel,
+                lineAbs,
+                1d);
     }
 
     /**
@@ -147,8 +151,8 @@ public class PowellOptimizer
     /**
      * Builds an instance with the default convergence checking procedure.
      *
-     * @param rel Relative threshold.
-     * @param abs Absolute threshold.
+     * @param rel     Relative threshold.
+     * @param abs     Absolute threshold.
      * @param lineRel Relative threshold for the internal line search optimizer.
      * @param lineAbs Absolute threshold for the internal line search optimizer.
      * @throws MathIllegalArgumentException if {@code abs <= 0}.
@@ -161,7 +165,9 @@ public class PowellOptimizer
         this(rel, abs, lineRel, lineAbs, null);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected PointValuePair doOptimize() {
         checkParameters();
@@ -176,7 +182,7 @@ public class PowellOptimizer
         }
 
         final ConvergenceChecker<PointValuePair> checker
-            = getConvergenceChecker();
+                = getConvergenceChecker();
 
         double[] x = guess;
         double fVal = computeObjectiveValue(x);
@@ -209,8 +215,8 @@ public class PowellOptimizer
 
             // Default convergence check.
             boolean stop = 2 * (fX - fVal) <=
-                (relativeThreshold * (FastMath.abs(fX) + FastMath.abs(fVal)) +
-                 absoluteThreshold);
+                    (relativeThreshold * (FastMath.abs(fX) + FastMath.abs(fVal)) +
+                            absoluteThreshold);
 
             final PointValuePair previous = new PointValuePair(x1, fX);
             final PointValuePair current = new PointValuePair(x, fVal);
@@ -261,8 +267,8 @@ public class PowellOptimizer
      * Compute a new point (in the original space) and a new direction
      * vector, resulting from the line search.
      *
-     * @param p Point used in the line search.
-     * @param d Direction used in the line search.
+     * @param p       Point used in the line search.
+     * @param d       Direction used in the line search.
      * @param optimum Optimum found by the line search.
      * @return a 2-element array containing the new point (at index 0) and
      * the new direction (at index 1).
@@ -287,11 +293,11 @@ public class PowellOptimizer
 
     /**
      * @throws MathRuntimeException if bounds were passed to the
-     * {@link #optimize(OptimizationData[]) optimize} method.
+     *                              {@link #optimize(OptimizationData[]) optimize} method.
      */
     private void checkParameters() {
         if (getLowerBound() != null ||
-            getUpperBound() != null) {
+                getUpperBound() != null) {
             throw new MathRuntimeException(LocalizedCoreFormats.CONSTRAINT);
         }
     }

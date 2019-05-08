@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fraction;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -116,15 +121,6 @@ public class ProperBigFractionFormat extends BigFractionFormat {
         getDenominatorFormat().format(den, toAppendTo, pos);
 
         return toAppendTo;
-    }
-
-    /**
-     * Access the whole format.
-     *
-     * @return the whole format.
-     */
-    public NumberFormat getWholeFormat() {
-        return wholeFormat;
     }
 
     /**
@@ -231,5 +227,14 @@ public class ProperBigFractionFormat extends BigFractionFormat {
 
         return new BigFraction(num, den);
 
+    }
+
+    /**
+     * Access the whole format.
+     *
+     * @return the whole format.
+     */
+    public NumberFormat getWholeFormat() {
+        return wholeFormat;
     }
 }

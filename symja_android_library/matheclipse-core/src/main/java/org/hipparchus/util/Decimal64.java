@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 import org.hipparchus.Field;
@@ -55,7 +60,9 @@ public class Decimal64 extends Number
      */
     public static final Decimal64 NAN;
 
-    /** */
+    /**
+     *
+     */
     private static final long serialVersionUID = 20120227L;
 
     static {
@@ -83,14 +90,6 @@ public class Decimal64 extends Number
     /*
      * Methods from the FieldElement interface.
      */
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Field<Decimal64> getField() {
-        return Decimal64Field.getInstance();
-    }
 
     /**
      * {@inheritDoc}
@@ -131,23 +130,23 @@ public class Decimal64 extends Number
      * {@inheritDoc}
      * <p>
      * The current implementation strictly enforces
-     * {@code this.multiply(a).equals(new Decimal64(this.doubleValue()
-     * * a.doubleValue()))}.
+     * {@code this.multiply(n).equals(new Decimal64(n * this.doubleValue()))}.
      */
     @Override
-    public Decimal64 multiply(final Decimal64 a) {
-        return new Decimal64(this.value * a.value);
+    public Decimal64 multiply(final int n) {
+        return new Decimal64(n * this.value);
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * The current implementation strictly enforces
-     * {@code this.multiply(n).equals(new Decimal64(n * this.doubleValue()))}.
+     * {@code this.multiply(a).equals(new Decimal64(this.doubleValue()
+     * * a.doubleValue()))}.
      */
     @Override
-    public Decimal64 multiply(final int n) {
-        return new Decimal64(n * this.value);
+    public Decimal64 multiply(final Decimal64 a) {
+        return new Decimal64(this.value * a.value);
     }
 
     /**
@@ -164,19 +163,11 @@ public class Decimal64 extends Number
 
     /**
      * {@inheritDoc}
-     * <p>
-     * The current implementation strictly enforces
-     * {@code this.reciprocal().equals(new Decimal64(1.0
-     * / this.doubleValue()))}.
      */
     @Override
-    public Decimal64 reciprocal() {
-        return new Decimal64(1.0 / this.value);
+    public Field<Decimal64> getField() {
+        return Decimal64Field.getInstance();
     }
-
-    /*
-     * Methods from the Number abstract class
-     */
 
     /**
      * {@inheritDoc}
@@ -188,14 +179,26 @@ public class Decimal64 extends Number
         return (byte) value;
     }
 
+    /*
+     * Methods from the Number abstract class
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double doubleValue() {
+        return value;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
-     * The current implementation performs casting to a {@code short}.
+     * The current implementation performs casting to a {@code float}.
      */
     @Override
-    public short shortValue() {
-        return (short) value;
+    public float floatValue() {
+        return (float) value;
     }
 
     /**
@@ -221,24 +224,12 @@ public class Decimal64 extends Number
     /**
      * {@inheritDoc}
      * <p>
-     * The current implementation performs casting to a {@code float}.
+     * The current implementation performs casting to a {@code short}.
      */
     @Override
-    public float floatValue() {
-        return (float) value;
+    public short shortValue() {
+        return (short) value;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double doubleValue() {
-        return value;
-    }
-
-    /*
-     * Methods from the Comparable interface.
-     */
 
     /**
      * {@inheritDoc}
@@ -255,7 +246,7 @@ public class Decimal64 extends Number
     }
 
     /*
-     * Methods from the Object abstract class.
+     * Methods from the Comparable interface.
      */
 
     /**
@@ -270,6 +261,10 @@ public class Decimal64 extends Number
         }
         return false;
     }
+
+    /*
+     * Methods from the Object abstract class.
+     */
 
     /**
      * {@inheritDoc}
@@ -298,10 +293,6 @@ public class Decimal64 extends Number
         return Double.toString(value);
     }
 
-    /*
-     * Methods inspired by the Double class.
-     */
-
     /**
      * Returns {@code true} if {@code this} double precision number is infinite
      * ({@link Double#POSITIVE_INFINITY} or {@link Double#NEGATIVE_INFINITY}).
@@ -311,6 +302,10 @@ public class Decimal64 extends Number
     public boolean isInfinite() {
         return Double.isInfinite(value);
     }
+
+    /*
+     * Methods inspired by the Double class.
+     */
 
     /**
      * Returns {@code true} if {@code this} double precision number is
@@ -460,6 +455,18 @@ public class Decimal64 extends Number
 
     /**
      * {@inheritDoc}
+     * <p>
+     * The current implementation strictly enforces
+     * {@code this.reciprocal().equals(new Decimal64(1.0
+     * / this.doubleValue()))}.
+     */
+    @Override
+    public Decimal64 reciprocal() {
+        return new Decimal64(1.0 / this.value);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Decimal64 sqrt() {
@@ -566,6 +573,12 @@ public class Decimal64 extends Number
     @Override
     public Decimal64 sin() {
         return new Decimal64(FastMath.sin(value));
+    }
+
+    @Override
+    public FieldSinCos<Decimal64> sinCos() {
+        return new FieldSinCos<>(sin(), cos());
+
     }
 
     /**

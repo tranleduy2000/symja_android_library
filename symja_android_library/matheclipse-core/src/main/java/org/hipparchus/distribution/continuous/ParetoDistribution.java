@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -140,19 +145,6 @@ public class ParetoDistribution extends AbstractRealDistribution {
     /**
      * {@inheritDoc}
      * <p>
-     * See documentation of {@link #density(double)} for computation details.
-     */
-    @Override
-    public double logDensity(double x) {
-        if (x < scale) {
-            return Double.NEGATIVE_INFINITY;
-        }
-        return FastMath.log(scale) * shape - FastMath.log(x) * (shape + 1) + FastMath.log(shape);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
      * For scale {@code k}, and shape {@code α} of this distribution, the CDF is given by
      * <ul>
      * <li>{@code 0} if {@code x < k},</li>
@@ -236,5 +228,18 @@ public class ParetoDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * See documentation of {@link #density(double)} for computation details.
+     */
+    @Override
+    public double logDensity(double x) {
+        if (x < scale) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        return FastMath.log(scale) * shape - FastMath.log(x) * (shape + 1) + FastMath.log(shape);
     }
 }

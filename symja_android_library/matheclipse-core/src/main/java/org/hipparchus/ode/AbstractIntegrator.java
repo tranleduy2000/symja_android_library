@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 
-package org.hipparchus.ode;
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 
-import com.duy.util.PriorityQueue;
+package org.hipparchus.ode;
 
 import org.hipparchus.analysis.UnivariateFunction;
 import org.hipparchus.analysis.solvers.BracketedUnivariateSolver;
 import org.hipparchus.analysis.solvers.BracketingNthOrderBrentSolver;
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.events.Action;
@@ -38,12 +42,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
  * Base class managing common boilerplate for all integrators.
  */
-public abstract class AbstractIntegrator extends ODEIntegratorImpl implements ODEIntegrator {
+public abstract class AbstractIntegrator implements ODEIntegrator {
 
     /**
      * Default relative accuracy.
@@ -177,7 +182,7 @@ public abstract class AbstractIntegrator extends ODEIntegratorImpl implements OD
      */
     @Override
     public Collection<ODEEventHandler> getEventHandlers() {
-        final List<ODEEventHandler> list = new ArrayList<ODEEventHandler>(eventsStates.size());
+        final List<ODEEventHandler> list = new ArrayList<>(eventsStates.size());
         for (EventState state : eventsStates) {
             list.add(state.getEventHandler());
         }
@@ -199,6 +204,14 @@ public abstract class AbstractIntegrator extends ODEIntegratorImpl implements OD
     @Deprecated
     public double getCurrentStepStart() {
         return stepStart.getTime();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ODEStateAndDerivative getStepStart() {
+        return stepStart;
     }
 
     /**
@@ -231,6 +244,44 @@ public abstract class AbstractIntegrator extends ODEIntegratorImpl implements OD
     @Override
     public int getEvaluations() {
         return evaluations.getCount();
+    }
+
+    @Override
+    public ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations, ODEState initialState, double finalTime) throws MathIllegalArgumentException, MathIllegalStateException {
+        return integrate(new ExpandableODE(equations), initialState, finalTime);
+
+    }
+
+    @Override
+    public double integrate(OrdinaryDifferentialEquation equations, double t0, double[] y0, double t, double[] y) throws MathIllegalArgumentException, MathIllegalStateException {
+        if (y0.length != equations.getDimension()) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    y0.length, equations.getDimension());
+        }
+        if (y.length != equations.getDimension()) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    y.length, equations.getDimension());
+        }
+
+        // prepare expandable stateful equations
+        final ExpandableODE expandableODE = new ExpandableODE(equations);
+
+        // perform integration
+        final ODEState initialState = new ODEState(t0, y0);
+        final ODEStateAndDerivative finalState = integrate(expandableODE, initialState, t);
+
+        // extract results back from the stateful equations
+        System.arraycopy(finalState.getPrimaryState(), 0, y, 0, y.length);
+        return finalState.getTime();
+    }
+
+    /**
+     * Set current step start.
+     *
+     * @param stepStart step start
+     */
+    protected void setStepStart(final ODEStateAndDerivative stepStart) {
+        this.stepStart = stepStart;
     }
 
     /**
@@ -339,6 +390,8 @@ public abstract class AbstractIntegrator extends ODEIntegratorImpl implements OD
 
         ODEStateAndDerivative previousState = interpolator.getGlobalPreviousState();
         final ODEStateAndDerivative currentState = interpolator.getGlobalCurrentState();
+        AbstractODEStateInterpolator restricted = interpolator;
+
 
         // initialize the events states if needed
         if (!statesInitialized) {
@@ -358,100 +411,116 @@ public abstract class AbstractIntegrator extends ODEIntegratorImpl implements OD
             }
         });
 
-        for (final EventState state : eventsStates) {
-            if (state.evaluateStep(interpolator)) {
-                // the event occurs during the current step
-                occurringEvents.add(state);
-            }
-        }
-
-        AbstractODEStateInterpolator restricted = interpolator;
-
+        resetOccurred = false;
+        boolean doneWithStep = false;
+        resetEvents:
         do {
 
-            eventLoop:
-            while (!occurringEvents.isEmpty()) {
-
-                // handle the chronologically first event
-                final EventState currentEvent = occurringEvents.poll();
-
-                // get state at event time
-                ODEStateAndDerivative eventState = restricted.getInterpolatedState(currentEvent.getEventTime());
-
-                // restrict the interpolator to the first part of the step, up to the event
-                restricted = restricted.restrictStep(previousState, eventState);
-
-                // try to advance all event states to current time
-                for (final EventState state : eventsStates) {
-                    if (state != currentEvent && state.tryAdvance(eventState, interpolator)) {
-                        // we need to handle another event first
-                        // remove event we just updated to prevent heap corruption
-                        occurringEvents.remove(state);
-                        // add it back to update its position in the heap
-                        occurringEvents.add(state);
-                        // re-queue the event we were processing
-                        occurringEvents.add(currentEvent);
-                        continue eventLoop;
-                    }
-                }
-                // all event detectors agree we can advance to the current event time
-
-                final EventOccurrence occurrence = currentEvent.doEvent(eventState);
-                final Action action = occurrence.getAction();
-                isLastStep = action == Action.STOP;
-
-                if (isLastStep) {
-                    // ensure the event is after the root if it is returned STOP
-                    // this lets the user integrate to a STOP event and then restart
-                    // integration from the same time.
-                    eventState = interpolator.getInterpolatedState(occurrence.getStopTime());
-                    restricted = interpolator.restrictStep(previousState, eventState);
-                }
-
-                // handle the first part of the step, up to the event
-                for (final ODEStepHandler handler : stepHandlers) {
-                    handler.handleStep(restricted, isLastStep);
-                }
-
-                if (isLastStep) {
-                    // the event asked to stop integration
-                    return eventState;
-                }
-
-                resetOccurred = false;
-                if (action == Action.RESET_DERIVATIVES || action == Action.RESET_STATE) {
-                    // some event handler has triggered changes that
-                    // invalidate the derivatives, we need to recompute them
-                    final ODEState newState = occurrence.getNewState();
-                    final double[] y = newState.getCompleteState();
-                    final double[] yDot = computeDerivatives(newState.getTime(), y);
-                    resetOccurred = true;
-                    return equations.getMapper().mapStateAndDerivative(newState.getTime(), y, yDot);
-                }
-                // at this point we know action == Action.CONTINUE
-
-                // prepare handling of the remaining part of the step
-                previousState = eventState;
-                restricted = restricted.restrictStep(eventState, currentState);
-
-                // check if the same event occurs again in the remaining part of the step
-                if (currentEvent.evaluateStep(restricted)) {
-                    // the event occurs during the current step
-                    occurringEvents.add(currentEvent);
-                }
-
-            }
-
-            // last part of the step, after the last event
-            // may be a new event here if the last event modified the g function of
-            // another event detector.
+            // Evaluate all event detectors for events
+            occurringEvents.clear();
             for (final EventState state : eventsStates) {
-                if (state.tryAdvance(currentState, interpolator)) {
+                if (state.evaluateStep(restricted)) {
+                    // the event occurs during the current step
                     occurringEvents.add(state);
                 }
             }
 
-        } while (!occurringEvents.isEmpty());
+            do {
+
+                eventLoop:
+                while (!occurringEvents.isEmpty()) {
+
+                    // handle the chronologically first event
+                    final EventState currentEvent = occurringEvents.poll();
+
+                    // get state at event time
+                    ODEStateAndDerivative eventState = restricted.getInterpolatedState(currentEvent.getEventTime());
+
+                    // restrict the interpolator to the first part of the step, up to the event
+                    restricted = restricted.restrictStep(previousState, eventState);
+
+                    // try to advance all event states to current time
+                    for (final EventState state : eventsStates) {
+                        if (state != currentEvent && state.tryAdvance(eventState, interpolator)) {
+                            // we need to handle another event first
+                            // remove event we just updated to prevent heap corruption
+                            occurringEvents.remove(state);
+                            // add it back to update its position in the heap
+                            occurringEvents.add(state);
+                            // re-queue the event we were processing
+                            occurringEvents.add(currentEvent);
+                            continue eventLoop;
+                        }
+                    }
+                    // all event detectors agree we can advance to the current event time
+
+                    final EventOccurrence occurrence = currentEvent.doEvent(eventState);
+                    final Action action = occurrence.getAction();
+                    isLastStep = action == Action.STOP;
+
+                    if (isLastStep) {
+                        // ensure the event is after the root if it is returned STOP
+                        // this lets the user integrate to a STOP event and then restart
+                        // integration from the same time.
+                        eventState = interpolator.getInterpolatedState(occurrence.getStopTime());
+                        restricted = interpolator.restrictStep(previousState, eventState);
+                    }
+
+                    // handle the first part of the step, up to the event
+                    for (final ODEStepHandler handler : stepHandlers) {
+                        handler.handleStep(restricted, isLastStep);
+                    }
+
+                    if (isLastStep) {
+                        // the event asked to stop integration
+                        return eventState;
+                    }
+
+                    if (action == Action.RESET_DERIVATIVES || action == Action.RESET_STATE) {
+                        // some event handler has triggered changes that
+                        // invalidate the derivatives, we need to recompute them
+                        final ODEState newState = occurrence.getNewState();
+                        final double[] y = newState.getCompleteState();
+                        final double[] yDot = computeDerivatives(newState.getTime(), y);
+                        resetOccurred = true;
+                        return equations.getMapper().mapStateAndDerivative(newState.getTime(), y, yDot);
+                    }
+                    // at this point action == Action.CONTINUE or Action.RESET_EVENTS
+
+                    // prepare handling of the remaining part of the step
+                    previousState = eventState;
+                    restricted = restricted.restrictStep(eventState, currentState);
+
+                    if (action == Action.RESET_EVENTS) {
+                        continue resetEvents;
+                    }
+
+                    // at this point action == Action.CONTINUE
+                    // check if the same event occurs again in the remaining part of the step
+                    if (currentEvent.evaluateStep(restricted)) {
+                        // the event occurs during the current step
+                        occurringEvents.add(currentEvent);
+                    }
+
+                }
+
+                // last part of the step, after the last event. Advance all event
+                // detectors to the end of the step. Should never find new events unless
+                // a previous event modified the g function of another event detector when
+                // it returned Action.CONTINUE. Detecting such events here is unreliable
+                // and RESET_EVENTS should be used instead. Other option is to replace
+                // tryAdvance(...) with a doAdvance(...) that throws an exception when
+                // the g function sign is not as expected.
+                for (final EventState state : eventsStates) {
+                    if (state.tryAdvance(currentState, interpolator)) {
+                        occurringEvents.add(state);
+                    }
+                }
+
+            } while (!occurringEvents.isEmpty());
+
+            doneWithStep = true;
+        } while (!doneWithStep);
 
         isLastStep = isLastStep || FastMath.abs(currentState.getTime() - tEnd) <= FastMath.ulp(tEnd);
 
@@ -511,23 +580,6 @@ public abstract class AbstractIntegrator extends ODEIntegratorImpl implements OD
      */
     protected void setStepSize(final double stepSize) {
         this.stepSize = stepSize;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ODEStateAndDerivative getStepStart() {
-        return stepStart;
-    }
-
-    /**
-     * Set current step start.
-     *
-     * @param stepStart step start
-     */
-    protected void setStepStart(final ODEStateAndDerivative stepStart) {
-        this.stepStart = stepStart;
     }
 
     /**

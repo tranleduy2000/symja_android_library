@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.regression;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -115,7 +120,7 @@ public class RegressionResults implements Serializable {
      *                              are copied and the RegressionResults become mutable
      */
     public RegressionResults(
-            final double[] parameters, final double[][] varcov,
+            final double[] parameters, final double[][] varcov, // NOPMD - storing a reference to the array is controlled by a user-supplied parameter
             final boolean isSymmetricCompressed,
             final long nobs, final int rank,
             final double sumy, final double sumysq, final double sse,
@@ -162,7 +167,7 @@ public class RegressionResults implements Serializable {
 
     /**
      * <p>Returns the parameter estimate for the regressor at the given index.</p>
-     * <p>
+     *
      * <p>A redundant regressor will have its redundancy flag set, as well as
      * a parameters estimated equal to {@code Double.NaN}</p>
      *
@@ -181,9 +186,9 @@ public class RegressionResults implements Serializable {
 
     /**
      * <p>Returns a copy of the regression parameters estimates.</p>
-     * <p>
+     *
      * <p>The parameter estimates are returned in the natural order of the data.</p>
-     * <p>
+     *
      * <p>A redundant regressor will have its redundancy flag set, as will
      * a parameter estimate equal to {@code Double.NaN}.</p>
      *
@@ -222,7 +227,7 @@ public class RegressionResults implements Serializable {
      * <p>Returns the <a href="http://www.xycoon.com/standerrorb(1).htm">standard
      * error of the parameter estimates</a>,
      * usually denoted s(b<sub>i</sub>).</p>
-     * <p>
+     *
      * <p>If there are problems with an ill conditioned design matrix then the regressor
      * which is redundant will be assigned <code>Double.NaN</code>. </p>
      *
@@ -247,7 +252,7 @@ public class RegressionResults implements Serializable {
 
     /**
      * <p>Returns the covariance between regression parameters i and j.</p>
-     * <p>
+     *
      * <p>If there are problems with an ill conditioned design matrix then the covariance
      * which involves redundant columns will be assigned {@code Double.NaN}. </p>
      *
@@ -268,7 +273,7 @@ public class RegressionResults implements Serializable {
 
     /**
      * <p>Returns the number of parameters estimated in the model.</p>
-     * <p>
+     *
      * <p>This is the maximum number of regressors, some techniques may drop
      * redundant parameters</p>
      *
@@ -292,10 +297,10 @@ public class RegressionResults implements Serializable {
 
     /**
      * <p>Returns the sum of squared deviations of the y values about their mean.</p>
-     * <p>
+     *
      * <p>This is defined as SSTO
      * <a href="http://www.xycoon.com/SumOfSquares.htm">here</a>.</p>
-     * <p>
+     *
      * <p>If {@code n < 2}, this returns {@code Double.NaN}.</p>
      *
      * @return sum of squared deviations of y values
@@ -307,10 +312,10 @@ public class RegressionResults implements Serializable {
     /**
      * <p>Returns the sum of squared deviations of the predicted y values about
      * their mean (which equals the mean of y).</p>
-     * <p>
+     *
      * <p>This is usually abbreviated SSR or SSM.  It is defined as SSM
      * <a href="http://www.xycoon.com/SumOfSquares.htm">here</a></p>
-     * <p>
+     *
      * <p><strong>Preconditions</strong>: <ul>
      * <li>At least two observations (with at least two different x values)
      * must have been added before invoking this method. If this method is
@@ -328,11 +333,11 @@ public class RegressionResults implements Serializable {
      * <p>Returns the <a href="http://www.xycoon.com/SumOfSquares.htm">
      * sum of squared errors</a> (SSE) associated with the regression
      * model.</p>
-     * <p>
+     *
      * <p>The return value is constrained to be non-negative - i.e., if due to
      * rounding errors the computational formula returns a negative result,
      * 0 is returned.</p>
-     * <p>
+     *
      * <p><strong>Preconditions</strong>: <ul>
      * <li>numberOfParameters data pairs
      * must have been added before invoking this method. If this method is
@@ -349,7 +354,7 @@ public class RegressionResults implements Serializable {
     /**
      * <p>Returns the sum of squared errors divided by the degrees of freedom,
      * usually abbreviated MSE.</p>
-     * <p>
+     *
      * <p>If there are fewer than <strong>numberOfParameters + 1</strong> data pairs in the model,
      * or if there is no variation in <code>x</code>, this returns
      * <code>Double.NaN</code>.</p>
@@ -364,7 +369,7 @@ public class RegressionResults implements Serializable {
      * <p>Returns the <a href="http://www.xycoon.com/coefficient1.htm">
      * coefficient of multiple determination</a>,
      * usually denoted r-square.</p>
-     * <p>
+     *
      * <p><strong>Preconditions</strong>: <ul>
      * <li>At least numberOfParameters observations (with at least numberOfParameters different x values)
      * must have been added before invoking this method. If this method is
@@ -385,7 +390,7 @@ public class RegressionResults implements Serializable {
      * where SSR is the sum of squared residuals},
      * SSTO is the total sum of squares}, n is the number
      * of observations and p is the number of parameters estimated (including the intercept).</p>
-     * <p>
+     *
      * <p>If the regression is estimated without an intercept term, what is returned is <pre>
      * <code> 1 - (1 - {@link #getRSquared()} ) * (n / (n - p)) </code>
      * </pre></p>

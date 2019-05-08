@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.NullArgumentException;
@@ -82,21 +87,20 @@ public class SecondMoment extends FirstMoment
      * {@inheritDoc}
      */
     @Override
-    public void increment(final double d) {
-        if (n < 1) {
-            m1 = m2 = 0.0;
-        }
-        super.increment(d);
-        m2 += ((double) n - 1) * dev * nDev;
+    public SecondMoment copy() {
+        return new SecondMoment(this);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void clear() {
-        super.clear();
-        m2 = Double.NaN;
+    public void increment(final double d) {
+        if (n < 1) {
+            m1 = m2 = 0.0;
+        }
+        super.increment(d);
+        m2 += ((double) n - 1) * dev * nDev;
     }
 
     /**
@@ -111,24 +115,9 @@ public class SecondMoment extends FirstMoment
      * {@inheritDoc}
      */
     @Override
-    public void aggregate(SecondMoment other) {
-        if (other.n > 0) {
-            final double oldN = n;
-            super.aggregate(other);
-            if (oldN == 0) {
-                m2 = other.m2;
-            } else {
-                m2 += other.m2 + (other.n * oldN) / n * dev * dev;
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SecondMoment copy() {
-        return new SecondMoment(this);
+    public void clear() {
+        super.clear();
+        m2 = Double.NaN;
     }
 
 }

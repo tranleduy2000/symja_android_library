@@ -14,12 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.inference;
 
 import org.hipparchus.distribution.continuous.ChiSquaredDistribution;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
+import org.hipparchus.stat.LocalizedStatFormats;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
@@ -108,26 +114,26 @@ public class GTest {
      * "http://www.cas.lancs.ac.uk/glossary_v1.1/hyptest.html#pvalue"> p-value</a>,
      * associated with a G-Test for goodness of fit</a> comparing the
      * {@code observed} frequency counts to those in the {@code expected} array.
-     * <p>
+     *
      * <p>The number returned is the smallest significance level at which one
      * can reject the null hypothesis that the observed counts conform to the
      * frequency distribution described by the expected counts.</p>
-     * <p>
+     *
      * <p>The probability returned is the tail probability beyond
      * {@link #g(double[], long[]) g(expected, observed)}
      * in the ChiSquare distribution with degrees of freedom one less than the
      * common length of {@code expected} and {@code observed}.</p>
-     * <p>
+     *
      * <p> <strong>Preconditions</strong>: <ul>
      * <li>Expected counts must all be positive. </li>
      * <li>Observed counts must all be &ge; 0. </li>
      * <li>The observed and expected arrays must have the
      * same length and their common length must be at least 2.</li>
      * </ul></p>
-     * <p>
+     *
      * <p>If any of the preconditions are not met, a
      * {@code MathIllegalArgumentException} is thrown.</p>
-     * <p>
+     *
      * <p><strong>Note:</strong>This implementation rescales the
      * {@code expected} array if necessary to ensure that the sum of the
      * expected and observed counts are equal.</p>
@@ -155,7 +161,7 @@ public class GTest {
      * Returns the intrinsic (Hardy-Weinberg proportions) p-Value, as described
      * in p64-69 of McDonald, J.H. 2009. Handbook of Biological Statistics
      * (2nd ed.). Sparky House Publishing, Baltimore, Maryland.
-     * <p>
+     *
      * <p> The probability returned is the tail probability beyond
      * {@link #g(double[], long[]) g(expected, observed)}
      * in the ChiSquare distribution with degrees of freedom two less than the
@@ -186,25 +192,25 @@ public class GTest {
      * frequency distribution described by the expected counts, with
      * significance level {@code alpha}. Returns true iff the null
      * hypothesis can be rejected with {@code 100 * (1 - alpha)} percent confidence.
-     * <p>
+     *
      * <p><strong>Example:</strong><br> To test the hypothesis that
      * {@code observed} follows {@code expected} at the 99% level,
      * use </p><p>
      * {@code gTest(expected, observed, 0.01)}</p>
-     * <p>
+     *
      * <p>Returns true iff {@link #gTest(double[], long[])
-     * gTestGoodnessOfFitPValue(expected, observed)} < alpha</p>
-     * <p>
+     * gTestGoodnessOfFitPValue(expected, observed)} &gt; alpha</p>
+     *
      * <p><strong>Preconditions</strong>: <ul>
      * <li>Expected counts must all be positive. </li>
      * <li>Observed counts must all be &ge; 0. </li>
      * <li>The observed and expected arrays must have the same length and their
      * common length must be at least 2.
      * <li> {@code 0 < alpha < 0.5} </li></ul></p>
-     * <p>
+     *
      * <p>If any of the preconditions are not met, a
      * {@code MathIllegalArgumentException} is thrown.</p>
-     * <p>
+     *
      * <p><strong>Note:</strong>This implementation rescales the
      * {@code expected} array if necessary to ensure that the sum of the
      * expected and observed counts are equal.</p>
@@ -229,7 +235,7 @@ public class GTest {
             throws MathIllegalArgumentException, MathIllegalStateException {
 
         if ((alpha <= 0) || (alpha > 0.5)) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
+            throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL,
                     alpha, 0, 0.5);
         }
         return gTest(expected, observed) < alpha;
@@ -296,9 +302,9 @@ public class GTest {
      * {@code observed1} and {@code observed2}. The sums of frequency
      * counts in the two samples are not required to be the same. The formula
      * used to compute the test statistic is </p>
-     * <p>
+     *
      * <p>{@code 2 * totalSum * [H(rowSums) + H(colSums) - H(k)]}</p>
-     * <p>
+     *
      * <p> where {@code H} is the
      * <a href="http://en.wikipedia.org/wiki/Entropy_%28information_theory%29">
      * Shannon Entropy</a> of the random variable formed by viewing the elements
@@ -306,17 +312,17 @@ public class GTest {
      * {@code k} is a matrix with rows {@code [observed1, observed2]}; <br/>
      * {@code rowSums, colSums} are the row/col sums of {@code k}; <br>
      * and {@code totalSum} is the overall sum of all entries in {@code k}.</p>
-     * <p>
+     *
      * <p>This statistic can be used to perform a G test evaluating the null
      * hypothesis that both observed counts are independent </p>
-     * <p>
+     *
      * <p> <strong>Preconditions</strong>: <ul>
      * <li>Observed counts must be non-negative. </li>
      * <li>Observed counts for a specific bin must not both be zero. </li>
      * <li>Observed counts for a specific sample must not all be  0. </li>
      * <li>The arrays {@code observed1} and {@code observed2} must have
      * the same length and their common length must be at least 2. </li></ul></p>
-     * <p>
+     *
      * <p>If any of the preconditions are not met, a
      * {@code MathIllegalArgumentException} is thrown.</p>
      *
@@ -377,17 +383,17 @@ public class GTest {
     /**
      * Calculates the root log-likelihood ratio for 2 state Datasets. See
      * {@link #gDataSetsComparison(long[], long[])}.
-     * <p>
+     *
      * <p>Given two events A and B, let k11 be the number of times both events
      * occur, k12 the incidence of B without A, k21 the count of A without B,
      * and k22 the number of times neither A nor B occurs.  What is returned
      * by this method is </p>
-     * <p>
+     *
      * <p>{@code (sgn) sqrt(gValueDataSetsComparison({k11, k12}, {k21, k22})}</p>
-     * <p>
+     *
      * <p>where {@code sgn} is -1 if {@code k11 / (k11 + k12) < k21 / (k21 + k22))};<br/>
      * 1 otherwise.</p>
-     * <p>
+     *
      * <p>Signed root LLR has two advantages over the basic LLR: a) it is positive
      * where k11 is bigger than expected, negative where it is lower b) if there is
      * no difference it is asymptotically normally distributed. This allows one
@@ -420,16 +426,16 @@ public class GTest {
      * p-value</a>, associated with a G-Value (Log-Likelihood Ratio) for two
      * sample test comparing bin frequency counts in {@code observed1} and
      * {@code observed2}.</p>
-     * <p>
+     *
      * <p>The number returned is the smallest significance level at which one
      * can reject the null hypothesis that the observed counts conform to the
      * same distribution. </p>
-     * <p>
+     *
      * <p>See {@link #gTest(double[], long[])} for details
      * on how the p-value is computed.  The degrees of of freedom used to
      * perform the test is one less than the common length of the input observed
      * count arrays.</p>
-     * <p>
+     *
      * <p><strong>Preconditions</strong>:
      * <ul> <li>Observed counts must be non-negative. </li>
      * <li>Observed counts for a specific bin must not both be zero. </li>
@@ -478,7 +484,7 @@ public class GTest {
      * the observed significance level is computed. The degrees of of freedom used
      * to perform the test is one less than the common length of the input observed
      * count arrays. </p>
-     * <p>
+     *
      * <strong>Preconditions</strong>: <ul>
      * <li>Observed counts must be non-negative. </li>
      * <li>Observed counts for a specific bin must not both be zero. </li>
@@ -486,7 +492,7 @@ public class GTest {
      * <li>The arrays {@code observed1} and {@code observed2} must
      * have the same length and their common length must be at least 2. </li>
      * <li>{@code 0 < alpha < 0.5} </li></ul></p>
-     * <p>
+     *
      * <p>If any of the preconditions are not met, a
      * {@code MathIllegalArgumentException} is thrown.</p>
      *
@@ -515,7 +521,7 @@ public class GTest {
 
         if (alpha <= 0 || alpha > 0.5) {
             throw new MathIllegalArgumentException(
-                    LocalizedCoreFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL, alpha, 0, 0.5);
+                    LocalizedStatFormats.OUT_OF_BOUND_SIGNIFICANCE_LEVEL, alpha, 0, 0.5);
         }
         return gTestDataSetsComparison(observed1, observed2) < alpha;
     }

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim;
 
 import org.hipparchus.util.Incrementor;
@@ -23,10 +28,10 @@ import org.hipparchus.util.Incrementor;
  * for counting the number of evaluations of the objective function and the number of
  * iterations of the algorithm, and storing the convergence checker.
  *
- * @param <PAIR> Type of the point/value pair returned by the optimization algorithm.
+ * @param <P> Type of the point/value pair returned by the optimization algorithm.
  */
-public abstract class AbstractOptimizationProblem<PAIR>
-        implements OptimizationProblem<PAIR> {
+public abstract class AbstractOptimizationProblem<P>
+        implements OptimizationProblem<P> {
 
     /**
      * max evaluations
@@ -39,7 +44,7 @@ public abstract class AbstractOptimizationProblem<PAIR>
     /**
      * Convergence checker.
      */
-    private final ConvergenceChecker<PAIR> checker;
+    private final ConvergenceChecker<P> checker;
 
     /**
      * Create an {@link AbstractOptimizationProblem} from the given data.
@@ -50,7 +55,7 @@ public abstract class AbstractOptimizationProblem<PAIR>
      */
     protected AbstractOptimizationProblem(final int maxEvaluations,
                                           final int maxIterations,
-                                          final ConvergenceChecker<PAIR> checker) {
+                                          final ConvergenceChecker<P> checker) {
         this.maxEvaluations = maxEvaluations;
         this.maxIterations = maxIterations;
         this.checker = checker;
@@ -76,7 +81,7 @@ public abstract class AbstractOptimizationProblem<PAIR>
      * {@inheritDoc}
      */
     @Override
-    public ConvergenceChecker<PAIR> getConvergenceChecker() {
+    public ConvergenceChecker<P> getConvergenceChecker() {
         return checker;
     }
 }

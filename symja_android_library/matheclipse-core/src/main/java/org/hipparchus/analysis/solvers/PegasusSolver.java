@@ -15,13 +15,22 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
+
+import org.hipparchus.analysis.UnivariateFunction;
+import org.hipparchus.exception.MathIllegalArgumentException;
+import org.hipparchus.exception.MathIllegalStateException;
 
 /**
  * Implements the <em>Pegasus</em> method for root-finding (approximating
  * a zero of a univariate real function). It is a modified
  * {@link RegulaFalsiSolver <em>Regula Falsi</em>} method.
- * <p>
+ *
  * <p>Like the <em>Regula Falsi</em> method, convergence is guaranteed by
  * maintaining a bracketed solution. The <em>Pegasus</em> method however,
  * should converge much faster than the original <em>Regula Falsi</em>
@@ -31,10 +40,10 @@ package org.hipparchus.analysis.solvers;
  * the <em>Pegasus</em> method should converge faster than the
  * {@link IllinoisSolver <em>Illinois</em>} method, another <em>Regula
  * Falsi</em>-based method.</p>
- * <p>
+ *
  * <p>The <em>Pegasus</em> method assumes that the function is continuous,
  * but not necessarily smooth.</p>
- * <p>
+ *
  * <p>Implementation based on the following article: M. Dowell and P. Jarratt,
  * <em>The "Pegasus" method for computing the root of an equation</em>,
  * BIT Numerical Mathematics, volume 12, number 4, pages 503-508, Springer,
@@ -80,5 +89,11 @@ public class PegasusSolver extends BaseSecantSolver {
                          final double absoluteAccuracy,
                          final double functionValueAccuracy) {
         super(relativeAccuracy, absoluteAccuracy, functionValueAccuracy, Method.PEGASUS);
+    }
+
+    @Override
+    public Interval solveInterval(int maxEval, UnivariateFunction univariateFunction, double min, double max) throws MathIllegalArgumentException, MathIllegalStateException {
+        return this.solveInterval(maxEval, univariateFunction, min, max, min + 0.5 * (max - min));
+
     }
 }

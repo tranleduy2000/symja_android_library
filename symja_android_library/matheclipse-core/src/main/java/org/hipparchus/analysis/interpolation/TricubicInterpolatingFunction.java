@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.interpolation;
 
 import org.hipparchus.analysis.TrivariateFunction;
@@ -413,31 +418,31 @@ public class TricubicInterpolatingFunction
      * <li>f(1,0,1)</li>
      * <li>f(0,1,1)</li>
      * <li>f(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>x</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>x</sub>(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>y</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>y</sub>(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>z</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>z</sub>(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>xy</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>xy</sub>(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>xz</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>xz</sub>(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>yz</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>yz</sub>(1,1,1)</li>
-     * <p>
+     *
      * <li>f<sub>xyz</sub>(0,0,0)</li>
      * <li>... <em>(same order as above)</em></li>
      * <li>f<sub>xyz</sub>(1,1,1)</li>

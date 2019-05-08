@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 import org.hipparchus.exception.MathIllegalStateException;
@@ -46,7 +51,7 @@ public class IterationManager {
      */
     public IterationManager(final int maxIterations) {
         this.iterations = new Incrementor(maxIterations);
-        this.listeners = new CopyOnWriteArrayList<IterationListener>();
+        this.listeners = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -60,7 +65,7 @@ public class IterationManager {
     public IterationManager(final int maxIterations,
                             final Incrementor.MaxCountExceededCallback callBack) {
         this.iterations = new Incrementor(maxIterations, callBack);
-        this.listeners = new CopyOnWriteArrayList<IterationListener>();
+        this.listeners = new CopyOnWriteArrayList<>();
     }
 
     /**

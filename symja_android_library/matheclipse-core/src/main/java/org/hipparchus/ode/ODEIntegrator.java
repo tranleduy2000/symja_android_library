@@ -29,15 +29,15 @@ import java.util.Collection;
 /**
  * This interface represents a first order integrator for
  * differential equations.
- * <p>
+ *
  * <p>The classes which are devoted to solve first order differential
  * equations should implement this interface. The problems which can
  * be handled should implement the {@link
  * OrdinaryDifferentialEquation} interface.</p>
  *
  * @see OrdinaryDifferentialEquation
- * @see ODEStepHandler
- * @see ODEEventHandler
+ * @see org.hipparchus.ode.sampling.ODEStepHandler
+ * @see org.hipparchus.ode.events.ODEEventHandler
  */
 public interface ODEIntegrator {
 
@@ -78,7 +78,7 @@ public interface ODEIntegrator {
 
     /**
      * Add an event handler to the integrator.
-     * <p>
+     *
      * <p> Uses a default {@link org.hipparchus.analysis.solvers.UnivariateSolver} with an absolute accuracy equal to the
      * given convergence threshold, as root-finding algorithm to detect the state events.
      *
@@ -220,7 +220,7 @@ public interface ODEIntegrator {
      *                     (can be set to a value smaller than {@code t0} for backward integration)
      * @return final state, its time will be the same as {@code finalTime} if
      * integration reached its target, but may be different if some {@link
-     * ODEEventHandler} stops it at some point.
+     * org.hipparchus.ode.events.ODEEventHandler} stops it at some point.
      * @throws MathIllegalArgumentException if integration step is too small
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
      * @throws MathIllegalArgumentException if the location of an event cannot be bracketed
@@ -242,13 +242,13 @@ public interface ODEIntegrator {
      *                     (can be set to a value smaller than {@code t0} for backward integration)
      * @return final state, its time will be the same as {@code finalTime} if
      * integration reached its target, but may be different if some {@link
-     * ODEEventHandler} stops it at some point.
+     * org.hipparchus.ode.events.ODEEventHandler} stops it at some point.
      * @throws MathIllegalArgumentException if integration step is too small
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
      * @throws MathIllegalArgumentException if the location of an event cannot be bracketed
      */
-    ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations,
-                                    ODEState initialState, double finalTime)
+     ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations,
+                                            ODEState initialState, double finalTime)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**
@@ -267,7 +267,7 @@ public interface ODEIntegrator {
      *                  step (and hence at the end of integration), can be the same object as y0
      * @return stop time, will be the same as target time if integration reached its
      * target, but may be different if some {@link
-     * ODEEventHandler} stops it at some point.
+     * org.hipparchus.ode.events.ODEEventHandler} stops it at some point.
      * @throws MathIllegalArgumentException if arrays dimension do not match equations settings
      * @throws MathIllegalArgumentException if integration step is too small
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
@@ -275,8 +275,8 @@ public interface ODEIntegrator {
      * @deprecated as of 1.0, replaced with {@link #integrate(ExpandableODE, ODEState, double)}
      */
     @Deprecated
-    double integrate(final OrdinaryDifferentialEquation equations,
-                     final double t0, final double[] y0, final double t, final double[] y)
+     double integrate(final OrdinaryDifferentialEquation equations,
+                             final double t0, final double[] y0, final double t, final double[] y)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
 }

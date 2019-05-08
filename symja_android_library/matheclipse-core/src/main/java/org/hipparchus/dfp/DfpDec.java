@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.dfp;
 
 /**
@@ -180,17 +185,6 @@ public class DfpDec extends Dfp {
     @Override
     public Dfp newInstance(final byte sign, final byte nans) {
         return new DfpDec(getField(), sign, nans);
-    }
-
-    /**
-     * Get the number of decimal digits this class is going to represent.
-     * Default implementation returns {@link #getRadixDigits()}*4-3. Subclasses can
-     * override this to return something less.
-     *
-     * @return number of decimal digits this class is going to represent
-     */
-    protected int getDecimalDigits() {
-        return getRadixDigits() * 4 - 3;
     }
 
     /**
@@ -395,12 +389,23 @@ public class DfpDec extends Dfp {
             result = dotrap(DfpField.FLAG_INEXACT, trapName, x, result);
         }
 
-        if (result.equals(getZero()) && this.equals(getZero()) == false) {
+        if (result.equals(getZero()) && !this.equals(getZero())) {
             getField().setIEEEFlagsBits(DfpField.FLAG_INEXACT);
             result = dotrap(DfpField.FLAG_INEXACT, trapName, x, result);
         }
 
         return result;
+    }
+
+    /**
+     * Get the number of decimal digits this class is going to represent.
+     * Default implementation returns {@link #getRadixDigits()}*4-3. Subclasses can
+     * override this to return something less.
+     *
+     * @return number of decimal digits this class is going to represent
+     */
+    protected int getDecimalDigits() {
+        return getRadixDigits() * 4 - 3;
     }
 
 }

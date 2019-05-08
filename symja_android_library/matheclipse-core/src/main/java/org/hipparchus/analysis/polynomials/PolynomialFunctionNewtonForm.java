@@ -14,8 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.polynomials;
 
+import org.hipparchus.Field;
+import org.hipparchus.RealFieldElement;
+import org.hipparchus.analysis.FieldUnivariateFunction;
+import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.analysis.differentiation.DerivativeStructure;
 import org.hipparchus.analysis.differentiation.UnivariateDifferentiableFunction;
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -33,23 +42,23 @@ import org.hipparchus.util.MathUtils;
  * a[n](x-c[0])(x-c[1])...(x-c[n-1])
  * Note that the length of a[] is one more than the length of c[]</p>
  */
-public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFunction {
+public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFunction, FieldUnivariateFunction {
 
     /**
      * Centers of the Newton polynomial.
      */
-    private final double c[];
+    private final double[] c;
     /**
      * When all c[i] = 0, a[] becomes normal polynomial coefficients,
      * i.e. a[i] = coefficients[i].
      */
-    private final double a[];
+    private final double[] a;
     /**
      * The coefficients of the polynomial, ordered by degree -- i.e.
      * coefficients[0] is the constant term and coefficients[n] is the
      * coefficient of x^n where n is the degree of the polynomial.
      */
-    private double coefficients[];
+    private double[] coefficients;
     /**
      * Whether the polynomial coefficients are available.
      */
@@ -69,7 +78,7 @@ public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFun
      * @throws MathIllegalArgumentException if the size difference between
      *                                      {@code a} and {@code c} is not equal to 1.
      */
-    public PolynomialFunctionNewtonForm(double a[], double c[])
+    public PolynomialFunctionNewtonForm(double[] a, double[] c)
             throws MathIllegalArgumentException, NullArgumentException {
 
         verifyInputArray(a, c);
@@ -94,7 +103,7 @@ public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFun
      * @throws MathIllegalArgumentException if the size difference between
      *                                      {@code a} and {@code c} is not equal to 1.
      */
-    public static double evaluate(double a[], double c[], double z)
+    public static double evaluate(double[] a, double[] c, double z)
             throws MathIllegalArgumentException, NullArgumentException {
         verifyInputArray(a, c);
 
@@ -122,7 +131,7 @@ public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFun
      * @see org.hipparchus.analysis.interpolation.DividedDifferenceInterpolator#computeDividedDifference(double[],
      * double[])
      */
-    protected static void verifyInputArray(double a[], double c[])
+    protected static void verifyInputArray(double[] a, double[] c)
             throws MathIllegalArgumentException, NullArgumentException {
         MathUtils.checkNotNull(a);
         MathUtils.checkNotNull(c);
@@ -155,6 +164,33 @@ public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFun
 
         final int n = c.length;
         DerivativeStructure value = t.getFactory().constant(a[n]);
+        for (int i = n - 1; i >= 0; i--) {
+            value = t.subtract(c[i]).multiply(value).add(a[i]);
+        }
+
+        return value;
+
+    }
+
+    @Override
+    public <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
+        return new RealFieldUnivariateFunction<T>() {
+            @Override
+            public T value(T x) {
+                return PolynomialFunctionNewtonForm.this.value(x);
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends RealFieldElement<T>> T value(final T t) {
+        verifyInputArray(a, c);
+
+        final int n = c.length;
+        T value = t.getField().getZero().add(a[n]);
         for (int i = n - 1; i >= 0; i--) {
             value = t.subtract(c[i]).multiply(value).add(a[i]);
         }

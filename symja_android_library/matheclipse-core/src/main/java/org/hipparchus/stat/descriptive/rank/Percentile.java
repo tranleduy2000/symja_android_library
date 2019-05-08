@@ -14,11 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.rank;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
+import org.hipparchus.stat.LocalizedStatFormats;
 import org.hipparchus.stat.descriptive.AbstractUnivariateStatistic;
 import org.hipparchus.stat.ranking.NaNStrategy;
 import org.hipparchus.util.FastMath;
@@ -41,15 +47,15 @@ import java.util.BitSet;
  * significantly different results.  The algorithm implemented here works as follows:
  * <ol>
  * <li>Let <code>n</code> be the length of the (sorted) array and
- * <code>0 < p <= 100</code> be the desired percentile.</li>
+ * <code>0 &lt; p &lt;= 100</code> be the desired percentile.</li>
  * <li>If <code> n = 1 </code> return the unique array element (regardless of
  * the value of <code>p</code>); otherwise </li>
  * <li>Compute the estimated percentile position
  * <code> pos = p * (n + 1) / 100</code> and the difference, <code>d</code>
  * between <code>pos</code> and <code>floor(pos)</code> (i.e. the fractional
  * part of <code>pos</code>).</li>
- * <li> If <code>pos < 1</code> return the smallest element in the array.</li>
- * <li> Else if <code>pos >= n</code> return the largest element in the array.</li>
+ * <li> If <code>pos &lt; 1</code> return the smallest element in the array.</li>
+ * <li> Else if <code>pos &gt;= n</code> return the largest element in the array.</li>
  * <li> Else let <code>lower</code> be the element in position
  * <code>floor(pos)</code> in the array and let <code>upper</code> be the
  * next element in the array.  Return <code>lower + d * (upper - lower)</code>
@@ -59,7 +65,7 @@ import java.util.BitSet;
  * To compute percentiles, the data must be at least partially ordered.  Input
  * arrays are copied and recursively partitioned using an ordering definition.
  * The ordering used by <code>Arrays.sort(double[])</code> is the one determined
- * by {@link Double#compareTo(Double)}.  This ordering makes
+ * by {@link java.lang.Double#compareTo(Double)}.  This ordering makes
  * <code>Double.NaN</code> larger than any other value (including
  * <code>Double.POSITIVE_INFINITY</code>).  Therefore, for example, the median
  * (50th percentile) of
@@ -278,9 +284,8 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
             temp = new double[length - bits.cardinality()];
             int start = begin;  //start index from source array (i.e values)
             int dest = 0;       //dest index in destination array(i.e temp)
-            int nextOne = -1;   //nextOne is the index of bit set of next one
             int bitSetPtr = 0;  //bitSetPtr is start index pointer of bitset
-            while ((nextOne = bits.nextSetBit(bitSetPtr)) != -1) {
+            for (int nextOne = bits.nextSetBit(bitSetPtr); nextOne != -1; nextOne = bits.nextSetBit(bitSetPtr)) {
                 final int lengthToCopy = nextOne - bitSetPtr;
                 System.arraycopy(values, start, temp, dest, lengthToCopy);
                 dest += lengthToCopy;
@@ -292,32 +297,6 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
             }
         }
         return temp;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setData(final double[] values) {
-        if (values == null) {
-            cachedPivots = null;
-        } else {
-            cachedPivots = new int[PIVOTS_HEAP_LENGTH];
-            Arrays.fill(cachedPivots, -1);
-        }
-        super.setData(values);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setData(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
-        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
-        cachedPivots = new int[PIVOTS_HEAP_LENGTH];
-        Arrays.fill(cachedPivots, -1);
-        super.setData(values, begin, length);
     }
 
     /**
@@ -361,6 +340,40 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
     public double evaluate(final double[] values, final int start, final int length)
             throws MathIllegalArgumentException {
         return evaluate(values, start, length, quantile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Percentile copy() {
+        return new Percentile(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setData(final double[] values) {
+        if (values == null) {
+            cachedPivots = null;
+        } else {
+            cachedPivots = new int[PIVOTS_HEAP_LENGTH];
+            Arrays.fill(cachedPivots, -1);
+        }
+        super.setData(values);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setData(final double[] values, final int begin, final int length)
+            throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        cachedPivots = new int[PIVOTS_HEAP_LENGTH];
+        Arrays.fill(cachedPivots, -1);
+        super.setData(values, begin, length);
     }
 
     /**
@@ -427,7 +440,7 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
 
         MathArrays.verifyValues(values, begin, length);
         if (p > 100 || p <= 0) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUNDS_QUANTILE_VALUE,
+            throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUNDS_QUANTILE_VALUE,
                     p, 0, 100);
         }
         if (length == 0) {
@@ -457,24 +470,16 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
      * Sets the value of the quantile field (determines what percentile is
      * computed when evaluate() is called with no quantile argument).
      *
-     * @param p a value between 0 < p <= 100
+     * @param p a value between 0 &lt; p &lt;= 100
      * @throws MathIllegalArgumentException if p is not greater than 0 and less
      *                                      than or equal to 100
      */
     public void setQuantile(final double p) throws MathIllegalArgumentException {
         if (p <= 0 || p > 100) {
             throw new MathIllegalArgumentException(
-                    LocalizedCoreFormats.OUT_OF_BOUNDS_QUANTILE_VALUE, p, 0, 100);
+                    LocalizedStatFormats.OUT_OF_BOUNDS_QUANTILE_VALUE, p, 0, 100);
         }
         quantile = p;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Percentile copy() {
-        return new Percentile(this);
     }
 
     /**
@@ -922,7 +927,8 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
                                 (length + 0.25) * p + 3d / 8;
             }
 
-        },;
+        },
+        ;
 
         /**
          * Simple name such as R-1, R-2 corresponding to those in wikipedia.
@@ -948,7 +954,7 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
          * @param length the total number of array elements in the work array
          * @return a computed real valued index as explained in the wikipedia
          */
-        protected abstract double index(final double p, final int length);
+        protected abstract double index(double p, int length);
 
         /**
          * Estimation based on K<sup>th</sup> selection. This may be overridden
@@ -1001,7 +1007,7 @@ public class Percentile extends AbstractUnivariateStatistic implements Serializa
                                   final KthSelector selector) {
             MathUtils.checkNotNull(work);
             if (p > 100 || p <= 0) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_BOUNDS_QUANTILE_VALUE,
+                throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUNDS_QUANTILE_VALUE,
                         p, 0, 100);
             }
             return estimate(work, pivotsHeap, index(p / 100d, work.length), work.length, selector);

@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -44,7 +49,7 @@ public final class CombinatoricsUtils {
     /**
      * Stirling numbers of the second kind.
      */
-    static final AtomicReference<long[][]> STIRLING_S2 = new AtomicReference<long[][]>(null);
+    static final AtomicReference<long[][]> STIRLING_S2 = new AtomicReference<>(null);
 
     /**
      * Default implementation of {@link #factorialLog(int)} method:
@@ -156,7 +161,7 @@ public final class CombinatoricsUtils {
      * <li> {@code 0 <= k <= n } (otherwise
      * {@code IllegalArgumentException} is thrown)</li>
      * <li> The result is small enough to fit into a {@code double}. The
-     * largest value of {@code n} for which all coefficients are <
+     * largest value of {@code n} for which all coefficients are &lt;
      * Double.MAX_VALUE is 1029. If the computed value exceeds Double.MAX_VALUE,
      * Double.POSITIVE_INFINITY is returned</li>
      * </ul></p>

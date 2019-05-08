@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.linear;
 
 import org.hipparchus.analysis.MultivariateFunction;
@@ -135,4 +140,28 @@ public class LinearObjectiveFunction
         return Double.valueOf(constantTerm).hashCode() ^ coefficients.hashCode();
     }
 
+    /**
+     * Serialize the instance.
+     *
+     * @param oos stream where object should be written
+     * @throws IOException if object cannot be written to stream
+     */
+    private void writeObject(ObjectOutputStream oos)
+            throws IOException {
+        oos.defaultWriteObject();
+        MatrixUtils.serializeRealVector(coefficients, oos);
+    }
+
+    /**
+     * Deserialize the instance.
+     *
+     * @param ois stream from which the object should be read
+     * @throws ClassNotFoundException if a class in the stream cannot be found
+     * @throws IOException            if object cannot be read from the stream
+     */
+    private void readObject(ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        MatrixUtils.deserializeRealVector(this, "coefficients", ois);
+    }
 }

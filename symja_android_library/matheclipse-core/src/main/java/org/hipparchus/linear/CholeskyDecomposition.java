@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -212,35 +217,13 @@ public class CholeskyDecomposition {
      * @return a solver
      */
     public DecompositionSolver getSolver() {
-        return new Solver(lTData);
+        return new Solver();
     }
 
     /**
      * Specialized solver.
      */
-    private static class Solver implements DecompositionSolver {
-        /**
-         * Row-oriented storage for L<sup>T</sup> matrix data.
-         */
-        private final double[][] lTData;
-
-        /**
-         * Build a solver from decomposed matrix.
-         *
-         * @param lTData row-oriented storage for L<sup>T</sup> matrix data
-         */
-        private Solver(final double[][] lTData) {
-            this.lTData = lTData;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            // if we get this far, the matrix was positive definite, hence non-singular
-            return true;
-        }
+    private class Solver implements DecompositionSolver {
 
         /**
          * {@inheritDoc}
@@ -325,6 +308,15 @@ public class CholeskyDecomposition {
             }
 
             return new Array2DRowRealMatrix(x);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isNonSingular() {
+            // if we get this far, the matrix was positive definite, hence non-singular
+            return true;
         }
 
         /**

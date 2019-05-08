@@ -14,8 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.polynomials;
 
+import org.hipparchus.Field;
+import org.hipparchus.RealFieldElement;
+import org.hipparchus.analysis.FieldUnivariateFunction;
+import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.analysis.differentiation.DerivativeStructure;
 import org.hipparchus.analysis.differentiation.UnivariateDifferentiableFunction;
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -58,12 +67,12 @@ import java.util.Arrays;
  * than or equal to <code>x</code>.  The value returned is
  * {@code polynomials[j](x - knot[j])}</li></ol>
  */
-public class PolynomialSplineFunction implements UnivariateDifferentiableFunction {
+public class PolynomialSplineFunction implements UnivariateDifferentiableFunction, FieldUnivariateFunction {
     /**
      * Spline segment interval delimiters (knots).
      * Size is n + 1 for n segments.
      */
-    private final double knots[];
+    private final double[] knots;
     /**
      * The polynomial functions that make up the spline.  The first element
      * determines the value of the spline over the first subinterval, the
@@ -71,7 +80,7 @@ public class PolynomialSplineFunction implements UnivariateDifferentiableFunctio
      * evaluating these functions at {@code (x - knot[i])} where i is the
      * knot segment to which x belongs.
      */
-    private final PolynomialFunction polynomials[];
+    private final PolynomialFunction[] polynomials;
     /**
      * Number of spline segments. It is equal to the number of polynomials and
      * to the number of partition points - 1.
@@ -92,7 +101,7 @@ public class PolynomialSplineFunction implements UnivariateDifferentiableFunctio
      * @throws MathIllegalArgumentException if {@code polynomials.length != knots.length - 1}.
      * @throws MathIllegalArgumentException if the {@code knots} array is not strictly increasing.
      */
-    public PolynomialSplineFunction(double knots[], PolynomialFunction polynomials[])
+    public PolynomialSplineFunction(double[] knots, PolynomialFunction[] polynomials)
             throws MathIllegalArgumentException, NullArgumentException {
         if (knots == null ||
                 polynomials == null) {
@@ -145,7 +154,7 @@ public class PolynomialSplineFunction implements UnivariateDifferentiableFunctio
      * @return the derivative function.
      */
     public PolynomialSplineFunction polynomialSplineDerivative() {
-        PolynomialFunction derivativePolynomials[] = new PolynomialFunction[n];
+        PolynomialFunction[] derivativePolynomials = new PolynomialFunction[n];
         for (int i = 0; i < n; i++) {
             derivativePolynomials[i] = polynomials[i].polynomialDerivative();
         }
@@ -159,6 +168,36 @@ public class PolynomialSplineFunction implements UnivariateDifferentiableFunctio
     @Override
     public DerivativeStructure value(final DerivativeStructure t) {
         final double t0 = t.getValue();
+        MathUtils.checkRangeInclusive(t0, knots[0], knots[n]);
+        int i = Arrays.binarySearch(knots, t0);
+        if (i < 0) {
+            i = -i - 2;
+        }
+        // This will handle the case where t is the last knot value
+        // There are only n-1 polynomials, so if t is the last knot
+        // then we will use the last polynomial to calculate the value.
+        if (i >= polynomials.length) {
+            i--;
+        }
+        return polynomials[i].value(t.subtract(knots[i]));
+    }
+
+    @Override
+    public <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
+        return new RealFieldUnivariateFunction<T>() {
+            @Override
+            public T value(T x) {
+                return PolynomialSplineFunction.this.value(x);
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends RealFieldElement<T>> T value(final T t) {
+        final double t0 = t.getReal();
         MathUtils.checkRangeInclusive(t0, knots[0], knots[n]);
         int i = Arrays.binarySearch(knots, t0);
         if (i < 0) {
@@ -191,7 +230,7 @@ public class PolynomialSplineFunction implements UnivariateDifferentiableFunctio
      * @return the interpolating polynomials.
      */
     public PolynomialFunction[] getPolynomials() {
-        PolynomialFunction p[] = new PolynomialFunction[n];
+        PolynomialFunction[] p = new PolynomialFunction[n];
         System.arraycopy(polynomials, 0, p, 0, n);
         return p;
     }
@@ -204,7 +243,7 @@ public class PolynomialSplineFunction implements UnivariateDifferentiableFunctio
      * @return the knot points.
      */
     public double[] getKnots() {
-        double out[] = new double[n + 1];
+        double[] out = new double[n + 1];
         System.arraycopy(knots, 0, out, 0, n + 1);
         return out;
     }

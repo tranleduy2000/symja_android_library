@@ -25,10 +25,10 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements an interpolator for the Gragg-Bulirsch-Stoer
  * integrator.
- * <p>
+ *
  * <p>This interpolator compute dense output inside the last step
  * produced by a Gragg-Bulirsch-Stoer integrator.</p>
- * <p>
+ *
  * <p>
  * This implementation is basically a reimplementation in Java of the
  * <a
@@ -38,10 +38,10 @@ import org.hipparchus.util.FastMath;
  * href="http://www.unige.ch/~hairer/prog/licence.txt">here</a>, for
  * convenience, it is reproduced below.</p>
  * </p>
- * <p>
+ *
  * <table border="0" width="80%" cellpadding="10" align="center" bgcolor="#E0E0E0">
  * <tr><td>Copyright (c) 2004, Ernst Hairer</td></tr>
- * <p>
+ *
  * <tr><td>Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
  * conditions are met:
@@ -52,7 +52,7 @@ import org.hipparchus.util.FastMath;
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.</li>
  * </ul></td></tr>
- * <p>
+ *
  * <tr><td><strong>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
  * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -164,6 +164,61 @@ class GraggBulirschStoerStateInterpolator
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ODEStateAndDerivative computeInterpolatedStateAndDerivatives(final EquationsMapper mapper,
+                                                                           final double time, final double theta,
+                                                                           final double thetaH, final double oneMinusThetaH) {
+
+        final int dimension = mapper.getTotalDimension();
+
+        final double h = thetaH / theta;
+        final double oneMinusTheta = 1.0 - theta;
+        final double theta05 = theta - 0.5;
+        final double tOmT = theta * oneMinusTheta;
+        final double t4 = tOmT * tOmT;
+        final double t4Dot = 2 * tOmT * (1 - 2 * theta);
+        final double dot1 = 1.0 / h;
+        final double dot2 = theta * (2 - 3 * theta) / h;
+        final double dot3 = ((3 * theta - 4) * theta + 1) / h;
+
+        final double[] interpolatedState = new double[dimension];
+        final double[] interpolatedDerivatives = new double[dimension];
+        for (int i = 0; i < dimension; ++i) {
+
+            final double p0 = polynomials[0][i];
+            final double p1 = polynomials[1][i];
+            final double p2 = polynomials[2][i];
+            final double p3 = polynomials[3][i];
+            interpolatedState[i] = p0 + theta * (p1 + oneMinusTheta * (p2 * theta + p3 * oneMinusTheta));
+            interpolatedDerivatives[i] = dot1 * p1 + dot2 * p2 + dot3 * p3;
+
+            if (currentDegree > 3) {
+                double cDot = 0;
+                double c = polynomials[currentDegree][i];
+                for (int j = currentDegree - 1; j > 3; --j) {
+                    final double d = 1.0 / (j - 3);
+                    cDot = d * (theta05 * cDot + c);
+                    c = polynomials[j][i] + c * d * theta05;
+                }
+                interpolatedState[i] += t4 * c;
+                interpolatedDerivatives[i] += (t4 * cDot + t4Dot * c) / h;
+            }
+
+        }
+
+        if (h == 0) {
+            // in this degenerated case, the previous computation leads to NaN for derivatives
+            // we fix this by using the derivatives at midpoint
+            System.arraycopy(yMidDots[1], 0, interpolatedDerivatives, 0, dimension);
+        }
+
+        return mapper.mapStateAndDerivative(time, interpolatedState, interpolatedDerivatives);
+
+    }
+
+    /**
      * Compute the interpolation coefficients for dense output.
      *
      * @param mu degree of the interpolation polynomial
@@ -239,61 +294,6 @@ class GraggBulirschStoerStateInterpolator
             error = FastMath.sqrt(error / scale.length) * errfac[currentDegree - 5];
         }
         return error;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ODEStateAndDerivative computeInterpolatedStateAndDerivatives(final EquationsMapper mapper,
-                                                                           final double time, final double theta,
-                                                                           final double thetaH, final double oneMinusThetaH) {
-
-        final int dimension = mapper.getTotalDimension();
-
-        final double h = thetaH / theta;
-        final double oneMinusTheta = 1.0 - theta;
-        final double theta05 = theta - 0.5;
-        final double tOmT = theta * oneMinusTheta;
-        final double t4 = tOmT * tOmT;
-        final double t4Dot = 2 * tOmT * (1 - 2 * theta);
-        final double dot1 = 1.0 / h;
-        final double dot2 = theta * (2 - 3 * theta) / h;
-        final double dot3 = ((3 * theta - 4) * theta + 1) / h;
-
-        final double[] interpolatedState = new double[dimension];
-        final double[] interpolatedDerivatives = new double[dimension];
-        for (int i = 0; i < dimension; ++i) {
-
-            final double p0 = polynomials[0][i];
-            final double p1 = polynomials[1][i];
-            final double p2 = polynomials[2][i];
-            final double p3 = polynomials[3][i];
-            interpolatedState[i] = p0 + theta * (p1 + oneMinusTheta * (p2 * theta + p3 * oneMinusTheta));
-            interpolatedDerivatives[i] = dot1 * p1 + dot2 * p2 + dot3 * p3;
-
-            if (currentDegree > 3) {
-                double cDot = 0;
-                double c = polynomials[currentDegree][i];
-                for (int j = currentDegree - 1; j > 3; --j) {
-                    final double d = 1.0 / (j - 3);
-                    cDot = d * (theta05 * cDot + c);
-                    c = polynomials[j][i] + c * d * theta05;
-                }
-                interpolatedState[i] += t4 * c;
-                interpolatedDerivatives[i] += (t4 * cDot + t4Dot * c) / h;
-            }
-
-        }
-
-        if (h == 0) {
-            // in this degenerated case, the previous computation leads to NaN for derivatives
-            // we fix this by using the derivatives at midpoint
-            System.arraycopy(yMidDots[1], 0, interpolatedDerivatives, 0, dimension);
-        }
-
-        return mapper.mapStateAndDerivative(time, interpolatedState, interpolatedDerivatives);
-
     }
 
 }

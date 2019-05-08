@@ -29,7 +29,7 @@ import org.hipparchus.util.FastMath;
 /**
  * This class implements the common part of all embedded Runge-Kutta
  * integrators for Ordinary Differential Equations.
- * <p>
+ *
  * <p>These methods are embedded explicit Runge-Kutta methods with two
  * sets of coefficients allowing to estimate the error, their Butcher
  * arrays are as follows :
@@ -44,11 +44,11 @@ import org.hipparchus.util.FastMath;
  *       |  b'1  b'2 ...   b's-1 b's
  * </pre>
  * </p>
- * <p>
+ *
  * <p>In fact, we rather use the array defined by ej = bj - b'j to
  * compute directly the error rather than computing two estimates and
  * then comparing them.</p>
- * <p>
+ *
  * <p>Some methods are qualified as <i>fsal</i> (first same as last)
  * methods. This means the last evaluation of the derivatives in one
  * step is the same as the first in the next step. Then, this

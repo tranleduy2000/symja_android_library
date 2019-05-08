@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.util;
 
 import org.hipparchus.Field;
@@ -55,16 +60,16 @@ public class BigRealField implements Field<BigReal>, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public BigReal getOne() {
-        return BigReal.ONE;
+    public BigReal getZero() {
+        return BigReal.ZERO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public BigReal getZero() {
-        return BigReal.ZERO;
+    public BigReal getOne() {
+        return BigReal.ONE;
     }
 
     /**

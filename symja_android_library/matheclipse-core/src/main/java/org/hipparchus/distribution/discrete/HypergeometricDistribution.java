@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.discrete;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -89,25 +94,6 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
         this.populationSize = populationSize;
         this.sampleSize = sampleSize;
         this.numericalVariance = calculateNumericalVariance();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double cumulativeProbability(int x) {
-        double ret;
-
-        int[] domain = getDomain(populationSize, numberOfSuccesses, sampleSize);
-        if (x < domain[0]) {
-            ret = 0.0;
-        } else if (x >= domain[1]) {
-            ret = 1.0;
-        } else {
-            ret = innerCumulativeProbability(domain[0], x, 1);
-        }
-
-        return ret;
     }
 
     /**
@@ -188,6 +174,88 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
      * {@inheritDoc}
      */
     @Override
+    public double cumulativeProbability(int x) {
+        double ret;
+
+        int[] domain = getDomain(populationSize, numberOfSuccesses, sampleSize);
+        if (x < domain[0]) {
+            ret = 0.0;
+        } else if (x >= domain[1]) {
+            ret = 1.0;
+        } else {
+            ret = innerCumulativeProbability(domain[0], x, 1);
+        }
+
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * For population size {@code N}, number of successes {@code m}, and sample
+     * size {@code n}, the mean is {@code n * m / N}.
+     */
+    @Override
+    public double getNumericalMean() {
+        return getSampleSize() * (getNumberOfSuccesses() / (double) getPopulationSize());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * For population size {@code N}, number of successes {@code m}, and sample
+     * size {@code n}, the variance is
+     * {@code [n * m * (N - n) * (N - m)] / [N^2 * (N - 1)]}.
+     */
+    @Override
+    public double getNumericalVariance() {
+        return numericalVariance;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * For population size {@code N}, number of successes {@code m}, and sample
+     * size {@code n}, the lower bound of the support is
+     * {@code max(0, n + m - N)}.
+     *
+     * @return lower bound of the support
+     */
+    @Override
+    public int getSupportLowerBound() {
+        return FastMath.max(0,
+                getSampleSize() + getNumberOfSuccesses() - getPopulationSize());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * For number of successes {@code m} and sample size {@code n}, the upper
+     * bound of the support is {@code min(m, n)}.
+     *
+     * @return upper bound of the support
+     */
+    @Override
+    public int getSupportUpperBound() {
+        return FastMath.min(getNumberOfSuccesses(), getSampleSize());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The support of this distribution is connected.
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean isSupportConnected() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public double logProbability(int x) {
         double ret;
 
@@ -254,29 +322,6 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * For population size {@code N}, number of successes {@code m}, and sample
-     * size {@code n}, the mean is {@code n * m / N}.
-     */
-    @Override
-    public double getNumericalMean() {
-        return getSampleSize() * (getNumberOfSuccesses() / (double) getPopulationSize());
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * For population size {@code N}, number of successes {@code m}, and sample
-     * size {@code n}, the variance is
-     * {@code [n * m * (N - n) * (N - m)] / [N^2 * (N - 1)]}.
-     */
-    @Override
-    public double getNumericalVariance() {
-        return numericalVariance;
-    }
-
-    /**
      * Calculate the numerical variance.
      *
      * @return the variance of this distribution
@@ -286,45 +331,5 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
         final double m = getNumberOfSuccesses();
         final double n = getSampleSize();
         return (n * m * (N - n) * (N - m)) / (N * N * (N - 1));
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * For population size {@code N}, number of successes {@code m}, and sample
-     * size {@code n}, the lower bound of the support is
-     * {@code max(0, n + m - N)}.
-     *
-     * @return lower bound of the support
-     */
-    @Override
-    public int getSupportLowerBound() {
-        return FastMath.max(0,
-                getSampleSize() + getNumberOfSuccesses() - getPopulationSize());
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * For number of successes {@code m} and sample size {@code n}, the upper
-     * bound of the support is {@code min(m, n)}.
-     *
-     * @return upper bound of the support
-     */
-    @Override
-    public int getSupportUpperBound() {
-        return FastMath.min(getNumberOfSuccesses(), getSampleSize());
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The support of this distribution is connected.
-     *
-     * @return {@code true}
-     */
-    @Override
-    public boolean isSupportConnected() {
-        return true;
     }
 }

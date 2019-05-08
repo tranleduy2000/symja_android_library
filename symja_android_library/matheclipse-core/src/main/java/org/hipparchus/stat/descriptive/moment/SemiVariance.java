@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -31,7 +36,7 @@ import java.io.Serializable;
  * We define the <i>downside semivariance</i> of a set of values <code>x</code>
  * against the <i>cutoff value</i> <code>cutoff</code> to be <br/>
  * <code>&Sigma; (x[i] - target)<sup>2</sup> / df</code> <br/>
- * where the sum is taken over all <code>i</code> such that <code>x[i] < cutoff</code>
+ * where the sum is taken over all <code>i</code> such that <code>x[i] &lt; cutoff</code>
  * and <code>df</code> is the length of <code>x</code> (non-bias-corrected) or
  * one less than this number (bias corrected).  The <i>upside semivariance</i>
  * is defined similarly, with the sum taken over values of <code>x</code> that
@@ -141,14 +146,6 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SemiVariance copy() {
-        return new SemiVariance(this);
-    }
-
-    /**
      * Returns the {@link SemiVariance} of the designated values against the mean, using
      * instance properties varianceDirection and biasCorrection.
      * <p>
@@ -166,6 +163,14 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
             throws MathIllegalArgumentException {
         double m = StatUtils.mean(values, start, length);
         return evaluate(values, m, varianceDirection, biasCorrected, start, length);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SemiVariance copy() {
+        return new SemiVariance(this);
     }
 
     /**
@@ -242,12 +247,12 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
             if (values.length == 1) {
                 return 0.0;
             } else {
-                final boolean booleanDirection = direction.getDirection();
 
                 double dev = 0.0;
                 double sumsq = 0.0;
-                for (int i = start, end = start + length; i < end; i++) {
-                    if ((values[i] > cutoff) == booleanDirection) {
+                final int end = start + length;
+                for (int i = start; i < end; i++) {
+                    if (direction.considerObservation(values[i], cutoff)) {
                         dev = values[i] - cutoff;
                         sumsq += dev * dev;
                     }
@@ -335,9 +340,24 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
          * Returns the value of this Direction. True corresponds to UPSIDE.
          *
          * @return true if direction is UPSIDE; false otherwise
+         * @deprecated as of 1.4 replaced by {@link #considerObservation(double, double)}
          */
-        boolean getDirection() {
+        @Deprecated
+        boolean getDirection() { // NOPMD - violation has been taken care as of 1.4 by deprecating this method and introcuding a new one
             return direction;
         }
+
+        /**
+         * Check if observation should be considered.
+         *
+         * @param value  observation value
+         * @param cutoff cutoff point
+         * @return true if observation should be considered.
+         * @since 1.4
+         */
+        boolean considerObservation(final double value, final double cutoff) {
+            return value > cutoff == direction;
+        }
+
     }
 }

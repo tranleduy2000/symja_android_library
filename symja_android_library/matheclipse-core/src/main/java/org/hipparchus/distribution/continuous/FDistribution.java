@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -102,23 +107,6 @@ public class FDistribution extends AbstractRealDistribution {
 
     /**
      * {@inheritDoc}
-     **/
-    @Override
-    public double logDensity(double x) {
-        final double nhalf = numeratorDegreesOfFreedom / 2;
-        final double mhalf = denominatorDegreesOfFreedom / 2;
-        final double logx = FastMath.log(x);
-        final double logn = FastMath.log(numeratorDegreesOfFreedom);
-        final double logm = FastMath.log(denominatorDegreesOfFreedom);
-        final double lognxm = FastMath.log(numeratorDegreesOfFreedom * x +
-                denominatorDegreesOfFreedom);
-        return nhalf * logn + nhalf * logx - logx +
-                mhalf * logm - nhalf * lognxm - mhalf * lognxm -
-                Beta.logBeta(nhalf, mhalf);
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
      * The implementation of this method is based on
      * <ul>
@@ -142,24 +130,6 @@ public class FDistribution extends AbstractRealDistribution {
                     0.5 * m);
         }
         return ret;
-    }
-
-    /**
-     * Access the numerator degrees of freedom.
-     *
-     * @return the numerator degrees of freedom.
-     */
-    public double getNumeratorDegreesOfFreedom() {
-        return numeratorDegreesOfFreedom;
-    }
-
-    /**
-     * Access the denominator degrees of freedom.
-     *
-     * @return the denominator degrees of freedom.
-     */
-    public double getDenominatorDegreesOfFreedom() {
-        return denominatorDegreesOfFreedom;
     }
 
     /**
@@ -201,25 +171,6 @@ public class FDistribution extends AbstractRealDistribution {
     }
 
     /**
-     * Calculates the numerical variance.
-     *
-     * @return the variance of this distribution
-     */
-    private double calculateNumericalVariance() {
-        final double denominatorDF = getDenominatorDegreesOfFreedom();
-
-        if (denominatorDF > 4) {
-            final double numeratorDF = getNumeratorDegreesOfFreedom();
-            final double denomDFMinusTwo = denominatorDF - 2;
-
-            return (2 * (denominatorDF * denominatorDF) * (numeratorDF + denominatorDF - 2)) /
-                    ((numeratorDF * (denomDFMinusTwo * denomDFMinusTwo) * (denominatorDF - 4)));
-        }
-
-        return Double.NaN;
-    }
-
-    /**
      * {@inheritDoc}
      * <p>
      * The lower bound of the support is always 0 no matter the parameters.
@@ -254,5 +205,59 @@ public class FDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    @Override
+    public double logDensity(double x) {
+        final double nhalf = numeratorDegreesOfFreedom / 2;
+        final double mhalf = denominatorDegreesOfFreedom / 2;
+        final double logx = FastMath.log(x);
+        final double logn = FastMath.log(numeratorDegreesOfFreedom);
+        final double logm = FastMath.log(denominatorDegreesOfFreedom);
+        final double lognxm = FastMath.log(numeratorDegreesOfFreedom * x +
+                denominatorDegreesOfFreedom);
+        return nhalf * logn + nhalf * logx - logx +
+                mhalf * logm - nhalf * lognxm - mhalf * lognxm -
+                Beta.logBeta(nhalf, mhalf);
+    }
+
+    /**
+     * Access the numerator degrees of freedom.
+     *
+     * @return the numerator degrees of freedom.
+     */
+    public double getNumeratorDegreesOfFreedom() {
+        return numeratorDegreesOfFreedom;
+    }
+
+    /**
+     * Access the denominator degrees of freedom.
+     *
+     * @return the denominator degrees of freedom.
+     */
+    public double getDenominatorDegreesOfFreedom() {
+        return denominatorDegreesOfFreedom;
+    }
+
+    /**
+     * Calculates the numerical variance.
+     *
+     * @return the variance of this distribution
+     */
+    private double calculateNumericalVariance() {
+        final double denominatorDF = getDenominatorDegreesOfFreedom();
+
+        if (denominatorDF > 4) {
+            final double numeratorDF = getNumeratorDegreesOfFreedom();
+            final double denomDFMinusTwo = denominatorDF - 2;
+
+            return (2 * (denominatorDF * denominatorDF) * (numeratorDF + denominatorDF - 2)) /
+                    ((numeratorDF * (denomDFMinusTwo * denomDFMinusTwo) * (denominatorDF - 4)));
+        }
+
+        return Double.NaN;
     }
 }

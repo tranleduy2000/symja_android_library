@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.multivariate;
 
 import org.hipparchus.distribution.MultivariateRealDistribution;
@@ -96,7 +101,7 @@ public class MixtureMultivariateRealDistribution<T extends MultivariateRealDistr
         }
 
         // Store each distribution and its normalized weight.
-        distribution = new ArrayList<T>();
+        distribution = new ArrayList<>();
         weight = new double[numComp];
         for (int i = 0; i < numComp; i++) {
             final Pair<Double, T> comp = components.get(i);
@@ -115,6 +120,22 @@ public class MixtureMultivariateRealDistribution<T extends MultivariateRealDistr
             p += weight[i] * distribution.get(i).density(values);
         }
         return p;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reseedRandomGenerator(long seed) {
+        // Seed needs to be propagated to underlying components
+        // in order to maintain consistency between runs.
+        super.reseedRandomGenerator(seed);
+
+        for (int i = 0; i < distribution.size(); i++) {
+            // Make each component's seed different in order to avoid
+            // using the same sequence of random numbers.
+            distribution.get(i).reseedRandomGenerator(i + 1 + seed);
+        }
     }
 
     /**
@@ -149,31 +170,15 @@ public class MixtureMultivariateRealDistribution<T extends MultivariateRealDistr
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reseedRandomGenerator(long seed) {
-        // Seed needs to be propagated to underlying components
-        // in order to maintain consistency between runs.
-        super.reseedRandomGenerator(seed);
-
-        for (int i = 0; i < distribution.size(); i++) {
-            // Make each component's seed different in order to avoid
-            // using the same sequence of random numbers.
-            distribution.get(i).reseedRandomGenerator(i + 1 + seed);
-        }
-    }
-
-    /**
      * Gets the distributions that make up the mixture model.
      *
      * @return the component distributions and associated weights.
      */
     public List<Pair<Double, T>> getComponents() {
-        final List<Pair<Double, T>> list = new ArrayList<Pair<Double, T>>(weight.length);
+        final List<Pair<Double, T>> list = new ArrayList<>(weight.length);
 
         for (int i = 0; i < weight.length; i++) {
-            list.add(new Pair<Double, T>(weight[i], distribution.get(i)));
+            list.add(new Pair<>(weight[i], distribution.get(i)));
         }
 
         return list;

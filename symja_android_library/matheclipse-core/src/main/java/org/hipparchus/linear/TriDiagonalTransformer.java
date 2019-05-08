@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -41,7 +46,7 @@ class TriDiagonalTransformer {
     /**
      * Householder vectors.
      */
-    private final double householderVectors[][];
+    private final double[][] householderVectors;
     /**
      * Main diagonal.
      */
@@ -178,7 +183,7 @@ class TriDiagonalTransformer {
      * @return the main diagonal elements of the B matrix
      */
     double[][] getHouseholderVectorsRef() {
-        return householderVectors;
+        return householderVectors; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**
@@ -189,7 +194,7 @@ class TriDiagonalTransformer {
      * @return the main diagonal elements of the T matrix
      */
     double[] getMainDiagonalRef() {
-        return main;
+        return main; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**
@@ -200,7 +205,7 @@ class TriDiagonalTransformer {
      * @return the secondary diagonal elements of the T matrix
      */
     double[] getSecondaryDiagonalRef() {
-        return secondary;
+        return secondary; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**

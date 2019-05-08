@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.optim.univariate;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -107,49 +112,6 @@ public class MultiStartUnivariateOptimizer
     }
 
     /**
-     * Gets all the optima found during the last call to {@code optimize}.
-     * The optimizer stores all the optima found during a set of
-     * restarts. The {@code optimize} method returns the best point only.
-     * This method returns all the points found at the end of each starts,
-     * including the best one already returned by the {@code optimize} method.
-     * <br/>
-     * The returned array as one element for each start as specified
-     * in the constructor. It is ordered with the results from the
-     * runs that did converge first, sorted from best to worst
-     * objective value (i.e in ascending order if minimizing and in
-     * descending order if maximizing), followed by {@code null} elements
-     * corresponding to the runs that did not converge. This means all
-     * elements will be {@code null} if the {@code optimize} method did throw
-     * an exception.
-     * This also means that if the first element is not {@code null}, it is
-     * the best point found across all starts.
-     *
-     * @return an array containing the optima.
-     * @throws MathIllegalStateException if {@link #optimize(OptimizationData[])
-     *                                   optimize} has not been called.
-     */
-    public UnivariatePointValuePair[] getOptima() {
-        if (optima == null) {
-            throw new MathIllegalStateException(LocalizedCoreFormats.NO_OPTIMUM_COMPUTED_YET);
-        }
-        return optima.clone();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalStateException if {@code optData} does not contain an
-     *                                   instance of {@link MaxEval} or {@link SearchInterval}.
-     */
-    @Override
-    public UnivariatePointValuePair optimize(OptimizationData... optData) {
-        // Store arguments in order to pass them to the internal optimizer.
-        optimData = optData;
-        // Set up base class and perform computations.
-        return super.optimize(optData);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -200,7 +162,7 @@ public class MultiStartUnivariateOptimizer
                 optimData[searchIntervalIndex] = new SearchInterval(min, max, s);
                 // Optimize.
                 optima[i] = optimizer.optimize(optimData);
-            } catch (RuntimeException mue) {
+            } catch (RuntimeException mue) { // NOPMD - caching a RuntimeException is intentional here, it will be rethrown later
                 lastException = mue;
                 optima[i] = null;
             }
@@ -217,6 +179,49 @@ public class MultiStartUnivariateOptimizer
 
         // Return the point with the best objective function value.
         return optima[0];
+    }
+
+    /**
+     * Gets all the optima found during the last call to {@code optimize}.
+     * The optimizer stores all the optima found during a set of
+     * restarts. The {@code optimize} method returns the best point only.
+     * This method returns all the points found at the end of each starts,
+     * including the best one already returned by the {@code optimize} method.
+     * <br/>
+     * The returned array as one element for each start as specified
+     * in the constructor. It is ordered with the results from the
+     * runs that did converge first, sorted from best to worst
+     * objective value (i.e in ascending order if minimizing and in
+     * descending order if maximizing), followed by {@code null} elements
+     * corresponding to the runs that did not converge. This means all
+     * elements will be {@code null} if the {@code optimize} method did throw
+     * an exception.
+     * This also means that if the first element is not {@code null}, it is
+     * the best point found across all starts.
+     *
+     * @return an array containing the optima.
+     * @throws MathIllegalStateException if {@link #optimize(OptimizationData[])
+     *                                   optimize} has not been called.
+     */
+    public UnivariatePointValuePair[] getOptima() {
+        if (optima == null) {
+            throw new MathIllegalStateException(LocalizedCoreFormats.NO_OPTIMUM_COMPUTED_YET);
+        }
+        return optima.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalStateException if {@code optData} does not contain an
+     *                                   instance of {@link MaxEval} or {@link SearchInterval}.
+     */
+    @Override
+    public UnivariatePointValuePair optimize(OptimizationData... optData) {
+        // Store arguments in order to pass them to the internal optimizer.
+        optimData = optData.clone();
+        // Set up base class and perform computations.
+        return super.optimize(optData);
     }
 
     /**

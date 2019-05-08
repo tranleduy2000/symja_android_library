@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.scalar.noderiv;
 
 import org.hipparchus.analysis.MultivariateFunction;
@@ -33,60 +38,61 @@ import java.util.Comparator;
  * This class implements simplex-based direct search optimization.
  *
  * <p>
- *  Direct search methods only use objective function values, they do
- *  not need derivatives and don't either try to compute approximation
- *  of the derivatives. According to a 1996 paper by Margaret H. Wright
- *  (<a href="http://cm.bell-labs.com/cm/cs/doc/96/4-02.ps.gz">Direct
- *  Search Methods: Once Scorned, Now Respectable</a>), they are used
- *  when either the computation of the derivative is impossible (noisy
- *  functions, unpredictable discontinuities) or difficult (complexity,
- *  computation cost). In the first cases, rather than an optimum, a
- *  <em>not too bad</em> point is desired. In the latter cases, an
- *  optimum is desired but cannot be reasonably found. In all cases
- *  direct search methods can be useful.
+ * Direct search methods only use objective function values, they do
+ * not need derivatives and don't either try to compute approximation
+ * of the derivatives. According to a 1996 paper by Margaret H. Wright
+ * (<a href="http://cm.bell-labs.com/cm/cs/doc/96/4-02.ps.gz">Direct
+ * Search Methods: Once Scorned, Now Respectable</a>), they are used
+ * when either the computation of the derivative is impossible (noisy
+ * functions, unpredictable discontinuities) or difficult (complexity,
+ * computation cost). In the first cases, rather than an optimum, a
+ * <em>not too bad</em> point is desired. In the latter cases, an
+ * optimum is desired but cannot be reasonably found. In all cases
+ * direct search methods can be useful.
  * </p>
  * <p>
- *  Simplex-based direct search methods are based on comparison of
- *  the objective function values at the vertices of a simplex (which is a
- *  set of n+1 points in dimension n) that is updated by the algorithms
- *  steps.
+ * Simplex-based direct search methods are based on comparison of
+ * the objective function values at the vertices of a simplex (which is a
+ * set of n+1 points in dimension n) that is updated by the algorithms
+ * steps.
  * <p>
  * <p>
- *  The simplex update procedure ({@link NelderMeadSimplex} or
+ * The simplex update procedure ({@link NelderMeadSimplex} or
  * {@link MultiDirectionalSimplex})  must be passed to the
  * {@code optimize} method.
  * </p>
  * <p>
- *  Each call to {@code optimize} will re-use the start configuration of
- *  the current simplex and move it such that its first vertex is at the
- *  provided start point of the optimization.
- *  If the {@code optimize} method is called to solve a different problem
- *  and the number of parameters change, the simplex must be re-initialized
- *  to one with the appropriate dimensions.
+ * Each call to {@code optimize} will re-use the start configuration of
+ * the current simplex and move it such that its first vertex is at the
+ * provided start point of the optimization.
+ * If the {@code optimize} method is called to solve a different problem
+ * and the number of parameters change, the simplex must be re-initialized
+ * to one with the appropriate dimensions.
  * </p>
  * <p>
- *  Convergence is checked by providing the <em>worst</em> points of
- *  previous and current simplex to the convergence checker, not the best
- *  ones.
+ * Convergence is checked by providing the <em>worst</em> points of
+ * previous and current simplex to the convergence checker, not the best
+ * ones.
  * </p>
  * <p>
- *  This simplex optimizer implementation does not directly support constrained
- *  optimization with simple bounds; so, for such optimizations, either a more
- *  dedicated algorithm must be used like
- *  {@link CMAESOptimizer} or {@link BOBYQAOptimizer}, or the objective
- *  function must be wrapped in an adapter like
- *  {@link org.hipparchus.optim.nonlinear.scalar.MultivariateFunctionMappingAdapter
- *  MultivariateFunctionMappingAdapter} or
- *  {@link org.hipparchus.optim.nonlinear.scalar.MultivariateFunctionPenaltyAdapter
- *  MultivariateFunctionPenaltyAdapter}.
- *  <br/>
- *  The call to {@link #optimize(OptimizationData[]) optimize} will throw
- *  {@link MathRuntimeException} if bounds are passed to it.
+ * This simplex optimizer implementation does not directly support constrained
+ * optimization with simple bounds; so, for such optimizations, either a more
+ * dedicated algorithm must be used like
+ * {@link CMAESOptimizer} or {@link BOBYQAOptimizer}, or the objective
+ * function must be wrapped in an adapter like
+ * {@link org.hipparchus.optim.nonlinear.scalar.MultivariateFunctionMappingAdapter
+ * MultivariateFunctionMappingAdapter} or
+ * {@link org.hipparchus.optim.nonlinear.scalar.MultivariateFunctionPenaltyAdapter
+ * MultivariateFunctionPenaltyAdapter}.
+ * <br/>
+ * The call to {@link #optimize(OptimizationData[]) optimize} will throw
+ * {@link MathRuntimeException} if bounds are passed to it.
  * </p>
- *
  */
 public class SimplexOptimizer extends MultivariateOptimizer {
-    /** Simplex update rule. */
+    /**
+     * Simplex update rule.
+     */
     private AbstractSimplex simplex;
 
     /**
@@ -108,11 +114,11 @@ public class SimplexOptimizer extends MultivariateOptimizer {
      * {@inheritDoc}
      *
      * @param optData Optimization data. In addition to those documented in
-     * {@link MultivariateOptimizer#parseOptimizationData(OptimizationData[])
-     * MultivariateOptimizer}, this method will register the following data:
-     * <ul>
-     *  <li>{@link AbstractSimplex}</li>
-     * </ul>
+     *                {@link MultivariateOptimizer#parseOptimizationData(OptimizationData[])
+     *                MultivariateOptimizer}, this method will register the following data:
+     *                <ul>
+     *                <li>{@link AbstractSimplex}</li>
+     *                </ul>
      * @return {@inheritDoc}
      */
     @Override
@@ -121,7 +127,36 @@ public class SimplexOptimizer extends MultivariateOptimizer {
         return super.optimize(optData);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Scans the list of (required and optional) optimization data that
+     * characterize the problem.
+     *
+     * @param optData Optimization data.
+     *                The following data will be looked for:
+     *                <ul>
+     *                <li>{@link AbstractSimplex}</li>
+     *                </ul>
+     */
+    @Override
+    protected void parseOptimizationData(OptimizationData... optData) {
+        // Allow base class to register its own data.
+        super.parseOptimizationData(optData);
+
+        // The existing values (as set by the previous call) are reused if
+        // not provided in the argument list.
+        for (OptimizationData data : optData) {
+            if (data instanceof AbstractSimplex) {
+                simplex = (AbstractSimplex) data;
+                // If more data must be parsed, this statement _must_ be
+                // changed to "continue".
+                break;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected PointValuePair doOptimize() {
         checkParameters();
@@ -129,17 +164,17 @@ public class SimplexOptimizer extends MultivariateOptimizer {
         // Indirect call to "computeObjectiveValue" in order to update the
         // evaluations counter.
         final MultivariateFunction evalFunc
-            = new MultivariateFunction() {
-                /** {@inheritDoc} */
-                @Override
-                public double value(double[] point) {
-                    return computeObjectiveValue(point);
-                }
-            };
+                = new MultivariateFunction() {
+            /** {@inheritDoc} */
+            @Override
+            public double value(double[] point) {
+                return computeObjectiveValue(point);
+            }
+        };
 
         final boolean isMinim = getGoalType() == GoalType.MINIMIZE;
         final Comparator<PointValuePair> comparator
-            = new Comparator<PointValuePair>() {
+                = new Comparator<PointValuePair>() {
             /** {@inheritDoc} */
             @Override
             public int compare(final PointValuePair o1,
@@ -163,7 +198,7 @@ public class SimplexOptimizer extends MultivariateOptimizer {
                 for (int i = 0; i < simplex.getSize(); i++) {
                     PointValuePair prev = previous[i];
                     converged = converged &&
-                        checker.converged(iteration, prev, simplex.getPoint(i));
+                            checker.converged(iteration, prev, simplex.getPoint(i));
                 }
                 if (converged) {
                     // We have found an optimum.
@@ -180,44 +215,17 @@ public class SimplexOptimizer extends MultivariateOptimizer {
     }
 
     /**
-     * Scans the list of (required and optional) optimization data that
-     * characterize the problem.
-     *
-     * @param optData Optimization data.
-     * The following data will be looked for:
-     * <ul>
-     *  <li>{@link AbstractSimplex}</li>
-     * </ul>
-     */
-    @Override
-    protected void parseOptimizationData(OptimizationData... optData) {
-        // Allow base class to register its own data.
-        super.parseOptimizationData(optData);
-
-        // The existing values (as set by the previous call) are reused if
-        // not provided in the argument list.
-        for (OptimizationData data : optData) {
-            if (data instanceof AbstractSimplex) {
-                simplex = (AbstractSimplex) data;
-                // If more data must be parsed, this statement _must_ be
-                // changed to "continue".
-                break;
-            }
-        }
-    }
-
-    /**
-     * @throws MathRuntimeException if bounds were passed to the
-     * {@link #optimize(OptimizationData[]) optimize} method.
+     * @throws MathRuntimeException  if bounds were passed to the
+     *                               {@link #optimize(OptimizationData[]) optimize} method.
      * @throws NullArgumentException if no initial simplex was passed to the
-     * {@link #optimize(OptimizationData[]) optimize} method.
+     *                               {@link #optimize(OptimizationData[]) optimize} method.
      */
     private void checkParameters() {
         if (simplex == null) {
             throw new NullArgumentException();
         }
         if (getLowerBound() != null ||
-            getUpperBound() != null) {
+                getUpperBound() != null) {
             throw new MathRuntimeException(LocalizedCoreFormats.CONSTRAINT);
         }
     }

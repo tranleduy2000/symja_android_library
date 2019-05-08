@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim.nonlinear.vector.leastsquares;
 
 import org.hipparchus.linear.RealMatrix;
@@ -23,15 +28,20 @@ import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem.Ev
 
 /**
  * A pedantic implementation of {@link Optimum}.
- *
  */
 class OptimumImpl implements Optimum {
 
-    /** abscissa and ordinate */
+    /**
+     * abscissa and ordinate
+     */
     private final Evaluation value;
-    /** number of evaluations to compute this optimum */
+    /**
+     * number of evaluations to compute this optimum
+     */
     private final int evaluations;
-    /** number of iterations to compute this optimum */
+    /**
+     * number of iterations to compute this optimum
+     */
     private final int iterations;
 
     /**
@@ -49,67 +59,89 @@ class OptimumImpl implements Optimum {
 
     /* auto-generated implementations */
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getEvaluations() {
         return evaluations;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getIterations() {
         return iterations;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealMatrix getCovariances(double threshold) {
         return value.getCovariances(threshold);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getSigma(double covarianceSingularityThreshold) {
         return value.getSigma(covarianceSingularityThreshold);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getRMS() {
         return value.getRMS();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealMatrix getJacobian() {
         return value.getJacobian();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getCost() {
         return value.getCost();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getChiSquare() {
         return value.getChiSquare();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getReducedChiSquare(int n) {
         return value.getReducedChiSquare(n);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getResiduals() {
         return value.getResiduals();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RealVector getPoint() {
         return value.getPoint();

@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.util.FastMath;
@@ -130,6 +135,23 @@ public class RRQRDecomposition extends QRDecomposition {
 
     }
 
+    /**
+     * Get a solver for finding the A &times; X = B solution in least square sense.
+     * <p>
+     * Least Square sense means a solver can be computed for an overdetermined system,
+     * (i.e. a system with more equations than unknowns, which corresponds to a tall A
+     * matrix with more rows than columns). In any case, if the matrix is singular
+     * within the tolerance set at {@link RRQRDecomposition#RRQRDecomposition(RealMatrix,
+     * double) construction}, an error will be triggered when
+     * the {@link DecompositionSolver#solve(RealVector) solve} method will be called.
+     * </p>
+     *
+     * @return a solver
+     */
+    @Override
+    public DecompositionSolver getSolver() {
+        return new Solver(super.getSolver(), this.getP());
+    }
 
     /**
      * Returns the pivot matrix, P, used in the QR Decomposition of matrix A such that AP = QR.
@@ -157,7 +179,7 @@ public class RRQRDecomposition extends QRDecomposition {
      * bottom right submatrices.  When a large fall in norm is seen,
      * the rank is returned. The drop is computed as:</p>
      * <pre>
-     *   (thisNorm/lastNorm) * rNorm < dropThreshold
+     *   (thisNorm/lastNorm) * rNorm &lt; dropThreshold
      * </pre>
      * <p>
      * where thisNorm is the Frobenius norm of the current submatrix,
@@ -184,24 +206,6 @@ public class RRQRDecomposition extends QRDecomposition {
             rank++;
         }
         return rank;
-    }
-
-    /**
-     * Get a solver for finding the A &times; X = B solution in least square sense.
-     * <p>
-     * Least Square sense means a solver can be computed for an overdetermined system,
-     * (i.e. a system with more equations than unknowns, which corresponds to a tall A
-     * matrix with more rows than columns). In any case, if the matrix is singular
-     * within the tolerance set at {@link RRQRDecomposition#RRQRDecomposition(RealMatrix,
-     * double) construction}, an error will be triggered when
-     * the {@link DecompositionSolver#solve(RealVector) solve} method will be called.
-     * </p>
-     *
-     * @return a solver
-     */
-    @Override
-    public DecompositionSolver getSolver() {
-        return new Solver(super.getSolver(), this.getP());
     }
 
     /**
@@ -234,14 +238,6 @@ public class RRQRDecomposition extends QRDecomposition {
          * {@inheritDoc}
          */
         @Override
-        public boolean isNonSingular() {
-            return upper.isNonSingular();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public RealVector solve(RealVector b) {
             return p.operate(upper.solve(b));
         }
@@ -252,6 +248,14 @@ public class RRQRDecomposition extends QRDecomposition {
         @Override
         public RealMatrix solve(RealMatrix b) {
             return p.multiply(upper.solve(b));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isNonSingular() {
+            return upper.isNonSingular();
         }
 
         /**

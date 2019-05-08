@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis;
 
 /**
@@ -26,7 +31,7 @@ package org.hipparchus.analysis;
  * The following code excerpt shows the recommended way to do that using
  * a root solver as an example, but the same construct is applicable to
  * ODE integrators or optimizers.</p>
- * <p>
+ *
  * <pre>
  * private static class LocalException extends RuntimeException {
  *     // The x value that caused the problem.

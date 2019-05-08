@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis;
 
 import org.hipparchus.analysis.differentiation.DSFactory;
@@ -454,7 +459,7 @@ public class FunctionUtils {
                 final double[] partials = new double[point.length];
                 final double[] packed = new double[parameters + 1];
                 packed[0] = v;
-                final int orders[] = new int[parameters];
+                final int[] orders = new int[parameters];
                 for (int i = 0; i < parameters; ++i) {
 
                     // we differentiate once with respect to parameter i
@@ -534,7 +539,8 @@ public class FunctionUtils {
 
         return new MultivariateFunction() {
 
-            private DSFactory factory = null;
+            /** Factory used for building derivatives. */
+            private DSFactory factory;
 
             /** {@inheritDoc} */
             @Override

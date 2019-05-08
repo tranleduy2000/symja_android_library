@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -116,57 +121,6 @@ public class Mean extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Note that when {@link #Mean(FirstMoment)} is used to
-     * create a Mean, this method does nothing. In that case, the
-     * FirstMoment should be incremented directly.
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return moment.m1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return moment.getN();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void aggregate(Mean other) {
-        MathUtils.checkNotNull(other);
-        if (incMoment) {
-            this.moment.aggregate(other.moment);
-        }
-    }
-
-    /**
      * Returns the arithmetic mean of the entries in the specified portion of
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.
@@ -196,6 +150,14 @@ public class Mean extends AbstractStorelessUnivariateStatistic
             return xbar + (correction / sampleSize);
         }
         return Double.NaN;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getN() {
+        return moment.getN();
     }
 
     /**
@@ -254,6 +216,38 @@ public class Mean extends AbstractStorelessUnivariateStatistic
     @Override
     public Mean copy() {
         return new Mean(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that when {@link #Mean(FirstMoment)} is used to
+     * create a Mean, this method does nothing. In that case, the
+     * FirstMoment should be incremented directly.
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        return moment.m1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
     }
 
 }

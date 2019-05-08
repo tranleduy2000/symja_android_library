@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -25,11 +30,11 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * specifications.
  * <em>It is not a "user" class.</em>
  *
- * @param <PAIR> Type of the point/value pair returned by the optimization
- *               algorithm.
+ * @param <P> Type of the point/value pair returned by the optimization
+ *            algorithm.
  */
-public abstract class BaseMultivariateOptimizer<PAIR>
-        extends BaseOptimizer<PAIR> {
+public abstract class BaseMultivariateOptimizer<P>
+        extends BaseOptimizer<P> {
     /**
      * Initial guess.
      */
@@ -46,7 +51,7 @@ public abstract class BaseMultivariateOptimizer<PAIR>
     /**
      * @param checker Convergence checker.
      */
-    protected BaseMultivariateOptimizer(ConvergenceChecker<PAIR> checker) {
+    protected BaseMultivariateOptimizer(ConvergenceChecker<P> checker) {
         super(checker);
     }
 
@@ -63,7 +68,7 @@ public abstract class BaseMultivariateOptimizer<PAIR>
      * @return {@inheritDoc}
      */
     @Override
-    public PAIR optimize(OptimizationData... optData) {
+    public P optimize(OptimizationData... optData) {
         // Perform optimization.
         return super.optimize(optData);
     }

@@ -14,15 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.optim;
 
 /**
  * Base class for all convergence checker implementations.
  *
- * @param <PAIR> Type of (point, value) pair.
+ * @param <P> Type of (point, value) pair.
  */
-public abstract class AbstractConvergenceChecker<PAIR>
-        implements ConvergenceChecker<PAIR> {
+public abstract class AbstractConvergenceChecker<P>
+        implements ConvergenceChecker<P> {
     /**
      * Relative tolerance threshold.
      */
@@ -63,6 +68,6 @@ public abstract class AbstractConvergenceChecker<PAIR>
      */
     @Override
     public abstract boolean converged(int iteration,
-                                      PAIR previous,
-                                      PAIR current);
+                                      P previous,
+                                      P current);
 }

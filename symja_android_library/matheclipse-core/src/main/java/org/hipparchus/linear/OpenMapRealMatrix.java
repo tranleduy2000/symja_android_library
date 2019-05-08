@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -25,7 +30,7 @@ import java.io.Serializable;
 
 /**
  * Sparse matrix implementation based on an open addressed map.
- * <p>
+ *
  * <p>
  * Caveat: This implementation assumes that, for any {@code x},
  * the equality {@code x * 0d == 0d} holds. But it is is not true for
@@ -89,34 +94,6 @@ public class OpenMapRealMatrix extends AbstractRealMatrix
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OpenMapRealMatrix copy() {
-        return new OpenMapRealMatrix(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException if the total number of entries of the
-     *                                      matrix is larger than {@code Integer.MAX_VALUE}.
-     */
-    @Override
-    public OpenMapRealMatrix createMatrix(int rowDimension, int columnDimension)
-            throws MathIllegalArgumentException {
-        return new OpenMapRealMatrix(rowDimension, columnDimension);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getColumnDimension() {
-        return columns;
-    }
-
-    /**
      * Compute the sum of this matrix and {@code m}.
      *
      * @param m Matrix to be added.
@@ -147,10 +124,135 @@ public class OpenMapRealMatrix extends AbstractRealMatrix
     @Override
     public OpenMapRealMatrix subtract(final RealMatrix m)
             throws MathIllegalArgumentException {
-        try {
+        if (m instanceof OpenMapRealMatrix) {
             return subtract((OpenMapRealMatrix) m);
-        } catch (ClassCastException cce) {
+        } else {
             return (OpenMapRealMatrix) super.subtract(m);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@code m} is an
+     *                                      {@code OpenMapRealMatrix}, and the total number of entries of the product
+     *                                      is larger than {@code Integer.MAX_VALUE}.
+     */
+    @Override
+    public RealMatrix multiply(final RealMatrix m)
+            throws MathIllegalArgumentException {
+
+        MatrixUtils.checkMultiplicationCompatible(this, m);
+
+        final int outCols = m.getColumnDimension();
+        final RealMatrix out = m.createMatrix(rows, outCols);
+        for (OpenIntToDoubleHashMap.Iterator iterator = entries.iterator(); iterator.hasNext(); ) {
+            iterator.advance();
+            final double value = iterator.value();
+            final int key = iterator.key();
+            final int i = key / columns;
+            final int k = key % columns;
+            for (int j = 0; j < outCols; ++j) {
+                out.addToEntry(i, j, value * m.getEntry(k, j));
+            }
+        }
+
+        return out;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addToEntry(int row, int column, double increment)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        MatrixUtils.checkColumnIndex(this, column);
+        final int key = computeKey(row, column);
+        final double value = entries.get(key) + increment;
+        if (value == 0.0) {
+            entries.remove(key);
+        } else {
+            entries.put(key, value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void multiplyEntry(int row, int column, double factor)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        MatrixUtils.checkColumnIndex(this, column);
+        final int key = computeKey(row, column);
+        final double value = entries.get(key) * factor;
+        if (value == 0.0) {
+            entries.remove(key);
+        } else {
+            entries.put(key, value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRowDimension() {
+        return rows;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getColumnDimension() {
+        return columns;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if the total number of entries of the
+     *                                      matrix is larger than {@code Integer.MAX_VALUE}.
+     */
+    @Override
+    public OpenMapRealMatrix createMatrix(int rowDimension, int columnDimension)
+            throws MathIllegalArgumentException {
+        return new OpenMapRealMatrix(rowDimension, columnDimension);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OpenMapRealMatrix copy() {
+        return new OpenMapRealMatrix(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getEntry(int row, int column) throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        MatrixUtils.checkColumnIndex(this, column);
+        return entries.get(computeKey(row, column));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEntry(int row, int column, double value)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        MatrixUtils.checkColumnIndex(this, column);
+        if (value == 0.0) {
+            entries.remove(computeKey(row, column));
+        } else {
+            entries.put(computeKey(row, column), value);
         }
     }
 
@@ -185,29 +287,56 @@ public class OpenMapRealMatrix extends AbstractRealMatrix
      *                                      is larger than {@code Integer.MAX_VALUE}.
      */
     @Override
-    public RealMatrix multiply(final RealMatrix m)
+    public RealMatrix multiplyTransposed(final RealMatrix m)
             throws MathIllegalArgumentException {
-        try {
-            return multiply((OpenMapRealMatrix) m);
-        } catch (ClassCastException cce) {
 
-            MatrixUtils.checkMultiplicationCompatible(this, m);
+        MatrixUtils.checkSameColumnDimension(this, m);
 
-            final int outCols = m.getColumnDimension();
-            final BlockRealMatrix out = new BlockRealMatrix(rows, outCols);
-            for (OpenIntToDoubleHashMap.Iterator iterator = entries.iterator(); iterator.hasNext(); ) {
-                iterator.advance();
-                final double value = iterator.value();
-                final int key = iterator.key();
-                final int i = key / columns;
-                final int k = key % columns;
-                for (int j = 0; j < outCols; ++j) {
-                    out.addToEntry(i, j, value * m.getEntry(k, j));
-                }
+        final int outCols = m.getRowDimension();
+        final RealMatrix out = m.createMatrix(rows, outCols);
+        for (OpenIntToDoubleHashMap.Iterator iterator = entries.iterator(); iterator.hasNext(); ) {
+            iterator.advance();
+            final double value = iterator.value();
+            final int key = iterator.key();
+            final int i = key / columns;
+            final int k = key % columns;
+            for (int j = 0; j < outCols; ++j) {
+                out.addToEntry(i, j, value * m.getEntry(j, k));
             }
-
-            return out;
         }
+
+        return out;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@code m} is an
+     *                                      {@code OpenMapRealMatrix}, and the total number of entries of the product
+     *                                      is larger than {@code Integer.MAX_VALUE}.
+     */
+    @Override
+    public RealMatrix transposeMultiply(final RealMatrix m)
+            throws MathIllegalArgumentException {
+
+        MatrixUtils.checkSameRowDimension(this, m);
+
+        final int outCols = m.getColumnDimension();
+        final RealMatrix out = m.createMatrix(columns, outCols);
+        for (OpenIntToDoubleHashMap.Iterator iterator = entries.iterator(); iterator.hasNext(); ) {
+            iterator.advance();
+            final double value = iterator.value();
+            final int key = iterator.key();
+            final int k = key / columns;
+            final int i = key % columns;
+            for (int j = 0; j < outCols; ++j) {
+                out.addToEntry(i, j, value * m.getEntry(k, j));
+            }
+        }
+
+        return out;
+
     }
 
     /**
@@ -249,73 +378,6 @@ public class OpenMapRealMatrix extends AbstractRealMatrix
         }
 
         return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getEntry(int row, int column) throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        MatrixUtils.checkColumnIndex(this, column);
-        return entries.get(computeKey(row, column));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getRowDimension() {
-        return rows;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setEntry(int row, int column, double value)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        MatrixUtils.checkColumnIndex(this, column);
-        if (value == 0.0) {
-            entries.remove(computeKey(row, column));
-        } else {
-            entries.put(computeKey(row, column), value);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addToEntry(int row, int column, double increment)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        MatrixUtils.checkColumnIndex(this, column);
-        final int key = computeKey(row, column);
-        final double value = entries.get(key) + increment;
-        if (value == 0.0) {
-            entries.remove(key);
-        } else {
-            entries.put(key, value);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void multiplyEntry(int row, int column, double factor)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        MatrixUtils.checkColumnIndex(this, column);
-        final int key = computeKey(row, column);
-        final double value = entries.get(key) * factor;
-        if (value == 0.0) {
-            entries.remove(key);
-        } else {
-            entries.put(key, value);
-        }
     }
 
     /**

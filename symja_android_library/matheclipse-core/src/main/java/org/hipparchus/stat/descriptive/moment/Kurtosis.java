@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.stat.descriptive.moment;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -36,7 +41,7 @@ import java.io.Serializable;
  * where n is the number of values, mean is the {@link Mean} and std is the
  * {@link StandardDeviation}.
  * <p>
- * Note that this statistic is undefined for n < 4.  <code>Double.Nan</code>
+ * Note that this statistic is undefined for n &lt; 4.  <code>Double.Nan</code>
  * is returned when there is not sufficient data to compute the statistic.
  * Note that Double.NaN may also be returned if the input includes NaN
  * and / or infinite values.
@@ -98,60 +103,6 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
     }
 
     /**
-     * {@inheritDoc}
-     * <p>Note that when {@link #Kurtosis(FourthMoment)} is used to
-     * create a Variance, this method does nothing. In that case, the
-     * FourthMoment should be incremented directly.</p>
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        double kurtosis = Double.NaN;
-        if (moment.getN() > 3) {
-            double variance = moment.m2 / (moment.n - 1);
-            if (moment.n <= 3 || variance < 10E-20) {
-                kurtosis = 0.0;
-            } else {
-                double n = moment.n;
-                kurtosis =
-                        (n * (n + 1) * moment.getResult() -
-                                3 * moment.m2 * moment.m2 * (n - 1)) /
-                                ((n - 1) * (n - 2) * (n - 3) * variance * variance);
-            }
-        }
-        return kurtosis;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return moment.getN();
-    }
-
-    /* UnvariateStatistic Approach  */
-
-    /**
      * Returns the kurtosis of the entries in the specified portion of the
      * input array.
      * <p>
@@ -206,8 +157,62 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
      * {@inheritDoc}
      */
     @Override
+    public long getN() {
+        return moment.getN();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Kurtosis copy() {
         return new Kurtosis(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>Note that when {@link #Kurtosis(FourthMoment)} is used to
+     * create a Variance, this method does nothing. In that case, the
+     * FourthMoment should be incremented directly.</p>
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /* UnvariateStatistic Approach  */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getResult() {
+        double kurtosis = Double.NaN;
+        if (moment.getN() > 3) {
+            double variance = moment.m2 / (moment.n - 1);
+            if (moment.n <= 3 || variance < 10E-20) {
+                kurtosis = 0.0;
+            } else {
+                double n = moment.n;
+                kurtosis =
+                        (n * (n + 1) * moment.getResult() -
+                                3 * moment.m2 * moment.m2 * (n - 1)) /
+                                ((n - 1) * (n - 2) * (n - 3) * variance * variance);
+            }
+        }
+        return kurtosis;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
     }
 
 }

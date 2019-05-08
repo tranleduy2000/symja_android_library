@@ -14,15 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
+import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.OpenIntToFieldHashMap;
 
 /**
  * Sparse matrix implementation based on an open addressed map.
- * <p>
+ *
  * <p>
  * Caveat: This implementation assumes that, for any {@code x},
  * the equality {@code x * 0d == 0d} holds. But it is is not true for
@@ -57,7 +63,7 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
         super(field);
         rows = 0;
         columns = 0;
-        entries = new OpenIntToFieldHashMap<T>(field);
+        entries = new OpenIntToFieldHashMap<>(field);
     }
 
     /**
@@ -74,7 +80,7 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
         super(field, rowDimension, columnDimension);
         this.rows = rowDimension;
         this.columns = columnDimension;
-        entries = new OpenIntToFieldHashMap<T>(field);
+        entries = new OpenIntToFieldHashMap<>(field);
     }
 
     /**
@@ -86,7 +92,7 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
         super(other.getField(), other.getRowDimension(), other.getColumnDimension());
         rows = other.getRowDimension();
         columns = other.getColumnDimension();
-        entries = new OpenIntToFieldHashMap<T>(other.entries);
+        entries = new OpenIntToFieldHashMap<>(other.entries);
     }
 
     /**
@@ -98,11 +104,51 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
         super(other.getField(), other.getRowDimension(), other.getColumnDimension());
         rows = other.getRowDimension();
         columns = other.getColumnDimension();
-        entries = new OpenIntToFieldHashMap<T>(getField());
+        entries = new OpenIntToFieldHashMap<>(getField());
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 setEntry(i, j, other.getEntry(i, j));
             }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldMatrix<T> createMatrix(int rowDimension, int columnDimension) {
+        return new SparseFieldMatrix<T>(getField(), rowDimension, columnDimension);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldMatrix<T> copy() {
+        return new SparseFieldMatrix<T>(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T getEntry(int row, int column) {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+        return entries.get(computeKey(row, column));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEntry(int row, int column, T value) {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+        if (getField().getZero().equals(value)) {
+            entries.remove(computeKey(row, column));
+        } else {
+            entries.put(computeKey(row, column), value);
         }
     }
 
@@ -126,48 +172,6 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
      * {@inheritDoc}
      */
     @Override
-    public FieldMatrix<T> copy() {
-        return new SparseFieldMatrix<T>(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldMatrix<T> createMatrix(int rowDimension, int columnDimension) {
-        return new SparseFieldMatrix<T>(getField(), rowDimension, columnDimension);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getColumnDimension() {
-        return columns;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T getEntry(int row, int column) {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-        return entries.get(computeKey(row, column));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getRowDimension() {
-        return rows;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void multiplyEntry(int row, int column, T factor) {
         checkRowIndex(row);
         checkColumnIndex(column);
@@ -185,14 +189,76 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
      * {@inheritDoc}
      */
     @Override
-    public void setEntry(int row, int column, T value) {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-        if (getField().getZero().equals(value)) {
-            entries.remove(computeKey(row, column));
-        } else {
-            entries.put(computeKey(row, column), value);
+    public int getRowDimension() {
+        return rows;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getColumnDimension() {
+        return columns;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@code m} is an
+     *                                      {@code OpenMapRealMatrix}, and the total number of entries of the product
+     *                                      is larger than {@code Integer.MAX_VALUE}.
+     */
+    @Override
+    public FieldMatrix<T> multiplyTransposed(final FieldMatrix<T> m)
+            throws MathIllegalArgumentException {
+
+        MatrixUtils.checkSameColumnDimension(this, m);
+
+        final int outCols = m.getRowDimension();
+        final FieldMatrix<T> out = m.createMatrix(rows, outCols);
+        for (OpenIntToFieldHashMap<T>.Iterator iterator = entries.iterator(); iterator.hasNext(); ) {
+            iterator.advance();
+            final T value = iterator.value();
+            final int key = iterator.key();
+            final int i = key / columns;
+            final int k = key % columns;
+            for (int j = 0; j < outCols; ++j) {
+                out.addToEntry(i, j, value.multiply(m.getEntry(j, k)));
+            }
         }
+
+        return out;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws MathIllegalArgumentException if {@code m} is an
+     *                                      {@code OpenMapRealMatrix}, and the total number of entries of the product
+     *                                      is larger than {@code Integer.MAX_VALUE}.
+     */
+    @Override
+    public FieldMatrix<T> transposeMultiply(final FieldMatrix<T> m)
+            throws MathIllegalArgumentException {
+
+        MatrixUtils.checkSameRowDimension(this, m);
+
+        final int outCols = m.getColumnDimension();
+        final FieldMatrix<T> out = m.createMatrix(columns, outCols);
+        for (OpenIntToFieldHashMap<T>.Iterator iterator = entries.iterator(); iterator.hasNext(); ) {
+            iterator.advance();
+            final T value = iterator.value();
+            final int key = iterator.key();
+            final int k = key / columns;
+            final int i = key % columns;
+            for (int j = 0; j < outCols; ++j) {
+                out.addToEntry(i, j, value.multiply(m.getEntry(k, j)));
+            }
+        }
+
+        return out;
+
     }
 
     /**

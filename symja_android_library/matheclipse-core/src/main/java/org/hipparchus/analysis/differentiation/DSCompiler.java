@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.analysis.differentiation;
 
 import org.hipparchus.Field;
@@ -23,8 +28,10 @@ import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
 import org.hipparchus.util.FastMath;
+import org.hipparchus.util.FieldSinCos;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
+import org.hipparchus.util.SinCos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,21 +85,21 @@ import java.util.concurrent.atomic.AtomicReference;
  *   int parameters = 3;
  *   DSCompiler compiler = DSCompiler.getCompiler(parameters, order);
  *   int size = compiler.getSize();
- * <p>
+ *
  *   // pack all elements in a single array
  *   double[] array = new double[n * size];
  *   for (int i = 0; i &lt; n; ++i) {
- * <p>
+ *
  *     // we know value is guaranteed to be the first element
  *     array[i * size] = v[i];
- * <p>
+ *
  *     // we don't know where first derivatives are stored, so we ask the compiler
  *     array[i * size + compiler.getPartialDerivativeIndex(1, 0, 0) = dvOnDx[i][0];
  *     array[i * size + compiler.getPartialDerivativeIndex(0, 1, 0) = dvOnDy[i][0];
  *     array[i * size + compiler.getPartialDerivativeIndex(0, 0, 1) = dvOnDz[i][0];
- * <p>
+ *
  *     // we let all higher order derivatives set to 0
- * <p>
+ *
  *   }
  * </pre>
  * <p>Then in another function, user can perform some operations on all elements stored
@@ -104,15 +111,15 @@ import java.util.concurrent.atomic.AtomicReference;
  *     double[] tmp = product.clone();
  *     compiler.multiply(tmp, 0, array, i * size, product, 0);
  *   }
- * <p>
+ *
  *   // value
  *   double p = product[0];
- * <p>
+ *
  *   // first derivatives
  *   double dPdX = product[compiler.getPartialDerivativeIndex(1, 0, 0)];
  *   double dPdY = product[compiler.getPartialDerivativeIndex(0, 1, 0)];
  *   double dPdZ = product[compiler.getPartialDerivativeIndex(0, 0, 1)];
- * <p>
+ *
  *   // cross derivatives (assuming order was at least 2)
  *   double dPdXdX = product[compiler.getPartialDerivativeIndex(2, 0, 0)];
  *   double dPdXdY = product[compiler.getPartialDerivativeIndex(1, 1, 0)];
@@ -129,8 +136,7 @@ public class DSCompiler {
     /**
      * Array of all compilers created so far.
      */
-    private static AtomicReference<DSCompiler[][]> compilers =
-            new AtomicReference<DSCompiler[][]>(null);
+    private static AtomicReference<DSCompiler[][]> compilers = new AtomicReference<>(null);
 
     /**
      * Number of free parameters.
@@ -388,14 +394,14 @@ public class DSCompiler {
 
         for (int i = 0; i < dSize; ++i) {
             final int[][] dRow = derivativeCompiler.multIndirection[i];
-            List<int[]> row = new ArrayList<int[]>(dRow.length * 2);
+            List<int[]> row = new ArrayList<>(dRow.length * 2);
             for (int j = 0; j < dRow.length; ++j) {
                 row.add(new int[]{dRow[j][0], lowerIndirection[dRow[j][1]], vSize + dRow[j][2]});
                 row.add(new int[]{dRow[j][0], vSize + dRow[j][1], lowerIndirection[dRow[j][2]]});
             }
 
             // combine terms with similar derivation orders
-            final List<int[]> combined = new ArrayList<int[]>(row.size());
+            final List<int[]> combined = new ArrayList<>(row.size());
             for (int j = 0; j < row.size(); ++j) {
                 final int[] termJ = row.get(j);
                 if (termJ[0] > 0) {
@@ -412,7 +418,7 @@ public class DSCompiler {
                 }
             }
 
-            multIndirection[vSize + i] = combined.toArray(new int[combined.size()][]);
+            multIndirection[vSize + i] = combined.toArray(new int[0][]);
 
         }
 
@@ -460,7 +466,7 @@ public class DSCompiler {
         // with respect to the parameter this compiler handles and the
         // underlying one did not handle
         for (int i = 0; i < dSize; ++i) {
-            List<int[]> row = new ArrayList<int[]>();
+            List<int[]> row = new ArrayList<>();
             for (int[] term : derivativeCompiler.compIndirection[i]) {
 
                 // handle term p * f_k(g(x)) * g_l1(x) * g_l2(x) * ... * g_lp(x)
@@ -507,7 +513,7 @@ public class DSCompiler {
             }
 
             // combine terms with similar derivation orders
-            final List<int[]> combined = new ArrayList<int[]>(row.size());
+            final List<int[]> combined = new ArrayList<>(row.size());
             for (int j = 0; j < row.size(); ++j) {
                 final int[] termJ = row.get(j);
                 if (termJ[0] > 0) {
@@ -528,7 +534,7 @@ public class DSCompiler {
                 }
             }
 
-            compIndirection[vSize + i] = combined.toArray(new int[combined.size()][]);
+            compIndirection[vSize + i] = combined.toArray(new int[0][]);
 
         }
 
@@ -569,7 +575,8 @@ public class DSCompiler {
                         ordersSum, order);
             }
 
-            while (derivativeOrder-- > 0) {
+            while (derivativeOrder > 0) {
+                --derivativeOrder;
                 // as long as we differentiate according to current free parameter,
                 // we have to skip the value part and dive into the derivative part
                 // so we add the size of the value part to the base index
@@ -659,7 +666,7 @@ public class DSCompiler {
      * @see #getPartialDerivativeIndex(int...)
      */
     public int[] getPartialDerivativeOrders(final int index) {
-        return derivativesIndirection[index];
+        return derivativesIndirection[index].clone();
     }
 
     /**
@@ -1914,9 +1921,10 @@ public class DSCompiler {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
-        function[0] = FastMath.cos(operand[operandOffset]);
+        final SinCos sinCos = FastMath.sinCos(operand[operandOffset]);
+        function[0] = sinCos.cos();
         if (order > 0) {
-            function[1] = -FastMath.sin(operand[operandOffset]);
+            function[1] = -sinCos.sin();
             for (int i = 2; i <= order; ++i) {
                 function[i] = -function[i - 2];
             }
@@ -1945,15 +1953,14 @@ public class DSCompiler {
 
         // create the function value and derivatives
         T[] function = MathArrays.buildArray(field, 1 + order);
-        final T cos = operand[operandOffset].cos();
-        function[0] = cos;
+        final FieldSinCos<T> sinCos = FastMath.sinCos(operand[operandOffset]);
+        function[0] = sinCos.cos();
         if (order > 0) {
-            final T sin = operand[operandOffset].sin();
-            function[1] = sin.negate();
+            function[1] = sinCos.sin().negate();
             if (order > 1) {
-                function[2] = cos.negate();
+                function[2] = sinCos.cos().negate();
                 if (order > 2) {
-                    function[3] = sin;
+                    function[3] = sinCos.sin();
                     for (int i = 4; i <= order; ++i) {
                         function[i] = function[i - 4];
                     }
@@ -1981,9 +1988,10 @@ public class DSCompiler {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
-        function[0] = FastMath.sin(operand[operandOffset]);
+        final SinCos sinCos = FastMath.sinCos(operand[operandOffset]);
+        function[0] = sinCos.sin();
         if (order > 0) {
-            function[1] = FastMath.cos(operand[operandOffset]);
+            function[1] = sinCos.cos();
             for (int i = 2; i <= order; ++i) {
                 function[i] = -function[i - 2];
             }
@@ -2012,15 +2020,14 @@ public class DSCompiler {
 
         // create the function value and derivatives
         T[] function = MathArrays.buildArray(field, 1 + order);
-        final T sin = operand[operandOffset].sin();
-        function[0] = sin;
+        final FieldSinCos<T> sinCos = FastMath.sinCos(operand[operandOffset]);
+        function[0] = sinCos.sin();
         if (order > 0) {
-            final T cos = operand[operandOffset].cos();
-            function[1] = cos;
+            function[1] = sinCos.cos();
             if (order > 1) {
-                function[2] = sin.negate();
+                function[2] = sinCos.sin().negate();
                 if (order > 2) {
-                    function[3] = cos.negate();
+                    function[3] = sinCos.cos().negate();
                     for (int i = 4; i <= order; ++i) {
                         function[i] = function[i - 4];
                     }
@@ -2030,6 +2037,94 @@ public class DSCompiler {
 
         // apply function composition
         compose(operand, operandOffset, function, result, resultOffset);
+
+    }
+
+    /**
+     * Compute combined sine and cosine of a derivative structure.
+     *
+     * @param operand       array holding the operand
+     * @param operandOffset offset of the operand in its array
+     * @param sin           array where sine must be stored (for
+     *                      sine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param sinOffset     offset of the result in its array
+     * @param cos           array where cosine must be stored (for
+     *                      cosine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param cosOffset     offset of the result in its array
+     * @since 1.4
+     */
+    public void sinCos(final double[] operand, final int operandOffset,
+                       final double[] sin, final int sinOffset,
+                       final double[] cos, final int cosOffset) {
+
+        // create the function value and derivatives
+        double[] functionSin = new double[1 + order];
+        double[] functionCos = new double[1 + order];
+        final SinCos sinCos = FastMath.sinCos(operand[operandOffset]);
+        functionSin[0] = sinCos.sin();
+        functionCos[0] = sinCos.cos();
+        if (order > 0) {
+            functionSin[1] = sinCos.cos();
+            functionCos[1] = -sinCos.sin();
+            for (int i = 2; i <= order; ++i) {
+                functionSin[i] = -functionSin[i - 2];
+                functionCos[i] = -functionCos[i - 2];
+            }
+        }
+
+        // apply function composition
+        compose(operand, operandOffset, functionSin, sin, sinOffset);
+        compose(operand, operandOffset, functionCos, cos, cosOffset);
+
+    }
+
+    /**
+     * Compute combined sine and cosine of a derivative structure.
+     *
+     * @param operand       array holding the operand
+     * @param operandOffset offset of the operand in its array
+     * @param sin           array where sine must be stored (for
+     *                      sine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param sinOffset     offset of the result in its array
+     * @param cos           array where cosine must be stored (for
+     *                      cosine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param cosOffset     offset of the result in its array
+     * @param <T>           the type of the function parameters and value
+     * @since 1.4
+     */
+    public <T extends RealFieldElement<T>> void sinCos(final T[] operand, final int operandOffset,
+                                                       final T[] sin, final int sinOffset,
+                                                       final T[] cos, final int cosOffset) {
+
+        final Field<T> field = operand[operandOffset].getField();
+
+        // create the function value and derivatives
+        T[] functionSin = MathArrays.buildArray(field, 1 + order);
+        T[] functionCos = MathArrays.buildArray(field, 1 + order);
+        final FieldSinCos<T> sinCos = FastMath.sinCos(operand[operandOffset]);
+        functionCos[0] = sinCos.cos();
+        if (order > 0) {
+            functionCos[1] = sinCos.sin().negate();
+            if (order > 1) {
+                functionCos[2] = sinCos.cos().negate();
+                if (order > 2) {
+                    functionCos[3] = sinCos.sin();
+                    for (int i = 4; i <= order; ++i) {
+                        functionCos[i] = functionCos[i - 4];
+                    }
+                }
+            }
+        }
+        functionSin[0] = sinCos.sin();
+        System.arraycopy(functionCos, 0, functionSin, 1, order);
+
+        // apply function composition
+        compose(operand, operandOffset, functionSin, sin, sinOffset);
+        compose(operand, operandOffset, functionCos, cos, cosOffset);
 
     }
 

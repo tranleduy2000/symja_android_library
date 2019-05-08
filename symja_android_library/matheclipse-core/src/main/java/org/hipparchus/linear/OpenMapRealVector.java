@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -236,20 +241,6 @@ public class OpenMapRealVector extends SparseRealVector
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealVector add(RealVector v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        if (v instanceof OpenMapRealVector) {
-            return add((OpenMapRealVector) v);
-        } else {
-            return super.add(v);
-        }
-    }
-
-    /**
      * Optimized method to add two OpenMapRealVectors.
      * It copies the larger vector, then iterates over the smaller.
      *
@@ -296,6 +287,37 @@ public class OpenMapRealVector extends SparseRealVector
      * {@inheritDoc}
      */
     @Override
+    public int getDimension() {
+        return virtualSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getEntry(int index) throws MathIllegalArgumentException {
+        checkIndex(index);
+        return entries.get(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEntry(int index, double value)
+            throws MathIllegalArgumentException {
+        checkIndex(index);
+        if (!isDefaultValue(value)) {
+            entries.put(index, value);
+        } else if (entries.containsKey(index)) {
+            entries.remove(index);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public OpenMapRealVector append(RealVector v) {
         if (v instanceof OpenMapRealVector) {
             return append((OpenMapRealVector) v);
@@ -316,6 +338,125 @@ public class OpenMapRealVector extends SparseRealVector
         OpenMapRealVector res = new OpenMapRealVector(this, 1);
         res.setEntry(virtualSize, d);
         return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OpenMapRealVector getSubVector(int index, int n)
+            throws MathIllegalArgumentException {
+        checkIndex(index);
+        if (n < 0) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE, n);
+        }
+        checkIndex(index + n - 1);
+        OpenMapRealVector res = new OpenMapRealVector(n);
+        int end = index + n;
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            if (key >= index && key < end) {
+                res.setEntry(key - index, iter.value());
+            }
+        }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSubVector(int index, RealVector v)
+            throws MathIllegalArgumentException {
+        checkIndex(index);
+        checkIndex(index + v.getDimension() - 1);
+        for (int i = 0; i < v.getDimension(); i++) {
+            setEntry(i + index, v.getEntry(i));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNaN() {
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            if (Double.isNaN(iter.value())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isInfinite() {
+        boolean infiniteFound = false;
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            final double value = iter.value();
+            if (Double.isNaN(value)) {
+                return false;
+            }
+            if (Double.isInfinite(value)) {
+                infiniteFound = true;
+            }
+        }
+        return infiniteFound;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealVector add(RealVector v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        if (v instanceof OpenMapRealVector) {
+            return add((OpenMapRealVector) v);
+        } else {
+            return super.add(v);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealVector subtract(RealVector v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        if (v instanceof OpenMapRealVector) {
+            return subtract((OpenMapRealVector) v);
+        } else {
+            return super.subtract(v);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OpenMapRealVector mapAdd(double d) {
+        return copy().mapAddToSelf(d);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OpenMapRealVector mapAddToSelf(double d) {
+        for (int i = 0; i < virtualSize; i++) {
+            setEntry(i, getEntry(i) + d);
+        }
+        return this;
     }
 
     /**
@@ -366,69 +507,6 @@ public class OpenMapRealVector extends SparseRealVector
      * {@inheritDoc}
      */
     @Override
-    public OpenMapRealVector getSubVector(int index, int n)
-            throws MathIllegalArgumentException {
-        checkIndex(index);
-        if (n < 0) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE, n);
-        }
-        checkIndex(index + n - 1);
-        OpenMapRealVector res = new OpenMapRealVector(n);
-        int end = index + n;
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            if (key >= index && key < end) {
-                res.setEntry(key - index, iter.value());
-            }
-        }
-        return res;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getDimension() {
-        return virtualSize;
-    }
-
-    /**
-     * Optimized method to compute distance.
-     *
-     * @param v Vector to compute distance to.
-     * @return the distance from {@code this} and {@code v}.
-     * @throws MathIllegalArgumentException if the dimensions do not match.
-     */
-    public double getDistance(OpenMapRealVector v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        Iterator iter = entries.iterator();
-        double res = 0;
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            double delta;
-            delta = iter.value() - v.getEntry(key);
-            res += delta * delta;
-        }
-        iter = v.getEntries().iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            if (!entries.containsKey(key)) {
-                final double value = iter.value();
-                res += value * value;
-            }
-        }
-        return FastMath.sqrt(res);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double getDistance(RealVector v) throws MathIllegalArgumentException {
         checkVectorDimensions(v.getDimension());
         if (v instanceof OpenMapRealVector) {
@@ -436,47 +514,6 @@ public class OpenMapRealVector extends SparseRealVector
         } else {
             return super.getDistance(v);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getEntry(int index) throws MathIllegalArgumentException {
-        checkIndex(index);
-        return entries.get(index);
-    }
-
-    /**
-     * Distance between two vectors.
-     * This method computes the distance consistent with
-     * L<sub>1</sub> norm, i.e. the sum of the absolute values of
-     * elements differences.
-     *
-     * @param v Vector to which distance is requested.
-     * @return distance between this vector and {@code v}.
-     * @throws MathIllegalArgumentException if the dimensions do not match.
-     */
-    public double getL1Distance(OpenMapRealVector v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        double max = 0;
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            double delta = FastMath.abs(iter.value() - v.getEntry(iter.key()));
-            max += delta;
-        }
-        iter = v.getEntries().iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            if (!entries.containsKey(key)) {
-                double delta = FastMath.abs(iter.value());
-                max += FastMath.abs(delta);
-            }
-        }
-        return max;
     }
 
     /**
@@ -491,36 +528,6 @@ public class OpenMapRealVector extends SparseRealVector
         } else {
             return super.getL1Distance(v);
         }
-    }
-
-    /**
-     * Optimized method to compute LInfDistance.
-     *
-     * @param v Vector to compute distance from.
-     * @return the LInfDistance.
-     * @throws MathIllegalArgumentException if the dimensions do not match.
-     */
-    private double getLInfDistance(OpenMapRealVector v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        double max = 0;
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            double delta = FastMath.abs(iter.value() - v.getEntry(iter.key()));
-            if (delta > max) {
-                max = delta;
-            }
-        }
-        iter = v.getEntries().iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            if (!entries.containsKey(key) && iter.value() > max) {
-                max = iter.value();
-            }
-        }
-        return max;
     }
 
     /**
@@ -541,87 +548,6 @@ public class OpenMapRealVector extends SparseRealVector
      * {@inheritDoc}
      */
     @Override
-    public boolean isInfinite() {
-        boolean infiniteFound = false;
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            final double value = iter.value();
-            if (Double.isNaN(value)) {
-                return false;
-            }
-            if (Double.isInfinite(value)) {
-                infiniteFound = true;
-            }
-        }
-        return infiniteFound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isNaN() {
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            if (Double.isNaN(iter.value())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OpenMapRealVector mapAdd(double d) {
-        return copy().mapAddToSelf(d);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OpenMapRealVector mapAddToSelf(double d) {
-        for (int i = 0; i < virtualSize; i++) {
-            setEntry(i, getEntry(i) + d);
-        }
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setEntry(int index, double value)
-            throws MathIllegalArgumentException {
-        checkIndex(index);
-        if (!isDefaultValue(value)) {
-            entries.put(index, value);
-        } else if (entries.containsKey(index)) {
-            entries.remove(index);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSubVector(int index, RealVector v)
-            throws MathIllegalArgumentException {
-        checkIndex(index);
-        checkIndex(index + v.getDimension() - 1);
-        for (int i = 0; i < v.getDimension(); i++) {
-            setEntry(i + index, v.getEntry(i));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void set(double value) {
         for (int i = 0; i < virtualSize; i++) {
             setEntry(i, value);
@@ -629,41 +555,17 @@ public class OpenMapRealVector extends SparseRealVector
     }
 
     /**
-     * Optimized method to subtract OpenMapRealVectors.
-     *
-     * @param v Vector to subtract from {@code this}.
-     * @return the difference of {@code this} and {@code v}.
-     * @throws MathIllegalArgumentException if the dimensions do not match.
-     */
-    public OpenMapRealVector subtract(OpenMapRealVector v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        OpenMapRealVector res = copy();
-        Iterator iter = v.getEntries().iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            if (entries.containsKey(key)) {
-                res.setEntry(key, entries.get(key) - iter.value());
-            } else {
-                res.setEntry(key, -iter.value());
-            }
-        }
-        return res;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public RealVector subtract(RealVector v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        if (v instanceof OpenMapRealVector) {
-            return subtract((OpenMapRealVector) v);
-        } else {
-            return super.subtract(v);
+    public double[] toArray() {
+        double[] res = new double[virtualSize];
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            res[iter.key()] = iter.value();
         }
+        return res;
     }
 
     /**
@@ -696,37 +598,8 @@ public class OpenMapRealVector extends SparseRealVector
      * {@inheritDoc}
      */
     @Override
-    public double[] toArray() {
-        double[] res = new double[virtualSize];
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            res[iter.key()] = iter.value();
-        }
-        return res;
-    }
-
-    /**
-     * {@inheritDoc}
-     * Implementation Note: This works on exact values, and as a result
-     * it is possible for {@code a.subtract(b)} to be the zero vector, while
-     * {@code a.hashCode() != b.hashCode()}.
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(epsilon);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        result = prime * result + virtualSize;
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            temp = Double.doubleToLongBits(iter.value());
-            result = prime * result + (int) (temp ^ (temp >> 32));
-        }
-        return result;
+    public java.util.Iterator<Entry> sparseIterator() {
+        return new OpenMapSparseIterator();
     }
 
     /**
@@ -771,18 +644,150 @@ public class OpenMapRealVector extends SparseRealVector
     }
 
     /**
+     * {@inheritDoc}
+     * Implementation Note: This works on exact values, and as a result
+     * it is possible for {@code a.subtract(b)} to be the zero vector, while
+     * {@code a.hashCode() != b.hashCode()}.
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        long temp;
+        temp = Double.doubleToLongBits(epsilon);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + virtualSize;
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            temp = Double.doubleToLongBits(iter.value());
+            result = prime * result + (int) (temp ^ (temp >> 32));
+        }
+        return result;
+    }
+
+    /**
+     * Optimized method to compute distance.
+     *
+     * @param v Vector to compute distance to.
+     * @return the distance from {@code this} and {@code v}.
+     * @throws MathIllegalArgumentException if the dimensions do not match.
+     */
+    public double getDistance(OpenMapRealVector v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        Iterator iter = entries.iterator();
+        double res = 0;
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            double delta;
+            delta = iter.value() - v.getEntry(key);
+            res += delta * delta;
+        }
+        iter = v.getEntries().iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            if (!entries.containsKey(key)) {
+                final double value = iter.value();
+                res += value * value;
+            }
+        }
+        return FastMath.sqrt(res);
+    }
+
+    /**
+     * Distance between two vectors.
+     * This method computes the distance consistent with
+     * L<sub>1</sub> norm, i.e. the sum of the absolute values of
+     * elements differences.
+     *
+     * @param v Vector to which distance is requested.
+     * @return distance between this vector and {@code v}.
+     * @throws MathIllegalArgumentException if the dimensions do not match.
+     */
+    public double getL1Distance(OpenMapRealVector v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        double max = 0;
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            double delta = FastMath.abs(iter.value() - v.getEntry(iter.key()));
+            max += delta;
+        }
+        iter = v.getEntries().iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            if (!entries.containsKey(key)) {
+                double delta = FastMath.abs(iter.value());
+                max += FastMath.abs(delta);
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Optimized method to compute LInfDistance.
+     *
+     * @param v Vector to compute distance from.
+     * @return the LInfDistance.
+     * @throws MathIllegalArgumentException if the dimensions do not match.
+     */
+    private double getLInfDistance(OpenMapRealVector v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        double max = 0;
+        Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            double delta = FastMath.abs(iter.value() - v.getEntry(iter.key()));
+            if (delta > max) {
+                max = delta;
+            }
+        }
+        iter = v.getEntries().iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            if (!entries.containsKey(key) && iter.value() > max) {
+                max = iter.value();
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Optimized method to subtract OpenMapRealVectors.
+     *
+     * @param v Vector to subtract from {@code this}.
+     * @return the difference of {@code this} and {@code v}.
+     * @throws MathIllegalArgumentException if the dimensions do not match.
+     */
+    public OpenMapRealVector subtract(OpenMapRealVector v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        OpenMapRealVector res = copy();
+        Iterator iter = v.getEntries().iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            if (entries.containsKey(key)) {
+                res.setEntry(key, entries.get(key) - iter.value());
+            } else {
+                res.setEntry(key, -iter.value());
+            }
+        }
+        return res;
+    }
+
+    /**
      * @return the percentage of none zero elements as a decimal percent.
      */
     public double getSparsity() {
         return (double) entries.size() / (double) getDimension();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public java.util.Iterator<Entry> sparseIterator() {
-        return new OpenMapSparseIterator();
     }
 
     /**

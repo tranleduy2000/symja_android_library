@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.distribution.continuous;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -101,22 +106,6 @@ public class LaplaceDistribution extends AbstractRealDistribution {
      * {@inheritDoc}
      */
     @Override
-    public double inverseCumulativeProbability(double p) throws MathIllegalArgumentException {
-        MathUtils.checkRangeInclusive(p, 0, 1);
-
-        if (p == 0) {
-            return Double.NEGATIVE_INFINITY;
-        } else if (p == 1) {
-            return Double.POSITIVE_INFINITY;
-        }
-        double x = (p > 0.5) ? -Math.log(2.0 - 2.0 * p) : Math.log(2.0 * p);
-        return mu + beta * x;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double getNumericalMean() {
         return mu;
     }
@@ -151,6 +140,22 @@ public class LaplaceDistribution extends AbstractRealDistribution {
     @Override
     public boolean isSupportConnected() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double inverseCumulativeProbability(double p) throws MathIllegalArgumentException {
+        MathUtils.checkRangeInclusive(p, 0, 1);
+
+        if (p == 0) {
+            return Double.NEGATIVE_INFINITY;
+        } else if (p == 1) {
+            return Double.POSITIVE_INFINITY;
+        }
+        double x = (p > 0.5) ? -Math.log(2.0 - 2.0 * p) : Math.log(2.0 * p);
+        return mu + beta * x;
     }
 
 }

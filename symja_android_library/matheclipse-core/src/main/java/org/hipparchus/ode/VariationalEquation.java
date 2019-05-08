@@ -246,7 +246,7 @@ public class VariationalEquation {
      * @return a new instance of initial state, with the initial Jacobians
      * matrices properly initialized
      */
-    public ODEState setUpInitialState(final ODEState initialState) {
+    public ODEState setUpInitialState(final ODEState initialState) { // NOPMD - PMD false positive
 
         // insert the matrices data into secondary states
         final double[][] secondary = new double[expandable.getMapper().getNumberOfEquations() - 1][];
@@ -362,10 +362,9 @@ public class VariationalEquation {
             return jode.getDimension() * (jode.getDimension() + jode.getParametersNames().size());
         }
 
-
         @Override
         public void init(double t0, double[] primary0, double[] secondary0, double finalTime) {
-
+            // nothing by default
         }
 
         /**

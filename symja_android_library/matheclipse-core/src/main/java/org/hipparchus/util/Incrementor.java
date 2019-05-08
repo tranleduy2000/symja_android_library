@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.util;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -52,7 +57,7 @@ public class Incrementor {
     /**
      * Current count.
      */
-    private int count = 0;
+    private int count;
 
     /**
      * Creates an Incrementor.
@@ -224,7 +229,8 @@ public class Incrementor {
      * @see #increment(int)
      */
     public void increment() {
-        if (++count > maximalCount) {
+        ++count;
+        if (count > maximalCount) {
             maxCountCallback.trigger(maximalCount);
         }
     }

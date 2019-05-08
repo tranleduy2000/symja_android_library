@@ -14,9 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
+import org.hipparchus.util.FieldSinCos;
 
 /**
  * Interface representing a <a href="http://mathworld.wolfram.com/RealNumber.html">real</a>
@@ -159,14 +165,14 @@ public interface RealFieldElement<T> extends FieldElement<T> {
      * Returns the hypotenuse of a triangle with sides {@code this} and {@code y}
      * - sqrt(<i>this</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
      * avoiding intermediate overflow or underflow.
-     * <p>
+     *
      * <ul>
      * <li> If either argument is infinite, then the result is positive infinity.</li>
      * <li> else, if either argument is NaN then the result is NaN.</li>
      * </ul>
      *
      * @param y a value
-     * @return sqrt(<i>this</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
+     * @return sqrt(< i > this < / i > < sup > 2 < / sup > & nbsp ; + < i > y < / i > < sup > 2 < / sup >)
      * @throws MathIllegalArgumentException if number of free parameters or orders are inconsistent
      */
     T hypot(T y)
@@ -274,6 +280,14 @@ public interface RealFieldElement<T> extends FieldElement<T> {
      * @return sin(this)
      */
     T sin();
+
+    /**
+     * Combined Sine and Cosine operation.
+     *
+     * @return [sin(this), cos(this)]
+     * @since 1.4
+     */
+    FieldSinCos<T> sinCos();
 
     /**
      * Tangent operation.

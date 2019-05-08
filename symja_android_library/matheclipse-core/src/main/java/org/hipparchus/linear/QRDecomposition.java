@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -318,80 +323,13 @@ public class QRDecomposition {
      * @return a solver
      */
     public DecompositionSolver getSolver() {
-        return new Solver(qrt, rDiag, threshold);
+        return new Solver();
     }
 
     /**
      * Specialized solver.
      */
-    private static class Solver implements DecompositionSolver {
-        /**
-         * A packed TRANSPOSED representation of the QR decomposition.
-         * <p>The elements BELOW the diagonal are the elements of the UPPER triangular
-         * matrix R, and the rows ABOVE the diagonal are the Householder reflector vectors
-         * from which an explicit form of Q can be recomputed if desired.</p>
-         */
-        private final double[][] qrt;
-        /**
-         * The diagonal elements of R.
-         */
-        private final double[] rDiag;
-        /**
-         * Singularity threshold.
-         */
-        private final double threshold;
-
-        /**
-         * Build a solver from decomposed matrix.
-         *
-         * @param qrt       Packed TRANSPOSED representation of the QR decomposition.
-         * @param rDiag     Diagonal elements of R.
-         * @param threshold Singularity threshold.
-         */
-        private Solver(final double[][] qrt,
-                       final double[] rDiag,
-                       final double threshold) {
-            this.qrt = qrt;
-            this.rDiag = rDiag;
-            this.threshold = threshold;
-        }
-
-        /**
-         * Check singularity.
-         *
-         * @param diag  Diagonal elements of the R matrix.
-         * @param min   Singularity threshold.
-         * @param raise Whether to raise a {@link MathIllegalArgumentException}
-         *              if any element of the diagonal fails the check.
-         * @return {@code true} if any element of the diagonal is smaller
-         * or equal to {@code min}.
-         * @throws MathIllegalArgumentException if the matrix is singular and
-         *                                      {@code raise} is {@code true}.
-         */
-        private static boolean checkSingular(double[] diag,
-                                             double min,
-                                             boolean raise) {
-            final int len = diag.length;
-            for (int i = 0; i < len; i++) {
-                final double d = diag[i];
-                if (FastMath.abs(d) <= min) {
-                    if (raise) {
-                        throw new MathIllegalArgumentException(LocalizedCoreFormats.SINGULAR_MATRIX);
-                    } else {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            return !checkSingular(rDiag, threshold, false);
-        }
+    private class Solver implements DecompositionSolver {
 
         /**
          * {@inheritDoc}
@@ -521,12 +459,47 @@ public class QRDecomposition {
 
         /**
          * {@inheritDoc}
+         */
+        @Override
+        public boolean isNonSingular() {
+            return !checkSingular(rDiag, threshold, false);
+        }
+
+        /**
+         * {@inheritDoc}
          *
          * @throws MathIllegalArgumentException if the decomposed matrix is singular.
          */
         @Override
         public RealMatrix getInverse() {
             return solve(MatrixUtils.createRealIdentityMatrix(qrt[0].length));
+        }
+
+        /**
+         * Check singularity.
+         *
+         * @param diag  Diagonal elements of the R matrix.
+         * @param min   Singularity threshold.
+         * @param raise Whether to raise a {@link MathIllegalArgumentException}
+         *              if any element of the diagonal fails the check.
+         * @return {@code true} if any element of the diagonal is smaller
+         * or equal to {@code min}.
+         * @throws MathIllegalArgumentException if the matrix is singular and
+         *                                      {@code raise} is {@code true}.
+         */
+        private boolean checkSingular(double[] diag, double min, boolean raise) {
+            final int len = diag.length;
+            for (int i = 0; i < len; i++) {
+                final double d = diag[i];
+                if (FastMath.abs(d) <= min) {
+                    if (raise) {
+                        throw new MathIllegalArgumentException(LocalizedCoreFormats.SINGULAR_MATRIX);
+                    } else {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

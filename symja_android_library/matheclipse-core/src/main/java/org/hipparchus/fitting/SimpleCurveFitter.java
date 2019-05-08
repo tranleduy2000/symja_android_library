@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
 package org.hipparchus.fitting;
 
 import org.hipparchus.analysis.ParametricUnivariateFunction;
@@ -41,18 +46,16 @@ public class SimpleCurveFitter extends AbstractCurveFitter {
     private final int maxIter;
 
     /**
-     * Contructor used by the factory methods.
+     * Constructor used by the factory methods.
      *
      * @param function     Function to fit.
      * @param initialGuess Initial guess. Cannot be {@code null}. Its length must
      *                     be consistent with the number of parameters of the {@code function} to fit.
      * @param maxIter      Maximum number of iterations of the optimization algorithm.
      */
-    private SimpleCurveFitter(ParametricUnivariateFunction function,
-                              double[] initialGuess,
-                              int maxIter) {
+    private SimpleCurveFitter(ParametricUnivariateFunction function, double[] initialGuess, int maxIter) {
         this.function = function;
-        this.initialGuess = initialGuess;
+        this.initialGuess = initialGuess.clone();
         this.maxIter = maxIter;
     }
 

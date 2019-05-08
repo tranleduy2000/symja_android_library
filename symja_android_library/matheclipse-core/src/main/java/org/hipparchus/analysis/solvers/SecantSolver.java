@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.analysis.solvers;
 
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -25,12 +30,12 @@ import org.hipparchus.util.FastMath;
  * Implements the <em>Secant</em> method for root-finding (approximating a
  * zero of a univariate real function). The solution that is maintained is
  * not bracketed, and as such convergence is not guaranteed.
- * <p>
+ *
  * <p>Implementation based on the following article: M. Dowell and P. Jarratt,
  * <em>A modified regula falsi method for computing the root of an
  * equation</em>, BIT Numerical Mathematics, volume 11, number 2,
  * pages 168-174, Springer, 1971.</p>
- * <p>
+ *
  * <p>Note that since release 3.0 this class implements the actual
  * <em>Secant</em> algorithm, and not a modified one. As such, the 3.0 version
  * is not backwards compatible with previous versions. To use an algorithm
