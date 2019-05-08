@@ -5,16 +5,9 @@
 package edu.jas.kern;
 
 
-
-import org.apache.log4j.Logger;
-
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 
 /**
  * ComputerThreads, provides global thread / executor service.
@@ -29,19 +22,6 @@ import java.util.concurrent.TimeUnit;
 public class ComputerThreads {
 
 
-    /**
-     * Number of processors.
-     */
-    public static final int N_CPUS = Runtime.getRuntime().availableProcessors();
-
-
-    // private static final boolean debug = logger.isInfoEnabled(); //logger.isInfoEnabled();
-    /*
-     * Core number of threads.
-     * N_CPUS x 1.5, x 2, x 2.5, min 3, ?.
-     */
-    public static final int N_THREADS = (N_CPUS < 3 ? 3 : N_CPUS + N_CPUS / 2);
-    private static final Logger logger = Logger.getLogger(ComputerThreads.class);
     /**
      * Flag for thread usage. <b>Note:</b> Only introduced because Google app
      * engine does not support threads.
@@ -78,26 +58,13 @@ public class ComputerThreads {
      * ExecutorService thread pool.
      */
     //static ThreadPoolExecutor pool = null;
-    static ExecutorService pool = null;
+    private static ExecutorService pool = null;
 
 
     /**
      * No public constructor.
      */
     private ComputerThreads() {
-    }
-
-
-    /**
-     * Test if a pool is running.
-     *
-     * @return true if a thread pool has been started or is running, else false.
-     */
-    public static synchronized boolean isRunning() {
-        if (pool == null) {
-            return false;
-        }
-        return !pool.isTerminated() && !pool.isShutdown();
     }
 
 
@@ -137,37 +104,6 @@ public class ComputerThreads {
 
 
     /**
-     * Stop execution.
-     */
-    public static synchronized void terminate() {
-        if (pool == null) {
-            return;
-        }
-        if (pool instanceof ThreadPoolExecutor) {
-            ThreadPoolExecutor tpe = (ThreadPoolExecutor) pool;
-            //logger.info("task queue size         " + Q_CAPACITY);
-            //logger.info("reject execution handler" + REH.getClass().getName());
-            logger.info("number of CPUs            " + N_CPUS);
-            logger.info("core number of threads    " + N_THREADS);
-            logger.info("current number of threads " + tpe.getPoolSize());
-            logger.info("maximal number of threads " + tpe.getLargestPoolSize());
-            BlockingQueue<Runnable> workpile = tpe.getQueue();
-            if (workpile != null) {
-                logger.info("queued tasks              " + workpile.size());
-            }
-            List<Runnable> r = tpe.shutdownNow();
-            if (r.size() != 0) {
-                logger.info("unfinished tasks          " + r.size());
-            }
-            logger.info("number of sheduled tasks  " + tpe.getTaskCount());
-            logger.info("number of completed tasks " + tpe.getCompletedTaskCount());
-        }
-        pool = null;
-        //workpile = null;
-    }
-
-
-    /**
      * Get timeout.
      *
      * @return timeout value
@@ -192,15 +128,6 @@ public class ComputerThreads {
      */
     public static synchronized TimeUnit getTimeUnit() {
         return timeunit;
-    }
-
-    /**
-     * Set TimeUnit.
-     *
-     * @param t TimeUnit value to set
-     */
-    public static synchronized void setTimeUnit(TimeUnit t) {
-        timeunit = t;
     }
 
 }

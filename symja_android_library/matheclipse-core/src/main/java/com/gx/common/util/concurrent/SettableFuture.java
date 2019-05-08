@@ -14,21 +14,20 @@
 
 package com.gx.common.util.concurrent;
 
-import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * A {@link ListenableFuture} whose result can be set by a {@link #set(Object)}, {@link
- * #setException(Throwable)} or {@link #setFuture(ListenableFuture)} call. It can also, like any
- * other {@code Future}, be {@linkplain #cancel cancelled}.
+ * A {#link ListenableFuture} whose result can be set by a {#link #set(Object)}, {#link
+ * #setException(Throwable)} or {#link #setFuture(ListenableFuture)} call. It can also, like any
+ * other {@code Future}, be {#linkplain #cancel cancelled}.
  * <p>
  * <p>{@code SettableFuture} is the recommended {@code ListenableFuture} implementation when your
- * task cannot be implemented with {@link ListeningExecutorService}, the various {@link Futures}
- * utility methods, or {@link ListenableFutureTask}. Those APIs have less opportunity for developer
- * error. If your needs are more complex than {@code SettableFuture} supports, use {@link
+ * task cannot be implemented with {#link ListeningExecutorService}, the various {#link Futures}
+ * utility methods, or {#link ListenableFutureTask}. Those APIs have less opportunity for developer
+ * error. If your needs are more complex than {@code SettableFuture} supports, use {#link
  * AbstractFuture}, which offers an extensible version of the API.
  *
  * @author Sven Mawson
@@ -58,10 +57,4 @@ public final class SettableFuture<V> extends AbstractFuture.TrustedFuture<V> {
         return super.setException(throwable);
     }
 
-    @Beta
-    @CanIgnoreReturnValue
-    @Override
-    public boolean setFuture(ListenableFuture<? extends V> future) {
-        return super.setFuture(future);
-    }
 }

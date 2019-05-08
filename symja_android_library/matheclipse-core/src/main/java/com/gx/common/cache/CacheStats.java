@@ -20,8 +20,6 @@ import com.gx.common.base.Objects;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.util.concurrent.Callable;
-
 import static com.gx.common.base.Preconditions.checkArgument;
 
 /**

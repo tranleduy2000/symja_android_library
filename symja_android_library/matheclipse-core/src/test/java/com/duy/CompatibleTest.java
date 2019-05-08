@@ -18,8 +18,15 @@ public class CompatibleTest extends TestCase {
                 "import java.security",
                 ".DOUBLE_EPSILON",
                 "java.util.UUID",
+
+
+                // Problem with Objc ARC
                 "java.util.concurrent.ThreadPoolExecutor",
+
+                // Problem with Objc ARC
                 "java.util.concurrent.Executors",
+
+                // Problem with Objc ARC
                 "java.util.concurrent.ExecutorService",
         };
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");

@@ -67,7 +67,7 @@ import java.util.Set;
  * ConcurrentHashMultiset}.
  * <p>
  * <p>If your values may be zero, negative, or outside the range of an int, you may wish to use
- * {@link com.gx.common.util.concurrent.AtomicLongMap} instead. Note, however, that unlike
+ * {link com.gx.common.util.concurrent.AtomicLongMap} instead. Note, however, that unlike
  * {@code Multiset}, {@code AtomicLongMap} does not automatically remove zeros.
  * <p>
  * <p>See the Guava User Guide article on <a href=

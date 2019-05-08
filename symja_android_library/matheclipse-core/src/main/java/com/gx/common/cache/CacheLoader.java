@@ -20,12 +20,9 @@ import com.gx.common.base.Function;
 import com.gx.common.base.Supplier;
 import com.gx.common.util.concurrent.Futures;
 import com.gx.common.util.concurrent.ListenableFuture;
-import com.gx.common.util.concurrent.ListenableFutureTask;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 
 import static com.gx.common.base.Preconditions.checkNotNull;
 
@@ -74,60 +71,6 @@ public abstract class CacheLoader<K, V> {
      */
     public static <K, V> CacheLoader<K, V> from(Function<K, V> function) {
         return new FunctionToCacheLoader<>(function);
-    }
-
-    /**
-     * Returns a cache loader based on an <i>existing</i> supplier instance. Note that there's no need
-     * to create a <i>new</i> supplier just to pass it in here; just subclass {@code CacheLoader} and
-     * implement {@link #load load} instead.
-     *
-     * @param supplier the supplier to be used for loading values; must never return {@code null}
-     * @return a cache loader that loads values by calling {@link Supplier#get}, irrespective of the
-     * key
-     */
-    public static <V> CacheLoader<Object, V> from(Supplier<V> supplier) {
-        return new SupplierToCacheLoader<V>(supplier);
-    }
-
-    /**
-     * Returns a {@code CacheLoader} which wraps {@code loader}, executing calls to {@link
-     * CacheLoader#reload} using {@code executor}.
-     * <p>
-     * <p>This method is useful only when {@code loader.reload} has a synchronous implementation, such
-     * as {@linkplain #reload the default implementation}.
-     *
-     * @since 17.0
-     */
-    @GwtIncompatible // Executor + Futures
-    public static <K, V> CacheLoader<K, V> asyncReloading(
-            final CacheLoader<K, V> loader, final Executor executor) {
-        checkNotNull(loader);
-        checkNotNull(executor);
-        return new CacheLoader<K, V>() {
-            @Override
-            public V load(K key) throws Exception {
-                return loader.load(key);
-            }
-
-            @Override
-            public ListenableFuture<V> reload(final K key, final V oldValue) {
-                ListenableFutureTask<V> task =
-                        ListenableFutureTask.create(
-                                new Callable<V>() {
-                                    @Override
-                                    public V call() throws Exception {
-                                        return loader.reload(key, oldValue).get();
-                                    }
-                                });
-                executor.execute(task);
-                return task;
-            }
-
-            @Override
-            public Map<K, V> loadAll(Iterable<? extends K> keys) throws Exception {
-                return loader.loadAll(keys);
-            }
-        };
     }
 
     /**

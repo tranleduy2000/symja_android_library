@@ -15,7 +15,6 @@
 package com.gx.common.util.concurrent;
 
 import com.gx.common.annotations.GwtCompatible;
-import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.util.concurrent.AbstractFuture.TrustedFuture;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
@@ -32,7 +31,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
  * Implementations of {@code Futures.immediate*}.
  */
 @GwtCompatible(emulated = true)
-abstract class ImmediateFuture<V> extends FluentFuture<V> {
+abstract class ImmediateFuture<V> extends GwtFluentFutureCatchingSpecialization<V> {
     private static final Logger log = Logger.getLogger(ImmediateFuture.class.getName());
 
     @Override
@@ -57,15 +56,6 @@ abstract class ImmediateFuture<V> extends FluentFuture<V> {
     }
 
     @Override
-    public abstract V get() throws ExecutionException;
-
-    @Override
-    public V get(long timeout, TimeUnit unit) throws ExecutionException {
-        checkNotNull(unit);
-        return get();
-    }
-
-    @Override
     public boolean isCancelled() {
         return false;
     }
@@ -73,6 +63,15 @@ abstract class ImmediateFuture<V> extends FluentFuture<V> {
     @Override
     public boolean isDone() {
         return true;
+    }
+
+    @Override
+    public abstract V get() throws ExecutionException;
+
+    @Override
+    public V get(long timeout, TimeUnit unit) throws ExecutionException {
+        checkNotNull(unit);
+        return get();
     }
 
     static class ImmediateSuccessfulFuture<V> extends ImmediateFuture<V> {
@@ -97,80 +96,10 @@ abstract class ImmediateFuture<V> extends FluentFuture<V> {
         }
     }
 
-    @GwtIncompatible // TODO
-    static class ImmediateSuccessfulCheckedFuture<V, X extends Exception> extends ImmediateFuture<V>
-            implements CheckedFuture<V, X> {
-        @NullableDecl
-        private final V value;
-
-        ImmediateSuccessfulCheckedFuture(@NullableDecl V value) {
-            this.value = value;
-        }
-
-        @Override
-        public V get() {
-            return value;
-        }
-
-        @Override
-        public V checkedGet() {
-            return value;
-        }
-
-        @Override
-        public V checkedGet(long timeout, TimeUnit unit) {
-            checkNotNull(unit);
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            // Behaviour analogous to AbstractFuture#toString().
-            return super.toString() + "[status=SUCCESS, result=[" + value + "]]";
-        }
-    }
-
     static final class ImmediateFailedFuture<V> extends TrustedFuture<V> {
         ImmediateFailedFuture(Throwable thrown) {
             setException(thrown);
         }
     }
 
-    static final class ImmediateCancelledFuture<V> extends TrustedFuture<V> {
-        ImmediateCancelledFuture() {
-            cancel(false);
-        }
-    }
-
-    @GwtIncompatible // TODO
-    static class ImmediateFailedCheckedFuture<V, X extends Exception> extends ImmediateFuture<V>
-            implements CheckedFuture<V, X> {
-        private final X thrown;
-
-        ImmediateFailedCheckedFuture(X thrown) {
-            this.thrown = thrown;
-        }
-
-        @Override
-        public V get() throws ExecutionException {
-            throw new ExecutionException(thrown);
-        }
-
-        @Override
-        public V checkedGet() throws X {
-            throw thrown;
-        }
-
-        @Override
-        public V checkedGet(long timeout, TimeUnit unit) throws X {
-            checkNotNull(unit);
-            throw thrown;
-        }
-
-        @Override
-        public String toString() {
-            // Behaviour analogous to AbstractFuture#toString().
-            return super.toString() + "[status=FAILURE, cause=[" + thrown + "]]";
-        }
-    }
 }

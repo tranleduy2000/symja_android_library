@@ -7,7 +7,6 @@ package edu.jas.kern;
 
 import java.util.concurrent.Callable;
 
-
 /**
  * Run-time status, defines global status and handling for run time limits.
  *

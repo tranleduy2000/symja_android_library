@@ -16,10 +16,8 @@ package com.gx.common.util.concurrent;
 
 import com.gx.common.annotations.GwtIncompatible;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 /**
- * Unchecked version of {@link java.util.concurrent.TimeoutException}.
+ * Unchecked version of {#link java.util.concurrent.TimeoutException}.
  *
  * @author Kevin Bourrillion
  * @since 1.0
@@ -28,18 +26,4 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 public class UncheckedTimeoutException extends RuntimeException {
     private static final long serialVersionUID = 0;
 
-    public UncheckedTimeoutException() {
-    }
-
-    public UncheckedTimeoutException(@NullableDecl String message) {
-        super(message);
-    }
-
-    public UncheckedTimeoutException(@NullableDecl Throwable cause) {
-        super(cause);
-    }
-
-    public UncheckedTimeoutException(@NullableDecl String message, @NullableDecl Throwable cause) {
-        super(message, cause);
-    }
 }
