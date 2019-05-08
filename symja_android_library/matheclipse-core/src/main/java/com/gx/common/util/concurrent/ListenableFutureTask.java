@@ -29,8 +29,8 @@ import java.util.concurrent.FutureTask;
  * <p>
  * <p>Few users should use this class. It is intended primarily for those who are implementing an
  * {@code ExecutorService}. Most users should call {@link ListeningExecutorService#submit(Callable)
- * ListeningExecutorService.submit} on a service obtained from {@link
- * MoreExecutors#listeningDecorator}.
+ * ListeningExecutorService.submit} on a service obtained from {link
+     * MoreExecutors#listeningDecorator}.
  *
  * @author Sven Mawson
  * @since 1.0

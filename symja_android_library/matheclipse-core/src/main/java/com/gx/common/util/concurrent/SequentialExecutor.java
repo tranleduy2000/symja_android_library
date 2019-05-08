@@ -73,7 +73,7 @@ final class SequentialExecutor implements Executor {
     private long workerRunCount = 0;
 
     /**
-     * Use {@link MoreExecutors#newSequentialExecutor}
+     * Use {link MoreExecutors#newSequentialExecutor}
      */
     SequentialExecutor(Executor executor) {
         this.executor = Preconditions.checkNotNull(executor);

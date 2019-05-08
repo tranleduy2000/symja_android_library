@@ -26,8 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * An {@link ExecutorService} that returns {@link ListenableFuture} instances. To create an instance
- * from an existing {@link ExecutorService}, call {@link
- * MoreExecutors#listeningDecorator(ExecutorService)}.
+ * from an existing {@link ExecutorService}, call {link
+     * MoreExecutors#listeningDecorator(ExecutorService)}.
  *
  * @author Chris Povirk
  * @since 10.0

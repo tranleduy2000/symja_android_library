@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * A {@link ScheduledExecutorService} that returns {@link ListenableFuture} instances from its
  * {@code ExecutorService} methods. To create an instance from an existing {@link
- * ScheduledExecutorService}, call {@link
- * MoreExecutors#listeningDecorator(ScheduledExecutorService)}.
+ * ScheduledExecutorService}, call {link
+     * MoreExecutors#listeningDecorator(ScheduledExecutorService)}.
  *
  * @author Chris Povirk
  * @since 10.0

@@ -35,7 +35,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
  * <p>
  * <p>Exceptions thrown by a listener will be propagated up to the executor. Any exception thrown
  * during {@code Executor.execute} (e.g., a {@code RejectedExecutionException} or an exception
- * thrown by {@linkplain MoreExecutors#directExecutor direct execution}) will be caught and logged.
+ * thrown by {linkplain MoreExecutors#directExecutor direct execution}) will be caught and logged.
  *
  * @author Nishant Thakkar
  * @author Sven Mawson

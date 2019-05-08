@@ -48,7 +48,7 @@ public final class JdkFutureAdapters {
      * internal, unbounded pool at the first call to {@code addListener} and holding it until the
      * future is {@linkplain Future#isDone() done}.
      * <p>
-     * <p>Prefer to create {@code ListenableFuture} instances with {@link SettableFuture}, {@link
+     * <p>Prefer to create {@code ListenableFuture} instances with {@link SettableFuture}, {link
      * MoreExecutors#listeningDecorator(java.util.concurrent.ExecutorService)}, {@link
      * ListenableFutureTask}, {@link AbstractFuture}, and other utilities over creating plain {@code
      * Future} instances to be upgraded to {@code ListenableFuture} after the fact.
@@ -73,7 +73,7 @@ public final class JdkFutureAdapters {
      * bounded executors or other executors that may fail to execute a task promptly may result in
      * deadlocks.
      * <p>
-     * <p>Prefer to create {@code ListenableFuture} instances with {@link SettableFuture}, {@link
+     * <p>Prefer to create {@code ListenableFuture} instances with {@link SettableFuture}, {link
      * MoreExecutors#listeningDecorator(java.util.concurrent.ExecutorService)}, {@link
      * ListenableFutureTask}, {@link AbstractFuture}, and other utilities over creating plain {@code
      * Future} instances to be upgraded to {@code ListenableFuture} after the fact.
