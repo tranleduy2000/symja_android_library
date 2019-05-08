@@ -29,6 +29,8 @@ public class CompatibleTest extends TestCase {
 
                 // Problem with Objc ARC
                 "java.util.concurrent.ExecutorService",
+
+                "java.util.Scanner",
         };
 
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");

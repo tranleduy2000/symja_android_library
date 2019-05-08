@@ -35,8 +35,6 @@
 
 package com.duy.concurrent;
 
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -224,43 +222,6 @@ public class Executors {
         if (task == null)
             throw new NullPointerException();
         return new RunnableAdapter<Object>(task, null);
-    }
-
-    /**
-     * Returns a {link Callable} object that, when
-     * called, runs the given privileged action and returns its result.
-     *
-     * @param action the privileged action to run
-     * @return a callable object
-     * throws NullPointerException if action null
-     */
-    public static Callable<Object> callable(final PrivilegedAction<?> action) {
-        if (action == null)
-            throw new NullPointerException();
-        return new Callable<Object>() {
-            public Object call() {
-                return action.run();
-            }
-        };
-    }
-
-    /**
-     * Returns a {link Callable} object that, when
-     * called, runs the given privileged exception action and returns
-     * its result.
-     *
-     * @param action the privileged exception action to run
-     * @return a callable object
-     * throws NullPointerException if action null
-     */
-    public static Callable<Object> callable(final PrivilegedExceptionAction<?> action) {
-        if (action == null)
-            throw new NullPointerException();
-        return new Callable<Object>() {
-            public Object call() throws Exception {
-                return action.run();
-            }
-        };
     }
 
     // Non-public classes supporting the public methods
