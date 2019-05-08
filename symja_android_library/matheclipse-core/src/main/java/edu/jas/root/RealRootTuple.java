@@ -42,18 +42,6 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         tuple = t;
     }
 
-
-    /**
-     * String representation of tuple.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return tuple.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -74,7 +62,6 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         return sb.toString();
     }
 
-
     /**
      * Contains a point.
      *
@@ -84,7 +71,6 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
     public boolean contains(RealRootTuple<C> c) {
         return contains(c.tuple);
     }
-
 
     /**
      * Contains a point.
@@ -104,7 +90,6 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         return true;
     }
 
-
     /**
      * Random point of real root tuple.
      *
@@ -119,7 +104,6 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         return tp;
     }
 
-
     /**
      * Refine root isolating intervals.
      *
@@ -132,7 +116,6 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         return;
     }
 
-
     /**
      * Copy this.
      *
@@ -142,11 +125,20 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         return new RealRootTuple<C>(new ArrayList<RealAlgebraicNumber<C>>(tuple));
     }
 
+    /**
+     * Hash code for this Rectangle.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return tuple.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -162,17 +154,15 @@ public class RealRootTuple<C extends GcdRingElem<C> & Rational> implements Seria
         return tuple.equals(a.tuple);
     }
 
-
     /**
-     * Hash code for this Rectangle.
+     * String representation of tuple.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return tuple.hashCode();
+    public String toString() {
+        return tuple.toString();
     }
-
 
     /**
      * Rational approximation of each coordinate.

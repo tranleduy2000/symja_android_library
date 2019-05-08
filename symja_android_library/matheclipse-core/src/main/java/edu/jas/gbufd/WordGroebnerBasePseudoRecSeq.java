@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         WordGroebnerBaseAbstract<GenPolynomial<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(WordGroebnerBasePseudoRecSeq.class);
+    private static final Logger logger = LogManager.getLogger(WordGroebnerBasePseudoRecSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -115,6 +115,44 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         //not used: engine = GCDFactory.<C>getProxy(cofac.coFac);
     }
 
+    /**
+     * Wird Groebner base simple test.
+     *
+     * @param F recursive polynomial list.
+     * @return true, if F is a Groebner base, else false.
+     */
+    @Override
+    public boolean isGB(List<GenWordPolynomial<GenPolynomial<C>>> F) {
+        if (F == null || F.isEmpty()) {
+            return true;
+        }
+        GenWordPolynomial<GenPolynomial<C>> pi, pj, h;
+        List<GenWordPolynomial<GenPolynomial<C>>> S;
+        for (int i = 0; i < F.size(); i++) {
+            pi = F.get(i);
+            for (int j = 0; j < F.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+                pj = F.get(j);
+
+                S = red.SPolynomials(pi, pj);
+                if (S.isEmpty()) {
+                    continue;
+                }
+                for (GenWordPolynomial<GenPolynomial<C>> s : S) {
+                    //System.out.println("i, j = " + i + ", " + j);
+                    h = redRec.normalformRecursive(F, s);
+                    if (!h.isZERO()) {
+                        logger.info("no GB: pi = " + pi + ", pj = " + pj);
+                        logger.info("s  = " + s + ", h = " + h);
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * Word Groebner base using word pairlist class.
@@ -174,12 +212,12 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
                 boolean t = pairlist.criterion3(pair.i, pair.j, s.leadingWord());
                 //System.out.println("criterion3(" + pair.i + "," + pair.j + ") = " + t);
                 //if ( !t ) {
-                //    continue;  
+                //    continue;
                 //}
 
                 H = redRec.normalformRecursive(G, s);
                 if (debug) {
-                    //logger.info("pair = " + pair); 
+                    //logger.info("pair = " + pair);
                     //logger.info("ht(S) = " + S.monic()); //.leadingWord() );
                     logger.info("ht(H) = " + H.monic()); //.leadingWord() );
                 }
@@ -221,7 +259,6 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         return G;
     }
 
-
     /**
      * Minimal ordered Groebner basis.
      *
@@ -252,7 +289,7 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
-                // drop polynomial 
+                // drop polynomial
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenWordPolynomial<GenPolynomial<C>>> ff;
@@ -292,47 +329,6 @@ public class WordGroebnerBasePseudoRecSeq<C extends GcdRingElem<C>> extends
         }
         return G;
     }
-
-
-    /**
-     * Wird Groebner base simple test.
-     *
-     * @param F recursive polynomial list.
-     * @return true, if F is a Groebner base, else false.
-     */
-    @Override
-    public boolean isGB(List<GenWordPolynomial<GenPolynomial<C>>> F) {
-        if (F == null || F.isEmpty()) {
-            return true;
-        }
-        GenWordPolynomial<GenPolynomial<C>> pi, pj, h;
-        List<GenWordPolynomial<GenPolynomial<C>>> S;
-        for (int i = 0; i < F.size(); i++) {
-            pi = F.get(i);
-            for (int j = 0; j < F.size(); j++) {
-                if (i == j) {
-                    continue;
-                }
-                pj = F.get(j);
-
-                S = red.SPolynomials(pi, pj);
-                if (S.isEmpty()) {
-                    continue;
-                }
-                for (GenWordPolynomial<GenPolynomial<C>> s : S) {
-                    //System.out.println("i, j = " + i + ", " + j); 
-                    h = redRec.normalformRecursive(F, s);
-                    if (!h.isZERO()) {
-                        logger.info("no GB: pi = " + pi + ", pj = " + pj);
-                        logger.info("s  = " + s + ", h = " + h);
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
 
     /**
      * GenWordPolynomial recursive coefficient content.

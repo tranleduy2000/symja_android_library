@@ -136,7 +136,7 @@ public final class ExpVectorLong extends ExpVector
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public ExpVectorLong copy() {
@@ -145,6 +145,16 @@ public final class ExpVectorLong extends ExpVector
         return new ExpVectorLong(w, true);
     }
 
+    /**
+     * ExpVector compareTo.
+     *
+     * @param V
+     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
+     */
+    @Override
+    public int compareTo(ExpVector V) {
+        return this.invLexCompareTo(V);
+    }
 
     /**
      * Get the exponent vector.
@@ -159,7 +169,6 @@ public final class ExpVectorLong extends ExpVector
         //return val;
     }
 
-
     /**
      * Get the exponent at position i.
      *
@@ -170,7 +179,6 @@ public final class ExpVectorLong extends ExpVector
     public long getVal(int i) {
         return val[i];
     }
-
 
     /**
      * Set the exponent at position i to e.
@@ -187,7 +195,6 @@ public final class ExpVectorLong extends ExpVector
         return x;
     }
 
-
     /**
      * Get the length of this exponent vector.
      *
@@ -197,7 +204,6 @@ public final class ExpVectorLong extends ExpVector
     public int length() {
         return val.length;
     }
-
 
     /**
      * Extend variables. Used e.g. in module embedding. Extend this by i
@@ -219,7 +225,6 @@ public final class ExpVectorLong extends ExpVector
         return new ExpVectorLong(w, true);
     }
 
-
     /**
      * Extend lower variables. Extend this by i lower elements and set val[j] to
      * e.
@@ -240,7 +245,6 @@ public final class ExpVectorLong extends ExpVector
         return new ExpVectorLong(w, true);
     }
 
-
     /**
      * Contract variables. Used e.g. in module embedding. Contract this to len
      * elements.
@@ -259,7 +263,6 @@ public final class ExpVectorLong extends ExpVector
         return new ExpVectorLong(w, true);
     }
 
-
     /**
      * Reverse variables. Used e.g. in opposite rings.
      *
@@ -273,7 +276,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return new ExpVectorLong(w, true);
     }
-
 
     /**
      * Reverse lower j variables. Used e.g. in opposite rings. Reverses the
@@ -300,30 +302,6 @@ public final class ExpVectorLong extends ExpVector
         //System.out.println("w   = " + Arrays.toString(w));
         return new ExpVectorLong(w, true);
     }
-
-
-    /**
-     * Reverse upper j variables. Reverses the last j-1 variables, the rest is
-     * unchanged.
-     *
-     * @param j index of first variable not reversed.
-     * @return reversed exponent vector.
-     */
-    public ExpVectorLong reverseUpper(int j) {
-        if (j <= 0 || j > val.length) {
-            return this;
-        }
-        long[] w = new long[val.length];
-        for (int i = 0; i < j; i++) {
-            w[i] = val[j - 1 - i];
-        }
-        // copy rest
-        for (int i = j; i < val.length; i++) {
-            w[i] = val[i];
-        }
-        return new ExpVectorLong(w, true);
-    }
-
 
     /**
      * Combine with ExpVector. Combine this with the other ExpVector V.
@@ -363,22 +341,20 @@ public final class ExpVectorLong extends ExpVector
         return new ExpVectorLong(w, true);
     }
 
-
     /**
-     * Get the string representation.
+     * hashCode for this exponent vector.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode() Only for findbugs.
      */
     @Override
-    public String toString() {
-        return super.toString() + ":long";
+    public int hashCode() {
+        return super.hashCode();
     }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -391,122 +367,15 @@ public final class ExpVectorLong extends ExpVector
         return (0 == t);
     }
 
-
     /**
-     * hashCode for this exponent vector.
+     * Get the string representation.
      *
-     * @see Object#hashCode() Only for findbugs.
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return super.toString() + ":long";
     }
-
-
-    /**
-     * ExpVector absolute value.
-     *
-     * @return abs(this).
-     */
-    @Override
-    public ExpVectorLong abs() {
-        long[] u = val;
-        long[] w = new long[u.length];
-        for (int i = 0; i < u.length; i++) {
-            if (u[i] >= 0L) {
-                w[i] = u[i];
-            } else {
-                w[i] = -u[i];
-            }
-        }
-        return new ExpVectorLong(w, true);
-    }
-
-
-    /**
-     * ExpVector negate.
-     *
-     * @return -this.
-     */
-    @Override
-    public ExpVectorLong negate() {
-        long[] u = val;
-        long[] w = new long[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = -u[i];
-        }
-        return new ExpVectorLong(w, true);
-    }
-
-
-    /**
-     * ExpVector summation.
-     *
-     * @param V
-     * @return this+V.
-     */
-    @Override
-    public ExpVectorLong sum(ExpVector V) {
-        long[] u = val;
-        long[] v = ((ExpVectorLong) V).val;
-        long[] w = new long[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = u[i] + v[i];
-        }
-        return new ExpVectorLong(w, true);
-    }
-
-
-    /**
-     * ExpVector subtract. Result may have negative entries.
-     *
-     * @param V
-     * @return this-V.
-     */
-    @Override
-    public ExpVectorLong subtract(ExpVector V) {
-        long[] u = val;
-        long[] v = ((ExpVectorLong) V).val;
-        long[] w = new long[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = u[i] - v[i];
-        }
-        return new ExpVectorLong(w, true);
-    }
-
-
-    /**
-     * ExpVector multiply by scalar.
-     *
-     * @param s scalar
-     * @return s*this.
-     */
-    @Override
-    public ExpVectorLong scalarMultiply(long s) {
-        long[] u = val;
-        long[] w = new long[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = s * u[i];
-        }
-        return new ExpVectorLong(w, true);
-    }
-
-
-    /**
-     * ExpVector substitution. Clone and set exponent to d at position i.
-     *
-     * @param i position.
-     * @param d new exponent.
-     * @return substituted ExpVector.
-     */
-    @Override
-    public ExpVectorLong subst(int i, long d) {
-        ExpVectorLong V = this.copy();
-        //long e = 
-        V.setVal(i, d);
-        return V;
-    }
-
 
     /**
      * ExpVector signum.
@@ -529,6 +398,104 @@ public final class ExpVectorLong extends ExpVector
         return t;
     }
 
+    /**
+     * ExpVector summation.
+     *
+     * @param V
+     * @return this+V.
+     */
+    @Override
+    public ExpVectorLong sum(ExpVector V) {
+        long[] u = val;
+        long[] v = ((ExpVectorLong) V).val;
+        long[] w = new long[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = u[i] + v[i];
+        }
+        return new ExpVectorLong(w, true);
+    }
+
+    /**
+     * ExpVector subtract. Result may have negative entries.
+     *
+     * @param V
+     * @return this-V.
+     */
+    @Override
+    public ExpVectorLong subtract(ExpVector V) {
+        long[] u = val;
+        long[] v = ((ExpVectorLong) V).val;
+        long[] w = new long[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = u[i] - v[i];
+        }
+        return new ExpVectorLong(w, true);
+    }
+
+    /**
+     * ExpVector negate.
+     *
+     * @return -this.
+     */
+    @Override
+    public ExpVectorLong negate() {
+        long[] u = val;
+        long[] w = new long[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = -u[i];
+        }
+        return new ExpVectorLong(w, true);
+    }
+
+    /**
+     * ExpVector absolute value.
+     *
+     * @return abs(this).
+     */
+    @Override
+    public ExpVectorLong abs() {
+        long[] u = val;
+        long[] w = new long[u.length];
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] >= 0L) {
+                w[i] = u[i];
+            } else {
+                w[i] = -u[i];
+            }
+        }
+        return new ExpVectorLong(w, true);
+    }
+
+    /**
+     * ExpVector multiply by scalar.
+     *
+     * @param s scalar
+     * @return s*this.
+     */
+    @Override
+    public ExpVectorLong scalarMultiply(long s) {
+        long[] u = val;
+        long[] w = new long[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = s * u[i];
+        }
+        return new ExpVectorLong(w, true);
+    }
+
+    /**
+     * ExpVector substitution. Clone and set exponent to d at position i.
+     *
+     * @param i position.
+     * @param d new exponent.
+     * @return substituted ExpVector.
+     */
+    @Override
+    public ExpVectorLong subst(int i, long d) {
+        ExpVectorLong V = this.copy();
+        //long e =
+        V.setVal(i, d);
+        return V;
+    }
 
     /**
      * ExpVector total degree.
@@ -720,19 +687,6 @@ public final class ExpVectorLong extends ExpVector
         return true;
     }
 
-
-    /**
-     * ExpVector compareTo.
-     *
-     * @param V
-     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
-     */
-    @Override
-    public int compareTo(ExpVector V) {
-        return this.invLexCompareTo(V);
-    }
-
-
     /**
      * ExpVector inverse lexicographical compareTo.
      *
@@ -752,7 +706,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector inverse lexicographical compareTo.
@@ -781,7 +734,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector inverse graded lexicographical compareTo.
@@ -823,7 +775,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector inverse graded lexicographical compareTo.
@@ -874,7 +825,6 @@ public final class ExpVectorLong extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector reverse inverse lexicographical compareTo.
      *
@@ -894,7 +844,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector reverse inverse lexicographical compareTo.
@@ -923,7 +872,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector reverse inverse graded compareTo.
@@ -965,7 +913,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector reverse inverse graded compareTo.
@@ -1016,7 +963,6 @@ public final class ExpVectorLong extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector inverse total degree lexicographical compareTo.
      *
@@ -1058,7 +1004,6 @@ public final class ExpVectorLong extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector reverse lexicographical inverse total degree compareTo.
      *
@@ -1099,7 +1044,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector inverse weighted lexicographical compareTo.
@@ -1143,7 +1087,6 @@ public final class ExpVectorLong extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector inverse weighted lexicographical compareTo.
@@ -1194,6 +1137,28 @@ public final class ExpVectorLong extends ExpVector
             }
         }
         return t;
+    }
+
+    /**
+     * Reverse upper j variables. Reverses the last j-1 variables, the rest is
+     * unchanged.
+     *
+     * @param j index of first variable not reversed.
+     * @return reversed exponent vector.
+     */
+    public ExpVectorLong reverseUpper(int j) {
+        if (j <= 0 || j > val.length) {
+            return this;
+        }
+        long[] w = new long[val.length];
+        for (int i = 0; i < j; i++) {
+            w[i] = val[j - 1 - i];
+        }
+        // copy rest
+        for (int i = j; i < val.length; i++) {
+            w[i] = val[i];
+        }
+        return new ExpVectorLong(w, true);
     }
 
 }

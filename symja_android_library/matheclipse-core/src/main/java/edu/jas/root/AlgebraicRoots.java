@@ -73,18 +73,6 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
         this.complex = c;
     }
 
-
-    /**
-     * String representation of AlgebraicRoots.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "[" + p + ", real=" + real + ", complex=" + complex + "]";
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -125,7 +113,6 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
         sb.append("]");
         return sb.toString();
     }
-
 
     /**
      * Get a decimal number scripting compatible string representation.
@@ -168,7 +155,6 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
         return sb.toString();
     }
 
-
     /**
      * Copy this.
      *
@@ -178,11 +164,20 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
         return new AlgebraicRoots<C>(p, cp, real, complex);
     }
 
+    /**
+     * Hash code for this AlgebraicRoots.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return (161 * p.hashCode() + 37) * real.hashCode() + complex.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -200,17 +195,15 @@ public class AlgebraicRoots<C extends GcdRingElem<C> & Rational> implements Seri
         return p.equals(a.p) && real.equals(a.real) && complex.equals(a.complex);
     }
 
-
     /**
-     * Hash code for this AlgebraicRoots.
+     * String representation of AlgebraicRoots.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return (161 * p.hashCode() + 37) * real.hashCode() + complex.hashCode();
+    public String toString() {
+        return "[" + p + ", real=" + real + ", complex=" + complex + "]";
     }
-
 
     /**
      * Algebraic number ring.

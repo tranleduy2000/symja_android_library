@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import edu.jas.vector.GenVectorModul;
 public class ModuleList<C extends RingElem<C>> implements Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(ModuleList.class);
+    private static final Logger logger = LogManager.getLogger(ModuleList.class);
     /**
      * The factory for the solvable polynomial ring.
      */
@@ -173,9 +173,22 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
     }
 
     /**
+     * Hash code for this module list.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + (list == null ? 0 : list.hashCode());
+        return h;
+    }
+
+    /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -211,56 +224,9 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
     }
 
     /**
-     * Hash code for this module list.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + (list == null ? 0 : list.hashCode());
-        return h;
-    }
-
-    /**
-     * Test if list is empty.
-     *
-     * @return true if this is empty, alse false.
-     */
-    public boolean isEmpty() {
-        if (list == null) {
-            return true;
-        }
-        return rows <= 0;
-    }
-
-    /**
-     * Test all elements are zero.
-     *
-     * @return true if all elements are zero, alse false.
-     */
-    public boolean isZERO() {
-        if (list == null) {
-            return true;
-        }
-        if (rows <= 0) {
-            return true;
-        }
-        for (List<GenPolynomial<C>> row : list) {
-            for (GenPolynomial<C> oa : row) {
-                if (!oa.isZERO()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * String representation of the module list.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     //@SuppressWarnings("unchecked")
@@ -308,6 +274,40 @@ public class ModuleList<C extends RingElem<C>> implements Serializable {
         }
         erg.append("\n)");
         return erg.toString();
+    }
+
+    /**
+     * Test if list is empty.
+     *
+     * @return true if this is empty, alse false.
+     */
+    public boolean isEmpty() {
+        if (list == null) {
+            return true;
+        }
+        return rows <= 0;
+    }
+
+    /**
+     * Test all elements are zero.
+     *
+     * @return true if all elements are zero, alse false.
+     */
+    public boolean isZERO() {
+        if (list == null) {
+            return true;
+        }
+        if (rows <= 0) {
+            return true;
+        }
+        for (List<GenPolynomial<C>> row : list) {
+            for (GenPolynomial<C> oa : row) {
+                if (!oa.isZERO()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**

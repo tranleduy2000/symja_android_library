@@ -5,8 +5,8 @@
 package edu.jas.root;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
      * Precision of the isolating rectangle for a complex root.
      */
     public static final int PRECISION = BigDecimal.DEFAULT_PRECISION;
-    private static final Logger logger = Logger.getLogger(ComplexAlgebraicRing.class);
+    private static final Logger logger = LogManager.getLogger(ComplexAlgebraicRing.class);
     /**
      * Representing AlgebraicNumberRing.
      */
@@ -125,6 +125,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         return this.eps;
     }
 
+
     /**
      * Set a new epsilon.
      *
@@ -134,6 +135,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         setEps(e.getRational());
     }
 
+
     /**
      * Set a new epsilon.
      *
@@ -142,6 +144,7 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
     public synchronized void setEps(BigRational e) {
         this.eps = e; //algebraic.ring.coFac.parse(e.toString()).getRe();
     }
+
 
     /**
      * Refine root.
@@ -178,29 +181,6 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         this.eps = e;
     }
 
-
-    /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
-     */
-    public boolean isFinite() {
-        return algebraic.isFinite();
-    }
-
-
-    /**
-     * Copy ComplexAlgebraicNumber element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public ComplexAlgebraicNumber<C> copy(ComplexAlgebraicNumber<C> c) {
-        return new ComplexAlgebraicNumber<C>(this, c.number);
-    }
-
-
     /**
      * Get the zero element.
      *
@@ -209,7 +189,6 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
     public ComplexAlgebraicNumber<C> getZERO() {
         return new ComplexAlgebraicNumber<C>(this, algebraic.getZERO());
     }
-
 
     /**
      * Get the one element.
@@ -220,6 +199,23 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         return new ComplexAlgebraicNumber<C>(this, algebraic.getONE());
     }
 
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return algebraic.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return algebraic.isAssociative();
+    }
 
     /**
      * Get the i element.
@@ -258,67 +254,15 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         return gens;
     }
 
-
     /**
-     * Query if this ring is commutative.
+     * Is this structure finite or infinite.
      *
-     * @return true if this ring is commutative, else false.
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
      */
-    public boolean isCommutative() {
-        return algebraic.isCommutative();
+    public boolean isFinite() {
+        return algebraic.isFinite();
     }
-
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true if this ring is associative, else false.
-     */
-    public boolean isAssociative() {
-        return algebraic.isAssociative();
-    }
-
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return true if algebraic is prime, else false.
-     */
-    public boolean isField() {
-        return algebraic.isField();
-    }
-
-
-    /**
-     * Assert that this ring is a field.
-     *
-     * @param isField true if this ring is a field, else false.
-     */
-    public void setField(boolean isField) {
-        algebraic.setField(isField);
-    }
-
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public java.math.BigInteger characteristic() {
-        return algebraic.characteristic();
-    }
-
-
-    /**
-     * Get a ComplexAlgebraicNumber element from a BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a ComplexAlgebraicNumber.
-     */
-    public ComplexAlgebraicNumber<C> fromInteger(java.math.BigInteger a) {
-        return new ComplexAlgebraicNumber<C>(this, algebraic.fromInteger(a));
-    }
-
 
     /**
      * Get a ComplexAlgebraicNumber element from a long value.
@@ -330,18 +274,66 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         return new ComplexAlgebraicNumber<C>(this, algebraic.fromInteger(a));
     }
 
-
     /**
-     * Get the String representation as RingFactory.
+     * Get a ComplexAlgebraicNumber element from a BigInteger value.
      *
-     * @see Object#toString()
+     * @param a BigInteger.
+     * @return a ComplexAlgebraicNumber.
      */
-    @Override
-    public String toString() {
-        return "ComplexAlgebraicRing[ " + algebraic.modul.toString() + " in " + root + " | isField="
-                + algebraic.isField() + " :: " + algebraic.ring.toString() + " ]";
+    public ComplexAlgebraicNumber<C> fromInteger(java.math.BigInteger a) {
+        return new ComplexAlgebraicNumber<C>(this, algebraic.fromInteger(a));
     }
 
+    /**
+     * ComplexAlgebraicNumber random.
+     *
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random integer mod modul.
+     */
+    public ComplexAlgebraicNumber<C> random(int n) {
+        return new ComplexAlgebraicNumber<C>(this, algebraic.random(n));
+    }
+
+    /**
+     * ComplexAlgebraicNumber random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random integer mod modul.
+     */
+    public ComplexAlgebraicNumber<C> random(int n, Random rnd) {
+        return new ComplexAlgebraicNumber<C>(this, algebraic.random(n, rnd));
+    }
+
+    /**
+     * Copy ComplexAlgebraicNumber element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public ComplexAlgebraicNumber<C> copy(ComplexAlgebraicNumber<C> c) {
+        return new ComplexAlgebraicNumber<C>(this, c.number);
+    }
+
+    /**
+     * Parse ComplexAlgebraicNumber from String.
+     *
+     * @param s String.
+     * @return ComplexAlgebraicNumber from s.
+     */
+    public ComplexAlgebraicNumber<C> parse(String s) {
+        return new ComplexAlgebraicNumber<C>(this, algebraic.parse(s));
+    }
+
+    /**
+     * Parse ComplexAlgebraicNumber from Reader.
+     *
+     * @param r Reader.
+     * @return next ComplexAlgebraicNumber from r.
+     */
+    public ComplexAlgebraicNumber<C> parse(Reader r) {
+        return new ComplexAlgebraicNumber<C>(this, algebraic.parse(r));
+    }
 
     /**
      * Get a scripting compatible string representation.
@@ -358,11 +350,47 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
                 + " )";
     }
 
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true if algebraic is prime, else false.
+     */
+    public boolean isField() {
+        return algebraic.isField();
+    }
+
+    /**
+     * Assert that this ring is a field.
+     *
+     * @param isField true if this ring is a field, else false.
+     */
+    public void setField(boolean isField) {
+        algebraic.setField(isField);
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return algebraic.characteristic();
+    }
+
+    /**
+     * Hash code for this ComplexAlgebraicNumber.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * algebraic.hashCode() + root.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -377,60 +405,15 @@ public class ComplexAlgebraicRing<C extends GcdRingElem<C> & Rational>
         return algebraic.equals(a.algebraic) && root.equals(a.root);
     }
 
-
     /**
-     * Hash code for this ComplexAlgebraicNumber.
+     * Get the String representation as RingFactory.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return 37 * algebraic.hashCode() + root.hashCode();
-    }
-
-
-    /**
-     * ComplexAlgebraicNumber random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random integer mod modul.
-     */
-    public ComplexAlgebraicNumber<C> random(int n) {
-        return new ComplexAlgebraicNumber<C>(this, algebraic.random(n));
-    }
-
-
-    /**
-     * ComplexAlgebraicNumber random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random integer mod modul.
-     */
-    public ComplexAlgebraicNumber<C> random(int n, Random rnd) {
-        return new ComplexAlgebraicNumber<C>(this, algebraic.random(n, rnd));
-    }
-
-
-    /**
-     * Parse ComplexAlgebraicNumber from String.
-     *
-     * @param s String.
-     * @return ComplexAlgebraicNumber from s.
-     */
-    public ComplexAlgebraicNumber<C> parse(String s) {
-        return new ComplexAlgebraicNumber<C>(this, algebraic.parse(s));
-    }
-
-
-    /**
-     * Parse ComplexAlgebraicNumber from Reader.
-     *
-     * @param r Reader.
-     * @return next ComplexAlgebraicNumber from r.
-     */
-    public ComplexAlgebraicNumber<C> parse(Reader r) {
-        return new ComplexAlgebraicNumber<C>(this, algebraic.parse(r));
+    public String toString() {
+        return "ComplexAlgebraicRing[ " + algebraic.modul.toString() + " in " + root + " | isField="
+                + algebraic.isField() + " :: " + algebraic.ring.toString() + " ]";
     }
 
 }

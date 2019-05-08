@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.structure.GcdRingElem;
 import edu.jas.structure.QuotPair;
@@ -23,7 +23,7 @@ import edu.jas.structure.RingElemImpl;
 public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> implements RingElem<Local<C>>, QuotPair<C> {
 
 
-    private static final Logger logger = Logger.getLogger(Local.class);
+    private static final Logger logger = LogManager.getLogger(Local.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -141,6 +141,59 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         }
     }
 
+    /**
+     * Numerator.
+     *
+     * @see edu.jas.structure.QuotPair#numerator()
+     */
+    public C numerator() {
+        return num;
+    }
+
+    /**
+     * Denominator.
+     *
+     * @see edu.jas.structure.QuotPair#denominator()
+     */
+    public C denominator() {
+        return den;
+    }
+
+    /**
+     * Is Local a constant. Not implemented.
+     *
+     * @throws UnsupportedOperationException.
+     */
+    public boolean isConstant() {
+        throw new UnsupportedOperationException("isConstant not implemented");
+    }
+
+    /**
+     * Clone this.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public Local<C> copy() {
+        return new Local<C>(ring, num, den, true);
+    }
+
+    /**
+     * Local comparison.
+     *
+     * @param b Local.
+     * @return sign(this - b).
+     */
+    @Override
+    public int compareTo(Local<C> b) {
+        if (b == null || b.isZERO()) {
+            return this.signum();
+        }
+        C r = num.multiply(b.den);
+        C s = den.multiply(b.num);
+        C x = r.subtract(s);
+        return x.signum();
+    }
 
     /**
      * Get the corresponding element factory.
@@ -152,47 +205,29 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         return ring;
     }
 
-
     /**
-     * Numerator.
+     * Get a scripting compatible string representation.
      *
-     * @see edu.jas.structure.QuotPair#numerator()
-     */
-    public C numerator() {
-        return num;
-    }
-
-
-    /**
-     * Denominator.
-     *
-     * @see edu.jas.structure.QuotPair#denominator()
-     */
-    public C denominator() {
-        return den;
-    }
-
-
-    /**
-     * Is Local a constant. Not implemented.
-     *
-     * @throws UnsupportedOperationException
-     */
-    public boolean isConstant() {
-        throw new UnsupportedOperationException("isConstant not implemented");
-    }
-
-
-    /**
-     * Clone this.
-     *
-     * @see Object#clone()
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public Local<C> copy() {
-        return new Local<C>(ring, num, den, true);
+    public String toScript() {
+        // Python case
+        return "Local( " + num.toScript() + " , " + den.toScript() + " )";
     }
 
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
+    }
 
     /**
      * Is Local zero.
@@ -204,6 +239,67 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         return num.isZERO();
     }
 
+    /**
+     * Local signum.
+     *
+     * @return signum(this).
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        return num.signum();
+    }
+
+    /**
+     * Local summation.
+     *
+     * @param S Local.
+     * @return this+S.
+     */
+    public Local<C> sum(Local<C> S) {
+        if (S == null || S.isZERO()) {
+            return this;
+        }
+        C n = num.multiply(S.den);
+        n = n.sum(den.multiply(S.num));
+        C d = den.multiply(S.den);
+        return new Local<C>(ring, n, d, false);
+    }
+
+    /**
+     * Local subtraction.
+     *
+     * @param S Local.
+     * @return this-S.
+     */
+    public Local<C> subtract(Local<C> S) {
+        if (S == null || S.isZERO()) {
+            return this;
+        }
+        C n = num.multiply(S.den);
+        n = n.subtract(den.multiply(S.num));
+        C d = den.multiply(S.den);
+        return new Local<C>(ring, n, d, false);
+    }
+
+    /**
+     * Local negate.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public Local<C> negate() {
+        return new Local<C>(ring, num.negate(), den, true);
+    }
+
+    /**
+     * Local absolute value.
+     *
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public Local<C> abs() {
+        return new Local<C>(ring, num.abs(), den, true);
+    }
 
     /**
      * Is Local one.
@@ -214,7 +310,6 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
     public boolean isONE() {
         return num.equals(den);
     }
-
 
     /**
      * Is Local unit.
@@ -244,220 +339,6 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         return (u);
     }
 
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "Local[ " + num.toString() + " / " + den.toString() + " ]";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return "Local( " + num.toScript() + " , " + den.toScript() + " )";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
-
-    /**
-     * Local comparison.
-     *
-     * @param b Local.
-     * @return sign(this - b).
-     */
-    @Override
-    public int compareTo(Local<C> b) {
-        if (b == null || b.isZERO()) {
-            return this.signum();
-        }
-        C r = num.multiply(b.den);
-        C s = den.multiply(b.num);
-        C x = r.subtract(s);
-        return x.signum();
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof Local)) {
-            return false;
-        }
-        Local<C> a = (Local<C>) b;
-        return (0 == compareTo(a));
-    }
-
-
-    /**
-     * Hash code for this local.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + num.hashCode();
-        h = 37 * h + den.hashCode();
-        return h;
-    }
-
-
-    /**
-     * Local absolute value.
-     *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public Local<C> abs() {
-        return new Local<C>(ring, num.abs(), den, true);
-    }
-
-
-    /**
-     * Local summation.
-     *
-     * @param S Local.
-     * @return this+S.
-     */
-    public Local<C> sum(Local<C> S) {
-        if (S == null || S.isZERO()) {
-            return this;
-        }
-        C n = num.multiply(S.den);
-        n = n.sum(den.multiply(S.num));
-        C d = den.multiply(S.den);
-        return new Local<C>(ring, n, d, false);
-    }
-
-
-    /**
-     * Local negate.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public Local<C> negate() {
-        return new Local<C>(ring, num.negate(), den, true);
-    }
-
-
-    /**
-     * Local signum.
-     *
-     * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        return num.signum();
-    }
-
-
-    /**
-     * Local subtraction.
-     *
-     * @param S Local.
-     * @return this-S.
-     */
-    public Local<C> subtract(Local<C> S) {
-        if (S == null || S.isZERO()) {
-            return this;
-        }
-        C n = num.multiply(S.den);
-        n = n.subtract(den.multiply(S.num));
-        C d = den.multiply(S.den);
-        return new Local<C>(ring, n, d, false);
-    }
-
-
-    /**
-     * Local division.
-     *
-     * @param S Local.
-     * @return this/S.
-     */
-    public Local<C> divide(Local<C> S) {
-        return multiply(S.inverse());
-    }
-
-
-    /**
-     * Local inverse.
-     *
-     * @return S with S = 1/this if defined.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public Local<C> inverse() {
-        if (isONE()) {
-            return this;
-        }
-        if (isUnit()) {
-            return new Local<C>(ring, den, num, true);
-        }
-        throw new ArithmeticException("element not invertible " + this);
-    }
-
-
-    /**
-     * Local remainder.
-     *
-     * @param S Local.
-     * @return this - (this/S)*S.
-     */
-    public Local<C> remainder(Local<C> S) {
-        if (num.isZERO()) {
-            throw new ArithmeticException("element not invertible " + this);
-        }
-        if (S.isUnit()) {
-            return ring.getZERO();
-        }
-        throw new UnsupportedOperationException("remainder not implemented" + S);
-    }
-
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a Local
-     * @return [this/S, this - (this/S)*S].
-     */
-    @SuppressWarnings("unchecked")
-    public Local<C>[] quotientRemainder(Local<C> S) {
-        return new Local[]{divide(S), remainder(S)};
-    }
-
-
     /**
      * Local multiplication.
      *
@@ -482,6 +363,100 @@ public class Local<C extends RingElem<C>> extends RingElemImpl<Local<C>> impleme
         return new Local<C>(ring, n, d, false);
     }
 
+    /**
+     * Local division.
+     *
+     * @param S Local.
+     * @return this/S.
+     */
+    public Local<C> divide(Local<C> S) {
+        return multiply(S.inverse());
+    }
+
+    /**
+     * Local remainder.
+     *
+     * @param S Local.
+     * @return this - (this/S)*S.
+     */
+    public Local<C> remainder(Local<C> S) {
+        if (num.isZERO()) {
+            throw new ArithmeticException("element not invertible " + this);
+        }
+        if (S.isUnit()) {
+            return ring.getZERO();
+        }
+        throw new UnsupportedOperationException("remainder not implemented" + S);
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a Local
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public Local<C>[] quotientRemainder(Local<C> S) {
+        return new Local[]{divide(S), remainder(S)};
+    }
+
+    /**
+     * Local inverse.
+     *
+     * @return S with S = 1/this if defined.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public Local<C> inverse() {
+        if (isONE()) {
+            return this;
+        }
+        if (isUnit()) {
+            return new Local<C>(ring, den, num, true);
+        }
+        throw new ArithmeticException("element not invertible " + this);
+    }
+
+    /**
+     * Hash code for this local.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + num.hashCode();
+        h = 37 * h + den.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof Local)) {
+            return false;
+        }
+        Local<C> a = (Local<C>) b;
+        return (0 == compareTo(a));
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "Local[ " + num.toString() + " / " + den.toString() + " ]";
+    }
 
     /**
      * Greatest common divisor. <b>Note: </b>Not implemented, throws

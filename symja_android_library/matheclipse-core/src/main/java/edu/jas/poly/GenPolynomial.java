@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
@@ -52,7 +53,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         Iterable<Monomial<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(GenPolynomial.class);
+    private static final Logger logger = LogManager.getLogger(GenPolynomial.class);
     private static final boolean debug = logger.isDebugEnabled();
     /**
      * The factory for the polynomial ring.
@@ -169,6 +170,61 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
     }
 
+    /**
+     * Copy this GenPolynomial.
+     *
+     * @return copy of this.
+     */
+    public GenPolynomial<C> copy() {
+        return new GenPolynomial<C>(ring, this.val);
+    }
+
+    /**
+     * GenPolynomial comparison.
+     *
+     * @param b GenPolynomial.
+     * @return sign(this - b).
+     */
+    public int compareTo(GenPolynomial<C> b) {
+        if (b == null) {
+            return 1;
+        }
+        SortedMap<ExpVector, C> av = this.val;
+        SortedMap<ExpVector, C> bv = b.val;
+        Iterator<Map.Entry<ExpVector, C>> ai = av.entrySet().iterator();
+        Iterator<Map.Entry<ExpVector, C>> bi = bv.entrySet().iterator();
+        int s = 0;
+        int c = 0;
+        while (ai.hasNext() && bi.hasNext()) {
+            Map.Entry<ExpVector, C> aie = ai.next();
+            Map.Entry<ExpVector, C> bie = bi.next();
+            ExpVector ae = aie.getKey();
+            ExpVector be = bie.getKey();
+            s = ae.compareTo(be);
+            if (s != 0) {
+                //System.out.println("s = " + s + ", " + ring.toScript(ae) + ", " + ring.toScript(be));
+                return s;
+            }
+            if (c == 0) {
+                C ac = aie.getValue(); //av.get(ae);
+                C bc = bie.getValue(); //bv.get(be);
+                c = ac.compareTo(bc);
+            }
+        }
+        if (ai.hasNext()) {
+            //System.out.println("ai = " + ai);
+            return 1;
+        }
+        if (bi.hasNext()) {
+            //System.out.println("bi = " + bi);
+            return -1;
+        }
+        //if (c != 0) {
+        //System.out.println("c = " + c);
+        //}
+        // now all keys are equal
+        return c;
+    }
 
     /**
      * Get the corresponding element factory.
@@ -180,16 +236,75 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return ring;
     }
 
-
     /**
-     * Copy this GenPolynomial.
+     * Get a scripting compatible string representation.
      *
-     * @return copy of this.
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
-    public GenPolynomial<C> copy() {
-        return new GenPolynomial<C>(ring, this.val);
+    @Override
+    public String toScript() {
+        // Python case
+        if (isZERO()) {
+            return "0";
+        }
+        StringBuffer s = new StringBuffer();
+        if (val.size() > 1) {
+            s.append("( ");
+        }
+        String[] v = ring.vars;
+        if (v == null) {
+            v = GenPolynomialRing.newVars("x", ring.nvar);
+        }
+        Pattern klammern = Pattern.compile("\\s*\\(.+\\)\\s*");
+        boolean first = true;
+        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+            C c = m.getValue();
+            if (first) {
+                first = false;
+            } else {
+                if (c.signum() < 0) {
+                    s.append(" - ");
+                    c = c.negate();
+                } else {
+                    s.append(" + ");
+                }
+            }
+            ExpVector e = m.getKey();
+            String cs = c.toScript();
+            boolean parenthesis = (cs.indexOf("-") >= 0 || cs.indexOf("+") >= 0)
+                    && !klammern.matcher(cs).matches();
+            if (!c.isONE() || e.isZERO()) {
+                if (parenthesis) {
+                    s.append("( ");
+                }
+                s.append(cs);
+                if (parenthesis) {
+                    s.append(" )");
+                }
+                if (!e.isZERO()) {
+                    s.append(" * ");
+                }
+            }
+            s.append(e.toScript(v));
+        }
+        if (val.size() > 1) {
+            s.append(" )");
+        }
+        return s.toString();
     }
 
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
+    }
 
     /**
      * Length of GenPolynomial.
@@ -200,7 +315,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return val.size();
     }
 
-
     /**
      * ExpVector to coefficient map of GenPolynomial.
      *
@@ -210,7 +324,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         // return val;
         return Collections.unmodifiableSortedMap(val);
     }
-
 
     /**
      * Put an ExpVector to coefficient entry into the internal map of this
@@ -235,7 +348,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
     }
 
-
     /**
      * Remove an ExpVector to coefficient entry from the internal map of this
      * GenPolynomial. <b>Note:</b> Do not use this method unless you are
@@ -259,7 +371,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             }
         }
     }
-
 
     /**
      * Put an a sorted map of exponents to coefficients into the internal map of
@@ -287,45 +398,11 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
     }
 
-
-    /**
-     * String representation of GenPolynomial.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        if (ring.vars != null) {
-            return toString(ring.vars);
-        }
-        StringBuffer s = new StringBuffer();
-        s.append(this.getClass().getSimpleName() + ":");
-        s.append(ring.coFac.getClass().getSimpleName());
-        if (ring.coFac.characteristic().signum() != 0) {
-            s.append("(" + ring.coFac.characteristic() + ")");
-        }
-        s.append("[ ");
-        boolean first = true;
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
-            if (first) {
-                first = false;
-            } else {
-                s.append(", ");
-            }
-            s.append(m.getValue().toString());
-            s.append(" ");
-            s.append(m.getKey().toString());
-        }
-        s.append(" ] "); // no not use: ring.toString() );
-        return s.toString();
-    }
-
-
     /**
      * String representation of GenPolynomial.
      *
      * @param v names for variables.
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     public String toString(String[] v) {
         StringBuffer s = new StringBuffer();
@@ -399,77 +476,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return s.toString();
     }
 
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        if (isZERO()) {
-            return "0";
-        }
-        StringBuffer s = new StringBuffer();
-        if (val.size() > 1) {
-            s.append("( ");
-        }
-        String[] v = ring.vars;
-        if (v == null) {
-            v = GenPolynomialRing.newVars("x", ring.nvar);
-        }
-        boolean first = true;
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
-            C c = m.getValue();
-            if (first) {
-                first = false;
-            } else {
-                if (c.signum() < 0) {
-                    s.append(" - ");
-                    c = c.negate();
-                } else {
-                    s.append(" + ");
-                }
-            }
-            ExpVector e = m.getKey();
-            String cs = c.toScript();
-            boolean parenthesis = (cs.indexOf("-") >= 0 || cs.indexOf("+") >= 0);
-            if (!c.isONE() || e.isZERO()) {
-                if (parenthesis) {
-                    s.append("( ");
-                }
-                s.append(cs);
-                if (parenthesis) {
-                    s.append(" )");
-                }
-                if (!e.isZERO()) {
-                    s.append(" * ");
-                }
-            }
-            s.append(e.toScript(v));
-        }
-        if (val.size() > 1) {
-            s.append(" )");
-        }
-        return s.toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
-
     /**
      * Is GenPolynomial&lt;C&gt; zero.
      *
@@ -479,163 +485,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
     public boolean isZERO() {
         return val.isEmpty();
     }
-
-
-    /**
-     * Is GenPolynomial&lt;C&gt; one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        if (val.size() != 1) {
-            return false;
-        }
-        C c = val.get(ring.evzero);
-        if (c == null) {
-            return false;
-        }
-        return c.isONE();
-    }
-
-
-    /**
-     * Is GenPolynomial&lt;C&gt; a unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        if (val.size() != 1) {
-            return false;
-        }
-        C c = val.get(ring.evzero);
-        if (c == null) {
-            return false;
-        }
-        return c.isUnit();
-    }
-
-
-    /**
-     * Is GenPolynomial&lt;C&gt; a constant.
-     *
-     * @return If this is a constant polynomial then true is returned, else
-     * false.
-     */
-    public boolean isConstant() {
-        if (val.size() != 1) {
-            return false;
-        }
-        C c = val.get(ring.evzero);
-        return c != null;
-    }
-
-
-    /**
-     * Is GenPolynomial&lt;C&gt; homogeneous.
-     *
-     * @return true, if this is homogeneous, else false.
-     */
-    public boolean isHomogeneous() {
-        if (val.size() <= 1) {
-            return true;
-        }
-        long deg = -1;
-        for (ExpVector e : val.keySet()) {
-            if (deg < 0) {
-                deg = e.totalDeg();
-            } else if (deg != e.totalDeg()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object B) {
-        if (B == null) {
-            return false;
-        }
-        if (!(B instanceof GenPolynomial)) {
-            return false;
-        }
-        GenPolynomial<C> a = (GenPolynomial<C>) B;
-        return this.compareTo(a) == 0;
-    }
-
-
-    /**
-     * Hash code for this polynomial.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h = hash;
-        if (h < 0) {
-            h = (ring.hashCode() << 27);
-            h += val.hashCode();
-            hash = h;
-        }
-        return h;
-    }
-
-
-    /**
-     * GenPolynomial comparison.
-     *
-     * @param b GenPolynomial.
-     * @return sign(this - b).
-     */
-    public int compareTo(GenPolynomial<C> b) {
-        if (b == null) {
-            return 1;
-        }
-        SortedMap<ExpVector, C> av = this.val;
-        SortedMap<ExpVector, C> bv = b.val;
-        Iterator<Map.Entry<ExpVector, C>> ai = av.entrySet().iterator();
-        Iterator<Map.Entry<ExpVector, C>> bi = bv.entrySet().iterator();
-        int s = 0;
-        int c = 0;
-        while (ai.hasNext() && bi.hasNext()) {
-            Map.Entry<ExpVector, C> aie = ai.next();
-            Map.Entry<ExpVector, C> bie = bi.next();
-            ExpVector ae = aie.getKey();
-            ExpVector be = bie.getKey();
-            s = ae.compareTo(be);
-            if (s != 0) {
-                //System.out.println("s = " + s + ", " + ring.toScript(ae) + ", " + ring.toScript(be));
-                return s;
-            }
-            if (c == 0) {
-                C ac = aie.getValue(); //av.get(ae);
-                C bc = bie.getValue(); //bv.get(be);
-                c = ac.compareTo(bc);
-            }
-        }
-        if (ai.hasNext()) {
-            //System.out.println("ai = " + ai);
-            return 1;
-        }
-        if (bi.hasNext()) {
-            //System.out.println("bi = " + bi);
-            return -1;
-        }
-        //if (c != 0) {
-        //System.out.println("c = " + c);
-        //}
-        // now all keys are equal
-        return c;
-    }
-
 
     /**
      * GenPolynomial signum.
@@ -650,413 +499,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         C c = val.get(t);
         return c.signum();
     }
-
-
-    /**
-     * Number of variables.
-     *
-     * @return ring.nvar.
-     */
-    public int numberOfVariables() {
-        return ring.nvar;
-    }
-
-
-    /**
-     * Leading monomial.
-     *
-     * @return first map entry.
-     */
-    public Map.Entry<ExpVector, C> leadingMonomial() {
-        if (val.isEmpty()) {
-            return null;
-        }
-        //Iterator<Map.Entry<ExpVector, C>> ai = val.entrySet().iterator();
-        //return ai.next();
-        ExpVector e = val.firstKey();
-        return new MapEntry<ExpVector, C>(e, val.get(e));
-    }
-
-
-    /**
-     * Leading exponent vector.
-     *
-     * @return first exponent.
-     */
-    public ExpVector leadingExpVector() {
-        if (val.isEmpty()) {
-            return null; // ring.evzero? needs many changes 
-        }
-        return val.firstKey();
-    }
-
-
-    /**
-     * Trailing exponent vector.
-     *
-     * @return last exponent.
-     */
-    public ExpVector trailingExpVector() {
-        if (val.isEmpty()) {
-            return null; //ring.evzero; // or null ?;
-        }
-        return val.lastKey();
-    }
-
-
-    /**
-     * Leading base coefficient.
-     *
-     * @return first coefficient.
-     */
-    public C leadingBaseCoefficient() {
-        if (val.isEmpty()) {
-            return ring.coFac.getZERO();
-        }
-        return val.get(val.firstKey());
-    }
-
-
-    /**
-     * Trailing base coefficient.
-     *
-     * @return coefficient of constant term.
-     */
-    public C trailingBaseCoefficient() {
-        C c = val.get(ring.evzero);
-        if (c == null) {
-            return ring.coFac.getZERO();
-        }
-        return c;
-    }
-
-
-    /**
-     * Coefficient.
-     *
-     * @param e exponent.
-     * @return coefficient for given exponent.
-     */
-    public C coefficient(ExpVector e) {
-        C c = val.get(e);
-        if (c == null) {
-            c = ring.coFac.getZERO();
-        }
-        return c;
-    }
-
-
-    /**
-     * Reductum.
-     *
-     * @return this - leading monomial.
-     */
-    public GenPolynomial<C> reductum() {
-        if (val.size() <= 1) {
-            return ring.getZERO();
-        }
-        Iterator<ExpVector> ai = val.keySet().iterator();
-        ExpVector lt = ai.next();
-        lt = ai.next(); // size > 1
-        SortedMap<ExpVector, C> red = val.tailMap(lt);
-        GenPolynomial<C> r = ring.getZERO().copy();
-        r.doPutToMap(red); //  new GenPolynomial<C>(ring, red);
-        return r;
-    }
-
-
-    /**
-     * Degree in variable i.
-     *
-     * @return maximal degree in the variable i.
-     */
-    public long degree(int i) {
-        if (val.isEmpty()) {
-            return -1L; // 0 or -1 ?;
-        }
-        int j;
-        if (i >= 0) {
-            j = ring.nvar - 1 - i;
-        } else { // python like -1 means main variable
-            j = ring.nvar + i;
-        }
-        long deg = 0;
-        if (j < 0) {
-            return deg;
-        }
-        for (ExpVector e : val.keySet()) {
-            long d = e.getVal(j);
-            if (d > deg) {
-                deg = d;
-            }
-        }
-        return deg;
-    }
-
-
-    /**
-     * Maximal degree.
-     *
-     * @return maximal degree in any variables.
-     */
-    public long degree() {
-        if (val.isEmpty()) {
-            return -1L; // 0 or -1 ?;
-        }
-        long deg = 0;
-        for (ExpVector e : val.keySet()) {
-            long d = e.maxDeg();
-            if (d > deg) {
-                deg = d;
-            }
-        }
-        return deg;
-    }
-
-
-    /**
-     * Minimal degree.
-     * <b>Author:</b> Youssef Elbarbary
-     *
-     * @return minimal degree in any variables.
-     */
-    public long degreeMin() {
-        if (val.isEmpty()) {
-            return -1L; // 0 or -1 ?;
-        }
-        long deg = Long.MAX_VALUE;
-        for (ExpVector e : val.keySet()) {
-            long d = e.minDeg();
-            if (d < deg) {
-                deg = d;
-            }
-        }
-        return deg;
-    }
-
-
-    /**
-     * Total degree.
-     *
-     * @return total degree in any variables.
-     */
-    public long totalDegree() {
-        if (val.isEmpty()) {
-            return -1L; // 0 or -1 ?;
-        }
-        long deg = 0;
-        for (ExpVector e : val.keySet()) {
-            long d = e.totalDeg();
-            if (d > deg) {
-                deg = d;
-            }
-        }
-        return deg;
-    }
-
-
-    /**
-     * Weight degree.
-     *
-     * @return weight degree in all variables.
-     */
-    public long weightDegree() {
-        long[][] w = ring.tord.getWeight();
-        if (w == null || w.length == 0) {
-            return totalDegree(); // assume weight 1 
-        }
-        if (val.isEmpty()) {
-            return -1L; // 0 or -1 ?;
-        }
-        long deg = 0;
-        for (ExpVector e : val.keySet()) {
-            long d = e.weightDeg(w);
-            if (d > deg) {
-                deg = d;
-            }
-        }
-        return deg;
-    }
-
-
-    /**
-     * Leading weight polynomial.
-     *
-     * @return polynomial with terms of maximal weight degree.
-     */
-    public GenPolynomial<C> leadingWeightPolynomial() {
-        if (val.isEmpty()) {
-            return ring.getZERO();
-        }
-        long[][] w = ring.tord.getWeight();
-        long maxw = weightDegree();
-        GenPolynomial<C> wp = ring.getZERO().copy();
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
-            ExpVector e = m.getKey();
-            long d = e.weightDeg(w);
-            if (d >= maxw) {
-                wp.val.put(e, m.getValue());
-            }
-        }
-        return wp;
-    }
-
-
-    /**
-     * Leading facet normal polynomial.
-     *
-     * @param u  leading exponent vector.
-     * @param uv exponent vector of facet normal.
-     * @return polynomial with terms of facet normal.
-     */
-    public GenPolynomial<C> leadingFacetPolynomial(ExpVector u, ExpVector uv) {
-        if (val.isEmpty()) {
-            return ring.getZERO();
-        }
-        long[] normal = uv.getVal();
-        GenPolynomial<C> fp = ring.getZERO().copy();
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
-            ExpVector e = m.getKey();
-            if (u.equals(e)) {
-                fp.val.put(e, m.getValue());
-            } else {
-                ExpVector v = u.subtract(e);
-                if (v.compareTo(uv) == 0) { // || v.negate().compareTo(uv) == 0
-                    fp.val.put(e, m.getValue());
-                } else { // check for v parallel to uv
-                    long ab = v.weightDeg(normal); //scalarProduct(v, uv);
-                    long a = v.weightDeg(v.getVal()); //scalarProduct(v, v);
-                    long b = uv.weightDeg(normal); //scalarProduct(uv, uv);
-                    if (ab * ab == a * b) { // cos == 1
-                        fp.val.put(e, m.getValue());
-                        logger.info("ab = " + ab + ", a = " + a + ", b = " + b + ", u = " + u + ", e = " + e
-                                + ", v = " + v);
-                    }
-                }
-            }
-        }
-        return fp;
-    }
-
-
-    /**
-     * Is GenPolynomial&lt;C&gt; homogeneous with respect to a weight.
-     *
-     * @return true, if this is weight homogeneous, else false.
-     */
-    public boolean isWeightHomogeneous() {
-        if (val.size() <= 1) {
-            return true;
-        }
-        long[][] w = ring.tord.getWeight();
-        if (w == null || w.length == 0) {
-            return isHomogeneous(); // assume weights = 1
-        }
-        long deg = -1;
-        for (ExpVector e : val.keySet()) {
-            if (deg < 0) {
-                deg = e.weightDeg(w);
-            } else if (deg != e.weightDeg(w)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Maximal degree vector.
-     *
-     * @return maximal degree vector of all variables.
-     */
-    public ExpVector degreeVector() {
-        if (val.isEmpty()) {
-            return null; //deg;
-        }
-        ExpVector deg = ring.evzero;
-        for (ExpVector e : val.keySet()) {
-            deg = deg.lcm(e);
-        }
-        return deg;
-    }
-
-
-    /**
-     * Delta of exponent vectors.
-     *
-     * @return list of u-v, where u = lt() and v != u in this.
-     */
-    public List<ExpVector> deltaExpVectors() {
-        List<ExpVector> de = new ArrayList<ExpVector>(val.size());
-        if (val.isEmpty()) {
-            return de;
-        }
-        ExpVector u = null;
-        for (ExpVector e : val.keySet()) {
-            if (u == null) {
-                u = e;
-            } else {
-                ExpVector v = u.subtract(e);
-                de.add(v);
-            }
-        }
-        return de;
-    }
-
-
-    /**
-     * Delta of exponent vectors.
-     *
-     * @param u marked ExpVector in this.expVectors
-     * @return list of u-v, where v != u in this.expVectors.
-     */
-    public List<ExpVector> deltaExpVectors(ExpVector u) {
-        List<ExpVector> de = new ArrayList<ExpVector>(val.size());
-        if (val.isEmpty()) {
-            return de;
-        }
-        for (ExpVector e : val.keySet()) {
-            ExpVector v = u.subtract(e);
-            if (v.isZERO()) {
-                continue;
-            }
-            de.add(v);
-        }
-        return de;
-    }
-
-
-    /**
-     * GenPolynomial maximum norm.
-     *
-     * @return ||this||.
-     */
-    public C maxNorm() {
-        C n = ring.getZEROCoefficient();
-        for (C c : val.values()) {
-            C x = c.abs();
-            if (n.compareTo(x) < 0) {
-                n = x;
-            }
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial sum norm.
-     *
-     * @return sum of all absolute values of coefficients.
-     */
-    public C sumNorm() {
-        C n = ring.getZEROCoefficient();
-        for (C c : val.values()) {
-            C x = c.abs();
-            n = n.sum(x);
-        }
-        return n;
-    }
-
 
     /**
      * GenPolynomial summation.
@@ -1097,135 +539,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return n;
     }
 
-
-    /**
-     * GenPolynomial addition. This method is not very efficient, since this is
-     * copied.
-     *
-     * @param a coefficient.
-     * @param e exponent.
-     * @return this + a x<sup>e</sup>.
-     */
-    public GenPolynomial<C> sum(C a, ExpVector e) {
-        if (a == null) {
-            return this;
-        }
-        if (a.isZERO()) {
-            return this;
-        }
-        GenPolynomial<C> n = this.copy();
-        SortedMap<ExpVector, C> nv = n.val;
-        //if ( nv.size() == 0 ) { nv.put(e,a); return n; }
-        C x = nv.get(e);
-        if (x != null) {
-            x = x.sum(a);
-            if (!x.isZERO()) {
-                nv.put(e, x);
-            } else {
-                nv.remove(e);
-            }
-        } else {
-            nv.put(e, a);
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial addition. This method is not very efficient, since this is
-     * copied.
-     *
-     * @param m monomial.
-     * @return this + m.
-     */
-    public GenPolynomial<C> sum(Monomial<C> m) {
-        return sum(m.coefficient(), m.exponent());
-    }
-
-
-    /**
-     * GenPolynomial addition. This method is not very efficient, since this is
-     * copied.
-     *
-     * @param a coefficient.
-     * @return this + a x<sup>0</sup>.
-     */
-    public GenPolynomial<C> sum(C a) {
-        return sum(a, ring.evzero);
-    }
-
-
-    /**
-     * GenPolynomial destructive summation.
-     *
-     * @param S GenPolynomial.
-     */
-    public void doAddTo(GenPolynomial<C> S) {
-        if (S == null || S.isZERO()) {
-            return;
-        }
-        if (this.isZERO()) {
-            this.val.putAll(S.val);
-            return;
-        }
-        assert (ring.nvar == S.ring.nvar);
-        SortedMap<ExpVector, C> nv = this.val;
-        SortedMap<ExpVector, C> sv = S.val;
-        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
-            ExpVector e = me.getKey();
-            C y = me.getValue(); // assert y != null
-            C x = nv.get(e);
-            if (x != null) {
-                x = x.sum(y);
-                if (!x.isZERO()) {
-                    nv.put(e, x);
-                } else {
-                    nv.remove(e);
-                }
-            } else {
-                nv.put(e, y);
-            }
-        }
-        return;
-    }
-
-
-    /**
-     * GenPolynomial destructive summation.
-     *
-     * @param a coefficient.
-     * @param e exponent.
-     */
-    public void doAddTo(C a, ExpVector e) {
-        if (a == null || a.isZERO()) {
-            return;
-        }
-        SortedMap<ExpVector, C> nv = this.val;
-        C x = nv.get(e);
-        if (x != null) {
-            x = x.sum(a);
-            if (!x.isZERO()) {
-                nv.put(e, x);
-            } else {
-                nv.remove(e);
-            }
-        } else {
-            nv.put(e, a);
-        }
-        return;
-    }
-
-
-    /**
-     * GenPolynomial destructive summation.
-     *
-     * @param a coefficient.
-     */
-    public void doAddTo(C a) {
-        doAddTo(a, ring.evzero);
-    }
-
-
     /**
      * GenPolynomial subtraction.
      *
@@ -1264,301 +577,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return n;
     }
 
-
-    /**
-     * GenPolynomial subtraction. This method is not very efficient, since this
-     * is copied.
-     *
-     * @param a coefficient.
-     * @param e exponent.
-     * @return this - a x<sup>e</sup>.
-     */
-    public GenPolynomial<C> subtract(C a, ExpVector e) {
-        if (a == null || a.isZERO()) {
-            return this;
-        }
-        GenPolynomial<C> n = this.copy();
-        SortedMap<ExpVector, C> nv = n.val;
-        C x = nv.get(e);
-        if (x != null) {
-            x = x.subtract(a);
-            if (!x.isZERO()) {
-                nv.put(e, x);
-            } else {
-                nv.remove(e);
-            }
-        } else {
-            nv.put(e, a.negate());
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial subtraction. This method is not very efficient, since this
-     * is copied.
-     *
-     * @param m monomial.
-     * @return this - m.
-     */
-    public GenPolynomial<C> subtract(Monomial<C> m) {
-        return subtract(m.coefficient(), m.exponent());
-    }
-
-
-    /**
-     * GenPolynomial subtract. This method is not very efficient, since this is
-     * copied.
-     *
-     * @param a coefficient.
-     * @return this + a x<sup>0</sup>.
-     */
-    public GenPolynomial<C> subtract(C a) {
-        return subtract(a, ring.evzero);
-    }
-
-
-    /**
-     * GenPolynomial subtract a multiple.
-     *
-     * @param a coefficient.
-     * @param S GenPolynomial.
-     * @return this - a S.
-     */
-    public GenPolynomial<C> subtractMultiple(C a, GenPolynomial<C> S) {
-        if (a == null || a.isZERO()) {
-            return this;
-        }
-        if (S == null || S.isZERO()) {
-            return this;
-        }
-        if (this.isZERO()) {
-            return S.multiply(a.negate());
-        }
-        assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.copy();
-        SortedMap<ExpVector, C> nv = n.val;
-        SortedMap<ExpVector, C> sv = S.val;
-        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
-            ExpVector f = me.getKey();
-            C y = me.getValue(); // assert y != null
-            y = a.multiply(y);
-            C x = nv.get(f);
-            if (x != null) {
-                x = x.subtract(y);
-                if (!x.isZERO()) {
-                    nv.put(f, x);
-                } else {
-                    nv.remove(f);
-                }
-            } else if (!y.isZERO()) {
-                nv.put(f, y.negate());
-            }
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial subtract a multiple.
-     *
-     * @param a coefficient.
-     * @param e exponent.
-     * @param S GenPolynomial.
-     * @return this - a x<sup>e</sup> S.
-     */
-    public GenPolynomial<C> subtractMultiple(C a, ExpVector e, GenPolynomial<C> S) {
-        if (a == null || a.isZERO()) {
-            return this;
-        }
-        if (S == null || S.isZERO()) {
-            return this;
-        }
-        if (this.isZERO()) {
-            return S.multiply(a.negate(), e);
-        }
-        assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.copy();
-        SortedMap<ExpVector, C> nv = n.val;
-        SortedMap<ExpVector, C> sv = S.val;
-        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
-            ExpVector f = me.getKey();
-            f = e.sum(f);
-            C y = me.getValue(); // assert y != null
-            y = a.multiply(y);
-            C x = nv.get(f);
-            if (x != null) {
-                x = x.subtract(y);
-                if (!x.isZERO()) {
-                    nv.put(f, x);
-                } else {
-                    nv.remove(f);
-                }
-            } else if (!y.isZERO()) {
-                nv.put(f, y.negate());
-            }
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial scale and subtract a multiple.
-     *
-     * @param b scale factor.
-     * @param a coefficient.
-     * @param S GenPolynomial.
-     * @return this * b - a S.
-     */
-    public GenPolynomial<C> scaleSubtractMultiple(C b, C a, GenPolynomial<C> S) {
-        if (a == null || S == null) {
-            return this.multiply(b);
-        }
-        if (a.isZERO() || S.isZERO()) {
-            return this.multiply(b);
-        }
-        if (this.isZERO() || b == null || b.isZERO()) {
-            return S.multiply(a.negate()); //left?
-        }
-        if (b.isONE()) {
-            return subtractMultiple(a, S);
-        }
-        assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.multiply(b);
-        SortedMap<ExpVector, C> nv = n.val;
-        SortedMap<ExpVector, C> sv = S.val;
-        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
-            ExpVector f = me.getKey();
-            //f = e.sum(f);
-            C y = me.getValue(); // assert y != null
-            y = a.multiply(y); // now y can be zero
-            C x = nv.get(f);
-            if (x != null) {
-                x = x.subtract(y);
-                if (!x.isZERO()) {
-                    nv.put(f, x);
-                } else {
-                    nv.remove(f);
-                }
-            } else if (!y.isZERO()) {
-                nv.put(f, y.negate());
-            }
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial scale and subtract a multiple.
-     *
-     * @param b scale factor.
-     * @param a coefficient.
-     * @param e exponent.
-     * @param S GenPolynomial.
-     * @return this * b - a x<sup>e</sup> S.
-     */
-    public GenPolynomial<C> scaleSubtractMultiple(C b, C a, ExpVector e, GenPolynomial<C> S) {
-        if (a == null || S == null) {
-            return this.multiply(b);
-        }
-        if (a.isZERO() || S.isZERO()) {
-            return this.multiply(b);
-        }
-        if (this.isZERO() || b == null || b.isZERO()) {
-            return S.multiply(a.negate(), e);
-        }
-        if (b.isONE()) {
-            return subtractMultiple(a, e, S);
-        }
-        assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.multiply(b);
-        SortedMap<ExpVector, C> nv = n.val;
-        SortedMap<ExpVector, C> sv = S.val;
-        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
-            ExpVector f = me.getKey();
-            f = e.sum(f);
-            C y = me.getValue(); // assert y != null
-            y = a.multiply(y); // now y can be zero
-            C x = nv.get(f);
-            if (x != null) {
-                x = x.subtract(y);
-                if (!x.isZERO()) {
-                    nv.put(f, x);
-                } else {
-                    nv.remove(f);
-                }
-            } else if (!y.isZERO()) {
-                nv.put(f, y.negate());
-            }
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial scale and subtract a multiple.
-     *
-     * @param b scale factor.
-     * @param g scale exponent.
-     * @param a coefficient.
-     * @param e exponent.
-     * @param S GenPolynomial.
-     * @return this * a x<sup>g</sup> - a x<sup>e</sup> S.
-     */
-    public GenPolynomial<C> scaleSubtractMultiple(C b, ExpVector g, C a, ExpVector e, GenPolynomial<C> S) {
-        if (a == null || S == null) {
-            return this.multiply(b, g);
-        }
-        if (a.isZERO() || S.isZERO()) {
-            return this.multiply(b, g);
-        }
-        if (this.isZERO() || b == null || b.isZERO()) {
-            return S.multiply(a.negate(), e);
-        }
-        if (b.isONE() && g.isZERO()) {
-            return subtractMultiple(a, e, S);
-        }
-        assert (ring.nvar == S.ring.nvar);
-        GenPolynomial<C> n = this.multiply(b, g);
-        SortedMap<ExpVector, C> nv = n.val;
-        SortedMap<ExpVector, C> sv = S.val;
-        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
-            ExpVector f = me.getKey();
-            f = e.sum(f);
-            C y = me.getValue(); // assert y != null
-            y = a.multiply(y); // y can be zero now
-            C x = nv.get(f);
-            if (x != null) {
-                x = x.subtract(y);
-                if (!x.isZERO()) {
-                    nv.put(f, x);
-                } else {
-                    nv.remove(f);
-                }
-            } else if (!y.isZERO()) {
-                nv.put(f, y.negate());
-            }
-        }
-        return n;
-    }
-
-
-    /**
-     * GenPolynomial negation, alternative implementation.
-     *
-     * @return -this.
-     */
-    public GenPolynomial<C> negateAlt() {
-        GenPolynomial<C> n = ring.getZERO().copy();
-        SortedMap<ExpVector, C> v = n.val;
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
-            C x = m.getValue(); // != null, 0
-            v.put(m.getKey(), x.negate());
-        }
-        return n;
-    }
-
-
     /**
      * GenPolynomial negation.
      *
@@ -1574,7 +592,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return n;
     }
 
-
     /**
      * GenPolynomial absolute value, i.e. leadingCoefficient &gt; 0.
      *
@@ -1587,6 +604,39 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return this;
     }
 
+    /**
+     * Is GenPolynomial&lt;C&gt; one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        if (val.size() != 1) {
+            return false;
+        }
+        C c = val.get(ring.evzero);
+        if (c == null) {
+            return false;
+        }
+        return c.isONE();
+    }
+
+    /**
+     * Is GenPolynomial&lt;C&gt; a unit.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        if (val.size() != 1) {
+            return false;
+        }
+        C c = val.get(ring.evzero);
+        if (c == null) {
+            return false;
+        }
+        return c.isUnit();
+    }
 
     /**
      * GenPolynomial multiplication.
@@ -1640,6 +690,1020 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return p;
     }
 
+    /**
+     * GenPolynomial division. Fails, if exact division by leading base
+     * coefficient is not possible. Meaningful only for univariate polynomials
+     * over fields, but works in any case.
+     *
+     * @param S nonzero GenPolynomial with invertible leading coefficient.
+     * @return quotient with this = quotient * S + remainder.
+     * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial, edu.jas.poly.GenPolynomial)
+     */
+    public GenPolynomial<C> divide(GenPolynomial<C> S) {
+        if (this instanceof GenSolvablePolynomial || S instanceof GenSolvablePolynomial) {
+            //throw new RuntimeException("wrong method dispatch in JRE ");
+            //logger.debug("warn: wrong method dispatch in JRE multiply(S) - trying to fix");
+            GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
+            GenSolvablePolynomial<C> Sp = (GenSolvablePolynomial<C>) S;
+            return T.quotientRemainder(Sp)[0];
+        }
+        return quotientRemainder(S)[0];
+    }
+
+    /**
+     * GenPolynomial remainder. Fails, if exact division by leading base
+     * coefficient is not possible. Meaningful only for univariate polynomials
+     * over fields, but works in any case.
+     *
+     * @param S nonzero GenPolynomial with invertible leading coefficient.
+     * @return remainder with this = quotient * S + remainder.
+     * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial, edu.jas.poly.GenPolynomial)
+     */
+    public GenPolynomial<C> remainder(GenPolynomial<C> S) {
+        if (this instanceof GenSolvablePolynomial || S instanceof GenSolvablePolynomial) {
+            //throw new RuntimeException("wrong method dispatch in JRE ");
+            //logger.debug("warn: wrong method dispatch in JRE multiply(S) - trying to fix");
+            GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
+            GenSolvablePolynomial<C> Sp = (GenSolvablePolynomial<C>) S;
+            return T.quotientRemainder(Sp)[1];
+        }
+        if (S == null || S.isZERO()) {
+            throw new ArithmeticException("division by zero");
+        }
+        C c = S.leadingBaseCoefficient();
+        if (!c.isUnit()) {
+            throw new ArithmeticException("lbc not invertible " + c);
+        }
+        C ci = c.inverse();
+        assert (ring.nvar == S.ring.nvar);
+        ExpVector e = S.leadingExpVector();
+        GenPolynomial<C> h;
+        GenPolynomial<C> r = this.copy();
+        while (!r.isZERO()) {
+            ExpVector f = r.leadingExpVector();
+            if (f.multipleOf(e)) {
+                C a = r.leadingBaseCoefficient();
+                ExpVector g = f.subtract(e);
+                //logger.info("red div = " + e);
+                a = a.multiply(ci);
+                h = S.multiply(a, g);
+                r = r.subtract(h);
+                assert (!f.equals(r.leadingExpVector())) : "leadingExpVector not descending: " + f;
+            } else {
+                break;
+            }
+        }
+        return r;
+    }
+
+    /**
+     * GenPolynomial division with remainder. Fails, if exact division by
+     * leading base coefficient is not possible. Meaningful only for univariate
+     * polynomials over fields, but works in any case.
+     *
+     * @param S nonzero GenPolynomial with invertible leading coefficient.
+     * @return [ quotient , remainder ] with this = quotient * S + remainder and
+     * deg(remainder) &lt; deg(S) or remiander = 0.
+     * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial, edu.jas.poly.GenPolynomial)
+     */
+    @SuppressWarnings("unchecked")
+    public GenPolynomial<C>[] quotientRemainder(GenPolynomial<C> S) {
+        if (S == null || S.isZERO()) {
+            throw new ArithmeticException("division by zero");
+        }
+        C c = S.leadingBaseCoefficient();
+        if (!c.isUnit()) {
+            throw new ArithmeticException("lbcf not invertible " + c);
+        }
+        C ci = c.inverse();
+        assert (ring.nvar == S.ring.nvar);
+        ExpVector e = S.leadingExpVector();
+        GenPolynomial<C> h;
+        GenPolynomial<C> q = ring.getZERO().copy();
+        GenPolynomial<C> r = this.copy();
+        while (!r.isZERO()) {
+            ExpVector f = r.leadingExpVector();
+            if (f.multipleOf(e)) {
+                C a = r.leadingBaseCoefficient();
+                ExpVector g = f.subtract(e);
+                a = a.multiply(ci);
+                q = q.sum(a, g);
+                h = S.multiply(a, g);
+                r = r.subtract(h);
+                assert (!f.equals(r.leadingExpVector())) : "leadingExpVector not descending: " + f;
+            } else {
+                break;
+            }
+        }
+        GenPolynomial<C>[] ret = new GenPolynomial[2];
+        ret[0] = q;
+        ret[1] = r;
+        return ret;
+    }
+
+    /**
+     * GenPolynomial inverse. Required by RingElem. Throws not invertible
+     * exception.
+     */
+    public GenPolynomial<C> inverse() {
+        if (isUnit()) { // only possible if ldbcf is unit
+            C c = leadingBaseCoefficient().inverse();
+            return ring.getONE().multiply(c);
+        }
+        throw new NotInvertibleException("element not invertible " + this + " :: " + ring);
+    }
+
+    /**
+     * Is GenPolynomial&lt;C&gt; a constant.
+     *
+     * @return If this is a constant polynomial then true is returned, else
+     * false.
+     */
+    public boolean isConstant() {
+        if (val.size() != 1) {
+            return false;
+        }
+        C c = val.get(ring.evzero);
+        return c != null;
+    }
+
+    /**
+     * Is GenPolynomial&lt;C&gt; homogeneous.
+     *
+     * @return true, if this is homogeneous, else false.
+     */
+    public boolean isHomogeneous() {
+        if (val.size() <= 1) {
+            return true;
+        }
+        long deg = -1;
+        for (ExpVector e : val.keySet()) {
+            if (deg < 0) {
+                deg = e.totalDeg();
+            } else if (deg != e.totalDeg()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Hash code for this polynomial.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = hash;
+        if (h < 0) {
+            h = (ring.hashCode() << 27);
+            h += val.hashCode();
+            hash = h;
+        }
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object B) {
+        if (B == null) {
+            return false;
+        }
+        if (!(B instanceof GenPolynomial)) {
+            return false;
+        }
+        GenPolynomial<C> a = (GenPolynomial<C>) B;
+        return this.compareTo(a) == 0;
+    }
+
+    /**
+     * String representation of GenPolynomial.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        if (ring.vars != null) {
+            return toString(ring.vars);
+        }
+        StringBuffer s = new StringBuffer();
+        s.append(this.getClass().getSimpleName() + ":");
+        s.append(ring.coFac.getClass().getSimpleName());
+        if (ring.coFac.characteristic().signum() != 0) {
+            s.append("(" + ring.coFac.characteristic() + ")");
+        }
+        s.append("[ ");
+        boolean first = true;
+        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                s.append(", ");
+            }
+            s.append(m.getValue().toString());
+            s.append(" ");
+            s.append(m.getKey().toString());
+        }
+        s.append(" ] "); // no not use: ring.toString() );
+        return s.toString();
+    }
+
+    /**
+     * Number of variables.
+     *
+     * @return ring.nvar.
+     */
+    public int numberOfVariables() {
+        return ring.nvar;
+    }
+
+    /**
+     * Leading monomial.
+     *
+     * @return first map entry.
+     */
+    public Map.Entry<ExpVector, C> leadingMonomial() {
+        if (val.isEmpty()) {
+            return null;
+        }
+        //Iterator<Map.Entry<ExpVector, C>> ai = val.entrySet().iterator();
+        //return ai.next();
+        ExpVector e = val.firstKey();
+        return new MapEntry<ExpVector, C>(e, val.get(e));
+    }
+
+    /**
+     * Leading exponent vector.
+     *
+     * @return first exponent.
+     */
+    public ExpVector leadingExpVector() {
+        if (val.isEmpty()) {
+            return null; // ring.evzero? needs many changes
+        }
+        return val.firstKey();
+    }
+
+    /**
+     * Trailing exponent vector.
+     *
+     * @return last exponent.
+     */
+    public ExpVector trailingExpVector() {
+        if (val.isEmpty()) {
+            return null; //ring.evzero; // or null ?;
+        }
+        return val.lastKey();
+    }
+
+    /**
+     * Leading base coefficient.
+     *
+     * @return first coefficient.
+     */
+    public C leadingBaseCoefficient() {
+        if (val.isEmpty()) {
+            return ring.coFac.getZERO();
+        }
+        return val.get(val.firstKey());
+    }
+
+    /**
+     * Trailing base coefficient.
+     *
+     * @return coefficient of constant term.
+     */
+    public C trailingBaseCoefficient() {
+        C c = val.get(ring.evzero);
+        if (c == null) {
+            return ring.coFac.getZERO();
+        }
+        return c;
+    }
+
+    /**
+     * Coefficient.
+     *
+     * @param e exponent.
+     * @return coefficient for given exponent.
+     */
+    public C coefficient(ExpVector e) {
+        C c = val.get(e);
+        if (c == null) {
+            c = ring.coFac.getZERO();
+        }
+        return c;
+    }
+
+    /**
+     * Reductum.
+     *
+     * @return this - leading monomial.
+     */
+    public GenPolynomial<C> reductum() {
+        if (val.size() <= 1) {
+            return ring.getZERO();
+        }
+        Iterator<ExpVector> ai = val.keySet().iterator();
+        ExpVector lt = ai.next();
+        lt = ai.next(); // size > 1
+        SortedMap<ExpVector, C> red = val.tailMap(lt);
+        GenPolynomial<C> r = ring.getZERO().copy();
+        r.doPutToMap(red); //  new GenPolynomial<C>(ring, red);
+        return r;
+    }
+
+    /**
+     * Degree in variable i.
+     *
+     * @return maximal degree in the variable i.
+     */
+    public long degree(int i) {
+        if (val.isEmpty()) {
+            return -1L; // 0 or -1 ?;
+        }
+        int j;
+        if (i >= 0) {
+            j = ring.nvar - 1 - i;
+        } else { // python like -1 means main variable
+            j = ring.nvar + i;
+        }
+        long deg = 0;
+        if (j < 0) {
+            return deg;
+        }
+        for (ExpVector e : val.keySet()) {
+            long d = e.getVal(j);
+            if (d > deg) {
+                deg = d;
+            }
+        }
+        return deg;
+    }
+
+    /**
+     * Maximal degree.
+     *
+     * @return maximal degree in any variables.
+     */
+    public long degree() {
+        if (val.isEmpty()) {
+            return -1L; // 0 or -1 ?;
+        }
+        long deg = 0;
+        for (ExpVector e : val.keySet()) {
+            long d = e.maxDeg();
+            if (d > deg) {
+                deg = d;
+            }
+        }
+        return deg;
+    }
+
+    /**
+     * Minimal degree.
+     * <b>Author:</b> Youssef Elbarbary
+     *
+     * @return minimal degree in any variables.
+     */
+    public long degreeMin() {
+        if (val.isEmpty()) {
+            return -1L; // 0 or -1 ?;
+        }
+        long deg = Long.MAX_VALUE;
+        for (ExpVector e : val.keySet()) {
+            long d = e.minDeg();
+            if (d < deg) {
+                deg = d;
+            }
+        }
+        return deg;
+    }
+
+    /**
+     * Total degree.
+     *
+     * @return total degree in any variables.
+     */
+    public long totalDegree() {
+        if (val.isEmpty()) {
+            return -1L; // 0 or -1 ?;
+        }
+        long deg = 0;
+        for (ExpVector e : val.keySet()) {
+            long d = e.totalDeg();
+            if (d > deg) {
+                deg = d;
+            }
+        }
+        return deg;
+    }
+
+    /**
+     * Weight degree.
+     *
+     * @return weight degree in all variables.
+     */
+    public long weightDegree() {
+        long[][] w = ring.tord.getWeight();
+        if (w == null || w.length == 0) {
+            return totalDegree(); // assume weight 1
+        }
+        if (val.isEmpty()) {
+            return -1L; // 0 or -1 ?;
+        }
+        long deg = 0;
+        for (ExpVector e : val.keySet()) {
+            long d = e.weightDeg(w);
+            if (d > deg) {
+                deg = d;
+            }
+        }
+        return deg;
+    }
+
+    /**
+     * Leading weight polynomial.
+     *
+     * @return polynomial with terms of maximal weight degree.
+     */
+    public GenPolynomial<C> leadingWeightPolynomial() {
+        if (val.isEmpty()) {
+            return ring.getZERO();
+        }
+        long[][] w = ring.tord.getWeight();
+        long maxw = weightDegree();
+        GenPolynomial<C> wp = ring.getZERO().copy();
+        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+            ExpVector e = m.getKey();
+            long d = e.weightDeg(w);
+            if (d >= maxw) {
+                wp.val.put(e, m.getValue());
+            }
+        }
+        return wp;
+    }
+
+    /**
+     * Leading facet normal polynomial.
+     *
+     * @param u  leading exponent vector.
+     * @param uv exponent vector of facet normal.
+     * @return polynomial with terms of facet normal.
+     */
+    public GenPolynomial<C> leadingFacetPolynomial(ExpVector u, ExpVector uv) {
+        if (val.isEmpty()) {
+            return ring.getZERO();
+        }
+        long[] normal = uv.getVal();
+        GenPolynomial<C> fp = ring.getZERO().copy();
+        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+            ExpVector e = m.getKey();
+            if (u.equals(e)) {
+                fp.val.put(e, m.getValue());
+            } else {
+                ExpVector v = u.subtract(e);
+                if (v.compareTo(uv) == 0) { // || v.negate().compareTo(uv) == 0
+                    fp.val.put(e, m.getValue());
+                } else { // check for v parallel to uv
+                    long ab = v.weightDeg(normal); //scalarProduct(v, uv);
+                    long a = v.weightDeg(v.getVal()); //scalarProduct(v, v);
+                    long b = uv.weightDeg(normal); //scalarProduct(uv, uv);
+                    if (ab * ab == a * b) { // cos == 1
+                        fp.val.put(e, m.getValue());
+                        logger.info("ab = " + ab + ", a = " + a + ", b = " + b + ", u = " + u + ", e = " + e
+                                + ", v = " + v);
+                    }
+                }
+            }
+        }
+        return fp;
+    }
+
+    /**
+     * Is GenPolynomial&lt;C&gt; homogeneous with respect to a weight.
+     *
+     * @return true, if this is weight homogeneous, else false.
+     */
+    public boolean isWeightHomogeneous() {
+        if (val.size() <= 1) {
+            return true;
+        }
+        long[][] w = ring.tord.getWeight();
+        if (w == null || w.length == 0) {
+            return isHomogeneous(); // assume weights = 1
+        }
+        long deg = -1;
+        for (ExpVector e : val.keySet()) {
+            if (deg < 0) {
+                deg = e.weightDeg(w);
+            } else if (deg != e.weightDeg(w)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Maximal degree vector.
+     *
+     * @return maximal degree vector of all variables.
+     */
+    public ExpVector degreeVector() {
+        if (val.isEmpty()) {
+            return null; //deg;
+        }
+        ExpVector deg = ring.evzero;
+        for (ExpVector e : val.keySet()) {
+            deg = deg.lcm(e);
+        }
+        return deg;
+    }
+
+    /**
+     * Delta of exponent vectors.
+     *
+     * @return list of u-v, where u = lt() and v != u in this.
+     */
+    public List<ExpVector> deltaExpVectors() {
+        List<ExpVector> de = new ArrayList<ExpVector>(val.size());
+        if (val.isEmpty()) {
+            return de;
+        }
+        ExpVector u = null;
+        for (ExpVector e : val.keySet()) {
+            if (u == null) {
+                u = e;
+            } else {
+                ExpVector v = u.subtract(e);
+                de.add(v);
+            }
+        }
+        return de;
+    }
+
+    /**
+     * Delta of exponent vectors.
+     *
+     * @param u marked ExpVector in this.expVectors
+     * @return list of u-v, where v != u in this.expVectors.
+     */
+    public List<ExpVector> deltaExpVectors(ExpVector u) {
+        List<ExpVector> de = new ArrayList<ExpVector>(val.size());
+        if (val.isEmpty()) {
+            return de;
+        }
+        for (ExpVector e : val.keySet()) {
+            ExpVector v = u.subtract(e);
+            if (v.isZERO()) {
+                continue;
+            }
+            de.add(v);
+        }
+        return de;
+    }
+
+    /**
+     * GenPolynomial maximum norm.
+     *
+     * @return ||this||.
+     */
+    public C maxNorm() {
+        C n = ring.getZEROCoefficient();
+        for (C c : val.values()) {
+            C x = c.abs();
+            if (n.compareTo(x) < 0) {
+                n = x;
+            }
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial sum norm.
+     *
+     * @return sum of all absolute values of coefficients.
+     */
+    public C sumNorm() {
+        C n = ring.getZEROCoefficient();
+        for (C c : val.values()) {
+            C x = c.abs();
+            n = n.sum(x);
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial addition. This method is not very efficient, since this is
+     * copied.
+     *
+     * @param a coefficient.
+     * @param e exponent.
+     * @return this + a x<sup>e</sup>.
+     */
+    public GenPolynomial<C> sum(C a, ExpVector e) {
+        if (a == null) {
+            return this;
+        }
+        if (a.isZERO()) {
+            return this;
+        }
+        GenPolynomial<C> n = this.copy();
+        SortedMap<ExpVector, C> nv = n.val;
+        //if ( nv.size() == 0 ) { nv.put(e,a); return n; }
+        C x = nv.get(e);
+        if (x != null) {
+            x = x.sum(a);
+            if (!x.isZERO()) {
+                nv.put(e, x);
+            } else {
+                nv.remove(e);
+            }
+        } else {
+            nv.put(e, a);
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial addition. This method is not very efficient, since this is
+     * copied.
+     *
+     * @param m monomial.
+     * @return this + m.
+     */
+    public GenPolynomial<C> sum(Monomial<C> m) {
+        return sum(m.coefficient(), m.exponent());
+    }
+
+    /**
+     * GenPolynomial addition. This method is not very efficient, since this is
+     * copied.
+     *
+     * @param a coefficient.
+     * @return this + a x<sup>0</sup>.
+     */
+    public GenPolynomial<C> sum(C a) {
+        return sum(a, ring.evzero);
+    }
+
+    /**
+     * GenPolynomial destructive summation.
+     *
+     * @param S GenPolynomial.
+     */
+    public void doAddTo(GenPolynomial<C> S) {
+        if (S == null || S.isZERO()) {
+            return;
+        }
+        if (this.isZERO()) {
+            this.val.putAll(S.val);
+            return;
+        }
+        assert (ring.nvar == S.ring.nvar);
+        SortedMap<ExpVector, C> nv = this.val;
+        SortedMap<ExpVector, C> sv = S.val;
+        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
+            ExpVector e = me.getKey();
+            C y = me.getValue(); // assert y != null
+            C x = nv.get(e);
+            if (x != null) {
+                x = x.sum(y);
+                if (!x.isZERO()) {
+                    nv.put(e, x);
+                } else {
+                    nv.remove(e);
+                }
+            } else {
+                nv.put(e, y);
+            }
+        }
+        return;
+    }
+
+    /**
+     * GenPolynomial destructive summation.
+     *
+     * @param a coefficient.
+     * @param e exponent.
+     */
+    public void doAddTo(C a, ExpVector e) {
+        if (a == null || a.isZERO()) {
+            return;
+        }
+        SortedMap<ExpVector, C> nv = this.val;
+        C x = nv.get(e);
+        if (x != null) {
+            x = x.sum(a);
+            if (!x.isZERO()) {
+                nv.put(e, x);
+            } else {
+                nv.remove(e);
+            }
+        } else {
+            nv.put(e, a);
+        }
+        return;
+    }
+
+    /**
+     * GenPolynomial destructive summation.
+     *
+     * @param a coefficient.
+     */
+    public void doAddTo(C a) {
+        doAddTo(a, ring.evzero);
+    }
+
+    /**
+     * GenPolynomial subtraction. This method is not very efficient, since this
+     * is copied.
+     *
+     * @param a coefficient.
+     * @param e exponent.
+     * @return this - a x<sup>e</sup>.
+     */
+    public GenPolynomial<C> subtract(C a, ExpVector e) {
+        if (a == null || a.isZERO()) {
+            return this;
+        }
+        GenPolynomial<C> n = this.copy();
+        SortedMap<ExpVector, C> nv = n.val;
+        C x = nv.get(e);
+        if (x != null) {
+            x = x.subtract(a);
+            if (!x.isZERO()) {
+                nv.put(e, x);
+            } else {
+                nv.remove(e);
+            }
+        } else {
+            nv.put(e, a.negate());
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial subtraction. This method is not very efficient, since this
+     * is copied.
+     *
+     * @param m monomial.
+     * @return this - m.
+     */
+    public GenPolynomial<C> subtract(Monomial<C> m) {
+        return subtract(m.coefficient(), m.exponent());
+    }
+
+    /**
+     * GenPolynomial subtract. This method is not very efficient, since this is
+     * copied.
+     *
+     * @param a coefficient.
+     * @return this + a x<sup>0</sup>.
+     */
+    public GenPolynomial<C> subtract(C a) {
+        return subtract(a, ring.evzero);
+    }
+
+    /**
+     * GenPolynomial subtract a multiple.
+     *
+     * @param a coefficient.
+     * @param S GenPolynomial.
+     * @return this - a S.
+     */
+    public GenPolynomial<C> subtractMultiple(C a, GenPolynomial<C> S) {
+        if (a == null || a.isZERO()) {
+            return this;
+        }
+        if (S == null || S.isZERO()) {
+            return this;
+        }
+        if (this.isZERO()) {
+            return S.multiply(a.negate());
+        }
+        assert (ring.nvar == S.ring.nvar);
+        GenPolynomial<C> n = this.copy();
+        SortedMap<ExpVector, C> nv = n.val;
+        SortedMap<ExpVector, C> sv = S.val;
+        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
+            ExpVector f = me.getKey();
+            C y = me.getValue(); // assert y != null
+            y = a.multiply(y);
+            C x = nv.get(f);
+            if (x != null) {
+                x = x.subtract(y);
+                if (!x.isZERO()) {
+                    nv.put(f, x);
+                } else {
+                    nv.remove(f);
+                }
+            } else if (!y.isZERO()) {
+                nv.put(f, y.negate());
+            }
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial subtract a multiple.
+     *
+     * @param a coefficient.
+     * @param e exponent.
+     * @param S GenPolynomial.
+     * @return this - a x<sup>e</sup> S.
+     */
+    public GenPolynomial<C> subtractMultiple(C a, ExpVector e, GenPolynomial<C> S) {
+        if (a == null || a.isZERO()) {
+            return this;
+        }
+        if (S == null || S.isZERO()) {
+            return this;
+        }
+        if (this.isZERO()) {
+            return S.multiply(a.negate(), e);
+        }
+        assert (ring.nvar == S.ring.nvar);
+        GenPolynomial<C> n = this.copy();
+        SortedMap<ExpVector, C> nv = n.val;
+        SortedMap<ExpVector, C> sv = S.val;
+        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
+            ExpVector f = me.getKey();
+            f = e.sum(f);
+            C y = me.getValue(); // assert y != null
+            y = a.multiply(y);
+            C x = nv.get(f);
+            if (x != null) {
+                x = x.subtract(y);
+                if (!x.isZERO()) {
+                    nv.put(f, x);
+                } else {
+                    nv.remove(f);
+                }
+            } else if (!y.isZERO()) {
+                nv.put(f, y.negate());
+            }
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial scale and subtract a multiple.
+     *
+     * @param b scale factor.
+     * @param a coefficient.
+     * @param S GenPolynomial.
+     * @return this * b - a S.
+     */
+    public GenPolynomial<C> scaleSubtractMultiple(C b, C a, GenPolynomial<C> S) {
+        if (a == null || S == null) {
+            return this.multiply(b);
+        }
+        if (a.isZERO() || S.isZERO()) {
+            return this.multiply(b);
+        }
+        if (this.isZERO() || b == null || b.isZERO()) {
+            return S.multiply(a.negate()); //left?
+        }
+        if (b.isONE()) {
+            return subtractMultiple(a, S);
+        }
+        assert (ring.nvar == S.ring.nvar);
+        GenPolynomial<C> n = this.multiply(b);
+        SortedMap<ExpVector, C> nv = n.val;
+        SortedMap<ExpVector, C> sv = S.val;
+        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
+            ExpVector f = me.getKey();
+            //f = e.sum(f);
+            C y = me.getValue(); // assert y != null
+            y = a.multiply(y); // now y can be zero
+            C x = nv.get(f);
+            if (x != null) {
+                x = x.subtract(y);
+                if (!x.isZERO()) {
+                    nv.put(f, x);
+                } else {
+                    nv.remove(f);
+                }
+            } else if (!y.isZERO()) {
+                nv.put(f, y.negate());
+            }
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial scale and subtract a multiple.
+     *
+     * @param b scale factor.
+     * @param a coefficient.
+     * @param e exponent.
+     * @param S GenPolynomial.
+     * @return this * b - a x<sup>e</sup> S.
+     */
+    public GenPolynomial<C> scaleSubtractMultiple(C b, C a, ExpVector e, GenPolynomial<C> S) {
+        if (a == null || S == null) {
+            return this.multiply(b);
+        }
+        if (a.isZERO() || S.isZERO()) {
+            return this.multiply(b);
+        }
+        if (this.isZERO() || b == null || b.isZERO()) {
+            return S.multiply(a.negate(), e);
+        }
+        if (b.isONE()) {
+            return subtractMultiple(a, e, S);
+        }
+        assert (ring.nvar == S.ring.nvar);
+        GenPolynomial<C> n = this.multiply(b);
+        SortedMap<ExpVector, C> nv = n.val;
+        SortedMap<ExpVector, C> sv = S.val;
+        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
+            ExpVector f = me.getKey();
+            f = e.sum(f);
+            C y = me.getValue(); // assert y != null
+            y = a.multiply(y); // now y can be zero
+            C x = nv.get(f);
+            if (x != null) {
+                x = x.subtract(y);
+                if (!x.isZERO()) {
+                    nv.put(f, x);
+                } else {
+                    nv.remove(f);
+                }
+            } else if (!y.isZERO()) {
+                nv.put(f, y.negate());
+            }
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial scale and subtract a multiple.
+     *
+     * @param b scale factor.
+     * @param g scale exponent.
+     * @param a coefficient.
+     * @param e exponent.
+     * @param S GenPolynomial.
+     * @return this * a x<sup>g</sup> - a x<sup>e</sup> S.
+     */
+    public GenPolynomial<C> scaleSubtractMultiple(C b, ExpVector g, C a, ExpVector e, GenPolynomial<C> S) {
+        if (a == null || S == null) {
+            return this.multiply(b, g);
+        }
+        if (a.isZERO() || S.isZERO()) {
+            return this.multiply(b, g);
+        }
+        if (this.isZERO() || b == null || b.isZERO()) {
+            return S.multiply(a.negate(), e);
+        }
+        if (b.isONE() && g.isZERO()) {
+            return subtractMultiple(a, e, S);
+        }
+        assert (ring.nvar == S.ring.nvar);
+        GenPolynomial<C> n = this.multiply(b, g);
+        SortedMap<ExpVector, C> nv = n.val;
+        SortedMap<ExpVector, C> sv = S.val;
+        for (Map.Entry<ExpVector, C> me : sv.entrySet()) {
+            ExpVector f = me.getKey();
+            f = e.sum(f);
+            C y = me.getValue(); // assert y != null
+            y = a.multiply(y); // y can be zero now
+            C x = nv.get(f);
+            if (x != null) {
+                x = x.subtract(y);
+                if (!x.isZERO()) {
+                    nv.put(f, x);
+                } else {
+                    nv.remove(f);
+                }
+            } else if (!y.isZERO()) {
+                nv.put(f, y.negate());
+            }
+        }
+        return n;
+    }
+
+    /**
+     * GenPolynomial negation, alternative implementation.
+     *
+     * @return -this.
+     */
+    public GenPolynomial<C> negateAlt() {
+        GenPolynomial<C> n = ring.getZERO().copy();
+        SortedMap<ExpVector, C> v = n.val;
+        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+            C x = m.getValue(); // != null, 0
+            v.put(m.getKey(), x.negate());
+        }
+        return n;
+    }
 
     /**
      * GenPolynomial multiplication. Product with coefficient ring element.
@@ -1672,7 +1736,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
         return p;
     }
-
 
     /**
      * GenPolynomial left multiplication. Left product with coefficient
@@ -1707,7 +1770,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return p;
     }
 
-
     /**
      * GenPolynomial monic, i.e. leadingCoefficient == 1. If leadingCoefficient
      * is not invertible returns this unmodified.
@@ -1726,7 +1788,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         C lm = lc.inverse();
         return multiplyLeft(lm);
     }
-
 
     /**
      * GenPolynomial multiplication. Product with ring element and exponent
@@ -1769,7 +1830,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return p;
     }
 
-
     /**
      * GenPolynomial multiplication. Product with exponent vector.
      *
@@ -1801,7 +1861,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return p;
     }
 
-
     /**
      * GenPolynomial multiplication. Product with 'monomial'.
      *
@@ -1814,7 +1873,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
         return multiply(m.getValue(), m.getKey());
     }
-
 
     /**
      * GenPolynomial division. Division by coefficient ring element. Fails, if
@@ -1853,7 +1911,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return p;
     }
 
-
     /**
      * GenPolynomial right division. Right division by coefficient ring element. Fails, if
      * exact division is not possible.
@@ -1890,7 +1947,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
         return p;
     }
-
 
     /**
      * GenPolynomial left division. Left division by coefficient ring element. Fails, if
@@ -1929,121 +1985,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         return p;
     }
 
-
-    /**
-     * GenPolynomial division with remainder. Fails, if exact division by
-     * leading base coefficient is not possible. Meaningful only for univariate
-     * polynomials over fields, but works in any case.
-     *
-     * @param S nonzero GenPolynomial with invertible leading coefficient.
-     * @return [ quotient , remainder ] with this = quotient * S + remainder and
-     * deg(remainder) &lt; deg(S) or remiander = 0.
-     * @see PolyUtil#baseSparsePseudoRemainder(GenPolynomial, GenPolynomial)
-     */
-    @SuppressWarnings("unchecked")
-    public GenPolynomial<C>[] quotientRemainder(GenPolynomial<C> S) {
-        if (S == null || S.isZERO()) {
-            throw new ArithmeticException("division by zero");
-        }
-        C c = S.leadingBaseCoefficient();
-        if (!c.isUnit()) {
-            throw new ArithmeticException("lbcf not invertible " + c);
-        }
-        C ci = c.inverse();
-        assert (ring.nvar == S.ring.nvar);
-        ExpVector e = S.leadingExpVector();
-        GenPolynomial<C> h;
-        GenPolynomial<C> q = ring.getZERO().copy();
-        GenPolynomial<C> r = this.copy();
-        while (!r.isZERO()) {
-            ExpVector f = r.leadingExpVector();
-            if (f.multipleOf(e)) {
-                C a = r.leadingBaseCoefficient();
-                ExpVector g = f.subtract(e);
-                a = a.multiply(ci);
-                q = q.sum(a, g);
-                h = S.multiply(a, g);
-                r = r.subtract(h);
-                assert (!f.equals(r.leadingExpVector())) : "leadingExpVector not descending: " + f;
-            } else {
-                break;
-            }
-        }
-        GenPolynomial<C>[] ret = new GenPolynomial[2];
-        ret[0] = q;
-        ret[1] = r;
-        return ret;
-    }
-
-
-    /**
-     * GenPolynomial division. Fails, if exact division by leading base
-     * coefficient is not possible. Meaningful only for univariate polynomials
-     * over fields, but works in any case.
-     *
-     * @param S nonzero GenPolynomial with invertible leading coefficient.
-     * @return quotient with this = quotient * S + remainder.
-     * @see PolyUtil#baseSparsePseudoRemainder(GenPolynomial, GenPolynomial)
-     */
-    public GenPolynomial<C> divide(GenPolynomial<C> S) {
-        if (this instanceof GenSolvablePolynomial || S instanceof GenSolvablePolynomial) {
-            //throw new RuntimeException("wrong method dispatch in JRE ");
-            //logger.debug("warn: wrong method dispatch in JRE multiply(S) - trying to fix");
-            GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
-            GenSolvablePolynomial<C> Sp = (GenSolvablePolynomial<C>) S;
-            return T.quotientRemainder(Sp)[0];
-        }
-        return quotientRemainder(S)[0];
-    }
-
-
-    /**
-     * GenPolynomial remainder. Fails, if exact division by leading base
-     * coefficient is not possible. Meaningful only for univariate polynomials
-     * over fields, but works in any case.
-     *
-     * @param S nonzero GenPolynomial with invertible leading coefficient.
-     * @return remainder with this = quotient * S + remainder.
-     * @see PolyUtil#baseSparsePseudoRemainder(GenPolynomial, GenPolynomial)
-     */
-    public GenPolynomial<C> remainder(GenPolynomial<C> S) {
-        if (this instanceof GenSolvablePolynomial || S instanceof GenSolvablePolynomial) {
-            //throw new RuntimeException("wrong method dispatch in JRE ");
-            //logger.debug("warn: wrong method dispatch in JRE multiply(S) - trying to fix");
-            GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
-            GenSolvablePolynomial<C> Sp = (GenSolvablePolynomial<C>) S;
-            return T.quotientRemainder(Sp)[1];
-        }
-        if (S == null || S.isZERO()) {
-            throw new ArithmeticException("division by zero");
-        }
-        C c = S.leadingBaseCoefficient();
-        if (!c.isUnit()) {
-            throw new ArithmeticException("lbc not invertible " + c);
-        }
-        C ci = c.inverse();
-        assert (ring.nvar == S.ring.nvar);
-        ExpVector e = S.leadingExpVector();
-        GenPolynomial<C> h;
-        GenPolynomial<C> r = this.copy();
-        while (!r.isZERO()) {
-            ExpVector f = r.leadingExpVector();
-            if (f.multipleOf(e)) {
-                C a = r.leadingBaseCoefficient();
-                ExpVector g = f.subtract(e);
-                //logger.info("red div = " + e);
-                a = a.multiply(ci);
-                h = S.multiply(a, g);
-                r = r.subtract(h);
-                assert (!f.equals(r.leadingExpVector())) : "leadingExpVector not descending: " + f;
-            } else {
-                break;
-            }
-        }
-        return r;
-    }
-
-
     /**
      * GenPolynomial greatest common divisor. Only for univariate polynomials
      * over fields.
@@ -2071,7 +2012,6 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
         return q.monic(); // normalize
     }
-
 
     /**
      * GenPolynomial extended greatest comon divisor. Only for univariate
@@ -2142,13 +2082,12 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             c1 = c1.multiply(h);
             c2 = c2.multiply(h);
         }
-        //assert ( ((c1.multiply(this)).sum( c2.multiply(S)).equals(q) )); 
+        //assert ( ((c1.multiply(this)).sum( c2.multiply(S)).equals(q) ));
         ret[0] = q;
         ret[1] = c1;
         ret[2] = c2;
         return ret;
     }
-
 
     /**
      * GenPolynomial half extended greatest comon divisor. Only for univariate
@@ -2197,25 +2136,11 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             q = q.multiply(h);
             c1 = c1.multiply(h);
         }
-        //assert ( ((c1.multiply(this)).remainder(S).equals(q) )); 
+        //assert ( ((c1.multiply(this)).remainder(S).equals(q) ));
         ret[0] = q;
         ret[1] = c1;
         return ret;
     }
-
-
-    /**
-     * GenPolynomial inverse. Required by RingElem. Throws not invertible
-     * exception.
-     */
-    public GenPolynomial<C> inverse() {
-        if (isUnit()) { // only possible if ldbcf is unit
-            C c = leadingBaseCoefficient().inverse();
-            return ring.getONE().multiply(c);
-        }
-        throw new NotInvertibleException("element not invertible " + this + " :: " + ring);
-    }
-
 
     /**
      * GenPolynomial modular inverse. Only for univariate polynomials over

@@ -5,8 +5,8 @@
 package edu.jas.root;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import edu.jas.structure.RingFactory;
 public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends ComplexRootsAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(ComplexRootsSturm.class);
+    private static final Logger logger = LogManager.getLogger(ComplexRootsSturm.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -225,34 +225,6 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         return wn;
     }
 
-
-    /**
-     * Winding number of complex function A on rectangle.
-     *
-     * @param rect rectangle.
-     * @param A    univariate complex polynomial.
-     * @return winding number of A arround rect.
-     */
-    public long windingNumber(Rectangle<C> rect, GenPolynomial<Complex<C>> A)
-            throws InvalidBoundaryException {
-        Boundary<C> bound = new Boundary<C>(rect, A); // throws InvalidBoundaryException
-        ComplexRing<C> cr = (ComplexRing<C>) A.ring.coFac;
-        RingFactory<C> cf = cr.ring;
-        C zero = cf.getZERO();
-        C one = cf.getONE();
-        long ix = 0L;
-        for (int i = 0; i < 4; i++) {
-            long ci = indexOfCauchy(zero, one, bound.getRealPart(i), bound.getImagPart(i));
-            //System.out.println("ci[" + i + "," + (i + 1) + "] = " + ci);
-            ix += ci;
-        }
-        if (ix % 2L != 0) {
-            throw new InvalidBoundaryException("odd winding number " + ix);
-        }
-        return ix / 2L;
-    }
-
-
     /**
      * List of complex roots of complex polynomial a on rectangle.
      *
@@ -269,7 +241,7 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         if (a.isConstant() || a.isZERO()) {
             return roots;
         }
-        //System.out.println("rect = " + rect); 
+        //System.out.println("rect = " + rect);
         long n = windingNumber(rect, a);
         if (n < 0) { // can this happen?
             throw new RuntimeException("negative winding number " + n);
@@ -287,15 +259,15 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         Complex<C> eps = cr.fromInteger(1);
         eps = eps.divide(cr.fromInteger(1000)); // 1/1000
         //System.out.println("eps = " + eps);
-        //System.out.println("rect = " + rect); 
+        //System.out.println("rect = " + rect);
         // construct new center
         Complex<C> delta = rect.corners[3].subtract(rect.corners[1]);
         delta = delta.divide(cr.fromInteger(2));
-        //System.out.println("delta = " + delta); 
+        //System.out.println("delta = " + delta);
         boolean work = true;
         while (work) {
             Complex<C> center = rect.corners[1].sum(delta);
-            //System.out.println("center = " + toDecimal(center)); 
+            //System.out.println("center = " + toDecimal(center));
             if (debug) {
                 logger.info("new center = " + center);
             }
@@ -307,9 +279,9 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 cp[2] = center;
                 cp[3] = new Complex<C>(cr, center.getRe(), cp[3].getIm());
                 Rectangle<C> nw = new Rectangle<C>(cp);
-                //System.out.println("nw = " + nw); 
+                //System.out.println("nw = " + nw);
                 List<Rectangle<C>> nwr = complexRoots(nw, a);
-                //System.out.println("#nwr = " + nwr.size()); 
+                //System.out.println("#nwr = " + nwr.size());
                 roots.addAll(nwr);
                 if (roots.size() == a.degree(0)) {
                     work = false;
@@ -322,9 +294,9 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 cp[2] = new Complex<C>(cr, center.getRe(), cp[2].getIm());
                 cp[3] = center;
                 Rectangle<C> sw = new Rectangle<C>(cp);
-                //System.out.println("sw = " + sw); 
+                //System.out.println("sw = " + sw);
                 List<Rectangle<C>> swr = complexRoots(sw, a);
-                //System.out.println("#swr = " + swr.size()); 
+                //System.out.println("#swr = " + swr.size());
                 roots.addAll(swr);
                 if (roots.size() == a.degree(0)) {
                     work = false;
@@ -337,9 +309,9 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 // cp[2] fix
                 cp[3] = new Complex<C>(cr, cp[3].getRe(), center.getIm());
                 Rectangle<C> se = new Rectangle<C>(cp);
-                //System.out.println("se = " + se); 
+                //System.out.println("se = " + se);
                 List<Rectangle<C>> ser = complexRoots(se, a);
-                //System.out.println("#ser = " + ser.size()); 
+                //System.out.println("#ser = " + ser.size());
                 roots.addAll(ser);
                 if (roots.size() == a.degree(0)) {
                     work = false;
@@ -352,21 +324,20 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
                 cp[2] = new Complex<C>(cr, cp[2].getRe(), center.getIm());
                 // cp[3] fix
                 Rectangle<C> ne = new Rectangle<C>(cp);
-                //System.out.println("ne = " + ne); 
+                //System.out.println("ne = " + ne);
                 List<Rectangle<C>> ner = complexRoots(ne, a);
-                //System.out.println("#ner = " + ner.size()); 
+                //System.out.println("#ner = " + ner.size());
                 roots.addAll(ner);
                 work = false;
             } catch (InvalidBoundaryException e) {
                 // repeat with new center
                 delta = delta.sum(delta.multiply(eps)); // distort
-                //System.out.println("new delta = " + toDecimal(delta)); 
+                //System.out.println("new delta = " + toDecimal(delta));
                 eps = eps.sum(eps.multiply(cr.getIMAG()));
             }
         }
         return roots;
     }
-
 
     /**
      * Invariant rectangle for algebraic number.
@@ -417,6 +388,31 @@ public class ComplexRootsSturm<C extends RingElem<C> & Rational> extends Complex
         //return v;
     }
 
+    /**
+     * Winding number of complex function A on rectangle.
+     *
+     * @param rect rectangle.
+     * @param A    univariate complex polynomial.
+     * @return winding number of A arround rect.
+     */
+    public long windingNumber(Rectangle<C> rect, GenPolynomial<Complex<C>> A)
+            throws InvalidBoundaryException {
+        Boundary<C> bound = new Boundary<C>(rect, A); // throws InvalidBoundaryException
+        ComplexRing<C> cr = (ComplexRing<C>) A.ring.coFac;
+        RingFactory<C> cf = cr.ring;
+        C zero = cf.getZERO();
+        C one = cf.getONE();
+        long ix = 0L;
+        for (int i = 0; i < 4; i++) {
+            long ci = indexOfCauchy(zero, one, bound.getRealPart(i), bound.getImagPart(i));
+            //System.out.println("ci[" + i + "," + (i + 1) + "] = " + ci);
+            ix += ci;
+        }
+        if (ix % 2L != 0) {
+            throw new InvalidBoundaryException("odd winding number " + ix);
+        }
+        return ix / 2L;
+    }
 
     /**
      * Exclude zero. If an axis intersects with the rectangle, it is shrinked

@@ -5,15 +5,15 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
  * Integer BigQuaternion class based on BigRational implementing the RingElem
  * interface and with the familiar MAS static method names. Objects of this
  * class are immutable. The integer quaternion methods are implemented after
- * https://de.wikipedia.org/wiki/Hurwitzquaternion @see also
+ * https://de.wikipedia.org/wiki/Hurwitzquaternion see also
  * https://en.wikipedia.org/wiki/Hurwitz_quaternion
  *
  * @author Heinz Kredel
@@ -24,7 +24,7 @@ public final class BigQuaternionInteger extends BigQuaternion
 {
 
 
-    private static final Logger logger = Logger.getLogger(BigQuaternionInteger.class);
+    private static final Logger logger = LogManager.getLogger(BigQuaternionInteger.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -171,6 +171,16 @@ public final class BigQuaternionInteger extends BigQuaternion
      */
 
     /**
+     * Clone this.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public BigQuaternionInteger copy() {
+        return new BigQuaternionInteger(ring, re, im, jm, km);
+    }
+
+    /**
      * Get the corresponding element factory.
      *
      * @return factory for this Element.
@@ -179,16 +189,6 @@ public final class BigQuaternionInteger extends BigQuaternion
     @Override
     public BigQuaternionRing factory() {
         return ring;
-    }
-
-    /**
-     * Clone this.
-     *
-     * @see Object#clone()
-     */
-    @Override
-    public BigQuaternionInteger copy() {
-        return new BigQuaternionInteger(ring, re, im, jm, km);
     }
 
     /**
@@ -205,18 +205,14 @@ public final class BigQuaternionInteger extends BigQuaternion
     }
 
     /**
-     * BigQuaternion inverse.
+     * BigQuaternion right divide.
      *
-     * @return S with S * this = this * S = 1.
-     * @see edu.jas.structure.RingElem#inverse()
+     * @param b BigQuaternion.
+     * @return this * b**(-1).
      */
     @Override
-    public BigQuaternion inverse() {
-        if (!isUnit()) {
-            logger.info("ring = " + ring);
-            throw new ArithmeticException("not invertible: " + this);
-        }
-        return super.inverse();
+    public BigQuaternion divide(BigQuaternion b) {
+        return rightDivide(b);
     }
 
     /**
@@ -231,16 +227,15 @@ public final class BigQuaternionInteger extends BigQuaternion
     }
 
     /**
-     * BigQuaternion right divide.
+     * Quotient and remainder by division of this by S.
      *
-     * @param b BigQuaternion.
-     * @return this * b**(-1).
+     * @param S a quaternion number
+     * @return [this*S**(-1), this - (this*S**(-1))*S].
      */
     @Override
-    public BigQuaternion divide(BigQuaternion b) {
-        return rightDivide(b);
+    public BigQuaternion[] quotientRemainder(BigQuaternion S) {
+        return new BigQuaternion[]{divide(S), remainder(S)};
     }
-
 
     /**
      * BigQuaternion right divide.
@@ -265,6 +260,20 @@ public final class BigQuaternionInteger extends BigQuaternion
         return leftQuotientAndRemainder(b)[0];
     }
 
+    /**
+     * BigQuaternion inverse.
+     *
+     * @return S with S * this = this * S = 1.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    @Override
+    public BigQuaternion inverse() {
+        if (!isUnit()) {
+            logger.info("ring = " + ring);
+            throw new ArithmeticException("not invertible: " + this);
+        }
+        return super.inverse();
+    }
 
     /**
      * BigQuaternion divide.
@@ -280,19 +289,6 @@ public final class BigQuaternionInteger extends BigQuaternion
         }
         return d;
     }
-
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a quaternion number
-     * @return [this*S**(-1), this - (this*S**(-1))*S].
-     */
-    @Override
-    public BigQuaternion[] quotientRemainder(BigQuaternion S) {
-        return new BigQuaternion[]{divide(S), remainder(S)};
-    }
-
 
     /**
      * Quaternion number greatest common divisor.
@@ -336,81 +332,6 @@ public final class BigQuaternionInteger extends BigQuaternion
         */
     }
 
-
-    /**
-     * Integral quotient and remainder by left division of this by S. This must
-     * be also an integral (Hurwitz) quaternion number.
-     *
-     * @param b an integral (Hurwitz) quaternion number
-     * @return [round(b * * ( - 1)) this, this - b * (round(b**(-1)) this)].
-     */
-    public BigQuaternion[] leftQuotientAndRemainder(BigQuaternion b) {
-        //System.out.println("left QR = " + this + ", " + b);
-        if (!this.isEntier() || !b.isEntier()) {
-            throw new IllegalArgumentException("entier elements required");
-        }
-        BigQuaternion bi = b.inverse();
-        BigQuaternion m = bi.multiply(this); // left divide
-        //System.out.println("m = " + m.toScript());
-        BigQuaternionInteger mh = m.roundToHurwitzian();
-        //System.out.println("mh = " + mh.toScript());
-        BigQuaternion n = this.subtract(b.multiply(mh));
-        BigQuaternion[] ret = new BigQuaternion[2];
-        ret[0] = mh;
-        ret[1] = n;
-        return ret;
-    }
-
-
-    /**
-     * Integral quotient and remainder by right division of this by S. This must
-     * be also an integral (Hurwitz) quaternion number.
-     *
-     * @param b an integral (Hurwitz) quaternion number
-     * @return [this round(b**(-1)), this - this (round(b**(-1)) b)].
-     */
-    public BigQuaternion[] rightQuotientAndRemainder(BigQuaternion b) {
-        //System.out.println("right QR = " + this + ", " + b);
-        if (!this.isEntier() || !b.isEntier()) {
-            throw new IllegalArgumentException("entier elements required");
-        }
-        BigQuaternion bi = b.inverse();
-        BigQuaternion m = this.multiply(bi); // right divide
-        //System.out.println("m = " + m.toScript());
-        BigQuaternionInteger mh = m.roundToHurwitzian();
-        //System.out.println("mh = " + mh.toScript());
-        BigQuaternion n = this.subtract(mh.multiply(b));
-        BigQuaternion[] ret = new BigQuaternion[2];
-        ret[0] = mh;
-        ret[1] = n;
-        return ret;
-    }
-
-
-    /**
-     * Left remainder.
-     *
-     * @param a element.
-     * @return r = this - (a/left) * a, where left * a = this.
-     */
-    @Override
-    public BigQuaternion leftRemainder(BigQuaternion a) {
-        return leftQuotientAndRemainder(a)[1];
-    }
-
-
-    /**
-     * Right remainder.
-     *
-     * @param a element.
-     * @return r = this - a * (a/right), where a * right = this.
-     */
-    @Override
-    public BigQuaternion rightRemainder(BigQuaternion a) {
-        return rightQuotientAndRemainder(a)[1];
-    }
-
-
     /**
      * Integer quaternion number left greatest common divisor.
      *
@@ -438,7 +359,6 @@ public final class BigQuaternionInteger extends BigQuaternion
         return q;
     }
 
-
     /**
      * Integer quaternion number right greatest common divisor.
      *
@@ -464,6 +384,76 @@ public final class BigQuaternionInteger extends BigQuaternion
             r = u;
         }
         return q;
+    }
+
+    /**
+     * Integral quotient and remainder by left division of this by S. This must
+     * be also an integral (Hurwitz) quaternion number.
+     *
+     * @param b an integral (Hurwitz) quaternion number
+     * @return [round(b * * ( - 1)) this, this - b * (round(b**(-1)) this)].
+     */
+    public BigQuaternion[] leftQuotientAndRemainder(BigQuaternion b) {
+        //System.out.println("left QR = " + this + ", " + b);
+        if (!this.isEntier() || !b.isEntier()) {
+            throw new IllegalArgumentException("entier elements required");
+        }
+        BigQuaternion bi = b.inverse();
+        BigQuaternion m = bi.multiply(this); // left divide
+        //System.out.println("m = " + m.toScript());
+        BigQuaternionInteger mh = m.roundToHurwitzian();
+        //System.out.println("mh = " + mh.toScript());
+        BigQuaternion n = this.subtract(b.multiply(mh));
+        BigQuaternion[] ret = new BigQuaternion[2];
+        ret[0] = mh;
+        ret[1] = n;
+        return ret;
+    }
+
+    /**
+     * Integral quotient and remainder by right division of this by S. This must
+     * be also an integral (Hurwitz) quaternion number.
+     *
+     * @param b an integral (Hurwitz) quaternion number
+     * @return [this round(b**(-1)), this - this (round(b**(-1)) b)].
+     */
+    public BigQuaternion[] rightQuotientAndRemainder(BigQuaternion b) {
+        //System.out.println("right QR = " + this + ", " + b);
+        if (!this.isEntier() || !b.isEntier()) {
+            throw new IllegalArgumentException("entier elements required");
+        }
+        BigQuaternion bi = b.inverse();
+        BigQuaternion m = this.multiply(bi); // right divide
+        //System.out.println("m = " + m.toScript());
+        BigQuaternionInteger mh = m.roundToHurwitzian();
+        //System.out.println("mh = " + mh.toScript());
+        BigQuaternion n = this.subtract(mh.multiply(b));
+        BigQuaternion[] ret = new BigQuaternion[2];
+        ret[0] = mh;
+        ret[1] = n;
+        return ret;
+    }
+
+    /**
+     * Right remainder.
+     *
+     * @param a element.
+     * @return r = this - a * (a/right), where a * right = this.
+     */
+    @Override
+    public BigQuaternion rightRemainder(BigQuaternion a) {
+        return rightQuotientAndRemainder(a)[1];
+    }
+
+    /**
+     * Left remainder.
+     *
+     * @param a element.
+     * @return r = this - (a/left) * a, where left * a = this.
+     */
+    @Override
+    public BigQuaternion leftRemainder(BigQuaternion a) {
+        return leftQuotientAndRemainder(a)[1];
     }
 
 }

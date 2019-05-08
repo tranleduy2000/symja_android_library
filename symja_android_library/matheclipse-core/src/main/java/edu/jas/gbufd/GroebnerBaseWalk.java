@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +38,12 @@ import edu.jas.structure.RingFactory;
  * @param <C> coefficient type
  * @author Heinz Kredel
  * @see edu.jas.application.GBAlgorithmBuilder
- * @see GBFactory
+ * @see edu.jas.gbufd.GBFactory
  */
 public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(GroebnerBaseWalk.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBaseWalk.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -124,7 +124,7 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
     /**
      * Get the String representation with GB engine.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -134,6 +134,27 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         return "GroebnerBaseWalk( " + sgb.toString() + ", " + startTO.toScript() + " )";
     }
 
+    /**
+     * Cleanup and terminate ThreadPool.
+     */
+    @Override
+    public void terminate() {
+        if (sgb == null) {
+            return;
+        }
+        sgb.terminate();
+    }
+
+    /**
+     * Cancel ThreadPool.
+     */
+    @Override
+    public int cancel() {
+        if (sgb == null) {
+            return 0;
+        }
+        return sgb.cancel();
+    }
 
     /**
      * Groebner base using Groebner Walk algorithm.
@@ -191,7 +212,6 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         G = walkGroebnerToTarget(modv, Gp, pfac);
         return G;
     }
-
 
     /**
      * Converts Groebner bases w.r.t. total degree / start term order to
@@ -274,7 +294,7 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
             if (debug) {
                 logger.info("GB(inOmega) = " + inOG);
             }
-            // remark polynomials 
+            // remark polynomials
             marks.clear();
             M.clear();
             for (GenPolynomial<C> p : inOG) {
@@ -300,7 +320,6 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
         }
         return Giter;
     }
-
 
     /**
      * Determine new facet normal.
@@ -349,36 +368,11 @@ public class GroebnerBaseWalk<C extends GcdRingElem<C>> extends GroebnerBaseAbst
                     break;
                 }
             }
-            //logger.info("step s  = " + s + ", d = " + d + ", d2 = " + d2 + ", e = " + e); 
+            //logger.info("step s  = " + s + ", d = " + d + ", d2 = " + d2 + ", e = " + e);
             //   + ", v = " + v + ", et = " + et + ", vt = " + vt);
         }
         return v;
     }
-
-
-    /**
-     * Cleanup and terminate ThreadPool.
-     */
-    @Override
-    public void terminate() {
-        if (sgb == null) {
-            return;
-        }
-        sgb.terminate();
-    }
-
-
-    /**
-     * Cancel ThreadPool.
-     */
-    @Override
-    public int cancel() {
-        if (sgb == null) {
-            return 0;
-        }
-        return sgb.cancel();
-    }
-
 
     /**
      * Lift leading polynomials to full Groebner base with respect to term

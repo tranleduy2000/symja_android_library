@@ -84,58 +84,6 @@ public class LogIntegral<C extends GcdRingElem<C>> implements Serializable {
         adenom = ad;
     }
 
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        //         sb.append("(" + num.toString() + ")");
-        //         sb.append(" / ");
-        //         sb.append("(" + den.toString() + ")");
-        //         sb.append(" =\n");
-        boolean first = true;
-        for (int i = 0; i < cfactors.size(); i++) {
-            C cp = cfactors.get(i);
-            if (first) {
-                first = false;
-            } else {
-                sb.append(" + ");
-            }
-            sb.append("(" + cp.toString() + ")");
-            GenPolynomial<C> p = cdenom.get(i);
-            sb.append(" log( " + p.toString() + ")");
-        }
-        if (!first && afactors.size() > 0) {
-            sb.append(" + ");
-        }
-        first = true;
-        for (int i = 0; i < afactors.size(); i++) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(" + ");
-            }
-            AlgebraicNumber<C> ap = afactors.get(i);
-            AlgebraicNumberRing<C> ar = ap.factory();
-            //sb.append(" ## over " + ap.factory() + "\n");
-            GenPolynomial<AlgebraicNumber<C>> p = adenom.get(i);
-            if (p.degree(0) < ar.modul.degree(0) && ar.modul.degree(0) > 2) {
-                sb.append("sum_(" + ar.getGenerator() + " in ");
-                sb.append("rootOf(" + ar.modul + ") ) ");
-            } else {
-                //sb.append("sum_("+ar+") ");
-            }
-            sb.append("(" + ap.toString() + ")");
-            sb.append(" log( " + p.toString() + ")");
-        }
-        return sb.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -197,11 +145,10 @@ public class LogIntegral<C extends GcdRingElem<C>> implements Serializable {
         return sb.toString();
     }
 
-
     /**
      * Hash code for this Factors.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -214,11 +161,10 @@ public class LogIntegral<C extends GcdRingElem<C>> implements Serializable {
         return h;
     }
 
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -248,6 +194,56 @@ public class LogIntegral<C extends GcdRingElem<C>> implements Serializable {
         }
         t = adenom.equals(a.adenom);
         return t;
+    }
+
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        //         sb.append("(" + num.toString() + ")");
+        //         sb.append(" / ");
+        //         sb.append("(" + den.toString() + ")");
+        //         sb.append(" =\n");
+        boolean first = true;
+        for (int i = 0; i < cfactors.size(); i++) {
+            C cp = cfactors.get(i);
+            if (first) {
+                first = false;
+            } else {
+                sb.append(" + ");
+            }
+            sb.append("(" + cp.toString() + ")");
+            GenPolynomial<C> p = cdenom.get(i);
+            sb.append(" log( " + p.toString() + ")");
+        }
+        if (!first && afactors.size() > 0) {
+            sb.append(" + ");
+        }
+        first = true;
+        for (int i = 0; i < afactors.size(); i++) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(" + ");
+            }
+            AlgebraicNumber<C> ap = afactors.get(i);
+            AlgebraicNumberRing<C> ar = ap.factory();
+            //sb.append(" ## over " + ap.factory() + "\n");
+            GenPolynomial<AlgebraicNumber<C>> p = adenom.get(i);
+            if (p.degree(0) < ar.modul.degree(0) && ar.modul.degree(0) > 2) {
+                sb.append("sum_(" + ar.getGenerator() + " in ");
+                sb.append("rootOf(" + ar.modul + ") ) ");
+            } else {
+                //sb.append("sum_("+ar+") ");
+            }
+            sb.append("(" + ap.toString() + ")");
+            sb.append(" log( " + p.toString() + ")");
+        }
+        return sb.toString();
     }
 
 }

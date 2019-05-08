@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         QuotPairFactory<GenPolynomial<C>, Quotient<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(QuotientRing.class);
+    private static final Logger logger = LogManager.getLogger(QuotientRing.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -85,22 +85,12 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         logger.debug("quotient ring constructed");
     }
 
-
-    /**
-     * Factory for base elements.
-     */
-    public GenPolynomialRing<C> pairFactory() {
-        return ring;
-    }
-
-
     /**
      * Create from numerator.
      */
     public Quotient<C> create(GenPolynomial<C> n) {
         return new Quotient<C>(this, n);
     }
-
 
     /**
      * Create from numerator, denominator pair.
@@ -109,6 +99,12 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return new Quotient<C>(this, n, d);
     }
 
+    /**
+     * Factory for base elements.
+     */
+    public GenPolynomialRing<C> pairFactory() {
+        return ring;
+    }
 
     /**
      * Divide.
@@ -137,29 +133,6 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         //return PolyGBUtil.<C> syzGcd(ring, n, d);
     }
 
-
-    /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
-     */
-    public boolean isFinite() {
-        return false;
-    }
-
-
-    /**
-     * Copy Quotient element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public Quotient<C> copy(Quotient<C> c) {
-        return new Quotient<C>(c.ring, c.num, c.den, true);
-    }
-
-
     /**
      * Get the zero element.
      *
@@ -168,7 +141,6 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
     public Quotient<C> getZERO() {
         return new Quotient<C>(this, ring.getZERO());
     }
-
 
     /**
      * Get the one element.
@@ -179,6 +151,23 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return new Quotient<C>(this, ring.getONE());
     }
 
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return ring.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return ring.isAssociative();
+    }
 
     /**
      * Get a list of the generating elements.
@@ -196,57 +185,15 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return gens;
     }
 
-
     /**
-     * Query if this ring is commutative.
+     * Is this structure finite or infinite.
      *
-     * @return true if this ring is commutative, else false.
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
      */
-    public boolean isCommutative() {
-        return ring.isCommutative();
+    public boolean isFinite() {
+        return false;
     }
-
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true if this ring is associative, else false.
-     */
-    public boolean isAssociative() {
-        return ring.isAssociative();
-    }
-
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return true.
-     */
-    public boolean isField() {
-        return true;
-    }
-
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public java.math.BigInteger characteristic() {
-        return ring.characteristic();
-    }
-
-
-    /**
-     * Get a Quotient element from a BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a Quotient.
-     */
-    public Quotient<C> fromInteger(java.math.BigInteger a) {
-        return new Quotient<C>(this, ring.fromInteger(a));
-    }
-
 
     /**
      * Get a Quotient element from a long value.
@@ -258,68 +205,15 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return new Quotient<C>(this, ring.fromInteger(a));
     }
 
-
     /**
-     * Get the String representation as RingFactory.
+     * Get a Quotient element from a BigInteger value.
      *
-     * @see Object#toString()
+     * @param a BigInteger.
+     * @return a Quotient.
      */
-    @Override
-    public String toString() {
-        String s = null;
-        if (ring.coFac.characteristic().signum() == 0) {
-            s = "RatFunc";
-        } else {
-            s = "ModFunc";
-        }
-        return s + "( " + ring.toString() + " )";
+    public Quotient<C> fromInteger(java.math.BigInteger a) {
+        return new Quotient<C>(this, ring.fromInteger(a));
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return "RF(" + ring.toScript() + ")";
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof QuotientRing)) {
-            return false;
-        }
-        QuotientRing<C> a = (QuotientRing<C>) b;
-        return ring.equals(a.ring);
-    }
-
-
-    /**
-     * Hash code for this quotient ring.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        return h;
-    }
-
 
     /**
      * Quotient random.
@@ -335,26 +229,6 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         }
         return new Quotient<C>(this, r, s, false);
     }
-
-
-    /**
-     * Generate a random quotient polynomial.
-     *
-     * @param k bitsize of random coefficients.
-     * @param l number of terms.
-     * @param d maximal degree in each variable.
-     * @param q density of nozero exponents.
-     * @return a random quotient polynomial.
-     */
-    public Quotient<C> random(int k, int l, int d, float q) {
-        GenPolynomial<C> r = ring.random(k, l, d, q).monic();
-        GenPolynomial<C> s = ring.random(k, l, d, q).monic();
-        while (s.isZERO()) {
-            s = ring.random(k, l, d, q).monic();
-        }
-        return new Quotient<C>(this, r, s, false);
-    }
-
 
     /**
      * Quotient random.
@@ -372,6 +246,15 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return new Quotient<C>(this, r, s, false);
     }
 
+    /**
+     * Copy Quotient element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public Quotient<C> copy(Quotient<C> c) {
+        return new Quotient<C>(c.ring, c.num, c.den, true);
+    }
 
     /**
      * Parse Quotient from String. Syntax: "{ polynomial | polynomial }" or
@@ -401,7 +284,6 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return new Quotient<C>(this, n, d);
     }
 
-
     /**
      * Parse Quotient from Reader.
      *
@@ -413,6 +295,99 @@ public class QuotientRing<C extends GcdRingElem<C>> implements RingFactory<Quoti
         return parse(s);
     }
 
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        return "RF(" + ring.toScript() + ")";
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true.
+     */
+    public boolean isField() {
+        return true;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return ring.characteristic();
+    }
+
+    /**
+     * Hash code for this quotient ring.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof QuotientRing)) {
+            return false;
+        }
+        QuotientRing<C> a = (QuotientRing<C>) b;
+        return ring.equals(a.ring);
+    }
+
+    /**
+     * Get the String representation as RingFactory.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        String s = null;
+        if (ring.coFac.characteristic().signum() == 0) {
+            s = "RatFunc";
+        } else {
+            s = "ModFunc";
+        }
+        return s + "( " + ring.toString() + " )";
+    }
+
+    /**
+     * Generate a random quotient polynomial.
+     *
+     * @param k bitsize of random coefficients.
+     * @param l number of terms.
+     * @param d maximal degree in each variable.
+     * @param q density of nozero exponents.
+     * @return a random quotient polynomial.
+     */
+    public Quotient<C> random(int k, int l, int d, float q) {
+        GenPolynomial<C> r = ring.random(k, l, d, q).monic();
+        GenPolynomial<C> s = ring.random(k, l, d, q).monic();
+        while (s.isZERO()) {
+            s = ring.random(k, l, d, q).monic();
+        }
+        return new Quotient<C>(this, r, s, false);
+    }
 
     /**
      * Degree of extension field.

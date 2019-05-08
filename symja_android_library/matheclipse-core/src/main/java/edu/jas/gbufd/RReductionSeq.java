@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         RReduction<C> {
 
 
-    private static final Logger logger = Logger.getLogger(RReductionSeq.class);
+    private static final Logger logger = LogManager.getLogger(RReductionSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -42,44 +42,6 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
      */
     public RReductionSeq() {
     }
-
-
-    /**
-     * Is top reducible. Condition is a b != 0, for a=ldcf(A) and b=ldcf(B) and
-     * lt(B) | lt(A) for some B in F.
-     *
-     * @param A polynomial.
-     * @param P polynomial list.
-     * @return true if A is top reducible with respect to P.
-     */
-    @Override
-    public boolean isTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A) {
-        if (P == null || P.isEmpty()) {
-            return false;
-        }
-        if (A == null || A.isZERO()) {
-            return false;
-        }
-        boolean mt = false;
-        ExpVector e = A.leadingExpVector();
-        C a = A.leadingBaseCoefficient();
-        a = a.idempotent();
-        for (GenPolynomial<C> p : P) {
-            mt = e.multipleOf(p.leadingExpVector());
-            if (mt) {
-                C b = p.leadingBaseCoefficient();
-                //C r = a.multiply( b );
-                //C r = a.multiply( b.idempotent() );
-                C r = a.idempotentAnd(b);
-                mt = !r.isZERO();
-                if (mt) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
     /**
      * Is strong top reducible. Condition is idempotent(a) == idempotent(b), for
@@ -113,74 +75,147 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         return false;
     }
 
+    /**
+     * Is boolean closed, test if A == idempotent(ldcf(A)) A.
+     *
+     * @param A polynomial.
+     * @return true if A is boolean closed, else false.
+     */
+    public boolean isBooleanClosed(GenPolynomial<C> A) {
+        if (A == null || A.isZERO()) {
+            return true;
+        }
+        C a = A.leadingBaseCoefficient();
+        C i = a.idempotent();
+        GenPolynomial<C> B = A.multiply(i);
+        // better run idemAnd on coefficients
+        return A.equals(B);
+    }
 
     /**
-     * Is in Normalform.
+     * Is boolean closed, test if all A in F are boolean closed.
      *
-     * @param Ap polynomial.
-     * @param Pp polynomial list.
-     * @return true if Ap is in normalform with respect to Pp.
+     * @param F polynomial list.
+     * @return true if F is boolean closed, else false.
      */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean isNormalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
-        if (Pp == null || Pp.isEmpty()) {
+    public boolean isBooleanClosed(List<GenPolynomial<C>> F) {
+        if (F == null || F.size() == 0) {
             return true;
         }
-        if (Ap == null || Ap.isZERO()) {
-            return true;
-        }
-        int l;
-        GenPolynomial<C>[] P;
-        synchronized (Pp) {
-            l = Pp.size();
-            P = new GenPolynomial[l];
-            //P = Pp.toArray();
-            for (int i = 0; i < Pp.size(); i++) {
-                P[i] = Pp.get(i);
-            }
-        }
-        ExpVector[] htl = new ExpVector[l];
-        C[] lbc = (C[]) new RegularRingElem[l]; // want <C>
-        GenPolynomial<C>[] p = new GenPolynomial[l];
-        Map.Entry<ExpVector, C> m;
-        int i;
-        int j = 0;
-        for (i = 0; i < l; i++) {
-            if (P[i] == null) {
+        for (GenPolynomial<C> a : F) {
+            if (a == null || a.isZERO()) {
                 continue;
             }
-            p[i] = P[i];
-            m = p[i].leadingMonomial();
-            if (m != null) {
-                p[j] = p[i];
-                htl[j] = m.getKey();
-                lbc[j] = m.getValue();
-                j++;
-            }
-        }
-        l = j;
-        boolean mt = false;
-        Map<ExpVector, C> Am = Ap.getMap();
-        for (Map.Entry<ExpVector, C> me : Am.entrySet()) {
-            ExpVector e = me.getKey();
-            C a = me.getValue();
-            for (i = 0; i < l; i++) {
-                mt = e.multipleOf(htl[i]);
-                if (mt) {
-                    //C r = a.multiply( lbc[i] );
-                    //C r = a.idempotent().multiply( lbc[i].idempotent() );
-                    C r = a.idempotentAnd(lbc[i]);
-                    mt = !r.isZERO();
-                    if (mt) {
-                        return false;
-                    }
-                }
+            //System.out.println("a = " + a);
+            if (!isBooleanClosed(a)) {
+                return false;
             }
         }
         return true;
     }
 
+    /**
+     * Boolean closure, compute idempotent(ldcf(A)) A.
+     *
+     * @param A polynomial.
+     * @return bc(A).
+     */
+    public GenPolynomial<C> booleanClosure(GenPolynomial<C> A) {
+        if (A == null || A.isZERO()) {
+            return A;
+        }
+        C a = A.leadingBaseCoefficient();
+        C i = a.idempotent();
+        GenPolynomial<C> B = A.multiply(i);
+        return B;
+    }
+
+    /**
+     * Boolean remainder, compute idemComplement(ldcf(A)) A.
+     *
+     * @param A polynomial.
+     * @return br(A).
+     */
+    public GenPolynomial<C> booleanRemainder(GenPolynomial<C> A) {
+        if (A == null || A.isZERO()) {
+            return A;
+        }
+        C a = A.leadingBaseCoefficient();
+        C i = a.idemComplement();
+        GenPolynomial<C> B = A.multiply(i);
+        return B;
+    }
+
+    /**
+     * Reduced boolean closure, compute BC(A) for all A in F.
+     *
+     * @param F polynomial list.
+     * @return red(bc ( F)) = bc(red(F)).
+     */
+    public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F) {
+        if (F == null || F.size() == 0) {
+            return F;
+        }
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(F);
+        GenPolynomial<C> a;
+        GenPolynomial<C> b;
+        GenPolynomial<C> c;
+        int len = B.size();
+        for (int i = 0; i < len; i++) { // not B.size(), it changes
+            a = B.remove(0);
+            if (a == null) {
+                continue;
+            }
+            while (!a.isZERO()) {
+                //System.out.println("a = " + a);
+                b = booleanClosure(a);
+                //System.out.println("b = " + b);
+                b = booleanClosure(normalform(B, b));
+                if (b.isZERO()) {
+                    break;
+                }
+                B.add(b); // adds as last
+                c = a.subtract(b); // = BR(a mod B)
+                //System.out.println("c = " + c);
+                c = normalform(B, c);
+                a = c;
+            }
+        }
+        return B;
+    }
+
+    /**
+     * Reduced boolean closure, compute BC(A) modulo F.
+     *
+     * @param A polynomial.
+     * @param F polynomial list.
+     * @return red(bc ( A)).
+     */
+    public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F, GenPolynomial<C> A) {
+        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>();
+        if (A == null || A.isZERO()) {
+            return B;
+        }
+        GenPolynomial<C> a = A;
+        GenPolynomial<C> b;
+        GenPolynomial<C> c;
+        while (!a.isZERO()) {
+            //System.out.println("a = " + a);
+            b = booleanClosure(a);
+            //System.out.println("b = " + b);
+            b = booleanClosure(normalform(F, b));
+            if (b.isZERO()) {
+                break;
+            }
+            B.add(b); // adds as last
+            c = a.subtract(b); // = BR(a mod F)
+            //System.out.println("c = " + c);
+            c = normalform(F, c);
+            //System.out.println("c = " + c);
+            a = c;
+        }
+        return B;
+    }
 
     /**
      * Normalform using r-reduction.
@@ -270,7 +305,7 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
                     }
                 }
             }
-            if (!a.isZERO()) { //! mt ) { 
+            if (!a.isZERO()) { //! mt ) {
                 //logger.debug("irred");
                 R = R.sum(a, e);
                 S = S.reductum();
@@ -280,74 +315,9 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
     }
 
 
-    /**
-     * GB criterium 4. Use only for commutative polynomial rings. <b>Note:</b>
-     * Experimental version for r-Groebner bases.
-     *
-     * @param A polynomial.
-     * @param B polynomial.
-     * @param e = lcm(ht(A),ht(B))
-     * @return true if the S-polynomial(i,j) is required, else false.
+    /*
+     * -------- boolean closure stuff -----------------------------------------
      */
-    @Override
-    public boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B, ExpVector e) {
-        if (logger.isInfoEnabled()) {
-            if (!A.ring.equals(B.ring)) {
-                logger.error("rings equal");
-            }
-            if (A instanceof GenSolvablePolynomial || B instanceof GenSolvablePolynomial) {
-                logger.error("GBCriterion4 not applicabable to SolvablePolynomials");
-                return true;
-            }
-        }
-        ExpVector ei = A.leadingExpVector();
-        ExpVector ej = B.leadingExpVector();
-        ExpVector g = ei.sum(ej);
-        // boolean t =  g == e ;
-        ExpVector h = g.subtract(e);
-        int s = h.signum();
-        if (s == 0) { // disjoint ht
-            C a = A.leadingBaseCoefficient();
-            C b = B.leadingBaseCoefficient();
-            C d = a.multiply(b);
-            return !d.isZERO();
-        }
-        return true; //! ( s == 0 );
-    }
-
-
-    /**
-     * GB criterium 4. Use only for commutative polynomial rings. <b>Note:</b>
-     * Experimental version for r-Groebner bases.
-     *
-     * @param A polynomial.
-     * @param B polynomial.
-     * @return true if the S-polynomial(i,j) is required, else false.
-     */
-    @Override
-    public boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B) {
-        if (logger.isInfoEnabled()) {
-            if (A instanceof GenSolvablePolynomial || B instanceof GenSolvablePolynomial) {
-                logger.error("GBCriterion4 not applicabable to SolvablePolynomials");
-                return true;
-            }
-        }
-        ExpVector ei = A.leadingExpVector();
-        ExpVector ej = B.leadingExpVector();
-        ExpVector g = ei.sum(ej);
-        ExpVector e = ei.lcm(ej);
-        //        boolean t =  g == e ;
-        ExpVector h = g.subtract(e);
-        int s = h.signum();
-        if (s == 0) { // disjoint ht
-            C a = A.leadingBaseCoefficient();
-            C b = B.leadingBaseCoefficient();
-            C d = a.multiply(b);
-            return !d.isZERO();
-        }
-        return true; //! ( s == 0 );
-    }
-
 
     /**
      * Normalform with recording.
@@ -443,15 +413,189 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
                     }
                 }
             }
-            if (!a.isZERO()) { //! mt ) { 
+            if (!a.isZERO()) { //! mt ) {
                 //logger.debug("irred");
                 R = R.sum(a, e);
                 S = S.reductum();
             }
         }
-        return R; //.abs(); not for recording 
+        return R; //.abs(); not for recording
     }
 
+    /**
+     * GB criterium 4. Use only for commutative polynomial rings. <b>Note:</b>
+     * Experimental version for r-Groebner bases.
+     *
+     * @param A polynomial.
+     * @param B polynomial.
+     * @param e = lcm(ht(A),ht(B))
+     * @return true if the S-polynomial(i,j) is required, else false.
+     */
+    @Override
+    public boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B, ExpVector e) {
+        if (logger.isInfoEnabled()) {
+            if (!A.ring.equals(B.ring)) {
+                logger.error("rings equal");
+            }
+            if (A instanceof GenSolvablePolynomial || B instanceof GenSolvablePolynomial) {
+                logger.error("GBCriterion4 not applicabable to SolvablePolynomials");
+                return true;
+            }
+        }
+        ExpVector ei = A.leadingExpVector();
+        ExpVector ej = B.leadingExpVector();
+        ExpVector g = ei.sum(ej);
+        // boolean t =  g == e ;
+        ExpVector h = g.subtract(e);
+        int s = h.signum();
+        if (s == 0) { // disjoint ht
+            C a = A.leadingBaseCoefficient();
+            C b = B.leadingBaseCoefficient();
+            C d = a.multiply(b);
+            // a guess
+            //System.out.println("d1 = " + d + ", a = " + a + ", b = " + b);
+            // can skip pair
+            return !d.isZERO();
+        }
+        return true; //! ( s == 0 );
+    }
+
+    /**
+     * GB criterium 4. Use only for commutative polynomial rings. <b>Note:</b>
+     * Experimental version for r-Groebner bases.
+     *
+     * @param A polynomial.
+     * @param B polynomial.
+     * @return true if the S-polynomial(i,j) is required, else false.
+     */
+    @Override
+    public boolean criterion4(GenPolynomial<C> A, GenPolynomial<C> B) {
+        if (logger.isInfoEnabled()) {
+            if (A instanceof GenSolvablePolynomial || B instanceof GenSolvablePolynomial) {
+                logger.error("GBCriterion4 not applicabable to SolvablePolynomials");
+                return true;
+            }
+        }
+        ExpVector ei = A.leadingExpVector();
+        ExpVector ej = B.leadingExpVector();
+        ExpVector g = ei.sum(ej);
+        ExpVector e = ei.lcm(ej);
+        //        boolean t =  g == e ;
+        ExpVector h = g.subtract(e);
+        int s = h.signum();
+        if (s == 0) { // disjoint ht
+            C a = A.leadingBaseCoefficient();
+            C b = B.leadingBaseCoefficient();
+            C d = a.multiply(b);
+            // a guess
+            // can skip pair
+            return !d.isZERO();
+        }
+        return true; //! ( s == 0 );
+    }
+
+    /**
+     * Is top reducible. Condition is a b != 0, for a=ldcf(A) and b=ldcf(B) and
+     * lt(B) | lt(A) for some B in F.
+     *
+     * @param A polynomial.
+     * @param P polynomial list.
+     * @return true if A is top reducible with respect to P.
+     */
+    @Override
+    public boolean isTopReducible(List<GenPolynomial<C>> P, GenPolynomial<C> A) {
+        if (P == null || P.isEmpty()) {
+            return false;
+        }
+        if (A == null || A.isZERO()) {
+            return false;
+        }
+        boolean mt = false;
+        ExpVector e = A.leadingExpVector();
+        C a = A.leadingBaseCoefficient();
+        a = a.idempotent();
+        for (GenPolynomial<C> p : P) {
+            mt = e.multipleOf(p.leadingExpVector());
+            if (mt) {
+                C b = p.leadingBaseCoefficient();
+                //C r = a.multiply( b );
+                //C r = a.multiply( b.idempotent() );
+                C r = a.idempotentAnd(b);
+                mt = !r.isZERO();
+                if (mt) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is in Normalform.
+     *
+     * @param Ap polynomial.
+     * @param Pp polynomial list.
+     * @return true if Ap is in normalform with respect to Pp.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean isNormalform(List<GenPolynomial<C>> Pp, GenPolynomial<C> Ap) {
+        if (Pp == null || Pp.isEmpty()) {
+            return true;
+        }
+        if (Ap == null || Ap.isZERO()) {
+            return true;
+        }
+        int l;
+        GenPolynomial<C>[] P;
+        synchronized (Pp) {
+            l = Pp.size();
+            P = new GenPolynomial[l];
+            //P = Pp.toArray();
+            for (int i = 0; i < Pp.size(); i++) {
+                P[i] = Pp.get(i);
+            }
+        }
+        ExpVector[] htl = new ExpVector[l];
+        C[] lbc = (C[]) new RegularRingElem[l]; // want <C>
+        GenPolynomial<C>[] p = new GenPolynomial[l];
+        Map.Entry<ExpVector, C> m;
+        int i;
+        int j = 0;
+        for (i = 0; i < l; i++) {
+            if (P[i] == null) {
+                continue;
+            }
+            p[i] = P[i];
+            m = p[i].leadingMonomial();
+            if (m != null) {
+                p[j] = p[i];
+                htl[j] = m.getKey();
+                lbc[j] = m.getValue();
+                j++;
+            }
+        }
+        l = j;
+        boolean mt = false;
+        Map<ExpVector, C> Am = Ap.getMap();
+        for (Map.Entry<ExpVector, C> me : Am.entrySet()) {
+            ExpVector e = me.getKey();
+            C a = me.getValue();
+            for (i = 0; i < l; i++) {
+                mt = e.multipleOf(htl[i]);
+                if (mt) {
+                    //C r = a.multiply( lbc[i] );
+                    //C r = a.idempotent().multiply( lbc[i].idempotent() );
+                    C r = a.idempotentAnd(lbc[i]);
+                    mt = !r.isZERO();
+                    if (mt) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * Irreducible set. May not be boolean closed.
@@ -507,52 +651,6 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         return P;
     }
 
-
-    /*
-     * -------- boolean closure stuff -----------------------------------------
-     */
-
-    /**
-     * Is boolean closed, test if A == idempotent(ldcf(A)) A.
-     *
-     * @param A polynomial.
-     * @return true if A is boolean closed, else false.
-     */
-    public boolean isBooleanClosed(GenPolynomial<C> A) {
-        if (A == null || A.isZERO()) {
-            return true;
-        }
-        C a = A.leadingBaseCoefficient();
-        C i = a.idempotent();
-        GenPolynomial<C> B = A.multiply(i);
-        // better run idemAnd on coefficients
-        return A.equals(B);
-    }
-
-
-    /**
-     * Is boolean closed, test if all A in F are boolean closed.
-     *
-     * @param F polynomial list.
-     * @return true if F is boolean closed, else false.
-     */
-    public boolean isBooleanClosed(List<GenPolynomial<C>> F) {
-        if (F == null || F.size() == 0) {
-            return true;
-        }
-        for (GenPolynomial<C> a : F) {
-            if (a == null || a.isZERO()) {
-                continue;
-            }
-            //System.out.println("a = " + a);
-            if (!isBooleanClosed(a)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
     /**
      * Is reduced boolean closed, test if all A in F are boolean closed or br(A)
      * reduces to zero.
@@ -591,41 +689,6 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
         return true;
     }
 
-
-    /**
-     * Boolean closure, compute idempotent(ldcf(A)) A.
-     *
-     * @param A polynomial.
-     * @return bc(A).
-     */
-    public GenPolynomial<C> booleanClosure(GenPolynomial<C> A) {
-        if (A == null || A.isZERO()) {
-            return A;
-        }
-        C a = A.leadingBaseCoefficient();
-        C i = a.idempotent();
-        GenPolynomial<C> B = A.multiply(i);
-        return B;
-    }
-
-
-    /**
-     * Boolean remainder, compute idemComplement(ldcf(A)) A.
-     *
-     * @param A polynomial.
-     * @return br(A).
-     */
-    public GenPolynomial<C> booleanRemainder(GenPolynomial<C> A) {
-        if (A == null || A.isZERO()) {
-            return A;
-        }
-        C a = A.leadingBaseCoefficient();
-        C i = a.idemComplement();
-        GenPolynomial<C> B = A.multiply(i);
-        return B;
-    }
-
-
     /**
      * Boolean closure, compute BC(A) for all A in F.
      *
@@ -646,79 +709,6 @@ public class RReductionSeq<C extends RegularRingElem<C>> extends ReductionAbstra
                 B.add(b);
                 a = booleanRemainder(a);
             }
-        }
-        return B;
-    }
-
-
-    /**
-     * Reduced boolean closure, compute BC(A) for all A in F.
-     *
-     * @param F polynomial list.
-     * @return red(bc ( F)) = bc(red(F)).
-     */
-    public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F) {
-        if (F == null || F.size() == 0) {
-            return F;
-        }
-        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>(F);
-        GenPolynomial<C> a;
-        GenPolynomial<C> b;
-        GenPolynomial<C> c;
-        int len = B.size();
-        for (int i = 0; i < len; i++) { // not B.size(), it changes
-            a = B.remove(0);
-            if (a == null) {
-                continue;
-            }
-            while (!a.isZERO()) {
-                //System.out.println("a = " + a);
-                b = booleanClosure(a);
-                //System.out.println("b = " + b);
-                b = booleanClosure(normalform(B, b));
-                if (b.isZERO()) {
-                    break;
-                }
-                B.add(b); // adds as last
-                c = a.subtract(b); // = BR(a mod B)
-                //System.out.println("c = " + c);
-                c = normalform(B, c);
-                a = c;
-            }
-        }
-        return B;
-    }
-
-
-    /**
-     * Reduced boolean closure, compute BC(A) modulo F.
-     *
-     * @param A polynomial.
-     * @param F polynomial list.
-     * @return red(bc ( A)).
-     */
-    public List<GenPolynomial<C>> reducedBooleanClosure(List<GenPolynomial<C>> F, GenPolynomial<C> A) {
-        List<GenPolynomial<C>> B = new ArrayList<GenPolynomial<C>>();
-        if (A == null || A.isZERO()) {
-            return B;
-        }
-        GenPolynomial<C> a = A;
-        GenPolynomial<C> b;
-        GenPolynomial<C> c;
-        while (!a.isZERO()) {
-            //System.out.println("a = " + a);
-            b = booleanClosure(a);
-            //System.out.println("b = " + b);
-            b = booleanClosure(normalform(F, b));
-            if (b.isZERO()) {
-                break;
-            }
-            B.add(b); // adds as last
-            c = a.subtract(b); // = BR(a mod F) 
-            //System.out.println("c = " + c);
-            c = normalform(F, c);
-            //System.out.println("c = " + c);
-            a = c;
         }
         return B;
     }

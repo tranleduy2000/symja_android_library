@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import edu.jas.structure.RingFactory;
 public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, QuotPairFactory<C, Local<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(LocalRing.class);
+    private static final Logger logger = LogManager.getLogger(LocalRing.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -68,22 +68,12 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         }
     }
 
-
-    /**
-     * Factory for base elements.
-     */
-    public RingFactory<C> pairFactory() {
-        return ring;
-    }
-
-
     /**
      * Create from numerator.
      */
     public Local<C> create(C n) {
         return new Local<C>(this, n);
     }
-
 
     /**
      * Create from numerator, denominator pair.
@@ -92,28 +82,12 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return new Local<C>(this, n, d);
     }
 
-
     /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
+     * Factory for base elements.
      */
-    public boolean isFinite() {
-        return ring.isFinite();
+    public RingFactory<C> pairFactory() {
+        return ring;
     }
-
-
-    /**
-     * Copy Local element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public Local<C> copy(Local<C> c) {
-        return new Local<C>(c.ring, c.num, c.den, true);
-    }
-
 
     /**
      * Get the zero element.
@@ -124,7 +98,6 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return new Local<C>(this, ring.getZERO());
     }
 
-
     /**
      * Get the one element.
      *
@@ -134,6 +107,23 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return new Local<C>(this, ring.getONE());
     }
 
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return ring.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return ring.isAssociative();
+    }
 
     /**
      * Get a list of the generating elements.
@@ -152,64 +142,15 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return gens;
     }
 
-
     /**
-     * Query if this ring is commutative.
+     * Is this structure finite or infinite.
      *
-     * @return true if this ring is commutative, else false.
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
      */
-    public boolean isCommutative() {
-        return ring.isCommutative();
+    public boolean isFinite() {
+        return ring.isFinite();
     }
-
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true if this ring is associative, else false.
-     */
-    public boolean isAssociative() {
-        return ring.isAssociative();
-    }
-
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return false.
-     */
-    public boolean isField() {
-        if (isField > 0) {
-            return true;
-        }
-        if (isField == 0) {
-            return false;
-        }
-        // ??
-        return false;
-    }
-
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public java.math.BigInteger characteristic() {
-        return ring.characteristic();
-    }
-
-
-    /**
-     * Get a Local element from a BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a Local.
-     */
-    public Local<C> fromInteger(java.math.BigInteger a) {
-        return new Local<C>(this, ring.fromInteger(a));
-    }
-
 
     /**
      * Get a Local element from a long value.
@@ -221,67 +162,15 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return new Local<C>(this, ring.fromInteger(a));
     }
 
-
     /**
-     * Get the String representation as RingFactory.
+     * Get a Local element from a BigInteger value.
      *
-     * @see Object#toString()
+     * @param a BigInteger.
+     * @return a Local.
      */
-    @Override
-    public String toString() {
-        return "Local[ " + ideal.toString() + " ]";
+    public Local<C> fromInteger(java.math.BigInteger a) {
+        return new Local<C>(this, ring.fromInteger(a));
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return "LocalRing(" + ideal.toScript() + ")";
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    // not jet working
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof LocalRing)) {
-            return false;
-        }
-        LocalRing<C> a = (LocalRing<C>) b;
-        if (!ring.equals(a.ring)) {
-            return false;
-        }
-        return ideal.equals(a.ideal);
-    }
-
-
-    /**
-     * Hash code for this local ring.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + ideal.hashCode();
-        return h;
-    }
-
 
     /**
      * Local random.
@@ -300,7 +189,6 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         }
         return new Local<C>(this, r, s, false);
     }
-
 
     /**
      * Local random.
@@ -321,6 +209,15 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return new Local<C>(this, r, s, false);
     }
 
+    /**
+     * Copy Local element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public Local<C> copy(Local<C> c) {
+        return new Local<C>(c.ring, c.num, c.den, true);
+    }
 
     /**
      * Parse Local from String.
@@ -333,7 +230,6 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
         return new Local<C>(this, x);
     }
 
-
     /**
      * Parse Local from Reader.
      *
@@ -343,6 +239,88 @@ public class LocalRing<C extends RingElem<C>> implements RingFactory<Local<C>>, 
     public Local<C> parse(Reader r) {
         C x = ring.parse(r);
         return new Local<C>(this, x);
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        return "LocalRing(" + ideal.toScript() + ")";
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return false.
+     */
+    public boolean isField() {
+        if (isField > 0) {
+            return true;
+        }
+        if (isField == 0) {
+            return false;
+        }
+        // ??
+        return false;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return ring.characteristic();
+    }
+
+    /**
+     * Hash code for this local ring.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + ideal.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    // not jet working
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof LocalRing)) {
+            return false;
+        }
+        LocalRing<C> a = (LocalRing<C>) b;
+        if (!ring.equals(a.ring)) {
+            return false;
+        }
+        return ideal.equals(a.ideal);
+    }
+
+    /**
+     * Get the String representation as RingFactory.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "Local[ " + ideal.toString() + " ]";
     }
 
 }

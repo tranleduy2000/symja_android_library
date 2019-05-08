@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import edu.jas.kern.Scripting;
 /**
  * Term order class for ordered polynomials. Implements the most used term
  * orders: graded, lexicographical, weight aray and block orders. For the
- * definitions @see for example the articles <a
+ * definitions see for example the articles <a
  * href="http://doi.acm.org/10.1145/43882.43887">Kredel
  * "Admissible term orderings used in computer algebra systems"</a> and <a
  * href="http://doi.acm.org/10.1145/70936.70941">Sit,
@@ -52,7 +52,7 @@ public final class TermOrder implements Serializable {
     public static final int REVITDEG = 10;
     public final static int MAX_EVORD = REVITDEG;
     public final static int DEFAULT_EVORD = IGRLEX;
-    private static final Logger logger = Logger.getLogger(TermOrder.class);
+    private static final Logger logger = LogManager.getLogger(TermOrder.class);
     private static final boolean debug = logger.isDebugEnabled();
 
 
@@ -1565,9 +1565,29 @@ public final class TermOrder implements Serializable {
     }
 
     /**
+     * Hash code.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = evord;
+        h = (h << 3) + evord2;
+        h = (h << 4) + evbeg1;
+        h = (h << 4) + evend1;
+        h = (h << 4) + evbeg2;
+        h = (h << 4) + evend2;
+        if (weight == null) {
+            return h;
+        }
+        h = h * 7 + Arrays.deepHashCode(weight);
+        return h;
+    }
+
+    /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -1584,23 +1604,26 @@ public final class TermOrder implements Serializable {
     }
 
     /**
-     * Hash code.
+     * String representation of TermOrder.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h = evord;
-        h = (h << 3) + evord2;
-        h = (h << 4) + evbeg1;
-        h = (h << 4) + evend1;
-        h = (h << 4) + evbeg2;
-        h = (h << 4) + evend2;
-        if (weight == null) {
-            return h;
+    public String toString() {
+        if (weight != null) {
+            StringBuffer erg = new StringBuffer();
+            erg.append("W( ");
+            erg.append(weightToString());
+            if (evend1 == evend2) {
+                erg.append(" )");
+                return erg.toString();
+            }
+            erg.append("[" + evbeg1 + "," + evend1 + "]");
+            erg.append("[" + evbeg2 + "," + evend2 + "]");
+            erg.append(" )");
+            return erg.toString();
         }
-        h = h * 7 + Arrays.deepHashCode(weight);
-        return h;
+        return toStringPlain();
     }
 
     /**
@@ -1622,7 +1645,7 @@ public final class TermOrder implements Serializable {
                     if (i > 0) {
                         erg.append(",");
                     }
-                    erg.append(String.valueOf(wj[wj.length - 1 - i]));
+                    erg.append(wj[wj.length - 1 - i]);
                 }
                 erg.append(")");
             }
@@ -1651,7 +1674,7 @@ public final class TermOrder implements Serializable {
                     if (i > 0) {
                         erg.append(",");
                     }
-                    erg.append(String.valueOf(wj[wj.length - 1 - i]));
+                    erg.append(wj[wj.length - 1 - i]);
                 }
                 erg.append("]");
             }
@@ -1681,29 +1704,6 @@ public final class TermOrder implements Serializable {
             return erg.toString();
         }
         return toScriptPlain();
-    }
-
-    /**
-     * String representation of TermOrder.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        if (weight != null) {
-            StringBuffer erg = new StringBuffer();
-            erg.append("W( ");
-            erg.append(weightToString());
-            if (evend1 == evend2) {
-                erg.append(" )");
-                return erg.toString();
-            }
-            erg.append("[" + evbeg1 + "," + evend1 + "]");
-            erg.append("[" + evbeg2 + "," + evend2 + "]");
-            erg.append(" )");
-            return erg.toString();
-        }
-        return toStringPlain();
     }
 
     /**

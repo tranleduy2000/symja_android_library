@@ -60,17 +60,6 @@ public class Pair<C extends RingElem<C>> implements Serializable, Comparable<Pai
         toZero = false; // ok
     }
 
-
-    /**
-     * toString.
-     */
-    @Override
-    public String toString() {
-        return "pair[" + n + "](" + i + j + ", r0=" + toZero + ", c4=" + useCriterion4 + ", c3="
-                + useCriterion3 + ")";
-    }
-
-
     /**
      * Set removed pair number.
      *
@@ -79,7 +68,6 @@ public class Pair<C extends RingElem<C>> implements Serializable, Comparable<Pai
     public void pairNumber(int n) {
         this.n = n;
     }
-
 
     /**
      * Get removed pair number.
@@ -90,14 +78,12 @@ public class Pair<C extends RingElem<C>> implements Serializable, Comparable<Pai
         return n;
     }
 
-
     /**
      * Set zero reduction. The S-power-series of this Pair was reduced to zero.
      */
     public void setZero() {
         toZero = true;
     }
-
 
     /**
      * Is reduced to zero.
@@ -108,23 +94,6 @@ public class Pair<C extends RingElem<C>> implements Serializable, Comparable<Pai
     public boolean isZero() {
         return toZero;
     }
-
-
-    /**
-     * equals.
-     *
-     * @param ob an Object.
-     * @return true if this is equal to o, else false.
-     */
-    @Override
-    public boolean equals(Object ob) {
-        if (!(ob instanceof Pair)) {
-            return false;
-            // throw new ClassCastException("Pair "+n+" o "+o);
-        }
-        return 0 == compareTo((Pair) ob);
-    }
-
 
     /**
      * compareTo used in TreeMap // not used at moment. Comparison is based on
@@ -144,15 +113,38 @@ public class Pair<C extends RingElem<C>> implements Serializable, Comparable<Pai
         return 0;
     }
 
-
     /**
      * Hash code for this Pair.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         return (i << 16) + j;
+    }
+
+    /**
+     * equals.
+     *
+     * @param ob an Object.
+     * @return true if this is equal to o, else false.
+     */
+    @Override
+    public boolean equals(Object ob) {
+        if (!(ob instanceof Pair)) {
+            return false;
+            // throw new ClassCastException("Pair "+n+" o "+o);
+        }
+        return 0 == compareTo((Pair) ob);
+    }
+
+    /**
+     * toString.
+     */
+    @Override
+    public String toString() {
+        return "pair[" + n + "](" + i + j + ", r0=" + toZero + ", c4=" + useCriterion4 + ", c3="
+                + useCriterion3 + ")";
     }
 
     /**

@@ -5,9 +5,8 @@
 package edu.jas.poly;
 
 
-import com.duy.util.DScanner;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -51,7 +51,7 @@ import edu.jas.structure.RingFactory;
 public class GenPolynomialTokenizer {
 
 
-    private static final Logger logger = Logger.getLogger(GenPolynomialTokenizer.class);
+    private static final Logger logger = LogManager.getLogger(GenPolynomialTokenizer.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -161,14 +161,14 @@ public class GenPolynomialTokenizer {
      * @param s String. Syntax:
      *
      *          <pre>
-     *                   (n1,...,nk)
-     *                              </pre>
+     *          (n1,...,nk)
+     *                     </pre>
      *          <p>
      *          or
      *
      *          <pre>
-     *                   (n1 ... nk)
-     *                              </pre>
+     *          (n1 ... nk)
+     *                     </pre>
      *          <p>
      *          parenthesis are optional.
      * @return array of variable names found in s.
@@ -190,7 +190,7 @@ public class GenPolynomialTokenizer {
         }
         st = st.replaceAll(",", " ");
         List<String> sl = new ArrayList<String>();
-        DScanner sc = new DScanner(st);
+        Scanner sc = new Scanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
             sl.add(sn);
@@ -235,7 +235,7 @@ public class GenPolynomialTokenizer {
         //System.out.println("st = " + st);
 
         Set<String> sl = new TreeSet<String>();
-        DScanner sc = new DScanner(st);
+        Scanner sc = new Scanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
             if (sn == null || sn.length() == 0) {
@@ -248,7 +248,7 @@ public class GenPolynomialTokenizer {
             }
             //System.out.println("sn = " + sn + ", i = " + i);
             if (i > 0) {
-                sn = sn.substring(i, sn.length());
+                sn = sn.substring(i);
             }
             //System.out.println("sn = " + sn);
             if (sn.length() == 0) {
@@ -877,9 +877,9 @@ public class GenPolynomialTokenizer {
                     tt = tok.nextToken();
                 }
             } else if (tok.sval.equalsIgnoreCase("RatFunc") || tok.sval.equalsIgnoreCase("ModFunc")) {
-                //logger.error("RatFunc and ModFunc can no more be read, @see edu.jas.application.RingFactoryTokenizer.");
+                //logger.error("RatFunc and ModFunc can no more be read, see edu.jas.application.RingFactoryTokenizer.");
                 throw new InvalidExpressionException(
-                        "RatFunc and ModFunc can no more be read, @see edu.jas.application.RingFactoryTokenizer.");
+                        "RatFunc and ModFunc can no more be read, see edu.jas.application.RingFactoryTokenizer.");
             } else if (tok.sval.equalsIgnoreCase("IntFunc")) {
                 String[] rfv = nextVariableList();
                 //System.out.println("rfv = " + rfv.length + " " + rfv[0]);

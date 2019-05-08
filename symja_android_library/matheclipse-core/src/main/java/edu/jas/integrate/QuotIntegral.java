@@ -102,11 +102,44 @@ public class QuotIntegral<C extends GcdRingElem<C>> implements Serializable {
         logarithm = log;
     }
 
+    /**
+     * Hash code for QuotIntegral.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h = quot.hashCode();
+        h = h * 37 + rational.hashCode();
+        h = h * 37 + logarithm.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object B) {
+        QuotIntegral<C> b = null;
+        try {
+            b = (QuotIntegral<C>) B;
+        } catch (ClassCastException ignored) {
+        }
+        if (b == null) {
+            return false;
+        }
+        return quot.equals(b.quot) &&
+                rational.equals(b.rational) &&
+                logarithm.equals(b.logarithm);
+    }
 
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -140,42 +173,6 @@ public class QuotIntegral<C extends GcdRingElem<C>> implements Serializable {
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-
-    /**
-     * Hash code for QuotIntegral.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h = quot.hashCode();
-        h = h * 37 + rational.hashCode();
-        h = h * 37 + logarithm.hashCode();
-        return h;
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object B) {
-        QuotIntegral<C> b = null;
-        try {
-            b = (QuotIntegral<C>) B;
-        } catch (ClassCastException ignored) {
-        }
-        if (b == null) {
-            return false;
-        }
-        return quot.equals(b.quot) &&
-                rational.equals(b.rational) &&
-                logarithm.equals(b.logarithm);
     }
 
 }

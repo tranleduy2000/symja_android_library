@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.SortedMap;
@@ -29,7 +29,7 @@ import edu.jas.structure.RingFactory;
 public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SquarefreeFieldChar0.class);
+    private static final Logger logger = LogManager.getLogger(SquarefreeFieldChar0.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -59,7 +59,7 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -95,35 +95,6 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         q = q.monic();
         return q;
     }
-
-
-    /**
-     * GenPolynomial test if is squarefree.
-     *
-     * @param P GenPolynomial.
-     * @return true if P is squarefree, else false.
-     */
-    public boolean isBaseSquarefree(GenPolynomial<C> P) {
-        if (P == null || P.isZERO()) {
-            return true;
-        }
-        GenPolynomialRing<C> pfac = P.ring;
-        if (pfac.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName() + " only for univariate polynomials");
-        }
-        GenPolynomial<C> pp = P.monic();
-        if (pp.isConstant()) {
-            return true;
-        }
-        GenPolynomial<C> d = PolyUtil.baseDeriviative(pp);
-        d = d.monic();
-        //System.out.println("d = " + d);
-        GenPolynomial<C> g = engine.baseGcd(pp, d);
-        //g = g.monic();
-        //return g.isONE();
-        return g.degree(0) == 0;
-    }
-
 
     /**
      * GenPolynomial polynomial squarefree factorization.
@@ -200,7 +171,6 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         return normalizeFactorization(sfactors);
     }
 
-
     /**
      * GenPolynomial recursive univariate polynomial greatest squarefree
      * divisor.
@@ -216,12 +186,12 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         GenPolynomialRing<GenPolynomial<C>> pfac = P.ring;
         if (pfac.nvar > 1) {
             throw new IllegalArgumentException(this.getClass().getName()
-                    + " only for multivariate polynomials");
+                    + " only for univariate recursive polynomials");
         }
         // squarefree content
         GenPolynomial<GenPolynomial<C>> pp = P;
         GenPolynomial<C> Pc = engine.recursiveContent(P);
-        Pc = Pc.monic();
+        //?? Pc = Pc.monic();
         if (!Pc.isONE()) {
             pp = PolyUtil.coefficientPseudoDivide(pp, Pc);
             //System.out.println("pp,sqp = " + pp);
@@ -238,41 +208,11 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         //System.out.println("d = " + d);
         GenPolynomial<GenPolynomial<C>> g = engine.recursiveUnivariateGcd(pp, d);
         //System.out.println("g,rec = " + g);
-        g = PolyUtil.monic(g);
+        //??g = PolyUtil.<C> monic(g);
         GenPolynomial<GenPolynomial<C>> q = PolyUtil.recursivePseudoDivide(pp, g);
-        q = PolyUtil.monic(q);
+        //?? q = PolyUtil.<C> monic(q);
         return q.multiply(Pc);
     }
-
-
-    /**
-     * GenPolynomial test if is squarefree.
-     *
-     * @param P GenPolynomial.
-     * @return true if P is squarefree, else false.
-     */
-    public boolean isRecursiveUnivariateSquarefree(GenPolynomial<GenPolynomial<C>> P) {
-        if (P == null || P.isZERO()) {
-            return true;
-        }
-        GenPolynomialRing<GenPolynomial<C>> pfac = P.ring;
-        if (pfac.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName()
-                    + " only for univariate recursive polynomials");
-        }
-        GenPolynomial<GenPolynomial<C>> pp = P;
-        GenPolynomial<GenPolynomial<C>> d = PolyUtil.recursiveDeriviative(pp);
-        //System.out.println("d = " + d);
-        GenPolynomial<GenPolynomial<C>> g = engine.recursiveUnivariateGcd(pp, d);
-        if (logger.isInfoEnabled()) {
-            logger.info("gcd = " + g);
-        }
-        //System.out.println("g,rec = " + g);
-        //g = PolyUtil.<C> monic(g);
-        //return g.isONE();
-        return g.degree(0) == 0;
-    }
-
 
     /**
      * GenPolynomial recursive univariate polynomial squarefree factorization.
@@ -390,7 +330,6 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         return sfactors;
     }
 
-
     /**
      * GenPolynomial greatest squarefree divisor.
      *
@@ -426,7 +365,6 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         return D;
     }
 
-
     /**
      * GenPolynomial test if is squarefree.
      *
@@ -449,7 +387,6 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         GenPolynomial<GenPolynomial<C>> Pr = PolyUtil.recursive(rfac, P);
         return isRecursiveUnivariateSquarefree(Pr);
     }
-
 
     /**
      * GenPolynomial squarefree factorization.
@@ -491,7 +428,6 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
         return normalizeFactorization(sfactors);
     }
 
-
     /**
      * Coefficients squarefree factorization.
      *
@@ -502,6 +438,61 @@ public class SquarefreeFieldChar0<C extends GcdRingElem<C>> extends SquarefreeAb
     @Override
     public SortedMap<C, Long> squarefreeFactors(C P) {
         throw new UnsupportedOperationException("method not implemented");
+    }
+
+    /**
+     * GenPolynomial test if is squarefree.
+     *
+     * @param P GenPolynomial.
+     * @return true if P is squarefree, else false.
+     */
+    public boolean isBaseSquarefree(GenPolynomial<C> P) {
+        if (P == null || P.isZERO()) {
+            return true;
+        }
+        GenPolynomialRing<C> pfac = P.ring;
+        if (pfac.nvar > 1) {
+            throw new IllegalArgumentException(this.getClass().getName() + " only for univariate polynomials");
+        }
+        GenPolynomial<C> pp = P.monic();
+        if (pp.isConstant()) {
+            return true;
+        }
+        GenPolynomial<C> d = PolyUtil.baseDeriviative(pp);
+        d = d.monic();
+        //System.out.println("d = " + d);
+        GenPolynomial<C> g = engine.baseGcd(pp, d);
+        //g = g.monic();
+        //return g.isONE();
+        return g.degree(0) == 0;
+    }
+
+    /**
+     * GenPolynomial test if is squarefree.
+     *
+     * @param P GenPolynomial.
+     * @return true if P is squarefree, else false.
+     */
+    public boolean isRecursiveUnivariateSquarefree(GenPolynomial<GenPolynomial<C>> P) {
+        if (P == null || P.isZERO()) {
+            return true;
+        }
+        GenPolynomialRing<GenPolynomial<C>> pfac = P.ring;
+        if (pfac.nvar > 1) {
+            throw new IllegalArgumentException(this.getClass().getName()
+                    + " only for univariate recursive polynomials");
+        }
+        GenPolynomial<GenPolynomial<C>> pp = P;
+        GenPolynomial<GenPolynomial<C>> d = PolyUtil.recursiveDeriviative(pp);
+        //System.out.println("d = " + d);
+        GenPolynomial<GenPolynomial<C>> g = engine.recursiveUnivariateGcd(pp, d);
+        if (logger.isInfoEnabled()) {
+            logger.info("gcd = " + g);
+        }
+        //System.out.println("g,rec = " + g);
+        //g = PolyUtil.<C> monic(g);
+        //return g.isONE();
+        return g.degree(0) == 0;
     }
 
 }

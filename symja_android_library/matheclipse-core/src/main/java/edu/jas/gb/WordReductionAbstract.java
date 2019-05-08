@@ -5,8 +5,8 @@
 package edu.jas.gb;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -31,7 +31,7 @@ import edu.jas.structure.RingElem;
 public abstract class WordReductionAbstract<C extends RingElem<C>> implements WordReduction<C> {
 
 
-    private static final Logger logger = Logger.getLogger(WordReductionAbstract.class);
+    private static final Logger logger = LogManager.getLogger(WordReductionAbstract.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -105,50 +105,6 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         return s;
     }
 
-
-    /**
-     * S-Polynomials of non-commutative polynomials.
-     *
-     * @param ol Overlap tuple.
-     * @param a  leading base coefficient of B.
-     * @param A  word polynomial.
-     * @param b  leading base coefficient of A.
-     * @param B  word polynomial.
-     * @return list of all spol(Ap,Bp) the S-polynomials of Ap and Bp.
-     */
-    public GenWordPolynomial<C> SPolynomial(Overlap ol, C a, GenWordPolynomial<C> A, C b,
-                                            GenWordPolynomial<C> B) {
-        C one = A.ring.coFac.getONE();
-        GenWordPolynomial<C> s1 = A.multiply(a, ol.l1, one, ol.r1);
-        GenWordPolynomial<C> s2 = B.multiply(b, ol.l2, one, ol.r2);
-        GenWordPolynomial<C> s = s1.subtract(s2);
-        return s;
-    }
-
-
-    /**
-     * Normalform Set.
-     *
-     * @param Ap polynomial list.
-     * @param Pp polynomial list.
-     * @return list of nf(a) with respect to Pp for all a in Ap.
-     */
-    public List<GenWordPolynomial<C>> normalform(List<GenWordPolynomial<C>> Pp, List<GenWordPolynomial<C>> Ap) {
-        if (Pp == null || Pp.isEmpty()) {
-            return Ap;
-        }
-        if (Ap == null || Ap.isEmpty()) {
-            return Ap;
-        }
-        ArrayList<GenWordPolynomial<C>> red = new ArrayList<GenWordPolynomial<C>>();
-        for (GenWordPolynomial<C> A : Ap) {
-            A = normalform(Pp, A);
-            red.add(A);
-        }
-        return red;
-    }
-
-
     /**
      * Is top reducible.
      *
@@ -174,7 +130,6 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         return false;
     }
 
-
     /**
      * Is reducible.
      *
@@ -185,7 +140,6 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
     public boolean isReducible(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
         return !isNormalform(Pp, Ap);
     }
-
 
     /**
      * Is in Normalform.
@@ -239,7 +193,6 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         return true;
     }
 
-
     /**
      * Is in Normalform.
      *
@@ -263,6 +216,27 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         return true;
     }
 
+    /**
+     * Normalform Set.
+     *
+     * @param Ap polynomial list.
+     * @param Pp polynomial list.
+     * @return list of nf(a) with respect to Pp for all a in Ap.
+     */
+    public List<GenWordPolynomial<C>> normalform(List<GenWordPolynomial<C>> Pp, List<GenWordPolynomial<C>> Ap) {
+        if (Pp == null || Pp.isEmpty()) {
+            return Ap;
+        }
+        if (Ap == null || Ap.isEmpty()) {
+            return Ap;
+        }
+        ArrayList<GenWordPolynomial<C>> red = new ArrayList<GenWordPolynomial<C>>();
+        for (GenWordPolynomial<C> A : Ap) {
+            A = normalform(Pp, A);
+            red.add(A);
+        }
+        return red;
+    }
 
     /**
      * Irreducible set.
@@ -294,7 +268,7 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         GenWordPolynomial<C> a;
         logger.debug("irr = ");
         while (irr != l) {
-            //it = P.listIterator(); 
+            //it = P.listIterator();
             //a = P.get(0); //it.next();
             a = P.remove(0);
             e = a.leadingWord();
@@ -324,7 +298,6 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
         //System.out.println();
         return P;
     }
-
 
     /**
      * Is reduction of normal form.
@@ -383,5 +356,24 @@ public abstract class WordReductionAbstract<C extends RingElem<C>> implements Wo
             logger.info("t-a = " + r);
         }
         return z;
+    }
+
+    /**
+     * S-Polynomials of non-commutative polynomials.
+     *
+     * @param ol Overlap tuple.
+     * @param a  leading base coefficient of B.
+     * @param A  word polynomial.
+     * @param b  leading base coefficient of A.
+     * @param B  word polynomial.
+     * @return list of all spol(Ap,Bp) the S-polynomials of Ap and Bp.
+     */
+    public GenWordPolynomial<C> SPolynomial(Overlap ol, C a, GenWordPolynomial<C> A, C b,
+                                            GenWordPolynomial<C> B) {
+        C one = A.ring.coFac.getONE();
+        GenWordPolynomial<C> s1 = A.multiply(a, ol.l1, one, ol.r1);
+        GenWordPolynomial<C> s2 = B.multiply(b, ol.l2, one, ol.r2);
+        GenWordPolynomial<C> s = s1.subtract(s2);
+        return s;
     }
 }

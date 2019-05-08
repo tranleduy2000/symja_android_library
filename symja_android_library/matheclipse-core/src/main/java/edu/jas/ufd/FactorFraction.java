@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class FactorFraction<C extends GcdRingElem<C>,
         D extends GcdRingElem<D> & QuotPair<GenPolynomial<C>>> {
 
 
-    private static final Logger logger = Logger.getLogger(FactorFraction.class);
+    private static final Logger logger = LogManager.getLogger(FactorFraction.class);
 
 
     /**
@@ -84,7 +84,7 @@ public class FactorFraction<C extends GcdRingElem<C>,
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

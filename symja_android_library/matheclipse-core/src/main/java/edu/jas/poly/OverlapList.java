@@ -41,7 +41,7 @@ public class OverlapList implements Serializable {
     /**
      * Get the string representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

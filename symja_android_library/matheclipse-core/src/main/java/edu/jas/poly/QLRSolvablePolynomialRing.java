@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -48,7 +48,7 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         extends GenSolvablePolynomialRing<C> {
 
 
-    private static final Logger logger = Logger.getLogger(QLRSolvablePolynomialRing.class);
+    private static final Logger logger = LogManager.getLogger(QLRSolvablePolynomialRing.class);
 
     //private static final boolean debug = logger.isDebugEnabled();
 
@@ -228,77 +228,24 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         ONE = new QLRSolvablePolynomial<C, D>(this, coeff, evzero);
     }
 
-
     /**
-     * Get the String representation.
+     * Hash code for this polynomial ring.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        String res = super.toString();
-        if (PrettyPrint.isTrue()) {
-            res += "\n" + polCoeff.coeffTable.toString(vars);
-            res += "\n" + polCoeff.table.toString(vars);
-        } else {
-            res += ", #rel = " + table.size() + " + " + polCoeff.coeffTable.size() + " + " + polCoeff.table.size();
-        }
-        return res;
+    public int hashCode() {
+        int h;
+        h = super.hashCode();
+        h = 37 * h + table.hashCode(); // may be different after some computations
+        h = 37 * h + polCoeff.coeffTable.hashCode(); // may be different
+        return h;
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        StringBuffer s = new StringBuffer();
-        switch (Scripting.getLang()) {
-            case Ruby:
-                s.append("SolvPolyRing.new(");
-                break;
-            case Python:
-            default:
-                s.append("SolvPolyRing(");
-        }
-        if (coFac instanceof RingElem) {
-            s.append(((RingElem<C>) coFac).toScriptFactory());
-        } else {
-            s.append(coFac.toScript().trim());
-        }
-        s.append(",\"" + varsToString() + "\",");
-        String to = tord.toScript();
-        s.append(to);
-        String rel = "";
-        if (table.size() > 0) {
-            rel = table.toScript();
-            s.append(",rel=");
-            s.append(rel);
-        }
-        if (polCoeff.coeffTable.size() > 0) {
-            String crel = polCoeff.coeffTable.toScript();
-            s.append(",coeffrel=");
-            s.append(crel);
-        }
-        if (polCoeff.table.size() > 0) { // should not be printed
-            String polrel = polCoeff.table.toScript();
-            if (!rel.equals(polrel)) {
-                s.append(",polrel=");
-                s.append(polrel);
-            }
-        }
-        s.append(")");
-        return s.toString();
-    }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -325,21 +272,22 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return polCoeff.coeffTable.equals(oring.polCoeff.coeffTable);
     }
 
-
     /**
-     * Hash code for this polynomial ring.
+     * Get the String representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h;
-        h = super.hashCode();
-        h = 37 * h + table.hashCode(); // may be different after some computations
-        h = 37 * h + polCoeff.coeffTable.hashCode(); // may be different
-        return h;
+    public String toString() {
+        String res = super.toString();
+        if (PrettyPrint.isTrue()) {
+            res += "\n" + polCoeff.coeffTable.toString(vars);
+            res += "\n" + polCoeff.table.toString(vars);
+        } else {
+            res += ", #rel = " + table.size() + " + " + polCoeff.coeffTable.size() + " + " + polCoeff.table.size();
+        }
+        return res;
     }
-
 
     /**
      * Get the zero element.
@@ -351,7 +299,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return ZERO;
     }
 
-
     /**
      * Get the one element.
      *
@@ -361,7 +308,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public QLRSolvablePolynomial<C, D> getONE() {
         return ONE;
     }
-
 
     /**
      * Query if this ring is commutative.
@@ -375,7 +321,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         }
         return false;
     }
-
 
     /**
      * Query if this ring is associative. Test if the relations between the mian
@@ -450,63 +395,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return true;
     }
 
-
-    /**
-     * Get a (constant) QLRSolvablePolynomial&lt;C&gt; element from a long
-     * value.
-     *
-     * @param a long.
-     * @return a QLRSolvablePolynomial&lt;C&gt;.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> fromInteger(long a) {
-        return new QLRSolvablePolynomial<C, D>(this, coFac.fromInteger(a), evzero);
-    }
-
-
-    /**
-     * Get a (constant) QLRSolvablePolynomial&lt;C&gt; element from a
-     * BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a QLRSolvablePolynomial&lt;C&gt;.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> fromInteger(BigInteger a) {
-        return new QLRSolvablePolynomial<C, D>(this, coFac.fromInteger(a), evzero);
-    }
-
-
-    /**
-     * Random solvable polynomial. Generates a random solvable polynomial with k
-     * = 5, l = n, d = (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
-     *
-     * @param n number of terms.
-     * @return a random solvable polynomial.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> random(int n) {
-        return random(n, random);
-    }
-
-
-    /**
-     * Random solvable polynomial. Generates a random solvable polynomial with k
-     * = 5, l = n, d = (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
-     *
-     * @param n   number of terms.
-     * @param rnd is a source for random bits.
-     * @return a random solvable polynomial.
-     */
-    @Override
-    public QLRSolvablePolynomial<C, D> random(int n, Random rnd) {
-        if (nvar == 1) {
-            return random(5, n, n, 0.7f, rnd);
-        }
-        return random(5, n, 3, 0.3f, rnd);
-    }
-
-
     /**
      * Generate a random solvable polynomial.
      *
@@ -520,7 +408,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public QLRSolvablePolynomial<C, D> random(int k, int l, int d, float q) {
         return random(k, l, d, q, random);
     }
-
 
     /**
      * Random solvable polynomial.
@@ -548,17 +435,98 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return r;
     }
 
-
     /**
-     * Copy polynomial c.
+     * Generate univariate solvable polynomial in a given variable.
      *
-     * @param c
-     * @return a copy of c.
+     * @param i the index of the variable.
+     * @return X_i as solvable univariate polynomial.
      */
-    public QLRSolvablePolynomial<C, D> copy(QLRSolvablePolynomial<C, D> c) {
-        return new QLRSolvablePolynomial<C, D>(this, c.getMap());
+    @Override
+    @SuppressWarnings("unchecked")
+    public QLRSolvablePolynomial<C, D> univariate(int i) {
+        return (QLRSolvablePolynomial<C, D>) super.univariate(i);
     }
 
+    /**
+     * Generate univariate solvable polynomial in a given variable with given
+     * exponent.
+     *
+     * @param i the index of the variable.
+     * @param e the exponent of the variable.
+     * @return X_i^e as solvable univariate polynomial.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public QLRSolvablePolynomial<C, D> univariate(int i, long e) {
+        return (QLRSolvablePolynomial<C, D>) super.univariate(i, e);
+    }
+
+    /**
+     * Generate univariate solvable polynomial in a given variable with given
+     * exponent.
+     *
+     * @param modv number of module variables.
+     * @param i    the index of the variable.
+     * @param e    the exponent of the variable.
+     * @return X_i^e as solvable univariate polynomial.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public QLRSolvablePolynomial<C, D> univariate(int modv, int i, long e) {
+        return (QLRSolvablePolynomial<C, D>) super.univariate(modv, i, e);
+    }
+
+    /**
+     * Get a (constant) QLRSolvablePolynomial&lt;C&gt; element from a long
+     * value.
+     *
+     * @param a long.
+     * @return a QLRSolvablePolynomial&lt;C&gt;.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> fromInteger(long a) {
+        return new QLRSolvablePolynomial<C, D>(this, coFac.fromInteger(a), evzero);
+    }
+
+    /**
+     * Get a (constant) QLRSolvablePolynomial&lt;C&gt; element from a
+     * BigInteger value.
+     *
+     * @param a BigInteger.
+     * @return a QLRSolvablePolynomial&lt;C&gt;.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> fromInteger(BigInteger a) {
+        return new QLRSolvablePolynomial<C, D>(this, coFac.fromInteger(a), evzero);
+    }
+
+    /**
+     * Random solvable polynomial. Generates a random solvable polynomial with k
+     * = 5, l = n, d = (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
+     *
+     * @param n number of terms.
+     * @return a random solvable polynomial.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * Random solvable polynomial. Generates a random solvable polynomial with k
+     * = 5, l = n, d = (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
+     *
+     * @param n   number of terms.
+     * @param rnd is a source for random bits.
+     * @return a random solvable polynomial.
+     */
+    @Override
+    public QLRSolvablePolynomial<C, D> random(int n, Random rnd) {
+        if (nvar == 1) {
+            return random(5, n, n, 0.7f, rnd);
+        }
+        return random(5, n, 3, 0.3f, rnd);
+    }
 
     /**
      * Parse a solvable polynomial with the use of GenPolynomialTokenizer
@@ -570,7 +538,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public QLRSolvablePolynomial<C, D> parse(String s) {
         return parse(new StringReader(s));
     }
-
 
     /**
      * Parse a solvable polynomial with the use of GenPolynomialTokenizer
@@ -593,50 +560,52 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return p;
     }
 
-
     /**
-     * Generate univariate solvable polynomial in a given variable.
+     * Get a scripting compatible string representation.
      *
-     * @param i the index of the variable.
-     * @return X_i as solvable univariate polynomial.
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public QLRSolvablePolynomial<C, D> univariate(int i) {
-        return (QLRSolvablePolynomial<C, D>) super.univariate(i);
+    public String toScript() {
+        StringBuffer s = new StringBuffer();
+        switch (Scripting.getLang()) {
+            case Ruby:
+                s.append("SolvPolyRing.new(");
+                break;
+            case Python:
+            default:
+                s.append("SolvPolyRing(");
+        }
+        if (coFac instanceof RingElem) {
+            s.append(((RingElem<C>) coFac).toScriptFactory());
+        } else {
+            s.append(coFac.toScript().trim());
+        }
+        s.append(",\"" + varsToString() + "\",");
+        String to = tord.toScript();
+        s.append(to);
+        String rel = "";
+        if (table.size() > 0) {
+            rel = table.toScript();
+            s.append(",rel=");
+            s.append(rel);
+        }
+        if (polCoeff.coeffTable.size() > 0) {
+            String crel = polCoeff.coeffTable.toScript();
+            s.append(",coeffrel=");
+            s.append(crel);
+        }
+        if (polCoeff.table.size() > 0) { // should not be printed
+            String polrel = polCoeff.table.toScript();
+            if (!rel.equals(polrel)) {
+                s.append(",polrel=");
+                s.append(polrel);
+            }
+        }
+        s.append(")");
+        return s.toString();
     }
-
-
-    /**
-     * Generate univariate solvable polynomial in a given variable with given
-     * exponent.
-     *
-     * @param i the index of the variable.
-     * @param e the exponent of the variable.
-     * @return X_i^e as solvable univariate polynomial.
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public QLRSolvablePolynomial<C, D> univariate(int i, long e) {
-        return (QLRSolvablePolynomial<C, D>) super.univariate(i, e);
-    }
-
-
-    /**
-     * Generate univariate solvable polynomial in a given variable with given
-     * exponent.
-     *
-     * @param modv number of module variables.
-     * @param i    the index of the variable.
-     * @param e    the exponent of the variable.
-     * @return X_i^e as solvable univariate polynomial.
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public QLRSolvablePolynomial<C, D> univariate(int modv, int i, long e) {
-        return (QLRSolvablePolynomial<C, D>) super.univariate(modv, i, e);
-    }
-
 
     /**
      * Generate list of univariate polynomials in all variables.
@@ -648,7 +617,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return univariateList(0, 1L);
     }
 
-
     /**
      * Generate list of univariate polynomials in all variables.
      *
@@ -659,7 +627,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public List<QLRSolvablePolynomial<C, D>> univariateList(int modv) {
         return univariateList(modv, 1L);
     }
-
 
     /**
      * Generate list of univariate polynomials in all variables with given
@@ -680,7 +647,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return pols;
     }
 
-
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
      * variables by i.
@@ -692,7 +658,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public QLRSolvablePolynomialRing<C, D> extend(int i) {
         return extend(i, false);
     }
-
 
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
@@ -712,7 +677,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return spfac;
     }
 
-
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
      * variables by length(vn). New variables commute with the exiting
@@ -725,7 +689,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public QLRSolvablePolynomialRing<C, D> extend(String[] vn) {
         return extend(vn, false);
     }
-
 
     /**
      * Extend variables. Used e.g. in module embedding. Extend number of
@@ -746,7 +709,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return spfac;
     }
 
-
     /**
      * Contract variables. Used e.g. in module embedding. Contract number of
      * variables by i.
@@ -764,7 +726,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return spfac;
     }
 
-
     /**
      * Reverse variables. Used e.g. in opposite rings.
      *
@@ -774,7 +735,6 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
     public QLRSolvablePolynomialRing<C, D> reverse() {
         return reverse(false);
     }
-
 
     /**
      * Reverse variables. Used e.g. in opposite rings.
@@ -793,6 +753,15 @@ public class QLRSolvablePolynomialRing<C extends GcdRingElem<C> & QuotPair<GenPo
         return spfac;
     }
 
+    /**
+     * Copy polynomial c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public QLRSolvablePolynomial<C, D> copy(QLRSolvablePolynomial<C, D> c) {
+        return new QLRSolvablePolynomial<C, D>(this, c.getMap());
+    }
 
     /**
      * Rational function from integral polynomial coefficients. Represent as

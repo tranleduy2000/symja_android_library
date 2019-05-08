@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -55,7 +55,7 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
     /**
      * Log4j logger object.
      */
-    private static final Logger logger = Logger.getLogger(GenPolynomialRing.class);
+    private static final Logger logger = LogManager.getLogger(GenPolynomialRing.class);
     /**
      * Count for number of polynomial creations.
      */
@@ -319,9 +319,68 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
     }
 
     /**
+     * Get a scripting compatible string representation of an ExpVector of this
+     * ring.
+     *
+     * @param e exponent vector
+     * @return script compatible representation for the ExpVector.
+     */
+    public String toScript(ExpVector e) {
+        if (e == null) {
+            return "null";
+        }
+        if (vars != null) {
+            return e.toScript(vars);
+        }
+        return e.toScript();
+    }
+
+    /**
+     * Hash code for this polynomial ring.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = (nvar << 27);
+        h += (coFac.hashCode() << 11);
+        h += tord.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof GenPolynomialRing)) {
+            return false;
+        }
+        GenPolynomialRing<C> oring = (GenPolynomialRing<C>) other;
+        if (nvar != oring.nvar) {
+            return false;
+        }
+        if (!coFac.equals(oring.coFac)) {
+            return false;
+        }
+        if (!tord.equals(oring.tord)) {
+            return false;
+        }
+        // same variables required ?
+        return Arrays.deepEquals(vars, oring.vars);
+    }
+
+    /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @SuppressWarnings("cast")
     @Override
@@ -386,100 +445,6 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
             res += "( " + varsToString() + " ) " + tord.toString() + " ]";
         }
         return res;
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        StringBuffer s = new StringBuffer();
-        switch (Scripting.getLang()) {
-            case Ruby:
-                s.append("PolyRing.new(");
-                break;
-            case Python:
-            default:
-                s.append("PolyRing(");
-        }
-        if (coFac instanceof RingElem) {
-            s.append(((RingElem<C>) coFac).toScriptFactory());
-        } else {
-            s.append(coFac.toScript().trim());
-        }
-        s.append(",\"" + varsToString() + "\"");
-        String to = tord.toScript();
-        //if (tord.getEvord() == TermOrder.INVLEX) {
-        //    to = "PolyRing.lex";
-        //}
-        //if (tord.getEvord() == TermOrder.IGRLEX) {
-        //    to = "PolyRing.grad";
-        //}
-        s.append("," + to);
-        s.append(")");
-        return s.toString();
-    }
-
-    /**
-     * Get a scripting compatible string representation of an ExpVector of this
-     * ring.
-     *
-     * @param e exponent vector
-     * @return script compatible representation for the ExpVector.
-     */
-    public String toScript(ExpVector e) {
-        if (e == null) {
-            return "null";
-        }
-        if (vars != null) {
-            return e.toScript(vars);
-        }
-        return e.toScript();
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        }
-        if (!(other instanceof GenPolynomialRing)) {
-            return false;
-        }
-        GenPolynomialRing<C> oring = (GenPolynomialRing<C>) other;
-        if (nvar != oring.nvar) {
-            return false;
-        }
-        if (!coFac.equals(oring.coFac)) {
-            return false;
-        }
-        if (!tord.equals(oring.tord)) {
-            return false;
-        }
-        // same variables required ?
-        return Arrays.deepEquals(vars, oring.vars);
-    }
-
-    /**
-     * Hash code for this polynomial ring.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = (nvar << 27);
-        h += (coFac.hashCode() << 11);
-        h += tord.hashCode();
-        return h;
     }
 
     /**
@@ -607,7 +572,7 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
      *
      * @return characteristic of this ring.
      */
-    public BigInteger characteristic() {
+    public java.math.BigInteger characteristic() {
         return coFac.characteristic();
     }
 
@@ -675,52 +640,6 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
     }
 
     /**
-     * Get a (constant) GenPolynomial&lt;C&gt; element from a long value.
-     *
-     * @param a long.
-     * @return a GenPolynomial&lt;C&gt;.
-     */
-    public GenPolynomial<C> fromInteger(long a) {
-        return new GenPolynomial<C>(this, coFac.fromInteger(a), evzero);
-    }
-
-    /**
-     * Get a (constant) GenPolynomial&lt;C&gt; element from a BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a GenPolynomial&lt;C&gt;.
-     */
-    public GenPolynomial<C> fromInteger(BigInteger a) {
-        return new GenPolynomial<C>(this, coFac.fromInteger(a), evzero);
-    }
-
-    /**
-     * Random polynomial. Generates a random polynomial with k = 5, l = n, d =
-     * (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
-     *
-     * @param n number of terms.
-     * @return a random polynomial.
-     */
-    public GenPolynomial<C> random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * Random polynomial. Generates a random polynomial with k = 5, l = n, d =
-     * n, q = (nvar == 1) ? 0.5 : 0.3.
-     *
-     * @param n   number of terms.
-     * @param rnd is a source for random bits.
-     * @return a random polynomial.
-     */
-    public GenPolynomial<C> random(int n, Random rnd) {
-        if (nvar == 1) {
-            return random(3, n, n, 0.5f, rnd);
-        }
-        return random(3, n, n, 0.3f, rnd);
-    }
-
-    /**
      * Generate a random polynomial.
      *
      * @param k bitsize of random coefficients.
@@ -759,17 +678,6 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
     }
 
     /**
-     * Copy polynomial c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public GenPolynomial<C> copy(GenPolynomial<C> c) {
-        //System.out.println("GP copy = " + this);
-        return new GenPolynomial<C>(this, c.val);
-    }
-
-    /**
      * Copy polynomial list.
      *
      * @param L polynomial list
@@ -784,39 +692,6 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
             R.add(copy(a));
         }
         return R;
-    }
-
-    /**
-     * Parse a polynomial with the use of GenPolynomialTokenizer.
-     *
-     * @param s String.
-     * @return GenPolynomial from s.
-     */
-    public GenPolynomial<C> parse(String s) {
-        String val = s;
-        if (!s.contains("|")) {
-            val = val.replace("{", "").replace("}", "");
-        }
-        return parse(new StringReader(val));
-    }
-
-    /**
-     * Parse a polynomial with the use of GenPolynomialTokenizer.
-     *
-     * @param r Reader.
-     * @return next GenPolynomial from r.
-     */
-    @SuppressWarnings({"unchecked", "cast"})
-    public GenPolynomial<C> parse(Reader r) {
-        GenPolynomialTokenizer pt = new GenPolynomialTokenizer(this, r);
-        GenPolynomial<C> p = null;
-        try {
-            p = (GenPolynomial<C>) pt.nextPolynomial();
-        } catch (IOException e) {
-            logger.error(e.toString() + " parse " + this);
-            p = ZERO;
-        }
-        return p;
     }
 
     /**
@@ -930,6 +805,141 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
     }
 
     /**
+     * Is this structure finite or infinite.
+     *
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
+     */
+    public boolean isFinite() {
+        return (nvar == 0) && coFac.isFinite();
+    }
+
+    /**
+     * Get a (constant) GenPolynomial&lt;C&gt; element from a long value.
+     *
+     * @param a long.
+     * @return a GenPolynomial&lt;C&gt;.
+     */
+    public GenPolynomial<C> fromInteger(long a) {
+        return new GenPolynomial<C>(this, coFac.fromInteger(a), evzero);
+    }
+
+    /**
+     * Get a (constant) GenPolynomial&lt;C&gt; element from a BigInteger value.
+     *
+     * @param a BigInteger.
+     * @return a GenPolynomial&lt;C&gt;.
+     */
+    public GenPolynomial<C> fromInteger(BigInteger a) {
+        return new GenPolynomial<C>(this, coFac.fromInteger(a), evzero);
+    }
+
+    /**
+     * Random polynomial. Generates a random polynomial with k = 5, l = n, d =
+     * (nvar == 1) ? n : 3, q = (nvar == 1) ? 0.7 : 0.3.
+     *
+     * @param n number of terms.
+     * @return a random polynomial.
+     */
+    public GenPolynomial<C> random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * Random polynomial. Generates a random polynomial with k = 5, l = n, d =
+     * n, q = (nvar == 1) ? 0.5 : 0.3.
+     *
+     * @param n   number of terms.
+     * @param rnd is a source for random bits.
+     * @return a random polynomial.
+     */
+    public GenPolynomial<C> random(int n, Random rnd) {
+        if (nvar == 1) {
+            return random(3, n, n, 0.5f, rnd);
+        }
+        return random(3, n, n, 0.3f, rnd);
+    }
+
+    /**
+     * Copy polynomial c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public GenPolynomial<C> copy(GenPolynomial<C> c) {
+        //System.out.println("GP copy = " + this);
+        return new GenPolynomial<C>(this, c.val);
+    }
+
+    /**
+     * Parse a polynomial with the use of GenPolynomialTokenizer.
+     *
+     * @param s String.
+     * @return GenPolynomial from s.
+     */
+    public GenPolynomial<C> parse(String s) {
+        String val = s;
+        if (!s.contains("|")) {
+            val = val.replace("{", "").replace("}", "");
+        }
+        return parse(new StringReader(val));
+    }
+
+    /**
+     * Parse a polynomial with the use of GenPolynomialTokenizer.
+     *
+     * @param r Reader.
+     * @return next GenPolynomial from r.
+     */
+    @SuppressWarnings({"unchecked", "cast"})
+    public GenPolynomial<C> parse(Reader r) {
+        GenPolynomialTokenizer pt = new GenPolynomialTokenizer(this, r);
+        GenPolynomial<C> p = null;
+        try {
+            p = (GenPolynomial<C>) pt.nextPolynomial();
+        } catch (IOException e) {
+            logger.error(e.toString() + " parse " + this);
+            p = ZERO;
+        }
+        return p;
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        StringBuffer s = new StringBuffer();
+        switch (Scripting.getLang()) {
+            case Ruby:
+                s.append("PolyRing.new(");
+                break;
+            case Python:
+            default:
+                s.append("PolyRing(");
+        }
+        if (coFac instanceof RingElem) {
+            s.append(((RingElem<C>) coFac).toScriptFactory());
+        } else {
+            s.append(coFac.toScript().trim());
+        }
+        s.append(",\"" + varsToString() + "\"");
+        String to = tord.toScript();
+        //if (tord.getEvord() == TermOrder.INVLEX) {
+        //    to = "PolyRing.lex";
+        //}
+        //if (tord.getEvord() == TermOrder.IGRLEX) {
+        //    to = "PolyRing.grad";
+        //}
+        s.append("," + to);
+        s.append(")");
+        return s.toString();
+    }
+
+    /**
      * Get a list of the generating elements excluding the module variables.
      *
      * @param modv number of module variables
@@ -944,16 +954,6 @@ public class GenPolynomialRing<C extends RingElem<C>> implements RingFactory<Gen
         }
         gens.addAll(univs);
         return gens;
-    }
-
-    /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
-     */
-    public boolean isFinite() {
-        return (nvar == 0) && coFac.isFinite();
     }
 
     /**

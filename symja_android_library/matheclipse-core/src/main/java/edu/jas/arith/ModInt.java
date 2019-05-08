@@ -137,18 +137,6 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return ring.modul;
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public ModIntRing factory() {
-        return ring;
-    }
-
-
     /**
      * Get the symmetric value part.
      *
@@ -162,7 +150,6 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return val;
     }
 
-
     /**
      * Return a BigInteger from this Element.
      *
@@ -171,7 +158,6 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
     public BigInteger getInteger() {
         return new BigInteger(val);
     }
-
 
     /**
      * Return a symmetric BigInteger from this Element.
@@ -187,94 +173,15 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return new BigInteger(v);
     }
 
-
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public ModInt copy() {
         return new ModInt(ring, val);
     }
-
-
-    /**
-     * Is ModInt number zero.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return val == 0;
-    }
-
-
-    /**
-     * Is ModInt number one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return val == 1L;
-    }
-
-
-    /**
-     * Is ModInt number a unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        if (isZERO()) {
-            return false;
-        }
-        if (ring.isField()) {
-            return true;
-        }
-        int g = gcd(ring.modul, val);
-        return (g == 1L || g == -1L);
-    }
-
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return Integer.toString(val);
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
 
     /**
      * ModInt comparison.
@@ -294,53 +201,49 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return (val < v ? -1 : 0);
     }
 
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public ModIntRing factory() {
+        return ring;
+    }
 
     /**
-     * Comparison with any other object.
+     * Get a scripting compatible string representation.
      *
-     * @see Object#equals(Object)
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public boolean equals(Object b) {
-        if (!(b instanceof ModInt)) {
-            return false;
-        }
-        return (0 == compareTo((ModInt) b));
+    public String toScript() {
+        // Python case
+        return toString();
     }
 
-
     /**
-     * Hash code for this ModInt.
+     * Get a scripting compatible string representation of the factory.
      *
-     * @see Object#hashCode()
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
      */
     @Override
-    public int hashCode() {
-        return val;
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
     }
-
 
     /**
-     * ModInt absolute value.
+     * Is ModInt number zero.
      *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
      */
-    public ModInt abs() {
-        return new ModInt(ring, (val < 0 ? -val : val));
+    public boolean isZERO() {
+        return val == 0;
     }
-
-
-    /**
-     * ModInt negative.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public ModInt negate() {
-        return new ModInt(ring, -val);
-    }
-
 
     /**
      * ModInt signum.
@@ -355,6 +258,15 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return (val < 0 ? -1 : 0);
     }
 
+    /**
+     * ModInt summation.
+     *
+     * @param S ModInt.
+     * @return this+S.
+     */
+    public ModInt sum(ModInt S) {
+        return new ModInt(ring, val + S.val);
+    }
 
     /**
      * ModInt subtraction.
@@ -366,6 +278,62 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return new ModInt(ring, val - S.val);
     }
 
+    /**
+     * ModInt negative.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public ModInt negate() {
+        return new ModInt(ring, -val);
+    }
+
+    /**
+     * ModInt absolute value.
+     *
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public ModInt abs() {
+        return new ModInt(ring, (val < 0 ? -val : val));
+    }
+
+    /**
+     * Is ModInt number one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        return val == 1L;
+    }
+
+    /**
+     * Is ModInt number a unit.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        if (isZERO()) {
+            return false;
+        }
+        if (ring.isField()) {
+            return true;
+        }
+        int g = gcd(ring.modul, val);
+        return (g == 1L || g == -1L);
+    }
+
+    /**
+     * ModInt multiply.
+     *
+     * @param S ModInt.
+     * @return this*S.
+     */
+    public ModInt multiply(ModInt S) {
+        return new ModInt(ring, val * S.val);
+    }
 
     /**
      * ModInt divide.
@@ -388,26 +356,6 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         }
     }
 
-
-    /**
-     * ModInt inverse.
-     *
-     * @return S with S=1/this if defined.
-     * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public ModInt inverse() /*throws NotInvertibleException*/ {
-        try {
-            return new ModInt(ring, modInverse(val, ring.modul));
-        } catch (ArithmeticException e) {
-            int g = gcd(val, ring.modul);
-            int f = ring.modul / g;
-            throw new ModularNotInvertibleException(e, new BigInteger(ring.modul), new BigInteger(g),
-                    new BigInteger(f));
-        }
-    }
-
-
     /**
      * ModInt remainder.
      *
@@ -427,28 +375,56 @@ public final class ModInt extends RingElemImpl<ModInt> implements GcdRingElem<Mo
         return new ModInt(ring, val % S.val);
     }
 
-
     /**
-     * ModInt multiply.
+     * ModInt inverse.
      *
-     * @param S ModInt.
-     * @return this*S.
+     * @return S with S=1/this if defined.
+     * @throws NotInvertibleException if the element is not invertible.
+     * @see edu.jas.structure.RingElem#inverse()
      */
-    public ModInt multiply(ModInt S) {
-        return new ModInt(ring, val * S.val);
+    public ModInt inverse() /*throws NotInvertibleException*/ {
+        try {
+            return new ModInt(ring, modInverse(val, ring.modul));
+        } catch (ArithmeticException e) {
+            int g = gcd(val, ring.modul);
+            int f = ring.modul / g;
+            throw new ModularNotInvertibleException(e, new BigInteger(ring.modul), new BigInteger(g),
+                    new BigInteger(f));
+        }
     }
 
-
     /**
-     * ModInt summation.
+     * Hash code for this ModInt.
      *
-     * @param S ModInt.
-     * @return this+S.
+     * @see java.lang.Object#hashCode()
      */
-    public ModInt sum(ModInt S) {
-        return new ModInt(ring, val + S.val);
+    @Override
+    public int hashCode() {
+        return val;
     }
 
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object b) {
+        if (!(b instanceof ModInt)) {
+            return false;
+        }
+        return (0 == compareTo((ModInt) b));
+    }
+
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return Integer.toString(val);
+    }
 
     /**
      * ModInteger greatest common divisor.

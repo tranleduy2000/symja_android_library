@@ -5,8 +5,8 @@
 package edu.jas.application;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 
@@ -95,13 +95,13 @@ import edu.jas.ufd.QuotientRing;
  *
  * <b>Note:</b> Not all combinations are meanigful
  * @see edu.jas.gb.GroebnerBase
- * @see GBFactory
+ * @see edu.jas.gbufd.GBFactory
  */
 
 public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(GBAlgorithmBuilder.class);
+    private static final Logger logger = LogManager.getLogger(GBAlgorithmBuilder.class);
     /**
      * The current polynomial ring.
      */
@@ -114,6 +114,14 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
      * The current GB algorithm implementation.
      */
     private GroebnerBaseAbstract<C> algo;
+
+
+    /**
+     * Constructor not for use.
+     */
+    protected GBAlgorithmBuilder() {
+        throw new IllegalArgumentException("do not use this constructor");
+    }
 
 
     /**
@@ -414,7 +422,7 @@ public class GBAlgorithmBuilder<C extends GcdRingElem<C>> implements Serializabl
     /**
      * String representation of the GB algorithm implementation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

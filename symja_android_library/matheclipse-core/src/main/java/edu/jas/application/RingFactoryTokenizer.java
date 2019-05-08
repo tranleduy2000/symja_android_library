@@ -5,9 +5,8 @@
 package edu.jas.application;
 
 
-import com.duy.util.DScanner;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import edu.jas.arith.BigComplex;
 import edu.jas.arith.BigDecimal;
@@ -50,12 +50,12 @@ import edu.jas.ufd.QuotientRing;
  * also read QuotientRing factory.
  *
  * @author Heinz Kredel
- * @see GenPolynomialTokenizer
+ * @see edu.jas.poly.GenPolynomialTokenizer
  */
 public class RingFactoryTokenizer {
 
 
-    private static final Logger logger = Logger.getLogger(RingFactoryTokenizer.class);
+    private static final Logger logger = LogManager.getLogger(RingFactoryTokenizer.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -161,14 +161,14 @@ public class RingFactoryTokenizer {
      * @param s String. Syntax:
      *
      *          <pre>
-     *                   (n1,...,nk)
-     *                              </pre>
+     *          (n1,...,nk)
+     *                     </pre>
      *          <p>
      *          or
      *
      *          <pre>
-     *                   (n1 ... nk)
-     *                              </pre>
+     *          (n1 ... nk)
+     *                     </pre>
      *          <p>
      *          parenthesis are optional.
      * @return array of variable names found in s.
@@ -190,7 +190,7 @@ public class RingFactoryTokenizer {
         }
         st = st.replaceAll(",", " ");
         List<String> sl = new ArrayList<String>();
-        DScanner sc = new DScanner(st);
+        Scanner sc = new Scanner(st);
         while (sc.hasNext()) {
             String sn = sc.next();
             sl.add(sn);

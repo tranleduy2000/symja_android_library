@@ -5,7 +5,8 @@
 package edu.jas.ufd;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.PolyUtil;
@@ -23,7 +24,7 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
         GreatestCommonDivisorAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(GreatestCommonDivisorPrimitive.class);
+    private static final Logger logger = LogManager.getLogger(GreatestCommonDivisorPrimitive.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -122,7 +123,9 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
             q = P;
             r = S;
         }
-
+        if (debug) {
+            logger.debug("degrees: e = " + e + ", f = " + f);
+        }
         r = r.abs();
         q = q.abs();
         GenPolynomial<C> a = recursiveContent(r);
@@ -141,6 +144,9 @@ public class GreatestCommonDivisorPrimitive<C extends GcdRingElem<C>> extends
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
             x = PolyUtil.recursivePseudoRemainder(q, r);
+            if (logger.isDebugEnabled()) {
+                logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
+            }
             q = r;
             r = recursivePrimitivePart(x);
         }

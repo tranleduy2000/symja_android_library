@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import edu.jas.structure.RingFactory;
 public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(ResidueRing.class);
+    private static final Logger logger = LogManager.getLogger(ResidueRing.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -71,30 +71,6 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
         modul = m;
     }
 
-
-    /**
-     * Is this structure finite or infinite.
-     *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
-     */
-    public boolean isFinite() {
-        throw new UnsupportedOperationException("not implemented");
-        //return ring.isFinite();
-    }
-
-
-    /**
-     * Copy Residue element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public Residue<C> copy(Residue<C> c) {
-        return new Residue<C>(c.ring, c.val);
-    }
-
-
     /**
      * Get the zero element.
      *
@@ -103,7 +79,6 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
     public Residue<C> getZERO() {
         return new Residue<C>(this, ring.getZERO());
     }
-
 
     /**
      * Get the one element.
@@ -118,6 +93,23 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
         return one;
     }
 
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return ring.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return ring.isAssociative();
+    }
 
     /**
      * Get a list of the generating elements.
@@ -134,26 +126,105 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
         return gens;
     }
 
-
     /**
-     * Query if this ring is commutative.
+     * Is this structure finite or infinite.
      *
-     * @return true if this ring is commutative, else false.
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
      */
-    public boolean isCommutative() {
-        return ring.isCommutative();
+    public boolean isFinite() {
+        throw new UnsupportedOperationException("not implemented");
+        //return ring.isFinite();
     }
 
-
     /**
-     * Query if this ring is associative.
+     * Get a Residue element from a long value.
      *
-     * @return true if this ring is associative, else false.
+     * @param a long.
+     * @return a Residue.
      */
-    public boolean isAssociative() {
-        return ring.isAssociative();
+    public Residue<C> fromInteger(long a) {
+        return new Residue<C>(this, ring.fromInteger(a));
     }
 
+    /**
+     * Get a Residue element from a BigInteger value.
+     *
+     * @param a BigInteger.
+     * @return a Residue.
+     */
+    public Residue<C> fromInteger(java.math.BigInteger a) {
+        return new Residue<C>(this, ring.fromInteger(a));
+    }
+
+    /**
+     * Residue random.
+     *
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random residue element.
+     */
+    public Residue<C> random(int n) {
+        C x = ring.random(n);
+        // x = x.sum( ring.getONE() );
+        return new Residue<C>(this, x);
+    }
+
+    /**
+     * Residue random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random residue element.
+     */
+    public Residue<C> random(int n, Random rnd) {
+        C x = ring.random(n, rnd);
+        // x = x.sum( ring.getONE() );
+        return new Residue<C>(this, x);
+    }
+
+    /**
+     * Copy Residue element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public Residue<C> copy(Residue<C> c) {
+        return new Residue<C>(c.ring, c.val);
+    }
+
+    /**
+     * Parse Residue from String.
+     *
+     * @param s String.
+     * @return Residue from s.
+     */
+    public Residue<C> parse(String s) {
+        C x = ring.parse(s);
+        return new Residue<C>(this, x);
+    }
+
+    /**
+     * Parse Residue from Reader.
+     *
+     * @param r Reader.
+     * @return next Residue from r.
+     */
+    public Residue<C> parse(Reader r) {
+        C x = ring.parse(r);
+        return new Residue<C>(this, x);
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        return "ResidueRing(" + modul.toScript() + ")";
+    }
 
     /**
      * Query if this ring is a field.
@@ -171,7 +242,6 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
         return false;
     }
 
-
     /**
      * Characteristic of this ring.
      *
@@ -181,57 +251,23 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
         return ring.characteristic();
     }
 
-
     /**
-     * Get a Residue element from a BigInteger value.
+     * Hash code for this residue ring.
      *
-     * @param a BigInteger.
-     * @return a Residue.
-     */
-    public Residue<C> fromInteger(java.math.BigInteger a) {
-        return new Residue<C>(this, ring.fromInteger(a));
-    }
-
-
-    /**
-     * Get a Residue element from a long value.
-     *
-     * @param a long.
-     * @return a Residue.
-     */
-    public Residue<C> fromInteger(long a) {
-        return new Residue<C>(this, ring.fromInteger(a));
-    }
-
-
-    /**
-     * Get the String representation as RingFactory.
-     *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        return "Residue[ " + modul.toString() + " ]";
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = 37 * h + modul.hashCode();
+        return h;
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return "ResidueRing(" + modul.toScript() + ")";
-    }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -249,69 +285,14 @@ public class ResidueRing<C extends RingElem<C>> implements RingFactory<Residue<C
         return modul.equals(a.modul);
     }
 
-
     /**
-     * Hash code for this residue ring.
+     * Get the String representation as RingFactory.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = 37 * h + modul.hashCode();
-        return h;
-    }
-
-
-    /**
-     * Residue random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random residue element.
-     */
-    public Residue<C> random(int n) {
-        C x = ring.random(n);
-        // x = x.sum( ring.getONE() );
-        return new Residue<C>(this, x);
-    }
-
-
-    /**
-     * Residue random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random residue element.
-     */
-    public Residue<C> random(int n, Random rnd) {
-        C x = ring.random(n, rnd);
-        // x = x.sum( ring.getONE() );
-        return new Residue<C>(this, x);
-    }
-
-
-    /**
-     * Parse Residue from String.
-     *
-     * @param s String.
-     * @return Residue from s.
-     */
-    public Residue<C> parse(String s) {
-        C x = ring.parse(s);
-        return new Residue<C>(this, x);
-    }
-
-
-    /**
-     * Parse Residue from Reader.
-     *
-     * @param r Reader.
-     * @return next Residue from r.
-     */
-    public Residue<C> parse(Reader r) {
-        C x = ring.parse(r);
-        return new Residue<C>(this, x);
+    public String toString() {
+        return "Residue[ " + modul.toString() + " ]";
     }
 
 }

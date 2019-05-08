@@ -76,18 +76,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         this(r, r.algebraic.getZERO());
     }
 
-
-    /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public RealAlgebraicRing<C> factory() {
-        return ring;
-    }
-
-
     /**
      * Copy this.
      *
@@ -97,103 +85,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
     public RealAlgebraicNumber<C> copy() {
         return new RealAlgebraicNumber<C>(ring, number);
     }
-
-
-    /**
-     * Return a BigRational approximation of this Element.
-     *
-     * @return a BigRational approximation of this.
-     * @see edu.jas.arith.Rational#getRational()
-     */
-    public BigRational getRational() {
-        return magnitude();
-    }
-
-
-    /**
-     * Is RealAlgebraicNumber zero.
-     *
-     * @return If this is 0 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isZERO()
-     */
-    public boolean isZERO() {
-        return number.isZERO();
-        //return magnitude().isZERO();
-    }
-
-
-    /**
-     * Is RealAlgebraicNumber one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return number.isONE();
-    }
-
-
-    /**
-     * Is RealAlgebraicNumber unit.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        return number.isUnit();
-    }
-
-
-    /**
-     * Is RealAlgebraicNumber a root of unity.
-     *
-     * @return true if |this**i| == 1, for some 0 &lt; i &le; deg(modul), else
-     * false.
-     */
-    public boolean isRootOfUnity() {
-        return number.isRootOfUnity();
-    }
-
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        if (PrettyPrint.isTrue()) {
-            return "{ " + number.toString() + " }";
-        }
-        return "Real" + number.toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return number.toScript();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
 
     /**
      * RealAlgebraicNumber comparison.
@@ -216,6 +107,197 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         return s;
     }
 
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public RealAlgebraicRing<C> factory() {
+        return ring;
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        return number.toScript();
+    }
+
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
+    }
+
+    /**
+     * Return a BigRational approximation of this Element.
+     *
+     * @return a BigRational approximation of this.
+     * @see edu.jas.arith.Rational#getRational()
+     */
+    public BigRational getRational() {
+        return magnitude();
+    }
+
+    /**
+     * Is RealAlgebraicNumber zero.
+     *
+     * @return If this is 0 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isZERO()
+     */
+    public boolean isZERO() {
+        return number.isZERO();
+        //return magnitude().isZERO();
+    }
+
+    /**
+     * RealAlgebraicNumber signum. <b>Note: </b> Modifies ring.root eventually.
+     *
+     * @return real signum(this).
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        Interval<C> v = ring.engine.invariantSignInterval(ring.root, ring.algebraic.modul, number.val);
+        ring.setRoot(v);
+        return ring.engine.realIntervalSign(v, ring.algebraic.modul, number.val);
+    }
+
+    /**
+     * RealAlgebraicNumber summation.
+     *
+     * @param S RealAlgebraicNumber.
+     * @return this+S.
+     */
+    public RealAlgebraicNumber<C> sum(RealAlgebraicNumber<C> S) {
+        return new RealAlgebraicNumber<C>(ring, number.sum(S.number));
+    }
+
+    /**
+     * RealAlgebraicNumber subtraction.
+     *
+     * @param S RealAlgebraicNumber.
+     * @return this-S.
+     */
+    public RealAlgebraicNumber<C> subtract(RealAlgebraicNumber<C> S) {
+        return new RealAlgebraicNumber<C>(ring, number.subtract(S.number));
+    }
+
+    /**
+     * RealAlgebraicNumber negate.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public RealAlgebraicNumber<C> negate() {
+        return new RealAlgebraicNumber<C>(ring, number.negate());
+    }
+
+    /**
+     * RealAlgebraicNumber absolute value.
+     *
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public RealAlgebraicNumber<C> abs() {
+        if (this.signum() < 0) {
+            return new RealAlgebraicNumber<C>(ring, number.negate());
+        }
+        return this;
+    }
+
+    /**
+     * Is RealAlgebraicNumber one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        return number.isONE();
+    }
+
+    /**
+     * Is RealAlgebraicNumber unit.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        return number.isUnit();
+    }
+
+    /**
+     * RealAlgebraicNumber multiplication.
+     *
+     * @param S RealAlgebraicNumber.
+     * @return this*S.
+     */
+    public RealAlgebraicNumber<C> multiply(RealAlgebraicNumber<C> S) {
+        return new RealAlgebraicNumber<C>(ring, number.multiply(S.number));
+    }
+
+    /**
+     * RealAlgebraicNumber division.
+     *
+     * @param S RealAlgebraicNumber.
+     * @return this/S.
+     */
+    public RealAlgebraicNumber<C> divide(RealAlgebraicNumber<C> S) {
+        return multiply(S.inverse());
+    }
+
+    /**
+     * RealAlgebraicNumber remainder.
+     *
+     * @param S RealAlgebraicNumber.
+     * @return this - (this/S)*S.
+     */
+    public RealAlgebraicNumber<C> remainder(RealAlgebraicNumber<C> S) {
+        return new RealAlgebraicNumber<C>(ring, number.remainder(S.number));
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a RealAlgebraicNumber
+     * @return [this/S, this - (this/S)*S].
+     */
+    @SuppressWarnings("unchecked")
+    public RealAlgebraicNumber<C>[] quotientRemainder(RealAlgebraicNumber<C> S) {
+        return new RealAlgebraicNumber[]{divide(S), remainder(S)};
+    }
+
+    /**
+     * RealAlgebraicNumber inverse.
+     *
+     * @return S with S = 1/this if defined.
+     * @throws NotInvertibleException if the element is not invertible.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public RealAlgebraicNumber<C> inverse() {
+        return new RealAlgebraicNumber<C>(ring, number.inverse());
+    }
+
+    /**
+     * Is RealAlgebraicNumber a root of unity.
+     *
+     * @return true if |this**i| == 1, for some 0 &lt; i &le; deg(modul), else
+     * false.
+     */
+    public boolean isRootOfUnity() {
+        return number.isRootOfUnity();
+    }
 
     /**
      * RealAlgebraicNumber comparison.
@@ -229,11 +311,20 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         return s;
     }
 
+    /**
+     * Hash code for this RealAlgebraicNumber.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * number.val.hashCode() + ring.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -251,42 +342,18 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         return number.equals(a.number);
     }
 
-
     /**
-     * Hash code for this RealAlgebraicNumber.
+     * Get the String representation as RingElem.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return 37 * number.val.hashCode() + ring.hashCode();
-    }
-
-
-    /**
-     * RealAlgebraicNumber absolute value.
-     *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public RealAlgebraicNumber<C> abs() {
-        if (this.signum() < 0) {
-            return new RealAlgebraicNumber<C>(ring, number.negate());
+    public String toString() {
+        if (PrettyPrint.isTrue()) {
+            return "{ " + number.toString() + " }";
         }
-        return this;
+        return "Real" + number.toString();
     }
-
-
-    /**
-     * RealAlgebraicNumber summation.
-     *
-     * @param S RealAlgebraicNumber.
-     * @return this+S.
-     */
-    public RealAlgebraicNumber<C> sum(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.sum(S.number));
-    }
-
 
     /**
      * RealAlgebraicNumber summation.
@@ -298,7 +365,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         return new RealAlgebraicNumber<C>(ring, number.sum(c));
     }
 
-
     /**
      * RealAlgebraicNumber summation.
      *
@@ -309,31 +375,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         return new RealAlgebraicNumber<C>(ring, number.sum(c));
     }
 
-
-    /**
-     * RealAlgebraicNumber negate.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public RealAlgebraicNumber<C> negate() {
-        return new RealAlgebraicNumber<C>(ring, number.negate());
-    }
-
-
-    /**
-     * RealAlgebraicNumber signum. <b>Note: </b> Modifies ring.root eventually.
-     *
-     * @return real signum(this).
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        Interval<C> v = ring.engine.invariantSignInterval(ring.root, ring.algebraic.modul, number.val);
-        ring.setRoot(v);
-        return ring.engine.realIntervalSign(v, ring.algebraic.modul, number.val);
-    }
-
-
     /**
      * RealAlgebraicNumber half interval.
      */
@@ -342,7 +383,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         //System.out.println("old v = " + ring.root + ", new v = " + v);
         ring.setRoot(v);
     }
-
 
     /**
      * RealAlgebraicNumber magnitude.
@@ -362,7 +402,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
         //throw new RuntimeException("Rational expected, but was " + ev.getClass());
     }
 
-
     /**
      * RealAlgebraicNumber magnitude.
      *
@@ -371,75 +410,6 @@ public class RealAlgebraicNumber<C extends GcdRingElem<C> & Rational> extends Ri
     public BigDecimal decimalMagnitude() {
         return new BigDecimal(magnitude());
     }
-
-
-    /**
-     * RealAlgebraicNumber subtraction.
-     *
-     * @param S RealAlgebraicNumber.
-     * @return this-S.
-     */
-    public RealAlgebraicNumber<C> subtract(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.subtract(S.number));
-    }
-
-
-    /**
-     * RealAlgebraicNumber division.
-     *
-     * @param S RealAlgebraicNumber.
-     * @return this/S.
-     */
-    public RealAlgebraicNumber<C> divide(RealAlgebraicNumber<C> S) {
-        return multiply(S.inverse());
-    }
-
-
-    /**
-     * RealAlgebraicNumber inverse.
-     *
-     * @return S with S = 1/this if defined.
-     * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public RealAlgebraicNumber<C> inverse() {
-        return new RealAlgebraicNumber<C>(ring, number.inverse());
-    }
-
-
-    /**
-     * RealAlgebraicNumber remainder.
-     *
-     * @param S RealAlgebraicNumber.
-     * @return this - (this/S)*S.
-     */
-    public RealAlgebraicNumber<C> remainder(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.remainder(S.number));
-    }
-
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a RealAlgebraicNumber
-     * @return [this/S, this - (this/S)*S].
-     */
-    @SuppressWarnings("unchecked")
-    public RealAlgebraicNumber<C>[] quotientRemainder(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber[]{divide(S), remainder(S)};
-    }
-
-
-    /**
-     * RealAlgebraicNumber multiplication.
-     *
-     * @param S RealAlgebraicNumber.
-     * @return this*S.
-     */
-    public RealAlgebraicNumber<C> multiply(RealAlgebraicNumber<C> S) {
-        return new RealAlgebraicNumber<C>(ring, number.multiply(S.number));
-    }
-
 
     /**
      * RealAlgebraicNumber multiplication.

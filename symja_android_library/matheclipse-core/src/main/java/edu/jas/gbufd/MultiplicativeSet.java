@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import edu.jas.structure.GcdRingElem;
 public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(MultiplicativeSet.class);
+    private static final Logger logger = LogManager.getLogger(MultiplicativeSet.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -71,17 +71,19 @@ public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable
         mset = ms;
     }
 
-
     /**
-     * toString.
+     * Hash code for this condition.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        return "MultiplicativeSet" + mset;
+    public int hashCode() {
+        int h;
+        h = ring.hashCode();
+        h = h << 17;
+        h += mset.hashCode();
+        return h;
     }
-
 
     /**
      * Equals.
@@ -107,21 +109,15 @@ public class MultiplicativeSet<C extends GcdRingElem<C>> implements Serializable
         return mset.equals(c.mset);
     }
 
-
     /**
-     * Hash code for this condition.
+     * toString.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h;
-        h = ring.hashCode();
-        h = h << 17;
-        h += mset.hashCode();
-        return h;
+    public String toString() {
+        return "MultiplicativeSet" + mset;
     }
-
 
     /**
      * Is set.

@@ -149,7 +149,7 @@ public final class ExpVectorInteger extends ExpVector
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public ExpVectorInteger copy() {
@@ -158,6 +158,16 @@ public final class ExpVectorInteger extends ExpVector
         return new ExpVectorInteger(w);
     }
 
+    /**
+     * ExpVector compareTo.
+     *
+     * @param V
+     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
+     */
+    @Override
+    public int compareTo(ExpVector V) {
+        return this.invLexCompareTo(V);
+    }
 
     /**
      * Get the exponent vector.
@@ -166,13 +176,12 @@ public final class ExpVectorInteger extends ExpVector
      */
     @Override
     public long[] getVal() {
-        long v[] = new long[val.length];
+        long[] v = new long[val.length];
         for (int i = 0; i < val.length; i++) {
             v[i] = val[i];
         }
         return v;
     }
-
 
     /**
      * Get the exponent at position i.
@@ -184,7 +193,6 @@ public final class ExpVectorInteger extends ExpVector
     public long getVal(int i) {
         return val[i];
     }
-
 
     /**
      * Set the exponent at position i to e.
@@ -203,22 +211,6 @@ public final class ExpVectorInteger extends ExpVector
         hash = 0; // beware of race condition
         return x;
     }
-
-
-    /**
-     * Set the exponent at position i to e.
-     *
-     * @param i
-     * @param e
-     * @return old val[i].
-     */
-    protected int setVal(int i, int e) {
-        int x = val[i];
-        val[i] = e;
-        hash = 0; // beware of race condition
-        return x;
-    }
-
 
     /**
      * Get the length of this exponent vector.
@@ -372,22 +364,20 @@ public final class ExpVectorInteger extends ExpVector
         return new ExpVectorInteger(w);
     }
 
-
     /**
-     * Get the string representation.
+     * hashCode for this exponent vector.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode() Only for findbugs.
      */
     @Override
-    public String toString() {
-        return super.toString() + ":int";
+    public int hashCode() {
+        return super.hashCode();
     }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -400,146 +390,15 @@ public final class ExpVectorInteger extends ExpVector
         return (0 == t);
     }
 
-
     /**
-     * hashCode for this exponent vector.
+     * Get the string representation.
      *
-     * @see Object#hashCode() Only for findbugs.
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return super.toString() + ":int";
     }
-
-
-    /**
-     * ExpVector absolute value.
-     *
-     * @return abs(this).
-     */
-    @Override
-    public ExpVectorInteger abs() {
-        int[] u = val;
-        int[] w = new int[u.length];
-        for (int i = 0; i < u.length; i++) {
-            if (u[i] >= 0L) {
-                w[i] = u[i];
-            } else {
-                w[i] = -u[i];
-            }
-        }
-        return new ExpVectorInteger(w);
-        //return EVABS(this);
-    }
-
-
-    /**
-     * ExpVector negate.
-     *
-     * @return -this.
-     */
-    @Override
-    public ExpVectorInteger negate() {
-        int[] u = val;
-        int[] w = new int[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = -u[i];
-        }
-        return new ExpVectorInteger(w);
-        // return EVNEG(this);
-    }
-
-
-    /**
-     * ExpVector summation.
-     *
-     * @param V
-     * @return this+V.
-     */
-    @Override
-    public ExpVectorInteger sum(ExpVector V) {
-        int[] u = val;
-        int[] v = ((ExpVectorInteger) V).val;
-        int[] w = new int[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = u[i] + v[i];
-        }
-        return new ExpVectorInteger(w);
-        // return EVSUM(this, V);
-    }
-
-
-    /**
-     * ExpVector subtract. Result may have negative entries.
-     *
-     * @param V
-     * @return this-V.
-     */
-    @Override
-    public ExpVectorInteger subtract(ExpVector V) {
-        int[] u = val;
-        int[] v = ((ExpVectorInteger) V).val;
-        int[] w = new int[u.length];
-        for (int i = 0; i < u.length; i++) {
-            w[i] = u[i] - v[i];
-        }
-        return new ExpVectorInteger(w);
-    }
-
-
-    /**
-     * ExpVector multiply by scalar.
-     *
-     * @param s scalar
-     * @return s*this.
-     */
-    @Override
-    public ExpVectorInteger scalarMultiply(long s) {
-        if (s >= maxInt || s <= minInt) {
-            throw new IllegalArgumentException("scalar to large: " + s);
-        }
-        int[] u = val;
-        int[] w = new int[u.length];
-        int si = (int) s;
-        for (int i = 0; i < u.length; i++) {
-            w[i] = si * u[i];
-        }
-        return new ExpVectorInteger(w);
-    }
-
-
-    /**
-     * ExpVector substitution. Clone and set exponent to d at position i.
-     *
-     * @param i position.
-     * @param d new exponent.
-     * @return substituted ExpVector.
-     */
-    @Override
-    public ExpVectorInteger subst(int i, long d) {
-        ExpVectorInteger V = this.copy();
-        //long e = 
-        V.setVal(i, d);
-        return V;
-        //return EVSU(this, i, d);
-    }
-
-
-    /**
-     * ExpVector substitution. Clone and set exponent to d at position i.
-     *
-     * @param i position.
-     * @param d new exponent.
-     * @return substituted ExpVector.
-     */
-    public ExpVectorInteger subst(int i, int d) {
-        ExpVectorInteger V = this.copy();
-        //long e = 
-        V.setVal(i, d);
-        return V;
-        //return EVSU(this, i, d);
-    }
-
 
     /**
      * ExpVector signum.
@@ -563,6 +422,112 @@ public final class ExpVectorInteger extends ExpVector
         //return EVSIGN(this);
     }
 
+    /**
+     * ExpVector summation.
+     *
+     * @param V
+     * @return this+V.
+     */
+    @Override
+    public ExpVectorInteger sum(ExpVector V) {
+        int[] u = val;
+        int[] v = ((ExpVectorInteger) V).val;
+        int[] w = new int[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = u[i] + v[i];
+        }
+        return new ExpVectorInteger(w);
+        // return EVSUM(this, V);
+    }
+
+    /**
+     * ExpVector subtract. Result may have negative entries.
+     *
+     * @param V
+     * @return this-V.
+     */
+    @Override
+    public ExpVectorInteger subtract(ExpVector V) {
+        int[] u = val;
+        int[] v = ((ExpVectorInteger) V).val;
+        int[] w = new int[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = u[i] - v[i];
+        }
+        return new ExpVectorInteger(w);
+    }
+
+    /**
+     * ExpVector negate.
+     *
+     * @return -this.
+     */
+    @Override
+    public ExpVectorInteger negate() {
+        int[] u = val;
+        int[] w = new int[u.length];
+        for (int i = 0; i < u.length; i++) {
+            w[i] = -u[i];
+        }
+        return new ExpVectorInteger(w);
+        // return EVNEG(this);
+    }
+
+    /**
+     * ExpVector absolute value.
+     *
+     * @return abs(this).
+     */
+    @Override
+    public ExpVectorInteger abs() {
+        int[] u = val;
+        int[] w = new int[u.length];
+        for (int i = 0; i < u.length; i++) {
+            if (u[i] >= 0L) {
+                w[i] = u[i];
+            } else {
+                w[i] = -u[i];
+            }
+        }
+        return new ExpVectorInteger(w);
+        //return EVABS(this);
+    }
+
+    /**
+     * ExpVector multiply by scalar.
+     *
+     * @param s scalar
+     * @return s*this.
+     */
+    @Override
+    public ExpVectorInteger scalarMultiply(long s) {
+        if (s >= maxInt || s <= minInt) {
+            throw new IllegalArgumentException("scalar to large: " + s);
+        }
+        int[] u = val;
+        int[] w = new int[u.length];
+        int si = (int) s;
+        for (int i = 0; i < u.length; i++) {
+            w[i] = si * u[i];
+        }
+        return new ExpVectorInteger(w);
+    }
+
+    /**
+     * ExpVector substitution. Clone and set exponent to d at position i.
+     *
+     * @param i position.
+     * @param d new exponent.
+     * @return substituted ExpVector.
+     */
+    @Override
+    public ExpVectorInteger subst(int i, long d) {
+        ExpVectorInteger V = this.copy();
+        //long e =
+        V.setVal(i, d);
+        return V;
+        //return EVSU(this, i, d);
+    }
 
     /**
      * ExpVector total degree.
@@ -579,7 +544,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVTDEG(this);
     }
-
 
     /**
      * ExpVector maximal degree.
@@ -599,7 +563,6 @@ public final class ExpVectorInteger extends ExpVector
         //return EVMDEG(this);
     }
 
-
     /**
      * ExpVector minimal degree.
      *
@@ -617,7 +580,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector weighted degree.
      *
@@ -627,7 +589,7 @@ public final class ExpVectorInteger extends ExpVector
     @Override
     public long weightDeg(long[][] w) {
         if (w == null || w.length == 0) {
-            return totalDeg(); // assume weight 1 
+            return totalDeg(); // assume weight 1
         }
         long t = 0;
         int[] u = val;
@@ -640,7 +602,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector weighted degree.
      *
@@ -650,7 +611,7 @@ public final class ExpVectorInteger extends ExpVector
     @Override
     public long weightDeg(long[] w) {
         if (w == null || w.length == 0) {
-            return totalDeg(); // assume weight 1 
+            return totalDeg(); // assume weight 1
         }
         long t = 0;
         int[] u = val;
@@ -659,7 +620,6 @@ public final class ExpVectorInteger extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector least common multiple.
@@ -679,7 +639,6 @@ public final class ExpVectorInteger extends ExpVector
         //return EVLCM(this, V);
     }
 
-
     /**
      * ExpVector greatest common divisor.
      *
@@ -698,7 +657,6 @@ public final class ExpVectorInteger extends ExpVector
         //return EVGCD(this, V);
     }
 
-
     /**
      * ExpVector dependent variables.
      *
@@ -713,7 +671,6 @@ public final class ExpVectorInteger extends ExpVector
         }
         return l;
     }
-
 
     /**
      * ExpVector dependency on variables.
@@ -738,7 +695,6 @@ public final class ExpVectorInteger extends ExpVector
         return dep;
     }
 
-
     /**
      * ExpVector multiple test. Test if this is component wise greater or equal
      * to V.
@@ -760,19 +716,6 @@ public final class ExpVectorInteger extends ExpVector
         //return EVMT(this, V);
     }
 
-
-    /**
-     * ExpVector compareTo.
-     *
-     * @param V
-     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
-     */
-    @Override
-    public int compareTo(ExpVector V) {
-        return this.invLexCompareTo(V);
-    }
-
-
     /**
      * ExpVector inverse lexicographical compareTo.
      *
@@ -793,7 +736,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVILCP(this, V);
     }
-
 
     /**
      * ExpVector inverse lexicographical compareTo.
@@ -823,7 +765,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVILCP(this, V, begin, end);
     }
-
 
     /**
      * ExpVector inverse graded lexicographical compareTo.
@@ -866,7 +807,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVIGLC(this, V);
     }
-
 
     /**
      * ExpVector inverse graded lexicographical compareTo.
@@ -918,7 +858,6 @@ public final class ExpVectorInteger extends ExpVector
         //return EVIGLC(this, V, begin, end);
     }
 
-
     /**
      * ExpVector reverse inverse lexicographical compareTo.
      *
@@ -939,7 +878,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVRILCP(this, V);
     }
-
 
     /**
      * ExpVector reverse inverse lexicographical compareTo.
@@ -969,7 +907,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVRILCP(this, V, begin, end);
     }
-
 
     /**
      * ExpVector reverse inverse graded compareTo.
@@ -1012,7 +949,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVRIGLC(this, V);
     }
-
 
     /**
      * ExpVector reverse inverse graded compareTo.
@@ -1064,7 +1000,6 @@ public final class ExpVectorInteger extends ExpVector
         //return EVRIGLC(this, V, begin, end);
     }
 
-
     /**
      * ExpVector inverse total degree lexicographical compareTo.
      *
@@ -1106,7 +1041,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
     }
 
-
     /**
      * ExpVector reverse lexicographical inverse total degree compareTo.
      *
@@ -1147,7 +1081,6 @@ public final class ExpVectorInteger extends ExpVector
         }
         return t;
     }
-
 
     /**
      * ExpVector inverse weighted lexicographical compareTo.
@@ -1192,7 +1125,6 @@ public final class ExpVectorInteger extends ExpVector
         return t;
         //return EVIWLC(w, this, V);
     }
-
 
     /**
      * ExpVector inverse weighted lexicographical compareTo.
@@ -1244,6 +1176,35 @@ public final class ExpVectorInteger extends ExpVector
         }
         return t;
         //return EVIWLC(w, this, V, begin, end);
+    }
+
+    /**
+     * Set the exponent at position i to e.
+     *
+     * @param i
+     * @param e
+     * @return old val[i].
+     */
+    protected int setVal(int i, int e) {
+        int x = val[i];
+        val[i] = e;
+        hash = 0; // beware of race condition
+        return x;
+    }
+
+    /**
+     * ExpVector substitution. Clone and set exponent to d at position i.
+     *
+     * @param i position.
+     * @param d new exponent.
+     * @return substituted ExpVector.
+     */
+    public ExpVectorInteger subst(int i, int d) {
+        ExpVectorInteger V = this.copy();
+        //long e =
+        V.setVal(i, d);
+        return V;
+        //return EVSU(this, i, d);
     }
 
 }

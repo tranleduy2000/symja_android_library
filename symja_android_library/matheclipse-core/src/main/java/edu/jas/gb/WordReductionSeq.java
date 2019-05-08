@@ -5,8 +5,8 @@
 package edu.jas.gb;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class WordReductionSeq<C extends RingElem<C>> // should be FieldElem<C>>
         extends WordReductionAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(WordReductionSeq.class);
+    private static final Logger logger = LogManager.getLogger(WordReductionSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

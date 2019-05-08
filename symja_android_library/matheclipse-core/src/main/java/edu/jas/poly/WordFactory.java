@@ -5,8 +5,8 @@
 package edu.jas.poly;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.io.Serializable;
@@ -44,7 +44,7 @@ public final class WordFactory implements MonoidFactory<Word> {
     /**
      * Log4j logger object.
      */
-    private static final Logger logger = Logger.getLogger(WordFactory.class);
+    private static final Logger logger = LogManager.getLogger(WordFactory.class);
     /**
      * Defined descending order comparator. Sorts the highest terms first.
      */
@@ -250,13 +250,12 @@ public final class WordFactory implements MonoidFactory<Word> {
     }
 
     /**
-     * Is this structure finite or infinite.
+     * Get the one element, the empty word.
      *
-     * @return true if this structure is finite, else false.
-     * @see edu.jas.structure.ElemFactory#isFinite()
+     * @return 1 as Word.
      */
-    public boolean isFinite() {
-        return alphabet.length() == 0;
+    public Word getONE() {
+        return ONE;
     }
 
     /**
@@ -275,26 +274,6 @@ public final class WordFactory implements MonoidFactory<Word> {
      */
     public boolean isAssociative() {
         return true;
-    }
-
-    /**
-     * Get the one element, the empty word.
-     *
-     * @return 1 as Word.
-     */
-    public Word getONE() {
-        return ONE;
-    }
-
-    /**
-     * Copy word.
-     *
-     * @param w word to copy.
-     * @return copy of w.
-     */
-    @Override
-    public Word copy(Word w) {
-        return new Word(this, w.getVal(), false);
     }
 
     /**
@@ -372,9 +351,33 @@ public final class WordFactory implements MonoidFactory<Word> {
     }
 
     /**
+     * hashCode.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return alphabet.hashCode();
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object B) {
+        if (!(B instanceof WordFactory)) {
+            return false;
+        }
+        WordFactory b = (WordFactory) B;
+        return alphabet.equals(b.alphabet);
+    }
+
+    /**
      * Get the string representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -399,41 +402,6 @@ public final class WordFactory implements MonoidFactory<Word> {
     }
 
     /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        return toString();
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object B) {
-        if (!(B instanceof WordFactory)) {
-            return false;
-        }
-        WordFactory b = (WordFactory) B;
-        return alphabet.equals(b.alphabet);
-    }
-
-    /**
-     * hashCode.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return alphabet.hashCode();
-    }
-
-    /**
      * Get a list of the generating elements.
      *
      * @return list of generators for the algebraic structure.
@@ -447,6 +415,16 @@ public final class WordFactory implements MonoidFactory<Word> {
             gens.add(w);
         }
         return gens;
+    }
+
+    /**
+     * Is this structure finite or infinite.
+     *
+     * @return true if this structure is finite, else false.
+     * @see edu.jas.structure.ElemFactory#isFinite()
+     */
+    public boolean isFinite() {
+        return alphabet.length() == 0;
     }
 
     /**
@@ -467,6 +445,87 @@ public final class WordFactory implements MonoidFactory<Word> {
      */
     public Word fromInteger(BigInteger a) {
         throw new UnsupportedOperationException("not implemented for WordFactory");
+    }
+
+    /**
+     * Generate a random Element with size less equal to n.
+     *
+     * @param n
+     * @return a random element.
+     */
+    public Word random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * Generate a random Element with size less equal to n.
+     *
+     * @param n
+     * @param random is a source for random bits.
+     * @return a random element.
+     */
+    public Word random(int n, Random random) {
+        StringBuffer sb = new StringBuffer();
+        int len = alphabet.length();
+        for (int i = 0; i < n; i++) {
+            int r = Math.abs(random.nextInt() % len);
+            sb.append(alphabet.charAt(r));
+        }
+        return new Word(this, sb.toString(), false);
+    }
+
+    /**
+     * Copy word.
+     *
+     * @param w word to copy.
+     * @return copy of w.
+     */
+    @Override
+    public Word copy(Word w) {
+        return new Word(this, w.getVal(), false);
+    }
+
+    /**
+     * Parse from String.
+     *
+     * @param s String.
+     * @return a Element corresponding to s.
+     */
+    public Word parse(String s) {
+        String st = clean(s);
+        String regex;
+        if (translation == null) {
+            regex = "[" + alphabet + " ]*";
+        } else {
+            regex = "[" + concat(translation) + " ]*";
+        }
+        if (!st.matches(regex)) {
+            throw new IllegalArgumentException("word '" + st + "' contains letters not from: " + alphabet
+                    + " or from " + concat(translation));
+        }
+        // now only alphabet or translation chars are contained in st
+        return new Word(this, st, true);
+    }
+
+    /**
+     * Parse from Reader. White space is delimiter for word.
+     *
+     * @param r Reader.
+     * @return the next Element found on r.
+     */
+    public Word parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        return toString();
     }
 
     /**
@@ -515,65 +574,6 @@ public final class WordFactory implements MonoidFactory<Word> {
      */
     public int indexOf(char s) {
         return alphabet.indexOf(s);
-    }
-
-    /**
-     * Generate a random Element with size less equal to n.
-     *
-     * @param n
-     * @return a random element.
-     */
-    public Word random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * Generate a random Element with size less equal to n.
-     *
-     * @param n
-     * @param random is a source for random bits.
-     * @return a random element.
-     */
-    public Word random(int n, Random random) {
-        StringBuffer sb = new StringBuffer();
-        int len = alphabet.length();
-        for (int i = 0; i < n; i++) {
-            int r = Math.abs(random.nextInt() % len);
-            sb.append(alphabet.charAt(r));
-        }
-        return new Word(this, sb.toString(), false);
-    }
-
-    /**
-     * Parse from String.
-     *
-     * @param s String.
-     * @return a Element corresponding to s.
-     */
-    public Word parse(String s) {
-        String st = clean(s);
-        String regex;
-        if (translation == null) {
-            regex = "[" + alphabet + " ]*";
-        } else {
-            regex = "[" + concat(translation) + " ]*";
-        }
-        if (!st.matches(regex)) {
-            throw new IllegalArgumentException("word '" + st + "' contains letters not from: " + alphabet
-                    + " or from " + concat(translation));
-        }
-        // now only alphabet or translation chars are contained in st
-        return new Word(this, st, true);
-    }
-
-    /**
-     * Parse from Reader. White space is delimiter for word.
-     *
-     * @param r Reader.
-     * @return the next Element found on r.
-     */
-    public Word parse(Reader r) {
-        return parse(StringUtil.nextString(r));
     }
 
     /**

@@ -5,8 +5,8 @@
 package edu.jas.root;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import edu.jas.structure.UnaryFunctor;
 public class PolyUtilRoot {
 
 
-    private static final Logger logger = Logger.getLogger(PolyUtilRoot.class);
+    private static final Logger logger = LogManager.getLogger(PolyUtilRoot.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

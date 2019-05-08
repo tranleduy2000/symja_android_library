@@ -5,8 +5,8 @@
 package edu.jas.root;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import edu.jas.structure.RingFactory;
 public class RootUtil {
 
 
-    private static final Logger logger = Logger.getLogger(RootUtil.class);
+    private static final Logger logger = LogManager.getLogger(RootUtil.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -91,7 +91,7 @@ public class RootUtil {
         }
         //System.out.println("k  = " + k + ", len = " + iv.length());
         String ls = iv.substring(0, k).trim();
-        String rs = iv.substring(k + 1, iv.length()).trim();
+        String rs = iv.substring(k + 1).trim();
         //System.out.println("ls = " + ls + ", rs = " + rs);
         C left = fac.parse(ls);
         C right = fac.parse(rs);
@@ -134,7 +134,7 @@ public class RootUtil {
         }
         //System.out.println("k  = " + k + ", len = " + iv.length());
         String ls = iv.substring(0, k).trim();
-        String rs = iv.substring(k + 1, iv.length()).trim();
+        String rs = iv.substring(k + 1).trim();
         //System.out.println("ls = " + ls + ", rs = " + rs);
         Object osw = fac.parse(ls);
         Object one = fac.parse(rs);

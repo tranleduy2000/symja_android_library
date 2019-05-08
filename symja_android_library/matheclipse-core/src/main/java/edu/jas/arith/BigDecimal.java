@@ -215,16 +215,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     }
 
     /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public BigDecimal factory() {
-        return this;
-    }
-
-    /**
      * Get a list of the generating elements.
      *
      * @return list of generators for the algebraic structure.
@@ -248,13 +238,46 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     }
 
     /**
-     * Clone this.
+     * Get a BigDecimal element from long.
      *
-     * @see Object#clone()
+     * @param a long.
+     * @return a as BigDecimal.
      */
-    @Override
-    public BigDecimal copy() {
-        return new BigDecimal(val, context);
+    public BigDecimal fromInteger(long a) {
+        return new BigDecimal(a, context);
+    }
+
+    /**
+     * Get a BigDecimal element from a math.BigDecimal.
+     *
+     * @param a math.BigDecimal.
+     * @return a as BigDecimal.
+     */
+    public BigDecimal fromInteger(java.math.BigInteger a) {
+        return new BigDecimal(new java.math.BigDecimal(a), context);
+    }
+
+    /**
+     * BigDecimal random.
+     *
+     * @param n such that 0 &le; val(r) &le; (2<sup>n</sup>-1). 0 &le; exp(r)
+     *          &le; (10-1).
+     * @return r, a random BigDecimal.
+     */
+    public BigDecimal random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * BigDecimal random.
+     *
+     * @param n   such that 0 &le; val(r) &le; (2<sup>n</sup>-1). 0 &le; exp(r)
+     *            &le; (10-1).
+     * @param rnd is a source for random bits.
+     * @return r, a random BigDecimal.
+     */
+    public BigDecimal random(int n, Random rnd) {
+        return random(n, 10, rnd);
     }
 
     /**
@@ -265,6 +288,83 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
      */
     public BigDecimal copy(BigDecimal c) {
         return new BigDecimal(c.val, c.context);
+    }
+
+    /**
+     * BigDecimal parse from String.
+     *
+     * @param s String.
+     * @return Biginteger from s.
+     */
+    public BigDecimal parse(String s) {
+        return new BigDecimal(s, context);
+    }
+
+    /**
+     * BigDecimal parse from Reader.
+     *
+     * @param r Reader.
+     * @return next Biginteger from r.
+     */
+    public BigDecimal parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Clone this.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public BigDecimal copy() {
+        return new BigDecimal(val, context);
+    }
+
+    /**
+     * Compare to BigDecimal b. Experimental, is hacked.
+     *
+     * @param b BigDecimal.
+     * @return 0 if abs(this-b) &lt; epsilon, 1 if this &gt; b, -1 if this &lt;
+     * b.
+     */
+    @Override
+    public int compareTo(BigDecimal b) {
+        //return compareToAbsolute(b);
+        return compareToRelative(b);
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public BigDecimal factory() {
+        return this;
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python+Ruby case
+        return toString();
+    }
+
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python+Ruby case
+        return "DD()";
     }
 
     /**
@@ -323,26 +423,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     }
 
     /**
-     * Get a BigDecimal element from a math.BigDecimal.
-     *
-     * @param a math.BigDecimal.
-     * @return a as BigDecimal.
-     */
-    public BigDecimal fromInteger(java.math.BigInteger a) {
-        return new BigDecimal(new java.math.BigDecimal(a), context);
-    }
-
-    /**
-     * Get a BigDecimal element from long.
-     *
-     * @param a long.
-     * @return a as BigDecimal.
-     */
-    public BigDecimal fromInteger(long a) {
-        return new BigDecimal(a, context);
-    }
-
-    /**
      * Is BigDecimal number zero.
      *
      * @return If this is 0 then true is returned, else false.
@@ -355,6 +435,50 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         return compareTo(ZERO) == 0;
     }
 
+    /**
+     * signum.
+     *
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        return val.signum();
+    }
+
+    /**
+     * BigDecimal summation.
+     *
+     * @param S BigDecimal.
+     * @return this+S.
+     */
+    public BigDecimal sum(BigDecimal S) {
+        return new BigDecimal(val.add(S.val, context), context);
+    }
+
+    /**
+     * BigDecimal subtract.
+     *
+     * @param S BigDecimal.
+     * @return this-S.
+     */
+    public BigDecimal subtract(BigDecimal S) {
+        return new BigDecimal(val.subtract(S.val, context), context);
+    }
+
+    /* Negative value of this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public BigDecimal negate() {
+        return new BigDecimal(val.negate(), context);
+    }
+
+    /**
+     * Absolute value of this.
+     *
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public BigDecimal abs() {
+        return new BigDecimal(val.abs(), context);
+    }
 
     /**
      * Is BigDecimal number one.
@@ -368,7 +492,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         return compareTo(ONE) == 0;
     }
 
-
     /**
      * Is BigDecimal number unit.
      *
@@ -378,69 +501,68 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         return (!isZERO());
     }
 
-
     /**
-     * Get the String representation.
+     * BigDecimal multiply.
      *
-     * @see Object#toString()
+     * @param S BigDecimal.
+     * @return this*S.
      */
-    @Override
-    public String toString() {
-        //return val.toString() + "(ulp=" + val.ulp() + ")";
-        return val.toString();
+    public BigDecimal multiply(BigDecimal S) {
+        return new BigDecimal(val.multiply(S.val, context), context);
     }
 
+    /**
+     * BigDecimal divide.
+     *
+     * @param S BigDecimal.
+     * @return this/S.
+     */
+    public BigDecimal divide(BigDecimal S) {
+        return new BigDecimal(val.divide(S.val, context), context);
+    }
+
+    /**
+     * BigDecimal remainder.
+     *
+     * @param S BigDecimal.
+     * @return this - (this/S)*S.
+     */
+    public BigDecimal remainder(BigDecimal S) {
+        return new BigDecimal(val.remainder(S.val, context), context);
+    }
+
+    /**
+     * BigDecimal compute quotient and remainder.
+     *
+     * @param S BigDecimal.
+     * @return BigDecimal[] { q, r } with q = this/S and r = rem(this,S).
+     */
+    public BigDecimal[] quotientRemainder(BigDecimal S) {
+        BigDecimal[] qr = new BigDecimal[2];
+        java.math.BigDecimal[] C = val.divideAndRemainder(S.val, context);
+        qr[0] = new BigDecimal(C[0], context);
+        qr[1] = new BigDecimal(C[1], context);
+        return qr;
+    }
+
+    /**
+     * Integer inverse. R is a non-zero integer. S=1/R if defined else 0.
+     *
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public BigDecimal inverse() {
+        return ONE.divide(this);
+    }
 
     /**
      * Get this decimal as a <tt>double</tt>.
      *
      * @return the decimal as a <tt>double</tt>
-     * @see Number#doubleValue()
+     * @see java.lang.Number#doubleValue()
      */
     public double doubleValue() {
         return val.doubleValue();
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python+Ruby case
-        return toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python+Ruby case
-        return "DD()";
-    }
-
-
-    /**
-     * Compare to BigDecimal b. Experimental, is hacked.
-     *
-     * @param b BigDecimal.
-     * @return 0 if abs(this-b) &lt; epsilon, 1 if this &gt; b, -1 if this &lt;
-     * b.
-     */
-    @Override
-    public int compareTo(BigDecimal b) {
-        //return compareToAbsolute(b);
-        return compareToRelative(b);
-    }
-
 
     /**
      * Compare absolute to BigDecimal b. Experimental, is hacked.
@@ -473,7 +595,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         }
         return s.signum();
     }
-
 
     /**
      * Compare to relative BigDecimal b. Experimental, is hacked.
@@ -513,11 +634,20 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         return s.signum();
     }
 
+    /**
+     * Hash code for this BigDecimal.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return val.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object b) {
@@ -531,103 +661,16 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         return compareTo(bi) == 0;
     }
 
-
     /**
-     * Hash code for this BigDecimal.
+     * Get the String representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return val.hashCode();
+    public String toString() {
+        //return val.toString() + "(ulp=" + val.ulp() + ")";
+        return val.toString();
     }
-
-
-    /**
-     * Absolute value of this.
-     *
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public BigDecimal abs() {
-        return new BigDecimal(val.abs(), context);
-    }
-
-
-    /* Negative value of this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public BigDecimal negate() {
-        return new BigDecimal(val.negate(), context);
-    }
-
-
-    /**
-     * signum.
-     *
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        return val.signum();
-    }
-
-
-    /**
-     * BigDecimal subtract.
-     *
-     * @param S BigDecimal.
-     * @return this-S.
-     */
-    public BigDecimal subtract(BigDecimal S) {
-        return new BigDecimal(val.subtract(S.val, context), context);
-    }
-
-
-    /**
-     * BigDecimal divide.
-     *
-     * @param S BigDecimal.
-     * @return this/S.
-     */
-    public BigDecimal divide(BigDecimal S) {
-        return new BigDecimal(val.divide(S.val, context), context);
-    }
-
-
-    /**
-     * Integer inverse. R is a non-zero integer. S=1/R if defined else 0.
-     *
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public BigDecimal inverse() {
-        return ONE.divide(this);
-    }
-
-
-    /**
-     * BigDecimal remainder.
-     *
-     * @param S BigDecimal.
-     * @return this - (this/S)*S.
-     */
-    public BigDecimal remainder(BigDecimal S) {
-        return new BigDecimal(val.remainder(S.val, context), context);
-    }
-
-
-    /**
-     * BigDecimal compute quotient and remainder.
-     *
-     * @param S BigDecimal.
-     * @return BigDecimal[] { q, r } with q = this/S and r = rem(this,S).
-     */
-    public BigDecimal[] quotientRemainder(BigDecimal S) {
-        BigDecimal[] qr = new BigDecimal[2];
-        java.math.BigDecimal[] C = val.divideAndRemainder(S.val, context);
-        qr[0] = new BigDecimal(C[0], context);
-        qr[1] = new BigDecimal(C[1], context);
-        return qr;
-    }
-
 
     /**
      * BigDecimal greatest common divisor.
@@ -640,7 +683,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         //return new BigDecimal( val.gcd( S.val ) );
     }
 
-
     /**
      * BigDecimal extended greatest common divisor.
      *
@@ -650,32 +692,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     public BigDecimal[] egcd(BigDecimal S) {
         throw new UnsupportedOperationException("BigDecimal.egcd() not implemented");
     }
-
-
-    /**
-     * BigDecimal random.
-     *
-     * @param n such that 0 &le; val(r) &le; (2<sup>n</sup>-1). 0 &le; exp(r)
-     *          &le; (10-1).
-     * @return r, a random BigDecimal.
-     */
-    public BigDecimal random(int n) {
-        return random(n, random);
-    }
-
-
-    /**
-     * BigDecimal random.
-     *
-     * @param n   such that 0 &le; val(r) &le; (2<sup>n</sup>-1). 0 &le; exp(r)
-     *            &le; (10-1).
-     * @param rnd is a source for random bits.
-     * @return r, a random BigDecimal.
-     */
-    public BigDecimal random(int n, Random rnd) {
-        return random(n, 10, rnd);
-    }
-
 
     /**
      * BigDecimal random.
@@ -687,7 +703,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
     public BigDecimal random(int n, int e) {
         return random(n, e, random);
     }
-
 
     /**
      * BigDecimal random.
@@ -709,51 +724,6 @@ public final class BigDecimal extends RingElemImpl<BigDecimal>
         java.math.BigDecimal d = new java.math.BigDecimal(r, scale, context);
         return new BigDecimal(d, context);
     }
-
-
-    /**
-     * BigDecimal multiply.
-     *
-     * @param S BigDecimal.
-     * @return this*S.
-     */
-    public BigDecimal multiply(BigDecimal S) {
-        return new BigDecimal(val.multiply(S.val, context), context);
-    }
-
-
-    /**
-     * BigDecimal summation.
-     *
-     * @param S BigDecimal.
-     * @return this+S.
-     */
-    public BigDecimal sum(BigDecimal S) {
-        return new BigDecimal(val.add(S.val, context), context);
-    }
-
-
-    /**
-     * BigDecimal parse from String.
-     *
-     * @param s String.
-     * @return Biginteger from s.
-     */
-    public BigDecimal parse(String s) {
-        return new BigDecimal(s, context);
-    }
-
-
-    /**
-     * BigDecimal parse from Reader.
-     *
-     * @param r Reader.
-     * @return next Biginteger from r.
-     */
-    public BigDecimal parse(Reader r) {
-        return parse(StringUtil.nextString(r));
-    }
-
 
     /**
      * Returns the number of bits in the representation of this BigDecimal,

@@ -107,46 +107,6 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
         arfactors = arfact;
     }
 
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(poly.toString());
-        if (afac == null) {
-            return sb.toString();
-        }
-        sb.append(" = ");
-        boolean first = true;
-        for (GenPolynomial<AlgebraicNumber<C>> ap : afactors) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(", ");
-            }
-            sb.append(ap.toString());
-        }
-        sb.append("\n  ## over " + afac.toString() + "\n");
-        if (arfactors == null) {
-            return sb.toString();
-        }
-        first = true;
-        for (Factors<AlgebraicNumber<C>> arp : arfactors) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",\n");
-            }
-            sb.append(arp.toString());
-        }
-        return sb.toString();
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -186,7 +146,6 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
         return sb.toString();
     }
 
-
     /**
      * Length. Number of factors.
      *
@@ -207,11 +166,10 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
         return i;
     }
 
-
     /**
      * Hash code for this Factors.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -233,11 +191,10 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
         return h;
     }
 
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -252,6 +209,43 @@ public class Factors<C extends GcdRingElem<C>> implements Comparable<Factors<C>>
         return this.compareTo(a) == 0;
     }
 
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(poly.toString());
+        if (afac == null) {
+            return sb.toString();
+        }
+        sb.append(" = ");
+        boolean first = true;
+        for (GenPolynomial<AlgebraicNumber<C>> ap : afactors) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(", ");
+            }
+            sb.append(ap.toString());
+        }
+        sb.append("\n  ## over " + afac.toString() + "\n");
+        if (arfactors == null) {
+            return sb.toString();
+        }
+        first = true;
+        for (Factors<AlgebraicNumber<C>> arp : arfactors) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",\n");
+            }
+            sb.append(arp.toString());
+        }
+        return sb.toString();
+    }
 
     /**
      * Comparison.

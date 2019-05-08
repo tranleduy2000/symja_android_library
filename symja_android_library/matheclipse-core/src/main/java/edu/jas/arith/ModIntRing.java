@@ -204,6 +204,34 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
     }
 
     /**
+     * ModInt chinese remainder algorithm. This is a factory method. Assert
+     * c.modul >= a.modul and c.modul * a.modul = this.modul.
+     *
+     * @param c  ModInt.
+     * @param ci inverse of c.modul in ring of a.
+     * @param a  other ModInt.
+     * @return S, with S mod c.modul == c and S mod a.modul == a.
+     */
+    public ModInt chineseRemainder(ModInt c, ModInt ci, ModInt a) {
+        //if (true) {
+        //    if (c.ring.modul < a.ring.modul) {
+        //        System.out.println("ModInt error " + c.ring + ", " + a.ring);
+        //    }
+        //}
+        ModInt b = a.ring.fromInteger(c.val); // c mod a.modul
+        ModInt d = a.subtract(b); // a-c mod a.modul
+        if (d.isZERO()) {
+            return new ModInt(this, c.val);
+        }
+        b = d.multiply(ci); // b = (a-c)*ci mod a.modul
+        // (c.modul*b)+c mod this.modul = c mod c.modul =
+        // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
+        int s = c.ring.modul * b.val;
+        s = s + c.val;
+        return new ModInt(this, s);
+    }
+
+    /**
      * Create ModInt element c.
      *
      * @param c
@@ -234,16 +262,6 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
     }
 
     /**
-     * Copy ModInt element c.
-     *
-     * @param c
-     * @return a copy of c.
-     */
-    public ModInt copy(ModInt c) {
-        return new ModInt(this, c.val);
-    }
-
-    /**
      * Get the zero element.
      *
      * @return 0 as ModInt.
@@ -259,6 +277,24 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
      */
     public ModInt getONE() {
         return new ModInt(this, 1);
+    }
+
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true.
+     */
+    public boolean isCommutative() {
+        return true;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true.
+     */
+    public boolean isAssociative() {
+        return true;
     }
 
     /**
@@ -284,21 +320,90 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
     }
 
     /**
-     * Query if this ring is commutative.
+     * Get a ModInt element from a long value.
      *
-     * @return true.
+     * @param a lon.
+     * @return a ModInt.
      */
-    public boolean isCommutative() {
-        return true;
+    public ModInt fromInteger(long a) {
+        return new ModInt(this, a);
     }
 
     /**
-     * Query if this ring is associative.
+     * Get a ModInt element from a BigInteger value.
      *
-     * @return true.
+     * @param a BigInteger.
+     * @return a ModInt.
      */
-    public boolean isAssociative() {
-        return true;
+    public ModInt fromInteger(java.math.BigInteger a) {
+        return new ModInt(this, a);
+    }
+
+    /**
+     * ModInt random.
+     *
+     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @return a random integer mod modul.
+     */
+    public ModInt random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * ModInt random.
+     *
+     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return a random integer mod modul.
+     */
+    public ModInt random(int n, Random rnd) {
+        java.math.BigInteger v = new java.math.BigInteger(n, rnd);
+        return new ModInt(this, v); // rnd.nextInt() not ok
+    }
+
+    /**
+     * Copy ModInt element c.
+     *
+     * @param c
+     * @return a copy of c.
+     */
+    public ModInt copy(ModInt c) {
+        return new ModInt(this, c.val);
+    }
+
+    /**
+     * Parse ModInt from String.
+     *
+     * @param s String.
+     * @return ModInt from s.
+     */
+    public ModInt parse(String s) {
+        return new ModInt(this, s);
+    }
+
+    /**
+     * Parse ModInt from Reader.
+     *
+     * @param r Reader.
+     * @return next ModInt from r.
+     */
+    public ModInt parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python and Ruby case
+        if (isField()) {
+            return "GFI(" + modul + ")";
+        }
+        return "ZMI(" + modul + ")";
     }
 
     /**
@@ -333,16 +438,6 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
     }
 
     /**
-     * Get a ModInt element from a BigInteger value.
-     *
-     * @param a BigInteger.
-     * @return a ModInt.
-     */
-    public ModInt fromInteger(java.math.BigInteger a) {
-        return new ModInt(this, a);
-    }
-
-    /**
      * Get a ModInt element from a int value.
      *
      * @param a int.
@@ -353,44 +448,19 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
     }
 
     /**
-     * Get a ModInt element from a long value.
+     * Hash code for this ModIntRing.
      *
-     * @param a lon.
-     * @return a ModInt.
-     */
-    public ModInt fromInteger(long a) {
-        return new ModInt(this, a);
-    }
-
-    /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        return " mod(" + modul + ")"; //",max="  + MAX_INT + ")";
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python and Ruby case
-        if (isField()) {
-            return "GFI(" + modul + ")";
-        }
-        return "ZMI(" + modul + ")";
+    public int hashCode() {
+        return modul;
     }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object b) {
@@ -402,83 +472,13 @@ public final class ModIntRing implements ModularRingFactory<ModInt>, Iterable<Mo
     }
 
     /**
-     * Hash code for this ModIntRing.
+     * Get the String representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return modul;
-    }
-
-    /**
-     * ModInt random.
-     *
-     * @param n such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @return a random integer mod modul.
-     */
-    public ModInt random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * ModInt random.
-     *
-     * @param n   such that 0 &le; v &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return a random integer mod modul.
-     */
-    public ModInt random(int n, Random rnd) {
-        java.math.BigInteger v = new java.math.BigInteger(n, rnd);
-        return new ModInt(this, v); // rnd.nextInt() not ok
-    }
-
-    /**
-     * Parse ModInt from String.
-     *
-     * @param s String.
-     * @return ModInt from s.
-     */
-    public ModInt parse(String s) {
-        return new ModInt(this, s);
-    }
-
-    /**
-     * Parse ModInt from Reader.
-     *
-     * @param r Reader.
-     * @return next ModInt from r.
-     */
-    public ModInt parse(Reader r) {
-        return parse(StringUtil.nextString(r));
-    }
-
-    /**
-     * ModInt chinese remainder algorithm. This is a factory method. Assert
-     * c.modul >= a.modul and c.modul * a.modul = this.modul.
-     *
-     * @param c  ModInt.
-     * @param ci inverse of c.modul in ring of a.
-     * @param a  other ModInt.
-     * @return S, with S mod c.modul == c and S mod a.modul == a.
-     */
-    public ModInt chineseRemainder(ModInt c, ModInt ci, ModInt a) {
-        //if (true) {
-        //    if (c.ring.modul < a.ring.modul) {
-        //        System.out.println("ModInt error " + c.ring + ", " + a.ring);
-        //    }
-        //}
-        ModInt b = a.ring.fromInteger(c.val); // c mod a.modul
-        ModInt d = a.subtract(b); // a-c mod a.modul
-        if (d.isZERO()) {
-            return new ModInt(this, c.val);
-        }
-        b = d.multiply(ci); // b = (a-c)*ci mod a.modul
-        // (c.modul*b)+c mod this.modul = c mod c.modul =
-        // (c.modul*ci*(a-c)+c) mod a.modul = a mod a.modul
-        int s = c.ring.modul * b.val;
-        s = s + c.val;
-        return new ModInt(this, s);
+    public String toString() {
+        return " mod(" + modul + ")"; //",max="  + MAX_INT + ")";
     }
 
     /**

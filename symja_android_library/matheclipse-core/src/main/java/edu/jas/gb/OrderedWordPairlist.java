@@ -5,8 +5,8 @@
 package edu.jas.gb;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -33,7 +33,7 @@ import edu.jas.structure.RingElem;
 public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<C> {
 
 
-    private static final Logger logger = Logger.getLogger(OrderedWordPairlist.class);
+    private static final Logger logger = LogManager.getLogger(OrderedWordPairlist.class);
     protected final List<GenWordPolynomial<C>> P;
     protected final SortedMap<Word, LinkedList<WordPair<C>>> pairlist;
     protected final List<BitSet> red;
@@ -82,27 +82,6 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
     public WordPairList<C> create(GenWordPolynomialRing<C> r) {
         return new OrderedWordPairlist<C>(r);
     }
-
-
-    /**
-     * toString.
-     */
-    @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer(this.getClass().getSimpleName() + "(");
-        //s.append("polys="+P.size());
-        s.append("#put=" + putCount);
-        s.append(", #rem=" + remCount);
-        if (pairlist != null && pairlist.size() != 0) {
-            s.append(", size=" + pairlist.size());
-        }
-        //if (red != null ) {
-        //    s.append(", bitmask=" + red);
-        //}
-        s.append(")");
-        return s.toString();
-    }
-
 
     /**
      * Put one Polynomial to the pairlist and reduction matrix.
@@ -162,13 +141,12 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
             }
         }
         red.add(redi);
-        //System.out.println("pairlist.keys@put = " + pairlist.keySet() );  
-        //System.out.println("#pairlist = " + pairlist.size() );  
+        //System.out.println("pairlist.keys@put = " + pairlist.keySet() );
+        //System.out.println("#pairlist = " + pairlist.size() );
         P.add(p);
-        //System.out.println("pairlist.key = " + pairlist.keySet() );  
+        //System.out.println("pairlist.key = " + pairlist.keySet() );
         return l; //P.size() - 1;
     }
-
 
     /**
      * Put all word polynomials in F to the pairlist and reduction matrix.
@@ -177,7 +155,7 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
      * @return the index of the last added word polynomial.
      */
     public int put(List<GenWordPolynomial<C>> F) {
-        //System.out.println("pairlist.F = " + F );  
+        //System.out.println("pairlist.F = " + F );
         int i = 0;
         for (GenWordPolynomial<C> p : F) {
             i = put(p);
@@ -185,10 +163,24 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
         return i;
     }
 
+    /**
+     * Put the ONE-Polynomial to the pairlist.
+     *
+     * @return the index of the last polynomial.
+     */
+    public synchronized int putOne() {
+        putCount++;
+        oneInGB = true;
+        pairlist.clear();
+        P.clear();
+        P.add(ring.getONE());
+        red.clear();
+        return P.size() - 1;
+    }
 
     /**
      * Remove the next required pair from the pairlist and reduction matrix.
-     * Appy the criterion 3 to @see if the S-polynomial is required.
+     * Appy the criterion 3 to see if the S-polynomial is required.
      *
      * @return the next pair if one exists, otherwise null.
      */
@@ -276,6 +268,24 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
         return remCount;
     }
 
+    /**
+     * toString.
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer(this.getClass().getSimpleName() + "(");
+        //s.append("polys="+P.size());
+        s.append("#put=" + putCount);
+        s.append(", #rem=" + remCount);
+        if (pairlist != null && pairlist.size() != 0) {
+            s.append(", size=" + pairlist.size());
+        }
+        //if (red != null ) {
+        //    s.append(", bitmask=" + red);
+        //}
+        s.append(")");
+        return s.toString();
+    }
 
     /**
      * Put the ONE-Polynomial to the pairlist.
@@ -292,23 +302,6 @@ public class OrderedWordPairlist<C extends RingElem<C>> implements WordPairList<
         }
         return putOne();
     }
-
-
-    /**
-     * Put the ONE-Polynomial to the pairlist.
-     *
-     * @return the index of the last polynomial.
-     */
-    public synchronized int putOne() {
-        putCount++;
-        oneInGB = true;
-        pairlist.clear();
-        P.clear();
-        P.add(ring.getONE());
-        red.clear();
-        return P.size() - 1;
-    }
-
 
     /**
      * GB criterium 3.

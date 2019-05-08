@@ -5,11 +5,13 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.jas.arith.BigInteger;
 import edu.jas.arith.BigRational;
+import edu.jas.arith.ModInt;
+import edu.jas.arith.ModIntRing;
 import edu.jas.arith.ModInteger;
 import edu.jas.arith.ModIntegerRing;
 import edu.jas.arith.ModLong;
@@ -72,7 +74,7 @@ import edu.jas.ufd.QuotientRing;
 public class GBFactory {
 
 
-    private static final Logger logger = Logger.getLogger(GBFactory.class);
+    private static final Logger logger = LogManager.getLogger(GBFactory.class);
 
 
     /**
@@ -115,6 +117,33 @@ public class GBFactory {
             bba = new GroebnerBaseSeq<ModLong>(pl);
         } else {
             bba = new GroebnerBasePseudoSeq<ModLong>(fac, pl);
+        }
+        return bba;
+    }
+
+    /**
+     * Determine suitable implementation of GB algorithms, case ModInt.
+     *
+     * @param fac ModIntRing.
+     * @return GB algorithm implementation.
+     */
+    public static GroebnerBaseAbstract<ModInt> getImplementation(ModIntRing fac) {
+        return getImplementation(fac, new OrderedPairlist<ModInt>());
+    }
+
+    /**
+     * Determine suitable implementation of GB algorithms, case ModInt.
+     *
+     * @param fac ModIntRing.
+     * @param pl  pair selection strategy
+     * @return GB algorithm implementation.
+     */
+    public static GroebnerBaseAbstract<ModInt> getImplementation(ModIntRing fac, PairList<ModInt> pl) {
+        GroebnerBaseAbstract<ModInt> bba;
+        if (fac.isField()) {
+            bba = new GroebnerBaseSeq<ModInt>(pl);
+        } else {
+            bba = new GroebnerBasePseudoSeq<ModInt>(fac, pl);
         }
         return bba;
     }
@@ -278,6 +307,31 @@ public class GBFactory {
      * coefficients.
      *
      * @param fac QuotientRing.
+     * @return GB algorithm implementation.
+     */
+    public static <C extends GcdRingElem<C>> GroebnerBaseAbstract<Quotient<C>> getImplementation(
+            QuotientRing<C> fac) {
+        return getImplementation(fac, Algo.qgb);
+    }
+
+    /**
+     * Determine suitable implementation of GB algorithms, case Quotient
+     * coefficients.
+     *
+     * @param fac QuotientRing.
+     * @param a   algorithm, a = qgb, ffgb.
+     * @return GB algorithm implementation.
+     */
+    public static <C extends GcdRingElem<C>> GroebnerBaseAbstract<Quotient<C>> getImplementation(
+            QuotientRing<C> fac, Algo a) {
+        return getImplementation(fac, a, new OrderedPairlist<Quotient<C>>());
+    }
+
+    /**
+     * Determine suitable implementation of GB algorithms, case Quotient
+     * coefficients.
+     *
+     * @param fac QuotientRing.
      * @param pl  pair selection strategy
      * @return GB algorithm implementation.
      */
@@ -317,6 +371,20 @@ public class GBFactory {
                 throw new IllegalArgumentException("algorithm not available for Quotient " + a);
         }
         return bba;
+    }
+
+    /**
+     * Determine suitable implementation of GB algorithms, case (recursive)
+     * polynomial.
+     *
+     * @param fac GenPolynomialRing&lt;C&gt;.
+     * @param a   algorithm, a = igb or egb, dgb if fac is univariate over a
+     *            field.
+     * @return GB algorithm implementation.
+     */
+    public static <C extends GcdRingElem<C>> GroebnerBaseAbstract<GenPolynomial<C>> getImplementation(
+            GenPolynomialRing<C> fac, Algo a) {
+        return getImplementation(fac, a, new OrderedPairlist<GenPolynomial<C>>());
     }
 
     /**

@@ -200,21 +200,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         return ps2;
     }
 
-
-    /**
-     * To String.
-     *
-     * @return string representation of this.
-     */
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        String scf = coFac.getClass().getSimpleName();
-        sb.append(scf + "((" + varsToString() + "))");
-        return sb.toString();
-    }
-
-
     /**
      * Get a String representation of the variable names.
      *
@@ -228,7 +213,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         //return Arrays.toString(vars);
     }
 
-
     /**
      * Get the variable names.
      *
@@ -238,32 +222,24 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         return Arrays.copyOf(vars, vars.length); // > Java-5
     }
 
-
     /**
-     * Get a scripting compatible string representation.
+     * Hash code for this .
      *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toScript() {
-        // Python case
-        StringBuffer s = new StringBuffer("MPS(");
-        String f = null;
-        try {
-            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
-        } catch (Exception e) {
-            f = coFac.toScript();
-        }
-        s.append(f + ",\"" + varsToString() + "\"," + truncate + ")");
-        return s.toString();
+    public int hashCode() {
+        int h = coFac.hashCode();
+        h = h << 7;
+        h += (Arrays.hashCode(vars) << 17);
+        h += truncate;
+        return h;
     }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -282,21 +258,18 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         return Arrays.deepEquals(vars, a.vars);
     }
 
-
     /**
-     * Hash code for this .
+     * To String.
      *
-     * @see Object#hashCode()
+     * @return string representation of this.
      */
     @Override
-    public int hashCode() {
-        int h = coFac.hashCode();
-        h = h << 7;
-        h += (Arrays.hashCode(vars) << 17);
-        h += truncate;
-        return h;
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        String scf = coFac.getClass().getSimpleName();
+        sb.append(scf + "((" + varsToString() + "))");
+        return sb.toString();
     }
-
 
     /**
      * Get the zero element.
@@ -307,7 +280,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         return ZERO;
     }
 
-
     /**
      * Get the one element.
      *
@@ -317,6 +289,23 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         return ONE;
     }
 
+    /**
+     * Query if this ring is commuative.
+     *
+     * @return true, if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return coFac.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return coFac.isAssociative();
+    }
 
     /**
      * Get a list of the generating elements.
@@ -347,7 +336,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         return gens;
     }
 
-
     /**
      * Is this structure finite or infinite.
      *
@@ -357,156 +345,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
     public boolean isFinite() {
         return false;
     }
-
-
-    /**
-     * Truncate.
-     *
-     * @return truncate index of power series.
-     */
-    public int truncate() {
-        return truncate;
-    }
-
-
-    /**
-     * Set truncate.
-     *
-     * @param t new truncate index.
-     * @return old truncate index of power series.
-     */
-    public int setTruncate(int t) {
-        if (t < 0) {
-            throw new IllegalArgumentException("negative truncate not allowed");
-        }
-        int ot = truncate;
-        truncate = t;
-        ONE.setTruncate(t);
-        ZERO.setTruncate(t);
-        return ot;
-    }
-
-
-    /**
-     * Get the power series of the exponential function.
-     *
-     * @param r variable for the direction.
-     * @return exp(x_r) as MultiVarPowerSeries<C>.
-     */
-    public MultiVarPowerSeries<C> getEXP(final int r) {
-        return fixPoint(new MultiVarPowerSeriesMap<C>() {
-
-
-            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> e) {
-                return e.integrate(coFac.getONE(), r);
-            }
-        });
-    }
-
-
-    /**
-     * Get the power series of the sinus function.
-     *
-     * @param r variable for the direction.
-     * @return sin(x_r) as MultiVarPowerSeries<C>.
-     */
-    public MultiVarPowerSeries<C> getSIN(final int r) {
-        return fixPoint(new MultiVarPowerSeriesMap<C>() {
-
-
-            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> s) {
-                return s.negate().integrate(coFac.getONE(), r).integrate(coFac.getZERO(), r);
-            }
-        });
-    }
-
-
-    /**
-     * Get the power series of the cosinus function.
-     *
-     * @param r variable for the direction.
-     * @return cos(x_r) as MultiVarPowerSeries<C>.
-     */
-    public MultiVarPowerSeries<C> getCOS(final int r) {
-        return fixPoint(new MultiVarPowerSeriesMap<C>() {
-
-
-            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> c) {
-                return c.negate().integrate(coFac.getZERO(), r).integrate(coFac.getONE(), r);
-            }
-        });
-    }
-
-
-    /**
-     * Get the power series of the tangens function.
-     *
-     * @param r variable for the direction.
-     * @return tan(x_r) as MultiVarPowerSeries<C>.
-     */
-    public MultiVarPowerSeries<C> getTAN(final int r) {
-        return fixPoint(new MultiVarPowerSeriesMap<C>() {
-
-
-            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> t) {
-                return t.multiply(t).sum(getONE()).integrate(coFac.getZERO(), r);
-            }
-        });
-    }
-
-
-    /**
-     * Solve an partial differential equation. y_r' = f(y_r) with y_r(0) = c.
-     *
-     * @param f a MultiVarPowerSeries<C>.
-     * @param c integration constant.
-     * @param r variable for the direction.
-     * @return f.integrate(c).
-     */
-    public MultiVarPowerSeries<C> solvePDE(MultiVarPowerSeries<C> f, C c, int r) {
-        return f.integrate(c, r);
-    }
-
-
-    /**
-     * Query if this ring is commuative.
-     *
-     * @return true, if this ring is commutative, else false.
-     */
-    public boolean isCommutative() {
-        return coFac.isCommutative();
-    }
-
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true if this ring is associative, else false.
-     */
-    public boolean isAssociative() {
-        return coFac.isAssociative();
-    }
-
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return true if this ring is a field, else false.
-     */
-    public boolean isField() {
-        return (nvar == 0) && coFac.isField(); //false;
-    }
-
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public java.math.BigInteger characteristic() {
-        return coFac.characteristic();
-    }
-
 
     /**
      * Get a (constant) MultiVarPowerSeries&lt;C&gt; from a long value.
@@ -527,7 +365,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
             }
         });
     }
-
 
     /**
      * Get a (constant) MultiVarPowerSeries&lt;C&gt; from a
@@ -550,6 +387,196 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         });
     }
 
+    /**
+     * Generate a random power series with d = 0.7.
+     *
+     * @param k bit-size of random coefficients.
+     * @return a random power series.
+     */
+    public MultiVarPowerSeries<C> random(int k) {
+        return random(k, 0.7f, random);
+    }
+
+    /**
+     * Generate a random power series with d = 0.7.
+     *
+     * @param k   bit-size of random coefficients.
+     * @param rnd is a source for random bits.
+     * @return a random power series.
+     */
+    public MultiVarPowerSeries<C> random(int k, Random rnd) {
+        return random(k, 0.7f, rnd);
+    }
+
+    /**
+     * Copy power series.
+     *
+     * @param c a power series.
+     * @return a copy of c.
+     */
+    public MultiVarPowerSeries<C> copy(MultiVarPowerSeries<C> c) {
+        return new MultiVarPowerSeries<C>(this, c.lazyCoeffs);
+    }
+
+    /**
+     * Parse a power series. <b>Note:</b> not implemented.
+     *
+     * @param s String.
+     * @return power series from s.
+     */
+    public MultiVarPowerSeries<C> parse(String s) {
+        throw new UnsupportedOperationException("parse for power series not implemented");
+    }
+
+    /**
+     * Parse a power series. <b>Note:</b> not implemented.
+     *
+     * @param r Reader.
+     * @return next power series from r.
+     */
+    public MultiVarPowerSeries<C> parse(Reader r) {
+        throw new UnsupportedOperationException("parse for power series not implemented");
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        StringBuffer s = new StringBuffer("MPS(");
+        String f = null;
+        try {
+            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
+        } catch (Exception e) {
+            f = coFac.toScript();
+        }
+        s.append(f + ",\"" + varsToString() + "\"," + truncate + ")");
+        return s.toString();
+    }
+
+    /**
+     * Truncate.
+     *
+     * @return truncate index of power series.
+     */
+    public int truncate() {
+        return truncate;
+    }
+
+    /**
+     * Set truncate.
+     *
+     * @param t new truncate index.
+     * @return old truncate index of power series.
+     */
+    public int setTruncate(int t) {
+        if (t < 0) {
+            throw new IllegalArgumentException("negative truncate not allowed");
+        }
+        int ot = truncate;
+        truncate = t;
+        ONE.setTruncate(t);
+        ZERO.setTruncate(t);
+        return ot;
+    }
+
+    /**
+     * Get the power series of the exponential function.
+     *
+     * @param r variable for the direction.
+     * @return exp(x_r) as MultiVarPowerSeries<C>.
+     */
+    public MultiVarPowerSeries<C> getEXP(final int r) {
+        return fixPoint(new MultiVarPowerSeriesMap<C>() {
+
+
+            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> e) {
+                return e.integrate(coFac.getONE(), r);
+            }
+        });
+    }
+
+    /**
+     * Get the power series of the sinus function.
+     *
+     * @param r variable for the direction.
+     * @return sin(x_r) as MultiVarPowerSeries<C>.
+     */
+    public MultiVarPowerSeries<C> getSIN(final int r) {
+        return fixPoint(new MultiVarPowerSeriesMap<C>() {
+
+
+            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> s) {
+                return s.negate().integrate(coFac.getONE(), r).integrate(coFac.getZERO(), r);
+            }
+        });
+    }
+
+    /**
+     * Get the power series of the cosinus function.
+     *
+     * @param r variable for the direction.
+     * @return cos(x_r) as MultiVarPowerSeries<C>.
+     */
+    public MultiVarPowerSeries<C> getCOS(final int r) {
+        return fixPoint(new MultiVarPowerSeriesMap<C>() {
+
+
+            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> c) {
+                return c.negate().integrate(coFac.getZERO(), r).integrate(coFac.getONE(), r);
+            }
+        });
+    }
+
+    /**
+     * Get the power series of the tangens function.
+     *
+     * @param r variable for the direction.
+     * @return tan(x_r) as MultiVarPowerSeries<C>.
+     */
+    public MultiVarPowerSeries<C> getTAN(final int r) {
+        return fixPoint(new MultiVarPowerSeriesMap<C>() {
+
+
+            public MultiVarPowerSeries<C> map(MultiVarPowerSeries<C> t) {
+                return t.multiply(t).sum(getONE()).integrate(coFac.getZERO(), r);
+            }
+        });
+    }
+
+    /**
+     * Solve an partial differential equation. y_r' = f(y_r) with y_r(0) = c.
+     *
+     * @param f a MultiVarPowerSeries<C>.
+     * @param c integration constant.
+     * @param r variable for the direction.
+     * @return f.integrate(c).
+     */
+    public MultiVarPowerSeries<C> solvePDE(MultiVarPowerSeries<C> f, C c, int r) {
+        return f.integrate(c, r);
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true if this ring is a field, else false.
+     */
+    public boolean isField() {
+        return (nvar == 0) && coFac.isField(); //false;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return coFac.characteristic();
+    }
 
     /**
      * Get the corresponding GenPolynomialRing&lt;C&gt;.
@@ -559,7 +586,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
     public GenPolynomialRing<C> polyRing() {
         return new GenPolynomialRing<C>(coFac, nvar, vars);
     }
-
 
     /**
      * Get a MultiVarPowerSeries&lt;C&gt; from a GenPolynomial&lt;C&gt;.
@@ -613,7 +639,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         });
     }
 
-
     /**
      * Get a list of MultiVarPowerSeries&lt;C&gt; from a list of
      * GenPolynomial&lt;C&gt;.
@@ -631,7 +656,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
                     }
                 });
     }
-
 
     /**
      * Get a MultiVarPowerSeries&lt;C&gt; from a univariate power series.
@@ -668,7 +692,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         });
     }
 
-
     /**
      * Generate a random power series with k = 5, d = 0.7.
      *
@@ -677,30 +700,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
     public MultiVarPowerSeries<C> random() {
         return random(5, 0.7f, random);
     }
-
-
-    /**
-     * Generate a random power series with d = 0.7.
-     *
-     * @param k bit-size of random coefficients.
-     * @return a random power series.
-     */
-    public MultiVarPowerSeries<C> random(int k) {
-        return random(k, 0.7f, random);
-    }
-
-
-    /**
-     * Generate a random power series with d = 0.7.
-     *
-     * @param k   bit-size of random coefficients.
-     * @param rnd is a source for random bits.
-     * @return a random power series.
-     */
-    public MultiVarPowerSeries<C> random(int k, Random rnd) {
-        return random(k, 0.7f, rnd);
-    }
-
 
     /**
      * Generate a random power series.
@@ -712,7 +711,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
     public MultiVarPowerSeries<C> random(int k, float d) {
         return random(k, d, random);
     }
-
 
     /**
      * Generate a random power series.
@@ -741,7 +739,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
         });
     }
 
-
     /**
      * Generate a power series via lambda expression.
      *
@@ -760,40 +757,6 @@ public class MultiVarPowerSeriesRing<C extends RingElem<C>> implements RingFacto
             }
         });
     }
-
-
-    /**
-     * Copy power series.
-     *
-     * @param c a power series.
-     * @return a copy of c.
-     */
-    public MultiVarPowerSeries<C> copy(MultiVarPowerSeries<C> c) {
-        return new MultiVarPowerSeries<C>(this, c.lazyCoeffs);
-    }
-
-
-    /**
-     * Parse a power series. <b>Note:</b> not implemented.
-     *
-     * @param s String.
-     * @return power series from s.
-     */
-    public MultiVarPowerSeries<C> parse(String s) {
-        throw new UnsupportedOperationException("parse for power series not implemented");
-    }
-
-
-    /**
-     * Parse a power series. <b>Note:</b> not implemented.
-     *
-     * @param r Reader.
-     * @return next power series from r.
-     */
-    public MultiVarPowerSeries<C> parse(Reader r) {
-        throw new UnsupportedOperationException("parse for power series not implemented");
-    }
-
 
     /**
      * Taylor power series.

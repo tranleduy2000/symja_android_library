@@ -5,8 +5,8 @@
 package edu.jas.kern;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -41,7 +41,7 @@ public class ComputerThreads {
      * N_CPUS x 1.5, x 2, x 2.5, min 3, ?.
      */
     public static final int N_THREADS = (N_CPUS < 3 ? 3 : N_CPUS + N_CPUS / 2);
-    private static final Logger logger = Logger.getLogger(ComputerThreads.class);
+    private static final Logger logger = LogManager.getLogger(ComputerThreads.class);
     /**
      * Flag for thread usage. <b>Note:</b> Only introduced because Google app
      * engine does not support threads.

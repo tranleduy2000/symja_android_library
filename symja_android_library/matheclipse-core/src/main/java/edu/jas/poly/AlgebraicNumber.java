@@ -81,6 +81,33 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
         return val;
     }
 
+    /**
+     * Copy this.
+     *
+     * @see edu.jas.structure.Element#copy()
+     */
+    @Override
+    public AlgebraicNumber<C> copy() {
+        return new AlgebraicNumber<C>(ring, val);
+    }
+
+    /**
+     * AlgebraicNumber comparison.
+     *
+     * @param b AlgebraicNumber.
+     * @return sign(this - b).
+     */
+    @Override
+    public int compareTo(AlgebraicNumber<C> b) {
+        int s = 0;
+        if (ring.modul != b.ring.modul) { // avoid compareTo if possible
+            s = ring.modul.compareTo(b.ring.modul);
+        }
+        if (s != 0) {
+            return s;
+        }
+        return val.compareTo(b.val);
+    }
 
     /**
      * Get the corresponding element factory.
@@ -92,17 +119,29 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
         return ring;
     }
 
-
     /**
-     * Copy this.
+     * Get a scripting compatible string representation.
      *
-     * @see edu.jas.structure.Element#copy()
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
      */
     @Override
-    public AlgebraicNumber<C> copy() {
-        return new AlgebraicNumber<C>(ring, val);
+    public String toScript() {
+        // Python case
+        return val.toScript();
     }
 
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return factory().toScript();
+    }
 
     /**
      * Is AlgebraicNumber zero.
@@ -114,6 +153,55 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
         return val.equals(ring.ring.getZERO());
     }
 
+    /**
+     * AlgebraicNumber signum.
+     *
+     * @return signum(this).
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        return val.signum();
+    }
+
+    /**
+     * AlgebraicNumber summation.
+     *
+     * @param S AlgebraicNumber.
+     * @return this+S.
+     */
+    public AlgebraicNumber<C> sum(AlgebraicNumber<C> S) {
+        return new AlgebraicNumber<C>(ring, val.sum(S.val));
+    }
+
+    /**
+     * AlgebraicNumber subtraction.
+     *
+     * @param S AlgebraicNumber.
+     * @return this-S.
+     */
+    public AlgebraicNumber<C> subtract(AlgebraicNumber<C> S) {
+        return new AlgebraicNumber<C>(ring, val.subtract(S.val));
+    }
+
+    /**
+     * AlgebraicNumber negate.
+     *
+     * @return -this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public AlgebraicNumber<C> negate() {
+        return new AlgebraicNumber<C>(ring, val.negate());
+    }
+
+    /**
+     * AlgebraicNumber absolute value.
+     *
+     * @return the absolute value of this.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public AlgebraicNumber<C> abs() {
+        return new AlgebraicNumber<C>(ring, val.abs());
+    }
 
     /**
      * Is AlgebraicNumber one.
@@ -124,7 +212,6 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
     public boolean isONE() {
         return val.equals(ring.ring.getONE());
     }
-
 
     /**
      * Is AlgebraicNumber unit.
@@ -157,194 +244,16 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
         return u;
     }
 
-
     /**
-     * Is AlgebraicNumber a root of unity.
-     *
-     * @return true if |this**i| == 1, for some 0 &lt; i &le; deg(modul), else false.
-     */
-    public boolean isRootOfUnity() {
-        long d = ring.modul.degree();
-        AlgebraicNumber<C> t = ring.getONE();
-        for (long i = 1; i <= d; i++) {
-            t = t.multiply(this);
-            if (t.abs().isONE()) {
-                //System.out.println("isRootOfUnity for i = " + i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        if (PrettyPrint.isTrue()) {
-            return val.toString(ring.ring.vars);
-        }
-        return "AlgebraicNumber[ " + val.toString() + " ]";
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return val.toScript();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return factory().toScript();
-    }
-
-
-    /**
-     * AlgebraicNumber comparison.
-     *
-     * @param b AlgebraicNumber.
-     * @return sign(this - b).
-     */
-    @Override
-    public int compareTo(AlgebraicNumber<C> b) {
-        int s = 0;
-        if (ring.modul != b.ring.modul) { // avoid compareTo if possible
-            s = ring.modul.compareTo(b.ring.modul);
-        }
-        if (s != 0) {
-            return s;
-        }
-        return val.compareTo(b.val);
-    }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object b) {
-        if (b == null) {
-            return false;
-        }
-        if (!(b instanceof AlgebraicNumber)) {
-            return false;
-        }
-        AlgebraicNumber<C> a = (AlgebraicNumber<C>) b;
-        if (!ring.equals(a.ring)) {
-            return false;
-        }
-        return (0 == compareTo(a));
-    }
-
-
-    /**
-     * Hash code for this AlgebraicNumber.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return 37 * val.hashCode() + ring.hashCode();
-    }
-
-
-    /**
-     * AlgebraicNumber absolute value.
-     *
-     * @return the absolute value of this.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public AlgebraicNumber<C> abs() {
-        return new AlgebraicNumber<C>(ring, val.abs());
-    }
-
-
-    /**
-     * AlgebraicNumber summation.
+     * AlgebraicNumber multiplication.
      *
      * @param S AlgebraicNumber.
-     * @return this+S.
+     * @return this*S.
      */
-    public AlgebraicNumber<C> sum(AlgebraicNumber<C> S) {
-        return new AlgebraicNumber<C>(ring, val.sum(S.val));
+    public AlgebraicNumber<C> multiply(AlgebraicNumber<C> S) {
+        GenPolynomial<C> x = val.multiply(S.val);
+        return new AlgebraicNumber<C>(ring, x);
     }
-
-
-    /**
-     * AlgebraicNumber summation.
-     *
-     * @param c coefficient.
-     * @return this+c.
-     */
-    public AlgebraicNumber<C> sum(GenPolynomial<C> c) {
-        return new AlgebraicNumber<C>(ring, val.sum(c));
-    }
-
-
-    /**
-     * AlgebraicNumber summation.
-     *
-     * @param c polynomial.
-     * @return this+c.
-     */
-    public AlgebraicNumber<C> sum(C c) {
-        return new AlgebraicNumber<C>(ring, val.sum(c));
-    }
-
-
-    /**
-     * AlgebraicNumber negate.
-     *
-     * @return -this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public AlgebraicNumber<C> negate() {
-        return new AlgebraicNumber<C>(ring, val.negate());
-    }
-
-
-    /**
-     * AlgebraicNumber signum.
-     *
-     * @return signum(this).
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        return val.signum();
-    }
-
-
-    /**
-     * AlgebraicNumber subtraction.
-     *
-     * @param S AlgebraicNumber.
-     * @return this-S.
-     */
-    public AlgebraicNumber<C> subtract(AlgebraicNumber<C> S) {
-        return new AlgebraicNumber<C>(ring, val.subtract(S.val));
-    }
-
 
     /**
      * AlgebraicNumber division.
@@ -355,27 +264,6 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
     public AlgebraicNumber<C> divide(AlgebraicNumber<C> S) {
         return multiply(S.inverse());
     }
-
-
-    /**
-     * AlgebraicNumber inverse.
-     *
-     * @return S with S = 1/this if defined.
-     * @throws NotInvertibleException if the element is not invertible.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public AlgebraicNumber<C> inverse() {
-        try {
-            return new AlgebraicNumber<C>(ring, val.modInverse(ring.modul));
-        } catch (AlgebraicNotInvertibleException e) {
-            //System.out.println(e);
-            throw e;
-        } catch (NotInvertibleException e) {
-            throw new AlgebraicNotInvertibleException(e + ", val = " + val + ", modul = " + ring.modul
-                    + ", gcd = " + val.gcd(ring.modul), e);
-        }
-    }
-
 
     /**
      * AlgebraicNumber remainder.
@@ -397,29 +285,117 @@ public class AlgebraicNumber<C extends RingElem<C>> extends RingElemImpl<Algebra
         return new AlgebraicNumber<C>(ring, x);
     }
 
-
     /**
      * Quotient and remainder by division of this by S.
      *
      * @param S a AlgebraicNumber
      * @return [this/S, this - (this/S)*S].
      */
+    @SuppressWarnings("unchecked")
     public AlgebraicNumber<C>[] quotientRemainder(AlgebraicNumber<C> S) {
         return new AlgebraicNumber[]{divide(S), remainder(S)};
     }
 
-
     /**
-     * AlgebraicNumber multiplication.
+     * AlgebraicNumber inverse.
      *
-     * @param S AlgebraicNumber.
-     * @return this*S.
+     * @return S with S = 1/this if defined.
+     * @throws NotInvertibleException if the element is not invertible.
+     * @see edu.jas.structure.RingElem#inverse()
      */
-    public AlgebraicNumber<C> multiply(AlgebraicNumber<C> S) {
-        GenPolynomial<C> x = val.multiply(S.val);
-        return new AlgebraicNumber<C>(ring, x);
+    public AlgebraicNumber<C> inverse() {
+        try {
+            return new AlgebraicNumber<C>(ring, val.modInverse(ring.modul));
+        } catch (AlgebraicNotInvertibleException e) {
+            //System.out.println(e);
+            throw e;
+        } catch (NotInvertibleException e) {
+            throw new AlgebraicNotInvertibleException(e + ", val = " + val + ", modul = " + ring.modul
+                    + ", gcd = " + val.gcd(ring.modul), e);
+        }
     }
 
+    /**
+     * Is AlgebraicNumber a root of unity.
+     *
+     * @return true if |this**i| == 1, for some 0 &lt; i &le; deg(modul), else false.
+     */
+    public boolean isRootOfUnity() {
+        long d = ring.modul.degree();
+        AlgebraicNumber<C> t = ring.getONE();
+        for (long i = 1; i <= d; i++) {
+            t = t.multiply(this);
+            if (t.abs().isONE()) {
+                //System.out.println("isRootOfUnity for i = " + i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Hash code for this AlgebraicNumber.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * val.hashCode() + ring.hashCode();
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object b) {
+        if (b == null) {
+            return false;
+        }
+        if (!(b instanceof AlgebraicNumber)) {
+            return false;
+        }
+        AlgebraicNumber<C> a = (AlgebraicNumber<C>) b;
+        if (!ring.equals(a.ring)) {
+            return false;
+        }
+        return (0 == compareTo(a));
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        if (PrettyPrint.isTrue()) {
+            return val.toString(ring.ring.vars);
+        }
+        return "AlgebraicNumber[ " + val.toString() + " ]";
+    }
+
+    /**
+     * AlgebraicNumber summation.
+     *
+     * @param c coefficient.
+     * @return this+c.
+     */
+    public AlgebraicNumber<C> sum(GenPolynomial<C> c) {
+        return new AlgebraicNumber<C>(ring, val.sum(c));
+    }
+
+    /**
+     * AlgebraicNumber summation.
+     *
+     * @param c polynomial.
+     * @return this+c.
+     */
+    public AlgebraicNumber<C> sum(C c) {
+        return new AlgebraicNumber<C>(ring, val.sum(c));
+    }
 
     /**
      * AlgebraicNumber multiplication.

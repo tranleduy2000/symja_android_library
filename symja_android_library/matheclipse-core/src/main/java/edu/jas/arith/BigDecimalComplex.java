@@ -5,8 +5,8 @@
 package edu.jas.arith;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.math.BigInteger;
@@ -45,7 +45,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      */
     public static final BigDecimalComplex I = new BigDecimalComplex(BigDecimal.ZERO, BigDecimal.ONE);
     private final static Random random = new Random();
-    private static final Logger logger = Logger.getLogger(BigDecimalComplex.class);
+    private static final Logger logger = LogManager.getLogger(BigDecimalComplex.class);
     /**
      * Real part of the data structure.
      */
@@ -127,7 +127,7 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         }
         String si = "";
         if (i < s.length()) {
-            si = s.substring(i + 1, s.length());
+            si = s.substring(i + 1);
         }
         //int j = sr.indexOf("+");
         re = new BigDecimal(sr.trim());
@@ -289,16 +289,6 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
     }
 
     /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public BigDecimalComplex factory() {
-        return this;
-    }
-
-    /**
      * Get a list of the generating elements.
      *
      * @return list of generators for the algebraic structure.
@@ -322,86 +312,13 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
     }
 
     /**
-     * Clone this.
+     * Get a BigDecimalComplex element from a long.
      *
-     * @see Object#clone()
+     * @param a long.
+     * @return a BigDecimalComplex.
      */
-    @Override
-    public BigDecimalComplex copy() {
-        return new BigDecimalComplex(re, im);
-    }
-
-    /**
-     * Copy BigDecimalComplex element c.
-     *
-     * @param c BigDecimalComplex.
-     * @return a copy of c.
-     */
-    public BigDecimalComplex copy(BigDecimalComplex c) {
-        return new BigDecimalComplex(c.re, c.im);
-    }
-
-    /**
-     * Get the zero element.
-     *
-     * @return 0 as BigDecimalComplex.
-     */
-    public BigDecimalComplex getZERO() {
-        return ZERO;
-    }
-
-    /**
-     * Get the one element.
-     *
-     * @return 1 as BigDecimalComplex.
-     */
-    public BigDecimalComplex getONE() {
-        return ONE;
-    }
-
-    /**
-     * Get the i element.
-     *
-     * @return i as BigDecimalComplex.
-     */
-    public BigDecimalComplex getIMAG() {
-        return I;
-    }
-
-    /**
-     * Query if this ring is commutative.
-     *
-     * @return true.
-     */
-    public boolean isCommutative() {
-        return true;
-    }
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true.
-     */
-    public boolean isAssociative() {
-        return true;
-    }
-
-    /**
-     * Query if this ring is a field.
-     *
-     * @return true.
-     */
-    public boolean isField() {
-        return true;
-    }
-
-    /**
-     * Characteristic of this ring.
-     *
-     * @return characteristic of this ring.
-     */
-    public BigInteger characteristic() {
-        return BigInteger.ZERO;
+    public BigDecimalComplex fromInteger(long a) {
+        return new BigDecimalComplex(new BigDecimal(a));
     }
 
     /**
@@ -415,46 +332,99 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
     }
 
     /**
-     * Get a BigDecimalComplex element from a long.
+     * Complex number, random. Random rational numbers A and B are generated
+     * using random(n). Then R is the complex number with real part A and
+     * imaginary part B.
      *
-     * @param a long.
-     * @return a BigDecimalComplex.
+     * @param n such that 0 &le; A, B &le; (2<sup>n</sup>-1).
+     * @return R.
      */
-    public BigDecimalComplex fromInteger(long a) {
-        return new BigDecimalComplex(new BigDecimal(a));
+    public BigDecimalComplex random(int n) {
+        return random(n, random);
     }
 
     /**
-     * Get the real part.
+     * Complex number, random. Random rational numbers A and B are generated
+     * using random(n). Then R is the complex number with real part A and
+     * imaginary part B.
      *
-     * @return re.
+     * @param n   such that 0 &le; A, B &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return R.
      */
-    public BigDecimal getRe() {
-        return re;
+    public BigDecimalComplex random(int n, Random rnd) {
+        BigDecimal r = BigDecimal.ONE.random(n, rnd);
+        BigDecimal i = BigDecimal.ONE.random(n, rnd);
+        return new BigDecimalComplex(r, i);
     }
 
     /**
-     * Get the imaginary part.
+     * Copy BigDecimalComplex element c.
      *
-     * @return im.
+     * @param c BigDecimalComplex.
+     * @return a copy of c.
      */
-    public BigDecimal getIm() {
-        return im;
+    public BigDecimalComplex copy(BigDecimalComplex c) {
+        return new BigDecimalComplex(c.re, c.im);
     }
 
     /**
-     * Get the String representation.
+     * Parse complex number from string.
+     *
+     * @param s String.
+     * @return BigDecimalComplex from s.
+     */
+    public BigDecimalComplex parse(String s) {
+        return new BigDecimalComplex(s);
+    }
+
+    /**
+     * Parse complex number from Reader.
+     *
+     * @param r Reader.
+     * @return next BigDecimalComplex from r.
+     */
+    public BigDecimalComplex parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Clone this.
+     *
+     * @see java.lang.Object#clone()
      */
     @Override
-    public String toString() {
-        String s = re.toString();
-        //int i = im.compareTo(BigDecimal.ZERO);
-        //logger.info("compareTo "+im+" ? 0 = "+i);
-        if (im.isZERO()) {
+    public BigDecimalComplex copy() {
+        return new BigDecimalComplex(re, im);
+    }
+
+    /**
+     * Since complex numbers are unordered, we use lexicographical order of re
+     * and im.
+     *
+     * @return 0 if this is equal to b; 1 if re &gt; b.re, or re == b.re and im
+     * &gt; b.im; -1 if re &lt; b.re, or re == b.re and im &lt; b.im
+     */
+    @Override
+    public int compareTo(BigDecimalComplex b) {
+        int s = re.compareTo(b.re);
+        //System.out.println("compareTo(a.re,b.re) = " + s);
+        if (s != 0) {
             return s;
         }
-        s += "i" + im;
+        s = im.compareTo(b.im);
+        //System.out.println("compareTo(a.im,b.im) = " + s);
         return s;
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public BigDecimalComplex factory() {
+        return this;
     }
 
     /**
@@ -505,10 +475,6 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         return s.toString();
     }
 
-
-    /* arithmetic operations: +, -, -
-     */
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -522,6 +488,91 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
     }
 
     /**
+     * Get the zero element.
+     *
+     * @return 0 as BigDecimalComplex.
+     */
+    public BigDecimalComplex getZERO() {
+        return ZERO;
+    }
+
+    /**
+     * Get the one element.
+     *
+     * @return 1 as BigDecimalComplex.
+     */
+    public BigDecimalComplex getONE() {
+        return ONE;
+    }
+
+    /**
+     * Query if this ring is commutative.
+     *
+     * @return true.
+     */
+    public boolean isCommutative() {
+        return true;
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true.
+     */
+    public boolean isAssociative() {
+        return true;
+    }
+
+
+    /* arithmetic operations: +, -, -
+     */
+
+    /**
+     * Get the i element.
+     *
+     * @return i as BigDecimalComplex.
+     */
+    public BigDecimalComplex getIMAG() {
+        return I;
+    }
+
+    /**
+     * Query if this ring is a field.
+     *
+     * @return true.
+     */
+    public boolean isField() {
+        return true;
+    }
+
+    /**
+     * Characteristic of this ring.
+     *
+     * @return characteristic of this ring.
+     */
+    public java.math.BigInteger characteristic() {
+        return java.math.BigInteger.ZERO;
+    }
+
+    /**
+     * Get the real part.
+     *
+     * @return re.
+     */
+    public BigDecimal getRe() {
+        return re;
+    }
+
+    /**
+     * Get the imaginary part.
+     *
+     * @return im.
+     */
+    public BigDecimal getIm() {
+        return im;
+    }
+
+    /**
      * Is Complex number zero.
      *
      * @return If this is 0 then true is returned, else false.
@@ -529,83 +580,6 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
      */
     public boolean isZERO() {
         return re.isZERO() && im.isZERO();
-    }
-
-    /**
-     * Is Complex number one.
-     *
-     * @return If this is 1 then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isONE()
-     */
-    public boolean isONE() {
-        return re.isONE() && im.isZERO();
-    }
-
-    /**
-     * Is Complex imaginary one.
-     *
-     * @return If this is i then true is returned, else false.
-     */
-    public boolean isIMAG() {
-        return re.isZERO() && im.isONE();
-    }
-
-    /**
-     * Is Complex unit element.
-     *
-     * @return If this is a unit then true is returned, else false.
-     * @see edu.jas.structure.RingElem#isUnit()
-     */
-    public boolean isUnit() {
-        return (!isZERO());
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object b) {
-        if (!(b instanceof BigDecimalComplex)) {
-            return false;
-        }
-        BigDecimalComplex bc = (BigDecimalComplex) b;
-        //return re.equals(bc.re) && im.equals(bc.im);
-        return re.compareTo(bc.re) == 0 && im.compareTo(bc.im) == 0;
-    }
-
-    /**
-     * Hash code for this BigDecimalComplex.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return 37 * re.hashCode() + im.hashCode();
-    }
-
-
-    /* arithmetic operations: conjugate, absolut value
-     */
-
-    /**
-     * Since complex numbers are unordered, we use lexicographical order of re
-     * and im.
-     *
-     * @return 0 if this is equal to b; 1 if re &gt; b.re, or re == b.re and im
-     * &gt; b.im; -1 if re &lt; b.re, or re == b.re and im &lt; b.im
-     */
-    @Override
-    public int compareTo(BigDecimalComplex b) {
-        int s = re.compareTo(b.re);
-        //System.out.println("compareTo(a.re,b.re) = " + s);
-        if (s != 0) {
-            return s;
-        }
-        s = im.compareTo(b.im);
-        //System.out.println("compareTo(a.im,b.im) = " + s);
-        return s;
     }
 
     /**
@@ -623,6 +597,10 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         }
         return im.signum();
     }
+
+
+    /* arithmetic operations: conjugate, absolut value
+     */
 
     /**
      * Complex number summation.
@@ -654,9 +632,151 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         return new BigDecimalComplex(re.negate(), im.negate());
     }
 
+    /**
+     * Complex number absolute value.
+     *
+     * @return |this|.
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public BigDecimalComplex abs() {
+        if (im.isZERO()) {
+            return new BigDecimalComplex(re.abs());
+        }
+        BigDecimalComplex n = norm();
+        BigDecimal d = Roots.sqrt(n.re);
+        if (logger.isDebugEnabled()) {
+            logger.debug("sqrt(re) = " + d);
+        }
+        return new BigDecimalComplex(d);
+    }
+
+    /**
+     * Is Complex number one.
+     *
+     * @return If this is 1 then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isONE()
+     */
+    public boolean isONE() {
+        return re.isONE() && im.isZERO();
+    }
+
 
     /* arithmetic operations: *, inverse, /
      */
+
+    /**
+     * Is Complex unit element.
+     *
+     * @return If this is a unit then true is returned, else false.
+     * @see edu.jas.structure.RingElem#isUnit()
+     */
+    public boolean isUnit() {
+        return (!isZERO());
+    }
+
+    /**
+     * Complex number product.
+     *
+     * @param B is a complex number.
+     * @return this*B.
+     */
+    public BigDecimalComplex multiply(BigDecimalComplex B) {
+        return new BigDecimalComplex(re.multiply(B.re).subtract(im.multiply(B.im)), re.multiply(B.im).sum(
+                im.multiply(B.re)));
+    }
+
+    /**
+     * Complex number divide.
+     *
+     * @param B is a complex number, non-zero.
+     * @return this/B.
+     */
+    public BigDecimalComplex divide(BigDecimalComplex B) {
+        return this.multiply(B.inverse());
+    }
+
+    /**
+     * Complex number inverse.
+     *
+     * @param S is a complex number.
+     * @return 0.
+     */
+    public BigDecimalComplex remainder(BigDecimalComplex S) {
+        if (S.isZERO()) {
+            throw new ArithmeticException("division by zero");
+        }
+        return ZERO;
+    }
+
+    /**
+     * Quotient and remainder by division of this by S.
+     *
+     * @param S a complex number
+     * @return [this/S, this - (this/S)*S].
+     */
+    public BigDecimalComplex[] quotientRemainder(BigDecimalComplex S) {
+        return new BigDecimalComplex[]{divide(S), ZERO};
+    }
+
+    /**
+     * Complex number inverse.
+     *
+     * @return S with S*this = 1.
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public BigDecimalComplex inverse() {
+        BigDecimal a = norm().re.inverse();
+        return new BigDecimalComplex(re.multiply(a), im.multiply(a.negate()));
+    }
+
+    /**
+     * Is Complex imaginary one.
+     *
+     * @return If this is i then true is returned, else false.
+     */
+    public boolean isIMAG() {
+        return re.isZERO() && im.isONE();
+    }
+
+    /**
+     * Hash code for this BigDecimalComplex.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * re.hashCode() + im.hashCode();
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object b) {
+        if (!(b instanceof BigDecimalComplex)) {
+            return false;
+        }
+        BigDecimalComplex bc = (BigDecimalComplex) b;
+        //return re.equals(bc.re) && im.equals(bc.im);
+        return re.compareTo(bc.re) == 0 && im.compareTo(bc.im) == 0;
+    }
+
+    /**
+     * Get the String representation.
+     */
+    @Override
+    public String toString() {
+        String s = re.toString();
+        //int i = im.compareTo(BigDecimal.ZERO);
+        //logger.info("compareTo "+im+" ? 0 = "+i);
+        if (im.isZERO()) {
+            return s;
+        }
+        s += "i" + im;
+        return s;
+    }
 
     /**
      * Complex number conjugate.
@@ -681,128 +801,6 @@ public final class BigDecimalComplex extends RingElemImpl<BigDecimalComplex>
         }
         return new BigDecimalComplex(v);
     }
-
-    /**
-     * Complex number absolute value.
-     *
-     * @return |this|.
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public BigDecimalComplex abs() {
-        if (im.isZERO()) {
-            return new BigDecimalComplex(re.abs());
-        }
-        BigDecimalComplex n = norm();
-        BigDecimal d = Roots.sqrt(n.re);
-        if (logger.isDebugEnabled()) {
-            logger.debug("sqrt(re) = " + d);
-        }
-        return new BigDecimalComplex(d);
-    }
-
-    /**
-     * Complex number product.
-     *
-     * @param B is a complex number.
-     * @return this*B.
-     */
-    public BigDecimalComplex multiply(BigDecimalComplex B) {
-        return new BigDecimalComplex(re.multiply(B.re).subtract(im.multiply(B.im)), re.multiply(B.im).sum(
-                im.multiply(B.re)));
-    }
-
-    /**
-     * Complex number inverse.
-     *
-     * @return S with S*this = 1.
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public BigDecimalComplex inverse() {
-        BigDecimal a = norm().re.inverse();
-        return new BigDecimalComplex(re.multiply(a), im.multiply(a.negate()));
-    }
-
-    /**
-     * Complex number inverse.
-     *
-     * @param S is a complex number.
-     * @return 0.
-     */
-    public BigDecimalComplex remainder(BigDecimalComplex S) {
-        if (S.isZERO()) {
-            throw new ArithmeticException("division by zero");
-        }
-        return ZERO;
-    }
-
-    /**
-     * Complex number divide.
-     *
-     * @param B is a complex number, non-zero.
-     * @return this/B.
-     */
-    public BigDecimalComplex divide(BigDecimalComplex B) {
-        return this.multiply(B.inverse());
-    }
-
-    /**
-     * Quotient and remainder by division of this by S.
-     *
-     * @param S a complex number
-     * @return [this/S, this - (this/S)*S].
-     */
-    public BigDecimalComplex[] quotientRemainder(BigDecimalComplex S) {
-        return new BigDecimalComplex[]{divide(S), ZERO};
-    }
-
-    /**
-     * Complex number, random. Random rational numbers A and B are generated
-     * using random(n). Then R is the complex number with real part A and
-     * imaginary part B.
-     *
-     * @param n such that 0 &le; A, B &le; (2<sup>n</sup>-1).
-     * @return R.
-     */
-    public BigDecimalComplex random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * Complex number, random. Random rational numbers A and B are generated
-     * using random(n). Then R is the complex number with real part A and
-     * imaginary part B.
-     *
-     * @param n   such that 0 &le; A, B &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return R.
-     */
-    public BigDecimalComplex random(int n, Random rnd) {
-        BigDecimal r = BigDecimal.ONE.random(n, rnd);
-        BigDecimal i = BigDecimal.ONE.random(n, rnd);
-        return new BigDecimalComplex(r, i);
-    }
-
-    /**
-     * Parse complex number from string.
-     *
-     * @param s String.
-     * @return BigDecimalComplex from s.
-     */
-    public BigDecimalComplex parse(String s) {
-        return new BigDecimalComplex(s);
-    }
-
-
-    /**
-     * Parse complex number from Reader.
-     *
-     * @param r Reader.
-     * @return next BigDecimalComplex from r.
-     */
-    public BigDecimalComplex parse(Reader r) {
-        return parse(StringUtil.nextString(r));
-    }
-
 
     /**
      * Complex number greatest common divisor.

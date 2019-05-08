@@ -5,8 +5,8 @@
 package edu.jas.vector;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import edu.jas.structure.RingElem;
 public class BasicLinAlg<C extends RingElem<C>> implements Serializable {
 
 
-    private static final Logger logger = Logger.getLogger(BasicLinAlg.class);
+    private static final Logger logger = LogManager.getLogger(BasicLinAlg.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();

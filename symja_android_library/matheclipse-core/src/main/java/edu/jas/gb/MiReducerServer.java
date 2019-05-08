@@ -4,8 +4,8 @@
 
 package edu.jas.gb;
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -21,7 +21,7 @@ import edu.jas.structure.RingElem;
 class MiReducerServer<C extends RingElem<C>> implements Runnable {
 
 
-    private static final Logger logger = Logger.getLogger(MiReducerServer.class);
+    private static final Logger logger = LogManager.getLogger(MiReducerServer.class);
     private final List<GenPolynomial<C>> G;
     private final Semaphore done = new Semaphore(0);
 
@@ -73,7 +73,7 @@ class MiReducerServer<C extends RingElem<C>> implements Runnable {
 class MiReducerClient<C extends RingElem<C>> implements Runnable {
 
 
-    private static final Logger logger = Logger.getLogger(MiReducerClient.class);
+    private static final Logger logger = LogManager.getLogger(MiReducerClient.class);
     private final List<GenPolynomial<C>> G;
     private final Reduction<C> red;
 

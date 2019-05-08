@@ -4,8 +4,8 @@
 
 package edu.jas.gb;
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -33,7 +33,7 @@ import edu.jas.structure.RingElem;
 
 public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> {
 
-    private static final Logger logger = Logger.getLogger(CriticalPairList.class);
+    private static final Logger logger = LogManager.getLogger(CriticalPairList.class);
     protected final SortedSet<CriticalPair<C>> pairlist; // hide super
     protected int recordCount;
 
@@ -129,20 +129,20 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         return len;
     }
 
-
     /**
-     * Test if there is possibly a pair in the list.
+     * Put the ONE-Polynomial to the pairlist.
      *
-     * @return true if a next pair could exist, otherwise false.
+     * @return the index of the last polynomial.
      */
-    public synchronized boolean hasNext() {
-        return pairlist.size() > 0;
+    public synchronized int putOne() {
+        super.putOne();
+        pairlist.clear();
+        return 0;
     }
-
 
     /**
      * Get and remove the next required pair from the pairlist.
-     * Appy the criterions 3 and 4 to @see if the S-polynomial is required.
+     * Appy the criterions 3 and 4 to see if the S-polynomial is required.
      * The pair is not removed from the pair list.
      *
      * @return the next pair if one exists, otherwise null.
@@ -155,10 +155,18 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         return new Pair<C>(cp.pi, cp.pj, cp.i, cp.j);
     }
 
+    /**
+     * Test if there is possibly a pair in the list.
+     *
+     * @return true if a next pair could exist, otherwise false.
+     */
+    public synchronized boolean hasNext() {
+        return pairlist.size() > 0;
+    }
 
     /**
      * Get the next required pair from the pairlist.
-     * Appy the criterions 3 and 4 to @see if the S-polynomial is required.
+     * Appy the criterions 3 and 4 to see if the S-polynomial is required.
      * The pair is not removed from the pair list.
      *
      * @return the next pair if one exists, otherwise null.
@@ -205,7 +213,6 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         return pair;
     }
 
-
     /**
      * Record reduced polynomial.
      *
@@ -226,7 +233,6 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         return -1;
     }
 
-
     /**
      * Record reduced polynomial and update critical pair list.
      * Note: it is better to use record and uptate separately.
@@ -244,7 +250,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
             recordCount++;
         }
         int c = update();
-        if (c < 0) { // use for findbugs 
+        if (c < 0) { // use for findbugs
             System.out.println("c < 0");
         }
         if (!p.isZERO() && !p.isONE()) {
@@ -252,7 +258,6 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         }
         return -1;
     }
-
 
     /**
      * Update pairlist.
@@ -286,7 +291,6 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         return num;
     }
 
-
     /**
      * In work pairs. List pairs which are currently reduced.
      *
@@ -305,7 +309,6 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         }
         return iw;
     }
-
 
     /**
      * Update pairlist, several pairs at once.
@@ -330,7 +333,7 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
         }
         // must work on a copy to avoid concurrent modification
         for (CriticalPair<C> pair : rem) {
-            // System.out.println("update = " + pair); 
+            // System.out.println("update = " + pair);
             pairlist.remove(pair);
             GenPolynomial<C> p = pair.getReductum();
             if (!p.isZERO()) {
@@ -342,18 +345,6 @@ public class CriticalPairList<C extends RingElem<C>> extends OrderedPairlist<C> 
             }
         }
         return num;
-    }
-
-
-    /**
-     * Put the ONE-Polynomial to the pairlist.
-     *
-     * @return the index of the last polynomial.
-     */
-    public synchronized int putOne() {
-        super.putOne();
-        pairlist.clear();
-        return 0;
     }
 
 }

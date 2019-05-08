@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import edu.jas.ufd.FactorFactory;
 public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends MultiplicativeSet<C> {
 
 
-    private static final Logger logger = Logger.getLogger(MultiplicativeSetFactors.class);
+    private static final Logger logger = LogManager.getLogger(MultiplicativeSetFactors.class);
 
 
     //private static final boolean debug = logger.isDebugEnabled();
@@ -65,22 +65,10 @@ public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends Multipli
         engine = eng;
     }
 
-
-    /**
-     * toString.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "MultiplicativeSetFactors" + mset;
-    }
-
-
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -90,6 +78,15 @@ public class MultiplicativeSetFactors<C extends GcdRingElem<C>> extends Multipli
         return super.equals(B);
     }
 
+    /**
+     * toString.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "MultiplicativeSetFactors" + mset;
+    }
 
     /**
      * Add polynomial to mset.

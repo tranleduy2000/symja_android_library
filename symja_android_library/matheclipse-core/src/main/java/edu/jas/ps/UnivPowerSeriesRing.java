@@ -5,13 +5,12 @@
 package edu.jas.ps;
 
 
-import com.duy.lambda.IntFunction;
-
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import com.duy.lambda.IntFunction;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;
@@ -163,46 +162,23 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return ps2;
     }
 
-
     /**
-     * To String.
+     * Hash code for this .
      *
-     * @return string representation of this.
+     * @see java.lang.Object#hashCode()
      */
     @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        String scf = coFac.getClass().getSimpleName();
-        sb.append(scf + "((" + var + "))");
-        return sb.toString();
+    public int hashCode() {
+        int h = coFac.hashCode();
+        h += (var.hashCode() << 27);
+        h += truncate;
+        return h;
     }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        StringBuffer s = new StringBuffer("PS(");
-        String f = null;
-        try {
-            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
-        } catch (Exception e) {
-            f = coFac.toScript();
-        }
-        s.append(f + ",\"" + var + "\"," + truncate + ")");
-        return s.toString();
-    }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -221,20 +197,18 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return var.equals(a.var);
     }
 
-
     /**
-     * Hash code for this .
+     * To String.
      *
-     * @see Object#hashCode()
+     * @return string representation of this.
      */
     @Override
-    public int hashCode() {
-        int h = coFac.hashCode();
-        h += (var.hashCode() << 27);
-        h += truncate;
-        return h;
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        String scf = coFac.getClass().getSimpleName();
+        sb.append(scf + "((" + var + "))");
+        return sb.toString();
     }
-
 
     /**
      * Get the zero element.
@@ -245,7 +219,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return ZERO;
     }
 
-
     /**
      * Get the one element.
      *
@@ -255,6 +228,23 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return ONE;
     }
 
+    /**
+     * Is commutative.
+     *
+     * @return true, if this ring is commutative, else false.
+     */
+    public boolean isCommutative() {
+        return coFac.isCommutative();
+    }
+
+    /**
+     * Query if this ring is associative.
+     *
+     * @return true if this ring is associative, else false.
+     */
+    public boolean isAssociative() {
+        return coFac.isAssociative();
+    }
 
     /**
      * Get a list of the generating elements.
@@ -283,7 +273,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return gens;
     }
 
-
     /**
      * Is this structure finite or infinite.
      *
@@ -294,6 +283,96 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return false;
     }
 
+    /**
+     * Get a (constant) UnivPowerSeries&lt;C&gt; from a long value.
+     *
+     * @param a long.
+     * @return a UnivPowerSeries&lt;C&gt;.
+     */
+    public UnivPowerSeries<C> fromInteger(long a) {
+        return ONE.multiply(coFac.fromInteger(a));
+    }
+
+    /**
+     * Get a (constant) UnivPowerSeries&lt;C&gt; from a java.math.BigInteger.
+     *
+     * @param a BigInteger.
+     * @return a UnivPowerSeries&lt;C&gt;.
+     */
+    public UnivPowerSeries<C> fromInteger(java.math.BigInteger a) {
+        return ONE.multiply(coFac.fromInteger(a));
+    }
+
+    /**
+     * Generate a random power series with d = 0.7.
+     *
+     * @param k bitsize of random coefficients.
+     * @return a random power series.
+     */
+    public UnivPowerSeries<C> random(int k) {
+        return random(k, 0.7f, random);
+    }
+
+    /**
+     * Generate a random power series with d = 0.7.
+     *
+     * @param k   bit-size of random coefficients.
+     * @param rnd is a source for random bits.
+     * @return a random power series.
+     */
+    public UnivPowerSeries<C> random(int k, Random rnd) {
+        return random(k, 0.7f, rnd);
+    }
+
+    /**
+     * Copy power series.
+     *
+     * @param c a power series.
+     * @return a copy of c.
+     */
+    public UnivPowerSeries<C> copy(UnivPowerSeries<C> c) {
+        return new UnivPowerSeries<C>(this, c.lazyCoeffs);
+    }
+
+    /**
+     * Parse a power series. <b>Note:</b> not implemented.
+     *
+     * @param s String.
+     * @return power series from s.
+     */
+    public UnivPowerSeries<C> parse(String s) {
+        throw new UnsupportedOperationException("parse for power series not implemented");
+    }
+
+    /**
+     * Parse a power series. <b>Note:</b> not implemented.
+     *
+     * @param r Reader.
+     * @return next power series from r.
+     */
+    public UnivPowerSeries<C> parse(Reader r) {
+        throw new UnsupportedOperationException("parse for power series not implemented");
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        StringBuffer s = new StringBuffer("PS(");
+        String f = null;
+        try {
+            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
+        } catch (Exception e) {
+            f = coFac.toScript();
+        }
+        s.append(f + ",\"" + var + "\"," + truncate + ")");
+        return s.toString();
+    }
 
     /**
      * Get the power series of the exponential function.
@@ -310,7 +389,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         });
     }
 
-
     /**
      * Get the power series of the sinus function.
      *
@@ -325,7 +403,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
             }
         });
     }
-
 
     /**
      * Get the power series of the cosine function.
@@ -342,7 +419,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         });
     }
 
-
     /**
      * Get the power series of the tangens function.
      *
@@ -358,7 +434,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         });
     }
 
-
     /**
      * Solve an ordinary differential equation. y' = f(y) with y(0) = c.
      *
@@ -370,27 +445,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return f.integrate(c);
     }
 
-
-    /**
-     * Is commutative.
-     *
-     * @return true, if this ring is commutative, else false.
-     */
-    public boolean isCommutative() {
-        return coFac.isCommutative();
-    }
-
-
-    /**
-     * Query if this ring is associative.
-     *
-     * @return true if this ring is associative, else false.
-     */
-    public boolean isAssociative() {
-        return coFac.isAssociative();
-    }
-
-
     /**
      * Query if this ring is a field.
      *
@@ -399,7 +453,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
     public boolean isField() {
         return false;
     }
-
 
     /**
      * Characteristic of this ring.
@@ -410,29 +463,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         return coFac.characteristic();
     }
 
-
-    /**
-     * Get a (constant) UnivPowerSeries&lt;C&gt; from a long value.
-     *
-     * @param a long.
-     * @return a UnivPowerSeries&lt;C&gt;.
-     */
-    public UnivPowerSeries<C> fromInteger(long a) {
-        return ONE.multiply(coFac.fromInteger(a));
-    }
-
-
-    /**
-     * Get a (constant) UnivPowerSeries&lt;C&gt; from a java.math.BigInteger.
-     *
-     * @param a BigInteger.
-     * @return a UnivPowerSeries&lt;C&gt;.
-     */
-    public UnivPowerSeries<C> fromInteger(java.math.BigInteger a) {
-        return ONE.multiply(coFac.fromInteger(a));
-    }
-
-
     /**
      * Get the corresponding GenPolynomialRing&lt;C&gt;.
      *
@@ -441,7 +471,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
     public GenPolynomialRing<C> polyRing() {
         return new GenPolynomialRing<C>(coFac, 1, new String[]{var});
     }
-
 
     /**
      * Get a UnivPowerSeries&lt;C&gt; from a GenPolynomial&lt;C&gt;.
@@ -475,7 +504,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         });
     }
 
-
     /**
      * Generate a random power series with k = 5, d = 0.7.
      *
@@ -484,30 +512,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
     public UnivPowerSeries<C> random() {
         return random(5, 0.7f, random);
     }
-
-
-    /**
-     * Generate a random power series with d = 0.7.
-     *
-     * @param k bitsize of random coefficients.
-     * @return a random power series.
-     */
-    public UnivPowerSeries<C> random(int k) {
-        return random(k, 0.7f, random);
-    }
-
-
-    /**
-     * Generate a random power series with d = 0.7.
-     *
-     * @param k   bit-size of random coefficients.
-     * @param rnd is a source for random bits.
-     * @return a random power series.
-     */
-    public UnivPowerSeries<C> random(int k, Random rnd) {
-        return random(k, 0.7f, rnd);
-    }
-
 
     /**
      * Generate a random power series.
@@ -519,7 +523,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
     public UnivPowerSeries<C> random(int k, float d) {
         return random(k, d, random);
     }
-
 
     /**
      * Generate a random power series.
@@ -548,7 +551,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
         });
     }
 
-
     /**
      * Generate a power series via lambda expression.
      *
@@ -567,40 +569,6 @@ public class UnivPowerSeriesRing<C extends RingElem<C>> implements RingFactory<U
             }
         });
     }
-
-
-    /**
-     * Copy power series.
-     *
-     * @param c a power series.
-     * @return a copy of c.
-     */
-    public UnivPowerSeries<C> copy(UnivPowerSeries<C> c) {
-        return new UnivPowerSeries<C>(this, c.lazyCoeffs);
-    }
-
-
-    /**
-     * Parse a power series. <b>Note:</b> not implemented.
-     *
-     * @param s String.
-     * @return power series from s.
-     */
-    public UnivPowerSeries<C> parse(String s) {
-        throw new UnsupportedOperationException("parse for power series not implemented");
-    }
-
-
-    /**
-     * Parse a power series. <b>Note:</b> not implemented.
-     *
-     * @param r Reader.
-     * @return next power series from r.
-     */
-    public UnivPowerSeries<C> parse(Reader r) {
-        throw new UnsupportedOperationException("parse for power series not implemented");
-    }
-
 
     /**
      * Taylor power series.

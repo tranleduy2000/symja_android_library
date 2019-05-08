@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import edu.jas.structure.RingFactory;
 public class SolvableSyzygySeq<C extends GcdRingElem<C>> extends SolvableSyzygyAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SolvableSyzygySeq.class);
+    private static final Logger logger = LogManager.getLogger(SolvableSyzygySeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

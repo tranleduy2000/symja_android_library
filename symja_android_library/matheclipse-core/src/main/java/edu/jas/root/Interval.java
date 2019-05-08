@@ -56,19 +56,6 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
         this(mid, mid);
     }
 
-
-    /**
-     * String representation of Interval.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "[" + left + ", " + right + "]";
-        //return "[" + left.getRational().getDecimal() + ", " + right.getRational().getDecimal() + "]";
-    }
-
-
     /**
      * Get a scripting compatible string representation.
      *
@@ -79,7 +66,6 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
         return "[ " + left.toScript() + ", " + right.toScript() + " ]";
     }
 
-
     /**
      * Copy this.
      *
@@ -89,11 +75,20 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
         return new Interval<C>(left, right);
     }
 
+    /**
+     * Hash code for this Interval.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return 37 * left.hashCode() + right.hashCode();
+    }
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -110,17 +105,16 @@ public class Interval<C extends RingElem<C> & Rational> implements Serializable 
         return left.equals(a.left) && right.equals(a.right);
     }
 
-
     /**
-     * Hash code for this Interval.
+     * String representation of Interval.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        return 37 * left.hashCode() + right.hashCode();
+    public String toString() {
+        return "[" + left + ", " + right + "]";
+        //return "[" + left.getRational().getDecimal() + ", " + right.getRational().getDecimal() + "]";
     }
-
 
     /**
      * Test if an element is contained in this interval.

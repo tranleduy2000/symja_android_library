@@ -84,17 +84,33 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
         return new Monomial<C>(e, c);
     }
 
-
     /**
-     * String representation of Monomial.
+     * Monomial comparison.
      *
-     * @see Object#toString()
+     * @param S Monomial.
+     * @return SIGN(this - S).
      */
     @Override
-    public String toString() {
-        return c.toString() + " " + e.toString();
+    public int compareTo(Monomial<C> S) {
+        if (S == null) {
+            return 1;
+        }
+        int s = e.compareTo(S.e);
+        if (s != 0) {
+            return s;
+        }
+        return c.compareTo(S.c);
     }
 
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return null, factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public ElemFactory<Monomial<C>> factory() {
+        return null; // TODO
+    }
 
     /**
      * Script representation of Monomial.
@@ -117,7 +133,6 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
         return sb.toString();
     }
 
-
     /**
      * Get a scripting compatible string representation of the factory.
      *
@@ -130,22 +145,22 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
         return ""; // TODO
     }
 
-
     /**
-     * Get the corresponding element factory.
+     * hashCode.
      *
-     * @return null, factory for this Element.
-     * @see edu.jas.structure.Element#factory()
+     * @see java.lang.Object#hashCode()
      */
-    public ElemFactory<Monomial<C>> factory() {
-        return null; // TODO
+    @Override
+    public int hashCode() {
+        int h = e.hashCode();
+        h = (h << 4) + c.hashCode();
+        return h;
     }
-
 
     /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -157,36 +172,14 @@ public final class Monomial<C extends RingElem<C>> implements Element<Monomial<C
         return (compareTo(b) == 0);
     }
 
-
     /**
-     * hashCode.
+     * String representation of Monomial.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        int h = e.hashCode();
-        h = (h << 4) + c.hashCode();
-        return h;
-    }
-
-
-    /**
-     * Monomial comparison.
-     *
-     * @param S Monomial.
-     * @return SIGN(this - S).
-     */
-    @Override
-    public int compareTo(Monomial<C> S) {
-        if (S == null) {
-            return 1;
-        }
-        int s = e.compareTo(S.e);
-        if (s != 0) {
-            return s;
-        }
-        return c.compareTo(S.c);
+    public String toString() {
+        return c.toString() + " " + e.toString();
     }
 
 }

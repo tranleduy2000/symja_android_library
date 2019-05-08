@@ -49,16 +49,6 @@ public class WordPair<C extends RingElem<C>> implements Comparable<WordPair> {
         this.n = 0;
     }
 
-
-    /**
-     * toString.
-     */
-    @Override
-    public String toString() {
-        return "wordPair(" + i + "," + j + ",{" + pi.length() + "," + pj.length() + "}," + n + ")";
-    }
-
-
     /**
      * Set removed pair number.
      *
@@ -68,7 +58,6 @@ public class WordPair<C extends RingElem<C>> implements Comparable<WordPair> {
         this.n = n;
     }
 
-
     /**
      * Get removed pair number.
      *
@@ -77,23 +66,6 @@ public class WordPair<C extends RingElem<C>> implements Comparable<WordPair> {
     public int getPairNumber() {
         return n;
     }
-
-
-    /**
-     * equals.
-     *
-     * @param ob an Object.
-     * @return true if this is equal to o, else false.
-     */
-    @Override
-    public boolean equals(Object ob) {
-        if (!(ob instanceof WordPair)) {
-            return false;
-            // throw new ClassCastException("Pair "+n+" o "+o);
-        }
-        return 0 == compareTo((WordPair) ob);
-    }
-
 
     /**
      * compareTo used in TreeMap // not used at moment. Comparison is based on
@@ -113,15 +85,37 @@ public class WordPair<C extends RingElem<C>> implements Comparable<WordPair> {
         return 0;
     }
 
-
     /**
      * Hash code for this WordPair.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         return (i << 16) + j;
+    }
+
+    /**
+     * equals.
+     *
+     * @param ob an Object.
+     * @return true if this is equal to o, else false.
+     */
+    @Override
+    public boolean equals(Object ob) {
+        if (!(ob instanceof WordPair)) {
+            return false;
+            // throw new ClassCastException("Pair "+n+" o "+o);
+        }
+        return 0 == compareTo((WordPair) ob);
+    }
+
+    /**
+     * toString.
+     */
+    @Override
+    public String toString() {
+        return "wordPair(" + i + "," + j + ",{" + pi.length() + "," + pj.length() + "}," + n + ")";
     }
 
 }

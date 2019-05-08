@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import edu.jas.vector.GenVectorModul;
 public abstract class SyzygyAbstract<C extends GcdRingElem<C>> implements Syzygy<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SyzygyAbstract.class);
+    private static final Logger logger = LogManager.getLogger(SyzygyAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();

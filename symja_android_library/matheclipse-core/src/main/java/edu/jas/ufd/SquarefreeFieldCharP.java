@@ -5,7 +5,8 @@
 package edu.jas.ufd;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.SortedMap;
@@ -30,7 +31,7 @@ import edu.jas.structure.RingFactory;
 public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends SquarefreeAbstract<C> {
 
 
-    private static final Logger logger = Logger.getLogger(SquarefreeFieldCharP.class);
+    private static final Logger logger = LogManager.getLogger(SquarefreeFieldCharP.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -100,7 +101,7 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
     /**
      * Get the String representation.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -126,9 +127,9 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
         }
         GenPolynomial<C> s = pfac.getONE();
         SortedMap<GenPolynomial<C>, Long> factors = baseSquarefreeFactors(P);
-        if (logger.isWarnEnabled()) {
-            logger.warn("sqfPart, better use sqfFactors, factors = " + factors);
-        }
+        //if (logger.isWarnEnabled()) {
+        //   logger.warn("sqfPart, better use sqfFactors, factors = " + factors);
+        //}
         for (GenPolynomial<C> sp : factors.keySet()) {
             s = s.multiply(sp);
         }
@@ -285,12 +286,13 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
         GenPolynomial<GenPolynomial<C>> s = pfac.getONE();
         SortedMap<GenPolynomial<GenPolynomial<C>>, Long> factors = recursiveUnivariateSquarefreeFactors(P);
         if (logger.isWarnEnabled()) {
-            logger.warn("sqfPart, better use sqfFactors, factors = " + factors);
+            logger.info("sqfPart, better use sqfFactors, factors = " + factors);
         }
         for (GenPolynomial<GenPolynomial<C>> sp : factors.keySet()) {
             s = s.multiply(sp);
         }
-        return PolyUtil.monic(s);
+        s = PolyUtil.monic(s);
+        return s;
     }
 
 
@@ -381,11 +383,11 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
                     break;
                 }
                 Tp = PolyUtil.recursiveDeriviative(T0);
+                //System.out.println("iT0 = " + T0);
+                //System.out.println("iTp = " + Tp);
                 T = engine.recursiveUnivariateGcd(T0, Tp);
                 T = PolyUtil.monic(T);
                 V = PolyUtil.recursivePseudoDivide(T0, T);
-                //System.out.println("iT0 = " + T0);
-                //System.out.println("iTp = " + Tp);
                 //System.out.println("iT = " + T);
                 //System.out.println("iV = " + V);
                 k = 0L;
@@ -456,8 +458,8 @@ public abstract class SquarefreeFieldCharP<C extends GcdRingElem<C>> extends Squ
         }
         GenPolynomial<C> s = pfac.getONE();
         SortedMap<GenPolynomial<C>, Long> factors = squarefreeFactors(P);
-        if (logger.isInfoEnabled()) {
-            logger.info("sqfPart,factors = " + factors);
+        if (logger.isWarnEnabled()) {
+            logger.info("sqfPart, better use sqfFactors, factors = " + factors);
         }
         for (GenPolynomial<C> sp : factors.keySet()) {
             if (sp.isConstant()) {

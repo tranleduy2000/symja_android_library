@@ -5,8 +5,8 @@
 package edu.jas.gb;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +43,7 @@ import edu.jas.vector.BasicLinAlg;
 public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements GroebnerBase<C> {
 
 
-    private static final Logger logger = Logger.getLogger(GroebnerBaseAbstract.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBaseAbstract.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -117,7 +117,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
     /**
      * Get the String representation with GB engines.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -177,6 +177,176 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         return isGB(modv, F, true);
     }
 
+    /**
+     * Groebner base using pairlist class.
+     *
+     * @param F polynomial list.
+     * @return GB(F) a Groebner base of F.
+     */
+    public List<GenPolynomial<C>> GB(List<GenPolynomial<C>> F) {
+        return GB(0, F);
+    }
+
+    /**
+     * isGB.
+     *
+     * @param M a module basis.
+     * @return true, if M is a Groebner base, else false.
+     */
+    public boolean isGB(ModuleList<C> M) {
+        return isGB(M, false);
+    }
+
+    /**
+     * GB.
+     *
+     * @param M a module basis.
+     * @return GB(M), a Groebner base of M.
+     */
+    public ModuleList<C> GB(ModuleList<C> M) {
+        return GB(M, false);
+    }
+
+    /**
+     * Extended Groebner base using critical pair class.
+     *
+     * @param F polynomial list.
+     * @return a container for a Groebner base G of F together with
+     * back-and-forth transformations.
+     */
+    public ExtendedGB<C> extGB(List<GenPolynomial<C>> F) {
+        return extGB(0, F);
+    }
+
+    /**
+     * Extended Groebner base using critical pair class.
+     *
+     * @param modv module variable number.
+     * @param F    polynomial list.
+     * @return a container for a Groebner base G of F together with
+     * back-and-forth transformations.
+     */
+    public ExtendedGB<C> extGB(int modv, List<GenPolynomial<C>> F) {
+        throw new UnsupportedOperationException("extGB not implemented in " + this.getClass().getSimpleName());
+    }
+
+    /**
+     * Minimal ordered Groebner basis.
+     *
+     * @param Gp a Groebner base.
+     * @return a reduced Groebner base of Gp.
+     */
+    public List<GenPolynomial<C>> minimalGB(List<GenPolynomial<C>> Gp) {
+        if (Gp == null || Gp.size() <= 1) {
+            return Gp;
+        }
+        // remove zero polynomials
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
+        for (GenPolynomial<C> a : Gp) {
+            if (a != null && !a.isZERO()) { // always true in GB()
+                // already positive a = a.abs();
+                G.add(a);
+            }
+        }
+        if (G.size() <= 1) {
+            return G;
+        }
+        // remove top reducible polynomials
+        GenPolynomial<C> a;
+        List<GenPolynomial<C>> F;
+        F = new ArrayList<GenPolynomial<C>>(G.size());
+        while (G.size() > 0) {
+            a = G.remove(0);
+            if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
+                // drop polynomial
+                if (debug) {
+                    System.out.println("dropped " + a);
+                    List<GenPolynomial<C>> ff;
+                    ff = new ArrayList<GenPolynomial<C>>(G);
+                    ff.addAll(F);
+                    a = red.normalform(ff, a);
+                    if (!a.isZERO()) {
+                        System.out.println("error, nf(a) " + a);
+                    }
+                }
+            } else {
+                F.add(a);
+            }
+        }
+        G = F;
+        if (G.size() <= 1) {
+            return G;
+        }
+        // reduce remaining polynomials
+        Collections.reverse(G); // important for lex GB
+        int len = G.size();
+        if (debug) {
+            System.out.println("#G " + len);
+            for (GenPolynomial<C> aa : G) {
+                System.out.println("aa = " + aa.length() + ", lt = " + aa.getMap().keySet());
+            }
+        }
+        int i = 0;
+        while (i < len) {
+            a = G.remove(0);
+            if (debug) {
+                System.out.println("doing " + a.length() + ", lt = " + a.leadingExpVector());
+            }
+            a = red.normalform(G, a);
+            G.add(a); // adds as last
+            i++;
+        }
+        Collections.reverse(G); // undo reverse
+        return G;
+    }
+
+    /**
+     * Test if reduction matrix.
+     *
+     * @param exgb an ExtendedGB container.
+     * @return true, if exgb contains a reduction matrix, else false.
+     */
+    public boolean isReductionMatrix(ExtendedGB<C> exgb) {
+        if (exgb == null) {
+            return true;
+        }
+        return isReductionMatrix(exgb.F, exgb.G, exgb.F2G, exgb.G2F);
+    }
+
+    /**
+     * Test if reduction matrix.
+     *
+     * @param F  a polynomial list.
+     * @param G  a Groebner base.
+     * @param Mf a possible reduction matrix.
+     * @param Mg a possible reduction matrix.
+     * @return true, if Mg and Mf are reduction matrices, else false.
+     */
+    public boolean isReductionMatrix(List<GenPolynomial<C>> F, List<GenPolynomial<C>> G,
+                                     List<List<GenPolynomial<C>>> Mf, List<List<GenPolynomial<C>>> Mg) {
+        // no more check G and Mg: G * Mg[i] == 0
+        // check F and Mg: F * Mg[i] == G[i]
+        int k = 0;
+        for (List<GenPolynomial<C>> row : Mg) {
+            boolean t = red.isReductionNF(row, F, G.get(k), null);
+            if (!t) {
+                logger.error("F isReductionMatrix s, k = " + F.size() + ", " + k);
+                return false;
+            }
+            k++;
+        }
+        // check G and Mf: G * Mf[i] == F[i]
+        k = 0;
+        for (List<GenPolynomial<C>> row : Mf) {
+            boolean t = red.isReductionNF(row, G, F.get(k), null);
+            if (!t) {
+                logger.error("G isReductionMatrix s, k = " + G.size() + ", " + k);
+                return false;
+            }
+            k++;
+        }
+        return true;
+    }
 
     /**
      * Groebner base test.
@@ -188,7 +358,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
     public boolean isGB(List<GenPolynomial<C>> F, boolean b) {
         return isGB(0, F, b);
     }
-
 
     /**
      * Groebner base test.
@@ -204,7 +373,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         }
         return isGBidem(modv, F);
     }
-
 
     /**
      * Groebner base simple test.
@@ -239,7 +407,7 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
                 if (s.isZERO()) {
                     continue;
                 }
-                //System.out.println("i, j = " + i + ", " + j); 
+                //System.out.println("i, j = " + i + ", " + j);
                 h = red.normalform(F, s);
                 if (!h.isZERO()) {
                     logger.info("no GB: pi = " + pi + ", pj = " + pj);
@@ -250,7 +418,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         }
         return true;
     }
-
 
     /**
      * GB criterium 3.
@@ -271,7 +438,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         return true;
     }
 
-
     /**
      * Groebner base idempotence test.
      *
@@ -289,7 +455,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         PolynomialList<C> Gp = new PolynomialList<C>(pring, G);
         return Fp.compareTo(Gp) == 0;
     }
-
 
     /**
      * Common zero test.
@@ -333,29 +498,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         return 1;
     }
 
-
-    /**
-     * Groebner base using pairlist class.
-     *
-     * @param F polynomial list.
-     * @return GB(F) a Groebner base of F.
-     */
-    public List<GenPolynomial<C>> GB(List<GenPolynomial<C>> F) {
-        return GB(0, F);
-    }
-
-
-    /**
-     * isGB.
-     *
-     * @param M a module basis.
-     * @return true, if M is a Groebner base, else false.
-     */
-    public boolean isGB(ModuleList<C> M) {
-        return isGB(M, false);
-    }
-
-
     /**
      * isGB.
      *
@@ -371,21 +513,9 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
             return true;
         }
         PolynomialList<C> F = M.getPolynomialList(top);
-        int modv = M.cols; // > 0  
+        int modv = M.cols; // > 0
         return isGB(modv, F.list);
     }
-
-
-    /**
-     * GB.
-     *
-     * @param M a module basis.
-     * @return GB(M), a Groebner base of M.
-     */
-    public ModuleList<C> GB(ModuleList<C> M) {
-        return GB(M, false);
-    }
-
 
     /**
      * GB.
@@ -409,103 +539,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         N = F.getModuleList(modv);
         return N;
     }
-
-
-    /**
-     * Extended Groebner base using critical pair class.
-     *
-     * @param F polynomial list.
-     * @return a container for a Groebner base G of F together with
-     * back-and-forth transformations.
-     */
-    public ExtendedGB<C> extGB(List<GenPolynomial<C>> F) {
-        return extGB(0, F);
-    }
-
-
-    /**
-     * Extended Groebner base using critical pair class.
-     *
-     * @param modv module variable number.
-     * @param F    polynomial list.
-     * @return a container for a Groebner base G of F together with
-     * back-and-forth transformations.
-     */
-    public ExtendedGB<C> extGB(int modv, List<GenPolynomial<C>> F) {
-        throw new UnsupportedOperationException("extGB not implemented in " + this.getClass().getSimpleName());
-    }
-
-
-    /**
-     * Minimal ordered Groebner basis.
-     *
-     * @param Gp a Groebner base.
-     * @return a reduced Groebner base of Gp.
-     */
-    public List<GenPolynomial<C>> minimalGB(List<GenPolynomial<C>> Gp) {
-        if (Gp == null || Gp.size() <= 1) {
-            return Gp;
-        }
-        // remove zero polynomials
-        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
-        for (GenPolynomial<C> a : Gp) {
-            if (a != null && !a.isZERO()) { // always true in GB()
-                // already positive a = a.abs();
-                G.add(a);
-            }
-        }
-        if (G.size() <= 1) {
-            return G;
-        }
-        // remove top reducible polynomials
-        GenPolynomial<C> a;
-        List<GenPolynomial<C>> F;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
-        while (G.size() > 0) {
-            a = G.remove(0);
-            if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
-                // drop polynomial 
-                if (debug) {
-                    System.out.println("dropped " + a);
-                    List<GenPolynomial<C>> ff;
-                    ff = new ArrayList<GenPolynomial<C>>(G);
-                    ff.addAll(F);
-                    a = red.normalform(ff, a);
-                    if (!a.isZERO()) {
-                        System.out.println("error, nf(a) " + a);
-                    }
-                }
-            } else {
-                F.add(a);
-            }
-        }
-        G = F;
-        if (G.size() <= 1) {
-            return G;
-        }
-        // reduce remaining polynomials
-        Collections.reverse(G); // important for lex GB
-        int len = G.size();
-        if (debug) {
-            System.out.println("#G " + len);
-            for (GenPolynomial<C> aa : G) {
-                System.out.println("aa = " + aa.length() + ", lt = " + aa.getMap().keySet());
-            }
-        }
-        int i = 0;
-        while (i < len) {
-            a = G.remove(0);
-            if (debug) {
-                System.out.println("doing " + a.length() + ", lt = " + a.leadingExpVector());
-            }
-            a = red.normalform(G, a);
-            G.add(a); // adds as last
-            i++;
-        }
-        Collections.reverse(G); // undo reverse
-        return G;
-    }
-
 
     /**
      * Test for minimal ordered Groebner basis.
@@ -559,57 +592,6 @@ public abstract class GroebnerBaseAbstract<C extends RingElem<C>> implements Gro
         }
         return true;
     }
-
-
-    /**
-     * Test if reduction matrix.
-     *
-     * @param exgb an ExtendedGB container.
-     * @return true, if exgb contains a reduction matrix, else false.
-     */
-    public boolean isReductionMatrix(ExtendedGB<C> exgb) {
-        if (exgb == null) {
-            return true;
-        }
-        return isReductionMatrix(exgb.F, exgb.G, exgb.F2G, exgb.G2F);
-    }
-
-
-    /**
-     * Test if reduction matrix.
-     *
-     * @param F  a polynomial list.
-     * @param G  a Groebner base.
-     * @param Mf a possible reduction matrix.
-     * @param Mg a possible reduction matrix.
-     * @return true, if Mg and Mf are reduction matrices, else false.
-     */
-    public boolean isReductionMatrix(List<GenPolynomial<C>> F, List<GenPolynomial<C>> G,
-                                     List<List<GenPolynomial<C>>> Mf, List<List<GenPolynomial<C>>> Mg) {
-        // no more check G and Mg: G * Mg[i] == 0
-        // check F and Mg: F * Mg[i] == G[i]
-        int k = 0;
-        for (List<GenPolynomial<C>> row : Mg) {
-            boolean t = red.isReductionNF(row, F, G.get(k), null);
-            if (!t) {
-                logger.error("F isReductionMatrix s, k = " + F.size() + ", " + k);
-                return false;
-            }
-            k++;
-        }
-        // check G and Mf: G * Mf[i] == F[i]
-        k = 0;
-        for (List<GenPolynomial<C>> row : Mf) {
-            boolean t = red.isReductionNF(row, G, F.get(k), null);
-            if (!t) {
-                logger.error("G isReductionMatrix s, k = " + G.size() + ", " + k);
-                return false;
-            }
-            k++;
-        }
-        return true;
-    }
-
 
     /**
      * Normalize M. Make all rows the same size and make certain column elements

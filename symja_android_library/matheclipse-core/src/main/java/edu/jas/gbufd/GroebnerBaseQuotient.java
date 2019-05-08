@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import edu.jas.ufd.QuotientRing;
 public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBaseAbstract<Quotient<C>> {
 
 
-    private static final Logger logger = Logger.getLogger(GroebnerBaseQuotient.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBaseQuotient.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -77,43 +77,12 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
     /**
      * Get the String representation with GB engines.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "(" + bba.toString() + ")";
     }
-
-
-    /**
-     * Groebner base using fraction free computation.
-     *
-     * @param modv module variable number.
-     * @param F    polynomial list.
-     * @return GB(F) a Groebner base of F.
-     */
-    @Override
-    public List<GenPolynomial<Quotient<C>>> GB(int modv, List<GenPolynomial<Quotient<C>>> F) {
-        List<GenPolynomial<Quotient<C>>> G = F;
-        if (F == null || F.isEmpty()) {
-            return G;
-        }
-        GenPolynomialRing<Quotient<C>> rring = F.get(0).ring;
-        QuotientRing<C> cf = (QuotientRing<C>) rring.coFac;
-        GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<GenPolynomial<C>>(cf.ring, rring);
-        List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.integralFromQuotientCoefficients(iring, F);
-        //System.out.println("Fi = " + Fi);
-        logger.info("#Fi = " + Fi.size());
-
-        List<GenPolynomial<GenPolynomial<C>>> Gi = bba.GB(modv, Fi);
-        //System.out.println("Gi = " + Gi);
-        logger.info("#Gi = " + Gi.size());
-
-        G = PolyUfdUtil.quotientFromIntegralCoefficients(rring, Gi);
-        G = PolyUtil.monic(G);
-        return G;
-    }
-
 
     /**
      * Minimal ordered Groebner basis.
@@ -144,7 +113,7 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         while (G.size() > 0) {
             a = G.remove(0);
             if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
-                // drop polynomial 
+                // drop polynomial
                 if (debug) {
                     System.out.println("dropped " + a);
                     List<GenPolynomial<Quotient<C>>> ff;
@@ -179,7 +148,6 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         return G;
     }
 
-
     /**
      * Cleanup and terminate ThreadPool.
      */
@@ -188,13 +156,41 @@ public class GroebnerBaseQuotient<C extends GcdRingElem<C>> extends GroebnerBase
         bba.terminate();
     }
 
-
     /**
      * Cancel ThreadPool.
      */
     @Override
     public int cancel() {
         return bba.cancel();
+    }
+
+    /**
+     * Groebner base using fraction free computation.
+     *
+     * @param modv module variable number.
+     * @param F    polynomial list.
+     * @return GB(F) a Groebner base of F.
+     */
+    @Override
+    public List<GenPolynomial<Quotient<C>>> GB(int modv, List<GenPolynomial<Quotient<C>>> F) {
+        List<GenPolynomial<Quotient<C>>> G = F;
+        if (F == null || F.isEmpty()) {
+            return G;
+        }
+        GenPolynomialRing<Quotient<C>> rring = F.get(0).ring;
+        QuotientRing<C> cf = (QuotientRing<C>) rring.coFac;
+        GenPolynomialRing<GenPolynomial<C>> iring = new GenPolynomialRing<GenPolynomial<C>>(cf.ring, rring);
+        List<GenPolynomial<GenPolynomial<C>>> Fi = PolyUfdUtil.integralFromQuotientCoefficients(iring, F);
+        //System.out.println("Fi = " + Fi);
+        logger.info("#Fi = " + Fi.size());
+
+        List<GenPolynomial<GenPolynomial<C>>> Gi = bba.GB(modv, Fi);
+        //System.out.println("Gi = " + Gi);
+        logger.info("#Gi = " + Gi.size());
+
+        G = PolyUfdUtil.quotientFromIntegralCoefficients(rring, Gi);
+        G = PolyUtil.monic(G);
+        return G;
     }
 
 }

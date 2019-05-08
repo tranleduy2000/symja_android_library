@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +34,7 @@ import edu.jas.ufd.GreatestCommonDivisorAbstract;
 public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroebnerBaseSeq<C> {
 
 
-    private static final Logger logger = Logger.getLogger(RGroebnerBasePseudoSeq.class);
+    private static final Logger logger = LogManager.getLogger(RGroebnerBasePseudoSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -84,6 +84,119 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         // (GreatestCommonDivisorAbstract<C>)GCDFactory.<C>getProxy( rf );
     }
 
+    /**
+     * Minimal ordered Groebner basis.
+     *
+     * @param Gp a Groebner base.
+     * @return a reduced Groebner base of Gp.
+     */
+    @Override
+    public List<GenPolynomial<C>> minimalGB(List<GenPolynomial<C>> Gp) {
+        if (Gp == null || Gp.size() <= 1) {
+            return Gp;
+        }
+        // remove zero polynomials
+        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
+        for (GenPolynomial<C> a : Gp) {
+            if (a != null && !a.isZERO()) { // always true in GB()
+                a = a.abs(); // already positive in GB
+                G.add(a);
+            }
+        }
+        // remove top reducible polynomials
+        logger.info("minGB start with " + G.size());
+        GenPolynomial<C> a, b;
+        List<GenPolynomial<C>> F;
+        F = new ArrayList<GenPolynomial<C>>(G.size());
+        while (G.size() > 0) {
+            a = G.remove(0);
+            b = a;
+            if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
+                // try to drop polynomial
+                List<GenPolynomial<C>> ff;
+                ff = new ArrayList<GenPolynomial<C>>(G);
+                ff.addAll(F);
+                a = red.normalform(ff, a);
+                if (a.isZERO()) {
+                    //if (false && !isGB(ff)) { // is really required, but why?
+                    //    logger.info("minGB not dropped " + b);
+                    //    F.add(b);
+                    //} else {
+                    if (debug) {
+                        logger.debug("minGB dropped " + b);
+                    }
+                    //}
+                } else { // happens
+                    logger.info("minGB not zero " + a);
+                    F.add(a);
+                }
+            } else { // not top reducible, keep polynomial
+                F.add(a);
+            }
+        }
+        G = F;
+        Collections.reverse(G); // important for lex GB
+        // reduce remaining polynomials
+        int len = G.size();
+        int el = 0;
+        while (el < len) {
+            el++;
+            a = G.remove(0);
+            b = a;
+            a = red.normalform(G, a);
+            a = engine.basePrimitivePart(a); // not a.monic() since no field
+            a = a.abs();
+            if (red.isBooleanClosed(a)) {
+                //List<GenPolynomial<C>> ff;
+                //ff = new ArrayList<GenPolynomial<C>>(G);
+                //ff.add(a);
+                //if (true || isGB(ff)) {
+                if (debug) {
+                    logger.debug("minGB reduced " + b + " to " + a);
+                }
+                G.add(a);
+                //} else {
+                //    logger.info("minGB not reduced " + b + " to " + a);
+                //    G.add(b);
+                //}
+                continue;
+            }
+            logger.info("minGB not boolean closed " + a);
+            G.add(b); // do not reduce
+        }
+        /* stratify: collect polynomials with equal leading terms */
+        ExpVector e, f;
+        F = new ArrayList<GenPolynomial<C>>(G.size());
+        List<GenPolynomial<C>> ff;
+        ff = new ArrayList<GenPolynomial<C>>(G);
+        for (int i = 0; i < ff.size(); i++) {
+            a = ff.get(i);
+            if (a == null || a.isZERO()) {
+                continue;
+            }
+            e = a.leadingExpVector();
+            for (int j = i + 1; j < ff.size(); j++) {
+                b = ff.get(j);
+                if (b == null || b.isZERO()) {
+                    continue;
+                }
+                f = b.leadingExpVector();
+                if (e.equals(f)) {
+                    // System.out.println("minGB e == f: " + a + ", " + b);
+                    a = a.sum(b);
+                    ff.set(j, null);
+                }
+            }
+            F.add(a);
+        }
+        //if (true || isGB(F)) {
+        G = F;
+        //} else {
+        //    logger.info("minGB not stratified " + F);
+        //}
+        logger.info("minGB end with #G = " + G.size());
+        return G;
+    }
 
     /**
      * R-Groebner base using pairlist class.
@@ -204,122 +317,6 @@ public class RGroebnerBasePseudoSeq<C extends RegularRingElem<C>> extends RGroeb
         logger.info("" + pairlist);
         return G;
     }
-
-
-    /**
-     * Minimal ordered Groebner basis.
-     *
-     * @param Gp a Groebner base.
-     * @return a reduced Groebner base of Gp.
-     */
-    @Override
-    public List<GenPolynomial<C>> minimalGB(List<GenPolynomial<C>> Gp) {
-        if (Gp == null || Gp.size() <= 1) {
-            return Gp;
-        }
-        // remove zero polynomials
-        List<GenPolynomial<C>> G = new ArrayList<GenPolynomial<C>>(Gp.size());
-        for (GenPolynomial<C> a : Gp) {
-            if (a != null && !a.isZERO()) { // always true in GB()
-                a = a.abs(); // already positive in GB
-                G.add(a);
-            }
-        }
-        // remove top reducible polynomials
-        logger.info("minGB start with " + G.size());
-        GenPolynomial<C> a, b;
-        List<GenPolynomial<C>> F;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
-        while (G.size() > 0) {
-            a = G.remove(0);
-            b = a;
-            if (red.isTopReducible(G, a) || red.isTopReducible(F, a)) {
-                // try to drop polynomial
-                List<GenPolynomial<C>> ff;
-                ff = new ArrayList<GenPolynomial<C>>(G);
-                ff.addAll(F);
-                a = red.normalform(ff, a);
-                if (a.isZERO()) {
-                    //if (false && !isGB(ff)) { // is really required, but why?
-                    //    logger.info("minGB not dropped " + b);
-                    //    F.add(b);
-                    //} else {
-                    if (debug) {
-                        logger.debug("minGB dropped " + b);
-                    }
-                    //}
-                } else { // happens
-                    logger.info("minGB not zero " + a);
-                    F.add(a);
-                }
-            } else { // not top reducible, keep polynomial
-                F.add(a);
-            }
-        }
-        G = F;
-        Collections.reverse(G); // important for lex GB
-        // reduce remaining polynomials
-        int len = G.size();
-        int el = 0;
-        while (el < len) {
-            el++;
-            a = G.remove(0);
-            b = a;
-            a = red.normalform(G, a);
-            a = engine.basePrimitivePart(a); // not a.monic() since no field
-            a = a.abs();
-            if (red.isBooleanClosed(a)) {
-                //List<GenPolynomial<C>> ff;
-                //ff = new ArrayList<GenPolynomial<C>>(G);
-                //ff.add(a);
-                //if (true || isGB(ff)) {
-                if (debug) {
-                    logger.debug("minGB reduced " + b + " to " + a);
-                }
-                G.add(a);
-                //} else {
-                //    logger.info("minGB not reduced " + b + " to " + a);
-                //    G.add(b);
-                //}
-                continue;
-            }
-            logger.info("minGB not boolean closed " + a);
-            G.add(b); // do not reduce
-        }
-        /* stratify: collect polynomials with equal leading terms */
-        ExpVector e, f;
-        F = new ArrayList<GenPolynomial<C>>(G.size());
-        List<GenPolynomial<C>> ff;
-        ff = new ArrayList<GenPolynomial<C>>(G);
-        for (int i = 0; i < ff.size(); i++) {
-            a = ff.get(i);
-            if (a == null || a.isZERO()) {
-                continue;
-            }
-            e = a.leadingExpVector();
-            for (int j = i + 1; j < ff.size(); j++) {
-                b = ff.get(j);
-                if (b == null || b.isZERO()) {
-                    continue;
-                }
-                f = b.leadingExpVector();
-                if (e.equals(f)) {
-                    // System.out.println("minGB e == f: " + a + ", " + b);
-                    a = a.sum(b);
-                    ff.set(j, null);
-                }
-            }
-            F.add(a);
-        }
-        //if (true || isGB(F)) {
-        G = F;
-        //} else {
-        //    logger.info("minGB not stratified " + F);
-        //}
-        logger.info("minGB end with #G = " + G.size());
-        return G;
-    }
-
 
     /*
      * Minimal ordered Groebner basis.

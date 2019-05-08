@@ -5,8 +5,8 @@
 package edu.jas.ufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
 
     //       implements GreatestCommonDivisor<C> {
 
-    private static final Logger logger = Logger.getLogger(GCDProxy.class);
+    private static final Logger logger = LogManager.getLogger(GCDProxy.class);
 
 
     private static final boolean debug = logger.isDebugEnabled(); //logger.isInfoEnabled();
@@ -68,7 +68,7 @@ public class GCDProxy<C extends GcdRingElem<C>> extends GreatestCommonDivisorAbs
     /**
      * Get the String representation with gcd engines.
      *
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

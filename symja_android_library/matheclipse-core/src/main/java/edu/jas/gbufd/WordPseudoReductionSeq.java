@@ -5,8 +5,8 @@
 package edu.jas.gbufd;
 
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
         WordPseudoReduction<C> {
 
 
-    private static final Logger logger = Logger.getLogger(WordPseudoReductionSeq.class);
+    private static final Logger logger = LogManager.getLogger(WordPseudoReductionSeq.class);
 
 
     private static final boolean debug = logger.isDebugEnabled();
@@ -235,6 +235,27 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
         return R;
     }
 
+    @Override
+    public GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
+        throw new UnsupportedOperationException("leftNormalform not imlemented");
+    }
+
+    @Override
+    public GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> lrow,
+                                               List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
+        throw new UnsupportedOperationException("leftNormalform not imlemented");
+    }
+
+    @Override
+    public GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
+        throw new UnsupportedOperationException("rightNormalform not imlemented");
+    }
+
+    @Override
+    public GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> rrow,
+                                                List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
+        throw new UnsupportedOperationException("rightNormalform not imlemented");
+    }
 
     /**
      * Normalform with multiplication factor.
@@ -247,7 +268,6 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
     public WordPseudoReductionEntry<C> normalformFactor(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
         throw new UnsupportedOperationException("normalformFactor not imlemented");
     }
-
 
     /**
      * Normalform with polynomial coefficients.
@@ -275,7 +295,7 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
         }
         int l = P.length;
         Word[] htl = new Word[l];
-        GenPolynomial<C>[] lbc = new GenPolynomial[l]; //(GenPolynomial<C>[]) 
+        GenPolynomial<C>[] lbc = new GenPolynomial[l]; //(GenPolynomial<C>[])
         GenWordPolynomial<GenPolynomial<C>>[] p = new GenWordPolynomial[l];
         int i;
         int j = 0;
@@ -344,32 +364,6 @@ public class WordPseudoReductionSeq<C extends RingElem<C>> extends WordReduction
             }
         }
         return R;
-    }
-
-
-    @Override
-    public GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
-        throw new UnsupportedOperationException("leftNormalform not imlemented");
-    }
-
-
-    @Override
-    public GenWordPolynomial<C> leftNormalform(List<GenWordPolynomial<C>> lrow,
-                                               List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
-        throw new UnsupportedOperationException("leftNormalform not imlemented");
-    }
-
-
-    @Override
-    public GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
-        throw new UnsupportedOperationException("rightNormalform not imlemented");
-    }
-
-
-    @Override
-    public GenWordPolynomial<C> rightNormalform(List<GenWordPolynomial<C>> rrow,
-                                                List<GenWordPolynomial<C>> Pp, GenWordPolynomial<C> Ap) {
-        throw new UnsupportedOperationException("rightNormalform not imlemented");
     }
 
 }

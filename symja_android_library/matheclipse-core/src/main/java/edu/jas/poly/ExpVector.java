@@ -576,16 +576,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     }
 
     /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public AbelianGroupFactory<ExpVector> factory() {
-        throw new UnsupportedOperationException("no factory implemented for ExpVector");
-    }
-
-    /**
      * Is this structure finite or infinite.
      *
      * @return true if this structure is finite, else false.
@@ -599,10 +589,54 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     /**
      * Clone this.
      *
-     * @see Object#clone()
+     * @see java.lang.Object#clone()
      */
     @Override
     public abstract ExpVector copy();
+
+    /**
+     * ExpVector compareTo.
+     *
+     * @param V
+     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
+     */
+    @Override
+    public int compareTo(ExpVector V) {
+        return this.invLexCompareTo(V);
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public AbelianGroupFactory<ExpVector> factory() {
+        throw new UnsupportedOperationException("no factory implemented for ExpVector");
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        return toScript(stdVars());
+    }
+
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return "ExpVector()";
+    }
 
     /**
      * Get the exponent vector.
@@ -700,28 +734,10 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     public abstract ExpVector permutation(List<Integer> P);
 
     /**
-     * Get the string representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer("(");
-        for (int i = 0; i < length(); i++) {
-            s.append(getVal(i));
-            if (i < length() - 1) {
-                s.append(",");
-            }
-        }
-        s.append(")");
-        return s.toString();
-    }
-
-    /**
      * Get the string representation with variable names.
      *
      * @param vars names of variables.
-     * @see Object#toString()
+     * @see java.lang.Object#toString()
      */
     public String toString(String[] vars) {
         StringBuffer s = new StringBuffer();
@@ -769,17 +785,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      * @return script compatible representation for this Element.
      * @see edu.jas.structure.Element#toScript()
      */
-    @Override
-    public String toScript() {
-        return toScript(stdVars());
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
     // @Override
     public String toScript(String[] vars) {
         // Python case
@@ -816,18 +821,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
             }
         }
         return s.toString();
-    }
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return "ExpVector()";
     }
 
     /**
@@ -892,9 +885,27 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     }
 
     /**
+     * hashCode. Optimized for small exponents, i.e. &le; 2<sup>4</sup> and
+     * small number of variables, i.e. &le; 8.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        if (hash < 0) {
+            int h = 0;
+            for (int i = 0; i < length(); i++) {
+                h = (h << 4) + (int) getVal(i);
+            }
+            hash = h;
+        }
+        return hash;
+    }
+
+    /**
      * Comparison with any other object.
      *
-     * @see Object#equals(Object)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object B) {
@@ -908,21 +919,21 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     }
 
     /**
-     * hashCode. Optimized for small exponents, i.e. &le; 2<sup>4</sup> and
-     * small number of variables, i.e. &le; 8.
+     * Get the string representation.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#toString()
      */
     @Override
-    public int hashCode() {
-        if (hash < 0) {
-            int h = 0;
-            for (int i = 0; i < length(); i++) {
-                h = (h << 4) + (int) getVal(i);
+    public String toString() {
+        StringBuffer s = new StringBuffer("(");
+        for (int i = 0; i < length(); i++) {
+            s.append(getVal(i));
+            if (i < length() - 1) {
+                s.append(",");
             }
-            hash = h;
         }
-        return hash;
+        s.append(")");
+        return s.toString();
     }
 
     /**
@@ -953,6 +964,44 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     }
 
     /**
+     * ExpVector signum.
+     *
+     * @return 0 if this is zero, -1 if some entry is negative, 1 if no entry is
+     * negative and at least one entry is positive.
+     */
+    public abstract int signum();
+
+    /**
+     * ExpVector summation.
+     *
+     * @param V
+     * @return this+V.
+     */
+    public abstract ExpVector sum(ExpVector V);
+
+    /**
+     * ExpVector subtract. Result may have negative entries.
+     *
+     * @param V
+     * @return this-V.
+     */
+    public abstract ExpVector subtract(ExpVector V);
+
+    /**
+     * ExpVector negate.
+     *
+     * @return -this.
+     */
+    public abstract ExpVector negate();
+
+    /**
+     * ExpVector absolute value.
+     *
+     * @return abs(this).
+     */
+    public abstract ExpVector abs();
+
+    /**
      * Standard variable names. Generate standard names for variables, i.e. x0
      * to x(n-1).
      *
@@ -972,36 +1021,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
     public String[] stdVars(String prefix) {
         return STDVARS(prefix, length());
     }
-
-    /**
-     * ExpVector absolute value.
-     *
-     * @return abs(this).
-     */
-    public abstract ExpVector abs();
-
-    /**
-     * ExpVector negate.
-     *
-     * @return -this.
-     */
-    public abstract ExpVector negate();
-
-    /**
-     * ExpVector summation.
-     *
-     * @param V
-     * @return this+V.
-     */
-    public abstract ExpVector sum(ExpVector V);
-
-    /**
-     * ExpVector subtract. Result may have negative entries.
-     *
-     * @param V
-     * @return this-V.
-     */
-    public abstract ExpVector subtract(ExpVector V);
 
     /**
      * ExpVector multiply by scalar.
@@ -1024,14 +1043,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
         V.setVal(i, d);
         return V;
     }
-
-    /**
-     * ExpVector signum.
-     *
-     * @return 0 if this is zero, -1 if some entry is negative, 1 if no entry is
-     * negative and at least one entry is positive.
-     */
-    public abstract int signum();
 
     /**
      * ExpVector degree.
@@ -1127,17 +1138,6 @@ public abstract class ExpVector implements AbelianGroupElem<ExpVector> {
      */
     public boolean divides(ExpVector V) {
         return V.multipleOf(this);
-    }
-
-    /**
-     * ExpVector compareTo.
-     *
-     * @param V
-     * @return 0 if U == V, -1 if U &lt; V, 1 if U &gt; V.
-     */
-    @Override
-    public int compareTo(ExpVector V) {
-        return this.invLexCompareTo(V);
     }
 
     /**

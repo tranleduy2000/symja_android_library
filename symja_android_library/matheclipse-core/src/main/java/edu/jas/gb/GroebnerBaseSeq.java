@@ -4,8 +4,8 @@
 
 package edu.jas.gb;
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import edu.jas.structure.RingElem;
 public class GroebnerBaseSeq<C extends RingElem<C>>
         extends GroebnerBaseAbstract<C> {
 
-    private static final Logger logger = Logger.getLogger(GroebnerBaseSeq.class);
+    private static final Logger logger = LogManager.getLogger(GroebnerBaseSeq.class);
     private static final boolean debug = logger.isDebugEnabled();
 
 

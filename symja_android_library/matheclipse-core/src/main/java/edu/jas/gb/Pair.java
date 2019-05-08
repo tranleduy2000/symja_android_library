@@ -138,23 +138,6 @@ public class Pair<C extends RingElem<C>> extends AbstractPair<C>
         return toZero;
     }
 
-
-    /**
-     * equals.
-     *
-     * @param ob an Object.
-     * @return true if this is equal to o, else false.
-     */
-    @Override
-    public boolean equals(Object ob) {
-        if (!(ob instanceof Pair)) {
-            return false;
-            // throw new ClassCastException("Pair "+n+" o "+o);
-        }
-        return 0 == compareTo((Pair) ob);
-    }
-
-
     /**
      * compareTo used in TreeMap // not used at moment.
      * Comparison is based on the number of the pairs.
@@ -173,15 +156,29 @@ public class Pair<C extends RingElem<C>> extends AbstractPair<C>
         return 0;
     }
 
-
     /**
      * Hash code for this Pair.
      *
-     * @see Object#hashCode()
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         return (i << 16) + j;
+    }
+
+    /**
+     * equals.
+     *
+     * @param ob an Object.
+     * @return true if this is equal to o, else false.
+     */
+    @Override
+    public boolean equals(Object ob) {
+        if (!(ob instanceof Pair)) {
+            return false;
+            // throw new ClassCastException("Pair "+n+" o "+o);
+        }
+        return 0 == compareTo((Pair) ob);
     }
 
     /**

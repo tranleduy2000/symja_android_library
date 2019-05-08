@@ -215,6 +215,12 @@ class CartesianProductLongIterator implements Iterator<List<Long>> {
         //return res;
     }
 
+    /**
+     * Remove a tuple if allowed.
+     */
+    public void remove() {
+        throw new UnsupportedOperationException("cannnot remove tuples");
+    }
 
     /**
      * Total degree of a tuple.
@@ -228,14 +234,6 @@ class CartesianProductLongIterator implements Iterator<List<Long>> {
             d += i;
         }
         return d;
-    }
-
-
-    /**
-     * Remove a tuple if allowed.
-     */
-    public void remove() {
-        throw new UnsupportedOperationException("cannnot remove tuples");
     }
 
 }

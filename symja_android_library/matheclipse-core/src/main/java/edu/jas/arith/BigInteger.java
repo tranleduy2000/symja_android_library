@@ -300,16 +300,6 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     }
 
     /**
-     * Get the corresponding element factory.
-     *
-     * @return factory for this Element.
-     * @see edu.jas.structure.Element#factory()
-     */
-    public BigInteger factory() {
-        return this;
-    }
-
-    /**
      * Get a list of the generating elements.
      *
      * @return list of generators for the algebraic structure.
@@ -332,13 +322,48 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     }
 
     /**
-     * Clone this.
+     * Get a BigInteger element from long.
      *
-     * @see Object#clone()
+     * @param a long.
+     * @return a as BigInteger.
      */
-    @Override
-    public BigInteger copy() {
-        return new BigInteger(val);
+    public BigInteger fromInteger(long a) {
+        return new BigInteger(a);
+    }
+
+    /**
+     * Get a BigInteger element from a math.BigInteger.
+     *
+     * @param a math.BigInteger.
+     * @return a as BigInteger.
+     */
+    public BigInteger fromInteger(java.math.BigInteger a) {
+        return new BigInteger(a);
+    }
+
+    /**
+     * BigInteger random.
+     *
+     * @param n such that 0 &le; r &le; (2<sup>n</sup>-1).
+     * @return r, a random BigInteger.
+     */
+    public BigInteger random(int n) {
+        return random(n, random);
+    }
+
+    /**
+     * BigInteger random.
+     *
+     * @param n   such that 0 &le; r &le; (2<sup>n</sup>-1).
+     * @param rnd is a source for random bits.
+     * @return r, a random BigInteger.
+     */
+    public BigInteger random(int n, Random rnd) {
+        java.math.BigInteger r = new java.math.BigInteger(n, rnd);
+        if (rnd.nextBoolean()) {
+            r = r.negate();
+        }
+        return new BigInteger(r);
     }
 
     /**
@@ -349,6 +374,81 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      */
     public BigInteger copy(BigInteger c) {
         return new BigInteger(c.val);
+    }
+
+    /**
+     * BigInteger parse from String.
+     *
+     * @param s String.
+     * @return Biginteger from s.
+     */
+    public BigInteger parse(String s) {
+        return new BigInteger(s);
+    }
+
+    /**
+     * BigInteger parse from Reader.
+     *
+     * @param r Reader.
+     * @return next Biginteger from r.
+     */
+    public BigInteger parse(Reader r) {
+        return parse(StringUtil.nextString(r));
+    }
+
+    /**
+     * Clone this.
+     *
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public BigInteger copy() {
+        return new BigInteger(val);
+    }
+
+    /**
+     * Compare to BigInteger b.
+     *
+     * @param b BigInteger.
+     * @return 0 if this == b, 1 if this > b, -1 if this < b.
+     */
+    @Override
+    public int compareTo(BigInteger b) {
+        return val.compareTo(b.val);
+    }
+
+    /**
+     * Get the corresponding element factory.
+     *
+     * @return factory for this Element.
+     * @see edu.jas.structure.Element#factory()
+     */
+    public BigInteger factory() {
+        return this;
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this Element.
+     * @see edu.jas.structure.Element#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        return toString();
+    }
+
+    /**
+     * Get a scripting compatible string representation of the factory.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.Element#toScriptFactory()
+     */
+    @Override
+    public String toScriptFactory() {
+        // Python case
+        return "ZZ()";
     }
 
     /**
@@ -406,35 +506,58 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     }
 
     /**
-     * Get a BigInteger element from a math.BigInteger.
-     *
-     * @param a math.BigInteger.
-     * @return a as BigInteger.
-     */
-    public BigInteger fromInteger(java.math.BigInteger a) {
-        return new BigInteger(a);
-    }
-
-    /**
-     * Get a BigInteger element from long.
-     *
-     * @param a long.
-     * @return a as BigInteger.
-     */
-    public BigInteger fromInteger(long a) {
-        return new BigInteger(a);
-    }
-
-    /**
      * Is BigInteger number zero.
      *
      * @return If this is 0 then true is returned, else false.
      * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
-        return val.compareTo(java.math.BigInteger.ZERO) == 0;
-        // Fixed Android framework bug: "al.signum() == 0" does not mean the number equal to zero
-//        return val.signum() == 0; //equals(java.math.BigInteger.ZERO);
+        return val.signum() == 0; //equals(java.math.BigInteger.ZERO);
+    }
+
+    /**
+     * signum.
+     *
+     * @see edu.jas.structure.RingElem#signum()
+     */
+    public int signum() {
+        return val.signum();
+    }
+
+    /**
+     * BigInteger summation.
+     *
+     * @param S BigInteger.
+     * @return this+S.
+     */
+    public BigInteger sum(BigInteger S) {
+        return new BigInteger(val.add(S.val));
+    }
+
+    /**
+     * BigInteger subtract.
+     *
+     * @param S BigInteger.
+     * @return this-S.
+     */
+    public BigInteger subtract(BigInteger S) {
+        return new BigInteger(val.subtract(S.val));
+    }
+
+    /* Negative value of this.
+     * @see edu.jas.structure.RingElem#negate()
+     */
+    public BigInteger negate() {
+        return new BigInteger(val.negate());
+    }
+
+    /**
+     * Absolute value of this.
+     *
+     * @see edu.jas.structure.RingElem#abs()
+     */
+    public BigInteger abs() {
+        return new BigInteger(val.abs());
     }
 
     /**
@@ -456,107 +579,13 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     }
 
     /**
-     * Get the String representation.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        return val.toString();
-    }
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this Element.
-     * @see edu.jas.structure.Element#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        return toString();
-    }
-
-    /**
-     * Get a scripting compatible string representation of the factory.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.Element#toScriptFactory()
-     */
-    @Override
-    public String toScriptFactory() {
-        // Python case
-        return "ZZ()";
-    }
-
-    /**
-     * Compare to BigInteger b.
-     *
-     * @param b BigInteger.
-     * @return 0 if this == b, 1 if this > b, -1 if this < b.
-     */
-    @Override
-    public int compareTo(BigInteger b) {
-        return val.compareTo(b.val);
-    }
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object b) {
-        if (!(b instanceof BigInteger)) {
-            return false;
-        }
-        BigInteger bi = (BigInteger) b;
-        return val.equals(bi.val);
-    }
-
-    /**
-     * Hash code for this BigInteger.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return val.hashCode();
-    }
-
-    /**
-     * Absolute value of this.
-     *
-     * @see edu.jas.structure.RingElem#abs()
-     */
-    public BigInteger abs() {
-        return new BigInteger(val.abs());
-    }
-
-    /* Negative value of this.
-     * @see edu.jas.structure.RingElem#negate()
-     */
-    public BigInteger negate() {
-        return new BigInteger(val.negate());
-    }
-
-    /**
-     * signum.
-     *
-     * @see edu.jas.structure.RingElem#signum()
-     */
-    public int signum() {
-        return val.signum();
-    }
-
-    /**
-     * BigInteger subtract.
+     * BigInteger multiply.
      *
      * @param S BigInteger.
-     * @return this-S.
+     * @return this*S.
      */
-    public BigInteger subtract(BigInteger S) {
-        return new BigInteger(val.subtract(S.val));
+    public BigInteger multiply(BigInteger S) {
+        return new BigInteger(val.multiply(S.val));
     }
 
     /**
@@ -567,20 +596,6 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      */
     public BigInteger divide(BigInteger S) {
         return new BigInteger(val.divide(S.val));
-    }
-
-    /**
-     * Integer inverse. R is a non-zero integer. S=1/R if defined else throws
-     * not invertible exception.
-     *
-     * @see edu.jas.structure.RingElem#inverse()
-     */
-    public BigInteger inverse() {
-        if (this.isONE() || this.negate().isONE()) {
-            return this;
-        }
-        //return ZERO;
-        throw new NotInvertibleException("element not invertible " + this + " :: BigInteger");
     }
 
     /**
@@ -607,6 +622,54 @@ public final class BigInteger extends RingElemImpl<BigInteger>
         qr[0] = new BigInteger(C[0]);
         qr[1] = new BigInteger(C[1]);
         return qr;
+    }
+
+    /**
+     * Integer inverse. R is a non-zero integer. S=1/R if defined else throws
+     * not invertible exception.
+     *
+     * @see edu.jas.structure.RingElem#inverse()
+     */
+    public BigInteger inverse() {
+        if (this.isONE() || this.negate().isONE()) {
+            return this;
+        }
+        //return ZERO;
+        throw new NotInvertibleException("element not invertible " + this + " :: BigInteger");
+    }
+
+    /**
+     * Hash code for this BigInteger.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return val.hashCode();
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object b) {
+        if (!(b instanceof BigInteger)) {
+            return false;
+        }
+        BigInteger bi = (BigInteger) b;
+        return val.equals(bi.val);
+    }
+
+    /**
+     * Get the String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return val.toString();
     }
 
     /**
@@ -673,41 +736,6 @@ public final class BigInteger extends RingElemImpl<BigInteger>
     }
 
     /**
-     * BigInteger random.
-     *
-     * @param n such that 0 &le; r &le; (2<sup>n</sup>-1).
-     * @return r, a random BigInteger.
-     */
-    public BigInteger random(int n) {
-        return random(n, random);
-    }
-
-    /**
-     * BigInteger random.
-     *
-     * @param n   such that 0 &le; r &le; (2<sup>n</sup>-1).
-     * @param rnd is a source for random bits.
-     * @return r, a random BigInteger.
-     */
-    public BigInteger random(int n, Random rnd) {
-        java.math.BigInteger r = new java.math.BigInteger(n, rnd);
-        if (rnd.nextBoolean()) {
-            r = r.negate();
-        }
-        return new BigInteger(r);
-    }
-
-    /**
-     * BigInteger multiply.
-     *
-     * @param S BigInteger.
-     * @return this*S.
-     */
-    public BigInteger multiply(BigInteger S) {
-        return new BigInteger(val.multiply(S.val));
-    }
-
-    /**
      * BigInteger shift left.
      *
      * @param n bits to shift.
@@ -715,36 +743,6 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      */
     public BigInteger shiftLeft(int n) {
         return new BigInteger(val.shiftLeft(n));
-    }
-
-    /**
-     * BigInteger summation.
-     *
-     * @param S BigInteger.
-     * @return this+S.
-     */
-    public BigInteger sum(BigInteger S) {
-        return new BigInteger(val.add(S.val));
-    }
-
-    /**
-     * BigInteger parse from String.
-     *
-     * @param s String.
-     * @return Biginteger from s.
-     */
-    public BigInteger parse(String s) {
-        return new BigInteger(s);
-    }
-
-    /**
-     * BigInteger parse from Reader.
-     *
-     * @param r Reader.
-     * @return next Biginteger from r.
-     */
-    public BigInteger parse(Reader r) {
-        return parse(StringUtil.nextString(r));
     }
 
     /**

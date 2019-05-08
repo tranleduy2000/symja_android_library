@@ -7,8 +7,8 @@ package edu.jas.vector;
 
 // import java.io.IOException;
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Reader;
 import java.math.BigInteger;
@@ -33,7 +33,7 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
 
 
     public final static float DEFAULT_DENSITY = 0.5f;
-    private static final Logger logger = Logger.getLogger(GenVectorModul.class);
+    private static final Logger logger = LogManager.getLogger(GenVectorModul.class);
     private final static Random random = new Random();
     public final RingFactory<C> coFac;
     public final int cols;
@@ -67,42 +67,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         logger.info(cols + " module over " + coFac + "constructed");
     }
 
-
-    /**
-     * Get the String representation as RingElem.
-     *
-     * @see Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer s = new StringBuffer();
-        s.append(coFac.getClass().getSimpleName());
-        s.append("[" + cols + "]");
-        return s.toString();
-    }
-
-
-    /**
-     * Get a scripting compatible string representation.
-     *
-     * @return script compatible representation for this ElemFactory.
-     * @see edu.jas.structure.ElemFactory#toScript()
-     */
-    @Override
-    public String toScript() {
-        // Python case
-        StringBuffer s = new StringBuffer("Vec(");
-        String f = null;
-        try {
-            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
-        } catch (Exception e) {
-            f = coFac.toScript();
-        }
-        s.append(f + "," + cols + " )");
-        return s.toString();
-    }
-
-
     /**
      * getZERO.
      *
@@ -111,7 +75,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
     public GenVector<C> getZERO() {
         return ZERO;
     }
-
 
     /**
      * Get a list of the generating elements.
@@ -123,7 +86,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         return BASIS;
     }
 
-
     /**
      * Is this structure finite or infinite.
      *
@@ -133,40 +95,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
     public boolean isFinite() {
         return coFac.isFinite();
     }
-
-
-    /**
-     * Comparison with any other object.
-     *
-     * @see Object#equals(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object other) {
-        if (!(other instanceof GenVectorModul)) {
-            return false;
-        }
-        GenVectorModul omod = (GenVectorModul) other;
-        if (cols != omod.cols) {
-            return false;
-        }
-        return coFac.equals(omod.coFac);
-    }
-
-
-    /**
-     * Hash code for this vector module.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        int h;
-        h = cols;
-        h = 37 * h + coFac.hashCode();
-        return h;
-    }
-
 
     /**
      * Get the vector for a.
@@ -179,7 +107,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         return BASIS.get(0).scalarMultiply(c);
     }
 
-
     /**
      * Get the vector for a.
      *
@@ -191,30 +118,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         return BASIS.get(0).scalarMultiply(c);
     }
 
-
-    /**
-     * From List of coefficients.
-     *
-     * @param v list of coefficients.
-     * @return vector from v.
-     */
-    public GenVector<C> fromList(List<C> v) {
-        if (v == null) {
-            return ZERO;
-        }
-        if (v.size() > cols) {
-            throw new IllegalArgumentException("size v > cols " + v + " > " + cols);
-        }
-        List<C> r = new ArrayList<C>(cols);
-        r.addAll(v);
-        // pad with zeros if required:
-        for (int i = r.size(); i < cols; i++) {
-            r.add(coFac.getZERO());
-        }
-        return new GenVector<C>(this, r);
-    }
-
-
     /**
      * Random vector.
      *
@@ -224,19 +127,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
     public GenVector<C> random(int k) {
         return random(k, density, random);
     }
-
-
-    /**
-     * Random vector.
-     *
-     * @param k size of random coefficients.
-     * @param q density of nonzero coefficients.
-     * @return random vector.
-     */
-    public GenVector<C> random(int k, float q) {
-        return random(k, q, random);
-    }
-
 
     /**
      * Random vector.
@@ -248,28 +138,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
     public GenVector<C> random(int k, Random random) {
         return random(k, density, random);
     }
-
-
-    /**
-     * Random vector.
-     *
-     * @param k      size of random coefficients.
-     * @param q      density of nonzero coefficients.
-     * @param random is a source for random bits.
-     * @return a random element.
-     */
-    public GenVector<C> random(int k, float q, Random random) {
-        List<C> r = new ArrayList<C>(cols);
-        for (int i = 0; i < cols; i++) {
-            if (random.nextFloat() < q) {
-                r.add(coFac.random(k));
-            } else {
-                r.add(coFac.getZERO());
-            }
-        }
-        return new GenVector<C>(this, r);
-    }
-
 
     /**
      * copy vector.
@@ -283,7 +151,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         }
         return c.copy();
     }
-
 
     /**
      * Parse a vector from a String. Syntax: [ c, ..., c ]
@@ -319,7 +186,6 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
         return new GenVector<C>(this, vec);
     }
 
-
     /**
      * Parse a vector from a Reader.
      *
@@ -329,6 +195,123 @@ public class GenVectorModul<C extends RingElem<C>> implements ModulFactory<GenVe
     public GenVector<C> parse(Reader r) {
         String s = StringUtil.nextPairedString(r, '[', ']');
         return parse(s);
+    }
+
+    /**
+     * Get a scripting compatible string representation.
+     *
+     * @return script compatible representation for this ElemFactory.
+     * @see edu.jas.structure.ElemFactory#toScript()
+     */
+    @Override
+    public String toScript() {
+        // Python case
+        StringBuffer s = new StringBuffer("Vec(");
+        String f = null;
+        try {
+            f = ((RingElem<C>) coFac).toScriptFactory(); // sic
+        } catch (Exception e) {
+            f = coFac.toScript();
+        }
+        s.append(f + "," + cols + " )");
+        return s.toString();
+    }
+
+    /**
+     * Hash code for this vector module.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int h;
+        h = cols;
+        h = 37 * h + coFac.hashCode();
+        return h;
+    }
+
+    /**
+     * Comparison with any other object.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object other) {
+        if (!(other instanceof GenVectorModul)) {
+            return false;
+        }
+        GenVectorModul omod = (GenVectorModul) other;
+        if (cols != omod.cols) {
+            return false;
+        }
+        return coFac.equals(omod.coFac);
+    }
+
+    /**
+     * Get the String representation as RingElem.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer();
+        s.append(coFac.getClass().getSimpleName());
+        s.append("[" + cols + "]");
+        return s.toString();
+    }
+
+    /**
+     * From List of coefficients.
+     *
+     * @param v list of coefficients.
+     * @return vector from v.
+     */
+    public GenVector<C> fromList(List<C> v) {
+        if (v == null) {
+            return ZERO;
+        }
+        if (v.size() > cols) {
+            throw new IllegalArgumentException("size v > cols " + v + " > " + cols);
+        }
+        List<C> r = new ArrayList<C>(cols);
+        r.addAll(v);
+        // pad with zeros if required:
+        for (int i = r.size(); i < cols; i++) {
+            r.add(coFac.getZERO());
+        }
+        return new GenVector<C>(this, r);
+    }
+
+    /**
+     * Random vector.
+     *
+     * @param k size of random coefficients.
+     * @param q density of nonzero coefficients.
+     * @return random vector.
+     */
+    public GenVector<C> random(int k, float q) {
+        return random(k, q, random);
+    }
+
+    /**
+     * Random vector.
+     *
+     * @param k      size of random coefficients.
+     * @param q      density of nonzero coefficients.
+     * @param random is a source for random bits.
+     * @return a random element.
+     */
+    public GenVector<C> random(int k, float q, Random random) {
+        List<C> r = new ArrayList<C>(cols);
+        for (int i = 0; i < cols; i++) {
+            if (random.nextFloat() < q) {
+                r.add(coFac.random(k));
+            } else {
+                r.add(coFac.getZERO());
+            }
+        }
+        return new GenVector<C>(this, r);
     }
 
 }

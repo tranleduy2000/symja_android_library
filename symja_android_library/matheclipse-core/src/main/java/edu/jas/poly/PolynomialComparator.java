@@ -56,6 +56,15 @@ public class PolynomialComparator<C extends RingElem<C>> implements Serializable
         return s;
     }
 
+    /**
+     * Hash code for this PolynomialComparator.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return tord.hashCode();
+    }
 
     /**
      * Equals test of comparator.
@@ -76,18 +85,6 @@ public class PolynomialComparator<C extends RingElem<C>> implements Serializable
         }
         return tord.equals(pc.tord);
     }
-
-
-    /**
-     * Hash code for this PolynomialComparator.
-     *
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return tord.hashCode();
-    }
-
 
     /**
      * toString.
