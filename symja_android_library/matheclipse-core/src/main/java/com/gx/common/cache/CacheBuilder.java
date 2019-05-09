@@ -418,7 +418,10 @@ public final class CacheBuilder<K, V> {
                 this.maximumWeight);
         checkState(this.weigher == null, "maximum size can not be combined with weigher");
         checkArgument(maximumSize >= 0, "maximum size must not be negative");
-        this.maximumSize = maximumSize;
+
+        // this.maximumSize = maximumSize;
+        this.maximumSize = Math.min(maximumSize, 200);
+
         return this;
     }
 
