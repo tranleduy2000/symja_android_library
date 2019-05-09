@@ -5,8 +5,8 @@
 package edu.jas.fd;
 
 
-import com.duy.concurrent.Callable;
-import com.duy.concurrent.ExecutorService;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
 

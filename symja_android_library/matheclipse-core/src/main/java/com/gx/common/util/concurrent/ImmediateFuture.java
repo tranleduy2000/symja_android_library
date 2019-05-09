@@ -20,7 +20,7 @@ import com.gx.common.util.concurrent.AbstractFuture.TrustedFuture;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.concurrent.ExecutionException;
-import com.duy.concurrent.Executor;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;

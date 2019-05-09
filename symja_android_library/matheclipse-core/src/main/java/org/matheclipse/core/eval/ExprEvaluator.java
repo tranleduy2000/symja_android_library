@@ -1,7 +1,7 @@
 package org.matheclipse.core.eval;
 
-import com.duy.concurrent.ExecutorService;
-import com.duy.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import com.gx.common.util.concurrent.SimpleTimeLimiter;
 import com.gx.common.util.concurrent.TimeLimiter;
 

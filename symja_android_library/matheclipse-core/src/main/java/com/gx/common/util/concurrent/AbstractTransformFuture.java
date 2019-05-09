@@ -23,7 +23,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import com.duy.concurrent.Executor;
+import java.util.concurrent.Executor;
 
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.util.concurrent.Futures.getDone;

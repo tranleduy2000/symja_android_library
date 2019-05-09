@@ -5,7 +5,7 @@
 package edu.jas.kern;
 
 
-import com.duy.concurrent.Callable;
+import java.util.concurrent.Callable;
 
 /**
  * Run-time status, defines global status and handling for run time limits.

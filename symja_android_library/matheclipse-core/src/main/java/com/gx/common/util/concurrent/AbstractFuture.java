@@ -14,7 +14,7 @@
 
 package com.gx.common.util.concurrent;
 
-import com.duy.concurrent.Executor;
+import java.util.concurrent.Executor;
 import com.gx.common.annotations.Beta;
 import com.gx.common.base.Ascii;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;

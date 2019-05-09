@@ -14,7 +14,7 @@
 
 package com.gx.common.util.concurrent;
 
-import com.duy.concurrent.Callable;
+import java.util.concurrent.Callable;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;

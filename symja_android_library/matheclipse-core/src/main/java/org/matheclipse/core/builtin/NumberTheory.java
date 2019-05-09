@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import com.duy.concurrent.Callable;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import edu.jas.arith.BigRational;

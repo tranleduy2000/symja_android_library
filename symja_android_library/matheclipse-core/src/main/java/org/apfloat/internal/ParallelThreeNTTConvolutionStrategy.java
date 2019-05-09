@@ -1,7 +1,7 @@
 package org.apfloat.internal;
 
-import com.duy.concurrent.Callable;
-import com.duy.concurrent.FutureTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 import org.apfloat.ApfloatContext;
 import org.apfloat.spi.NTTStrategy;

@@ -16,7 +16,7 @@ package com.gx.common.util.concurrent;
 
 import com.gx.common.annotations.GwtCompatible;
 
-import com.duy.concurrent.Executor;
+import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
 import static com.gx.common.base.Preconditions.checkNotNull;

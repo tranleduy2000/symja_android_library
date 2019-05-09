@@ -1,8 +1,8 @@
 package org.apfloat;
 
-import com.duy.concurrent.ExecutorService;
-import com.duy.concurrent.Executors;
-import com.duy.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apfloat.internal.IntBuilderFactory;
 import org.apfloat.spi.BuilderFactory;
