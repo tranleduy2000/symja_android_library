@@ -673,6 +673,10 @@ public class Integrate extends AbstractFunctionEvaluator {
 			} finally {
 				engine.setRecursionLimit(limit);
 				if (newCache) {
+					// Swift changed: call clear() before assign null value
+					if (engine.REMEMBER_AST_CACHE != null) {
+						engine.REMEMBER_AST_CACHE.cleanUp();
+					}
 					engine.REMEMBER_AST_CACHE = null;
 				}
 				engine.setQuietMode(quietMode);

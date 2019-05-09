@@ -1868,6 +1868,10 @@ public class EvalEngine implements Serializable {
 		fModifiedVariablesList = null;
 		fContextPathStack = new Stack<ContextPath>();
 		fContextPath = ContextPath.initialContext();
+		// Swift changed: call clear() before assign null value
+		if (REMEMBER_AST_CACHE != null) {
+			REMEMBER_AST_CACHE.cleanUp();
+		}
 		REMEMBER_AST_CACHE = null;
 	}
 
@@ -2046,6 +2050,11 @@ public class EvalEngine implements Serializable {
 		fStopRequested = false;
 		fSeconds = 0;
 		fModifiedVariablesList =null;
+
+		// Swift changed: call clear() before assign null value
+		if (REMEMBER_AST_CACHE != null) {
+			REMEMBER_AST_CACHE.cleanUp();
+		}
 		REMEMBER_AST_CACHE = null;
 		if (fOnOffMode && fOnOffUnique) {
 			fOnOffUniqueMap = new HashMap<IExpr, IExpr>();
