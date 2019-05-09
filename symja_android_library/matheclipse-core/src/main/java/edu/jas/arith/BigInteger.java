@@ -512,7 +512,9 @@ public final class BigInteger extends RingElemImpl<BigInteger>
      * @see edu.jas.structure.RingElem#isZERO()
      */
     public boolean isZERO() {
-        return val.signum() == 0; //equals(java.math.BigInteger.ZERO);
+        return val.compareTo(java.math.BigInteger.ZERO) == 0;
+        // Fixed Android framework bug: "al.signum() == 0" does not mean the number equal to zero
+        // return val.signum() == 0; //equals(java.math.BigInteger.ZERO);
     }
 
     /**
