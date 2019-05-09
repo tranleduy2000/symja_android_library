@@ -46,8 +46,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
 public class TreeRangeSet<C extends Comparable<?>> extends AbstractRangeSet<C>
         implements Serializable {
 
-    @VisibleForTesting
-    final NavigableMap<Cut<C>, Range<C>> rangesByLowerBound;
+    @VisibleForTesting final NavigableMap<Cut<C>, Range<C>> rangesByLowerBound;
     @MonotonicNonNullDecl
     private transient Set<Range<C>> asRanges;
     @MonotonicNonNullDecl

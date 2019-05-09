@@ -34,11 +34,10 @@ package com.duy.lambda;
  * whose functional method is {@link #apply(Object, Object)}.
  *
  * @param <T> the type of the operands and result of the operator
- *
  * @see BiFunction
  * @see UnaryOperator
  * @since 1.8
  */
-public interface BinaryOperator<T> extends BiFunction<T,T,T> {
+public interface BinaryOperator<T> extends BiFunction<T, T, T> {
 
 }

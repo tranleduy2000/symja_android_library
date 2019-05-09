@@ -58,6 +58,7 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the commander encoding due to Klieber & Kwon.
+ *
  * @version 1.3
  * @since 1.1
  */
@@ -71,6 +72,7 @@ final class CCAMOCommander implements CCAtMostOne {
 
     /**
      * Constructs the commander AMO encoder with a given group size.
+     *
      * @param k the group size for the encoding
      */
     CCAMOCommander(int k) {
@@ -122,6 +124,7 @@ final class CCAMOCommander implements CCAtMostOne {
 
     /**
      * Internal non recursive encoding.
+     *
      * @param literals the current literals
      */
     private void encodeNonRecursive(final LNGVector<Literal> literals) {

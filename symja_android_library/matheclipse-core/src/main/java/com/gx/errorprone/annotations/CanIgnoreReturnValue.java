@@ -33,4 +33,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Documented
 @Target({METHOD, TYPE})
 @Retention(CLASS)
-public @interface CanIgnoreReturnValue {}
+public @interface CanIgnoreReturnValue {
+}

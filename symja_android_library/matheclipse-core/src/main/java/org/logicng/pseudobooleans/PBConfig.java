@@ -43,6 +43,7 @@ public final class PBConfig extends Configuration {
     final boolean binaryMergeUseGAC;
     final boolean binaryMergeNoSupportForSingleBit;
     final boolean binaryMergeUseWatchDog;
+
     /**
      * Constructs a new pseudo-Boolean encoder configuration from a given builder.
      *

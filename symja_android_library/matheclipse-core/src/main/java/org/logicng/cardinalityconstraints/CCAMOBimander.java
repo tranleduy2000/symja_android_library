@@ -58,6 +58,7 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the bimander encoding due to Hölldobler and Nguyen.
+ *
  * @version 1.3
  * @since 1.1
  */
@@ -89,6 +90,7 @@ final class CCAMOBimander implements CCAtMostOne {
 
     /**
      * Internal encoding.
+     *
      * @param vars the variables of the constraint
      */
     private void encodeIntern(final LNGVector<Literal> vars) {
@@ -128,6 +130,7 @@ final class CCAMOBimander implements CCAtMostOne {
 
     /**
      * Initializes the groups
+     *
      * @param vars the variables of the constraint
      */
     private void initializeGroups(LNGVector<Literal> vars) {
@@ -165,6 +168,7 @@ final class CCAMOBimander implements CCAtMostOne {
 
     /**
      * Naive encoding of a cardinality constraint.
+     *
      * @param vars the variables of the constraint
      */
     private void encodeNaive(final LNGVector<Literal> vars) {

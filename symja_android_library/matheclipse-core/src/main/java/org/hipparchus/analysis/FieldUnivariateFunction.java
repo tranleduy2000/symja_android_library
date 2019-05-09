@@ -25,31 +25,34 @@ import org.hipparchus.RealFieldElement;
  * This interface is more general than {@link RealFieldUnivariateFunction} because
  * the same instance can accept any field type, not just one.
  * </p>
+ *
  * @see UnivariateFunction
  * @see RealFieldUnivariateFunction
  * @since 1.3
  */
 public interface FieldUnivariateFunction {
 
-    /** Convert to a {@link RealFieldUnivariateFunction} with a specific type.
-     * @param <T> the type of the field elements
+    /**
+     * Convert to a {@link RealFieldUnivariateFunction} with a specific type.
+     *
+     * @param <T>   the type of the field elements
      * @param field field for the argument and value
      * @return converted function
      */
-     <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field);
+    <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field);
 
     /**
      * Compute the value of the function.
      *
      * @param <T> the type of the field elements
-     * @param x Point at which the function value should be computed.
+     * @param x   Point at which the function value should be computed.
      * @return the value of the function.
      * @throws IllegalArgumentException when the activated method itself can
-     * ascertain that a precondition, specified in the API expressed at the
-     * level of the activated method, has been violated.
-     * When Hipparchus throws an {@code IllegalArgumentException}, it is
-     * usually the consequence of checking the actual parameters passed to
-     * the method.
+     *                                  ascertain that a precondition, specified in the API expressed at the
+     *                                  level of the activated method, has been violated.
+     *                                  When Hipparchus throws an {@code IllegalArgumentException}, it is
+     *                                  usually the consequence of checking the actual parameters passed to
+     *                                  the method.
      */
     <T extends RealFieldElement<T>> T value(T x);
 

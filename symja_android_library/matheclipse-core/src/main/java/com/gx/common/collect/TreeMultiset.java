@@ -61,12 +61,14 @@ public final class TreeMultiset<E> extends AbstractSortedMultiset<E> implements 
     private final transient Reference<AvlNode<E>> rootReference;
     private final transient GeneralRange<E> range;
     private final transient AvlNode<E> header;
+
     TreeMultiset(Reference<AvlNode<E>> rootReference, GeneralRange<E> range, AvlNode<E> endLink) {
         super(range.comparator());
         this.rootReference = rootReference;
         this.range = range;
         this.header = endLink;
     }
+
     TreeMultiset(Comparator<? super E> comparator) {
         super(comparator);
         this.range = GeneralRange.all(comparator);

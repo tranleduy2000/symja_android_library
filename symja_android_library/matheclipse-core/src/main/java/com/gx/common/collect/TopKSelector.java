@@ -70,6 +70,7 @@ final class TopKSelector<T> {
      */
     @NullableDecl
     private T threshold;
+
     private TopKSelector(Comparator<? super T> comparator, int k) {
         this.comparator = checkNotNull(comparator, "comparator");
         this.k = k;

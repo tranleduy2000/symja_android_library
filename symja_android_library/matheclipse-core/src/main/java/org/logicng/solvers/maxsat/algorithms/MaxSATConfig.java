@@ -52,6 +52,7 @@ public final class MaxSATConfig extends Configuration {
     final boolean symmetry;
     final int limit;
     final boolean bmo;
+
     /**
      * Constructor for a MaxSAT configuration.
      *
@@ -88,30 +89,35 @@ public final class MaxSATConfig extends Configuration {
         sb.append("}\n");
         return sb.toString();
     }
+
     /**
      * The solver type of the underlying SAT solver.
      */
     public enum SolverType {
         MINISAT, GLUCOSE
     }
+
     /**
      * The incremental strategy for cardinality and pseudo-boolean constraints.
      */
     public enum IncrementalStrategy {
         NONE, ITERATIVE
     }
+
     /**
      * The AMO encoding.
      */
     public enum AMOEncoding {
         LADDER
     }
+
     /**
      * The pseudo Boolean encoding.
      */
     public enum PBEncoding {
         SWC
     }
+
     /**
      * The cardinality constraint encoding.
      */

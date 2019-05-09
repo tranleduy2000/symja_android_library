@@ -40,7 +40,7 @@ public interface UnivariateStatistic extends MathArrays.Function {
      * @throws MathIllegalArgumentException if values is null
      */
     @Override
-     double evaluate(double[] values) throws MathIllegalArgumentException;
+    double evaluate(double[] values) throws MathIllegalArgumentException;
 
     /**
      * Returns the result of evaluating the statistic over the specified entries

@@ -76,6 +76,7 @@ public final class CleaneLing extends SATSolver {
     private boolean plain;
     private SortedMap<String, Integer> name2idx;
     private SortedMap<Integer, String> idx2name;
+
     /**
      * Constructs a new SAT solver instance.
      *

@@ -123,7 +123,7 @@ public interface ExecutorService extends Executor {
      * @param <T>  the type of the task's result
      * @return a Future representing pending completion of the task
      * throws RejectedExecutionException if the task cannot be
-     *                                    scheduled for execution
+     * scheduled for execution
      * throws NullPointerException       if the task is null
      */
     <T> Future<T> submit(Callable<T> task);
@@ -138,7 +138,7 @@ public interface ExecutorService extends Executor {
      * @param <T>    the type of the result
      * @return a Future representing pending completion of the task
      * throws RejectedExecutionException if the task cannot be
-     *                                    scheduled for execution
+     * scheduled for execution
      * throws NullPointerException       if the task is null
      */
     <T> Future<T> submit(Runnable task, T result);
@@ -151,7 +151,7 @@ public interface ExecutorService extends Executor {
      * @param task the task to submit
      * @return a Future representing pending completion of the task
      * throws RejectedExecutionException if the task cannot be
-     *                                    scheduled for execution
+     * scheduled for execution
      * throws NullPointerException       if the task is null
      */
     Future<?> submit(Runnable task);
@@ -172,10 +172,10 @@ public interface ExecutorService extends Executor {
      * sequential order as produced by the iterator for the
      * given task list, each of which has completed
      * throws InterruptedException       if interrupted while waiting, in
-     *                                    which case unfinished tasks are cancelled
+     * which case unfinished tasks are cancelled
      * throws NullPointerException       if tasks or any of its elements are {@code null}
      * throws RejectedExecutionException if any task cannot be
-     *                                    scheduled for execution
+     * scheduled for execution
      */
     <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
             throws InterruptedException;
@@ -202,11 +202,11 @@ public interface ExecutorService extends Executor {
      * each task will have completed. If it did time out, some
      * of these tasks will not have completed.
      * throws InterruptedException       if interrupted while waiting, in
-     *                                    which case unfinished tasks are cancelled
+     * which case unfinished tasks are cancelled
      * throws NullPointerException       if tasks, any of its elements, or
-     *                                    unit are {@code null}
+     * unit are {@code null}
      * throws RejectedExecutionException if any task cannot be scheduled
-     *                                    for execution
+     * for execution
      */
     <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
                                   long timeout, TimeUnit unit)
@@ -225,11 +225,11 @@ public interface ExecutorService extends Executor {
      * @return the result returned by one of the tasks
      * throws InterruptedException       if interrupted while waiting
      * throws NullPointerException       if tasks or any element task
-     *                                    subject to execution is {@code null}
+     * subject to execution is {@code null}
      * throws IllegalArgumentException   if tasks is empty
      * throws ExecutionException         if no task successfully completes
      * throws RejectedExecutionException if tasks cannot be scheduled
-     *                                    for execution
+     * for execution
      */
     <T> T invokeAny(Collection<? extends Callable<T>> tasks)
             throws InterruptedException, ExecutionException;
@@ -250,12 +250,12 @@ public interface ExecutorService extends Executor {
      * @return the result returned by one of the tasks
      * throws InterruptedException       if interrupted while waiting
      * throws NullPointerException       if tasks, or unit, or any element
-     *                                    task subject to execution is {@code null}
+     * task subject to execution is {@code null}
      * throws TimeoutException           if the given timeout elapses before
-     *                                    any task successfully completes
+     * any task successfully completes
      * throws ExecutionException         if no task successfully completes
      * throws RejectedExecutionException if tasks cannot be scheduled
-     *                                    for execution
+     * for execution
      */
     <T> T invokeAny(Collection<? extends Callable<T>> tasks,
                     long timeout, TimeUnit unit)

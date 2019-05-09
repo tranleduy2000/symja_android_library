@@ -447,12 +447,9 @@ abstract class AbstractMapBasedMultimap<K, V> extends AbstractMultimap<K, V>
      */
     @WeakOuter
     class WrappedCollection extends AbstractCollection<V> {
-        @NullableDecl
-        final K key;
-        @NullableDecl
-        final WrappedCollection ancestor;
-        @NullableDecl
-        final Collection<V> ancestorDelegate;
+        @NullableDecl final K key;
+        @NullableDecl final WrappedCollection ancestor;
+        @NullableDecl final Collection<V> ancestorDelegate;
         Collection<V> delegate;
 
         WrappedCollection(

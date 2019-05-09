@@ -30,6 +30,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
 public final class Defaults {
     private static final Double DOUBLE_DEFAULT = Double.valueOf(0d);
     private static final Float FLOAT_DEFAULT = Float.valueOf(0f);
+
     private Defaults() {
     }
 

@@ -51,5 +51,5 @@ import java.util.Collection;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.PARAMETER)
 public @interface CompatibleWith {
-  String value();
+    String value();
 }

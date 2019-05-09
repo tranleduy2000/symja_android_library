@@ -105,6 +105,7 @@ public abstract class MaxSAT {
     int ubCost;
     int lbCost;
     int currentWeight;
+
     /**
      * Constructor.
      *

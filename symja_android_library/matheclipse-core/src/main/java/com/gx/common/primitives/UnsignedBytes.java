@@ -362,7 +362,7 @@ public final class UnsignedBytes {
 //                Comparator<byte[]> comparator = (Comparator<byte[]>) theClass.getEnumConstants()[0];
 //                return comparator;
 //            } catch (Throwable t) { // ensure we really catch *everything*
-                return lexicographicalComparatorJavaImpl();
+            return lexicographicalComparatorJavaImpl();
 //            }
         }
 

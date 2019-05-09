@@ -39,8 +39,7 @@ public class InputMismatchException extends NoSuchElementException implements
      * Constructs a new {@code InputMismatchException} with the stack trace
      * filled in and {@code msg} as its error message.
      *
-     * @param msg
-     *           the specified error message.
+     * @param msg the specified error message.
      */
     public InputMismatchException(String msg) {
         super(msg);

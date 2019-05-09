@@ -59,8 +59,7 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     // This class is never actually serialized directly, but we have to make the
     // warning go away (and suppressing would suppress for all nested classes too)
     private static final long serialVersionUID = 0;
-    @VisibleForTesting
-    final transient Object[] alternatingKeysAndValues;
+    @VisibleForTesting final transient Object[] alternatingKeysAndValues;
     private final transient int[] hashTable;
     private final transient int size;
 

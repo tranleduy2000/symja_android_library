@@ -86,6 +86,7 @@ public final class CleaneLingSolver extends CleaneLingStyleSolver {
     private int distilled;
     private LNGIntVector extension;
     private Simplifier simplifier;
+
     /**
      * Constructs a new CleaneLing solver with a given configuration.
      *

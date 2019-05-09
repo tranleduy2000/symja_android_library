@@ -36,8 +36,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
 @GwtCompatible
 abstract class Cut<C extends Comparable> implements Comparable<Cut<C>>, Serializable {
     private static final long serialVersionUID = 0;
-    @NullableDecl
-    final C endpoint;
+    @NullableDecl final C endpoint;
 
     Cut(@NullableDecl C endpoint) {
         this.endpoint = endpoint;

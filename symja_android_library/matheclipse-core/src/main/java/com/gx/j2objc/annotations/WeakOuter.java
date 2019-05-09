@@ -25,7 +25,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Annotation that indicates an inner class has a weak relationship to its owning class.
- *
+ * <p>
  * Lambdas can be given a weak outer reference by declaring a local variable with this annotation
  * and assigning the lambda expression directly to the local variable. WeakOuter is only allowed on
  * local variables, not fields, to encourage the annotation to be used where the lambda is declared.

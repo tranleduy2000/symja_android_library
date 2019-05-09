@@ -31,9 +31,9 @@ import org.hipparchus.util.MathUtils;
  * <p>
  * <a href="http://mathworld.wolfram.com/HornersMethod.html">Horner's Method</a>
  * is used to evaluate the function.</p>
+ *
  * @param <T> the type of the field elements
  * @since 1.5
- *
  */
 public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements RealFieldUnivariateFunction<T> {
 
@@ -42,7 +42,7 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
      * coefficients[0] is the constant term and coefficients[n] is the
      * coefficient of x^n where n is the degree of the polynomial.
      */
-    private final T coefficients[];
+    private final T[] coefficients;
 
     /**
      * Construct a polynomial with the given coefficients.  The first element
@@ -55,11 +55,11 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
      * the coefficients property.</p>
      *
      * @param c Polynomial coefficients.
-     * @throws NullArgumentException if {@code c} is {@code null}.
+     * @throws NullArgumentException        if {@code c} is {@code null}.
      * @throws MathIllegalArgumentException if {@code c} is empty.
      */
-    public FieldPolynomialFunction(final T c[])
-        throws MathIllegalArgumentException, NullArgumentException {
+    public FieldPolynomialFunction(final T[] c)
+            throws MathIllegalArgumentException, NullArgumentException {
         super();
         MathUtils.checkNotNull(c);
         int n = c.length;
@@ -76,37 +76,37 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
     /**
      * Compute the value of the function for the given argument.
      * <p>
-     *  The value returned is </p><p>
-     *  {@code coefficients[n] * x^n + ... + coefficients[1] * x  + coefficients[0]}
+     * The value returned is </p><p>
+     * {@code coefficients[n] * x^n + ... + coefficients[1] * x  + coefficients[0]}
      * </p>
      *
      * @param x Argument for which the function value should be computed.
      * @return the value of the polynomial at the given point.
-     *
      * @see org.hipparchus.analysis.UnivariateFunction#value(double)
      */
     public T value(double x) {
-       return evaluate(coefficients, getField().getZero().add(x));
+        return evaluate(coefficients, getField().getZero().add(x));
     }
 
     /**
      * Compute the value of the function for the given argument.
      * <p>
-     *  The value returned is </p><p>
-     *  {@code coefficients[n] * x^n + ... + coefficients[1] * x  + coefficients[0]}
+     * The value returned is </p><p>
+     * {@code coefficients[n] * x^n + ... + coefficients[1] * x  + coefficients[0]}
      * </p>
      *
      * @param x Argument for which the function value should be computed.
      * @return the value of the polynomial at the given point.
-     *
      * @see org.hipparchus.analysis.UnivariateFunction#value(double)
      */
     @Override
     public T value(T x) {
-       return evaluate(coefficients, x);
+        return evaluate(coefficients, x);
     }
 
-    /** Get the {@link Field} to which the instance belongs.
+    /**
+     * Get the {@link Field} to which the instance belongs.
+     *
      * @return {@link Field} to which the instance belongs
      */
     public Field<T> getField() {
@@ -139,14 +139,14 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
      * the argument.
      *
      * @param coefficients Coefficients of the polynomial to evaluate.
-     * @param argument Input value.
-     * @param <T> the type of the field elements
+     * @param argument     Input value.
+     * @param <T>          the type of the field elements
      * @return the value of the polynomial.
      * @throws MathIllegalArgumentException if {@code coefficients} is empty.
-     * @throws NullArgumentException if {@code coefficients} is {@code null}.
+     * @throws NullArgumentException        if {@code coefficients} is {@code null}.
      */
     protected static <T extends RealFieldElement<T>> T evaluate(T[] coefficients, T argument)
-        throws MathIllegalArgumentException, NullArgumentException {
+            throws MathIllegalArgumentException, NullArgumentException {
         MathUtils.checkNotNull(coefficients);
         int n = coefficients.length;
         if (n == 0) {
@@ -167,7 +167,7 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
      */
     public FieldPolynomialFunction<T> add(final FieldPolynomialFunction<T> p) {
         // identify the lowest degree polynomial
-        final int lowLength  = FastMath.min(coefficients.length, p.coefficients.length);
+        final int lowLength = FastMath.min(coefficients.length, p.coefficients.length);
         final int highLength = FastMath.max(coefficients.length, p.coefficients.length);
 
         // build the coefficients array
@@ -176,10 +176,10 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
             newCoefficients[i] = coefficients[i].add(p.coefficients[i]);
         }
         System.arraycopy((coefficients.length < p.coefficients.length) ?
-                         p.coefficients : coefficients,
-                         lowLength,
-                         newCoefficients, lowLength,
-                         highLength - lowLength);
+                        p.coefficients : coefficients,
+                lowLength,
+                newCoefficients, lowLength,
+                highLength - lowLength);
 
         return new FieldPolynomialFunction<>(newCoefficients);
     }
@@ -192,7 +192,7 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
      */
     public FieldPolynomialFunction<T> subtract(final FieldPolynomialFunction<T> p) {
         // identify the lowest degree polynomial
-        int lowLength  = FastMath.min(coefficients.length, p.coefficients.length);
+        int lowLength = FastMath.min(coefficients.length, p.coefficients.length);
         int highLength = FastMath.max(coefficients.length, p.coefficients.length);
 
         // build the coefficients array
@@ -206,7 +206,7 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
             }
         } else {
             System.arraycopy(coefficients, lowLength, newCoefficients, lowLength,
-                             highLength - lowLength);
+                    highLength - lowLength);
         }
 
         return new FieldPolynomialFunction<>(newCoefficients);
@@ -240,7 +240,7 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
             for (int j = FastMath.max(0, i + 1 - p.coefficients.length);
                  j < FastMath.min(coefficients.length, i + 1);
                  ++j) {
-                newCoefficients[i] = newCoefficients[i].add(coefficients[j].multiply(p.coefficients[i-j]));
+                newCoefficients[i] = newCoefficients[i].add(coefficients[j].multiply(p.coefficients[i - j]));
             }
         }
 
@@ -251,13 +251,13 @@ public class FieldPolynomialFunction<T extends RealFieldElement<T>> implements R
      * Returns the coefficients of the derivative of the polynomial with the given coefficients.
      *
      * @param coefficients Coefficients of the polynomial to differentiate.
-     * @param <T> the type of the field elements
+     * @param <T>          the type of the field elements
      * @return the coefficients of the derivative or {@code null} if coefficients has length 1.
      * @throws MathIllegalArgumentException if {@code coefficients} is empty.
-     * @throws NullArgumentException if {@code coefficients} is {@code null}.
+     * @throws NullArgumentException        if {@code coefficients} is {@code null}.
      */
     protected static <T extends RealFieldElement<T>> T[] differentiate(T[] coefficients)
-        throws MathIllegalArgumentException, NullArgumentException {
+            throws MathIllegalArgumentException, NullArgumentException {
         MathUtils.checkNotNull(coefficients);
         int n = coefficients.length;
         if (n == 0) {

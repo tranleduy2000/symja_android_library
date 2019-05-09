@@ -100,12 +100,12 @@ public final class Closer implements Closeable {
             SuppressingSuppressor.isAvailable()
                     ? SuppressingSuppressor.INSTANCE
                     : LoggingSuppressor.INSTANCE;
-    @VisibleForTesting
-    final Suppressor suppressor;
+    @VisibleForTesting final Suppressor suppressor;
     // only need space for 2 elements in most cases, so try to use the smallest array possible
     private final Deque<Closeable> stack = new ArrayDeque<>(4);
     @MonotonicNonNullDecl
     private Throwable thrown;
+
     @VisibleForTesting
     Closer(Suppressor suppressor) {
         this.suppressor = checkNotNull(suppressor); // checkNotNull to satisfy null tests

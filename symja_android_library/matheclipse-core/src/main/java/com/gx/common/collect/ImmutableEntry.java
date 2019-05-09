@@ -28,10 +28,8 @@ import java.io.Serializable;
 @GwtCompatible(serializable = true)
 class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializable {
     private static final long serialVersionUID = 0;
-    @NullableDecl
-    final K key;
-    @NullableDecl
-    final V value;
+    @NullableDecl final K key;
+    @NullableDecl final V value;
 
     ImmutableEntry(@NullableDecl K key, @NullableDecl V value) {
         this.key = key;

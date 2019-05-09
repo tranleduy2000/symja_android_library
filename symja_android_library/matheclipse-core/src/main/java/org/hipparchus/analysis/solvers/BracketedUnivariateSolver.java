@@ -120,7 +120,7 @@ public interface BracketedUnivariateSolver<F extends UnivariateFunction>
      * @throws MathIllegalStateException    if the allowed number of evaluations is
      *                                      exceeded.
      */
-     Interval solveInterval(int maxEval, F f, double min, double max)
+    Interval solveInterval(int maxEval, F f, double min, double max)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**

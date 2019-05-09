@@ -32,12 +32,12 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * that satisfies one of the following conditions:
  *
  * <ol>
- *   <li>The expression is one for which the Java compiler can determine a constant value at compile
- *       time, or
- *   <li>the expression consists of the literal {@code null}, or
- *   <li>the expression consists of a single identifier, where the identifier is a formal method
- *       parameter that is declared {@code final} and has the {@link CompileTimeConstant}
- *       annotation.
+ * <li>The expression is one for which the Java compiler can determine a constant value at compile
+ * time, or
+ * <li>the expression consists of the literal {@code null}, or
+ * <li>the expression consists of a single identifier, where the identifier is a formal method
+ * parameter that is declared {@code final} and has the {@link CompileTimeConstant}
+ * annotation.
  * </ol>
  *
  * <p>This constraint on call sites of methods or constructors that have one or more formal
@@ -81,4 +81,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Documented
 @Retention(CLASS)
 @Target({ElementType.PARAMETER})
-public @interface CompileTimeConstant {}
+public @interface CompileTimeConstant {
+}

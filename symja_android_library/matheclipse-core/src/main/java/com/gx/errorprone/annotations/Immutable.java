@@ -36,10 +36,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>A conservative definition of object immutability is:
  *
  * <ul>
- *   <li>All fields are final;
- *   <li>All reference fields are of immutable type, or null;
- *   <li>It is <em>properly constructed</em> (the {@code this} reference does not escape the
- *       constructor).
+ * <li>All fields are final;
+ * <li>All reference fields are of immutable type, or null;
+ * <li>It is <em>properly constructed</em> (the {@code this} reference does not escape the
+ * constructor).
  * </ul>
  *
  * <p>The requirement that all reference fields be immutable ensures <em>deep</em> immutability,
@@ -66,8 +66,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>For more information about immutability, see:
  *
  * <ul>
- *   <li>Java Concurrency in Practice §3.4
- *   <li>Effective Java §15
+ * <li>Java Concurrency in Practice §3.4
+ * <li>Effective Java §15
  * </ul>
  */
 @Documented
@@ -76,9 +76,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Inherited
 public @interface Immutable {
 
-  /**
-   * When annotating a generic type as immutable, {@code containerOf} specifies which type
-   * parameters must be instantiated with immutable types for the container to be deeply immutable.
-   */
-  String[] containerOf() default {};
+    /**
+     * When annotating a generic type as immutable, {@code containerOf} specifies which type
+     * parameters must be instantiated with immutable types for the container to be deeply immutable.
+     */
+    String[] containerOf() default {};
 }

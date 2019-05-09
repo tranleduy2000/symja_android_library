@@ -1562,11 +1562,11 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     static class StrongEntry<K, V> extends AbstractReferenceEntry<K, V> {
         final K key;
         final int hash;
-        @NullableDecl
-        final ReferenceEntry<K, V> next;
+        @NullableDecl final ReferenceEntry<K, V> next;
 
         // The code below is exactly the same for each entry type.
         volatile ValueReference<K, V> valueReference = unset();
+
         StrongEntry(K key, int hash, @NullableDecl ReferenceEntry<K, V> next) {
             this.key = key;
             this.hash = hash;
@@ -1773,8 +1773,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
      */
     static class WeakEntry<K, V> extends WeakReference<K> implements ReferenceEntry<K, V> {
         final int hash;
-        @NullableDecl
-        final ReferenceEntry<K, V> next;
+        @NullableDecl final ReferenceEntry<K, V> next;
 
         /*
          * It'd be nice to get these for free from AbstractReferenceEntry, but we're already extending
@@ -2302,8 +2301,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
          * comments.
          */
 
-        @Weak
-        final LocalCache<K, V> map;
+        @Weak final LocalCache<K, V> map;
         /**
          * The maximum weight of this segment. UNSET_INT if there is no maximum.
          */
@@ -2312,14 +2310,12 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
          * The key reference queue contains entries whose keys have been garbage collected, and which
          * need to be cleaned up internally.
          */
-        @NullableDecl
-        final ReferenceQueue<K> keyReferenceQueue;
+        @NullableDecl final ReferenceQueue<K> keyReferenceQueue;
         /**
          * The value reference queue contains value references whose values have been garbage collected,
          * and which need to be cleaned up internally.
          */
-        @NullableDecl
-        final ReferenceQueue<V> valueReferenceQueue;
+        @NullableDecl final ReferenceQueue<V> valueReferenceQueue;
         /**
          * The recency queue is used to record which entries were accessed for updating the access
          * list's ordering. It is drained as a batch operation when either the DRAIN_THRESHOLD is
@@ -2335,14 +2331,12 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
          * A queue of elements currently in the map, ordered by write time. Elements are added to the
          * tail of the queue on write.
          */
-        @GuardedBy("this")
-        final Queue<ReferenceEntry<K, V>> writeQueue;
+        @GuardedBy("this") final Queue<ReferenceEntry<K, V>> writeQueue;
         /**
          * A queue of elements currently in the map, ordered by access time. Elements are added to the
          * tail of the queue on access (note that writes count as accesses).
          */
-        @GuardedBy("this")
-        final Queue<ReferenceEntry<K, V>> accessQueue;
+        @GuardedBy("this") final Queue<ReferenceEntry<K, V>> accessQueue;
         /**
          * Accumulates cache statistics.
          */
@@ -4267,8 +4261,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
         final Weigher<K, V> weigher;
         final int concurrencyLevel;
         final RemovalListener<? super K, ? super V> removalListener;
-        @NullableDecl
-        final Ticker ticker;
+        @NullableDecl final Ticker ticker;
         final CacheLoader<? super K, V> loader;
 
         @MonotonicNonNullDecl
@@ -4707,8 +4700,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     // Serialization Support
 
     abstract class AbstractCacheSet<T> extends AbstractSet<T> {
-        @Weak
-        final ConcurrentMap<?, ?> map;
+        @Weak final ConcurrentMap<?, ?> map;
 
         AbstractCacheSet(ConcurrentMap<?, ?> map) {
             this.map = map;

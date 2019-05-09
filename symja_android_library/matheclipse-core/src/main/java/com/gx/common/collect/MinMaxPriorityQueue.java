@@ -106,13 +106,13 @@ public final class MinMaxPriorityQueue<E> extends AbstractQueue<E> {
     private static final int EVEN_POWERS_OF_TWO = 0x55555555;
     private static final int ODD_POWERS_OF_TWO = 0xaaaaaaaa;
     private static final int DEFAULT_CAPACITY = 11;
-    @VisibleForTesting
-    final int maximumSize;
+    @VisibleForTesting final int maximumSize;
     private final Heap minHeap;
     private final Heap maxHeap;
     private Object[] queue;
     private int size;
     private int modCount;
+
     private MinMaxPriorityQueue(Builder<? super E> builder, int queueSize) {
         Ordering<E> ordering = builder.ordering();
         this.minHeap = new Heap(ordering);

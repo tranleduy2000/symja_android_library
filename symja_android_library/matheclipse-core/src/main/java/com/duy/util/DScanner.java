@@ -122,8 +122,7 @@ public final class DScanner implements Closeable, Iterator<String> {
     /**
      * Creates a {@code Scanner} on the specified string.
      *
-     * @param src
-     *            the string to be scanned.
+     * @param src the string to be scanned.
      */
     public DScanner(String src) {
         initialize(new StringReader(src));
@@ -175,12 +174,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * When waiting for input, the {@code Scanner} may be blocked. All the
      * input may be cached if no line terminator exists in the buffer.
      *
-     * @param pattern
-     *            the pattern to find in the input.
+     * @param pattern the pattern to find in the input.
      * @return the matched string or {@code null} if the pattern is not found
-     *         before the next line terminator.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
+     * before the next line terminator.
+     * @throws IllegalStateException if the {@code Scanner} is closed.
      */
     public String findInLine(Pattern pattern) {
         checkOpen();
@@ -235,7 +232,7 @@ public final class DScanner implements Closeable, Iterator<String> {
             // the match result according to the Spec
             if (horizonLineSeparator != bufferLength
                     && (horizonLineSeparator + terminatorLength == matcher
-                            .end())) {
+                    .end())) {
                 // ========== To deal with regex bug ====================
                 buffer.limit(oldLimit);
                 // ========== To deal with regex bug ====================
@@ -265,13 +262,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * delimiter will be ignored. This is the same as invoking
      * {@code findInLine(Pattern.compile(pattern))}.
      *
-     * @param pattern
-     *            a string used to construct a pattern which is in turn used to
-     *            match a substring of the input data.
+     * @param pattern a string used to construct a pattern which is in turn used to
+     *                match a substring of the input data.
      * @return the matched string or {@code null} if the pattern is not found
-     *         before the next line terminator.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
+     * before the next line terminator.
+     * @throws IllegalStateException if the {@code Scanner} is closed.
      * @see #findInLine(Pattern)
      */
     public String findInLine(String pattern) {
@@ -299,16 +294,12 @@ public final class DScanner implements Closeable, Iterator<String> {
      * A {@code horizon} whose value is zero will be ignored and the whole input will be
      * used for search. In this situation, all the input may be cached.
      *
-     * @param pattern
-     *            the pattern used to scan.
-     * @param horizon
-     *            the search limit.
+     * @param pattern the pattern used to scan.
+     * @param horizon the search limit.
      * @return the matched string or {@code null} if the pattern is not found
-     *         within the specified {@code horizon}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
-     * @throws IllegalArgumentException
-     *             if {@code horizon} is less than zero.
+     * within the specified {@code horizon}.
+     * @throws IllegalStateException    if the {@code Scanner} is closed.
+     * @throws IllegalArgumentException if {@code horizon} is less than zero.
      */
     public String findWithinHorizon(Pattern pattern, int horizon) {
         checkOpen();
@@ -365,9 +356,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * This method will block if the data is still being read.
      *
      * @return {@code true} if this {@code Scanner} has one or more tokens remaining,
-     *         otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNext() {
         return hasNext(ANY_PATTERN);
@@ -378,12 +368,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * and the next token matches the given pattern. This method will block if the data is
      * still being read.
      *
-     * @param pattern
-     *            the pattern to check for.
+     * @param pattern the pattern to check for.
      * @return {@code true} if this {@code Scanner} has more tokens and the next token
-     *         matches the pattern, {@code false} otherwise.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * matches the pattern, {@code false} otherwise.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNext(Pattern pattern) {
         checkOpen();
@@ -414,12 +402,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * block if the data is still being read. This call is equivalent to
      * {@code hasNext(Pattern.compile(pattern))}.
      *
-     * @param pattern
-     *            the string specifying the pattern to scan for
+     * @param pattern the string specifying the pattern to scan for
      * @return {@code true} if the specified pattern matches this {@code Scanner}'s
-     *         next token, {@code false} otherwise.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * next token, {@code false} otherwise.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNext(String pattern) {
         return hasNext(Pattern.compile(pattern));
@@ -430,9 +416,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code BigDecimal}.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code BigDecimal}, otherwise {@code false.}
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code BigDecimal}, otherwise {@code false.}
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextBigDecimal() {
         Pattern floatPattern = getFloatPattern();
@@ -455,9 +440,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code BigInteger} in the default radix.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code BigInteger}, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code BigInteger}, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextBigInteger() {
         return hasNextBigInteger(currentRadix);
@@ -467,13 +451,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns whether the next token can be translated into a valid
      * {@code BigInteger} in the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into a
-     *            {@code BigInteger}.
+     * @param radix the radix used to translate the token into a
+     *              {@code BigInteger}.
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code BigInteger}, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code BigInteger}, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextBigInteger(int radix) {
         Pattern integerPattern = getIntegerPattern(radix);
@@ -496,9 +478,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code boolean} value.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code boolean} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code boolean} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextBoolean() {
         return hasNext(BOOLEAN_PATTERN);
@@ -509,9 +490,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code byte} value in the default radix.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code byte} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code byte} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextByte() {
         return hasNextByte(currentRadix);
@@ -521,13 +501,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns whether the next token can be translated into a valid
      * {@code byte} value in the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into a {@code byte}
-     *            value
+     * @param radix the radix used to translate the token into a {@code byte}
+     *              value
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code byte} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code byte} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextByte(int radix) {
         Pattern integerPattern = getIntegerPattern(radix);
@@ -550,9 +528,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * value.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code double} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code double} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextDouble() {
         Pattern floatPattern = getFloatPattern();
@@ -575,9 +552,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code float} value.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code float} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code float} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextFloat() {
         Pattern floatPattern = getFloatPattern();
@@ -600,9 +576,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * value in the default radix.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code int} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed,
+     * {@code int} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed,
      */
     public boolean hasNextInt() {
         return hasNextInt(currentRadix);
@@ -612,14 +587,12 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns whether the next token can be translated into a valid {@code int}
      * value in the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into an {@code int}
-     *            value.
+     * @param radix the radix used to translate the token into an {@code int}
+     *              value.
      * @return {@code true} if the next token in this {@code Scanner}'s input can be
-     *         translated into a valid {@code int} value, otherwise
-     *         {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * translated into a valid {@code int} value, otherwise
+     * {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextInt(int radix) {
         Pattern integerPattern = getIntegerPattern(radix);
@@ -655,9 +628,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code long} value in the default radix.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code long} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code long} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextLong() {
         return hasNextLong(currentRadix);
@@ -667,13 +639,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns whether the next token can be translated into a valid
      * {@code long} value in the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into a {@code long}
-     *            value.
+     * @param radix the radix used to translate the token into a {@code long}
+     *              value.
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code long} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code long} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextLong(int radix) {
         Pattern integerPattern = getIntegerPattern(radix);
@@ -696,9 +666,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code short} value in the default radix.
      *
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code short} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code short} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextShort() {
         return hasNextShort(currentRadix);
@@ -708,13 +677,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns whether the next token can be translated into a valid
      * {@code short} value in the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into a {@code short}
-     *            value.
+     * @param radix the radix used to translate the token into a {@code short}
+     *              value.
      * @return {@code true} if the next token can be translated into a valid
-     *         {@code short} value, otherwise {@code false}.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} has been closed.
+     * {@code short} value, otherwise {@code false}.
+     * @throws IllegalStateException if the {@code Scanner} has been closed.
      */
     public boolean hasNextShort(int radix) {
         Pattern integerPattern = getIntegerPattern(radix);
@@ -762,9 +729,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * successful match.
      *
      * @return the match result of the last successful match operation
-     * @throws IllegalStateException
-     *             if the match result is not available, of if the last match
-     *             was not successful.
+     * @throws IllegalStateException if the match result is not available, of if the last match
+     *                               was not successful.
      */
     public MatchResult match() {
         if (!matchSuccessful) {
@@ -779,10 +745,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * delimiter pattern). This method will block if input is being read.
      *
      * @return the next complete token.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
      */
     public String next() {
         return next(ANY_PATTERN);
@@ -794,15 +758,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * being used (or a string that matches the delimiter pattern). This method will block
      * if input is being read.
      *
-     * @param pattern
-     *            the specified pattern to scan.
+     * @param pattern the specified pattern to scan.
      * @return the next token.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token does not match the pattern given.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token does not match the pattern given.
      */
     public String next(Pattern pattern) {
         checkOpen();
@@ -831,15 +791,11 @@ public final class DScanner implements Closeable, Iterator<String> {
      * if input is being read. Calling this method is equivalent to
      * {@code next(Pattern.compile(pattern))}.
      *
-     * @param pattern
-     *            the string specifying the pattern to scan for.
+     * @param pattern the string specifying the pattern to scan for.
      * @return the next token.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token does not match the pattern given.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token does not match the pattern given.
      */
     public String next(String pattern) {
         return next(Pattern.compile(pattern));
@@ -856,13 +812,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@code BigDecimal(String) }.
      *
      * @return the next token as a {@code BigDecimal}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code BigDecimal}.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code BigDecimal}.
      */
     public BigDecimal nextBigDecimal() {
         checkOpen();
@@ -890,13 +843,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns the next token as a {@code BigInteger} in the current radix.
      * This method may block for more input.
      *
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code BigInteger}.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code BigInteger}.
      */
     public BigInteger nextBigInteger() {
         return nextBigInteger(currentRadix);
@@ -913,17 +863,13 @@ public final class DScanner implements Closeable, Iterator<String> {
      * resulting String is passed to {@link BigInteger#BigInteger(String, int)}}
      * with the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into a
-     *            {@code BigInteger}.
+     * @param radix the radix used to translate the token into a
+     *              {@code BigInteger}.
      * @return the next token as a {@code BigInteger}
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code BigInteger}.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code BigInteger}.
      */
     public BigInteger nextBigInteger(int radix) {
         checkOpen();
@@ -952,13 +898,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * being read.
      *
      * @return the next token as a {@code boolean}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code boolean} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code boolean} value.
      */
     public boolean nextBoolean() {
         return Boolean.parseBoolean(next(BOOLEAN_PATTERN));
@@ -968,13 +911,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns the next token as a {@code byte} in the current radix.
      * This method may block for more input.
      *
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code byte} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code byte} value.
      */
     public byte nextByte() {
         return nextByte(currentRadix);
@@ -991,16 +931,12 @@ public final class DScanner implements Closeable, Iterator<String> {
      * resulting String is passed to {@link Byte#parseByte(String, int)}} with
      * the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into {@code byte} value.
+     * @param radix the radix used to translate the token into {@code byte} value.
      * @return the next token as a {@code byte}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code byte} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code byte} value.
      */
     @SuppressWarnings("boxing")
     public byte nextByte(int radix) {
@@ -1038,13 +974,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@link Double#parseDouble(String)}}.
      *
      * @return the next token as a {@code double}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code double} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code double} value.
      */
     @SuppressWarnings("boxing")
     public double nextDouble() {
@@ -1082,13 +1015,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * {@link Float#parseFloat(String)}}.
      *
      * @return the next token as a {@code float}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code float} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code float} value.
      */
     @SuppressWarnings("boxing")
     public float nextFloat() {
@@ -1117,13 +1047,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns the next token as an {@code int} in the current radix.
      * This method may block for more input.
      *
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code int} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code int} value.
      */
     public int nextInt() {
         return nextInt(currentRadix);
@@ -1140,17 +1067,13 @@ public final class DScanner implements Closeable, Iterator<String> {
      * resulting String is passed to {@link Integer#parseInt(String, int)} with
      * the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into an {@code int}
-     *            value.
+     * @param radix the radix used to translate the token into an {@code int}
+     *              value.
      * @return the next token as an {@code int}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code int} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code int} value.
      */
     @SuppressWarnings("boxing")
     public int nextInt(int radix) {
@@ -1183,10 +1106,8 @@ public final class DScanner implements Closeable, Iterator<String> {
      * will be thrown.
      *
      * @return the skipped line.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
-     * @throws NoSuchElementException
-     *             if no line can be found, e.g. when input is an empty string.
+     * @throws IllegalStateException  if the {@code Scanner} is closed.
+     * @throws NoSuchElementException if no line can be found, e.g. when input is an empty string.
      */
     public String nextLine() {
         checkOpen();
@@ -1229,13 +1150,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns the next token as a {@code long} in the current radix.
      * This method may block for more input.
      *
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code long} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code long} value.
      */
     public long nextLong() {
         return nextLong(currentRadix);
@@ -1252,17 +1170,13 @@ public final class DScanner implements Closeable, Iterator<String> {
      * resulting String is passed to {@link Long#parseLong(String, int)}} with
      * the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into a {@code long}
-     *            value.
+     * @param radix the radix used to translate the token into a {@code long}
+     *              value.
      * @return the next token as a {@code long}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code long} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code long} value.
      */
     @SuppressWarnings("boxing")
     public long nextLong(int radix) {
@@ -1291,13 +1205,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Returns the next token as a {@code short} in the current radix.
      * This method may block for more input.
      *
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code short} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code short} value.
      */
     public short nextShort() {
         return nextShort(currentRadix);
@@ -1314,17 +1225,13 @@ public final class DScanner implements Closeable, Iterator<String> {
      * resulting String is passed to {@link Short#parseShort(String, int)}}
      * with the specified radix.
      *
-     * @param radix
-     *            the radix used to translate the token into {@code short}
-     *            value.
+     * @param radix the radix used to translate the token into {@code short}
+     *              value.
      * @return the next token as a {@code short}.
-     * @throws IllegalStateException
-     *             if this {@code Scanner} has been closed.
-     * @throws NoSuchElementException
-     *             if input has been exhausted.
-     * @throws InputMismatchException
-     *             if the next token can not be translated into a valid
-     *             {@code short} value.
+     * @throws IllegalStateException  if this {@code Scanner} has been closed.
+     * @throws NoSuchElementException if input has been exhausted.
+     * @throws InputMismatchException if the next token can not be translated into a valid
+     *                                {@code short} value.
      */
     @SuppressWarnings("boxing")
     public short nextShort(int radix) {
@@ -1366,13 +1273,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Patterns that can match a lot of input may cause the {@code Scanner} to read
      * in a large amount of input.
      *
-     * @param pattern
-     *            used to skip over input.
+     * @param pattern used to skip over input.
      * @return the {@code Scanner} itself.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
-     * @throws NoSuchElementException
-     *             if the specified pattern match fails.
+     * @throws IllegalStateException  if the {@code Scanner} is closed.
+     * @throws NoSuchElementException if the specified pattern match fails.
      */
     public DScanner skip(Pattern pattern) {
         checkOpen();
@@ -1408,12 +1312,10 @@ public final class DScanner implements Closeable, Iterator<String> {
      * delimiter will be ignored. This call is the same as invoke
      * {@code skip(Pattern.compile(pattern))}.
      *
-     * @param pattern
-     *            the string used to construct a pattern which in turn is used to
-     *            match input.
+     * @param pattern the string used to construct a pattern which in turn is used to
+     *                match input.
      * @return the {@code Scanner} itself.
-     * @throws IllegalStateException
-     *             if the {@code Scanner} is closed.
+     * @throws IllegalStateException if the {@code Scanner} is closed.
      */
     public DScanner skip(String pattern) {
         return skip(Pattern.compile(pattern));
@@ -1438,8 +1340,7 @@ public final class DScanner implements Closeable, Iterator<String> {
     /**
      * Sets the delimiting pattern of this {@code Scanner}.
      *
-     * @param pattern
-     *            the delimiting pattern to use.
+     * @param pattern the delimiting pattern to use.
      * @return this {@code Scanner}.
      */
     public DScanner useDelimiter(Pattern pattern) {
@@ -1451,8 +1352,7 @@ public final class DScanner implements Closeable, Iterator<String> {
      * Sets the delimiting pattern of this {@code Scanner} with a pattern compiled from
      * the supplied string value.
      *
-     * @param pattern
-     *            a string from which a {@code Pattern} can be compiled.
+     * @param pattern a string from which a {@code Pattern} can be compiled.
      * @return this {@code Scanner}.
      */
     public DScanner useDelimiter(String pattern) {
@@ -1462,8 +1362,7 @@ public final class DScanner implements Closeable, Iterator<String> {
     /**
      * Sets the {@code Locale} of this {@code Scanner} to a specified {@code Locale}.
      *
-     * @param l
-     *            the specified {@code Locale} to use.
+     * @param l the specified {@code Locale} to use.
      * @return this {@code Scanner}.
      */
     public DScanner useLocale(Locale l) {
@@ -1477,8 +1376,7 @@ public final class DScanner implements Closeable, Iterator<String> {
     /**
      * Sets the radix of this {@code Scanner} to the specified radix.
      *
-     * @param radix
-     *            the specified radix to use.
+     * @param radix the specified radix to use.
      * @return this {@code Scanner}.
      */
     public DScanner useRadix(int radix) {
@@ -1496,8 +1394,7 @@ public final class DScanner implements Closeable, Iterator<String> {
     /**
      * Remove is not a supported operation on {@code Scanner}.
      *
-     * @throws UnsupportedOperationException
-     *             if this method is invoked.
+     * @throws UnsupportedOperationException if this method is invoked.
      */
     public void remove() {
         throw new UnsupportedOperationException();
@@ -1586,8 +1483,8 @@ public final class DScanner implements Closeable, Iterator<String> {
         String numeral = getNumeral(digit, nonZeroDigit);
 
         String regex = "(([-+]?(" + numeral + ")))|" +
-            "(" + addPositiveSign(numeral) + ")|" +
-            "(" + addNegativeSign(numeral) + ")";
+                "(" + addPositiveSign(numeral) + ")|" +
+                "(" + addNegativeSign(numeral) + ")";
 
         cachedIntegerPatternRadix = radix;
         cachedIntegerPattern = Pattern.compile(regex);
@@ -1611,21 +1508,21 @@ public final class DScanner implements Closeable, Iterator<String> {
 
         String decimalSeparator = "\\" + dfs.getDecimalSeparator();
         String decimalNumeral = "(" + numeral + "|" +
-            numeral + decimalSeparator + digit + "*+|" +
-            decimalSeparator + digit + "++)";
+                numeral + decimalSeparator + digit + "*+|" +
+                decimalSeparator + digit + "++)";
         String exponent = "([eE][+-]?" + digit + "+)?";
 
         String decimal = "(([-+]?" + decimalNumeral + "(" + exponent + "?)" + ")|" +
-            "(" + addPositiveSign(decimalNumeral) + "(" + exponent + "?)" + ")|" +
-            "(" + addNegativeSign(decimalNumeral) + "(" + exponent + "?)" + "))";
+                "(" + addPositiveSign(decimalNumeral) + "(" + exponent + "?)" + ")|" +
+                "(" + addNegativeSign(decimalNumeral) + "(" + exponent + "?)" + "))";
 
         String hexFloat = "([-+]?0[xX][0-9a-fA-F]*\\.[0-9a-fA-F]+([pP][-+]?[0-9]+)?)";
         String localNaN = dfs.getNaN();
         String localeInfinity = dfs.getInfinity();
         String nonNumber = "(NaN|\\Q" + localNaN + "\\E|Infinity|\\Q" + localeInfinity + "\\E)";
         String signedNonNumber = "((([-+]?(" + nonNumber + ")))|" +
-            "(" + addPositiveSign(nonNumber) + ")|" +
-            "(" + addNegativeSign(nonNumber) + "))";
+                "(" + addPositiveSign(nonNumber) + ")|" +
+                "(" + addNegativeSign(nonNumber) + "))";
 
         cachedFloatPattern = Pattern.compile(decimal + "|" + hexFloat + "|" + signedNonNumber);
         return cachedFloatPattern;
@@ -1634,7 +1531,7 @@ public final class DScanner implements Closeable, Iterator<String> {
     private String getNumeral(String digit, String nonZeroDigit) {
         String groupSeparator = "\\" + decimalFormat.getDecimalFormatSymbols().getGroupingSeparator();
         String groupedNumeral = "(" + nonZeroDigit + digit + "?" + digit + "?" +
-            "(" + groupSeparator + digit + digit + digit + ")+)";
+                "(" + groupSeparator + digit + digit + digit + ")+)";
         return "((" + digit + "++)|" + groupedNumeral + ")";
     }
 
@@ -1681,7 +1578,7 @@ public final class DScanner implements Closeable, Iterator<String> {
         int exponentIndex;
         if ((exponentIndex = floatString.indexOf('e')) != -1 || (exponentIndex = floatString.indexOf('E')) != -1) {
             String decimalNumeralString = floatString.substring(0, exponentIndex);
-            String exponentString = floatString.substring(exponentIndex + 1, floatString.length());
+            String exponentString = floatString.substring(exponentIndex + 1);
             decimalNumeralString = removeLocaleInfo(decimalNumeralString, float.class);
             return decimalNumeralString + "e" + exponentString;
         }
@@ -1706,7 +1603,7 @@ public final class DScanner implements Closeable, Iterator<String> {
         // Remove decimal separator
         String decimalSeparator = String.valueOf(dfs.getDecimalSeparator());
         separatorIndex = tokenBuilder.indexOf(decimalSeparator);
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
         if (type == int.class) {
             for (int i = 0; i < tokenBuilder.length(); i++) {
                 if (Character.digit(tokenBuilder.charAt(i), Character.MAX_RADIX) != -1) {
@@ -1760,7 +1657,7 @@ public final class DScanner implements Closeable, Iterator<String> {
         }
         if (!positiveSuffix.isEmpty() && tokenBuilder.indexOf(positiveSuffix) != -1) {
             tokenBuilder.delete(tokenBuilder.length() - positiveSuffix.length(),
-                                tokenBuilder.length());
+                    tokenBuilder.length());
         }
         boolean negative = false;
         if (tokenBuilder.indexOf("-") == 0) {
@@ -1773,7 +1670,7 @@ public final class DScanner implements Closeable, Iterator<String> {
         }
         if (!negativeSuffix.isEmpty() && tokenBuilder.indexOf(negativeSuffix) != -1) {
             tokenBuilder.delete(tokenBuilder.length() - negativeSuffix.length(),
-                                tokenBuilder.length());
+                    tokenBuilder.length());
             negative = true;
         }
         return negative;
@@ -1876,10 +1773,7 @@ public final class DScanner implements Closeable, Iterator<String> {
         boolean findComplete = false;
         while (!findComplete) {
             if (matcher.find()) {
-                findComplete = true;
-                if (matcher.start() == findStartIndex && matcher.start() == matcher.end()) {
-                    findComplete = false;
-                }
+                findComplete = matcher.start() != findStartIndex || matcher.start() != matcher.end();
             } else {
                 if (!inputExhausted) {
                     readMore();

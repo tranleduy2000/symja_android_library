@@ -67,10 +67,8 @@ import static com.gx.common.collect.Maps.safeGet;
 @GwtCompatible
 class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializable {
     private static final long serialVersionUID = 0;
-    @GwtTransient
-    final Map<R, Map<C, V>> backingMap;
-    @GwtTransient
-    final Supplier<? extends Map<C, V>> factory;
+    @GwtTransient final Map<R, Map<C, V>> backingMap;
+    @GwtTransient final Supplier<? extends Map<C, V>> factory;
 
     // Accessors
     @MonotonicNonNullDecl

@@ -1083,8 +1083,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
      * work if the key has not moved.
      */
     final class EntryForKey extends AbstractMapEntry<K, V> {
-        @NullableDecl
-        final K key;
+        @NullableDecl final K key;
         int index;
 
         EntryForKey(int index) {

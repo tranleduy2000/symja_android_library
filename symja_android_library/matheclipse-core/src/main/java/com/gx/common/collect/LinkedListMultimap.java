@@ -548,8 +548,7 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
     }
 
     private static final class Node<K, V> extends AbstractMapEntry<K, V> {
-        @NullableDecl
-        final K key;
+        @NullableDecl final K key;
         @NullableDecl
         V value;
         @NullableDecl
@@ -758,8 +757,7 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
      * A {@code ListIterator} over values for a specified key.
      */
     private class ValueForKeyIterator implements ListIterator<V> {
-        @NullableDecl
-        final Object key;
+        @NullableDecl final Object key;
         int nextIndex;
         @NullableDecl
         Node<K, V> next;

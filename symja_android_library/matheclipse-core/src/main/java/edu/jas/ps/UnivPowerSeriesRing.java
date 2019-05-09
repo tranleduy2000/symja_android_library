@@ -5,12 +5,13 @@
 package edu.jas.ps;
 
 
+import com.duy.lambda.IntFunction;
+
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import com.duy.lambda.IntFunction;
 
 import edu.jas.poly.GenPolynomial;
 import edu.jas.poly.GenPolynomialRing;

@@ -654,8 +654,7 @@ public abstract class BaseEncoding {
         // TODO(lowasser): provide a useful toString
         final Alphabet alphabet;
 
-        @NullableDecl
-        final Character paddingChar;
+        @NullableDecl final Character paddingChar;
         @MonotonicNonNullDecl
         private transient BaseEncoding upperCase;
         @MonotonicNonNullDecl

@@ -126,8 +126,7 @@ public final class Interners {
     @VisibleForTesting
     static final class InternerImpl<E> implements Interner<E> {
         // MapMaker is our friend, we know about this type
-        @VisibleForTesting
-        final MapMakerInternalMap<E, Dummy, ?, ?> map;
+        @VisibleForTesting final MapMakerInternalMap<E, Dummy, ?, ?> map;
 
         private InternerImpl(MapMaker mapMaker) {
             this.map =

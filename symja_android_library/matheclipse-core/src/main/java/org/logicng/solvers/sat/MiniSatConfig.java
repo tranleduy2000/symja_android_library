@@ -53,6 +53,7 @@ public final class MiniSatConfig extends Configuration {
     final boolean incremental;
     final boolean initialPhase;
     final boolean proofGeneration;
+
     /**
      * Constructs a new MiniSAT configuration from a given builder.
      *

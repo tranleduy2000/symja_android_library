@@ -46,6 +46,7 @@ final class GraphConstants {
             "Cannot call source()/target() on a EndpointPair from an undirected graph. Consider calling "
                     + "adjacentNode(node) if you already have a node, or nodeU()/nodeV() if you don't.";
     static final String EDGE_ALREADY_EXISTS = "Edge %s already exists in the graph.";
+
     private GraphConstants() {
     }
 

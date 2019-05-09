@@ -22,14 +22,16 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
-/** Indicates that the annotated element should be used only while holding the specified lock. */
+/**
+ * Indicates that the annotated element should be used only while holding the specified lock.
+ */
 @Target({FIELD, METHOD})
 @Retention(CLASS)
 public @interface GuardedBy {
-  /**
-   * The lock that should be held, specified in the format <a
-   * href="http://jcip.net/annotations/doc/net/jcip/annotations/GuardedBy.html">given in Java
-   * Concurrency in Practice</a>.
-   */
-  String value();
+    /**
+     * The lock that should be held, specified in the format <a
+     * href="http://jcip.net/annotations/doc/net/jcip/annotations/GuardedBy.html">given in Java
+     * Concurrency in Practice</a>.
+     */
+    String value();
 }

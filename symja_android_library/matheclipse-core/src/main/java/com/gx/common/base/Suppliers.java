@@ -312,8 +312,7 @@ public final class Suppliers {
 
     private static class SupplierOfInstance<T> implements Supplier<T>, Serializable {
         private static final long serialVersionUID = 0;
-        @NullableDecl
-        final T instance;
+        @NullableDecl final T instance;
 
         SupplierOfInstance(@NullableDecl T instance) {
             this.instance = instance;

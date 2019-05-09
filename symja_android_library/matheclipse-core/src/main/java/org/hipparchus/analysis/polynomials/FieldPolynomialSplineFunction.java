@@ -69,7 +69,7 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      * Spline segment interval delimiters (knots).
      * Size is n + 1 for n segments.
      */
-    private final T knots[];
+    private final T[] knots;
 
     /**
      * The polynomial functions that make up the spline.  The first element
@@ -78,7 +78,7 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      * evaluating these functions at {@code (x - knot[i])} where i is the
      * knot segment to which x belongs.
      */
-    private final FieldPolynomialFunction<T> polynomials[];
+    private final FieldPolynomialFunction<T>[] polynomials;
 
     /**
      * Number of spline segments. It is equal to the number of polynomials and
@@ -93,35 +93,36 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      * The constructor copies both arrays and assigns the copies to the knots
      * and polynomials properties, respectively.
      *
-     * @param knots Spline segment interval delimiters.
+     * @param knots       Spline segment interval delimiters.
      * @param polynomials Polynomial functions that make up the spline.
-     * @throws NullArgumentException if either of the input arrays is {@code null}.
+     * @throws NullArgumentException        if either of the input arrays is {@code null}.
      * @throws MathIllegalArgumentException if knots has length less than 2.
      * @throws MathIllegalArgumentException if {@code polynomials.length != knots.length - 1}.
      * @throws MathIllegalArgumentException if the {@code knots} array is not strictly increasing.
-     *
      */
     @SuppressWarnings("unchecked")
-    public FieldPolynomialSplineFunction(final T knots[], final FieldPolynomialFunction<T> polynomials[])
-        throws MathIllegalArgumentException, NullArgumentException {
+    public FieldPolynomialSplineFunction(final T[] knots, final FieldPolynomialFunction<T>[] polynomials)
+            throws MathIllegalArgumentException, NullArgumentException {
         if (knots == null ||
-            polynomials == null) {
+                polynomials == null) {
             throw new NullArgumentException();
         }
         if (knots.length < 2) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NOT_ENOUGH_POINTS_IN_SPLINE_PARTITION,
-                                                   2, knots.length, false);
+                    2, knots.length, false);
         }
         MathUtils.checkDimension(polynomials.length, knots.length - 1);
         MathArrays.checkOrder(knots);
 
-        this.n = knots.length -1;
+        this.n = knots.length - 1;
         this.knots = knots.clone();
         this.polynomials = (FieldPolynomialFunction<T>[]) Array.newInstance(FieldPolynomialFunction.class, n);
         System.arraycopy(polynomials, 0, this.polynomials, 0, n);
     }
 
-    /** Get the {@link Field} to which the instance belongs.
+    /**
+     * Get the {@link Field} to which the instance belongs.
+     *
      * @return {@link Field} to which the instance belongs
      */
     public Field<T> getField() {
@@ -136,8 +137,8 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      * @param v Point for which the function value should be computed.
      * @return the value.
      * @throws MathIllegalArgumentException if {@code v} is outside of the domain of the
-     * spline function (smaller than the smallest knot point or larger than the
-     * largest knot point).
+     *                                      spline function (smaller than the smallest knot point or larger than the
+     *                                      largest knot point).
      */
     public T value(final double v) {
         return value(getField().getZero().add(v));
@@ -151,8 +152,8 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      * @param v Point for which the function value should be computed.
      * @return the value.
      * @throws MathIllegalArgumentException if {@code v} is outside of the domain of the
-     * spline function (smaller than the smallest knot point or larger than the
-     * largest knot point).
+     *                                      spline function (smaller than the smallest knot point or larger than the
+     *                                      largest knot point).
      */
     @Override
     public T value(final T v) {
@@ -164,7 +165,7 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
         // This will handle the case where v is the last knot value
         // There are only n-1 polynomials, so if v is the last knot
         // then we will use the last polynomial to calculate the value.
-        if ( i >= polynomials.length ) {
+        if (i >= polynomials.length) {
             i--;
         }
         return polynomials[i].value(v.subtract(knots[i]));
@@ -209,13 +210,10 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      * @return {@code true} if {@code x} is a valid point.
      */
     public boolean isValidPoint(T x) {
-        if (x.getReal() < knots[0].getReal() ||
-            x.getReal() > knots[n].getReal()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(x.getReal() < knots[0].getReal()) &&
+                !(x.getReal() > knots[n].getReal());
     }
+
     /**
      * Get the derivative of the polynomial spline function.
      *
@@ -223,8 +221,8 @@ public class FieldPolynomialSplineFunction<T extends RealFieldElement<T>> implem
      */
     @SuppressWarnings("unchecked")
     public FieldPolynomialSplineFunction<T> polynomialSplineDerivative() {
-        FieldPolynomialFunction<T> derivativePolynomials[] =
-                        (FieldPolynomialFunction<T>[]) Array.newInstance(FieldPolynomialFunction.class, n);
+        FieldPolynomialFunction<T>[] derivativePolynomials =
+                (FieldPolynomialFunction<T>[]) Array.newInstance(FieldPolynomialFunction.class, n);
         for (int i = 0; i < n; i++) {
             derivativePolynomials[i] = polynomials[i].polynomialDerivative();
         }

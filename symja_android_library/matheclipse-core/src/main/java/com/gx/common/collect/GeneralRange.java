@@ -50,6 +50,7 @@ final class GeneralRange<T> implements Serializable {
     private final BoundType upperBoundType;
     @MonotonicNonNullDecl
     private transient GeneralRange<T> reverse;
+
     private GeneralRange(
             Comparator<? super T> comparator,
             boolean hasLowerBound,

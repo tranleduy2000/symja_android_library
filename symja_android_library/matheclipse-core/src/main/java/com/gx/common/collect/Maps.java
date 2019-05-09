@@ -3606,8 +3606,7 @@ public final class Maps {
     }
 
     static class KeySet<K, V> extends Sets.ImprovedAbstractSet<K> {
-        @Weak
-        final Map<K, V> map;
+        @Weak final Map<K, V> map;
 
         KeySet(Map<K, V> map) {
             this.map = checkNotNull(map);
@@ -3777,8 +3776,7 @@ public final class Maps {
     }
 
     static class Values<K, V> extends AbstractCollection<V> {
-        @Weak
-        final Map<K, V> map;
+        @Weak final Map<K, V> map;
 
         Values(Map<K, V> map) {
             this.map = checkNotNull(map);

@@ -5,6 +5,8 @@
 package edu.jas.ps;
 
 
+import com.duy.lambda.Function;
+
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +14,6 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import com.duy.lambda.Function;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.poly.ExpVector;

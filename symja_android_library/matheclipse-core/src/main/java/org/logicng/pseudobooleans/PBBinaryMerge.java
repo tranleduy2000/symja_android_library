@@ -65,6 +65,7 @@ import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.
 
 /**
  * The binary merge encoding for pseudo-Boolean constraints to CNF due to Manthey, Philipp, and Steinke.
+ *
  * @version 1.1
  * @since 1.1
  */
@@ -76,6 +77,7 @@ final class PBBinaryMerge implements PBEncoding {
 
     /**
      * Constructs a new binary merge encoding.
+     *
      * @param f      the formula factory
      * @param config the configuration
      */

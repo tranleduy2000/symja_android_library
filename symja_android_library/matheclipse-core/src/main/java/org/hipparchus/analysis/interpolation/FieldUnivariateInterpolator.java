@@ -22,6 +22,7 @@ import org.hipparchus.exception.MathIllegalArgumentException;
 
 /**
  * Interface representing a univariate field interpolating function.
+ *
  * @since 1.5
  */
 public interface FieldUnivariateInterpolator {
@@ -30,13 +31,12 @@ public interface FieldUnivariateInterpolator {
      *
      * @param xval Arguments for the interpolation points.
      * @param yval Values for the interpolation points.
-     * @param <T> the type of the field elements
+     * @param <T>  the type of the field elements
      * @return a function which interpolates the dataset.
-     * @throws MathIllegalArgumentException
-     * if the arguments violate assumptions made by the interpolation
-     * algorithm.
+     * @throws MathIllegalArgumentException if the arguments violate assumptions made by the interpolation
+     *                                      algorithm.
      * @throws MathIllegalArgumentException if arrays lengthes do not match
      */
-    <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> interpolate(T xval[], T yval[])
-        throws MathIllegalArgumentException;
+    <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> interpolate(T[] xval, T[] yval)
+            throws MathIllegalArgumentException;
 }

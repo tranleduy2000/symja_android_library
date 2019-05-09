@@ -38,4 +38,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({METHOD, CONSTRUCTOR, TYPE, PACKAGE})
 @Retention(RUNTIME)
-public @interface CheckReturnValue {}
+public @interface CheckReturnValue {
+}

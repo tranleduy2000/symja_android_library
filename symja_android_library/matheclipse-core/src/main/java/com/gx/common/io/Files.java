@@ -16,7 +16,6 @@ package com.gx.common.io;
 
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
-import com.gx.common.base.Optional;
 import com.gx.common.base.Predicate;
 import com.gx.common.collect.ImmutableSet;
 import com.gx.common.collect.TreeTraverser;
@@ -24,8 +23,6 @@ import com.gx.common.graph.SuccessorsFunction;
 import com.gx.common.graph.Traverser;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;

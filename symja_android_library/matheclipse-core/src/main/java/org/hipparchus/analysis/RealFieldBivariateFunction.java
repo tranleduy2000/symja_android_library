@@ -20,6 +20,7 @@ import org.hipparchus.RealFieldElement;
 
 /**
  * An interface representing a bivariate field function.
+ *
  * @param <T> type of the field elements
  * @since 1.5
  */
@@ -32,6 +33,6 @@ public interface RealFieldBivariateFunction<T extends RealFieldElement<T>> {
      * @param y Ordinate for which the function value should be computed.
      * @return the value.
      */
-     T value(T x, T y);
+    T value(T x, T y);
 
 }

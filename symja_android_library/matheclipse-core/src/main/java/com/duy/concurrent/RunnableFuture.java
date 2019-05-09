@@ -39,11 +39,12 @@ package com.duy.concurrent;
  * A {@link Future} that is {@link Runnable}. Successful execution of
  * the {@code run} method causes completion of the {@code Future}
  * and allows access to its results.
+ *
+ * @param <V> The result type returned by this Future's {@code get} method
+ * @author Doug Lea
  * @see FutureTask
  * @see Executor
  * @since 1.6
- * @author Doug Lea
- * @param <V> The result type returned by this Future's {@code get} method
  */
 public interface RunnableFuture<V> extends Runnable, Future<V> {
     /**

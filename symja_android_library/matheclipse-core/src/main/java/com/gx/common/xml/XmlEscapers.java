@@ -89,6 +89,7 @@ public class XmlEscapers {
         builder.addEscape('\r', "&#xD;");
         XML_ATTRIBUTE_ESCAPER = builder.build();
     }
+
     private XmlEscapers() {
     }
 

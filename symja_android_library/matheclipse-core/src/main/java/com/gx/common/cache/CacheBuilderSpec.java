@@ -147,6 +147,7 @@ public final class CacheBuilderSpec {
     @MonotonicNonNullDecl
     @VisibleForTesting
     TimeUnit refreshTimeUnit;
+
     private CacheBuilderSpec(String specification) {
         this.specification = specification;
     }

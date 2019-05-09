@@ -1887,8 +1887,7 @@ public final class Multimaps {
     }
 
     static class Keys<K, V> extends AbstractMultiset<K> {
-        @Weak
-        final Multimap<K, V> multimap;
+        @Weak final Multimap<K, V> multimap;
 
         Keys(Multimap<K, V> multimap) {
             this.multimap = multimap;

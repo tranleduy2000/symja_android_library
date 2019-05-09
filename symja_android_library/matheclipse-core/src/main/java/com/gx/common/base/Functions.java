@@ -228,8 +228,7 @@ public final class Functions {
     private static class ForMapWithDefault<K, V> implements Function<K, V>, Serializable {
         private static final long serialVersionUID = 0;
         final Map<K, ? extends V> map;
-        @NullableDecl
-        final V defaultValue;
+        @NullableDecl final V defaultValue;
 
         ForMapWithDefault(Map<K, ? extends V> map, @NullableDecl V defaultValue) {
             this.map = checkNotNull(map);

@@ -21,22 +21,25 @@ import org.hipparchus.RealFieldElement;
 
 /**
  * An interface representing a bivariate field function.
+ *
  * @since 1.5
  */
 public interface FieldBivariateFunction {
 
-    /** Convert to a {@link RealFieldBivariateFunction} with a specific type.
-     * @param <T> the type of the field elements
+    /**
+     * Convert to a {@link RealFieldBivariateFunction} with a specific type.
+     *
+     * @param <T>   the type of the field elements
      * @param field field for the argument and value
      * @return converted function
      */
-     <T extends RealFieldElement<T>> RealFieldBivariateFunction<T> toRealFieldBivariateFunction(Field<T> field);
+    <T extends RealFieldElement<T>> RealFieldBivariateFunction<T> toRealFieldBivariateFunction(Field<T> field);
 
     /**
      * Compute the value for the function.
      *
-     * @param x Abscissa for which the function value should be computed.
-     * @param y Ordinate for which the function value should be computed.
+     * @param x   Abscissa for which the function value should be computed.
+     * @param y   Ordinate for which the function value should be computed.
      * @param <T> type of the field elements
      * @return the value.
      */

@@ -30,8 +30,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 @SuppressWarnings("serial") // uses writeReplace(), not default serialization
 final class RegularImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
     static final RegularImmutableBiMap<Object, Object> EMPTY = new RegularImmutableBiMap<>();
-    @VisibleForTesting
-    final transient Object[] alternatingKeysAndValues;
+    @VisibleForTesting final transient Object[] alternatingKeysAndValues;
     private final transient int[] keyHashTable;
     private final transient int keyOffset; // 0 for K-to-V, 1 for V-to-K
     private final transient int size;

@@ -460,8 +460,7 @@ class ObjectCountHashMap<K> {
     }
 
     class MapEntry extends AbstractEntry<K> {
-        @NullableDecl
-        final K key;
+        @NullableDecl final K key;
 
         int lastKnownIndex;
 

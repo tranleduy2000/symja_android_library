@@ -50,16 +50,16 @@ import java.lang.annotation.Target;
  * undefined:
  * <ul>
  * <li> The child object must not reassign any references back to the parent
- *   object. Preferably references from child to parent are declared final.
+ * object. Preferably references from child to parent are declared final.
  * <li> The child object must not contain any {@link Weak} references back to the
- *   parent object.
+ * parent object.
  * <li> The child object must not be available to other threads at the time of
- *   assignment. (Normally, the cycle is created upon construction of the child)
+ * assignment. (Normally, the cycle is created upon construction of the child)
  * </ul>
  *
  * @author Keith Stanger
  */
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.CLASS)
 public @interface RetainedWith {
 }

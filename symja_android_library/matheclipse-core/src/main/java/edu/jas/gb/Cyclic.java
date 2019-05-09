@@ -23,6 +23,7 @@ public class Cyclic {
     final int N;
     final String var;
     final String order;
+
     /**
      * Cyclic constructor.
      *

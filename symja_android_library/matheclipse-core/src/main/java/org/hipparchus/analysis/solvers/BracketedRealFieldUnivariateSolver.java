@@ -168,10 +168,10 @@ public interface BracketedRealFieldUnivariateSolver<T extends RealFieldElement<T
      * @throws MathIllegalStateException    if the allowed number of evaluations is
      *                                      exceeded.
      */
-     Interval<T> solveInterval(int maxEval,
-                                      RealFieldUnivariateFunction<T> f,
-                                      T min,
-                                      T max)
+    Interval<T> solveInterval(int maxEval,
+                              RealFieldUnivariateFunction<T> f,
+                              T min,
+                              T max)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**

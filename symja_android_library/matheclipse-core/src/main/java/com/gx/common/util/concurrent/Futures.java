@@ -129,7 +129,7 @@ public final class Futures {
      * <p>The returned {@code Future} can't be cancelled, and its {@code isDone()} method always
      * returns {@code true}. Calling {@code get()} will immediately throw the provided {@code
      * Throwable} wrapped in an {@code ExecutionException}.
-        */
+     */
     public static <V> ListenableFuture<V> immediateFailedFuture(Throwable throwable) {
         checkNotNull(throwable);
         return new ImmediateFailedFuture<V>(throwable);

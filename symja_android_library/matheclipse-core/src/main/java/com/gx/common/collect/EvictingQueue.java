@@ -49,8 +49,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
 public final class EvictingQueue<E> extends ForwardingQueue<E> implements Serializable {
 
     private static final long serialVersionUID = 0L;
-    @VisibleForTesting
-    final int maxSize;
+    @VisibleForTesting final int maxSize;
     private final Queue<E> delegate;
 
     private EvictingQueue(int maxSize) {

@@ -14,7 +14,6 @@
 
 package com.gx.common.util.concurrent;
 
-import java.util.concurrent.Executor;
 import com.gx.common.annotations.Beta;
 import com.gx.common.base.Ascii;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
@@ -24,6 +23,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;

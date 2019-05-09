@@ -44,6 +44,7 @@ public final class CNFConfig extends Configuration {
     final int distributionBoundary;
     final int createdClauseBoundary;
     final int atomBoundary;
+
     /**
      * Constructs a new configuration with a given type.
      *

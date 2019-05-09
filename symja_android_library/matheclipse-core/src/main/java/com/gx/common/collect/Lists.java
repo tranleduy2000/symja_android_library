@@ -712,8 +712,7 @@ public final class Lists {
     private static class OnePlusArrayList<E> extends AbstractList<E>
             implements Serializable, RandomAccess {
         private static final long serialVersionUID = 0;
-        @NullableDecl
-        final E first;
+        @NullableDecl final E first;
         final E[] rest;
 
         OnePlusArrayList(@NullableDecl E first, E[] rest) {
@@ -740,10 +739,8 @@ public final class Lists {
     private static class TwoPlusArrayList<E> extends AbstractList<E>
             implements Serializable, RandomAccess {
         private static final long serialVersionUID = 0;
-        @NullableDecl
-        final E first;
-        @NullableDecl
-        final E second;
+        @NullableDecl final E first;
+        @NullableDecl final E second;
         final E[] rest;
 
         TwoPlusArrayList(@NullableDecl E first, @NullableDecl E second, E[] rest) {

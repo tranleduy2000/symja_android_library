@@ -518,7 +518,7 @@ public class Color implements Serializable {
      * @see #getRGB()
      * @see #Color(int)
      */
-    public static float[] RGBtoHSB(int red, int green, int blue, float array[]) {
+    public static float[] RGBtoHSB(int red, int green, int blue, float[] array) {
         if (array == null)
             array = new float[3];
         // Calculate brightness.

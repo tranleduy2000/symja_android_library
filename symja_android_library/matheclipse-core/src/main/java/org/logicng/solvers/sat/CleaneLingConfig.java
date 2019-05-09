@@ -71,6 +71,7 @@ public final class CleaneLingConfig extends Configuration {
     final boolean searchfirst;
     final int scincfact;
     final int stepslim;
+
     /**
      * Constructs a new CleaneLing configuration from a given builder.
      *

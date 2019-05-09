@@ -225,10 +225,8 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
     }
 
     private class TreeRow extends Row implements SortedMap<C, V> {
-        @NullableDecl
-        final C lowerBound;
-        @NullableDecl
-        final C upperBound;
+        @NullableDecl final C lowerBound;
+        @NullableDecl final C upperBound;
         @NullableDecl
         transient SortedMap<C, V> wholeRow;
 

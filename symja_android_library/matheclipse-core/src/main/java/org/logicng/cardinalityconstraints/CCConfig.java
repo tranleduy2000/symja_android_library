@@ -48,6 +48,7 @@ public final class CCConfig extends Configuration {
     final int nestingGroupSize;
     final int productRecursiveBound;
     final int commanderGroupSize;
+
     /**
      * Constructs a new cardinality constraint encoder configuration from a given builder.
      *
@@ -81,18 +82,21 @@ public final class CCConfig extends Configuration {
         sb.append("}\n");
         return sb.toString();
     }
+
     /**
      * The encoder for at-most-one and exactly-one constraints.
      */
     public enum AMO_ENCODER {
         PURE, LADDER, PRODUCT, NESTED, COMMANDER, BINARY, BIMANDER, BEST
     }
+
     /**
      * The encoder for at-most-k constraints.
      */
     public enum AMK_ENCODER {
         TOTALIZER, MODULAR_TOTALIZER, CARDINALITY_NETWORK, BEST
     }
+
     /**
      * The encoder for at-least-k constraints.
      */

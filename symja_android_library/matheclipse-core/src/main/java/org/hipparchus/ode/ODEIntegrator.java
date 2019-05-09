@@ -247,8 +247,8 @@ public interface ODEIntegrator {
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
      * @throws MathIllegalArgumentException if the location of an event cannot be bracketed
      */
-     ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations,
-                                            ODEState initialState, double finalTime)
+    ODEStateAndDerivative integrate(OrdinaryDifferentialEquation equations,
+                                    ODEState initialState, double finalTime)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
     /**
@@ -275,8 +275,8 @@ public interface ODEIntegrator {
      * @deprecated as of 1.0, replaced with {@link #integrate(ExpandableODE, ODEState, double)}
      */
     @Deprecated
-     double integrate(final OrdinaryDifferentialEquation equations,
-                             final double t0, final double[] y0, final double t, final double[] y)
+    double integrate(final OrdinaryDifferentialEquation equations,
+                     final double t0, final double[] y0, final double t, final double[] y)
             throws MathIllegalArgumentException, MathIllegalStateException;
 
 }

@@ -604,8 +604,7 @@ public abstract class ImmutableMultimap<K, V> extends AbstractMultimap<K, V>
 
     private static class EntryCollection<K, V> extends ImmutableCollection<Entry<K, V>> {
         private static final long serialVersionUID = 0;
-        @Weak
-        final ImmutableMultimap<K, V> multimap;
+        @Weak final ImmutableMultimap<K, V> multimap;
 
         EntryCollection(ImmutableMultimap<K, V> multimap) {
             this.multimap = multimap;

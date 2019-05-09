@@ -124,7 +124,7 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
      *                                      {@code columnDimension(this) != columnDimension(m)}
      * @since 1.3
      */
-     FieldMatrix<T> multiplyTransposed(final FieldMatrix<T> m)
+    FieldMatrix<T> multiplyTransposed(final FieldMatrix<T> m)
             throws MathIllegalArgumentException;
 
     /**
@@ -140,7 +140,7 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
      *                                      {@code columnDimension(this) != columnDimension(m)}
      * @since 1.3
      */
-     FieldMatrix<T> transposeMultiply(final FieldMatrix<T> m)
+    FieldMatrix<T> transposeMultiply(final FieldMatrix<T> m)
             throws MathIllegalArgumentException;
 
     /**

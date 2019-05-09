@@ -36,6 +36,8 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target(METHOD)
 public @interface DoNotCall {
 
-  /** An optional explanation of why the method should not be called. */
-  String value() default "";
+    /**
+     * An optional explanation of why the method should not be called.
+     */
+    String value() default "";
 }

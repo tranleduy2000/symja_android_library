@@ -64,6 +64,7 @@ final class CCTotalizer {
     private LNGVector<Variable> cardinalityInvars;
     private EncodingResult result;
     private CCIncrementalData incData;
+
     /**
      * Constructs a new totalizer.
      */

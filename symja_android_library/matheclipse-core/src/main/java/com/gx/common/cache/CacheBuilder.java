@@ -228,6 +228,7 @@ public final class CacheBuilder<K, V> {
     @MonotonicNonNullDecl
     Ticker ticker;
     Supplier<? extends StatsCounter> statsCounterSupplier = NULL_STATS_COUNTER;
+
     private CacheBuilder() {
     }
 

@@ -54,26 +54,32 @@ public enum LocalizedStatFormats implements Localizable {
     TWO_OR_MORE_CATEGORIES_REQUIRED("two or more categories required, got {0}"),
     TWO_OR_MORE_VALUES_IN_CATEGORY_REQUIRED("two or more values required in each category, one has {0}");
 
-    /** Source English format. */
+    /**
+     * Source English format.
+     */
     private final String sourceFormat;
 
     /**
      * Simple constructor.
      *
      * @param sourceFormat source English format to use when no localized
-     *        version is available
+     *                     version is available
      */
     LocalizedStatFormats(final String sourceFormat) {
         this.sourceFormat = sourceFormat;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSourceString() {
         return sourceFormat;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocalizedString(final Locale locale) {
         // either the locale is not supported or the resource is unknown

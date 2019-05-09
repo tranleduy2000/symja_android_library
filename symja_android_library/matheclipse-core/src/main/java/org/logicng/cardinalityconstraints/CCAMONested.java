@@ -58,6 +58,7 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the nested encoding.
+ *
  * @version 1.3
  * @since 1.1
  */
@@ -68,6 +69,7 @@ final class CCAMONested implements CCAtMostOne {
 
     /**
      * Constructs the nested AMO encoder.
+     *
      * @param groupSize the group size
      */
     CCAMONested(int groupSize) {
@@ -83,6 +85,7 @@ final class CCAMONested implements CCAtMostOne {
 
     /**
      * Internal recursive encoding.
+     *
      * @param vars the variables of the constraint
      */
     private void encodeIntern(final LNGVector<Literal> vars) {

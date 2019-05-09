@@ -45,4 +45,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Documented
 @Retention(CLASS)
 @Target({ElementType.PARAMETER})
-public @interface FormatString {}
+public @interface FormatString {
+}

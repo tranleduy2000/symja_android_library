@@ -88,6 +88,7 @@ public final class MiniSat extends SATSolver {
     private final boolean initialPhase;
     private boolean incremental;
     private int nextStateId;
+
     /**
      * Constructs a new SAT solver instance.
      *

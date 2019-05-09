@@ -782,8 +782,7 @@ class MapMakerInternalMap<
             implements InternalEntry<K, V, E> {
         final K key;
         final int hash;
-        @NullableDecl
-        final E next;
+        @NullableDecl final E next;
 
         AbstractStrongKeyEntry(K key, int hash, @NullableDecl E next) {
             this.key = key;
@@ -1083,8 +1082,7 @@ class MapMakerInternalMap<
     abstract static class AbstractWeakKeyEntry<K, V, E extends InternalEntry<K, V, E>>
             extends WeakReference<K> implements InternalEntry<K, V, E> {
         final int hash;
-        @NullableDecl
-        final E next;
+        @NullableDecl final E next;
 
         AbstractWeakKeyEntry(ReferenceQueue<K> queue, K key, int hash, @NullableDecl E next) {
             super(key, queue);
@@ -1432,8 +1430,7 @@ class MapMakerInternalMap<
      */
     static final class WeakValueReferenceImpl<K, V, E extends InternalEntry<K, V, E>>
             extends WeakReference<V> implements WeakValueReference<K, V, E> {
-        @Weak
-        final E entry;
+        @Weak final E entry;
 
         WeakValueReferenceImpl(ReferenceQueue<V> queue, V referent, E entry) {
             super(referent, queue);
@@ -1488,8 +1485,7 @@ class MapMakerInternalMap<
          * comments.
          */
 
-        @Weak
-        final MapMakerInternalMap<K, V, E, S> map;
+        @Weak final MapMakerInternalMap<K, V, E, S> map;
         /**
          * The maximum size of this map. MapMaker.UNSET_INT if there is no maximum.
          */
