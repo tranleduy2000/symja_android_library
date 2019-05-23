@@ -697,7 +697,7 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		public static IExpr[] cancelQuotientRemainder(final IExpr arg1, IExpr arg2, IExpr variable) {
+		private static IExpr[] cancelQuotientRemainder(final IExpr arg1, IExpr arg2, IExpr variable) {
 			IExpr[] result = new IExpr[2];
 			try {
 
@@ -944,11 +944,11 @@ public class Algebra {
 		 * @return
 		 */
 		private IExpr collectSingleVariable(IExpr expr, IExpr x, final IAST listOfVariables, final int listPosition,
-											IExpr head, final EvalEngine engine) {
+				IExpr head, EvalEngine engine) {
 			if (expr.isAST()) {
 				Map<IExpr, IASTAppendable> map = new HashMap<IExpr, IASTAppendable>();
 				IAST poly = (IAST) expr;
-				final IASTAppendable rest = F.PlusAlloc(poly.size());
+				IASTAppendable rest = F.PlusAlloc(poly.size());
 
 				// IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
 				final IPatternMatcher matcher = engine.evalPatternMatcher(x);
@@ -969,14 +969,11 @@ public class Algebra {
 				}
 
 				if (head != null) {
-					final IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
+					IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
 					IExpr coefficient;
-					rest.forEach(new ObjIntConsumer<IExpr>() {
-                        @Override
-                        public void accept(IExpr arg, int i) {
+					rest.forEach((arg, i) -> {
                             simplifyAST.set(1, arg);
                             rest.set(i, engine.evaluate(simplifyAST));
-                        }
                     });
 					for (Map.Entry<IExpr, IASTAppendable> entry : map.entrySet()) {
 						simplifyAST.set(1, entry.getValue());
@@ -1051,7 +1048,7 @@ public class Algebra {
 			return;
 		}
 
-		public boolean collectToMapPlus(IExpr expr, final IPatternMatcher matcher, final Map<IExpr, IASTAppendable> map) {
+		public boolean collectToMapPlus(IExpr expr, IPatternMatcher matcher, Map<IExpr, IASTAppendable> map) {
 			if (expr.isFree(matcher, false)) {
 				return false;
 			} else if (matcher.test(expr)) {
@@ -1061,17 +1058,14 @@ public class Algebra {
 				addPowerFactor(expr, F.C1, map);
 				return true;
 			} else if (expr.isTimes()) {
-				final IAST timesAST = (IAST) expr;
-				return timesAST.exists(new ObjIntPredicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x, int i) {
-                        if (matcher.test(x) || Collect.this.isPowerMatched(x, matcher)) {
-                            IAST clone = timesAST.removeAtClone(i);
-                            Collect.this.addOneIdentityPowerFactor(x, clone, map);
+				IAST timesAST = (IAST) expr;
+				return timesAST.exists((x, i) -> {
+					if (matcher.test(x) || isPowerMatched(x, matcher)) {
+						IAST clone = timesAST.removeAtCopy(i);
+						addOneIdentityPowerFactor(x, clone, map);
                             return true;
                         }
                         return false;
-                    }
                 }, 1);
 			}
 
@@ -1949,8 +1943,8 @@ public class Algebra {
 					IExpr[] parts = Algebra.getNumeratorDenominator((IAST) expr, engine);
 					if (!parts[1].isOne()) {
 						try {
-							IExpr numerator = factorExpr(F.Factor(parts[0]), parts[0], eVar, engine);
-							IExpr denomimator = factorExpr(F.Factor(parts[1]), parts[1], eVar, engine);
+							IExpr numerator = factorExpr(F.Factor(parts[0]), parts[0], eVar, false, engine);
+							IExpr denomimator = factorExpr(F.Factor(parts[1]), parts[1], eVar, false, engine);
 							return F.Divide(numerator, denomimator);
 						} catch (JASConversionException e) {
 							if (Config.DEBUG) {
@@ -1967,7 +1961,7 @@ public class Algebra {
 				if (ast.isAST2()) {
 					return factorWithOption(ast, expr, varList, false, engine);
 				}
-				return factorExpr(ast, expr, eVar, engine);
+				return factorExpr(ast, expr, eVar, false, engine);
 
 			} catch (JASConversionException e) {
 				if (Config.DEBUG) {
@@ -1980,7 +1974,7 @@ public class Algebra {
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_2;
 		}
-		private IExpr factorExpr(final IAST ast, IExpr expr, final VariablesSet eVar, final EvalEngine engine) {
+		public IExpr factorExpr(final IAST ast, IExpr expr, VariablesSet eVar, boolean factorSquareFree,  EvalEngine engine) {
 				if (expr.isAST()) {
 				IExpr temp;
 				// if (expr.isPower()&&expr.base().isPlus()) {
@@ -1988,26 +1982,29 @@ public class Algebra {
 				// temp = factorExpr(ast, expr.base(), varList);
 				// temp = F.Power(temp, expr.exponent());
 				// } else
-				if (expr.isTimes()) {
+				if (expr.isPower()) {
+					IExpr p = factorExpr((IAST) expr, expr.base(), eVar,factorSquareFree, engine);
+					if (!p.equals(expr.base())) {
+						return F.Power(p, expr.exponent());
+					}
+					return expr;
+				} else if (expr.isTimes()) {
 					// System.out.println(ast.toString());
-					temp = ((IAST) expr).map(new Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
+					temp = ((IAST) expr).map(x -> {
 							if (x.isPlus()) {
-								return Factor.this.factorExpr(ast, x, eVar, engine);
+							return factorExpr(ast, x, eVar, factorSquareFree, engine);
 							}
 							if (x.isPower() && x.base().isPlus()) {
-								IExpr p = Factor.this.factorExpr(ast, x.base(), eVar, engine);
+							IExpr p = factorExpr(ast, x.base(), eVar, factorSquareFree,engine);
 								if (!p.equals(x.base())) {
 									return F.Power(p, x.exponent());
 								}
 							}
 							return F.NIL;
-						}
 					}, 1);
 				} else {
 				// System.out.println("leafCount " + expr.leafCount());
-					temp = factor((IAST) expr, eVar, false, engine);
+					temp = factor((IAST) expr, eVar, factorSquareFree, engine);
 				}
 				if (temp.isPresent()) {
 					F.REMEMBER_AST_CACHE.put(ast, temp);
@@ -2018,7 +2015,7 @@ public class Algebra {
 
 		}
 
-		public static IExpr factor(IAST expr, VariablesSet eVar, boolean factorSquareFree, EvalEngine engine)
+		private static IExpr factor(IAST expr, VariablesSet eVar, boolean factorSquareFree, EvalEngine engine)
 				throws JASConversionException {
 			if (Config.MAX_FACTOR_LEAFCOUNT > 0 && expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT) {
 				return expr;
@@ -2073,12 +2070,7 @@ public class Algebra {
 				IExpr base = jas.integerPoly2Expr(entry.getKey());
 				if (entry.getValue() == 1L) {
 					if (f.isMinusOne() && base.isPlus()) {
-							base = ((IAST) base).map(new Function<IExpr, IExpr>() {
-								@Override
-								public IExpr apply(IExpr x) {
-									return x.negate();
-								}
-							}, 1);
+							base = ((IAST) base).map(x -> x.negate(), 1);
 						f = F.C1;
 					}
 					result.append(base);
@@ -2179,7 +2171,7 @@ public class Algebra {
 					return factorWithOption(ast, expr, varList, true, engine);
 				}
 				if (expr.isAST()) {
-					return factor((IAST) expr, eVar, true, engine);
+					return factorExpr((IAST) expr, (IAST) expr, eVar, true, engine);
 				}
 				return expr;
 
@@ -3387,18 +3379,13 @@ public class Algebra {
 				if (head.equals(Power)) {
 					if (x1.isTimes()) {
 						// Power[x_ * y_, z_] :> x^z * y^z
-						final IAST timesAST = (IAST) x1;
+						IAST timesAST = (IAST) x1;
 						IASTMutable timesResult = timesAST.mapThread(Power(Null, x2), 1);
 						if (assumptions) {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
 							plusResult.append(C1D2);
 							plusResult.appendArgs(timesAST.size(),
-									new IntFunction<IExpr>() {
-										@Override
-										public IExpr apply(int i) {
-											return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
-										}
-									});
+									i -> Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi))));
 							IAST expResult = Power(E, Times(C2, I, Pi, x2, Floor(plusResult)));
 							if (!(timesResult instanceof IASTAppendable)) {
 								timesResult = timesResult.copyAppendable();
@@ -3833,12 +3820,7 @@ public class Algebra {
 			public boolean visit(IAST ast) {
 				if (ast.isTimes() || ast.isPlus()) {
 					// check the arguments
-					return ast.forAll(new Predicate<IExpr>() {
-                        @Override
-                        public boolean test(IExpr x) {
-                            return x.accept(IsBasicExpressionVisitor.this);
-                        }
-                    });
+					return ast.forAll(x -> x.accept(this));
 				}
 				if (ast.isPower() && (ast.exponent().isInteger())) {
 					// check the arguments

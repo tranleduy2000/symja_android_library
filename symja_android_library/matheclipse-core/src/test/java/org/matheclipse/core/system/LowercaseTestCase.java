@@ -15369,8 +15369,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testSlot() {
 		// check("x^2+x", "x+x^2");
 
-		check("(# &)[a, b, c]", //
-				"a");
 		check("f = If(#1 == 1, 1, #1*#0(#1 - 1)) &", //
 				"If(#1==1,1,#1*#0[-1+#1])&");
 		check("f(10)", //
@@ -15391,18 +15389,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSlotSequence() {
-		check("(## &)[a, b, c]", //
-				"Sequence(a,b,c)");
-		check("(##2 &)[a, b, c]", //
-				"Sequence(b,c)");
-		check("(##4 &)[a, b, c]", //
-				"Sequence()");
-		check("(##5 &)[a, b, c]", //
-				"##5");
-		check("(##-1 &)[a, b, c]", //
-				"-1+a+b+c");
-		check("(##2-7 &)[a, b, c]", //
-				"-7+b+c");
 		check("##", //
 				"##1");
 		check("##42", //

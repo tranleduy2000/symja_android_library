@@ -3524,7 +3524,7 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if (ast.size() < 3) {
 				return F.NIL;
@@ -4058,7 +4058,7 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if (ast.size() < 3 || ast.size() > 4) {
 				return F.NIL;
@@ -4131,7 +4131,7 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if (ast.size() == 3) {
 			try {
@@ -4245,7 +4245,7 @@ public final class ListFunctions {
 				return F.NIL;
 			}
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if (ast.size() == 2 && ast.head().isAST(F.ReplaceList, 2)) {
 				return F.ReplaceList(ast.first(), ast.head().first());
@@ -4355,7 +4355,7 @@ public final class ListFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			try {
 				if (ast.isAST3()) {
@@ -4459,7 +4459,7 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			try {
 				IExpr arg2 = ast.arg2();
@@ -4831,6 +4831,9 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			if (ast.isAST1()) {
+				return F.operatorFormAppend(ast);
+			}
 
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
@@ -4860,7 +4863,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_3;
+			return IOFunctions.ARGS_1_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -5580,11 +5583,10 @@ public final class ListFunctions {
 						return take(arg1, 0, sequ);
 					}
 				} else {
-					engine.printMessage("Take: Nonatomic expression expected at position 1");
+					return engine.printMessage("Take: Nonatomic expression expected at position 1");
 				}
 			} catch (final IllegalArgument e) {
-				engine.printMessage("Take: " + e.getMessage());
-				return F.NIL;
+				return engine.printMessage("Take: " + e.getMessage());
 			} catch (final Exception e) {
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();

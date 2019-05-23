@@ -1,8 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.gx.common.util.concurrent.SimpleTimeLimiter;
@@ -46,6 +43,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.matheclipse.core.expression.F.Divide;
@@ -1625,7 +1625,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_0_1;
+			return IOFunctions.ARGS_0_2;
 		}
 		private IExpr enableOnOffTrace(IExpr arg1, boolean unique, EvalEngine engine) {
 			IdentityHashMap<ISymbol, ISymbol> map = null;
@@ -2400,10 +2400,14 @@ public final class Programming {
 				}
 				return F.$Aborted;
 			} catch (Exception e) {
-				Throwable re = e.getCause();
-				if (re instanceof RecursionLimitExceeded) {
-					throw (RecursionLimitExceeded) re;
+				if (ast.isAST3()) {
+					// e.printStackTrace();
+					return ast.arg3();
 				}
+				// Throwable re = e.getCause();
+				// if (re instanceof RecursionLimitExceeded) {
+				// throw (RecursionLimitExceeded) re;
+				// }
 				if (Config.DEBUG) {
 					e.printStackTrace();
 				}

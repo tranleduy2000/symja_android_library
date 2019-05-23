@@ -1158,7 +1158,6 @@ public class TrigFunctions extends AbstractRubiTestCase {
 
 	// {2945}
 	public void test0146() {
-		fSeconds=60;
 		check(//
 				"Integrate[(Csc[e + f*x]*Sqrt[a + b*Sin[e + f*x]])/Sqrt[c + d*Sin[e + f*x]], x]", //
 				"(-2*Sqrt[c + d]*EllipticPi[(a*(c + d))/((a + b)*c), ArcSin[(Sqrt[a + b]*Sqrt[c + d*Sin[e + f*x]])/(Sqrt[c + d]*Sqrt[a + b*Sin[e + f*x]])], ((a - b)*(c + d))/((a + b)*(c - d))]*Sec[e + f*x]*Sqrt[-(((b*c - a*d)*(1 - Sin[e + f*x]))/((c + d)*(a + b*Sin[e + f*x])))]*Sqrt[((b*c - a*d)*(1 + Sin[e + f*x]))/((c - d)*(a + b*Sin[e + f*x]))]*(a + b*Sin[e + f*x]))/(Sqrt[a + b]*c*f)", //
@@ -1983,6 +1982,7 @@ public class TrigFunctions extends AbstractRubiTestCase {
 
 	// {2994}
 	public void test0255() {
+		fSeconds = 120;
 		check(//
 				"Integrate[(1 + Cos[c + d*x])/(Cos[c + d*x]^(3/2)*Sqrt[2 + 3*Cos[c + d*x]]), x]", //
 				"-((Cot[c + d*x]*EllipticE[ArcSin[Sqrt[2 + 3*Cos[c + d*x]]/(Sqrt[5]*Sqrt[Cos[c + d*x]])], 5]*Sqrt[-1 - Sec[c + d*x]]*Sqrt[1 - Sec[c + d*x]])/d)", //
@@ -1991,6 +1991,7 @@ public class TrigFunctions extends AbstractRubiTestCase {
 
 	// {2994}
 	public void test0256() {
+		fSeconds = 120;
 		check(//
 				"Integrate[(1 + Cos[c + d*x])/(Cos[c + d*x]^(3/2)*Sqrt[-2 + 3*Cos[c + d*x]]), x]", //
 				"-((Sqrt[5]*Cot[c + d*x]*EllipticE[ArcSin[Sqrt[-2 + 3*Cos[c + d*x]]/Sqrt[Cos[c + d*x]]], 1/5]*Sqrt[-1 + Sec[c + d*x]]*Sqrt[1 + Sec[c + d*x]])/d)", //
@@ -1999,6 +2000,7 @@ public class TrigFunctions extends AbstractRubiTestCase {
 
 	// {2994}
 	public void test0257() {
+		fSeconds = 120;
 		check(//
 				"Integrate[(1 + Cos[c + d*x])/(Cos[c + d*x]^(3/2)*Sqrt[3 + 2*Cos[c + d*x]]), x]", //
 				"(2*Cot[c + d*x]*EllipticE[ArcSin[Sqrt[3 + 2*Cos[c + d*x]]/(Sqrt[5]*Sqrt[Cos[c + d*x]])], -5]*Sqrt[1 - Sec[c + d*x]]*Sqrt[1 + Sec[c + d*x]])/(3*d)", //
@@ -2007,6 +2009,7 @@ public class TrigFunctions extends AbstractRubiTestCase {
 
 	// {2994}
 	public void test0258() {
+		fSeconds = 120;
 		check(//
 				"Integrate[(1 + Cos[c + d*x])/(Sqrt[3 - 2*Cos[c + d*x]]*Cos[c + d*x]^(3/2)), x]", //
 				"(2*Sqrt[5]*Cot[c + d*x]*EllipticE[ArcSin[Sqrt[3 - 2*Cos[c + d*x]]/Sqrt[Cos[c + d*x]]], -1/5]*Sqrt[1 - Sec[c + d*x]]*Sqrt[1 + Sec[c + d*x]])/(3*d)", //

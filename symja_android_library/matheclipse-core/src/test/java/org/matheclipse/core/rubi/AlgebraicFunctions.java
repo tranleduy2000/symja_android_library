@@ -7950,6 +7950,8 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 		check(//
 				"Integrate[(d + e*x)/(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(3/2), x]", //
 				"(-2*(d + e*x))/((c*d^2 - a*e^2)*Sqrt[a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2])", //
+				"(2*(c*d^2-a*e^2)*(d+e*x))/((4*a*c*d^2*e^2-(c*d^2+a*e^2)^2)*Sqrt(a*d*e+(c*d^2+a*e^\n"
+						+ "2)*x+c*d*e*x^2))", //
 				636);
 	}
 
@@ -8612,6 +8614,7 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 
 	// {860}
 	public void test1121() {
+		fSeconds = 120;
 		check(//
 				"Integrate[(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(5/2)/((d + e*x)^(5/2)*(f + g*x)^(9/2)), x]", //
 				"(2*(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^(7/2))/(7*(c*d*f - a*e*g)*(d + e*x)^(7/2)*(f + g*x)^(7/2))", //
