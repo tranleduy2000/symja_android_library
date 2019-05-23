@@ -12,16 +12,39 @@ public class ContainsFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.ContainsAny.setEvaluator(new ContainsAny());
+			F.ContainsAny.setEvaluator(ContainsAny.CONST);
 			F.ContainsAll.setEvaluator(ContainsAll.CONST);
-			F.ContainsExactly.setEvaluator(new ContainsExactly());
-			F.ContainsNone.setEvaluator(new ContainsNone());
+			F.ContainsExactly.setEvaluator(ContainsExactly.CONST);
+			F.ContainsNone.setEvaluator(ContainsNone.CONST);
 			F.ContainsOnly.setEvaluator(ContainsOnly.CONST);
+			// seemed to be the same behavior as ContainsXXX functions, if the headers of the lists are identical
+			F.DisjointQ.setEvaluator(new DisjointQ());
+			F.IntersectingQ.setEvaluator(new IntersectingQ());
+			F.SubsetQ.setEvaluator(new SubsetQ());
 		}
 
 	}
 
+	private static class DisjointQ extends ContainsNone {
+		public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
+			return arg1.isAST() && arg2.isAST(arg1.head());
+		}
+		}
+
+	private static class IntersectingQ extends ContainsAny {
+		public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
+			return arg1.isAST() && arg2.isAST(arg1.head());
+		}
+	}
+
+	private static class SubsetQ extends ContainsAll {
+		public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
+			return arg1.isAST() && arg2.isAST(arg1.head());
+		}
+	}
+
 	private static class ContainsAny extends AbstractEvaluator {
+		final static ContainsAny CONST = new ContainsAny();
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -29,7 +52,7 @@ public class ContainsFunctions {
 				return F.operatorFormAppend(ast);
 			}
 			IExpr sameTest = F.SameQ;
-			if (ast.arg1().isList() && ast.arg2().isList()) {
+			if (validateArgs(ast.arg1(), ast.arg2(), engine)) {
 				if (ast.isAST3()) {
 					// determine option SameTest
 					final Options options = new Options(ast.topHead(), ast, 2, engine);
@@ -45,6 +68,9 @@ public class ContainsFunctions {
 			return F.NIL;
 		}
 
+		public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
+			return arg1.isList() && arg2.isList();
+		}
 		public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
 			for (int i = 1; i < list1.size(); i++) {
 				IExpr list1Arg = list1.get(i);
@@ -65,6 +91,7 @@ public class ContainsFunctions {
 	}
 
 	private final static class ContainsExactly extends ContainsAny {
+		final static ContainsExactly CONST = new ContainsExactly();
 
 		public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
 			if (ContainsAll.CONST.containsFunction(list1, list2, sameTest, engine).isTrue()) {
@@ -77,7 +104,7 @@ public class ContainsFunctions {
 
 	}
 
-	private final static class ContainsAll extends ContainsAny {
+	private static class ContainsAll extends ContainsAny {
 		final static ContainsAll CONST = new ContainsAll();
 
 		public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
@@ -125,7 +152,8 @@ public class ContainsFunctions {
 
 	}
 
-	private final static class ContainsNone extends ContainsAny {
+	private static class ContainsNone extends ContainsAny {
+		final static ContainsNone CONST = new ContainsNone();
 
 		public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
 			for (int i = 1; i < list1.size(); i++) {
