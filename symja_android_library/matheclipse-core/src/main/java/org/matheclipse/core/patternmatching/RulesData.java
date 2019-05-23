@@ -405,7 +405,7 @@ public final class RulesData implements Serializable {
 				for (IPatternMatcher patternEvaluator : fPatternDownRules) {
 					// if (patternEvaluator.fLhsPatternExpr.isAST(F.Integrate)) {
 					// System.out.println(((IPatternMatcher) patternEvaluator).getLHSPriority());
-					// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 6686) {
+					// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 2932) {
 					// System.out.println("Debug from this line");
 					// }
 					// }

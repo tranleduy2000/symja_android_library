@@ -64,7 +64,7 @@ public class Structure {
             F.Depth.setEvaluator(new Depth());
             F.Flatten.setEvaluator(new Flatten());
 		    F.FlattenAt.setEvaluator(new FlattenAt());
-			F.Function.setEvaluator(new Function());
+			F.Function.setEvaluator(new Structure.Function());
             F.Head.setEvaluator(new Head());
             F.LeafCount.setEvaluator(new LeafCount());
             F.Map.setEvaluator(new Map());
@@ -176,6 +176,9 @@ public class Structure {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			if (ast.isAST1()) {
+				return F.operatorFormPrepend(ast);
+				}
 			final IASTAppendable evaledAST = ast.copyAppendable();
 			evaledAST.setArgs(evaledAST.size(), new IntFunction<IExpr>() {
 				@Override
@@ -207,7 +210,7 @@ public class Structure {
 		}
 
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_4;
+			return IOFunctions.ARGS_1_4;
 		}
 
 		public static IExpr evalApply(final IExpr f, IExpr expr, IAST evaledAST, int lastIndex, boolean heads,
@@ -543,6 +546,9 @@ public class Structure {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			if (ast.isAST1()) {
+				return F.operatorFormAppend(ast);
+			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			IExpr arg2 = engine.evaluate(ast.arg2());
 			if (arg1.isAST()) {
@@ -573,7 +579,7 @@ public class Structure {
 		}
 
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_2;
+			return IOFunctions.ARGS_1_2;
 		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
@@ -890,6 +896,9 @@ public class Structure {
 	private static class Map extends AbstractFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				return F.operatorFormPrepend(ast);
+			}
 
 			int lastIndex = ast.argSize();
 			boolean heads = false;
@@ -925,13 +934,12 @@ public class Structure {
 				}
 				return arg2.accept(level).orElse(arg2);
 			} catch (final MathException e) {
-				engine.printMessage("Map: " +e.getMessage());
+				return engine.printMessage("Map: " + e.getMessage());
 			}
-			return F.NIL;
 		}
 
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_4;
+			return IOFunctions.ARGS_1_4;
 		}
 	}
 
@@ -1068,7 +1076,7 @@ public class Structure {
 					return level.visitAST(((IAST) arg2), new int[0]).orElse(arg2);
 				}
 			} catch (final MathException e) {
-				engine.printMessage("MapIndexed: " +e.getMessage());
+				return engine.printMessage("MapIndexed: " + e.getMessage());
 			}
 			return F.NIL;
 		}
@@ -1192,6 +1200,9 @@ public class Structure {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			if (ast.isAST1()) {
+				return F.operatorFormPrepend(ast);
+			}
 			if (ast.arg2().isAST()) {
 				int level = 1;
 				if (ast.isAST3()) {
@@ -1221,7 +1232,7 @@ public class Structure {
 		}
 
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_3;
+			return IOFunctions.ARGS_1_3;
 		}
 	}
 
@@ -1543,6 +1554,9 @@ public class Structure {
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			// Validate.checkRange(ast, 3, 5);
 
+			if (ast.isAST1()) {
+				return F.operatorFormPrepend(ast);
+			}
 			if (ast.size() >= 3 && ast.size() < 5) {
 			int lastIndex = ast.argSize();
 			boolean heads = false;
@@ -1606,6 +1620,9 @@ public class Structure {
 			return F.NIL;
 		}
 
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_4;
+		}
 	}
 
 	/**

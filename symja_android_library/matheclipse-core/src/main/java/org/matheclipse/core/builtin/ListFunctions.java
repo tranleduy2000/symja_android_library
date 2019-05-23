@@ -1102,7 +1102,7 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 
 			if (ast.size() >= 3 && ast.size() <= 5) {
@@ -4831,9 +4831,6 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
-			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
-			}
 
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
@@ -4863,7 +4860,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_1_3;
+			return IOFunctions.ARGS_2_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -5066,8 +5063,7 @@ public final class ListFunctions {
 				if (ast.size() == 2) {
 					int n = ast.arg1().toIntDefault(-1);
 					if (n < 0 || n == 0) {
-						engine.printMessage("Subdivide: argument 1 should be a positive integer.");
-						return F.NIL;
+						return engine.printMessage("Subdivide: argument 1 should be a positive integer.");
 					}
 					return Range.range(0, n + 1).map(new Function<IExpr, IExpr>() {
 						@Override
@@ -5079,9 +5075,8 @@ public final class ListFunctions {
 				if (ast.size() == 3) {
 					int n = ast.arg2().toIntDefault(-1);
 					if (n < 0 || n == 0) {
-						engine.printMessage("Subdivide: argument 2 should be a positive integer.");
-						return F.NIL;
-					}
+						return engine.printMessage("Subdivide: argument 2 should be a positive integer.");
+						}
 					IAST factorList = Range.range(0, n + 1).map(new Function<IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x) {
@@ -5103,8 +5098,7 @@ public final class ListFunctions {
 					}
 					int n = ast.arg3().toIntDefault(-1);
 					if (n < 0 || n == 0) {
-						engine.printMessage("Subdivide: argument 3 should be a positive integer.");
-						return F.NIL;
+						return engine.printMessage("Subdivide: argument 3 should be a positive integer.");
 					}
 					IAST factorList = Range.range(0, n + 1).map(new Function<IExpr, IExpr>() {
 						@Override

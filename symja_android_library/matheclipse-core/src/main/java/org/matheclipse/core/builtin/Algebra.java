@@ -944,11 +944,11 @@ public class Algebra {
 		 * @return
 		 */
 		private IExpr collectSingleVariable(IExpr expr, IExpr x, final IAST listOfVariables, final int listPosition,
-				IExpr head, EvalEngine engine) {
+											IExpr head, final EvalEngine engine) {
 			if (expr.isAST()) {
 				Map<IExpr, IASTAppendable> map = new HashMap<IExpr, IASTAppendable>();
 				IAST poly = (IAST) expr;
-				IASTAppendable rest = F.PlusAlloc(poly.size());
+				final IASTAppendable rest = F.PlusAlloc(poly.size());
 
 				// IPatternMatcher matcher = new PatternMatcherEvalEngine(x, engine);
 				final IPatternMatcher matcher = engine.evalPatternMatcher(x);
@@ -969,12 +969,15 @@ public class Algebra {
 				}
 
 				if (head != null) {
-					IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
+					final IASTMutable simplifyAST = (IASTMutable) F.unaryAST1(head, null);
 					IExpr coefficient;
-					rest.forEach((arg, i) -> {
-                            simplifyAST.set(1, arg);
-                            rest.set(i, engine.evaluate(simplifyAST));
-                    });
+					rest.forEach(new ObjIntConsumer<IExpr>() {
+						@Override
+						public void accept(IExpr arg, int i) {
+							simplifyAST.set(1, arg);
+							rest.set(i, engine.evaluate(simplifyAST));
+						}
+					});
 					for (Map.Entry<IExpr, IASTAppendable> entry : map.entrySet()) {
 						simplifyAST.set(1, entry.getValue());
 						coefficient = engine.evaluate(simplifyAST);
@@ -1048,7 +1051,7 @@ public class Algebra {
 			return;
 		}
 
-		public boolean collectToMapPlus(IExpr expr, IPatternMatcher matcher, Map<IExpr, IASTAppendable> map) {
+		public boolean collectToMapPlus(IExpr expr, final IPatternMatcher matcher, final Map<IExpr, IASTAppendable> map) {
 			if (expr.isFree(matcher, false)) {
 				return false;
 			} else if (matcher.test(expr)) {
@@ -1058,15 +1061,18 @@ public class Algebra {
 				addPowerFactor(expr, F.C1, map);
 				return true;
 			} else if (expr.isTimes()) {
-				IAST timesAST = (IAST) expr;
-				return timesAST.exists((x, i) -> {
-					if (matcher.test(x) || isPowerMatched(x, matcher)) {
-						IAST clone = timesAST.removeAtCopy(i);
-						addOneIdentityPowerFactor(x, clone, map);
-                            return true;
-                        }
-                        return false;
-                }, 1);
+				final IAST timesAST = (IAST) expr;
+				return timesAST.exists(new ObjIntPredicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x, int i) {
+						if (matcher.test(x) || Collect.this.isPowerMatched(x, matcher)) {
+							IAST clone = timesAST.removeAtCopy(i);
+							Collect.this.addOneIdentityPowerFactor(x, clone, map);
+							return true;
+						}
+						return false;
+					}
+				}, 1);
 			}
 
 			return false;
@@ -1974,7 +1980,7 @@ public class Algebra {
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_2;
 		}
-		public IExpr factorExpr(final IAST ast, IExpr expr, VariablesSet eVar, boolean factorSquareFree,  EvalEngine engine) {
+		public IExpr factorExpr(final IAST ast, IExpr expr, final VariablesSet eVar, final boolean factorSquareFree, final EvalEngine engine) {
 				if (expr.isAST()) {
 				IExpr temp;
 				// if (expr.isPower()&&expr.base().isPlus()) {
@@ -1990,17 +1996,20 @@ public class Algebra {
 					return expr;
 				} else if (expr.isTimes()) {
 					// System.out.println(ast.toString());
-					temp = ((IAST) expr).map(x -> {
+					temp = ((IAST) expr).map(new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
 							if (x.isPlus()) {
-							return factorExpr(ast, x, eVar, factorSquareFree, engine);
+								return Factor.this.factorExpr(ast, x, eVar, factorSquareFree, engine);
 							}
 							if (x.isPower() && x.base().isPlus()) {
-							IExpr p = factorExpr(ast, x.base(), eVar, factorSquareFree,engine);
+								IExpr p = Factor.this.factorExpr(ast, x.base(), eVar, factorSquareFree, engine);
 								if (!p.equals(x.base())) {
 									return F.Power(p, x.exponent());
 								}
 							}
 							return F.NIL;
+						}
 					}, 1);
 				} else {
 				// System.out.println("leafCount " + expr.leafCount());
@@ -2070,7 +2079,12 @@ public class Algebra {
 				IExpr base = jas.integerPoly2Expr(entry.getKey());
 				if (entry.getValue() == 1L) {
 					if (f.isMinusOne() && base.isPlus()) {
-							base = ((IAST) base).map(x -> x.negate(), 1);
+							base = ((IAST) base).map(new Function<IExpr, IExpr>() {
+								@Override
+								public IExpr apply(IExpr x) {
+									return x.negate();
+								}
+							}, 1);
 						f = F.C1;
 					}
 					result.append(base);
@@ -3379,13 +3393,18 @@ public class Algebra {
 				if (head.equals(Power)) {
 					if (x1.isTimes()) {
 						// Power[x_ * y_, z_] :> x^z * y^z
-						IAST timesAST = (IAST) x1;
+						final IAST timesAST = (IAST) x1;
 						IASTMutable timesResult = timesAST.mapThread(Power(Null, x2), 1);
 						if (assumptions) {
 							IASTAppendable plusResult = F.PlusAlloc(timesAST.size() + 1);
 							plusResult.append(C1D2);
 							plusResult.appendArgs(timesAST.size(),
-									i -> Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi))));
+									new IntFunction<IExpr>() {
+										@Override
+										public IExpr apply(int i) {
+											return Negate(Divide(Arg(timesAST.get(i)), Times(C2, Pi)));
+										}
+									});
 							IAST expResult = Power(E, Times(C2, I, Pi, x2, Floor(plusResult)));
 							if (!(timesResult instanceof IASTAppendable)) {
 								timesResult = timesResult.copyAppendable();
@@ -3820,7 +3839,12 @@ public class Algebra {
 			public boolean visit(IAST ast) {
 				if (ast.isTimes() || ast.isPlus()) {
 					// check the arguments
-					return ast.forAll(x -> x.accept(this));
+					return ast.forAll(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							return x.accept(IsBasicExpressionVisitor.this);
+						}
+					});
 				}
 				if (ast.isPower() && (ast.exponent().isInteger())) {
 					// check the arguments

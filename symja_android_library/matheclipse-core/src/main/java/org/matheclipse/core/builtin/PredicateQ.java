@@ -507,7 +507,7 @@ public class PredicateQ {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if (ast.size() == 3) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -601,7 +601,7 @@ public class PredicateQ {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if ((ast.isAST2())) {
 				final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -721,7 +721,7 @@ public class PredicateQ {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 
 			boolean heads = false;
