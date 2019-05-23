@@ -164,8 +164,6 @@ public class F {
 	public final static INilPointer NIL = AbstractAST.NIL;
 
     /***/
-    public final static IBuiltInSymbol ContainsAny = F.initFinalSymbol("ContainsAny", ID.ContainsAny);
-    /***/
     public final static IBuiltInSymbol $Aborted = F.initFinalSymbol("$Aborted", ID.$Aborted);
     /***/
     public final static IBuiltInSymbol $Context = F.initFinalSymbol("$Context", ID.$Context);
@@ -414,6 +412,8 @@ public class F {
     public final static IBuiltInSymbol ByteArray = F.initFinalSymbol("ByteArray", ID.ByteArray);
     /***/
     public final static IBuiltInSymbol ByteArrayQ = F.initFinalSymbol("ByteArrayQ", ID.ByteArrayQ);
+	/***/
+	public final static IBuiltInSymbol C = F.initFinalSymbol("C", ID.C);
 	/** CDF(distribution, value) - returns the cumulative distribution function of `value`. */
     public final static IBuiltInSymbol CDF = F.initFinalSymbol("CDF", ID.CDF);
     /***/
@@ -554,6 +554,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol ContainsAll = F.initFinalSymbol("ContainsAll", ID.ContainsAll);
 
+	/***/
+	public final static IBuiltInSymbol ContainsAny = F.initFinalSymbol("ContainsAny", ID.ContainsAny);
 	/***/
 	public final static IBuiltInSymbol ContainsExactly = F.initFinalSymbol("ContainsExactly", ID.ContainsExactly);
 
@@ -1916,6 +1918,7 @@ public class F {
             ID.RussellRaoDissimilarity);
 	/** SameQ(x, y) - returns `True` if `x` and `y` are structurally identical. */
     public final static IBuiltInSymbol SameQ = F.initFinalSymbol("SameQ", ID.SameQ);
+	/***/
 	public final static IBuiltInSymbol SameTest = F.initFinalSymbol("SameTest", ID.SameTest);
     /**
      * SatisfiabilityCount(boolean-expr) - test whether the `boolean-expr` is satisfiable by a combination of boolean
@@ -4092,6 +4095,9 @@ public class F {
         return headAST0(Break);
     }
 
+	public static IAST C(final int index) {
+		return unaryAST1(C, F.ZZ(index));
+	}
     public static IAST Cancel(final IExpr a) {
         return unaryAST1(Cancel, a);
     }

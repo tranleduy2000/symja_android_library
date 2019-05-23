@@ -232,6 +232,11 @@ public class MathMLPresentationTestCase extends TestCase {
 				"<mfrac><mi>a</mi><mrow><mi>b</mi><mo>&#0183;</mo><mi>c</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow><mo>&#0183;</mo><msup><mfrac><mrow><mo>-</mo><mi>b</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow></mrow><mi>e</mi></mfrac><mi>m</mi></msup></mrow></mfrac>");
 	}
 
+	public void testC1() {
+		IExpr expr = EvalEngine.get().evaluate("C(1)");
+		check(expr, //
+				"<msub><mi>c</mi><mn>1</mn></msub>");
+	}
 	public void testCeiling() {
 		IExpr expr = EvalEngine.get().evaluate("Ceiling(f(x))");
 		check(expr, //
@@ -285,6 +290,20 @@ public class MathMLPresentationTestCase extends TestCase {
 
 	}
 
+	public void testElement() {
+		IExpr expr = EvalEngine.get().evaluate("Element[a, Integers]");
+		check(expr, //
+				"<mrow><mi>a</mi><mo>&#8712;</mo><mi>&#8484;</mi></mrow>");
+		expr = EvalEngine.get().evaluate("Element[a, Complexes]");
+		check(expr, //
+				"<mrow><mi>a</mi><mo>&#8712;</mo><mi>&#8450;</mi></mrow>");
+		expr = EvalEngine.get().evaluate("Element[a, Rationals]");
+		check(expr, //
+				"<mrow><mi>a</mi><mo>&#8712;</mo><mi>&#8474;</mi></mrow>");
+		expr = EvalEngine.get().evaluate("Element[a, Reals]");
+		check(expr, //
+				"<mrow><mi>a</mi><mo>&#8712;</mo><mi>&#8477;</mi></mrow>");
+	}
 	public void testSeries001() {
 		IExpr expr = EvalEngine.get().evaluate("Series(f(x),{x,a,3})");
 		check(expr,
