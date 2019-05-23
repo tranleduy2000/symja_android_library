@@ -736,6 +736,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isBlank();
 
     /**
+     * Test if this expression is a boolean function (i.e. a number, a symbol or a boolean function where all arguments
+     * are also &quot;boolean functions&quot;)
+     *
+     * @return <code>true</code>, if the given expression is a boolean function or value.
+     * @see #isRealResult()
+     */
+    boolean isBooleanResult();
+
+    /**
      * Test if this expression is a symbol (instanceof IBuiltInSymbol)
      */
     boolean isBuiltInSymbol();
@@ -878,11 +887,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isEqual();
 
-    /**
-     * Test if this expression is an exact number. I.e. an instance of type <code>IRational</code> or
-     * <code>IComplex</code>.
-     */
-    boolean isExactNumber();
 
     /**
      * Check if this expression is an even integer result otherwise return false.
@@ -890,6 +894,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>true</code> if this is an even integer result.
      */
     boolean isEvenResult();
+
+    /**
+     * Test if this expression is an exact number. I.e. an instance of type <code>IRational</code> or
+     * <code>IComplex</code>.
+     */
+    boolean isExactNumber();
 
     /**
      * Test if this expression is the <code>Except</code> function <code>Except[&lt;pattern1&gt;]</code> or
@@ -1610,6 +1620,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Test if this expression equals the given expression. If the compared expressions are of the same numeric type,
      * they are equal to a given EPSILON
+     *
      * @param expression
      */
     boolean isSame(IExpr expression);

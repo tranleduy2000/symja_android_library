@@ -192,6 +192,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public IExpr evalDownRule(EvalEngine engine, IExpr expression);
 
+    public IExpr evalMessage(String messageName);
+
     /**
      * Evaluate the given expression for the &quot;up value&quot; rules associated with this symbol
      *
@@ -318,6 +320,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     boolean hasOrderlessFlatAttribute();
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    boolean isBooleanResult();
+
+    boolean isConstantAttribute();
+
+    @Override
+    IExpr[] linear(IExpr variable);
+
+    /**
      * Gives <code>true</code> if the system is in server mode and cannot be modified
      *
      * @return
@@ -331,10 +344,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public boolean isLocked(boolean packageMode);
 
-    boolean isConstantAttribute();
-
-    @Override
-    IExpr[] linear(IExpr variable);
 
     boolean isNumericFunctionAttribute();
 
@@ -371,6 +380,14 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     /**
      * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
      *
+     * @param args the arguments for which this function symbol should be evaluated
+     * @return
+     */
+    public IExpr of(IExpr... args);
+
+    /**
+     * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
+     *
      * @param engine the current evaluation engine
      * @param args   the arguments for which this function symbol should be evaluated
      * @return
@@ -387,13 +404,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public IExpr ofNIL(EvalEngine engine, IExpr... args);
 
-    /**
-     * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
-     *
-     * @param args the arguments for which this function symbol should be evaluated
-     * @return
-     */
-    public IExpr of(IExpr... args);
 
     /**
      * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code> to a boolean
@@ -443,8 +453,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public void putDownRule(final int setSymbol, boolean equalRule, IExpr leftHandSide,
                             IExpr rightHandSide, boolean packageMode);
-
-    public IExpr evalMessage(String messageName);
 
     public void putMessage(final int setSymbol, String messageName, IStringX message);
 
@@ -545,6 +553,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      *
      * @deprecated use {@link #assign(IExpr)} instead
      */
+    @Deprecated
     public void set(IExpr value);
 
     /**

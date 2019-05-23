@@ -995,6 +995,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isBooleanResult() {
+        return F.True.equals(AbstractAssumptions.assumeBoolean(this));
+    }
+
     /**
      * Test if this expression is a symbol (instanceof IBuiltInSymbol)
      *
@@ -1221,17 +1226,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
-    /**
-     * Test if this expression is an exact number. I.e. an instance of type <code>IRational</code> or
-     * <code>IComplex</code>.
-     *
-     * @return
-     */
-    @Override
-    public boolean isExactNumber() {
-        return this instanceof IRational || this instanceof IComplex;
-    }
-
     @Override
     public boolean isEvenResult() {
         if (isInteger()) {
@@ -1249,6 +1243,17 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
             }
         }
         return false;
+    }
+
+    /**
+     * Test if this expression is an exact number. I.e. an instance of type <code>IRational</code> or
+     * <code>IComplex</code>.
+     *
+     * @return
+     */
+    @Override
+    public boolean isExactNumber() {
+        return this instanceof IRational || this instanceof IComplex;
     }
 
     /**
@@ -1774,32 +1779,19 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isNegativeSigned() {
         if (isNumber()) {
-            if (((INumber) this).complexSign() < 0) {
-                return true;
-            }
+            return ((INumber) this).complexSign() < 0;
         } else if (isTimes()) {
             IExpr arg1 = this.first();
             if (arg1.isNumber()) {
-                if (((INumber) arg1).complexSign() < 0) {
-                    return true;
-                }
-            } else if (arg1.isNegativeInfinity()) {
-                return true;
-            }
+                return ((INumber) arg1).complexSign() < 0;
+            } else return arg1.isNegativeInfinity();
         } else if (isPlus()) {
             IExpr arg1 = this.first();
             if (arg1.isNumber()) {
-                if (((INumber) arg1).complexSign() < 0) {
-                    return true;
-                }
-            } else if (arg1.isNegativeInfinity()) {
-                return true;
-            }
-        } else if (isNegativeInfinity()) {
-            return true;
-        }
+                return ((INumber) arg1).complexSign() < 0;
+            } else return arg1.isNegativeInfinity();
+        } else return isNegativeInfinity();
 
-        return false;
     }
 
     /**
@@ -1827,10 +1819,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         if (isNonZeroRealResult()) {
             return true;
         }
-        if (isNumber()) {
-            return true;
-        }
-        return false;
+        return isNumber();
     }
 
     /**
@@ -1850,10 +1839,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         if (isReal()) {
             return true;
         }
-        if (isNegativeInfinity() || isInfinity()) {
-            return true;
-        }
-        return false;
+        return isNegativeInfinity() || isInfinity();
     }
 
     /**
@@ -2209,10 +2195,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isPowerReciprocal() {
-        if (isPower() && second().isMinusOne()) {
-            return true;
-        }
-        return false;
+        return isPower() && second().isMinusOne();
     }
 
     /**
@@ -2509,10 +2492,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isSqrt() {
-        if (isPower() && second().isNumEqualRational(F.C1D2)) {
-            return true;
-        }
-        return false;
+        return isPower() && second().isNumEqualRational(F.C1D2);
     }
 
     /**
@@ -2528,9 +2508,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
             return true;
         }
         if (isTimes() && first().equals(F.CN1) && size() == 3) {
-            if (second().isPower() && second().second().isNumEqualRational(F.C1D2)) {
-                return true;
-            }
+            return second().isPower() && second().second().isNumEqualRational(F.C1D2);
         }
         return false;
     }
@@ -3520,7 +3498,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         if (isNumber()) {
             return isZero();
         }
-        return isAST()&& PredicateQ.isZeroTogether(this, EvalEngine.get());
+        return isAST() && PredicateQ.isZeroTogether(this, EvalEngine.get());
     }
 
     /**

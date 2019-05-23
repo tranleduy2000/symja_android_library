@@ -408,6 +408,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		/** {@inheritDoc} */
 		@Override
+		public boolean isBooleanResult() {
+			return false;
+		}
+		/** {@inheritDoc} */
+		@Override
 		public boolean isIntegerResult() {
 			return false;
 		}
@@ -2475,6 +2480,24 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return this.equals(F.CInfinity);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public boolean isBooleanResult() {
+		IExpr symbol = head();
+		if (symbol.isSymbol()) {
+			if (symbol.equals(F.And) || symbol.equals(F.Or) || symbol.equals(F.Equivalent) || symbol.equals(F.Not)
+					|| symbol.equals(F.Nand) || symbol.equals(F.Nor) || symbol.equals(F.Xor)) {
+				for (int i = 1; i < size(); i++) {
+					if (get(i).isBooleanResult()) {
+						continue;
+					}
+					return false;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -3259,7 +3282,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/**
 	 * {@inheritDoc}
 	 *
-	 *   use {@link #isZero()} instead.
+	 * use {@link #isZero()} instead.
 	 */
 	// @Deprecated
 	// @Override

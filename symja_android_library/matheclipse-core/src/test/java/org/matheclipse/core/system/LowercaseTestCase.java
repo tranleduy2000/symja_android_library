@@ -5857,6 +5857,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindInstance() {
+		check("FindInstance((a || b || c) && (! a || ! b || ! c) && True, {a, b, c}, 2)",
+				"{{a->False,b->True,c->False},{a->False,b->True,c->True}}");
 		check("FindInstance(2*Sin(x)==1/2,x)", //
 				"{{x->ArcSin(1/4)}}");
 
@@ -14530,6 +14532,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSatisfiabilityInstances() {
+		check("SatisfiabilityInstances((a || b || c) && (! a || ! b || ! c), {a, b, c},All)",
+				"{{False,True,False},{False,True,True},{True,False,True},{True,False,False},{False,False,True},{True,True,False}}");
 		check("SatisfiabilityInstances(a&&!(b||!c), {b,a,c}, All )", //
 				"{{False,True,True}}");
 		check("SatisfiabilityInstances(a&&!(b||!c), {a,b,c}, All )", //
