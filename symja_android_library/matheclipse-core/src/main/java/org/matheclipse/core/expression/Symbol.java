@@ -295,7 +295,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     }
 
     @Override
-    public boolean isBooleanResult() {
+    public boolean isBooleanFormula() {
         if (isConstantAttribute() && !(isTrue() || isFalse())) {
             return false;
         }

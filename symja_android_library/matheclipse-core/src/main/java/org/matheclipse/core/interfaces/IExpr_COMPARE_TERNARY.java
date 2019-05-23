@@ -1,5 +1,5 @@
 package org.matheclipse.core.interfaces;
 
-public enum COMPARE_TERNARY {
+public enum IExpr_COMPARE_TERNARY {
     TRUE, FALSE, UNDEFINED
 }

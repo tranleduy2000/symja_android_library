@@ -11,9 +11,12 @@ import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
 import org.matheclipse.core.eval.interfaces.ISymbolEvaluator;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IBooleanFormula;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
+import org.matheclipse.core.interfaces.IComparatorFunction;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.ISymbol;
 
 import java.io.IOException;
@@ -24,7 +27,7 @@ import java.io.ObjectStreamException;
  * 
  */
 public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
-	private final static class PredicateEvaluator extends AbstractCorePredicateEvaluator {
+	private final static class PredicateEvaluator extends AbstractCorePredicateEvaluator implements IPredicate {
 		Predicate<IExpr> predicate;
 
 		public PredicateEvaluator(Predicate<IExpr> predicate) {
@@ -182,6 +185,23 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return fEvaluator instanceof ICoreFunctionEvaluator;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public  boolean isBooleanFormulaSymbol() {
+		return fEvaluator instanceof IBooleanFormula;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public  boolean isComparatorFunctionSymbol() {
+		return fEvaluator instanceof IComparatorFunction;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isPredicateFunctionSymbol() {
+		return fEvaluator instanceof IPredicate;
+	}
 	/** {@inheritDoc} */
 	@Override
 	final public boolean isHoldOrHoldFormOrDefer() {

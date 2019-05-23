@@ -349,7 +349,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr equalTo(IExpr that) {
-        COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
+        IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
         return ExprUtil.convertToExpr(temp);
     }
 
@@ -536,7 +536,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr greaterEqualThan(IExpr that) {
-        COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER_EQUAL.prepareCompare(this, that);
+        IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER_EQUAL.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
     }
 
@@ -553,7 +553,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr greaterThan(IExpr that) {
-        COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER.prepareCompare(this, that);
+        IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_GREATER.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
     }
 
@@ -996,8 +996,16 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     @Override
+    public boolean isBooleanFormula() {
+        return false;
+    }
+
+    @Override
     public boolean isBooleanResult() {
-        return F.True.equals(AbstractAssumptions.assumeBoolean(this));
+        if (F.True.equals(AbstractAssumptions.assumeBoolean(this))) {
+            return true;
+        }
+        return isBooleanFormula();
     }
 
     /**
@@ -1073,6 +1081,16 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isBooleanFormulaSymbol() {
+        return false;
+    }
+
+    @Override
+    public boolean isComparatorFunctionSymbol() {
+        return false;
+    }
+
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
      * <code>ICoreFunctionEvaluator</code> (see package <code>org.matheclipse.core.builtin.function</code>).
@@ -1081,6 +1099,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isCoreFunctionSymbol() {
+        return false;
+    }
+
+    @Override
+    public boolean isPredicateFunctionSymbol() {
         return false;
     }
 
@@ -2713,7 +2736,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr lessEqualThan(IExpr that) {
-        COMPARE_TERNARY temp = BooleanFunctions.CONST_LESS_EQUAL.prepareCompare(this, that);
+        IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_LESS_EQUAL.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
     }
 
@@ -2730,7 +2753,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr lessThan(IExpr that) {
-        COMPARE_TERNARY temp = BooleanFunctions.CONST_LESS.prepareCompare(this, that);
+        IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_LESS.prepareCompare(this, that);
         return ExprUtil.convertToExpr(temp);
     }
 
@@ -3345,7 +3368,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public IExpr unequalTo(IExpr that) {
-        COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
+        IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
         return ExprUtil.convertToExpr(temp);
     }
 

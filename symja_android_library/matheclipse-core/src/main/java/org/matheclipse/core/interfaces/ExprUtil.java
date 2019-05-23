@@ -16,11 +16,11 @@ public class ExprUtil {
         return value == null ? F.NIL : value;
     }
     
-    public static IExpr convertToExpr(COMPARE_TERNARY temp) {
-		if (temp== COMPARE_TERNARY.TRUE) {
+    public static IExpr convertToExpr(IExpr_COMPARE_TERNARY temp) {
+		if (temp== IExpr_COMPARE_TERNARY.TRUE) {
 			return F.True;
 		}
-		if (temp== COMPARE_TERNARY.FALSE) {
+		if (temp== IExpr_COMPARE_TERNARY.FALSE) {
 			return F.False;
 		}
 		return F.NIL;

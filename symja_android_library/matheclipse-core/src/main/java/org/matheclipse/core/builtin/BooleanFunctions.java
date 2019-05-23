@@ -30,14 +30,17 @@ import org.matheclipse.core.eval.util.Options;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.StringX;
-import org.matheclipse.core.interfaces.COMPARE_TERNARY;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBooleanFormula;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
+import org.matheclipse.core.interfaces.IComparatorFunction;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExpr_COMPARE_TERNARY;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
+import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -189,7 +192,7 @@ public final class BooleanFunctions {
 	 * a &amp;&amp; b &amp;&amp; c
 	 * </pre>
 	 */
-	private static class And extends AbstractCoreFunctionEvaluator {
+	private static class And extends AbstractCoreFunctionEvaluator implements IBooleanFormula {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -798,7 +801,7 @@ public final class BooleanFunctions {
 	 * {True, True, True}
 	 * </pre>
 	 */
-	public static class Equal extends AbstractFunctionEvaluator implements ITernaryComparator {
+	public static class Equal extends AbstractFunctionEvaluator implements ITernaryComparator, IComparatorFunction {
 
 		/**
 		 * Create the result for a <code>simplifyCompare()</code> step
@@ -859,7 +862,7 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
 				//Swift changed: can't declare enum inside protocol
-				COMPARE_TERNARY b = COMPARE_TERNARY.UNDEFINED;
+				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.UNDEFINED;
 				if (ast.isAST2()) {
 					return equalNull(ast.arg1(), ast.arg2(), engine);
 				}
@@ -871,11 +874,11 @@ public final class BooleanFunctions {
 					IExpr arg2 = F.expandAll(result.get(i), true, true);
 					b = prepareCompare(arg1, arg2, engine);
 					//Swift changed: can't declare enum inside protocol
-					if (b == COMPARE_TERNARY.FALSE) {
+					if (b == IExpr_COMPARE_TERNARY.FALSE) {
 						return F.False;
 					}
 					//Swift changed: can't declare enum inside protocol
-					else if (b == COMPARE_TERNARY.TRUE) {
+					else if (b == IExpr_COMPARE_TERNARY.TRUE) {
 						evaled = true;
 						result.remove(i - 1);
 					} else {
@@ -903,10 +906,10 @@ public final class BooleanFunctions {
 		 * @param engine
 		 * @return
 		 */
-		protected COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) {
+		protected IExpr_COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) {
 			if (arg1.isIndeterminate() || arg2.isIndeterminate()) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 			if (arg1.isList() && arg2.isList()) {
 				IAST list1 = (IAST) arg1;
@@ -914,26 +917,26 @@ public final class BooleanFunctions {
 				int size1 = list1.size();
 				if (size1 != list2.size()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				}
 				//Swift changed: can't declare enum inside protocol
-				COMPARE_TERNARY b = COMPARE_TERNARY.TRUE;
+				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.TRUE;
 				for (int i = 1; i < size1; i++) {
 					b = prepareCompare(list1.get(i), list2.get(i), engine);
 					//Swift changed: can't declare enum inside protocol
-					if (b == COMPARE_TERNARY.FALSE) {
+					if (b == IExpr_COMPARE_TERNARY.FALSE) {
 						//Swift changed: can't declare enum inside protocol
-						return COMPARE_TERNARY.FALSE;
+						return IExpr_COMPARE_TERNARY.FALSE;
 					}
 					//Swift changed: can't declare enum inside protocol
-					if (b == COMPARE_TERNARY.TRUE) {
+					if (b == IExpr_COMPARE_TERNARY.TRUE) {
 					} else {
 						//Swift changed: can't declare enum inside protocol
-						return COMPARE_TERNARY.UNDEFINED;
+						return IExpr_COMPARE_TERNARY.UNDEFINED;
 					}
 				}
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.TRUE;
+				return IExpr_COMPARE_TERNARY.TRUE;
 			}
 			IExpr a0 = arg1;
 			IExpr a1 = arg2;
@@ -953,60 +956,60 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr o0, final IExpr o1) {
+		public IExpr_COMPARE_TERNARY compareTernary(final IExpr o0, final IExpr o1) {
 			if (o0.isSame(o1)) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.TRUE;
+				return IExpr_COMPARE_TERNARY.TRUE;
 			}
 
 			if (o0.isTrue()) {
 				if (o1.isTrue()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.TRUE;
+					return IExpr_COMPARE_TERNARY.TRUE;
 				} else if (o1.isFalse()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				}
 			} else if (o0.isFalse()) {
 				if (o1.isTrue()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				} else if (o1.isFalse()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.TRUE;
+					return IExpr_COMPARE_TERNARY.TRUE;
 				}
 			}
 			if (o0.isConstantAttribute() && o1.isConstantAttribute()) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
 			if (o0.isNumber() && o1.isNumber()) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
 			if ((o0 instanceof StringX) && (o1 instanceof StringX)) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
 			IExpr difference = F.eval(F.Subtract(o0, o1));
 			if (difference.isNumber()) {
 				if (difference.isZero()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.TRUE;
+					return IExpr_COMPARE_TERNARY.TRUE;
 				}
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 			if (difference.isConstantAttribute()) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
 			//Swift changed: can't declare enum inside protocol
-			return COMPARE_TERNARY.UNDEFINED;
+			return IExpr_COMPARE_TERNARY.UNDEFINED;
 		}
 
 		@Override
@@ -1057,7 +1060,7 @@ public final class BooleanFunctions {
 	 * True
 	 * </pre>
 	 */
-	private final static class Equivalent extends AbstractFunctionEvaluator {
+	private final static class Equivalent extends AbstractFunctionEvaluator implements IBooleanFormula {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1259,7 +1262,8 @@ public final class BooleanFunctions {
 	 * {True, True, True}
 	 * </pre>
 	 */
-	public static class Greater extends AbstractCoreFunctionEvaluator implements ITernaryComparator {
+	public static class Greater extends AbstractCoreFunctionEvaluator
+			implements ITernaryComparator, IComparatorFunction {
 		public final static Greater CONST = new Greater();
 
 		/**
@@ -1314,66 +1318,66 @@ public final class BooleanFunctions {
 		 *            the upper bound of the second interval
 		 * @return
 		 */
-		private static COMPARE_TERNARY compareGreaterIntervalTernary(final IExpr lower0, final IExpr upper0,
-				final IExpr lower1, final IExpr upper1) {
+		private static IExpr_COMPARE_TERNARY compareGreaterIntervalTernary(final IExpr lower0, final IExpr upper0,
+																		   final IExpr lower1, final IExpr upper1) {
 			if (lower0.greaterThan(upper1).isTrue()) {
 				//Swift changed: can't declare enum inside protocol
-				return COMPARE_TERNARY.TRUE;
+				return IExpr_COMPARE_TERNARY.TRUE;
 			} else {
 				if (upper0.lessThan(lower1).isTrue()) {
 					//Swift changed: can't declare enum inside protocol
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				}
 			}
 			//Swift changed: can't declare enum inside protocol
-			return COMPARE_TERNARY.UNDEFINED;
+			return IExpr_COMPARE_TERNARY.UNDEFINED;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
+		public IExpr_COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			// don't compare strings
 			if (a0.isReal()) {
 				if (a1.isReal()) {
 					//Swift changed: can't declare enum inside protocol
-					return ((ISignedNumber) a0).isGreaterThan((ISignedNumber) a1) ? COMPARE_TERNARY.TRUE
-							: COMPARE_TERNARY.FALSE;
+					return ((ISignedNumber) a0).isGreaterThan((ISignedNumber) a1) ? IExpr_COMPARE_TERNARY.TRUE
+							: IExpr_COMPARE_TERNARY.FALSE;
 				} else if (a1.isInfinity()) {
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				} else if (a1.isNegativeInfinity()) {
-					return COMPARE_TERNARY.TRUE;
+					return IExpr_COMPARE_TERNARY.TRUE;
 				} else if (a1.isInterval1()) {
 					return compareGreaterIntervalTernary(a0.lower(), a0.upper(), a1.lower(), a1.upper());
 				}
 			} else if (a1.isReal()) {
 				if (a0.isInfinity()) {
-					return COMPARE_TERNARY.TRUE;
+					return IExpr_COMPARE_TERNARY.TRUE;
 				} else if (a0.isNegativeInfinity()) {
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				} else if (a0.isInterval1()) {
 					return compareGreaterIntervalTernary(a0.lower(), a0.upper(), a1.lower(), a1.upper());
 				}
 			} else if (a0.isInfinity()) {
 				if (a1.isRealResult() || a1.isNegativeInfinity()) {
-					return COMPARE_TERNARY.TRUE;
+					return IExpr_COMPARE_TERNARY.TRUE;
 				}
 			} else if (a0.isNegativeInfinity()) {
 				if (a1.isRealResult() || a1.isInfinity()) {
-					return COMPARE_TERNARY.FALSE;
+					return IExpr_COMPARE_TERNARY.FALSE;
 				}
 			} else if (a1.isInfinity() && a0.isRealResult()) {
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			} else if (a1.isNegativeInfinity() && a0.isRealResult()) {
-				return COMPARE_TERNARY.TRUE;
+				return IExpr_COMPARE_TERNARY.TRUE;
 			} else if (a0.isInterval1() && a1.isInterval1()) {
 				return compareGreaterIntervalTernary(a0.lower(), a0.upper(), a1.lower(), a1.upper());
 			}
 
 			if (a0.equals(a1) && !a0.isList()) {
-				return COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
-			return COMPARE_TERNARY.UNDEFINED;
+			return IExpr_COMPARE_TERNARY.UNDEFINED;
 		}
 
 		/**
@@ -1427,21 +1431,21 @@ public final class BooleanFunctions {
 				}
 			}
 			boolean evaled = false;
-			COMPARE_TERNARY b;
+			IExpr_COMPARE_TERNARY b;
 			IASTAppendable result = astEvaled.copyAppendable();
-			COMPARE_TERNARY[] cResult = new COMPARE_TERNARY[astEvaled.size()];
-			cResult[0] = COMPARE_TERNARY.TRUE;
+			IExpr_COMPARE_TERNARY[] cResult = new IExpr_COMPARE_TERNARY[astEvaled.size()];
+			cResult[0] = IExpr_COMPARE_TERNARY.TRUE;
 			for (int i = 1; i < astEvaled.argSize(); i++) {
 				b = prepareCompare(result.get(i), result.get(i + 1), engine);
-				if (b == COMPARE_TERNARY.FALSE) {
+				if (b == IExpr_COMPARE_TERNARY.FALSE) {
 					return F.False;
 				}
-				if (b == COMPARE_TERNARY.TRUE) {
+				if (b == IExpr_COMPARE_TERNARY.TRUE) {
 					evaled = true;
 				}
 				cResult[i] = b;
 			}
-			cResult[astEvaled.argSize()] = COMPARE_TERNARY.TRUE;
+			cResult[astEvaled.argSize()] = IExpr_COMPARE_TERNARY.TRUE;
 			if (!evaled) {
 				// expression doesn't change
 				return F.NIL;
@@ -1449,7 +1453,7 @@ public final class BooleanFunctions {
 			int i = 2;
 			evaled = false;
 			for (int j = 1; j < astEvaled.size(); j++) {
-				if (cResult[j - 1] == COMPARE_TERNARY.TRUE && cResult[j] == COMPARE_TERNARY.TRUE) {
+				if (cResult[j - 1] == IExpr_COMPARE_TERNARY.TRUE && cResult[j] == IExpr_COMPARE_TERNARY.TRUE) {
 					evaled = true;
 					result.remove(i - 1);
 				} else {
@@ -1467,7 +1471,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		private COMPARE_TERNARY prepareCompare(IExpr a0, IExpr a1, EvalEngine engine) {
+		private IExpr_COMPARE_TERNARY prepareCompare(IExpr a0, IExpr a1, EvalEngine engine) {
 			if (!a0.isReal() && a0.isNumericFunction()) {
 				a0 = engine.evalN(a0);
 			} else if (a1.isNumeric() && a0.isRational()) {
@@ -1482,7 +1486,7 @@ public final class BooleanFunctions {
 			return compareTernary(a0, a1);
 		}
 
-		public COMPARE_TERNARY prepareCompare(final IExpr o0, final IExpr o1) {
+		public IExpr_COMPARE_TERNARY prepareCompare(final IExpr o0, final IExpr o1) {
 			return prepareCompare(o0, o1, EvalEngine.get());
 		}
 
@@ -1662,9 +1666,9 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
+		public IExpr_COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			if (a0.equals(a1)) {
-				return COMPARE_TERNARY.TRUE;
+				return IExpr_COMPARE_TERNARY.TRUE;
 			}
 			return super.compareTernary(a0, a1);
 		}
@@ -1702,7 +1706,7 @@ public final class BooleanFunctions {
 	 * Implies(a,Implies(b,c))
 	 * </pre>
 	 */
-	private final static class Implies extends AbstractCoreFunctionEvaluator {
+	private final static class Implies extends AbstractCoreFunctionEvaluator implements IBooleanFormula {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
@@ -1751,7 +1755,7 @@ public final class BooleanFunctions {
 		}
 	}
 
-	private final static class Inequality extends AbstractEvaluator {
+	private final static class Inequality extends AbstractEvaluator implements IComparatorFunction {
 		final static IBuiltInSymbol[] COMPARATOR_SYMBOLS = { F.Greater, F.GreaterEqual, F.Less, F.LessEqual };
 
 		private int getCompSign(IExpr e) {
@@ -1930,7 +1934,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
+		public IExpr_COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			// swap arguments
 			return super.compareTernary(a1, a0);
 		}
@@ -2004,10 +2008,10 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		public COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
+		public IExpr_COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			// don't compare strings
 			if (a0.equals(a1)) {
-				return COMPARE_TERNARY.TRUE;
+				return IExpr_COMPARE_TERNARY.TRUE;
 			}
 			// swap arguments
 			return super.compareTernary(a1, a0);
@@ -2116,7 +2120,7 @@ public final class BooleanFunctions {
 			IExpr max2;
 			max1 = list.arg1();
 
-			COMPARE_TERNARY comp;
+			IExpr_COMPARE_TERNARY comp;
 			f = list.copyHead();
 			for (int i = 2; i < list.size(); i++) {
 				max2 = list.get(i);
@@ -2125,13 +2129,13 @@ public final class BooleanFunctions {
 				}
 				comp = BooleanFunctions.CONST_LESS.prepareCompare(max1, max2);
 
-				if (comp == COMPARE_TERNARY.TRUE) {
+				if (comp == IExpr_COMPARE_TERNARY.TRUE) {
 					max1 = max2;
 					evaled = true;
-				} else if (comp == COMPARE_TERNARY.FALSE) {
+				} else if (comp == IExpr_COMPARE_TERNARY.FALSE) {
 					evaled = true;
 				} else {
-					if (comp == COMPARE_TERNARY.UNDEFINED) {
+					if (comp == IExpr_COMPARE_TERNARY.UNDEFINED) {
 						// undetermined
 						if (max1.isNumber()) {
 							f.append(max2);
@@ -2260,7 +2264,7 @@ public final class BooleanFunctions {
 			IExpr min2;
 			min1 = list.arg1();
 			f = list.copyHead();
-			COMPARE_TERNARY comp;
+			IExpr_COMPARE_TERNARY comp;
 			for (int i = 2; i < list.size(); i++) {
 				min2 = list.get(i);
 				if (min2.isInfinity()) {
@@ -2273,13 +2277,13 @@ public final class BooleanFunctions {
 				}
 				comp = BooleanFunctions.CONST_GREATER.prepareCompare(min1, min2);
 
-				if (comp == COMPARE_TERNARY.TRUE) {
+				if (comp == IExpr_COMPARE_TERNARY.TRUE) {
 					min1 = min2;
 					evaled = true;
-				} else if (comp == COMPARE_TERNARY.FALSE) {
+				} else if (comp == IExpr_COMPARE_TERNARY.FALSE) {
 					evaled = true;
 				} else {
-					if (comp == COMPARE_TERNARY.UNDEFINED) {
+					if (comp == IExpr_COMPARE_TERNARY.UNDEFINED) {
 						// undetermined
 						if (min1.isNumber()) {
 							f.append(min2);
@@ -2328,7 +2332,7 @@ public final class BooleanFunctions {
 	 * True
 	 * </pre>
 	 */
-	private final static class Nand extends AbstractCoreFunctionEvaluator {
+	private final static class Nand extends AbstractCoreFunctionEvaluator implements IBooleanFormula {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2660,7 +2664,7 @@ public final class BooleanFunctions {
 	 * False
 	 * </pre>
 	 */
-	private static class Nor extends AbstractCoreFunctionEvaluator {
+	private static class Nor extends AbstractCoreFunctionEvaluator implements IBooleanFormula {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2730,7 +2734,7 @@ public final class BooleanFunctions {
 	 * !b
 	 * </pre>
 	 */
-	private static class Not extends AbstractArg1 {
+	private static class Not extends AbstractArg1 implements IBooleanFormula {
 
 		@Override
 		public IExpr e1ObjArg(final IExpr o) {
@@ -2804,7 +2808,7 @@ public final class BooleanFunctions {
 	 * a || b
 	 * </pre>
 	 */
-	private static class Or extends AbstractCoreFunctionEvaluator {
+	private static class Or extends AbstractCoreFunctionEvaluator implements IBooleanFormula {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2996,7 +3000,7 @@ public final class BooleanFunctions {
 	 * {True,False}
 	 * </pre>
 	 */
-	private final static class SameQ extends AbstractCoreFunctionEvaluator {
+	private final static class SameQ extends AbstractCoreFunctionEvaluator implements IPredicate, IComparatorFunction {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 1) {
@@ -3197,7 +3201,7 @@ public final class BooleanFunctions {
 	 * True
 	 * </pre>
 	 */
-	private final static class SatisfiableQ extends AbstractFunctionEvaluator {
+	private final static class SatisfiableQ extends AbstractFunctionEvaluator implements IPredicate {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -3320,7 +3324,7 @@ public final class BooleanFunctions {
 	 * <li><a href="https://en.wikipedia.org/wiki/Tautology_(logic)">Wikipedia - Tautology (logic)</a></li>
 	 * </ul>
 	 */
-	private static class TautologyQ extends AbstractFunctionEvaluator {
+	private static class TautologyQ extends AbstractFunctionEvaluator implements IPredicate {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -3433,7 +3437,7 @@ public final class BooleanFunctions {
 	 * False
 	 * </pre>
 	 */
-	private static class TrueQ extends AbstractFunctionEvaluator {
+	private static class TrueQ extends AbstractFunctionEvaluator implements IPredicate {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -3527,7 +3531,7 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
-				COMPARE_TERNARY b = COMPARE_TERNARY.UNDEFINED;
+				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.UNDEFINED;
 				if (ast.isAST2()) {
 					return unequalNull(ast.arg1(), ast.arg2(), engine);
 				}
@@ -3545,9 +3549,9 @@ public final class BooleanFunctions {
 					j = i;
 					while (j < result.size()) {
 						b = compareTernary(result.get(i - 1), result.get(j++));
-						if (b == COMPARE_TERNARY.TRUE) {
+						if (b == IExpr_COMPARE_TERNARY.TRUE) {
 							return F.False;
-						} else if (b == COMPARE_TERNARY.UNDEFINED) {
+						} else if (b == IExpr_COMPARE_TERNARY.UNDEFINED) {
 							return F.NIL;
 						}
 					}
@@ -3587,7 +3591,8 @@ public final class BooleanFunctions {
 	 * True
 	 * </pre>
 	 */
-	private final static class UnsameQ extends AbstractCoreFunctionEvaluator {
+	private final static class UnsameQ extends AbstractCoreFunctionEvaluator
+			implements IPredicate, IComparatorFunction {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -3658,7 +3663,7 @@ public final class BooleanFunctions {
 	 * Xor(a,b)
 	 * </pre>
 	 */
-	private static class Xor extends AbstractFunctionEvaluator {
+	private static class Xor extends AbstractFunctionEvaluator implements IBooleanFormula {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -3735,15 +3740,15 @@ public final class BooleanFunctions {
 		if (a1.isExactNumber() && a2.isExactNumber()) {
 			return a1.equals(a2) ? F.True : F.False;
 		}
-		COMPARE_TERNARY b;
+		IExpr_COMPARE_TERNARY b;
 		IExpr arg1 = F.expandAll(a1, true, true);
 		IExpr arg2 = F.expandAll(a2, true, true);
 
 		b = CONST_EQUAL.prepareCompare(arg1, arg2, engine);
-		if (b == COMPARE_TERNARY.FALSE) {
+		if (b == IExpr_COMPARE_TERNARY.FALSE) {
 			return F.False;
 		}
-		if (b == COMPARE_TERNARY.TRUE) {
+		if (b == IExpr_COMPARE_TERNARY.TRUE) {
 			return F.True;
 		}
 
@@ -3763,14 +3768,14 @@ public final class BooleanFunctions {
 		if (a1.isExactNumber() && a2.isExactNumber()) {
 			return a1.equals(a2) ? F.False : F.True;
 		}
-		COMPARE_TERNARY b;
+		IExpr_COMPARE_TERNARY b;
 		IExpr arg1 = F.expandAll(a1, true, true);
 		IExpr arg2 = F.expandAll(a2, true, true);
 		b = CONST_EQUAL.prepareCompare(arg1, arg2, engine);
-		if (b == COMPARE_TERNARY.FALSE) {
+		if (b == IExpr_COMPARE_TERNARY.FALSE) {
 			return F.True;
 		}
-		if (b == COMPARE_TERNARY.TRUE) {
+		if (b == IExpr_COMPARE_TERNARY.TRUE) {
 			return F.False;
 		}
 

@@ -408,6 +408,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		/** {@inheritDoc} */
 		@Override
+		public boolean isBooleanFormula() {
+			return false;
+		}
+		/** {@inheritDoc} */
+		@Override
 		public boolean isBooleanResult() {
 			return false;
 		}
@@ -2480,6 +2485,16 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return this.equals(F.CInfinity);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public boolean isBooleanFormula() {
+		return head().isBooleanFormulaSymbol() && exists(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                return !x.isBooleanFormula();
+            }
+        });
+	}
 	/** {@inheritDoc} */
 	@Override
 	public boolean isBooleanResult() {
