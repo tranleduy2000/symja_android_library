@@ -23,6 +23,7 @@ import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.Combinatoric;
 import org.matheclipse.core.builtin.ComputationalGeometryFunctions;
 import org.matheclipse.core.builtin.ConstantDefinitions;
+import org.matheclipse.core.builtin.ContainsFunctions;
 import org.matheclipse.core.builtin.CurveFitterFunctions;
 import org.matheclipse.core.builtin.EllipticIntegrals;
 import org.matheclipse.core.builtin.ExpTrigsFunctions;
@@ -81,8 +82,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.parser.client.Characters;
-import org.matheclipse.parser.client.operator.ASTNodeFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -163,6 +162,9 @@ public class F {
      */
     // Swift change: type is incompatible
 	public final static INilPointer NIL = AbstractAST.NIL;
+
+    /***/
+    public final static IBuiltInSymbol ContainsAny = F.initFinalSymbol("ContainsAny", ID.ContainsAny);
     /***/
     public final static IBuiltInSymbol $Aborted = F.initFinalSymbol("$Aborted", ID.$Aborted);
     /***/
@@ -549,6 +551,17 @@ public class F {
     public final static IBuiltInSymbol Constant = F.initFinalSymbol("Constant", ID.Constant);
 	/** ConstantArray(expr, n) - returns a list of `n` copies of `expr`. */
     public final static IBuiltInSymbol ConstantArray = F.initFinalSymbol("ConstantArray", ID.ConstantArray);
+	/***/
+	public final static IBuiltInSymbol ContainsAll = F.initFinalSymbol("ContainsAll", ID.ContainsAll);
+
+	/***/
+	public final static IBuiltInSymbol ContainsExactly = F.initFinalSymbol("ContainsExactly", ID.ContainsExactly);
+
+	/***/
+	public final static IBuiltInSymbol ContainsNone = F.initFinalSymbol("ContainsNone", ID.ContainsNone);
+
+	/***/
+	public final static IBuiltInSymbol ContainsOnly = F.initFinalSymbol("ContainsOnly", ID.ContainsOnly);
 	/** Context(symbol) - return the context of the given symbol. */
     public final static IBuiltInSymbol Context = F.initFinalSymbol("Context", ID.Context);
 	/** Continue() - continues with the next iteration in a `For`, `While`, or `Do` loop. */
@@ -928,9 +941,9 @@ public class F {
     public final static IBuiltInSymbol GammaDistribution = F.initFinalSymbol("GammaDistribution", ID.GammaDistribution);
     /***/
     public final static IBuiltInSymbol GammaRegularized = F.initFinalSymbol("GammaRegularized", ID.GammaRegularized);
-    /***/
+	/** Gather(list, test) - gathers leaves of `list` into sub lists of items that are the same according to `test`. */
     public final static IBuiltInSymbol Gather = F.initFinalSymbol("Gather", ID.Gather);
-	/***/
+	/** GatherBy(list, f) - gathers leaves of `list` into sub lists of items whose image under `f` identical. */
 	public final static IBuiltInSymbol GatherBy = F.initFinalSymbol("GatherBy", ID.GatherBy);
     /***/
     public final static IBuiltInSymbol GaussianIntegers = F.initFinalSymbol("GaussianIntegers", ID.GaussianIntegers);
@@ -1070,7 +1083,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Information = F.initFinalSymbol("Information", ID.Information);
     /**
-     * Inner(f, x, y, g) - computes a generalised inner product of `x` and `y`, using a multiplication function `f` and
+	 * Inner(f, x, y, g) - computes a generalized inner product of `x` and `y`, using a multiplication function `f` and
      * an addition function `g`.
      */
     public final static IBuiltInSymbol Inner = F.initFinalSymbol("Inner", ID.Inner);
@@ -1768,7 +1781,7 @@ public class F {
     public final static IBuiltInSymbol QuantityMagnitude = F.initFinalSymbol("QuantityMagnitude", ID.QuantityMagnitude);
     /***/
     public final static IBuiltInSymbol QuantityQ = F.initFinalSymbol("QuantityQ", ID.QuantityQ);
-    /***/
+	/** Quiet(expr) - evaluates `expr` in "quiet" mode (i.e. no warning messages are shown during evaluation). */
     public final static IBuiltInSymbol Quiet = F.initFinalSymbol("Quiet", ID.Quiet);
     /***/
     public final static IBuiltInSymbol Quit = F.initFinalSymbol("Quit", ID.Quit);
@@ -1780,6 +1793,7 @@ public class F {
     public final static IBuiltInSymbol RandomChoice = F.initFinalSymbol("RandomChoice", ID.RandomChoice);
 	/** RandomInteger(n) - create a random integer number between `0` and `n`. */
     public final static IBuiltInSymbol RandomInteger = F.initFinalSymbol("RandomInteger", ID.RandomInteger);
+	/** RandomPrime(n) - create a random prime integer number between `2` and `n`. */
 	public final static IBuiltInSymbol RandomPrime = F.initFinalSymbol("RandomPrime", ID.RandomPrime);
 	/** RandomReal() - create a random number between `0.0` and `1.0`. */
     public final static IBuiltInSymbol RandomReal = F.initFinalSymbol("RandomReal", ID.RandomReal);
@@ -1840,7 +1854,10 @@ public class F {
     public final static IBuiltInSymbol ReplaceList = F.initFinalSymbol("ReplaceList", ID.ReplaceList);
 	/** ReplacePart(expr, i -> new) - replaces part `i` in `expr` with `new`. */
     public final static IBuiltInSymbol ReplacePart = F.initFinalSymbol("ReplacePart", ID.ReplacePart);
-    /***/
+	/**
+	 * ReplaceRepeated(expr, lhs -> rhs) - repeatedly applies the rule `lhs -> rhs` to `expr` until the result no longer
+	 * changes.
+	 */
     public final static IBuiltInSymbol ReplaceRepeated = F.initFinalSymbol("ReplaceRepeated", ID.ReplaceRepeated);
 	/** Rescale(list) - returns `Rescale(list,{Min(list), Max(list)})`. */
     public final static IBuiltInSymbol Rescale = F.initFinalSymbol("Rescale", ID.Rescale);
@@ -1899,6 +1916,7 @@ public class F {
             ID.RussellRaoDissimilarity);
 	/** SameQ(x, y) - returns `True` if `x` and `y` are structurally identical. */
     public final static IBuiltInSymbol SameQ = F.initFinalSymbol("SameQ", ID.SameQ);
+	public final static IBuiltInSymbol SameTest = F.initFinalSymbol("SameTest", ID.SameTest);
     /**
      * SatisfiabilityCount(boolean-expr) - test whether the `boolean-expr` is satisfiable by a combination of boolean
      * `False` and `True` values for the variables of the boolean expression and return the number of possible
@@ -1988,7 +2006,11 @@ public class F {
     public final static IBuiltInSymbol Solve = F.initFinalSymbol("Solve", ID.Solve);
 	/** Sort(list) - sorts $list$ (or the leaves of any other expression) according to canonical ordering. */
     public final static IBuiltInSymbol Sort = F.initFinalSymbol("Sort", ID.Sort);
-	/** Sort(list) - sorts $list$ (or the leaves of any other expression) according to canonical ordering. */
+	/**
+	 * Sort(list, f) - sorts `list` (or the leaves of any other expression) according to canonical ordering of the keys
+	 * that are extracted from the `list`'s elements using `f`. Chunks of leaves that appear the same under `f` are
+	 * sorted according to their natural order (without applying `f`).
+	 */
 	public final static IBuiltInSymbol SortBy = F.initFinalSymbol("SortBy", ID.SortBy);
 	/** Sow(expr) - sends the value `expr` to the innermost `Reap`. */
     public final static IBuiltInSymbol Sow = F.initFinalSymbol("Sow", ID.Sow);
@@ -2071,7 +2093,7 @@ public class F {
     public final static IBuiltInSymbol Surd = F.initFinalSymbol("Surd", ID.Surd);
     /***/
     public final static IBuiltInSymbol SurfaceGraphics = F.initFinalSymbol("SurfaceGraphics", ID.SurfaceGraphics);
-	 /***/
+	/** SurvivalFunction(dist, x) - returns the survival function for the distribution `dist` evaluated at `x`. */
     public final static IBuiltInSymbol SurvivalFunction = F.initFinalSymbol("SurvivalFunction", ID.SurvivalFunction);
     /**
      * Switch(expr, pattern1, value1, pattern2, value2, ...) - yields the first `value` for which `expr` matches the
@@ -3019,6 +3041,7 @@ public class F {
             PolynomialFunctions.initialize();
             SeriesFunctions.initialize();
             AssumptionFunctions.initialize();
+			ContainsFunctions.initialize();
             CurveFitterFunctions.initialize();
             VectorAnalysisFunctions.initialize();
             QuantityFunctions.initialize();
@@ -8220,9 +8243,30 @@ public class F {
         return AbstractIntegerSym.valueOf(integerValue);
     }
 
-    public static IExpr operatorFormAST1(final IAST ast) {
-        if (ast.head().isAST1() && ast.isAST1()) {
-            return binaryAST2(ast.topHead(), ast.arg1(), ((IAST) ast.head()).arg1());
+	/**
+	 * The operator form <code>op(f)[expr]</code> is transformed to <code>op(expr, f)</code>
+	 *
+	 * @param ast1Arg
+	 *            an IAST with condition <code>ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
+	 * @return
+	 */
+	public static IExpr operatorFormAppend(final IAST ast1Arg) {
+		if (ast1Arg.head().isAST1() && ast1Arg.isAST1()) {
+			return binaryAST2(ast1Arg.topHead(), ast1Arg.arg1(), ((IAST) ast1Arg.head()).arg1());
+		}
+		return NIL;
+	}
+
+	/**
+	 * The operator form <code>op(f)[expr]</code> is transformed to <code>op(f, expr)</code>
+	 *
+	 * @param ast1Arg
+	 *            an IAST with condition <code>ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
+	 * @return
+	 */
+	public static IExpr operatorFormPrepend(final IAST ast1Arg) {
+		if (ast1Arg.head().isAST1() && ast1Arg.isAST1()) {
+			return binaryAST2(ast1Arg.topHead(), ((IAST) ast1Arg.head()).arg1(), ast1Arg.arg1());
         }
         return NIL;
     }

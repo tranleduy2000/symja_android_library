@@ -1709,7 +1709,7 @@ public class Structure {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAST1(ast);
+				return F.operatorFormAppend(ast);
 			}
 			if (ast.isAST2()) {
 				if (ast.arg1().isAST()) {
