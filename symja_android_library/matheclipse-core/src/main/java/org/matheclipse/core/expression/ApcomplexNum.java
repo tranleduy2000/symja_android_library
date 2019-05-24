@@ -45,6 +45,10 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 				new Apfloat(new BigDecimal(imaginary), precision)));
 	}
 
+	public static ApcomplexNum valueOf(final Complex c, long precision) {
+		return valueOf(new Apcomplex(new Apfloat(new BigDecimal(c.getReal()), precision),
+				new Apfloat(new BigDecimal(c.getImaginary()), precision)));
+	}
 	/**
 	 * Create a <code>ApcomplexNum</code> complex number from the real and imaginary <code>BigInteger</code> parts.
 	 * 
@@ -215,6 +219,10 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return valueOf(fApcomplex.divide(that.fApcomplex));
 	}
 
+	@Override
+	public IComplexNum divide(final IComplexNum val) {
+		return valueOf(fApcomplex.divide(((ApcomplexNum) val).fApcomplex));
+	}
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
