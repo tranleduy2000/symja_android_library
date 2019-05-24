@@ -2170,7 +2170,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isPolynomialOfMaxDegree(ISymbol variable, long maxDegree) {
-        return isPolynomial(variable);
+        return isPolynomial(F.List(variable));
     }
 
     /**
