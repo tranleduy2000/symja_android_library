@@ -15,6 +15,8 @@ import org.matheclipse.core.parser.ExprParser;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.matheclipse.core.expression.F.List;
 

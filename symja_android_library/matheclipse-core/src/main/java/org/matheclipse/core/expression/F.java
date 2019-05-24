@@ -898,7 +898,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Fourier = F.initFinalSymbol("Fourier", ID.Fourier);
 
-    /** FourierMatrix(n) - gives a fourier matrix with the dimension `n`.*/
+	/** FourierMatrix(n) - gives a fourier matrix with the dimension `n`. */
     public final static IBuiltInSymbol FourierMatrix = F.initFinalSymbol("FourierMatrix", ID.FourierMatrix);
 	/** FractionalPart(number) - get the fractional part of a `number`. */
     public final static IBuiltInSymbol FractionalPart = F.initFinalSymbol("FractionalPart", ID.FractionalPart);
@@ -1152,7 +1152,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol InverseFourier = F.initFinalSymbol("InverseFourier", ID.InverseFourier);
 
-    /** InverseFunction(head) - returns the inverse function for the symbol `head`.*/
+	/** InverseFunction(head) - returns the inverse function for the symbol `head`. */
     public final static IBuiltInSymbol InverseFunction = F.initFinalSymbol("InverseFunction", ID.InverseFunction);
     /***/
     public final static IBuiltInSymbol InverseGammaRegularized = F.initFinalSymbol("InverseGammaRegularized",
@@ -3495,7 +3495,7 @@ public class F {
     }
 
     /**
-     * Converts an arbitrary expression to a type that can be used inside Symja.
+	 * Converts and evaluates arbitrary expressiona to a Symja type.
 	 *
 	 * <pre>
 	 * Java Object       -&gt; Symja object
@@ -3523,11 +3523,16 @@ public class F {
 	 *
      */
     public static IExpr symjify(final Object object) {
-        return Object2Expr.convert(object);
-    }
+		return symjify(object, true);
+	}
+
+	public static IExpr symjify(final Object object, boolean evaluate) {
+		IExpr temp = Object2Expr.convert(object);
+		return evaluate ? eval(temp) : temp;
+	}
 
 	/**
-	 * Parses a Java string to a Symja expression. May throw an SyntaxError exception, if the string couldn't be parsed.
+	 * Parses and evaluates a Java string to a Symja expression. May throw an SyntaxError exception, if the string couldn't be parsed.
 	 *
 	 * @param str
 	 *            the epression which should be parsed
@@ -3535,8 +3540,24 @@ public class F {
 	 * @throws SyntaxError
 	 */
 	public static IExpr symjify(final String str) throws SyntaxError {
-		ExprParser parser = new ExprParser(EvalEngine.get());
-		return parser.parse(str);
+		return symjify(str, true);
+    }
+
+	/**
+	 * Parses a Java string to a Symja expression. May throw an SyntaxError exception, if the string couldn't be parsed.
+	 *
+	 * @param str
+	 *            the epression which should be parsed
+	 * @param evaluate
+	 *            if true evaluate the parsed string
+	 * @return
+	 * @throws SyntaxError
+	 */
+	public static IExpr symjify(final String str, boolean evaluate) throws SyntaxError {
+		EvalEngine engine = EvalEngine.get();
+		ExprParser parser = new ExprParser(engine);
+		IExpr temp = parser.parse(str);
+		return evaluate ? engine.evaluate(temp) : temp;
 	}
 
 	public static IExpr symjify(final long value) {
