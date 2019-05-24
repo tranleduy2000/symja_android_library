@@ -5,9 +5,13 @@
 package edu.jas.structure;
 
 
+import com.duy.ref.ObjectRef;
+import com.google.j2objc.annotations.AutoreleasePool;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigInteger;
 import java.util.List;
 
 
@@ -84,19 +88,29 @@ public class Power<C extends RingElem<C>> {
      * @return a^n.
      */
     public static <C extends RingElem<C>> C positivePower(C a, java.math.BigInteger n) {
+        ObjectRef<C> res = new ObjectRef<>();
+        positivePowerImpl(a, n, res);
+        return res.get();
+    }
+
+    @AutoreleasePool
+    private static <C extends RingElem<C>> void positivePowerImpl(C a, BigInteger n, ObjectRef<C> res) {
         if (n.signum() <= 0) {
             throw new IllegalArgumentException("only positive n allowed");
         }
         if (a.isZERO() || a.isONE()) {
-            return a;
+            res.set(a);
+            return;
         }
         C b = a;
         if (n.compareTo(java.math.BigInteger.ONE) == 0) {
-            return b;
+            res.set(b);
+            return;
         }
         if (n.bitLength() <= 63) {
             long l = n.longValue();
-            return positivePower(a, l);
+            res.set(positivePower(a, l));
+            return;
         }
         C p = a;
         java.math.BigInteger i = n.subtract(java.math.BigInteger.ONE);
@@ -109,7 +123,8 @@ public class Power<C extends RingElem<C>> {
                 b = b.multiply(b);
             }
         } while (i.signum() > 0);
-        return p;
+        res.set(p);
+        return;
     }
 
 
@@ -172,14 +187,24 @@ public class Power<C extends RingElem<C>> {
      * @return a^n, with a^{-n} = {1/a}^n.
      */
     public static <C extends MonoidElem<C>> C power(MonoidFactory<C> fac, C a, long n) {
+        ObjectRef<C> res = new ObjectRef<>();
+        powerImpl(fac, a, n, res);
+        return res.get();
+    }
+
+    @AutoreleasePool
+    private static <C extends MonoidElem<C>> void powerImpl(MonoidFactory<C> fac, C a, long n, ObjectRef<C> res) {
+
         if (n == 0) {
             if (fac == null) {
                 throw new IllegalArgumentException("fac may not be null for a^0");
             }
-            return fac.getONE();
+            res.set(fac.getONE());
+            return;
         }
         if (a.isONE()) {
-            return a;
+            res.set(a);
+            return;
         }
         C b = a;
         if (n < 0) {
@@ -187,7 +212,8 @@ public class Power<C extends RingElem<C>> {
             n = -n;
         }
         if (n == 1) {
-            return b;
+            res.set(b);
+            return;
         }
         C p = fac.getONE();
         long i = n;
@@ -203,7 +229,8 @@ public class Power<C extends RingElem<C>> {
         if (n > 11 && debug) {
             logger.info("n  = " + n + ", p  = " + p);
         }
-        return p;
+        res.set(p);
+        return;
     }
 
 
@@ -217,14 +244,23 @@ public class Power<C extends RingElem<C>> {
      * @return a^n mod m, with a^{-n} = {1/a}^n.
      */
     public static <C extends MonoidElem<C>> C modPower(MonoidFactory<C> fac, C a, long n, C m) {
+        ObjectRef<C> res = new ObjectRef<>();
+        modPowerImpl(fac, a, n, m, res);
+        return res.get();
+    }
+
+    @AutoreleasePool
+    public static <C extends MonoidElem<C>> void modPowerImpl(MonoidFactory<C> fac, C a, long n, C m, ObjectRef<C> res) {
         if (n == 0) {
             if (fac == null) {
                 throw new IllegalArgumentException("fac may not be null for a^0");
             }
-            return fac.getONE();
+            res.set(fac.getONE());
+            return;
         }
         if (a.isONE()) {
-            return a;
+            res.set(a);
+            return;
         }
         C b = a.remainder(m);
         if (n < 0) {
@@ -232,7 +268,8 @@ public class Power<C extends RingElem<C>> {
             n = -n;
         }
         if (n == 1) {
-            return b;
+            res.set(b);
+            return;
         }
         C p = fac.getONE();
         long i = n;
@@ -248,7 +285,8 @@ public class Power<C extends RingElem<C>> {
         if (n > 11 && debug) {
             logger.info("n  = " + n + ", p  = " + p);
         }
-        return p;
+        res.set(p);
+        return;
     }
 
 
@@ -262,14 +300,23 @@ public class Power<C extends RingElem<C>> {
      * @return a^n mod m, with a^{-n} = {1/a}^n.
      */
     public static <C extends MonoidElem<C>> C modPower(MonoidFactory<C> fac, C a, java.math.BigInteger n, C m) {
+        ObjectRef<C> res = new ObjectRef<>();
+        modPowerImpl(fac, a, n, m, res);
+        return res.get();
+    }
+
+    @AutoreleasePool
+    private static <C extends MonoidElem<C>> void modPowerImpl(MonoidFactory<C> fac, C a, BigInteger n, C m, ObjectRef<C> res) {
         if (n.signum() == 0) {
             if (fac == null) {
                 throw new IllegalArgumentException("fac may not be null for a^0");
             }
-            return fac.getONE();
+            res.set(fac.getONE());
+            return;
         }
         if (a.isONE()) {
-            return a;
+            res.set(a);
+            return;
         }
         C b = a.remainder(m);
         if (n.signum() < 0) {
@@ -277,11 +324,13 @@ public class Power<C extends RingElem<C>> {
             n = n.negate();
         }
         if (n.compareTo(java.math.BigInteger.ONE) == 0) {
-            return b;
+            res.set(b);
+            return;
         }
         if (n.bitLength() <= 63) {
             long l = n.longValue();
-            return modPower(fac, a, l, m);
+            res.set(modPower(fac, a, l, m));
+            return;
         }
         C p = fac.getONE();
         java.math.BigInteger i = n;
@@ -297,7 +346,8 @@ public class Power<C extends RingElem<C>> {
         if (debug) {
             logger.info("n  = " + n + ", p  = " + p);
         }
-        return p;
+        res.set(p);
+        return;
     }
 
     /**

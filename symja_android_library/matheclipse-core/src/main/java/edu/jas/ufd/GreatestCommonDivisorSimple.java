@@ -5,6 +5,9 @@
 package edu.jas.ufd;
 
 
+import com.duy.ref.ObjectRef;
+import com.google.j2objc.annotations.AutoreleasePool;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +53,76 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
         if (P.ring.nvar > 1) {
             throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
         }
+        ObjectRef<GenPolynomial<C>> res = new ObjectRef<>();
+        baseGcdImpl(P, S, res);
+        return res.get();
+    }
+
+    /**
+     * Univariate GenPolynomial recursive greatest comon divisor. Uses
+     * pseudoRemainder for remainder.
+     *
+     * @param P univariate recursive GenPolynomial.
+     * @param S univariate recursive GenPolynomial.
+     * @return gcd(P, S).
+     */
+    @Override
+    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateGcd(GenPolynomial<GenPolynomial<C>> P,
+                                                                  GenPolynomial<GenPolynomial<C>> S) {
+        if (S == null || S.isZERO()) {
+            return P;
+        }
+        if (P == null || P.isZERO()) {
+            return S;
+        }
+        if (P.ring.nvar > 1) {
+            throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
+        }
+        ObjectRef<GenPolynomial<GenPolynomial<C>>> res = new ObjectRef<>();
+        recursiveUnivariateGcdImpl(P, S, res);
+        return res.get();
+    }
+
+    /**
+     * Univariate GenPolynomial resultant.
+     *
+     * @param P univariate GenPolynomial.
+     * @param S univariate GenPolynomial.
+     * @return res(P, S).
+     */
+    @Override
+    public GenPolynomial<C> baseResultant(GenPolynomial<C> P, GenPolynomial<C> S) {
+        if (S == null || S.isZERO()) {
+            return S;
+        }
+        if (P == null || P.isZERO()) {
+            return P;
+        }
+        if (P.ring.nvar > 1 || P.ring.nvar == 0) {
+            throw new IllegalArgumentException("no univariate polynomial");
+        }
+        ObjectRef<GenPolynomial<C>> res = new ObjectRef<>();
+        baseResultantImpl(P, S, res);
+        return res.get();
+    }
+
+    /**
+     * Univariate GenPolynomial recursive resultant.
+     *
+     * @param P univariate recursive GenPolynomial.
+     * @param S univariate recursive GenPolynomial.
+     * @return res(P, S).
+     */
+    @Override
+    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateResultant(GenPolynomial<GenPolynomial<C>> P,
+                                                                        GenPolynomial<GenPolynomial<C>> S) {
+        ObjectRef<GenPolynomial<GenPolynomial<C>>> res = new ObjectRef<>();
+        recursiveUnivariateResultantImpl(P, S, res);
+        return res.get();
+    }
+
+    @AutoreleasePool
+    private void baseGcdImpl(GenPolynomial<C> P, GenPolynomial<C> S, ObjectRef<GenPolynomial<C>> res) {
         boolean field = P.ring.coFac.isField();
         long e = P.degree(0);
         long f = S.degree(0);
@@ -83,10 +156,12 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             q = divide(q, b); // indirection
         }
         if (r.isONE()) {
-            return r.multiply(c);
+            res.set(r.multiply(c));
+            return;
         }
         if (q.isONE()) {
-            return q.multiply(c);
+            res.set(q.multiply(c));
+            return;
         }
         GenPolynomial<C> x;
         //System.out.println("q = " + q);
@@ -103,30 +178,12 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             //System.out.println("r = " + r);
         }
         q = basePrimitivePart(q);
-        return (q.multiply(c)).abs();
+        res.set((q.multiply(c)).abs());
+        return;
     }
 
-
-    /**
-     * Univariate GenPolynomial recursive greatest comon divisor. Uses
-     * pseudoRemainder for remainder.
-     *
-     * @param P univariate recursive GenPolynomial.
-     * @param S univariate recursive GenPolynomial.
-     * @return gcd(P, S).
-     */
-    @Override
-    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateGcd(GenPolynomial<GenPolynomial<C>> P,
-                                                                  GenPolynomial<GenPolynomial<C>> S) {
-        if (S == null || S.isZERO()) {
-            return P;
-        }
-        if (P == null || P.isZERO()) {
-            return S;
-        }
-        if (P.ring.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
-        }
+    @AutoreleasePool
+    private void recursiveUnivariateGcdImpl(GenPolynomial<GenPolynomial<C>> P, GenPolynomial<GenPolynomial<C>> S, ObjectRef<GenPolynomial<GenPolynomial<C>>> res) {
         boolean field = P.leadingBaseCoefficient().ring.coFac.isField();
         long e = P.degree(0);
         long f = S.degree(0);
@@ -160,10 +217,12 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
         r = PolyUtil.recursiveDivide(r, a);
         q = PolyUtil.recursiveDivide(q, b);
         if (r.isONE()) {
-            return r.multiply(c);
+            res.set(r.multiply(c));
+            return;
         }
         if (q.isONE()) {
-            return q.multiply(c);
+            res.set(q.multiply(c));
+            return;
         }
         GenPolynomial<GenPolynomial<C>> x;
         while (!r.isZERO()) {
@@ -180,38 +239,25 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
         }
         q = recursivePrimitivePart(q);
         q = q.abs().multiply(c);
-        return q;
+        res.set(q);
+        return;
     }
 
-
-    /**
-     * Univariate GenPolynomial resultant.
-     *
-     * @param P univariate GenPolynomial.
-     * @param S univariate GenPolynomial.
-     * @return res(P, S).
-     */
-    @Override
-    public GenPolynomial<C> baseResultant(GenPolynomial<C> P, GenPolynomial<C> S) {
-        if (S == null || S.isZERO()) {
-            return S;
-        }
-        if (P == null || P.isZERO()) {
-            return P;
-        }
-        if (P.ring.nvar > 1 || P.ring.nvar == 0) {
-            throw new IllegalArgumentException("no univariate polynomial");
-        }
+    @AutoreleasePool
+    private void baseResultantImpl(GenPolynomial<C> P, GenPolynomial<C> S, ObjectRef<GenPolynomial<C>> res) {
         long e = P.degree(0);
         long f = S.degree(0);
         if (f == 0 && e == 0) {
-            return P.ring.getONE();
+            res.set(P.ring.getONE());
+            return;
         }
         if (e == 0) {
-            return P.power(f);
+            res.set(P.power(f));
+            return;
         }
         if (f == 0) {
-            return S.power(e);
+            res.set(S.power(e));
+            return;
         }
         GenPolynomial<C> q;
         GenPolynomial<C> r;
@@ -242,7 +288,8 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
                 //System.out.println("x_s = " + x + ", lbcf(r) = " + r.leadingBaseCoefficient());
             }
             if (x.isZERO()) {
-                return x;
+                res.set(x);
+                return;
             }
             //System.out.println("x = " + x);
             e = q.degree(0);
@@ -266,25 +313,19 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             c = c.negate();
         }
         x = P.ring.getONE().multiply(c);
-        return x;
+        res.set(x);
+        return;
     }
 
-
-    /**
-     * Univariate GenPolynomial recursive resultant.
-     *
-     * @param P univariate recursive GenPolynomial.
-     * @param S univariate recursive GenPolynomial.
-     * @return res(P, S).
-     */
-    @Override
-    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateResultant(GenPolynomial<GenPolynomial<C>> P,
-                                                                        GenPolynomial<GenPolynomial<C>> S) {
+    @AutoreleasePool
+    private void recursiveUnivariateResultantImpl(GenPolynomial<GenPolynomial<C>> P, GenPolynomial<GenPolynomial<C>> S, ObjectRef<GenPolynomial<GenPolynomial<C>>> res) {
         if (S == null || S.isZERO()) {
-            return S;
+            res.set(S);
+            return;
         }
         if (P == null || P.isZERO()) {
-            return P;
+            res.set(P);
+            return;
         }
         if (P.ring.nvar > 1 || P.ring.nvar == 0) {
             throw new IllegalArgumentException("no recursive univariate polynomial");
@@ -295,13 +336,16 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             // if coeffs are multivariate (and non constant)
             // otherwise it would be 1
             GenPolynomial<C> t = resultant(P.leadingBaseCoefficient(), S.leadingBaseCoefficient());
-            return P.ring.getONE().multiply(t);
+            res.set(P.ring.getONE().multiply(t));
+            return;
         }
         if (e == 0) {
-            return P.power(f);
+            res.set(P.power(f));
+            return;
         }
         if (f == 0) {
-            return S.power(e);
+            res.set(S.power(e));
+            return;
         }
         GenPolynomial<GenPolynomial<C>> q;
         GenPolynomial<GenPolynomial<C>> r;
@@ -327,7 +371,8 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             x = PolyUtil.recursiveSparsePseudoRemainder(q, r);
             //x = PolyUtil.<C>recursiveDensePseudoRemainder(q,r);
             if (x.isZERO()) {
-                return x;
+                res.set(x);
+                return;
             }
             //no: x = recursivePrimitivePart(x);
             //System.out.println("x = " + x);
@@ -352,7 +397,8 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
             c = c.negate();
         }
         x = P.ring.getONE().multiply(c);
-        return x;
+        res.set(x);
+        return;
     }
 
 }
