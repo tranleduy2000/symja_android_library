@@ -1071,11 +1071,11 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr leftHandSide = ast.arg1();
-			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
-			} else {
+			// if (leftHandSide.isAST()) {
+			// leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
+			// } else {
 				leftHandSide = engine.evaluate(leftHandSide);
-			}
+			// }
 			IExpr arg2 = engine.evaluateNull(ast.arg2());
 			if (!arg2.isPresent()) {
 				if (leftHandSide.equals(ast.arg1())) {
@@ -1114,11 +1114,11 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr leftHandSide = ast.arg1();
-			if (leftHandSide.isAST()) {
-				leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
-			} else {
+			// if (leftHandSide.isAST()) {
+			// leftHandSide = engine.evalHoldPattern((IAST) leftHandSide);
+			// } else {
 				leftHandSide = engine.evaluate(leftHandSide);
-			}
+			// }
 			if (!leftHandSide.equals(ast.arg1())) {
 				return RuleDelayed(leftHandSide, ast.arg2());
 			}

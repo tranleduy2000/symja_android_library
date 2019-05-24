@@ -3,7 +3,7 @@ package org.matheclipse.core.reflection.system.rules;
 import org.matheclipse.core.interfaces.IAST;
 
 import static org.matheclipse.core.expression.F.$p;
-import static org.matheclipse.core.expression.F.Abs;
+import static org.matheclipse.core.expression.F.*;
 import static org.matheclipse.core.expression.F.And;
 import static org.matheclipse.core.expression.F.ArcCos;
 import static org.matheclipse.core.expression.F.ArcCosh;
@@ -41,6 +41,7 @@ import static org.matheclipse.core.expression.F.Equal;
 import static org.matheclipse.core.expression.F.EvenQ;
 import static org.matheclipse.core.expression.F.Exp;
 import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.FreeQ;
 import static org.matheclipse.core.expression.F.Greater;
 import static org.matheclipse.core.expression.F.HarmonicNumber;
 import static org.matheclipse.core.expression.F.IInit;

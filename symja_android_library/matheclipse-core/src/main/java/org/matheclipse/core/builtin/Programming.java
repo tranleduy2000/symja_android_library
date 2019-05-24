@@ -354,14 +354,14 @@ public final class Programming {
 
 		@Override
 		public final IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (engine.isEvalRHSMode()) {
 				if (engine.evalTrue(ast.arg2())) {
 					return ast.arg1();
 				}
-				if (engine.isEvalLHSMode()) {
-					return F.NIL;
-				}
 				throw new ConditionException(ast);
 			}
+					return F.NIL;
+				}
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_2_2;
 		}
