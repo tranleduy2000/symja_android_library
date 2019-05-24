@@ -22,7 +22,6 @@ import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Noo;
 import static org.matheclipse.core.expression.F.Pi;
@@ -43,7 +42,7 @@ public interface ArcCosRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 20, 0 };
+  final public static int[] SIZES = { 18, 0 };
 
   final public static IAST RULES = List(
     IInit(ArcCos, SIZES),
@@ -86,12 +85,6 @@ public interface ArcCosRules {
     // ArcCos(-1)=Pi
     ISet(ArcCos(CN1),
       Pi),
-    // ArcCos(I)=Pi/2+I*Log(-1+Sqrt(2))
-    ISet(ArcCos(CI),
-      Plus(CPiHalf,Times(CI,Log(Plus(CN1,CSqrt2))))),
-    // ArcCos(-I)=Pi/2+I*Log(1+Sqrt(2))
-    ISet(ArcCos(CNI),
-      Plus(CPiHalf,Times(CI,Log(Plus(C1,CSqrt2))))),
     // ArcCos(Infinity)=I*Infinity
     ISet(ArcCos(oo),
       DirectedInfinity(CI)),

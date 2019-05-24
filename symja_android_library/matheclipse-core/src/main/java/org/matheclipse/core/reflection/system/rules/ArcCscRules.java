@@ -20,7 +20,6 @@ import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Noo;
 import static org.matheclipse.core.expression.F.Pi;
 import static org.matheclipse.core.expression.F.Plus;
@@ -38,7 +37,7 @@ public interface ArcCscRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 13, 0 };
+  final public static int[] SIZES = { 12, 0 };
 
   final public static IAST RULES = List(
     IInit(ArcCsc, SIZES),
@@ -63,9 +62,6 @@ public interface ArcCscRules {
     // ArcCsc(Sqrt(2)+Sqrt(6))=Pi/12
     ISet(ArcCsc(Plus(CSqrt2,CSqrt6)),
       Times(QQ(1L,12L),Pi)),
-    // ArcCsc(I)=-I*Log(Sqrt(2)+1)
-    ISet(ArcCsc(CI),
-      Times(CNI,Log(Plus(C1,CSqrt2)))),
     // ArcCsc(Infinity)=0
     ISet(ArcCsc(oo),
       C0),

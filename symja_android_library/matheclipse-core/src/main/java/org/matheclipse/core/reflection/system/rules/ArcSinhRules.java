@@ -4,7 +4,6 @@ import org.matheclipse.core.interfaces.IAST;
 
 import static org.matheclipse.core.expression.F.ArcSinh;
 import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
@@ -14,9 +13,7 @@ import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.IInit;
 import static org.matheclipse.core.expression.F.ISet;
 import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Log;
 import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.oo;
 
@@ -30,7 +27,7 @@ public interface ArcSinhRules {
    * <li>index 0 - number of equal rules in <code>RULES</code></li>
 	 * </ul>
 	 */
-  final public static int[] SIZES = { 9, 0 };
+  final public static int[] SIZES = { 8, 0 };
 
   final public static IAST RULES = List(
     IInit(ArcSinh, SIZES),
@@ -49,9 +46,6 @@ public interface ArcSinhRules {
     // ArcSinh(I)=Pi*I/2
     ISet(ArcSinh(CI),
       Times(CC(0L,1L,1L,2L),Pi)),
-    // ArcSinh(1)=Log(Sqrt(2)+1)
-    ISet(ArcSinh(C1),
-      Log(Plus(C1,CSqrt2))),
     // ArcSinh(Infinity)=Infinity
     ISet(ArcSinh(oo),
       oo),
