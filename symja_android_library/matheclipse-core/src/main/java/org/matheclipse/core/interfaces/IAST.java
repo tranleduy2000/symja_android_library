@@ -291,6 +291,12 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * {@inheritDoc}
      */
     @Override
+    public boolean isPatternMatchingFunction();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     IAST rest();
 
     /**

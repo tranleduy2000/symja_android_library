@@ -106,24 +106,30 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
     /**
      * Determine all patterns (i.e. all objects of instance IPattern) in the given expression
-     * <p>
+     *
      * Increments this classes pattern counter.
      *
      * @param patternIndexMap
-     * @param lhsPatternExpr  the (left-hand-side) expression which could contain pattern objects.
-     * @param treeLevel       the level of the tree where the patterns are determined
+     * @param lhsPatternExpr
+     *            the (left-hand-side) expression which could contain pattern objects.
+     * @param treeLevel
+     *            the level of the tree where the patterns are determined
      */
     static int determinePatternsRecursive(final List<IExpr> patternIndexMap, final IAST lhsPatternExpr, final int[] priority,
                                           final boolean[] ruleWithoutPattern, final int treeLevel) {
         if (lhsPatternExpr.isAlternatives() || lhsPatternExpr.isExcept()) {
             ruleWithoutPattern[0] = false;
         }
-        final int[] listEvalFlags = new int[]{IAST.NO_FLAG};
+        final int[] listEvalFlags = new int[] { IAST.NO_FLAG };
         lhsPatternExpr.forEach(new Consumer<IExpr>() {
             @Override
             public void accept(IExpr x) {
                 if (x.isAST()) {
-                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, (IAST) x, priority, ruleWithoutPattern,
+                    final IAST lhsPatternAST = (IAST) x;
+                    if (lhsPatternAST.isPatternMatchingFunction()) {
+                        listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
+                    }
+                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority, ruleWithoutPattern,
                             treeLevel + 1);
                     priority[0] -= 11;
                     if (x.isPatternDefault()) {
@@ -144,7 +150,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
         // listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;
         return listEvalFlags[0];
     }
-
     @Override
     public abstract IPatternMap clone();
 

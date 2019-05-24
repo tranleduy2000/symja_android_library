@@ -1687,6 +1687,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCases() {
+		check("Cases({{a, a}, {b, a}, {a, b, c}, {b, b}, {c, a}, {b, b, b}}, {__, a | b} | {c, __})", //
+				"{{a,a},{b,a},{b,b},{c,a},{b,b,b}}");
+		check("Cases({{2,1,0},{3,2,0},{2,0,0},{3,3,1}}, {_, 1 | 2, _})", //
+				"{{2,1,0},{3,2,0}}");
+		check("Cases({{a, a}, {b, a}, {a, b, c}, {b, b}, {c, a}, {b, b, b}}, {a|b, _})", //
+				"{{a,a},{b,a},{b,b}}");
 		check("Cases({a, 1, 2.5, \"string\"}, _Integer|_Real)", //
 				"{1,2.5}");
 		check("Cases(_Complex)[{1, 2*I, 3, 4-I, 5}]", //
@@ -15043,6 +15049,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSelect() {
+		check("Select(# > 4 &) [{1, 2.2, 3, 4.5, 5, 6, 7.5, 8}]", //
+				"{4.5,5,6,7.5,8}");
+		check("Cases(_Integer)@Select(# > 4 &)@{1, 2.2, 3, 4.5, 5, 6, 7.5, 8}", //
+				"{5,6,8}");
 		check("Select({-3, 0, 1, 3, a}, #>0&)", //
 				"{1,3}");
 		check("Select(f(a, 2, 3), NumberQ)", //

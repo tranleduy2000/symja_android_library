@@ -1266,6 +1266,9 @@ public class F {
     public final static IBuiltInSymbol ListConvolve = F.initFinalSymbol("ListConvolve", ID.ListConvolve);
 	/** ListCorrelate(kernel-list, tensor-list) - create the correlation of the `kernel-list` with `tensor-list`. */
     public final static IBuiltInSymbol ListCorrelate = F.initFinalSymbol("ListCorrelate", ID.ListCorrelate);
+	public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
+
+	public final static IBuiltInSymbol ListLinePlot = F.initFinalSymbol("ListLinePlot", ID.ListLinePlot);
 	/** ListQ(expr) - tests whether `expr` is a `List`. */
     public final static IBuiltInSymbol ListQ = F.initFinalSymbol("ListQ", ID.ListQ);
     /**
@@ -6167,6 +6170,9 @@ public class F {
         return ast(Line);
     }
 
+	public static IAST Line(final IExpr a0) {
+		return unaryAST1(Line, a0);
+	}
     public static IAST LinearModelFit(final IExpr a0) {
         return unaryAST1(LinearModelFit, a0);
     }
@@ -7036,6 +7042,9 @@ public class F {
         return binaryAST2(Pochhammer, a0, a1);
     }
 
+	public static IAST Point(final IAST list) {
+		return unaryAST1(Point, list);
+	}
     public static IAST PolyGamma(final IExpr a0) {
         return unaryAST1(PolyGamma, a0);
     }

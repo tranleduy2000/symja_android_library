@@ -2607,6 +2607,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isPatternMatchingFunction() {
+        return false;
+    }
+
     /**
      * Test if this expression equals the symbol <code>True</code>.
      *

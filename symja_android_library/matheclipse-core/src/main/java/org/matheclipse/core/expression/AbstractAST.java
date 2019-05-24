@@ -2425,6 +2425,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if ((getEvalFlags() & IAST.CONTAINS_PATTERN_EXPR) != IAST.NO_FLAG) {
 			return false;
 		}
+		if (isPatternMatchingFunction()) {
+			addEvalFlags(IAST.CONTAINS_PATTERN);
+			return false;
+		}
 		boolean isFreeOfPatterns = true;
 		for (int i = 0; i < size(); i++) {
 			// all elements including head element
@@ -2498,20 +2502,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isBooleanResult() {
-		IExpr symbol = head();
-		if (symbol.isSymbol()) {
-			if (symbol.equals(F.And) || symbol.equals(F.Or) || symbol.equals(F.Equivalent) || symbol.equals(F.Not)
-					|| symbol.equals(F.Nand) || symbol.equals(F.Nor) || symbol.equals(F.Xor)) {
-				for (int i = 1; i < size(); i++) {
-					if (get(i).isBooleanResult()) {
-						continue;
-					}
-					return false;
-				}
-				return true;
+		return head().isPredicateFunctionSymbol() //
+				|| ((head().isBooleanFormulaSymbol() || head().isComparatorFunctionSymbol()) //
+						&& exists(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return !x.isBooleanResult();
 			}
-		}
-		return false;
+		}));
 	}
 
 	/** {@inheritDoc} */
@@ -3190,6 +3188,18 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return false;
 	}
 
+	@Override
+	public boolean isPatternMatchingFunction() {
+		int id = headID();
+		if (id >= 0) {
+			if (size() >= 2) {
+				return id == ID.HoldPattern || id == ID.Literal || id == ID.Condition || id == ID.Alternatives || //
+						id == ID.Except || id == ID.Complex || id == ID.Rational || id == ID.Optional || //
+						id == ID.PatternTest;
+			}
+		}
+		return false;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public boolean isUnit() {

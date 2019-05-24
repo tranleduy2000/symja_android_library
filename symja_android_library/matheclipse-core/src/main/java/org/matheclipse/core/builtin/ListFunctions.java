@@ -4831,6 +4831,9 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			if (ast.isAST1()) {
+				return F.operatorFormAppend(ast);
+			}
 
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
@@ -4860,7 +4863,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_3;
+			return IOFunctions.ARGS_1_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
