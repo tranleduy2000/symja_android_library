@@ -5,6 +5,9 @@
 package edu.jas.ufd;
 
 
+import com.duy.ref.ObjectRef;
+import com.google.j2objc.annotations.AutoreleasePool;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -89,62 +92,10 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
         if (P.ring.nvar > 1) {
             throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
         }
-        long e = P.degree(0);
-        long f = S.degree(0);
-        GenPolynomial<C> q;
-        GenPolynomial<C> r;
-        if (f > e) {
-            r = P;
-            q = S;
-            long g = f;
-            f = e;
-            e = g;
-        } else {
-            q = P;
-            r = S;
-        }
-        if (debug) {
-            logger.debug("degrees: e = " + e + ", f = " + f);
-        }
-        r = r.abs();
-        q = q.abs();
-        C a = baseContent(r);
-        C b = baseContent(q);
-        C c = gcd(a, b); // indirection
-        r = divide(r, a); // indirection
-        q = divide(q, b); // indirection
-        if (r.isONE()) {
-            return r.multiply(c);
-        }
-        if (q.isONE()) {
-            return q.multiply(c);
-        }
-        C g = r.ring.getONECoefficient();
-        C h = r.ring.getONECoefficient();
-        GenPolynomial<C> x;
-        C z;
-        while (!r.isZERO()) {
-            long delta = q.degree(0) - r.degree(0);
-            //System.out.println("delta    = " + delta);
-            x = PolyUtil.baseDensePseudoRemainder(q, r);
-            q = r;
-            if (!x.isZERO()) {
-                z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
-                //System.out.println("z  = " + z);
-                r = x.divide(z);
-                g = q.leadingBaseCoefficient();
-                z = g.power(delta); //power(P.ring.coFac, g, delta);
-                h = z.divide(h.power(delta - 1)); //power(P.ring.coFac, h, delta - 1));
-                //System.out.println("g  = " + g);
-                //System.out.println("h  = " + h);
-            } else {
-                r = x;
-            }
-        }
-        q = basePrimitivePart(q);
-        return (q.multiply(c)).abs();
+        ObjectRef<GenPolynomial<C>> res = new ObjectRef<>();
+        baseGcdImpl(P, S, res);
+        return res.get();
     }
-
 
     /**
      * Univariate GenPolynomial recursive greatest comon divisor. Uses
@@ -166,64 +117,10 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
         if (P.ring.nvar > 1) {
             throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
         }
-        long e = P.degree(0);
-        long f = S.degree(0);
-        GenPolynomial<GenPolynomial<C>> q;
-        GenPolynomial<GenPolynomial<C>> r;
-        if (f > e) {
-            r = P;
-            q = S;
-            long g = f;
-            f = e;
-            e = g;
-        } else {
-            q = P;
-            r = S;
-        }
-        if (debug) {
-            logger.debug("degrees: e = " + e + ", f = " + f);
-        }
-        r = r.abs();
-        q = q.abs();
-        GenPolynomial<C> a = recursiveContent(r);
-        GenPolynomial<C> b = recursiveContent(q);
-
-        GenPolynomial<C> c = gcd(a, b); // go to recursion
-        //System.out.println("rgcd c = " + c);
-        r = PolyUtil.recursiveDivide(r, a);
-        q = PolyUtil.recursiveDivide(q, b);
-        if (r.isONE()) {
-            return r.multiply(c);
-        }
-        if (q.isONE()) {
-            return q.multiply(c);
-        }
-        GenPolynomial<C> g = r.ring.getONECoefficient();
-        GenPolynomial<C> h = r.ring.getONECoefficient();
-        GenPolynomial<GenPolynomial<C>> x;
-        GenPolynomial<C> z = null;
-        while (!r.isZERO()) {
-            long delta = q.degree(0) - r.degree(0);
-            //System.out.println("rgcd delta = " + delta);
-            x = PolyUtil.recursiveDensePseudoRemainder(q, r);
-            if (logger.isDebugEnabled()) {
-                logger.info("recursiveDensePseudoRemainder.bits = " + x.bitLength());
-            }
-            q = r;
-            if (!x.isZERO()) {
-                z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
-                r = PolyUtil.recursiveDivide(x, z);
-                g = q.leadingBaseCoefficient();
-                z = g.power(delta); //power(P.ring.coFac, g, delta);
-                h = PolyUtil.basePseudoDivide(z, h.power(delta - 1)); // power(P.ring.coFac, h, delta - 1)
-            } else {
-                r = x;
-            }
-        }
-        q = recursivePrimitivePart(q);
-        return q.abs().multiply(c); //.abs();
+        ObjectRef<GenPolynomial<GenPolynomial<C>>> res = new ObjectRef<>();
+        recursiveUnivariateGcdImpl(P, S, res);
+        return res.get();
     }
-
 
     /**
      * Univariate GenPolynomial resultant. Uses pseudoRemainder for remainder.
@@ -243,6 +140,38 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
         if (P.ring.nvar > 1) {
             throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
         }
+        ObjectRef<GenPolynomial<C>> res = new ObjectRef<>();
+        baseResultantImpl(P, S, res);
+        return res.get();
+    }
+
+    /**
+     * Univariate GenPolynomial recursive resultant. Uses pseudoRemainder for
+     * remainder.
+     *
+     * @param P univariate recursive GenPolynomial.
+     * @param S univariate recursive GenPolynomial.
+     * @return res(P, S).
+     */
+    @Override
+    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateResultant(GenPolynomial<GenPolynomial<C>> P,
+                                                                        GenPolynomial<GenPolynomial<C>> S) {
+        if (S == null || S.isZERO()) {
+            return S;
+        }
+        if (P == null || P.isZERO()) {
+            return P;
+        }
+        if (P.ring.nvar > 1) {
+            throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
+        }
+        ObjectRef<GenPolynomial<GenPolynomial<C>>> res = new ObjectRef<>();
+        recursiveUnivariateResultantImpl(P, S, res);
+        return res.get();
+    }
+
+    @AutoreleasePool
+    private void baseResultantImpl(GenPolynomial<C> P, GenPolynomial<C> S, ObjectRef<GenPolynomial<C>> res) {
         long e = P.degree(0);
         long f = S.degree(0);
         GenPolynomial<C> q;
@@ -298,30 +227,12 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
             z = z.negate();
         }
         x = P.ring.getONE().multiply(z);
-        return x;
+        res.set(x);
+        return;
     }
 
-
-    /**
-     * Univariate GenPolynomial recursive resultant. Uses pseudoRemainder for
-     * remainder.
-     *
-     * @param P univariate recursive GenPolynomial.
-     * @param S univariate recursive GenPolynomial.
-     * @return res(P, S).
-     */
-    @Override
-    public GenPolynomial<GenPolynomial<C>> recursiveUnivariateResultant(GenPolynomial<GenPolynomial<C>> P,
-                                                                        GenPolynomial<GenPolynomial<C>> S) {
-        if (S == null || S.isZERO()) {
-            return S;
-        }
-        if (P == null || P.isZERO()) {
-            return P;
-        }
-        if (P.ring.nvar > 1) {
-            throw new IllegalArgumentException(this.getClass().getName() + " no univariate polynomial");
-        }
+    @AutoreleasePool
+    private void recursiveUnivariateResultantImpl(GenPolynomial<GenPolynomial<C>> P, GenPolynomial<GenPolynomial<C>> S, ObjectRef<GenPolynomial<GenPolynomial<C>>> res) {
         long e = P.degree(0);
         long f = S.degree(0);
         GenPolynomial<GenPolynomial<C>> q;
@@ -352,7 +263,8 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
             // otherwise it would be 1
             t = resultant(a, b);
             x = P.ring.getONE().multiply(t);
-            return x;
+            res.set(x);
+            return;
         }
         t = a.power(e); //power(cofac, a, e);
         t = t.multiply(b.power(f)); //power(cofac, b, f));
@@ -384,9 +296,133 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
             z = z.negate();
         }
         x = P.ring.getONE().multiply(z);
-        return x;
+        res.set(x);
+        return;
     }
 
+    @AutoreleasePool
+    private void recursiveUnivariateGcdImpl(GenPolynomial<GenPolynomial<C>> P, GenPolynomial<GenPolynomial<C>> S, ObjectRef<GenPolynomial<GenPolynomial<C>>> res) {
+        long e = P.degree(0);
+        long f = S.degree(0);
+        GenPolynomial<GenPolynomial<C>> q;
+        GenPolynomial<GenPolynomial<C>> r;
+        if (f > e) {
+            r = P;
+            q = S;
+            long g = f;
+            f = e;
+            e = g;
+        } else {
+            q = P;
+            r = S;
+        }
+        if (debug) {
+            logger.debug("degrees: e = " + e + ", f = " + f);
+        }
+        r = r.abs();
+        q = q.abs();
+        GenPolynomial<C> a = recursiveContent(r);
+        GenPolynomial<C> b = recursiveContent(q);
+
+        GenPolynomial<C> c = gcd(a, b); // go to recursion
+        //System.out.println("rgcd c = " + c);
+        r = PolyUtil.recursiveDivide(r, a);
+        q = PolyUtil.recursiveDivide(q, b);
+        if (r.isONE()) {
+            res.set(r.multiply(c));
+            return;
+        }
+        if (q.isONE()) {
+            res.set(q.multiply(c));
+            return;
+        }
+        GenPolynomial<C> g = r.ring.getONECoefficient();
+        GenPolynomial<C> h = r.ring.getONECoefficient();
+        GenPolynomial<GenPolynomial<C>> x;
+        GenPolynomial<C> z = null;
+        while (!r.isZERO()) {
+            long delta = q.degree(0) - r.degree(0);
+            //System.out.println("rgcd delta = " + delta);
+            x = PolyUtil.recursiveDensePseudoRemainder(q, r);
+            if (logger.isDebugEnabled()) {
+                logger.info("recursiveDensePseudoRemainder.bits = " + x.bitLength());
+            }
+            q = r;
+            if (!x.isZERO()) {
+                z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
+                r = PolyUtil.recursiveDivide(x, z);
+                g = q.leadingBaseCoefficient();
+                z = g.power(delta); //power(P.ring.coFac, g, delta);
+                h = PolyUtil.basePseudoDivide(z, h.power(delta - 1)); // power(P.ring.coFac, h, delta - 1)
+            } else {
+                r = x;
+            }
+        }
+        q = recursivePrimitivePart(q);
+        res.set(q.abs().multiply(c));
+        return; //.abs();
+    }
+
+    @AutoreleasePool
+    private void baseGcdImpl(GenPolynomial<C> P, GenPolynomial<C> S, ObjectRef<GenPolynomial<C>> res) {
+        long e = P.degree(0);
+        long f = S.degree(0);
+        GenPolynomial<C> q;
+        GenPolynomial<C> r;
+        if (f > e) {
+            r = P;
+            q = S;
+            long g = f;
+            f = e;
+            e = g;
+        } else {
+            q = P;
+            r = S;
+        }
+        if (debug) {
+            logger.debug("degrees: e = " + e + ", f = " + f);
+        }
+        r = r.abs();
+        q = q.abs();
+        C a = baseContent(r);
+        C b = baseContent(q);
+        C c = gcd(a, b); // indirection
+        r = divide(r, a); // indirection
+        q = divide(q, b); // indirection
+        if (r.isONE()) {
+            res.set(r.multiply(c));
+            return;
+        }
+        if (q.isONE()) {
+            res.set(q.multiply(c));
+            return;
+        }
+        C g = r.ring.getONECoefficient();
+        C h = r.ring.getONECoefficient();
+        GenPolynomial<C> x;
+        C z;
+        while (!r.isZERO()) {
+            long delta = q.degree(0) - r.degree(0);
+            //System.out.println("delta    = " + delta);
+            x = PolyUtil.baseDensePseudoRemainder(q, r);
+            q = r;
+            if (!x.isZERO()) {
+                z = g.multiply(h.power(delta)); //power(P.ring.coFac, h, delta));
+                //System.out.println("z  = " + z);
+                r = x.divide(z);
+                g = q.leadingBaseCoefficient();
+                z = g.power(delta); //power(P.ring.coFac, g, delta);
+                h = z.divide(h.power(delta - 1)); //power(P.ring.coFac, h, delta - 1));
+                //System.out.println("g  = " + g);
+                //System.out.println("h  = " + h);
+            } else {
+                r = x;
+            }
+        }
+        q = basePrimitivePart(q);
+        res.set((q.multiply(c)).abs());
+        return;
+    }
 
     /**
      * Univariate GenPolynomial recursive Subresultant list. Uses
