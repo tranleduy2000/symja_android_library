@@ -7,6 +7,7 @@ import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 import com.gx.common.cache.Cache;
 
+import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.IOFunctions;
@@ -33,6 +34,7 @@ import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvalStepListener;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -955,6 +957,24 @@ public class EvalEngine implements Serializable {
 		throw new WrongArgumentType(expr, "Conversion into a double numeric value is not possible!");
 	}
 
+	final public Complex evalComplex(final IExpr expr) {
+		if (expr.isReal()) {
+			return new Complex(((ISignedNumber) expr).doubleValue());
+		}
+		if (expr.isNumber()) {
+			return new Complex(((INumber) expr).reDoubleValue(), ((INumber) expr).imDoubleValue());
+		}
+		if (expr.isNumericFunction()) {
+			IExpr result = evalN(expr);
+			if (result.isReal()) {
+				return new Complex(((ISignedNumber) result).doubleValue());
+			}
+			if (result.isNumber()) {
+				return new Complex(((INumber) result).reDoubleValue(), ((INumber) result).imDoubleValue());
+			}
+		}
+		throw new WrongArgumentType(expr, "Conversion into a double numeric value is not possible!");
+	}
 	/**
 	 * Evaluate arguments with the head <code>F.Evaluate</code>, i.e. <code>f(a, ... , Evaluate(x), ...)</code>
 	 *

@@ -395,6 +395,10 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return valueOf(fApcomplex.subtract(that.fApcomplex));
 	}
 
+	@Override
+	public IComplexNum subtract(final IComplexNum val) {
+		return valueOf(fApcomplex.subtract(((ApcomplexNum) val).fApcomplex));
+	}
 	/**
 	 * @param that
 	 * @return

@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import org.matheclipse.core.expression.F;
+
 import static org.matheclipse.core.expression.F.ComplexExpand;
 import static org.matheclipse.core.expression.F.CreateDirectory;
 import static org.matheclipse.core.expression.F.D;
@@ -47,7 +49,6 @@ import static org.matheclipse.core.expression.F.Share;
 import static org.matheclipse.core.expression.F.Solve;
 import static org.matheclipse.core.expression.F.Sum;
 import static org.matheclipse.core.expression.F.Taylor;
-import static org.matheclipse.core.expression.F.ToPolarCoordinates;
 import static org.matheclipse.core.expression.F.TrigExpand;
 import static org.matheclipse.core.expression.F.TrigReduce;
 import static org.matheclipse.core.expression.F.TrigToExp;
@@ -74,6 +75,7 @@ public final class FunctionDefinitions {
 		ExpToTrig.setEvaluator(new org.matheclipse.core.reflection.system.ExpToTrig());
 		FindInstance.setEvaluator(new org.matheclipse.core.reflection.system.FindInstance());
 		FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
+			F.Fourier.setEvaluator(new org.matheclipse.core.reflection.system.Fourier());
 		FrobeniusSolve.setEvaluator(new org.matheclipse.core.reflection.system.FrobeniusSolve());
 		FunctionExpand.setEvaluator(new org.matheclipse.core.reflection.system.FunctionExpand());
 		GroebnerBasis.setEvaluator(new org.matheclipse.core.reflection.system.GroebnerBasis());
@@ -84,6 +86,7 @@ public final class FunctionDefinitions {
 		InterpolatingPolynomial.setEvaluator(new org.matheclipse.core.reflection.system.InterpolatingPolynomial());
 		Interpolation.setEvaluator(new org.matheclipse.core.reflection.system.Interpolation());
 		Interval.setEvaluator(new org.matheclipse.core.reflection.system.Interval());
+			F.InverseFourier.setEvaluator(new org.matheclipse.core.reflection.system.InverseFourier());
 		InverseFunction.setEvaluator(new org.matheclipse.core.reflection.system.InverseFunction());
 		InverseLaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.InverseLaplaceTransform());
 		LaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.LaplaceTransform());

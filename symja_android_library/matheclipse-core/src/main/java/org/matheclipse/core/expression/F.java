@@ -893,7 +893,10 @@ public class F {
     public final static IBuiltInSymbol For = F.initFinalSymbol("For", ID.For);
     /***/
     public final static IBuiltInSymbol ForAll = F.initFinalSymbol("ForAll", ID.ForAll);
-	/** FourierMatrix(n) - gives a fourier matrix with the dimension `n`. */
+    /***/
+    public final static IBuiltInSymbol Fourier = F.initFinalSymbol("Fourier", ID.Fourier);
+
+    /** FourierMatrix(n) - gives a fourier matrix with the dimension `n`.*/
     public final static IBuiltInSymbol FourierMatrix = F.initFinalSymbol("FourierMatrix", ID.FourierMatrix);
 	/** FractionalPart(number) - get the fractional part of a `number`. */
     public final static IBuiltInSymbol FractionalPart = F.initFinalSymbol("FractionalPart", ID.FractionalPart);
@@ -1144,7 +1147,10 @@ public class F {
     public final static IBuiltInSymbol InverseErf = F.initFinalSymbol("InverseErf", ID.InverseErf);
 	/** InverseErfc(z) - returns the inverse complementary error function of `z`. */
     public final static IBuiltInSymbol InverseErfc = F.initFinalSymbol("InverseErfc", ID.InverseErfc);
-	/** InverseFunction(head) - returns the inverse function for the symbol `head`. */
+    /***/
+    public final static IBuiltInSymbol InverseFourier = F.initFinalSymbol("InverseFourier", ID.InverseFourier);
+
+    /** InverseFunction(head) - returns the inverse function for the symbol `head`.*/
     public final static IBuiltInSymbol InverseFunction = F.initFinalSymbol("InverseFunction", ID.InverseFunction);
     /***/
     public final static IBuiltInSymbol InverseGammaRegularized = F.initFinalSymbol("InverseGammaRegularized",
