@@ -91,6 +91,8 @@ public final class FunctionDefinitions {
 		InverseLaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.InverseLaplaceTransform());
 		LaplaceTransform.setEvaluator(new org.matheclipse.core.reflection.system.LaplaceTransform());
 		LinearProgramming.setEvaluator(new org.matheclipse.core.reflection.system.LinearProgramming());
+			F.ListLinePlot.setEvaluator(new org.matheclipse.core.reflection.system.ListLinePlot());
+			F.ListPlot.setEvaluator(new org.matheclipse.core.reflection.system.ListPlot());
 		Maximize.setEvaluator(new org.matheclipse.core.reflection.system.Maximize());
 		Minimize.setEvaluator(new org.matheclipse.core.reflection.system.Minimize());
 		MonomialList.setEvaluator(new org.matheclipse.core.reflection.system.MonomialList());
