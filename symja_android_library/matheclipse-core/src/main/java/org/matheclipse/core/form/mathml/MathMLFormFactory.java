@@ -1268,40 +1268,33 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			convert(buf, list.arg1(), precedence, false);
 			return;
 		}
+		if (head.equals(F.DirectedInfinity)) {
+			if (list.isDirectedInfinity()) { // head.equals(F.DirectedInfinity))
+				if (list.isAST0()) {
+					convertSymbol(buf, F.ComplexInfinity);
+					return;
+				}
+				if (list.isAST1()) {
+					if (list.arg1().isOne()) {
+						convertSymbol(buf, F.Infinity);
+						return;
+					} else if (list.arg1().isMinusOne()) {
+						convert(buf, F.Times(F.CN1, F.Infinity), precedence, false);
+						return;
+					} else if (list.arg1().isImaginaryUnit()) {
+						convert(buf, F.Times(F.CI, F.Infinity), precedence, false);
+						return;
+					} else if (list.arg1().isNegativeImaginaryUnit()) {
+						convert(buf, F.Times(F.CNI, F.Infinity), precedence, false);
+						return;
+					}
+				}
+			}
+		}
 		// if (head.equals(F.SeriesData) && (list.size() == 7)) {
 		// if (convertSeriesData(buf, list, precedence)) {
 		// return;
 		// }
-		// }
-		// if (list.isDirectedInfinity()) { // head.equals(F.DirectedInfinity))
-		// // {
-		// if (list.isAST0()) {
-		// append(buf, "ComplexInfinity");
-		// return;
-		// }
-		// if (list.isAST1()) {
-		// if (list.arg1().isOne()) {
-		// append(buf, "Infinity");
-		// return;
-		// } else if (list.arg1().isMinusOne()) {
-		// if (ASTNodeFactory.PLUS_PRECEDENCE < precedence) {
-		// append(buf, "(");
-		// }
-		// append(buf, "-Infinity");
-		// if (ASTNodeFactory.PLUS_PRECEDENCE < precedence) {
-		// append(buf, ")");
-		// }
-		// return;
-		// } else if (list.arg1().isImaginaryUnit()) {
-		// append(buf, "I*Infinity");
-		// return;
-		// } else if (list.arg1().isNegativeImaginaryUnit()) {
-		// append(buf, "-I*Infinity");
-		// return;
-		// }
-		// }
-		// }
-		// convertAST(buf, list);
 
 		tagStart(buf, "mrow");
 		convertHead(buf, ast.head());

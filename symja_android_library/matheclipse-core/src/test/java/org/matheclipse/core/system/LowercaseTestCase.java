@@ -2573,6 +2573,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCondition() {
+		check("x /; x > 0", //
+				"x/;x>0");
+		check("x /; (10==10)", //
+				"x/;10==10");
 		check("fac(n_ /; n > 0) := n!", //
 				"");
 		check("fac(3)+fac(-4)", //
@@ -12383,6 +12387,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "$Aborted");
 		// check("TimeConstrained(1^3^3^3, 10)", //
 		// "1");
+		check("0^(-1)", //
+				"ComplexInfinity");
 		check("Power(a,b,c,d) // FullForm", //
 				"Power(a, Power(b, Power(c, d)))");
 		check("Refine(Exp(I*k*Pi),Element(k,Integers))", //
