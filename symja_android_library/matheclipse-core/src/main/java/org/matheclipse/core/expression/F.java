@@ -1534,6 +1534,7 @@ public class F {
      * `expr` is `True`
      */
     public final static IBuiltInSymbol Not = F.initFinalSymbol("Not", ID.Not);
+    public final static IBuiltInSymbol Nothing = F.initFinalSymbol("Nothing", ID.Nothing);
     /***/
     public final static IBuiltInSymbol NotApplicable = F.initFinalSymbol("NotApplicable", ID.NotApplicable);
     /***/

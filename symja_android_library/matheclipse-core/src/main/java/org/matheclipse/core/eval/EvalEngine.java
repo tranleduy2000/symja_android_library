@@ -1736,8 +1736,8 @@ public class EvalEngine implements Serializable {
 	 * @return
 	 */
 	private IAST flattenSequences(final IAST ast) {
-		final IASTAppendable[] seqResult = new IASTAppendable[1];
-		seqResult[0] = F.NIL;
+		final IASTAppendable[] seqResult = new IASTAppendable[] { F.NIL };
+
 		ast.forEach(new ObjIntConsumer<IExpr>() {
 			@Override
 			public void accept(IExpr x, int i) {
@@ -1748,6 +1748,11 @@ public class EvalEngine implements Serializable {
 						seqResult[0].appendArgs(ast, i);
 					}
 					seqResult[0].appendArgs(seq);
+				} else if (x.equals(F.Nothing)) {
+					if (!seqResult[0].isPresent()) {
+						seqResult[0] = F.ast(ast.head(), ast.size() - 1, false);
+						seqResult[0].appendArgs(ast, i);
+					}
 				} else if (seqResult[0].isPresent()) {
 					seqResult[0].append(x);
 				}
