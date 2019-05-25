@@ -28,6 +28,7 @@ import com.gx.common.cache.LocalCache.Strength;
 import com.gx.errorprone.annotations.CheckReturnValue;
 
 import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+import org.matheclipse.core.basic.OperationSystem;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -421,8 +422,11 @@ public final class CacheBuilder<K, V> {
         checkArgument(maximumSize >= 0, "maximum size must not be negative");
 
         // this.maximumSize = maximumSize;
-        this.maximumSize = Math.min(maximumSize, 200);
-
+        if (OperationSystem.isJvm()) {
+            this.maximumSize = maximumSize;
+        } else {
+            this.maximumSize = Math.min(maximumSize, 500);
+        }
         return this;
     }
 
