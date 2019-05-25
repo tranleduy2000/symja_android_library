@@ -430,20 +430,21 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 			return F.List(F.C1);
 		}
 
-		if (b instanceof IntegerSym) {
-			long longValue = b.longValue();
-			return factorizeLong(longValue);
-		}
-		BigInteger big = b.toBigNumerator();
-		try {
+		// ObjC changed: memory issues
+//		if (b instanceof IntegerSym) {
+//			long longValue = b.longValue();
+//			return factorizeLong(longValue);
+//		}
+//		BigInteger big = b.toBigNumerator();
+//		try {
 			// Android changed: BigInteger#longValueExact doesn't exist
-			long longValue = new java.math.BigDecimal(big).longValueExact();
-			if (longValue < PrimeInteger.BETA) {
-				return factorizeLong(longValue);
-			}
-		} catch (ArithmeticException aex) {
+//			long longValue = new java.math.BigDecimal(big).longValueExact();
+//			if (longValue < PrimeInteger.BETA) {
+//				return factorizeLong(longValue);
+//			}
+//		} catch (ArithmeticException aex) {
 			// go on with big integers
-		}
+//		}
 
 		SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
 		BigInteger rest = Primality.countPrimes32749(b.toBigNumerator(), map);
