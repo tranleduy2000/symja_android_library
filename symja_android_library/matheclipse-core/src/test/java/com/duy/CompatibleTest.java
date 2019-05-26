@@ -42,7 +42,7 @@ public class CompatibleTest extends TestCase {
             String content = FileUtils.readFileToString(javaFile);
             for (String unavailablePackage : unavailableSymbols) {
                 if (content.contains(unavailablePackage)) {
-                    System.err.println("Symbol " + (unavailablePackage) + " is unavailable in class " + javaFile);
+                    System.err.println("Symbol " + (unavailablePackage) + " needs modified in file " + javaFile);
                 }
             }
         }

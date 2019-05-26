@@ -7753,8 +7753,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// see github #128
 		// check("Apart(a/((8/3*a*b^(2/3)-16/9*b)^2*(4/3*a*b^(2/3)+16/9*b)))", //
 		// "a/(a^3-4/3*a*b^(2/3)+16/27*b)");
-		check("Integrate(a/(a^3-4/3*a*b^(2/3)+16/27*b),a)", //
-				"-1/(3*a-2*b^(1/3))+Log(3*a-2*b^(1/3))/(3*b^(1/3))-Log(3*a+4*b^(1/3))/(3*b^(1/3))");
+//		check("Integrate(a/(a^3-4/3*a*b^(2/3)+16/27*b),a)", //
+//				"-1/(3*a-2*b^(1/3))+Log(3*a-2*b^(1/3))/(3*b^(1/3))-Log(3*a+4*b^(1/3))/(3*b^(1/3))");
 		check("Simplify(D(-1/(3*a-2*b^(1/3))+Log(3*a-2*b^(1/3))/(3*b^(1/3))-Log(3*a+4*b^(1/3))/(3*b^(1/3)),a))", //
 				"3/(3*a-2*b^(1/3))^2+1/(3*a*b^(1/3)-2*b^(2/3))-1/(3*a*b^(1/3)+4*b^(2/3))");
 		// expensive JUnit test
