@@ -22,6 +22,8 @@
 
 package org.hipparchus.util;
 
+import com.duy.lang.DDouble;
+
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.Localizable;
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -64,7 +66,7 @@ public final class MathUtils {
      * @return the hash code
      */
     public static int hash(double value) {
-        return Double.hashCode(value);
+        return DDouble.hashCode(value);
     }
 
     /**

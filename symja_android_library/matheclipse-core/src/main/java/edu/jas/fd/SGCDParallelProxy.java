@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
+import com.duy.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import com.duy.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
 import edu.jas.kern.ComputerThreads;

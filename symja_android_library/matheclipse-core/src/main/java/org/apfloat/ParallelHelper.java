@@ -1,7 +1,7 @@
 package org.apfloat;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import com.duy.concurrent.ExecutorService;
+import com.duy.concurrent.Future;
 
 import java.util.ArrayList;
 import java.util.Arrays;

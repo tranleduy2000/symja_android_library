@@ -16,8 +16,8 @@ package com.gx.common.util.concurrent;
 
 import com.gx.common.annotations.GwtCompatible;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
+import com.duy.concurrent.Executor;
+import com.duy.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
@@ -70,11 +70,11 @@ import java.util.concurrent.RejectedExecutionException;
  * instances:
  * <p>
  * <ul>
- * <li>If you receive them from an {@code java.util.concurrent.ExecutorService}, convert that
+ * <li>If you receive them from an {@code com.duy.concurrent.ExecutorService}, convert that
  * service to a {#link ListeningExecutorService}, usually by calling {link
- * MoreExecutors#listeningDecorator(java.util.concurrent.ExecutorService)
+ * MoreExecutors#listeningDecorator(com.duy.concurrent.ExecutorService)
  * MoreExecutors.listeningDecorator}.
- * <li>If you manually call {#link java.util.concurrent.FutureTask#set} or a similar method,
+ * <li>If you manually call {#link com.duy.concurrent.FutureTask#set} or a similar method,
  * create a {#link SettableFuture} instead. (If your needs are more complex, you may prefer
  * {#link AbstractFuture}.)
  * </ul>

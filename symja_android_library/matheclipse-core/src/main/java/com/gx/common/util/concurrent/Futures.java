@@ -25,8 +25,8 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
+import com.duy.concurrent.Executor;
+import com.duy.concurrent.Future;
 
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.base.Preconditions.checkState;

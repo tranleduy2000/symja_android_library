@@ -1,6 +1,6 @@
 package org.matheclipse.core.eval;
 
-import java.util.concurrent.Callable;
+import com.duy.concurrent.Callable;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;

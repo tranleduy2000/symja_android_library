@@ -9,7 +9,7 @@ import static java.lang.Double.doubleToLongBits;
 public class DDouble {
     /**
      * Returns a hash code for a {@code double} value; compatible with
-     * {@code Double.hashCode()}.
+     * {@code DDouble.hashCode()}.
      *
      * @param value the value to hash
      * @return a hash code value for a {@code double} value.
