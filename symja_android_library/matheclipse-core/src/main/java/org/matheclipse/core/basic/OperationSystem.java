@@ -2,10 +2,8 @@ package org.matheclipse.core.basic;
 
 public class OperationSystem {
     private static boolean jvm = true;
-    @SuppressWarnings("FieldCanBeLocal")
-    private static boolean debug = false;
-    @SuppressWarnings("FieldCanBeLocal")
-    private static float memoryUsageFactor = 0.85f;
+    public static boolean debug = false;
+    public static float memoryUsageFactor = 0.85f;
 
     static {
         setJvm(true);
