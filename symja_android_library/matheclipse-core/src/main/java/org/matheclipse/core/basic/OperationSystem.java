@@ -2,7 +2,10 @@ package org.matheclipse.core.basic;
 
 public class OperationSystem {
     private static boolean jvm = true;
+    @SuppressWarnings("FieldCanBeLocal")
     private static boolean debug = false;
+    @SuppressWarnings("FieldCanBeLocal")
+    private static float memoryUsageFactor = 0.85f;
 
     static {
         setJvm(true);
@@ -17,7 +20,6 @@ public class OperationSystem {
     }
 
     public static void checkMemory() {
-        final float memoryUsageFactor = 0.85f;
         long freeMemory = Runtime.getRuntime().freeMemory();
         long totalMemory = Runtime.getRuntime().totalMemory();
         if (debug) {
