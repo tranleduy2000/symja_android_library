@@ -3,6 +3,7 @@ package org.matheclipse.core.expression;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.hipparchus.util.ArithmeticUtils;
+import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.NumberTheory;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
@@ -940,6 +941,9 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	@Override
 	public IExpr times(final IExpr that) {
+		// Swift changed: memory check
+		OperationSystem.checkMemory();
+
 		if (isZero()) {
 			return F.C0;
 		}
