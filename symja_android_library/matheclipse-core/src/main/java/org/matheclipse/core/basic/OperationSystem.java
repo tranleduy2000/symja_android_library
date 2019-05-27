@@ -1,9 +1,11 @@
 package org.matheclipse.core.basic;
 
+import android.annotation.SuppressLint;
+
 public class OperationSystem {
-    private static boolean jvm = true;
     public static boolean debug = false;
-    public static float memoryUsageFactor = 0.85f;
+    public static float memoryUsageFactor = 0.9f;
+    private static boolean jvm = true;
 
     static {
         setJvm(true);
@@ -18,25 +20,27 @@ public class OperationSystem {
     }
 
     public static void checkMemory() {
-        long freeMemory = Runtime.getRuntime().freeMemory();
-        long totalMemory = Runtime.getRuntime().totalMemory();
+        long memoryUsage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        long maxMemory = Runtime.getRuntime().maxMemory();
         if (debug) {
-            printMemoryUsage(freeMemory, totalMemory);
+            printMemoryUsage(maxMemory, memoryUsage);
         }
 
         // value is valid
-        if (totalMemory > 0 && freeMemory > 0) {
-            float usageFactor = (1.0f * totalMemory - freeMemory) / totalMemory;
+        if (maxMemory > 0
+                && maxMemory < Long.MAX_VALUE
+                && memoryUsage > 0) {
+            float usageFactor = (float) memoryUsage / maxMemory;
             if (usageFactor < 1.0f && usageFactor > memoryUsageFactor) {
-                System.err.println("freeMemory = " + freeMemory + "; totalMemory = " + totalMemory);
+                System.err.println("freeMemory = " + memoryUsage + "; maxMemory = " + maxMemory);
                 throw new OutOfMemoryError("Out of memory");
             }
         }
     }
 
-    private static void printMemoryUsage(long freeMemory, long totalMemory) {
+    private static void printMemoryUsage(long maxMemory, long usageMemory) {
         int max = 50;
-        int usage = (int) (((1.0f * totalMemory - freeMemory) / totalMemory) * max);
+        int usage = (int) (((float) usageMemory / maxMemory) * max);
         StringBuilder str = new StringBuilder("[");
         for (int i = 1; i <= max; i++) {
             if (i <= usage) {
@@ -46,8 +50,12 @@ public class OperationSystem {
             }
         }
         str.append("] ");
-        str.append(" Max = ").append(totalMemory / 1024 / 1024).append(" MB").append(";");
-        str.append(" Free = ").append(freeMemory / 1024 / 1024).append(" MB");
+        str.append(" ").append(toMegabytes(usageMemory)).append("/").append(toMegabytes(maxMemory));
         System.out.println(str);
+    }
+
+    @SuppressLint("DefaultLocale")
+    private static String toMegabytes(long bytes) {
+        return String.format("%5d MB", bytes / 1024 / 1024);
     }
 }
