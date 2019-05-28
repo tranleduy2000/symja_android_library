@@ -1,7 +1,5 @@
 package org.matheclipse.core.basic;
 
-import android.annotation.SuppressLint;
-
 public class OperationSystem {
     public static boolean debug = false;
     public static float memoryUsageFactor = 0.9f;
@@ -20,19 +18,25 @@ public class OperationSystem {
     }
 
     public static void checkMemory() {
-        long memoryUsage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        long maxMemory = Runtime.getRuntime().maxMemory();
+        Runtime runtime = Runtime.getRuntime();
+        long maxMemory = runtime.maxMemory();
+        long usageMemory;
+        if (isJvm()) {
+            usageMemory = runtime.totalMemory() - runtime.freeMemory();
+        } else {
+            usageMemory = runtime.totalMemory();
+        }
         if (debug) {
-            printMemoryUsage(maxMemory, memoryUsage);
+            printMemoryUsage(maxMemory, usageMemory);
         }
 
         // value is valid
         if (maxMemory > 0
                 && maxMemory < Long.MAX_VALUE
-                && memoryUsage > 0) {
-            float usageFactor = (float) memoryUsage / maxMemory;
+                && usageMemory > 0) {
+            float usageFactor = (float) usageMemory / maxMemory;
             if (usageFactor < 1.0f && usageFactor > memoryUsageFactor) {
-                System.err.println("freeMemory = " + memoryUsage + "; maxMemory = " + maxMemory);
+                System.err.println("usageMemory = " + usageMemory + "; maxMemory = " + maxMemory);
                 throw new OutOfMemoryError("Out of memory");
             }
         }
@@ -54,8 +58,7 @@ public class OperationSystem {
         System.out.println(str);
     }
 
-    @SuppressLint("DefaultLocale")
     private static String toMegabytes(long bytes) {
-        return String.format("%5d MB", bytes / 1024 / 1024);
+        return (bytes / 1024 / 1024) + " MB";
     }
 }

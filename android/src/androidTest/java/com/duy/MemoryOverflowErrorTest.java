@@ -7,6 +7,7 @@ import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class MemoryOverflowErrorTest extends TestCase {
 
@@ -18,12 +19,21 @@ public class MemoryOverflowErrorTest extends TestCase {
         assertEquals(result.toString(), "Infinity");
     }
 
-    public void testPower2() {
+    public void testPower2() throws InterruptedException {
         OperationSystem.debug = true;
-        IExpr result;
-        result = new ExprEvaluator().eval("123232131112323213111232321311123232131112323211232321311123231232321123232131112323" +
-                "^31112323213111232");
-        assertEquals(result.toString(), "Infinity");
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        CountDownLatch countDownLatch = new CountDownLatch(availableProcessors);
+        for (int i = 0; i < availableProcessors; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new ExprEvaluator().eval("31112323213111232" +
+                            "^31112323213111232");
+                    countDownLatch.countDown();
+                }
+            }).start();
+        }
+        countDownLatch.await();
     }
 
     public void test2() throws InterruptedException {
