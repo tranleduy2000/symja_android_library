@@ -52,6 +52,7 @@ public class CNFEncoder {
 
     private CNFFactorization factorization;
     private CNFFactorization advancedFactorization;
+    private BDDCNFTransformation bddCnfTransformation;
     private TseitinTransformation tseitin;
     private PlaistedGreenbaumTransformation plaistedGreenbaum;
     private int currentAtomBoundary;
@@ -102,6 +103,10 @@ public class CNFEncoder {
                     this.plaistedGreenbaum = new PlaistedGreenbaumTransformation(this.config().atomBoundary);
                 }
                 return formula.transform(this.plaistedGreenbaum);
+            case BDD:
+                if (this.bddCnfTransformation == null)
+                    this.bddCnfTransformation = new BDDCNFTransformation();
+                return formula.transform(this.bddCnfTransformation);
             case ADVANCED:
                 if (this.factorizationHandler == null) {
                     this.factorizationHandler = new AdvancedFactorizationHandler();
@@ -165,7 +170,7 @@ public class CNFEncoder {
     public CNFConfig config() {
         if (this.config != null)
             return this.config;
-        Configuration cnfConfig = this.f.configurationFor(ConfigurationType.CNF);
+        final Configuration cnfConfig = this.f.configurationFor(ConfigurationType.CNF);
         return cnfConfig != null ? (CNFConfig) cnfConfig : this.defaultConfig;
     }
 
@@ -184,7 +189,7 @@ public class CNFEncoder {
         private int currentDistributions;
         private int currentClauses;
 
-        private void reset(int distributionBoundary, int createdClauseBoundary) {
+        private void reset(final int distributionBoundary, final int createdClauseBoundary) {
             this.distributionBoundary = distributionBoundary;
             this.createdClauseBoundary = createdClauseBoundary;
             this.currentDistributions = 0;
@@ -193,12 +198,12 @@ public class CNFEncoder {
 
         @Override
         public boolean performedDistribution() {
-            return distributionBoundary == -1 || ++currentDistributions <= distributionBoundary;
+            return this.distributionBoundary == -1 || ++this.currentDistributions <= this.distributionBoundary;
         }
 
         @Override
-        public boolean createdClause(Formula clause) {
-            return createdClauseBoundary == -1 || ++currentClauses <= createdClauseBoundary;
+        public boolean createdClause(final Formula clause) {
+            return this.createdClauseBoundary == -1 || ++this.currentClauses <= this.createdClauseBoundary;
         }
     }
 }

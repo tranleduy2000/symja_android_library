@@ -64,7 +64,6 @@ import java.util.List;
 
 /**
  * The adder networks encoding for pseudo-Boolean constraints to CNF.
- *
  * @version 1.1
  * @since 1.1
  */
@@ -75,7 +74,6 @@ final class PBAdderNetworks implements PBEncoding {
 
     /**
      * Constructs a new pseudo-Boolean adder network.
-     *
      * @param f the formula factory
      */
     public PBAdderNetworks(final FormulaFactory f) {

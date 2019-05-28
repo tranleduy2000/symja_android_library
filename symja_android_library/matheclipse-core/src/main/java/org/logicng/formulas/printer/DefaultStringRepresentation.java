@@ -36,7 +36,7 @@ import org.logicng.formulas.CType;
  * @version 1.0
  * @since 1.0
  */
-public final class DefaultStringRepresentation extends FormulaStringRepresentation {
+public class DefaultStringRepresentation extends FormulaStringRepresentation {
 
     @Override
     protected String falsum() {
@@ -55,37 +55,37 @@ public final class DefaultStringRepresentation extends FormulaStringRepresentati
 
     @Override
     protected String implication() {
-        return "=>";
+        return " => ";
     }
 
     @Override
     protected String equivalence() {
-        return "<=>";
+        return " <=> ";
     }
 
     @Override
     protected String and() {
-        return "&";
+        return " & ";
     }
 
     @Override
     protected String or() {
-        return "|";
+        return " | ";
     }
 
     @Override
     protected String pbComparator(final CType comparator) {
         switch (comparator) {
             case EQ:
-                return "=";
+                return " = ";
             case LE:
-                return "<=";
+                return " <= ";
             case LT:
-                return "<";
+                return " < ";
             case GE:
-                return ">=";
+                return " >= ";
             case GT:
-                return ">";
+                return " > ";
             default:
                 throw new IllegalArgumentException("Unknown pseudo-Boolean comparison: " + comparator);
         }
@@ -98,7 +98,7 @@ public final class DefaultStringRepresentation extends FormulaStringRepresentati
 
     @Override
     protected String pbAdd() {
-        return "+";
+        return " + ";
     }
 
     @Override

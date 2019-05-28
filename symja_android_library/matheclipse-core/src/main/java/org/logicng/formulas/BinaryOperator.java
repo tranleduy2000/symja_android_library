@@ -29,17 +29,17 @@
 package org.logicng.formulas;
 
 import org.logicng.datastructures.Substitution;
+import org.logicng.util.FormulaHelper;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Super class for Boolean binary operators.
  *
- * @version 1.2
+ * @version 1.5.1
  * @since 1.0
  */
 public abstract class BinaryOperator extends Formula {
@@ -72,18 +72,29 @@ public abstract class BinaryOperator extends Formula {
         return this.left;
     }
 
+    /**
+     * Returns the right-hand side operator.
+     *
+     * @return the right-hand side operator
+     */
+    public Formula right() {
+        return this.right;
+    }
+
     @Override
     public long numberOfAtoms() {
-        if (this.numberOfAtoms != -1)
+        if (this.numberOfAtoms != -1) {
             return this.numberOfAtoms;
+        }
         this.numberOfAtoms = this.left.numberOfAtoms() + this.right.numberOfAtoms();
         return this.numberOfAtoms;
     }
 
     @Override
     public long numberOfNodes() {
-        if (this.numberOfNodes != -1)
+        if (this.numberOfNodes != -1) {
             return this.numberOfNodes;
+        }
         this.numberOfNodes = this.left.numberOfNodes() + this.right.numberOfNodes() + 1;
         return this.numberOfNodes;
     }
@@ -94,6 +105,11 @@ public abstract class BinaryOperator extends Formula {
     }
 
     @Override
+    public boolean isConstantFormula() {
+        return false;
+    }
+
+    @Override
     public boolean isAtomicFormula() {
         return false;
     }
@@ -101,20 +117,14 @@ public abstract class BinaryOperator extends Formula {
     @Override
     public SortedSet<Variable> variables() {
         if (this.variables == null) {
-            final SortedSet<Variable> set = new TreeSet<>();
-            set.addAll(this.left.variables());
-            set.addAll(this.right.variables());
-            this.variables = Collections.unmodifiableSortedSet(set);
+            this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(left, right));
         }
         return this.variables;
     }
 
     @Override
     public SortedSet<Literal> literals() {
-        final SortedSet<Literal> set = new TreeSet<>();
-        set.addAll(this.left.literals());
-        set.addAll(this.right.literals());
-        return Collections.unmodifiableSortedSet(set);
+        return Collections.unmodifiableSortedSet(FormulaHelper.literals(left, right));
     }
 
     @Override
@@ -129,21 +139,12 @@ public abstract class BinaryOperator extends Formula {
 
     @Override
     public Formula substitute(final Substitution substitution) {
-        return f.binaryOperator(type, this.left.substitute(substitution), this.right.substitute(substitution));
+        return this.f.binaryOperator(this.type, this.left.substitute(substitution), this.right.substitute(substitution));
     }
 
     @Override
     public Formula negate() {
-        return f.not(this);
-    }
-
-    /**
-     * Returns the right-hand side operator.
-     *
-     * @return the right-hand side operator
-     */
-    public Formula right() {
-        return this.right;
+        return this.f.not(this);
     }
 
     @Override
@@ -153,17 +154,17 @@ public abstract class BinaryOperator extends Formula {
 
             @Override
             public boolean hasNext() {
-                return count < 2;
+                return this.count < 2;
             }
 
             @Override
             public Formula next() {
-                if (count == 0) {
-                    count++;
-                    return left;
-                } else if (count == 1) {
-                    count++;
-                    return right;
+                if (this.count == 0) {
+                    this.count++;
+                    return BinaryOperator.this.left;
+                } else if (this.count == 1) {
+                    this.count++;
+                    return BinaryOperator.this.right;
                 }
                 throw new NoSuchElementException();
             }

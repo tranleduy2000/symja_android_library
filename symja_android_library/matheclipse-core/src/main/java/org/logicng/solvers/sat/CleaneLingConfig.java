@@ -36,6 +36,8 @@ import org.logicng.configurations.ConfigurationType;
  *
  * @version 1.1
  * @since 1.0
+ * @deprecated CleaneLing does not support many of the features of MiniSat in LogicNG.
+ * With an upcoming 2.0 Release of LogicNG CleaneLing will be removed.
  */
 public final class CleaneLingConfig extends Configuration {
 
@@ -71,7 +73,6 @@ public final class CleaneLingConfig extends Configuration {
     final boolean searchfirst;
     final int scincfact;
     final int stepslim;
-
     /**
      * Constructs a new CleaneLing configuration from a given builder.
      *
@@ -124,40 +125,40 @@ public final class CleaneLingConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CleaneLingConfig{\n");
-        sb.append("blockedClauseElimination=").append(this.block).append("\n");
-        sb.append("blockedClauseEliminationWait=").append(this.blkwait).append("\n");
-        sb.append("blockedClauseEliminationRTC=").append(this.blkrtc).append("\n");
-        sb.append("boost=").append(this.boost).append("\n");
-        sb.append("bwClauseLim=").append(this.bwclslim).append("\n");
-        sb.append("bwOccurrenceLim=").append(this.bwocclim).append("\n");
-        sb.append("clauseBumping=").append(this.cbump).append("\n");
-        sb.append("distillation=").append(this.distill).append("\n");
-        sb.append("bvElim=").append(this.elim).append("\n");
-        sb.append("bvElimRTC=").append(this.elmrtc).append("\n");
-        sb.append("bvElimOccurrenceLim=").append(this.elmocclim).append("\n");
-        sb.append("bvElimPivotOccurrenceLimOneSided=").append(this.elmpocclim1).append("\n");
-        sb.append("bvElimPivotOccurrenceLimTwoSided=").append(this.elmpocclim2).append("\n");
-        sb.append("bvElimClauseLim=").append(this.elmclslim).append("\n");
-        sb.append("gluered=").append(this.gluered).append("\n");
-        sb.append("glueKeep=").append(this.gluekeep).append("\n");
-        sb.append("glueUpdate=").append(this.glueupdate).append("\n");
-        sb.append("iterationSimplificationDelay=").append(this.itsimpdel).append("\n");
-        sb.append("plain=").append(this.plain).append("\n");
-        sb.append("restart=").append(this.restart).append("\n");
-        sb.append("restartInterval=").append(this.restartint).append("\n");
-        sb.append("reductionInterval=").append(this.redinit).append("\n");
-        sb.append("reductionIntervalInc=").append(this.redinc).append("\n");
-        sb.append("reuseTrail=").append(this.reusetrail).append("\n");
-        sb.append("simpSteps=").append(this.simpint).append("\n");
-        sb.append("simpGeomIncrease=").append(this.simpgeom).append("\n");
-        sb.append("sizePenalty=").append(this.sizepen).append("\n");
-        sb.append("sizeMaxPenalty=").append(this.sizemaxpen).append("\n");
-        sb.append("searchInterval=").append(this.searchint).append("\n");
-        sb.append("searchFirst=").append(this.searchfirst).append("\n");
-        sb.append("scoreIncrementFactor=").append(this.scincfact).append("\n");
-        sb.append("stepsLim=").append(this.stepslim).append("\n");
-        sb.append("}\n");
+        final StringBuilder sb = new StringBuilder("CleaneLingConfig{").append(System.lineSeparator());
+        sb.append("blockedClauseElimination=").append(this.block).append(System.lineSeparator());
+        sb.append("blockedClauseEliminationWait=").append(this.blkwait).append(System.lineSeparator());
+        sb.append("blockedClauseEliminationRTC=").append(this.blkrtc).append(System.lineSeparator());
+        sb.append("boost=").append(this.boost).append(System.lineSeparator());
+        sb.append("bwClauseLim=").append(this.bwclslim).append(System.lineSeparator());
+        sb.append("bwOccurrenceLim=").append(this.bwocclim).append(System.lineSeparator());
+        sb.append("clauseBumping=").append(this.cbump).append(System.lineSeparator());
+        sb.append("distillation=").append(this.distill).append(System.lineSeparator());
+        sb.append("bvElim=").append(this.elim).append(System.lineSeparator());
+        sb.append("bvElimRTC=").append(this.elmrtc).append(System.lineSeparator());
+        sb.append("bvElimOccurrenceLim=").append(this.elmocclim).append(System.lineSeparator());
+        sb.append("bvElimPivotOccurrenceLimOneSided=").append(this.elmpocclim1).append(System.lineSeparator());
+        sb.append("bvElimPivotOccurrenceLimTwoSided=").append(this.elmpocclim2).append(System.lineSeparator());
+        sb.append("bvElimClauseLim=").append(this.elmclslim).append(System.lineSeparator());
+        sb.append("gluered=").append(this.gluered).append(System.lineSeparator());
+        sb.append("glueKeep=").append(this.gluekeep).append(System.lineSeparator());
+        sb.append("glueUpdate=").append(this.glueupdate).append(System.lineSeparator());
+        sb.append("iterationSimplificationDelay=").append(this.itsimpdel).append(System.lineSeparator());
+        sb.append("plain=").append(this.plain).append(System.lineSeparator());
+        sb.append("restart=").append(this.restart).append(System.lineSeparator());
+        sb.append("restartInterval=").append(this.restartint).append(System.lineSeparator());
+        sb.append("reductionInterval=").append(this.redinit).append(System.lineSeparator());
+        sb.append("reductionIntervalInc=").append(this.redinc).append(System.lineSeparator());
+        sb.append("reuseTrail=").append(this.reusetrail).append(System.lineSeparator());
+        sb.append("simpSteps=").append(this.simpint).append(System.lineSeparator());
+        sb.append("simpGeomIncrease=").append(this.simpgeom).append(System.lineSeparator());
+        sb.append("sizePenalty=").append(this.sizepen).append(System.lineSeparator());
+        sb.append("sizeMaxPenalty=").append(this.sizemaxpen).append(System.lineSeparator());
+        sb.append("searchInterval=").append(this.searchint).append(System.lineSeparator());
+        sb.append("searchFirst=").append(this.searchfirst).append(System.lineSeparator());
+        sb.append("scoreIncrementFactor=").append(this.scincfact).append(System.lineSeparator());
+        sb.append("stepsLim=").append(this.stepslim).append(System.lineSeparator());
+        sb.append("}").append(System.lineSeparator());
         return sb.toString();
     }
 
@@ -215,7 +216,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param blockedClauseElimination {@code true} if BCE should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder blockedClauseElimination(boolean blockedClauseElimination) {
+        public Builder blockedClauseElimination(final boolean blockedClauseElimination) {
             this.blockedClauseElimination = blockedClauseElimination;
             return this;
         }
@@ -226,7 +227,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param blockedClauseEliminationWait the number of simplification steps before BCE is performed
          * @return the builder
          */
-        public Builder blockedClauseEliminationWait(int blockedClauseEliminationWait) {
+        public Builder blockedClauseEliminationWait(final int blockedClauseEliminationWait) {
             this.blockedClauseEliminationWait = blockedClauseEliminationWait;
             return this;
         }
@@ -237,7 +238,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param blockedClauseEliminationRTC the number of simplification steps before BCE is run to completion
          * @return the builder
          */
-        public Builder blockedClauseEliminationRTC(int blockedClauseEliminationRTC) {
+        public Builder blockedClauseEliminationRTC(final int blockedClauseEliminationRTC) {
             this.blockedClauseEliminationRTC = blockedClauseEliminationRTC;
             return this;
         }
@@ -248,7 +249,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param boost the initial effort for simplification
          * @return the builder
          */
-        public Builder boost(int boost) {
+        public Builder boost(final int boost) {
             this.boost = boost;
             return this;
         }
@@ -259,7 +260,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bwClauseLim the backward-subsumption clause size limit
          * @return the builder
          */
-        public Builder bwClauseLim(int bwClauseLim) {
+        public Builder bwClauseLim(final int bwClauseLim) {
             this.bwClauseLim = bwClauseLim;
             return this;
         }
@@ -270,7 +271,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bwOccurrenceLim the backward-subsumption occurrence limit
          * @return the builder
          */
-        public Builder bwOccurrenceLim(int bwOccurrenceLim) {
+        public Builder bwOccurrenceLim(final int bwOccurrenceLim) {
             this.bwOccurrenceLim = bwOccurrenceLim;
             return this;
         }
@@ -292,7 +293,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param distillation {@code true} if distillation should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder distillation(boolean distillation) {
+        public Builder distillation(final boolean distillation) {
             this.distillation = distillation;
             return this;
         }
@@ -303,7 +304,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bvElim {@code true} if bounded variable elimination (BVE) should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder bvElim(boolean bvElim) {
+        public Builder bvElim(final boolean bvElim) {
             this.bvElim = bvElim;
             return this;
         }
@@ -314,7 +315,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bvElimRTC the number of simplification steps before BVE is run to completion
          * @return the builder
          */
-        public Builder bvElimRTC(int bvElimRTC) {
+        public Builder bvElimRTC(final int bvElimRTC) {
             this.bvElimRTC = bvElimRTC;
             return this;
         }
@@ -325,7 +326,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bvElimOccurrenceLim the number of maximum occurrences in BVE
          * @return the builder
          */
-        public Builder bvElimOccurrenceLim(int bvElimOccurrenceLim) {
+        public Builder bvElimOccurrenceLim(final int bvElimOccurrenceLim) {
             this.bvElimOccurrenceLim = bvElimOccurrenceLim;
             return this;
         }
@@ -336,7 +337,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bvElimPivotOccurrenceLimOneSided the number of maximum one-sided occurrences of BVE pivot
          * @return the builder
          */
-        public Builder bvElimPivotOccurrenceLimOneSided(int bvElimPivotOccurrenceLimOneSided) {
+        public Builder bvElimPivotOccurrenceLimOneSided(final int bvElimPivotOccurrenceLimOneSided) {
             this.bvElimPivotOccurrenceLimOneSided = bvElimPivotOccurrenceLimOneSided;
             return this;
         }
@@ -347,7 +348,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bvElimPivotOccurrenceLimTwoSided the number of maximum two-sided occurrences of BVE pivot
          * @return the builder
          */
-        public Builder bvElimPivotOccurrenceLimTwoSided(int bvElimPivotOccurrenceLimTwoSided) {
+        public Builder bvElimPivotOccurrenceLimTwoSided(final int bvElimPivotOccurrenceLimTwoSided) {
             this.bvElimPivotOccurrenceLimTwoSided = bvElimPivotOccurrenceLimTwoSided;
             return this;
         }
@@ -358,7 +359,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param bvElimClauseLim the maximum antecedent size in BVE
          * @return the builder
          */
-        public Builder bvElimClauseLim(int bvElimClauseLim) {
+        public Builder bvElimClauseLim(final int bvElimClauseLim) {
             this.bvElimClauseLim = bvElimClauseLim;
             return this;
         }
@@ -369,7 +370,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param gluered {@code true} if glue (LBD) based reduction should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder gluered(boolean gluered) {
+        public Builder gluered(final boolean gluered) {
             this.gluered = gluered;
             return this;
         }
@@ -380,7 +381,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param glueKeep the glue of which size clauses are kept
          * @return the builder
          */
-        public Builder glueKeep(int glueKeep) {
+        public Builder glueKeep(final int glueKeep) {
             this.glueKeep = glueKeep;
             return this;
         }
@@ -391,7 +392,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param glueUpdate {@code true} if glue updates should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder glueUpdate(boolean glueUpdate) {
+        public Builder glueUpdate(final boolean glueUpdate) {
             this.glueUpdate = glueUpdate;
             return this;
         }
@@ -402,7 +403,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param iterationSimplificationDelay the iteration simplification delay in conflicts
          * @return the builder
          */
-        public Builder iterationSimplificationDelay(int iterationSimplificationDelay) {
+        public Builder iterationSimplificationDelay(final int iterationSimplificationDelay) {
             this.iterationSimplificationDelay = iterationSimplificationDelay;
             return this;
         }
@@ -413,7 +414,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param plain {@code true} if plain solving should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder plain(boolean plain) {
+        public Builder plain(final boolean plain) {
             this.plain = plain;
             return this;
         }
@@ -424,7 +425,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param restart {@code true} if restarts are enabled, {@code false} otherwise
          * @return the builder
          */
-        public Builder restart(boolean restart) {
+        public Builder restart(final boolean restart) {
             this.restart = restart;
             return this;
         }
@@ -435,7 +436,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param restartInterval the basic restart interval
          * @return the builder
          */
-        public Builder restartInterval(int restartInterval) {
+        public Builder restartInterval(final int restartInterval) {
             this.restartInterval = restartInterval;
             return this;
         }
@@ -446,7 +447,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param reductionInterval the initial reduction interval
          * @return the builder
          */
-        public Builder reductionInterval(int reductionInterval) {
+        public Builder reductionInterval(final int reductionInterval) {
             this.reductionInterval = reductionInterval;
             return this;
         }
@@ -457,11 +458,10 @@ public final class CleaneLingConfig extends Configuration {
          * @param reductionIntervalInc the reduction interval increment
          * @return the builder
          */
-        public Builder reductionIntervalInc(int reductionIntervalInc) {
+        public Builder reductionIntervalInc(final int reductionIntervalInc) {
             this.reductionIntervalInc = reductionIntervalInc;
             return this;
         }
-
 
         /**
          * If turned on, the trail will be reused.  The default value is {@code true}.
@@ -469,7 +469,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param reuseTrail {@code true} if the trail should be reused, {@code false} otherwise
          * @return the builder
          */
-        public Builder reuseTrail(boolean reuseTrail) {
+        public Builder reuseTrail(final boolean reuseTrail) {
             this.reuseTrail = reuseTrail;
             return this;
         }
@@ -480,7 +480,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param simpSteps the inprocessing steps interval
          * @return the builder
          */
-        public Builder simpSteps(int simpSteps) {
+        public Builder simpSteps(final int simpSteps) {
             this.simpSteps = simpSteps;
             return this;
         }
@@ -491,7 +491,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param simpGeomIncrease {@code true} if geometric increase in simplification effort should be performed, {@code false} otherwise
          * @return the builder
          */
-        public Builder simpGeomIncrease(boolean simpGeomIncrease) {
+        public Builder simpGeomIncrease(final boolean simpGeomIncrease) {
             this.simpGeomIncrease = simpGeomIncrease;
             return this;
         }
@@ -502,7 +502,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param sizePenalty the size penalty for the number of clauses
          * @return the builder
          */
-        public Builder sizePenalty(int sizePenalty) {
+        public Builder sizePenalty(final int sizePenalty) {
             this.sizePenalty = sizePenalty;
             return this;
         }
@@ -513,7 +513,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param sizeMaxPenalty the maximum logarithmic size penalty
          * @return the builder
          */
-        public Builder sizeMaxPenalty(int sizeMaxPenalty) {
+        public Builder sizeMaxPenalty(final int sizeMaxPenalty) {
             this.sizeMaxPenalty = sizeMaxPenalty;
             return this;
         }
@@ -524,7 +524,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param searchInterval the CDCL search conflict interval
          * @return the builder
          */
-        public Builder searchInterval(int searchInterval) {
+        public Builder searchInterval(final int searchInterval) {
             this.searchInterval = searchInterval;
             return this;
         }
@@ -535,7 +535,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param searchFirst {@code true} if search should be first performed instead of simplifying, {@code false} otherwise
          * @return the builder
          */
-        public Builder searchFirst(boolean searchFirst) {
+        public Builder searchFirst(final boolean searchFirst) {
             this.searchFirst = searchFirst;
             return this;
         }
@@ -546,7 +546,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param scoreIncrementFactor the variable score increment in per mille
          * @return the builder
          */
-        public Builder scoreIncrementFactor(int scoreIncrementFactor) {
+        public Builder scoreIncrementFactor(final int scoreIncrementFactor) {
             this.scoreIncrementFactor = scoreIncrementFactor;
             return this;
         }
@@ -557,7 +557,7 @@ public final class CleaneLingConfig extends Configuration {
          * @param stepsLim maximum steps limit
          * @return the builder
          */
-        public Builder stepsLim(int stepsLim) {
+        public Builder stepsLim(final int stepsLim) {
             this.stepsLim = stepsLim;
             return this;
         }

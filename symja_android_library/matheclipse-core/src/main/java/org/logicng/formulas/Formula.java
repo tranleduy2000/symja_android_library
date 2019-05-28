@@ -33,9 +33,9 @@ import org.logicng.datastructures.Substitution;
 import org.logicng.datastructures.Tristate;
 import org.logicng.formulas.cache.CacheEntry;
 
-import java.util.SortedMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeMap;
 
 /**
  * Super class for formulas.
@@ -47,9 +47,9 @@ public abstract class Formula implements Iterable<Formula> {
 
     protected final FType type;
     protected final FormulaFactory f;
-    protected final SortedMap<CacheEntry, Formula> transformationCache;
-    protected final SortedMap<CacheEntry, Tristate> predicateCache;
-    protected final SortedMap<CacheEntry, Object> functionCache;
+    protected final Map<CacheEntry, Formula> transformationCache;
+    protected final Map<CacheEntry, Tristate> predicateCache;
+    protected final Map<CacheEntry, Object> functionCache;
     protected SortedSet<Variable> variables;
     protected long numberOfAtoms;
     protected long numberOfNodes;
@@ -63,9 +63,9 @@ public abstract class Formula implements Iterable<Formula> {
     protected Formula(final FType type, final FormulaFactory f) {
         this.type = type;
         this.f = f;
-        this.transformationCache = new TreeMap<>();
-        this.predicateCache = new TreeMap<>();
-        this.functionCache = new TreeMap<>();
+        this.transformationCache = new HashMap<>();
+        this.predicateCache = new HashMap<>();
+        this.functionCache = new HashMap<>();
         this.variables = null;
         this.numberOfAtoms = -1;
         this.numberOfNodes = -1;
@@ -117,8 +117,15 @@ public abstract class Formula implements Iterable<Formula> {
      * @return the number of internal nodes of this formula.
      */
     public long numberOfInternalNodes() {
-        return f.numberOfNodes(this);
+        return this.f.numberOfNodes(this);
     }
+
+    /**
+     * Returns whether this formula is a constant formula ("True" or "False").
+     *
+     * @return {@code true} if this formula is a constant formula, {@code false} otherwise
+     */
+    public abstract boolean isConstantFormula();
 
     /**
      * Returns whether this formula is an atomic formula (constant, literal, pseudo Boolean constraint), or not.
@@ -189,14 +196,14 @@ public abstract class Formula implements Iterable<Formula> {
     public abstract boolean containsNode(final Formula formula);
 
     /**
-     * Performs a substitution on this formula given a single mapping from variable to formula.
+     * Performs a simultaneous substitution on this formula given a single mapping from variable to formula.
      *
      * @param variable the variable
      * @param formula  the formula
      * @return a new substituted formula
      */
     public Formula substitute(final Variable variable, final Formula formula) {
-        Substitution subst = new Substitution();
+        final Substitution subst = new Substitution();
         subst.addMapping(variable, formula);
         return this.substitute(subst);
     }
@@ -227,6 +234,15 @@ public abstract class Formula implements Iterable<Formula> {
      * Returns a copy of this formula which is in CNF.  The algorithm which is used for the default CNF transformation
      * can be configured in the {@link FormulaFactory}.
      * <p>
+     * Be aware that the default algorithm for the CNF transformation may result in a CNF containing additional auxiliary
+     * variables with prefix {@value FormulaFactory#CNF_PREFIX}.  Also, the result may not be a semantically equivalent CNF
+     * but an equisatisfiable CNF.
+     * <p>
+     * If the introduction of auxiliary variables is unwanted, you can choose one of the algorithms
+     * {@link org.logicng.transformations.cnf.CNFConfig.Algorithm#FACTORIZATION} and
+     * {@link org.logicng.transformations.cnf.CNFConfig.Algorithm#BDD}.  Both algorithms provide CNF conversions without
+     * the introduction of auxiliary variables and the result is a semantically equivalent CNF.
+     * <p>
      * Since CNF is the input for the SAT or MaxSAT solvers, it has a special treatment here.  For other conversions, use
      * the according formula functions.
      *
@@ -253,7 +269,7 @@ public abstract class Formula implements Iterable<Formula> {
      * @param cache          indicates whether the result (and associated predicates) should be cached in this formula's cache.
      * @return the transformed formula
      */
-    public Formula transform(final FormulaTransformation transformation, boolean cache) {
+    public Formula transform(final FormulaTransformation transformation, final boolean cache) {
         return transformation.apply(this, cache);
     }
 
@@ -275,7 +291,7 @@ public abstract class Formula implements Iterable<Formula> {
      * @param cache     indicates whether the result should be cached in this formula's cache
      * @return {@code true} if the predicate holds, {@code false} otherwise
      */
-    public boolean holds(final FormulaPredicate predicate, boolean cache) {
+    public boolean holds(final FormulaPredicate predicate, final boolean cache) {
         return predicate.test(this, cache);
     }
 
@@ -287,7 +303,7 @@ public abstract class Formula implements Iterable<Formula> {
      * @param <T>      the result type of the function
      * @return the result of the function application
      */
-    public <T> T apply(final FormulaFunction<T> function, boolean cache) {
+    public <T> T apply(final FormulaFunction<T> function, final boolean cache) {
         return function.apply(this, cache);
     }
 
@@ -330,8 +346,9 @@ public abstract class Formula implements Iterable<Formula> {
      */
     public Tristate predicateCacheEntry(final CacheEntry key) {
         final Tristate tristate = this.predicateCache.get(key);
-        if (tristate == null)
+        if (tristate == null) {
             return Tristate.UNDEF;
+        }
         return tristate;
     }
 
@@ -341,7 +358,7 @@ public abstract class Formula implements Iterable<Formula> {
      * @param key   the cache key
      * @param value the cache value
      */
-    public void setPredicateCacheEntry(final CacheEntry key, boolean value) {
+    public void setPredicateCacheEntry(final CacheEntry key, final boolean value) {
         this.predicateCache.put(key, Tristate.fromBool(value));
     }
 
@@ -379,12 +396,12 @@ public abstract class Formula implements Iterable<Formula> {
      * Clears the transformation and function cache of the formula.
      */
     public void clearCaches() {
-        transformationCache.clear();
-        functionCache.clear();
+        this.transformationCache.clear();
+        this.functionCache.clear();
     }
 
     @Override
     public String toString() {
-        return f.string(this);
+        return this.f.string(this);
     }
 }

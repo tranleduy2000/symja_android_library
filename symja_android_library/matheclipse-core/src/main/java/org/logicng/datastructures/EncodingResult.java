@@ -114,13 +114,13 @@ public final class EncodingResult {
             this.result.add(this.f.clause(literals));
         else if (this.miniSat != null) {
             final LNGIntVector clauseVec = new LNGIntVector(literals.length);
-            for (Literal lit : literals) {
+            for (final Literal lit : literals) {
                 int index = this.miniSat.underlyingSolver().idxForName(lit.name());
                 if (index == -1) {
-                    index = this.miniSat.underlyingSolver().newVar(!miniSat.initialPhase(), true);
+                    index = this.miniSat.underlyingSolver().newVar(!this.miniSat.initialPhase(), true);
                     this.miniSat.underlyingSolver().addName(lit.name(), index);
                 }
-                int litNum;
+                final int litNum;
                 if (lit instanceof EncodingAuxiliaryVariable)
                     litNum = !((EncodingAuxiliaryVariable) lit).negated ? index * 2 : (index * 2) ^ 1;
                 else
@@ -130,8 +130,8 @@ public final class EncodingResult {
             this.miniSat.underlyingSolver().addClause(clauseVec, null);
             this.miniSat.setSolverToUndef();
         } else {
-            for (Literal lit : literals) {
-                int index = this.cleaneLing.getOrCreateVarIndex(lit.variable());
+            for (final Literal lit : literals) {
+                final int index = this.cleaneLing.getOrCreateVarIndex(lit.variable());
                 if (lit instanceof EncodingAuxiliaryVariable)
                     this.cleaneLing.underlyingSolver().addlit(!((EncodingAuxiliaryVariable) lit).negated ? index : -index);
                 else
@@ -152,10 +152,13 @@ public final class EncodingResult {
             this.result.add(this.vec2clause(literals));
         else if (this.miniSat != null) {
             final LNGIntVector clauseVec = new LNGIntVector(literals.size());
-            for (Literal lit : literals) {
+            for (final Literal lit : literals) {
                 int index = this.miniSat.underlyingSolver().idxForName(lit.name());
-                assert index != -1;
-                int litNum;
+                if (index == -1) {
+                    index = this.miniSat.underlyingSolver().newVar(!this.miniSat.initialPhase(), true);
+                    this.miniSat.underlyingSolver().addName(lit.name(), index);
+                }
+                final int litNum;
                 if (lit instanceof EncodingAuxiliaryVariable)
                     litNum = !((EncodingAuxiliaryVariable) lit).negated ? index * 2 : (index * 2) ^ 1;
                 else
@@ -165,8 +168,8 @@ public final class EncodingResult {
             this.miniSat.underlyingSolver().addClause(clauseVec, null);
             this.miniSat.setSolverToUndef();
         } else {
-            for (Literal lit : literals) {
-                int index = this.cleaneLing.getOrCreateVarIndex(lit.variable());
+            for (final Literal lit : literals) {
+                final int index = this.cleaneLing.getOrCreateVarIndex(lit.variable());
                 if (lit instanceof EncodingAuxiliaryVariable)
                     this.cleaneLing.underlyingSolver().addlit(!((EncodingAuxiliaryVariable) lit).negated ? index : -index);
                 else
@@ -198,8 +201,8 @@ public final class EncodingResult {
     public Variable newVariable() {
         if (this.miniSat == null && this.cleaneLing == null)
             return this.f.newCCVariable();
-        else if (miniSat != null) {
-            final int index = this.miniSat.underlyingSolver().newVar(!miniSat.initialPhase(), true);
+        else if (this.miniSat != null) {
+            final int index = this.miniSat.underlyingSolver().newVar(!this.miniSat.initialPhase(), true);
             final String name = FormulaFactory.CC_PREFIX + "MINISAT_" + index;
             this.miniSat.underlyingSolver().addName(name, index);
             return new EncodingAuxiliaryVariable(name, false);

@@ -34,6 +34,7 @@ import org.logicng.collections.LNGVector;
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Substitution;
 import org.logicng.datastructures.Tristate;
+import org.logicng.util.FormulaHelper;
 import org.logicng.util.Pair;
 
 import java.util.Arrays;
@@ -46,7 +47,6 @@ import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
 
@@ -54,7 +54,7 @@ import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
  * A pseudo-Boolean constraint of the form {@code c_1 * l_1 + ... + c_n * l_n R k} where {@code R} is one of
  * {@code =, >, >=, <, <=}.
  *
- * @version 1.3
+ * @version 1.5.1
  * @since 1.0
  */
 public final class PBConstraint extends Formula {
@@ -140,7 +140,7 @@ public final class PBConstraint extends Formula {
                     isTrivialTrue = rhs < 0;
                     break;
                 default:
-                    throw new IllegalArgumentException("Unknown comperator: " + comparator);
+                    throw new IllegalArgumentException("Unknown comparator: " + comparator);
             }
             isTrivialFalse = !isTrivialTrue;
         } else {
@@ -420,6 +420,11 @@ public final class PBConstraint extends Formula {
     }
 
     @Override
+    public boolean isConstantFormula() {
+        return false;
+    }
+
+    @Override
     public boolean isAtomicFormula() {
         return true;
     }
@@ -427,19 +432,14 @@ public final class PBConstraint extends Formula {
     @Override
     public SortedSet<Variable> variables() {
         if (this.variables == null) {
-            this.variables = new TreeSet<>();
-            for (final Literal lit : this.literals)
-                this.variables.add(lit.variable());
-            this.variables = Collections.unmodifiableSortedSet(this.variables);
+            this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(literals));
         }
         return this.variables;
     }
 
     @Override
     public SortedSet<Literal> literals() {
-        final SortedSet<Literal> lits = new TreeSet<>();
-        Collections.addAll(lits, this.literals);
-        return Collections.unmodifiableSortedSet(lits);
+        return Collections.unmodifiableSortedSet(FormulaHelper.literals(literals));
     }
 
     @Override
@@ -465,7 +465,7 @@ public final class PBConstraint extends Formula {
         int maxValue = 0;
         for (int i = 0; i < this.literals.length; i++) {
             final Formula restriction = assignment.restrictLit(this.literals[i]);
-            if (restriction == null) {
+            if (restriction.type == FType.LITERAL) {
                 newLits.add(this.literals[i]);
                 final int coeff = this.coefficients[i];
                 newCoeffs.add(coeff);
@@ -477,8 +477,9 @@ public final class PBConstraint extends Formula {
                 lhsFixed += this.coefficients[i];
         }
 
-        if (newLits.isEmpty())
-            return this.evaluateComparator(lhsFixed) ? this.f.verum() : this.f.falsum();
+        if (newLits.isEmpty()) {
+            return this.f.constant(this.evaluateComparator(lhsFixed));
+        }
 
         final int newRHS = this.rhs - lhsFixed;
         if (this.comparator != CType.EQ) {

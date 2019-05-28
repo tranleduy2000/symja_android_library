@@ -36,6 +36,7 @@ import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 import org.logicng.functions.LiteralProfileFunction;
 import org.logicng.functions.VariableProfileFunction;
+import org.logicng.util.FormulaHelper;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,12 +48,11 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * A list of formulas.  This can represent the operands of an n-ary operator, a CNF, a DNF, a constraint, etc.
  *
- * @version 1.0
+ * @version 1.5.1
  * @since 1.0
  */
 public final class ImmutableFormulaList implements Iterable<Formula> {
@@ -90,7 +90,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      */
     public ImmutableFormulaList(final Collection<? extends Formula> formulas) {
         this.operator = FType.NONE;
-        this.formulas = formulas.toArray(new Formula[formulas.size()]);
+        this.formulas = formulas.toArray(new Formula[0]);
     }
 
     /**
@@ -101,7 +101,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      */
     public ImmutableFormulaList(final FType operator, final Collection<? extends Formula> formulas) {
         this.operator = operator;
-        this.formulas = formulas.toArray(new Formula[formulas.size()]);
+        this.formulas = formulas.toArray(new Formula[0]);
     }
 
     /**
@@ -143,7 +143,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      * @param copy     {@code true} if the input array should be copied, {@code false} otherwise
      * @param formulas the formulas
      */
-    private ImmutableFormulaList(final FType operator, boolean copy, final Formula... formulas) {
+    private ImmutableFormulaList(final FType operator, final boolean copy, final Formula... formulas) {
         this.operator = operator;
         this.formulas = copy ? Arrays.copyOf(formulas, formulas.length) : formulas;
     }
@@ -166,9 +166,9 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      */
     public Formula formula(final FormulaFactory f) {
         if (this.operator != FType.AND && this.operator != FType.OR)
-            throw new IllegalStateException("Illegal operator for formula list formula construction: " + operator);
+            throw new IllegalStateException("Illegal operator for formula list formula construction: " + this.operator);
         if (this.formula == null) {
-            if (operator == FType.AND)
+            if (this.operator == FType.AND)
                 this.formula = f.and(this.formulas);
             else
                 this.formula = f.or(this.formulas);
@@ -200,7 +200,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      * @param i the index
      * @return the i-th formula of this formula list
      */
-    public Formula get(int i) {
+    public Formula get(final int i) {
         if (i < 0 || i >= this.formulas.length)
             throw new IllegalArgumentException("Illegal formula index: " + i);
         return this.formulas[i];
@@ -227,11 +227,9 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      */
     public SortedSet<Variable> variables() {
         if (this.variables == null) {
-            this.variables = new TreeSet<>();
-            for (final Formula f : this.formulas)
-                this.variables.addAll(f.variables());
+            this.variables = FormulaHelper.variables(formulas);
         }
-        return variables;
+        return this.variables;
     }
 
     /**
@@ -240,10 +238,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
      * @return all literals occurring in this formula list
      */
     public SortedSet<Literal> literals() {
-        final SortedSet<Literal> literals = new TreeSet<>();
-        for (final Formula f : this.formulas)
-            literals.addAll(f.literals());
-        return literals;
+        return FormulaHelper.literals(formulas);
     }
 
     /**
@@ -346,14 +341,14 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
 
             @Override
             public boolean hasNext() {
-                return i < formulas.length;
+                return this.i < ImmutableFormulaList.this.formulas.length;
             }
 
             @Override
             public Formula next() {
-                if (i == formulas.length)
+                if (this.i == ImmutableFormulaList.this.formulas.length)
                     throw new NoSuchElementException();
-                return formulas[i++];
+                return ImmutableFormulaList.this.formulas[this.i++];
             }
 
             @Override

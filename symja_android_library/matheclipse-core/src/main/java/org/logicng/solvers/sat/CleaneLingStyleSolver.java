@@ -67,6 +67,8 @@ import org.logicng.solvers.datastructures.CLWatch;
  *
  * @version 1.1
  * @since 1.0
+ * @deprecated CleaneLing does not support many of the features of MiniSat in LogicNG.
+ * With an upcoming 2.0 Release of LogicNG CleaneLing will be removed.
  */
 public abstract class CleaneLingStyleSolver {
 
@@ -113,7 +115,7 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return -1 for a negative literal, 1 for a positive literal
      */
-    protected static byte sign(int lit) {
+    public static byte sign(final int lit) {
         return lit < 0 ? (byte) -1 : (byte) 1;
     }
 
@@ -123,17 +125,19 @@ public abstract class CleaneLingStyleSolver {
      * @param i the base value
      * @return the next number in the luby sequence
      */
-    protected static long luby(long i) {
+    protected static long luby(final long i) {
         long res = 0;
         long k;
         for (k = 1; res == 0 && k < 64; k++) {
-            if (i == (1L << k) - 1)
+            if (i == (1L << k) - 1) {
                 res = 1L << (k - 1);
+            }
         }
         k = 1;
         while (res == 0) {
-            if ((1L << (k - 1)) <= i && i < (1L << k) - 1)
+            if ((1L << (k - 1)) <= i && i < (1L << k) - 1) {
                 res = luby(i - (1L << (k - 1)) + 1);
+            }
             k++;
         }
         return res;
@@ -161,7 +165,7 @@ public abstract class CleaneLingStyleSolver {
         this.stats = new CLStats();
         this.limits = new CLLimits();
         this.model = new LNGBooleanVector();
-        control.push(new CLFrame());
+        this.control.push(new CLFrame());
     }
 
     /**
@@ -169,14 +173,15 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param lit the literal
      */
-    public void addlit(int lit) {
+    public void addlit(final int lit) {
         if (lit != 0) {
             importLit(lit);
-            addedlits.push(lit);
+            this.addedlits.push(lit);
         } else {
-            if (!trivialClause())
+            if (!trivialClause()) {
                 newPushConnectClause();
-            addedlits.clear();
+            }
+            this.addedlits.clear();
         }
     }
 
@@ -212,19 +217,20 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param lit the literal
      */
-    protected void importLit(int lit) {
-        int idx = Math.abs(lit);
+    protected void importLit(final int lit) {
+        final int idx = Math.abs(lit);
         assert lit != 0;
         int newIdx;
-        while (idx >= (newIdx = vars.size())) {
-            vars.push(new CLVar());
-            vals.push((byte) 0);
-            phases.push((byte) 1);
-            watches.push(new LNGVector<CLWatch>());
-            watches.push(new LNGVector<CLWatch>());
-            if (newIdx == 0)
+        while (idx >= (newIdx = this.vars.size())) {
+            this.vars.push(new CLVar());
+            this.vals.push((byte) 0);
+            this.phases.push((byte) 1);
+            this.watches.push(new LNGVector<CLWatch>());
+            this.watches.push(new LNGVector<CLWatch>());
+            if (newIdx == 0) {
                 continue;
-            decisions.push(newIdx);
+            }
+            this.decisions.push(newIdx);
         }
     }
 
@@ -235,11 +241,11 @@ public abstract class CleaneLingStyleSolver {
      */
     protected boolean trivialClause() {
         boolean res = false;
-        final LNGIntVector newAddedLits = new LNGIntVector(addedlits.size());
-        for (int i = 0; i < addedlits.size(); i++) {
-            final int lit = addedlits.get(i);
+        final LNGIntVector newAddedLits = new LNGIntVector(this.addedlits.size());
+        for (int i = 0; i < this.addedlits.size(); i++) {
+            final int lit = this.addedlits.get(i);
             assert lit != 0;
-            int m = marked(lit);
+            final int m = marked(lit);
             if (m < 0) {
                 res = true;
                 break;
@@ -248,7 +254,7 @@ public abstract class CleaneLingStyleSolver {
                 mark(lit);
             }
         }
-        addedlits = newAddedLits;
+        this.addedlits = newAddedLits;
         unmark();
         return res;
     }
@@ -274,7 +280,7 @@ public abstract class CleaneLingStyleSolver {
      * @return the maximum variable index
      */
     protected int maxvar() {
-        int res = vars.size();
+        int res = this.vars.size();
         if (res != 0) {
             assert res > 1;
             res--;
@@ -288,10 +294,10 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return the variable for the literal
      */
-    protected CLVar var(int lit) {
-        int idx = Math.abs(lit);
-        assert 0 < idx && idx < vars.size();
-        return vars.get(idx);
+    protected CLVar var(final int lit) {
+        final int idx = Math.abs(lit);
+        assert 0 < idx && idx < this.vars.size();
+        return this.vars.get(idx);
     }
 
     /**
@@ -300,10 +306,11 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return the value as byte (-1 = false, 1 = true)
      */
-    protected byte val(int lit) {
-        byte res = vals.get(Math.abs(lit));
-        if (lit < 0)
+    protected byte val(final int lit) {
+        byte res = this.vals.get(Math.abs(lit));
+        if (lit < 0) {
             res = (byte) -res;
+        }
         return res;
     }
 
@@ -313,7 +320,7 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return whether a given literal is marked or not
      */
-    protected int marked(int lit) {
+    protected int marked(final int lit) {
         final int res = var(lit).mark();
         return (lit < 0) ? -res : res;
     }
@@ -323,11 +330,11 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param lit the literal
      */
-    protected void mark(int lit) {
+    protected void mark(final int lit) {
         final CLVar v = var(lit);
         assert v.mark() == 0;
         v.setMark(sign(lit));
-        seen.push(lit);
+        this.seen.push(lit);
     }
 
     /**
@@ -342,11 +349,11 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param level the level
      */
-    protected void unmark(int level) {
-        assert level <= seen.size();
-        while (level < seen.size()) {
-            final int lit = seen.back();
-            seen.pop();
+    protected void unmark(final int level) {
+        assert level <= this.seen.size();
+        while (level < this.seen.size()) {
+            final int lit = this.seen.back();
+            this.seen.pop();
             final CLVar v = var(lit);
             assert v.mark() == sign(lit);
             v.setMark(0);
@@ -359,8 +366,8 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return the watchers for the literal
      */
-    protected LNGVector<CLWatch> watches(int lit) {
-        return watches.get(lit < 0 ? -lit * 2 - 1 : lit * 2);
+    protected LNGVector<CLWatch> watches(final int lit) {
+        return this.watches.get(lit < 0 ? -lit * 2 - 1 : lit * 2);
     }
 
     /**
@@ -371,7 +378,7 @@ public abstract class CleaneLingStyleSolver {
      * @param binary indicates whether it is a binary clause or not
      * @param clause the watched clause
      */
-    protected void addWatch(int lit, int blit, boolean binary, final CLClause clause) {
+    protected void addWatch(final int lit, final int blit, final boolean binary, final CLClause clause) {
         watches(lit).push(new CLWatch(blit, binary, clause));
     }
 
@@ -381,13 +388,14 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return {@code true} if the frame was newly marked, {@code false} if the frame was already marked
      */
-    protected boolean markFrame(int lit) {
+    protected boolean markFrame(final int lit) {
         final int currentlevel = var(lit).level();
-        final CLFrame frame = control.get(currentlevel);
-        if (frame.mark())
+        final CLFrame frame = this.control.get(currentlevel);
+        if (frame.mark()) {
             return false;
+        }
         frame.setMark(true);
-        frames.push(currentlevel);
+        this.frames.push(currentlevel);
         return true;
     }
 
@@ -397,10 +405,10 @@ public abstract class CleaneLingStyleSolver {
      * @return the number of unmarked frames
      */
     protected int unmarkFrames() {
-        final int res = frames.size();
-        while (!frames.empty()) {
-            final CLFrame f = control.get(frames.back());
-            frames.pop();
+        final int res = this.frames.size();
+        while (!this.frames.empty()) {
+            final CLFrame f = this.control.get(this.frames.back());
+            this.frames.pop();
             assert f.mark();
             f.setMark(false);
         }
@@ -419,28 +427,29 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param newLevel the level
      */
-    protected void backtrack(int newLevel) {
-        assert 0 <= newLevel && newLevel <= level;
-        if (newLevel == level)
+    protected void backtrack(final int newLevel) {
+        assert 0 <= newLevel && newLevel <= this.level;
+        if (newLevel == this.level) {
             return;
-        CLFrame f = control.back();
+        }
+        CLFrame f = this.control.back();
         while (f.level() > newLevel) {
-            assert f.level() == level;
-            assert f.trail() < trail.size();
-            while (f.trail() < trail.size()) {
-                int lit = trail.back();
+            assert f.level() == this.level;
+            assert f.trail() < this.trail.size();
+            while (f.trail() < this.trail.size()) {
+                final int lit = this.trail.back();
                 assert var(lit).level() == f.level();
-                trail.pop();
+                this.trail.pop();
                 unassign(lit);
             }
-            assert level > 0;
-            level--;
-            trail.shrinkTo(f.trail());
-            next = f.trail();
-            control.pop();
-            f = control.back();
+            assert this.level > 0;
+            this.level--;
+            this.trail.shrinkTo(f.trail());
+            this.next = f.trail();
+            this.control.pop();
+            f = this.control.back();
         }
-        assert newLevel == level;
+        assert newLevel == this.level;
     }
 
     /**
@@ -464,22 +473,23 @@ public abstract class CleaneLingStyleSolver {
      * @return {@code true} if all assignments were propagated
      */
     protected boolean propagated() {
-        return next == trail.size();
+        return this.next == this.trail.size();
     }
 
     /**
      * Rescores all variables.
      */
     protected void rescore() {
-        double maxScore = scoreIncrement;
-        for (int idx = 1; idx < vars.size(); idx++) {
-            double p = decisions.priority(idx);
-            if (p > maxScore)
+        double maxScore = this.scoreIncrement;
+        for (int idx = 1; idx < this.vars.size(); idx++) {
+            final double p = this.decisions.priority(idx);
+            if (p > maxScore) {
                 maxScore = p;
+            }
         }
-        double factor = 1 / maxScore;
-        decisions.rescore(factor);
-        scoreIncrement *= factor;
+        final double factor = 1 / maxScore;
+        this.decisions.rescore(factor);
+        this.scoreIncrement *= factor;
     }
 
     /**
@@ -487,16 +497,16 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param lit the literal
      */
-    protected void bumpLit(int lit) {
+    protected void bumpLit(final int lit) {
         final double maxPriority = 1e300;
-        int idx = Math.abs(lit);
+        final int idx = Math.abs(lit);
         double oldPriority;
-        if (scoreIncrement > maxPriority || (oldPriority = decisions.priority(idx)) > maxPriority) {
+        if (this.scoreIncrement > maxPriority || (oldPriority = this.decisions.priority(idx)) > maxPriority) {
             rescore();
-            oldPriority = decisions.priority(idx);
+            oldPriority = this.decisions.priority(idx);
         }
-        double newPriority = oldPriority + scoreIncrement;
-        decisions.update(idx, newPriority);
+        final double newPriority = oldPriority + this.scoreIncrement;
+        this.decisions.update(idx, newPriority);
     }
 
     /**
@@ -505,17 +515,20 @@ public abstract class CleaneLingStyleSolver {
      * @param lit the literal
      * @return the result of the analysis
      */
-    protected boolean pullLit(int lit) {
-        if (val(lit) == VALUE_TRUE)
+    protected boolean pullLit(final int lit) {
+        if (val(lit) == VALUE_TRUE) {
             return false;
-        if (marked(lit) != 0)
+        }
+        if (marked(lit) != 0) {
             return false;
+        }
         mark(lit);
         bumpLit(lit);
-        if (var(lit).level() == level)
+        if (var(lit).level() == this.level) {
             return true;
+        }
         markFrame(lit);
-        addedlits.push(lit);
+        this.addedlits.push(lit);
         return false;
     }
 
@@ -525,12 +538,13 @@ public abstract class CleaneLingStyleSolver {
      * @param root the literal
      * @return {@code true} if the literal can be removed, {@code false} otherwise
      */
-    protected boolean minimizeLit(int root) {
+    protected boolean minimizeLit(final int root) {
         assert marked(root) != 0;
         CLClause reason = var(root).reason();
-        if (reason == null)
+        if (reason == null) {
             return false;
-        int oldSeenSize = seen.size();
+        }
+        final int oldSeenSize = this.seen.size();
         int nextSeen = oldSeenSize;
         boolean res = true;
         int lit = root;
@@ -538,27 +552,32 @@ public abstract class CleaneLingStyleSolver {
             int other;
             for (int p = 0; res && p < reason.lits().size(); p++) {
                 other = reason.lits().get(p);
-                if (other == lit)
+                if (other == lit) {
                     continue;
+                }
                 assert val(other) == VALUE_FALSE;
-                if (marked(other) != 0)
+                if (marked(other) != 0) {
                     continue;
-                CLVar v = var(other);
-                if (v.reason() == null)
+                }
+                final CLVar v = var(other);
+                if (v.reason() == null) {
                     res = false;
-                else if (!control.get(v.level()).mark()) {
+                } else if (!this.control.get(v.level()).mark()) {
                     res = false;
-                } else
+                } else {
                     mark(other);
+                }
             }
-            if (!res || nextSeen == seen.size())
+            if (!res || nextSeen == this.seen.size()) {
                 break;
-            lit = -seen.get(nextSeen++);
+            }
+            lit = -this.seen.get(nextSeen++);
             reason = var(lit).reason();
             assert reason != null;
         }
-        if (!res)
+        if (!res) {
             unmark(oldSeenSize);
+        }
         return res;
     }
 
@@ -566,10 +585,11 @@ public abstract class CleaneLingStyleSolver {
      * Computes a new restart limit.
      */
     protected void newRestartLimit() {
-        long newInterval = config.restartint * luby(stats.restartsCount + 1);
-        if (newInterval > limits.maxRestartInterval)
-            limits.maxRestartInterval = newInterval;
-        limits.restart = stats.conflicts + newInterval;
+        final long newInterval = this.config.restartint * luby(this.stats.restartsCount + 1);
+        if (newInterval > this.limits.maxRestartInterval) {
+            this.limits.maxRestartInterval = newInterval;
+        }
+        this.limits.restart = this.stats.conflicts + newInterval;
     }
 
     /**
@@ -577,12 +597,12 @@ public abstract class CleaneLingStyleSolver {
      *
      * @param decision the decision
      */
-    protected void assume(int decision) {
+    protected void assume(final int decision) {
         assert propagated();
-        level++;
-        int height = trail.size();
-        control.push(new CLFrame(decision, level, height));
-        assert level + 1 == control.size();
+        this.level++;
+        final int height = this.trail.size();
+        this.control.push(new CLFrame(decision, this.level, height));
+        assert this.level + 1 == this.control.size();
         assign(decision, null);
     }
 
@@ -594,19 +614,22 @@ public abstract class CleaneLingStyleSolver {
     protected boolean decide() {
         assert propagated();
         int decision = 0;
-        while (decision == 0 && !decisions.empty()) {
-            int lit = decisions.top();
-            decisions.pop(lit);
-            if (val(lit) == 0)
+        while (decision == 0 && !this.decisions.empty()) {
+            final int lit = this.decisions.top();
+            this.decisions.pop(lit);
+            if (val(lit) == 0) {
                 decision = lit;
+            }
         }
-        if (decision == 0)
+        if (decision == 0) {
             return false;
+        }
         assert decision > 0;
-        if (phases.get(decision) < 0)
+        if (this.phases.get(decision) < 0) {
             decision = -decision;
-        stats.decisions++;
-        stats.levels += level;
+        }
+        this.stats.decisions++;
+        this.stats.levels += this.level;
         assume(decision);
         return true;
     }
@@ -674,6 +697,24 @@ public abstract class CleaneLingStyleSolver {
      * @return the state of the search
      */
     protected abstract Tristate search();
+
+    /**
+     * Returns the unit propagated literals on level zero.
+     *
+     * @return unit propagated literal on level zero
+     */
+    public LNGIntVector upZeroLiterals() {
+        final LNGIntVector upZeroLiterals = new LNGIntVector();
+        for (int i = 0; i < this.trail.size(); ++i) {
+            final int lit = this.trail.get(i);
+            if (var(lit).level() > 0) {
+                break;
+            } else {
+                upZeroLiterals.push(lit);
+            }
+        }
+        return upZeroLiterals;
+    }
 
     /**
      * Limits for the solver.

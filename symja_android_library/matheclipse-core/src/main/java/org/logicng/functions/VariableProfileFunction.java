@@ -28,10 +28,10 @@
 
 package org.logicng.functions;
 
+import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFunction;
 import org.logicng.formulas.Literal;
-import org.logicng.formulas.PBConstraint;
 import org.logicng.formulas.Variable;
 
 import java.util.HashMap;
@@ -74,14 +74,14 @@ public final class VariableProfileFunction implements FormulaFunction<Map<Variab
      * @param map     the variable profile
      */
     private static void nonCachingRecursion(final Formula formula, final Map<Variable, Integer> map) {
-        if (formula instanceof Literal) {
+        if (formula.type() == FType.LITERAL) {
             final Literal lit = (Literal) formula;
             final Integer currentCount = map.get(lit.variable());
             if (currentCount == null)
                 map.put(lit.variable(), 1);
             else
                 map.put(lit.variable(), currentCount + 1);
-        } else if (formula instanceof PBConstraint)
+        } else if (formula.type() == FType.PBC)
             for (final Literal l : formula.literals())
                 nonCachingRecursion(l.variable(), map);
         else
@@ -102,9 +102,9 @@ public final class VariableProfileFunction implements FormulaFunction<Map<Variab
         if (cached != null)
             return (Map<Variable, Integer>) cached;
         Map<Variable, Integer> result = new HashMap<>();
-        if (formula instanceof Literal)
+        if (formula.type() == FType.LITERAL)
             result.put(((Literal) formula).variable(), 1);
-        else if (formula instanceof PBConstraint)
+        else if (formula.type() == FType.PBC)
             for (final Literal l : formula.literals())
                 result.put(l.variable(), 1);
         else

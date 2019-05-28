@@ -42,5 +42,6 @@ public enum ConfigurationType {
     MAXSAT,
     MUS,
     CC_ENCODER,
-    PB_ENCODER
+    PB_ENCODER,
+    BACKBONE
 }

@@ -62,7 +62,6 @@ public final class CLVar {
     private int level;
     private int mark;
     private CLClause reason;
-
     /**
      * Constructs a new variable.
      */

@@ -96,6 +96,18 @@ public class Assignment {
     }
 
     /**
+     * Constructs a new assignment for a given array of literals (without fast evaluation).
+     *
+     * @param lits a new assignment for a given array of literals
+     */
+    public Assignment(final Literal... lits) {
+        this(false);
+        for (Literal lit : lits) {
+            addLiteral(lit);
+        }
+    }
+
+    /**
      * Constructs a new assignment for a given collection of literals.
      *
      * @param lits          a new assignment for a given collection of literals
@@ -105,13 +117,9 @@ public class Assignment {
      */
     public Assignment(final Collection<? extends Literal> lits, final boolean fastEvaluable) {
         this(fastEvaluable);
-        for (Literal lit : lits)
-            if (lit.phase())
-                this.pos.add((Variable) lit);
-            else {
-                this.neg.add(lit);
-                this.negVars.add((Variable) lit.negate());
-            }
+        for (Literal lit : lits) {
+            addLiteral(lit);
+        }
     }
 
     /**
@@ -133,12 +141,7 @@ public class Assignment {
      */
     public Assignment(final Literal lit, final boolean fastEvaluable) {
         this(fastEvaluable);
-        if (lit.phase())
-            this.pos.add((Variable) lit);
-        else {
-            this.neg.add(lit);
-            this.negVars.add((Variable) lit.negate());
-        }
+        addLiteral(lit);
     }
 
     /**
@@ -222,41 +225,41 @@ public class Assignment {
      */
     public void addLiteral(final Literal lit) {
         if (lit.phase())
-            this.pos.add((Variable) lit);
+            this.pos.add(lit.variable());
         else {
             this.neg.add(lit);
-            this.negVars.add((Variable) lit.negate());
+            this.negVars.add(lit.variable());
         }
     }
 
     /**
-     * Evaluates a given literal.  Will be {@code false} if the literal is unknown.
+     * Evaluates a given literal.  A literal not covered by the assignment evaluates
+     * to {@code false} if it is positive, otherwise it evaluates to {@code true}.
      *
      * @param lit the literal
-     * @return the evaluation of the literal or {@code false} if unknown
+     * @return the evaluation of the literal
      */
     public boolean evaluateLit(final Literal lit) {
         if (lit.phase())
-            return this.pos.contains(lit);
+            return this.pos.contains(lit.variable());
         else
             return this.neg.contains(lit) || !this.pos.contains(lit.variable());
     }
 
     /**
-     * Restricts a given literal to a constant.  Returns {@code null}, if the literal's variable is not known.
+     * Restricts a given literal to a constant.  Returns the literal itself, if the literal's variable is not known.
      *
      * @param lit the literal
-     * @return the restriction of the literal or {@code null}, if the literal's variable is not known
+     * @return the restriction of the literal or the literal itself, if the literal's variable is not known
      */
     public Formula restrictLit(final Literal lit) {
         final FormulaFactory f = lit.factory();
-        Literal searchLit = lit.variable();
-        if (this.pos.contains(searchLit))
-            return lit.phase() ? f.verum() : f.falsum();
-        searchLit = lit.negative();
-        if (this.neg.contains(searchLit))
-            return !lit.phase() ? f.verum() : f.falsum();
-        return null;
+        Variable var = lit.variable();
+        if (this.pos.contains(var))
+            return f.constant(lit.phase());
+        if (this.neg.contains(var.negate()))
+            return f.constant(!lit.phase());
+        return lit;
     }
 
     /**
@@ -270,6 +273,21 @@ public class Assignment {
     }
 
     /**
+     * Creates the blocking clause for this assignment.
+     *
+     * @param f the formula factory
+     * @return the blocking clause for this assignment
+     */
+    public Formula blockingClause(final FormulaFactory f) {
+        final List<Literal> ops = new LinkedList<>();
+        for (final Literal lit : this.pos)
+            ops.add(lit.negate());
+        for (final Literal lit : this.neg)
+            ops.add(lit.negate());
+        return f.or(ops);
+    }
+
+    /**
      * Creates the blocking clause for this assignment wrt. a given set of literals.  If the set is {@code null},
      * all literals are considered relevant.
      *
@@ -278,15 +296,20 @@ public class Assignment {
      * @return the blocking clause for this assignment
      */
     public Formula blockingClause(final FormulaFactory f, final Collection<? extends Literal> literals) {
+        if (literals == null)
+            return blockingClause(f);
         final List<Literal> ops = new LinkedList<>();
-        for (final Literal l : this.pos)
-            if (literals == null || literals.contains(l))
-                ops.add(l.negate());
-        for (final Literal l : this.neg)
-            if (literals == null || literals.contains(l.variable()))
-                ops.add(l.negate());
+        for (Literal lit : literals) {
+            Variable var = lit.variable();
+            Literal negatedVar = var.negate();
+            if (pos.contains(var))
+                ops.add(negatedVar);
+            else if (neg.contains(negatedVar))
+                ops.add(var);
+        }
         return f.or(ops);
     }
+
 
     @Override
     public int hashCode() {

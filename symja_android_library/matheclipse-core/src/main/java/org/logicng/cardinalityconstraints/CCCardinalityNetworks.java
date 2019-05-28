@@ -62,7 +62,6 @@ import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.
 
 /**
  * Implementation of cardinality networks due to Asín, Nieuwenhuis, Oliveras, and Rodríguez-Carbonell.
- *
  * @version 1.1
  * @since 1.1
  */

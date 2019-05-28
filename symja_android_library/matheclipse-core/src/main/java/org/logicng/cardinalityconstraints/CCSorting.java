@@ -62,7 +62,6 @@ import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.
 
 /**
  * Implementation of a sorting network.
- *
  * @version 1.1
  * @since 1.1
  */
@@ -89,7 +88,6 @@ public final class CCSorting {
 
     /**
      * Generates a sorter encoding for the given input.
-     *
      * @param m         the the counter
      * @param input     the input literals
      * @param result    the result of the encoding
@@ -270,7 +268,6 @@ public final class CCSorting {
 
     /**
      * Merges to input vectors.
-     *
      * @param m         parameter m
      * @param inputA    the first input vector
      * @param inputB    the second input vector

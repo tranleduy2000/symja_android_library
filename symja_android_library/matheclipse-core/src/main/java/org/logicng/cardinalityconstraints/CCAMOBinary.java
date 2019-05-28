@@ -57,7 +57,6 @@ import org.logicng.formulas.Variable;
 /**
  * Encodes that at most one variable is assigned value true.  Uses the binary encoding due to Doggett, Frisch, Peugniez,
  * and Nightingale.
- *
  * @version 1.1
  * @since 1.1
  */

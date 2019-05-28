@@ -48,7 +48,6 @@ public final class CCConfig extends Configuration {
     final int nestingGroupSize;
     final int productRecursiveBound;
     final int commanderGroupSize;
-
     /**
      * Constructs a new cardinality constraint encoder configuration from a given builder.
      *
@@ -69,34 +68,31 @@ public final class CCConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CCConfig{\n");
-        sb.append("amoEncoder=").append(this.amoEncoder).append("\n");
-        sb.append("amkEncoder=").append(this.amkEncoder).append("\n");
-        sb.append("alkEncoder=").append(this.alkEncoder).append("\n");
-        sb.append("exkEncoder=").append(this.exkEncoder).append("\n");
-        sb.append("bimanderGroupSize=").append(this.bimanderGroupSize).append("\n");
-        sb.append("bimanderFixedGroupSize=").append(this.bimanderFixedGroupSize).append("\n");
-        sb.append("nestingGroupSize=").append(this.nestingGroupSize).append("\n");
-        sb.append("productRecursiveBound=").append(this.productRecursiveBound).append("\n");
-        sb.append("commanderGroupSize=").append(this.commanderGroupSize).append("\n");
-        sb.append("}\n");
+        final StringBuilder sb = new StringBuilder("CCConfig{").append(System.lineSeparator());
+        sb.append("amoEncoder=").append(this.amoEncoder).append(System.lineSeparator());
+        sb.append("amkEncoder=").append(this.amkEncoder).append(System.lineSeparator());
+        sb.append("alkEncoder=").append(this.alkEncoder).append(System.lineSeparator());
+        sb.append("exkEncoder=").append(this.exkEncoder).append(System.lineSeparator());
+        sb.append("bimanderGroupSize=").append(this.bimanderGroupSize).append(System.lineSeparator());
+        sb.append("bimanderFixedGroupSize=").append(this.bimanderFixedGroupSize).append(System.lineSeparator());
+        sb.append("nestingGroupSize=").append(this.nestingGroupSize).append(System.lineSeparator());
+        sb.append("productRecursiveBound=").append(this.productRecursiveBound).append(System.lineSeparator());
+        sb.append("commanderGroupSize=").append(this.commanderGroupSize).append(System.lineSeparator());
+        sb.append("}").append(System.lineSeparator());
         return sb.toString();
     }
-
     /**
      * The encoder for at-most-one and exactly-one constraints.
      */
     public enum AMO_ENCODER {
         PURE, LADDER, PRODUCT, NESTED, COMMANDER, BINARY, BIMANDER, BEST
     }
-
     /**
      * The encoder for at-most-k constraints.
      */
     public enum AMK_ENCODER {
         TOTALIZER, MODULAR_TOTALIZER, CARDINALITY_NETWORK, BEST
     }
-
     /**
      * The encoder for at-least-k constraints.
      */

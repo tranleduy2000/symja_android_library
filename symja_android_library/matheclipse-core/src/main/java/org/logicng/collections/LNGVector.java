@@ -133,7 +133,6 @@ public final class LNGVector<T> implements Iterable<T> {
      *
      * @param element the element
      */
-    @SuppressWarnings("unchecked")
     public void push(final T element) {
         int newSize = this.size + 1;
         this.ensure(newSize);

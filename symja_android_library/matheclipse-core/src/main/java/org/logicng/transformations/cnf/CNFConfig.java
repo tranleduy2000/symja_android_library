@@ -61,13 +61,13 @@ public final class CNFConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CNFConfig{\n");
-        sb.append("algorithm=").append(this.algorithm).append("\n");
-        sb.append("fallbackAlgorithmForAdvancedEncoding=").append(this.fallbackAlgorithmForAdvancedEncoding).append("\n");
-        sb.append("distributedBoundary=").append(this.distributionBoundary).append("\n");
-        sb.append("createdClauseBoundary=").append(this.createdClauseBoundary).append("\n");
-        sb.append("atomBoundary=").append(this.atomBoundary).append("\n");
-        sb.append("}\n");
+        final StringBuilder sb = new StringBuilder(String.format("CNFConfig{%n"));
+        sb.append("algorithm=").append(this.algorithm).append(System.lineSeparator());
+        sb.append("fallbackAlgorithmForAdvancedEncoding=").append(this.fallbackAlgorithmForAdvancedEncoding).append(System.lineSeparator());
+        sb.append("distributedBoundary=").append(this.distributionBoundary).append(System.lineSeparator());
+        sb.append("createdClauseBoundary=").append(this.createdClauseBoundary).append(System.lineSeparator());
+        sb.append("atomBoundary=").append(this.atomBoundary).append(System.lineSeparator());
+        sb.append("}").append(System.lineSeparator());
         return sb.toString();
     }
 
@@ -75,7 +75,7 @@ public final class CNFConfig extends Configuration {
      * The algorithm for the CNF encoding.
      */
     public enum Algorithm {
-        FACTORIZATION, TSEITIN, PLAISTED_GREENBAUM, ADVANCED
+        FACTORIZATION, TSEITIN, PLAISTED_GREENBAUM, ADVANCED, BDD
     }
 
     /**
@@ -124,7 +124,7 @@ public final class CNFConfig extends Configuration {
          * @param distributionBoundary the distribution boundary
          * @return the builder
          */
-        public Builder distributionBoundary(int distributionBoundary) {
+        public Builder distributionBoundary(final int distributionBoundary) {
             this.distributionBoundary = distributionBoundary;
             return this;
         }
@@ -136,7 +136,7 @@ public final class CNFConfig extends Configuration {
          * @param createdClauseBoundary the clause creation boundary
          * @return the builder
          */
-        public Builder createdClauseBoundary(int createdClauseBoundary) {
+        public Builder createdClauseBoundary(final int createdClauseBoundary) {
             this.createdClauseBoundary = createdClauseBoundary;
             return this;
         }
@@ -148,7 +148,7 @@ public final class CNFConfig extends Configuration {
          * @param atomBoundary the atom boundary
          * @return the builder
          */
-        public Builder atomBoundary(int atomBoundary) {
+        public Builder atomBoundary(final int atomBoundary) {
             this.atomBoundary = atomBoundary;
             return this;
         }
