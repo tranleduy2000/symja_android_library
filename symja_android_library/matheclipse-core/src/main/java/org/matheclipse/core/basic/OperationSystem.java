@@ -1,8 +1,15 @@
 package org.matheclipse.core.basic;
 
 public class OperationSystem {
+
     public static boolean debug = false;
+    /**
+     * Recommend value:
+     * - JVM: 90% values of -Xmx argument
+     * - iOS or MacOS 70%
+     */
     public static float memoryUsageFactor = 0.9f;
+
     private static boolean jvm = true;
 
     static {
@@ -31,9 +38,7 @@ public class OperationSystem {
         }
 
         // value is valid
-        if (maxMemory > 0
-                && maxMemory < Long.MAX_VALUE
-                && usageMemory > 0) {
+        if (maxMemory > 0 && maxMemory < Long.MAX_VALUE && usageMemory > 0) {
             float usageFactor = (float) usageMemory / maxMemory;
             if (usageFactor < 1.0f && usageFactor > memoryUsageFactor) {
                 System.err.println("usageMemory = " + usageMemory + "; maxMemory = " + maxMemory);
