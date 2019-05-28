@@ -3,6 +3,7 @@ package org.matheclipse.core.expression;
 import com.gx.common.math.BigIntegerMath;
 
 import org.hipparchus.fraction.BigFraction;
+import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.Combinatoric.Subsets;
 import org.matheclipse.core.builtin.Combinatoric.Subsets.KSubsetsList;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -595,6 +596,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	 */
 	@Override
 	public IInteger multiply(final IInteger that) {
+		// Swift changed: check out of memory
+		OperationSystem.checkMemory();
 		if (that instanceof IntegerSym) {
 			switch (((IntegerSym) that).fIntValue) {
 			case 0:
@@ -615,6 +618,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	 */
 	@Override
 	public IInteger multiply(int value) {
+		// Swift changed: check out of memory
+		OperationSystem.checkMemory();
 		switch (value) {
 		case 0:
 			return F.C0;
@@ -629,6 +634,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	@Override
 	public IRational multiply(IRational parm1) {
+		// Swift changed: check out of memory
+		OperationSystem.checkMemory();
 		if (parm1.isZero()) {
 			return F.C0;
 		}
