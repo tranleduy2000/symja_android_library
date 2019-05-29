@@ -128,6 +128,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     int CONTAINS_NUMERIC_ARG = 0x00010000;
 
+    int BUILT_IN_EVALED = 0x00040000;
+
     /**
      * Add an evaluation flag to the existing ones.
      *
@@ -291,7 +293,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * {@inheritDoc}
      */
     @Override
-    public boolean isPatternMatchingFunction();
+    boolean isPatternMatchingFunction();
 
     /**
      * {@inheritDoc}
@@ -377,8 +379,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     /**
      * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
      * to the <code>copyAppendable()</code> method, this method returns exactly the same type for
-     * <code>AST0, AST1, AST2, AST3</code> and tries to transform <code>AST</code> objects to <code>AST0, AST1, AST2, AST3</code> if
-     * possible.
+     * <code>AST0, AST1, AST2, AST3</code> and tries to transform <code>AST</code> objects to
+     * <code>AST0, AST1, AST2, AST3</code> if possible.
      *
      * @return a copy of this <code>IAST</code> instance.
      */
@@ -822,7 +824,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @return <code>true</code>, if one of the headers of this AST contains a trigonometric function.
      */
-    public boolean hasTrigonometricFunction();
+    boolean hasTrigonometricFunction();
 
     /**
      * Find the first argument position, which equals <code>expr</code>. The search starts at index <code>1</code>.
@@ -830,7 +832,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param expr
      * @return <code>-1</code> if no position was found
      */
-    public int indexOf(final IExpr expr);
+    int indexOf(final IExpr expr);
 
     /**
      * Find the first argument position, which fulfills the <code>predicate</code>. The search starts at index
@@ -1043,7 +1045,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param defaultValue default value, if <code>size() < 2</code>.
      * @return
      */
-    public IExpr oneIdentity(IExpr defaultValue);
+    IExpr oneIdentity(IExpr defaultValue);
 
     /**
      * Get the argument at index 1, if the <code>size() == 2</code> or the complete ast if the <code>size() > 2</code>
@@ -1132,7 +1134,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @param firstPosition
      * @return
      */
-    public IAST removeFromStart(int firstPosition);
+    IAST removeFromStart(int firstPosition);
 
     /**
      * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code> inclusive to the

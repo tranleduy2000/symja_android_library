@@ -34,8 +34,7 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 				return e1ApfloatArg(((ApfloatNum) arg1).apfloatValue());
 			}
 			return e1DblArg(((Num) arg1).doubleValue());
-		}
-		if (arg1 instanceof IComplexNum) {
+		} else if (arg1 instanceof IComplexNum) {
 			if (arg1 instanceof ApcomplexNum) {
 				return e1ApcomplexArg(((ApcomplexNum) arg1).apcomplexValue());
 			}

@@ -236,7 +236,7 @@ public class JASConvert<C extends RingElem<C>> {
 		} else {
 			// "ComplexRing expected"
 			throw new JASConversionException( );
-//			throw new ClassCastException(complexValue.toString());
+			// throw new ClassCastException(complexValue.toString());
 			// return new GenPolynomial(fPolyFactory, r);
 		}
 	}
@@ -348,7 +348,7 @@ public class JASConvert<C extends RingElem<C>> {
 					// }
 					if (exponent < 0) {
 						throw new JASConversionException();
-//								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+						// "JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
 					}
 					try {
 						return fPolyFactory.univariate(base.getSymbolName(), exponent);
@@ -365,8 +365,8 @@ public class JASConvert<C extends RingElem<C>> {
 					// }
 					if (exponent < 0) {
 						throw new JASConversionException();
-//						throw new ArithmeticException(
-//								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
+						// throw new ArithmeticException(
+						// "JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
 					}
 					try {
 						return fPolyFactory.univariate(base.toString(), exponent);
@@ -400,7 +400,7 @@ public class JASConvert<C extends RingElem<C>> {
 			}
 		}
 		throw new JASConversionException( );
-//		throw new ClassCastException(exprPoly.toString());
+		// throw new ClassCastException(exprPoly.toString());
 	}
 
 	private boolean expVectorToExpr(ExpVector exp, IASTAppendable monomTimes) {
