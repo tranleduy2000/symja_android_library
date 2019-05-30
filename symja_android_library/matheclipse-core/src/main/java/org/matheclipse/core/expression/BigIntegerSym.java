@@ -599,7 +599,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IInteger multiply(final IInteger that) {
 		// Swift changed: check out of memory
-		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 3);
+		// suppose that result is length of this number, two bytes per digit
+		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 2);
 		if (that instanceof IntegerSym) {
 			switch (((IntegerSym) that).fIntValue) {
 			case 0:
@@ -621,7 +622,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IInteger multiply(int value) {
 		// Swift changed: check out of memory
-		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 3);
+		// suppose that result is length of this number, two bytes per digit
+		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 2);
 		switch (value) {
 		case 0:
 			return F.C0;
@@ -637,7 +639,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IRational multiply(IRational parm1) {
 		// Swift changed: check out of memory
-		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 3);
+		// suppose that result is length of this number, two bytes per digit
+		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 2);
 		if (parm1.isZero()) {
 			return F.C0;
 		}

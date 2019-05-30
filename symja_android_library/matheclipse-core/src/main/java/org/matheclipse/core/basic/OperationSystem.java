@@ -1,16 +1,25 @@
 package org.matheclipse.core.basic;
 
+@SuppressWarnings("unused")
 public class OperationSystem {
 
     public static boolean debug = false;
-    /**
-     * Recommend value:
-     * - JVM: 90% values of -Xmx argument
-     * - iOS or MacOS 70%
-     */
-    public static float memoryUsageFactor = 0.9f;
 
+    /**
+     * Is running on JVM or not
+     */
     private static boolean jvm = true;
+
+    /**
+     * Maximum memory can use by this process
+     */
+    private static float memoryUsageFactor = 0.9f;
+
+    /**
+     * This field should be set to true if the application receive memory warning, typically in
+     * AppDelegate.swift
+     */
+    private static boolean isMemoryWarning = false;
 
     static {
         setJvm(true);
@@ -24,33 +33,45 @@ public class OperationSystem {
         OperationSystem.jvm = jvm;
     }
 
+    public static float getMemoryUsageFactor() {
+        return memoryUsageFactor;
+    }
+
+    public static void setMemoryUsageFactor(float memoryUsageFactor) {
+        OperationSystem.memoryUsageFactor = memoryUsageFactor;
+    }
+
+    public static void setIsMemoryWarning(boolean isMemoryWarning) {
+        OperationSystem.isMemoryWarning = isMemoryWarning;
+    }
+
     public static void checkMemory() {
         checkMemory(0);
     }
 
     /**
-     * @param additionalMemory approximately memory will be allocate after perform some operations.
+     * @param additionalMemoryInBytes approximately memory will be allocate after perform some operations.
      *                         Unit of bytes
      */
-    public static void checkMemory(int additionalMemory) {
-        Runtime runtime = Runtime.getRuntime();
-        long maxMemory = runtime.maxMemory();
-        long usageMemory;
+    public static void checkMemory(int additionalMemoryInBytes) {
         if (isJvm()) {
-            usageMemory = runtime.totalMemory() - runtime.freeMemory();
-        } else {
-            usageMemory = runtime.totalMemory();
-        }
-        usageMemory += additionalMemory;
-        if (debug) {
-            printMemoryUsage(maxMemory, usageMemory);
-        }
+            Runtime runtime = Runtime.getRuntime();
+            long maxMemory = runtime.maxMemory();
+            long usedMemory = runtime.totalMemory() - runtime.freeMemory() + additionalMemoryInBytes;
+            if (debug) {
+                printMemoryUsage(maxMemory, usedMemory);
+            }
 
-        // value is valid
-        if (maxMemory > 0 && maxMemory < Long.MAX_VALUE && usageMemory > 0) {
-            float usageFactor = (float) usageMemory / maxMemory;
-            if (usageFactor < 1.0f && usageFactor > memoryUsageFactor) {
-                System.err.println("usageMemory = " + usageMemory + "; maxMemory = " + maxMemory);
+            // value is valid
+            if (maxMemory > 0 && maxMemory < Long.MAX_VALUE && usedMemory > 0) {
+                float usageFactor = (float) usedMemory / maxMemory;
+                if (usageFactor < 1.0f && usageFactor > memoryUsageFactor) {
+                    System.err.println("usedMemory = " + usedMemory + "; maxMemory = " + maxMemory);
+                    throw new OutOfMemoryError("Out of memory");
+                }
+            }
+        } else {
+            if (isMemoryWarning) {
                 throw new OutOfMemoryError("Out of memory");
             }
         }
