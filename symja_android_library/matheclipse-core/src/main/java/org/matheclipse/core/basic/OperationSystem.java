@@ -18,6 +18,7 @@ public class OperationSystem {
     /**
      * This field should be set to true if the application receive memory warning, typically in
      * AppDelegate.swift
+     * Before calculating, this field should set to true
      */
     private static boolean isMemoryWarning = false;
 
@@ -72,6 +73,7 @@ public class OperationSystem {
             }
         } else {
             if (isMemoryWarning) {
+                isMemoryWarning = false;
                 throw new OutOfMemoryError("Out of memory");
             }
         }
