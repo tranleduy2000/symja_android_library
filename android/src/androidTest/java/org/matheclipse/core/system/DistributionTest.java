@@ -13,10 +13,10 @@ public class DistributionTest extends AbstractTestCase {
 	}
 
 	public void testChiSquareDistribution() {
-		check("Mean(ChiSquareDistribution(v))", //
-				"v");
 		check("StandardDeviation(ChiSquareDistribution(v))", //
 				"Sqrt(2)*Sqrt(v)");
+		check("Mean(ChiSquareDistribution(v))", //
+				"v");
 		check("Variance(ChiSquareDistribution(v))", //
 				"2*v");
 		check("CDF(ChiSquareDistribution(v))", //
@@ -27,10 +27,10 @@ public class DistributionTest extends AbstractTestCase {
 		check("CDF(ChiSquareDistribution(v), k)", //
 				"Piecewise({{GammaRegularized(v/2,0,k/2),k>0}},0)");
 		check("PDF(ChiSquareDistribution(v), k)", //
-				"Piecewise({{1/(2^(v/2)*E^(k/2)*Gamma(v/2)*k^(1-v/2)),k>0}},0)");
+				"Piecewise({{1/(2^(v/2)*E^(k/2)*k^(1-v/2)*Gamma(v/2)),k>0}},0)");
 		// TODO
-//		check("Skewness(ChiSquareDistribution(v))", //
-//				"");
+		// check("Skewness(ChiSquareDistribution(v))", //
+		// "");
 	}
 
 	public void testErlangDistribution() {
@@ -53,9 +53,9 @@ public class DistributionTest extends AbstractTestCase {
 				"Piecewise({{m/(-2+m),m>2}},Indeterminate)");
 		// TODO distribute Sqrt over Piecewise
 		check("StandardDeviation(FRatioDistribution(n, m))", //
-				"Sqrt(Piecewise({{(2*m^2*(-2+m+n))/((-4+m)*(-2+m)^2*n),m>4}},Indeterminate))");
+				"Sqrt(Piecewise({{(2*m^2*(-2+m+n))/((2-m)^2*(-4+m)*n),m>4}},Indeterminate))");
 		check("Variance(FRatioDistribution(n, m))", //
-				"Piecewise({{(2*m^2*(-2+m+n))/((-4+m)*(-2+m)^2*n),m>4}},Indeterminate)");
+				"Piecewise({{(2*m^2*(-2+m+n))/((2-m)^2*(-4+m)*n),m>4}},Indeterminate)");
 		check("CDF(FRatioDistribution(n, m))", //
 				"Piecewise({{BetaRegularized((n*#1)/(m+n*#1),n/2,m/2),#1>0}},0)&");
 		check("PDF(FRatioDistribution(n, m))", //
@@ -89,7 +89,7 @@ public class DistributionTest extends AbstractTestCase {
 		check("PDF(GammaDistribution(a, b))", //
 				"Piecewise({{1/(b^a*E^(#1/b)*Gamma(a)*#1^(1-a)),#1>0}},0)&");
 		check("PDF(GammaDistribution(a, b, g, d))", //
-				"Piecewise({{g/(E^((-d+#1)/b)^g*b*Gamma(a)*((-d+#1)/b)^(1-a*g)),#1>d}},0)&");
+				"Piecewise({{g/(b*E^((-d+#1)/b)^g*Gamma(a)*((-d+#1)/b)^(1-a*g)),#1>d}},0)&");
 		check("Quantile(GammaDistribution(a, b), {1/4, 1/2, 3/4})", //
 				"{b*InverseGammaRegularized(a,0,1/4),b*InverseGammaRegularized(a,0,1/2),b*InverseGammaRegularized(a,\n"
 						+ "0,3/4)}");
@@ -104,7 +104,7 @@ public class DistributionTest extends AbstractTestCase {
 		check("Mean(NormalDistribution(m, s))", //
 				"m");
 		check("CDF(NormalDistribution( ), x)", //
-				"1/2*(2-Erfc(x/Sqrt(2)))");
+				"Erfc(-x/Sqrt(2))/2");
 		check("CDF(NormalDistribution(n,m), x)", //
 				"Erfc((n-x)/(Sqrt(2)*m))/2");
 		check("PDF(NormalDistribution( ), x)", //

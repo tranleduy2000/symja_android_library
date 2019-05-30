@@ -124,5 +124,4 @@ public class AssumptionTestCase extends TestCase {
 		assertEquals(result.toString(), "t");
 	}
 
-
 }

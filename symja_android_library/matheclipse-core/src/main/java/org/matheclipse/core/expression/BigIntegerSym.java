@@ -27,6 +27,8 @@ import java.math.RoundingMode;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.matheclipse.core.expression.NumberUtil.approximatelyDigitCount;
+
 /**
  * IInteger implementation which delegates most of the methods to the BigInteger methods.
  * 
@@ -597,7 +599,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IInteger multiply(final IInteger that) {
 		// Swift changed: check out of memory
-		OperationSystem.checkMemory();
+		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 3);
 		if (that instanceof IntegerSym) {
 			switch (((IntegerSym) that).fIntValue) {
 			case 0:
@@ -619,7 +621,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IInteger multiply(int value) {
 		// Swift changed: check out of memory
-		OperationSystem.checkMemory();
+		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 3);
 		switch (value) {
 		case 0:
 			return F.C0;
@@ -635,7 +637,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IRational multiply(IRational parm1) {
 		// Swift changed: check out of memory
-		OperationSystem.checkMemory();
+		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 3);
 		if (parm1.isZero()) {
 			return F.C0;
 		}

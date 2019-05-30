@@ -21,7 +21,7 @@ import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.y;
 
 /**
- *
+ * 
  */
 public class ExpandTestCase extends AbstractTestCase {
 	public ExpandTestCase(String name) {

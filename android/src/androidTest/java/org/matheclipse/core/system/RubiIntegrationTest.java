@@ -56,18 +56,20 @@ import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FixSimpli
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfTrig;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfTrigOfLinearQ;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.MakeAssocList;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NormalizeTrig;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.PolyQ;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.QuadraticMatchQ;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RemoveContent;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SimpFixFactor;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Subst;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SubstAux;
 import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.TrigSimplifyAux;
 
 /**
  * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- *
+ * 
  */
 public class RubiIntegrationTest extends AbstractTestCase {
 	public RubiIntegrationTest(String name) {
@@ -375,7 +377,7 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		IAST ast;
 		// NormalizeTrig[func_,m_.*(n_.*Pi+r_.)+s_.,b_,x_]
 		ast = NormalizeTrig(Sin, F.Plus(Times(F.C1D2, F.Plus(Times(F.C1D2, Pi), F.r)), F.s), F.CN1, F.x);
-		check(ast, "Cos[Pi/4-r/2-s+x]");
+		check(ast, "Sin[Pi/4+r/2+s-x]");
 
 		ast = NormalizeTrig(F.ArcSin, F.Plus(Times(F.C1D3, F.Plus(Times(F.C1D2, Pi), F.r)), F.s), F.CN1, F.x);
 		check(ast, "ArcSin[Pi/6+r/3+s-x]");
@@ -461,10 +463,31 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		// check(ast, "ArcTanh[x/(2*Sqrt[2])]/Sqrt[2]");
 	}
 
-	public void testSqrtSin() {
-		check("Integrate(Sqrt(a*Sin(x)^2),x)", "-Cot(x)*Sqrt(a*Sin(x)^2)");
+	/**
+	 * Github issue #116
+	 */
+	public void testRubi021() {
+		IAST ast;
+		// Rubi`subst(-ArcTan(x/Sqrt(3))/Sqrt(3),x,1+2*x)
+		ast = Subst(F.Times(F.CN1, F.C1DSqrt3, F.ArcTan(F.Times(F.C1DSqrt3, F.x))), F.x,
+				F.Plus(F.C1, F.Times(F.C2, F.x)));
+		check(ast, "-ArcTan[(1+2*x)/Sqrt[3]]/Sqrt[3]");
 	}
 
+	/**
+	 * Github issue #116
+	 */
+	public void testRubi022() {
+		IAST ast;
+		ast = SubstAux(F.Times(F.CN1,F.C1DSqrt3,F.ArcTan(F.Times(F.C1DSqrt3,F.x))),F.x,F.Plus(F.C1,F.Times(F.C2,F.x)),F.True);
+		check(ast, "-ArcTan[(1+2*x)/Sqrt[3]]/Sqrt[3]");
+	}
+
+	public void testRubi023() {
+		IAST ast;
+		ast = MakeAssocList(F.Power(F.x,F.CN1),F.x);
+		check(ast, "{}");
+	}
 	public void testArcSin() {
 
 		check("Integrate(ArcSin(x),x)", "Sqrt(1-x^2)+x*ArcSin(x)");
@@ -553,7 +576,8 @@ public class RubiIntegrationTest extends AbstractTestCase {
 
 		check("Integrate(x*Sin(a + b*x),x)", //
 				"(-x*Cos(a+b*x))/b+Sin(a+b*x)/b^2");
-		check("D(b^(-2)*Sin(b*x+a)-Cos(b*x+a)*b^(-1)*x,x)", "x*Sin(a+b*x)");
+		check("D(b^(-2)*Sin(b*x+a)-Cos(b*x+a)*b^(-1)*x,x)", //
+				"x*Sin(a+b*x)");
 		check("Integrate(x*Sin(a + b*x)^2,x)", //
 				"x^2/4+(-x*Cos(a+b*x)*Sin(a+b*x))/(2*b)+Sin(a+b*x)^2/(4*b^2)");
 		check("Integrate(x*Sin(a + b*x)^3,x)", //
@@ -610,7 +634,8 @@ public class RubiIntegrationTest extends AbstractTestCase {
 	}
 
 	public void testRationalFunction001() {
-		check("PolynomialQ(x^2*(a+b*x^3)^16,x)", "True");
+		check("PolynomialQ(x^2*(a+b*x^3)^16,x)", //
+				"True");
 
 		check("Integrate(x^2*(a+b*x^3)^16,x)", //
 				"(a+b*x^3)^17/(51*b)");
@@ -701,9 +726,9 @@ public class RubiIntegrationTest extends AbstractTestCase {
 		check("ExpandAll(-(2-x)^(-1)*x^(-2))", //
 				"-1/(2*x^2-x^3)");
 		check("integrate(1/(-2*x^2+x^3),x)", //
-				"1/(2*x)-Log(x)/4+Log(-8+4*x)/4");
+				"1/(2*x)+Log(2-x)/4-Log(x)/4");
 		check("integrate(1/(x^2*(x-2)),x)", //
-				"1/(2*x)-Log(x)/4+Log(-8+4*x)/4");
+				"1/(2*x)+Log(2-x)/4-Log(x)/4");
 		check("Expand(-(2-x)^(-1)*x^(-2))", //
 				"-1/((2-x)*x^2)");
 	}
@@ -729,7 +754,7 @@ public class RubiIntegrationTest extends AbstractTestCase {
 				"SinIntegral(a)");
 
 		check("test(Sin((e_.) + (f_.)*(x_))/((c_.) + (d_.)*(x_)), x_Symbol) := SinIntegral(e + f*x)/d " //
-						+ "/; FreeQ({c, d, e, f}, x) && (d*e - c*f== 0)", //
+				+ "/; FreeQ({c, d, e, f}, x) && (d*e - c*f== 0)", //
 				"");
 		// check("Definition(test)", //
 		// "");
@@ -771,7 +796,6 @@ public class RubiIntegrationTest extends AbstractTestCase {
 				"-Log(I-x)");
 		check("Integrate(1/(x-I), x)", //
 				"Log(I-x)");
-
 		check("D(-Log(-1+x),x)", //
 				"-1/(-1+x)");
 	}

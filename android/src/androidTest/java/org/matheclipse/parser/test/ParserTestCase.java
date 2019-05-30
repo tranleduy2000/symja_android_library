@@ -89,7 +89,7 @@ public class ParserTestCase extends TestCase {
 			if (!Config.EXPLICIT_TIMES_OPERATOR) {
 				ASTNode obj = p.parse("4.7942553860420304E-1");
 				assertEquals(obj.toString(), "Plus(Times(4.7942553860420304, E), Times(-1, 1))");
-				
+
 				obj = p.parse("4.7942553860420304 * E - 1");
 				assertEquals(obj.toString(), "Plus(Times(4.7942553860420304, E), Times(-1, 1))");
 			} else {
@@ -414,14 +414,13 @@ public class ParserTestCase extends TestCase {
 		try {
 			Parser p = new Parser();
 			ASTNode obj = p.parse("FracPart[m_*u_,n_:1]");
-			assertEquals(obj.toString(),
-					"FracPart(Times(m_, u_), Optional(n_, 1))");
+			assertEquals(obj.toString(), "FracPart(Times(m_, u_), Optional(n_, 1))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());
 		}
 	}
-	
+
 	public void testParse30() {
 		try {
 			Parser p = new Parser();
@@ -432,6 +431,7 @@ public class ParserTestCase extends TestCase {
 			assertEquals("", e.getMessage());
 		}
 	}
+
 	public void testParser31() {
 		try {
 			Parser p = new Parser();
@@ -448,6 +448,19 @@ public class ParserTestCase extends TestCase {
 			Parser p = new Parser();
 			ASTNode obj = p.parse("(-1)^(a) (b)");
 			assertEquals(obj.toString(), "Times(Power(-1, a), b)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParser33() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse(
+					"Int[(u_)*(y_)^(m_.), x_Symbol] := With[{q = DerivativeDivides[y, u, x]}, Simp[(q*y^(m + 1))/(m + 1), x] /;  !FalseQ[q]] /; FreeQ[m, x] && NeQ[m, -1]");
+			assertEquals(obj.toString(),
+					"SetDelayed(Int(Times(u_, Power(y_, m_.)), x_Symbol), Condition(With(List(Set(q, DerivativeDivides(y, u, x))), Condition(Simp(Times(Times(q, Power(y, Plus(m, 1))), Power(Plus(m, 1), -1)), x), Not(FalseQ(q)))), And(FreeQ(m, x), NeQ(m, -1))))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());
@@ -473,6 +486,125 @@ public class ParserTestCase extends TestCase {
 					"a = {1}; Do[ If[ a[ [ -1 ] ] - n > 0 && Position[ a, a[ [ -1 ] ] - n ] == {}, a = Append[ a, a[ [ -1 ] ] - n ], a = Append[ a, a[ [ -1 ] ] + n ] ], {n, 2, 70} ]; a");
 			assertEquals(obj.toString(),
 					"CompoundExpression(Set(a, List(1)), Do(If(And(Greater(Plus(Part(a, -1), Times(-1, n)), 0), Equal(Position(a, Plus(Part(a, -1), Times(-1, n))), List())), Set(a, Append(a, Plus(Part(a, -1), Times(-1, n)))), Set(a, Append(a, Plus(Part(a, -1), n)))), List(n, 2, 70)), a)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse35() {
+		try {
+			Parser p = new Parser();
+			// http://oeis.org/A005132
+			ASTNode obj = p.parse("	If[!MatchQ[#,_\\[Rule]_],\n" + "       Message[Caller::\"UnknownOption\",#];\n"
+					+ "       (*else*),\n" + "       pos=Position[FullOptions,{#[[1]],_,_}];\n"
+					+ "       If[Length[pos]\\[Equal]0,\n" + "         Message[Caller::\"UnknownOption\",#]\n"
+					+ "         (*else*),\n" + "         FullOptions[[pos[[1,1]],3]]=#[[2]]\n" + "         ];\n"
+					+ "       ];");
+			assertEquals(obj.toString(),
+					"CompoundExpression(If(Not(MatchQ(Slot(1), Rule(_, _))), CompoundExpression(Message(MessageName(Caller, UnknownOption), Slot(1)), Null), CompoundExpression(Set(pos, Position(FullOptions, List(Part(Slot(1), 1), _, _))), If(Equal(Length(pos), 0), Message(MessageName(Caller, UnknownOption), Slot(1)), Set(Part(FullOptions, Part(pos, 1, 1), 3), Part(Slot(1), 2))), Null)), Null)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse36() {
+		try {
+			// System.out.println(Character.isUnicodeIdentifierPart('\u221E'));
+			Parser p = new Parser();
+			ASTNode obj = p.parse("\u221E");
+			assertEquals(obj.toString(),
+					"Infinity");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse37() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("      Do[\n" + "        serh=SeriesHead[ser,\\[Omega]];\n" + "        \n"
+					+ "        (* check for series term that run out of precision *)\n"
+					+ "        If[FreeQ[serh,HoldPattern[SeriesData[_,_,{},_,_,_]]],\n" + "          (* No: done. *)\n"
+					+ "          Break[];\n" + "          ];\n" + "        ,{i,1,30}\n" + "        ]");
+			assertEquals(obj.toString(),
+					"Do(CompoundExpression(Set(serh, SeriesHead(ser, ω)), If(FreeQ(serh, HoldPattern(SeriesData(_, _, List(), _, _, _))), CompoundExpression(Break(), Null)), Null), List(i, 1, 30))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse38() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("MakeGraph[Range[26],\n" + "                            Mod[#1-#2, 26] == 1 ||\n"
+					+ "                                (-1)^#1Mod[#1-#2, 26] == 11 ||\n"
+					+ "                                (-1)^#1Mod[#1-#2, 26] == 7&,\n"
+					+ "                            Type -> Directed]");
+			assertEquals(obj.toString(),
+					"MakeGraph(Range(26), Function(Or(Equal(Mod(Plus(Slot(1), Times(-1, Slot(2))), 26), 1), Equal(Times(Power(-1, Slot(1)), Mod(Plus(Slot(1), Times(-1, Slot(2))), 26)), 11), Equal(Times(Power(-1, Slot(1)), Mod(Plus(Slot(1), Times(-1, Slot(2))), 26)), 7))), Rule(Type, Directed))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse39() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("While[i\\[LessEqual]Length[asympt] && asympt[[i,2]]\\[Equal]0,i++]");
+			assertEquals(obj.toString(),
+					"While(And(LessEqual(i, Length(asympt)), Equal(Part(asympt, i, 2), 0)), Increment(i))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse40() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("ff/: Power[ff, i_Integer] = {i}");
+			assertEquals(obj.toString(),
+					"TagSet(ff, Power(ff, i_Integer), List(i))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse41() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("ff/: Power[ff, i_Integer] := {i}");
+			assertEquals(obj.toString(),
+					"TagSetDelayed(ff, Power(ff, i_Integer), List(i))");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse42() {
+		try {
+			Parser p = new Parser();
+			ASTNode obj = p.parse("m_.k_+b_.");
+			assertEquals(obj.toString(),
+					"Plus(Times(m_., k_), b_.)");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", e.getMessage());
+		}
+	}
+
+	public void testParse43() {
+		try {
+			Parser p = new Parser();
+ 			ASTNode obj = p.parse("MakeAssocList[u_,x_Symbol,alst_List:{}] ");
+			assertEquals(obj.toString(), "MakeAssocList(u_, x_Symbol, Optional(alst_List, List()))");
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals("", e.getMessage());

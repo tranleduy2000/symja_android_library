@@ -7,36 +7,15 @@ import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
 
 public class MemoryOverflowErrorTest extends TestCase {
 
-    public void testPower() {
+    public void test1() {
         IExpr result = new ExprEvaluator().eval("N(3123^22321321)");
         assertEquals(result.toString(), "Infinity");
-
-        result = new ExprEvaluator().eval("3123^(1232321311/2131211123)");
-        assertEquals(result.toString(), "Infinity");
     }
 
-    public void testPower2() throws InterruptedException {
-        OperationSystem.debug = true;
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        CountDownLatch countDownLatch = new CountDownLatch(availableProcessors);
-        for (int i = 0; i < availableProcessors; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    new ExprEvaluator().eval("31112323213111232" +
-                            "^31112323213111232");
-                    countDownLatch.countDown();
-                }
-            }).start();
-        }
-        countDownLatch.await();
-    }
-
-    public void test2() throws InterruptedException {
+    public void test4() throws InterruptedException {
         try {
             OperationSystem.debug = true;
             //noinspection MismatchedQueryAndUpdateOfCollection

@@ -64,7 +64,8 @@ public class CompleteTestSuite extends TestCase {
 
 //		suite.addTestSuite(ConsoleTestCase.class);
 		suite.addTestSuite(AssumptionTestCase.class);
-		
+		suite.addTestSuite(WXFTestCase.class);
+
 		return suite;
 
 	}

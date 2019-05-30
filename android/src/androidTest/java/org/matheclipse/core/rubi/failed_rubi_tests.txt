@@ -1,0 +1,27 @@
+Exponentials
+HyperbolicFunctions
+IndependentTestSuites
+InverseHyperbolicFunctions
+test0041 - Integrate[(a + I*b*ArcSin[1 - I*d*x^2])^(-1), x]
+test0042 - Integrate[(a + I*b*ArcSin[1 - I*d*x^2])^(-2), x]
+test0045 - Integrate[Sqrt[a + I*b*ArcSin[1 - I*d*x^2]], x]
+InverseTrigFunctions
+Logarithms
+test0128 - Integrate[Log[(2*x*(d*Sqrt[-(e/d)] + e*x))/(d + e*x^2)]/(d + e*x^2), x]
+test0129 - Integrate[Log[(-2*x*(d*Sqrt[-(e/d)] - e*x))/(d + e*x^2)]/(d + e*x^2), x]
+test0130 - Integrate[Log[(2*x*((d*Sqrt[e])/Sqrt[-d] + e*x))/(d + e*x^2)]/(d + e*x^2), x]
+test0131 - Integrate[Log[(-2*x*((d*Sqrt[e])/Sqrt[-d] - e*x))/(d + e*x^2)]/(d + e*x^2), x]
+test0132 - Integrate[Log[(2*x*(Sqrt[d]*Sqrt[-e] + e*x))/(d + e*x^2)]/(d + e*x^2), x]
+test0133 - Integrate[Log[(-2*x*(Sqrt[d]*Sqrt[-e] - e*x))/(d + e*x^2)]/(d + e*x^2), x]
+SpecialFunctions
+TrigFunctions
+test0255 - Integrate[(1 + Cos[c + d*x])/(Cos[c + d*x]^(3/2)*Sqrt[2 + 3*Cos[c + d*x]]), x]
+test0256 - Integrate[(1 + Cos[c + d*x])/(Cos[c + d*x]^(3/2)*Sqrt[-2 + 3*Cos[c + d*x]]), x]
+test0257 - Integrate[(1 + Cos[c + d*x])/(Cos[c + d*x]^(3/2)*Sqrt[3 + 2*Cos[c + d*x]]), x]
+test0258 - Integrate[(1 + Cos[c + d*x])/(Sqrt[3 - 2*Cos[c + d*x]]*Cos[c + d*x]^(3/2)), x]
+AlgebraicFunctions
+test0275 - Integrate[((1 - x)^(-1/2 + p)*(1 + x)^(1/2 + p))/(c*x)^(2*(1 + p)), x]
+test0276 - Integrate[(1 + x/a)^(n/2)/(x^2*(1 - x/a)^(n/2)), x]
+test0486 - Integrate[1/(Sqrt[3 - 3*Sqrt[3] + 2*Sqrt[3]*x^2]*Sqrt[3 + (-3 + Sqrt[3])*x^2]), x]
+test1047 - Integrate[(a*d*e + (c*d^2 + a*e^2)*x + c*d*e*x^2)^p, x]
+test1242 - Integrate[(1 + Sqrt[c/a]*x^2)/((d + e*x^2)*Sqrt[a + b*x^2 + c*x^4]), x]

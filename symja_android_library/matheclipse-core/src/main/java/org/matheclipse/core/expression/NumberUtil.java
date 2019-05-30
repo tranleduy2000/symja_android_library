@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import com.duy.annotations.Nullable;
 import com.gx.common.math.DoubleMath;
 
 import org.hipparchus.fraction.BigFraction;
@@ -160,7 +161,7 @@ public class NumberUtil {
 	 * Converts this number to <code>int</code>; unlike {@link #intValue} this
 	 * method raises {@link ArithmeticException} if this integer cannot be
 	 * represented by an <code>int</code> type.
-	 * 
+	 *
 	 * @return the numeric value represented by this integer after conversion to
 	 *         type <code>int</code>.
 	 * @throws ArithmeticException
@@ -189,7 +190,7 @@ public class NumberUtil {
 	 * Converts this number to <code>int</code>; unlike {@link #intValue} this
 	 * method raises {@link ArithmeticException} if this integer cannot be
 	 * represented by an <code>int</code> type.
-	 * 
+	 *
 	 * @return the numeric value represented by this number after conversion to
 	 *         type <code>int</code>.
 	 * @throws ArithmeticException
@@ -204,7 +205,7 @@ public class NumberUtil {
 	 * Converts this number to <code>long</code>; unlike {@link #longValue} this
 	 * method raises {@link ArithmeticException} if this integer cannot be
 	 * represented by an <code>long</code> type.
-	 * 
+	 *
 	 * @return the numeric value represented by this number after conversion to
 	 *         type <code>long</code>.
 	 * @throws ArithmeticException
@@ -217,7 +218,7 @@ public class NumberUtil {
 
 	/**
 	 * Compares the absolute value of two rational numbers.
-	 * 
+	 *
 	 * @param that
 	 *            the rational number to be compared with.
 	 * @return <code>|this| > |that|</code>
@@ -439,7 +440,7 @@ public class NumberUtil {
 	 * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
 	 * Stackoverflow.com - Fastest way to determine if an integer's square root
 	 * is an integer</a>
-	 * 
+	 *
 	 * @param bi
 	 * @return <code>true</code> if the number is a perfect square.
 	 */
@@ -458,7 +459,7 @@ public class NumberUtil {
 	 * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
 	 * Stackoverflow.com - Fastest way to determine if an integer's square root
 	 * is an integer</a>
-	 * 
+	 *
 	 * @param bf
 	 * @return <code>true</code> if the number is a perfect square.
 	 */
@@ -479,7 +480,7 @@ public class NumberUtil {
 	 * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
 	 * Stackoverflow.com - Fastest way to determine if an integer's square root
 	 * is an integer</a>
-	 * 
+	 *
 	 * @param bf
 	 * @return <code>true</code> if the number is a perfect square.
 	 */
@@ -500,7 +501,7 @@ public class NumberUtil {
 	 * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
 	 * Stackoverflow.com - Fastest way to determine if an integer's square root
 	 * is an integer</a>
-	 * 
+	 *
 	 * @param n
 	 * @return <code>true</code> if the number is a perfect square.
 	 */
@@ -554,10 +555,10 @@ public class NumberUtil {
 	/**
 	 * Convert a <code>double</code> number into a reduced ratio of two
 	 * BigIntegers that mathematically represents exactly the same value.
-	 * 
+	 *
 	 * See: <a href="http://stackoverflow.com/questions/27259162">http://
 	 * stackoverflow.com/questions/27259162</a>
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
@@ -633,5 +634,14 @@ public class NumberUtil {
 			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}
 		return x;
+	}
+
+	public static int approximatelyDigitCount(@Nullable BigInteger number) {
+		// log(10, 2^n) = n * log(10, 2)
+		if (number == null) {
+			return 0;
+		}
+		double factor = Math.log(2) / Math.log(10);
+		return (int) (factor * number.bitLength() + 1);
 	}
 }

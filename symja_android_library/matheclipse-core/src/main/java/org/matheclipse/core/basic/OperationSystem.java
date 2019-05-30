@@ -25,6 +25,14 @@ public class OperationSystem {
     }
 
     public static void checkMemory() {
+        checkMemory(0);
+    }
+
+    /**
+     * @param additionalMemory approximately memory will be allocate after perform some operations.
+     *                         Unit of bytes
+     */
+    public static void checkMemory(int additionalMemory) {
         Runtime runtime = Runtime.getRuntime();
         long maxMemory = runtime.maxMemory();
         long usageMemory;
@@ -33,6 +41,7 @@ public class OperationSystem {
         } else {
             usageMemory = runtime.totalMemory();
         }
+        usageMemory += additionalMemory;
         if (debug) {
             printMemoryUsage(maxMemory, usageMemory);
         }

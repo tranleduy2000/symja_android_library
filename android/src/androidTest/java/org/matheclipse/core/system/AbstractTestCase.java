@@ -28,8 +28,25 @@ public abstract class AbstractTestCase extends TestCase {
     public AbstractTestCase(String name) {
         super(name);
         Config.SERVER_MODE = false;
+        Config.SHOW_STACKTRACE = true;
     }
 
+	public void ESameTest(String expectedString, String evalString  ) {
+		try {
+			if (evalString.length() == 0 && expectedString.length() == 0) {
+				return;
+			}
+			// scriptEngine.put("STEPWISE",Boolean.TRUE);
+			String evaledResult = (String) fScriptEngine.eval(evalString);
+			String expectedResult = (String) fScriptEngine.eval(expectedString);
+
+				assertEquals(expectedResult, evaledResult);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertEquals("", "1");
+		}
+	}
     public void check(String evalString, String expectedResult) {
         check(fScriptEngine, evalString, expectedResult, -1);
     }
@@ -38,59 +55,35 @@ public abstract class AbstractTestCase extends TestCase {
         check(fScriptEngine, evalString, expectedResult, resultLength);
     }
 
-    public void check(final ScriptEngine scriptEngine, final String evalString, final String expectedResult, final int resultLength) {
+    public void check(ScriptEngine scriptEngine, String evalString, String expectedResult, int resultLength) {
         try {
             if (evalString.length() == 0 && expectedResult.length() == 0) {
                 return;
             }
-
             // scriptEngine.put("STEPWISE",Boolean.TRUE);
-            String evaledResult = evals(scriptEngine, evalString);
+            String evaledResult = (String) scriptEngine.eval(evalString);
+
             if (resultLength > 0 && evaledResult.length() > resultLength) {
                 evaledResult = evaledResult.substring(0, resultLength) + "<<SHORT>>";
                 assertEquals(expectedResult, evaledResult);
             } else {
                 assertEquals(expectedResult, evaledResult);
             }
-
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            fail(throwable.getMessage());
-        }
-    }
-
-    private String evals(final ScriptEngine scriptEngine, final String evalString) throws Throwable {
-        final String[] result = new String[1];
-        final Throwable[] exceptions = new Throwable[1];
-        ThreadGroup group = new ThreadGroup("CalculateThread");
-        Thread thread = new Thread(group, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    result[0] = (String) scriptEngine.eval(evalString);
-                } catch (Throwable e) {
-                    exceptions[0] = e;
-                }
-            }
-        }, "CalculateThread", 20971520/*2MB*/);
-        thread.start();
-        thread.join();
-        if (exceptions[0] != null) {
-            throw exceptions[0];
-        }
-        return result[0];
-    }
-
-    public String evalString(String evalString) {
-        try {
-            // scriptEngine.put("STEPWISE",Boolean.TRUE);
-            String evaledResult = (String) fScriptEngine.eval(evalString);
-            return evaledResult;
         } catch (Exception e) {
             e.printStackTrace();
             assertEquals("", "1");
         }
-        return "";
+    }
+
+	public String evalString(String evalString) {
+        try {
+            // scriptEngine.put("STEPWISE",Boolean.TRUE);
+			return (String) fScriptEngine.eval(evalString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertEquals("", "1");
+        }
+		return "";
     }
 
     public void checkNumeric(String evalString, String expectedResult) {
@@ -163,15 +156,17 @@ public abstract class AbstractTestCase extends TestCase {
     protected void setUp() {
         try {
             synchronized (fScriptManager) {
-                fScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
+				EvalEngine engine = new EvalEngine();
+				fScriptEngine = new MathScriptEngine(engine);// fScriptManager.getEngineByExtension("m");
                 fScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 fScriptEngine.put("DECIMAL_FORMAT", "0.0####");
 
                 fNumericScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
                 fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
-				F.await();
+                F.await();
 
-                EvalEngine engine = EvalEngine.get();
+				EvalEngine.set(engine);
+				engine.init();
                 engine.setRecursionLimit(256);
                 engine.setIterationLimit(500);
             }
