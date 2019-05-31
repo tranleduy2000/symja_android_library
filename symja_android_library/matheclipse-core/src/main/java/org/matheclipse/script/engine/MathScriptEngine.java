@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.ScriptContext;
@@ -25,180 +26,205 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 
 public class MathScriptEngine extends AbstractScriptEngine {
-	public final static String RETURN_OBJECT = "RETURN_OBJECT";
+    public final static String RETURN_OBJECT = "RETURN_OBJECT";
 
-	private EvalUtilities fUtility;
-	private EvalEngine fEngine;
-	private String fDecimalFormat;
+    private EvalUtilities fUtility;
+    private EvalEngine fEngine;
+    private String fDecimalFormat;
 
-	// static {
-	// run the static groovy code for the MathEclipse domain specific language
-	// DSL groovyDSL = new DSL();
-	// }
+    // static {
+    // run the static groovy code for the MathEclipse domain specific language
+    // DSL groovyDSL = new DSL();
+    // }
 
-	public MathScriptEngine() {
-		this(new EvalEngine());
-	}
+    public MathScriptEngine() {
+        this(new EvalEngine());
+    }
 
-	public MathScriptEngine(EvalEngine engine) {
-		// get the thread local evaluation engine
-		fEngine = engine;
-		// fEngine.setRecursionLimit(256);
-		// fEngine.setIterationLimit(256);
-		fUtility = new EvalUtilities(fEngine, false, false);
-	}
+    public MathScriptEngine(EvalEngine engine) {
+        // get the thread local evaluation engine
+        fEngine = engine;
+        // fEngine.setRecursionLimit(256);
+        // fEngine.setIterationLimit(256);
+        fUtility = new EvalUtilities(fEngine, false, false);
+    }
 
-	@Override
-	public Object eval(final Reader reader, final ScriptContext context) throws ScriptException {
-		final BufferedReader f = new BufferedReader(reader);
-		final StringBuilder buff = new StringBuilder(1024);
-		String line;
-		try {
-			while ((line = f.readLine()) != null) {
-				buff.append(line);
-				buff.append('\n');
-			}
-			return eval(buff.toString());
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    @Override
+    public Object eval(final String script, final ScriptContext context) throws ScriptException {
+        // final ArrayList<ISymbol> list = new ArrayList<ISymbol>();
+        boolean relaxedSyntax = false;
+        try {
+            // first assign the EvalEngine to the current thread:
+            fUtility.startRequest();
 
-	@Override
-	public Object eval(final String script, final ScriptContext context) throws ScriptException {
-		// final ArrayList<ISymbol> list = new ArrayList<ISymbol>();
-		boolean relaxedSyntax = false;
-		try {
-			// first assign the EvalEngine to the current thread:
-			fUtility.startRequest();
+            // final Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            // ISymbol symbol;
+            // for (Map.Entry<String, Object> currEntry : bindings.entrySet()) {
+            // symbol = F.userSymbol(currEntry.getKey(), fEngine);
+            // symbol.pushLocalVariable(Object2Expr.convert(currEntry.getValue()));
+            // list.add(symbol);
+            // }
 
-			// final Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
-			// ISymbol symbol;
-			// for (Map.Entry<String, Object> currEntry : bindings.entrySet()) {
-			// symbol = F.userSymbol(currEntry.getKey(), fEngine);
-			// symbol.pushLocalVariable(Object2Expr.convert(currEntry.getValue()));
-			// list.add(symbol);
-			// }
+            final Object decimalFormat = get("DECIMAL_FORMAT");
+            if (decimalFormat instanceof String) {
+                fDecimalFormat = (String) decimalFormat;
+            }
 
-			final Object decimalFormat = get("DECIMAL_FORMAT");
-			if (decimalFormat instanceof String) {
-				fDecimalFormat = (String) decimalFormat;
-			}
+            final Object relaxedSyntaxBoolean = get("RELAXED_SYNTAX");
+            if (Boolean.TRUE.equals(relaxedSyntaxBoolean)) {
+                relaxedSyntax = true;
+                fEngine.setRelaxedSyntax(relaxedSyntax);
+            }
 
-			final Object relaxedSyntaxBoolean = get("RELAXED_SYNTAX");
-			if (Boolean.TRUE.equals(relaxedSyntaxBoolean)) {
-				relaxedSyntax = true;
-				fEngine.setRelaxedSyntax(relaxedSyntax);
-			}
+            boolean disableHistory = true;
+            final Object enableHistoryBoolean = get("ENABLE_HISTORY");
+            if (Boolean.TRUE.equals(enableHistoryBoolean)) {
+                disableHistory = false;
+                fEngine.setOutListDisabled(disableHistory, 100);
+            }
 
-			boolean disableHistory = true;
-			final Object enableHistoryBoolean = get("ENABLE_HISTORY");
-			if (Boolean.TRUE.equals(enableHistoryBoolean)) {
-				disableHistory = false;
-				fEngine.setOutListDisabled(disableHistory, 100);
-			}
+            // evaluate an expression
+            final Object stepwise = get("STEPWISE");
+            final IExpr[] result = new IExpr[1];
+            if (Boolean.TRUE.equals(stepwise)) {
+                result[0] = fUtility.evalTrace(script, null, F.List());
+            } else {
+                boolean isAndroid = System.getenv().containsKey("ANDROID_ASSETS");
+                final Throwable[] error = new Throwable[1];
+                if (isAndroid) {
+                    final CountDownLatch countDownLatch = new CountDownLatch(1);
+                    Thread thread = new Thread(null, new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                result[0] = fUtility.evaluate(script);
+                            } catch (Throwable e) {
+                                error[0] = e;
+                            }
+                            countDownLatch.countDown();
+                        }
+                    }, toString(), 8 * 1024 * 1024);
+                    thread.start();
+                    countDownLatch.await();
+                    if (error[0] != null) {
+                        throw error[0];
+                    }
+                } else {
+                    result[0] = fUtility.evaluate(script);
+                }
+            }
+            final Object returnType = context.getAttribute("RETURN_OBJECT");
+            if ((returnType != null) && returnType.equals(Boolean.TRUE)) {
+                // return the object "as is"
+                return result[0];
+            } else {
+                // return the object as String representation
+                if (result[0] != null) {
+                    return printResult(result[0], relaxedSyntax);
+                }
+                return "";
+            }
 
-			// evaluate an expression
-			final Object stepwise = get("STEPWISE");
-			IExpr result;
-			if (Boolean.TRUE.equals(stepwise)) {
-				result = fUtility.evalTrace(script, null, F.List());
-			} else {
-				result = fUtility.evaluate(script);
-			}
-			final Object returnType = context.getAttribute("RETURN_OBJECT");
-			if ((returnType != null) && returnType.equals(Boolean.TRUE)) {
-				// return the object "as is"
-				return result;
-			} else {
-				// return the object as String representation
-				if (result != null) {
-					return printResult(result, relaxedSyntax);
-				}
-				return "";
-			}
+        } catch (final AbortException e) {
+            if (Config.SHOW_STACKTRACE) {
+                e.printStackTrace();
+            }
+            try {
+                return printResult(F.$Aborted, relaxedSyntax);
+            } catch (IOException e1) {
+                if (Config.DEBUG) {
+                    e.printStackTrace();
+                }
+                return e1.getMessage();
+            }
+        } catch (final SyntaxError e) {
+            if (Config.DEBUG) {
+                e.printStackTrace();
+            }
+            // catch parser errors here
+            return e.getMessage();
+        } catch (final MathException e) {
+            if (Config.SHOW_STACKTRACE) {
+                e.printStackTrace();
+            }
+            // catch parser errors here
+            return e.getMessage();
+        } catch (final ApfloatRuntimeException e) {
+            if (Config.SHOW_STACKTRACE) {
+                e.printStackTrace();
+            }
+            // catch parser errors here
+            return "Apfloat: " + e.getMessage();
+        } catch (final Exception e) {
+            // if (e instanceof ExceptionContextProvider) {
+            // if (Config.DEBUG) {
+            // e.printStackTrace();
+            // }
+            // return e.getMessage();
+            // }
+            if (Config.SHOW_STACKTRACE) {
+                e.printStackTrace();
+            }
+            return "Exception: " + e.getMessage();
+        } catch (final OutOfMemoryError e) {
+            if (Config.DEBUG) {
+                e.printStackTrace();
+            }
+            return "OutOfMemoryError";
+        } catch (final StackOverflowError e) {
+            if (Config.SHOW_STACKTRACE) {
+                e.printStackTrace();
+            }
+            return "StackOverflowError";
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return "Exception: " + throwable.getMessage();
+        } finally {
+            // if (list.size() > 0) {
+            // for (int i = 0; i < list.size(); i++) {
+            // list.get(i).popLocalVariable();
+            // }
+            // }
+            EvalEngine.remove();
+        }
 
-		} catch (final AbortException e) {
-			if (Config.SHOW_STACKTRACE) {
-				e.printStackTrace();
-			}
-			try {
-				return printResult(F.$Aborted, relaxedSyntax);
-			} catch (IOException e1) {
-				if (Config.DEBUG) {
-					e.printStackTrace();
-				}
-				return e1.getMessage();
-			}
-		} catch (final SyntaxError e) {
-			if (Config.DEBUG) {
-				e.printStackTrace();
-			}
-			// catch parser errors here
-			return e.getMessage();
-		} catch (final MathException e) {
-			if (Config.SHOW_STACKTRACE) {
-				e.printStackTrace();
-			}
-			// catch parser errors here
-			return e.getMessage();
-		} catch (final ApfloatRuntimeException e) {
-			if (Config.SHOW_STACKTRACE) {
-				e.printStackTrace();
-			}
-			// catch parser errors here
-			return "Apfloat: " + e.getMessage();
-		} catch (final Exception e) {
-			// if (e instanceof ExceptionContextProvider) {
-			// if (Config.DEBUG) {
-			// e.printStackTrace();
-			// }
-			// return e.getMessage();
-			// }
-			if (Config.SHOW_STACKTRACE) {
-				e.printStackTrace();
-			}
-			return "Exception: " + e.getMessage();
-		} catch (final OutOfMemoryError e) {
-			if (Config.DEBUG) {
-				e.printStackTrace();
-			}
-			return "OutOfMemoryError";
-		} catch (final StackOverflowError e) {
-			if (Config.SHOW_STACKTRACE) {
-				e.printStackTrace();
-			}
-			return "StackOverflowError";
-		} finally {
-			// if (list.size() > 0) {
-			// for (int i = 0; i < list.size(); i++) {
-			// list.get(i).popLocalVariable();
-			// }
-			// }
-			EvalEngine.remove();
-		}
+    }
 
-	}
+    @Override
+    public Object eval(final Reader reader, final ScriptContext context) throws ScriptException {
+        final BufferedReader f = new BufferedReader(reader);
+        final StringBuilder buff = new StringBuilder(1024);
+        String line;
+        try {
+            while ((line = f.readLine()) != null) {
+                buff.append(line);
+                buff.append('\n');
+            }
+            return eval(buff.toString());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	private Object printResult(IExpr result, boolean relaxedSyntax) throws IOException {
-		if (result.equals(F.Null)) {
-			return "";
-		}
-		final StringWriter buf = new StringWriter();
-		if (fDecimalFormat != null) {
-		DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-			DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
-			OutputFormFactory.get(relaxedSyntax, false, decimalFormat).convert(buf, result);
-		} else {
-			OutputFormFactory.get(relaxedSyntax).convert(buf, result);
-		}
-		// print the result in the console
-		return buf.toString();
-	}
+    @Override
+    public ScriptEngineFactory getFactory() {
+        return new MathScriptEngineFactory();
+    }
 
-	@Override
-	public ScriptEngineFactory getFactory() {
-		return new MathScriptEngineFactory();
-	}
+    private Object printResult(IExpr result, boolean relaxedSyntax) throws IOException {
+        if (result.equals(F.Null)) {
+            return "";
+        }
+        final StringWriter buf = new StringWriter();
+        if (fDecimalFormat != null) {
+            DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
+            DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
+            OutputFormFactory.get(relaxedSyntax, false, decimalFormat).convert(buf, result);
+        } else {
+            OutputFormFactory.get(relaxedSyntax).convert(buf, result);
+        }
+        // print the result in the console
+        return buf.toString();
+    }
 }
