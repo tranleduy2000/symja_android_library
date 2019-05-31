@@ -1,6 +1,5 @@
 package org.matheclipse.core.basic;
 
-@SuppressWarnings("unused")
 public class OperationSystem {
 
     public static boolean debug = false;
@@ -52,7 +51,7 @@ public class OperationSystem {
 
     /**
      * @param additionalMemoryInBytes approximately memory will be allocate after perform some operations.
-     *                         Unit of bytes
+     *                                Unit of bytes
      */
     public static void checkMemory(int additionalMemoryInBytes) {
         if (isJvm()) {
