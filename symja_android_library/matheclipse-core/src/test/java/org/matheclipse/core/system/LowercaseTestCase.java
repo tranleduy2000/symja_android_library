@@ -3116,6 +3116,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCot() {
+		check("Cot(0.0)", //
+				"ComplexInfinity");
+		check("Cot(0)", //
+				"ComplexInfinity");
 		// check("Cot(z-Pi/3)", //
 		// "-Tan(Pi/6+z)");
 		check("Cot(e-Pi/2+f*x)", //
@@ -11787,6 +11791,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPatternAndRules() {
+		check("f(a_.*x_^j_.,x_):={a,x,j}; f(a*x*z,x)", //
+				"{a*z,x,1}");
+		check("f(a_.*x_^j_.,x_):={a,x,j}; f(a*b*x^3,x)", //
+				"{a*b,x,3}");
+		check("f(a_.*x_^j_.,x_):={a,x,j}; f(a*b*x^3*y*z,x)", //
+				"{a*b*y*z,x,3}");
 		check("a + b + c /. a + b -> t", //
 				"c+t");
 		check("a + 2 + b + c + x * y /. n_Integer + s__Symbol + rest_ -> {n, s, rest}", //
@@ -17456,6 +17466,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTan() {
+		check("Tan(Pi / 2.0)", //
+				"1.63312*10^16");
 		// TODO
 		// check("Tan(z-Pi/3)", //
 		// "-Cot(Pi/6+z)");

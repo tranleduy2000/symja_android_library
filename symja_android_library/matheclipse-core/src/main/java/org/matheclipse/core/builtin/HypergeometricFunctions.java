@@ -98,7 +98,33 @@ public class HypergeometricFunctions {
 		}
 	}
 
-	private static class CoshIntegral extends AbstractTrigArg1  {
+	private static class CoshIntegral extends AbstractTrigArg1 { // implements INumeric, DoubleUnaryOperator {
+
+		// @Override
+		// public double applyAsDouble(double z) {
+		// if (F.isZero(z)) {
+		// return Double.NEGATIVE_INFINITY;
+		// }
+		// // 1/4*(2*(ExpIntegralEi(-z)+ExpIntegralEi(z))+Log(-1/z)+Log(1/z)-Log(-z)+3*Log(z))
+		// return 0.25 * (2.0 * (ExpIntegralEi.CONST.applyAsDouble(-z) + ExpIntegralEi.CONST.applyAsDouble(z))
+		// + Math.log(-1 / z) + Math.log(1 / z) - Math.log(-z) + 3 * Math.log(z));
+		// }
+		//
+		// @Override
+		// public IExpr e1DblArg(final double arg1) {
+		// if (F.isZero(arg1)) {
+		// return F.CNInfinity;
+		// }
+		// return F.num(applyAsDouble(arg1));
+		// }
+		//
+		// @Override
+		// public double evalReal(final double[] stack, final int top, final int size) {
+		// if (size != 1) {
+		// throw new UnsupportedOperationException();
+		// }
+		// return applyAsDouble(stack[top]);
+		// }
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
@@ -163,6 +189,7 @@ public class HypergeometricFunctions {
 		}
 	}
 	private static class ExpIntegralEi extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
+		final static ExpIntegralEi CONST = new ExpIntegralEi();
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -489,7 +516,7 @@ public class HypergeometricFunctions {
 				try {
 					return F.num(de.lab4inf.math.functions.HypergeometricLimitFunction.limitSeries(bDouble, zDouble));
 				} catch (RuntimeException rex) {
-					return engine.printMessage("Hypergeometric0F1: " + rex.getMessage());
+					return engine.printMessage(ast.topHead() + ": "  + rex.getMessage());
 				}
 			}
 			return F.NIL;
@@ -541,7 +568,7 @@ public class HypergeometricFunctions {
 					try {
 						return F.num(de.lab4inf.math.functions.KummerFunction.kummer(aDouble, bDoube, zDouble));
 					} catch (RuntimeException rex) {
-						return engine.printMessage("Hypergeometric1F1: " + rex.getMessage());
+						return engine.printMessage(ast.topHead() + ": "  + rex.getMessage());
 					}
 				}
 			}
@@ -620,7 +647,7 @@ public class HypergeometricFunctions {
 					return F.num(de.lab4inf.math.functions.HypergeometricGaussSeries.gaussSeries(aDouble, bDouble,
 							cDouble, zDouble));
 				} catch (RuntimeException rex) {
-					return engine.printMessage("Hypergeometric2F1: " + rex.getMessage());
+					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
 				}
 			}
 			return F.NIL;

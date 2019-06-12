@@ -38,6 +38,7 @@ public abstract class AbstractArg1 extends AbstractFunctionEvaluator {
 		final int hier = ast.arg1().hierarchy();
 		if (hier <= IExpr.INTEGERID) {
 			if (hier <= IExpr.DOUBLECOMPLEXID) {
+				try {
 				if (hier == IExpr.DOUBLEID) {
 					if (arg1 instanceof ApfloatNum) {
 						return e1ApfloatArg(((ApfloatNum) arg1).apfloatValue());
@@ -48,6 +49,10 @@ public abstract class AbstractArg1 extends AbstractFunctionEvaluator {
 					return e1ApcomplexArg(((ApcomplexNum) arg1).apcomplexValue());
 				}
 				return e1ComplexArg(((ComplexNum) arg1).complexValue());
+				} catch (RuntimeException rex) {
+//					EvalEngine.get().printMessage(ast.topHead().toString() + ": " + rex.getMessage());
+					return F.NIL;
+				}
 			} else {
 				return e1IntArg((IInteger) arg1);
 			}

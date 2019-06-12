@@ -1083,7 +1083,7 @@ public class ExpTrigsFunctions {
 					// arg1 == x + k*Pi
 					if (k.isRational()) {
 						IRational t = (IRational) k;
-						if (t.isLT(F.C0) || !F.C2.isGT(t)) {
+						if (t.isLT(F.C0) || F.C2.isLE(t)) {
 							// Cos(arg1-2*Pi*Floor(1/2*t))
 							return F.Cos(F.Plus(arg1, F.Times(F.CN2, F.Pi, F.Floor(F.Times(F.C1D2, t)))));
 						} else if (t.isLT(F.C1D2)) {// t < 1/2
@@ -1535,7 +1535,11 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr e1ApfloatArg(Apfloat arg1) {
-			return F.num(ApfloatMath.cos(arg1).divide(ApfloatMath.sin(arg1)));
+			Apfloat denom = ApfloatMath.sin(arg1);
+			if (denom.equals(Apfloat.ZERO)) {
+				return F.CComplexInfinity;
+			}
+			return F.num(ApfloatMath.cos(arg1).divide(denom));
 		}
 
 		@Override
@@ -1545,7 +1549,11 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
-			return F.num(Math.cos(arg1) / Math.sin(arg1));
+			double denom = Math.sin(arg1);
+			if (F.isZero(denom)) {
+				return F.CComplexInfinity;
+			}
+			return F.num(Math.cos(arg1) / denom);
 		}
 
 		@Override
@@ -2253,7 +2261,7 @@ public class ExpTrigsFunctions {
 					// arg1 == x + k*Pi
 					if (k.isRational()) {
 						IRational t = (IRational) k;
-						if (t.isLT(F.C0) || !F.C2.isGT(t)) {
+						if (t.isLT(F.C0) || F.C2.isLE(t)) {
 							// Sin(arg1-2*Pi*Floor(1/2*t))
 							return F.Sin(F.Plus(arg1, F.Times(F.CN2, F.Pi, F.Floor(F.Times(F.C1D2, t)))));
 						} else if (t.isLT(F.C1D2)) {// t < 1/2
