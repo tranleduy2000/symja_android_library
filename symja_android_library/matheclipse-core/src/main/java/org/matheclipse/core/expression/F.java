@@ -34,6 +34,7 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.IntegerFunctions;
 import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.builtin.ListFunctions;
+import org.matheclipse.core.builtin.MinMaxFunctions;
 import org.matheclipse.core.builtin.NumberTheory;
 import org.matheclipse.core.builtin.OutputFunctions;
 import org.matheclipse.core.builtin.PatternMatching;
@@ -286,6 +287,9 @@ public class F {
     public final static IBuiltInSymbol ArcTanh = F.initFinalSymbol("ArcTanh", ID.ArcTanh);
 	/** Arg(expr) - returns the argument of the complex number `expr`. */
     public final static IBuiltInSymbol Arg = F.initFinalSymbol("Arg", ID.Arg);
+	public final static IBuiltInSymbol ArgMax = F.initFinalSymbol("ArgMax", ID.ArgMax);
+
+	public final static IBuiltInSymbol ArgMin = F.initFinalSymbol("ArgMin", ID.ArgMin);
 	/** ArithmeticGeometricMean(a, b) - returns the arithmetic geometric mean of `a` and `b`. */
 	public final static IBuiltInSymbol ArithmeticGeometricMean = F.initFinalSymbol("ArithmeticGeometricMean",
 			ID.ArithmeticGeometricMean);
@@ -420,6 +424,8 @@ public class F {
     public final static IBuiltInSymbol ByteArray = F.initFinalSymbol("ByteArray", ID.ByteArray);
     /***/
     public final static IBuiltInSymbol ByteArrayQ = F.initFinalSymbol("ByteArrayQ", ID.ByteArrayQ);
+	/***/
+	public final static IBuiltInSymbol ByteCount = F.initFinalSymbol("ByteCount", ID.ByteCount);
 	/***/
 	public final static IBuiltInSymbol C = F.initFinalSymbol("C", ID.C);
 	/** CDF(distribution, value) - returns the cumulative distribution function of `value`. */
@@ -975,6 +981,8 @@ public class F {
 	public final static IBuiltInSymbol GatherBy = F.initFinalSymbol("GatherBy", ID.GatherBy);
     /***/
     public final static IBuiltInSymbol GaussianIntegers = F.initFinalSymbol("GaussianIntegers", ID.GaussianIntegers);
+	/***/
+	public final static IBuiltInSymbol GaussianMatrix = F.initFinalSymbol("GaussianMatrix", ID.GaussianMatrix);
     /***/
     public final static IBuiltInSymbol GaussianWindow = F.initFinalSymbol("GaussianWindow", ID.GaussianWindow);
     /***/
@@ -1017,6 +1025,8 @@ public class F {
     public final static IBuiltInSymbol HammingWindow = F.initFinalSymbol("HammingWindow", ID.HammingWindow);
     /***/
     public final static IBuiltInSymbol HannWindow = F.initFinalSymbol("HannWindow", ID.HannWindow);
+	/***/
+	public final static IBuiltInSymbol HarmonicMean = F.initFinalSymbol("HarmonicMean", ID.HarmonicMean);
 	/** HarmonicNumber(n) - returns the `n`th harmonic number. */
     public final static IBuiltInSymbol HarmonicNumber = F.initFinalSymbol("HarmonicNumber", ID.HarmonicNumber);
 	/** Haversine(z) - returns the haversine function of `z`. */
@@ -3122,6 +3132,7 @@ public class F {
             FinancialFunctions.initialize();
             WXFFunctions.initialize();
             WindowFunctions.initialize();
+			MinMaxFunctions.initialize();
             ComputationalGeometryFunctions.initialize();
 
             F.Integrate.setEvaluator(org.matheclipse.core.reflection.system.Integrate.CONST);
@@ -5602,6 +5613,9 @@ public class F {
         return binaryAST2(GumbelDistribution, a0, a1);
     }
 
+	public static IAST HarmonicMean(final IExpr a0) {
+		return unaryAST1(HarmonicMean, a0);
+	}
     public static IAST HarmonicNumber(final IExpr a) {
         return unaryAST1(HarmonicNumber, a);
     }
@@ -6625,6 +6639,9 @@ public class F {
         return quaternary(Max, a0, a1, a2, a3);
     }
 
+	public static IAST Maximize(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Maximize, a0, a1);
+	}
     public static IAST Mean(final IExpr a0) {
         return unaryAST1(Mean, a0);
     }
@@ -6665,6 +6682,9 @@ public class F {
         return quaternary(Min, a0, a1, a2, a3);
     }
 
+	public static IAST Minimize(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Minimize, a0, a1);
+	}
     public static IExpr minus(IExpr a, Integer i) {
         return Plus(a, Times(integer(i.longValue()), CN1));
     }

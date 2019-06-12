@@ -909,34 +909,26 @@ public final class BooleanFunctions {
 		 */
 		protected IExpr_COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) {
 			if (arg1.isIndeterminate() || arg2.isIndeterminate()) {
-				//Swift changed: can't declare enum inside protocol
-				return IExpr_COMPARE_TERNARY.FALSE;
+				return IExpr_COMPARE_TERNARY.UNDEFINED;
 			}
 			if (arg1.isList() && arg2.isList()) {
 				IAST list1 = (IAST) arg1;
 				IAST list2 = (IAST) arg2;
 				int size1 = list1.size();
 				if (size1 != list2.size()) {
-					//Swift changed: can't declare enum inside protocol
 					return IExpr_COMPARE_TERNARY.FALSE;
 				}
-				//Swift changed: can't declare enum inside protocol
 				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.TRUE;
 				for (int i = 1; i < size1; i++) {
 					b = prepareCompare(list1.get(i), list2.get(i), engine);
-					//Swift changed: can't declare enum inside protocol
 					if (b == IExpr_COMPARE_TERNARY.FALSE) {
-						//Swift changed: can't declare enum inside protocol
 						return IExpr_COMPARE_TERNARY.FALSE;
 					}
-					//Swift changed: can't declare enum inside protocol
 					if (b == IExpr_COMPARE_TERNARY.TRUE) {
 					} else {
-						//Swift changed: can't declare enum inside protocol
 						return IExpr_COMPARE_TERNARY.UNDEFINED;
 					}
 				}
-				//Swift changed: can't declare enum inside protocol
 				return IExpr_COMPARE_TERNARY.TRUE;
 			}
 			IExpr a0 = arg1;
@@ -959,57 +951,45 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr_COMPARE_TERNARY compareTernary(final IExpr o0, final IExpr o1) {
 			if (o0.isSame(o1)) {
-				//Swift changed: can't declare enum inside protocol
 				return IExpr_COMPARE_TERNARY.TRUE;
 			}
 
 			if (o0.isTrue()) {
 				if (o1.isTrue()) {
-					//Swift changed: can't declare enum inside protocol
 					return IExpr_COMPARE_TERNARY.TRUE;
 				} else if (o1.isFalse()) {
-					//Swift changed: can't declare enum inside protocol
 					return IExpr_COMPARE_TERNARY.FALSE;
 				}
 			} else if (o0.isFalse()) {
 				if (o1.isTrue()) {
-					//Swift changed: can't declare enum inside protocol
 					return IExpr_COMPARE_TERNARY.FALSE;
 				} else if (o1.isFalse()) {
-					//Swift changed: can't declare enum inside protocol
 					return IExpr_COMPARE_TERNARY.TRUE;
 				}
 			}
 			if (o0.isConstantAttribute() && o1.isConstantAttribute()) {
-				//Swift changed: can't declare enum inside protocol
-				return IExpr_COMPARE_TERNARY.FALSE;
-			}
-
-			if (o0.isNumber() && o1.isNumber()) {
-				//Swift changed: can't declare enum inside protocol
 				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
 			if ((o0 instanceof StringX) && (o1 instanceof StringX)) {
-				//Swift changed: can't declare enum inside protocol
 				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
 			IExpr difference = F.eval(F.Subtract(o0, o1));
 			if (difference.isNumber()) {
 				if (difference.isZero()) {
-					//Swift changed: can't declare enum inside protocol
 					return IExpr_COMPARE_TERNARY.TRUE;
 				}
-				//Swift changed: can't declare enum inside protocol
 				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 			if (difference.isConstantAttribute()) {
-				//Swift changed: can't declare enum inside protocol
 				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
-			//Swift changed: can't declare enum inside protocol
+			if (o0.isNumber() && o1.isNumber()) {
+				return IExpr_COMPARE_TERNARY.FALSE;
+			}
+
 			return IExpr_COMPARE_TERNARY.UNDEFINED;
 		}
 

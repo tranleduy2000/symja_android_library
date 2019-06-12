@@ -33,6 +33,7 @@ import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IDiscreteDistribution;
@@ -91,6 +92,7 @@ public class StatisticsFunctions {
 		F.GeometricMean.setEvaluator(new GeometricMean());
 		F.GeometricDistribution.setEvaluator(new GeometricDistribution());
 		F.GumbelDistribution.setEvaluator(new GumbelDistribution());
+			F.HarmonicMean.setEvaluator(new HarmonicMean());
 		F.HypergeometricDistribution.setEvaluator(new HypergeometricDistribution());
 		F.InverseCDF.setEvaluator(new InverseCDF());
 		F.KolmogorovSmirnovTest.setEvaluator(new KolmogorovSmirnovTest());
@@ -1867,12 +1869,27 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IAST arg1 = Validate.checkASTType(ast, 1);
+			IExpr arg1 = ast.arg1();
+			if (arg1.isList() && arg1.size() > 1) {
+				IAST list = (IAST) arg1;
+
+				int[] dim = list.isMatrix();
+				if (dim == null && arg1.isListOfLists()) {
+					return F.NIL;
+				}
+				if (dim != null) {
+					IAST matrix = list;
+					return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return F.GeometricMean(x);
+						}
+					});
+				}
 			if (arg1.isRealVector()) {
 				return F.num(StatUtils.geometricMean(arg1.toDoubleVector()));
 			}
-			if (arg1.size() > 1) {
-				return F.Power(arg1.setAtCopy(0, F.Times), F.fraction(1, arg1.argSize()));
+				return F.Power(list.apply(F.Times), F.fraction(1, arg1.argSize()));
 			}
 			return F.NIL;
 		}
@@ -2106,6 +2123,46 @@ public class StatisticsFunctions {
 
 	}
 
+	private static class HarmonicMean extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+			if (arg1.isList() && arg1.size() > 1) {
+				IAST list = (IAST) arg1;
+
+				int[] dim = list.isMatrix();
+				if (dim == null && arg1.isListOfLists()) {
+					return F.NIL;
+				}
+				if (dim != null) {
+					IAST matrix = list;
+					return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return F.HarmonicMean(x);
+						}
+					});
+				}
+
+				IASTMutable result = list.apply(F.Plus);
+				result.map(result, new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return F.Divide(F.C1, x);
+					}
+				});
+				return F.Times(F.ZZ(list.argSize()), F.Power(result, F.CN1));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+
+	}
     /**
      * <pre>
      * <code>HypergeometricDistribution(n, s, t)

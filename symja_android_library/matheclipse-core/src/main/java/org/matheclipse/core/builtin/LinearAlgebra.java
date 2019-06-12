@@ -1845,12 +1845,12 @@ public final class LinearAlgebra {
                     variables = (IAST) ast.arg2();
                 }
                 if (variables.isPresent()) {
-                    final int variablesSize = variables.size();
-                    final IAST vector = (IAST) ast.arg1();
+					final int variablesSize = variables.size();
+					final IAST vector = (IAST) ast.arg1();
                     int vectorSize = vector.size();
                     IASTAppendable jacobiMatrix = F.ListAlloc(vectorSize);
                     final IAST vars = variables;
-                    return jacobiMatrix.appendArgs(vectorSize, new IntFunction<IExpr>() {
+					return jacobiMatrix.appendArgs(vectorSize, new IntFunction<IExpr>() {
                         @Override
                         public IExpr apply(final int i) {
                             IASTAppendable jacobiRow = F.ListAlloc(variablesSize);
@@ -1862,17 +1862,6 @@ public final class LinearAlgebra {
                             });
                         }
                     });
-                    // IASTAppendable jacobiRow = null;
-                    // for (int i = 1; i < vectorSize; i++) {
-                    // jacobiRow = F.ListAlloc(variablesSize);
-                    // final int ii = i;
-                    // jacobiRow.appendArgs(variablesSize, j -> F.D(vector.get(ii), vars.get(j)));
-                    // // for (int j = 1; j < variablesSize; j++) {
-                    // // jacobiRow.append(F.D(vector.get(i), variables.get(j)));
-                    // // }
-                    // jacobiMatrix.append(jacobiRow);
-                    // }
-                    // return jacobiMatrix;
                 }
             }
 
