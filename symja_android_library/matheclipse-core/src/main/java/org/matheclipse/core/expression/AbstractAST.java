@@ -1343,6 +1343,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return result;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public final IAST removeIf(Predicate<? super IExpr> predicate) {
+		IASTAppendable result = copyHead();
+		for (int i = 1; i < size(); i++) {
+			IExpr arg = get(i);
+			if (predicate.test(arg)) {
+				continue;
+			}
+			result.append(arg);
+		}
+		return result;
+	}
 	/**
 	 * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append
 	 * the result elements for which the <code>function</code> returns non-null elements to the <code>filterAST</code>,

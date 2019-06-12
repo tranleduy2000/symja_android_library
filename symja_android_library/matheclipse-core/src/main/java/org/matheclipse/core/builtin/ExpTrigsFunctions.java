@@ -2434,6 +2434,9 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public double applyAsDouble(double operand) {
+			if (F.isZero(operand)) {
+				return 1.0;
+			}
 			return Math.sin(operand) / operand;
 		}
 
@@ -2463,7 +2466,7 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
-			if (arg1 == 0.0) {
+			if (F.isZero(arg1)) {
 				return CD1;
 			}
 			return num(Math.sin(arg1) / arg1);

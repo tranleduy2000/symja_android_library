@@ -1137,6 +1137,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IAST removeFromStart(int firstPosition);
 
     /**
+     * Removes all the elements from this list which satisfies the given predicate and return the result as a new List
+     *
+     * @param predicate
+     *            the predicate which filters each element in the range
+     * @return the resulting ASTs in the 0-th and 1-st element of the array
+     */
+    IAST removeIf(Predicate<? super IExpr> predicate);
+
+    /**
      * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code> inclusive to the
      * end of this AST.
      *

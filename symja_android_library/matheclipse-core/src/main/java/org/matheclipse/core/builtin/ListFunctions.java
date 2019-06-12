@@ -1756,8 +1756,7 @@ public final class ListFunctions {
 			return IOFunctions.ARGS_2_4;
 		}
 		public static IAST deleteCases(final IAST ast, final IPatternMatcher matcher) {
-			IAST[] results = ast.filter(matcher);
-			return results[1];
+			return ast.removeIf(matcher);
 
 		}
 
