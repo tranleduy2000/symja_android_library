@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IBooleanFormula;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComparatorFunction;
 import org.matheclipse.core.interfaces.IEvaluator;
+import org.matheclipse.core.interfaces.IEvaluatorImpl;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -50,7 +51,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		}
 	}
 
-	private static class DummyEvaluator implements IEvaluator {
+	private static class DummyEvaluator extends IEvaluatorImpl implements IEvaluator {
 
 		/**
 		 * Causes the current thread to wait until the INIT_THREAD has initialized the Integrate() rules.

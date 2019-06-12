@@ -14,4 +14,7 @@ public interface IEvaluator {
      * @param newSymbol the symbol which should be set up
      */
     public void setUp(ISymbol newSymbol);
+
+
+    IAST options();
 }

@@ -48,6 +48,7 @@ public abstract class AbstractTestCase extends TestCase {
 		}
 	}
     public void check(String evalString, String expectedResult) {
+        System.out.println("evalString = " + evalString);
         check(fScriptEngine, evalString, expectedResult, -1);
     }
 

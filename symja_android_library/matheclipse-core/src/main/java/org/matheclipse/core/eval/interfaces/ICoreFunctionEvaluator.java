@@ -1,6 +1,7 @@
 package org.matheclipse.core.eval.interfaces;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -32,6 +33,11 @@ public interface ICoreFunctionEvaluator extends IFunctionEvaluator {
         @Override
         public void setUp(ISymbol newSymbol) {
 
+        }
+
+        @Override
+        public IAST options() {
+            return F.NIL;
         }
 
         @Override

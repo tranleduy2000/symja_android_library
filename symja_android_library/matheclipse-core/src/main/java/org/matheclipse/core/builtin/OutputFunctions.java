@@ -9,7 +9,7 @@ import org.matheclipse.core.eval.TeXUtilities;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.util.Options;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -199,7 +199,6 @@ public final class OutputFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
 			if (arg1.isAST()) {
@@ -226,6 +225,10 @@ public final class OutputFunctions {
 			return arg1;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 		}
@@ -297,21 +300,24 @@ public final class OutputFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			boolean strictJava = false;
 			boolean usePrefix = false;
 			if (ast.isAST2()) {
 				IExpr arg2 = engine.evaluate(ast.arg2());
-				final Options options = new Options(ast.topHead(), arg2, engine);
-				strictJava = options.isOption("Strict");
-				usePrefix = options.isOption("Prefix");
+				final OptionArgs options = new OptionArgs(ast.topHead(), arg2, engine);
+				strictJava = options.isTrue(F.Strict);
+				usePrefix = options.isTrue(F.Prefix);
 			}
 			String resultStr = javaForm(arg1, strictJava, usePrefix);
 			return F.$str(resultStr);
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		public static String javaForm(IExpr arg1, boolean strictJava, boolean usePrefix) {
 			return arg1.internalJavaString(strictJava, 0, false, usePrefix, false);
 		}

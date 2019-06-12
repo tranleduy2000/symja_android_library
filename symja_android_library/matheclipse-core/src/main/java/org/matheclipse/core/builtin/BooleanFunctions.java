@@ -26,7 +26,7 @@ import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.util.Options;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.StringX;
@@ -3061,9 +3061,9 @@ public final class BooleanFunctions {
 				if (ast.size() > 2) {
 					userDefinedVariables = ast.arg2().orNewList();
 					if (ast.size() > 3) {
-						final Options options = new Options(ast.topHead(), ast, 3, engine);
+						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine);
 						// "BDD" (binary decision diagram), "SAT", "TREE" ?
-						IExpr optionMethod = options.getOption("Method");
+						IExpr optionMethod = options.getOption(F.Method);
 						if (optionMethod.isString()) {
 							method = optionMethod.toString();
 						}
@@ -3151,9 +3151,9 @@ public final class BooleanFunctions {
 				if (ast.size() > 2) {
 					userDefinedVariables = ast.arg2().orNewList();
 					if (ast.size() > 3) {
-						final Options options = new Options(ast.topHead(), ast, 3, engine);
+						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine);
 						// "BDD" (binary decision diagram), "SAT", "TREE" ?
-						IExpr optionMethod = options.getOption("Method");
+						IExpr optionMethod = options.getOption(F.Method);
 						if (optionMethod.isString()) {
 							method = optionMethod.toString();
 						}
@@ -3220,9 +3220,9 @@ public final class BooleanFunctions {
 						userDefinedVariables = F.ListAlloc(ast.arg2());
 					}
 					if (ast.size() > 3) {
-						final Options options = new Options(ast.topHead(), ast, 3, engine);
+						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine);
 						// "BDD" (binary decision diagram), "SAT", "TREE" ?
-						IExpr optionMethod = options.getOption("Method");
+						IExpr optionMethod = options.getOption(F.Method);
 						if (optionMethod.isString()) {
 							method = optionMethod.toString();
 						}
@@ -3831,6 +3831,7 @@ public final class BooleanFunctions {
 					lf.literals2BooleanList(assignments.get(i).literals(), map) //
 			);
 		}
+		EvalAttributes.sort(list, Comparators.ExprReverseComparator.CONS);
 		return list;
 	}
 

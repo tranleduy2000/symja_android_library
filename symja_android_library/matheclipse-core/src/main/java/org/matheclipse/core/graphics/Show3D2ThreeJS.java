@@ -1,14 +1,14 @@
 package org.matheclipse.core.graphics;
 
+import com.gx.common.escape.Escaper;
+import com.gx.common.html.HtmlEscapers;
+
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.util.Options;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
-
-import com.gx.common.escape.Escaper;
-import com.gx.common.html.HtmlEscapers;
 
 public class Show3D2ThreeJS {
 
@@ -42,7 +42,7 @@ public class Show3D2ThreeJS {
 		IAST numericAST = (IAST) engine.evalN(ast);
 		double[] viewpoints = new double[] { 1.3, -2.4, 2.0 };
 		if (numericAST.size() > 2) {
-			final Options options = new Options(numericAST.topHead(), numericAST, 2, engine);
+			final OptionArgs options = new OptionArgs(numericAST.topHead(), numericAST, 2, engine);
 			optionViewPoint(options, viewpoints);
 		}
 		int width = 400;
@@ -83,8 +83,8 @@ public class Show3D2ThreeJS {
 	 * @param options
 	 * @param viewpoints
 	 */
-	static void optionViewPoint(final Options options, double[] viewpoints) {
-		IExpr option = options.getOption("ViewPoint");
+	static void optionViewPoint(final OptionArgs options, double[] viewpoints) {
+		IExpr option = options.getOption(F.ViewPoint);
 		if (option.isPresent()) {
 			if (option.isSymbol()) {
 				String viewpoint = option.toString().toLowerCase();

@@ -168,6 +168,8 @@ public class F {
     /***/
     public final static IBuiltInSymbol $Aborted = F.initFinalSymbol("$Aborted", ID.$Aborted);
     /***/
+    public final static IBuiltInSymbol $Assumptions = F.initFinalSymbol("$Assumptions", ID.$Assumptions);
+    /***/
     public final static IBuiltInSymbol $Context = F.initFinalSymbol("$Context", ID.$Context);
     /***/
     public final static IBuiltInSymbol $ContextPath = F.initFinalSymbol("$ContextPath", ID.$ContextPath);
@@ -633,6 +635,11 @@ public class F {
 	/** Degree - the constant `Degree` converts angles from degree to `Pi/180` radians. */
     public final static IBuiltInSymbol Degree = F.initFinalSymbol("Degree", ID.Degree);
     /***/
+    public final static IBuiltInSymbol DegreeLexicographic = F.initFinalSymbol("DegreeLexicographic", ID.DegreeLexicographic);
+
+    /***/
+    public final static IBuiltInSymbol DegreeReverseLexicographic = F.initFinalSymbol("DegreeReverseLexicographic", ID.DegreeReverseLexicographic);
+    /***/
     public final static IBuiltInSymbol Delete = F.initFinalSymbol("Delete", ID.Delete);
 	/** DeleteCases(list, pattern) - returns the elements of `list` that do not match `pattern`. */
     public final static IBuiltInSymbol DeleteCases = F.initFinalSymbol("DeleteCases", ID.DeleteCases);
@@ -729,6 +736,8 @@ public class F {
      * `list-of-variables` in the `list-of-equations`.
      */
     public final static IBuiltInSymbol Eliminate = F.initFinalSymbol("Eliminate", ID.Eliminate);
+    /***/
+    public final static IBuiltInSymbol EliminationOrder = F.initFinalSymbol("EliminationOrder", ID.EliminationOrder);
 	/** EllipticE(z) - returns the complete elliptic integral of the second kind. */
     public final static IBuiltInSymbol EllipticE = F.initFinalSymbol("EllipticE", ID.EllipticE);
 	/** EllipticF(z) - returns the incomplete elliptic integral of the first kind. */
@@ -895,7 +904,7 @@ public class F {
     public final static IBuiltInSymbol For = F.initFinalSymbol("For", ID.For);
     /***/
     public final static IBuiltInSymbol ForAll = F.initFinalSymbol("ForAll", ID.ForAll);
-    /***/
+    /** Fourier(vector-of-complex-numbers) - Discrete Fourier transform of a `vector-of-complex-numbers`. Fourier transform is restricted to vectors with length of power of 2.  */
     public final static IBuiltInSymbol Fourier = F.initFinalSymbol("Fourier", ID.Fourier);
 
 	/** FourierMatrix(n) - gives a fourier matrix with the dimension `n`. */
@@ -967,10 +976,7 @@ public class F {
             ID.GeometricDistribution);
     /***/
     public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
-    /**
-     * Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't
-     * work in the web interface. A file system has to be available to load a package.
-     */
+    /** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't work in the web interface. A file system has to be available to load a package. */
     public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
 	/** Glaisher constant. */
     public final static IBuiltInSymbol Glaisher = F.initFinalSymbol("Glaisher", ID.Glaisher);
@@ -1090,6 +1096,8 @@ public class F {
 	/** Infinity - represents an infinite real quantity. */
     public final static IBuiltInSymbol Infinity = F.initFinalSymbol("Infinity", ID.Infinity);
     /***/
+    public final static IBuiltInSymbol Infix = F.initFinalSymbol("Infix", ID.Infix);
+    /***/
     public final static IBuiltInSymbol Information = F.initFinalSymbol("Information", ID.Information);
     /**
 	 * Inner(f, x, y, g) - computes a generalized inner product of `x` and `y`, using a multiplication function `f` and
@@ -1149,7 +1157,7 @@ public class F {
     public final static IBuiltInSymbol InverseErf = F.initFinalSymbol("InverseErf", ID.InverseErf);
 	/** InverseErfc(z) - returns the inverse complementary error function of `z`. */
     public final static IBuiltInSymbol InverseErfc = F.initFinalSymbol("InverseErfc", ID.InverseErfc);
-    /***/
+    /** InverseFourier(vector-of-complex-numbers) - Inverse discrete Fourier transform of a `vector-of-complex-numbers`. Fourier transform is restricted to vectors with length of power of 2.  */
     public final static IBuiltInSymbol InverseFourier = F.initFinalSymbol("InverseFourier", ID.InverseFourier);
 
 	/** InverseFunction(head) - returns the inverse function for the symbol `head`. */
@@ -1238,7 +1246,10 @@ public class F {
     public final static IBuiltInSymbol Level = F.initFinalSymbol("Level", ID.Level);
 	/** LevelQ(expr) - tests whether `expr` is a valid level specification. */
     public final static IBuiltInSymbol LevelQ = F.initFinalSymbol("LevelQ", ID.LevelQ);
-	/** Limit(expr, x->x0) - gives the limit of `expr` as `x` approaches `x0` */
+    /***/
+    public final static IBuiltInSymbol Lexicographic = F.initFinalSymbol("Lexicographic", ID.Lexicographic);
+
+    /** Limit(expr, x->x0) - gives the limit of `expr` as `x` approaches `x0`*/
     public final static IBuiltInSymbol Limit = F.initFinalSymbol("Limit", ID.Limit);
     /***/
     public final static IBuiltInSymbol Line = F.initFinalSymbol("Line", ID.Line);
@@ -1268,10 +1279,13 @@ public class F {
     public final static IBuiltInSymbol ListConvolve = F.initFinalSymbol("ListConvolve", ID.ListConvolve);
 	/** ListCorrelate(kernel-list, tensor-list) - create the correlation of the `kernel-list` with `tensor-list`. */
     public final static IBuiltInSymbol ListCorrelate = F.initFinalSymbol("ListCorrelate", ID.ListCorrelate);
-	public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
 
+    /***/
 	public final static IBuiltInSymbol ListLinePlot = F.initFinalSymbol("ListLinePlot", ID.ListLinePlot);
-	/** ListQ(expr) - tests whether `expr` is a `List`. */
+    /***/
+    public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
+
+    /** ListQ(expr) - tests whether `expr` is a `List`.*/
     public final static IBuiltInSymbol ListQ = F.initFinalSymbol("ListQ", ID.ListQ);
     /**
      * Listable - is an attribute specifying that a function should be automatically applied to each element of a list.
@@ -1431,7 +1445,10 @@ public class F {
      * respect to the `list-of-variables`.
      */
     public final static IBuiltInSymbol MonomialList = F.initFinalSymbol("MonomialList", ID.MonomialList);
-	/** Most(expr) - returns `expr` with the last element removed. */
+    /***/
+    public final static IBuiltInSymbol MonomialOrder = F.initFinalSymbol("MonomialOrder", ID.MonomialOrder);
+
+    /** Most(expr) - returns `expr` with the last element removed.*/
     public final static IBuiltInSymbol Most = F.initFinalSymbol("Most", ID.Most);
 	/** Multinomial(n1, n2, ...) - gives the multinomial coefficient `(n1+n2+...)!/(n1! n2! ...)`. */
     public final static IBuiltInSymbol Multinomial = F.initFinalSymbol("Multinomial", ID.Multinomial);
@@ -1485,7 +1502,16 @@ public class F {
     public final static IBuiltInSymbol Nearest = F.initFinalSymbol("Nearest", ID.Nearest);
 	/** Negative(x) - returns `True` if `x` is a negative real number. */
     public final static IBuiltInSymbol Negative = F.initFinalSymbol("Negative", ID.Negative);
-	/** Nest(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns the final result. */
+    /***/
+    public final static IBuiltInSymbol NegativeDegreeLexicographic = F.initFinalSymbol("NegativeDegreeLexicographic", ID.NegativeDegreeLexicographic);
+
+    /***/
+    public final static IBuiltInSymbol NegativeDegreeReverseLexicographic = F.initFinalSymbol("NegativeDegreeReverseLexicographic", ID.NegativeDegreeReverseLexicographic);
+
+    /***/
+    public final static IBuiltInSymbol NegativeLexicographic = F.initFinalSymbol("NegativeLexicographic", ID.NegativeLexicographic);
+
+    /** Nest(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns the final result.*/
     public final static IBuiltInSymbol Nest = F.initFinalSymbol("Nest", ID.Nest);
     /**
      * NestList(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns a list of all
@@ -1539,7 +1565,6 @@ public class F {
      * `expr` is `True`
      */
     public final static IBuiltInSymbol Not = F.initFinalSymbol("Not", ID.Not);
-    public final static IBuiltInSymbol Nothing = F.initFinalSymbol("Nothing", ID.Nothing);
     /***/
     public final static IBuiltInSymbol NotApplicable = F.initFinalSymbol("NotApplicable", ID.NotApplicable);
     /***/
@@ -1548,14 +1573,17 @@ public class F {
     public final static IBuiltInSymbol NotElement = F.initFinalSymbol("NotElement", ID.NotElement);
     /***/
     public final static IBuiltInSymbol NotListQ = F.initFinalSymbol("NotListQ", ID.NotListQ);
-	/** Null - is the implicit result of expressions that do not yield a result. */
+    /***/
+    public final static IBuiltInSymbol Nothing = F.initFinalSymbol("Nothing", ID.Nothing);
+
+    /** Null - is the implicit result of expressions that do not yield a result.*/
     public final static IBuiltInSymbol Null = F.initFinalSymbol("Null", ID.Null);
 	/** NullSpace(matrix) - returns a list of vectors that span the nullspace of the `matrix`. */
     public final static IBuiltInSymbol NullSpace = F.initFinalSymbol("NullSpace", ID.NullSpace);
     /***/
-    public final static IBuiltInSymbol NumberFieldRootsOfUnity = F.initFinalSymbol("NumberFieldRootsOfUnity",
-            ID.NumberFieldRootsOfUnity);
-	/** NumberQ(expr) - returns `True` if `expr` is an explicit number, and `False` otherwise. */
+    public final static IBuiltInSymbol NumberFieldRootsOfUnity = F.initFinalSymbol("NumberFieldRootsOfUnity", ID.NumberFieldRootsOfUnity);
+
+    /** NumberQ(expr) - returns `True` if `expr` is an explicit number, and `False` otherwise.*/
     public final static IBuiltInSymbol NumberQ = F.initFinalSymbol("NumberQ", ID.NumberQ);
 	/** Numerator(expr) - gives the numerator in `expr`. */
     public final static IBuiltInSymbol Numerator = F.initFinalSymbol("Numerator", ID.Numerator);
@@ -1727,7 +1755,10 @@ public class F {
     public final static IBuiltInSymbol Positive = F.initFinalSymbol("Positive", ID.Positive);
 	/** PossibleZeroQ(expr) - maps a (possible) zero `expr` to `True` and returns `False` otherwise. */
     public final static IBuiltInSymbol PossibleZeroQ = F.initFinalSymbol("PossibleZeroQ", ID.PossibleZeroQ);
-	/** Power(a, b) - represents `a` raised to the power of `b`. */
+    /***/
+    public final static IBuiltInSymbol Postefix = F.initFinalSymbol("Postefix", ID.Postefix);
+
+    /** Power(a, b) - represents `a` raised to the power of `b`.*/
     public final static IBuiltInSymbol Power = F.initFinalSymbol("Power", ID.Power);
 	/** PowerExpand(expr) - expands out powers of the form `(x^y)^z` and `(x*y)^z` in `expr`. */
     public final static IBuiltInSymbol PowerExpand = F.initFinalSymbol("PowerExpand", ID.PowerExpand);
@@ -1743,7 +1774,10 @@ public class F {
     public final static IBuiltInSymbol Precision = F.initFinalSymbol("Precision", ID.Precision);
     /***/
     public final static IBuiltInSymbol PrecisionGoal = F.initFinalSymbol("PrecisionGoal", ID.PrecisionGoal);
-	/** Prepend(expr, item) - returns `expr` with `item` prepended to its leaves. */
+    /***/
+    public final static IBuiltInSymbol Prefix = F.initFinalSymbol("Prefix", ID.Prefix);
+
+    /** Prepend(expr, item) - returns `expr` with `item` prepended to its leaves.*/
     public final static IBuiltInSymbol Prepend = F.initFinalSymbol("Prepend", ID.Prepend);
 	/** PrependTo(s, item) - prepend `item` to value of `s` and sets `s` to the result. */
     public final static IBuiltInSymbol PrependTo = F.initFinalSymbol("PrependTo", ID.PrependTo);
@@ -2070,6 +2104,8 @@ public class F {
      */
     public final static IBuiltInSymbol StirlingS2 = F.initFinalSymbol("StirlingS2", ID.StirlingS2);
     /***/
+    public final static IBuiltInSymbol Strict = F.initFinalSymbol("Strict", ID.Strict);
+    /***/
     public final static IBuiltInSymbol String = F.initFinalSymbol("String", ID.String);
     /***/
     public final static IBuiltInSymbol StringDrop = F.initFinalSymbol("StringDrop", ID.StringDrop);
@@ -2299,15 +2335,15 @@ public class F {
     public final static IBuiltInSymbol VectorAngle = F.initFinalSymbol("VectorAngle", ID.VectorAngle);
 	/** VectorQ(v) - returns `True` if `v` is a list of elements which are not themselves lists. */
     public final static IBuiltInSymbol VectorQ = F.initFinalSymbol("VectorQ", ID.VectorQ);
-	/** WeibullDistribution(a, b) - returns a Weibull distribution. */
-    public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution",
-            ID.WeibullDistribution);
-    /**
-	 * Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2`
-	 * evaluates to `True`, etc.
-     */
+    /***/
+    public final static IBuiltInSymbol ViewPoint = F.initFinalSymbol("ViewPoint", ID.ViewPoint);
+
+    /** WeibullDistribution(a, b) - returns a Weibull distribution.*/
+    public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution", ID.WeibullDistribution);
+
+    /** Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2` evaluates to `True`, etc.*/
     public final static IBuiltInSymbol Which = F.initFinalSymbol("Which", ID.Which);
-	/** While(test, body) - evaluates `body` as long as test evaluates to `True`. */
+    /** While(test, body) - evaluates `body` as long as test evaluates to `True`.*/
     public final static IBuiltInSymbol While = F.initFinalSymbol("While", ID.While);
     /***/
     public final static IBuiltInSymbol White = F.initFinalSymbol("White", ID.White);

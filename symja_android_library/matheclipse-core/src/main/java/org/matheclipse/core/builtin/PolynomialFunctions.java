@@ -24,7 +24,7 @@ import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.util.Options;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -34,7 +34,6 @@ import org.matheclipse.core.interfaces.IEvalStepListener;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISignedNumber;
-import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
@@ -334,12 +333,12 @@ public class PolynomialFunctions {
 			TermOrder termOrder = TermOrderByName.Lexicographic;
 			try {
 				if (ast.size() > 3) {
-					if (ast.arg3() instanceof IStringX) {
-						String orderStr = ast.arg3().toString();
-						termOrder = Options.getMonomialOrder(orderStr, termOrder);
+					if (ast.arg3().isSymbol()) {
+						// String orderStr = ast.arg3().toString();
+						termOrder = OptionArgs.monomialOrder((ISymbol) ast.arg3(), termOrder);
 					}
-					final Options options = new Options(ast.topHead(), ast, 2, engine);
-					IExpr option = options.getOption("Modulus");
+					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
+					IExpr option = options.getOption(F.Modulus);
 					if (option.isReal()) {
 						return coefficientRulesModulus(expr, varList, termOrder, option);
 					}
