@@ -179,6 +179,8 @@ public class F {
     public final static IBuiltInSymbol $DisplayFunction = F.initFinalSymbol("$DisplayFunction", ID.$DisplayFunction);
     /***/
     public final static IBuiltInSymbol $HistoryLength = F.initFinalSymbol("$HistoryLength", ID.$HistoryLength);
+	/***/
+	public final static IBuiltInSymbol $HomeDirectory = F.initFinalSymbol("$HomeDirectory", ID.$HomeDirectory);
     /***/
     public final static IBuiltInSymbol $IterationLimit = F.initFinalSymbol("$IterationLimit", ID.$IterationLimit);
     /***/
@@ -197,6 +199,8 @@ public class F {
     public final static IBuiltInSymbol $PrePrint = F.initFinalSymbol("$PrePrint", ID.$PrePrint);
     /***/
     public final static IBuiltInSymbol $RecursionLimit = F.initFinalSymbol("$RecursionLimit", ID.$RecursionLimit);
+	/***/
+	public final static IBuiltInSymbol $UserName = F.initFinalSymbol("$UserName", ID.$UserName);
     /***/
     public final static IBuiltInSymbol $Version = F.initFinalSymbol("$Version", ID.$Version);
 	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
@@ -907,7 +911,10 @@ public class F {
     public final static IBuiltInSymbol For = F.initFinalSymbol("For", ID.For);
     /***/
     public final static IBuiltInSymbol ForAll = F.initFinalSymbol("ForAll", ID.ForAll);
-    /** Fourier(vector-of-complex-numbers) - Discrete Fourier transform of a `vector-of-complex-numbers`. Fourier transform is restricted to vectors with length of power of 2.  */
+	/**
+	 * Fourier(vector-of-complex-numbers) - Discrete Fourier transform of a `vector-of-complex-numbers`. Fourier
+	 * transform is restricted to vectors with length of power of 2.
+	 */
     public final static IBuiltInSymbol Fourier = F.initFinalSymbol("Fourier", ID.Fourier);
 
 	/** FourierMatrix(n) - gives a fourier matrix with the dimension `n`. */
@@ -979,7 +986,10 @@ public class F {
             ID.GeometricDistribution);
     /***/
     public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
-    /** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't work in the web interface. A file system has to be available to load a package. */
+	/**
+	 * Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't
+	 * work in the web interface. A file system has to be available to load a package.
+	 */
     public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
 	/** Glaisher constant. */
     public final static IBuiltInSymbol Glaisher = F.initFinalSymbol("Glaisher", ID.Glaisher);
@@ -1451,7 +1461,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol MonomialOrder = F.initFinalSymbol("MonomialOrder", ID.MonomialOrder);
 
-    /** Most(expr) - returns `expr` with the last element removed.*/
+	/** Most(expr) - returns `expr` with the last element removed. */
     public final static IBuiltInSymbol Most = F.initFinalSymbol("Most", ID.Most);
 	/** Multinomial(n1, n2, ...) - gives the multinomial coefficient `(n1+n2+...)!/(n1! n2! ...)`. */
     public final static IBuiltInSymbol Multinomial = F.initFinalSymbol("Multinomial", ID.Multinomial);

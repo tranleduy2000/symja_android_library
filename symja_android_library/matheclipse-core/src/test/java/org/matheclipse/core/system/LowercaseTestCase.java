@@ -1114,6 +1114,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBellY() {
+		// check("x + Sum(x^m/(m!*(m - 1)!) * BellY(Table({(m + k - 2)!, -(k - 1)! * c(k)}, {k, 2, m})), {m, 2, 4}) ",
+		// //
+		// "");
 		check("BellY(2,1,{1/2,0})", //
 				"0");
 

@@ -63,8 +63,10 @@ public class ConstantDefinitions {
 		F.$Context.setEvaluator(new $Context());
 		F.$ContextPath.setEvaluator(new $ContextPath());
 		F.$CreationDate.setEvaluator(new $CreationDate());
+			F.$HomeDirectory.setEvaluator(new $HomeDirectory());
 		F.$MachineEpsilon.setEvaluator(new $MachineEpsilon());
 		F.$MachinePrecision.setEvaluator(new $MachinePrecision());
+			F.$UserName.setEvaluator(new $UserName());
 		F.$Version.setEvaluator(new $Version());
 
 		// System.out.println(F.$CreationDate.of().toString());
@@ -141,6 +143,18 @@ public class ConstantDefinitions {
 
 	}
 
+	private static class $HomeDirectory extends AbstractSymbolEvaluator {
+
+		@Override
+		public IExpr evaluate(final ISymbol symbol) {
+			String userHome = System.getProperty("user.home");
+			if (userHome == null) {
+				return F.stringx("");
+			}
+			return F.stringx(userHome);
+		}
+
+	}
 	private static class $MachineEpsilon extends AbstractSymbolEvaluator {
 
 		@Override
@@ -160,6 +174,18 @@ public class ConstantDefinitions {
 
 	}
 
+	private static class $UserName extends AbstractSymbolEvaluator {
+
+		@Override
+		public IExpr evaluate(final ISymbol symbol) {
+			String userName = System.getProperty("user.name");
+			if (userName == null) {
+				return F.stringx("");
+			}
+			return F.stringx(userName);
+		}
+
+	}
 	private static class $Version extends AbstractSymbolEvaluator {
 
 		@Override
