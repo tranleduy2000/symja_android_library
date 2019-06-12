@@ -502,7 +502,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IExpr greater(final IExpr a1) {
         if (isReal() && a1.isReal()) {
-            return ((ISignedNumber) this).isGreaterThan(((ISignedNumber) a1)) ? F.True : F.False;
+            return ((ISignedNumber) this).isGT(((ISignedNumber) a1)) ? F.True : F.False;
         }
         EvalEngine engine = EvalEngine.get();
         return engine.evaluate(F.Greater(this, a1));
@@ -517,7 +517,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IExpr greaterEqual(final IExpr a1) {
         if (isReal() && a1.isReal()) {
-            return ((ISignedNumber) this).isLessThan(((ISignedNumber) a1)) ? F.False : F.True;
+            return ((ISignedNumber) this).isLT(((ISignedNumber) a1)) ? F.False : F.True;
         }
         EvalEngine engine = EvalEngine.get();
         return engine.evaluate(F.GreaterEqual(this, a1));
@@ -2707,7 +2707,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IExpr less(final IExpr a1) {
         if (isReal() && a1.isReal()) {
-            return ((ISignedNumber) this).isLessThan(((ISignedNumber) a1)) ? F.True : F.False;
+            return ((ISignedNumber) this).isLT(((ISignedNumber) a1)) ? F.True : F.False;
         }
         EvalEngine engine = EvalEngine.get();
         return engine.evaluate(F.Less(this, a1));
@@ -2722,7 +2722,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IExpr lessEqual(final IExpr a1) {
         if (isReal() && a1.isReal()) {
-            return ((ISignedNumber) this).isGreaterThan(((ISignedNumber) a1)) ? F.False : F.True;
+            return ((ISignedNumber) this).isGT(((ISignedNumber) a1)) ? F.False : F.True;
         }
         EvalEngine engine = EvalEngine.get();
         return engine.evaluate(F.LessEqual(this, a1));

@@ -78,12 +78,40 @@ public interface ISignedNumber extends INumber {
      *
      * @return <code>this > that</code>
      */
+    boolean isGT(ISignedNumber that);
+    /**
+     * Test if <code>this</code> signed number is greater equal than <code>that</code> signed number.
+     *
+     * @return <code>this > that</code>
+     */
+    boolean isGE(ISignedNumber that);
+
+    /**
+     *
+     * @param that
+     * @return
+     * @deprecated use #isGT()
+     */
     boolean isGreaterThan(ISignedNumber that);
 
     /**
      * Test if <code>this</code> signed number is less <code>than</code> that signed number..
      *
      * @return <code>this < that</code>
+     */
+    boolean isLT(ISignedNumber that);
+    /**
+     * Test if <code>this</code> signed number is less equal than <code>that</code> signed number.
+     *
+     * @return <code>this > that</code>
+     */
+    boolean isLE(ISignedNumber that);
+
+    /**
+     *
+     * @param that
+     * @return
+     * @deprecated use #isLT()
      */
     boolean isLessThan(ISignedNumber that);
 

@@ -24,14 +24,34 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
      *
      * @return <code>this > that</code>
      */
-    public abstract boolean isGreaterThan(ISignedNumber that);
+    public abstract boolean isGT(ISignedNumber that);
+
+    @Override
+    public boolean isGE(ISignedNumber that) {
+        return !isLT(that);
+    }
+
+    @Override
+    public boolean isGreaterThan(ISignedNumber that) {
+        return isGT(that);
+    }
 
     /**
      * Test if <code>this</code> signed number is less <code>than</code> that signed number..
      *
      * @return <code>this < that</code>
      */
-    public abstract boolean isLessThan(ISignedNumber that);
+    public abstract boolean isLT(ISignedNumber that);
+
+    @Override
+    public boolean isLE(ISignedNumber that) {
+        return !isGT(that);
+    }
+
+    @Override
+    public boolean isLessThan(ISignedNumber that) {
+        return isLT(that);
+    }
 
     /**
      * {@inheritDoc}

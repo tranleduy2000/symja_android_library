@@ -290,7 +290,7 @@ public class Assumptions extends AbstractAssumptions {
 			IExpr arg2 = greaterAST.arg2();
 			IExpr arg3 = greaterAST.arg3();
 			if (arg1.isReal() && arg3.isReal() && !arg2.isNumber()) {
-				if (((ISignedNumber) arg1).isGreaterThan(((ISignedNumber) arg3))) {
+				if (((ISignedNumber) arg1).isGT(((ISignedNumber) arg3))) {
 					ISignedNumber num1 = (ISignedNumber) arg1;
 					ISignedNumber num3 = (ISignedNumber) arg3;
 					IExpr key = arg2;
@@ -342,7 +342,7 @@ public class Assumptions extends AbstractAssumptions {
 			IExpr arg2 = greaterEqualAST.arg2();
 			IExpr arg3 = greaterEqualAST.arg3();
 			if (arg1.isReal() && arg3.isReal() && !arg2.isNumber()) {
-				if (!((ISignedNumber) arg1).isLessThan(((ISignedNumber) arg3))) {
+				if (!((ISignedNumber) arg1).isLT(((ISignedNumber) arg3))) {
 					ISignedNumber num1 = (ISignedNumber) arg1;
 					ISignedNumber num3 = (ISignedNumber) arg3;
 					IExpr key = arg2;
@@ -391,7 +391,7 @@ public class Assumptions extends AbstractAssumptions {
 			IExpr arg2 = lessAST.arg2();
 			IExpr arg3 = lessAST.arg3();
 			if (arg1.isReal() && arg3.isReal() && !arg2.isNumber()) {
-				if (((ISignedNumber) arg1).isLessThan(((ISignedNumber) arg3))) {
+				if (((ISignedNumber) arg1).isLT(((ISignedNumber) arg3))) {
 					ISignedNumber num1 = (ISignedNumber) arg1;
 					ISignedNumber num3 = (ISignedNumber) arg3;
 					IExpr key = arg2;
@@ -440,7 +440,7 @@ public class Assumptions extends AbstractAssumptions {
 			IExpr arg2 = lessEqualAST.arg2();
 			IExpr arg3 = lessEqualAST.arg3();
 			if (arg1.isReal() && arg3.isReal() && !arg2.isNumber()) {
-				if (!((ISignedNumber) arg1).isGreaterThan(((ISignedNumber) arg3))) {
+				if (!((ISignedNumber) arg1).isGT(((ISignedNumber) arg3))) {
 					ISignedNumber num1 = (ISignedNumber) arg1;
 					ISignedNumber num3 = (ISignedNumber) arg3;
 					IExpr key = arg2;
@@ -651,7 +651,7 @@ public class Assumptions extends AbstractAssumptions {
 			num = gla.getGreater();
 			if (num != null) {
 				if (!num.equals(number)) {
-					if (!num.isGreaterThan(number)) {
+					if (!num.isGT(number)) {
 						return false;
 					}
 				}
@@ -660,7 +660,7 @@ public class Assumptions extends AbstractAssumptions {
 			if (!result) {
 				num = gla.getGreaterEqual();
 				if (num != null) {
-					if (!num.isGreaterThan(number)) {
+					if (!num.isGT(number)) {
 						return false;
 					}
 					result = true;
@@ -685,7 +685,7 @@ public class Assumptions extends AbstractAssumptions {
 			num = gla.getLess();
 			if (num != null) {
 				if (!num.equals(number)) {
-					if (!num.isLessThan(number)) {
+					if (!num.isLT(number)) {
 						return false;
 					}
 				}
@@ -694,7 +694,7 @@ public class Assumptions extends AbstractAssumptions {
 			if (!result) {
 				num = gla.getLessEqual();
 				if (num != null) {
-					if (!num.isLessThan(number)) {
+					if (!num.isLT(number)) {
 						return false;
 					}
 					result = true;

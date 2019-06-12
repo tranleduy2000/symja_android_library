@@ -1341,7 +1341,7 @@ public final class BooleanFunctions {
 			if (a0.isReal()) {
 				if (a1.isReal()) {
 					//Swift changed: can't declare enum inside protocol
-					return ((ISignedNumber) a0).isGreaterThan((ISignedNumber) a1) ? IExpr_COMPARE_TERNARY.TRUE
+					return ((ISignedNumber) a0).isGT((ISignedNumber) a1) ? IExpr_COMPARE_TERNARY.TRUE
 							: IExpr_COMPARE_TERNARY.FALSE;
 				} else if (a1.isInfinity()) {
 					return IExpr_COMPARE_TERNARY.FALSE;

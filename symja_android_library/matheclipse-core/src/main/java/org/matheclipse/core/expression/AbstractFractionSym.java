@@ -436,7 +436,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	public abstract IFraction inverse();
 
 	@Override
-	public boolean isGreaterThan(ISignedNumber obj) {
+	public boolean isGT(ISignedNumber obj) {
 		if (obj instanceof FractionSym) {
 			return compareTo((obj)) > 0;
 		}
@@ -454,7 +454,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	public abstract boolean isIntegral();
 
 	@Override
-	public boolean isLessThan(ISignedNumber obj) {
+	public boolean isLT(ISignedNumber obj) {
 		if (obj instanceof FractionSym) {
 			return compareTo((obj)) < 0;
 		}

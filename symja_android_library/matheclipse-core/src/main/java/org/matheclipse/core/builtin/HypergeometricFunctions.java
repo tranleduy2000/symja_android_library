@@ -531,7 +531,7 @@ public class HypergeometricFunctions {
 			if (a.isReal() && b.isReal()) {
 				ISignedNumber n = (ISignedNumber) a;
 				ISignedNumber m = (ISignedNumber) b;
-				if (n.isInteger() && m.isInteger() && n.isNegative() && m.isNegative() && m.isGreaterThan(n)) {
+				if (n.isInteger() && m.isInteger() && n.isNegative() && m.isNegative() && m.isGT(n)) {
 					return F.CComplexInfinity;
 				}
 				if (z.isReal()) {
