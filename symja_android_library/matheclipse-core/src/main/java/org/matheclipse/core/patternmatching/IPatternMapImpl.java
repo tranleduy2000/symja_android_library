@@ -129,8 +129,8 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     if (lhsPatternAST.isPatternMatchingFunction()) {
                         listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
                     }
-                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority, ruleWithoutPattern,
-                            treeLevel + 1);
+                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
+                            ruleWithoutPattern, treeLevel + 1);
                     priority[0] -= 11;
                     if (x.isPatternDefault()) {
                         listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
@@ -251,7 +251,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
             // set the eval flags
             result.isFreeOfPatterns();
-//			System.out.println("  " + lhsPatternExpr.toString() + " -> " + result.toString());
+            // System.out.println(" " + lhsPatternExpr.toString() + " -> " + result.toString());
             return result;
         }
         return lhsPatternExpr;
@@ -514,6 +514,9 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
             if (temp == fSymbol1) {
                 fValue1 = expr;
+                if (fValue1.isOneIdentityAST1()) {
+                    fValue1 = fValue1.first();
+                }
                 return;
             }
             throw new IllegalStateException("Pattern:" + pattern + " is not available");
@@ -744,10 +747,16 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
             if (temp == fSymbol1) {
                 fValue1 = expr;
+                if (fValue1.isOneIdentityAST1()) {
+                    fValue1 = fValue1.first();
+                }
                 return;
             }
             if (temp == fSymbol2) {
                 fValue2 = expr;
+                if (fValue2.isOneIdentityAST1()) {
+                    fValue2 = fValue2.first();
+                }
                 return;
             }
             throw new IllegalStateException("Pattern:" + pattern + " is not available");
@@ -1023,14 +1032,23 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
             if (temp == fSymbol1) {
                 fValue1 = expr;
+                if (fValue1.isOneIdentityAST1()) {
+                    fValue1 = fValue1.first();
+                }
                 return;
             }
             if (temp == fSymbol2) {
                 fValue2 = expr;
+                if (fValue2.isOneIdentityAST1()) {
+                    fValue2 = fValue2.first();
+                }
                 return;
             }
             if (temp == fSymbol3) {
                 fValue3 = expr;
+                if (fValue3.isOneIdentityAST1()) {
+                    fValue3 = fValue3.first();
+                }
                 return;
             }
             throw new IllegalStateException("Pattern:" + pattern + " is not available");
@@ -1405,7 +1423,11 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
             int indx = get(temp);
             if (indx >= 0) {
-                fSymbolsOrPatternValues[indx] = expr;
+                if (expr.isOneIdentityAST1()) {
+                    fSymbolsOrPatternValues[indx] = expr.first();
+                } else {
+                    fSymbolsOrPatternValues[indx] = expr;
+                }
                 return;
             }
             throw new IllegalStateException("Pattern:" + pattern + " is not available");

@@ -6,6 +6,7 @@ import com.duy.lambda.Function;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPattern;
@@ -28,6 +29,9 @@ public class VisitorReplaceAllWithPatternFlags extends VisitorReplaceAll {
 	public IExpr visit(IPattern element) {
 		IExpr temp = fFunction.apply(element);
 		if (temp.isPresent()) {
+			if (temp.isOneIdentityAST1()) {
+				return temp.first();
+			}
 			return temp;
 		}
 		// ISymbol symbol = element.getSymbol();
@@ -47,6 +51,9 @@ public class VisitorReplaceAllWithPatternFlags extends VisitorReplaceAll {
 	public IExpr visit(IPatternSequence element) {
 		IExpr temp = fFunction.apply(element);
 		if (temp.isPresent()) {
+			if (temp.isOneIdentityAST1()) {
+				return temp.first();
+			}
 			return temp;
 		}
 		// ISymbol symbol = element.getSymbol();
@@ -61,25 +68,34 @@ public class VisitorReplaceAllWithPatternFlags extends VisitorReplaceAll {
 	
 	@Override
 	public IExpr visit(IASTMutable ast) {
-		// int functionID = ast.headID();
-		// if (functionID > ID.UNKNOWN) {
-		// if (functionID == ID.HoldPattern || functionID == ID.Literal || functionID == ID.Condition
-		// || functionID == ID.Alternatives || functionID == ID.Except || functionID == ID.Complex
-		// || functionID == ID.Rational || functionID == ID.Optional || functionID == ID.PatternTest) {
-		// return F.NIL;
-		// }
-		// }
-		IExpr result = (IASTMutable) super.visit(ast);
-		if (result.isPresent()) {
+		if (ast.isPatternMatchingFunction()) {
+			return F.NIL;
+		}
+
+		int i = fOffset;
+		int size = ast.size();
+		IASTMutable result = F.NIL;
+		while (i < size) {
+			IExpr temp = ast.get(i).accept(this);
+			if (temp.isPresent()) {
+				// something was evaluated - return a new IAST:
+				result = ast.setAtCopy(i++, temp);
+				while (i < size) {
+					temp = ast.get(i).accept(this);
+					if (temp.isPresent()) {
+						result.set(i, temp);
+					}
+					i++;
+				}
 			if (result.isAST()) {
 				if (result.isFlatAST()) {
-					IExpr temp = EvalAttributes.flatten((IAST) result);
-					if (temp.isPresent()) {
-						result = temp;
+						IASTAppendable flattened = EvalAttributes.flatten((IAST) result);
+						if (flattened.isPresent()) {
+							result = flattened;
 					}
 				}
 				if (result.isOneIdentityAST1()) {
-					result = result.first();
+						return result.first();
 				} else if (result.isOrderlessAST()) {
 					EvalAttributes.sort((IASTMutable) result);
 				}
@@ -91,6 +107,8 @@ public class VisitorReplaceAllWithPatternFlags extends VisitorReplaceAll {
 			// ((IASTMutable) result).setEvalFlags(ast.getEvalFlags() & IAST.CONTAINS_PATTERN_EXPR);
 			// }
 			return result;
+		}
+			i++;
 		}
 		return F.NIL;
 	}
