@@ -17,7 +17,6 @@ public class MemoryOverflowErrorTest extends TestCase {
 
     public void test4() throws InterruptedException {
         try {
-            OperationSystem.debug = true;
             //noinspection MismatchedQueryAndUpdateOfCollection
             ArrayList<int[]> arrayList = new ArrayList<>();
             for (int i = 0; i < 1000; i++) {

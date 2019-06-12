@@ -510,9 +510,12 @@ public class F {
     public final static IBuiltInSymbol CompatibleUnitQ = F.initFinalSymbol("CompatibleUnitQ", ID.CompatibleUnitQ);
     /***/
     public final static IBuiltInSymbol Compile = F.initFinalSymbol("Compile", ID.Compile);
-	/** Complement (set1, set2) - get the complement set from `set1` and `set2`. */
+    /***/
+    public final static IBuiltInSymbol CompiledFunction = F.initFinalSymbol("CompiledFunction", ID.Compile);
+
+    /** Complement (set1, set2) - get the complement set from `set1` and `set2`.*/
     public final static IBuiltInSymbol Complement = F.initFinalSymbol("Complement", ID.Complement);
-	/** Complex - is the head of complex numbers. */
+    /** Complex - is the head of complex numbers.*/
     public final static IBuiltInSymbol Complex = F.initFinalSymbol("Complex", ID.Complex);
     /**
      * ComplexExpand(expr) - get the expanded `expr`. All variable symbols in `expr` are assumed to be non complex

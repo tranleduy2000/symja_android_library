@@ -1,5 +1,8 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.concurrent.Callable;
+import com.duy.concurrent.ExecutorService;
+import com.duy.concurrent.Executors;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.gx.common.util.concurrent.SimpleTimeLimiter;
@@ -23,6 +26,7 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.eval.util.Iterator;
+import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
@@ -43,9 +47,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
-import com.duy.concurrent.Callable;
-import com.duy.concurrent.ExecutorService;
-import com.duy.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.matheclipse.core.expression.F.Divide;
@@ -65,7 +66,7 @@ public final class Programming {
 		F.Break.setEvaluator(new Break());
 		F.Block.setEvaluator(new Block());
 		F.Catch.setEvaluator(new Catch());
-		F.Compile.setEvaluator(new Compile());
+			F.CompiledFunction.setEvaluator(new CompiledFunction());
 		F.CompoundExpression.setEvaluator(new CompoundExpression());
 		F.Condition.setEvaluator(new Condition());
 		F.Continue.setEvaluator(new Continue());
@@ -254,16 +255,6 @@ public final class Programming {
 
 	}
 
-	private static class Compile extends AbstractCoreFunctionEvaluator {
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (!ToggleFeature.COMPILE) {
-				return F.NIL;
-			}
-			return engine.printMessage("Compile: Compile() function not implemented! ");
-		}
-
-	}
 
 	/**
 	 * <pre>
@@ -413,6 +404,31 @@ public final class Programming {
 
 	}
 
+	private final static class CompiledFunction extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr head = ast.head();
+			if (head instanceof DataExpr) {
+				try {
+					DataExpr data = (DataExpr) head;
+					if (data.head() == F.CompiledFunction) {
+						AbstractFunctionEvaluator fun = (AbstractFunctionEvaluator) data.toData();
+						return fun.evaluate(ast, engine);
+					}
+				} catch (RuntimeException rex) {
+					engine.printMessage("CompiledFunction: " + rex.getMessage());
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
+
+	}
 	/**
 	 * <pre>
 	 * <code>Defer(expr)
