@@ -29,6 +29,7 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 	@Override
 	public IExpr numericEval(final IAST ast, EvalEngine engine) {
 		IExpr arg1 = ast.arg1();
+		try {
 		if (arg1 instanceof INum) {
 			if (arg1 instanceof ApfloatNum) {
 				return e1ApfloatArg(((ApfloatNum) arg1).apfloatValue());
@@ -39,6 +40,10 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 				return e1ApcomplexArg(((ApcomplexNum) arg1).apcomplexValue());
 			}
 			return e1ComplexArg(((ComplexNum) arg1).complexValue());
+		}
+		} catch (Exception ex) {
+			EvalEngine.get().printMessage(ast.topHead().toString() + ": " + ex.getMessage());
+			return F.NIL;
 		}
 		return evaluateArg1(arg1, engine);
 	}
