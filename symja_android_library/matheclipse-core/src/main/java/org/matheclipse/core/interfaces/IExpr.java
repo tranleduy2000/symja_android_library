@@ -781,6 +781,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isCondition();
 
     /**
+     * Test if this expression is the ConditionalExpression function <code>ConditionalExpression[&lt;arg1&gt;, &lt;arg2&gt;]</code>
+     *
+     * @return
+     */
+    boolean isConditionalExpression();
+
+    /**
      * Test if this expression is the function <code>Conjugate[&lt;arg&gt;]</code>
      */
     boolean isConjugate();
