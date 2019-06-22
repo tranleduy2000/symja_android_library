@@ -9242,6 +9242,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// github #134
 		check("Log(10,1)", //
 				"0");
+		check("Log(0,0)", //
+				"Indeterminate");
 		check("Log(E^(7+13*I))", //
 				"7+I*13-I*4*Pi");
 		check("Log(E^(27*I))", //
@@ -17680,6 +17682,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTeXForm() {
+		check("TeXForm(N(1.1+Pi*I,30))", //
+				"1.1 + 3.14159265358979323846264338327\\,i ");
+		check("TeXForm(N(Pi,30))", //
+				"3.14159265358979323846264338327");
 		check("TeXForm(Infinity)", //
 				"\\infty");
 		check("TeXForm(-Infinity)", //
