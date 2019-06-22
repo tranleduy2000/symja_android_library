@@ -1578,9 +1578,9 @@ public class EvalEngine implements Serializable {
 	 */
 	private IExpr evalTagSetPlusTimes(IAST ast) {
 		if (ast.isPlus()) {
-			return UtilityFunctionCtors.evalRubiDistPlus(ast);
+			return UtilityFunctionCtors.evalRubiDistPlus(ast, this);
 		} else if (ast.isTimes()) {
-			return UtilityFunctionCtors.evalRubiDistTimes(ast);
+			return UtilityFunctionCtors.evalRubiDistTimes(ast, this);
 		}
 		return F.NIL;
 	}
