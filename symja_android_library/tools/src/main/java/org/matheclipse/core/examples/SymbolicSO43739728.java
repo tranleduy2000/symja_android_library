@@ -1,16 +1,13 @@
 package org.matheclipse.core.examples;
 
-import java.io.StringWriter;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
+
+import java.io.StringWriter;
 
 /**
  * See <a href="http://stackoverflow.com/questions/43739728">Stackoverflow 43739728</a>
@@ -35,9 +32,9 @@ public class SymbolicSO43739728 {
 
 			// print result in decimal format
 			final StringWriter buf = new StringWriter();
-			DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-			DecimalFormat decimalFormat = new DecimalFormat("0.0####", usSymbols);
-			OutputFormFactory.get(true, false, decimalFormat).convert(buf, result);
+			// DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
+			// DecimalFormat decimalFormat = new DecimalFormat("0.0####", usSymbols);
+			OutputFormFactory.get(true, false, 5, 7).convert(buf, result);
 			// I*1.41421
 			System.out.println(buf.toString());
 

@@ -295,12 +295,10 @@ public class Console {
      */
 	public Console() {
 		fEvaluator = new ExprEvaluator(false, 100);
-		DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-		DecimalFormat decimalFormat = new DecimalFormat("0.0####", usSymbols);
-		fOutputFactory = OutputFormFactory.get(true, false, decimalFormat);
+		fOutputFactory = OutputFormFactory.get(true, false, 5, 7);
 		fEvaluator.getEvalEngine().setFileSystemEnabled(true);
-		fOutputTraditionalFactory = OutputFormFactory.get(true, false, decimalFormat);
-		fInputFactory = OutputFormFactory.get(true, false, decimalFormat);
+		fOutputTraditionalFactory = OutputFormFactory.get(true, false, 5, 7);
+		fInputFactory = OutputFormFactory.get(true, false, 5, 7);
 		fInputFactory.setQuotes(true);
     }
 

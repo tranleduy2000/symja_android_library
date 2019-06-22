@@ -8,6 +8,10 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
+/**
+ *
+ *
+ */
 public class Compile extends AbstractCoreFunctionEvaluator {
 	static final String JAVA_SOURCE_CODE = //
 			"/* an in-memory compiled function */                                      \n"//

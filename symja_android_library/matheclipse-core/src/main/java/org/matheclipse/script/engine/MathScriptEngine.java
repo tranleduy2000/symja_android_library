@@ -15,9 +15,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import javax.script.AbstractScriptEngine;
@@ -218,9 +215,9 @@ public class MathScriptEngine extends AbstractScriptEngine {
         }
         final StringWriter buf = new StringWriter();
         if (fDecimalFormat != null) {
-            DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-            DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
-            OutputFormFactory.get(relaxedSyntax, false, decimalFormat).convert(buf, result);
+			// DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
+			// DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
+			OutputFormFactory.get(relaxedSyntax, false, 5, 7).convert(buf, result);
         } else {
             OutputFormFactory.get(relaxedSyntax).convert(buf, result);
         }
