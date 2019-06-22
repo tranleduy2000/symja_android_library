@@ -11,7 +11,6 @@ import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -316,7 +315,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 
 	/** {@inheritDoc} */
 	@Override
-	public IASTMutable copy() {
+	public ASTRealVector copy() {
 		return new ASTRealVector(vector.copy(), false);
 	}
 
@@ -384,6 +383,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return F.num(val);
 	}
 
+	public double getEntry(int location) {
+		return vector.getEntry(location - 1);
+	}
 	public RealVector getRealVector() {
 		return vector;
 	}
@@ -431,6 +433,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return true;
 	}
 
+	public boolean isNaN() {
+		return vector.isNaN();
+	}
 	/** {@inheritDoc} */
 	@Override
 	public boolean isRealVector() {
@@ -527,6 +532,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 				"Index: " + Integer.valueOf(location) + ", Size: " + (vector.getDimension() + 1));
 	}
 
+	public void setEntry(int location, double value) {
+		hashValue = 0;
+		vector.setEntry(location - 1, value);
+	}
 	/**
 	 * Returns the number of elements in this {@code ArrayList}.
 	 * 
@@ -537,6 +546,9 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return vector.getDimension() + 1;
 	}
 
+	public ASTRealVector subtract(ASTRealVector that) {
+		return new ASTRealVector(vector.subtract(that.vector),false);
+	}
 	/**
 	 * Returns a new array containing all elements contained in this {@code ArrayList}.
 	 * 
