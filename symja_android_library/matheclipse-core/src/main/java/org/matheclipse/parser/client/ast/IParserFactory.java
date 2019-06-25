@@ -26,6 +26,7 @@ import java.util.Map;
  * 
  */
 public interface IParserFactory {
+	
 	/**
 	 * The default set of characters, which could form an operator
 	 * 

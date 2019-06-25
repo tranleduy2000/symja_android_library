@@ -190,7 +190,7 @@ public class ExprParser extends Scanner {
 				return F.Power(arg1Power.base(), arg1Power.exponent().negate());
 			}
 		} else if (ast.isSameHeadSizeGE(F.GreaterEqual, 3)) {
-			return AST2Expr.rewriteLessGreaterAST(ast,  F.Greater);
+			return AST2Expr.rewriteLessGreaterAST(ast, F.Greater);
 		} else if (ast.isSameHeadSizeGE(F.Greater, 3)) {
 			return AST2Expr.rewriteLessGreaterAST(ast, F.GreaterEqual);
 		} else if (ast.isSameHeadSizeGE(F.LessEqual, 3)) {
