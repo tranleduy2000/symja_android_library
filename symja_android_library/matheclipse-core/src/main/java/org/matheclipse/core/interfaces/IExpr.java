@@ -959,6 +959,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isFalse();
 
+    boolean isFalseValue();
+
     /**
      * Test if this expression is an AST list, which contains a <b>header element</b> (i.e. a function symbol like for
      * example <code>Dot, Plus or Times</code>) with attribute <code>Flat</code> at index position <code>0</code> and
@@ -1798,6 +1800,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * cases
      */
     boolean isTrue();
+
+    boolean isTrueValue();
 
     /**
      * Returns <code>true</code>, if this symbol or ast expression is bound to a value (i.e. the evaluation returns an

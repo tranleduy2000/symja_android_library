@@ -1305,6 +1305,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return true;
     }
 
+
     /**
      * Test if this expression equals the symbol "False"
      *
@@ -1313,6 +1314,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isFalse() {
         return false;
+    }
+
+    @Override
+    public boolean isFalseValue() {
+        // Android changed: accept number as boolean argument
+        return this instanceof INumber && this.isZero();
     }
 
     /**
@@ -2625,7 +2632,14 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isTrue() {
+        // Android changed: accept number as boolean argument
         return false;
+    }
+
+    @Override
+    public boolean isTrueValue() {
+        // Android changed: accept number as boolean argument
+        return this instanceof INumber && !this.isZero();
     }
 
     /**

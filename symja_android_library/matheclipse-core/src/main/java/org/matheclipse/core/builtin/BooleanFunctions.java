@@ -217,18 +217,18 @@ public final class BooleanFunctions {
 			for (int i = 1; i < flattenedAST.size(); i++) {
 				temp = flattenedAST.get(i);
 				if (temp.isBuiltInSymbol()) {
-					if (temp.isFalse()) {
+					if (temp.isFalse() || temp.isFalseValue()) {
 						return F.False;
-					} else if (temp.isTrue()) {
+					} else if (temp.isTrue() || temp.isTrueValue()) {
 						continue;
 					}
 				}
 
 				temp = engine.evaluateNull(temp);
 				if (temp.isPresent()) {
-					if (temp.isFalse()) {
+					if (temp.isFalse() || temp.isFalseValue()) {
 						return F.False;
-					} else if (temp.isTrue()) {
+					} else if (temp.isTrue() || temp.isTrueValue()) {
 						continue;
 					}
 					evaled = true;
@@ -248,9 +248,9 @@ public final class BooleanFunctions {
 			int[] notSymbols = new int[flattenedAST.size()];
 			for (int i = start; i < flattenedAST.size(); i++) {
 				temp = flattenedAST.get(i);
-				if (temp.isFalse()) {
+				if (temp.isFalse() || temp.isFalseValue()) {
 					return F.False;
-				} else if (temp.isTrue()) {
+				} else if (temp.isTrue() || temp.isTrueValue()) {
 					result.remove(index);
 					evaled = true;
 					continue;
@@ -258,9 +258,9 @@ public final class BooleanFunctions {
 
 				temp = engine.evaluateNull(temp);
 				if (temp.isPresent()) {
-					if (temp.isFalse()) {
+					if (temp.isFalse() || temp.isFalseValue()) {
 						return F.False;
-					} else if (temp.isTrue()) {
+					} else if (temp.isTrue() || temp.isTrueValue()) {
 						result.remove(index);
 						evaled = true;
 						continue;
@@ -2328,9 +2328,9 @@ public final class BooleanFunctions {
 
 			for (int i = 1; i < ast.size(); i++) {
 				IExpr temp = engine.evaluate(ast.get(i));
-				if (temp.isFalse()) {
+				if (temp.isFalse() || temp.isFalseValue()) {
 					return F.True;
-				} else if (temp.isTrue()) {
+				} else if (temp.isTrue() || temp.isTrueValue()) {
 					evaled = true;
 				} else {
 					result.append(temp);
@@ -2660,9 +2660,9 @@ public final class BooleanFunctions {
 
 			for (int i = 1; i < ast.size(); i++) {
 				IExpr temp = engine.evaluate(ast.get(i));
-				if (temp.isTrue()) {
+				if (temp.isTrue() || temp.isTrueValue()) {
 					return F.False;
-				} else if (temp.isFalse()) {
+				} else if (temp.isFalse() || temp.isFalseValue()) {
 					evaled = true;
 				} else {
 					result.append(temp);
@@ -2719,10 +2719,10 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr e1ObjArg(final IExpr o) {
-			if (o.isTrue()) {
+			if (o.isTrue() || o.isTrueValue()) {
 				return F.False;
 			}
-			if (o.isFalse()) {
+			if (o.isFalse() || o.isFalseValue()) {
 				return F.True;
 			}
 			if (o.isAST()) {
@@ -2814,10 +2814,10 @@ public final class BooleanFunctions {
 
 			for (int i = 1; i < flattenedAST.size(); i++) {
 				temp = flattenedAST.get(i);
-				if (temp.isTrue()) {
+				if (temp.isTrue() || temp.isTrueValue()) {
 					return F.True;
 				}
-				if (temp.isFalse()) {
+				if (temp.isFalse() || temp.isFalseValue()) {
 					result.remove(index);
 					evaled = true;
 					continue;
@@ -2825,10 +2825,10 @@ public final class BooleanFunctions {
 
 				temp = engine.evaluateNull(flattenedAST.get(i));
 				if (temp.isPresent()) {
-					if (temp.isTrue()) {
+					if (temp.isTrue() || temp.isTrueValue()) {
 						return F.True;
 					}
-					if (temp.isFalse()) {
+					if (temp.isFalse() || temp.isFalseValue()) {
 						result.remove(index);
 						evaled = true;
 						continue;
@@ -3662,19 +3662,19 @@ public final class BooleanFunctions {
 			boolean evaled = false;
 			for (int i = 2; i < size; i++) {
 				temp = ast.get(i);
-				if (temp.isTrue()) {
-					if (result.isTrue()) {
+				if (temp.isTrue() || temp.isTrueValue()) {
+					if (result.isTrue() || result.isTrueValue()) {
 						result = F.False;
-					} else if (result.isFalse()) {
+					} else if (result.isFalse() || result.isFalseValue()) {
 						result = F.True;
 					} else {
 						result = F.Not.of(engine, result);
 					}
 					evaled = true;
-				} else if (temp.isFalse()) {
-					if (result.isTrue()) {
+				} else if (temp.isFalse() || temp.isFalseValue()) {
+					if (result.isTrue() || result.isTrueValue()) {
 						result = F.True;
-					} else if (result.isFalse()) {
+					} else if (result.isFalse() || result.isFalseValue()) {
 						result = F.False;
 					}
 					evaled = true;
@@ -3683,10 +3683,10 @@ public final class BooleanFunctions {
 						result = F.False;
 						evaled = true;
 					} else {
-						if (result.isTrue()) {
+						if (result.isTrue() || result.isTrueValue()) {
 							result = F.Not.of(engine, temp);
 							evaled = true;
-						} else if (result.isFalse()) {
+						} else if (result.isFalse() || result.isFalseValue()) {
 							result = temp;
 							evaled = true;
 						} else {

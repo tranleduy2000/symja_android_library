@@ -176,8 +176,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"a&&b&&c");
 		check("And()", //
 				"True");
-		check("And(4)", //
-				"4");
+		check("And(4)", // Android changed: accept non-zero number as true value
+				"True");
 		check("2 > 1 && Pi > 3", //
 				"True");
 		check("a && b && ! c", //
@@ -10365,7 +10365,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testNand() {
 		check("Nand( )", "False");
 		check("Nand(a)", "!a");
-		check("Nand(2+2)", "!4");
+		// Android changed: accept non-zero number as true value
+		check("Nand(2+2)", "False");
 		check("Nand(x,y,z)", "Nand(x,y,z)");
 		check("Nand(x,True,z)", "Nand(x,z)");
 		check("Nand(x,False,z)", "True");
@@ -10884,7 +10885,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testNor() {
 		check("Nor( )", "True");
-		check("Nor(2+2)", "!4");
+		// Android changed: accept non-zero number as true value
+		check("Nor(2+2)", "False") ;
 		check("Nor(True,False)", "False");
 		check("Nor(x,y,z)", "Nor(x,y,z)");
 		check("Nor(x,True,z)", "False");
@@ -11328,8 +11330,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("False || True", //
 				"True");
 		check("a || False || b", "a||b");
+		// Android changed: accept non-zero number as true value
 		check("Or( )", "False");
-		check("Or(2+2)", "4");
+		// Android changed: accept non-zero number as true value
+		check("Or(2+2)", "True");
 		check("FullForm( Or(x, Or(y, z)) )", "Or(x, y, z)");
 		check("Or(x, False, z)", "x||z");
 		check("Or(x, True, z)", "True");
