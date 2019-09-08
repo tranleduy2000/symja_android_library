@@ -524,7 +524,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Compile = F.initFinalSymbol("Compile", ID.Compile);
     /***/
-    public final static IBuiltInSymbol CompiledFunction = F.initFinalSymbol("CompiledFunction", ID.Compile);
+    public final static IBuiltInSymbol CompiledFunction = F.initFinalSymbol("CompiledFunction", ID.CompiledFunction);
 
     /** Complement (set1, set2) - get the complement set from `set1` and `set2`.*/
     public final static IBuiltInSymbol Complement = F.initFinalSymbol("Complement", ID.Complement);
@@ -743,9 +743,11 @@ public class F {
 
     /** EdgeList(graph) - convert the `graph` into a list of edges. */
     public final static IBuiltInSymbol EdgeList = F.initFinalSymbol("EdgeList", ID.EdgeList);
-    /***/
+    /** EdgeQ(graph, edge) - test if `edge` is an edge in the `graph` object.*/
     public final static IBuiltInSymbol EdgeQ = F.initFinalSymbol("EdgeQ", ID.EdgeQ);
 
+    /***/
+    public final static IBuiltInSymbol EdgeWeight = F.initFinalSymbol("EdgeWeight", ID.EdgeWeight);
     /** EffectiveInterest(i, n) - returns an effective interest rate object.*/
     public final static IBuiltInSymbol EffectiveInterest = F.initFinalSymbol("EffectiveInterest", ID.EffectiveInterest);
 	/** Eigenvalues(matrix) - get the numerical eigenvalues of the `matrix`. */
@@ -788,18 +790,18 @@ public class F {
     public final static IBuiltInSymbol Erfc = F.initFinalSymbol("Erfc", ID.Erfc);
     /***/
     public final static IBuiltInSymbol Erfi = F.initFinalSymbol("Erfi", ID.Erfi);
-	/** ErlangDistribution({k, lambda}) - returns a Erlang distribution. */
-    public final static IBuiltInSymbol ErlangDistribution = F.initFinalSymbol("ErlangDistribution",
-            ID.ErlangDistribution);
-	/** EuclideanDistance(u, v) - returns the euclidean distance between `u` and `v`. */
+    /** ErlangDistribution({k, lambda}) - returns a Erlang distribution.*/
+    public final static IBuiltInSymbol ErlangDistribution = F.initFinalSymbol("ErlangDistribution", ID.ErlangDistribution);
+
+    /** EuclideanDistance(u, v) - returns the euclidean distance between `u` and `v`.*/
     public final static IBuiltInSymbol EuclideanDistance = F.initFinalSymbol("EuclideanDistance", ID.EuclideanDistance);
-	/** EulerE(n) - gives the euler number `En`. */
+    /** EulerE(n) - gives the euler number `En`.*/
     public final static IBuiltInSymbol EulerE = F.initFinalSymbol("EulerE", ID.EulerE);
     /***/
     public final static IBuiltInSymbol EulerGamma = F.initFinalSymbol("EulerGamma", ID.EulerGamma);
 	/** EulerPhi(n) - compute Euler's totient function. */
     public final static IBuiltInSymbol EulerPhi = F.initFinalSymbol("EulerPhi", ID.EulerPhi);
-    /***/
+    /** EulerianGraphQ(graph) - returns `True` if `graph` is an eulerian graph, and `False` otherwise.*/
     public final static IBuiltInSymbol EulerianGraphQ = F.initFinalSymbol("EulerianGraphQ", ID.EulerianGraphQ);
     /***/
     public final static IBuiltInSymbol Evaluate = F.initFinalSymbol("Evaluate", ID.Evaluate);
@@ -870,24 +872,25 @@ public class F {
     public final static IBuiltInSymbol False = F.initFinalSymbol("False", ID.False);
 	/** Fibonacci(n) - returns the Fibonacci number of the integer `n` */
     public final static IBuiltInSymbol Fibonacci = F.initFinalSymbol("Fibonacci", ID.Fibonacci);
-    /***/
+    /** FindEulerianCycle(graph) - find an eulerian cycle in the `graph`.*/
     public final static IBuiltInSymbol FindEulerianCycle = F.initFinalSymbol("FindEulerianCycle", ID.FindEulerianCycle);
 
     /** FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
     public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
-    /***/
+    /** FindHamiltonianCycle(graph) - find an hamiltonian cycle in the `graph`.*/
     public final static IBuiltInSymbol FindHamiltonianCycle = F.initFinalSymbol("FindHamiltonianCycle", ID.FindHamiltonianCycle);
 
     /** FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables `vars`.*/
     public final static IBuiltInSymbol FindInstance = F.initFinalSymbol("FindInstance", ID.FindInstance);
     /** FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to `xmax`. */
     public final static IBuiltInSymbol FindRoot = F.initFinalSymbol("FindRoot", ID.FindRoot);
-    /***/
+    /** FindShortestPath(graph, source, destination) - find a shortest path in the `graph` from `source` to `destination`.*/
     public final static IBuiltInSymbol FindShortestPath = F.initFinalSymbol("FindShortestPath", ID.FindShortestPath);
 
-    /***/
+    /** FindShortestTour({{p11, p12}, {p21, p22}, {p31, p32}, ...}) - find a shortest tour in the `graph` with minimum `EuclideanDistance`.*/
     public final static IBuiltInSymbol FindShortestTour = F.initFinalSymbol("FindShortestTour", ID.FindShortestTour);
 
+    /** FindSpanningTree(graph) - find the minimum spanning tree in the `graph`.*/
     public final static IBuiltInSymbol FindSpanningTree = F.initFinalSymbol("FindSpanningTree", ID.FindSpanningTree);
     /** First(expr) - returns the first element in `expr`.*/
     public final static IBuiltInSymbol First = F.initFinalSymbol("First", ID.First);
@@ -961,18 +964,15 @@ public class F {
     public final static IBuiltInSymbol FrobeniusSolve = F.initFinalSymbol("FrobeniusSolve", ID.FrobeniusSolve);
     /***/
     public final static IBuiltInSymbol FromCharacterCode = F.initFinalSymbol("FromCharacterCode", ID.FromCharacterCode);
-    /**
-     * FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2,
-     * ...}`.
-     */
-    public final static IBuiltInSymbol FromContinuedFraction = F.initFinalSymbol("FromContinuedFraction",
-            ID.FromContinuedFraction);
-	/** FromDigits(list) - creates an expression from the list of digits for radix `10`. */
+    /** FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2, ...}`.*/
+    public final static IBuiltInSymbol FromContinuedFraction = F.initFinalSymbol("FromContinuedFraction", ID.FromContinuedFraction);
+
+    /** FromDigits(list) - creates an expression from the list of digits for radix `10`.*/
     public final static IBuiltInSymbol FromDigits = F.initFinalSymbol("FromDigits", ID.FromDigits);
-	/** FromPolarCoordinates({r, t}) - return the cartesian coordinates for the polar coordinates `{r, t}`. */
-    public final static IBuiltInSymbol FromPolarCoordinates = F.initFinalSymbol("FromPolarCoordinates",
-            ID.FromPolarCoordinates);
-	/** FullForm(expression) - shows the internal representation of the given `expression`. */
+    /** FromPolarCoordinates({r, t}) - return the cartesian coordinates for the polar coordinates `{r, t}`.*/
+    public final static IBuiltInSymbol FromPolarCoordinates = F.initFinalSymbol("FromPolarCoordinates", ID.FromPolarCoordinates);
+
+    /** FullForm(expression) - shows the internal representation of the given `expression`.*/
     public final static IBuiltInSymbol FullForm = F.initFinalSymbol("FullForm", ID.FullForm);
     /**
      * FullSimplify(expr) - works like `Simplify` but additionally tries some `FunctionExpand` rule transformations to
@@ -1202,9 +1202,9 @@ public class F {
 	/** Inverse(matrix) - computes the inverse of the `matrix`. */
     public final static IBuiltInSymbol Inverse = F.initFinalSymbol("Inverse", ID.Inverse);
     /***/
-    public final static IBuiltInSymbol InverseBetaRegularized = F.initFinalSymbol("InverseBetaRegularized",
-            ID.InverseBetaRegularized);
-    /***/
+    public final static IBuiltInSymbol InverseBetaRegularized = F.initFinalSymbol("InverseBetaRegularized", ID.InverseBetaRegularized);
+
+    /** InverseCDF(dist, q) - returns the inverse cumulative distribution for the distribution `dist` as a function of `q` */
     public final static IBuiltInSymbol InverseCDF = F.initFinalSymbol("InverseCDF", ID.InverseCDF);
 	/** InverseErf(z) - returns the inverse error function of `z`. */
     public final static IBuiltInSymbol InverseErf = F.initFinalSymbol("InverseErf", ID.InverseErf);
@@ -1225,7 +1225,7 @@ public class F {
             ID.InverseLaplaceTransform);
 	/** InverseSeries( series ) - return the inverse series. */
     public final static IBuiltInSymbol InverseSeries = F.initFinalSymbol("InverseSeries", ID.InverseSeries);
-    /***/
+    /** JSForm(expre) - returns the JavaScript form of the `expr`.  */
     public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
 
     /** JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
@@ -1252,17 +1252,10 @@ public class F {
     public final static IBuiltInSymbol Khinchin = F.initFinalSymbol("Khinchin", ID.Khinchin);
     /***/
     public final static IBuiltInSymbol KnownUnitQ = F.initFinalSymbol("KnownUnitQ", ID.KnownUnitQ);
-    /**
-     * KolmogorovSmirnovTest(data) - Computes the `p-value`, or <i>observed significance level</i>, of a one-sample
-     * [Wikipedia:Kolmogorov-Smirnov test](http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test) evaluating the null
-     * hypothesis that `data` conforms to the `NormalDistribution()`.
-     */
-    public final static IBuiltInSymbol KolmogorovSmirnovTest = F.initFinalSymbol("KolmogorovSmirnovTest",
-            ID.KolmogorovSmirnovTest);
-    /**
-     * KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`, otherwise return
-     * `0`.
-     */
+    /** KolmogorovSmirnovTest(data) - Computes the `p-value`, or <i>observed significance level</i>, of a one-sample [Wikipedia:Kolmogorov-Smirnov test](http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test) evaluating the null hypothesis that `data` conforms to the `NormalDistribution()`.*/
+    public final static IBuiltInSymbol KolmogorovSmirnovTest = F.initFinalSymbol("KolmogorovSmirnovTest", ID.KolmogorovSmirnovTest);
+
+    /** KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`, otherwise return `0`. */
     public final static IBuiltInSymbol KroneckerDelta = F.initFinalSymbol("KroneckerDelta", ID.KroneckerDelta);
 	/** Kurtosis(list) - gives the Pearson measure of kurtosis for `list` (a measure of existing outliers). */
     public final static IBuiltInSymbol Kurtosis = F.initFinalSymbol("Kurtosis", ID.Kurtosis);
@@ -2396,7 +2389,7 @@ public class F {
     /** VertexList(graph) - convert the `graph` into a list of vertices.*/
     public final static IBuiltInSymbol VertexList = F.initFinalSymbol("VertexList", ID.VertexList);
 
-    /***/
+    /** VertexQ(graph, vertex) - test if `vertex` is a vertex in the `graph` object.*/
     public final static IBuiltInSymbol VertexQ = F.initFinalSymbol("VertexQ", ID.VertexQ);
     /***/
     public final static IBuiltInSymbol ViewPoint = F.initFinalSymbol("ViewPoint", ID.ViewPoint);
@@ -2404,6 +2397,8 @@ public class F {
     /** WeibullDistribution(a, b) - returns a Weibull distribution.*/
     public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution", ID.WeibullDistribution);
 
+    /***/
+    public final static IBuiltInSymbol WeightedAdjacencyMatrix = F.initFinalSymbol("WeightedAdjacencyMatrix", ID.WeightedAdjacencyMatrix);
     /** Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2` evaluates to `True`, etc.*/
     public final static IBuiltInSymbol Which = F.initFinalSymbol("Which", ID.Which);
     /** While(test, body) - evaluates `body` as long as test evaluates to `True`.*/

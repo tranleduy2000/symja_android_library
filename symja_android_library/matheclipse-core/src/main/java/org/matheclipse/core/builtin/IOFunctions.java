@@ -234,13 +234,11 @@ public class IOFunctions {
 		}
 
 			if (message != null) {
-			if (message != null) {
 				for (int i = 1; i < ast.size(); i++) {
 					message = message.replaceAll("`" + (i) + "`", ast.get(i).toString());
 				}
 				engine.printMessage(symbol.toString() + ": " + message);
 			}
-		}
 		return F.NIL;
 	}
 
