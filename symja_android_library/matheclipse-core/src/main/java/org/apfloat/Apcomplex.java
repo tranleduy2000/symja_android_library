@@ -304,6 +304,23 @@ public class Apcomplex
     {
         return Math.max(real().size(), imag().size());
     }
+    /**
+     * Returns if this number has an integer value. Note that this does not
+     * necessarily mean that this object is an instance of {@link Apint}.
+     * Neither does it mean that the precision is infinite.<p>
+     *
+     * A complex number needs to have a zero imaginary part to be an integer.
+     *
+     * @return If this number's value is an integer.
+     *
+     * @since 1.9.0
+     */
+
+    public boolean isInteger()
+            throws ApfloatRuntimeException
+    {
+        return imag().signum() == 0 && real().isInteger();
+    }
 
     /**
      * Negative value.
@@ -524,7 +541,100 @@ public class Apcomplex
     {
         return real().longValue();
     }
+    /**
+     * Returns the value of the this number as a <code>byte</code>, checking
+     * for lost information. If the value of this number is out of the range
+     * of the <code>byte</code> type, then an <code>ArithmeticException</code>
+     * is thrown.
+     *
+     * @return The numeric value represented by this object after conversion to type <code>byte</code>.
+     *
+     * @throws ArithmeticException If the value of <code>this</code> will not exactly fit in a <code>byte</code>.
+     *
+     * @since  1.9.0
+     */
 
+    public byte byteValueExact()
+            throws ArithmeticException
+    {
+        long value = longValueExact();
+        if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE)
+        {
+            throw new ArithmeticException("Out of range");
+        }
+        return (byte) value;
+    }
+
+    /**
+     * Returns the value of the this number as a <code>short</code>, checking
+     * for lost information. If the value of this number is out of the range
+     * of the <code>short</code> type, then an <code>ArithmeticException</code>
+     * is thrown.
+     *
+     * @return The numeric value represented by this object after conversion to type <code>short</code>.
+     *
+     * @throws ArithmeticException If the value of <code>this</code> will not exactly fit in a <code>short</code>.
+     *
+     * @since  1.9.0
+     */
+
+    public short shortValueExact()
+            throws ArithmeticException
+    {
+        long value = longValueExact();
+        if (value > Short.MAX_VALUE || value < Short.MIN_VALUE)
+        {
+            throw new ArithmeticException("Out of range");
+        }
+        return (short) value;
+    }
+
+    /**
+     * Returns the value of the this number as an <code>int</code>, checking
+     * for lost information. If the value of this number is out of the range
+     * of the <code>int</code> type, then an <code>ArithmeticException</code>
+     * is thrown.
+     *
+     * @return The numeric value represented by this object after conversion to type <code>int</code>.
+     *
+     * @throws ArithmeticException If the value of <code>this</code> will not exactly fit in an <code>int</code>.
+     *
+     * @since  1.9.0
+     */
+
+    public int intValueExact()
+            throws ArithmeticException
+    {
+        long value = longValueExact();
+        if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE)
+        {
+            throw new ArithmeticException("Out of range");
+        }
+        return (int) value;
+    }
+
+    /**
+     * Returns the value of the this number as a <code>long</code>, checking
+     * for lost information. If the value of this number is out of the range
+     * of the <code>long</code> type, then an <code>ArithmeticException</code>
+     * is thrown.
+     *
+     * @return The numeric value represented by this object after conversion to type <code>long</code>.
+     *
+     * @throws ArithmeticException If the value of <code>this</code> will not exactly fit in a <code>long</code>.
+     *
+     * @since  1.9.0
+     */
+
+    public long longValueExact()
+            throws ArithmeticException
+    {
+        if (imag().signum() != 0)
+        {
+            throw new ArithmeticException("Out of range");
+        }
+        return real().longValueExact();
+    }
     /**
      * Computes number of equal digits.<p>
      *

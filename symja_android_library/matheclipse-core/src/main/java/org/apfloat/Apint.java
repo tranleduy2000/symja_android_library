@@ -212,6 +212,23 @@ public class Apint
     }
 
     /**
+     * Returns if this number has an integer value.<p>
+     *
+     * For <code>Apint</code> this method always returns <code>true</code>.
+     *
+     * @return <code>true</code>.
+     *
+     * @since 1.9.0
+     */
+
+    @Override
+    public boolean isInteger()
+            throws ApfloatRuntimeException
+    {
+        return true;
+    }
+
+    /**
      * Negative value.
      *
      * @return <code>-this</code>.

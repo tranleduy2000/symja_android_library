@@ -1535,6 +1535,19 @@ public final class Arithmetic {
 		}
 
 		@Override
+		public IExpr e1ApcomplexArg(Apcomplex arg1) {
+			return F.complexNum(ApcomplexMath.gamma(arg1));
+		}
+
+		@Override
+		public IExpr e1ApfloatArg(Apfloat arg1) {
+			try {
+				return F.num(ApfloatMath.gamma(arg1));
+			} catch (ArithmeticException ae) {
+				return F.complexNum(ApcomplexMath.gamma(new Apcomplex(arg1, Apcomplex.ZERO)));
+			}
+		}
+		@Override
 		public IExpr e1DblComArg(final IComplexNum c) {
 			if (pComplex == null) {
 				// lazy initialization

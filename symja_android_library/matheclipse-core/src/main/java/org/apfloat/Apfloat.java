@@ -497,6 +497,23 @@ public class Apfloat
     }
 
     /**
+     * Returns if this number has an integer value. Note that this does not
+     * necessarily mean that this object is an instance of {@link Apint}.
+     * Neither does it mean that the precision is infinite.
+     *
+     * @return If this number's value is an integer.
+     *
+     * @since 1.9.0
+     */
+
+    @Override
+    public boolean isInteger()
+            throws ApfloatRuntimeException
+    {
+        return signum() == 0 || size() <= scale();
+    }
+
+    /**
      * Returns if this apfloat is "short". In practice an apfloat is "short" if its
      * mantissa fits in one machine word. If the apfloat is "short", some algorithms
      * can be performed faster.<p>
@@ -878,6 +895,19 @@ public class Apfloat
         ApfloatImpl impl = getImpl(targetPrecision);
 
         return impl.longValue();
+    }
+
+    @Override
+    public long longValueExact()
+            throws ArithmeticException
+    {
+        long value = longValue();
+        if (!new Apint(value, radix()).equals(truncate()))
+        {
+            throw new ArithmeticException("Out of range");
+        }
+
+        return value;
     }
 
     /**

@@ -6206,7 +6206,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testFindShortestTour() {
 		check("FindShortestTour({GeoPosition[{41, 20}], GeoPosition[{5, 20}], GeoPosition[{49, 32}], " //
 				+ "GeoPosition[{53, 28}], GeoPosition[{47, 29}]})", //
-				"{6852.02461316151[mi],{1,2,5,3,4,1}}");
+				"{UnitConvert(Quantity(315504.9,m),mi)+UnitConvert(Quantity(525988.4,m),mi)+UnitConvert(Quantity(1.46408*10^6,m),mi)+UnitConvert(Quantity(3.98769*10^6,m),mi)+UnitConvert(Quantity(4.73401*10^6,m),mi),{\n" +
+						"1,2,5,3,4,1}}");
 		check("FindShortestTour({{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 1}, {2, 3}, {2, 5}, {3, 1}, {3, 2},"//
 				+ " {3, 4}, {3, 5}, {4, 1}, {4, 3}, {4, 5}, {5, 1}, {5, 2}, {5, 3}, {5, 4}})", //
 				"{14+5*Sqrt(2),{1,6,9,13,16,17,18,19,14,10,7,11,15,12,8,5,4,3,2,1}}");
@@ -7012,6 +7013,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGamma() {
+		check("N(Gamma(100.000000000000000000000000000+374.000000000000000000000000000*I), 30)", //
+				"4.74294943677064514689542753376*10^1+I*(-3.27488916473624576880974867017*10^1)");
 		check("Gamma(1/2, a*x)", //
 				"Gamma(1/2,a*x)");
 		check("Gamma(3, a*x)", //
@@ -7222,6 +7225,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testGeoDistance() {
 		check("GeoDistance({37, -109}, {40.113, -88.261})", //
 				"UnitConvert(Quantity(1.83601*10^6,m),mi)");
+		check("GeoDistance({30, 40}, {-40, 120})", //
+				"7031.6370551943855[mi]");
 	}
 	public void testGet() {
 		if (Config.FILESYSTEM_ENABLED) {
@@ -13573,11 +13578,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 			check("ProductLog(-1.5)", //
 					"-3.2783735915572*10^-2+I*1.549643823350159");
 			check("ProductLog({0.2, 0.5, 0.8})", //
-					"{1.689159734991096*10^-1,3.517337112491959*10^-1,4.900678588015799*10^-1}");
+					"{1.689159734991095*10^-1,3.517337112491958*10^-1,4.900678588015798*10^-1}");
 			check("ProductLog(2.5 + 2*I)", //
 					"1.056167968948635+I*3.5256052020787*10^-1");
 			check("N(ProductLog(4/10),50)", //
-					"2.9716775067313854677972696224702134190445810155014*10^-1");
+					"2.9716775067313854677972696224702134190445810155012*10^-1");
 
 			check("N(ProductLog(-1),20)", //
 					"-3.181315052047641353*10^-1+I*1.3372357014306894089");

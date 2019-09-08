@@ -306,6 +306,24 @@ public class Aprational
     }
 
     /**
+     * Returns if this number has an integer value. Note that this does not
+     * necessarily mean that this object is an instance of {@link Apint}.<p>
+     *
+     * A rational number is an integer if the denominator is one.
+     *
+     * @return If this number's value is an integer.
+     *
+     * @since 1.9.0
+     */
+
+    @Override
+    public boolean isInteger()
+            throws ApfloatRuntimeException
+    {
+        return denominator().equals(ONE);
+    }
+
+    /**
      * Negative value.
      *
      * @return <code>-this</code>.
