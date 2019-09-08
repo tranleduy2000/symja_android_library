@@ -12,6 +12,7 @@ import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
+import org.jgrapht.GraphType;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.visit.IVisitor;
@@ -1140,7 +1141,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @return
      */
-    boolean isListOfEdges();
+    GraphType isListOfEdges();
 
     /**
      * Test if this expression is a list of rules (head Rule or RuleDelayed)

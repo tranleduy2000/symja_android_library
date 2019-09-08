@@ -15,6 +15,8 @@ import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
+import org.jgrapht.GraphType;
+import org.jgrapht.graph.DefaultGraphType;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.IOFunctions;
@@ -67,6 +69,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import static org.jgrapht.graph.DefaultGraphType.*;
 
 public abstract class AbstractAST extends IASTMutableImpl {
 	protected static final class ASTIterator implements ListIterator<IExpr> {
@@ -436,8 +440,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 		/** {@inheritDoc} */
 		@Override
-		public final boolean isListOfEdges() {
-			return false;
+		public final GraphType isListOfEdges() {
+			return null;
 		}
 
 		/** {@inheritDoc} */
@@ -2609,18 +2613,26 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 	/** {@inheritDoc} */
 	@Override
-	public boolean isListOfEdges() {
+	public GraphType isListOfEdges() {
 		if (head().equals(F.List)) {
+			boolean directed = true;
 			for (int i = 1; i < size(); i++) {
-				if (!(get(i).isAST(F.DirectedEdge, 3) || get(i).isAST(F.UndirectedEdge, 3)
-						|| get(i).isAST(F.Rule, 3))) {
-					// the row is no list
-					return false;
+				if (get(i).isAST(F.DirectedEdge, 3) || get(i).isAST(F.Rule, 3)) {
+					continue;
 				}
+				if (!(get(i).isAST(F.UndirectedEdge, 3) || get(i).isAST(F.TwoWayRule, 3))) {
+					// the row is no list
+					return null;
+				}
+				directed = false;
 			}
-			return true;
+			Builder builder = new DefaultGraphType.Builder();
+			if (directed) {
+				return builder.directed().build();
 		}
-		return false;
+			return builder.undirected().build();
+		}
+		return null;
 	}
 
 	/** {@inheritDoc} */
@@ -3028,9 +3040,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			}
 			return true;
 		}
-//		if (isInfinity()||isNegativeInfinity()) {
-//			return true;
-//		}
+		// if (isInfinity()||isNegativeInfinity()) {
+		// return true;
+		// }
 		return false;
 	}
 

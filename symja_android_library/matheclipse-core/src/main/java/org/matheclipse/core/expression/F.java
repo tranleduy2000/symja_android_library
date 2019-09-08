@@ -2325,6 +2325,7 @@ public class F {
     public final static IBuiltInSymbol TukeyWindow = F.initFinalSymbol("TukeyWindow", ID.TukeyWindow);
 	/** Tuples(list, n) - creates a list of all `n`-tuples of elements in `list`. */
     public final static IBuiltInSymbol Tuples = F.initFinalSymbol("Tuples", ID.Tuples);
+	public final static IBuiltInSymbol TwoWayRule = F.initFinalSymbol("TwoWayRule", ID.TwoWayRule);
     /***/
     public final static IBuiltInSymbol Undefined = F.initFinalSymbol("Undefined", ID.Undefined);
     /***/
@@ -5629,6 +5630,9 @@ public class F {
         return binaryAST2(Grad, a0, a1);
     }
 
+	public static IAST Graph(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Graph, a0, a1);
+	}
     public static IASTAppendable Graphics() {
         return ast(Graphics);
     }
@@ -5786,7 +5790,7 @@ public class F {
      * </p>
      *
      * <pre>
-	 * &gt;&gt; InexactNumberQ(4.0+I)
+?	 * &gt;&gt; InexactNumberQ(4.0+I)
      * True
      * </pre>
      */
