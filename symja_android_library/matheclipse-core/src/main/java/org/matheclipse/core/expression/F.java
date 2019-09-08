@@ -217,6 +217,8 @@ public class F {
 	/** AddTo(x, dx) - is equivalent to `x = x + dx`. */
     public final static IBuiltInSymbol AddTo = F.initFinalSymbol("AddTo", ID.AddTo);
     /***/
+    public final static IBuiltInSymbol AdjacencyMatrix = F.initFinalSymbol("AdjacencyMatrix", ID.AdjacencyMatrix);
+    /***/
     public final static IBuiltInSymbol AlgebraicNumber = F.initFinalSymbol("AlgebraicNumber", ID.AlgebraicNumber);
     /***/
     public final static IBuiltInSymbol Algebraics = F.initFinalSymbol("Algebraics", ID.Algebraics);
@@ -2478,7 +2480,7 @@ public class F {
 
 	public final static ISymbol ASymbol = initFinalHiddenSymbol("A");
 	public final static ISymbol BSymbol = initFinalHiddenSymbol("B");
-	public final static ISymbol CSymbol = F.C; //initFinalHiddenSymbol("C");
+	public final static ISymbol CSymbol = F.C; // initFinalHiddenSymbol("C");
 	public final static ISymbol FSymbol = initFinalHiddenSymbol("F");
 	public final static ISymbol GSymbol = initFinalHiddenSymbol("G");
 	public final static ISymbol PSymbol = initFinalHiddenSymbol("P");

@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.BiFunction;
+
 import org.hipparchus.util.MathArrays;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -44,6 +46,7 @@ public class GraphFunctions {
 
 		private static void init() {
 			F.Graph.setEvaluator(new GraphCTor());
+			F.AdjacencyMatrix.setEvaluator(new AdjacencyMatrix());
 			F.EulerianGraphQ.setEvaluator(new EulerianGraphQ());
 			F.FindEulerianCycle.setEvaluator(new FindEulerianCycle());
 			F.FindHamiltonianCycle.setEvaluator(new FindHamiltonianCycle());
@@ -162,6 +165,33 @@ public class GraphFunctions {
 					Graph<IExpr, IExprEdge> gResult = new DefaultDirectedGraph<IExpr, IExprEdge>(IExprEdge.class);
 					Graphs.addAllEdges(gResult, g, edgeSet);
 					return DataExpr.newInstance(F.Graph, gResult);
+				}
+			} catch (RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+	}
+	private static class AdjacencyMatrix extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
+				if (ast.isAST1()) {
+					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
+					if (dex == null) {
+						return F.NIL;
+					}
+
+					Graph<IExpr, IExprEdge> g = dex.toData();
+					return graphToAdjacencyMatrix(g);
 				}
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
@@ -466,5 +496,20 @@ public class GraphFunctions {
 		}
 		IExpr graph = F.Graph(vertexes, edges);
 		return graph;
+	}
+	public static IAST graphToAdjacencyMatrix(Graph<IExpr, IExprEdge> g) {
+		Set<IExpr> vertexSet = g.vertexSet();
+		int size = vertexSet.size();
+		IExpr[] array = new IExpr[size];
+		int indx = 0;
+		for (IExpr expr : vertexSet) {
+			array[indx++] = expr;
+		}
+		return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+            @Override
+            public IExpr apply(Integer i, Integer j) {
+                return g.containsEdge(array[i], array[j]) ? F.C1 : F.C0;
+            }
+        }, size, size);
 	}
 }

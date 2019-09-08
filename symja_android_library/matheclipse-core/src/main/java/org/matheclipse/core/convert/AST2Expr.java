@@ -62,12 +62,12 @@ public class AST2Expr {
 			"SameTest", "Second", "Slot", "SlotSequence", "Strict", "String", "Symbol", "TooLarge", "Trig", "True",
 			"Variable", "White", "Unknown", "ViewPoint" };
 
-	public final static String[] FUNCTION_STRINGS = { "Abort", "Abs", "AbsArg", "Accumulate", "AddTo", "AllTrue", "And",
-			"AngleVector", "AnyTrue", "AntihermitianMatrixQ", "AntiSymmetric", "AntisymmetricMatrixQ", "Annuity",
-			"AnnuityDue", "AlgebraicNumber", "Alternatives", "Apart", "AppellF1", "Append", "AppendTo", "Apply",
-			"ArcCos", "ArcCosh", "ArcCot", "ArcCoth", "ArcCsc", "ArcCsch", "ArcSec", "ArcSech",
-			"ArithmeticGeometricMean", "ArcSin", "ArcSinh", "ArcTan", "ArcTanh", "Arg", "ArgMax", "ArgMin", "Array",
-			"ArrayDepth", "ArrayPad", "ArrayReshape", "Arrays", "ArrayQ", "Assumptions", "AtomQ", "Attributes",
+	public final static String[] FUNCTION_STRINGS = { "Abort", "Abs", "AbsArg", "Accumulate", "AddTo",
+			"AdjacencyMatrix", "AllTrue", "And", "AngleVector", "AnyTrue", "AntihermitianMatrixQ", "AntiSymmetric",
+			"AntisymmetricMatrixQ", "Annuity", "AnnuityDue", "AlgebraicNumber", "Alternatives", "Apart", "AppellF1",
+			"Append", "AppendTo", "Apply", "ArcCos", "ArcCosh", "ArcCot", "ArcCoth", "ArcCsc", "ArcCsch", "ArcSec",
+			"ArcSech", "ArithmeticGeometricMean", "ArcSin", "ArcSinh", "ArcTan", "ArcTanh", "Arg", "ArgMax", "ArgMin",
+			"Array", "ArrayDepth", "ArrayPad", "ArrayReshape", "Arrays", "ArrayQ", "Assumptions", "AtomQ", "Attributes",
 			"BartlettWindow", "Begin", "BeginPackage", "BellB", "BellY", "BernoulliB", "BernoulliDistribution",
 			"BesselI", "BesselJ", "BesselK", "BesselY", "Beta", "BetaDistribution", "BetaRegularized",
 			"BinarySerialize", "BinaryDeserialize", "BinCounts", "Binomial", "BinomialDistribution", "BitLength",
