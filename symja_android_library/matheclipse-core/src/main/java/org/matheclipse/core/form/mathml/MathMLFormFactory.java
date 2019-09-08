@@ -1227,28 +1227,6 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			convertFunctionArgs(buf, list);
 			return;
 		}
-//		int functionID = ((ISymbol) list.head()).ordinal();
-//		if (functionID > ID.UNKNOWN) {
-//			switch (functionID) {
-//			case ID.TwoWayRule:
-//			case ID.UndirectedEdge:
-//				if (list.isAST2()) {
-//					convert(buf, list.arg1(), precedence, false);
-//					buf.append("<->");
-//					convert(buf, list.arg2(), precedence, false);
-//					return;
-//				}
-//				break;
-//			case ID.DirectedEdge:
-//				if (list.isAST2()) {
-//					convert(buf, list.arg1(), precedence, false);
-//					buf.append("->");
-//					convert(buf, list.arg2(), precedence, false);
-//					return;
-//				}
-//				break;
-//			}
-//		}
 		ISymbol head = list.topHead();
 		final org.matheclipse.parser.client.operator.Operator operator = OutputFormFactory.getOperator(head);
 		if (operator != null) {
@@ -1258,8 +1236,6 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 					return;
 				}
 			} else {
-				// if (convertOperator(operator, list, buf, isASTHead ? Integer.MAX_VALUE :
-				// precedence, head)) {
 				if (convertOperator(operator, list, buf, operator.getPrecedence(), head)) {
 					return;
 				}
