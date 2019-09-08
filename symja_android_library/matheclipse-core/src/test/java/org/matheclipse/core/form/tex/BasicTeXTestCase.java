@@ -4,6 +4,9 @@ import junit.framework.TestCase;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TeXUtilities;
+import org.matheclipse.core.expression.ASTRealMatrix;
+import org.matheclipse.core.expression.ASTRealVector;
+import org.matheclipse.core.interfaces.IExpr;
 
 import java.io.StringWriter;
 
@@ -249,9 +252,25 @@ public class BasicTeXTestCase extends TestCase {
 		check("Graph({1,2,3},{1->2,2->3})", //
 				"\\text{Graph}(\\{1,2,3\\},\\{1\\to 2,2\\to 3\\})");
 	}
+	public void testTeX027() {
+		check(new ASTRealMatrix(new double[][] { { 1.0, 2.0, 3.0 }, { 3.3, 4.4, 5.5 } }, false), //
+				"\\left(\n" + "\\begin{array}{ccc}\n" + "1.0 & 2.0 & 3.0 \\\\\n" + "3.3 & 4.4 & 5.5 \n"
+						+ "\\end{array}\n" + "\\right) ");
+	}
+
+	public void testTeX028() {
+		check(new ASTRealVector(new double[] { 1.0, 2.0, 3.0 }, false), //
+				"\\{1.0,2.0,3.0\\}");
+	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		texUtil.toTeX(strEval, stw);
+		assertEquals(stw.toString(), strResult);
+	}
+
+	public void check(IExpr expr, String strResult) {
+		StringWriter stw = new StringWriter();
+		texUtil.toTeX(expr, stw);
 		assertEquals(stw.toString(), strResult);
 
 	}

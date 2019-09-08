@@ -1549,6 +1549,8 @@ public final class Arithmetic {
 		}
 		@Override
 		public IExpr e1DblComArg(final IComplexNum c) {
+			// Apcomplex gamma = ApcomplexMath.gamma(c.apcomplexNumValue(Config.MACHINE_PRECISION).apcomplexValue());
+			// return F.complexNum(gamma.real().doubleValue(), gamma.imag().doubleValue());
 			if (pComplex == null) {
 				// lazy initialization
 				pComplex = new org.hipparchus.complex.Complex[p.length];

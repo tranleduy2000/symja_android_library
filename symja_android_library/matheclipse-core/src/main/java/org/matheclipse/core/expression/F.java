@@ -1814,7 +1814,7 @@ public class F {
 	/** PreIncrement(x) - increments `x` by `1`, returning the new value of `x`. */
     public final static IBuiltInSymbol PreIncrement = F.initFinalSymbol("PreIncrement", ID.PreIncrement);
     /***/
-    public final static IBuiltInSymbol PrePlus = F.initFinalSymbol("PrePlus", ID.PrePlus);
+//    public final static IBuiltInSymbol PrePlus = F.initFinalSymbol("PrePlus", ID.PrePlus);
     /***/
     public final static IBuiltInSymbol Precision = F.initFinalSymbol("Precision", ID.Precision);
     /***/
