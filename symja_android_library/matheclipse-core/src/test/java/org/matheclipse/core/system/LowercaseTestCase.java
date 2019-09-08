@@ -7195,9 +7195,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testGreater() {
 		check("x>x", //
-				"False");
+				"x>x");
 		check("x+1>x", //
-				"True");
+				"1+x>x");
 
 		check("42>Infinity", //
 				"False");
@@ -7218,18 +7218,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("2/17 > 1/5 > Pi/10", //
 				"False");
 		check("x<x", //
-				"False");
+				"x<x");
 		check("x<=x", //
-				"True");
+				"x<=x");
 		check("x>x", //
-				"False");
+				"x>x");
 		check("x>=x", //
-				"True");
+				"x>=x");
 	}
 
 	public void testGreaterEqual() {
 		check("x>=x", //
-				"True");
+				"x>=x");
 		check("Infinity>=Infinity", //
 				"True");
 
@@ -7247,9 +7247,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("2/17 >= 1/5 >= Pi/10", //
 				"False");
 		check("x>=x", //
-				"True");
+				"x>=x");
 		check("x>x", //
-				"False");
+				"x>x");
 	}
 
 	public void testGroebnerBasis() {
@@ -8790,13 +8790,13 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"False");
 
 		check("x<x", //
-				"False");
+				"x<x");
 		check("I<0", //
 				"I<0");
 		check("3+x<4+x", //
-				"True");
+				"3+x<4+x");
 		check("3+x>4+x", //
-				"False");
+				"3+x>4+x");
 
 		check("Refine(Infinity<x, x>0)", //
 				"False");
@@ -8817,11 +8817,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testLessEqual() {
 		check("x<=x", //
-				"True");
+				"x<=x");
 		check("3+x<=4+x", //
-				"True");
+				"3+x<=4+x");
 		check("3+x>=4+x", //
-				"False");
+				"3+x>=4+x");
 
 		check("Infinity<=Infinity", //
 				"True");
