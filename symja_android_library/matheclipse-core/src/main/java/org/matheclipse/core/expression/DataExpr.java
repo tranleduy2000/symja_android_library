@@ -128,8 +128,11 @@ public class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 	public String toString() {
 		if (fHead.equals(F.Graph)) {
 			if (fData instanceof AbstractBaseGraph) {
-				AbstractBaseGraph<IExpr, IExprEdge> g = (AbstractBaseGraph<IExpr, IExprEdge>) fData;
-				return GraphFunctions.graphToIExpr(g).toString();
+				AbstractBaseGraph<IExpr, ?> g = (AbstractBaseGraph<IExpr, ?>) fData;
+				if (g.getType().isWeighted()) {
+					return GraphFunctions.weightedGraphToIExpr((AbstractBaseGraph<IExpr, IExprWeightedEdge>) g).toString();
+				}
+				return GraphFunctions.graphToIExpr((AbstractBaseGraph<IExpr, IExprEdge>) g).toString();
 
 			}
 		}
