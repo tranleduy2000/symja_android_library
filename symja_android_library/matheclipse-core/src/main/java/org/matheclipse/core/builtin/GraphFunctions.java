@@ -3,11 +3,14 @@ package org.matheclipse.core.builtin;
 import org.hipparchus.util.MathArrays;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
 import org.jgrapht.alg.cycle.HierholzerEulerianCycle;
 import org.jgrapht.alg.interfaces.EulerianCycleAlgorithm;
 import org.jgrapht.alg.interfaces.HamiltonianCycleAlgorithm;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.alg.spanning.BoruvkaMinimumSpanningTree;
 import org.jgrapht.alg.tour.HeldKarpTSP;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -26,6 +29,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 
 import java.util.List;
+import java.util.Set;
 
 public class GraphFunctions {
 	/**
@@ -42,6 +46,7 @@ public class GraphFunctions {
 			F.FindHamiltonianCycle.setEvaluator(new FindHamiltonianCycle());
 			F.FindShortestPath.setEvaluator(new FindShortestPath());
 			F.FindShortestTour.setEvaluator(new FindShortestTour());
+			F.FindSpanningTree.setEvaluator(new FindSpanningTree());
 			F.HamiltonianGraphQ.setEvaluator(new HamiltonianGraphQ());
 		}
 	}
@@ -60,6 +65,11 @@ public class GraphFunctions {
 					if (g != null) {
 						return g;
 					}
+				} else if (ast.isAST2()) {
+					DataExpr<org.jgrapht.Graph<IExpr, DefaultEdge>> g = createGraph(ast.arg1(), ast.arg2());
+					if (g != null) {
+						return g;
+					}
 				}
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
@@ -71,7 +81,7 @@ public class GraphFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_1_1;
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -133,6 +143,36 @@ public class GraphFunctions {
 		}
 	}
 
+	private static class FindSpanningTree extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
+				if (ast.isAST1()) {
+					DataExpr<org.jgrapht.Graph<IExpr, DefaultEdge>> dex = createGraph(ast.arg1());
+					if (dex == null) {
+						return F.NIL;
+					}
+					Graph<IExpr, DefaultEdge> g = dex.toData();
+					SpanningTreeAlgorithm<DefaultEdge> k = new BoruvkaMinimumSpanningTree<IExpr, DefaultEdge>(g);
+					Set<DefaultEdge> edgeSet = k.getSpanningTree().getEdges();
+					Graph<IExpr, DefaultEdge> gResult = new DefaultDirectedGraph<IExpr, DefaultEdge>(DefaultEdge.class);
+					Graphs.addAllEdges(gResult, g, edgeSet);
+					return DataExpr.newInstance(F.Graph, gResult);
+				}
+			} catch (RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+	}
 	private static class EulerianGraphQ extends AbstractEvaluator {
 
 		@Override
@@ -330,6 +370,27 @@ public class GraphFunctions {
 		return null;
 	}
 
+	private static DataExpr<org.jgrapht.Graph<IExpr, DefaultEdge>> createGraph(final IExpr vertices,
+			final IExpr edges) {
+		if (vertices.isList()) {
+			Graph<IExpr, DefaultEdge> g = new DefaultDirectedGraph<IExpr, DefaultEdge>(DefaultEdge.class);
+			IAST list = (IAST) vertices;
+			for (int i = 1; i < vertices.size(); i++) {
+				g.addVertex(list.get(i));
+			}
+
+			if (edges.isListOfEdges()) {
+				list = (IAST) edges;
+				for (int i = 1; i < list.size(); i++) {
+					IAST edge = list.getAST(i);
+					g.addEdge(edge.arg1(), edge.arg2());
+				}
+				return DataExpr.newInstance(F.Graph, g);
+			}
+		}
+
+		return null;
+	}
 	/**
 	 * Create an eulerian cycle.
 	 *

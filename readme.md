@@ -1,6 +1,13 @@
 ## Symja Library - Java Symbolic Math System
 
-**Note**: this repository contains the **Java 7** android version of the project. The **Java 8** version is maintained in this [original Symja repository](https://github.com/axkr/symja_android_library).
+**Note**: this repository contains the **Java 8** version of the project. The [NCalc](https://github.com/tranleduy2000/ncalc) and [Natural Calc](https://github.com/tranleduy2000/naturalcalc)  projects maintains a [Java 7 branch based on Retrolambda](https://github.com/tranleduy2000/symja_android_library).
+
+Use especially the "2nd" button in the following calculator interfaces:
+
+<a href="https://play.google.com/store/apps/details?id=com.duy.calc.casio.v2">
+	<img src="en_badge_web_generic.png" alt="Google Play" width="200"></a>
+<a href="https://itunes.apple.com/us/app/ncalc-scientific-calculator/id1449106995">
+	<img src="http://www.lawprose.org/wordpress/wp-content/uploads/App-Store-Badge.png" alt="App Store" width="200"></a>
 
 - [Quick start](#quick-start)
 - [Features](#features)
@@ -14,7 +21,7 @@
   
 ### Quick start 
 
-Read the [Symja Manual](symja_android_library/doc/index.md) for the description of the Symja language.
+Read the [Symja Manual](symja_android_library/doc/index.md) for the description of the Symja language or [browse the available functions](symja_android_library/doc/functions/). We encourage everyone to participate in our [Wiki](https://github.com/axkr/symja_android_library/wiki).
 
 [![Join the chat at https://gitter.im/symja_android_library/Lobby](https://badges.gitter.im/symja_android_library/Lobby.svg)](https://gitter.im/symja_android_library/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -23,14 +30,17 @@ Read the [Symja Manual](symja_android_library/doc/index.md) for the description 
 Features of the Symja language:
 
 * arbitrary precision integers, rational and complex numbers
-* differentiation, integration, equation solving, polynomial and linear algebra functions...
+* [differentiation](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/D.md), [integration](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Integrate.md), [equation solving](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Solve.md), [linear algebra](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/linear-algebra.md), [number theory](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/number-theoretic-functions.md), [combinatorial](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/combinatorial.md), [logic](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/logic.md) and polynomial functions...
 * a general purpose [Term Rewriting System and Pattern Matching engine](symja_android_library/doc/functions-and-patterns.md)
 * use human readable math expression strings or the internal abstract syntax tree (AST) representation to code in Java. See the [Unit test examples](symja_android_library/matheclipse-core/src/test/java/org/matheclipse/core/system/LowercaseTestCase.java)
-* two [REPLs](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) are available in the library a [Console.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/main/java/org/matheclipse/core/eval/Console.java) for standard math input and a [MMAConsole.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/main/java/org/matheclipse/core/eval/MMAConsole.java) for Mathematica syntax input.
+* two [REPLs](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) are available in the library. A [Console.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/main/java/org/matheclipse/core/eval/Console.java) for standard math input and a [MMAConsole.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/main/java/org/matheclipse/core/eval/MMAConsole.java) for "Mathematica like syntax" input.
+* Symja with "Mathematica like syntax" input can also be used interactively in a [BeakerX/Jupyter Lab](https://github.com/axkr/symja_android_library/wiki/BeakerX-usage) environment
+* Symja can also be used interactively in the [Java jshell](https://github.com/axkr/symja_android_library/wiki/JShell-usage)
+* the [Rubi symbolic integration rules](https://github.com/axkr/symja_android_library/wiki/Porting-Rubi-Integration-rules-to-Symja) are used to implement the [Integrate](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Integrate.md) function, they can be systematically applied to determine the antiderivative of a wide variety of mathematical expressions. 
 
 ### Demos
 
-* [Appengine web interface symjaweb.appspot.com](http://symjaweb.appspot.com/) - available as open source in this [Java 8 Github repository](https://github.com/axkr/symja_web) 
+* [Appengine web interface symjaweb.appspot.com](http://symjaweb.appspot.com/) - available as open source in this [Github repository](https://github.com/axkr/symja_web) 
 
 * [Android App Calculator N+ on Google play store](https://play.google.com/store/apps/details?id=com.duy.calculator.free) - available as open source in this [Github repository](https://github.com/tranleduy2000/ncalc) provides an **IDE mode** to calculate arbitrary Symja expressions.
 
@@ -92,7 +102,7 @@ To get an idea of the kinds of expressions Symja handles, see the [tests in this
 ```
 
 
-### Gradle Usage
+### Maven Usage
 
 1. Download latest version from https://github.com/tranleduy2000/symja_android_library/releases
 2. Compile project using Android Studio

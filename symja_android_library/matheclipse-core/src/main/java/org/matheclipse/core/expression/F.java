@@ -289,8 +289,10 @@ public class F {
     public final static IBuiltInSymbol ArcTanh = F.initFinalSymbol("ArcTanh", ID.ArcTanh);
 	/** Arg(expr) - returns the argument of the complex number `expr`. */
     public final static IBuiltInSymbol Arg = F.initFinalSymbol("Arg", ID.Arg);
+    /***/
 	public final static IBuiltInSymbol ArgMax = F.initFinalSymbol("ArgMax", ID.ArgMax);
 
+    /***/
 	public final static IBuiltInSymbol ArgMin = F.initFinalSymbol("ArgMin", ID.ArgMin);
 	/** ArithmeticGeometricMean(a, b) - returns the arithmetic geometric mean of `a` and `b`. */
 	public final static IBuiltInSymbol ArithmeticGeometricMean = F.initFinalSymbol("ArithmeticGeometricMean",
@@ -885,6 +887,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol FindShortestTour = F.initFinalSymbol("FindShortestTour", ID.FindShortestTour);
 
+    public final static IBuiltInSymbol FindSpanningTree = F.initFinalSymbol("FindSpanningTree", ID.FindSpanningTree);
     /** First(expr) - returns the first element in `expr`.*/
     public final static IBuiltInSymbol First = F.initFinalSymbol("First", ID.First);
     /**
@@ -1043,7 +1046,7 @@ public class F {
     /** GumbelDistribution(a, b) - returns a Gumbel distribution.*/
     public final static IBuiltInSymbol GumbelDistribution = F.initFinalSymbol("GumbelDistribution", ID.GumbelDistribution);
 
-    /***/
+    /** HamiltonianGraphQ(graph) - returns `True` if `graph` is an hamiltonian graph, and `False` otherwise.*/
     public final static IBuiltInSymbol HamiltonianGraphQ = F.initFinalSymbol("HamiltonianGraphQ", ID.HamiltonianGraphQ);
     /***/
     public final static IBuiltInSymbol HammingWindow = F.initFinalSymbol("HammingWindow", ID.HammingWindow);
@@ -5410,6 +5413,17 @@ public class F {
         return quaternary(FindFit, a0, a1, a2, a3);
     }
 
+	public static IAST FindShortestPath(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return ternaryAST3(FindShortestPath, a0, a1, a2);
+	}
+
+	public static IAST FindShortestTour(final IExpr a0) {
+		return unaryAST1(FindShortestTour, a0);
+	}
+
+	public static IAST FindSpanningTree(final IExpr a0) {
+		return unaryAST1(FindSpanningTree, a0);
+	}
     public static IAST Fit(final IExpr a0, final IExpr a1, final IExpr a2) {
         return ternaryAST3(Fit, a0, a1, a2);
     }
