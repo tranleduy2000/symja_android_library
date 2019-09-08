@@ -6204,6 +6204,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindShortestTour() {
+		check("FindShortestTour[{GeoPosition[{41, 20}], GeoPosition[{5, 20}], GeoPosition[{49, 32}], " //
+				+ "GeoPosition[{53, 28}], GeoPosition[{47, 29}]}]", //
+				"{6852.02461316151[mi],{1,2,5,3,4,1}}");
 		check("FindShortestTour({{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 1}, {2, 3}, {2, 5}, {3, 1}, {3, 2},"//
 				+ " {3, 4}, {3, 5}, {4, 1}, {4, 3}, {4, 5}, {5, 1}, {5, 2}, {5, 3}, {5, 4}})", //
 				"{14+5*Sqrt(2),{1,6,9,13,16,17,18,19,14,10,7,11,15,12,8,5,4,3,2,1}}");

@@ -2284,6 +2284,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr timesDistributed(final IExpr that);
 
+    Object toData();
+
     /**
      * Convert this object into a <code>double[]</code> matrix.
      *

@@ -3332,6 +3332,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return times(that);
     }
 
+    @Override
+    public Object toData() {
+        return null;
+    }
+
     /**
      * Convert this object into a <code>double[]</code> matrix.
      *
