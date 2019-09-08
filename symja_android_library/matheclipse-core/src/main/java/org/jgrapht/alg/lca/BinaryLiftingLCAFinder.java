@@ -71,6 +71,7 @@ import static org.jgrapht.util.MathUtil.log2;
  * @author Alexandru Valeanu
  */
 public class BinaryLiftingLCAFinder<V, E>
+    extends LowestCommonAncestorAlgorithmImpl<V>
     implements
     LowestCommonAncestorAlgorithm<V>
 {

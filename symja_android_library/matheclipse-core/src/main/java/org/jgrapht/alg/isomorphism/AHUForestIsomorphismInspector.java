@@ -147,7 +147,7 @@ public class AHUForestIsomorphismInspector<V, E>
 
     private Pair<V, Graph<V, E>> createSingleRootGraph(Graph<V, E> forest, Set<V> roots)
     {
-        Graph<V, E> freshForest = GraphTypeBuilder.forGraph(forest).weighted(false).buildGraph();
+        final Graph<V, E> freshForest = GraphTypeBuilder.forGraph(forest).weighted(false).buildGraph();
 
         roots.forEach(new Consumer<V>() {
             @Override
@@ -160,7 +160,7 @@ public class AHUForestIsomorphismInspector<V, E>
         for (V root : roots)
             freshForest.addEdge(freshVertex, root);
 
-        return Pair.of(freshVertex, new AsGraphUnion<>(freshForest, forest));
+        return Pair.<V, Graph<V, E>>of(freshVertex, new AsGraphUnion<V, E>(freshForest, forest));
     }
 
     /**

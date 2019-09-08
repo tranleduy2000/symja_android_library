@@ -168,7 +168,12 @@ public class PathGrowingWeightedMatching<V, E>
         int i = 1;
         while (!visibleVertex.isEmpty()) {
             // find vertex arbitrarily
-            V x = visibleVertex.stream().findAny().get();
+            Optional<V> found = Optional.empty();
+            for (V v : visibleVertex) {
+                found = Optional.of(v);
+                break;
+            }
+            V x = found.get();
 
             // grow path from x
             while (x != null) {
@@ -240,7 +245,12 @@ public class PathGrowingWeightedMatching<V, E>
         // run algorithm
         while (!visibleVertex.isEmpty()) {
             // find vertex arbitrarily
-            V x = visibleVertex.stream().findAny().get();
+            Optional<V> found = Optional.empty();
+            for (V v : visibleVertex) {
+                found = Optional.of(v);
+                break;
+            }
+            V x = found.get();
 
             // grow path from x
             LinkedList<E> path = new LinkedList<>();
@@ -348,7 +358,7 @@ public class PathGrowingWeightedMatching<V, E>
             switch (pathLength) {
             case 0:
                 // special case, empty path
-                return Pair.of(0d, Collections.emptySet());
+                return Pair.of(0d, Collections.<E>emptySet());
             case 1:
                 // special case, one edge
                 E e = path.getFirst();
@@ -356,7 +366,7 @@ public class PathGrowingWeightedMatching<V, E>
                 if (comparator.compare(eWeight, 0d) > 0) {
                     return Pair.of(eWeight, Collections.singleton(e));
                 } else {
-                    return Pair.of(0d, Collections.emptySet());
+                    return Pair.of(0d, Collections.<E>emptySet());
                 }
             }
 

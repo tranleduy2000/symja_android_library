@@ -163,6 +163,11 @@ public class ConnectivityInspector<V, E>
                 // amend them. If the edge is a bridge, 2 components need to be split.
     }
 
+    @Override
+    public void edgeWeightUpdated(GraphEdgeChangeEvent<V, E> e) {
+
+    }
+
     /**
      * Tests whether two vertices lay respectively in the same connected component (undirected
      * graph), or in the same weakly connected component (directed graph).

@@ -22,6 +22,8 @@ import org.jgrapht.alg.util.*;
 import org.jgrapht.graph.builder.*;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Find all simple cycles of a directed graph using the Johnson's algorithm.
@@ -243,8 +245,13 @@ public class JohnsonSimpleCycles<V, E>
             V successor = scg.getEdgeTarget(e);
             int successorIndex = toI(successor);
             if (successorIndex == startIndex) {
-                List<V> cycle = new ArrayList<>(stack.size());
-                stack.descendingIterator().forEachRemaining(cycle::add);
+                final List<V> cycle = new ArrayList<>(stack.size());
+                stack.descendingIterator().forEachRemaining(new Consumer<V>() {
+                    @Override
+                    public void accept(V e1) {
+                        cycle.add(e1);
+                    }
+                });
                 cycles.add(cycle);
                 foundCycle = true;
             } else if (!blocked.contains(successor)) {
@@ -337,6 +344,11 @@ public class JohnsonSimpleCycles<V, E>
     {
         // B sets typically not all needed,
         // so instantiate lazily.
-        return bSets.computeIfAbsent(v, k -> new HashSet<>());
+        return bSets.computeIfAbsent(v, new Function<V, Set<V>>() {
+            @Override
+            public Set<V> apply(V k) {
+                return new HashSet<>();
+            }
+        });
     }
 }

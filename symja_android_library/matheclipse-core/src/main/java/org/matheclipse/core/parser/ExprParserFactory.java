@@ -15,6 +15,8 @@
  */
 package org.matheclipse.core.parser;
 
+import com.gx.common.base.CharMatcher;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.expression.F;
@@ -24,6 +26,7 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.parser.client.ast.IParserFactory;
+import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 
 import java.util.ArrayList;
@@ -33,17 +36,17 @@ import java.util.Map;
 
 public class ExprParserFactory implements IParserFactory {
 	/**
-	 * The default set of characters, which could form an operator
+	 * The matcher for characters, which could form an operator
 	 *
 	 */
-	public static String DEFAULT_OPERATOR_CHARACTERS = null;
+	public static CharMatcher OPERATOR_MATCHER = null;
 
 	/**
 	 * The set of characters, which could form an operator
 	 *
 	 */
-	public String getOperatorCharacters() {
-		return DEFAULT_OPERATOR_CHARACTERS;
+	public boolean isOperatorChar(char ch) {
+		return OPERATOR_MATCHER.matches(ch);
 	}
 
 	private static class InformationOperator extends PrefixExprOperator {
@@ -219,12 +222,16 @@ public class ExprParserFactory implements IParserFactory {
 			"GreaterEqual", "Condition", "Colon", "//", "DivideBy", "Or", "Span", "Equal", "StringJoin", "Unequal",
 			"Decrement", "SubtractFrom", "PrePlus", "RepeatedNull", "UnsameQ", "Rule", "UpSetDelayed", "PreIncrement",
 			"Function", "Greater", "PreDecrement", "Subtract", "SetDelayed", "Alternatives", "AddTo", "Repeated",
-			"ReplaceAll", "TagSet"};
+			"ReplaceAll", "TagSet", "TwoWayRule", "DirectedEdge", "UndirectedEdge" };
 
 	static final String[] OPERATOR_STRINGS = { "::", "<<", "?", "??", "?", "//@", "*=", "+", "^=", ";", "@", "/@", "=.",
 			"@@", "@@@", "//.", "<", "&&", "/", "=", "++", "!!", "<=", "**", "!", "*", "^", ".", "!", "-", "===", ":>",
 			">=", "/;", ":", "//", "/=", "||", ";;", "==", "<>", "!=", "--", "-=", "+", "...", "=!=", "->", "^:=", "++",
-			"&", ">", "--", "-", ":=", "|", "+=", "..", "/.", "/:" };
+			"&", ">", "--", "-", ":=", "|", "+=", "..", "/.", "/:", //
+			"\uF120", // TwoWayRule
+			"\uF3D5", // DirectedEdge
+			"\uF3D4"// UndirectedEdge
+	};
 
 	private static Operator[] OPERATORS;
 	// = { new InfixExprOperator("::", "MessageName", 750, InfixExprOperator.NONE),
@@ -369,7 +376,10 @@ public class ExprParserFactory implements IParserFactory {
 			new InfixExprOperator("+=", "AddTo", 100, InfixExprOperator.RIGHT_ASSOCIATIVE), //
 			new PostfixExprOperator("..", "Repeated", 170), //
 			new InfixExprOperator("/.", "ReplaceAll", 110, InfixExprOperator.LEFT_ASSOCIATIVE), //
-			TAG_SET_OPERATOR};
+					TAG_SET_OPERATOR, //
+					new InfixExprOperator("\uF120", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE), //
+					new InfixExprOperator("\uF3D5", "DirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE), //
+					new InfixExprOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE) };
 
 		StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
 		fOperatorMap = new HashMap<String, Operator>();
@@ -382,7 +392,7 @@ public class ExprParserFactory implements IParserFactory {
 				buf.append(unicodeChar);
 		}
 	}
-		DEFAULT_OPERATOR_CHARACTERS = buf.toString();
+			OPERATOR_MATCHER = CharMatcher.anyOf(buf.toString());
 	}
 	}
 

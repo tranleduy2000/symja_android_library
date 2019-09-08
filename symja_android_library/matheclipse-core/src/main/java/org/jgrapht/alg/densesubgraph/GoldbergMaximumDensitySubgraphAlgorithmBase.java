@@ -17,14 +17,18 @@
  */
 package org.jgrapht.alg.densesubgraph;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.MaximumDensitySubgraphAlgorithm;
+import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This abstract base class computes a maximum density subgraph based on the algorithm described by
@@ -33,7 +37,7 @@ import java.util.stream.*;
  * Density Subgraphs</a>, 1984, University of Berkley. Each subclass decides which concrete
  * definition of density is used by implementing {@link #getEdgeWeightFromSourceToVertex(Object)}
  * and {@link #getEdgeWeightFromVertexToSink(Object)} as proposed in the paper. After the
- * computation the density is computed using {@link MaximumDensitySubgraphAlgorithm#getDensity()}.
+ * computation the density is computed using {link MaximumDensitySubgraphAlgorithm#getDensity()}.
  * <br>
  * The basic concept is to construct a network that can be used to compute the maximum density
  * subgraph using a binary search approach.
@@ -149,7 +153,12 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
     {
         return GraphTypeBuilder
             .<V, DefaultWeightedEdge> directed().allowingMultipleEdges(true).allowingSelfLoops(true)
-            .weighted(true).edgeSupplier(DefaultWeightedEdge::new).buildGraph();
+            .weighted(true).edgeSupplier(new Supplier<DefaultWeightedEdge>() {
+                    @Override
+                    public DefaultWeightedEdge get() {
+                        return new DefaultWeightedEdge();
+                    }
+                }).buildGraph();
     }
 
     /**
@@ -157,40 +166,50 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
      * positivity on network weights if specified by adding subtracting the lowest weights to all
      * edges $(v,t)$ and $(v,s)$.
      **/
-    private void updateNetwork()
-    {
-        for (V v : this.graph.vertexSet()) {
-            currentNetwork
-                .setEdgeWeight(currentNetwork.getEdge(v, t), getEdgeWeightFromVertexToSink(v));
-            currentNetwork
-                .setEdgeWeight(currentNetwork.getEdge(s, v), getEdgeWeightFromSourceToVertex(v));
-        }
-        if (this.checkWeights) {
-            double minCapacity = getMinimalCapacity();
-            if (minCapacity < 0) {
-                DefaultWeightedEdge e;
-                for (V v : this.graph.vertexSet()) {
-                    e = currentNetwork.getEdge(v, t);
-                    currentNetwork.setEdgeWeight(e, currentNetwork.getEdgeWeight(e) - minCapacity);
-                    e = currentNetwork.getEdge(s, v);
-                    currentNetwork.setEdgeWeight(e, currentNetwork.getEdgeWeight(e) - minCapacity);
-                }
-            }
-        }
-    }
+//    private void updateNetwork()
+//    {
+//        for (V v : this.graph.vertexSet()) {
+//            currentNetwork
+//                .setEdgeWeight(currentNetwork.getEdge(v, t), getEdgeWeightFromVertexToSink(v));
+//            currentNetwork
+//                .setEdgeWeight(currentNetwork.getEdge(s, v), getEdgeWeightFromSourceToVertex(v));
+//        }
+//        if (this.checkWeights) {
+//            double minCapacity = getMinimalCapacity();
+//            if (minCapacity < 0) {
+//                DefaultWeightedEdge e;
+//                for (V v : this.graph.vertexSet()) {
+//                    e = currentNetwork.getEdge(v, t);
+//                    currentNetwork.setEdgeWeight(e, currentNetwork.getEdgeWeight(e) - minCapacity);
+//                    e = currentNetwork.getEdge(s, v);
+//                    currentNetwork.setEdgeWeight(e, currentNetwork.getEdgeWeight(e) - minCapacity);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * @return the minimal capacity of all edges vt and sv
      */
-    private double getMinimalCapacity()
-    {
-        DoubleStream sourceWeights = this.graph.vertexSet().stream().mapToDouble(
-            v -> currentNetwork.getEdgeWeight(currentNetwork.getEdge(v, t)));
-        DoubleStream sinkWeights = this.graph.vertexSet().stream().mapToDouble(
-            v -> currentNetwork.getEdgeWeight(currentNetwork.getEdge(s, v)));
-        OptionalDouble min = DoubleStream.concat(sourceWeights, sinkWeights).min();
-        return min.isPresent() ? min.getAsDouble() : 0;
-    }
+//    private double getMinimalCapacity()
+//    {
+//        DoubleStream sourceWeights = this.graph.vertexSet().stream().mapToDouble(
+//                new ToDoubleFunction<V>() {
+//                    @Override
+//                    public double applyAsDouble(V v) {
+//                        return currentNetwork.getEdgeWeight(currentNetwork.getEdge(v, t));
+//                    }
+//                });
+//        DoubleStream sinkWeights = this.graph.vertexSet().stream().mapToDouble(
+//                new ToDoubleFunction<V>() {
+//                    @Override
+//                    public double applyAsDouble(V v) {
+//                        return currentNetwork.getEdgeWeight(currentNetwork.getEdge(s, v));
+//                    }
+//                });
+//        OptionalDouble min = DoubleStream.concat(sourceWeights, sinkWeights).min();
+//        return min.isPresent() ? min.getAsDouble() : 0;
+//    }
 
     /**
      * Initializes network (only once) for Min-Cut computation Adds s,t to vertex set Adds every v
@@ -225,45 +244,45 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
      * 
      * @return max density subgraph of the graph
      */
-    public Graph<V, E> calculateDensest()
-    {
-        if (this.densestSubgraph != null) {
-            return this.densestSubgraph;
-        }
-        Set<V> sourcePartition;
-        while (Double.compare(upper - lower, this.epsilon) >= 0) {
-            guess = lower + ((upper - lower)) / 2;
-            updateNetwork();
-            minSTCutAlg.calculateMinCut(s, t);
-            sourcePartition = minSTCutAlg.getSourcePartition();
-            sourcePartition.remove(s);
-            if (sourcePartition.isEmpty()) {
-                upper = guess;
-            } else {
-                lower = guess;
-                currentVertices = new HashSet<>(sourcePartition);
-            }
-        }
-        this.densestSubgraph = new AsSubgraph<>(graph, currentVertices);
-        return this.densestSubgraph;
-    }
+//    public Graph<V, E> calculateDensest()
+//    {
+//        if (this.densestSubgraph != null) {
+//            return this.densestSubgraph;
+//        }
+//        Set<V> sourcePartition;
+//        while (Double.compare(upper - lower, this.epsilon) >= 0) {
+//            guess = lower + ((upper - lower)) / 2;
+//            updateNetwork();
+//            minSTCutAlg.calculateMinCut(s, t);
+//            sourcePartition = minSTCutAlg.getSourcePartition();
+//            sourcePartition.remove(s);
+//            if (sourcePartition.isEmpty()) {
+//                upper = guess;
+//            } else {
+//                lower = guess;
+//                currentVertices = new HashSet<>(sourcePartition);
+//            }
+//        }
+//        this.densestSubgraph = new AsSubgraph<>(graph, currentVertices);
+//        return this.densestSubgraph;
+//    }
 
     /**
      * Computes density of a maximum density subgraph.
      * 
      * @return the actual density of the maximum density subgraph
      */
-    public double getDensity()
-    {
-        if (this.densestSubgraph == null) {
-            this.calculateDensest();
-        }
-        double denominator = computeDensityDenominator(this.densestSubgraph);
-        if (denominator != 0) {
-            return computeDensityNumerator(this.densestSubgraph) / denominator;
-        }
-        return 0;
-    }
+//    public double getDensity()
+//    {
+//        if (this.densestSubgraph == null) {
+//            this.calculateDensest();
+//        }
+//        double denominator = computeDensityDenominator(this.densestSubgraph);
+//        if (denominator != 0) {
+//            return computeDensityNumerator(this.densestSubgraph) / denominator;
+//        }
+//        return 0;
+//    }
 
     /**
      * Getter for network weights of edges su for u in V

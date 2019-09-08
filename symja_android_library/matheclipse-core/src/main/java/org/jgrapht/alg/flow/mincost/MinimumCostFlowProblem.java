@@ -103,7 +103,12 @@ public interface MinimumCostFlowProblem<V, E>
             Graph<V, E> graph, Function<V, Integer> supplyMap,
             Function<E, Integer> arcCapacityUpperBounds)
         {
-            this(graph, supplyMap, arcCapacityUpperBounds, a -> 0);
+            this(graph, supplyMap, arcCapacityUpperBounds, new Function<E, Integer>() {
+                @Override
+                public Integer apply(E a) {
+                    return 0;
+                }
+            });
         }
 
         /**

@@ -17,9 +17,15 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Barabási-Albert growth and preferential attachment graph generator.
@@ -48,7 +54,7 @@ import java.util.*;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public class BarabasiAlbertGraphGenerator<V, E>
+public class BarabasiAlbertGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {
@@ -126,10 +132,14 @@ public class BarabasiAlbertGraphGenerator<V, E>
         /*
          * Create complete graph with m0 nodes
          */
-        Set<V> oldNodes = new HashSet<>(target.vertexSet());
-        Set<V> newNodes = new HashSet<>();
+        final Set<V> oldNodes = new HashSet<>(target.vertexSet());
+        final Set<V> newNodes = new HashSet<>();
         new CompleteGraphGenerator<V, E>(m0).generateGraph(target, resultMap);
-        target.vertexSet().stream().filter(v -> !oldNodes.contains(v)).forEach(newNodes::add);
+        for (V e : target.vertexSet()) {
+            if (!oldNodes.contains(e)) {
+                newNodes.add(e);
+            }
+        }
 
         List<V> nodes = new ArrayList<>(n * m);
         nodes.addAll(newNodes);

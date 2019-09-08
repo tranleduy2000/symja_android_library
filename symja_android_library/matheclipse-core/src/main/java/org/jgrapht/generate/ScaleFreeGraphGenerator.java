@@ -33,7 +33,7 @@ import java.util.*;
  *
  * @author Ilya Razenshteyn
  */
-public class ScaleFreeGraphGenerator<V, E>
+public class ScaleFreeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

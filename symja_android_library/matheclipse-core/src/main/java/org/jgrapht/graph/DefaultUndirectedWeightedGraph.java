@@ -71,7 +71,7 @@ public class DefaultUndirectedWeightedGraph<V, E>
         E> GraphBuilder<V, E, ? extends DefaultUndirectedWeightedGraph<V, E>> createBuilder(
             Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DefaultUndirectedWeightedGraph<>(edgeClass));
+        return new GraphBuilder<>(new DefaultUndirectedWeightedGraph<V, E>(edgeClass));
     }
 
     /**
@@ -86,7 +86,7 @@ public class DefaultUndirectedWeightedGraph<V, E>
         E> GraphBuilder<V, E, ? extends DefaultUndirectedWeightedGraph<V, E>> createBuilder(
             Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DefaultUndirectedWeightedGraph<>(null, edgeSupplier));
+        return new GraphBuilder<>(new DefaultUndirectedWeightedGraph<V, E>(null, edgeSupplier));
     }
 
 }

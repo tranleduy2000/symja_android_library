@@ -1368,19 +1368,16 @@ public final class LinearAlgebra {
                     if (dim1 == 0) {
                         return F.C0;
                     }
-                    final IAST a1 = ((IAST) arg1);
-                    final IAST a2 = ((IAST) arg2);
+					final IAST a1 = ((IAST) arg1);
+					final IAST a2 = ((IAST) arg2);
                     int size = a1.size();
                     IASTAppendable plusAST = F.PlusAlloc(size);
-                    plusAST.appendArgs(size, new IntFunction<IExpr>() {
+					plusAST.appendArgs(size, new IntFunction<IExpr>() {
                         @Override
                         public IExpr apply(int i) {
                             return F.Sqr(F.Abs(F.Subtract(a1.get(i), a2.get(i))));
                         }
                     });
-                    // for (int i = 1; i < size; i++) {
-                    // plusAST.append(F.Sqr(F.Abs(F.Subtract(a1.get(i), a2.get(i)))));
-                    // }
                     return F.Sqrt(plusAST);
                 }
             }

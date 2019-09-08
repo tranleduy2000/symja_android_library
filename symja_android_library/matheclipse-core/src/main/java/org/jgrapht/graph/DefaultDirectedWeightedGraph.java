@@ -71,7 +71,7 @@ public class DefaultDirectedWeightedGraph<V, E>
         E> GraphBuilder<V, E, ? extends DefaultDirectedWeightedGraph<V, E>> createBuilder(
             Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DefaultDirectedWeightedGraph<>(edgeClass));
+        return new GraphBuilder<>(new DefaultDirectedWeightedGraph<V, E>(edgeClass));
     }
 
     /**
@@ -86,7 +86,7 @@ public class DefaultDirectedWeightedGraph<V, E>
         E> GraphBuilder<V, E, ? extends DefaultDirectedWeightedGraph<V, E>> createBuilder(
             Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DefaultDirectedWeightedGraph<>(null, edgeSupplier));
+        return new GraphBuilder<>(new DefaultDirectedWeightedGraph<V, E>(null, edgeSupplier));
     }
 
 }

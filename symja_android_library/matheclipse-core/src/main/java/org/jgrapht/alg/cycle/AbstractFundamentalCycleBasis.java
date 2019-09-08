@@ -17,14 +17,19 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.CycleBasisAlgorithm;
+import org.jgrapht.alg.util.Pair;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A base implementation for the computation of a fundamental cycle basis of a graph. Subclasses
@@ -74,19 +79,14 @@ public abstract class AbstractFundamentalCycleBasis<V, E>
         Map<V, E> spanningForest = computeSpanningForest();
 
         // collect set with all tree edges
-        Set<E> treeEdges = spanningForest
-            .entrySet().stream().map(new Function<Map.Entry<V, E>, Object>() {
-                    @Override
-                    public Object apply(Map.Entry<V, E> veEntry) {
-                        return veEntry.getValue();
-                    }
-                }).filter(new Predicate<Object>() {
-                    @Override
-                    public boolean test(Object obj) {
-                        return Objects.nonNull(obj);
-                    }
-                })
-            .collect(Collectors.toSet());
+        Set<E> treeEdges = new HashSet<>();
+        for (Map.Entry<V, E> veEntry : spanningForest
+                .entrySet()) {
+            E obj = veEntry.getValue();
+            if (obj != null) {
+                treeEdges.add(obj);
+            }
+        }
 
         // build cycles for all non-tree edges
         Set<List<E>> cycles = new LinkedHashSet<>();
@@ -180,7 +180,7 @@ public abstract class AbstractFundamentalCycleBasis<V, E>
             path2.addFirst(a);
         }
 
-        return Pair.of(path2, path2Weight);
+        return Pair.<List<E>, Double>of(path2, path2Weight);
     }
 
 }

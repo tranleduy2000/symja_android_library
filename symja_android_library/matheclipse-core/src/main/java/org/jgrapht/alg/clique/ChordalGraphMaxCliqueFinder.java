@@ -17,13 +17,26 @@
  */
 package org.jgrapht.alg.clique;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.color.*;
-import org.jgrapht.alg.cycle.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.traverse.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.color.ChordalGraphColoring;
+import org.jgrapht.alg.cycle.ChordalityInspector;
+import org.jgrapht.alg.interfaces.CliqueAlgorithm;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
+import org.jgrapht.traverse.LexBreadthFirstIterator;
+import org.jgrapht.traverse.MaximumCardinalityIterator;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Calculates a <a href = "http://mathworld.wolfram.com/MaximumClique.html">maximum cardinality
@@ -100,12 +113,25 @@ public class ChordalGraphMaxCliqueFinder<V, E>
             }
             // finds the vertex with the maximum cardinality predecessor list
             Map<V, Integer> vertexInOrder = getVertexInOrder(perfectEliminationOrder);
+            boolean seen = false;
+            Map.Entry<V, Integer> best = null;
+            Comparator<Map.Entry<V, Integer>> comparator = DComparator.comparing(new Function<Map.Entry<V, Integer>, Integer>() {
+                @Override
+                public Integer apply(Map.Entry<V, Integer> vIntegerEntry1) {
+                    return vIntegerEntry1.getValue();
+                }
+            });
+            for (Map.Entry<V, Integer> vIntegerEntry : coloring
+                    .getColors().entrySet()) {
+                if (!seen || comparator.compare(vIntegerEntry, best) > 0) {
+                    seen = true;
+                    best = vIntegerEntry;
+                }
+            }
             Map.Entry<V,
-                Integer> maxEntry = coloring
-                    .getColors().entrySet().stream().max(Comparator.comparing(Map.Entry::getValue))
-                    .orElse(null);
+                Integer> maxEntry = seen ? best : null;
             if (maxEntry == null) {
-                maximumClique = new CliqueImpl<>(Collections.emptySet());
+                maximumClique = new CliqueImpl<>(Collections.<V>emptySet());
             } else {
                 Set<V> cliqueSet = getPredecessors(vertexInOrder, maxEntry.getKey());
                 cliqueSet.add(maxEntry.getKey());

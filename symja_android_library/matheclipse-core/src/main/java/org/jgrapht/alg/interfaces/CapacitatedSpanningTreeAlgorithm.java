@@ -235,5 +235,10 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
             return "Capacitated Spanning-Tree [weight=" + weight + ", edges=" + edges + ", labels="
                 + labels + ", partition=" + partition + "]";
         }
+
+        @Override
+        public Iterator<E> iterator() {
+            return getEdges().iterator();
+        }
     }
 }

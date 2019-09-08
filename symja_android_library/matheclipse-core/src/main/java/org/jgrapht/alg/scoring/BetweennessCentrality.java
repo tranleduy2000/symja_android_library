@@ -23,6 +23,8 @@ import org.jheaps.*;
 import org.jheaps.tree.*;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Betweenness centrality.
@@ -128,22 +130,42 @@ public class BetweennessCentrality<V, E>
     {
         // initialize result container
         this.scores = new HashMap<>();
-        this.graph.vertexSet().forEach(v -> this.scores.put(v, 0.0));
+        this.graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V v) {
+                BetweennessCentrality.this.scores.put(v, 0.0);
+            }
+        });
 
         // compute for each source
-        this.graph.vertexSet().forEach(this::compute);
+        this.graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V s) {
+                BetweennessCentrality.this.compute(s);
+            }
+        });
 
         // For undirected graph, divide scores by two as each shortest path
         // considered twice.
         if (!this.graph.getType().isDirected()) {
-            this.scores.forEach((v, score) -> this.scores.put(v, score / 2));
+            this.scores.forEach(new BiConsumer<V, Double>() {
+                @Override
+                public void accept(V v, Double score) {
+                    BetweennessCentrality.this.scores.put(v, score / 2);
+                }
+            });
         }
 
         if (normalize) {
             int n = this.graph.vertexSet().size();
-            int normalizationFactor = (n - 1) * (n - 2);
+            final int normalizationFactor = (n - 1) * (n - 2);
             if (normalizationFactor != 0) {
-                this.scores.forEach((v, score) -> this.scores.put(v, score / normalizationFactor));
+                this.scores.forEach(new BiConsumer<V, Double>() {
+                    @Override
+                    public void accept(V v, Double score) {
+                        BetweennessCentrality.this.scores.put(v, score / normalizationFactor);
+                    }
+                });
             }
         }
     }
@@ -152,17 +174,32 @@ public class BetweennessCentrality<V, E>
     {
         // initialize
         ArrayDeque<V> stack = new ArrayDeque<>();
-        Map<V, List<V>> predecessors = new HashMap<>();
-        this.graph.vertexSet().forEach(w -> predecessors.put(w, new ArrayList<>()));
+        final Map<V, List<V>> predecessors = new HashMap<>();
+        this.graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V w) {
+                predecessors.put(w, new ArrayList<V>());
+            }
+        });
 
         // Number of shortest paths from s to v
-        Map<V, Double> sigma = new HashMap<>();
-        this.graph.vertexSet().forEach(t -> sigma.put(t, 0.0));
+        final Map<V, Double> sigma = new HashMap<>();
+        this.graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V t) {
+                sigma.put(t, 0.0);
+            }
+        });
         sigma.put(s, 1.0);
 
         // Distance (Weight) of the shortest path from s to v
-        Map<V, Double> distance = new HashMap<>();
-        this.graph.vertexSet().forEach(t -> distance.put(t, Double.POSITIVE_INFINITY));
+        final Map<V, Double> distance = new HashMap<>();
+        this.graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V t) {
+                distance.put(t, Double.POSITIVE_INFINITY);
+            }
+        });
         distance.put(s, 0.0);
 
         MyQueue<V, Double> queue =
@@ -198,8 +235,13 @@ public class BetweennessCentrality<V, E>
 
         // 2. sum all pair dependencies.
         // The pair-dependency of s and v in w
-        Map<V, Double> dependency = new HashMap<>();
-        this.graph.vertexSet().forEach(v -> dependency.put(v, 0.0));
+        final Map<V, Double> dependency = new HashMap<>();
+        this.graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V v) {
+                dependency.put(v, 0.0);
+            }
+        });
         // S returns vertices in order of non-increasing distance from s
         while (!stack.isEmpty()) {
             V w = stack.pop();

@@ -68,7 +68,12 @@ class DijkstraClosestFirstIterator<V, E>
      */
     public DijkstraClosestFirstIterator(Graph<V, E> graph, V source)
     {
-        this(graph, source, Double.POSITIVE_INFINITY, PairingHeap::new);
+        this(graph, source, Double.POSITIVE_INFINITY, new Supplier<AddressableHeap<Double, Pair<V, E>>>() {
+            @Override
+            public AddressableHeap<Double, Pair<V, E>> get() {
+                return new PairingHeap<Double, Pair<V, E>>();
+            }
+        });
     }
 
     /**
@@ -83,7 +88,12 @@ class DijkstraClosestFirstIterator<V, E>
      */
     public DijkstraClosestFirstIterator(Graph<V, E> graph, V source, double radius)
     {
-        this(graph, source, radius, PairingHeap::new);
+        this(graph, source, radius, new Supplier<AddressableHeap<Double, Pair<V, E>>>() {
+            @Override
+            public AddressableHeap<Double, Pair<V, E>> get() {
+                return new PairingHeap<Double, Pair<V, E>>();
+            }
+        });
     }
 
     /**

@@ -21,6 +21,7 @@ import org.jgrapht.*;
 import org.jgrapht.alg.connectivity.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Find all simple cycles of a directed graph using the Schwarcfiter and Lauer's algorithm.
@@ -266,13 +267,23 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
     {
         // B sets are typically not all
         // needed, so instantiate lazily.
-        return bSets.computeIfAbsent(v, k -> new HashSet<>());
+        return bSets.computeIfAbsent(v, new Function<V, Set<V>>() {
+            @Override
+            public Set<V> apply(V k) {
+                return new HashSet<>();
+            }
+        });
     }
 
     private Set<V> getRemoved(V v)
     {
         // Removed sets typically not all
         // needed, so instantiate lazily.
-        return removed.computeIfAbsent(v, k -> new HashSet<>());
+        return removed.computeIfAbsent(v, new Function<V, Set<V>>() {
+            @Override
+            public Set<V> apply(V k) {
+                return new HashSet<>();
+            }
+        });
     }
 }

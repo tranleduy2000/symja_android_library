@@ -23,6 +23,7 @@ import org.jgrapht.generate.*;
 import org.jgrapht.graph.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Tests whether a graph is <a href="http://www.graphclasses.org/classes/gc_14.html">weakly
@@ -260,7 +261,7 @@ public class WeakChordalityInspector<V, E>
         List<Pair<List<Pair<Integer, Integer>>, E>> reformattedSeparators = new ArrayList<>();
         List<List<List<Pair<Integer, Integer>>>> vInSeparator = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            vInSeparator.add(new ArrayList<>());
+            vInSeparator.add(new ArrayList<List<Pair<Integer, Integer>>>());
         }
 
         for (Set<V> computedSeparator : separators) {
@@ -296,7 +297,7 @@ public class WeakChordalityInspector<V, E>
     {
         V source = graph.getEdgeSource(edge);
         V target = graph.getEdgeTarget(edge);
-        List<Integer> labeling = new ArrayList<>(Collections.nCopies(n, null));
+        List<Integer> labeling = new ArrayList<>(Collections.<Integer>nCopies(n, null));
         for (E sourceEdge : graph.edgesOf(source)) {
             labeling.set(vertices.get(Graphs.getOppositeVertex(graph, sourceEdge, source)), 1);
         }
@@ -330,7 +331,7 @@ public class WeakChordalityInspector<V, E>
         separators.clear();
         List<Queue<Pair<List<Pair<Integer, Integer>>, E>>> queues = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            queues.add(new LinkedList<>());
+            queues.add(new LinkedList<Pair<List<Pair<Integer, Integer>>, E>>());
         }
         for (int i = 0; i < maxSeparatorLength; i++) {
             while (!mainQueue.isEmpty()) {
@@ -394,13 +395,16 @@ public class WeakChordalityInspector<V, E>
         // to bucket with label 0
         List<Set<Integer>> bucketsByLabel = new ArrayList<>(separator.size());
         for (int i = 0; i < separator.size(); i++) {
-            bucketsByLabel.add(new HashSet<>());
+            bucketsByLabel.add(new HashSet<Integer>());
         }
-        List<Integer> labels = new ArrayList<>(Collections.nCopies(n, -1));
-        Set<Integer> unvisited = new HashSet<>(separator.size());
-        separator.forEach(pair -> {
-            unvisited.add(pair.getFirst());
-            labels.set(pair.getFirst(), 0);
+        final List<Integer> labels = new ArrayList<>(Collections.nCopies(n, -1));
+        final Set<Integer> unvisited = new HashSet<>(separator.size());
+        separator.forEach(new Consumer<Pair<Integer, Integer>>() {
+            @Override
+            public void accept(Pair<Integer, Integer> pair) {
+                unvisited.add(pair.getFirst());
+                labels.set(pair.getFirst(), 0);
+            }
         });
         bucketsByLabel.set(0, unvisited);
         int minLabel = 0;
@@ -484,7 +488,7 @@ public class WeakChordalityInspector<V, E>
     private Pair<Integer, Integer> checkLabels(
         List<List<Integer>> coConnectedComponents, List<Pair<Integer, Integer>> separator)
     {
-        List<Integer> vertexLabels = new ArrayList<>(Collections.nCopies(n, null));
+        List<Integer> vertexLabels = new ArrayList<>(Collections.<Integer>nCopies(n, null));
         for (Pair<Integer, Integer> vertexAndLabel : separator) {
             vertexLabels.set(vertexAndLabel.getFirst(), vertexAndLabel.getSecond());
         }
@@ -536,7 +540,7 @@ public class WeakChordalityInspector<V, E>
         // Generating the complement of the inspected graph
         ComplementGraphGenerator<V, E> generator = new ComplementGraphGenerator<>(graph, false);
         Graph<V, E> complement = Pseudograph.<V, E> createBuilder(graph.getEdgeSupplier()).build();
-        generator.generateGraph(complement);
+        SGraphGenerator.generateGraph(generator, (complement));
 
         E cycleFormer = complement.getEdge(source, targetInSeparator);
         V cycleSource = graph.getEdgeSource(cycleFormer);

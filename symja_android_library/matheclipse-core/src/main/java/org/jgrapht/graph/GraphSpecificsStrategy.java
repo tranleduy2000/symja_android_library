@@ -17,37 +17,36 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.specifics.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
+import org.jgrapht.graph.specifics.Specifics;
 
-import java.io.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * A graph specifics construction factory.
- * 
+ *
  * <p>
  * Such a strategy can be used to adjust the internals of the default graph implementations.
- * 
- * @author Dimitrios Michail
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
+ * @author Dimitrios Michail
  * @see FastLookupGraphSpecificsStrategy
  * @see DefaultGraphSpecificsStrategy
  */
 public interface GraphSpecificsStrategy<V, E>
-    extends
-    Serializable
-{
+        extends
+        Serializable {
     /**
      * Get a function which creates the intrusive edges specifics. The factory will accept the graph
      * type as a parameter.
-     * 
+     *
      * <p>
      * Note that it is very important to use a map implementation which respects iteration order.
-     * 
+     *
      * @return a function which creates intrusive edges specifics.
      */
     Function<GraphType, IntrusiveEdgesSpecifics<V, E>> getIntrusiveEdgesSpecificsFactory();
@@ -55,19 +54,16 @@ public interface GraphSpecificsStrategy<V, E>
     /**
      * Get a function which creates the specifics. The factory will accept the graph type as a
      * parameter.
-     * 
+     *
      * @return a function which creates intrusive edges specifics.
      */
     BiFunction<Graph<V, E>, GraphType, Specifics<V, E>> getSpecificsFactory();
 
     /**
      * Get an edge set factory.
-     * 
+     *
      * @return an edge set factory
      */
-    default EdgeSetFactory<V, E> getEdgeSetFactory()
-    {
-        return new ArrayUnenforcedSetEdgeSetFactory<>();
-    }
+    EdgeSetFactory<V, E> getEdgeSetFactory();
 
 }

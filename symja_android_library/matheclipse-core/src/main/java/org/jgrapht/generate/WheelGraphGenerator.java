@@ -34,7 +34,7 @@ import java.util.function.*;
  *
  * @author John V. Sichi
  */
-public class WheelGraphGenerator<V, E>
+public class WheelGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {
@@ -92,10 +92,13 @@ public class WheelGraphGenerator<V, E>
         // rely on its vertex set after the rim is generated.
         final Collection<V> rim = new ArrayList<>();
         final Supplier<V> initialSupplier = target.getVertexSupplier();
-        Supplier<V> rimVertexSupplier = () -> {
-            V vertex = initialSupplier.get();
-            rim.add(vertex);
-            return vertex;
+        Supplier<V> rimVertexSupplier = new Supplier<V>() {
+            @Override
+            public V get() {
+                V vertex = initialSupplier.get();
+                rim.add(vertex);
+                return vertex;
+            }
         };
 
         Graph<V, E> targetWithRimVertexSupplier =

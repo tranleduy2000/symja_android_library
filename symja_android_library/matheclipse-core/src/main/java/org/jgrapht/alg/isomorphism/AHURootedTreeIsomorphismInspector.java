@@ -24,6 +24,7 @@ import org.jgrapht.util.*;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * This is an implementation of the AHU algorithm for detecting an (unweighted) isomorphism between
@@ -124,7 +125,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
             V u = bfs.next();
 
             if (levels.size() < bfs.getDepth(u) + 1) {
-                levels.add(new ArrayList<>());
+                levels.add(new ArrayList<V>());
             }
 
             levels.get(bfs.getDepth(u)).add(u);
@@ -160,7 +161,12 @@ public class AHURootedTreeIsomorphismInspector<V, E>
                 // avoid walking back "up" the tree.
                 if (!forwardMapping.containsKey(next)) {
                     labelList
-                        .computeIfAbsent(canonicalName[0].get(next), x -> new ArrayList<>())
+                        .computeIfAbsent(canonicalName[0].get(next), new Function<Integer, List<V>>() {
+                            @Override
+                            public List<V> apply(Integer x) {
+                                return new ArrayList<>();
+                            }
+                        })
                         .add(next);
                 }
             }

@@ -17,13 +17,24 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.alg.util.extension.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.MaximumFlowAlgorithm;
+import org.jgrapht.alg.interfaces.MaximumFlowAlgorithmImpl;
+import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
+import org.jgrapht.alg.util.extension.Extension;
+import org.jgrapht.alg.util.extension.ExtensionFactory;
+import org.jgrapht.alg.util.extension.ExtensionManager;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Base class backing algorithms allowing to derive
@@ -37,6 +48,7 @@ import java.util.stream.*;
  * @author Joris Kinable
  */
 public abstract class MaximumFlowAlgorithmBase<V, E>
+    extends MaximumFlowAlgorithmImpl<V, E>
     implements
     MaximumFlowAlgorithm<V, E>,
     MinimumSTCutAlgorithm<V, E>
@@ -433,23 +445,30 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
             return cutEdges;
         cutEdges = new LinkedHashSet<>();
 
-        Set<V> p1 = getSourcePartition();
+        final Set<V> p1 = getSourcePartition();
         if (directedGraph) {
             for (V vertex : p1) {
+                List<E> list = new ArrayList<>();
+                for (E edge : network
+                        .outgoingEdgesOf(vertex)) {
+                    if (!p1.contains(network.getEdgeTarget(edge))) {
+                        list.add(edge);
+                    }
+                }
                 cutEdges.addAll(
-                    network
-                        .outgoingEdgesOf(vertex).stream()
-                        .filter(edge -> !p1.contains(network.getEdgeTarget(edge)))
-                        .collect(Collectors.toList()));
+                        list);
             }
         } else {
+            List<E> list = new ArrayList<>();
+            for (E e : network
+                    .edgeSet()) {
+                if (p1.contains(network.getEdgeSource(e))
+                        ^ p1.contains(network.getEdgeTarget(e))) {
+                    list.add(e);
+                }
+            }
             cutEdges.addAll(
-                network
-                    .edgeSet().stream()
-                    .filter(
-                        e -> p1.contains(network.getEdgeSource(e))
-                            ^ p1.contains(network.getEdgeTarget(e)))
-                    .collect(Collectors.toList()));
+                    list);
         }
         return cutEdges;
     }

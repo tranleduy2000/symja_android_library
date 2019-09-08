@@ -22,6 +22,7 @@ import org.jgrapht.graph.*;
 import org.jgrapht.traverse.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Constructs the transitive closure of the input graph.
@@ -119,8 +120,13 @@ public class TransitiveClosure
      */
     public <V, E> void closeDirectedAcyclicGraph(DirectedAcyclicGraph<V, E> graph)
     {
-        Deque<V> orderedVertices = new ArrayDeque<>(graph.vertexSet().size());
-        new TopologicalOrderIterator<>(graph).forEachRemaining(orderedVertices::addFirst);
+        final Deque<V> orderedVertices = new ArrayDeque<>(graph.vertexSet().size());
+        new TopologicalOrderIterator<>(graph).forEachRemaining(new Consumer<V>() {
+            @Override
+            public void accept(V e) {
+                orderedVertices.addFirst(e);
+            }
+        });
 
         for (V vertex : orderedVertices) {
             for (V successor : Graphs.successorListOf(graph, vertex)) {

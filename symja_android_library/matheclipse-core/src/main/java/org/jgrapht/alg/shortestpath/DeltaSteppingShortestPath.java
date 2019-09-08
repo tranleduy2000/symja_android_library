@@ -17,11 +17,29 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.util.Pair;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Parallel implementation of a single-source shortest path algorithm: the delta-stepping algorithm.
@@ -261,13 +279,16 @@ public class DeltaSteppingShortestPath<V, E>
         protected Double compute()
         {
             if (spliterator.estimateSize() <= loadBalancing) {
-                double[] max = { 0 };
-                spliterator.forEachRemaining(e -> {
-                    double weight = graph.getEdgeWeight(e);
-                    if (weight < 0) {
-                        throw new IllegalArgumentException(NEGATIVE_EDGE_WEIGHT_NOT_ALLOWED);
+                final double[] max = { 0 };
+                spliterator.forEachRemaining(new Consumer<E>() {
+                    @Override
+                    public void accept(E e) {
+                        double weight = graph.getEdgeWeight(e);
+                        if (weight < 0) {
+                            throw new IllegalArgumentException(NEGATIVE_EDGE_WEIGHT_NOT_ALLOWED);
+                        }
+                        max[0] = Math.max(weight, max[0]);
                     }
-                    max[0] = Math.max(weight, max[0]);
                 });
                 return max[0];
             } else {
@@ -331,8 +352,17 @@ public class DeltaSteppingShortestPath<V, E>
         if (maxEdgeWeight == 0) {
             return 1.0;
         } else {
+            boolean seen = false;
+            int best = 0;
+            for (V vertex : graph.vertexSet()) {
+                int i = graph.outDegreeOf(vertex);
+                if (!seen || i > best) {
+                    seen = true;
+                    best = i;
+                }
+            }
             int maxOutDegree =
-                graph.vertexSet().parallelStream().mapToInt(graph::outDegreeOf).max().orElse(0);
+                    seen ? best : 0;
             return maxEdgeWeight / maxOutDegree;
         }
     }
@@ -342,8 +372,9 @@ public class DeltaSteppingShortestPath<V, E>
      */
     private void fillDistanceAndPredecessorMap()
     {
-        graph.vertexSet().parallelStream().forEach(
-            v -> distanceAndPredecessorMap.put(v, Pair.of(Double.POSITIVE_INFINITY, null)));
+        for (V v : graph.vertexSet()) {
+            distanceAndPredecessorMap.put(v, Pair.<Double, E>of(Double.POSITIVE_INFINITY, null));
+        }
     }
 
     /**
@@ -437,7 +468,11 @@ public class DeltaSteppingShortestPath<V, E>
     private void findAndRelaxHeavyRequests(List<Set<V>> verticesSets)
     {
         allVerticesAdded = false;
-        int numOfVertices = verticesSets.stream().mapToInt(Set::size).sum();
+        int numOfVertices = 0;
+        for (Set<V> vs : verticesSets) {
+            int size = vs.size();
+            numOfVertices += size;
+        }
         int numOfTasks;
         if (numOfVertices >= parallelism) {
             // use as available tasks

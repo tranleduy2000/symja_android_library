@@ -17,14 +17,27 @@
  */
 package org.jgrapht.alg.matching;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.util.FixedSizeIntegerQueue;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.alg.util.UnionFind;
+import org.jgrapht.graph.AsSubgraph;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This implementation of Edmonds' blossom algorithm computes maximum cardinality matchings in
@@ -524,11 +537,22 @@ public class EdmondsMaximumCardinalityMatching<V, E>
         // minimum in the Tutte-Berge Formula. It can be shown that
         // A(G)= {vertices labeled odd in the Edmonds Blossomg-Shrinking algorithm}. Note: we only
         // take odd vertices that are not consumed by blossoms (every blossom is even).
-        Set<V> oddVertices = vertexIndexMap
-            .values().stream().filter(vx -> levels.isOdd(vx) && !bridges.containsKey(vx))
-            .map(vertices::get).collect(Collectors.toSet());
-        Set<V> otherVertices = graph
-            .vertexSet().stream().filter(v -> !oddVertices.contains(v)).collect(Collectors.toSet());
+        Set<V> oddVertices = new HashSet<>();
+        List<V> vs = vertices;
+        for (Integer vx : vertexIndexMap
+                .values()) {
+            if (levels.isOdd(vx) && !bridges.containsKey(vx)) {
+                V v = vs.get(vx);
+                oddVertices.add(v);
+            }
+        }
+        Set<V> otherVertices = new HashSet<>();
+        for (V v : graph
+                .vertexSet()) {
+            if (!oddVertices.contains(v)) {
+                otherVertices.add(v);
+            }
+        }
 
         Graph<V, E> subgraph = new AsSubgraph<>(graph, otherVertices, null); // Induced subgraph
                                                                              // defined on all
@@ -536,7 +560,12 @@ public class EdmondsMaximumCardinalityMatching<V, E>
                                                                              // not odd.
         List<Set<V>> connectedComponents = new ConnectivityInspector<>(subgraph).connectedSets();
         long nrOddCardinalityComponents =
-            connectedComponents.stream().filter(s -> s.size() % 2 == 1).count();
+                0L;
+        for (Set<V> s : connectedComponents) {
+            if (s.size() % 2 == 1) {
+                nrOddCardinalityComponents++;
+            }
+        }
 
         return matching
             .getEdges()
@@ -632,7 +661,9 @@ public class EdmondsMaximumCardinalityMatching<V, E>
             this.exposed = new HashSet<>(n);
 
             Arrays.fill(match, UNMATCHED);
-            IntStream.range(0, n).forEach(exposed::add);
+            for (int e = 0; e < n; e++) {
+                exposed.add(e);
+            }
         }
 
         /**

@@ -59,7 +59,8 @@ import java.util.*;
  * @author Alexandru Valeanu
  */
 public class EulerTourRMQLCAFinder<V, E>
-    implements
+        extends LowestCommonAncestorAlgorithmImpl<V>
+        implements
     LowestCommonAncestorAlgorithm<V>
 {
     private final Graph<V, E> graph;

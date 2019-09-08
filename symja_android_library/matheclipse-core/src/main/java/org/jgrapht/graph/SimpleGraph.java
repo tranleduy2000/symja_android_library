@@ -76,7 +76,7 @@ public class SimpleGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends SimpleGraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new SimpleGraph<>(edgeClass));
+        return new GraphBuilder<>(new SimpleGraph<V, E>(edgeClass));
     }
 
     /**
@@ -90,7 +90,7 @@ public class SimpleGraph<V, E>
     public static <V,
         E> GraphBuilder<V, E, ? extends SimpleGraph<V, E>> createBuilder(Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new SimpleGraph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new SimpleGraph<V, E>(null, edgeSupplier, false));
     }
 
 }

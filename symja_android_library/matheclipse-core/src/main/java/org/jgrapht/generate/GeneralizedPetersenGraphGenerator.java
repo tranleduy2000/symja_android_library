@@ -33,7 +33,7 @@ import java.util.*;
  * @param <V> graph vertex type
  * @param <E> graph edge type
  */
-public class GeneralizedPetersenGraphGenerator<V, E>
+public class GeneralizedPetersenGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, List<V>>
     implements
     GraphGenerator<V, E, List<V>>
 {

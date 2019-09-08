@@ -17,11 +17,23 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
-import java.util.stream.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.ToIntFunction;
 
 /**
  * Color refinement algorithm that finds the coarsest stable coloring of a graph based on a given
@@ -83,10 +95,10 @@ public class ColorRefinementAlgorithm<V, E>
     public Coloring<V> getColoring()
     {
         // initialize internal representation
-        ColoringRepresentation rep = new ColoringRepresentation(graph, alpha);
+        final ColoringRepresentation rep = new ColoringRepresentation(graph, alpha);
 
         // get a sorted (ascending) stack of all colors that are predefined by alpha
-        Deque<Integer> refineStack = getSortedStack(alpha);
+        final Deque<Integer> refineStack = getSortedStack(alpha);
 
         // main iteration
         while (!refineStack.isEmpty()) {
@@ -95,10 +107,22 @@ public class ColorRefinementAlgorithm<V, E>
             Set<Integer> adjacentColors = calculateColorDegrees(currentColor, rep);
 
             // split colors
-            adjacentColors
-                .stream().filter(c -> rep.minColorDegree[c] < rep.maxColorDegree[c])
-                .sorted(Comparator.comparingInt(o -> o)) // canonical order
-                .forEach(color -> splitUpColor(color, refineStack, rep));
+            // canonical order
+            List<Integer> toSort = new ArrayList<>();
+            for (Integer c : adjacentColors) {
+                if (rep.minColorDegree[c] < rep.maxColorDegree[c]) {
+                    toSort.add(c);
+                }
+            }
+            toSort.sort(DComparator.comparingInt(new ToIntFunction<Integer>() {
+                @Override
+                public int applyAsInt(Integer o) {
+                    return o;
+                }
+            }));
+            for (Integer c : toSort) {
+                ColorRefinementAlgorithm.this.splitUpColor(c, refineStack, rep);
+            }
 
             cleanupColorDegrees(adjacentColors, rep);
         }
@@ -122,9 +146,12 @@ public class ColorRefinementAlgorithm<V, E>
 
         // calculate color degree and update maxColorDegree
         for (V v : rep.colorClasses.get(refiningColor)) {
-            Set<V> inNeighborhood = graph
-                .incomingEdgesOf(v).stream().map(e -> Graphs.getOppositeVertex(graph, e, v))
-                .collect(Collectors.toSet());
+            Set<V> inNeighborhood = new HashSet<>();
+            for (E e : graph
+                    .incomingEdgesOf(v)) {
+                V oppositeVertex = Graphs.getOppositeVertex(graph, e, v);
+                inNeighborhood.add(oppositeVertex);
+            }
 
             for (V w : inNeighborhood) {
                 rep.colorDegree.put(w, rep.colorDegree.get(w) + 1);
@@ -173,7 +200,7 @@ public class ColorRefinementAlgorithm<V, E>
                 rep.colorDegree.put(v, 0);
             }
             rep.maxColorDegree[c] = 0;
-            rep.positiveDegreeColorClasses.put(c, new ArrayList<>());
+            rep.positiveDegreeColorClasses.put(c, new ArrayList<V>());
         }
     }
 
@@ -360,8 +387,8 @@ public class ColorRefinementAlgorithm<V, E>
             this.coloring = new HashMap<>();
 
             for (int c = 0; c < n; ++c) {
-                colorClasses.put(c, new ArrayList<>());
-                positiveDegreeColorClasses.put(c, new ArrayList<>());
+                colorClasses.put(c, new ArrayList<V>());
+                positiveDegreeColorClasses.put(c, new ArrayList<V>());
             }
             for (V v : graph.vertexSet()) {
                 colorClasses.get(alpha.getColors().get(v)).add(v);

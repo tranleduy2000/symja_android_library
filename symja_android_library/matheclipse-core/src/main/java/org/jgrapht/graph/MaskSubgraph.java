@@ -243,7 +243,10 @@ public class MaskSubgraph<V, E>
         if (edges == null) {
             return null;
         } else {
-            return edges.stream().findAny().orElse(null);
+            for (E edge : edges) {
+                return edge;
+            }
+            return null;
         }
     }
 

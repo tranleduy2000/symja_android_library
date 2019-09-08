@@ -17,12 +17,21 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.specifics.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.specifics.ArrayUnenforcedSetEdgeSetFactory;
+import org.jgrapht.graph.specifics.DirectedEdgeContainer;
+import org.jgrapht.graph.specifics.FastLookupDirectedSpecifics;
+import org.jgrapht.graph.specifics.FastLookupUndirectedSpecifics;
+import org.jgrapht.graph.specifics.Specifics;
+import org.jgrapht.graph.specifics.UndirectedEdgeContainer;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * The fast lookup specifics strategy implementation.
@@ -47,11 +56,14 @@ public class FastLookupGraphSpecificsStrategy<V, E>
     @Override
     public Function<GraphType, IntrusiveEdgesSpecifics<V, E>> getIntrusiveEdgesSpecificsFactory()
     {
-        return (Function<GraphType, IntrusiveEdgesSpecifics<V, E>> & Serializable) (type) -> {
-            if (type.isWeighted()) {
-                return new WeightedIntrusiveEdgesSpecifics<V, E>(new LinkedHashMap<>());
-            } else {
-                return new UniformIntrusiveEdgesSpecifics<>(new LinkedHashMap<>());
+        return new Function<GraphType, IntrusiveEdgesSpecifics<V, E>>() {
+            @Override
+            public IntrusiveEdgesSpecifics<V, E> apply(GraphType type) {
+                if (type.isWeighted()) {
+                    return new WeightedIntrusiveEdgesSpecifics<V, E>(new LinkedHashMap<E, IntrusiveWeightedEdge>());
+                } else {
+                    return new UniformIntrusiveEdgesSpecifics<>(new LinkedHashMap<E, IntrusiveEdge>());
+                }
             }
         };
     }
@@ -59,16 +71,23 @@ public class FastLookupGraphSpecificsStrategy<V, E>
     @Override
     public BiFunction<Graph<V, E>, GraphType, Specifics<V, E>> getSpecificsFactory()
     {
-        return (BiFunction<Graph<V, E>, GraphType,
-            Specifics<V, E>> & Serializable) (graph, type) -> {
+        return new BiFunction<Graph<V, E>, GraphType, Specifics<V, E>>() {
+            @Override
+            public Specifics<V, E> apply(Graph<V, E> graph, GraphType type) {
                 if (type.isDirected()) {
                     return new FastLookupDirectedSpecifics<>(
-                        graph, new LinkedHashMap<>(), new HashMap<>(), getEdgeSetFactory());
+                            graph, new LinkedHashMap<V, DirectedEdgeContainer<V, E>>(), new HashMap<Pair<V, V>, Set<E>>(), FastLookupGraphSpecificsStrategy.this.getEdgeSetFactory());
                 } else {
                     return new FastLookupUndirectedSpecifics<>(
-                        graph, new LinkedHashMap<>(), new HashMap<>(), getEdgeSetFactory());
+                            graph, new LinkedHashMap<V, UndirectedEdgeContainer<V, E>>(), new HashMap<Pair<V, V>, Set<E>>(), FastLookupGraphSpecificsStrategy.this.getEdgeSetFactory());
                 }
-            };
+            }
+        };
+    }
+
+    @Override
+    public EdgeSetFactory<V, E> getEdgeSetFactory() {
+        return new ArrayUnenforcedSetEdgeSetFactory<>();
     }
 
 }

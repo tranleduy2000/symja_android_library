@@ -229,8 +229,8 @@ class KShortestSimplePathsIterator<V, E>
      */
     private void encounterStartVertex()
     {
-        RankingPathElementList<V, E> data = new RankingPathElementList<>(
-            this.graph, this.k, new RankingPathElement<>(this.startVertex), this.pathValidator);
+        RankingPathElementList<V, E> data = new RankingPathElementList<V, E>(
+            this.graph, this.k, new RankingPathElement<V, E>(this.startVertex), this.pathValidator);
 
         this.seenDataContainer.put(this.startVertex, data);
         this.prevSeenDataContainer.put(this.startVertex, data);

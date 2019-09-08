@@ -44,7 +44,7 @@ import java.util.*;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public class KleinbergSmallWorldGraphGenerator<V, E>
+public class KleinbergSmallWorldGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

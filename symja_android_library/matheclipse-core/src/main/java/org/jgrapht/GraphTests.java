@@ -17,13 +17,23 @@
  */
 package org.jgrapht;
 
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.cycle.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.partition.*;
+import org.jgrapht.alg.connectivity.BiconnectivityInspector;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
+import org.jgrapht.alg.cycle.ChordalityInspector;
+import org.jgrapht.alg.cycle.HierholzerEulerianCycle;
+import org.jgrapht.alg.cycle.WeakChordalityInspector;
+import org.jgrapht.alg.interfaces.PartitioningAlgorithm;
+import org.jgrapht.alg.partition.BipartitePartitioning;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.OptionalInt;
+import java.util.Set;
 
 /**
  * A collection of utilities to test for various graph properties.
@@ -312,9 +322,18 @@ public abstract class GraphTests
      * @param <E> the graph edge type
      * @return true if the graph is overfull, false otherwise
      */
-    public static <V, E> boolean isOverfull(Graph<V, E> graph)
+    public static <V, E> boolean isOverfull(final Graph<V, E> graph)
     {
-        int maxDegree = graph.vertexSet().stream().mapToInt(graph::degreeOf).max().getAsInt();
+        boolean seen = false;
+        int best = 0;
+        for (V vertex : graph.vertexSet()) {
+            int i = graph.degreeOf(vertex);
+            if (!seen || i > best) {
+                seen = true;
+                best = i;
+            }
+        }
+        int maxDegree = (seen ? OptionalInt.of(best) : OptionalInt.empty()).getAsInt();
         return graph.edgeSet().size() > maxDegree * Math.floor(graph.vertexSet().size() / 2.0);
     }
 
@@ -341,8 +360,13 @@ public abstract class GraphTests
             return false;
 
         List<Integer> degrees = new ArrayList<>(graph.vertexSet().size());
+        List<Integer> list = new ArrayList<>();
+        for (V v : graph.vertexSet()) {
+            Integer degreeOf = graph.degreeOf(v);
+            list.add(degreeOf);
+        }
         degrees
-            .addAll(graph.vertexSet().stream().map(graph::degreeOf).collect(Collectors.toList()));
+            .addAll(list);
         Collections.sort(degrees, Collections.reverseOrder()); // sort degrees descending order
         // Find m = \max_i \{d_i\geq i-1\}
         int m = 1;
@@ -529,21 +553,21 @@ public abstract class GraphTests
         return GraphMetrics.getNumberOfTriangles(graph) == 0;
     }
 
-    /**
-     * Checks that the specified graph is perfect. Due to the Strong Perfect Graph Theorem Berge
-     * Graphs are the same as perfect Graphs. The implementation of this method is delegated to
-     * {@link BergeGraphInspector}
-     *
-     * @param graph the graph reference to check for being perfect or not
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
-     * @return true if the graph is perfect, false otherwise
-     */
-    public static <V, E> boolean isPerfect(Graph<V, E> graph)
-    {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
-        return new BergeGraphInspector<V, E>().isBerge(graph);
-    }
+//    /**
+//     * Checks that the specified graph is perfect. Due to the Strong Perfect Graph Theorem Berge
+//     * Graphs are the same as perfect Graphs. The implementation of this method is delegated to
+//     * {@link BergeGraphInspector}
+//     *
+//     * @param graph the graph reference to check for being perfect or not
+//     * @param <V> the graph vertex type
+//     * @param <E> the graph edge type
+//     * @return true if the graph is perfect, false otherwise
+//     */
+//    public static <V, E> boolean isPerfect(Graph<V, E> graph)
+//    {
+//        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+//        return new BergeGraphInspector<V, E>().isBerge(graph);
+//    }
 
     /**
      * Checks that the specified graph is directed and throws a customized

@@ -17,11 +17,27 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.AsUndirectedGraph;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.traverse.GraphIterator;
+import org.jgrapht.traverse.LexBreadthFirstIterator;
+import org.jgrapht.traverse.MaximumCardinalityIterator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.ToIntFunction;
 
 /**
  * Tests whether a graph is <a href="https://en.wikipedia.org/wiki/Chordal_graph">chordal</a>. A
@@ -211,12 +227,17 @@ public class ChordalityInspector<V, E>
     {
         Set<V> graphVertices = graph.vertexSet();
         if (graphVertices.size() == vertexOrder.size() && graphVertices.containsAll(vertexOrder)) {
-            Map<V, Integer> vertexInOrder = getVertexInOrder(vertexOrder);
+            final Map<V, Integer> vertexInOrder = getVertexInOrder(vertexOrder);
             for (V vertex : vertexOrder) {
                 Set<V> predecessors = getPredecessors(vertexInOrder, vertex);
                 if (predecessors.size() > 0) {
                     V maxPredecessor =
-                        Collections.max(predecessors, Comparator.comparingInt(vertexInOrder::get));
+                        Collections.max(predecessors, DComparator.comparingInt(new ToIntFunction<Object>() {
+                            @Override
+                            public int applyAsInt(Object key) {
+                                return vertexInOrder.get(key);
+                            }
+                        }));
                     for (V predecessor : predecessors) {
                         if (!predecessor.equals(maxPredecessor)
                             && !graph.containsEdge(predecessor, maxPredecessor))

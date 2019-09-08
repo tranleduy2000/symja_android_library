@@ -67,7 +67,7 @@ public class BFSShortestPath<V, E>
          * Initialize distanceAndPredecessorMap
          */
         Map<V, Pair<Double, E>> distanceAndPredecessorMap = new HashMap<>();
-        distanceAndPredecessorMap.put(source, Pair.of(0d, null));
+        distanceAndPredecessorMap.put(source, Pair.<Double, E>of(0d, null));
 
         /*
          * Declaring queue

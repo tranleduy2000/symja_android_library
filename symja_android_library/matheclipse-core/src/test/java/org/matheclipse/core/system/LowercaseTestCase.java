@@ -4898,6 +4898,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEuclideanDistance() {
+		check("EuclideanDistance({a, b, c}, {x, y, z})", //
+				"Sqrt(Abs(a-x)^2+Abs(b-y)^2+Abs(c-z)^2)");
 		check("EuclideanDistance({-1, -1}, {1, 1})", //
 				"2*Sqrt(2)");
 		check("EuclideanDistance({a, b}, {c, d})", //
@@ -6146,6 +6148,54 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{x->0.0}");
 	}
 
+	public void testEulerianGraphQ() {
+		check("EulerianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"True");
+		check("EulerianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"False");
+	}
+
+	public void testFindEulerianCycle() {
+		check("FindEulerianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"{DirectedEdge(4,1),DirectedEdge(1,3),DirectedEdge(3,1),DirectedEdge(1,2),DirectedEdge(\n"
+						+ "2,3),DirectedEdge(3,4)}");
+		check("FindEulerianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"{}");
+	}
+
+	public void testFindHamiltonianCycle() {
+		check("FindHamiltonianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"{DirectedEdge(1,2),DirectedEdge(2,3),DirectedEdge(3,4),DirectedEdge(4,1)}");
+		check("FindHamiltonianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"{}");
+	}
+
+	public void testFindShortestTour() {
+		check("FindShortestTour({{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 1}, {2, 3}, {2, 5}, {3, 1}, {3, 2},"//
+				+ " {3, 4}, {3, 5}, {4, 1}, {4, 3}, {4, 5}, {5, 1}, {5, 2}, {5, 3}, {5, 4}})", //
+				"{14+5*Sqrt(2),{1,6,9,13,16,17,18,19,14,10,7,11,15,12,8,5,4,3,2,1}}");
+	}
+
+	public void testFindShortestPath() {
+		check("FindShortestPath({1 -> 2, 2 -> 3, 3 -> 1,  3 -> 4, 4 -> 5, 3 -> 5},1,4)", //
+				"{1,2,3,4}");
+	}
+
+	public void testHamiltonianGraphQ() {
+		check("HamiltonianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"True");
+		check("HamiltonianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"False");
+	}
+
+	public void testGraph() {
+		check("Graph({1 \\[UndirectedEdge] 2, 2 \\[UndirectedEdge] 3, 3 \\[UndirectedEdge] 1})", //
+				"Graph[([1, 2, 3], [(1,2), (2,3), (3,1)])]");
+		check("Graph({1 \\[DirectedEdge] 2, 2 \\[DirectedEdge] 3, 3 \\[DirectedEdge] 1})", //
+				"Graph[([1, 2, 3], [(1,2), (2,3), (3,1)])]");
+		check("Graph({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1})", //
+				"Graph[([1, 2, 3, 4], [(1,2), (2,3), (3,1), (1,3), (3,4), (4,1)])]");
+	}
 	public void testFirst() {
 		check("First(Infinity)", //
 				"1");
@@ -7105,6 +7155,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"4.56079359657056");
 	}
 
+	public void testGeoDistance() {
+		check("GeoDistance({37, -109}, {40.113, -88.261})", //
+				"UnitConvert(Quantity(1.83601*10^6,m),mi)");
+	}
 	public void testGet() {
 		if (Config.FILESYSTEM_ENABLED) {
 			String pathToVectorAnalysis = getClass().getResource("/symja/VectorAnalysis.m").getFile();
@@ -7140,6 +7194,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGreater() {
+		check("x>x", //
+				"False");
 		check("x+1>x", //
 				"True");
 
@@ -7172,6 +7228,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGreaterEqual() {
+		check("x>=x", //
+				"True");
 		check("Infinity>=Infinity", //
 				"True");
 
@@ -8728,13 +8786,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLess() {
+		check("Infinity<Infinity", //
+				"False");
+
+		check("x<x", //
+				"False");
 		check("I<0", //
 				"I<0");
 		check("3+x<4+x", //
 				"True");
 		check("3+x>4+x", //
-				"False");
-		check("Infinity<Infinity", //
 				"False");
 
 		check("Refine(Infinity<x, x>0)", //
@@ -8755,6 +8816,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLessEqual() {
+		check("x<=x", //
+				"True");
 		check("3+x<=4+x", //
 				"True");
 		check("3+x>=4+x", //
@@ -13901,6 +13964,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRefine() {
+		check("Refine(x<x, x>0)", //
+				"False");
+		check("Refine(x>=x, x>0)", //
+				"True");
 		check("Refine((-1)^(43*k), Element(k, Integers))", //
 				"(-1)^k");
 		check("Refine((-1)^(42*k), Element(k, Integers))", //

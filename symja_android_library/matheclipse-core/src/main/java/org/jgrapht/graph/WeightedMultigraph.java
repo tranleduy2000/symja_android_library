@@ -70,7 +70,7 @@ public class WeightedMultigraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends WeightedMultigraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new WeightedMultigraph<>(edgeClass));
+        return new GraphBuilder<>(new WeightedMultigraph<V, E>(edgeClass));
     }
 
     /**
@@ -84,7 +84,7 @@ public class WeightedMultigraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends WeightedMultigraph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new WeightedMultigraph<>(null, edgeSupplier));
+        return new GraphBuilder<>(new WeightedMultigraph<V, E>(null, edgeSupplier));
     }
 
 }

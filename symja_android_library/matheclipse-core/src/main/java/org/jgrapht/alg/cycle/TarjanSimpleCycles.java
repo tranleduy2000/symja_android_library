@@ -20,6 +20,7 @@ package org.jgrapht.alg.cycle;
 import org.jgrapht.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Find all simple cycles of a directed graph using the Tarjan's algorithm.
@@ -190,6 +191,11 @@ public class TarjanSimpleCycles<V, E>
     {
         // Removed sets typically not all
         // needed, so instantiate lazily.
-        return removed.computeIfAbsent(v, k -> new HashSet<>());
+        return removed.computeIfAbsent(v, new Function<V, Set<V>>() {
+            @Override
+            public Set<V> apply(V k) {
+                return new HashSet<>();
+            }
+        });
     }
 }

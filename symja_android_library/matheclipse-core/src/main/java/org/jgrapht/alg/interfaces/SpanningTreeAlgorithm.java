@@ -61,14 +61,11 @@ public interface SpanningTreeAlgorithm<E>
 
         /**
          * Returns an iterator over the edges in the spanning tree.
-         * 
+         *
          * @return iterator over the edges in the spanning tree.
          */
         @Override
-        default Iterator<E> iterator()
-        {
-            return getEdges().iterator();
-        }
+        Iterator<E> iterator();
     }
 
     /**
@@ -108,6 +105,11 @@ public interface SpanningTreeAlgorithm<E>
         public Set<E> getEdges()
         {
             return edges;
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return getEdges().iterator();
         }
 
         @Override

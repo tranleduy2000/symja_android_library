@@ -17,13 +17,16 @@
  */
 package org.jgrapht.alg.vertexcover;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.VertexCoverAlgorithm;
+import org.jgrapht.graph.AsSubgraph;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implementation of the 2-opt algorithm for a minimum weighted vertex cover by R. Bar-Yehuda and S.
@@ -63,8 +66,14 @@ public class BarYehudaEvenTwoApproxVCImpl<V, E>
     public BarYehudaEvenTwoApproxVCImpl(Graph<V, E> graph)
     {
         this.graph = GraphTests.requireUndirected(graph);
-        this.vertexWeightMap = graph
-            .vertexSet().stream().collect(Collectors.toMap(Function.identity(), vertex -> 1.0));
+        Map<V, Double> map = new HashMap<>();
+        for (V vertex : graph
+                .vertexSet()) {
+            if (map.put(vertex, 1.0) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
+        this.vertexWeightMap = map;
     }
 
     /**

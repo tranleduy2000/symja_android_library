@@ -22,6 +22,7 @@ import org.jgrapht.alg.connectivity.*;
 import org.jgrapht.graph.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * List of simple paths in increasing order of weight.
@@ -305,10 +306,20 @@ final class RankingPathElementList<V, E>
         }
 
         ConnectivityInspector<V, E> connectivityInspector;
-        PathMask<V, E> connectivityMask = new PathMask<>(prevPathElement);
+        final PathMask<V, E> connectivityMask = new PathMask<>(prevPathElement);
 
         MaskSubgraph<V, E> connectivityGraph = new MaskSubgraph<>(
-            this.graph, connectivityMask::isVertexMasked, connectivityMask::isEdgeMasked);
+            this.graph, new Predicate<V>() {
+            @Override
+            public boolean test(V vertex1) {
+                return connectivityMask.isVertexMasked(vertex1);
+            }
+        }, new Predicate<E>() {
+            @Override
+            public boolean test(E edge) {
+                return connectivityMask.isEdgeMasked(edge);
+            }
+        });
         connectivityInspector = new ConnectivityInspector<>(connectivityGraph);
 
         if (connectivityMask.isVertexMasked(this.guardVertexToNotDisconnect)) {

@@ -17,12 +17,28 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.alg.interfaces.MaximumFlowAlgorithm;
+import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -290,8 +306,22 @@ public class GusfieldGomoryHuCutTree<V, E>
         if (this.gomoryHuTree == null) {
             this.gomoryHuTree = this.getGomoryHuTree();
         }
-        DefaultWeightedEdge cheapestEdge = gomoryHuTree
-            .edgeSet().stream().min(Comparator.comparing(gomoryHuTree::getEdgeWeight))
+        boolean seen = false;
+        DefaultWeightedEdge best = null;
+        Comparator<DefaultWeightedEdge> comparator = DComparator.comparing(new Function<DefaultWeightedEdge, Double>() {
+            @Override
+            public Double apply(DefaultWeightedEdge e) {
+                return gomoryHuTree.getEdgeWeight(e);
+            }
+        });
+        for (DefaultWeightedEdge defaultWeightedEdge : gomoryHuTree
+                .edgeSet()) {
+            if (!seen || comparator.compare(defaultWeightedEdge, best) < 0) {
+                seen = true;
+                best = defaultWeightedEdge;
+            }
+        }
+        DefaultWeightedEdge cheapestEdge = (seen ? Optional.of(best) : Optional.<DefaultWeightedEdge>empty())
             .orElseThrow(new Supplier<RuntimeException>() {
                 @Override
                 public RuntimeException get() {
@@ -325,7 +355,12 @@ public class GusfieldGomoryHuCutTree<V, E>
             this.findPathBetween(gomoryHuTree, lastInvokedSource, lastInvokedTarget);
         boolean seen = false;
         DefaultWeightedEdge best = null;
-        Comparator<DefaultWeightedEdge> comparator = Comparator.comparing(gomoryHuTree::getEdgeWeight);
+        Comparator<DefaultWeightedEdge> comparator = DComparator.comparing(new Function<DefaultWeightedEdge, Double>() {
+            @Override
+            public Double apply(DefaultWeightedEdge e) {
+                return gomoryHuTree.getEdgeWeight(e);
+            }
+        });
         for (DefaultWeightedEdge pathEdge : pathEdges) {
             if (!seen || comparator.compare(pathEdge, best) < 0) {
                 seen = true;

@@ -70,7 +70,7 @@ public class WeightedPseudograph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends WeightedPseudograph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new WeightedPseudograph<>(edgeClass));
+        return new GraphBuilder<>(new WeightedPseudograph<V, E>(edgeClass));
     }
 
     /**
@@ -84,7 +84,7 @@ public class WeightedPseudograph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends WeightedPseudograph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new WeightedPseudograph<>(null, edgeSupplier));
+        return new GraphBuilder<>(new WeightedPseudograph<V, E>(null, edgeSupplier));
     }
 
 }

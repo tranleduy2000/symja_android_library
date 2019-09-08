@@ -31,7 +31,7 @@ import java.util.*;
  *
  * @author Andrew Newell
  */
-public class CompleteBipartiteGraphGenerator<V, E>
+public class CompleteBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

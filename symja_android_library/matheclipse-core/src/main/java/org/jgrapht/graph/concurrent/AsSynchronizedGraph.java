@@ -17,15 +17,23 @@
  */
 package org.jgrapht.graph.concurrent;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.GraphDelegator;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Create a synchronized (thread-safe) Graph backed by the specified Graph. This Graph is designed
@@ -951,11 +959,11 @@ public class AsSynchronizedGraph<V, E>
          * @return a sequential <code>Stream</code> with the backing set's unmodifiable copy as its
          *         source.
          */
-        @Override
-        public Stream<E> stream()
-        {
-            return getCopy().stream();
-        }
+//        @Override
+//        public Stream<E> stream()
+//        {
+//            return getCopy().stream();
+//        }
 
         /**
          * Return a possibly parallel <code>Stream</code> with the backing set's unmodifiable copy
@@ -964,11 +972,11 @@ public class AsSynchronizedGraph<V, E>
          * @return a possibly parallel <code>Stream</code> with the backing set's unmodifiable copy
          *         as its source.
          */
-        @Override
-        public Stream<E> parallelStream()
-        {
-            return getCopy().parallelStream();
-        }
+//        @Override
+//        public Stream<E> parallelStream()
+//        {
+//            return getCopy().parallelStream();
+//        }
 
         /**
          * Compares the specified object with this set for equality.

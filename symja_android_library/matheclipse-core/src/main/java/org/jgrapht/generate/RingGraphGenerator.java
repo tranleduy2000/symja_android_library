@@ -31,7 +31,7 @@ import java.util.*;
  *
  * @author John V. Sichi
  */
-public class RingGraphGenerator<V, E>
+public class RingGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

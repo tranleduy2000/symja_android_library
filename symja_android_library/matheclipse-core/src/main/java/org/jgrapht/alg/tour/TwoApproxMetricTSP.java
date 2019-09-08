@@ -88,7 +88,7 @@ public class TwoApproxMetricTSP<V, E>
         if (graph.vertexSet().size() == 1) {
             V start = graph.vertexSet().iterator().next();
             return new GraphWalk<>(
-                graph, start, start, Collections.singletonList(start), Collections.emptyList(), 0d);
+                graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
         }
 
         /*

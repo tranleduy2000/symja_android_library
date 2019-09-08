@@ -17,15 +17,26 @@
  */
 package org.jgrapht.alg.tour;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.cycle.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.matching.blossom.v5.*;
-import org.jgrapht.alg.spanning.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.cycle.HierholzerEulerianCycle;
+import org.jgrapht.alg.interfaces.EulerianCycleAlgorithm;
+import org.jgrapht.alg.interfaces.HamiltonianCycleAlgorithm;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
+import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching;
+import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.graph.Pseudograph;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A $3/2$-approximation algorithm for the metric TSP problem.
@@ -94,7 +105,7 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
      * @throws IllegalArgumentException if the graph contains no vertices
      */
     @Override
-    public GraphPath<V, E> getTour(Graph<V, E> graph)
+    public GraphPath<V, E> getTour(final Graph<V, E> graph)
     {
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("Graph must be undirected");
@@ -112,23 +123,30 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
         if (graph.vertexSet().size() == 1) {
             V start = graph.vertexSet().iterator().next();
             return new GraphWalk<>(
-                graph, start, start, Collections.singletonList(start), Collections.emptyList(), 0d);
+                graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
         }
 
         int n = graph.vertexSet().size();
         // add all vertices of the graph to the auxiliary graph
-        Graph<V, DefaultEdge> mstAndMatching = new Pseudograph<>(DefaultEdge.class);
-        graph.vertexSet().forEach(mstAndMatching::addVertex);
+        final Graph<V, DefaultEdge> mstAndMatching = new Pseudograph<>(DefaultEdge.class);
+        for (V v1 : graph.vertexSet()) {
+            mstAndMatching.addVertex(v1);
+        }
 
         // add all edges of a minimum spanning tree to the auxiliary graph
         SpanningTreeAlgorithm<E> spanningTreeAlgorithm = new KruskalMinimumSpanningTree<>(graph);
-        spanningTreeAlgorithm.getSpanningTree().getEdges().forEach(
-            e -> mstAndMatching.addEdge(graph.getEdgeSource(e), graph.getEdgeTarget(e)));
+        for (E e2 : spanningTreeAlgorithm.getSpanningTree().getEdges()) {
+            mstAndMatching.addEdge(graph.getEdgeSource(e2), graph.getEdgeTarget(e2));
+        }
 
         // find odd degree vertices
-        Set<V> oddDegreeVertices = mstAndMatching
-            .vertexSet().stream().filter(v -> (mstAndMatching.edgesOf(v).size() & 1) == 1)
-            .collect(Collectors.toSet());
+        Set<V> oddDegreeVertices = new HashSet<>();
+        for (V v : mstAndMatching
+                .vertexSet()) {
+            if ((mstAndMatching.edgesOf(v).size() & 1) == 1) {
+                oddDegreeVertices.add(v);
+            }
+        }
 
         /*
          * Form an induced subgraph on odd degree vertices, find minimum weight perfect matching and
@@ -137,8 +155,9 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
         Graph<V, E> subgraph = new AsSubgraph<>(graph, oddDegreeVertices);
         MatchingAlgorithm<V, E> matchingAlgorithm =
             new KolmogorovWeightedPerfectMatching<>(subgraph);
-        matchingAlgorithm.getMatching().getEdges().forEach(
-            e -> mstAndMatching.addEdge(graph.getEdgeSource(e), graph.getEdgeTarget(e)));
+        for (E e1 : matchingAlgorithm.getMatching().getEdges()) {
+            mstAndMatching.addEdge(graph.getEdgeSource(e1), graph.getEdgeTarget(e1));
+        }
 
         // find an Eulerian cycle in the auxiliary graph
         EulerianCycleAlgorithm<V, DefaultEdge> eulerianCycleAlgorithm =
@@ -147,9 +166,14 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
             eulerianCycleAlgorithm.getEulerianCycle(mstAndMatching);
 
         // form a closed tour from the Hamiltonian cycle
-        Set<V> visited = new HashSet<>(n);
-        List<V> tourVertices = eulerianCycle
-            .getVertexList().stream().filter(visited::add).collect(Collectors.toList());
+        final Set<V> visited = new HashSet<>(n);
+        List<V> tourVertices = new ArrayList<>();
+        for (V e : eulerianCycle
+                .getVertexList()) {
+            if (visited.add(e)) {
+                tourVertices.add(e);
+            }
+        }
         tourVertices.add(tourVertices.get(0));
 
         // compute tour edges

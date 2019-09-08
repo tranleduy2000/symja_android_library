@@ -104,7 +104,12 @@ public class ClosestFirstIterator<V, E>
     {
         this(
             g, startVertex == null ? null : Collections.singletonList(startVertex), radius,
-            PairingHeap::new);
+                new Supplier<AddressableHeap<Double, QueueEntry<V, E>>>() {
+                    @Override
+                    public AddressableHeap<Double, QueueEntry<V, E>> get() {
+                        return new PairingHeap<Double, QueueEntry<V, E>>();
+                    }
+                });
     }
 
     /**
@@ -145,7 +150,12 @@ public class ClosestFirstIterator<V, E>
      */
     public ClosestFirstIterator(Graph<V, E> g, Iterable<V> startVertices, double radius)
     {
-        this(g, startVertices, radius, PairingHeap::new);
+        this(g, startVertices, radius, new Supplier<AddressableHeap<Double, QueueEntry<V, E>>>() {
+            @Override
+            public AddressableHeap<Double, QueueEntry<V, E>> get() {
+                return new PairingHeap<Double, QueueEntry<V, E>>();
+            }
+        });
     }
 
     /**

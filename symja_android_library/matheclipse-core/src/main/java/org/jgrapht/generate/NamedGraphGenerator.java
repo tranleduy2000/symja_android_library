@@ -17,12 +17,13 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Collection of commonly used named graphs
@@ -120,8 +121,8 @@ public class NamedGraphGenerator<V, E>
     private void generateGeneralizedPetersenGraph(Graph<V, E> targetGraph, int n, int k)
     {
         GeneralizedPetersenGraphGenerator<V, E> gpgg =
-            new GeneralizedPetersenGraphGenerator<>(n, k);
-        gpgg.generateGraph(targetGraph);
+                new GeneralizedPetersenGraphGenerator<>(n, k);
+        SGraphGenerator.generateGraph(gpgg, (targetGraph));
     }
 
     // -------------Petersen Graph-----------//
@@ -331,8 +332,8 @@ public class NamedGraphGenerator<V, E>
      */
     public void generateButterflyGraph(Graph<V, E> targetGraph)
     {
-        new WindmillGraphsGenerator<V, E>(WindmillGraphsGenerator.Mode.DUTCHWINDMILL, 2, 3)
-            .generateGraph(targetGraph);
+        SGraphGenerator.generateGraph(new WindmillGraphsGenerator<V, E>(WindmillGraphsGenerator.Mode.DUTCHWINDMILL, 2, 3),
+            (targetGraph));
     }
 
     // -------------Claw Graph-----------//
@@ -361,7 +362,7 @@ public class NamedGraphGenerator<V, E>
      */
     public void generateClawGraph(Graph<V, E> targetGraph)
     {
-        new StarGraphGenerator<V, E>(4).generateGraph(targetGraph);
+        SGraphGenerator.generateGraph(new StarGraphGenerator<V, E>(4), (targetGraph));
     }
 
     // -------------Bucky ball Graph-----------//

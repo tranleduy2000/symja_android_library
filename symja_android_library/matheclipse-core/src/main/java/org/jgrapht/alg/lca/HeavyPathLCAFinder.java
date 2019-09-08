@@ -50,7 +50,8 @@ import java.util.*;
  * @author Alexandru Valeanu
  */
 public class HeavyPathLCAFinder<V, E>
-    implements
+        extends LowestCommonAncestorAlgorithmImpl<V>
+        implements
     LowestCommonAncestorAlgorithm<V>
 {
 

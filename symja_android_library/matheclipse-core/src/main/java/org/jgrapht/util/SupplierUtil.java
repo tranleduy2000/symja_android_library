@@ -55,13 +55,16 @@ public class SupplierUtil
      * @return the supplier
      * @param <T> the type of results supplied by this supplier
      */
-    public static <T> Supplier<T> createSupplier(Class<? extends T> clazz)
+    public static <T> Supplier<T> createSupplier(final Class<? extends T> clazz)
     {
-        return (Supplier<T> & Serializable) () -> {
-            try {
-                return clazz.getDeclaredConstructor().newInstance();
-            } catch (Exception ex) {
-                throw new RuntimeException("Supplier failed", ex);
+        return new Supplier<T>() {
+            @Override
+            public T get() {
+                try {
+                    return clazz.getDeclaredConstructor().newInstance();
+                } catch (Exception ex) {
+                    throw new RuntimeException("Supplier failed", ex);
+                }
             }
         };
     }

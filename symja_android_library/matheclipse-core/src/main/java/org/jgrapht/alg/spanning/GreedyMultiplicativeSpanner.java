@@ -17,14 +17,27 @@
  */
 package org.jgrapht.alg.spanning;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.SpannerAlgorithm;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Greedy algorithm for $(2k-1)$-multiplicative spanner construction (for any integer
@@ -106,7 +119,12 @@ public class GreedyMultiplicativeSpanner<V, E>
         {
             // sort edges
             ArrayList<E> allEdges = new ArrayList<>(graph.edgeSet());
-            allEdges.sort(Comparator.comparingDouble(graph::getEdgeWeight));
+            allEdges.sort(DComparator.comparingDouble(new ToDoubleFunction<E>() {
+                @Override
+                public double applyAsDouble(E e1) {
+                    return graph.getEdgeWeight(e1);
+                }
+            }));
 
             // check precondition
             double minWeight = graph.getEdgeWeight(allEdges.get(0));

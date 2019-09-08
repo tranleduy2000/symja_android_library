@@ -17,10 +17,10 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.alg.util.*;
+import org.jgrapht.alg.util.Pair;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Algorithm to compute a <a href="https://en.wikipedia.org/wiki/Lowest_common_ancestor">lowest
@@ -49,11 +49,7 @@ public interface LowestCommonAncestorAlgorithm<V>
      * @param queries a list of pairs of vertices
      * @return a list L of LCAs where L(i) is the LCA for pair queries(i)
      */
-    default List<V> getBatchLCA(List<Pair<V, V>> queries)
-    {
-        return queries
-            .stream().map(p -> getLCA(p.getFirst(), p.getSecond())).collect(Collectors.toList());
-    }
+    List<V> getBatchLCA(List<Pair<V, V>> queries);
 
     /**
      * Return the computed set of LCAs of a and b
@@ -73,9 +69,5 @@ public interface LowestCommonAncestorAlgorithm<V>
      * @param queries a list of pairs of vertices
      * @return a list L of LCAs where L(i) is the computed set of LCAs for pair queries(i)
      */
-    default List<Set<V>> getBatchLCASet(List<Pair<V, V>> queries)
-    {
-        return queries
-            .stream().map(p -> getLCASet(p.getFirst(), p.getSecond())).collect(Collectors.toList());
-    }
+    List<Set<V>> getBatchLCASet(List<Pair<V, V>> queries);
 }

@@ -22,6 +22,7 @@ import org.jgrapht.alg.interfaces.*;
 import org.jgrapht.alg.util.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Tarjan's offline algorithm for computing lowest common ancestors in rooted trees and forests.
@@ -62,7 +63,8 @@ import java.util.*;
  * @author Alexandru Valeanu
  */
 public class TarjanLCAFinder<V, E>
-    implements
+        extends LowestCommonAncestorAlgorithmImpl<V>
+        implements
     LowestCommonAncestorAlgorithm<V>
 {
     private Graph<V, E> graph;
@@ -137,7 +139,7 @@ public class TarjanLCAFinder<V, E>
 
     private void initialize()
     {
-        unionFind = new UnionFind<>(Collections.emptySet());
+        unionFind = new UnionFind<>(Collections.<V>emptySet());
         ancestors = new HashMap<>();
         blackNodes = new HashSet<>();
     }
@@ -175,8 +177,18 @@ public class TarjanLCAFinder<V, E>
             if (a.equals(b))
                 this.lowestCommonAncestors.add(a);
             else {
-                queryOccurs.computeIfAbsent(a, x -> new HashSet<>()).add(i);
-                queryOccurs.computeIfAbsent(b, x -> new HashSet<>()).add(i);
+                queryOccurs.computeIfAbsent(a, new Function<V, Set<Integer>>() {
+                    @Override
+                    public Set<Integer> apply(V x) {
+                        return new HashSet<>();
+                    }
+                }).add(i);
+                queryOccurs.computeIfAbsent(b, new Function<V, Set<Integer>>() {
+                    @Override
+                    public Set<Integer> apply(V x) {
+                        return new HashSet<>();
+                    }
+                }).add(i);
 
                 this.lowestCommonAncestors.add(null);
             }
@@ -216,7 +228,12 @@ public class TarjanLCAFinder<V, E>
 
         blackNodes.add(u);
 
-        for (int index : queryOccurs.computeIfAbsent(u, x -> new HashSet<>())) {
+        for (int index : queryOccurs.computeIfAbsent(u, new Function<V, Set<Integer>>() {
+            @Override
+            public Set<Integer> apply(V x) {
+                return new HashSet<>();
+            }
+        })) {
             Pair<V, V> query = queries.get(index);
             V v;
 

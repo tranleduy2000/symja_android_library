@@ -17,13 +17,22 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.event.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.GraphType;
+import org.jgrapht.ListenableGraph;
+import org.jgrapht.event.GraphEdgeChangeEvent;
+import org.jgrapht.event.GraphListener;
+import org.jgrapht.event.GraphVertexChangeEvent;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A subgraph is a graph that has a subset of vertices and a subset of edges with respect to some
@@ -33,7 +42,7 @@ import java.util.stream.*;
  * <code>Graph</code> interface.
  *
  * <p>
- * If the base graph is a {@link org.jgrapht.ListenableGraph}, the subgraph listens on the base
+ * If the base graph is a {@link ListenableGraph}, the subgraph listens on the base
  * graph and guarantees the subgraph property. If an edge or a vertex is removed from the base
  * graph, it is automatically removed from the subgraph. Subgraph listeners are informed on such
  * removal only if it results in a cascaded removal from the subgraph. If the subgraph has been
@@ -168,19 +177,14 @@ public class AsSubgraph<V, E>
     public Set<E> getAllEdges(V sourceVertex, V targetVertex)
     {
         if (containsVertex(sourceVertex) && containsVertex(targetVertex)) {
-            return base
-                .getAllEdges(sourceVertex, targetVertex).stream().filter(new Predicate<E>() {
-                        @Override
-                        public boolean test(E o) {
-                            return edgeSet.contains(o);
-                        }
-                    })
-                .collect(Collectors.toCollection(new Supplier<Collection<Object>>() {
-                    @Override
-                    public Collection<Object> get() {
-                        return new LinkedHashSet<Object>();
-                    }
-                }));
+            LinkedHashSet<E> es = new LinkedHashSet<>();
+            for (E e : base
+                    .getAllEdges(sourceVertex, targetVertex)) {
+                if (edgeSet.contains(e)) {
+                    es.add(e);
+                }
+            }
+            return es;
         } else {
             return null;
         }
@@ -197,7 +201,10 @@ public class AsSubgraph<V, E>
         if (edges == null) {
             return null;
         } else {
-            return edges.stream().findAny().orElse(null);
+            for (E edge : edges) {
+                return edge;
+            }
+            return null;
         }
     }
 
@@ -349,18 +356,13 @@ public class AsSubgraph<V, E>
     {
         assertVertexExist(vertex);
 
-        return base.edgesOf(vertex).stream().filter(new Predicate<E>() {
-            @Override
-            public boolean test(E o) {
-                return edgeSet.contains(o);
+        LinkedHashSet<E> es = new LinkedHashSet<>();
+        for (E e : base.edgesOf(vertex)) {
+            if (edgeSet.contains(e)) {
+                es.add(e);
             }
-        }).collect(
-            Collectors.toCollection(new Supplier<Collection<Object>>() {
-                @Override
-                public Collection<Object> get() {
-                    return new LinkedHashSet<Object>();
-                }
-            }));
+        }
+        return es;
     }
 
     /**
@@ -377,12 +379,13 @@ public class AsSubgraph<V, E>
 
         if (baseType.isUndirected()) {
             int degree = 0;
-            Iterator<E> it = base.edgesOf(vertex).stream().filter(new Predicate<E>() {
-                @Override
-                public boolean test(E o) {
-                    return edgeSet.contains(o);
+            List<E> list = new ArrayList<>();
+            for (E o : base.edgesOf(vertex)) {
+                if (edgeSet.contains(o)) {
+                    list.add(o);
                 }
-            }).iterator();
+            }
+            Iterator<E> it = list.iterator();
             while (it.hasNext()) {
                 E e = it.next();
                 degree++;
@@ -404,18 +407,13 @@ public class AsSubgraph<V, E>
     {
         assertVertexExist(vertex);
 
-        return base.incomingEdgesOf(vertex).stream().filter(new Predicate<E>() {
-            @Override
-            public boolean test(E o) {
-                return edgeSet.contains(o);
+        LinkedHashSet<E> es = new LinkedHashSet<>();
+        for (E e : base.incomingEdgesOf(vertex)) {
+            if (edgeSet.contains(e)) {
+                es.add(e);
             }
-        }).collect(
-            Collectors.toCollection(new Supplier<Collection<Object>>() {
-                @Override
-                public Collection<Object> get() {
-                    return new LinkedHashSet<Object>();
-                }
-            }));
+        }
+        return es;
     }
 
     /**
@@ -439,18 +437,13 @@ public class AsSubgraph<V, E>
     {
         assertVertexExist(vertex);
 
-        return base.outgoingEdgesOf(vertex).stream().filter(new Predicate<E>() {
-            @Override
-            public boolean test(E o) {
-                return edgeSet.contains(o);
+        LinkedHashSet<E> es = new LinkedHashSet<>();
+        for (E e : base.outgoingEdgesOf(vertex)) {
+            if (edgeSet.contains(e)) {
+                es.add(e);
             }
-        }).collect(
-            Collectors.toCollection(new Supplier<Collection<Object>>() {
-                @Override
-                public Collection<Object> get() {
-                    return new LinkedHashSet<Object>();
-                }
-            }));
+        }
+        return es;
     }
 
     /**
@@ -573,67 +566,46 @@ public class AsSubgraph<V, E>
             vertexSet.addAll(base.vertexSet());
         } else {
             if (vertexFilter.size() > base.vertexSet().size()) {
-                base.vertexSet().stream().filter(new Predicate<V>() {
-                    @Override
-                    public boolean test(V o) {
-                        return vertexFilter.contains(o);
+                for (V v : base.vertexSet()) {
+                    if (vertexFilter.contains(v)) {
+                        vertexSet.add(v);
                     }
-                }).forEach(new Consumer<V>() {
-                    @Override
-                    public void accept(V e) {
-                        vertexSet.add(e);
-                    }
-                });
+                }
             } else {
-                vertexFilter.stream().filter(v -> v != null && base.containsVertex(v)).forEach(
-                        e -> vertexSet.add(e));
+                for (V v : vertexFilter) {
+                    if (v != null && base.containsVertex(v)) {
+                        vertexSet.add(v);
+                    }
+                }
             }
         }
 
         // add edges
         if (edgeFilter == null) {
-            base
-                .edgeSet().stream()
-                .filter(
-                        new Predicate<E>() {
-                            @Override
-                            public boolean test(E e) {
-                                return vertexSet.contains(base.getEdgeSource(e))
-                                        && vertexSet.contains(base.getEdgeTarget(e));
-                            }
-                        })
-                .forEach(new Consumer<E>() {
-                    @Override
-                    public void accept(E e1) {
-                        edgeSet.add(e1);
-                    }
-                });
+            for (E e : base
+                    .edgeSet()) {
+                if (vertexSet.contains(base.getEdgeSource(e))
+                        && vertexSet.contains(base.getEdgeTarget(e))) {
+                    edgeSet.add(e);
+                }
+            }
         } else {
             if (edgeFilter.size() > base.edgeSet().size()) {
-                base
-                    .edgeSet().stream()
-                    .filter(
-                            new Predicate<E>() {
-                                @Override
-                                public boolean test(E e) {
-                                    return edgeFilter.contains(e) && vertexSet.contains(base.getEdgeSource(e))
-                                            && vertexSet.contains(base.getEdgeTarget(e));
-                                }
-                            })
-                    .forEach(new Consumer<E>() {
-                        @Override
-                        public void accept(E e1) {
-                            edgeSet.add(e1);
-                        }
-                    });
+                for (E e : base
+                        .edgeSet()) {
+                    if (edgeFilter.contains(e) && vertexSet.contains(base.getEdgeSource(e))
+                            && vertexSet.contains(base.getEdgeTarget(e))) {
+                        edgeSet.add(e);
+                    }
+                }
             } else {
-                edgeFilter
-                    .stream()
-                    .filter(
-                        e -> e != null && base.containsEdge(e)
+                for (E e : edgeFilter) {
+                    if (e != null && base.containsEdge(e)
                             && vertexSet.contains(base.getEdgeSource(e))
-                            && vertexSet.contains(base.getEdgeTarget(e)))
-                    .forEach(e1 -> edgeSet.add(e1));
+                            && vertexSet.contains(base.getEdgeTarget(e))) {
+                        edgeSet.add(e);
+                    }
+                }
             }
         }
     }
@@ -675,6 +647,11 @@ public class AsSubgraph<V, E>
             E edge = e.getEdge();
 
             removeEdge(edge);
+        }
+
+        @Override
+        public void edgeWeightUpdated(GraphEdgeChangeEvent<V, E> e) {
+
         }
 
         /**

@@ -222,7 +222,7 @@ public class JohnsonShortestPaths<V, E>
             // transform result
             for (V u : g.vertexSet()) {
                 Pair<Double, E> pair = distanceAndPredecessorMap
-                    .getOrDefault(u, Pair.of(Double.POSITIVE_INFINITY, null));
+                    .getOrDefault(u, Pair.<Double, E>of(Double.POSITIVE_INFINITY, null));
                 distance[vertexIndices.get(v)][vertexIndices.get(u)] = pair.getFirst();
                 pred[vertexIndices.get(v)][vertexIndices.get(u)] = pair.getSecond();
             }

@@ -75,7 +75,7 @@ public class Multigraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends Multigraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new Multigraph<>(edgeClass));
+        return new GraphBuilder<>(new Multigraph<V, E>(edgeClass));
     }
 
     /**
@@ -89,7 +89,7 @@ public class Multigraph<V, E>
     public static <V,
         E> GraphBuilder<V, E, ? extends Multigraph<V, E>> createBuilder(Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new Multigraph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new Multigraph<V, E>(null, edgeSupplier, false));
     }
 
 }

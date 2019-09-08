@@ -140,7 +140,7 @@ public class EppsteinShortestPathIterator<V, E>
             distanceAndPredecessorMap = shortestPaths.getDistanceAndPredecessorMap();
             pathsQueue.add(
                 new EppsteinGraphPath(
-                    graph, new ArrayList<>(0), distanceAndPredecessorMap,
+                    graph, new ArrayList<PathsGraphVertex>(0), distanceAndPredecessorMap,
                     shortestPath.getWeight()));
             hMapping = new HashMap<>();
 
@@ -530,6 +530,7 @@ public class EppsteinShortestPathIterator<V, E>
      * Represents a path that is generated during the computations.
      */
     private class EppsteinGraphPath
+        extends GraphPathImpl<V, E>
         implements
         GraphPath<V, E>,
         Comparable<EppsteinGraphPath>

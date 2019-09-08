@@ -66,7 +66,7 @@ public class SimpleWeightedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends SimpleWeightedGraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new SimpleWeightedGraph<>(edgeClass));
+        return new GraphBuilder<>(new SimpleWeightedGraph<V, E>(edgeClass));
     }
 
     /**
@@ -80,7 +80,7 @@ public class SimpleWeightedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends SimpleWeightedGraph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new SimpleWeightedGraph<>(null, edgeSupplier));
+        return new GraphBuilder<>(new SimpleWeightedGraph<V, E>(null, edgeSupplier));
     }
 
 }

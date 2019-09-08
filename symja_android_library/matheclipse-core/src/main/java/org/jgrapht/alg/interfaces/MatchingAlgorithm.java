@@ -17,10 +17,12 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Allows to derive a <a href="http://en.wikipedia.org/wiki/Matching_(graph_theory)">matching</a> of
@@ -74,30 +76,32 @@ public interface MatchingAlgorithm<V, E>
          */
         Set<E> getEdges();
 
-        /**
-         * Returns true if vertex v is incident to an edge in this matching.
-         * 
-         * @param v vertex
-         * @return true if vertex v is incident to an edge in this matching.
-         */
-        default boolean isMatched(V v)
-        {
-            Set<E> edges = getEdges();
-            return getGraph().edgesOf(v).stream().anyMatch(edges::contains);
-        }
+//        /**
+//         * Returns true if vertex v is incident to an edge in this matching.
+//         *
+//         * @param v vertex
+//         * @return true if vertex v is incident to an edge in this matching.
+//         */
+//        default boolean isMatched(V v)
+//        {
+//            final Set<E> edges = getEdges();
+//            return getGraph().edgesOf(v).stream().anyMatch(new Predicate<E>() {
+//                @Override
+//                public boolean test(E o) {
+//                    return edges.contains(o);
+//                }
+//            });
+//        }
 
         /**
          * Returns true if the matching is a perfect matching. A matching is perfect if every vertex
          * in the graph is incident to an edge in the matching.
-         * 
+         *
          * @return true if the matching is perfect. By definition, a perfect matching consists of
          *         exactly $\frac{1}{2|V|}$ edges, and the number of vertices in the graph must be
          *         even.
          */
-        default boolean isPerfect()
-        {
-            return getEdges().size() == getGraph().vertexSet().size() / 2.0;
-        }
+        boolean isPerfect();
 
         /**
          * Returns an iterator over the edges in the matching.
@@ -105,10 +109,7 @@ public interface MatchingAlgorithm<V, E>
          * @return iterator over the edges in the matching.
          */
         @Override
-        default Iterator<E> iterator()
-        {
-            return getEdges().iterator();
-        }
+        Iterator<E> iterator();
     }
 
     /**
@@ -167,10 +168,20 @@ public interface MatchingAlgorithm<V, E>
             return edges;
         }
 
+        @Override
+        public boolean isPerfect() {
+            return getEdges().size() == getGraph().vertexSet().size() / 2.0;
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return getEdges().iterator();
+        }
+
         /**
          * {@inheritDoc}
          */
-        @Override
+//        @Override
         public boolean isMatched(V v)
         {
             if (matchedVertices == null) { // lazily index the vertices that have been matched

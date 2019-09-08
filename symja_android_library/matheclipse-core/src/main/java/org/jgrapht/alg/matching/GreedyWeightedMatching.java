@@ -113,17 +113,25 @@ public class GreedyWeightedMatching<V, E>
         // (the lambda uses e1 and e2 in the reverse order on purpose)
         List<E> allEdges = new ArrayList<>(graph.edgeSet());
         if (normalizeEdgeCosts) {
-            allEdges.sort((e1, e2) -> {
-                double degreeE1 = graph.degreeOf(graph.getEdgeSource(e1))
-                    + graph.degreeOf(graph.getEdgeTarget(e1));
-                double degreeE2 = graph.degreeOf(graph.getEdgeSource(e2))
-                    + graph.degreeOf(graph.getEdgeTarget(e2));
-                return comparator.compare(
-                    graph.getEdgeWeight(e2) / degreeE2, graph.getEdgeWeight(e1) / degreeE1);
+            allEdges.sort(new Comparator<E>() {
+                @Override
+                public int compare(E e1, E e2) {
+                    double degreeE1 = graph.degreeOf(graph.getEdgeSource(e1))
+                            + graph.degreeOf(graph.getEdgeTarget(e1));
+                    double degreeE2 = graph.degreeOf(graph.getEdgeSource(e2))
+                            + graph.degreeOf(graph.getEdgeTarget(e2));
+                    return comparator.compare(
+                            graph.getEdgeWeight(e2) / degreeE2, graph.getEdgeWeight(e1) / degreeE1);
+                }
             });
         } else {
             allEdges.sort(
-                (e1, e2) -> comparator.compare(graph.getEdgeWeight(e2), graph.getEdgeWeight(e1)));
+                    new Comparator<E>() {
+                        @Override
+                        public int compare(E e1, E e2) {
+                            return comparator.compare(graph.getEdgeWeight(e2), graph.getEdgeWeight(e1));
+                        }
+                    });
         }
 
         double matchingWeight = 0d;

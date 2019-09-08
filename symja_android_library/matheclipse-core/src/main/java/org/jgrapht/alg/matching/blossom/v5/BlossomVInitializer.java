@@ -17,16 +17,23 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jgrapht.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.jgrapht.alg.matching.blossom.v5.BlossomVInitializer.Action.*;
+import static org.jgrapht.alg.matching.blossom.v5.BlossomVInitializer.Action.AUGMENT;
+import static org.jgrapht.alg.matching.blossom.v5.BlossomVInitializer.Action.NONE;
+import static org.jgrapht.alg.matching.blossom.v5.BlossomVInitializer.Action.SHRINK;
 import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.MINUS;
 import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.PLUS;
-import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.*;
+import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.DEBUG;
+import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.INFINITY;
+import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.NO_PERFECT_MATCHING;
+import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.NO_PERFECT_MATCHING_THRESHOLD;
 
 /**
  * Is used to start the Kolmogorov's Blossom V algorithm. Performs initialization of the algorithm's
@@ -213,8 +220,17 @@ class BlossomVInitializer<V, E>
         nodes[nodeNum] = new BlossomVNode(nodeNum); // auxiliary node to keep track of the first
                                                     // item in the linked list of tree roots
         i = 0;
-        double minEdgeWeight = graph
-            .edgeSet().stream().map(graph::getEdgeWeight).min(Comparator.naturalOrder()).orElse(0d);
+        boolean seen = false;
+        Double best = null;
+        for (E e1 : graph
+                .edgeSet()) {
+            Double edgeWeight = graph.getEdgeWeight(e1);
+            if (!seen || edgeWeight.compareTo(best) < 0) {
+                seen = true;
+                best = edgeWeight;
+            }
+        }
+        double minEdgeWeight = seen ? best : 0d;
         // maps edges
         for (E e : graph.edgeSet()) {
             BlossomVNode source = vertexMap.get(graph.getEdgeSource(e));

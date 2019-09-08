@@ -32,7 +32,7 @@ import java.util.*;
  * paths to callers, use the public {@link GraphPath} interface instead.
  *
  */
-abstract class AbstractPathElement<V, E>
+abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
 {
     /**
      * Number of hops of the path.

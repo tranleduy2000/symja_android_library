@@ -44,6 +44,7 @@ import java.util.*;
  * @see GnmRandomGraphGenerator
  */
 public class GnpRandomGraphGenerator<V, E>
+    extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

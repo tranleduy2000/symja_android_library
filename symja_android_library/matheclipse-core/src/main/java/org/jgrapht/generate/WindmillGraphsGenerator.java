@@ -37,7 +37,7 @@ import java.util.*;
  * @param <V> graph vertex type
  * @param <E> graph edge type
  */
-public class WindmillGraphsGenerator<V, E>
+public class WindmillGraphsGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

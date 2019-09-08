@@ -17,13 +17,26 @@
  */
 package org.jgrapht.alg.vertexcover;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.VertexCoverAlgorithm;
+import org.jgrapht.alg.util.NeighborCache;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Finds a minimum vertex cover in a undirected graph. The implementation relies on a recursive
@@ -104,8 +117,14 @@ public class RecursiveExactVCImpl<V, E>
     public RecursiveExactVCImpl(Graph<V, E> graph)
     {
         this.graph = GraphTests.requireUndirected(graph);
-        this.vertexWeightMap = graph
-            .vertexSet().stream().collect(Collectors.toMap(Function.identity(), vertex -> 1.0));
+        Map<V, Double> map = new HashMap<>();
+        for (V vertex : graph
+                .vertexSet()) {
+            if (map.put(vertex, 1.0) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
+        this.vertexWeightMap = map;
         weighted = false;
     }
 
@@ -135,7 +154,12 @@ public class RecursiveExactVCImpl<V, E>
         N = vertices.size();
         // Sort vertices based on their weight/degree ratio in ascending order
         // TODO JK: Are there better orderings?
-        vertices.sort(Comparator.comparingDouble(v -> vertexWeightMap.get(v) / graph.degreeOf(v)));
+        vertices.sort(DComparator.comparingDouble(new ToDoubleFunction<V>() {
+            @Override
+            public double applyAsDouble(V v) {
+                return vertexWeightMap.get(v) / graph.degreeOf(v);
+            }
+        }));
         for (int i = 0; i < vertices.size(); i++)
             vertexIDDictionary.put(vertices.get(i), i);
 
@@ -220,7 +244,12 @@ public class RecursiveExactVCImpl<V, E>
         BitSetCover rightCover = calculateCoverRecursively(
             indexNextVertex + 1, visitedRightBranch, accumulatedWeight + weight);
         List<Integer> neighborsIndices =
-            neighbors.stream().map(vertexIDDictionary::get).collect(Collectors.toList());
+                new ArrayList<>();
+        Map<V, Integer> vIntegerMap = vertexIDDictionary;
+        for (V neighbor : neighbors) {
+            Integer integer = vIntegerMap.get(neighbor);
+            neighborsIndices.add(integer);
+        }
         rightCover.addAllVertices(neighborsIndices, weight);
 
         // Left branch (vertex v is added to the cover, and we solve for G_{v}):
@@ -254,7 +283,13 @@ public class RecursiveExactVCImpl<V, E>
     private double getWeight(Collection<V> vertices)
     {
         if (weighted) {
-            return vertices.stream().map(vertexWeightMap::get).reduce(0d, Double::sum);
+            Double acc = 0d;
+            Map<V, Double> vDoubleMap = vertexWeightMap;
+            for (V vertex : vertices) {
+                Double aDouble = vDoubleMap.get(vertex);
+                acc = acc + aDouble;
+            }
+            return acc;
         } else {
             return vertices.size();
         }
@@ -333,7 +368,12 @@ public class RecursiveExactVCImpl<V, E>
          */
         protected void addAllVertices(List<Integer> vertexIndices, double totalWeight)
         {
-            vertexIndices.forEach(bitSetCover::set);
+            vertexIndices.forEach(new Consumer<Integer>() {
+                @Override
+                public void accept(Integer bitIndex) {
+                    bitSetCover.set(bitIndex);
+                }
+            });
             this.weight += totalWeight;
         }
     }

@@ -17,12 +17,16 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.util.TypeUtil;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Helper for {@link MaskSubgraph}.
@@ -71,12 +75,14 @@ class MaskEdgeSet<V, E>
     @Override
     public Iterator<E> iterator()
     {
-        return edgeSet
-            .stream()
-            .filter(
-                e -> !edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))
-                    && !vertexMask.test(graph.getEdgeTarget(e)))
-            .iterator();
+        List<E> list = new ArrayList<>();
+        for (E e : edgeSet) {
+            if (!edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))
+                    && !vertexMask.test(graph.getEdgeTarget(e))) {
+                list.add(e);
+            }
+        }
+        return list.iterator();
     }
 
     /**
@@ -85,12 +91,14 @@ class MaskEdgeSet<V, E>
     @Override
     public int size()
     {
-        return (int) edgeSet
-            .stream()
-            .filter(
-                e -> !edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))
-                    && !vertexMask.test(graph.getEdgeTarget(e)))
-            .count();
+        long count = 0L;
+        for (E e : edgeSet) {
+            if (!edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))
+                    && !vertexMask.test(graph.getEdgeTarget(e))) {
+                count++;
+            }
+        }
+        return (int) count;
     }
 
 }

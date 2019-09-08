@@ -17,9 +17,17 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Algorithm to compute a vertex partitioning of a graph.
@@ -73,23 +81,23 @@ public interface PartitioningAlgorithm<V>
          */
         Set<V> getPartition(int index);
 
-        /**
-         * Get the partitions. This method returns a partitioning of the vertices in the graph into
-         * disjoint partitions.
-         *
-         * @return a list of partitions
-         */
-        default List<Set<V>> getPartitions()
-        {
-            final int n = getNumberPartitions();
-            List<Set<V>> partitions = new ArrayList<>(n);
-
-            for (int i = 0; i < n; i++) {
-                partitions.add(getPartition(i));
-            }
-
-            return partitions;
-        }
+//        /**
+//         * Get the partitions. This method returns a partitioning of the vertices in the graph into
+//         * disjoint partitions.
+//         *
+//         * @return a list of partitions
+//         */
+//        default List<Set<V>> getPartitions()
+//        {
+//            final int n = getNumberPartitions();
+//            List<Set<V>> partitions = new ArrayList<>(n);
+//
+//            for (int i = 0; i < n; i++) {
+//                partitions.add(getPartition(i));
+//            }
+//
+//            return partitions;
+//        }
     }
 
     /**
@@ -116,9 +124,13 @@ public interface PartitioningAlgorithm<V>
          */
         public PartitioningImpl(List<Set<V>> classes)
         {
+            List<Set<V>> list = new ArrayList<>();
+            for (Set<V> vs : Objects.requireNonNull(classes)) {
+                Set<V> unmodifiableSet = Collections.unmodifiableSet(vs);
+                list.add(unmodifiableSet);
+            }
             this.classes = Collections.unmodifiableList(
-                Objects.requireNonNull(classes).stream().map(Collections::unmodifiableSet).collect(
-                    Collectors.toList()));
+                    list);
         }
 
         /**
@@ -135,13 +147,22 @@ public interface PartitioningAlgorithm<V>
 
             for (Map.Entry<V, Integer> entry : vertexToPartitionMap.entrySet()) {
                 partitionIndexToVertexMap
-                    .computeIfAbsent(entry.getValue(), x -> new HashSet<>()).add(entry.getKey());
+                    .computeIfAbsent(entry.getValue(), new Function<Integer, Set<V>>() {
+                        @Override
+                        public Set<V> apply(Integer x) {
+                            return new HashSet<>();
+                        }
+                    }).add(entry.getKey());
             }
 
+            List<Set<V>> list = new ArrayList<>();
+            for (Set<V> vs : partitionIndexToVertexMap
+                    .values()) {
+                Set<V> unmodifiableSet = Collections.unmodifiableSet(vs);
+                list.add(unmodifiableSet);
+            }
             this.classes = Collections.unmodifiableList(
-                partitionIndexToVertexMap
-                    .values().stream().map(Collections::unmodifiableSet)
-                    .collect(Collectors.toList()));
+                    list);
         }
 
         /**

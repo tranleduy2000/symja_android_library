@@ -23,6 +23,7 @@ import org.jgrapht.alg.interfaces.*;
 import org.jgrapht.traverse.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Calculates a <a href="http://mathworld.wolfram.com/MinimumVertexColoring.html">minimum vertex
@@ -93,12 +94,17 @@ public class ChordalGraphColoring<V, E>
         if (coloring == null && chordalityInspector.isChordal()) {
             List<V> perfectEliminationOrder = chordalityInspector.getPerfectEliminationOrder();
 
-            Map<V, Integer> vertexColoring = new HashMap<>(perfectEliminationOrder.size());
+            final Map<V, Integer> vertexColoring = new HashMap<>(perfectEliminationOrder.size());
             Map<V, Integer> vertexInOrder = getVertexInOrder(perfectEliminationOrder);
             for (V vertex : perfectEliminationOrder) {
                 Set<V> predecessors = getPredecessors(vertexInOrder, vertex);
-                Set<Integer> predecessorColors = new HashSet<>(predecessors.size());
-                predecessors.forEach(v -> predecessorColors.add(vertexColoring.get(v)));
+                final Set<Integer> predecessorColors = new HashSet<>(predecessors.size());
+                predecessors.forEach(new Consumer<V>() {
+                    @Override
+                    public void accept(V v) {
+                        predecessorColors.add(vertexColoring.get(v));
+                    }
+                });
 
                 // find the minimum unused color in the set of predecessors
                 int minUnusedColor = 0;
@@ -107,7 +113,14 @@ public class ChordalGraphColoring<V, E>
                 }
                 vertexColoring.put(vertex, minUnusedColor);
             }
-            int maxColor = (int) vertexColoring.values().stream().distinct().count();
+            long count = 0L;
+            Set<Integer> uniqueValues = new HashSet<>();
+            for (Integer integer : vertexColoring.values()) {
+                if (uniqueValues.add(integer)) {
+                    count++;
+                }
+            }
+            int maxColor = (int) count;
             coloring = new ColoringImpl<>(vertexColoring, maxColor);
         }
     }

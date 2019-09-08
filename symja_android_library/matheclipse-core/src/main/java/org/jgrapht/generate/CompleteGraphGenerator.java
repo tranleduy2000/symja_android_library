@@ -33,7 +33,7 @@ import java.util.*;
  *
  * @author Tim Shearouse
  */
-public class CompleteGraphGenerator<V, E>
+public class CompleteGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

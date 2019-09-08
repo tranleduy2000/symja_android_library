@@ -17,9 +17,9 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.alg.flow.mincost.*;
+import org.jgrapht.alg.flow.mincost.MinimumCostFlowProblem;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Allows to calculate minimum cost flow on the specified
@@ -51,10 +51,7 @@ public interface MinimumCostFlowAlgorithm<V, E>
      * @param minimumCostFlowProblem minimum cost flow problem
      * @return the objective value (cost) of a solution to the minimum cost flow problem.
      */
-    default double getFlowCost(MinimumCostFlowProblem<V, E> minimumCostFlowProblem)
-    {
-        return getMinimumCostFlow(minimumCostFlowProblem).getCost();
-    }
+    double getFlowCost(MinimumCostFlowProblem<V, E> minimumCostFlowProblem);
 
     /**
      * Represents a minimum cost flow.

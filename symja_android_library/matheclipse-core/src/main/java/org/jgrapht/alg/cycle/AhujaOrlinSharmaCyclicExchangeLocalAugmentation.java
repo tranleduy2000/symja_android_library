@@ -113,7 +113,7 @@ public class AhujaOrlinSharmaCyclicExchangeLocalAugmentation<V, E>
         int k = 1;
 
         LabeledPath<V> bestCycle =
-            new LabeledPath<>(new ArrayList<>(lengthBound), Double.MAX_VALUE, new HashSet<>());
+            new LabeledPath<>(new ArrayList<V>(lengthBound), Double.MAX_VALUE, new HashSet<Integer>());
 
         /*
          * Store the path in map with key PathSetKey<V, V, Set<Integer>>, since only paths with the

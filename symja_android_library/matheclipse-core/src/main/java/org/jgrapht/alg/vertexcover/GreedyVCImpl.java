@@ -17,13 +17,17 @@
  */
 package org.jgrapht.alg.vertexcover;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.vertexcover.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.VertexCoverAlgorithm;
+import org.jgrapht.alg.vertexcover.util.RatioVertex;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Greedy algorithm to find a vertex cover for a graph. A vertex cover is a set of vertices that
@@ -62,8 +66,14 @@ public class GreedyVCImpl<V, E>
     public GreedyVCImpl(Graph<V, E> graph)
     {
         this.graph = GraphTests.requireUndirected(graph);
-        this.vertexWeightMap = graph
-            .vertexSet().stream().collect(Collectors.toMap(Function.identity(), vertex -> 1.0));
+        Map<V, Double> map = new HashMap<>();
+        for (V vertex : graph
+                .vertexSet()) {
+            if (map.put(vertex, 1.0) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
+        this.vertexWeightMap = map;
     }
 
     /**
@@ -94,10 +104,13 @@ public class GreedyVCImpl<V, E>
 
         // Create working graph: for every vertex, create a RatioVertex which maintains its own list
         // of neighbors
-        Map<V, RatioVertex<V>> vertexEncapsulationMap = new HashMap<>();
-        graph.vertexSet().stream().filter(v -> graph.degreeOf(v) > 0).forEach(
-            v -> vertexEncapsulationMap
-                .put(v, new RatioVertex<>(vertexCounter++, v, vertexWeightMap.get(v))));
+        final Map<V, RatioVertex<V>> vertexEncapsulationMap = new HashMap<>();
+        for (V v1 : graph.vertexSet()) {
+            if (graph.degreeOf(v1) > 0) {
+                vertexEncapsulationMap
+                        .put(v1, new RatioVertex<>(vertexCounter++, v1, vertexWeightMap.get(v1)));
+            }
+        }
 
         for (E e : graph.edgeSet()) {
             V u = graph.getEdgeSource(e);
@@ -120,11 +133,11 @@ public class GreedyVCImpl<V, E>
         while (!workingGraph.isEmpty()) { // Continue until all edges are covered
 
             // Find a vertex vx for which W(vx)/degree(vx) is minimal
-            RatioVertex<V> vx = workingGraph.pollFirst();
-            assert (workingGraph.parallelStream().allMatch(
-                ux -> vx.getRatio() <= ux
-                    .getRatio())) : "vx does not have the smallest ratio among all elements. VX: "
-                        + vx + " WorkingGraph: " + workingGraph;
+            final RatioVertex<V> vx = workingGraph.pollFirst();
+//            assert (workingGraph.stream().allMatch(
+//                    ux -> vx.getRatio() <= ux
+//                            .getRatio())) : "vx does not have the smallest ratio among all elements. VX: "
+//                        + vx + " WorkingGraph: " + workingGraph;
 
             for (RatioVertex<V> nx : vx.neighbors.keySet()) {
 
@@ -145,8 +158,8 @@ public class GreedyVCImpl<V, E>
             // Update cover
             cover.add(vx.v);
             weight += vertexWeightMap.get(vx.v);
-            assert (workingGraph.parallelStream().noneMatch(
-                ux -> ux.ID == vx.ID)) : "vx should no longer exist in the working graph";
+//            assert (workingGraph.parallelStream().noneMatch(
+//                    ux -> ux.ID == vx.ID)) : "vx should no longer exist in the working graph";
         }
         return new VertexCoverImpl<>(cover, weight);
     }

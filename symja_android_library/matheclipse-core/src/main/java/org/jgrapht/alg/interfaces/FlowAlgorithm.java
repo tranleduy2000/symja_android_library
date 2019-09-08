@@ -30,15 +30,15 @@ import java.util.*;
 public interface FlowAlgorithm<V, E>
 {
 
-    /**
-     * Result object of a flow algorithm
-     *
-     * @return flow
-     */
-    default Flow getFlow()
-    {
-        return new FlowImpl<>(this.getFlowMap());
-    }
+//    /**
+//     * Result object of a flow algorithm
+//     *
+//     * @return flow
+//     */
+//    default Flow getFlow()
+//    {
+//        return new FlowImpl<>(this.getFlowMap());
+//    }
 
     /**
      * Returns a <em>read-only</em> mapping from edges to the corresponding flow values.
@@ -72,10 +72,7 @@ public interface FlowAlgorithm<V, E>
          * @param edge an edge from the flow network
          * @return the flow on the {@code edge}
          */
-        default double getFlow(E edge)
-        {
-            return getFlowMap().get(edge);
-        }
+        double getFlow(E edge);
 
         /**
          * Returns a mapping from the network flow edges to the corresponding flow values. The
@@ -109,6 +106,11 @@ public interface FlowAlgorithm<V, E>
         public FlowImpl(Map<E, Double> flowMap)
         {
             this.flowMap = Collections.unmodifiableMap(flowMap);
+        }
+
+        @Override
+        public double getFlow(E edge) {
+            return getFlowMap().get(edge);
         }
 
         /**

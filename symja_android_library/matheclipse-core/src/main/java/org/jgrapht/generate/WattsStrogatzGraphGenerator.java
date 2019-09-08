@@ -62,7 +62,7 @@ import java.util.*;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public class WattsStrogatzGraphGenerator<V, E>
+public class WattsStrogatzGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {
@@ -161,7 +161,7 @@ public class WattsStrogatzGraphGenerator<V, E>
         for (int i = 0; i < n; i++) {
             V v = target.addVertex();
             ring.add(v);
-            adj.put(v, new ArrayList<>(k));
+            adj.put(v, new ArrayList<E>(k));
         }
 
         for (int i = 0; i < n; i++) {

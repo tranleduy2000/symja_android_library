@@ -48,7 +48,7 @@ import java.util.*;
  *
  * @author Emilio Cruciani
  */
-public class PlantedPartitionGraphGenerator<V, E>
+public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {
@@ -201,7 +201,7 @@ public class PlantedPartitionGraphGenerator<V, E>
         // instantiate community structure
         communities = new ArrayList<>(this.l);
         for (int i = 0; i < this.l; i++) {
-            communities.add(new LinkedHashSet<>(this.k));
+            communities.add(new LinkedHashSet<V>(this.k));
         }
 
         // empty graph case

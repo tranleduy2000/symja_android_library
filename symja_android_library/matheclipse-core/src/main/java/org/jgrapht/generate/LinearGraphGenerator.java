@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author John V. Sichi
  */
-public class LinearGraphGenerator<V, E>
+public class LinearGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

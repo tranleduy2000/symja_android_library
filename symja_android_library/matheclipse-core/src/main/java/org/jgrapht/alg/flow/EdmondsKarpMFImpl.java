@@ -17,10 +17,16 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.extension.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.util.extension.ExtensionFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * This class computes a maximum flow in a
@@ -102,9 +108,19 @@ public final class EdmondsKarpMFImpl<V, E>
     public EdmondsKarpMFImpl(Graph<V, E> network, double epsilon)
     {
         super(network, epsilon);
-        this.vertexExtensionsFactory = () -> new VertexExtension();
+        this.vertexExtensionsFactory = new ExtensionFactory<VertexExtension>() {
+            @Override
+            public VertexExtension create() {
+                return new VertexExtension();
+            }
+        };
 
-        this.edgeExtensionsFactory = () -> new AnnotatedFlowEdge();
+        this.edgeExtensionsFactory = new ExtensionFactory<AnnotatedFlowEdge>() {
+            @Override
+            public AnnotatedFlowEdge create() {
+                return new AnnotatedFlowEdge();
+            }
+        };
 
         if (network == null) {
             throw new NullPointerException("network is null");
@@ -127,7 +143,7 @@ public final class EdmondsKarpMFImpl<V, E>
      *
      * @param source source vertex
      * @param sink sink vertex
-     * 
+     *
      * @return a maximum flow
      */
     public MaximumFlow<E> getMaximumFlow(V source, V sink)
@@ -146,7 +162,7 @@ public final class EdmondsKarpMFImpl<V, E>
      *
      * @param source source vertex
      * @param sink sink vertex
-     * 
+     *
      * @return the value of the maximum flow
      */
     public double calculateMaximumFlow(V source, V sink)
@@ -239,7 +255,7 @@ public final class EdmondsKarpMFImpl<V, E>
     /**
      * For all paths which end in the sink. trace them back to the source and push flow through
      * them.
-     * 
+     *
      * @return total increase in flow from source to sink
      */
     private double augmentFlow()

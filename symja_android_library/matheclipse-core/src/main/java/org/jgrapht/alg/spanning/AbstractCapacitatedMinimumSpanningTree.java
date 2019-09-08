@@ -26,6 +26,7 @@ import org.jgrapht.traverse.*;
 import org.jgrapht.util.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * This is an abstract class for capacitated minimum spanning tree algorithms. This class manages
@@ -142,7 +143,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          */
         public CapacitatedSpanningTreeSolutionRepresentation()
         {
-            this(new HashMap<>(), new HashMap<>());
+            this(new HashMap<V, Integer>(), new HashMap<Integer, Pair<Set<V>, Double>>());
         }
 
         /**
@@ -217,7 +218,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
                 Pair.of(oldPart, partition.get(fromLabel).getSecond() - demands.get(vertex)));
 
             if (!partition.keySet().contains(toLabel)) {
-                partition.put(toLabel, Pair.of(new HashSet<>(), 0.0));
+                partition.put(toLabel, Pair.<Set<V>, Double>of(new HashSet<V>(), 0.0));
             }
             Set<V> newPart = partition.get(toLabel).getFirst();
             newPart.add(vertex);
@@ -245,7 +246,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
 
             // update partition
             if (!partition.keySet().contains(toLabel)) {
-                partition.put(toLabel, Pair.of(new HashSet<>(), 0.0));
+                partition.put(toLabel, Pair.<Set<V>, Double>of(new HashSet<V>(), 0.0));
             }
             Set<V> newPart = partition.get(toLabel).getFirst();
             newPart.addAll(vertices);
@@ -340,7 +341,12 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          */
         public void cleanUp()
         {
-            partition.entrySet().removeIf(entry -> entry.getValue().getFirst().isEmpty());
+            partition.entrySet().removeIf(new Predicate<Map.Entry<Integer, Pair<Set<V>, Double>>>() {
+                @Override
+                public boolean test(Map.Entry<Integer, Pair<Set<V>, Double>> entry) {
+                    return entry.getValue().getFirst().isEmpty();
+                }
+            });
         }
 
         /**
@@ -425,9 +431,9 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
                 for (Map.Entry<Integer, Pair<Set<V>, Double>> entry : this.partition.entrySet()) {
                     capacitatedSpanningTreeSolutionRepresentation.partition.put(
                         entry.getKey(),
-                        Pair.of(
-                            new HashSet<>(entry.getValue().getFirst()),
-                            entry.getValue().getSecond()));
+                            Pair.<Set<V>, Double>of(
+                                new HashSet<>(entry.getValue().getFirst()),
+                                entry.getValue().getSecond()));
                 }
                 capacitatedSpanningTreeSolutionRepresentation.nextFreeLabel = this.nextFreeLabel;
 

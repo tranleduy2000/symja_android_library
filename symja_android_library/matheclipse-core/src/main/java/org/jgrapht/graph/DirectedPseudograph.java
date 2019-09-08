@@ -76,7 +76,7 @@ public class DirectedPseudograph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DirectedPseudograph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DirectedPseudograph<>(edgeClass));
+        return new GraphBuilder<>(new DirectedPseudograph<V, E>(edgeClass));
     }
 
     /**
@@ -90,6 +90,6 @@ public class DirectedPseudograph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DirectedPseudograph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DirectedPseudograph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new DirectedPseudograph<V, E>(null, edgeSupplier, false));
     }
 }

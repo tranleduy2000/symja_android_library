@@ -17,8 +17,6 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
-
 /**
  * Interface for algorithms computing the maximum density subgraph
  *
@@ -35,13 +33,13 @@ public interface MaximumDensitySubgraphAlgorithm<V, E>
      *
      * @return the maximum density subgraph
      */
-    Graph<V, E> calculateDensest();
+//    Graph<V, E> calculateDensest();
 
     /**
      * Computes density of a maximum density subgraph.
      *
      * @return the actual density of the maximum density subgraph
      */
-    double getDensity();
+//    double getDensity();
 
 }

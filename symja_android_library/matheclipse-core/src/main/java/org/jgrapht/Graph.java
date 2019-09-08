@@ -577,22 +577,22 @@ public interface Graph<V, E>
      */
     void setEdgeWeight(E e, double weight);
 
-    /**
-     * Assigns a weight to an edge between <code>sourceVertex</code> and <code>targetVertex</code>.
-     * If no edge exists between <code>sourceVertex</code> and <code>targetVertex</code> or either
-     * of these vertices is <code>null</code>, a <code>NullPointerException</code> is thrown.
-     * <p>
-     * When there exist multiple edges between <code>sourceVertex</code> and
-     * <code>targetVertex</code>, consider using {@link #setEdgeWeight(Object, double)} instead.
-     *
-     * @param sourceVertex source vertex of the edge
-     * @param targetVertex target vertex of the edge
-     * @param weight new weight for edge
-     * @throws UnsupportedOperationException if the graph does not support weights
-     */
-    default void setEdgeWeight(V sourceVertex, V targetVertex, double weight)
-    {
-        this.setEdgeWeight(this.getEdge(sourceVertex, targetVertex), weight);
-    }
+//    /**
+//     * Assigns a weight to an edge between <code>sourceVertex</code> and <code>targetVertex</code>.
+//     * If no edge exists between <code>sourceVertex</code> and <code>targetVertex</code> or either
+//     * of these vertices is <code>null</code>, a <code>NullPointerException</code> is thrown.
+//     * <p>
+//     * When there exist multiple edges between <code>sourceVertex</code> and
+//     * <code>targetVertex</code>, consider using {@link #setEdgeWeight(Object, double)} instead.
+//     *
+//     * @param sourceVertex source vertex of the edge
+//     * @param targetVertex target vertex of the edge
+//     * @param weight new weight for edge
+//     * @throws UnsupportedOperationException if the graph does not support weights
+//     */
+//    default void setEdgeWeight(V sourceVertex, V targetVertex, double weight)
+//    {
+//        this.setEdgeWeight(this.getEdge(sourceVertex, targetVertex), weight);
+//    }
 
 }

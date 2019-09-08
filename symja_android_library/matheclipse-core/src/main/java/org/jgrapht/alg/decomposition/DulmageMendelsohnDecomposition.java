@@ -17,16 +17,18 @@
  */
 package org.jgrapht.alg.decomposition;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.interfaces.MatchingAlgorithm.*;
-import org.jgrapht.alg.matching.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm.Matching;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.builder.GraphBuilder;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -109,14 +111,14 @@ public class DulmageMendelsohnDecomposition<V, E>
      *        required
      * @return the {@link Decomposition}
      */
-    public Decomposition<V, E> getDecomposition(boolean fine)
-    {
-        // Get a maximum matching to the bipartite problem
-        HopcroftKarpMaximumCardinalityBipartiteMatching<V, E> hopkarp =
-            new HopcroftKarpMaximumCardinalityBipartiteMatching<>(graph, partition1, partition2);
-        Matching<V, E> matching = hopkarp.getMatching();
-        return decompose(matching, fine);
-    }
+//    public Decomposition<V, E> getDecomposition(boolean fine)
+//    {
+//        // Get a maximum matching to the bipartite problem
+//        HopcroftKarpMaximumCardinalityBipartiteMatching<V, E> hopkarp =
+//            new HopcroftKarpMaximumCardinalityBipartiteMatching<>(graph, partition1, partition2);
+//        Matching<V, E> matching = hopkarp.getMatching();
+//        return decompose(matching, fine);
+//    }
 
     /**
      * Perform the decomposition, using a pre-calculated bipartite matching
@@ -125,65 +127,97 @@ public class DulmageMendelsohnDecomposition<V, E>
      * @param fine true if the fine decomposition is required
      * @return the {@link Decomposition}
      */
-    public Decomposition<V, E> decompose(Matching<V, E> matching, boolean fine)
-    {
-        // Determine the unmatched vertices from both partitions
-        Set<V> unmatched1 = new HashSet<>();
-        Set<V> unmatched2 = new HashSet<>();
-        getUnmatched(matching, unmatched1, unmatched2);
-        // Assemble a directed graph
-        Graph<V, DefaultEdge> dg = asDirectedGraph(matching);
-        // Find the non-square subgraph dominated by partition1
-        Set<V> subset1 = new HashSet<>();
-        unmatched1.stream().map((v) -> {
-            subset1.add(v);
-            return v;
-        }).map((v) -> new DepthFirstIterator<>(dg, v)).forEachOrdered((it) -> {
-            while (it.hasNext()) {
-                subset1.add(it.next());
-            }
-        });
-        // Find the non-square subgraph dominated by partition2
-        Graph<V, DefaultEdge> gd = new EdgeReversedGraph<>(dg);
-        Set<V> subset2 = new HashSet<>();
-        unmatched2.stream().map((v) -> {
-            subset2.add(v);
-            return v;
-        }).map((v) -> new DepthFirstIterator<>(gd, v)).forEachOrdered((it) -> {
-            while (it.hasNext()) {
-                subset2.add(it.next());
-            }
-        });
-        // Find the square subgraph
-        Set<V> subset3 = new HashSet<>();
-        subset3.addAll(partition1);
-        subset3.addAll(partition2);
-        subset3.removeAll(subset1);
-        subset3.removeAll(subset2);
-        if (fine) {
-            List<Set<V>> out = new ArrayList<>();
-            // Build a directed graph between edges of the matching in subset3
-            Graph<E, DefaultEdge> graphH = asDirectedEdgeGraph(matching, subset3);
-
-            // Perform strongly-connected-components on the graph
-            StrongConnectivityAlgorithm<E, DefaultEdge> sci =
-                new KosarajuStrongConnectivityInspector<>(graphH);
-            // Divide into sets of vertices
-            for (Set<E> edgeSet : sci.stronglyConnectedSets()) {
-                Set<V> vertexSet = new HashSet<>();
-                edgeSet.stream().map((edge) -> {
-                    vertexSet.add(graph.getEdgeSource(edge));
-                    return edge;
-                }).forEachOrdered((edge) -> {
-                    vertexSet.add(graph.getEdgeTarget(edge));
-                });
-                out.add(vertexSet);
-            }
-            return new Decomposition<>(subset1, subset2, out);
-        } else {
-            return new Decomposition<>(subset1, subset2, Collections.singletonList(subset3));
-        }
-    }
+//    public Decomposition<V, E> decompose(Matching<V, E> matching, boolean fine)
+//    {
+//        // Determine the unmatched vertices from both partitions
+//        Set<V> unmatched1 = new HashSet<>();
+//        Set<V> unmatched2 = new HashSet<>();
+//        getUnmatched(matching, unmatched1, unmatched2);
+//        // Assemble a directed graph
+//        final Graph<V, DefaultEdge> dg = asDirectedGraph(matching);
+//        // Find the non-square subgraph dominated by partition1
+//        final Set<V> subset1 = new HashSet<>();
+//        Stream<V> stream = unmatched1.stream();
+//        Stream<V> objectStream = stream.map(new Function<V, V>() {
+//            @Override
+//            public V apply(V v) {
+//                subset1.add(v);
+//                return v;
+//            }
+//        });
+//        Stream<Iterator<V>> objectStream1 = objectStream.map(new Function<V, Iterator<V>>() {
+//            @Override
+//            public Iterator<V> apply(V v) {
+//                return new DepthFirstIterator<>(dg, v);
+//            }
+//        });
+//        objectStream1.forEachOrdered(new Consumer<Iterator<V>>() {
+//            @Override
+//            public void accept(Iterator<V> it) {
+//                while (it.hasNext()) {
+//                    subset1.add(it.next());
+//                }
+//            }
+//        });
+//        // Find the non-square subgraph dominated by partition2
+//        final Graph<V, DefaultEdge> gd = new EdgeReversedGraph<>(dg);
+//        final Set<V> subset2 = new HashSet<>();
+//        unmatched2.stream().map(new Function<V, V>() {
+//            @Override
+//            public V apply(V v) {
+//                subset2.add(v);
+//                return v;
+//            }
+//        }).map(new Function<V, Iterator<V>>() {
+//            @Override
+//            public Iterator<V> apply(V v) {
+//                return new DepthFirstIterator<>(gd, v);
+//            }
+//        }).forEachOrdered(new Consumer<Iterator<V>>() {
+//            @Override
+//            public void accept(Iterator<V> it) {
+//                while (it.hasNext()) {
+//                    subset2.add(it.next());
+//                }
+//            }
+//        });
+//        // Find the square subgraph
+//        Set<V> subset3 = new HashSet<>();
+//        subset3.addAll(partition1);
+//        subset3.addAll(partition2);
+//        subset3.removeAll(subset1);
+//        subset3.removeAll(subset2);
+//        if (fine) {
+//            List<Set<V>> out = new ArrayList<>();
+//            // Build a directed graph between edges of the matching in subset3
+//            Graph<E, DefaultEdge> graphH = asDirectedEdgeGraph(matching, subset3);
+//
+//            // Perform strongly-connected-components on the graph
+//            StrongConnectivityAlgorithm<E, DefaultEdge> sci =
+//                new KosarajuStrongConnectivityInspector<>(graphH);
+//            // Divide into sets of vertices
+//            for (Set<E> edgeSet : sci.stronglyConnectedSets()) {
+//                final Set<V> vertexSet = new HashSet<>();
+//                Stream<E> objectStream2 = edgeSet.stream().map(new Function<E, E>() {
+//                    @Override
+//                    public E apply(E edge) {
+//                        vertexSet.add(graph.getEdgeSource(edge));
+//                        return edge;
+//                    }
+//                });
+//                objectStream2.forEachOrdered(new Consumer<E>() {
+//                    @Override
+//                    public void accept(E edge) {
+//                        vertexSet.add(graph.getEdgeTarget(edge));
+//                    }
+//                });
+//                out.add(vertexSet);
+//            }
+//            return new Decomposition<>(subset1, subset2, out);
+//        } else {
+//            return new Decomposition<>(subset1, subset2, Collections.singletonList(subset3));
+//        }
+//    }
 
     /**
      * The output of a decomposition operation
@@ -243,42 +277,51 @@ public class DulmageMendelsohnDecomposition<V, E>
         }
     }
 
-    private void getUnmatched(Matching<V, E> matching, Set<V> unmatched1, Set<V> unmatched2)
+    private void getUnmatched(Matching<V, E> matching, final Set<V> unmatched1, final Set<V> unmatched2)
     {
         unmatched1.addAll(partition1);
         unmatched2.addAll(partition2);
-        matching.forEach((e) -> {
-            V source = graph.getEdgeSource(e);
-            V target = graph.getEdgeTarget(e);
-            if (partition1.contains(source)) {
-                unmatched1.remove(source);
-                unmatched2.remove(target);
-            } else {
-                unmatched2.remove(source);
-                unmatched1.remove(target);
+        matching.forEach(new Consumer<E>() {
+            @Override
+            public void accept(E e) {
+                V source = graph.getEdgeSource(e);
+                V target = graph.getEdgeTarget(e);
+                if (partition1.contains(source)) {
+                    unmatched1.remove(source);
+                    unmatched2.remove(target);
+                } else {
+                    unmatched2.remove(source);
+                    unmatched1.remove(target);
+                }
             }
         });
     }
 
-    private Graph<V, DefaultEdge> asDirectedGraph(Matching<V, E> matching)
+    private Graph<V, DefaultEdge> asDirectedGraph(final Matching<V, E> matching)
     {
-        GraphBuilder<V, DefaultEdge, ? extends DefaultDirectedGraph<V, DefaultEdge>> builder =
+        final GraphBuilder<V, DefaultEdge, ? extends DefaultDirectedGraph<V, DefaultEdge>> builder =
             DefaultDirectedGraph.createBuilder(DefaultEdge.class);
-        graph.vertexSet().forEach((v) -> {
-            builder.addVertex(v);
+        graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V v) {
+                builder.addVertex(v);
+            }
         });
-        graph.edgeSet().forEach((e) -> {
-            V v1 = graph.getEdgeSource(e);
-            V v2 = graph.getEdgeTarget(e);
-            if (partition1.contains(v1)) {
-                builder.addEdge(v1, v2);
-                if (matching.getEdges().contains(e)) {
-                    builder.addEdge(v2, v1);
-                }
-            } else {
-                builder.addEdge(v2, v1);
-                if (matching.getEdges().contains(e)) {
+        graph.edgeSet().forEach(new Consumer<E>() {
+            @Override
+            public void accept(E e) {
+                V v1 = graph.getEdgeSource(e);
+                V v2 = graph.getEdgeTarget(e);
+                if (partition1.contains(v1)) {
                     builder.addEdge(v1, v2);
+                    if (matching.getEdges().contains(e)) {
+                        builder.addEdge(v2, v1);
+                    }
+                } else {
+                    builder.addEdge(v2, v1);
+                    if (matching.getEdges().contains(e)) {
+                        builder.addEdge(v1, v2);
+                    }
                 }
             }
         });

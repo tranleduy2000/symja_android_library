@@ -17,11 +17,15 @@
  */
 package org.jgrapht.alg.clique;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.MaximalCliqueEnumerationAlgorithm;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base implementation of the Bron-Kerbosch algorithm.
@@ -87,13 +91,19 @@ abstract class BaseBronKerboschCliqueFinder<V, E>
     /**
      * Create an iterator which returns only the maximum cliques of a graph. The iterator computes
      * all maximal cliques and then filters them by the size of the maximum found clique.
-     * 
+     *
      * @return an iterator which returns only the maximum cliques of a graph
      */
     public Iterator<Set<V>> maximumIterator()
     {
         lazyRun();
-        return allMaximalCliques.stream().filter(c -> c.size() == maxSize).iterator();
+        List<Set<V>> list = new ArrayList<>();
+        for (Set<V> c : allMaximalCliques) {
+            if (c.size() == maxSize) {
+                list.add(c);
+            }
+        }
+        return list.iterator();
     }
 
     /**

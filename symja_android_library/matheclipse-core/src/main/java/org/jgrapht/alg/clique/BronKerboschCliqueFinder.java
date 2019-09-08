@@ -17,10 +17,14 @@
  */
 package org.jgrapht.alg.clique;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Bron-Kerbosch maximal clique enumeration algorithm.
@@ -90,7 +94,7 @@ public class BronKerboschCliqueFinder<V, E>
             }
 
             findCliques(
-                new ArrayList<>(), new ArrayList<>(graph.vertexSet()), new ArrayList<>(),
+                new ArrayList<V>(), new ArrayList<>(graph.vertexSet()), new ArrayList<V>(),
                 nanosTimeLimit);
         }
     }
@@ -103,8 +107,15 @@ public class BronKerboschCliqueFinder<V, E>
          * Termination condition: check if any already found node is connected to all candidate
          * nodes.
          */
-        for (V v : alreadyFound) {
-            if (candidates.stream().allMatch(c -> graph.containsEdge(v, c))) {
+        for (final V v : alreadyFound) {
+            boolean b = true;
+            for (V c : candidates) {
+                if (!graph.containsEdge(v, c)) {
+                    b = false;
+                    break;
+                }
+            }
+            if (b) {
                 return;
             }
         }

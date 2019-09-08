@@ -15,6 +15,8 @@
  */
 package org.matheclipse.parser.client.operator;
 
+import com.gx.common.base.CharMatcher;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.expression.F;
@@ -37,18 +39,13 @@ import java.util.Map;
 
 public class ASTNodeFactory implements INodeParserFactory {
 	/**
-	 * The default set of characters, which could form an operator
+	 * The matcher for characters, which could form an operator
 	 *
 	 */
-	public static String DEFAULT_OPERATOR_CHARACTERS = null;
+	public static CharMatcher OPERATOR_MATCHER = null;
 
-	/**
-	 * The set of characters, which could form an operator
-	 *
-	 */
-	@Override
-	public String getOperatorCharacters() {
-		return DEFAULT_OPERATOR_CHARACTERS;
+	public boolean isOperatorChar(char ch) {
+		return OPERATOR_MATCHER.matches(ch);
 	}
 
 	/**
@@ -177,12 +174,17 @@ public class ASTNodeFactory implements INodeParserFactory {
 			"Dot", "Not", "PreMinus", "SameQ", "RuleDelayed", "GreaterEqual", "Condition", "Colon", "//", "DivideBy",
 			"Or", "Span", "Equal", "StringJoin", "Unequal", "Decrement", "SubtractFrom", "PrePlus", "RepeatedNull",
 			"UnsameQ", "Rule", "UpSetDelayed", "PreIncrement", "Function", "Greater", "PreDecrement", "Subtract",
-			"SetDelayed", "Alternatives", "AddTo", "Repeated", "ReplaceAll", "TagSet" };
+			"SetDelayed", "Alternatives", "AddTo", "Repeated", "ReplaceAll", "TagSet", "TwoWayRule", "Directed>Edge",
+			"Undirected>Edge" };
 
 	static final String[] OPERATOR_STRINGS = { "::", "<<", "?", "//@", "*=", "+", "^=", ";", "@", "/@", "=.", "@@",
 			"@@@", "//.", "<", "&&", "/", "=", "++", "!!", "<=", "**", "!", "*", "^", ".", "!", "-", "===", ":>", ">=",
 			"/;", ":", "//", "/=", "||", ";;", "==", "<>", "!=", "--", "-=", "+", "...", "=!=", "->", "^:=", "++", "&",
-			">", "--", "-", ":=", "|", "+=", "..", "/.", "/:" };
+			">", "--", "-", ":=", "|", "+=", "..", "/.", "/:", //
+			"\uF120", // TwoWayRule
+			"\uF3D5", // DirectedEdge
+			"\uF3D4"// UndirectedEdge
+	};
 
 	public static final ApplyOperator APPLY_HEAD_OPERATOR = new ApplyOperator("@", "Apply", APPLY_HEAD_PRECEDENCE,
 			InfixOperator.RIGHT_ASSOCIATIVE);
@@ -315,8 +317,10 @@ public class ASTNodeFactory implements INodeParserFactory {
 			new InfixOperator("|", "Alternatives", 160, InfixOperator.NONE),
 			new InfixOperator("+=", "AddTo", 100, InfixOperator.RIGHT_ASSOCIATIVE),
 			new PostfixOperator("..", "Repeated", 170),
-			new InfixOperator("/.", "ReplaceAll", 110, InfixOperator.LEFT_ASSOCIATIVE),
-			TAG_SET_OPERATOR };
+					new InfixOperator("/.", "ReplaceAll", 110, InfixOperator.LEFT_ASSOCIATIVE), TAG_SET_OPERATOR,
+					new InfixOperator("\uF120", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE),
+					new InfixOperator("\uF3D5", "DirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE),
+					new InfixOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE) };
 
 		StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
 		fOperatorMap = new HashMap<String, Operator>();
@@ -329,7 +333,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 				buf.append(unicodeChar);
 		}
 	}
-		DEFAULT_OPERATOR_CHARACTERS = buf.toString();
+			OPERATOR_MATCHER = CharMatcher.anyOf(buf.toString());
 	}
 	}
 

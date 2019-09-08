@@ -22,6 +22,7 @@ import org.jgrapht.traverse.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 /**
  * Bron-Kerbosch maximal clique enumeration algorithm with pivot and degeneracy ordering.
@@ -99,8 +100,13 @@ public class DegeneracyBronKerboschCliqueFinder<V, E>
                 nanosTimeLimit = Long.MAX_VALUE;
             }
 
-            List<V> ordering = new ArrayList<>();
-            new DegeneracyOrderingIterator<V, E>(graph).forEachRemaining(ordering::add);
+            final List<V> ordering = new ArrayList<>();
+            new DegeneracyOrderingIterator<V, E>(graph).forEachRemaining(new Consumer<V>() {
+                @Override
+                public void accept(V e1) {
+                    ordering.add(e1);
+                }
+            });
 
             int n = ordering.size();
             for (int i = 0; i < n; i++) {

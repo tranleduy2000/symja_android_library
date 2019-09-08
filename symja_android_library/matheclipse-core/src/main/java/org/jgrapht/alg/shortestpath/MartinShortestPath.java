@@ -17,14 +17,24 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jheaps.*;
-import org.jheaps.array.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.GraphWalk;
+import org.jheaps.Heap;
+import org.jheaps.array.DaryArrayHeap;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Martin's algorithm for the multi-objective shortest paths problem.
@@ -87,7 +97,7 @@ public class MartinShortestPath<V, E>
 
         if (graph.vertexSet().isEmpty() || graph.edgeSet().isEmpty()) {
             return new ListMultiObjectiveSingleSourcePathsImpl<>(
-                graph, source, Collections.emptyMap());
+                graph, source, Collections.<V, List<GraphPath<V,E>>>emptyMap());
         }
 
         if (nodeLabels.isEmpty()) {
@@ -105,7 +115,7 @@ public class MartinShortestPath<V, E>
     {
         Label sourceLabel = new Label(source, new double[objectives], null, null);
         for (V v : graph.vertexSet()) {
-            nodeLabels.put(v, new LinkedList<>());
+            nodeLabels.put(v, new LinkedList<Label>());
         }
         nodeLabels.get(source).add(sourceLabel);
         heap.insert(sourceLabel);
@@ -145,24 +155,35 @@ public class MartinShortestPath<V, E>
      * @param source the source vertex
      * @return the paths
      */
-    private Map<V, List<GraphPath<V, E>>> buildPaths(V source)
+    private Map<V, List<GraphPath<V, E>>> buildPaths(final V source)
     {
         Map<V, List<GraphPath<V, E>>> paths = new HashMap<>();
-        for (V sink : graph.vertexSet()) {
+        for (final V sink : graph.vertexSet()) {
             if (sink.equals(source)) {
                 paths.put(sink, Arrays.asList(createEmptyPath(source, sink)));
             } else {
-                paths.put(sink, nodeLabels.get(sink).stream().map(l -> {
-                    double weight = 0d;
-                    LinkedList<E> edgeList = new LinkedList<>();
-                    Label cur = l;
-                    while (cur != null && cur.fromPrevious != null) {
-                        weight += graph.getEdgeWeight(cur.fromPrevious);
-                        edgeList.push(cur.fromPrevious);
-                        cur = cur.previous;
+                LinkedList<Label> labels = nodeLabels.get(sink);
+                assert labels != null;
+                Function<Label, GraphWalk<V, E>> labelGraphWalkFunction = new Function<Label, GraphWalk<V, E>>() {
+                    @Override
+                    public GraphWalk<V, E> apply(Label l) {
+                        double weight = 0d;
+                        LinkedList<E> edgeList = new LinkedList<>();
+                        Label cur = l;
+                        while (cur != null && cur.fromPrevious != null) {
+                            weight += graph.getEdgeWeight(cur.fromPrevious);
+                            edgeList.push(cur.fromPrevious);
+                            cur = cur.previous;
+                        }
+                        return new GraphWalk<>(graph, source, sink, edgeList, weight);
                     }
-                    return new GraphWalk<>(graph, source, sink, edgeList, weight);
-                }).collect(Collectors.toList()));
+                };
+                List<GraphPath<V, E>> collect = new ArrayList<>();
+                for (Label label : labels) {
+                    GraphWalk<V, E> veGraphWalk = labelGraphWalkFunction.apply(label);
+                    collect.add(veGraphWalk);
+                }
+                paths.put(sink, collect);
             }
         }
         return paths;

@@ -76,9 +76,19 @@ public class DinicMFImpl<V, E>
     public DinicMFImpl(Graph<V, E> network, double epsilon)
     {
         super(network, epsilon);
-        this.vertexExtensionsFactory = VertexExtension::new;
+        this.vertexExtensionsFactory =  new ExtensionFactory<VertexExtension>() {
+            @Override
+            public VertexExtension create() {
+                return new VertexExtension();
+            }
+        };
 
-        this.edgeExtensionsFactory = AnnotatedFlowEdge::new;
+        this.edgeExtensionsFactory = new ExtensionFactory<AnnotatedFlowEdge>() {
+            @Override
+            public AnnotatedFlowEdge create() {
+                return new AnnotatedFlowEdge();
+            }
+        };
 
         if (epsilon <= 0) {
             throw new IllegalArgumentException("Epsilon must be positive!");

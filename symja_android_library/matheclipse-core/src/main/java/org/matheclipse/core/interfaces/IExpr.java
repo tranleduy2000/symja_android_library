@@ -1136,6 +1136,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isListOfLists();
 
     /**
+     * Test if this expression is a list of DirectedEdge or UndirectedEdge
+     *
+     * @return
+     */
+    boolean isListOfEdges();
+
+    /**
      * Test if this expression is a list of rules (head Rule or RuleDelayed)
      *
      * @see #isList()

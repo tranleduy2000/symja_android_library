@@ -17,9 +17,9 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * An interface for generating new graph structures.
@@ -64,9 +64,6 @@ public interface GraphGenerator<V, E, T>
      * @throws UnsupportedOperationException if the graph does not have appropriate vertex and edge
      *         suppliers, in order to be able to create new vertices and edges
      */
-    default void generateGraph(Graph<V, E> target)
-    {
-        generateGraph(target, null);
-    }
+    void generateGraph(Graph<V, E> target);
 
 }

@@ -17,11 +17,20 @@
  */
 package org.jgrapht;
 
-import org.jgrapht.alg.shortestpath.*;
-import org.jgrapht.alg.util.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
-import java.util.stream.*;
+import org.jgrapht.alg.shortestpath.GraphMeasurer;
+import org.jgrapht.alg.util.NeighborCache;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.function.ToIntFunction;
 
 /**
  * Collection of methods which provide numerical graph information.
@@ -259,7 +268,7 @@ public abstract class GraphMetrics
      * @throws NullPointerException if {@code graph} is {@code null}
      * @throws IllegalArgumentException if {@code graph} is not undirected
      */
-    public static <V, E> long getNumberOfTriangles(Graph<V, E> graph)
+    public static <V, E> long getNumberOfTriangles(final Graph<V, E> graph)
     {
         GraphTests.requireUndirected(graph);
 
@@ -273,22 +282,41 @@ public abstract class GraphMetrics
          */
 
         // Fix vertex order for unique comparison of vertices
-        Map<V, Integer> vertexOrder = new HashMap<>(graph.vertexSet().size());
+        final Map<V, Integer> vertexOrder = new HashMap<>(graph.vertexSet().size());
         int k = 0;
         for (V v : graph.vertexSet()) {
             vertexOrder.put(v, k++);
         }
 
-        Comparator<V> comparator = Comparator
-            .comparingInt(graph::degreeOf).thenComparingInt(System::identityHashCode)
-            .thenComparingInt(vertexOrder::get);
+        Comparator<V> comparator = DComparator
+            .comparingInt(new ToIntFunction<V>() {
+                @Override
+                public int applyAsInt(V vertex) {
+                    return graph.degreeOf(vertex);
+                }
+            }).thenComparingInt(new ToIntFunction<Object>() {
+                    @Override
+                    public int applyAsInt(Object x1) {
+                        return System.identityHashCode(x1);
+                    }
+                })
+            .thenComparingInt(new ToIntFunction<V>() {
+                @Override
+                public int applyAsInt(V key) {
+                    return vertexOrder.get(key);
+                }
+            });
 
         vertexList.sort(comparator);
 
         // vertex v is a heavy-hitter iff degree(v) >= sqrtV
         List<V> heavyHitterVertices =
-            vertexList.stream().filter(x -> graph.degreeOf(x) >= sqrtV).collect(
-                Collectors.toCollection(ArrayList::new));
+                new ArrayList<>();
+        for (V x : vertexList) {
+            if (graph.degreeOf(x) >= sqrtV) {
+                heavyHitterVertices.add(x);
+            }
+        }
 
         // count the number of triangles formed from only heavy-hitter vertices
         long numberTriangles = naiveCountTriangles(graph, heavyHitterVertices);

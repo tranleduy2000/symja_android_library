@@ -57,10 +57,7 @@ public interface MaximumFlowAlgorithm<V, E>
      * @param sink sink vertex
      * @return the value of the maximum flow
      */
-    default double getMaximumFlowValue(V source, V sink)
-    {
-        return getMaximumFlow(source, sink).getValue();
-    }
+    double getMaximumFlowValue(V source, V sink);
 
     /**
      * A maximum flow

@@ -17,8 +17,13 @@
  */
 package org.jgrapht.alg.util;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/Disjoint-set_data_structure">Union
@@ -208,19 +213,25 @@ public class UnionFind<T>
      */
     public String toString()
     {
-        Map<T, Set<T>> setRep = new LinkedHashMap<>();
+        final Map<T, Set<T>> setRep = new LinkedHashMap<>();
         for (T t : parentMap.keySet()) {
             T representative = find(t);
             if (!setRep.containsKey(representative))
-                setRep.put(representative, new LinkedHashSet<>());
+                setRep.put(representative, new LinkedHashSet<T>());
             setRep.get(representative).add(t);
         }
 
-        return setRep
-            .keySet().stream()
-            .map(
-                key -> "{" + key + ":" + setRep.get(key).stream().map(Objects::toString).collect(
-                    Collectors.joining(",")) + "}")
-            .collect(Collectors.joining(", ", "{", "}"));
+        StringJoiner joiner = new StringJoiner(", ", "{", "}");
+        for (T key : setRep
+                .keySet()) {
+            StringJoiner result = new StringJoiner(",");
+            for (T t : setRep.get(key)) {
+                String toString = Objects.toString(t);
+                result.add(toString);
+            }
+            String s = "{" + key + ":" + result.toString() + "}";
+            joiner.add(s);
+        }
+        return joiner.toString();
     }
 }

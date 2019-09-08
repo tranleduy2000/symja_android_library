@@ -58,7 +58,12 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      */
     public BidirectionalDijkstraShortestPath(Graph<V, E> graph)
     {
-        this(graph, Double.POSITIVE_INFINITY, PairingHeap::new);
+        this(graph, Double.POSITIVE_INFINITY, new Supplier<AddressableHeap<Double, Pair<V, E>>>() {
+            @Override
+            public AddressableHeap<Double, Pair<V, E>> get() {
+                return new PairingHeap<Double, Pair<V, E>>();
+            }
+        });
     }
 
     /**
@@ -82,7 +87,12 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      */
     public BidirectionalDijkstraShortestPath(Graph<V, E> graph, double radius)
     {
-        this(graph, radius, PairingHeap::new);
+        this(graph, radius, new Supplier<AddressableHeap<Double, Pair<V, E>>>() {
+            @Override
+            public AddressableHeap<Double, Pair<V, E>> get() {
+                return new PairingHeap<Double, Pair<V, E>>();
+            }
+        });
     }
 
     /**

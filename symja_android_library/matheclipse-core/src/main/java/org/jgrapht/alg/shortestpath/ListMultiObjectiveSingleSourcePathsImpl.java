@@ -88,7 +88,8 @@ public class ListMultiObjectiveSingleSourcePathsImpl<V, E>
         List<GraphPath<V, E>> p = paths.get(targetVertex);
         if (p == null) {
             if (source.equals(targetVertex)) {
-                return Collections.singletonList(GraphWalk.singletonWalk(graph, source, 0d));
+                GraphWalk<V, E> o = GraphWalk.singletonWalk(graph, source, 0d);
+                return Collections.<GraphPath<V, E>>singletonList(o);
             } else {
                 return Collections.emptyList();
             }

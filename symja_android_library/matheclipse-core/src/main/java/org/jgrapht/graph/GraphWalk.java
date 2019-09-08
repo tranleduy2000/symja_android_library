@@ -62,6 +62,7 @@ import java.util.function.*;
  * 
  */
 public class GraphWalk<V, E>
+    extends GraphPathImpl<V, E>
     implements
     GraphPath<V, E>,
     Serializable
@@ -169,13 +170,13 @@ public class GraphWalk<V, E>
     @Override
     public List<E> getEdgeList()
     {
-        return (edgeList != null ? edgeList : GraphPath.super.getEdgeList());
+        return (edgeList != null ? edgeList : super.getEdgeList());
     }
 
     @Override
     public List<V> getVertexList()
     {
-        return (vertexList != null ? vertexList : GraphPath.super.getVertexList());
+        return (vertexList != null ? vertexList : super.getVertexList());
     }
 
     @Override
@@ -489,7 +490,7 @@ public class GraphWalk<V, E>
     public static <V, E> GraphWalk<V, E> emptyWalk(Graph<V, E> graph)
     {
         return new GraphWalk<>(
-            graph, null, null, Collections.emptyList(), Collections.emptyList(), 0.0);
+            graph, null, null, Collections.<V>emptyList(), Collections.<E>emptyList(), 0.0);
     }
 
     /**
@@ -519,7 +520,7 @@ public class GraphWalk<V, E>
     public static <V, E> GraphWalk<V, E> singletonWalk(Graph<V, E> graph, V v, double weight)
     {
         return new GraphWalk<>(
-            graph, v, v, Collections.singletonList(v), Collections.emptyList(), weight);
+            graph, v, v, Collections.<V>singletonList(v), Collections.<E>emptyList(), weight);
     }
 
 }

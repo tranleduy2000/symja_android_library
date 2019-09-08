@@ -226,6 +226,11 @@ public class CapacityScalingMinimumCostFlow<V, E>
         return minimumCostFlow;
     }
 
+    @Override
+    public double getFlowCost(MinimumCostFlowProblem<V, E> minimumCostFlowProblem) {
+        return getMinimumCostFlow(minimumCostFlowProblem).getCost();
+    }
+
     /**
      * Returns solution to the dual linear program formulated on the network. Serves as a
      * certificate of optimality.

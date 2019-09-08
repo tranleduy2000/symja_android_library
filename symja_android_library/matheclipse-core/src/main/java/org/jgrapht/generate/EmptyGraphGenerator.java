@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author John V. Sichi
  */
-public class EmptyGraphGenerator<V, E>
+public class EmptyGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

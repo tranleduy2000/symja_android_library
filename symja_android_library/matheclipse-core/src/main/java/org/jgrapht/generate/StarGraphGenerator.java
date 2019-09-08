@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author Andrew Newell
  */
-public class StarGraphGenerator<V, E>
+public class StarGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

@@ -77,7 +77,12 @@ public class BidirectionalAStarShortestPath<V, E>
      */
     public BidirectionalAStarShortestPath(Graph<V, E> graph, AStarAdmissibleHeuristic<V> heuristic)
     {
-        this(graph, heuristic, PairingHeap::new);
+        this(graph, heuristic, new Supplier<AddressableHeap<Double, V>>() {
+            @Override
+            public AddressableHeap<Double, V> get() {
+                return new PairingHeap<Double, V>();
+            }
+        });
     }
 
     /**
@@ -305,6 +310,7 @@ public class BidirectionalAStarShortestPath<V, E>
      * Helper class for backward search, since it should operate on the reversed graph.
      */
     class ReversedGraphHeuristic
+        extends AStarAdmissibleHeuristicImpl<V>
         implements
         AStarAdmissibleHeuristic<V>
     {

@@ -21,6 +21,7 @@ import org.jgrapht.*;
 import org.jgrapht.alg.util.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Implementation of a randomized version of the Esau-Williams heuristic, a greedy randomized
@@ -336,7 +337,12 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                                  * this part, so add the part to the restricted parts
                                  */
                                 Set<Integer> restriction =
-                                    restrictionMap.computeIfAbsent(vertex, k -> new HashSet<>());
+                                    restrictionMap.computeIfAbsent(vertex, new Function<V, Set<Integer>>() {
+                                        @Override
+                                        public Set<Integer> apply(V k) {
+                                            return new HashSet<>();
+                                        }
+                                    });
                                 restriction.add(bestSolution.getLabel(v2));
                                 break;
                             }

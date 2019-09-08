@@ -17,16 +17,32 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.matching.*;
-import org.jgrapht.alg.matching.blossom.v5.*;
-import org.jgrapht.alg.shortestpath.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.EulerianCycleAlgorithm;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.jgrapht.alg.matching.KuhnMunkresMinimalWeightBipartitePerfectMatching;
+import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.alg.util.UnorderedPair;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DirectedPseudograph;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.graph.Pseudograph;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class solves the Chinese Postman Problem (CPP), also known as the Route Inspection Problem.
@@ -101,13 +117,17 @@ public class ChinesePostman<V, E>
      * @param graph input graph
      * @return CPP solution (closed walk)
      */
-    private GraphPath<V, E> solveCPPUndirected(Graph<V, E> graph)
+    private GraphPath<V, E> solveCPPUndirected(final Graph<V, E> graph)
     {
 
         // 1. Find all odd degree vertices (there should be an even number of those)
         List<V> oddDegreeVertices =
-            graph.vertexSet().stream().filter(v -> graph.degreeOf(v) % 2 == 1).collect(
-                Collectors.toList());
+                new ArrayList<>();
+        for (V v1 : graph.vertexSet()) {
+            if (graph.degreeOf(v1) % 2 == 1) {
+                oddDegreeVertices.add(v1);
+            }
+        }
 
         // 2. Compute all pairwise shortest paths for the oddDegreeVertices
         Map<Pair<V, V>, GraphPath<V, E>> shortestPaths = new HashMap<>();
@@ -299,7 +319,11 @@ public class ChinesePostman<V, E>
             }
         }
         vertexList.add(endVertex);
-        double pathWeight = edgeList.stream().mapToDouble(inputGraph::getEdgeWeight).sum();
+        double pathWeight = 0.0;
+        for (E e : edgeList) {
+            double edgeWeight = inputGraph.getEdgeWeight(e);
+            pathWeight += edgeWeight;
+        }
 
         return new GraphWalk<>(
             inputGraph, startVertex, endVertex, vertexList, edgeList, pathWeight);

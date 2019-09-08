@@ -75,7 +75,7 @@ public class DefaultDirectedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DefaultDirectedGraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DefaultDirectedGraph<>(edgeClass));
+        return new GraphBuilder<>(new DefaultDirectedGraph<V, E>(edgeClass));
     }
 
     /**
@@ -89,7 +89,7 @@ public class DefaultDirectedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DefaultDirectedGraph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DefaultDirectedGraph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new DefaultDirectedGraph<V, E>(null, edgeSupplier, false));
     }
 
 }

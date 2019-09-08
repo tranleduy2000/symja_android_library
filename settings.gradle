@@ -13,5 +13,5 @@
  * limitations under the License.
  */
 
-include ':symja_android_library'
+include ':symja_android_library', ':jgraphttest'
 include ':android'

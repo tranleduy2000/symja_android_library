@@ -139,7 +139,7 @@ public class BiconnectivityInspector<V, E>
         if (vertex2blocks == null) {
             vertex2blocks = new HashMap<>();
             for (V v : graph.vertexSet())
-                vertex2blocks.put(v, new LinkedHashSet<>());
+                vertex2blocks.put(v, new LinkedHashSet<Graph<V, E>>());
 
             for (Graph<V, E> block : this.getBlocks()) {
                 for (V v : block.vertexSet())

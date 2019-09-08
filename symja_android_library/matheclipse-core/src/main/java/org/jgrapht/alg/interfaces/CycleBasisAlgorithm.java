@@ -114,7 +114,7 @@ public interface CycleBasisAlgorithm<V, E>
          */
         public CycleBasisImpl(Graph<V, E> graph)
         {
-            this(graph, Collections.emptySet(), 0, 0d);
+            this(graph, Collections.<List<E>>emptySet(), 0, 0d);
         }
 
         /**

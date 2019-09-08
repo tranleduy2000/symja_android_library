@@ -17,14 +17,29 @@
  */
 package org.jgrapht.alg.matching;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import com.duy.stream.DComparator;
 
-import java.math.*;
-import java.util.*;
-import java.util.function.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.FibonacciHeap;
+
+import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Maximum weight matching in bipartite graphs.
@@ -80,7 +95,12 @@ public class MaximumWeightBipartiteMatching<V, E>
      */
     public MaximumWeightBipartiteMatching(Graph<V, E> graph, Set<V> partition1, Set<V> partition2)
     {
-        this(graph, partition1, partition2, (comparator) -> new FibonacciHeap<>(comparator));
+        this(graph, partition1, partition2, new Function<Comparator<BigDecimal>, AddressableHeap<BigDecimal, V>>() {
+            @Override
+            public AddressableHeap<BigDecimal, V> apply(Comparator<BigDecimal> comparator) {
+                return new FibonacciHeap<>(comparator);
+            }
+        });
     }
 
     /**
@@ -99,7 +119,7 @@ public class MaximumWeightBipartiteMatching<V, E>
         this.graph = GraphTests.requireUndirected(graph);
         this.partition1 = Objects.requireNonNull(partition1, "Partition 1 cannot be null");
         this.partition2 = Objects.requireNonNull(partition2, "Partition 2 cannot be null");
-        this.comparator = Comparator.<BigDecimal> naturalOrder();
+        this.comparator = DComparator.<BigDecimal> naturalOrder();
         this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
     }
 
@@ -135,10 +155,13 @@ public class MaximumWeightBipartiteMatching<V, E>
         heap = heapSupplier.apply(comparator);
         nodeInHeap = new HashMap<>();
         pred = new HashMap<>();
-        graph.vertexSet().forEach(v -> {
-            pot.put(v, BigDecimal.ZERO);
-            pred.put(v, null);
-            dist.put(v, BigDecimal.ZERO);
+        graph.vertexSet().forEach(new Consumer<V>() {
+            @Override
+            public void accept(V v) {
+                pot.put(v, BigDecimal.ZERO);
+                pred.put(v, null);
+                dist.put(v, BigDecimal.ZERO);
+            }
         });
 
         // run simple heuristic

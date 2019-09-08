@@ -177,14 +177,19 @@ public final class AlphaCentrality<V, E>
      *        between iterations change less than this value
      */
     public AlphaCentrality(
-        Graph<V, E> g, double dampingFactor, double exogenousFactor, int maxIterations,
-        double tolerance)
+            Graph<V, E> g, double dampingFactor, final double exogenousFactor, int maxIterations,
+            double tolerance)
     {
         this.g = g;
         this.scores = new HashMap<>();
 
         validate(dampingFactor, maxIterations, tolerance);
-        ToDoubleFunction<V> exofactorFunction = (v) -> exogenousFactor;
+        ToDoubleFunction<V> exofactorFunction = new ToDoubleFunction<V>() {
+            @Override
+            public double applyAsDouble(V v) {
+                return exogenousFactor;
+            }
+        };
         run(dampingFactor, exofactorFunction, maxIterations, tolerance);
     }
 

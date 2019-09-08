@@ -127,7 +127,12 @@ public class YenShortestPathIterator<V, E>
      */
     public YenShortestPathIterator(Graph<V, E> graph, V source, V sink)
     {
-        this(graph, source, sink, PairingHeap::new);
+        this(graph, source, sink, new Supplier<AddressableHeap<Double, GraphPath<V, E>>>() {
+            @Override
+            public AddressableHeap<Double, GraphPath<V, E>> get() {
+                return new PairingHeap<Double, GraphPath<V, E>>();
+            }
+        });
     }
 
     /**
@@ -228,12 +233,22 @@ public class YenShortestPathIterator<V, E>
 
         // receive masked vertices and edges
         Pair<Set<V>, Set<E>> p = getMaskedVerticesAndEdges(path, pathDeviation, pathDeviationIndex);
-        Set<V> maskedVertices = p.getFirst();
-        Set<E> maskedEdges = p.getSecond();
+        final Set<V> maskedVertices = p.getFirst();
+        final Set<E> maskedEdges = p.getSecond();
 
         // build reversed shortest paths tree
         Graph<V, E> maskSubgraph =
-            new MaskSubgraph<>(graph, maskedVertices::contains, maskedEdges::contains);
+            new MaskSubgraph<>(graph, new Predicate<V>() {
+                @Override
+                public boolean test(V o1) {
+                    return maskedVertices.contains(o1);
+                }
+            }, new Predicate<E>() {
+                @Override
+                public boolean test(E o) {
+                    return maskedEdges.contains(o);
+                }
+            });
         Graph<V, E> reversedMaskedGraph = new EdgeReversedGraph<>(maskSubgraph);
         DijkstraShortestPath<V, E> shortestPath = new DijkstraShortestPath<>(reversedMaskedGraph);
         TreeSingleSourcePathsImpl<V, E> singleSourcePaths =
@@ -268,7 +283,12 @@ public class YenShortestPathIterator<V, E>
 
                 if (weightsFrequencies.containsKey(candidateWeight)) {
                     weightsFrequencies
-                        .computeIfPresent(candidateWeight, (weight, frequency) -> frequency + 1);
+                        .computeIfPresent(candidateWeight, new BiFunction<Double, Integer, Integer>() {
+                            @Override
+                            public Integer apply(Double weight, Integer frequency) {
+                                return frequency + 1;
+                            }
+                        });
                 } else {
                     weightsFrequencies.put(candidateWeight, 1);
                 }
@@ -461,7 +481,7 @@ public class YenShortestPathIterator<V, E>
          */
         void correctDistanceForward(V v)
         {
-            super.map.putIfAbsent(v, new Pair<>(Double.POSITIVE_INFINITY, null));
+            super.map.putIfAbsent(v, new Pair<Double, E>(Double.POSITIVE_INFINITY, null));
 
             for (E e : super.g.outgoingEdgesOf(v)) {
                 V successor = Graphs.getOppositeVertex(super.g, e, v);

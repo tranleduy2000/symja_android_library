@@ -17,14 +17,20 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Implementation of the algorithm by Padberg and Rao to compute Odd Minimum Cut-Sets. Let $G=(V,E)$
@@ -131,10 +137,15 @@ public class PadbergRaoOddMinimumCutset<V, E>
 
         if (oddVertices.size() % 2 == 1)
             throw new IllegalArgumentException("There needs to be an even number of odd vertices");
-        assert network.vertexSet().containsAll(oddVertices); // All odd vertices must be contained
+//        assert network.vertexSet().containsAll(oddVertices); // All odd vertices must be contained
         // in the graph
         // all edge weights mucht be non-negative
-        assert network.edgeSet().stream().noneMatch(e -> network.getEdgeWeight(e) < 0);
+//        assert network.edgeSet().stream().noneMatch(new Predicate<E>() {
+//            @Override
+//            public boolean test(E e) {
+//                return network.getEdgeWeight(e) < 0;
+//            }
+//        });
 
         gomoryHuTree = gusfieldGomoryHuCutTreeAlgorithm.getGomoryHuTree();
 
@@ -265,7 +276,7 @@ public class PadbergRaoOddMinimumCutset<V, E>
     private Set<V> intersection(Set<V> set1, Set<V> set2)
     {
         Set<V> a;
-        Set<V> b;
+        final Set<V> b;
         if (set1.size() <= set2.size()) {
             a = set1;
             b = set2;
@@ -274,7 +285,13 @@ public class PadbergRaoOddMinimumCutset<V, E>
             b = set1;
         }
 
-        return a.stream().filter(b::contains).collect(Collectors.toSet());
+        Set<V> set = new HashSet<>();
+        for (V o : a) {
+            if (b.contains(o)) {
+                set.add(o);
+            }
+        }
+        return set;
     }
 
     /**
@@ -286,12 +303,26 @@ public class PadbergRaoOddMinimumCutset<V, E>
      * @param oddVertices subset of vertices which are labeled odd
      * @return true if the given set contains an odd number of odd-labeled nodes.
      */
-    public static <V> boolean isOddVertexSet(Set<V> vertices, Set<V> oddVertices)
+    public static <V> boolean isOddVertexSet(final Set<V> vertices, final Set<V> oddVertices)
     {
-        if (vertices.size() < oddVertices.size())
-            return vertices.stream().filter(oddVertices::contains).count() % 2 == 1;
-        else
-            return oddVertices.stream().filter(vertices::contains).count() % 2 == 1;
+        if (vertices.size() < oddVertices.size()) {
+            long count = 0L;
+            for (V o1 : vertices) {
+                if (oddVertices.contains(o1)) {
+                    count++;
+                }
+            }
+            return count % 2 == 1;
+        }
+        else {
+            long count = 0L;
+            for (V o : oddVertices) {
+                if (vertices.contains(o)) {
+                    count++;
+                }
+            }
+            return count % 2 == 1;
+        }
     }
 
     /**
@@ -327,10 +358,20 @@ public class PadbergRaoOddMinimumCutset<V, E>
      */
     public Set<E> getCutEdges()
     {
-        Predicate<E> predicate = e -> sourcePartitionMinimumCut.contains(network.getEdgeSource(e))
-            ^ sourcePartitionMinimumCut.contains(network.getEdgeTarget(e));
-        return network.edgeSet().stream().filter(predicate).collect(
-            Collectors.toCollection(LinkedHashSet::new));
+        Predicate<E> predicate = new Predicate<E>() {
+            @Override
+            public boolean test(E e) {
+                return sourcePartitionMinimumCut.contains(network.getEdgeSource(e))
+                        ^ sourcePartitionMinimumCut.contains(network.getEdgeTarget(e));
+            }
+        };
+        LinkedHashSet<E> es = new LinkedHashSet<>();
+        for (E e : network.edgeSet()) {
+            if (predicate.test(e)) {
+                es.add(e);
+            }
+        }
+        return es;
     }
 
 }

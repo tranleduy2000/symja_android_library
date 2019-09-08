@@ -23,6 +23,7 @@ import org.jgrapht.graph.*;
 import org.jgrapht.graph.builder.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.DEFAULT_OPTIONS;
 import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.EPS;
@@ -175,7 +176,12 @@ public class KolmogorovWeightedMatching<V, E>
             new KolmogorovWeightedPerfectMatching<>(graph, options, objectiveSense);
         matching = perfectMatching.getMatching();
         Set<E> matchingEdges = matching.getEdges();
-        matchingEdges.removeIf(e -> !initialGraph.containsEdge(e));
+        matchingEdges.removeIf(new Predicate<E>() {
+            @Override
+            public boolean test(E e) {
+                return !initialGraph.containsEdge(e);
+            }
+        });
         this.matching = new MatchingImpl<>(initialGraph, matchingEdges, matching.getWeight() / 2);
     }
 

@@ -17,9 +17,13 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generator which produces the
@@ -43,8 +47,9 @@ import java.util.*;
  * @param <E> edge type
  */
 public class ComplementGraphGenerator<V, E>
-    implements
-    GraphGenerator<V, E, V>
+        extends GraphGeneratorImpl<V, E, V>
+        implements
+        GraphGenerator<V, E, V>
 {
 
     private final Graph<V, E> graph;

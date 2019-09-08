@@ -54,8 +54,6 @@ public interface GraphListener<V, E>
      * 
      * @param e the edge event.
      */
-    default void edgeWeightUpdated(GraphEdgeChangeEvent<V, E> e)
-    {
-    }
+     void edgeWeightUpdated(GraphEdgeChangeEvent<V, E> e);
 
 }

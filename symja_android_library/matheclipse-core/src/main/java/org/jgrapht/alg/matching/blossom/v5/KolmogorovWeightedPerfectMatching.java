@@ -24,6 +24,7 @@ import org.jgrapht.alg.util.*;
 import org.jgrapht.graph.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static org.jgrapht.alg.matching.blossom.v5.BlossomVOptions.DualUpdateStrategy.MULTIPLE_TREE_CONNECTED_COMPONENTS;
 import static org.jgrapht.alg.matching.blossom.v5.ObjectiveSense.MAXIMIZE;
@@ -251,14 +252,19 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * @param objectiveSense objective sense of the algorithm
      */
     public KolmogorovWeightedPerfectMatching(
-        Graph<V, E> graph, BlossomVOptions options, ObjectiveSense objectiveSense)
+            final Graph<V, E> graph, BlossomVOptions options, ObjectiveSense objectiveSense)
     {
         Objects.requireNonNull(graph);
         this.objectiveSense = objectiveSense;
         if ((graph.vertexSet().size() & 1) == 1) {
             throw new IllegalArgumentException(NO_PERFECT_MATCHING);
         } else if (objectiveSense == MAXIMIZE) {
-            this.graph = new AsWeightedGraph<>(graph, e -> -graph.getEdgeWeight(e), true, false);
+            this.graph = new AsWeightedGraph<>(graph, new Function<E, Double>() {
+                @Override
+                public Double apply(E e) {
+                    return -graph.getEdgeWeight(e);
+                }
+            }, true, false);
         } else {
             this.graph = graph;
         }

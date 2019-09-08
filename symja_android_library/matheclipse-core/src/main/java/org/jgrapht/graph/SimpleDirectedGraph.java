@@ -73,7 +73,7 @@ public class SimpleDirectedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends SimpleDirectedGraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new SimpleDirectedGraph<>(edgeClass));
+        return new GraphBuilder<>(new SimpleDirectedGraph<V, E>(edgeClass));
     }
 
     /**
@@ -87,7 +87,7 @@ public class SimpleDirectedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends SimpleDirectedGraph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new SimpleDirectedGraph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new SimpleDirectedGraph<V, E>(null, edgeSupplier, false));
     }
 
 }

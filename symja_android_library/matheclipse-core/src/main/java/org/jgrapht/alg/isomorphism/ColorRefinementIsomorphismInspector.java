@@ -17,15 +17,25 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.color.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.interfaces.VertexColoringAlgorithm.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMapping;
+import org.jgrapht.GraphTests;
+import org.jgrapht.GraphType;
+import org.jgrapht.alg.color.ColorRefinementAlgorithm;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm.Coloring;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm.ColoringImpl;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.AsGraphUnion;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implementation of the color refinement algorithm isomorphism test using its feature of detecting
@@ -329,19 +339,22 @@ public class ColorRefinementIsomorphismInspector<V, E>
      * @param colorClasses the list of the color classes
      * @param coloring the coloring
      */
-    private void sortColorClasses(List<Set<V>> colorClasses, Coloring<V> coloring)
+    private void sortColorClasses(List<Set<V>> colorClasses, final Coloring<V> coloring)
     {
-        colorClasses.sort((o1, o2) -> {
-            if (o1.size() == o2.size()) {
-                Iterator<V> it1 = o1.iterator();
-                Iterator<V> it2 = o2.iterator();
-                if (!it1.hasNext() || !it2.hasNext()) {
-                    return Integer.compare(o1.size(), o2.size());
+        colorClasses.sort(new Comparator<Set<V>>() {
+            @Override
+            public int compare(Set<V> o1, Set<V> o2) {
+                if (o1.size() == o2.size()) {
+                    Iterator<V> it1 = o1.iterator();
+                    Iterator<V> it2 = o2.iterator();
+                    if (!it1.hasNext() || !it2.hasNext()) {
+                        return Integer.compare(o1.size(), o2.size());
+                    }
+                    return coloring
+                            .getColors().get(it1.next()).compareTo(coloring.getColors().get(it2.next()));
                 }
-                return coloring
-                    .getColors().get(it1.next()).compareTo(coloring.getColors().get(it2.next()));
+                return Integer.compare(o1.size(), o2.size());
             }
-            return Integer.compare(o1.size(), o2.size());
         });
     }
 

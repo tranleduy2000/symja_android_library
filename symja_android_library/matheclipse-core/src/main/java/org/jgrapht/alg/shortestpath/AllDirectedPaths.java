@@ -17,10 +17,21 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.graph.GraphWalk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * A Dijkstra-like algorithm to find all paths between two sets of nodes in a directed graph, with
@@ -302,7 +313,11 @@ public class AllDirectedPaths<V, E>
     {
         V source = graph.getEdgeSource(edges.get(0));
         V target = graph.getEdgeTarget(edges.get(edges.size() - 1));
-        double weight = edges.stream().mapToDouble(edge -> graph.getEdgeWeight(edge)).sum();
+        double weight = 0.0;
+        for (E edge : edges) {
+            double edgeWeight = graph.getEdgeWeight(edge);
+            weight += edgeWeight;
+        }
         return new GraphWalk<>(graph, source, target, edges, weight);
     }
 }

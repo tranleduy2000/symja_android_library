@@ -17,11 +17,17 @@
  */
 package org.jgrapht.alg.spanning;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
+import org.jgrapht.alg.util.UnionFind;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.ToDoubleFunction;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/Kruskal's_algorithm">Kruskal's minimum
@@ -58,7 +64,12 @@ public class KruskalMinimumSpanningTree<V, E>
     {
         UnionFind<V> forest = new UnionFind<>(graph.vertexSet());
         ArrayList<E> allEdges = new ArrayList<>(graph.edgeSet());
-        allEdges.sort(Comparator.comparingDouble(graph::getEdgeWeight));
+        allEdges.sort(DComparator.<E>comparingDouble(new ToDoubleFunction<E>() {
+            @Override
+            public double applyAsDouble(E e) {
+                return graph.getEdgeWeight(e);
+            }
+        }));
 
         double spanningTreeCost = 0;
         Set<E> edgeList = new HashSet<>();

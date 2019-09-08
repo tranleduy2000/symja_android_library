@@ -17,9 +17,10 @@
  */
 package org.jgrapht.alg.vertexcover.util;
 
-import org.jgrapht.util.*;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Helper class for vertex covers. Guarantees that vertices can be sorted, thereby obtaining a
@@ -76,7 +77,12 @@ public class RatioVertex<V>
             neighbors.put(v, neighbors.get(v) + 1);
         degree++;
 
-        assert (neighbors.values().stream().mapToInt(Integer::intValue).sum() == degree);
+//        assert (neighbors.values().stream().mapToInt(new ToIntFunction<Integer>() {
+//            @Override
+//            public int applyAsInt(Integer integer) {
+//                return integer.intValue();
+//            }
+//        }).sum() == degree);
     }
 
     /**

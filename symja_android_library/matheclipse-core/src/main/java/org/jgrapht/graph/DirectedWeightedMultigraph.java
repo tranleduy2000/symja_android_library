@@ -69,7 +69,7 @@ public class DirectedWeightedMultigraph<V, E>
         E> GraphBuilder<V, E, ? extends DirectedWeightedMultigraph<V, E>> createBuilder(
             Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DirectedWeightedMultigraph<>(edgeClass));
+        return new GraphBuilder<>(new DirectedWeightedMultigraph<V, E>(edgeClass));
     }
 
     /**
@@ -84,7 +84,7 @@ public class DirectedWeightedMultigraph<V, E>
         E> GraphBuilder<V, E, ? extends DirectedWeightedMultigraph<V, E>> createBuilder(
             Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DirectedWeightedMultigraph<>(null, edgeSupplier));
+        return new GraphBuilder<>(new DirectedWeightedMultigraph<V, E>(null, edgeSupplier));
     }
 
 }

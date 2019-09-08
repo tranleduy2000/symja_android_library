@@ -1602,6 +1602,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isListOfEdges() {
+        return false;
+    }
+
     /**
      * Test if this expression is a list of rules (head Rule or RuleDelayed)
      *

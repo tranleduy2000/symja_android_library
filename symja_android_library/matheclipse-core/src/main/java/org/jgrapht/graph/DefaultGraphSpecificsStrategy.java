@@ -17,12 +17,18 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.specifics.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
+import org.jgrapht.graph.specifics.ArrayUnenforcedSetEdgeSetFactory;
+import org.jgrapht.graph.specifics.DirectedEdgeContainer;
+import org.jgrapht.graph.specifics.DirectedSpecifics;
+import org.jgrapht.graph.specifics.Specifics;
+import org.jgrapht.graph.specifics.UndirectedEdgeContainer;
+import org.jgrapht.graph.specifics.UndirectedSpecifics;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.util.LinkedHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * A default lookup specifics strategy implementation.
@@ -47,11 +53,14 @@ public class DefaultGraphSpecificsStrategy<V, E>
     @Override
     public Function<GraphType, IntrusiveEdgesSpecifics<V, E>> getIntrusiveEdgesSpecificsFactory()
     {
-        return (Function<GraphType, IntrusiveEdgesSpecifics<V, E>> & Serializable) (type) -> {
-            if (type.isWeighted()) {
-                return new WeightedIntrusiveEdgesSpecifics<V, E>(new LinkedHashMap<>());
-            } else {
-                return new UniformIntrusiveEdgesSpecifics<>(new LinkedHashMap<>());
+        return new Function<GraphType, IntrusiveEdgesSpecifics<V, E>>() {
+            @Override
+            public IntrusiveEdgesSpecifics<V, E> apply(GraphType type) {
+                if (type.isWeighted()) {
+                    return new WeightedIntrusiveEdgesSpecifics<V, E>(new LinkedHashMap<E, IntrusiveWeightedEdge>());
+                } else {
+                    return new UniformIntrusiveEdgesSpecifics<>(new LinkedHashMap<E, IntrusiveEdge>());
+                }
             }
         };
     }
@@ -59,16 +68,23 @@ public class DefaultGraphSpecificsStrategy<V, E>
     @Override
     public BiFunction<Graph<V, E>, GraphType, Specifics<V, E>> getSpecificsFactory()
     {
-        return (BiFunction<Graph<V, E>, GraphType,
-            Specifics<V, E>> & Serializable) (graph, type) -> {
+        return new BiFunction<Graph<V, E>, GraphType, Specifics<V, E>>() {
+            @Override
+            public Specifics<V, E> apply(Graph<V, E> graph, GraphType type) {
                 if (type.isDirected()) {
                     return new DirectedSpecifics<V, E>(
-                        graph, new LinkedHashMap<>(), getEdgeSetFactory());
+                            graph, new LinkedHashMap<V, DirectedEdgeContainer<V, E>>(), DefaultGraphSpecificsStrategy.this.getEdgeSetFactory());
                 } else {
                     return new UndirectedSpecifics<>(
-                        graph, new LinkedHashMap<>(), getEdgeSetFactory());
+                            graph, new LinkedHashMap<V, UndirectedEdgeContainer<V, E>>(), DefaultGraphSpecificsStrategy.this.getEdgeSetFactory());
                 }
-            };
+            }
+        };
+    }
+
+    @Override
+    public EdgeSetFactory<V, E> getEdgeSetFactory() {
+        return new ArrayUnenforcedSetEdgeSetFactory<>();
     }
 
 }

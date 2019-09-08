@@ -25,32 +25,62 @@ public interface WeightCombiner
     /**
      * Sum of weights.
      */
-    WeightCombiner SUM = (a, b) -> a + b;
+    WeightCombiner SUM = new WeightCombiner() {
+        @Override
+        public double combine(double a, double b) {
+            return a + b;
+        }
+    };
 
     /**
      * Multiplication of weights.
      */
-    WeightCombiner MULT = (a, b) -> a * b;
+    WeightCombiner MULT = new WeightCombiner() {
+        @Override
+        public double combine(double a, double b) {
+            return a * b;
+        }
+    };
 
     /**
      * Minimum weight.
      */
-    WeightCombiner MIN = Math::min;
+    WeightCombiner MIN = new WeightCombiner() {
+        @Override
+        public double combine(double a, double b) {
+            return Math.min(a, b);
+        }
+    };
 
     /**
      * Maximum weight.
      */
-    WeightCombiner MAX = Math::max;
+    WeightCombiner MAX = new WeightCombiner() {
+        @Override
+        public double combine(double a, double b) {
+            return Math.max(a, b);
+        }
+    };
 
     /**
      * First weight.
      */
-    WeightCombiner FIRST = (a, b) -> a;
+    WeightCombiner FIRST = new WeightCombiner() {
+        @Override
+        public double combine(double a, double b) {
+            return a;
+        }
+    };
 
     /**
      * Second weight.
      */
-    WeightCombiner SECOND = (a, b) -> b;
+    WeightCombiner SECOND = new WeightCombiner() {
+        @Override
+        public double combine(double a, double b) {
+            return b;
+        }
+    };
 
     /**
      * Combines two weights.

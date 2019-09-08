@@ -27,7 +27,7 @@ import java.util.*;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public class SimpleWeightedBipartiteGraphMatrixGenerator<V, E>
+public class SimpleWeightedBipartiteGraphMatrixGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

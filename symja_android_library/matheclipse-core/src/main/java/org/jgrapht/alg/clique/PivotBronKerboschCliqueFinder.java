@@ -17,11 +17,16 @@
  */
 package org.jgrapht.alg.clique;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Bron-Kerbosch maximal clique enumeration algorithm with pivot.
@@ -96,7 +101,7 @@ public class PivotBronKerboschCliqueFinder<V, E>
             }
 
             findCliques(
-                new HashSet<>(graph.vertexSet()), new HashSet<>(), new HashSet<>(), nanosTimeLimit);
+                new HashSet<>(graph.vertexSet()), new HashSet<V>(), new HashSet<V>(), nanosTimeLimit);
         }
     }
 
@@ -112,7 +117,11 @@ public class PivotBronKerboschCliqueFinder<V, E>
         int max = -1;
         V pivot = null;
 
-        Iterator<V> it = Stream.concat(P.stream(), X.stream()).iterator();
+//        Iterator<V> it = Stream.concat(P.stream(), X.stream()).iterator();
+        List<V> l1 = new ArrayList<>(P);
+        List<V> l2 = new ArrayList<>(X);
+        l1.addAll(l2);
+        Iterator<V> it = l1.iterator();
         while (it.hasNext()) {
             V u = it.next();
             int count = 0;
@@ -181,13 +190,23 @@ public class PivotBronKerboschCliqueFinder<V, E>
          * Main loop
          */
         for (V v : candidates) {
-            Set<V> vNeighbors = new HashSet<>();
+            final Set<V> vNeighbors = new HashSet<>();
             for (E e : graph.edgesOf(v)) {
                 vNeighbors.add(Graphs.getOppositeVertex(graph, e, v));
             }
 
-            Set<V> newP = P.stream().filter(vNeighbors::contains).collect(Collectors.toSet());
-            Set<V> newX = X.stream().filter(vNeighbors::contains).collect(Collectors.toSet());
+            Set<V> newP = new HashSet<>();
+            for (V o1 : P) {
+                if (vNeighbors.contains(o1)) {
+                    newP.add(o1);
+                }
+            }
+            Set<V> newX = new HashSet<>();
+            for (V o : X) {
+                if (vNeighbors.contains(o)) {
+                    newX.add(o);
+                }
+            }
             Set<V> newR = new HashSet<>(R);
             newR.add(v);
 

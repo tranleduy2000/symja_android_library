@@ -87,19 +87,34 @@ public class GoldbergMaximumDensitySubgraphAlgorithmNodeWeightPerEdgeWeight<
     public GoldbergMaximumDensitySubgraphAlgorithmNodeWeightPerEdgeWeight(
         Graph<V, E> graph, V s, V t, double epsilon)
     {
-        this(graph, s, t, epsilon, PushRelabelMFImpl::new);
+        this(graph, s, t, epsilon, new Function<Graph<V, DefaultWeightedEdge>, MinimumSTCutAlgorithm<V, DefaultWeightedEdge>>() {
+            @Override
+            public MinimumSTCutAlgorithm<V, DefaultWeightedEdge> apply(Graph<V, DefaultWeightedEdge> network) {
+                return new PushRelabelMFImpl<V, DefaultWeightedEdge>(network);
+            }
+        });
     }
 
     @Override
-    protected double computeDensityNumerator(Graph<V, E> g)
+    protected double computeDensityNumerator(final Graph<V, E> g)
     {
-        return g.edgeSet().stream().mapToDouble(g::getEdgeWeight).sum();
+        double sum = 0.0;
+        for (E e : g.edgeSet()) {
+            double edgeWeight = g.getEdgeWeight(e);
+            sum += edgeWeight;
+        }
+        return sum;
     }
 
     @Override
     protected double computeDensityDenominator(Graph<V, E> g)
     {
-        return g.vertexSet().stream().mapToDouble(v -> v.getSecond()).sum();
+        double sum = 0.0;
+        for (V v : g.vertexSet()) {
+            double second = v.getSecond();
+            sum += second;
+        }
+        return sum;
     }
 
     @Override
@@ -111,7 +126,12 @@ public class GoldbergMaximumDensitySubgraphAlgorithmNodeWeightPerEdgeWeight<
     @Override
     protected double getEdgeWeightFromVertexToSink(V v)
     {
+        double sum = 0.0;
+        for (E e : this.graph.outgoingEdgesOf(v)) {
+            double edgeWeight = GoldbergMaximumDensitySubgraphAlgorithmNodeWeightPerEdgeWeight.this.graph.getEdgeWeight(e);
+            sum += edgeWeight;
+        }
         return 2 * guess * v.getSecond()
-            - this.graph.outgoingEdgesOf(v).stream().mapToDouble(this.graph::getEdgeWeight).sum();
+            - sum;
     }
 }

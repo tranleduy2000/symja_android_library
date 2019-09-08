@@ -17,13 +17,28 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import com.duy.stream.DComparator;
 
-import java.util.*;
-import java.util.stream.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
+import org.jgrapht.alg.util.UnorderedPair;
+import org.jgrapht.graph.AsWeightedGraph;
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+import org.jgrapht.graph.GraphWalk;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.ToDoubleFunction;
 
 /**
  * A base implementation of a $k$ disjoint shortest paths algorithm based on the strategy used in
@@ -125,7 +140,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         this.workingGraph = new AsWeightedGraph<>(
             new DefaultDirectedWeightedGraph<>(
                 this.originalGraph.getVertexSupplier(), this.originalGraph.getEdgeSupplier()),
-            new HashMap<>(), false);
+            new HashMap<E, Double>(), false);
         Graphs.addGraph(workingGraph, this.originalGraph);
 
         this.pathList = new ArrayList<>();
@@ -145,7 +160,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
             }
         }
 
-        return pathList.size() > 0 ? resolvePaths(startVertex, endVertex) : Collections.emptyList();
+        return pathList.size() > 0 ? resolvePaths(startVertex, endVertex) : Collections.<GraphPath<V,E>>emptyList();
 
     }
 
@@ -169,7 +184,13 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         List<GraphPath<V, E>> paths = buildPaths(startVertex, endVertex);
 
         // sort paths by overall weight (ascending)
-        Collections.sort(paths, Comparator.comparingDouble(GraphPath::getWeight));
+        Collections.sort(paths, DComparator.comparingDouble(new ToDoubleFunction<GraphPath<V, E>>() {
+            @Override
+            public double applyAsDouble(GraphPath<V, E> value) {
+//                return GraphPath.getWeight(value);
+                return value.getWeight();
+            }
+        }));
         return paths;
     }
 
@@ -186,9 +207,14 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
     {
         List<List<E>> paths = new ArrayList<>();
         Map<V, ArrayDeque<E>> sourceToEdgeLookup = new HashMap<>();
-        Set<E> nonOverlappingEdges = pathList
-            .stream().flatMap(List::stream).filter(e -> !this.overlappingEdges.contains(e))
-            .collect(Collectors.toSet());
+        Set<E> nonOverlappingEdges = new HashSet<>();
+        for (List<E> es : pathList) {
+            for (E e1 : es) {
+                if (!this.overlappingEdges.contains(e1)) {
+                    nonOverlappingEdges.add(e1);
+                }
+            }
+        }
 
         for (E e : nonOverlappingEdges) {
             V u = getEdgeSource(e);
@@ -198,7 +224,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
                 paths.add(path);
             } else { // some edge which is part of a path
                 if (!sourceToEdgeLookup.containsKey(u)) {
-                    sourceToEdgeLookup.put(u, new ArrayDeque<>());
+                    sourceToEdgeLookup.put(u, new ArrayDeque<E>());
                 }
                 sourceToEdgeLookup.get(u).add(e);
             }
@@ -214,9 +240,12 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
             }
         }
 
-        return paths
-            .stream().map(path -> createGraphPath(new ArrayList<>(path), startVertex, endVertex))
-            .collect(Collectors.toList());
+        List<GraphPath<V, E>> list = new ArrayList<>();
+        for (List<E> path : paths) {
+            GraphPath<V, E> graphPath = createGraphPath(new ArrayList<>(path), startVertex, endVertex);
+            list.add(graphPath);
+        }
+        return list;
     }
 
     /**
@@ -243,12 +272,16 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
             }
         }
 
-        this.overlappingEdges = pathList
-            .stream().flatMap(List::stream)
-            .filter(
-                e -> edgeOccurrenceCount
-                    .get(new UnorderedPair<>(this.getEdgeSource(e), this.getEdgeTarget(e))) > 1)
-            .collect(Collectors.toSet());
+        Set<E> set = new HashSet<>();
+        for (List<E> es : pathList) {
+            for (E e : es) {
+                if (edgeOccurrenceCount
+                        .get(new UnorderedPair<>(this.getEdgeSource(e), this.getEdgeTarget(e))) > 1) {
+                    set.add(e);
+                }
+            }
+        }
+        this.overlappingEdges = set;
     }
 
     private GraphPath<V, E> createGraphPath(List<E> edgeList, V startVertex, V endVertex)

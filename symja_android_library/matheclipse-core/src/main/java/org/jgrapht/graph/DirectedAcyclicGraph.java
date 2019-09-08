@@ -103,7 +103,7 @@ public class DirectedAcyclicGraph<V, E>
         Supplier<V> vertexSupplier, Supplier<E> edgeSupplier, boolean weighted)
     {
         this(
-            vertexSupplier, edgeSupplier, new VisitedBitSetImpl(), new TopoVertexBiMap<>(),
+            vertexSupplier, edgeSupplier, new VisitedBitSetImpl(), new TopoVertexBiMap<V>(),
             weighted, false);
     }
 
@@ -120,7 +120,7 @@ public class DirectedAcyclicGraph<V, E>
         boolean allowMultipleEdges)
     {
         this(
-            vertexSupplier, edgeSupplier, new VisitedBitSetImpl(), new TopoVertexBiMap<>(),
+            vertexSupplier, edgeSupplier, new VisitedBitSetImpl(), new TopoVertexBiMap<V>(),
             weighted, allowMultipleEdges);
     }
 
@@ -183,7 +183,7 @@ public class DirectedAcyclicGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DirectedAcyclicGraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DirectedAcyclicGraph<>(edgeClass));
+        return new GraphBuilder<>(new DirectedAcyclicGraph<V, E>(edgeClass));
     }
 
     /**
@@ -197,7 +197,7 @@ public class DirectedAcyclicGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DirectedAcyclicGraph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DirectedAcyclicGraph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new DirectedAcyclicGraph<V, E>(null, edgeSupplier, false));
     }
 
     @Override
@@ -330,14 +330,19 @@ public class DirectedAcyclicGraph<V, E>
     {
         EdgeReversedGraph<V, E> reversedGraph = new EdgeReversedGraph<>(this);
         Iterator<V> iterator = new DepthFirstIterator<>(reversedGraph, vertex);
-        Set<V> ancestors = new HashSet<>();
+        final Set<V> ancestors = new HashSet<>();
 
         // Do not add start vertex to result.
         if (iterator.hasNext()) {
             iterator.next();
         }
 
-        iterator.forEachRemaining(ancestors::add);
+        iterator.forEachRemaining(new Consumer<V>() {
+            @Override
+            public void accept(V e) {
+                ancestors.add(e);
+            }
+        });
 
         return ancestors;
     }
@@ -351,14 +356,19 @@ public class DirectedAcyclicGraph<V, E>
     public Set<V> getDescendants(V vertex)
     {
         Iterator<V> iterator = new DepthFirstIterator<>(this, vertex);
-        Set<V> descendants = new HashSet<>();
+        final Set<V> descendants = new HashSet<>();
 
         // Do not add start vertex to result.
         if (iterator.hasNext()) {
             iterator.next();
         }
 
-        iterator.forEachRemaining(descendants::add);
+        iterator.forEachRemaining(new Consumer<V>() {
+            @Override
+            public void accept(V e) {
+                descendants.add(e);
+            }
+        });
 
         return descendants;
     }

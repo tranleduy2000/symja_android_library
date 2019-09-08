@@ -33,7 +33,7 @@ import java.util.*;
  *
  * @author Assaf Mizrachi
  */
-public class GridGraphGenerator<V, E>
+public class GridGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

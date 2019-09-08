@@ -97,7 +97,7 @@ public class TiernanSimpleCycles<V, E>
 
         int index = 0;
         for (V v : graph.vertexSet()) {
-            blocked.put(v, new HashSet<>());
+            blocked.put(v, new HashSet<V>());
             indices.put(v, index++);
         }
 

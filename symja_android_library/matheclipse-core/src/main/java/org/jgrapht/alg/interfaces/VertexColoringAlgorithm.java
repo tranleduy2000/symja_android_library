@@ -19,6 +19,8 @@ package org.jgrapht.alg.interfaces;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * An algorithm which computes a graph vertex coloring.
@@ -118,10 +120,18 @@ public interface VertexColoringAlgorithm<V>
         @Override
         public List<Set<V>> getColorClasses()
         {
-            Map<Integer, Set<V>> groups = new HashMap<>();
-            colors.forEach((v, color) -> {
-                Set<V> g = groups.computeIfAbsent(color, k -> new HashSet<>());
-                g.add(v);
+            final Map<Integer, Set<V>> groups = new HashMap<>();
+            colors.forEach(new BiConsumer<V, Integer>() {
+                @Override
+                public void accept(V v, Integer color) {
+                    Set<V> g = groups.computeIfAbsent(color, new Function<Integer, Set<V>>() {
+                        @Override
+                        public Set<V> apply(Integer k) {
+                            return new HashSet<>();
+                        }
+                    });
+                    g.add(v);
+                }
             });
             List<Set<V>> classes = new ArrayList<>(numberColors);
             classes.addAll(groups.values());

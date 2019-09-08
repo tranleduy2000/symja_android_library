@@ -39,7 +39,7 @@ import java.util.*;
  *
  * @author Alexandru Valeanu
  */
-public class PruferTreeGenerator<V, E>
+public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     implements
     GraphGenerator<V, E, V>
 {

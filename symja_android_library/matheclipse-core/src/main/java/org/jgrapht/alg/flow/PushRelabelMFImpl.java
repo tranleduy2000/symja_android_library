@@ -17,12 +17,20 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.alg.util.extension.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
+import org.jgrapht.alg.util.extension.ExtensionFactory;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * <p>
@@ -108,9 +116,19 @@ public class PushRelabelMFImpl<V, E>
     {
         super(network, epsilon);
 
-        this.vertexExtensionsFactory = VertexExtension::new;
+        this.vertexExtensionsFactory = new ExtensionFactory<VertexExtension>() {
+            @Override
+            public VertexExtension create() {
+                return new VertexExtension();
+            }
+        };
 
-        this.edgeExtensionsFactory = AnnotatedFlowEdge::new;
+        this.edgeExtensionsFactory = new ExtensionFactory<AnnotatedFlowEdge>() {
+            @Override
+            public AnnotatedFlowEdge create() {
+                return new AnnotatedFlowEdge();
+            }
+        };
 
         if (DIAGNOSTIC_ENABLED) {
             this.diagnostic = new PushRelabelDiagnostic();
@@ -494,7 +512,12 @@ public class PushRelabelMFImpl<V, E>
             List<Map.Entry<Pair<Integer, Integer>, Integer>> relabelsSorted =
                 new ArrayList<>(relabels.entrySet());
 
-            relabelsSorted.sort((o1, o2) -> -(o1.getValue() - o2.getValue()));
+            relabelsSorted.sort(new Comparator<Map.Entry<Pair<Integer, Integer>, Integer>>() {
+                @Override
+                public int compare(Map.Entry<Pair<Integer, Integer>, Integer> o1, Map.Entry<Pair<Integer, Integer>, Integer> o2) {
+                    return -(o1.getValue() - o2.getValue());
+                }
+            });
 
             System.out.println("RELABELS    ");
             System.out.println("--------    ");
@@ -504,7 +527,12 @@ public class PushRelabelMFImpl<V, E>
             List<Map.Entry<Pair<V, V>, Integer>> dischargesSorted =
                 new ArrayList<>(discharges.entrySet());
 
-            dischargesSorted.sort((one, other) -> -(one.getValue() - other.getValue()));
+            dischargesSorted.sort(new Comparator<Map.Entry<Pair<V, V>, Integer>>() {
+                @Override
+                public int compare(Map.Entry<Pair<V, V>, Integer> one, Map.Entry<Pair<V, V>, Integer> other) {
+                    return -(one.getValue() - other.getValue());
+                }
+            });
 
             System.out.println("DISCHARGES  ");
             System.out.println("----------  ");

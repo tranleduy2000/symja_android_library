@@ -86,7 +86,8 @@ import java.util.*;
  * @author Alexandru Valeanu
  */
 public class NaiveLCAFinder<V, E>
-    implements
+        extends LowestCommonAncestorAlgorithmImpl<V>
+        implements
     LowestCommonAncestorAlgorithm<V>
 {
     private Graph<V, E> graph;
@@ -114,8 +115,8 @@ public class NaiveLCAFinder<V, E>
             throw new IllegalArgumentException("invalid vertex: " + b);
 
         return findLca(
-            Collections.singleton(a), Collections.singleton(b), new LinkedHashSet<>(),
-            new LinkedHashSet<>());
+            Collections.singleton(a), Collections.singleton(b), new LinkedHashSet<V>(),
+            new LinkedHashSet<V>());
     }
 
     /**

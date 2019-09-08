@@ -74,7 +74,7 @@ public class DefaultUndirectedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DefaultUndirectedGraph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new DefaultUndirectedGraph<>(edgeClass));
+        return new GraphBuilder<>(new DefaultUndirectedGraph<V, E>(edgeClass));
     }
 
     /**
@@ -88,7 +88,7 @@ public class DefaultUndirectedGraph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends DefaultUndirectedGraph<V, E>> createBuilder(
         Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new DefaultUndirectedGraph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new DefaultUndirectedGraph<V, E>(null, edgeSupplier, false));
     }
 
 }

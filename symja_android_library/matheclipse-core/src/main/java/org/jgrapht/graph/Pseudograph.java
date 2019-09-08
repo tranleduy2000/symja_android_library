@@ -74,7 +74,7 @@ public class Pseudograph<V, E>
     public static <V, E> GraphBuilder<V, E, ? extends Pseudograph<V, E>> createBuilder(
         Class<? extends E> edgeClass)
     {
-        return new GraphBuilder<>(new Pseudograph<>(edgeClass));
+        return new GraphBuilder<>(new Pseudograph<V, E>(edgeClass));
     }
 
     /**
@@ -88,7 +88,7 @@ public class Pseudograph<V, E>
     public static <V,
         E> GraphBuilder<V, E, ? extends Pseudograph<V, E>> createBuilder(Supplier<E> edgeSupplier)
     {
-        return new GraphBuilder<>(new Pseudograph<>(null, edgeSupplier, false));
+        return new GraphBuilder<>(new Pseudograph<V, E>(null, edgeSupplier, false));
     }
 
 }

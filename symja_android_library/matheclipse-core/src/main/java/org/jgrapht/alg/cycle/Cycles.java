@@ -83,7 +83,12 @@ public abstract class Cycles
         // traverse
         List<E> edges = new ArrayList<>();
         double weight = 0d;
-        E e = cycle.stream().findAny().get();
+        Optional<E> found = Optional.empty();
+        for (E e1 : cycle) {
+            found = Optional.of(e1);
+            break;
+        }
+        E e = found.get();
         edges.add(e);
         weight += graph.getEdgeWeight(e);
         V start = graph.getEdgeSource(e);

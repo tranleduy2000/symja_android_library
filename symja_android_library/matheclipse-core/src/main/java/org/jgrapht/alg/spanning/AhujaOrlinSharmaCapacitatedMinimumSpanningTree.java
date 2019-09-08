@@ -246,7 +246,7 @@ public class AhujaOrlinSharmaCapacitatedMinimumSpanningTree<V, E>
         // map that contains the subtrees of all vertices
         Map<V, Pair<Set<V>, Double>> subtrees = new HashMap<>();
         // set that contains all part of the partition that were affected by an exchange operation
-        Pair<Set<Integer>, Set<V>> affected = Pair.of(bestSolution.getLabels(), new HashSet<>());
+        Pair<Set<Integer>, Set<V>> affected = Pair.<Set<Integer>, Set<V>>of(bestSolution.getLabels(), new HashSet<V>());
         // the improvement graph
         ImprovementGraph improvementGraph = new ImprovementGraph(bestSolution);
         // tabu list

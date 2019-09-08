@@ -67,9 +67,14 @@ public class NeighborCache<V, E>
      * @param v the given vertex
      * @return the unique predecessors of the given vertex
      */
-    public Set<V> predecessorsOf(V v)
+    public Set<V> predecessorsOf(final V v)
     {
-        return fetch(v, predecessors, k -> new Neighbors<>(Graphs.predecessorListOf(graph, v)));
+        return fetch(v, predecessors, new Function<V, Neighbors<V>>() {
+            @Override
+            public Neighbors<V> apply(V k) {
+                return new Neighbors<>(Graphs.predecessorListOf(graph, v));
+            }
+        });
     }
 
     /**
@@ -79,9 +84,14 @@ public class NeighborCache<V, E>
      * @param v the given vertex
      * @return the unique successors of the given vertex
      */
-    public Set<V> successorsOf(V v)
+    public Set<V> successorsOf(final V v)
     {
-        return fetch(v, successors, k -> new Neighbors<>(Graphs.successorListOf(graph, v)));
+        return fetch(v, successors, new Function<V, Neighbors<V>>() {
+            @Override
+            public Neighbors<V> apply(V k) {
+                return new Neighbors<>(Graphs.successorListOf(graph, v));
+            }
+        });
     }
 
     /**
@@ -91,9 +101,14 @@ public class NeighborCache<V, E>
      * @param v the given vertex
      * @return the unique neighbors of the given vertex
      */
-    public Set<V> neighborsOf(V v)
+    public Set<V> neighborsOf(final V v)
     {
-        return fetch(v, neighbors, k -> new Neighbors<>(Graphs.neighborListOf(graph, v)));
+        return fetch(v, neighbors, new Function<V, Neighbors<V>>() {
+            @Override
+            public Neighbors<V> apply(V k) {
+                return new Neighbors<>(Graphs.neighborListOf(graph, v));
+            }
+        });
     }
 
     /**
@@ -172,6 +187,11 @@ public class NeighborCache<V, E>
         if (neighbors.containsKey(target)) {
             neighbors.get(target).removeNeighbor(source);
         }
+    }
+
+    @Override
+    public void edgeWeightUpdated(GraphEdgeChangeEvent<V, E> e) {
+
     }
 
     @Override

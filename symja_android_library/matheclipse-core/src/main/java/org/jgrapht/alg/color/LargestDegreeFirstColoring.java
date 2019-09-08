@@ -62,7 +62,7 @@ public class LargestDegreeFirstColoring<V, E>
         // compute degrees and maximum degree
         int n = graph.vertexSet().size();
         int maxDegree = 0;
-        Map<V, Integer> degree = new HashMap<>(n);
+        final Map<V, Integer> degree = new HashMap<>(n);
         for (V v : graph.vertexSet()) {
             int d = graph.edgesOf(v).size();
             degree.put(v, d);
@@ -76,7 +76,12 @@ public class LargestDegreeFirstColoring<V, E>
              * Order vertices by degree by using a comparison based sort.
              */
             List<V> nodes = new ArrayList<>(graph.vertexSet());
-            nodes.sort((u, v) -> -1 * Integer.compare(degree.get(u), degree.get(v)));
+            nodes.sort(new Comparator<V>() {
+                @Override
+                public int compare(V u, V v) {
+                    return -1 * Integer.compare(degree.get(u), degree.get(v));
+                }
+            });
             return nodes;
         } else {
             /*

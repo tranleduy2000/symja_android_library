@@ -90,7 +90,7 @@ public abstract class AbstractBaseGraph<V, E>
     protected AbstractBaseGraph(
         Supplier<V> vertexSupplier, Supplier<E> edgeSupplier, GraphType type)
     {
-        this(vertexSupplier, edgeSupplier, type, new FastLookupGraphSpecificsStrategy<>());
+        this(vertexSupplier, edgeSupplier, type, new FastLookupGraphSpecificsStrategy<V, E>());
     }
 
     /**

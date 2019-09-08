@@ -17,13 +17,15 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An algorithm which computes a decomposition into disjoint paths for a given tree/forest
@@ -65,10 +67,7 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
         /**
          * @return number of paths in the decomposition
          */
-        default int numberOfPaths()
-        {
-            return getPaths().size();
-        }
+        int numberOfPaths();
     }
 
     /**
@@ -94,13 +93,16 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
          * @param edges the edges
          * @param paths the vertex paths
          */
-        public PathDecompositionImpl(Graph<V, E> graph, Set<E> edges, List<List<V>> paths)
+        public PathDecompositionImpl(final Graph<V, E> graph, Set<E> edges, List<List<V>> paths)
         {
             this.edges = edges;
 
             Set<GraphPath<V, E>> arrayUnenforcedSet =
-                paths.stream().map(path -> new GraphWalk<>(graph, path, path.size())).collect(
-                    Collectors.toCollection(ArrayUnenforcedSet::new));
+                    new ArrayUnenforcedSet<>();
+            for (List<V> path : paths) {
+                GraphWalk<V, E> veGraphWalk = new GraphWalk<>(graph, path, path.size());
+                arrayUnenforcedSet.add(veGraphWalk);
+            }
 
             this.paths = Collections.unmodifiableSet(arrayUnenforcedSet);
         }
@@ -115,6 +117,11 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
         public Set<GraphPath<V, E>> getPaths()
         {
             return paths;
+        }
+
+        @Override
+        public int numberOfPaths() {
+            return getPaths().size();
         }
 
         @Override

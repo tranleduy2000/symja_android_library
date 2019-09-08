@@ -46,7 +46,7 @@ public class DefaultEdgeFunction<E, T>
      */
     public DefaultEdgeFunction(T defaultValue)
     {
-        this(defaultValue, new HashMap<>());
+        this(defaultValue, new HashMap<E, T>());
     }
 
     /**
