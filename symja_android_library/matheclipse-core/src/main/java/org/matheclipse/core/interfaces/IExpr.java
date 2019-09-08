@@ -1146,6 +1146,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     GraphType isListOfEdges();
 
     /**
+     * Test if this expression is an DirectedEdge, UndirectedEdge, Rule, TwoWayRule.
+     *
+     * @return
+     */
+    boolean isEdge();
+
+    /**
      * Test if this expression is a list of rules (head Rule or RuleDelayed)
      *
      * @see #isList()

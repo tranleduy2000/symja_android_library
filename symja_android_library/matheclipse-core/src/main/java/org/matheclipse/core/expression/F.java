@@ -216,7 +216,7 @@ public class F {
     public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
 	/** AddTo(x, dx) - is equivalent to `x = x + dx`. */
     public final static IBuiltInSymbol AddTo = F.initFinalSymbol("AddTo", ID.AddTo);
-    /***/
+    /** AdjacencyMatrix(graph) - convert the `graph` into a adjacency matrix.*/
     public final static IBuiltInSymbol AdjacencyMatrix = F.initFinalSymbol("AdjacencyMatrix", ID.AdjacencyMatrix);
     /***/
     public final static IBuiltInSymbol AlgebraicNumber = F.initFinalSymbol("AlgebraicNumber", ID.AlgebraicNumber);
@@ -244,16 +244,13 @@ public class F {
     public final static IBuiltInSymbol AnnuityDue = F.initFinalSymbol("AnnuityDue", ID.AnnuityDue);
     /***/
     public final static IBuiltInSymbol AntiSymmetric = F.initFinalSymbol("AntiSymmetric", ID.AntiSymmetric);
-	/** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix. */
-    public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ",
-            ID.AntihermitianMatrixQ);
-	/** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix. */
-    public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
-            ID.AntisymmetricMatrixQ);
-    /**
-	 * AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates
-	 * to `True`.
-     */
+    /** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix.*/
+    public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ", ID.AntihermitianMatrixQ);
+
+    /** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix.*/
+    public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ", ID.AntisymmetricMatrixQ);
+
+    /** AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates to `True`.*/
     public final static IBuiltInSymbol AnyTrue = F.initFinalSymbol("AnyTrue", ID.AnyTrue);
 	/** Apart(expr) - rewrites `expr` as a sum of individual fractions. */
     public final static IBuiltInSymbol Apart = F.initFinalSymbol("Apart", ID.Apart);
@@ -744,8 +741,10 @@ public class F {
     /***/
     public final static IBuiltInSymbol EdgeCount = F.initFinalSymbol("EdgeCount", ID.EdgeCount);
 
-    /***/
+    /** EdgeList(graph) - convert the `graph` into a list of edges. */
     public final static IBuiltInSymbol EdgeList = F.initFinalSymbol("EdgeList", ID.EdgeList);
+    /***/
+    public final static IBuiltInSymbol EdgeQ = F.initFinalSymbol("EdgeQ", ID.EdgeQ);
 
     /** EffectiveInterest(i, n) - returns an effective interest rate object.*/
     public final static IBuiltInSymbol EffectiveInterest = F.initFinalSymbol("EffectiveInterest", ID.EffectiveInterest);
@@ -1035,6 +1034,8 @@ public class F {
 
     /***/
     public final static IBuiltInSymbol GraphData = F.initFinalSymbol("GraphData", ID.GraphData);
+    /***/
+    public final static IBuiltInSymbol GraphQ = F.initFinalSymbol("GraphQ", ID.GraphQ);
     /***/
     public final static IBuiltInSymbol Graphics = F.initFinalSymbol("Graphics", ID.Graphics);
     /***/
@@ -2392,6 +2393,11 @@ public class F {
     public final static IBuiltInSymbol VectorAngle = F.initFinalSymbol("VectorAngle", ID.VectorAngle);
 	/** VectorQ(v) - returns `True` if `v` is a list of elements which are not themselves lists. */
     public final static IBuiltInSymbol VectorQ = F.initFinalSymbol("VectorQ", ID.VectorQ);
+    /** VertexList(graph) - convert the `graph` into a list of vertices.*/
+    public final static IBuiltInSymbol VertexList = F.initFinalSymbol("VertexList", ID.VertexList);
+
+    /***/
+    public final static IBuiltInSymbol VertexQ = F.initFinalSymbol("VertexQ", ID.VertexQ);
     /***/
     public final static IBuiltInSymbol ViewPoint = F.initFinalSymbol("ViewPoint", ID.ViewPoint);
 
