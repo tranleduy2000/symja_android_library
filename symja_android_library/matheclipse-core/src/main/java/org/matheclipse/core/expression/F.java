@@ -914,6 +914,8 @@ public class F {
     public final static IBuiltInSymbol Flatten = F.initFinalSymbol("Flatten", ID.Flatten);
 	/** FlattenAt(expr, position) - flattens out nested lists at the given `position` in `expr`. */
     public final static IBuiltInSymbol FlattenAt = F.initFinalSymbol("FlattenAt", ID.FlattenAt);
+    /***/
+    public final static IBuiltInSymbol Float = F.initFinalSymbol("Float", ID.Float);
 	/** Floor(expr) - gives the smallest integer less than or equal `expr`. */
     public final static IBuiltInSymbol Floor = F.initFinalSymbol("Floor", ID.Floor);
 	/** Fold[f, x, {a, b}] - returns `f[f[x, a], b]`, and this nesting continues for lists of arbitrary length. */
@@ -1217,14 +1219,13 @@ public class F {
             ID.InverseLaplaceTransform);
 	/** InverseSeries( series ) - return the inverse series. */
     public final static IBuiltInSymbol InverseSeries = F.initFinalSymbol("InverseSeries", ID.InverseSeries);
-    /**
-     * JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and
-     * `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of
-     * occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
-     */
-    public final static IBuiltInSymbol JaccardDissimilarity = F.initFinalSymbol("JaccardDissimilarity",
-            ID.JaccardDissimilarity);
-	/** JacobiMatrix(matrix, var) - creates a Jacobian matrix. */
+    /***/
+    public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
+
+    /** JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
+    public final static IBuiltInSymbol JaccardDissimilarity = F.initFinalSymbol("JaccardDissimilarity", ID.JaccardDissimilarity);
+
+    /** JacobiMatrix(matrix, var) - creates a Jacobian matrix.*/
     public final static IBuiltInSymbol JacobiMatrix = F.initFinalSymbol("JacobiMatrix", ID.JacobiMatrix);
 	/** JacobiSymbol(m, n) - calculates the Jacobi symbol. */
     public final static IBuiltInSymbol JacobiSymbol = F.initFinalSymbol("JacobiSymbol", ID.JacobiSymbol);
