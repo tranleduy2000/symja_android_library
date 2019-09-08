@@ -6204,8 +6204,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindShortestTour() {
-		check("FindShortestTour[{GeoPosition[{41, 20}], GeoPosition[{5, 20}], GeoPosition[{49, 32}], " //
-				+ "GeoPosition[{53, 28}], GeoPosition[{47, 29}]}]", //
+		check("FindShortestTour({GeoPosition[{41, 20}], GeoPosition[{5, 20}], GeoPosition[{49, 32}], " //
+				+ "GeoPosition[{53, 28}], GeoPosition[{47, 29}]})", //
 				"{6852.02461316151[mi],{1,2,5,3,4,1}}");
 		check("FindShortestTour({{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 1}, {2, 3}, {2, 5}, {3, 1}, {3, 2},"//
 				+ " {3, 4}, {3, 5}, {4, 1}, {4, 3}, {4, 5}, {5, 1}, {5, 2}, {5, 3}, {5, 4}})", //
@@ -12349,10 +12349,20 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolyGamma() {
-		check("PolyGamma(-1,1)", //
-				"0");
+		check("PolyGamma(0,-42)", //
+				"ComplexInfinity");
+		check("PolyGamma(-1,z)", //
+				"LogGamma(z)");
+		check("PolyGamma(-1,0)", //
+				"Infinity");
+		check("PolyGamma(-1,12)", //
+				"Log(39916800)");
+		check("PolyGamma(-1,-7)", //
+				"Infinity");
 		check("PolyGamma(-1)", //
 				"ComplexInfinity");
+		check("PolyGamma(-1,1)", //
+				"0");
 		check("PolyGamma(-2)", //
 				"ComplexInfinity");
 		check("PolyGamma(1)", //
