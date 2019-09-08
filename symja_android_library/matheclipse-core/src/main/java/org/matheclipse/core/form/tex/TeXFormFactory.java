@@ -1500,6 +1500,7 @@ public class TeXFormFactory {
 		operTab.put("D", new D());
 		operTab.put("DirectedInfinity", new DirectedInfinity());
 		operTab.put("Floor", new UnaryFunction(" \\left \\lfloor ", " \\right \\rfloor "));
+		operTab.put("Function", new UnaryFunction("", "\\&"));
 		operTab.put("HarmonicNumber", new HarmonicNumber());
 		operTab.put("HurwitzZeta", new Zeta());
 		operTab.put("Integrate", new Integrate());
@@ -1511,6 +1512,7 @@ public class TeXFormFactory {
 		operTab.put("Power", new Power());
 		operTab.put("Product", new Product());
 		operTab.put("Rational", new Rational());
+		operTab.put("Slot", new UnaryFunction("\\text{$\\#$", "}"));
 		operTab.put("Sqrt", new UnaryFunction("\\sqrt{", "}"));
 		operTab.put("Subscript", new Subscript());
 		operTab.put("Subsuperscript", new Subsuperscript());
@@ -1565,6 +1567,8 @@ public class TeXFormFactory {
 				ASTNodeFactory.MMA_STYLE_FACTORY.get("Alternatives").getPrecedence(), "\\text{|}"));
 		operTab.put("Equal",
 				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Equal").getPrecedence(), " = "));
+		operTab.put("DirectedEdge",
+				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("DirectedEdge").getPrecedence(), "\\to "));
 		operTab.put("Divide", new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Divide").getPrecedence(),
 				"\\text{/}"));
 		operTab.put("Apply", new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Apply").getPrecedence(),
@@ -1610,6 +1614,8 @@ public class TeXFormFactory {
 				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Set").getPrecedence(), " = "));
 		operTab.put("SetDelayed", new AbstractOperator(this,
 				ASTNodeFactory.MMA_STYLE_FACTORY.get("SetDelayed").getPrecedence(), "\\text{:=}\\,"));
+		operTab.put("UndirectedEdge",
+				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("UndirectedEdge").getPrecedence(), "\\leftrightarrow "));
 		operTab.put("Sin", new TeXFunction(this, "sin "));
 		operTab.put("Cos", new TeXFunction(this, "cos "));
 		operTab.put("Tan", new TeXFunction(this, "tan "));

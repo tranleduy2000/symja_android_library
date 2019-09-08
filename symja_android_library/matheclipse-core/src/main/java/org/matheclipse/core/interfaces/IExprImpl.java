@@ -10,6 +10,7 @@ import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
+import org.jgrapht.GraphType;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.PredicateQ;
@@ -1607,6 +1608,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isListOfLists() {
         return false;
+    }
+
+    @Override
+    public GraphType isListOfEdges() {
+        return null;
     }
 
     /**

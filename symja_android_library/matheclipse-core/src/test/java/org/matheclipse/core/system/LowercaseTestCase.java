@@ -4898,6 +4898,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEuclideanDistance() {
+		check("EuclideanDistance({a, b, c}, {x, y, z})", //
+				"Sqrt(Abs(a-x)^2+Abs(b-y)^2+Abs(c-z)^2)");
 		check("EuclideanDistance({-1, -1}, {1, 1})", //
 				"2*Sqrt(2)");
 		check("EuclideanDistance({a, b}, {c, d})", //
@@ -6146,6 +6148,71 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{x->0.0}");
 	}
 
+	public void testEulerianGraphQ() {
+		check("EulerianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"True");
+		check("EulerianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"False");
+	}
+
+	public void testFindEulerianCycle() {
+		check("FindEulerianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"{4->1,1->3,3->1,1->2,2->3,3->4}");
+		check("FindEulerianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"{}");
+	}
+
+	public void testFindHamiltonianCycle() {
+		check("FindHamiltonianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"{1->2,2->3,3->4,4->1}");
+		check("FindHamiltonianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"{}");
+	}
+
+	public void testFindShortestTour() {
+		check("FindShortestTour({{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 1}, {2, 3}, {2, 5}, {3, 1}, {3, 2},"//
+				+ " {3, 4}, {3, 5}, {4, 1}, {4, 3}, {4, 5}, {5, 1}, {5, 2}, {5, 3}, {5, 4}})", //
+				"{14+5*Sqrt(2),{1,6,9,13,16,17,18,19,14,10,7,11,15,12,8,5,4,3,2,1}}");
+	}
+
+	public void testFindSpanningTree() {
+		check("g=Graph({1,2,3,4,5,6,7,8},\n"
+				+ "{UndirectedEdge(1,2),UndirectedEdge(1,3),UndirectedEdge(1,4),UndirectedEdge(3,4),UndirectedEdge(2,6),\n"
+				+ "UndirectedEdge(3,6),UndirectedEdge(5,3),UndirectedEdge(5,4),UndirectedEdge(5,6),UndirectedEdge(5,7),\n"
+				+ "UndirectedEdge(5,8),UndirectedEdge(6,7),UndirectedEdge(7,8),UndirectedEdge(4,8)});", //
+				"");
+
+		check("FindSpanningTree(g)", //
+				"Graph({1,2,3,4,6,5,7,8},{1->2,1->3,1->4,2->6,5->3,5->7,5->8})");
+	}
+	public void testFindShortestPath() {
+		check("FindShortestPath({1 -> 2, 2 -> 3, 3 -> 1,  3 -> 4, 4 -> 5, 3 -> 5},1,4)", //
+				"{1,2,3,4}");
+	}
+
+	public void testHamiltonianGraphQ() {
+		check("HamiltonianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
+				"True");
+		check("HamiltonianGraphQ({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
+				"False");
+	}
+
+	public void testGraph() {
+		check("Graph({1 \\[UndirectedEdge] 2, 2 \\[UndirectedEdge] 3, 3 \\[UndirectedEdge] 1})", //
+				"Graph({1,2,3},{1<->2,2<->3,3<->1})");
+		check("Graph({1,2,3},{1<->2,2<->3,3<->1})", //
+				"Graph({1,2,3},{1<->2,2<->3,3<->1})");
+
+		check("Graph({1 \\[DirectedEdge] 2, 2 \\[DirectedEdge] 3, 3 \\[DirectedEdge] 1})", //
+				"Graph({1,2,3},{1->2,2->3,3->1})");
+		check("Graph({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1})", //
+				"Graph({1,2,3,4},{1->2,2->3,3->1,1->3,3->4,4->1})");
+		check("Graph({1,2,3,4,5,6,7,8},\n"
+				+ "{UndirectedEdge(1,2),UndirectedEdge(1,3),UndirectedEdge(1,4),UndirectedEdge(3,4),UndirectedEdge(2,6),\n"
+				+ "UndirectedEdge(3,6),UndirectedEdge(5,3),UndirectedEdge(5,4),UndirectedEdge(5,6),UndirectedEdge(5,7),\n"
+				+ "UndirectedEdge(5,8),UndirectedEdge(6,7),UndirectedEdge(7,8),UndirectedEdge(4,8)})", //
+				"Graph({1,2,3,4,5,6,7,8},{1<->2,1<->3,1<->4,3<->4,2<->6,3<->6,5<->3,5<->4,5<->6,5<->7,5<->8,6<->7,7<->8,4<->8})");
+	}
 	public void testFirst() {
 		check("First(Infinity)", //
 				"1");
@@ -7105,6 +7172,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"4.56079359657056");
 	}
 
+	public void testGeoDistance() {
+		check("GeoDistance({37, -109}, {40.113, -88.261})", //
+				"UnitConvert(Quantity(1.83601*10^6,m),mi)");
+	}
 	public void testGet() {
 		if (Config.FILESYSTEM_ENABLED) {
 			String pathToVectorAnalysis = getClass().getResource("/symja/VectorAnalysis.m").getFile();
@@ -7140,8 +7211,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGreater() {
+		check("x>x", //
+				"x>x");
 		check("x+1>x", //
-				"True");
+				"1+x>x");
 
 		check("42>Infinity", //
 				"False");
@@ -7162,16 +7235,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("2/17 > 1/5 > Pi/10", //
 				"False");
 		check("x<x", //
-				"False");
+				"x<x");
 		check("x<=x", //
-				"True");
+				"x<=x");
 		check("x>x", //
-				"False");
+				"x>x");
 		check("x>=x", //
-				"True");
+				"x>=x");
 	}
 
 	public void testGreaterEqual() {
+		check("x>=x", //
+				"x>=x");
 		check("Infinity>=Infinity", //
 				"True");
 
@@ -7189,9 +7264,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("2/17 >= 1/5 >= Pi/10", //
 				"False");
 		check("x>=x", //
-				"True");
+				"x>=x");
 		check("x>x", //
-				"False");
+				"x>x");
 	}
 
 	public void testGroebnerBasis() {
@@ -7602,6 +7677,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testImportExport() {
 		if (Config.FILESYSTEM_ENABLED) {
+			// check("Export(\"c:\\\\temp\\\\testgraph.csv\",Graph({1 \\[DirectedEdge] 2, 2 \\[DirectedEdge] 3, 3
+			// \\[DirectedEdge] 1}))", //
+			// "c:\\temp\\testgraph.csv");
+			check("Export(\"c:\\\\temp\\\\dotgraph.dot\",Graph({1 \\[DirectedEdge] 2, 2 \\[DirectedEdge] 3, 3 \\[DirectedEdge] 1}))", //
+					"c:\\temp\\dotgraph.dot");
+			check("Import(\"c:\\\\temp\\\\dotgraph.dot\")", //
+					"Graph[([1, 2, 3], [(1,2), (2,3), (3,1)])]");
+
+			check("Export(\"c:\\\\temp\\\\dotgraph.graphml\",Graph({1 \\[DirectedEdge] 2, 2 \\[DirectedEdge] 3, 3 \\[DirectedEdge] 1}),\"GraphML\")", //
+					"c:\\temp\\dotgraph.graphml");
+			check("Import(\"c:\\\\temp\\\\dotgraph.graphml\", \"GraphML\")", //
+					"Graph[([1, 2, 3], [(1,2), (2,3), (3,1)])]");
 			check("Export(\"c:\\\\temp\\\\out.wxf\", {{5.7, 4.3}, {-1.2, 7.8}, {a, f(x)}}, \"WXF\")", //
 					"c:\\temp\\out.wxf");
 			check("Import(\"c:\\\\temp\\\\out.wxf\", \"WXF\")", //
@@ -8348,6 +8435,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testJavaForm() {
+		check("JavaForm(E^3-Cos(Pi^2/x), Prefix->True)", //
+				"F.Subtract(F.Exp(F.C3),F.Cos(F.Times(F.Sqr(F.Pi),F.Power(F.x,F.CN1))))");
+		check("JavaForm(E^3-Cos(Pi^2/x), Float->True)", //
+				"Math.pow(Math.E,3)-Math.cos(Math.pow(Math.PI,2)/x)");
+		check("JavaForm(E^3-Cos(Pi^2/x), Float)", //
+				"Math.pow(Math.E,3)-Math.cos(Math.pow(Math.PI,2)/x)");
 		check("JavaForm(Hold(D(sin(x)*cos(x),x)), prefix->True)", //
 				"F.D(F.Times(F.Sin(F.x),F.Cos(F.x)),F.x)");
 		check("JavaForm(Hold(D(sin(x)*cos(x),x)))", //
@@ -8366,6 +8459,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"Plus(CC(31L,4L,1L,1L),a,b,x,Sqr(x),y)");
 	}
 
+	public void testJSForm() {
+		check("JSForm(E^3-Cos(Pi^2/x) )", //
+				"Math.pow(Math.E,3)-Math.cos(Math.pow(Math.PI,2)/x)");
+	}
 	public void testJoin() {
 		// http://oeis.org/A001597 - Perfect powers: m^k where m > 0 and k >= 2. //
 		check("Join({1}, Select(Range(1770), GCD@@FactorInteger(#)[[All, 2]]>1&))", //
@@ -8728,14 +8825,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLess() {
+		check("Infinity<Infinity", //
+				"False");
+
+		check("x<x", //
+				"x<x");
 		check("I<0", //
 				"I<0");
 		check("3+x<4+x", //
-				"True");
+				"3+x<4+x");
 		check("3+x>4+x", //
-				"False");
-		check("Infinity<Infinity", //
-				"False");
+				"3+x>4+x");
 
 		check("Refine(Infinity<x, x>0)", //
 				"False");
@@ -8755,10 +8855,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLessEqual() {
+		check("x<=x", //
+				"x<=x");
 		check("3+x<=4+x", //
-				"True");
+				"3+x<=4+x");
 		check("3+x>=4+x", //
-				"False");
+				"3+x>=4+x");
 
 		check("Infinity<=Infinity", //
 				"True");
@@ -9704,6 +9806,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMathMLForm() {
+		check("MathMLForm( f(#,#3)&  )", //
+				"<?xml version=\"1.0\"?>\n"
+						+ "<!DOCTYPE math PUBLIC \"-//W3C//DTD MathML 2.0//EN\" \"http://www.w3.org/TR/MathML2/dtd/mathml2.dtd\">\n"
+						+ "<math mode=\"display\">\n"
+						+ "<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>#1</mi><mo>,</mo><mi>#3</mi></mrow><mo>)</mo></mrow></mrow><mo>&amp;</mo></mrow></math>");
 		check("MathMLForm(D(sin(x)*cos(x),x))", "<?xml version=\"1.0\"?>\n"
 				+ "<!DOCTYPE math PUBLIC \"-//W3C//DTD MathML 2.0//EN\" \"http://www.w3.org/TR/MathML2/dtd/mathml2.dtd\">\n"
 				+ "<math mode=\"display\">\n"
@@ -13905,6 +14012,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testRefine() {
+		check("Refine(x<x, x>0)", //
+				"False");
+		check("Refine(x>=x, x>0)", //
+				"True");
 		check("Refine((-1)^(43*k), Element(k, Integers))", //
 				"(-1)^k");
 		check("Refine((-1)^(42*k), Element(k, Integers))", //
@@ -17686,6 +17797,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testTeXForm() {
+		check("TeXForm( f(#,#3)&  )", //
+				"f(\\text{$\\#$1},\\text{$\\#$3})\\&");
+		check("TeXForm( f(#,#3)*2&  )", //
+				"2\\,f(\\text{$\\#$1},\\text{$\\#$3})\\&");
 		check("TeXForm(N(1.1+Pi*I,30))", //
 				"1.1 + 3.14159265358979323846264338327\\,i ");
 		check("TeXForm(N(Pi,30))", //
