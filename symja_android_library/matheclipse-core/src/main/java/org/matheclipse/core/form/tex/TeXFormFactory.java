@@ -1616,6 +1616,8 @@ public class TeXFormFactory {
 				ASTNodeFactory.MMA_STYLE_FACTORY.get("SetDelayed").getPrecedence(), "\\text{:=}\\,"));
 		operTab.put("UndirectedEdge",
 				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("UndirectedEdge").getPrecedence(), "\\leftrightarrow "));
+		operTab.put("TwoWayRule",
+				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("TwoWayRule").getPrecedence(), "\\leftrightarrow "));
 		operTab.put("Sin", new TeXFunction(this, "sin "));
 		operTab.put("Cos", new TeXFunction(this, "cos "));
 		operTab.put("Tan", new TeXFunction(this, "tan "));

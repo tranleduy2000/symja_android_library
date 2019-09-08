@@ -324,11 +324,14 @@ public class MathMLPresentationTestCase extends TestCase {
 
 	public void testEdge() {
 		IExpr expr = EvalEngine.get().evaluate("DirectedEdge(a,b)");
-		check(expr,
-				"<mi>a</mi>-><mi>b</mi>");
+		check(expr, "<mrow><mi>a</mi><mo>-&gt;</mo><mi>b</mi></mrow>");
 		expr = EvalEngine.get().evaluate("UndirectedEdge(a,b)");
-		check(expr,
-				"<mi>a</mi><-><mi>b</mi>");
+		check(expr, "<mrow><mi>a</mi><mo>&lt;-&gt;</mo><mi>b</mi></mrow>");
+
+		check("Graph({1,2,3},{1<->2,2<->3})", //
+				"<mrow><mi>Graph</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mo>{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>}</mo></mrow><mo>,</mo><mrow><mo>{</mo><mrow><mrow><mn>1</mn><mo>&lt;-&gt;</mo><mn>2</mn></mrow><mo>,</mo><mrow><mn>2</mn><mo>&lt;-&gt;</mo><mn>3</mn></mrow></mrow><mo>}</mo></mrow></mrow><mo>)</mo></mrow></mrow>");
+		check("Graph({1,2,3},{1->2,2->3})", //
+				"<mrow><mi>Graph</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mo>{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>}</mo></mrow><mo>,</mo><mrow><mo>{</mo><mrow><mrow><mn>1</mn><mo>-&gt;</mo><mn>2</mn></mrow><mo>,</mo><mrow><mn>2</mn><mo>-&gt;</mo><mn>3</mn></mrow></mrow><mo>}</mo></mrow></mrow><mo>)</mo></mrow></mrow>");
 	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();

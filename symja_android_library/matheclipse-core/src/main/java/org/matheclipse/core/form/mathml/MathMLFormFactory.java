@@ -1227,28 +1227,28 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			convertFunctionArgs(buf, list);
 			return;
 		}
-		int functionID = ((ISymbol) list.head()).ordinal();
-		if (functionID > ID.UNKNOWN) {
-			switch (functionID) {
-			case ID.TwoWayRule:
-			case ID.UndirectedEdge:
-				if (list.isAST2()) {
-					convert(buf, list.arg1(), precedence, false);
-					buf.append("<->");
-					convert(buf, list.arg2(), precedence, false);
-					return;
-				}
-				break;
-			case ID.DirectedEdge:
-				if (list.isAST2()) {
-					convert(buf, list.arg1(), precedence, false);
-					buf.append("->");
-					convert(buf, list.arg2(), precedence, false);
-					return;
-				}
-				break;
-			}
-		}
+//		int functionID = ((ISymbol) list.head()).ordinal();
+//		if (functionID > ID.UNKNOWN) {
+//			switch (functionID) {
+//			case ID.TwoWayRule:
+//			case ID.UndirectedEdge:
+//				if (list.isAST2()) {
+//					convert(buf, list.arg1(), precedence, false);
+//					buf.append("<->");
+//					convert(buf, list.arg2(), precedence, false);
+//					return;
+//				}
+//				break;
+//			case ID.DirectedEdge:
+//				if (list.isAST2()) {
+//					convert(buf, list.arg1(), precedence, false);
+//					buf.append("->");
+//					convert(buf, list.arg2(), precedence, false);
+//					return;
+//				}
+//				break;
+//			}
+//		}
 		ISymbol head = list.topHead();
 		final org.matheclipse.parser.client.operator.Operator operator = OutputFormFactory.getOperator(head);
 		if (operator != null) {
@@ -1274,6 +1274,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			convertList(buf, list);
 			return;
 		}
+		int functionID = ((ISymbol) list.head()).ordinal();
 		if (functionID > ID.UNKNOWN) {
 			switch (functionID) {
 			case ID.Part:
@@ -2198,6 +2199,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		CONVERTERS.put(F.CompoundExpression,
 				new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("CompoundExpression").getPrecedence(), ";"));
 		CONVERTERS.put(F.D, new D());
+		CONVERTERS.put(F.DirectedEdge, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("DirectedEdge").getPrecedence(), "-&gt;"));
 		CONVERTERS.put(F.Dot, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Dot").getPrecedence(), "."));
 		CONVERTERS.put(F.Element, new Element());
 		CONVERTERS.put(F.Equal, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Equal").getPrecedence(), "=="));
@@ -2231,6 +2233,8 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		CONVERTERS.put(F.Sqrt, new Sqrt());
 		CONVERTERS.put(F.Sum, new Sum());
 		CONVERTERS.put(F.Times, new Times());
+		CONVERTERS.put(F.TwoWayRule, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("TwoWayRule").getPrecedence(), "&lt;-&gt;"));
+		CONVERTERS.put(F.UndirectedEdge, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("UndirectedEdge").getPrecedence(), "&lt;-&gt;"));
 		CONVERTERS.put(F.Unequal,
 				new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Unequal").getPrecedence(), "!="));
 	}
