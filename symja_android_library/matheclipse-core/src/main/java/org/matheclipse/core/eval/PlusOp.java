@@ -2,12 +2,14 @@ package org.matheclipse.core.eval;
 
 import com.duy.lambda.Supplier;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -151,6 +153,7 @@ public class PlusOp {
             return F.Indeterminate;
         }
 
+		try {
         if (numberValue != null && numberValue.isDirectedInfinity()) {
             if (numberValue.isComplexInfinity()) {
                 if (arg.isDirectedInfinity()) {
@@ -250,7 +253,9 @@ public class PlusOp {
 			}
 			IQuantity q = (IQuantity) arg;
 			numberValue = q.plus(numberValue);
+				if (numberValue.isPresent()) {
 			evaled = true;
+				}
 			return F.NIL;
         } else if (arg instanceof ASTSeriesData) {
             if (numberValue == null) {
@@ -276,6 +281,11 @@ public class PlusOp {
         if (addMerge(arg, F.C1)) {
             evaled = true;
         }
+		} catch (MathException mex) {
+			if (Config.SHOW_STACKTRACE) {
+				mex.printStackTrace();
+			}
+		}
         return F.NIL;
     }
 
@@ -327,13 +337,6 @@ public class PlusOp {
 		final IAST plus = F.Plus(a1, a2);
 		return Arithmetic.CONST_PLUS.evaluate(plus, EvalEngine.get()).orElse(plus);
 		}
-    /**
-     * Use interval arithmetic to add to interval objects
-     *
-     * @param o0
-     * @param o1
-     * @return
-     */
     private IExpr plusInterval(final IExpr o0, final IExpr o1) {
         return F.Interval(F.List(o0.lower().plus(o1.lower()), o0.upper().plus(o1.upper())));
     }
