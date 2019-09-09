@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
@@ -75,15 +77,23 @@ public class ContainsFunctions {
 		public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
 			return arg1.isList() && arg2.isList();
 		}
-		public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
+		public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest, final EvalEngine engine) {
 			for (int i = 1; i < list1.size(); i++) {
-				IExpr list1Arg = list1.get(i);
-				for (int j = 1; j < list2.size(); j++) {
-					IExpr list2Arg = list2.get(j);
-					if (engine.evalTrue(F.binaryAST2(sameTest, list1Arg, list2Arg))) {
+				final IExpr list1Arg = list1.get(i);
+				if (list2.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return engine.evalTrue(F.binaryAST2(sameTest, list1Arg, x));
+					}
+				})) {
 						return F.True;
 					}
-				}
+				// for (int j = 1; j < list2.size(); j++) {
+				// IExpr list2Arg = list2.get(j);
+				// if (engine.evalTrue(F.binaryAST2(sameTest, list1Arg, list2Arg))) {
+				// return F.True;
+				// }
+				// }
 			}
 			return F.False;
 		}
@@ -163,15 +173,23 @@ public class ContainsFunctions {
 	private static class ContainsNone extends ContainsAny {
 		final static ContainsNone CONST = new ContainsNone();
 
-		public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
+		public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest, final EvalEngine engine) {
 			for (int i = 1; i < list1.size(); i++) {
-				IExpr list1Arg = list1.get(i);
-				for (int j = 1; j < list2.size(); j++) {
-					IExpr list2Arg = list2.get(j);
-					if (engine.evalTrue(F.binaryAST2(sameTest, list1Arg, list2Arg))) {
+				final IExpr list1Arg = list1.get(i);
+				if (list2.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return engine.evalTrue(F.binaryAST2(sameTest, list1Arg, x));
+					}
+				})) {
 						return F.False;
 					}
-				}
+				// for (int j = 1; j < list2.size(); j++) {
+				// IExpr list2Arg = list2.get(j);
+				// if (engine.evalTrue(F.binaryAST2(sameTest, list1Arg, list2Arg))) {
+				// return F.False;
+				// }
+				// }
 			}
 			return F.True;
 		}

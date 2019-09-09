@@ -919,10 +919,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	// }
 
 	/**
-	 * Compare all adjacent elements from lowest to highest index and return true, if the binary predicate gives true in each step. If
-	 * the size is &lt; 2 the method returns false;
+	 * Compare all adjacent elements from lowest to highest index and return true, if the binary predicate gives true in
+	 * each step. If the size is &lt; 2 the method returns false;
 	 *
-	 * @param predicate the binary predicate
+	 * @param predicate
+	 *            the binary predicate
 	 * @return
 	 */
 	public boolean compareAdjacent(BiPredicate<IExpr, IExpr> predicate) {
@@ -940,8 +941,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return true;
 	}
 	/**
-	 * Compares this expression with the specified expression for canonical order. Returns a negative integer, zero, or a positive
-	 * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for canonical order. Returns a negative integer, zero, or
+	 * a positive integer as this expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr rhsExpr) {
@@ -1557,7 +1558,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final IAST getAST(int index) {
@@ -1589,7 +1591,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final IInteger getInt(int index) {
@@ -1621,7 +1624,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 *
 	 * @param index
 	 * @return
-	 * @throws WrongArgumentType if the cast is not possible
+	 * @throws WrongArgumentType
+	 *             if the cast is not possible
 	 */
 	@Override
 	public final INumber getNumber(int index) {
@@ -1674,8 +1678,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 
 	/**
-	 * Returns the value to which the specified property is mapped, or <code>null</code> if this map contains no mapping for the
-	 * property.
+	 * Returns the value to which the specified property is mapped, or <code>null</code> if this map contains no mapping
+	 * for the property.
 	 *
 	 * @param key
 	 * @return
@@ -1788,13 +1792,24 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final int indexOf(Predicate<? super IExpr> predicate) {
+	public int indexOf(Predicate<? super IExpr> predicate) {
 		for (int i = 1; i < size(); i++) {
 			if (predicate.test(get(i))) {
 				return i;
 			}
 		}
 		return -1;
+	}
+	/** {@inheritDoc} */
+	@Override
+	public IExpr findFirst(Function<IExpr, IExpr> function) {
+		for (int i = 1; i < size(); i++) {
+			IExpr temp = function.apply(get(i));
+			if (temp.isPresent()) {
+				return temp;
+			}
+		}
+		return F.NIL;
 	}
 	/** {@inheritDoc} */
 	@Override

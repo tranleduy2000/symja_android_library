@@ -5,6 +5,7 @@ import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 import com.duy.lang.DDouble;
 
 import org.apfloat.Apcomplex;
@@ -1908,12 +1909,21 @@ public final class Arithmetic {
             }
             if (arg1.isTimes()) {
 				IAST timesAST = (IAST) arg1;
-				for (int i = 1; i < timesAST.size(); i++) {
-					IExpr temp = timesAST.get(i);
-					if (temp.isRealResult()) {
-						return F.Times(temp, F.Im(timesAST.removeAtClone(i)));
+				int position = timesAST.indexOf(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.isRealResult();
+                    }
+                });
+				if (position > 0) {
+					return F.Times(timesAST.get(position), F.Im(timesAST.removeAtClone(position)));
 					}
-				}
+				// for (int i = 1; i < timesAST.size(); i++) {
+				// IExpr temp = timesAST.get(i);
+				// if (temp.isRealResult()) {
+				// return F.Times(temp, F.Im(timesAST.removeAtClone(i)));
+				// }
+				// }
 				IExpr first = timesAST.arg1();
 				if (first.isNumber()) {
 					IExpr rest = timesAST.rest().oneIdentity1();
@@ -2560,31 +2570,32 @@ public final class Arithmetic {
          */
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            int size = ast.size();
-            if (size == 1) {
-                return F.C0;
-            }
-            if (size == 2 && ast.head() == F.Plus) {
-                return ast.arg1();
-            }
 			if (ast.isEvalFlagOn(IAST.BUILT_IN_EVALED)) {
 				return F.NIL;
 			}
+			final int size = ast.size();
             if (size > 2) {
-                PlusOp plusOp = new PlusOp(size);
-                for (int i = 1; i < size; i++) {
-                    final IExpr temp = plusOp.plus(ast.get(i));
+                final PlusOp plusOp = new PlusOp(size);
+				IExpr temp = ast.findFirst(new Function<IExpr, IExpr>() {
+                    @Override
+                    public IExpr apply(IExpr x) {
+                        return plusOp.plus(x);
+                    }
+                });
                     if (temp.isPresent()) {
                         return temp;
                     }
-                }
+				// for (int i = 1; i < size; i++) {
+				// final IExpr temp = plusOp.plus(ast.get(i));
+				// if (temp.isPresent()) {
+				// return temp;
+				// }
+				// }
                 if (plusOp.isEvaled()) {
                     return plusOp.getSum();
                 }
-            }
 
-            if (size > 2) {
-                IExpr temp = evaluateHashsRepeated(ast, engine);
+				temp = evaluateHashsRepeated(ast, engine);
                 if (temp.isAST(F.Plus, 2)) {
                     return temp.first();
                 }
@@ -2592,7 +2603,14 @@ public final class Arithmetic {
 					ast.addEvalFlags(IAST.BUILT_IN_EVALED);
 				}
                 return temp;
+			} else {
+				if (size == 1) {
+					return F.C0;
+				}
+				if (size == 2 && ast.head() == F.Plus) {
+					return ast.arg1();
             }
+			}
 			ast.addEvalFlags(IAST.BUILT_IN_EVALED);
             return F.NIL;
         }
@@ -4054,12 +4072,21 @@ public final class Arithmetic {
             }
             if (expr.isTimes()) {
 				IAST timesAST = (IAST) expr;
-				for (int i = 1; i < timesAST.size(); i++) {
-					IExpr temp = timesAST.get(i);
-					if (temp.isRealResult()) {
-						return F.Times(temp, F.Re(timesAST.removeAtClone(i)));
+				int position = timesAST.indexOf(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.isRealResult();
+                    }
+                });
+				if (position > 0) {
+					return F.Times(timesAST.get(position), F.Re(timesAST.removeAtClone(position)));
 					}
-				}
+				// for (int i = 1; i < timesAST.size(); i++) {
+				// IExpr temp = timesAST.get(i);
+				// if (temp.isRealResult()) {
+				// return F.Times(temp, F.Re(timesAST.removeAtClone(i)));
+				// }
+				// }
 				IExpr first = timesAST.arg1();
 				if (first.isNumber()) {
 					IExpr rest = timesAST.rest().oneIdentity1();
@@ -4212,7 +4239,7 @@ public final class Arithmetic {
                     return F.Power(F.Sign(arg1.base()), arg1.exponent());
                 }
                 if (arg1.base().isE()) {
-                    // E^z   == >   E^(I*Im(z))
+					// E^z == > E^(I*Im(z))
                     return F.Power(F.E, F.Times(F.CI, F.Im(arg1.exponent())));
                 }
             } else if (arg1.isAST(F.Sign, 2)) {

@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
@@ -127,6 +128,7 @@ public class AttributeFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
 			if (ast.isAST2()) {
 
 			if (ast.arg1().isSymbol()) {
@@ -147,6 +149,9 @@ public class AttributeFunctions {
 
 				}
 			}
+			} catch (RuntimeException rex) {
+				//
+			}
 			return F.NIL;
 		}
 
@@ -164,6 +169,10 @@ public class AttributeFunctions {
 					throw new RuleCreationError(sym);
 				}
 			}
+			if (sym.isProtected()) {
+				IOFunctions.printMessage(F.ClearAttributes, "write", F.List(sym), EvalEngine.get());
+				throw new FailedException();
+			}
 			if (attributes.isSymbol()) {
 				ISymbol attribute = (ISymbol) attributes;
 
@@ -173,11 +182,16 @@ public class AttributeFunctions {
 			} else {
 				if (attributes.isList()) {
 					final IAST lst = (IAST) attributes;
-					for (int i = 1; i < lst.size(); i++) {
-						ISymbol attribute = (ISymbol) lst.get(i);
-
-						clearAttributes(sym, attribute);
-					}
+					lst.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							ClearAttributes.this.clearAttributes(sym, (ISymbol) x);
+						}
+					});
+					// for (int i = 1; i < lst.size(); i++) {
+					// ISymbol attribute = (ISymbol) lst.get(i);
+					// clearAttributes(sym, attribute);
+					// }
 					return F.Null;
 				}
 			}
@@ -353,6 +367,7 @@ public class AttributeFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
 			if (ast.isAST2()) {
 
 			if (ast.arg1().isSymbol()) {
@@ -364,6 +379,9 @@ public class AttributeFunctions {
 				IAST list = (IAST) ast.arg1();
 				return setSymbolsAttributes(list, ast.arg2(), engine);
 			}
+			}
+			} catch (RuntimeException rex) {
+				//
 			}
 			return F.NIL;
 		}
@@ -390,10 +408,16 @@ public class AttributeFunctions {
 
 			} else if (attributes.isList()) {
 				final IAST lst = (IAST) attributes;
-					for (int i = 1; i < lst.size(); i++) {
-						ISymbol attribute = (ISymbol) lst.get(i);
-						addAttributes(sym, attribute);
+				lst.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						addAttributes(sym, (ISymbol) x);
 					}
+				});
+				// for (int i = 1; i < lst.size(); i++) {
+				// ISymbol attribute = (ISymbol) lst.get(i);
+				// addAttributes(sym, attribute);
+				// }
 
 					return F.Null;
 				}
@@ -407,6 +431,10 @@ public class AttributeFunctions {
 		 * @param attribute
 		 */
 		private static void addAttributes(final ISymbol sym, ISymbol attribute) {
+			if (sym.isProtected()) {
+				IOFunctions.printMessage(F.SetAttributes, "write", F.List(sym), EvalEngine.get());
+				throw new FailedException();
+			}
 			int functionID = attribute.ordinal();
 			if (functionID > ID.UNKNOWN) {
 				switch (functionID) {

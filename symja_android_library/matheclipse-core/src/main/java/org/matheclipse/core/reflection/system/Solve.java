@@ -428,10 +428,10 @@ public class Solve extends AbstractFunctionEvaluator {
 		}
 		public void reset() {
 			int size = fListOfVariables.size();
-			this.fMatrixRow = F.ListAlloc(size);
-			for (int i = 1; i < size; i++) {
-				fMatrixRow.append(F.C0);
-			}
+			this.fMatrixRow = F.constantArray(F.C0, size - 1);
+			// for (int i = 1; i < size; i++) {
+			// fMatrixRow.append(F.C0);
+			// }
 			this.fPlusAST = F.PlusAlloc(8);
 			this.fEquationType = LINEAR;
 		}
@@ -1017,12 +1017,12 @@ public class Solve extends AbstractFunctionEvaluator {
 	 */
 	private static boolean isComplex(IAST listOfRules) {
 		if (listOfRules.isListOfRules()) {
-			for (int i = 1; i < listOfRules.size(); i++) {
-				IExpr value = listOfRules.get(i).second();
-				if (!value.isRealResult()) {
-					return true;
+			return listOfRules.exists(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return !x.second().isRealResult();
 				}
-			}
+			});
 		}
 		return false;
 	}

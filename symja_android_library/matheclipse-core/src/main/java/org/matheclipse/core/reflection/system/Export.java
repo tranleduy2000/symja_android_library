@@ -8,45 +8,16 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import ch.ethz.idsc.tensor.io.ImageFormat;
-
 /**
  * Export some data from file system.
+ *
  */
 public class Export extends AbstractEvaluator {
 
-//    private static final ComponentNameProvider<IExpr> nameProvider = v -> String.valueOf(v);
 
     public Export() {
     }
 
-    /**
-     * See the documentation of {link CsvFormat}, {@link ImageFormat}, {link MatlabExport}, and {link ObjectFormat}
-     * for information on how tensors are encoded in the respective format.
-     *
-     * @param file   destination
-     * @param tensor
-     * @throws IOException
-     */
-    public static void of(File file, IAST tensor) throws IOException {
-//        String filename = file.getName();
-//        Extension extension = Extension.exportFilename(filename);
-//        if (extension.equals(Extension.JPG))
-//            ImageIO.write(ImageFormat.jpg(tensor), "jpg", file);
-//        // else if (filename.hasExtension("m"))
-//        // Files.write(file.toPath(), (Iterable<String>) MatlabExport.of(tensor)::iterator);
-//        if (extension.equals(Extension.PNG))
-//            ImageIO.write(ImageFormat.of(tensor), "png", file);
-//            // else if (filename.hasExtension("tensor"))
-//            // object(file, tensor);
-//        else
-//            throw new RuntimeException(file.toString());
-        throw new UnsupportedEncodingException();
-    }
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {

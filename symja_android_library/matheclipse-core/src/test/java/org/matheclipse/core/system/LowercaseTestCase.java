@@ -3653,6 +3653,25 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"E^(b*x)/x");
 	}
 
+	public void testDefault() {
+		check("Default(test) = 1", //
+				"1");
+		check("test(x_., y_.) = {x, y}", //
+				"{x,y}");
+		check("test(a)", //
+				"{a,1}");
+		check("test( )", //
+				"{1,1}");
+
+		check("Default(Plus)", //
+				"0");
+		check("Default(Power)", //
+				"Default(Power)");
+		check("Default(Power, 2)", //
+				"1");
+		check("Default(Times)", //
+				"1");
+	}
 	public void testDefer() {
 		// check("Defer(3*2)", "3*2");
 		check("Defer(6/8)==6/8", //
@@ -4670,6 +4689,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testElement() {
+		check("Element(a | b | c, Reals)", //
+				"Element(a|b|c,Reals)");
+		check("Element(a | 2 | c, Reals)", //
+				"True");
 		check("Element(pi, reals)", //
 				"True");
 		check("Element(sin, reals)", //

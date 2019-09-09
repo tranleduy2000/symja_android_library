@@ -1,5 +1,7 @@
 package org.matheclipse.core.visit;
 
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -21,12 +23,21 @@ public class VisitorReplaceArgs extends VisitorExpr {
 	}
 
 	@Override
-	public IExpr visit(ISymbol element) {
-		for (int i = 1; i < astSlots.size(); i++) {
-			if (astSlots.get(i).equals(element)) {
-				return F.Slot(F.ZZ(i));
+	public IExpr visit(final ISymbol element) {
+		int position = astSlots.indexOf(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return x.equals(element);
 			}
-		}
+		});
+		if (position > 0) {
+			return F.Slot(F.ZZ(position));
+			}
+		// for (int i = 1; i < astSlots.size(); i++) {
+		// if (astSlots.get(i).equals(element)) {
+		// return F.Slot(F.ZZ(i));
+		// }
+		// }
 		return F.NIL;
 	}
 

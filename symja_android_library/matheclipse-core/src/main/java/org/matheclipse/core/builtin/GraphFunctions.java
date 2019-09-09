@@ -33,10 +33,11 @@ import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
-import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.IExprEdge;
 import org.matheclipse.core.expression.IExprWeightedEdge;
+import org.matheclipse.core.expression.data.GeoPositionExpr;
+import org.matheclipse.core.expression.data.GraphExpr;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IDataExpr;
@@ -96,9 +97,9 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> g = createGraph(ast.arg1());
-					if (g != null) {
-						return g;
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex != null) {
+						return gex;
 					}
 				} else if (ast.size() >= 3 && ast.arg1().isList()) {
 					IExpr edgeWeight = F.NIL;
@@ -110,28 +111,27 @@ public class GraphFunctions {
 					GraphType t = ast.arg1().isListOfEdges();
 					if (t != null) {
 						if (edgeWeight.isList()) {
-							DataExpr<org.jgrapht.Graph<IExpr, IExprWeightedEdge>> g = createWeightedGraph(F.NIL,
-									(IAST) ast.arg1(), (IAST) edgeWeight);
-							if (g != null) {
-								return g;
+							GraphExpr<IExprWeightedEdge> gex = createWeightedGraph(F.NIL, (IAST) ast.arg1(),
+									(IAST) edgeWeight);
+							if (gex != null) {
+								return gex;
 							}
 						} else {
-							DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> g = createGraph(F.NIL, (IAST) ast.arg1());
+							GraphExpr g = createGraph(F.NIL, (IAST) ast.arg1());
 							if (g != null) {
 								return g;
 							}
 						}
 					} else {
 						if (edgeWeight.isList()) {
-							DataExpr<org.jgrapht.Graph<IExpr, IExprWeightedEdge>> g = createWeightedGraph(
-									(IAST) ast.arg1(), (IAST) ast.arg1(), (IAST) edgeWeight);
-							if (g != null) {
-								return g;
+							GraphExpr<IExprWeightedEdge> gex = createWeightedGraph((IAST) ast.arg1(), (IAST) ast.arg1(),
+									(IAST) edgeWeight);
+							if (gex != null) {
+								return gex;
 							}
 						} else {
 							if (ast.arg2().isList()) {
-								DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> g = createGraph((IAST) ast.arg1(),
-										(IAST) ast.arg2());
+								GraphExpr g = createGraph((IAST) ast.arg1(), (IAST) ast.arg2());
 								if (g != null) {
 									return g;
 								}
@@ -163,11 +163,11 @@ public class GraphFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-				if (dex == null) {
+				GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+				if (gex == null) {
 					return F.NIL;
 				}
-				Graph<IExpr, IExprEdge> g = dex.toData();
+				Graph<IExpr, IExprEdge> g = gex.toData();
 
 				GraphMeasurer<IExpr, IExprEdge> graphMeasurer = new GraphMeasurer<>(g);
 				Set<IExpr> centerSet = graphMeasurer.getGraphCenter();
@@ -193,14 +193,14 @@ public class GraphFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
+				GraphExpr<IExprEdge> dex = createGraph(ast.arg1());
 				if (dex == null) {
 					return F.NIL;
 				}
 				Graph<IExpr, IExprEdge> g = dex.toData();
 				GraphMeasurer<IExpr, IExprEdge> graphMeasurer = new GraphMeasurer<>(g);
 				INum diameter = F.num(graphMeasurer.getDiameter());
-				if (isWeightedGraph(g)) {
+				if (dex.isWeightedGraph()) {
 					return diameter;
 				}
 				int intDiameter = diameter.toIntDefault();
@@ -227,11 +227,11 @@ public class GraphFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-				if (dex == null) {
+				GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+				if (gex == null) {
 					return F.NIL;
 				}
-				Graph<IExpr, IExprEdge> g = dex.toData();
+				Graph<IExpr, IExprEdge> g = gex.toData();
 				// boolean pseudoDiameter = false;
 				// if (ast.isAST2()) {
 				// final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
@@ -268,8 +268,8 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex != null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex != null) {
 						return F.True;
 					}
 				}
@@ -292,15 +292,15 @@ public class GraphFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-				if (dex == null) {
+				GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+				if (gex == null) {
 					return F.NIL;
 				}
-				Graph<IExpr, IExprEdge> g = dex.toData();
+				Graph<IExpr, IExprEdge> g = gex.toData();
 
 				GraphMeasurer<IExpr, IExprEdge> graphMeasurer = new GraphMeasurer<>(g);
 				INum radius = F.num(graphMeasurer.getRadius());
-				if (isWeightedGraph(g)) {
+				if (gex.isWeightedGraph()) {
 					return radius;
 				}
 				int intRadius = radius.toIntDefault();
@@ -372,7 +372,7 @@ public class GraphFunctions {
 						if (list.size() > 2 && list.forAll(new Predicate<IExpr>() {
 							@Override
 							public boolean test(IExpr x) {
-								return (x.toData() instanceof GlobalPosition);
+								return (x instanceof GeoPositionExpr);
 							}
 						})) {
 							int rowDim = list.size() - 1;
@@ -387,9 +387,9 @@ public class GraphFunctions {
 							Ellipsoid reference = Ellipsoid.WGS84;
 							// create all possible edges between the given vertices
 							for (int i = 0; i < rowDim - 1; i++) {
-								GlobalPosition p1 = (GlobalPosition) list.get(i + 1).toData();
+								GlobalPosition p1 = ((GeoPositionExpr) list.get(i + 1)).toData();
 								for (int j = i + 1; j < rowDim; j++) {
-									GlobalPosition p2 = (GlobalPosition) list.get(j + 1).toData();
+									GlobalPosition p2 = ((GeoPositionExpr) list.get(j + 1)).toData();
 									GeodeticMeasurement gm = geoCalc.calculateGeodeticMeasurement(reference, p1, p2);
 									g.setEdgeWeight(g.addEdge(F.ZZ(i + 1), F.ZZ(j + 1)), // GeoDistance
 											gm.getPointToPointDistance());
@@ -436,16 +436,16 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					SpanningTreeAlgorithm<IExprEdge> k = new BoruvkaMinimumSpanningTree<IExpr, IExprEdge>(g);
 					Set<IExprEdge> edgeSet = k.getSpanningTree().getEdges();
 					Graph<IExpr, IExprEdge> gResult = new DefaultDirectedGraph<IExpr, IExprEdge>(IExprEdge.class);
 					Graphs.addAllEdges(gResult, g, edgeSet);
-					return DataExpr.newInstance(F.Graph, gResult);
+					return GraphExpr.newInstance(gResult);
 				}
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
@@ -467,12 +467,12 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
 
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					return graphToAdjacencyMatrix(g);
 				}
 			} catch (RuntimeException rex) {
@@ -495,11 +495,11 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					return edgesToIExpr(g);
 				}
 			} catch (RuntimeException rex) {
@@ -524,9 +524,9 @@ public class GraphFunctions {
 
 				if (ast.isAST2() && ast.arg2().isEdge()) {
 					IAST edge = (IAST) ast.arg2();
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex != null) {
-						Graph<IExpr, IExprEdge> g = dex.toData();
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex != null) {
+						Graph<IExpr, IExprEdge> g = gex.toData();
 						return F.bool(g.containsEdge(edge.first(), edge.second()));
 					}
 				}
@@ -550,12 +550,12 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
 
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					GraphPath<IExpr, IExprEdge> path = eulerianCycle(g);
 					if (path != null) {
 						// Graph is Eulerian
@@ -582,12 +582,12 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
 
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					GraphPath<IExpr, IExprEdge> path = hamiltonianCycle(g);
 					if (path != null) {
 						// Graph is Hamiltonian
@@ -614,12 +614,12 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
 
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					GraphPath<IExpr, IExprEdge> path = eulerianCycle(g);
 					if (path == null) {
 						// Graph is not Eulerian
@@ -652,12 +652,12 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
 
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					GraphPath<IExpr, IExprEdge> path = hamiltonianCycle(g);
 					if (path == null) {
 						// Graph is not Hamiltonian
@@ -689,11 +689,11 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					// ChordalityInspector<IExpr, IExprEdge> inspector = new ChordalityInspector<IExpr, IExprEdge>(g);
 					VertexCoverAlgorithm<IExpr> greedy = new GreedyVCImpl<>(g);
 					VertexCoverAlgorithm.VertexCover<IExpr> cover = greedy.getVertexCover();
@@ -730,12 +730,12 @@ public class GraphFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-				if (dex == null) {
+				GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+				if (gex == null) {
 					return F.NIL;
 				}
 
-				Graph<IExpr, IExprEdge> g = dex.toData();
+				Graph<IExpr, IExprEdge> g = gex.toData();
 
 				DijkstraShortestPath<IExpr, IExprEdge> dijkstraAlg = new DijkstraShortestPath<>(g);
 				SingleSourcePaths<IExpr, IExprEdge> iPaths = dijkstraAlg.getPaths(ast.arg2());
@@ -761,18 +761,18 @@ public class GraphFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-				if (dex == null) {
+				GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+				if (gex == null) {
 					return F.NIL;
 				}
-				Graph<IExpr, IExprEdge> g = dex.toData();
+				Graph<IExpr, IExprEdge> g = gex.toData();
 
 				GraphMeasurer<IExpr, IExprEdge> graphMeasurer = new GraphMeasurer<>(g);
 				Map<IExpr, Double> centerSet = graphMeasurer.getVertexEccentricityMap();
 				Double dValue = centerSet.get(ast.arg2());
 				if (dValue != null) {
 					INum vertexEccentricity = F.num(dValue);
-					if (isWeightedGraph(g)) {
+					if (gex.isWeightedGraph()) {
 						return vertexEccentricity;
 					}
 					int intVertexEccentricity = vertexEccentricity.toIntDefault();
@@ -801,11 +801,11 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST1()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex == null) {
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex == null) {
 						return F.NIL;
 					}
-					Graph<IExpr, IExprEdge> g = dex.toData();
+					Graph<IExpr, IExprEdge> g = gex.toData();
 					return vertexToIExpr(g);
 					// Set<IExpr> vertexSet = g.vertexSet();
 					// int size = vertexSet.size();
@@ -835,9 +835,9 @@ public class GraphFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				if (ast.isAST2()) {
-					DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> dex = createGraph(ast.arg1());
-					if (dex != null) {
-						Graph<IExpr, IExprEdge> g = dex.toData();
+					GraphExpr<IExprEdge> gex = createGraph(ast.arg1());
+					if (gex != null) {
+						Graph<IExpr, IExprEdge> g = gex.toData();
 						return F.bool(g.containsVertex(ast.arg2()));
 					}
 				}
@@ -861,9 +861,9 @@ public class GraphFunctions {
 	 * @param arg1
 	 * @return
 	 */
-	private static DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> createGraph(final IExpr arg1) {
-		if (arg1.head().equals(F.Graph) && arg1 instanceof IDataExpr) {
-			return (DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>>) arg1;
+	private static GraphExpr<IExprEdge> createGraph(final IExpr arg1) {
+		if (arg1.head().equals(F.Graph) && arg1 instanceof GraphExpr) {
+			return (GraphExpr<IExprEdge>) arg1;
 		}
 		Graph<IExpr, IExprEdge> g;
 		GraphType t = arg1.isListOfEdges();
@@ -882,7 +882,7 @@ public class GraphFunctions {
 				g.addEdge(edge.arg1(), edge.arg2());
 			}
 
-			return DataExpr.newInstance(F.Graph, g);
+			return GraphExpr.newInstance(g);
 		}
 
 		return null;
@@ -894,8 +894,8 @@ public class GraphFunctions {
 	 * @param arg1
 	 * @return
 	 */
-	private static DataExpr<org.jgrapht.Graph<IExpr, IExprWeightedEdge>> createWeightedGraph(final IAST vertices,
-			final IAST arg1, final IAST edgeWeight) {
+	private static GraphExpr<IExprWeightedEdge> createWeightedGraph(final IAST vertices, final IAST arg1,
+			final IAST edgeWeight) {
 		if (arg1.size() != edgeWeight.size()) {
 			return null;
 		}
@@ -931,13 +931,13 @@ public class GraphFunctions {
 				}
 			}
 
-			return DataExpr.newInstance(F.Graph, g);
+			return GraphExpr.newInstance(g);
 		}
 
 		return null;
 	}
 
-	private static DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> createGraph(final IAST vertices, final IAST edges) {
+	private static GraphExpr createGraph(final IAST vertices, final IAST edges) {
 
 		Graph<IExpr, IExprEdge> g;
 		GraphType t = edges.isListOfEdges();
@@ -961,7 +961,7 @@ public class GraphFunctions {
 				g.addEdge(edge.arg1(), edge.arg2());
 			}
 
-			return DataExpr.newInstance(F.Graph, g);
+			return GraphExpr.newInstance(g);
 		}
 
 		return null;
@@ -997,17 +997,6 @@ public class GraphFunctions {
 		Initializer.init();
 	}
 
-	/**
-	 * Test if the graph is instance of <code>DefaultDirectedWeightedGraph</code> or
-	 * <code>DefaultUndirectedWeightedGraph</code>
-	 *
-	 * @param graph
-	 *            the graph which should be tested.
-	 * @return <code>true</code> if the graph is a weighted graph
-	 */
-	private static boolean isWeightedGraph(Graph<IExpr, IExprEdge> graph) {
-		return graph instanceof DefaultDirectedWeightedGraph || graph instanceof DefaultUndirectedWeightedGraph;
-	}
 	private GraphFunctions() {
 
 	}
@@ -1109,8 +1098,8 @@ public class GraphFunctions {
 	 */
 	public static String graphToJSForm(IDataExpr graphExpr) {
 
-		DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>> graph = (DataExpr<org.jgrapht.Graph<IExpr, IExprEdge>>) graphExpr;
-		AbstractBaseGraph<IExpr, ?> g = (AbstractBaseGraph<IExpr, ?>) graph.toData();
+		GraphExpr<IExprEdge> gex = (GraphExpr<IExprEdge>) graphExpr;
+		AbstractBaseGraph<IExpr, ?> g = (AbstractBaseGraph<IExpr, ?>) gex.toData();
 		Map<IExpr, Integer> map = new HashMap<IExpr, Integer>();
 		StringBuilder buf = new StringBuilder();
 		if (g.getType().isWeighted()) {

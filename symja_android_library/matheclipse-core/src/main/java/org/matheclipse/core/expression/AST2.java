@@ -97,8 +97,7 @@ public class AST2 extends AST1 {
 	}
 
 	/**
-	 * Returns a new {@code AST2} with the same elements, the same size and the same capacity as this
-	 * {@code AST2}.
+	 * Returns a new {@code AST2} with the same elements, the same size and the same capacity as this {@code AST2}.
 	 * 
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
@@ -327,6 +326,27 @@ public class AST2 extends AST1 {
 				break;
 			}
 		}
+	}
+	/** {@inheritDoc} */
+	@Override
+	public   int indexOf(Predicate<? super IExpr> predicate) {
+		if (predicate.test(arg1)) {
+			return 1;
+		}
+		if (predicate.test(arg2)) {
+			return 2;
+		}
+		return -1;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public   IExpr findFirst(Function<IExpr, IExpr> function) {
+		IExpr temp = function.apply(arg1);
+		if (temp.isPresent()) {
+			return temp;
+		}
+		return function.apply(arg2);
 	}
 	@Override
 	public IExpr get(int location) {

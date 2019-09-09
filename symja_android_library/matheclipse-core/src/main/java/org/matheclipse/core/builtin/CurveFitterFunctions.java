@@ -1,5 +1,8 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.ObjIntConsumer;
+
 import org.hipparchus.analysis.ParametricUnivariateFunction;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.fitting.AbstractCurveFitter;
@@ -8,7 +11,6 @@ import org.hipparchus.fitting.SimpleCurveFitter;
 import org.hipparchus.fitting.WeightedObservedPoints;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -100,9 +102,15 @@ public class CurveFitterFunctions {
 				this.gradientList = gradientList;
 				this.listOfRules = F.ListAlloc(gradientList.size());
 				this.listOfRules.append(F.Rule(x, F.Null));
-				for (int i = 1; i < listOfSymbols.size(); i++) {
-					this.listOfRules.append(F.Rule(listOfSymbols.get(i), F.Null));
-				}
+				listOfSymbols.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr arg) {
+						FindFitParametricFunction.this.listOfRules.append(F.Rule(arg, F.Null));
+					}
+				});
+				// for (int i = 1; i < listOfSymbols.size(); i++) {
+				// this.listOfRules.append(F.Rule(listOfSymbols.get(i), F.Null));
+				// }
 			}
 
 			private void createSubstitutionRules(double t, double... parameters) {
@@ -170,11 +178,17 @@ public class CurveFitterFunctions {
 		 * 
 		 * @return
 		 */
-		private static IExpr convertToRulesList(IAST listOfSymbols, double[] values) {
-			IASTAppendable result = F.ListAlloc(listOfSymbols.size());
-			for (int i = 1; i < listOfSymbols.size(); i++) {
-				result.append(F.Rule(listOfSymbols.get(i), F.num(values[i - 1])));
-			}
+		private static IExpr convertToRulesList(IAST listOfSymbols, final double[] values) {
+			final IASTAppendable result = F.ListAlloc(listOfSymbols.size());
+			listOfSymbols.forEach(new ObjIntConsumer<IExpr>() {
+				@Override
+				public void accept(IExpr arg, int i) {
+					result.append(F.Rule(arg, F.num(values[i - 1])));
+				}
+			});
+			// for (int i = 1; i < listOfSymbols.size(); i++) {
+			// result.append(F.Rule(listOfSymbols.get(i), F.num(values[i - 1])));
+			// }
 			return result;
 		}
 

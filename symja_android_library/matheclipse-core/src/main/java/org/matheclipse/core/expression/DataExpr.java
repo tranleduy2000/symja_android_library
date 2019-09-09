@@ -18,27 +18,15 @@ import org.matheclipse.core.visit.IVisitorLong;
  * 
  * @see org.matheclipse.core.interfaces.IDataExpr
  */
-public class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
+public abstract class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4987827851920443376L;
 
-	/**
-	 * Be cautious with this method, no new internal IExpr object is created
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static <T> DataExpr<T> newInstance(final IBuiltInSymbol head, final T value) {
-		return new DataExpr(head, value);
-	}
 
 	private IBuiltInSymbol fHead;
-	private T fData;
+	protected T fData;
 
-	private DataExpr(final IBuiltInSymbol head, final T data) {
+	protected DataExpr(final IBuiltInSymbol head, final T data) {
 		fHead = head;
 		fData = data;
 	}
@@ -73,10 +61,6 @@ public class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 		return 0L;
 	}
 
-	@Override
-	public IExpr copy() {
-		return new DataExpr(fHead, fData);
-	}
 
 	@Override
 	public boolean equals(final Object obj) {

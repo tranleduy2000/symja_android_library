@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 
 import org.matheclipse.combinatoric.KSubsets;
 import org.matheclipse.core.eval.EvalEngine;
@@ -207,7 +208,6 @@ public final class Combinatoric {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3);
 			List<IAST> la = new ArrayList<IAST>(ast.argSize());
 			for (int i = 1; i < ast.size(); i++) {
 				if (ast.get(i).isList()) {
@@ -222,6 +222,10 @@ public final class Combinatoric {
 				result.append(iast);
 			}
 			return result;
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_INFINITY;
 		}
 	}
 
@@ -413,7 +417,6 @@ public final class Combinatoric {
 		/** {@inheritDoc} */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IntRangeSpec range = IntRangeSpec.createNonNegative(ast, 2);
 			if (range != null) {
@@ -461,6 +464,10 @@ public final class Combinatoric {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 	}
 
 	private static class JaccardDissimilarity extends AbstractEvaluator {
@@ -881,7 +888,6 @@ public final class Combinatoric {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 3, 4);
 
 			if (ast.arg1().isAST()) {
 				if (ast.arg2().isInteger()) {
@@ -909,6 +915,10 @@ public final class Combinatoric {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
 	}
 
 	/**
@@ -1145,7 +1155,6 @@ public final class Combinatoric {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			if (ast.arg1().isAST()) {
 				final IAST list = (IAST) ast.arg1();
@@ -1182,6 +1191,10 @@ public final class Combinatoric {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		private IAST createPermutationsWithNParts(final IAST list, int parts, final IASTAppendable result) {
 			if (parts == 0) {
 				result.append(F.List());
@@ -1207,7 +1220,6 @@ public final class Combinatoric {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkSize(ast, 3);
 
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
@@ -1458,7 +1470,6 @@ public final class Combinatoric {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 1, 3);
 			if (ast.isAST0()) {
 				return F.NIL;
 			}
@@ -1501,6 +1512,10 @@ public final class Combinatoric {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_0_2;
+		}
 		public static KSubsetsList createKSubsets(final IAST list, final int k, IAST resultList, final int offset) {
 			return new KSubsetsList(new KSubsets.KSubsetsIterable(list.size() - offset, k), list, k, resultList,
 					offset);
@@ -1514,17 +1529,24 @@ public final class Combinatoric {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			Validate.checkRange(ast, 2, 3);
 
 			IExpr arg1 = ast.arg1();
 			if (ast.isAST1() && arg1.isList()) {
 				try {
 					IAST list = (IAST) arg1;
-					for (int i = 1; i < list.size(); i++) {
-						if (!list.get(i).isAST()) {
+					if (list.exists(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							return !x.isAST();
+						}
+					})) {
 							return F.NIL;
 						}
-					}
+//					for (int i = 1; i < list.size(); i++) {
+//						if (!list.get(i).isAST()) {
+//							return F.NIL;
+//						}
+//					}
 					IASTAppendable result = F.ListAlloc(16);
 					IAST temp = F.List();
 					tuplesOfLists(list, 1, result, temp);
@@ -1549,6 +1571,10 @@ public final class Combinatoric {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		/**
 		 * Generate all n-tuples form a list.
 		 * 

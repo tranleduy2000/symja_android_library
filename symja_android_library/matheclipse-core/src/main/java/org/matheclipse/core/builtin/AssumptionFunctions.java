@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Function;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -80,20 +82,18 @@ public class AssumptionFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			final IExpr arg2 = engine.evaluate(ast.arg2());
-			IExpr truthValue;
 			if (arg2.isSymbol()) {
+				final ISymbol domain = (ISymbol) arg2;
 				final IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isAST(F.Alternatives)) {
-					IAST list = (IAST) arg1;
-					for (int i = 1; i < list.size(); i++) {
-						truthValue = assumeDomain(arg1, (ISymbol) arg2);
-						if (truthValue.isPresent()) {
-							return truthValue;
+					return ((IAST) arg1).findFirst(new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return Element.this.assumeDomain(x, domain);
 						}
-					}
-					return F.True;
+					});
 				} else {
-					return assumeDomain(arg1, (ISymbol) arg2);
+					return assumeDomain(arg1, domain);
 				}
 			}
 			return F.NIL;
@@ -102,10 +102,19 @@ public class AssumptionFunctions {
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_2_2;
 		}
-		private IExpr assumeDomain(final IExpr arg1, final ISymbol arg2) {
-			if (arg2.isBuiltInSymbol()) {
+		/**
+		 * Return F.True or F.False if expr is assumed to be in the <code>domain</code> or not to be in the
+		 * <code>domain</code>.
+		 *
+		 * @param arg1
+		 * @param domain
+		 * @return F.True or F.False if expr is assumed to be in the <code>domain</code> or not to be in the
+		 *         <code>domain</code>. In all other cases return <code>F.NIL</code>.
+		 */
+		private IExpr assumeDomain(final IExpr arg1, final ISymbol domain) {
+			if (domain.isBuiltInSymbol()) {
 				ISymbol truthValue;
-				int symbolID = ((IBuiltInSymbol) arg2).ordinal();
+				int symbolID = ((IBuiltInSymbol) domain).ordinal();
 				switch (symbolID) {
 				case ID.Algebraics:
 					truthValue = AbstractAssumptions.assumeAlgebraic(arg1);

@@ -109,7 +109,8 @@ public class Algebra {
 	public static boolean DEBUG = false;
 	/**
 	 *
-	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static initializer</a>
+	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
+	 * initializer</a>
 	 */
 	private static class Initializer {
 
@@ -275,8 +276,8 @@ public class Algebra {
 		}
 
 		/**
-		 * Determine common factors in a <code>Plus(...)</code> expression. Index <code>[0]</code> contains the common factor. Index
-		 * <code>[1]</code> contains the rest <code>Plus(...)</code> factor;
+		 * Determine common factors in a <code>Plus(...)</code> expression. Index <code>[0]</code> contains the common
+		 * factor. Index <code>[1]</code> contains the rest <code>Plus(...)</code> factor;
 		 *
 		 * @param plusAST
 		 * @return <code>null</code> if no common factor was found.
@@ -307,12 +308,18 @@ public class Algebra {
 					IExpr[] result = new IExpr[2];
 					result[0] = commonFactor.oneIdentity1();
 					if (!result[0].isOne()) {
-						IExpr inverse = result[0].inverse();
+						final IExpr inverse = result[0].inverse();
 
-						IASTAppendable commonPlus = F.PlusAlloc(plusAST.size());
-						for (int i = 1; i < plusAST.size(); i++) {
-							commonPlus.append(F.Times(inverse, plusAST.get(i)));
-						}
+						final IASTAppendable commonPlus = F.PlusAlloc(plusAST.size());
+						plusAST.forEach(new Consumer<IExpr>() {
+							@Override
+							public void accept(IExpr x) {
+								commonPlus.append(F.Times(inverse, x));
+							}
+						});
+						// for (int i = 1; i < plusAST.size(); i++) {
+						// commonPlus.append(F.Times(inverse, plusAST.get(i)));
+						// }
 
 						result[1] = commonPlus.oneIdentity1();
 						return result;
