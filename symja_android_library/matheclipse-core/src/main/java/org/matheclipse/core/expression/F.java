@@ -904,6 +904,8 @@ public class F {
 
     /** FindSpanningTree(graph) - find the minimum spanning tree in the `graph`.*/
     public final static IBuiltInSymbol FindSpanningTree = F.initFinalSymbol("FindSpanningTree", ID.FindSpanningTree);
+    /***/
+    public final static IBuiltInSymbol FindVertexCover = F.initFinalSymbol("FindVertexCover", ID.FindVertexCover);
     /** First(expr) - returns the first element in `expr`.*/
     public final static IBuiltInSymbol First = F.initFinalSymbol("First", ID.First);
     /**
