@@ -68,65 +68,65 @@ public final class ListFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.Accumulate.setEvaluator(new Accumulate());
-		F.Append.setEvaluator(new Append());
-		F.AppendTo.setEvaluator(new AppendTo());
-		F.Array.setEvaluator(new Array());
-		F.ArrayPad.setEvaluator(new ArrayPad());
-		F.Cases.setEvaluator(new Cases());
-		F.Catenate.setEvaluator(new Catenate());
-		F.Commonest.setEvaluator(new Commonest());
-		F.Complement.setEvaluator(new Complement());
-		F.Composition.setEvaluator(new Composition());
-		F.ComposeList.setEvaluator(new ComposeList());
-		F.ConstantArray.setEvaluator(new ConstantArray());
-		F.Count.setEvaluator(new Count());
-		F.Delete.setEvaluator(new Delete());
-		F.DeleteDuplicates.setEvaluator(new DeleteDuplicates());
-		F.DeleteCases.setEvaluator(new DeleteCases());
-		F.Drop.setEvaluator(new Drop());
-		F.Extract.setEvaluator(new Extract());
-		F.First.setEvaluator(new First());
-		F.Fold.setEvaluator(new Fold());
-		F.FoldList.setEvaluator(new FoldList());
-		F.Gather.setEvaluator(new Gather());
+			F.Accumulate.setEvaluator(new Accumulate());
+			F.Append.setEvaluator(new Append());
+			F.AppendTo.setEvaluator(new AppendTo());
+			F.Array.setEvaluator(new Array());
+			F.ArrayPad.setEvaluator(new ArrayPad());
+			F.Cases.setEvaluator(new Cases());
+			F.Catenate.setEvaluator(new Catenate());
+			F.Commonest.setEvaluator(new Commonest());
+			F.Complement.setEvaluator(new Complement());
+			F.Composition.setEvaluator(new Composition());
+			F.ComposeList.setEvaluator(new ComposeList());
+			F.ConstantArray.setEvaluator(new ConstantArray());
+			F.Count.setEvaluator(new Count());
+			F.Delete.setEvaluator(new Delete());
+			F.DeleteDuplicates.setEvaluator(new DeleteDuplicates());
+			F.DeleteCases.setEvaluator(new DeleteCases());
+			F.Drop.setEvaluator(new Drop());
+			F.Extract.setEvaluator(new Extract());
+			F.First.setEvaluator(new First());
+			F.Fold.setEvaluator(new Fold());
+			F.FoldList.setEvaluator(new FoldList());
+			F.Gather.setEvaluator(new Gather());
 			F.GatherBy.setEvaluator(new GatherBy());
-		F.Insert.setEvaluator(new Insert());
-		F.Intersection.setEvaluator(new Intersection());
-		F.Join.setEvaluator(new Join());
-		F.Last.setEvaluator(new Last());
-		F.Length.setEvaluator(new Length());
-		F.LevelQ.setEvaluator(new LevelQ());
-		F.Level.setEvaluator(new Level());
-		F.Most.setEvaluator(new Most());
-		F.Nearest.setEvaluator(new Nearest());
-		F.PadLeft.setEvaluator(new PadLeft());
-		F.PadRight.setEvaluator(new PadRight());
-		F.Position.setEvaluator(new Position());
-		F.Prepend.setEvaluator(new Prepend());
-		F.PrependTo.setEvaluator(new PrependTo());
-		F.Range.setEvaluator(new Range());
-		F.Rest.setEvaluator(new Rest());
-		F.Reverse.setEvaluator(new Reverse());
+			F.Insert.setEvaluator(new Insert());
+			F.Intersection.setEvaluator(new Intersection());
+			F.Join.setEvaluator(new Join());
+			F.Last.setEvaluator(new Last());
+			F.Length.setEvaluator(new Length());
+			F.LevelQ.setEvaluator(new LevelQ());
+			F.Level.setEvaluator(new Level());
+			F.Most.setEvaluator(new Most());
+			F.Nearest.setEvaluator(new Nearest());
+			F.PadLeft.setEvaluator(new PadLeft());
+			F.PadRight.setEvaluator(new PadRight());
+			F.Position.setEvaluator(new Position());
+			F.Prepend.setEvaluator(new Prepend());
+			F.PrependTo.setEvaluator(new PrependTo());
+			F.Range.setEvaluator(new Range());
+			F.Rest.setEvaluator(new Rest());
+			F.Reverse.setEvaluator(new Reverse());
 			F.Replace.setEvaluator(new Replace());
-		F.ReplaceAll.setEvaluator(new ReplaceAll());
+			F.ReplaceAll.setEvaluator(new ReplaceAll());
 			F.ReplaceList.setEvaluator(new ReplaceList());
-		F.ReplacePart.setEvaluator(new ReplacePart());
+			F.ReplacePart.setEvaluator(new ReplacePart());
 			F.ReplaceRepeated.setEvaluator(new ReplaceRepeated());
-		F.Riffle.setEvaluator(new Riffle());
-		F.RotateLeft.setEvaluator(new RotateLeft());
-		F.RotateRight.setEvaluator(new RotateRight());
-		F.Select.setEvaluator(new Select());
-		F.Split.setEvaluator(new Split());
-		F.SplitBy.setEvaluator(new SplitBy());
-		F.Subdivide.setEvaluator(new Subdivide());
-		F.Table.setEvaluator(new Table());
-		F.Take.setEvaluator(new Take());
-		F.Tally.setEvaluator(new Tally());
-		F.Total.setEvaluator(new Total());
-		F.Union.setEvaluator(new Union());
+			F.Riffle.setEvaluator(new Riffle());
+			F.RotateLeft.setEvaluator(new RotateLeft());
+			F.RotateRight.setEvaluator(new RotateRight());
+			F.Select.setEvaluator(new Select());
+			F.Split.setEvaluator(new Split());
+			F.SplitBy.setEvaluator(new SplitBy());
+			F.Subdivide.setEvaluator(new Subdivide());
+			F.Table.setEvaluator(new Table());
+			F.Take.setEvaluator(new Take());
+			F.Tally.setEvaluator(new Tally());
+			F.Total.setEvaluator(new Total());
+			F.Union.setEvaluator(new Union());
 
-	}
+		}
 
 	}
 
@@ -1646,23 +1646,102 @@ public final class ListFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			final IExpr arg2 = engine.evaluate(ast.arg2());
-			if (arg1.isAST() && arg2.isInteger()) {
-				final IAST list1 = (IAST) arg1;
+			if (arg1.isAST()) {
+				final IAST list = (IAST) arg1;
+				if (arg2.isInteger()) {
+					int indx = 0;
 
 				try {
-					int indx = Validate.checkIntType(ast, 2, Integer.MIN_VALUE);
+						indx = Validate.checkIntType(ast, 2, Integer.MIN_VALUE);
 					if (indx < 0) {
 						// negative n counts from the end
-						indx = list1.size() + indx;
+							indx = list.size() + indx;
 					}
-					return list1.removeAtCopy(indx);
-				} catch (final IndexOutOfBoundsException e) {
+						if (indx == 0 && list.size() == 1) {
+							return F.Sequence();
+						}
+						return list.removeAtCopy(indx);
+					} catch (final RuntimeException rex) {
 					if (Config.DEBUG) {
-						e.printStackTrace();
+							rex.printStackTrace();
+						}
+						return engine
+								.printMessage("Cannot delete position " + arg2.toString() + " in " + arg1.toString());
+					}
+				} else if (arg2.isList()) {
+					final IAST indxList = (IAST) arg2;
+					if (indxList.isListOfLists()) {
+//						IAST result = list;
+//						for (int i = 1; i < indxList.size(); i++) {
+//							result = deleteListOfPositions(result, (IAST) indxList.get(i), engine);
+//							if (!result.isPresent()) {
+//								return F.NIL;
+//							}
+//						}
+//						return result;
+					} else {
+
+						return deleteListOfPositions(list, indxList, engine);
+					}
+				}
 					}
 					return F.NIL;
 				}
 
+		/**
+		 * Remove a list of <code>int</code> positions from the <code>list</code>.
+		 *
+		 * @param list
+		 *            the list in which sub-positions should be removed
+		 * @param listOfIntPositions
+		 *            a list of int positions <code>{2,4,-3,5,...}</code>
+		 * @param engine
+		 *            the evaluation engine
+		 * @return
+		 */
+		private IAST deleteListOfPositions(final IAST list, final IAST listOfIntPositions, EvalEngine engine) {
+			int[] indx;
+			try {
+				indx = Validate.checkListOfInts(listOfIntPositions, Integer.MIN_VALUE, Integer.MAX_VALUE);
+				return deletePartRecursive(list, indx, 0);
+			} catch (final RuntimeException rex) {
+				if (Config.DEBUG) {
+					rex.printStackTrace();
+				}
+				return engine.printMessage(
+						"Cannot delete position " + listOfIntPositions.toString() + " in " + list.toString());
+			}
+		}
+
+		/**
+		 * Delete the position index recursively from the list.
+		 *
+		 * @param list
+		 *            the list in which sub-positions should be removed
+		 * @param indx
+		 *            a list of int sub-positions from <code>list</code>
+		 * @param indxPosition
+		 *            the current position in <code>indx</code>. Increased by 1 in each recursion step.
+		 * @return
+		 */
+		private IAST deletePartRecursive(IAST list, int[] indx, int indxPosition) {
+			int position = indx[indxPosition];
+			if (position < 0) {
+				// negative n counts from the end
+				position = list.size() + position;
+			}
+			if (indxPosition == indx.length - 1) {
+				if (position == 0 && list.size() == 1) {
+					return F.Sequence();
+				}
+				return list.removeAtCopy(position);
+			}
+			IExpr temp = list.get(position);
+			if (temp.isAST()) {
+				IAST subResult = deletePartRecursive((IAST) temp, indx, indxPosition + 1);
+				if (subResult.isPresent()) {
+					return list.setAtCopy(position, subResult);
+				}
 			}
 			return F.NIL;
 		}
