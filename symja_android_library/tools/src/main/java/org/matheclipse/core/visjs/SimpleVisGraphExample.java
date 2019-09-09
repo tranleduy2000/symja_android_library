@@ -1,23 +1,13 @@
 package org.matheclipse.core.visjs;
 
-import org.jgrapht.Graph;
-import org.jgrapht.GraphType;
-import org.jgrapht.graph.AbstractBaseGraph;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.GraphFunctions;
 import org.matheclipse.core.eval.ExprEvaluator;
-import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.IExprEdge;
-import org.matheclipse.core.expression.IExprWeightedEdge;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IDataExpr;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Graph visualization with <a href="https://visjs.org/">vis-network</a>
