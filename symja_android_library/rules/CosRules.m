@@ -51,14 +51,18 @@ Cos(2*Pi)=1,
 
 Cos(I)=Cosh(1),
 
-Cos(ArcSin(x_)):=(1-x^2)^(1/2),
+Cos(ArcSin(x_)):=Sqrt(1-x^2),
+Cos(2*ArcSin(x_)):=1-2*x^2,
 Cos(ArcCos(x_)):=x,
-Cos(ArcTan(x_)):=(1+x^2)^(-1/2),
-Cos(ArcCot(x_)):=x*(1+x^2)^(-1/2),
+Cos(2*ArcCos(x_)):= -1+2*x^2,
+Cos(ArcTan(x_)):=1/Sqrt(1+x^2),
+Cos(2*ArcTan(x_)):=(1-x^2)/(1+x^2),
+Cos(ArcCot(x_)):=1/Sqrt(1+1/x^2),
+Cos(2*ArcCot(x_)):=(-1+x^2)/(1+x^2),
 Cos(ArcCsc(x_)):=(1-x^(-2))^(1/2),
+Cos(2*ArcCsc(x_)):=(-2+x^2)/(x^2),
 Cos(ArcSec(x_)):=x^(-1),
-
-Cos(Sqrt(x_^2)):=Cos(x),  
+Cos(2*ArcSec(x_)):=(2-x^2)/(x^2),
 	 
 Cos(I*Infinity)=Infinity,
 Cos(-I*Infinity)=Infinity,
