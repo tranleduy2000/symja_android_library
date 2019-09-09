@@ -7,6 +7,7 @@ import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.math.MathException;
 import org.matheclipse.parser.client.operator.Operator;
 
 import java.io.IOException;
@@ -304,6 +305,9 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 					buf.append(")");
 					return;
 				}
+			}
+			if (function.headID() > 0) {
+				throw new MathException("illegal JavaScript arg");
 			}
 		} else {
 		if (function.isPower()) {

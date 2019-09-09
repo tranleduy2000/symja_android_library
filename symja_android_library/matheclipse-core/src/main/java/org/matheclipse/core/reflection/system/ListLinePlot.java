@@ -4,6 +4,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.graphics.Dimensions2D;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -24,7 +25,7 @@ public class ListLinePlot extends AbstractEvaluator {
 	/**
 	 * Constructor for the singleton
 	 */
-//	public final static ListLinePlot CONST = new ListLinePlot();
+	// public final static ListLinePlot CONST = new ListLinePlot();
 
 	public ListLinePlot() {
 	}
@@ -32,7 +33,10 @@ public class ListLinePlot extends AbstractEvaluator {
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (Config.USE_MATHCELL) {
-			return F.Manipulate.of(engine, ast);
+			IExpr temp = F.Manipulate.of(engine, ast);
+			if (temp.headID() == ID.JSFormData) {
+				return temp;
+			}
 		}
 		if ((ast.size() == 2) && ast.arg1().isList()) {
 			try {
