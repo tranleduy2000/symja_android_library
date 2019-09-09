@@ -8647,6 +8647,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testJSForm() {
+		check("JSForm(x < 10 && y > 1)", //
+				"x<10&&y>1");
+		check("JSForm(a<b)", //
+				"a<b");
+		check("JSForm(a+b)", //
+				"a+b");
 		check("JSForm(E^3-Cos(Pi^2/x) )", //
 				"Math.pow(Math.E,3)-Math.cos(Math.pow(Math.PI,2)/x)");
 	}

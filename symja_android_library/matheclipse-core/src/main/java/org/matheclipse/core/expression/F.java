@@ -34,6 +34,7 @@ import org.matheclipse.core.builtin.GraphDataFunctions;
 import org.matheclipse.core.builtin.GraphFunctions;
 import org.matheclipse.core.builtin.HypergeometricFunctions;
 import org.matheclipse.core.builtin.IOFunctions;
+import org.matheclipse.core.builtin.ImageFunctions;
 import org.matheclipse.core.builtin.IntegerFunctions;
 import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.builtin.ListFunctions;
@@ -3238,6 +3239,7 @@ public class F {
 			GraphFunctions.initialize();
 			GraphDataFunctions.initialize();
 			GeodesyFunctions.initialize();
+            ImageFunctions.initialize();
 			ManipulateFunction.initialize();
             ComputationalGeometryFunctions.initialize();
 

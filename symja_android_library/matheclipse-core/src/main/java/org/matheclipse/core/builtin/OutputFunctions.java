@@ -32,17 +32,17 @@ public final class OutputFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.CForm.setEvaluator(new CForm());
-		F.FullForm.setEvaluator(new FullForm());
-		F.HoldForm.setEvaluator(new HoldForm());
-		F.HornerForm.setEvaluator(new HornerForm());
-		F.InputForm.setEvaluator(new InputForm());
-		F.JavaForm.setEvaluator(new JavaForm());
+			F.CForm.setEvaluator(new CForm());
+			F.FullForm.setEvaluator(new FullForm());
+			F.HoldForm.setEvaluator(new HoldForm());
+			F.HornerForm.setEvaluator(new HornerForm());
+			F.InputForm.setEvaluator(new InputForm());
+			F.JavaForm.setEvaluator(new JavaForm());
 			F.JSForm.setEvaluator(new JSForm());
-		F.MathMLForm.setEvaluator(new MathMLForm());
-		F.TableForm.setEvaluator(new TableForm());
-		F.TeXForm.setEvaluator(new TeXForm());
-	}
+			F.MathMLForm.setEvaluator(new MathMLForm());
+			F.TableForm.setEvaluator(new TableForm());
+			F.TeXForm.setEvaluator(new TeXForm());
+		}
 	}
 
 	private static class CForm extends AbstractCoreFunctionEvaluator {
@@ -364,7 +364,7 @@ public final class OutputFunctions {
 				if (Config.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
-				return engine.printMessage("JavaForm: " + rex.getMessage());
+				return engine.printMessage("JSForm: " + rex.getMessage());
 			}
 		}
 
