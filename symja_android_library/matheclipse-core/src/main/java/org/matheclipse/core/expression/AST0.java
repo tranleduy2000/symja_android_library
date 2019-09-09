@@ -59,7 +59,7 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	 *
 	 * Package private.
 	 */
-	IExpr arg0;
+	protected IExpr arg0;
 
 	/**
 	 * ctor for deserialization
@@ -174,8 +174,7 @@ public class AST0 extends AbstractAST implements Cloneable, Externalizable, Rand
 	// }
 
 	/**
-	 * Returns a new {@code AST0} with the same elements, the same size and the same capacity as this
-	 * {@code AST0}.
+	 * Returns a new {@code AST0} with the same elements, the same size and the same capacity as this {@code AST0}.
 	 * 
 	 * @return a shallow copy of this {@code ArrayList}
 	 * @see java.lang.Cloneable
