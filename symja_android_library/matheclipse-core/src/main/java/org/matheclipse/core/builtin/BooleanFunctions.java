@@ -208,7 +208,7 @@ public final class BooleanFunctions {
 			int index = 1;
 			IExpr temp = F.NIL;
 
-			IAST flattenedAST = EvalAttributes.flatten(ast);
+			IAST flattenedAST = EvalAttributes.flattenDeep(ast);
 			if (flattenedAST.isPresent()) {
 				evaled = true;
 			} else {
@@ -1415,9 +1415,13 @@ public final class BooleanFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.size() <= 2) {
 				return F.True;
+			}
+			IASTAppendable flattened;
+			if ((flattened = EvalAttributes.flattenDeep(ast)).isPresent()) {
+				ast = flattened;
 			}
 			IExpr temp = engine.evalAttributes((ISymbol) ast.head(), ast);
 			if (temp.isPresent()) {

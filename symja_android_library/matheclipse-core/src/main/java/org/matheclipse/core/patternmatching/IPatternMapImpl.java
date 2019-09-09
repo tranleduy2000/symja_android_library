@@ -240,7 +240,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
         if (result.isPresent()) {
             if (result.isFlatAST()) {
-                IASTMutable temp = EvalAttributes.flatten((IAST) result);
+                IASTMutable temp = EvalAttributes.flattenDeep((IAST) result);
                 if (temp.isPresent()) {
                     result = temp;
                 }

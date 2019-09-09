@@ -15784,6 +15784,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSelect() {
+		check("Select(Accumulate(Table({1,Prime(x)},{x,900,1000})), PrimeQ( #[[2]] )& )", //
+				"{{1,6997},{3,21011},{7,49139},{11,77447},{87,644377},{93,691333}}");
 		check("Select(# > 4 &) [{1, 2.2, 3, 4.5, 5, 6, 7.5, 8}]", //
 				"{4.5,5,6,7.5,8}");
 		check("Cases(_Integer)@Select(# > 4 &)@{1, 2.2, 3, 4.5, 5, 6, 7.5, 8}", //
@@ -18313,7 +18315,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("(1/2)*4^(1+p)", //
 				"2^(1+2*p)");
 		check("-(-b*c+a*d)*n", //
-				"-(-b*c+a*d)*n");
+				"(b*c-a*d)*n");
 		check("5/7*Sqrt(7/6)", //
 				"5/Sqrt(42)");
 		check("(Sqrt(3)*x)/Sqrt(2)", //

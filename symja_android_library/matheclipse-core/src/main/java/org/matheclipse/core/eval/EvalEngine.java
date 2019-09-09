@@ -668,21 +668,18 @@ public class EvalEngine implements Serializable {
 
 		// don't test for OneIdentity here! OneIdentity will only be used in "structural pattern-matching".
 		// Functions like Times and PLus implement OneIdentity as extra transformation!
-		// if ((ISymbol.ONEIDENTITY & attr) == ISymbol.ONEIDENTITY) {
-		// return ast.arg1();
-		// }
+		if ((result = evalArgs(ast, attr)).isPresent()) {
+			return result;
+		}
 
 		final IExpr arg1 = ast.arg1();
 		if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
-			if (arg1.topHead().equals(symbol)) {
+			if (arg1.head().equals(symbol)) {
 				// associative
 				return arg1;
 			}
 		}
 
-		if ((result = evalArgs(ast, attr)).isPresent()) {
-			return result;
-		}
 
 		if ((ISymbol.LISTABLE & attr) == ISymbol.LISTABLE) {
 			if (symbol.isBuiltInSymbol()) {
@@ -823,6 +820,10 @@ public class EvalEngine implements Serializable {
 
 			// ONEIDENTITY is checked in the evalASTArg1() method!
 
+			IASTMutable resultList = evalArgs(tempAST, attr);
+			if (resultList.isPresent()) {
+				return resultList;
+			}
 			if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
 				// associative symbol
 				IASTAppendable flattened;
@@ -835,11 +836,6 @@ public class EvalEngine implements Serializable {
 			result = evalTagSetPlusTimes(tempAST);
 			if (result.isPresent()) {
 				return result;
-			}
-			IASTMutable resultList = evalArgs(tempAST, attr);
-			if (resultList.isPresent()) {
-				returnResult = resultList;
-				tempAST = returnResult;
 			}
 
 			if ((ISymbol.LISTABLE & attr) == ISymbol.LISTABLE
@@ -1060,7 +1056,7 @@ public class EvalEngine implements Serializable {
 				if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
 					// associative
 					IASTAppendable result;
-					if ((result = EvalAttributes.flatten(resultList)).isPresent()) {
+					if ((result = EvalAttributes.flattenDeep(resultList)).isPresent()) {
 						resultList = result;
 						if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
 							EvalAttributes.sortWithFlags(resultList);
@@ -1080,7 +1076,7 @@ public class EvalEngine implements Serializable {
 		if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
 			// associative
 			IASTAppendable result;
-			if ((result = EvalAttributes.flatten(ast)).isPresent()) {
+			if ((result = EvalAttributes.flattenDeep(ast)).isPresent()) {
 				resultList = result;
 				if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
 					EvalAttributes.sortWithFlags(resultList);
@@ -1533,7 +1529,7 @@ public class EvalEngine implements Serializable {
 				if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
 					// associative
 					IASTAppendable result;
-					if ((result = EvalAttributes.flatten(resultList)).isPresent()) {
+					if ((result = EvalAttributes.flattenDeep(resultList)).isPresent()) {
 						return evalSetOrderless(result, attr, noEvaluation, level);
 					}
 				}
@@ -1552,7 +1548,7 @@ public class EvalEngine implements Serializable {
 		if ((ISymbol.FLAT & attr) == ISymbol.FLAT) {
 			// associative
 			IASTAppendable result;
-			if ((result = EvalAttributes.flatten(ast)).isPresent()) {
+			if ((result = EvalAttributes.flattenDeep(ast)).isPresent()) {
 				return evalSetOrderless(result, attr, noEvaluation, level);
 			}
 		}
