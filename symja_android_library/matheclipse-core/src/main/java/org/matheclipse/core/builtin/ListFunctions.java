@@ -500,10 +500,16 @@ public final class ListFunctions {
 	private final static class Append extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			IAST arg1AST = Validate.checkASTType(arg1, engine);
-			if (arg1AST == null) {
+			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
 			IExpr arg2 = engine.evaluate(ast.arg2());
@@ -512,7 +518,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_2;
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -1100,9 +1106,12 @@ public final class ListFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 
 			if (ast.size() >= 3 && ast.size() <= 5) {
@@ -1643,7 +1652,13 @@ public final class ListFunctions {
 	private static class Delete extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			final IExpr arg2 = engine.evaluate(ast.arg2());
 			if (arg1.isAST()) {
@@ -1751,7 +1766,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_2;
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -2637,11 +2652,17 @@ public final class ListFunctions {
 	private static class Insert extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1() || ast.isAST2()) {
+				ast = F.operatorFormAppend2(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			IAST arg1AST = Validate.checkASTType(arg1, engine);
-			if (arg1AST == null) {
+			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
 			IExpr arg2 = engine.evaluate(ast.arg2());
@@ -2652,7 +2673,7 @@ public final class ListFunctions {
 					if (i < 0) {
 						i = 1 + arg1AST.size() + i;
 					}
-					if (i > 0 && i < arg1AST.size()) {
+					if (i > 0 && i <= arg1AST.size()) {
 						return arg1AST.appendAtClone(i, arg2);
 					}
 				} catch (final IndexOutOfBoundsException e) {
@@ -2666,7 +2687,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_3_3;
+			return IOFunctions.ARGS_1_3;
 		}
 	}
 
@@ -3621,9 +3642,12 @@ public final class ListFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 			if (ast.size() < 3) {
 				return F.NIL;
@@ -3720,10 +3744,16 @@ public final class ListFunctions {
 	private final static class Prepend extends AbstractCoreFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			IAST arg1AST = Validate.checkASTType(arg1, engine);
-			if (arg1AST == null) {
+			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
 			IExpr arg2 = engine.evaluate(ast.arg2());
@@ -3732,7 +3762,7 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_2;
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -4155,9 +4185,12 @@ public final class ListFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 			if (ast.size() < 3 || ast.size() > 4) {
 				return F.NIL;
@@ -4228,9 +4261,12 @@ public final class ListFunctions {
 	private static class ReplaceAll extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 			if (ast.size() == 3) {
 			try {
@@ -4339,12 +4375,15 @@ public final class ListFunctions {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (!ToggleFeature.REPLACE_LIST) {
 				return F.NIL;
 			}
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+			}
 			}
 			if (ast.size() == 2 && ast.head().isAST(F.ReplaceList, 2)) {
 				return F.ReplaceList(ast.first(), ast.head().first());
@@ -4451,10 +4490,13 @@ public final class ListFunctions {
 	private final static class ReplacePart extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 			try {
 				if (ast.isAST3()) {
@@ -4556,9 +4598,12 @@ public final class ListFunctions {
 	private static final class ReplaceRepeated extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+			}
 			}
 			try {
 				IExpr arg2 = ast.arg2();
@@ -4929,11 +4974,14 @@ public final class ListFunctions {
 	private final static class Select extends AbstractEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(IAST ast, final EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
 			}
 
+			}
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();

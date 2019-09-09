@@ -8042,7 +8042,7 @@ public class F {
      *
      * @param expr
 	 * @param function
-	 *            if the unary functions <code>apply()</code> method returns <code>null</code> the expression isn't
+	 *            if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the expression isn't
 	 *            substituted.
      * @return the input <code>expr</code> if no substitution of a (sub-)expression was possible or the substituted
 	 *         expression.
@@ -8475,9 +8475,22 @@ public class F {
 	 *            an IAST with condition <code>ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
 	 * @return
 	 */
-	public static IExpr operatorFormAppend(final IAST ast1Arg) {
+	public static IAST operatorFormAppend(final IAST ast1Arg) {
 		if (ast1Arg.head().isAST1() && ast1Arg.isAST1()) {
 			return binaryAST2(ast1Arg.topHead(), ast1Arg.arg1(), ((IAST) ast1Arg.head()).arg1());
+		}
+		return NIL;
+	}
+	/**
+	 * The binary operator form <code>op(f, g)[expr]</code> is transformed to <code>op(expr, f, g)</code>
+	 *
+	 * @param astArg
+	 *            an IAST with condition <code>astArg.head().isAST2() && astArg.isAST1()</code>
+	 * @return
+	 */
+	public static IAST operatorFormAppend2(final IAST astArg) {
+		if (astArg.head().isAST2() && astArg.isAST1()) {
+			return ternaryAST3(astArg.topHead(), astArg.arg1(), ((IAST) astArg.head()).arg1(), ((IAST) astArg.head()).arg2());
 		}
 		return NIL;
 	}
@@ -8489,7 +8502,7 @@ public class F {
 	 *            an IAST with condition <code>ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
 	 * @return
 	 */
-	public static IExpr operatorFormPrepend(final IAST ast1Arg) {
+	public static IAST operatorFormPrepend(final IAST ast1Arg) {
 		if (ast1Arg.head().isAST1() && ast1Arg.isAST1()) {
 			return binaryAST2(ast1Arg.topHead(), ((IAST) ast1Arg.head()).arg1(), ast1Arg.arg1());
         }

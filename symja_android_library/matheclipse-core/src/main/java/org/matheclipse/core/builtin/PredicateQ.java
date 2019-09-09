@@ -506,9 +506,12 @@ public class PredicateQ {
 		}
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 			if (ast.size() == 3) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -600,9 +603,12 @@ public class PredicateQ {
 	private final static class MatchQ extends AbstractCoreFunctionEvaluator implements IPredicate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 			if ((ast.isAST2())) {
 				final IExpr arg1 = engine.evaluate(ast.arg1());
@@ -720,9 +726,12 @@ public class PredicateQ {
 	private final static class MemberQ extends AbstractCoreFunctionEvaluator implements IPredicate {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				return F.operatorFormAppend(ast);
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
 			}
 
 			boolean heads = false;
