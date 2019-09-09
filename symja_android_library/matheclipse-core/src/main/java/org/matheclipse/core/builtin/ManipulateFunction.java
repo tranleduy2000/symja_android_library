@@ -54,7 +54,9 @@ public class ManipulateFunction {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
-				if (ast.arg1().isAST(F.ListPlot)) {
+				if (ast.arg1().isAST(F.ListLinePlot) || //
+						ast.arg1().isAST(F.ListPlot) || //
+						ast.arg1().isAST(F.ListPlot3D)) {
 					IAST plot = (IAST) ast.arg1();
 					return createSliderWithListPlot(ast, plot, engine);
 				} else if (ast.arg1().isAST(F.Plot) || //
@@ -320,8 +322,24 @@ public class ManipulateFunction {
 				if (dimension != null) {
 					if (dimension[1] == 2) {
 						StringBuilder function = new StringBuilder();
+						if (ast.arg1().isAST(F.ListLinePlot)) {
+							function.append("var data = [ listPlot( [\n");
+							for (int i = 1; i < pointList.size(); i++) {
+								IAST rowList = (IAST) pointList.get(i);
+								function.append("[ ");
+								function.append(OutputFunctions.toJavaScript(rowList.arg1()));
+								function.append(",");
+								function.append(OutputFunctions.toJavaScript(rowList.arg2()));
+								function.append("] ");
+								if (i < pointList.size() - 1) {
+									function.append(",");
+								}
+								function.append("\n");
+							}
+							function.append("], { })];");
+						} else {
 						function.append("var data = [\n");
-						// point( [ 2*Math.random() - 1, 2*Math.random() - 1, 2*Math.random() - 1 ],
+							// point( [ x, y, z ],
 						// { color: 'hsl(' + 360*Math.random() + ',100%,50%)', size: 5 } )
 						for (int i = 1; i < pointList.size(); i++) {
 							IAST rowList = (IAST) pointList.get(i);
@@ -337,6 +355,7 @@ public class ManipulateFunction {
 							function.append("\n");
 						}
 						function.append("];");
+						}
 
 						js = js.replace("`3`", function.toString());
 
@@ -350,9 +369,58 @@ public class ManipulateFunction {
 
 						return F.JSFormData(js, "mathcell");
 					}
+					if (dimension[1] == 3) {
+						StringBuilder function = new StringBuilder();
+
+						function.append("var data = [\n");
+						// point( [ x, y, z ],
+						// { color: 'hsl(' + 360*Math.random() + ',100%,50%)', size: 5 } )
+						for (int i = 1; i < pointList.size(); i++) {
+							IAST rowList = (IAST) pointList.get(i);
+							function.append("point( [ ");
+							function.append(OutputFunctions.toJavaScript(rowList.arg1()));
+							function.append(",");
+							function.append(OutputFunctions.toJavaScript(rowList.arg2()));
+							function.append(",");
+							function.append(OutputFunctions.toJavaScript(rowList.arg3()));
+							function.append("], ");
+							function.append(" {size: 2 } )");
+							if (i < pointList.size() - 1) {
+								function.append(",");
+							}
+							function.append("\n");
+						}
+						function.append("];");
+
+						js = js.replace("`3`", function.toString());
+
+						StringBuilder graphicControl = new StringBuilder();
+
+						// var config = dim === 'two' ? { type: 'svg', ticks: false }
+						// : { type: 'threejs', axesLabels: false };
+						graphicControl.append("var config = { type: 'threejs' };\n");
+						graphicControl.append("evaluate( id, data, config );\n");
+						js = js.replace("`4`", graphicControl.toString());
+						return F.JSFormData(js, "mathcell");
+					}
 					return F.NIL;
 				} else {
 					StringBuilder function = new StringBuilder();
+					if (ast.arg1().isAST(F.ListLinePlot)) {
+						function.append("var data = [ listPlot( [\n");
+						for (int i = 1; i < pointList.size(); i++) {
+							function.append("[ ");
+							function.append(i);
+							function.append(",");
+							function.append(OutputFunctions.toJavaScript(pointList.get(i)));
+							function.append("] ");
+							if (i < pointList.size() - 1) {
+								function.append(",");
+							}
+							function.append("\n");
+						}
+						function.append("], { })];");
+					} else {
 					function.append("var data = [\n");
 					// point( [ 2*Math.random() - 1, 2*Math.random() - 1, 2*Math.random() - 1 ],
 					// { color: 'hsl(' + 360*Math.random() + ',100%,50%)', size: 5 } )
@@ -369,6 +437,7 @@ public class ManipulateFunction {
 						function.append("\n");
 					}
 					function.append("];");
+					}
 
 					js = js.replace("`3`", function.toString());
 

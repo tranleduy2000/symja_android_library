@@ -1363,6 +1363,8 @@ public class F {
     /***/
     public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
 
+    /***/
+    public final static IBuiltInSymbol ListPlot3D = F.initFinalSymbol("ListPlot3D", ID.ListPlot3D);
     /** ListQ(expr) - tests whether `expr` is a `List`.*/
     public final static IBuiltInSymbol ListQ = F.initFinalSymbol("ListQ", ID.ListQ);
     /**
@@ -1740,7 +1742,7 @@ public class F {
     public final static IBuiltInSymbol PadLeft = F.initFinalSymbol("PadLeft", ID.PadLeft);
 	/** PadRight(list, n) - pads `list` to length `n` by adding `0` on the right. */
     public final static IBuiltInSymbol PadRight = F.initFinalSymbol("PadRight", ID.PadRight);
-    /***/
+    /** ParametricPlot({function1, function2}, {t, tMin, tMax}) - generate a JavaScript control for the parametric expressions `function1`, `function1` in the `t` range `{t, tMin, tMax}`.*/
     public final static IBuiltInSymbol ParametricPlot = F.initFinalSymbol("ParametricPlot", ID.ParametricPlot);
 	/** Part(expr, i) - returns part `i` of `expr`. */
     public final static IBuiltInSymbol Part = F.initFinalSymbol("Part", ID.Part);
@@ -1779,9 +1781,9 @@ public class F {
     public final static IBuiltInSymbol Pi = F.initFinalSymbol("Pi", ID.Pi);
 	/** Piecewise({{expr1, cond1}, ...}) - represents a piecewise function. */
     public final static IBuiltInSymbol Piecewise = F.initFinalSymbol("Piecewise", ID.Piecewise);
-    /***/
+    /** Plot(function, {x, xMin, xMax}, PlotRange->{yMin,yMax}) - generate a JavaScript control for the expression `function` in the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.*/
     public final static IBuiltInSymbol Plot = F.initFinalSymbol("Plot", ID.Plot);
-    /***/
+    /** Plot3D(function, {x, xMin, xMax}, {y,yMin,yMax}) - generate a JavaScript control for the expression `function` in the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.*/
     public final static IBuiltInSymbol Plot3D = F.initFinalSymbol("Plot3D", ID.Plot3D);
     /***/
     public final static IBuiltInSymbol PlotRange = F.initFinalSymbol("PlotRange", ID.PlotRange);
