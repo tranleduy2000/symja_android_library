@@ -21,6 +21,11 @@ import java.util.Map;
  * 
  */
 public class JavaScriptFormFactory extends DoubleFormFactory {
+	/**
+	 * If <code>true</code> the <code>Piecewise()</code> function was used in an expression, which need to do inline operators with the
+	 * JavaScript ternary operator. If <code>false</code> the converter will use <code>if(...){...}</code> statements.
+	 */
+	public boolean INLINE_PIECEWISE = true;
 	private final static Map<ISymbol, String> FUNCTIONS_STR = new HashMap<ISymbol, String>();
 	static {
 
@@ -320,60 +325,88 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				int[] dim = function.arg1().isMatrix();
 				if (dim != null && dim[1] == 2) {
 					IAST list = (IAST) function.arg1();
-					for (int i = 1; i < list.size(); i++) {
-						IAST row = (IAST) list.get(i);
-						if (i == 1) {
-							buf.append("if (");
+					if (INLINE_PIECEWISE) {
+						// use the ternary operator
+						int size = list.size();
+						for (int i = 1; i < size; i++) {
+							IAST row = (IAST) list.get(i);
+							if (i > 1) {
+								buf.append("(");
+							}
+							buf.append("(");
 							convert(buf, row.second());
-							buf.append(") {");
-						} else {
-							buf.append(" else if (");
-							convert(buf, row.second());
-							buf.append(") {");
+							buf.append(") ? ");
+							convert(buf, row.first());
+							buf.append(" : ");
 						}
-						buf.append(" return ");
-						convert(buf, row.first());
-						buf.append("}");
-					}
-					buf.append(" else {");
-					if (function.isAST2()) {
-						convert(buf, function.second());
+						buf.append("( ");
+						if (function.isAST2()) {
+							convert(buf, function.second());
+						} else {
+							buf.append(" NaN ");
+						}
+						buf.append(" )");
+						for (int i = 2; i < size; i++) {
+							buf.append(" )");
+						}
+						return;
 					} else {
-						buf.append(" return NaN; ");
+						// use if... statements
+						for (int i = 1; i < list.size(); i++) {
+							IAST row = (IAST) list.get(i);
+							if (i == 1) {
+								buf.append("if (");
+								convert(buf, row.second());
+								buf.append(") {");
+							} else {
+								buf.append(" else if (");
+								convert(buf, row.second());
+								buf.append(") {");
+							}
+							buf.append(" return ");
+							convert(buf, row.first());
+							buf.append("}");
+						}
+						buf.append(" else {");
+						if (function.isAST2()) {
+							convert(buf, function.second());
+						} else {
+							buf.append(" return NaN; ");
+						}
+						buf.append("}");
+						return;
 					}
-					buf.append("}");
-					return;
 				}
 			}
 			if (function.headID() > 0) {
 				throw new MathException("illegal JavaScript arg");
 			}
 		} else {
-		if (function.isPower()) {
-			IExpr base = function.base();
-			IExpr exponent = function.exponent();
-			if (exponent.isMinusOne()) {
-				buf.append("(1.0/");
-				convert(buf, base);
-				buf.append(")"); 
+			if (function.isPower()) {
+				IExpr base = function.base();
+				IExpr exponent = function.exponent();
+				if (exponent.isMinusOne()) {
+					buf.append("(1.0/");
+					convert(buf, base);
+					buf.append(")");
+					return;
+				}
+				if (exponent.isNumEqualRational(F.C1D2)) {
+					buf.append("Math.sqrt(");
+					convert(buf, base);
+					buf.append(")");
+					return;
+				}
+				if (exponent.isNumEqualRational(F.C1D3)) {
+					buf.append("Math.cbrt(");
+					convert(buf, base);
+					buf.append(")");
+					return;
+				}
+				buf.append("Math.pow");
+				convertArgs(buf, head, function);
 				return;
 			}
-			if (exponent.isNumEqualRational(F.C1D2)) {
-				buf.append("Math.sqrt(");
-				convert(buf, base);
-				buf.append(")");
-				return;
-			}
-			if (exponent.isNumEqualRational(F.C1D3)) {
-				buf.append("Math.cbrt(");
-				convert(buf, base);
-				buf.append(")");
-				return;
-			}
-			buf.append("Math.pow");
-			convertArgs(buf, head, function);
-			return;
-		}
 		}
 		if (function.isInfinity()) {
 			buf.append("Number.POSITIVE_INFINITY");

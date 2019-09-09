@@ -176,35 +176,32 @@ public class ManipulateFunction {
 					}
 				} else {
 					function.append("function z1(");
-								function.append(OutputFunctions.toJavaScript(plotSymbolX));
-					function.append(") { ");
-					if (!plot.arg1().isAST(F.Piecewise)) {
-						function.append("return ");
-					}
-									function.append(OutputFunctions.toJavaScript(plot.arg1()));
-								function.append("; }\n");
-							}
+					function.append(OutputFunctions.toJavaScript(plotSymbolX));
+					function.append(") { return ");
+					function.append(OutputFunctions.toJavaScript(plot.arg1()));
+					function.append("; }\n");
+				}
 
 			}
 			js = js.replace("`3`", function.toString());
 
-							// plot( x => (Math.sin(x*(1+a*x))), [0, 2*Math.PI], { } )
-							StringBuilder graphicControl = new StringBuilder();
+			// plot( x => (Math.sin(x*(1+a*x))), [0, 2*Math.PI], { } )
+			StringBuilder graphicControl = new StringBuilder();
 
-							if (plotID == ID.Plot3D) {
-								if (!plotRangeY.isPresent()) {
-									return F.NIL;
-								}
+			if (plotID == ID.Plot3D) {
+				if (!plotRangeY.isPresent()) {
+					return F.NIL;
+				}
 				graphicControl.append("var p1 = ");
-								graphicControl.append("parametric( z1, ");
+				graphicControl.append("parametric( z1, ");
 				range(graphicControl, plotRangeX, -1);
-								graphicControl.append(", ");
+				graphicControl.append(", ");
 				range(graphicControl, plotRangeY, -1);
-								graphicControl.append(", { colormap: (x,y) => ( 1 - Math.sin(x*y) ) / 2 } );\n\n\n");
+				graphicControl.append(", { colormap: (x,y) => ( 1 - Math.sin(x*y) ) / 2 } );\n\n\n");
 
-								graphicControl.append("  var config = { type: 'threejs' };\n");
+				graphicControl.append("  var config = { type: 'threejs' };\n");
 				graphicControl.append("  var data = [ p1 ];\n");
-							} else {
+			} else {
 				if (plot.arg1().isList()) {
 					IAST listOfFunctions = (IAST) plot.arg1();
 					if (plotID == ID.ParametricPlot) {
