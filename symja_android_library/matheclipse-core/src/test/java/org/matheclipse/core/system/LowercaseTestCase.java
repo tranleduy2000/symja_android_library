@@ -3167,8 +3167,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"-Cos(x+y+z)");
 		check("Cos(z+42*a*Pi)", //
 				"Cos(42*a*Pi+z)");
+		// this rule was moved to FunctionExpand
 		check("Cos(Sqrt(x^2))", //
-				"Cos(x)");
+				"Cos(Sqrt(x^2))");
 	}
 
 	public void testCosh() {
@@ -7163,6 +7164,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFunctionExpand() {
+		check("FunctionExpand(Cos(Sqrt(x^2)))", //
+				"Cos(x)");
+		check("FunctionExpand(Sin(Sqrt(x^2)))", //
+				"(Sqrt(x^2)*Sin(x))/x");
 		check("FunctionExpand(Haversine(hf))", //
 				"1/2*(1-Cos(hf))");
 		check("FunctionExpand(InverseHaversine(ihf))", //
@@ -8452,6 +8457,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"False");
 		check("IntersectingQ({1.0,2.0}, {1,2,3}, SameTest->Equal)", //
 				"True");
+	}
+	public void testInterrupt() {
+		check("Print(test1); Interrupt(); Print(test2)", //
+				"$Aborted");
 	}
 	public void testIntersection() {
 		check("Intersection({a,a,b,c})", //
