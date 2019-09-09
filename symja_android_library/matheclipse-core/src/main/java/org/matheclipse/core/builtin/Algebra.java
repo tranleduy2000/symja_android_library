@@ -2395,33 +2395,6 @@ public class Algebra {
 				result.append(jas.integerPoly2Expr(iPoly));
 				return result;
 			} catch (JASConversionException e1) {
-				try {
-					if (variableList.isAST1()) {
-						IAST list = PolynomialFunctions.rootsOfExprPolynomial(expr, variableList, true);
-						if (list.isList()) {
-							final IExpr x = variableList.arg1();
-							final IASTAppendable result = F.TimesAlloc(list.size());
-							list.forEach(new Consumer<IExpr>() {
-								@Override
-								public void accept(IExpr arg) {
-									result.append(F.Plus(x, arg));
-								}
-							});
-							// for (int i = 1; i < list.size(); i++) {
-							// result.append(F.Plus(x, list.get(i)));
-							// }
-							return result;
-						}
-					}
-				} catch (ClassCastException e2) {
-					if (Config.SHOW_STACKTRACE) {
-						e2.printStackTrace();
-					}
-				} catch (JASConversionException e2) {
-					if (Config.SHOW_STACKTRACE) {
-						e2.printStackTrace();
-					}
-				}
 
 			}
 			return ast.arg1();
@@ -3595,11 +3568,16 @@ public class Algebra {
 		/**
 		 * Root of a polynomial: <code>a + b*Slot1 + c*Slot1^2 + d*Slot1^3</code>.
 		 *
-		 * @param a       coefficient a of the polynomial
-		 * @param b       coefficient b of the polynomial
-		 * @param c       coefficient c of the polynomial
-		 * @param d       coefficient d of the polynomial
-		 * @param nthRoot <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
+		 * @param a
+		 *            coefficient a of the polynomial
+		 * @param b
+		 *            coefficient b of the polynomial
+		 * @param c
+		 *            coefficient c of the polynomial
+		 * @param d
+		 *            coefficient d of the polynomial
+		 * @param nthRoot
+		 *            <code>1 <= nthRoot <= 3</code> otherwise return F.NIL;
 		 * @return
 		 */
 		private static IExpr root3(IExpr a, IExpr b, IExpr c, IExpr d, int nthRoot) {
@@ -3611,7 +3589,7 @@ public class Algebra {
 			// r = 3*b*d - c^2
 			IExpr r = Plus(Negate(F.Sqr(c)), Times(F.C3, b, d));
 			// q = 9*b*c*d - 2*c^3 - 27*a*d^2
-			IExpr q = Plus(Times(F.CN2, Power(c, 3)), Times(F.C9, b, c, d), Times(F.ZZ(-27L), a, F.Sqr(d)));
+			IExpr q = Plus(Times(F.CN2, Power(c, 3)), Times(F.C9, b, c, d), Times(F.ZZ(-27), a, F.Sqr(d)));
 			// p = (q + Sqrt(q^2 + 4 r^3))^(1/3)
 			IExpr p = Power(Plus(q, F.Sqrt(Plus(F.Sqr(q), Times(F.C4, Power(r, 3))))), F.C1D3);
 			// -(c/(3*d)) + (E^((2*I*Pi*(k - 1))/3)*p)/(3*2^(1/3)*d) -
@@ -6011,7 +5989,7 @@ public class Algebra {
 		if (temp.isAST()) {
 			IExpr result = Together.togetherPlusTimesPower((IAST) temp, engine);
 			if (result.isPresent()) {
-				return F.eval(result);
+				return engine.evaluate(result);
 			}
 		}
 		return temp;
