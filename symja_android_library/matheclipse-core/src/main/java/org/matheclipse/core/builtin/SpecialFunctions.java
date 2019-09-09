@@ -20,12 +20,12 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.reflection.system.rules.LogGammaRules;
 import org.matheclipse.core.reflection.system.rules.PolyGammaRules;
 import org.matheclipse.core.reflection.system.rules.PolyLogRules;
 import org.matheclipse.core.reflection.system.rules.ProductLogRules;
@@ -821,11 +821,7 @@ public class SpecialFunctions {
 
 	}
 
-	private static class LogGamma extends AbstractTrigArg1 implements LogGammaRules, INumeric {
-		@Override
-		public IAST getRuleAST() {
-			return RULES;
-		}
+	private static class LogGamma extends AbstractTrigArg1 implements INumeric {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
@@ -868,6 +864,14 @@ public class SpecialFunctions {
 			if (arg1.isPositive()) {
 				if (arg1.isInteger()) {
 					return F.Log(F.Factorial(arg1.dec()));
+				}
+				if (arg1.isFraction() && ((IFraction) arg1).denominator().equals(F.C2)) {
+					IInteger n = ((IFraction) arg1).numerator();
+					//
+					return
+					// [$ Log(2^(1 - n)*Sqrt(Pi)*Gamma(n)/Gamma((n+1)/2)) $]
+					F.Log(F.Times(F.Power(F.C2, F.Subtract(F.C1, n)), F.Sqrt(F.Pi),
+							F.Power(F.Gamma(F.Times(F.C1D2, F.Plus(n, F.C1))), F.CN1), F.Gamma(n))); // $$;
 				}
 			} else if (arg1.isNegative()) {
 				if (arg1.isInteger()) {

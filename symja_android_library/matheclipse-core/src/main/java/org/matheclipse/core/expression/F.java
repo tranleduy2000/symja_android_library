@@ -206,11 +206,11 @@ public class F {
 	public final static IBuiltInSymbol $UserName = F.initFinalSymbol("$UserName", ID.$UserName);
     /***/
     public final static IBuiltInSymbol $Version = F.initFinalSymbol("$Version", ID.$Version);
-	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
+    /** Abort() - aborts an evaluation completely and returns `$Aborted`.*/
     public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
-	/** Abs(expr) - returns the absolute value of the real or complex number `expr`. */
+    /** Abs(expr) - returns the absolute value of the real or complex number `expr`.*/
     public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
-	/** AbsArg(expr) - returns a list the 2 values of the real or complex number `Abs(expr), Arg(expr)`. */
+    /** AbsArg(expr) - returns a list the 2 values of the real or complex number `Abs(expr), Arg(expr)`.*/
     public final static IBuiltInSymbol AbsArg = F.initFinalSymbol("AbsArg", ID.AbsArg);
 	/** Accumulate(list) - accumulate the values of `list` returning a new list. */
     public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
@@ -658,7 +658,7 @@ public class F {
 
     /***/
     public final static IBuiltInSymbol DegreeReverseLexicographic = F.initFinalSymbol("DegreeReverseLexicographic", ID.DegreeReverseLexicographic);
-    /***/
+    /** Delete(expr, n) - returns `expr` with part `n` removed. */
     public final static IBuiltInSymbol Delete = F.initFinalSymbol("Delete", ID.Delete);
 	/** DeleteCases(list, pattern) - returns the elements of `list` that do not match `pattern`. */
     public final static IBuiltInSymbol DeleteCases = F.initFinalSymbol("DeleteCases", ID.DeleteCases);
@@ -1005,7 +1005,7 @@ public class F {
     public final static IBuiltInSymbol GegenbauerC = F.initFinalSymbol("GegenbauerC", ID.GegenbauerC);
     /***/
     public final static IBuiltInSymbol General = F.initFinalSymbol("General", ID.General);
-    /***/
+    /** GeoDistance({latitude1,longitude1}, {latitude2,longitude2}) - returns the geodesic distance between `{latitude1,longitude1}` and `{latitude2,longitude2}`.*/
     public final static IBuiltInSymbol GeoDistance = F.initFinalSymbol("GeoDistance", ID.GeoDistance);
 
     /***/
@@ -1034,7 +1034,7 @@ public class F {
 
     /***/
     public final static IBuiltInSymbol GraphData = F.initFinalSymbol("GraphData", ID.GraphData);
-    /***/
+    /** GraphQ(expr) - test if `expr` is a graph object.*/
     public final static IBuiltInSymbol GraphQ = F.initFinalSymbol("GraphQ", ID.GraphQ);
     /***/
     public final static IBuiltInSymbol Graphics = F.initFinalSymbol("Graphics", ID.Graphics);
@@ -1378,6 +1378,8 @@ public class F {
      * or vertical moves in the grid like Manhattan city layout to get from `u` to `v`.
      */
     public final static IBuiltInSymbol ManhattanDistance = F.initFinalSymbol("ManhattanDistance", ID.ManhattanDistance);
+    /***/
+    public final static IBuiltInSymbol Manipulate = F.initFinalSymbol("Manipulate", ID.Manipulate);
     /***/
     public final static IBuiltInSymbol MantissaExponent = F.initFinalSymbol("MantissaExponent", ID.MantissaExponent);
 	/** Map(f, expr) or f /@ expr - applies `f` to each part on the first level of `expr`. */
@@ -2321,6 +2323,7 @@ public class F {
     public final static IBuiltInSymbol TukeyWindow = F.initFinalSymbol("TukeyWindow", ID.TukeyWindow);
 	/** Tuples(list, n) - creates a list of all `n`-tuples of elements in `list`. */
     public final static IBuiltInSymbol Tuples = F.initFinalSymbol("Tuples", ID.Tuples);
+    /***/
 	public final static IBuiltInSymbol TwoWayRule = F.initFinalSymbol("TwoWayRule", ID.TwoWayRule);
     /***/
     public final static IBuiltInSymbol Undefined = F.initFinalSymbol("Undefined", ID.Undefined);
@@ -6636,6 +6639,10 @@ public class F {
      */
     public static IAST MachineNumberQ(final IExpr a0) {
         return unaryAST1(MachineNumberQ, a0);
+    }
+
+    public static IAST Manipulate(final IExpr a0, final IExpr a1) {
+        return binaryAST2(Manipulate, a0, a1);
     }
 
     public static IAST Map(final IExpr a0) {
