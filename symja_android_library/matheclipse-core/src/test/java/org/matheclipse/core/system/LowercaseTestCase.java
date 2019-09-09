@@ -7226,7 +7226,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("GeoDistance({37, -109}, {40.113, -88.261})", //
 				"UnitConvert(Quantity(1.83601*10^6,m),mi)");
 		check("GeoDistance({30, 40}, {-40, 120})", //
-				"7031.6370551943855[mi]");
+				"UnitConvert(Quantity(1.13163*10^7,m),mi)");
 	}
 	public void testGet() {
 		if (Config.FILESYSTEM_ENABLED) {
