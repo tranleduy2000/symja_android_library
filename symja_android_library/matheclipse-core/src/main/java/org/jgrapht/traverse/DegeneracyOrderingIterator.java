@@ -17,37 +17,40 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * A degeneracy ordering iterator.
- * 
+ *
  * <p>
  * The degeneracy of a graph $G $is the smallest value d such that every nonempty subgraph of $G$
  * contains a vertex of degree at most $d.$ If a graph has degeneracy $d$, then it has a degeneracy
  * ordering, an ordering such that each vertex has $d$ or fewer neighbors that come later in the
  * ordering.
- * 
+ *
  * <p>
  * The iterator crosses components but does not track them, it only tracks visited vertices.
- * 
+ *
  * <p>
  * The iterator treats the input graph as undirected even if the graph is directed. Moreover, it
  * completely ignores self-loops, meaning that it operates as if self-loops do not contribute to the
  * degree of a vertex.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class DegeneracyOrderingIterator<V, E>
-    extends
-    AbstractGraphIterator<V, E>
-{
+        extends
+        AbstractGraphIterator<V, E> {
     private Set<V>[] buckets;
     private Map<V, Integer> degrees;
     private int minDegree;
@@ -59,8 +62,7 @@ public class DegeneracyOrderingIterator<V, E>
      * @param graph the graph to be iterated
      */
     @SuppressWarnings("unchecked")
-    public DegeneracyOrderingIterator(Graph<V, E> graph)
-    {
+    public DegeneracyOrderingIterator(Graph<V, E> graph) {
         super(graph);
 
         /*
@@ -97,32 +99,29 @@ public class DegeneracyOrderingIterator<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Always returns true since the iterator does not care about components.
      */
     @Override
-    public boolean isCrossComponentTraversal()
-    {
+    public boolean isCrossComponentTraversal() {
         return true;
     }
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Trying to disable the cross components nature of this iterator will result into throwing a
      * {@link IllegalArgumentException}.
      */
     @Override
-    public void setCrossComponentTraversal(boolean crossComponentTraversal)
-    {
+    public void setCrossComponentTraversal(boolean crossComponentTraversal) {
         if (!crossComponentTraversal) {
             throw new IllegalArgumentException("Iterator is always cross-component");
         }
     }
 
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         if (cur != null) {
             return true;
         }
@@ -134,8 +133,7 @@ public class DegeneracyOrderingIterator<V, E>
     }
 
     @Override
-    public V next()
-    {
+    public V next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -147,8 +145,7 @@ public class DegeneracyOrderingIterator<V, E>
         return result;
     }
 
-    private V advance()
-    {
+    private V advance() {
         while (minDegree < buckets.length && buckets[minDegree].isEmpty()) {
             minDegree++;
         }

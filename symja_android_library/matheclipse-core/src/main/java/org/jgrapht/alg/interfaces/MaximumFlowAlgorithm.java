@@ -17,23 +17,20 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Allows to derive <a href="https://en.wikipedia.org/wiki/Maximum_flow_problem">maximum-flow</a>
  * from the supplied <a href="https://en.wikipedia.org/wiki/Flow_network">flow network</a>
  *
- * @author Alexey Kudinkin
- * @author Joris Kinable
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
+ * @author Alexey Kudinkin
+ * @author Joris Kinable
  */
 public interface MaximumFlowAlgorithm<V, E>
-    extends
-    FlowAlgorithm<V, E>
-{
+        extends
+        FlowAlgorithm<V, E> {
 
     /**
      * Sets current source to <tt>source</tt>, current sink to <tt>sink</tt>, then calculates
@@ -41,8 +38,7 @@ public interface MaximumFlowAlgorithm<V, E>
      * information about the flow.
      *
      * @param source source of the flow inside the network
-     * @param sink sink of the flow inside the network
-     *
+     * @param sink   sink of the flow inside the network
      * @return maximum flow
      */
     MaximumFlow<E> getMaximumFlow(V source, V sink);
@@ -54,7 +50,7 @@ public interface MaximumFlowAlgorithm<V, E>
      * network</tt> passed to the constructor, and they must be different.
      *
      * @param source source vertex
-     * @param sink sink vertex
+     * @param sink   sink vertex
      * @return the value of the maximum flow
      */
     double getMaximumFlowValue(V source, V sink);
@@ -65,9 +61,8 @@ public interface MaximumFlowAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     interface MaximumFlow<E>
-        extends
-        Flow<E>
-    {
+            extends
+            Flow<E> {
         /**
          * Returns value of the maximum-flow for the given network
          *
@@ -82,34 +77,30 @@ public interface MaximumFlowAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     class MaximumFlowImpl<E>
-        extends
-        FlowImpl<E>
-        implements
-        MaximumFlow<E>
-    {
+            extends
+            FlowImpl<E>
+            implements
+            MaximumFlow<E> {
         private Double value;
 
         /**
          * Create a new maximum flow
-         * 
+         *
          * @param value the flow value
-         * @param flow the flow map
+         * @param flow  the flow map
          */
-        public MaximumFlowImpl(Double value, Map<E, Double> flow)
-        {
+        public MaximumFlowImpl(Double value, Map<E, Double> flow) {
             super(flow);
             this.value = value;
         }
 
         @Override
-        public Double getValue()
-        {
+        public Double getValue() {
             return value;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Flow Value: " + value + "\nFlow map:\n" + getFlowMap();
         }
     }

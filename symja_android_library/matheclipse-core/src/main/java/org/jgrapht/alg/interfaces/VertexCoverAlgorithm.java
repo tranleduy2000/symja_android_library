@@ -17,9 +17,9 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.util.*;
+import org.jgrapht.util.WeightedUnmodifiableSet;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * Computes a (weighted) <a href="http://mathworld.wolfram.com/VertexCover.html">vertex cover</a> in
@@ -33,11 +33,9 @@ import java.util.*;
  * weighted version of the problem can also solve instances of the unweighted version.
  *
  * @param <V> vertex type
- *
  * @author Joris Kinable
  */
-public interface VertexCoverAlgorithm<V>
-{
+public interface VertexCoverAlgorithm<V> {
 
     /**
      * Computes a vertex cover.
@@ -52,9 +50,8 @@ public interface VertexCoverAlgorithm<V>
      * @param <V> the vertex type
      */
     interface VertexCover<V>
-        extends
-        Set<V>
-    {
+            extends
+            Set<V> {
 
         /**
          * Returns the weight of the vertex cover. When solving a weighted vertex cover problem, the
@@ -72,21 +69,18 @@ public interface VertexCoverAlgorithm<V>
      * @param <V> the vertex type
      */
     class VertexCoverImpl<V>
-        extends
-        WeightedUnmodifiableSet<V>
-        implements
-        VertexCover<V>
-    {
+            extends
+            WeightedUnmodifiableSet<V>
+            implements
+            VertexCover<V> {
 
         private static final long serialVersionUID = 3922451519162460179L;
 
-        public VertexCoverImpl(Set<V> vertexCover)
-        {
+        public VertexCoverImpl(Set<V> vertexCover) {
             super(vertexCover);
         }
 
-        public VertexCoverImpl(Set<V> vertexCover, double weight)
-        {
+        public VertexCoverImpl(Set<V> vertexCover, double weight) {
             super(vertexCover, weight);
         }
     }

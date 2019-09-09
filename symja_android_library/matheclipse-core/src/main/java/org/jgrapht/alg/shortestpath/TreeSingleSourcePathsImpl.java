@@ -17,34 +17,37 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.GraphWalk;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * An implementation of {@link SingleSourcePaths} which uses linear space.
- * 
+ *
  * <p>
  * This implementation uses the traditional representation of maintaining for each vertex the
  * predecessor in the shortest path tree. In order to keep space to linear, the paths are recomputed
  * in each invocation of the {@link #getPath(Object)} method. The complexity of
  * {@link #getPath(Object)} is linear to the number of edges of the path while the complexity of
  * {@link #getWeight(Object)} is $O(1)$.
- * 
- * @author Dimitrios Michail
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Dimitrios Michail
  */
 public class TreeSingleSourcePathsImpl<V, E>
-    implements
-    SingleSourcePaths<V, E>,
-    Serializable
-{
+        implements
+        SingleSourcePaths<V, E>,
+        Serializable {
     private static final long serialVersionUID = -5914007312734512847L;
 
     /**
@@ -65,29 +68,27 @@ public class TreeSingleSourcePathsImpl<V, E>
 
     /**
      * Construct a new instance.
-     * 
-     * @param g the graph
-     * @param source the source vertex
+     *
+     * @param g                         the graph
+     * @param source                    the source vertex
      * @param distanceAndPredecessorMap a map which contains for each vertex the distance and the
-     *        last edge that was used to discover the vertex. The map does not need to contain any
-     *        entry for the source vertex. In case it does contain the predecessor at the source
-     *        vertex must be null.
+     *                                  last edge that was used to discover the vertex. The map does not need to contain any
+     *                                  entry for the source vertex. In case it does contain the predecessor at the source
+     *                                  vertex must be null.
      */
     public TreeSingleSourcePathsImpl(
-        Graph<V, E> g, V source, Map<V, Pair<Double, E>> distanceAndPredecessorMap)
-    {
+            Graph<V, E> g, V source, Map<V, Pair<Double, E>> distanceAndPredecessorMap) {
         this.g = Objects.requireNonNull(g, "Graph is null");
         this.source = Objects.requireNonNull(source, "Source vertex is null");
         this.map = Objects
-            .requireNonNull(distanceAndPredecessorMap, "Distance and predecessor map is null");
+                .requireNonNull(distanceAndPredecessorMap, "Distance and predecessor map is null");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return g;
     }
 
@@ -95,18 +96,16 @@ public class TreeSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getSourceVertex()
-    {
+    public V getSourceVertex() {
         return source;
     }
 
     /**
      * Get the internal map used for representing the paths.
-     * 
+     *
      * @return the internal distance and predecessor map used for representing the paths.
      */
-    public Map<V, Pair<Double, E>> getDistanceAndPredecessorMap()
-    {
+    public Map<V, Pair<Double, E>> getDistanceAndPredecessorMap() {
         return Collections.unmodifiableMap(map);
     }
 
@@ -114,8 +113,7 @@ public class TreeSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getWeight(V targetVertex)
-    {
+    public double getWeight(V targetVertex) {
         Pair<Double, E> p = map.get(targetVertex);
         if (p == null) {
             if (source.equals(targetVertex)) {
@@ -132,8 +130,7 @@ public class TreeSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphPath<V, E> getPath(V targetVertex)
-    {
+    public GraphPath<V, E> getPath(V targetVertex) {
         if (source.equals(targetVertex)) {
             return GraphWalk.singletonWalk(g, source, 0d);
         }

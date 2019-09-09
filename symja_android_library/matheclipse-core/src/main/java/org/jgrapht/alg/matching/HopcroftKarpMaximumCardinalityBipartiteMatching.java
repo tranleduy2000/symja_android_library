@@ -17,11 +17,18 @@
  */
 package org.jgrapht.alg.matching;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.util.FixedSizeIntegerQueue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the well-known Hopcroft Karp algorithm to compute a matching of maximum
@@ -43,16 +50,13 @@ import java.util.*;
  * doi:10.1137/0202019 A coarse overview of the algorithm is given in: <a href=
  * "http://en.wikipedia.org/wiki/Hopcroft-Karp_algorithm">http://en.wikipedia.org/wiki/Hopcroft-Karp_algorithm</a>
  *
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
 
     private final Graph<V, E> graph;
     private final Set<V> partition1;
@@ -84,14 +88,13 @@ public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
      * must be bipartite. For efficiency reasons, this class does not check whether the input graph
      * is bipartite. Invoking this class on a non-bipartite graph results in undefined behavior. To
      * test whether a graph is bipartite, use {@link GraphTests#isBipartite(Graph)}.
-     * 
-     * @param graph bipartite graph
+     *
+     * @param graph      bipartite graph
      * @param partition1 the first partition of vertices in the bipartite graph
      * @param partition2 the second partition of vertices in the bipartite graph
      */
     public HopcroftKarpMaximumCardinalityBipartiteMatching(
-        Graph<V, E> graph, Set<V> partition1, Set<V> partition2)
-    {
+            Graph<V, E> graph, Set<V> partition1, Set<V> partition2) {
         this.graph = GraphTests.requireUndirected(graph);
 
         // Ensure that partition1 is smaller or equal in size compared to partition 2
@@ -107,8 +110,7 @@ public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
     /**
      * Initialize data structures
      */
-    private void init()
-    {
+    private void init() {
         vertices = new ArrayList<>();
         vertices.add(null);
         vertices.addAll(partition1);
@@ -125,8 +127,7 @@ public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
     /**
      * Greedily compute an initial feasible matching
      */
-    private void warmStart()
-    {
+    private void warmStart() {
         for (V uOrig : partition1) {
             int u = vertexIndexMap.get(uOrig);
 
@@ -145,16 +146,15 @@ public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
     /**
      * BFS function which finds the shortest augmenting path. The length of the shortest augmenting
      * path is stored in dist[DUMMY].
-     * 
+     *
      * @return true if an augmenting path was found, false otherwise
      */
-    private boolean bfs()
-    {
+    private boolean bfs() {
         queue.clear();
 
         for (int u = 1; u <= partition1.size(); u++)
             if (matching[u] == DUMMY) { // Add all unmatched vertices to the queue and set their
-                                        // distance to 0
+                // distance to 0
                 dist[u] = 0;
                 queue.enqueue(u);
             } else // Set distance of all matched vertices to INF
@@ -178,12 +178,11 @@ public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
     /**
      * Find all vertex disjoint augmenting paths of length dist[DUMMY]. To find paths of dist[DUMMY]
      * length, we simply follow nodes that are 1 distance increments away from each other.
-     * 
+     *
      * @param u vertex from which the DFS is started
      * @return true if an augmenting path from vertex u was found, false otherwise
      */
-    private boolean dfs(int u)
-    {
+    private boolean dfs(int u) {
         if (u != DUMMY) {
             for (V vOrig : Graphs.neighborListOf(graph, vertices.get(u))) {
                 int v = vertexIndexMap.get(vOrig);
@@ -203,8 +202,7 @@ public class HopcroftKarpMaximumCardinalityBipartiteMatching<V, E>
     }
 
     @Override
-    public Matching<V, E> getMatching()
-    {
+    public Matching<V, E> getMatching() {
         this.init();
         this.warmStart();
 

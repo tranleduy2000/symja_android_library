@@ -17,10 +17,17 @@
  */
 package org.jgrapht.alg.partition;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.PartitioningAlgorithm;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.jgrapht.GraphTests.isEmpty;
 
@@ -32,14 +39,12 @@ import static org.jgrapht.GraphTests.isEmpty;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  * @author Alexandru Valeanu
  */
 public class BipartitePartitioning<V, E>
-    implements
-    PartitioningAlgorithm<V>
-{
+        implements
+        PartitioningAlgorithm<V> {
 
     /* Input graph */
     private Graph<V, E> graph;
@@ -53,8 +58,7 @@ public class BipartitePartitioning<V, E>
      *
      * @param graph the input graph;
      */
-    public BipartitePartitioning(Graph<V, E> graph)
-    {
+    public BipartitePartitioning(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "graph cannot be null");
     }
 
@@ -63,16 +67,14 @@ public class BipartitePartitioning<V, E>
      *
      * @return true if the input graph is bipartite, false otherwise
      */
-    public boolean isBipartite()
-    {
+    public boolean isBipartite() {
         if (isEmpty(graph)) {
             return true;
         }
         try {
             // at most n^2/4 edges
             if (Math.multiplyExact(4, graph.edgeSet().size()) > Math
-                .multiplyExact(graph.vertexSet().size(), graph.vertexSet().size()))
-            {
+                    .multiplyExact(graph.vertexSet().size(), graph.vertexSet().size())) {
                 return false;
             }
         } catch (ArithmeticException e) {
@@ -86,8 +88,7 @@ public class BipartitePartitioning<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Partitioning<V> getPartitioning()
-    {
+    public Partitioning<V> getPartitioning() {
         if (computed) {
             return cachedPartitioning;
         }
@@ -131,8 +132,7 @@ public class BipartitePartitioning<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean isValidPartitioning(Partitioning<V> partitioning)
-    {
+    public boolean isValidPartitioning(Partitioning<V> partitioning) {
         Objects.requireNonNull(partitioning, "Partition cannot be null");
 
         if (partitioning.getNumberPartitions() != 2)

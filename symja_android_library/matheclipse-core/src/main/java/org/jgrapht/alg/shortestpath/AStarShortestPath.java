@@ -17,15 +17,25 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
+import org.jgrapht.graph.GraphWalk;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A* shortest path.
@@ -59,9 +69,8 @@ import java.util.function.*;
  * @author Thomas Breitbart
  */
 public class AStarShortestPath<V, E>
-    extends
-    BaseShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseShortestPathAlgorithm<V, E> {
     // Supplier of the preferable heap implementation
     protected final Supplier<AddressableHeap<Double, V>> heapSupplier;
     // List of open nodes
@@ -90,12 +99,11 @@ public class AStarShortestPath<V, E>
     /**
      * Create a new instance of the A* shortest path algorithm.
      *
-     * @param graph the input graph
+     * @param graph               the input graph
      * @param admissibleHeuristic admissible heuristic which estimates the distance from a node to
-     *        the target node. The heuristic must never overestimate the distance.
+     *                            the target node. The heuristic must never overestimate the distance.
      */
-    public AStarShortestPath(Graph<V, E> graph, AStarAdmissibleHeuristic<V> admissibleHeuristic)
-    {
+    public AStarShortestPath(Graph<V, E> graph, AStarAdmissibleHeuristic<V> admissibleHeuristic) {
         this(graph, admissibleHeuristic, new Supplier<AddressableHeap<Double, V>>() {
             @Override
             public AddressableHeap<Double, V> get() {
@@ -107,18 +115,17 @@ public class AStarShortestPath<V, E>
     /**
      * Create a new instance of the A* shortest path algorithm.
      *
-     * @param graph the input graph
+     * @param graph               the input graph
      * @param admissibleHeuristic admissible heuristic which estimates the distance from a node to
-     *        the target node. The heuristic must never overestimate the distance.
-     * @param heapSupplier supplier of the preferable heap implementation
+     *                            the target node. The heuristic must never overestimate the distance.
+     * @param heapSupplier        supplier of the preferable heap implementation
      */
     public AStarShortestPath(
-        Graph<V, E> graph, AStarAdmissibleHeuristic<V> admissibleHeuristic,
-        Supplier<AddressableHeap<Double, V>> heapSupplier)
-    {
+            Graph<V, E> graph, AStarAdmissibleHeuristic<V> admissibleHeuristic,
+            Supplier<AddressableHeap<Double, V>> heapSupplier) {
         super(graph);
         this.admissibleHeuristic =
-            Objects.requireNonNull(admissibleHeuristic, "Heuristic function cannot be null!");
+                Objects.requireNonNull(admissibleHeuristic, "Heuristic function cannot be null!");
         this.comparator = new ToleranceDoubleComparator();
         this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null!");
     }
@@ -128,8 +135,7 @@ public class AStarShortestPath<V, E>
      *
      * @param admissibleHeuristic admissible heuristic
      */
-    private void initialize(AStarAdmissibleHeuristic<V> admissibleHeuristic)
-    {
+    private void initialize(AStarAdmissibleHeuristic<V> admissibleHeuristic) {
         this.admissibleHeuristic = admissibleHeuristic;
         openList = heapSupplier.get();
         vertexToHeapNodeMap = new HashMap<>();
@@ -148,11 +154,10 @@ public class AStarShortestPath<V, E>
      * @return the shortest path from sourceVertex to targetVertex
      */
     @Override
-    public GraphPath<V, E> getPath(V sourceVertex, V targetVertex)
-    {
+    public GraphPath<V, E> getPath(V sourceVertex, V targetVertex) {
         if (!graph.containsVertex(sourceVertex) || !graph.containsVertex(targetVertex)) {
             throw new IllegalArgumentException(
-                "Source or target vertex not contained in the graph!");
+                    "Source or target vertex not contained in the graph!");
         }
 
         if (sourceVertex.equals(targetVertex)) {
@@ -188,8 +193,7 @@ public class AStarShortestPath<V, E>
      *
      * @return number of expanded nodes
      */
-    public int getNumberOfExpandedNodes()
-    {
+    public int getNumberOfExpandedNodes() {
         return numberOfExpandedNodes;
     }
 
@@ -209,8 +213,7 @@ public class AStarShortestPath<V, E>
      * @deprecated use {@link AStarAdmissibleHeuristic#isConsistent(Graph)} instead
      */
     @Deprecated
-    public boolean isConsistentHeuristic(AStarAdmissibleHeuristic<V> admissibleHeuristic)
-    {
+    public boolean isConsistentHeuristic(AStarAdmissibleHeuristic<V> admissibleHeuristic) {
         for (V targetVertex : graph.vertexSet()) {
             for (E e : graph.edgeSet()) {
                 double weight = graph.getEdgeWeight(e);
@@ -225,8 +228,7 @@ public class AStarShortestPath<V, E>
         return true;
     }
 
-    private void expandNode(AddressableHeap.Handle<Double, V> currentNode, V endVertex)
-    {
+    private void expandNode(AddressableHeap.Handle<Double, V> currentNode, V endVertex) {
         numberOfExpandedNodes++;
 
         Set<E> outgoingEdges = graph.outgoingEdgesOf(currentNode.getValue());
@@ -241,7 +243,7 @@ public class AStarShortestPath<V, E>
             double gScore_current = gScoreMap.get(currentNode.getValue());
             double tentativeGScore = gScore_current + graph.getEdgeWeight(edge);
             double fScore =
-                tentativeGScore + admissibleHeuristic.getCostEstimate(successor, endVertex);
+                    tentativeGScore + admissibleHeuristic.getCostEstimate(successor, endVertex);
 
             if (vertexToHeapNodeMap.containsKey(successor)) { // We re-encountered a vertex. It's
                 // either in the open or closed list.
@@ -272,13 +274,12 @@ public class AStarShortestPath<V, E>
     /**
      * Builds the graph path
      *
-     * @param startVertex starting vertex of the path
+     * @param startVertex  starting vertex of the path
      * @param targetVertex ending vertex of the path
-     * @param pathLength length of the path
+     * @param pathLength   length of the path
      * @return the shortest path from startVertex to endVertex
      */
-    private GraphPath<V, E> buildGraphPath(V startVertex, V targetVertex, double pathLength)
-    {
+    private GraphPath<V, E> buildGraphPath(V startVertex, V targetVertex, double pathLength) {
         List<E> edgeList = new ArrayList<>();
         List<V> vertexList = new ArrayList<>();
         vertexList.add(targetVertex);

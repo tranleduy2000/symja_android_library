@@ -17,9 +17,11 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates a <a href="http://mathworld.wolfram.com/CompleteBipartiteGraph.html">complete bipartite
@@ -28,13 +30,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Andrew Newell
  */
 public class CompleteBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private final int sizeA, sizeB;
 
     /**
@@ -43,8 +43,7 @@ public class CompleteBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V,
      * @param partitionOne number of vertices in the first partition
      * @param partitionTwo number of vertices in the second partition
      */
-    public CompleteBipartiteGraphGenerator(int partitionOne, int partitionTwo)
-    {
+    public CompleteBipartiteGraphGenerator(int partitionOne, int partitionTwo) {
         if (partitionOne < 0 || partitionTwo < 0) {
             throw new IllegalArgumentException("partition sizes must be non-negative");
         }
@@ -56,8 +55,7 @@ public class CompleteBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V,
      * Construct a complete bipartite graph
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         if ((sizeA < 1) && (sizeB < 1)) {
             return;
         }

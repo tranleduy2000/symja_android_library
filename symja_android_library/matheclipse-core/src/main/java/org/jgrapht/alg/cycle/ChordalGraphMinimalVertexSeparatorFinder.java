@@ -17,9 +17,15 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Allows obtaining a mapping of all
@@ -62,8 +68,7 @@ import java.util.*;
  * @author Timofey Chudakov
  * @see ChordalityInspector
  */
-public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
-{
+public class ChordalGraphMinimalVertexSeparatorFinder<V, E> {
     /**
      * The graph in which minimal vertex separators to searched in
      */
@@ -84,11 +89,10 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
      *
      * @param graph the graph minimal separators to search in
      */
-    public ChordalGraphMinimalVertexSeparatorFinder(Graph<V, E> graph)
-    {
+    public ChordalGraphMinimalVertexSeparatorFinder(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph);
         chordalityInspector =
-            new ChordalityInspector<>(graph, ChordalityInspector.IterationOrder.MCS);
+                new ChordalityInspector<>(graph, ChordalityInspector.IterationOrder.MCS);
     }
 
     /**
@@ -97,11 +101,10 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
      *
      * @return computed set of all minimal separators, or null if the {@code graph} isn't chordal
      */
-    public Set<Set<V>> getMinimalSeparators()
-    {
+    public Set<Set<V>> getMinimalSeparators() {
         lazyComputeMinimalSeparatorsWithMultiplicities();
         return minimalSeparatorsWithMultiplicities == null ? null
-            : minimalSeparatorsWithMultiplicities.keySet();
+                : minimalSeparatorsWithMultiplicities.keySet();
     }
 
     /**
@@ -109,10 +112,9 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
      * Returns null if the {@code graph} isn't chordal.
      *
      * @return computed mapping of all minimal separators to their multiplicities, or null if the
-     *         {@code graph} isn't chordal
+     * {@code graph} isn't chordal
      */
-    public Map<Set<V>, Integer> getMinimalSeparatorsWithMultiplicities()
-    {
+    public Map<Set<V>, Integer> getMinimalSeparatorsWithMultiplicities() {
         lazyComputeMinimalSeparatorsWithMultiplicities();
         return minimalSeparatorsWithMultiplicities;
     }
@@ -121,8 +123,7 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
      * Lazy computes a set of all minimal separators and a mapping of all minimal vertex separators
      * to their multiplicities
      */
-    private void lazyComputeMinimalSeparatorsWithMultiplicities()
-    {
+    private void lazyComputeMinimalSeparatorsWithMultiplicities() {
         if (minimalSeparatorsWithMultiplicities == null && chordalityInspector.isChordal()) {
             minimalSeparatorsWithMultiplicities = new HashMap<>();
             List<V> perfectEliminationOrder = chordalityInspector.getPerfectEliminationOrder();
@@ -137,7 +138,7 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
                     if (minimalSeparatorsWithMultiplicities.containsKey(current)) {
                         // found another vertex dependent on current set
                         minimalSeparatorsWithMultiplicities
-                            .put(current, minimalSeparatorsWithMultiplicities.get(current) + 1);
+                                .put(current, minimalSeparatorsWithMultiplicities.get(current) + 1);
                     } else {
                         // vertex at position i is the first vertex dependent on current set
                         minimalSeparatorsWithMultiplicities.put(current, 1);
@@ -153,10 +154,9 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
      *
      * @param vertexOrder a list with vertices.
      * @return a mapping of vertices from {@code vertexOrder} to their indices in
-     *         {@code vertexOrder}.
+     * {@code vertexOrder}.
      */
-    private Map<V, Integer> getVertexInOrder(List<V> vertexOrder)
-    {
+    private Map<V, Integer> getVertexInOrder(List<V> vertexOrder) {
         Map<V, Integer> vertexInOrder = new HashMap<>(vertexOrder.size());
         int i = 0;
         for (V vertex : vertexOrder) {
@@ -171,12 +171,11 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E>
      * the index of {@code vertex}.
      *
      * @param vertexInOrder defines the mapping of vertices in {@code graph} to their indices in
-     *        order.
-     * @param vertex the vertex whose predecessors in order are to be returned.
+     *                      order.
+     * @param vertex        the vertex whose predecessors in order are to be returned.
      * @return the predecessors of {@code vertex} in order defines by {@code map}.
      */
-    private Set<V> getPredecessors(Map<V, Integer> vertexInOrder, V vertex)
-    {
+    private Set<V> getPredecessors(Map<V, Integer> vertexInOrder, V vertex) {
         Set<V> predecessors = new HashSet<>();
         Integer vertexPosition = vertexInOrder.get(vertex);
         Set<E> edges = graph.edgesOf(vertex);

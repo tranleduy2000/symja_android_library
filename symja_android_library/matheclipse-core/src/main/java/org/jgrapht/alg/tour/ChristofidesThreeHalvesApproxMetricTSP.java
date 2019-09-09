@@ -84,15 +84,13 @@ import java.util.Set;
  * @author Dimitrios Michail
  */
 public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
-    implements
-    HamiltonianCycleAlgorithm<V, E>
-{
+        implements
+        HamiltonianCycleAlgorithm<V, E> {
 
     /**
      * Empty constructor
      */
-    public ChristofidesThreeHalvesApproxMetricTSP()
-    {
+    public ChristofidesThreeHalvesApproxMetricTSP() {
     }
 
     /**
@@ -105,8 +103,7 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
      * @throws IllegalArgumentException if the graph contains no vertices
      */
     @Override
-    public GraphPath<V, E> getTour(final Graph<V, E> graph)
-    {
+    public GraphPath<V, E> getTour(final Graph<V, E> graph) {
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("Graph must be undirected");
         }
@@ -123,7 +120,7 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
         if (graph.vertexSet().size() == 1) {
             V start = graph.vertexSet().iterator().next();
             return new GraphWalk<>(
-                graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
+                    graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
         }
 
         int n = graph.vertexSet().size();
@@ -154,16 +151,16 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
          */
         Graph<V, E> subgraph = new AsSubgraph<>(graph, oddDegreeVertices);
         MatchingAlgorithm<V, E> matchingAlgorithm =
-            new KolmogorovWeightedPerfectMatching<>(subgraph);
+                new KolmogorovWeightedPerfectMatching<>(subgraph);
         for (E e1 : matchingAlgorithm.getMatching().getEdges()) {
             mstAndMatching.addEdge(graph.getEdgeSource(e1), graph.getEdgeTarget(e1));
         }
 
         // find an Eulerian cycle in the auxiliary graph
         EulerianCycleAlgorithm<V, DefaultEdge> eulerianCycleAlgorithm =
-            new HierholzerEulerianCycle<>();
+                new HierholzerEulerianCycle<>();
         GraphPath<V, DefaultEdge> eulerianCycle =
-            eulerianCycleAlgorithm.getEulerianCycle(mstAndMatching);
+                eulerianCycleAlgorithm.getEulerianCycle(mstAndMatching);
 
         // form a closed tour from the Hamiltonian cycle
         final Set<V> visited = new HashSet<>(n);
@@ -190,6 +187,6 @@ public class ChristofidesThreeHalvesApproxMetricTSP<V, E>
         }
 
         return new GraphWalk<>(
-            graph, tourVertices.get(0), tourVertices.get(0), tourVertices, tourEdges, tourWeight);
+                graph, tourVertices.get(0), tourVertices.get(0), tourVertices, tourEdges, tourWeight);
     }
 }

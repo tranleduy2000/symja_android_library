@@ -17,42 +17,48 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * A random walk iterator for a directed or undirected graph.
- * 
+ *
  * <p>
  * At each step the iterator selects a random (uniformly distributed) edge out of the current vertex
  * and follows it to the next vertex. In case of directed graphs the outgoing edge set is used. See
  * <a href="https://en.wikipedia.org/wiki/Random_walk#Random_walk_on_graphs">wikipedia</a> for more
  * details.
- * 
+ *
  * <p>
  * In case a weighted walk is desired, edges are selected with probability respective to its weight
  * (out of the total weight of the edges). The walk can be bounded by number of steps (default
  * {@code Long#MAX_VALUE} . When the bound is reached the iterator is considered exhausted. Calling
  * {@code next()} on exhausted iterator will throw {@code NoSuchElementException}.
- * 
+ * <p>
  * In case a sink (i.e. no edges) vertex is reached, any consecutive calls to {@code next()} will
  * throw {@code NoSuchElementException}.
- * 
+ *
  * <p>
  * For this iterator to work correctly the graph must not be modified during iteration. Currently
  * there are no means to ensure that, nor to fail-fast. The results of such modifications are
  * undefined.
- * 
- * @author Assaf Mizrachi
  *
  * @param <V> vertex type
  * @param <E> edge type
+ * @author Assaf Mizrachi
  */
 public class RandomWalkIterator<V, E>
-    extends
-    AbstractGraphIterator<V, E>
-{
+        extends
+        AbstractGraphIterator<V, E> {
     private V currentVertex;
     private final boolean isWeighted;
     private boolean sinkReached;
@@ -64,12 +70,10 @@ public class RandomWalkIterator<V, E>
      * Walk is un-weighted and bounded by {@code Long#MAX_VALUE} steps.
      *
      * @param graph the graph to be iterated.
-     *
      * @throws IllegalArgumentException if <code>graph==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
-    public RandomWalkIterator(Graph<V, E> graph)
-    {
+    public RandomWalkIterator(Graph<V, E> graph) {
         this(graph, null);
     }
 
@@ -79,14 +83,12 @@ public class RandomWalkIterator<V, E>
      * null</code>, Iteration will start at an arbitrary graph vertex. Walk is un-weighted and
      * bounded by {@code Long#MAX_VALUE} steps.
      *
-     * @param graph the graph to be iterated.
+     * @param graph       the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
-     *
      * @throws IllegalArgumentException if <code>graph==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
-    public RandomWalkIterator(Graph<V, E> graph, V startVertex)
-    {
+    public RandomWalkIterator(Graph<V, E> graph, V startVertex) {
         this(graph, startVertex, true);
     }
 
@@ -96,15 +98,13 @@ public class RandomWalkIterator<V, E>
      * null</code>, Iteration will start at an arbitrary graph vertex. Walk is bounded by
      * {@code Long#MAX_VALUE} steps.
      *
-     * @param graph the graph to be iterated.
+     * @param graph       the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
-     * @param isWeighted set to <code>true</code> if a weighted walk is desired.
-     *
+     * @param isWeighted  set to <code>true</code> if a weighted walk is desired.
      * @throws IllegalArgumentException if <code>graph==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
-    public RandomWalkIterator(Graph<V, E> graph, V startVertex, boolean isWeighted)
-    {
+    public RandomWalkIterator(Graph<V, E> graph, V startVertex, boolean isWeighted) {
         this(graph, startVertex, isWeighted, Long.MAX_VALUE);
     }
 
@@ -114,16 +114,14 @@ public class RandomWalkIterator<V, E>
      * null</code>, Iteration will start at an arbitrary graph vertex. Walk is bounded by the
      * provided number steps.
      *
-     * @param graph the graph to be iterated.
+     * @param graph       the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
-     * @param isWeighted set to <code>true</code> if a weighted walk is desired.
-     * @param maxSteps number of steps before walk is exhausted.
-     *
+     * @param isWeighted  set to <code>true</code> if a weighted walk is desired.
+     * @param maxSteps    number of steps before walk is exhausted.
      * @throws IllegalArgumentException if <code>graph==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
-    public RandomWalkIterator(Graph<V, E> graph, V startVertex, boolean isWeighted, long maxSteps)
-    {
+    public RandomWalkIterator(Graph<V, E> graph, V startVertex, boolean isWeighted, long maxSteps) {
         this(graph, startVertex, isWeighted, maxSteps, new Random());
     }
 
@@ -133,18 +131,16 @@ public class RandomWalkIterator<V, E>
      * null</code>, Iteration will start at an arbitrary graph vertex. Walk is bounded by the
      * provided number steps.
      *
-     * @param graph the graph to be iterated.
+     * @param graph       the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
-     * @param isWeighted set to <code>true</code> if a weighted walk is desired.
-     * @param maxSteps number of steps before walk is exhausted.
-     * @param rng the random number generator to use
-     *
+     * @param isWeighted  set to <code>true</code> if a weighted walk is desired.
+     * @param maxSteps    number of steps before walk is exhausted.
+     * @param rng         the random number generator to use
      * @throws IllegalArgumentException if <code>graph==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
     public RandomWalkIterator(
-        Graph<V, E> graph, V startVertex, boolean isWeighted, long maxSteps, Random rng)
-    {
+            Graph<V, E> graph, V startVertex, boolean isWeighted, long maxSteps, Random rng) {
         super(graph);
 
         // do not cross components.
@@ -170,11 +166,10 @@ public class RandomWalkIterator<V, E>
     /**
      * Check if this walk is exhausted. Calling {@link #next()} on exhausted iterator will throw
      * {@link NoSuchElementException}.
-     * 
+     *
      * @return <code>true</code>if this iterator is exhausted, <code>false</code> otherwise.
      */
-    protected boolean isExhausted()
-    {
+    protected boolean isExhausted() {
         return maxSteps == 0;
     }
 
@@ -182,23 +177,20 @@ public class RandomWalkIterator<V, E>
      * Update data structures every time we see a vertex.
      *
      * @param vertex the vertex encountered
-     * @param edge the edge via which the vertex was encountered, or null if the vertex is a
-     *        starting point
+     * @param edge   the edge via which the vertex was encountered, or null if the vertex is a
+     *               starting point
      */
-    protected void encounterVertex(V vertex, E edge)
-    {
+    protected void encounterVertex(V vertex, E edge) {
         maxSteps--;
     }
 
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return currentVertex != null && !isExhausted() && !sinkReached;
     }
 
     @Override
-    public V next()
-    {
+    public V next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -225,12 +217,11 @@ public class RandomWalkIterator<V, E>
      * Randomly draws an edges out of the provided set. In case of un-weighted walk, edge will be
      * selected with uniform distribution across all outgoing edges. In case of a weighted walk,
      * edge will be selected with probability respective to its weight across all outgoing edges.
-     * 
+     *
      * @param edges the set to select the edge from
      * @return the drawn edges or null if set is empty.
      */
-    private E drawEdge(Set<? extends E> edges)
-    {
+    private E drawEdge(Set<? extends E> edges) {
         if (edges.isEmpty()) {
             return null;
         }
@@ -252,8 +243,7 @@ public class RandomWalkIterator<V, E>
         return list.get(drawn);
     }
 
-    private double getTotalWeight(Collection<E> edges)
-    {
+    private double getTotalWeight(Collection<E> edges) {
         double total = 0;
         for (E e : edges) {
             total += graph.getEdgeWeight(e);

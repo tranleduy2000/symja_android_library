@@ -81,7 +81,7 @@ import java.util.function.Predicate;
  * eg: If threadA tries to get all edges touching a certain vertex after threadB removes the vertex,
  * the algorithm will be interrupted by {@link IllegalArgumentException}.
  * </p>
- * 
+ *
  * <pre>
  * Thread threadA = new Thread(() -&gt; {
  *     Set vertices = graph.vertexSet();
@@ -103,7 +103,7 @@ import java.util.function.Predicate;
  * </pre>
  *
  * <p>
- *
+ * <p>
  * One way to avoid the hazard noted above is for the calling application to explicitly synchronize
  * all iterations using the {@link #getLock} method.
  *
@@ -117,16 +117,14 @@ import java.util.function.Predicate;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author CHEN Kui
  */
 public class AsSynchronizedGraph<V, E>
-    extends
-    GraphDelegator<V, E>
-    implements
-    Graph<V, E>,
-    Serializable
-{
+        extends
+        GraphDelegator<V, E>
+        implements
+        Graph<V, E>,
+        Serializable {
     private static final long serialVersionUID = 5144561442831050752L;
 
     private final ReentrantReadWriteLock readWriteLock;
@@ -145,21 +143,19 @@ public class AsSynchronizedGraph<V, E>
      *
      * @param g the backing graph (the delegate)
      */
-    public AsSynchronizedGraph(Graph<V, E> g)
-    {
+    public AsSynchronizedGraph(Graph<V, E> g) {
         this(g, false, false, false);
     }
 
     /**
      * Constructor for AsSynchronizedGraph with specified properties.
      *
-     * @param g the backing graph (the delegate)
+     * @param g           the backing graph (the delegate)
      * @param cacheEnable a flag describing whether a cache will be used
-     * @param fair a flag describing whether fair mode will be used
-     * @param copyless a flag describing whether copyless mode will be used
+     * @param fair        a flag describing whether fair mode will be used
+     * @param copyless    a flag describing whether copyless mode will be used
      */
-    private AsSynchronizedGraph(Graph<V, E> g, boolean cacheEnable, boolean fair, boolean copyless)
-    {
+    private AsSynchronizedGraph(Graph<V, E> g, boolean cacheEnable, boolean fair, boolean copyless) {
         super(g);
         readWriteLock = new ReentrantReadWriteLock(fair);
         if (copyless) {
@@ -177,8 +173,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         readWriteLock.readLock().lock();
         try {
             return super.getAllEdges(sourceVertex, targetVertex);
@@ -191,8 +186,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         readWriteLock.readLock().lock();
         try {
             return super.getEdge(sourceVertex, targetVertex);
@@ -206,8 +200,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E addEdge(V sourceVertex, V targetVertex)
-    {
+    public E addEdge(V sourceVertex, V targetVertex) {
         readWriteLock.writeLock().lock();
         try {
             E e = cacheStrategy.addEdge(sourceVertex, targetVertex);
@@ -223,8 +216,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         readWriteLock.writeLock().lock();
         try {
             if (cacheStrategy.addEdge(sourceVertex, targetVertex, e)) {
@@ -241,8 +233,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         readWriteLock.writeLock().lock();
         try {
             if (super.addVertex(v)) {
@@ -259,8 +250,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsEdge(V sourceVertex, V targetVertex)
-    {
+    public boolean containsEdge(V sourceVertex, V targetVertex) {
         readWriteLock.readLock().lock();
         try {
             return super.containsEdge(sourceVertex, targetVertex);
@@ -273,8 +263,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsEdge(E e)
-    {
+    public boolean containsEdge(E e) {
         readWriteLock.readLock().lock();
         try {
             return super.containsEdge(e);
@@ -287,8 +276,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsVertex(V v)
-    {
+    public boolean containsVertex(V v) {
         readWriteLock.readLock().lock();
         try {
             return super.containsVertex(v);
@@ -301,8 +289,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         readWriteLock.readLock().lock();
         try {
             return super.degreeOf(vertex);
@@ -315,8 +302,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgeSet()
-    {
+    public Set<E> edgeSet() {
         return allEdgesSet;
     }
 
@@ -324,8 +310,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgesOf(V vertex)
-    {
+    public Set<E> edgesOf(V vertex) {
         readWriteLock.readLock().lock();
         try {
             return cacheStrategy.edgesOf(vertex);
@@ -338,8 +323,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         readWriteLock.readLock().lock();
         try {
             return super.inDegreeOf(vertex);
@@ -352,8 +336,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         readWriteLock.readLock().lock();
         try {
             return cacheStrategy.incomingEdgesOf(vertex);
@@ -366,8 +349,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         readWriteLock.readLock().lock();
         try {
             return super.outDegreeOf(vertex);
@@ -380,8 +362,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         readWriteLock.readLock().lock();
         try {
             return cacheStrategy.outgoingEdgesOf(vertex);
@@ -394,8 +375,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeAllEdges(Collection<? extends E> edges)
-    {
+    public boolean removeAllEdges(Collection<? extends E> edges) {
         readWriteLock.writeLock().lock();
         try {
             return super.removeAllEdges(edges);
@@ -408,8 +388,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> removeAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> removeAllEdges(V sourceVertex, V targetVertex) {
         readWriteLock.writeLock().lock();
         try {
             return super.removeAllEdges(sourceVertex, targetVertex);
@@ -422,8 +401,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeAllVertices(Collection<? extends V> vertices)
-    {
+    public boolean removeAllVertices(Collection<? extends V> vertices) {
         readWriteLock.writeLock().lock();
         try {
             return super.removeAllVertices(vertices);
@@ -436,8 +414,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeEdge(E e)
-    {
+    public boolean removeEdge(E e) {
         readWriteLock.writeLock().lock();
         try {
             if (cacheStrategy.removeEdge(e)) {
@@ -454,8 +431,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E removeEdge(V sourceVertex, V targetVertex)
-    {
+    public E removeEdge(V sourceVertex, V targetVertex) {
         readWriteLock.writeLock().lock();
         try {
             E e = cacheStrategy.removeEdge(sourceVertex, targetVertex);
@@ -471,8 +447,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeVertex(V v)
-    {
+    public boolean removeVertex(V v) {
         readWriteLock.writeLock().lock();
         try {
             if (cacheStrategy.removeVertex(v)) {
@@ -490,8 +465,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         readWriteLock.readLock().lock();
         try {
             return super.toString();
@@ -504,8 +478,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<V> vertexSet()
-    {
+    public Set<V> vertexSet() {
         return allVerticesSet;
     }
 
@@ -513,8 +486,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeSource(E e)
-    {
+    public V getEdgeSource(E e) {
         readWriteLock.readLock().lock();
         try {
             return super.getEdgeSource(e);
@@ -527,8 +499,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeTarget(E e)
-    {
+    public V getEdgeTarget(E e) {
         readWriteLock.readLock().lock();
         try {
             return super.getEdgeTarget(e);
@@ -541,8 +512,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         readWriteLock.readLock().lock();
         try {
             return super.getEdgeWeight(e);
@@ -555,8 +525,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         readWriteLock.writeLock().lock();
         try {
             super.setEdgeWeight(e, weight);
@@ -568,11 +537,10 @@ public class AsSynchronizedGraph<V, E>
     /**
      * Return whether the graph uses cache for <code>edgesOf</code>, <code>incomingEdgesOf</code>
      * and <code>outgoingEdgesOf</code> methods.
-     * 
+     *
      * @return <tt>true</tt> if cache is in use, <tt>false</tt> if cache is not in use.
      */
-    public boolean isCacheEnabled()
-    {
+    public boolean isCacheEnabled() {
         readWriteLock.readLock().lock();
         try {
             return cacheStrategy.isCacheEnabled();
@@ -583,11 +551,10 @@ public class AsSynchronizedGraph<V, E>
 
     /**
      * Return whether copyless mode is used for collection-returning methods.
-     * 
+     *
      * @return <tt>true</tt> if the graph uses copyless mode, <tt>false</tt> otherwise
      */
-    public boolean isCopyless()
-    {
+    public boolean isCopyless() {
         return allVerticesSet.isCopyless();
     }
 
@@ -596,11 +563,10 @@ public class AsSynchronizedGraph<V, E>
      * <code>outgoingEdgesOf</code> methods.
      *
      * @param cacheEnabled a flag whether to use cache for those methods, if <tt>true</tt>, cache
-     *        will be used for those methods, otherwise cache will not be used.
+     *                     will be used for those methods, otherwise cache will not be used.
      * @return the AsSynchronizedGraph
      */
-    public AsSynchronizedGraph<V, E> setCache(boolean cacheEnabled)
-    {
+    public AsSynchronizedGraph<V, E> setCache(boolean cacheEnabled) {
         readWriteLock.writeLock().lock();
         try {
             if (cacheEnabled == isCacheEnabled())
@@ -619,8 +585,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         readWriteLock.readLock().lock();
         try {
             return getDelegate().hashCode();
@@ -633,8 +598,7 @@ public class AsSynchronizedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         readWriteLock.readLock().lock();
@@ -649,37 +613,32 @@ public class AsSynchronizedGraph<V, E>
      * Create a unmodifiable copy of the set.
      *
      * @param set the set to be copied.
-     *
      * @return a unmodifiable copy of the set
      */
-    private <C> Set<C> copySet(Set<C> set)
-    {
+    private <C> Set<C> copySet(Set<C> set) {
         return Collections.unmodifiableSet(new LinkedHashSet<>(set));
     }
 
     /**
      * Inform allVerticesSet that the backing data has been modified.
      */
-    private void vertexSetModified()
-    {
+    private void vertexSetModified() {
         allVerticesSet.modified();
     }
 
     /**
      * Inform allEdgesSet that the backing data has been modified.
      */
-    private void edgeSetModified()
-    {
+    private void edgeSetModified() {
         allEdgesSet.modified();
     }
 
     /**
      * Return whether fair mode is used for synchronizing access to this graph.
-     * 
+     *
      * @return <tt>true</tt> if the graph uses fair mode, <tt>false</tt> if non-fair mode
      */
-    public boolean isFair()
-    {
+    public boolean isFair() {
         return readWriteLock.isFair();
     }
 
@@ -692,8 +651,7 @@ public class AsSynchronizedGraph<V, E>
      *
      * @return the reentrant read/write lock used to synchronize all access to this graph
      */
-    public ReentrantReadWriteLock getLock()
-    {
+    public ReentrantReadWriteLock getLock() {
         return readWriteLock;
     }
 
@@ -717,14 +675,12 @@ public class AsSynchronizedGraph<V, E>
      * </p>
      *
      * @param <E> the class of the objects in the set
-     *
      * @author CHEN Kui
      */
     private static class CopyOnDemandSet<E>
-        implements
-        Set<E>,
-        Serializable
-    {
+            implements
+            Set<E>,
+            Serializable {
         private static final long serialVersionUID = 5553953818148294283L;
 
         // Backing set.
@@ -743,13 +699,12 @@ public class AsSynchronizedGraph<V, E>
 
         /**
          * Constructor for CopyOnDemandSet.
-         * 
-         * @param s the backing set.
+         *
+         * @param s             the backing set.
          * @param readWriteLock the ReadWriteLock on which to locked
-         * @param copyless whether copyless mode should be used
+         * @param copyless      whether copyless mode should be used
          */
-        private CopyOnDemandSet(Set<E> s, ReadWriteLock readWriteLock, boolean copyless)
-        {
+        private CopyOnDemandSet(Set<E> s, ReadWriteLock readWriteLock, boolean copyless) {
             set = Objects.requireNonNull(s, "s must not be null");
             copy = null;
             this.readWriteLock = readWriteLock;
@@ -758,11 +713,10 @@ public class AsSynchronizedGraph<V, E>
 
         /**
          * Return whether copyless mode is used for iteration.
-         * 
+         *
          * @return <tt>true</tt> if the set uses copyless mode, <tt>false</tt> otherwise
          */
-        public boolean isCopyless()
-        {
+        public boolean isCopyless() {
             return copyless;
         }
 
@@ -770,8 +724,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public int size()
-        {
+        public int size() {
             readWriteLock.readLock().lock();
             try {
                 return set.size();
@@ -784,8 +737,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean isEmpty()
-        {
+        public boolean isEmpty() {
             readWriteLock.readLock().lock();
             try {
                 return set.isEmpty();
@@ -798,8 +750,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean contains(Object o)
-        {
+        public boolean contains(Object o) {
             readWriteLock.readLock().lock();
             try {
                 return set.contains(o);
@@ -815,8 +766,7 @@ public class AsSynchronizedGraph<V, E>
          * @return an iterator over the elements in the backing set's unmodifiable copy.
          */
         @Override
-        public Iterator<E> iterator()
-        {
+        public Iterator<E> iterator() {
             return getCopy().iterator();
         }
 
@@ -824,8 +774,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Object[] toArray()
-        {
+        public Object[] toArray() {
             readWriteLock.readLock().lock();
             try {
                 return set.toArray();
@@ -838,8 +787,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public <T> T[] toArray(T[] a)
-        {
+        public <T> T[] toArray(T[] a) {
             readWriteLock.readLock().lock();
             try {
                 return set.toArray(a);
@@ -852,8 +800,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean add(E e)
-        {
+        public boolean add(E e) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -861,8 +808,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean remove(Object o)
-        {
+        public boolean remove(Object o) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -870,8 +816,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean containsAll(Collection<?> c)
-        {
+        public boolean containsAll(Collection<?> c) {
             readWriteLock.readLock().lock();
             try {
                 return set.containsAll(c);
@@ -884,8 +829,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean addAll(Collection<? extends E> c)
-        {
+        public boolean addAll(Collection<? extends E> c) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -893,8 +837,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean retainAll(Collection<?> c)
-        {
+        public boolean retainAll(Collection<?> c) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -902,8 +845,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean removeAll(Collection<?> c)
-        {
+        public boolean removeAll(Collection<?> c) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -911,8 +853,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public void clear()
-        {
+        public void clear() {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -921,8 +862,7 @@ public class AsSynchronizedGraph<V, E>
          */
         // Override default methods in Collection
         @Override
-        public void forEach(Consumer<? super E> action)
-        {
+        public void forEach(Consumer<? super E> action) {
             readWriteLock.readLock().lock();
             try {
                 set.forEach(action);
@@ -935,8 +875,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean removeIf(Predicate<? super E> filter)
-        {
+        public boolean removeIf(Predicate<? super E> filter) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
 
@@ -944,18 +883,17 @@ public class AsSynchronizedGraph<V, E>
          * Creates a <Code>Spliterator</code> over the elements in the set's unmodifiable copy.
          *
          * @return a <code>Spliterator</code> over the elements in the backing set's unmodifiable
-         *         copy.
+         * copy.
          */
         @Override
-        public Spliterator<E> spliterator()
-        {
+        public Spliterator<E> spliterator() {
             return getCopy().spliterator();
         }
 
         /**
          * Return a sequential <code>Stream</code> with the backing set's unmodifiable copy as its
          * source.
-         * 
+         *
          * @return a sequential <code>Stream</code> with the backing set's unmodifiable copy as its
          *         source.
          */
@@ -968,7 +906,7 @@ public class AsSynchronizedGraph<V, E>
         /**
          * Return a possibly parallel <code>Stream</code> with the backing set's unmodifiable copy
          * as its source.
-         * 
+         *
          * @return a possibly parallel <code>Stream</code> with the backing set's unmodifiable copy
          *         as its source.
          */
@@ -980,14 +918,13 @@ public class AsSynchronizedGraph<V, E>
 
         /**
          * Compares the specified object with this set for equality.
-         * 
+         *
          * @param o object to be compared for equality with this set.
          * @return <code>true</code> if o and this set are the same object or o is equal to the
-         *         backing object, false otherwise.
+         * backing object, false otherwise.
          */
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             if (this == o)
                 return true;
             readWriteLock.readLock().lock();
@@ -1000,12 +937,11 @@ public class AsSynchronizedGraph<V, E>
 
         /**
          * Return the backing set's hashcode.
-         * 
+         *
          * @return the backing set's hashcode.
          */
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             readWriteLock.readLock().lock();
             try {
                 return set.hashCode();
@@ -1016,12 +952,11 @@ public class AsSynchronizedGraph<V, E>
 
         /**
          * Return the backing set's toString result.
-         * 
+         *
          * @return the backing set's toString result.
          */
         @Override
-        public String toString()
-        {
+        public String toString() {
             readWriteLock.readLock().lock();
             try {
                 return set.toString();
@@ -1036,8 +971,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the backing set or its unmodifiable copy
          */
-        private Set<E> getCopy()
-        {
+        private Set<E> getCopy() {
             if (copyless) {
                 return set;
             }
@@ -1062,8 +996,7 @@ public class AsSynchronizedGraph<V, E>
          * If the backing set is modified, call this method to let this set knows the backing set's
          * copy need to update.
          */
-        private void modified()
-        {
+        private void modified() {
             copy = null;
         }
     }
@@ -1072,8 +1005,7 @@ public class AsSynchronizedGraph<V, E>
      * An interface for cache strategy of AsSynchronizedGraph's <code>edgesOf</code>,
      * <code>incomingEdgesOf</code> and <code>outgoingEdgesOf</code> methods.
      */
-    private interface CacheStrategy<V, E>
-    {
+    private interface CacheStrategy<V, E> {
         /**
          * Add an edge into AsSynchronizedGraph's backing graph.
          */
@@ -1119,7 +1051,7 @@ public class AsSynchronizedGraph<V, E>
         /**
          * Return whether the graph uses cache for <code>edgesOf</code>,
          * <code>incomingEdgesOf</code> and <code>outgoingEdgesOf</code> methods.
-         * 
+         *
          * @return <tt>true</tt> if cache is in use, <tt>false</tt> if cache is not in use.
          */
         boolean isCacheEnabled();
@@ -1130,18 +1062,16 @@ public class AsSynchronizedGraph<V, E>
      * and <code>outgoingEdgesOf</code> methods.
      */
     private class NoCache
-        implements
-        CacheStrategy<V, E>,
-        Serializable
-    {
+            implements
+            CacheStrategy<V, E>,
+            Serializable {
         private static final long serialVersionUID = 19246150051213471L;
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public E addEdge(V sourceVertex, V targetVertex)
-        {
+        public E addEdge(V sourceVertex, V targetVertex) {
             return AsSynchronizedGraph.super.addEdge(sourceVertex, targetVertex);
         }
 
@@ -1149,8 +1079,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean addEdge(V sourceVertex, V targetVertex, E e)
-        {
+        public boolean addEdge(V sourceVertex, V targetVertex, E e) {
             return AsSynchronizedGraph.super.addEdge(sourceVertex, targetVertex, e);
         }
 
@@ -1158,8 +1087,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> edgesOf(V vertex)
-        {
+        public Set<E> edgesOf(V vertex) {
             return copySet(AsSynchronizedGraph.super.edgesOf(vertex));
         }
 
@@ -1167,8 +1095,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> incomingEdgesOf(V vertex)
-        {
+        public Set<E> incomingEdgesOf(V vertex) {
             return copySet(AsSynchronizedGraph.super.incomingEdgesOf(vertex));
         }
 
@@ -1176,8 +1103,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> outgoingEdgesOf(V vertex)
-        {
+        public Set<E> outgoingEdgesOf(V vertex) {
             return copySet(AsSynchronizedGraph.super.outgoingEdgesOf(vertex));
         }
 
@@ -1185,8 +1111,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean removeEdge(E e)
-        {
+        public boolean removeEdge(E e) {
             return AsSynchronizedGraph.super.removeEdge(e);
         }
 
@@ -1194,8 +1119,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public E removeEdge(V sourceVertex, V targetVertex)
-        {
+        public E removeEdge(V sourceVertex, V targetVertex) {
             return AsSynchronizedGraph.super.removeEdge(sourceVertex, targetVertex);
         }
 
@@ -1203,8 +1127,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean removeVertex(V v)
-        {
+        public boolean removeVertex(V v) {
             return AsSynchronizedGraph.super.removeVertex(v);
         }
 
@@ -1212,8 +1135,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean isCacheEnabled()
-        {
+        public boolean isCacheEnabled() {
             return false;
         }
     }
@@ -1224,17 +1146,15 @@ public class AsSynchronizedGraph<V, E>
      * synchronize iterations over these collections.
      */
     private class NoCopy
-        extends
-        NoCache
-    {
+            extends
+            NoCache {
         private static final long serialVersionUID = -5046944235164395939L;
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Set<E> edgesOf(V vertex)
-        {
+        public Set<E> edgesOf(V vertex) {
             return AsSynchronizedGraph.super.edgesOf(vertex);
         }
 
@@ -1242,8 +1162,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> incomingEdgesOf(V vertex)
-        {
+        public Set<E> incomingEdgesOf(V vertex) {
             return AsSynchronizedGraph.super.incomingEdgesOf(vertex);
         }
 
@@ -1251,8 +1170,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> outgoingEdgesOf(V vertex)
-        {
+        public Set<E> outgoingEdgesOf(V vertex) {
             return AsSynchronizedGraph.super.outgoingEdgesOf(vertex);
         }
     }
@@ -1262,10 +1180,9 @@ public class AsSynchronizedGraph<V, E>
      * <code>outgoingEdgesOf</code> methods.
      */
     private class CacheAccess
-        implements
-        CacheStrategy<V, E>,
-        Serializable
-    {
+            implements
+            CacheStrategy<V, E>,
+            Serializable {
         private static final long serialVersionUID = -18262921841829294L;
 
         // A map caching for incomingEdges operation.
@@ -1281,8 +1198,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public E addEdge(V sourceVertex, V targetVertex)
-        {
+        public E addEdge(V sourceVertex, V targetVertex) {
             E e = AsSynchronizedGraph.super.addEdge(sourceVertex, targetVertex);
             if (e != null)
                 edgeModified(sourceVertex, targetVertex);
@@ -1293,8 +1209,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean addEdge(V sourceVertex, V targetVertex, E e)
-        {
+        public boolean addEdge(V sourceVertex, V targetVertex, E e) {
             if (AsSynchronizedGraph.super.addEdge(sourceVertex, targetVertex, e)) {
                 edgeModified(sourceVertex, targetVertex);
                 return true;
@@ -1306,8 +1221,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> edgesOf(V vertex)
-        {
+        public Set<E> edgesOf(V vertex) {
             Set<E> s = edgesOfMap.get(vertex);
             if (s != null)
                 return s;
@@ -1320,8 +1234,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> incomingEdgesOf(V vertex)
-        {
+        public Set<E> incomingEdgesOf(V vertex) {
             Set<E> s = incomingEdgesMap.get(vertex);
             if (s != null)
                 return s;
@@ -1334,8 +1247,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> outgoingEdgesOf(V vertex)
-        {
+        public Set<E> outgoingEdgesOf(V vertex) {
             Set<E> s = outgoingEdgesMap.get(vertex);
             if (s != null)
                 return s;
@@ -1348,8 +1260,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean removeEdge(E e)
-        {
+        public boolean removeEdge(E e) {
             V sourceVertex = getEdgeSource(e);
             V targetVertex = getEdgeTarget(e);
             if (AsSynchronizedGraph.super.removeEdge(e)) {
@@ -1363,8 +1274,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public E removeEdge(V sourceVertex, V targetVertex)
-        {
+        public E removeEdge(V sourceVertex, V targetVertex) {
             E e = AsSynchronizedGraph.super.removeEdge(sourceVertex, targetVertex);
             if (e != null)
                 edgeModified(sourceVertex, targetVertex);
@@ -1375,8 +1285,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean removeVertex(V v)
-        {
+        public boolean removeVertex(V v) {
             if (AsSynchronizedGraph.super.removeVertex(v)) {
                 edgesOfMap.clear();
                 incomingEdgesMap.clear();
@@ -1392,8 +1301,7 @@ public class AsSynchronizedGraph<V, E>
          * @param sourceVertex source vertex of the modified edge.
          * @param targetVertex target vertex of the modified edge.
          */
-        private void edgeModified(V sourceVertex, V targetVertex)
-        {
+        private void edgeModified(V sourceVertex, V targetVertex) {
             outgoingEdgesMap.remove(sourceVertex);
             incomingEdgesMap.remove(targetVertex);
             edgesOfMap.remove(sourceVertex);
@@ -1408,8 +1316,7 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public boolean isCacheEnabled()
-        {
+        public boolean isCacheEnabled() {
             return true;
         }
     }
@@ -1419,11 +1326,9 @@ public class AsSynchronizedGraph<V, E>
      *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
-     *
      * @author CHEN Kui
      */
-    public static class Builder<V, E>
-    {
+    public static class Builder<V, E> {
         private boolean cacheEnable;
         private boolean fair;
         private boolean copyless;
@@ -1431,8 +1336,7 @@ public class AsSynchronizedGraph<V, E>
         /**
          * Construct a new Builder with non-fair mode, cache disabled, and copyless mode disabled.
          */
-        public Builder()
-        {
+        public Builder() {
             cacheEnable = false;
             fair = false;
             copyless = false;
@@ -1443,8 +1347,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @param graph the graph on which to base the builder
          */
-        public Builder(AsSynchronizedGraph<V, E> graph)
-        {
+        public Builder(AsSynchronizedGraph<V, E> graph) {
             this.cacheEnable = graph.isCacheEnabled();
             this.fair = graph.isFair();
             this.copyless = graph.isCopyless();
@@ -1455,8 +1358,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the Builder
          */
-        public Builder<V, E> cacheDisable()
-        {
+        public Builder<V, E> cacheDisable() {
             cacheEnable = false;
             return this;
         }
@@ -1466,8 +1368,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the Builder
          */
-        public Builder<V, E> cacheEnable()
-        {
+        public Builder<V, E> cacheEnable() {
             cacheEnable = true;
             return this;
         }
@@ -1477,8 +1378,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return <tt>true</tt> if cache will be used, <tt>false</tt> if cache will not be used
          */
-        public boolean isCacheEnable()
-        {
+        public boolean isCacheEnable() {
             return cacheEnable;
         }
 
@@ -1487,8 +1387,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the Builder
          */
-        public Builder<V, E> setCopyless()
-        {
+        public Builder<V, E> setCopyless() {
             copyless = true;
             return this;
         }
@@ -1498,8 +1397,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the Builder
          */
-        public Builder<V, E> clearCopyless()
-        {
+        public Builder<V, E> clearCopyless() {
             copyless = false;
             return this;
         }
@@ -1509,8 +1407,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return <tt>true</tt> if constructed as copyless, <tt>false</tt> otherwise
          */
-        public boolean isCopyless()
-        {
+        public boolean isCopyless() {
             return copyless;
         }
 
@@ -1519,8 +1416,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the SynchronizedGraphParams
          */
-        public Builder<V, E> setFair()
-        {
+        public Builder<V, E> setFair() {
             fair = true;
             return this;
         }
@@ -1530,8 +1426,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return the SynchronizedGraphParams
          */
-        public Builder<V, E> setNonfair()
-        {
+        public Builder<V, E> setNonfair() {
             fair = false;
             return this;
         }
@@ -1541,8 +1436,7 @@ public class AsSynchronizedGraph<V, E>
          *
          * @return <tt>true</tt> if constructed as fair mode, <tt>false</tt> if non-fair
          */
-        public boolean isFair()
-        {
+        public boolean isFair() {
             return fair;
         }
 
@@ -1552,8 +1446,7 @@ public class AsSynchronizedGraph<V, E>
          * @param graph the backing graph (the delegate)
          * @return the AsSynchronizedGraph
          */
-        public AsSynchronizedGraph<V, E> build(Graph<V, E> graph)
-        {
+        public AsSynchronizedGraph<V, E> build(Graph<V, E> graph) {
             return new AsSynchronizedGraph<>(graph, cacheEnable, fair, copyless);
         }
     }

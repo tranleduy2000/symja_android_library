@@ -17,32 +17,41 @@
  */
 package org.jgrapht.alg.util;
 
-import org.jgrapht.*;
-import org.jgrapht.event.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.event.GraphEdgeChangeEvent;
+import org.jgrapht.event.GraphListener;
+import org.jgrapht.event.GraphVertexChangeEvent;
+import org.jgrapht.util.ModifiableInteger;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Maintains a cache of each vertex's neighbors. While lists of neighbors can be obtained from
  * {@link Graphs}, they are re-calculated at each invocation by walking a vertex's incident edges,
  * which becomes inordinately expensive when performed often.
- * 
+ *
  * <p>
  * The cache also keeps track of successors and predecessors for each vertex. This means that the
  * result of the union of calling predecessorsOf(v) and successorsOf(v) is equal to the result of
  * calling neighborsOf(v) for a given vertex v.
- * 
+ *
  * @param <V> the vertex type
  * @param <E> the edge type
- * 
  * @author Szabolcs Besenyei
  */
 public class NeighborCache<V, E>
-    implements
-    GraphListener<V, E>
-{
+        implements
+        GraphListener<V, E> {
     private Map<V, Neighbors<V>> successors = new HashMap<>();
     private Map<V, Neighbors<V>> predecessors = new HashMap<>();
     private Map<V, Neighbors<V>> neighbors = new HashMap<>();
@@ -51,24 +60,22 @@ public class NeighborCache<V, E>
 
     /**
      * Constructor
-     * 
+     *
      * @param graph the input graph
      * @throws NullPointerException if the input graph is null
      */
-    public NeighborCache(Graph<V, E> graph)
-    {
+    public NeighborCache(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph);
     }
 
     /**
      * Returns the unique predecessors of the given vertex if it exists in the cache, otherwise it
      * is initialized.
-     * 
+     *
      * @param v the given vertex
      * @return the unique predecessors of the given vertex
      */
-    public Set<V> predecessorsOf(final V v)
-    {
+    public Set<V> predecessorsOf(final V v) {
         return fetch(v, predecessors, new Function<V, Neighbors<V>>() {
             @Override
             public Neighbors<V> apply(V k) {
@@ -80,12 +87,11 @@ public class NeighborCache<V, E>
     /**
      * Returns the unique successors of the given vertex if it exists in the cache, otherwise it is
      * initialized.
-     * 
+     *
      * @param v the given vertex
      * @return the unique successors of the given vertex
      */
-    public Set<V> successorsOf(final V v)
-    {
+    public Set<V> successorsOf(final V v) {
         return fetch(v, successors, new Function<V, Neighbors<V>>() {
             @Override
             public Neighbors<V> apply(V k) {
@@ -97,12 +103,11 @@ public class NeighborCache<V, E>
     /**
      * Returns the unique neighbors of the given vertex if it exists in the cache, otherwise it is
      * initialized.
-     * 
+     *
      * @param v the given vertex
      * @return the unique neighbors of the given vertex
      */
-    public Set<V> neighborsOf(final V v)
-    {
+    public Set<V> neighborsOf(final V v) {
         return fetch(v, neighbors, new Function<V, Neighbors<V>>() {
             @Override
             public Neighbors<V> apply(V k) {
@@ -119,11 +124,9 @@ public class NeighborCache<V, E>
      * {@link #neighborsOf} unless duplicate neighbors are important.
      *
      * @param v the vertex whose neighbors are desired
-     *
      * @return all neighbors of the specified vertex
      */
-    public List<V> neighborListOf(V v)
-    {
+    public List<V> neighborListOf(V v) {
         Neighbors<V> nbrs = neighbors.get(v);
         if (nbrs == null) {
             nbrs = new Neighbors<>(Graphs.neighborListOf(graph, v));
@@ -132,16 +135,14 @@ public class NeighborCache<V, E>
         return nbrs.getNeighborList();
     }
 
-    private Set<V> fetch(V vertex, Map<V, Neighbors<V>> map, Function<V, Neighbors<V>> func)
-    {
+    private Set<V> fetch(V vertex, Map<V, Neighbors<V>> map, Function<V, Neighbors<V>> func) {
         return map.computeIfAbsent(vertex, func).getNeighbors();
     }
 
     @Override
-    public void edgeAdded(GraphEdgeChangeEvent<V, E> e)
-    {
+    public void edgeAdded(GraphEdgeChangeEvent<V, E> e) {
         assert e
-            .getSource() == this.graph : "This NeighborCache is added as a listener to a graph other than the one specified during the construction of this NeighborCache!";
+                .getSource() == this.graph : "This NeighborCache is added as a listener to a graph other than the one specified during the construction of this NeighborCache!";
 
         V source = e.getEdgeSource();
         V target = e.getEdgeTarget();
@@ -164,10 +165,9 @@ public class NeighborCache<V, E>
     }
 
     @Override
-    public void edgeRemoved(GraphEdgeChangeEvent<V, E> e)
-    {
+    public void edgeRemoved(GraphEdgeChangeEvent<V, E> e) {
         assert e
-            .getSource() == this.graph : "This NeighborCache is added as a listener to a graph other than the one specified during the construction of this NeighborCache!";
+                .getSource() == this.graph : "This NeighborCache is added as a listener to a graph other than the one specified during the construction of this NeighborCache!";
 
         V source = e.getEdgeSource();
         V target = e.getEdgeTarget();
@@ -195,16 +195,14 @@ public class NeighborCache<V, E>
     }
 
     @Override
-    public void vertexAdded(GraphVertexChangeEvent<V> e)
-    {
+    public void vertexAdded(GraphVertexChangeEvent<V> e) {
         // Nothing to cache until there are edges
     }
 
     @Override
-    public void vertexRemoved(GraphVertexChangeEvent<V> e)
-    {
+    public void vertexRemoved(GraphVertexChangeEvent<V> e) {
         assert e
-            .getSource() == this.graph : "This NeighborCache is added as a listener to a graph other than the one specified during the construction of this NeighborCache!";
+                .getSource() == this.graph : "This NeighborCache is added as a listener to a graph other than the one specified during the construction of this NeighborCache!";
 
         successors.remove(e.getVertex());
         predecessors.remove(e.getVertex());
@@ -215,24 +213,21 @@ public class NeighborCache<V, E>
      * Stores cached neighbors for a single vertex. Includes support for live neighbor sets and
      * duplicate neighbors.
      */
-    static class Neighbors<V>
-    {
+    static class Neighbors<V> {
         private Map<V, ModifiableInteger> neighborCounts = new LinkedHashMap<>();
 
         // TODO could eventually make neighborSet modifiable, resulting
         // in edge removals from the graph
         private Set<V> neighborSet = Collections.unmodifiableSet(neighborCounts.keySet());
 
-        public Neighbors(Collection<V> neighbors)
-        {
+        public Neighbors(Collection<V> neighbors) {
             // add all current neighbors
             for (V neighbor : neighbors) {
                 addNeighbor(neighbor);
             }
         }
 
-        public void addNeighbor(V v)
-        {
+        public void addNeighbor(V v) {
             ModifiableInteger count = neighborCounts.get(v);
             if (count == null) {
                 count = new ModifiableInteger(1);
@@ -242,12 +237,11 @@ public class NeighborCache<V, E>
             }
         }
 
-        public void removeNeighbor(V v)
-        {
+        public void removeNeighbor(V v) {
             ModifiableInteger count = neighborCounts.get(v);
             if (count == null) {
                 throw new IllegalArgumentException(
-                    "Attempting to remove a neighbor that wasn't present");
+                        "Attempting to remove a neighbor that wasn't present");
             }
 
             count.decrement();
@@ -256,13 +250,11 @@ public class NeighborCache<V, E>
             }
         }
 
-        public Set<V> getNeighbors()
-        {
+        public Set<V> getNeighbors() {
             return neighborSet;
         }
 
-        public List<V> getNeighborList()
-        {
+        public List<V> getNeighborList() {
             List<V> neighbors = new ArrayList<>();
             for (Map.Entry<V, ModifiableInteger> entry : neighborCounts.entrySet()) {
                 V v = entry.getKey();
@@ -275,8 +267,7 @@ public class NeighborCache<V, E>
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return neighborSet.toString();
         }
     }

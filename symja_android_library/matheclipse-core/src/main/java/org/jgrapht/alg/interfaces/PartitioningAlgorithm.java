@@ -33,11 +33,9 @@ import java.util.function.Function;
  * Algorithm to compute a vertex partitioning of a graph.
  *
  * @param <V> vertex the graph vertex type
- *
  * @author Alexandru Valeanu
  */
-public interface PartitioningAlgorithm<V>
-{
+public interface PartitioningAlgorithm<V> {
 
     /**
      * Computes a vertex partitioning.
@@ -60,9 +58,8 @@ public interface PartitioningAlgorithm<V>
      * @param <V> the vertex type
      */
     interface Partitioning<V>
-        extends
-        Iterable<Set<V>>
-    {
+            extends
+            Iterable<Set<V>> {
 
         /**
          * Get the number of partitions.
@@ -77,7 +74,7 @@ public interface PartitioningAlgorithm<V>
          * @param index index of the partition to return
          * @return the index-th partition
          * @throws IndexOutOfBoundsException if the index is out of range
-         *         (<tt>index &lt; 0 || index &gt;= getNumberPartitions()</tt>)
+         *                                   (<tt>index &lt; 0 || index &gt;= getNumberPartitions()</tt>)
          */
         Set<V> getPartition(int index);
 
@@ -106,10 +103,9 @@ public interface PartitioningAlgorithm<V>
      * @param <V> the vertex type
      */
     class PartitioningImpl<V>
-        implements
-        Partitioning<V>,
-        Serializable
-    {
+            implements
+            Partitioning<V>,
+            Serializable {
 
         private static final long serialVersionUID = 3702471090706836080L;
 
@@ -122,8 +118,7 @@ public interface PartitioningAlgorithm<V>
          * @param classes the partition classes
          * @throws NullPointerException if {@code classes} is {@code null}
          */
-        public PartitioningImpl(List<Set<V>> classes)
-        {
+        public PartitioningImpl(List<Set<V>> classes) {
             List<Set<V>> list = new ArrayList<>();
             for (Set<V> vs : Objects.requireNonNull(classes)) {
                 Set<V> unmodifiableSet = Collections.unmodifiableSet(vs);
@@ -139,20 +134,19 @@ public interface PartitioningAlgorithm<V>
          * @param vertexToPartitionMap the vertex to partition index map
          * @throws NullPointerException if {@code vertexToPartitionMap} is {@code null}
          */
-        public PartitioningImpl(Map<V, Integer> vertexToPartitionMap)
-        {
+        public PartitioningImpl(Map<V, Integer> vertexToPartitionMap) {
             Objects.requireNonNull(vertexToPartitionMap);
 
             Map<Integer, Set<V>> partitionIndexToVertexMap = new HashMap<>();
 
             for (Map.Entry<V, Integer> entry : vertexToPartitionMap.entrySet()) {
                 partitionIndexToVertexMap
-                    .computeIfAbsent(entry.getValue(), new Function<Integer, Set<V>>() {
-                        @Override
-                        public Set<V> apply(Integer x) {
-                            return new HashSet<>();
-                        }
-                    }).add(entry.getKey());
+                        .computeIfAbsent(entry.getValue(), new Function<Integer, Set<V>>() {
+                            @Override
+                            public Set<V> apply(Integer x) {
+                                return new HashSet<>();
+                            }
+                        }).add(entry.getKey());
             }
 
             List<Set<V>> list = new ArrayList<>();
@@ -169,8 +163,7 @@ public interface PartitioningAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public int getNumberPartitions()
-        {
+        public int getNumberPartitions() {
             return classes.size();
         }
 
@@ -178,8 +171,7 @@ public interface PartitioningAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public Set<V> getPartition(int index)
-        {
+        public Set<V> getPartition(int index) {
             if (index < 0 || index >= classes.size()) {
                 throw new IndexOutOfBoundsException(index + " is not valid");
             }
@@ -191,18 +183,16 @@ public interface PartitioningAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Partition [number-of-partitions=" + getNumberPartitions() + ", partitions="
-                + classes + "]";
+                    + classes + "]";
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Iterator<Set<V>> iterator()
-        {
+        public Iterator<Set<V>> iterator() {
             return classes.iterator();
         }
     }

@@ -43,16 +43,14 @@ import java.util.Set;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexey Kudinkin
  * @author Joris Kinable
  */
 public abstract class MaximumFlowAlgorithmBase<V, E>
-    extends MaximumFlowAlgorithmImpl<V, E>
-    implements
-    MaximumFlowAlgorithm<V, E>,
-    MinimumSTCutAlgorithm<V, E>
-{
+        extends MaximumFlowAlgorithmImpl<V, E>
+        implements
+        MaximumFlowAlgorithm<V, E>,
+        MinimumSTCutAlgorithm<V, E> {
     /**
      * Default tolerance.
      */
@@ -85,12 +83,11 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
 
     /**
      * Construct a new maximum flow
-     * 
+     *
      * @param network the network
      * @param epsilon the tolerance for the comparison of floating point values
      */
-    public MaximumFlowAlgorithmBase(Graph<V, E> network, double epsilon)
-    {
+    public MaximumFlowAlgorithmBase(Graph<V, E> network, double epsilon) {
         this.network = network;
         this.directedGraph = network.getType().isDirected();
         this.comparator = new ToleranceDoubleComparator(epsilon);
@@ -99,17 +96,16 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     /**
      * Prepares all data structures to start a new invocation of the Maximum Flow or Minimum Cut
      * algorithms
-     * 
-     * @param source source
-     * @param sink sink
+     *
+     * @param source                 source
+     * @param sink                   sink
      * @param vertexExtensionFactory vertex extension factory
-     * @param edgeExtensionFactory edge extension factory
-     * @param <VE> vertex extension type
+     * @param edgeExtensionFactory   edge extension factory
+     * @param <VE>                   vertex extension type
      */
     protected <VE extends VertexExtensionBase> void init(
-        V source, V sink, ExtensionFactory<VE> vertexExtensionFactory,
-        ExtensionFactory<AnnotatedFlowEdge> edgeExtensionFactory)
-    {
+            V source, V sink, ExtensionFactory<VE> vertexExtensionFactory,
+            ExtensionFactory<AnnotatedFlowEdge> edgeExtensionFactory) {
         vertexExtensionManager = new ExtensionManager<>(vertexExtensionFactory);
         edgeExtensionManager = new ExtensionManager<>(edgeExtensionFactory);
 
@@ -126,8 +122,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     /**
      * Create internal data structure
      */
-    private void buildInternal()
-    {
+    private void buildInternal() {
         if (directedGraph) { // Directed graph
             for (V v : network.vertexSet()) {
                 VertexExtensionBase vx = vertexExtensionManager.getExtension(v);
@@ -157,9 +152,9 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
             }
             for (E e : network.edgeSet()) {
                 VertexExtensionBase ux =
-                    vertexExtensionManager.getExtension(network.getEdgeSource(e));
+                        vertexExtensionManager.getExtension(network.getEdgeSource(e));
                 VertexExtensionBase vx =
-                    vertexExtensionManager.getExtension(network.getEdgeTarget(e));
+                        vertexExtensionManager.getExtension(network.getEdgeTarget(e));
                 AnnotatedFlowEdge forwardEdge = createEdge(ux, vx, e, network.getEdgeWeight(e));
                 AnnotatedFlowEdge backwardEdge = createBackwardEdge(forwardEdge);
                 ux.getOutgoing().add(forwardEdge);
@@ -169,8 +164,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     }
 
     private AnnotatedFlowEdge createEdge(
-        VertexExtensionBase source, VertexExtensionBase target, E e, double weight)
-    {
+            VertexExtensionBase source, VertexExtensionBase target, E e, double weight) {
         AnnotatedFlowEdge ex = edgeExtensionManager.getExtension(e);
         ex.source = source;
         ex.target = target;
@@ -180,16 +174,15 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
         return ex;
     }
 
-    private AnnotatedFlowEdge createBackwardEdge(AnnotatedFlowEdge forwardEdge)
-    {
+    private AnnotatedFlowEdge createBackwardEdge(AnnotatedFlowEdge forwardEdge) {
         AnnotatedFlowEdge backwardEdge;
         E backwardPrototype =
-            network.getEdge(forwardEdge.target.prototype, forwardEdge.source.prototype);
+                network.getEdge(forwardEdge.target.prototype, forwardEdge.source.prototype);
 
         if (directedGraph && backwardPrototype != null) { // if edge exists in directed input graph
             backwardEdge = createEdge(
-                forwardEdge.target, forwardEdge.source, backwardPrototype,
-                network.getEdgeWeight(backwardPrototype));
+                    forwardEdge.target, forwardEdge.source, backwardPrototype,
+                    network.getEdgeWeight(backwardPrototype));
         } else {
             backwardEdge = edgeExtensionManager.createExtension();
             backwardEdge.source = forwardEdge.target;
@@ -213,24 +206,23 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
      * \geq f_2$, then the flow on $(v,u)$ becomes $0$, and the flow on $(u,v)$ becomes $f_1-f_2$.
      * Else, if $f_1 \textlptr f_2$, the flow in the direction $(v, u)$ is reduced, i.e. the flow on
      * $(v, u)$ becomes $f_2 - f_1$, whereas the flow on $(u,v)$ remains zero.
-     * 
+     *
      * @param edge desired direction in which the flow is increased
      * @param flow increase of flow in the the direction indicated by the forwardEdge
      */
-    protected void pushFlowThrough(AnnotatedFlowEdge edge, double flow)
-    {
+    protected void pushFlowThrough(AnnotatedFlowEdge edge, double flow) {
         AnnotatedFlowEdge inverseEdge = edge.getInverse();
 
         assert ((comparator.compare(edge.flow, 0.0) == 0)
-            || (comparator.compare(inverseEdge.flow, 0.0) == 0));
+                || (comparator.compare(inverseEdge.flow, 0.0) == 0));
 
         if (comparator.compare(inverseEdge.flow, flow) < 0) { // If f_1 >= f_2
             double flowDifference = flow - inverseEdge.flow;
 
             edge.flow += flowDifference;
             edge.capacity -= inverseEdge.flow; // Capacity on edge (u,v) PLUS flow on (v,u) gives
-                                               // the MAXIMUM flow in the direction (u,v) i.e
-                                               // edge.weight in the graph 'network'.
+            // the MAXIMUM flow in the direction (u,v) i.e
+            // edge.weight in the graph 'network'.
 
             inverseEdge.flow = 0;
             inverseEdge.capacity += flowDifference;
@@ -243,44 +235,40 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     /**
      * Create a map which specifies for each edge in the input map the amount of flow that flows
      * through it
-     * 
+     *
      * @return a map which specifies for each edge in the input map the amount of flow that flows
-     *         through it
+     * through it
      */
-    protected Map<E, Double> composeFlow()
-    {
+    protected Map<E, Double> composeFlow() {
         Map<E, Double> maxFlow = new HashMap<>();
 
         for (E e : network.edgeSet()) {
             AnnotatedFlowEdge annotatedFlowEdge = edgeExtensionManager.getExtension(e);
             maxFlow.put(
-                e, directedGraph ? annotatedFlowEdge.flow
-                    : Math.max(annotatedFlowEdge.flow, annotatedFlowEdge.inverse.flow));
+                    e, directedGraph ? annotatedFlowEdge.flow
+                            : Math.max(annotatedFlowEdge.flow, annotatedFlowEdge.inverse.flow));
         }
 
         return maxFlow;
     }
 
     class VertexExtensionBase
-        implements
-        Extension
-    {
+            implements
+            Extension {
         private final List<AnnotatedFlowEdge> outgoing = new ArrayList<>();
 
         V prototype;
 
         double excess;
 
-        public List<AnnotatedFlowEdge> getOutgoing()
-        {
+        public List<AnnotatedFlowEdge> getOutgoing() {
             return outgoing;
         }
     }
 
     class AnnotatedFlowEdge
-        implements
-        Extension
-    {
+            implements
+            Extension {
         /* Edge source */
         private VertexExtensionBase source;
         /* Edge target */
@@ -290,45 +278,38 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
 
         E prototype; // Edge
         double capacity; // Maximum by which the flow in the direction can be increased (on top of
-                         // the flow already in this direction).
+        // the flow already in this direction).
         double flow; // Flow in the direction denoted by this edge
 
-        public <VE extends VertexExtensionBase> VE getSource()
-        {
+        public <VE extends VertexExtensionBase> VE getSource() {
             return (VE) source;
         }
 
-        public void setSource(VertexExtensionBase source)
-        {
+        public void setSource(VertexExtensionBase source) {
             this.source = source;
         }
 
-        public <VE extends VertexExtensionBase> VE getTarget()
-        {
+        public <VE extends VertexExtensionBase> VE getTarget() {
             return (VE) target;
         }
 
-        public void setTarget(VertexExtensionBase target)
-        {
+        public void setTarget(VertexExtensionBase target) {
             this.target = target;
         }
 
-        public AnnotatedFlowEdge getInverse()
-        {
+        public AnnotatedFlowEdge getInverse() {
             return inverse;
         }
 
-        public boolean hasCapacity()
-        {
+        public boolean hasCapacity() {
             return comparator.compare(capacity, flow) > 0;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "(" + (source == null ? null : source.prototype) + ","
-                + (target == null ? null : target.prototype) + ",c:" + capacity + " f: " + flow
-                + ")";
+                    + (target == null ? null : target.prototype) + ",c:" + capacity + " f: " + flow
+                    + ")";
         }
     }
 
@@ -338,8 +319,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
      *
      * @return current source
      */
-    public V getCurrentSource()
-    {
+    public V getCurrentSource() {
         return source;
     }
 
@@ -349,8 +329,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
      *
      * @return current sink
      */
-    public V getCurrentSink()
-    {
+    public V getCurrentSink() {
         return sink;
     }
 
@@ -360,8 +339,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
      *
      * @return maximum flow value
      */
-    public double getMaximumFlowValue()
-    {
+    public double getMaximumFlowValue() {
         return maxFlowValue;
     }
 
@@ -372,8 +350,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
      *
      * @return <i>read-only</i> mapping from edges to doubles - flow values
      */
-    public Map<E, Double> getFlowMap()
-    {
+    public Map<E, Double> getFlowMap() {
         if (maxFlow == null) // Lazily calculate the max flow map
             maxFlow = composeFlow();
         return maxFlow;
@@ -385,15 +362,14 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
      * in an undirected graph, flow may go through the edge in either side. If the flow goes from
      * $u$ to $v$, we return $v$, otherwise $u$. If the flow on an edge equals $0$, the returned
      * value has no meaning.
-     * 
+     *
      * @param e edge
      * @return the vertex where the flow leaves the edge
      */
-    public V getFlowDirection(E e)
-    {
+    public V getFlowDirection(E e) {
         if (!network.containsEdge(e))
             throw new IllegalArgumentException(
-                "Cannot query the flow on an edge which does not exist in the input graph!");
+                    "Cannot query the flow on an edge which does not exist in the input graph!");
         AnnotatedFlowEdge annotatedFlowEdge = edgeExtensionManager.getExtension(e);
 
         if (directedGraph)
@@ -409,28 +385,24 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     /*---------------- Minimum s-t cut related methods -------------------*/
 
     @Override
-    public double calculateMinCut(V source, V sink)
-    {
+    public double calculateMinCut(V source, V sink) {
         return this.getMaximumFlowValue(source, sink);
     }
 
     @Override
-    public double getCutCapacity()
-    {
+    public double getCutCapacity() {
         return getMaximumFlowValue();
     }
 
     @Override
-    public Set<V> getSourcePartition()
-    {
+    public Set<V> getSourcePartition() {
         if (sourcePartition == null)
             calculateSourcePartition();
         return sourcePartition;
     }
 
     @Override
-    public Set<V> getSinkPartition()
-    {
+    public Set<V> getSinkPartition() {
         if (sinkPartition == null) {
             sinkPartition = new LinkedHashSet<>(network.vertexSet());
             sinkPartition.removeAll(this.getSourcePartition());
@@ -439,8 +411,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     }
 
     @Override
-    public Set<E> getCutEdges()
-    {
+    public Set<E> getCutEdges() {
         if (cutEdges != null)
             return cutEdges;
         cutEdges = new LinkedHashSet<>();
@@ -476,8 +447,7 @@ public abstract class MaximumFlowAlgorithmBase<V, E>
     /**
      * Calculate the set of reachable vertices from $s$ in the residual graph.
      */
-    protected void calculateSourcePartition()
-    {
+    protected void calculateSourcePartition() {
         // the source partition contains all vertices reachable from s in the residual graph
         this.sourcePartition = new LinkedHashSet<>();
         Queue<VertexExtensionBase> processQueue = new LinkedList<>();

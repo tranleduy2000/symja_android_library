@@ -17,10 +17,15 @@
  */
 package org.jgrapht.alg.spanning;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.util.Pair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -46,14 +51,12 @@ import java.util.function.Function;
  *
  * @param <V> the vertex type
  * @param <E> the edge type
- *
  * @author Christoph Grüne
  * @since July 12, 2018
  */
 public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
-    extends
-    AbstractCapacitatedMinimumSpanningTree<V, E>
-{
+        extends
+        AbstractCapacitatedMinimumSpanningTree<V, E> {
 
     /**
      * the number of the most profitable operations for every iteration considered in the procedure.
@@ -68,17 +71,16 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
     /**
      * Constructs an Esau-Williams GRASP algorithm instance.
      *
-     * @param graph the graph
-     * @param root the root of the CMST
-     * @param capacity the capacity constraint of the CMST
-     * @param weights the weights of the vertices
+     * @param graph                       the graph
+     * @param root                        the root of the CMST
+     * @param capacity                    the capacity constraint of the CMST
+     * @param weights                     the weights of the vertices
      * @param numberOfOperationsParameter the parameter how many best vertices are considered in the
-     *        procedure
+     *                                    procedure
      */
     public EsauWilliamsCapacitatedMinimumSpanningTree(
-        Graph<V, E> graph, V root, double capacity, Map<V, Double> weights,
-        int numberOfOperationsParameter)
-    {
+            Graph<V, E> graph, V root, double capacity, Map<V, Double> weights,
+            int numberOfOperationsParameter) {
         super(graph, root, capacity, weights);
         this.numberOfOperationsParameter = numberOfOperationsParameter;
         this.isAlgorithmExecuted = false;
@@ -90,8 +92,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
      * Returns a capacitated spanning tree computed by the Esau-Williams algorithm.
      */
     @Override
-    public CapacitatedSpanningTree<V, E> getCapacitatedSpanningTree()
-    {
+    public CapacitatedSpanningTree<V, E> getCapacitatedSpanningTree() {
         if (isAlgorithmExecuted) {
             return bestSolution.calculateResultingSpanningTree();
         }
@@ -100,7 +101,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
         isAlgorithmExecuted = true;
         if (!cmst.isCapacitatedSpanningTree(graph, root, capacity, demands)) {
             throw new IllegalArgumentException(
-                "This graph does not have a capacitated minimum spanning tree with the given capacity and demands.");
+                    "This graph does not have a capacitated minimum spanning tree with the given capacity and demands.");
         }
         return cmst;
     }
@@ -112,10 +113,9 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
      * non-negative.
      *
      * @return a representation of the partition of the capacitated spanning tree that has
-     *         non-negative labels.
+     * non-negative labels.
      */
-    protected CapacitatedSpanningTreeSolutionRepresentation getSolution()
-    {
+    protected CapacitatedSpanningTreeSolutionRepresentation getSolution() {
         /*
          * labeling of the improvement graph vertices. There are two vertices in the improvement
          * graph for every vertex in the input graph: the vertex indicating the vertex itself and
@@ -172,7 +172,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
 
         while (true) {
 
-            for (Iterator<V> it = vertices.iterator(); it.hasNext();) {
+            for (Iterator<V> it = vertices.iterator(); it.hasNext(); ) {
 
                 V v = it.next();
 
@@ -190,8 +190,8 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                 closestVertex.put(v, closestVertexToV);
                 // store the maximum saving and the corresponding vertex
                 savings.put(
-                    v, getDistance(shortestGate.getOrDefault(bestSolution.getLabel(v), v), root)
-                        - getDistance(v, closestVertexToV));
+                        v, getDistance(shortestGate.getOrDefault(bestSolution.getLabel(v), v), root)
+                                - getDistance(v, closestVertexToV));
             }
 
             // calculate list of best operations
@@ -207,7 +207,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
 
                 V shortestGate1 = shortestGate.getOrDefault(labelOfVertexToMove, vertexToMove);
                 V shortestGate2 =
-                    shortestGate.getOrDefault(labelOfClosestMoveVertex, closestMoveVertex);
+                        shortestGate.getOrDefault(labelOfClosestMoveVertex, closestMoveVertex);
 
                 /*
                  * Do improving move. The case distinction is important such that the the
@@ -217,11 +217,10 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                  * deleted by the move operation.
                  */
                 if (bestSolution.getPartitionWeight(labelOfVertexToMove) < bestSolution
-                    .getPartitionWeight(labelOfClosestMoveVertex))
-                {
+                        .getPartitionWeight(labelOfClosestMoveVertex)) {
                     bestSolution.moveVertices(
-                        bestSolution.getPartitionSet(labelOfVertexToMove), labelOfVertexToMove,
-                        labelOfClosestMoveVertex);
+                            bestSolution.getPartitionSet(labelOfVertexToMove), labelOfVertexToMove,
+                            labelOfClosestMoveVertex);
 
                     if (getDistance(shortestGate1, root) < getDistance(shortestGate2, root)) {
                         shortestGate.put(labelOfClosestMoveVertex, shortestGate1);
@@ -230,8 +229,8 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                     }
                 } else {
                     bestSolution.moveVertices(
-                        bestSolution.getPartitionSet(labelOfClosestMoveVertex),
-                        labelOfClosestMoveVertex, labelOfVertexToMove);
+                            bestSolution.getPartitionSet(labelOfClosestMoveVertex),
+                            labelOfClosestMoveVertex, labelOfVertexToMove);
 
                     if (getDistance(shortestGate1, root) < getDistance(shortestGate2, root)) {
                         shortestGate.put(labelOfVertexToMove, shortestGate1);
@@ -246,7 +245,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
         }
 
         CapacitatedSpanningTreeSolutionRepresentation result =
-            new CapacitatedSpanningTreeSolutionRepresentation(labels, partition);
+                new CapacitatedSpanningTreeSolutionRepresentation(labels, partition);
 
         result.cleanUp();
         Set<Integer> labelSet = new HashSet<>(result.getLabels());
@@ -262,8 +261,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
      * @param savings the savings calculated in the algorithm (see getSolution())
      * @return the list of the <code>numberOfOperationsParameter</code> best options
      */
-    private LinkedList<V> getListOfBestOptions(Map<V, Double> savings)
-    {
+    private LinkedList<V> getListOfBestOptions(Map<V, Double> savings) {
         LinkedList<V> bestVertices = new LinkedList<>();
 
         for (Map.Entry<V, Double> entry : savings.entrySet()) {
@@ -296,14 +294,13 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
      * <code>vertex</code> to the subtree of the closest vertex does not violate the capacity
      * constraint and the savings are positive. Otherwise null is returned.
      *
-     * @param vertex the vertex to find a valid closest vertex for
+     * @param vertex         the vertex to find a valid closest vertex for
      * @param restrictionMap the set of labels of sets of the partition, in which the capacity
-     *        constraint is violated.
+     *                       constraint is violated.
      * @return the closest valid vertex and null, if no valid vertex exists
      */
     private V calculateClosestVertex(
-        V vertex, Map<V, Set<Integer>> restrictionMap, Map<Integer, V> shortestGate)
-    {
+            V vertex, Map<V, Set<Integer>> restrictionMap, Map<Integer, V> shortestGate) {
         V closestVertexToV1 = null;
 
         double distanceToRoot;
@@ -323,8 +320,8 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                     for (V v2 : part) {
                         if (graph.containsEdge(vertex, v2)) {
                             double newWeight = bestSolution
-                                .getPartitionWeight(bestSolution.getLabel(v2))
-                                + bestSolution.getPartitionWeight(bestSolution.getLabel(vertex));
+                                    .getPartitionWeight(bestSolution.getLabel(v2))
+                                    + bestSolution.getPartitionWeight(bestSolution.getLabel(vertex));
                             if (newWeight <= capacity) {
                                 double currentEdgeWeight = getDistance(vertex, v2);
                                 if (currentEdgeWeight < distanceToRoot) {
@@ -337,12 +334,12 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                                  * this part, so add the part to the restricted parts
                                  */
                                 Set<Integer> restriction =
-                                    restrictionMap.computeIfAbsent(vertex, new Function<V, Set<Integer>>() {
-                                        @Override
-                                        public Set<Integer> apply(V k) {
-                                            return new HashSet<>();
-                                        }
-                                    });
+                                        restrictionMap.computeIfAbsent(vertex, new Function<V, Set<Integer>>() {
+                                            @Override
+                                            public Set<Integer> apply(V k) {
+                                                return new HashSet<>();
+                                            }
+                                        });
                                 restriction.add(bestSolution.getLabel(v2));
                                 break;
                             }
@@ -355,8 +352,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
         return closestVertexToV1;
     }
 
-    private double getDistance(V v1, V v2)
-    {
+    private double getDistance(V v1, V v2) {
         E e = graph.getEdge(v1, v2);
         if (e == null) {
             return Double.MAX_VALUE;

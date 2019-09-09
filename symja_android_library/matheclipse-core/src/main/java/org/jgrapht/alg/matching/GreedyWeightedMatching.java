@@ -17,11 +17,15 @@
  */
 package org.jgrapht.alg.matching;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The greedy algorithm for computing a maximum weight matching in an arbitrary graph. The algorithm
@@ -29,7 +33,7 @@ import java.util.*;
  * the graph. This implementation accepts directed and undirected graphs which may contain
  * self-loops and multiple (parallel) edges. There is no assumption on the edge weights, i.e. they
  * can also be negative or zero.
- * 
+ *
  * <p>
  * This algorithm can be run in two modes: with and without edge cost normalization. Without
  * normalization, the algorithm first orders the edge set in non-increasing order of weights and
@@ -56,18 +60,15 @@ import java.util.*;
  * <li>D.E. Drake, S. Hougardy, A Simple Approximation Algorithm for the Weighted Matching Problem,
  * Information Processing Letters 85, 211-213, 2003.</li>
  * </ul>
- * 
- * @see PathGrowingWeightedMatching
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
+ * @see PathGrowingWeightedMatching
  */
 public class GreedyWeightedMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
     private final Graph<V, E> graph;
     private final Comparator<Double> comparator;
     private final boolean normalizeEdgeCosts;
@@ -75,24 +76,22 @@ public class GreedyWeightedMatching<V, E>
     /**
      * Create and execute a new instance of the greedy maximum weight matching algorithm. Floating
      * point values are compared using {@link #DEFAULT_EPSILON} tolerance.
-     * 
-     * @param graph the input graph
+     *
+     * @param graph              the input graph
      * @param normalizeEdgeCosts boolean indicating whether edge normalization has to be used.
      */
-    public GreedyWeightedMatching(Graph<V, E> graph, boolean normalizeEdgeCosts)
-    {
+    public GreedyWeightedMatching(Graph<V, E> graph, boolean normalizeEdgeCosts) {
         this(graph, normalizeEdgeCosts, DEFAULT_EPSILON);
     }
 
     /**
      * Create and execute a new instance of the greedy maximum weight matching algorithm.
-     * 
-     * @param graph the input graph
+     *
+     * @param graph              the input graph
      * @param normalizeEdgeCosts boolean indicating whether edge normalization has to be used.
-     * @param epsilon tolerance when comparing floating point values
+     * @param epsilon            tolerance when comparing floating point values
      */
-    public GreedyWeightedMatching(Graph<V, E> graph, boolean normalizeEdgeCosts, double epsilon)
-    {
+    public GreedyWeightedMatching(Graph<V, E> graph, boolean normalizeEdgeCosts, double epsilon) {
         if (graph == null) {
             throw new IllegalArgumentException("Input graph cannot be null");
         }
@@ -103,12 +102,11 @@ public class GreedyWeightedMatching<V, E>
 
     /**
      * Get a matching that is a $\frac{1}{2}$-approximation of the maximum weighted matching.
-     * 
+     *
      * @return a matching
      */
     @Override
-    public Matching<V, E> getMatching()
-    {
+    public Matching<V, E> getMatching() {
         // sort edges in non-decreasing order of weight
         // (the lambda uses e1 and e2 in the reverse order on purpose)
         List<E> allEdges = new ArrayList<>(graph.edgeSet());

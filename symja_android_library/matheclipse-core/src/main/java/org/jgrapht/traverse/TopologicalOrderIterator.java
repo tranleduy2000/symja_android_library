@@ -17,14 +17,22 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.util.ModifiableInteger;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * A topological ordering iterator for a directed acyclic graph.
- * 
+ *
  * <p>
  * A topological order is a permutation <tt>p</tt> of the vertices of a graph such that an edge
  * <tt>(i,j)</tt> implies that <tt>i</tt> appears before <tt>j</tt> in <tt>p</tt>. For more
@@ -35,7 +43,7 @@ import java.util.*;
  * The iterator crosses components but does not track them, it only tracks visited vertices. The
  * iterator will detect (at some point) if the graph is not a directed acyclic graph and throw a
  * {@link IllegalArgumentException}.
- * 
+ *
  * <p>
  * For this iterator to work correctly the graph must not be modified during iteration. Currently
  * there are no means to ensure that, nor to fail-fast. The results of such modifications are
@@ -43,14 +51,12 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Marden Neubert
  * @author Dimitrios Michail
  */
 public class TopologicalOrderIterator<V, E>
-    extends
-    AbstractGraphIterator<V, E>
-{
+        extends
+        AbstractGraphIterator<V, E> {
     private static final String GRAPH_IS_NOT_A_DAG = "Graph is not a DAG";
 
     private Queue<V> queue;
@@ -60,7 +66,7 @@ public class TopologicalOrderIterator<V, E>
 
     /**
      * Construct a topological order iterator.
-     * 
+     *
      * <p>
      * Traversal will start at one of the graph's <i>sources</i>. See the definition of source at
      * <a href="http://mathworld.wolfram.com/Source.html">
@@ -69,25 +75,23 @@ public class TopologicalOrderIterator<V, E>
      *
      * @param graph the directed graph to be iterated
      */
-    public TopologicalOrderIterator(Graph<V, E> graph)
-    {
-        this(graph, (Comparator<V>) null);
+    public TopologicalOrderIterator(Graph<V, E> graph) {
+        this(graph, null);
     }
 
     /**
      * Construct a topological order iterator.
-     * 
+     *
      * <p>
      * Traversal will start at one of the graph's <i>sources</i>. See the definition of source at
      * <a href="http://mathworld.wolfram.com/Source.html">
      * http://mathworld.wolfram.com/Source.html</a>. In case of partial order, a comparator is used
      * to break ties.
      *
-     * @param graph the directed graph to be iterated
+     * @param graph      the directed graph to be iterated
      * @param comparator comparator in order to break ties in case of partial order
      */
-    public TopologicalOrderIterator(Graph<V, E> graph, Comparator<V> comparator)
-    {
+    public TopologicalOrderIterator(Graph<V, E> graph, Comparator<V> comparator) {
         super(graph);
         GraphTests.requireDirected(graph);
 
@@ -121,32 +125,29 @@ public class TopologicalOrderIterator<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Always returns true since the iterator does not care about components.
      */
     @Override
-    public boolean isCrossComponentTraversal()
-    {
+    public boolean isCrossComponentTraversal() {
         return true;
     }
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Trying to disable the cross components nature of this iterator will result into throwing a
      * {@link IllegalArgumentException}.
      */
     @Override
-    public void setCrossComponentTraversal(boolean crossComponentTraversal)
-    {
+    public void setCrossComponentTraversal(boolean crossComponentTraversal) {
         if (!crossComponentTraversal) {
             throw new IllegalArgumentException("Iterator is always cross-component");
         }
     }
 
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         if (cur != null) {
             return true;
         }
@@ -158,8 +159,7 @@ public class TopologicalOrderIterator<V, E>
     }
 
     @Override
-    public V next()
-    {
+    public V next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -172,8 +172,7 @@ public class TopologicalOrderIterator<V, E>
         return result;
     }
 
-    private V advance()
-    {
+    private V advance() {
         V result = queue.poll();
 
         if (result != null) {

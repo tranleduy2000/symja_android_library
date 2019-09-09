@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +17,15 @@
  */
 package org.jheaps.tree;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.AddressableHeap;
 import org.jheaps.MergeableAddressableHeap;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LogarithmicTime;
+
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * Simple Fibonacci heaps. The heap is sorted according to the
@@ -47,18 +47,18 @@ import org.jheaps.annotations.LogarithmicTime;
  * Operation {@code findMin} is worst-case O(1). Operations {@code deleteMin}
  * and {@code delete} are amortized O(log(n)). The operation {@code meld} is
  * also amortized O(1).
- * 
+ *
  * <p>
  * All the above bounds, however, assume that the user does not perform
  * cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
@@ -84,13 +84,9 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- *
  */
 public class SimpleFibonacciHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializable {
 
@@ -129,7 +125,7 @@ public class SimpleFibonacciHeap<K, V> implements MergeableAddressableHeap<K, V>
      * Used to reference the current heap or some other heap in case of melding,
      * so that handles remain valid even after a meld, without having to iterate
      * over them.
-     * 
+     * <p>
      * In order to avoid maintaining a full-fledged union-find data structure,
      * we disallow a heap to be used in melding more than once. We use however,
      * path-compression in case of cascading melds, that it, a handle moves from
@@ -162,10 +158,9 @@ public class SimpleFibonacciHeap<K, V> implements MergeableAddressableHeap<K, V>
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     @ConstantTime
     @SuppressWarnings("unchecked")
@@ -179,10 +174,9 @@ public class SimpleFibonacciHeap<K, V> implements MergeableAddressableHeap<K, V>
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalStateException
-     *             if the heap has already been used in the right hand side of a
-     *             meld
+     *
+     * @throws IllegalStateException if the heap has already been used in the right hand side of a
+     *                               meld
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -219,10 +213,9 @@ public class SimpleFibonacciHeap<K, V> implements MergeableAddressableHeap<K, V>
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalStateException
-     *             if the heap has already been used in the right hand side of a
-     *             meld
+     *
+     * @throws IllegalStateException if the heap has already been used in the right hand side of a
+     *                               meld
      */
     @Override
     @ConstantTime(amortized = true)

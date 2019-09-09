@@ -17,22 +17,21 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.graph.builder.GraphBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A simple directed weighted graph. A simple directed weighted graph is a simple directed graph for
  * which edges are assigned weights.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
 public class SimpleDirectedWeightedGraph<V, E>
-    extends
-    SimpleDirectedGraph<V, E>
-{
+        extends
+        SimpleDirectedGraph<V, E> {
     private static final long serialVersionUID = -3301373580757772501L;
 
     /**
@@ -40,49 +39,45 @@ public class SimpleDirectedWeightedGraph<V, E>
      *
      * @param edgeClass class on which to base the edge supplier
      */
-    public SimpleDirectedWeightedGraph(Class<? extends E> edgeClass)
-    {
+    public SimpleDirectedWeightedGraph(Class<? extends E> edgeClass) {
         this(null, SupplierUtil.createSupplier(edgeClass));
     }
 
     /**
      * Creates a new graph.
-     * 
+     *
      * @param vertexSupplier the vertex supplier, can be null
-     * @param edgeSupplier the edge supplier, can be null
+     * @param edgeSupplier   the edge supplier, can be null
      */
-    public SimpleDirectedWeightedGraph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier)
-    {
+    public SimpleDirectedWeightedGraph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier) {
         super(vertexSupplier, edgeSupplier, true);
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeClass class on which to base factory for edges
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>       the graph vertex type
+     * @param <E>       the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V,
-        E> GraphBuilder<V, E, ? extends SimpleDirectedWeightedGraph<V, E>> createBuilder(
-            Class<? extends E> edgeClass)
-    {
+            E> GraphBuilder<V, E, ? extends SimpleDirectedWeightedGraph<V, E>> createBuilder(
+            Class<? extends E> edgeClass) {
         return new GraphBuilder<>(new SimpleDirectedWeightedGraph<V, E>(edgeClass));
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeSupplier the edge supplier
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V,
-        E> GraphBuilder<V, E, ? extends SimpleDirectedWeightedGraph<V, E>> createBuilder(
-            Supplier<E> edgeSupplier)
-    {
+            E> GraphBuilder<V, E, ? extends SimpleDirectedWeightedGraph<V, E>> createBuilder(
+            Supplier<E> edgeSupplier) {
         return new GraphBuilder<>(new SimpleDirectedWeightedGraph<V, E>(null, edgeSupplier));
     }
 

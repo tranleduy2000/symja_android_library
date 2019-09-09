@@ -26,11 +26,9 @@ import java.util.List;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John Sichi
  */
-public interface GraphPath<V, E>
-{
+public interface GraphPath<V, E> {
     /**
      * Returns the graph over which this path is defined. The path may also be valid with respect to
      * other graphs.

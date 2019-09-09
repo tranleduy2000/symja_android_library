@@ -17,10 +17,10 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.util.*;
+import org.jgrapht.util.WeightedUnmodifiableSet;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * An algorithm which computes a
@@ -28,11 +28,9 @@ import java.util.*;
  * given graph.
  *
  * @param <E> edge the graph edge type
- *
  * @author Dimitrios Michail
  */
-public interface SpannerAlgorithm<E>
-{
+public interface SpannerAlgorithm<E> {
 
     /**
      * Computes a graph spanner.
@@ -47,13 +45,12 @@ public interface SpannerAlgorithm<E>
      * @param <E> the graph edge type
      */
     interface Spanner<E>
-        extends
-        Set<E>
-    {
+            extends
+            Set<E> {
 
         /**
          * Returns the weight of the graph spanner.
-         * 
+         *
          * @return weight of the graph spanner
          */
         double getWeight();
@@ -65,12 +62,11 @@ public interface SpannerAlgorithm<E>
      * @param <E> the graph edge type
      */
     class SpannerImpl<E>
-        extends
-        WeightedUnmodifiableSet<E>
-        implements
-        Spanner<E>,
-        Serializable
-    {
+            extends
+            WeightedUnmodifiableSet<E>
+            implements
+            Spanner<E>,
+            Serializable {
         private static final long serialVersionUID = 5951646499902668516L;
 
         /**
@@ -78,25 +74,22 @@ public interface SpannerAlgorithm<E>
          *
          * @param edges the edges
          */
-        public SpannerImpl(Set<E> edges)
-        {
+        public SpannerImpl(Set<E> edges) {
             super(edges);
         }
 
         /**
          * Construct a new spanner
          *
-         * @param edges the edges
+         * @param edges  the edges
          * @param weight the weight
          */
-        public SpannerImpl(Set<E> edges, double weight)
-        {
+        public SpannerImpl(Set<E> edges, double weight) {
             super(edges, weight);
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Spanner [weight=" + weight + ", edges=" + this + "]";
         }
     }

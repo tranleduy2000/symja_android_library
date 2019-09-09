@@ -59,16 +59,14 @@ import java.util.function.ToDoubleFunction;
  * </ul>
  * Currently known extensions are {@link SuurballeKDisjointShortestPaths} and
  * {@link BhandariKDisjointShortestPaths}.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Assaf Mizrachi
  */
 abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
-    implements
-    KShortestPathAlgorithm<V, E>
-{
+        implements
+        KShortestPathAlgorithm<V, E> {
 
     /**
      * Graph on which shortest paths are searched.
@@ -85,13 +83,11 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
      * Creates a new instance of the algorithm
      *
      * @param graph graph on which shortest paths are searched.
-     *
      * @throws IllegalArgumentException if the graph is null.
      * @throws IllegalArgumentException if the graph is undirected.
      * @throws IllegalArgumentException if the graph is not simple.
      */
-    public BaseKDisjointShortestPathsAlgorithm(Graph<V, E> graph)
-    {
+    public BaseKDisjointShortestPathsAlgorithm(Graph<V, E> graph) {
 
         this.originalGraph = graph;
         GraphTests.requireDirected(graph);
@@ -105,18 +101,15 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
      * Returns the $k$ shortest simple paths in increasing order of weight.
      *
      * @param startVertex source vertex of the calculated paths.
-     * @param endVertex target vertex of the calculated paths.
-     *
+     * @param endVertex   target vertex of the calculated paths.
      * @return list of disjoint paths between the start vertex and the end vertex
-     * 
      * @throws IllegalArgumentException if the graph does not contain the startVertex or the
-     *         endVertex
+     *                                  endVertex
      * @throws IllegalArgumentException if the startVertex and the endVertex are the same vertices
      * @throws IllegalArgumentException if the startVertex or the endVertex is null
      */
     @Override
-    public List<GraphPath<V, E>> getPaths(V startVertex, V endVertex, int k)
-    {
+    public List<GraphPath<V, E>> getPaths(V startVertex, V endVertex, int k) {
         if (k <= 0) {
             throw new IllegalArgumentException("Number of paths must be positive");
         }
@@ -138,9 +131,9 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         // (even when the graph copy is already weighted) to avoid writing weight changes through to
         // the underlying graph.
         this.workingGraph = new AsWeightedGraph<>(
-            new DefaultDirectedWeightedGraph<>(
-                this.originalGraph.getVertexSupplier(), this.originalGraph.getEdgeSupplier()),
-            new HashMap<E, Double>(), false);
+                new DefaultDirectedWeightedGraph<>(
+                        this.originalGraph.getVertexSupplier(), this.originalGraph.getEdgeSupplier()),
+                new HashMap<E, Double>(), false);
         Graphs.addGraph(workingGraph, this.originalGraph);
 
         this.pathList = new ArrayList<>();
@@ -160,7 +153,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
             }
         }
 
-        return pathList.size() > 0 ? resolvePaths(startVertex, endVertex) : Collections.<GraphPath<V,E>>emptyList();
+        return pathList.size() > 0 ? resolvePaths(startVertex, endVertex) : Collections.<GraphPath<V, E>>emptyList();
 
     }
 
@@ -168,14 +161,12 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
      * At the end of the search we have list of intermediate paths - not necessarily disjoint and
      * may contain reversed edges. Here we go over all, removing overlapping edges and merging them
      * to valid paths (from start to end). Finally, we sort them according to their weight.
-     * 
+     *
      * @param startVertex the start vertex
-     * @param endVertex the end vertex
-     * 
+     * @param endVertex   the end vertex
      * @return sorted list of disjoint paths from start vertex to end vertex.
      */
-    private List<GraphPath<V, E>> resolvePaths(V startVertex, V endVertex)
-    {
+    private List<GraphPath<V, E>> resolvePaths(V startVertex, V endVertex) {
         // first we need to remove overlapping edges.
         findOverlappingEdges();
 
@@ -197,14 +188,12 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
     /**
      * After removing overlapping edges, each path is not necessarily connecting start to end
      * vertex. Here we connect the path fragments to valid paths (from start to end).
-     * 
+     *
      * @param startVertex the start vertex
-     * @param endVertex the end vertex
-     * 
+     * @param endVertex   the end vertex
      * @return list of disjoint paths from start to end.
      */
-    private List<GraphPath<V, E>> buildPaths(V startVertex, V endVertex)
-    {
+    private List<GraphPath<V, E>> buildPaths(V startVertex, V endVertex) {
         List<List<E>> paths = new ArrayList<>();
         Map<V, ArrayDeque<E>> sourceToEdgeLookup = new HashMap<>();
         Set<E> nonOverlappingEdges = new HashSet<>();
@@ -253,10 +242,8 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
      * one path). Two edges are considered as overlapping in case both edges connect the same vertex
      * pair, disregarding direction. At the end of this method, each path contains unique edges but
      * not necessarily connecting the start to end vertex.
-     * 
      */
-    private void findOverlappingEdges()
-    {
+    private void findOverlappingEdges() {
         Map<UnorderedPair<V, V>, Integer> edgeOccurrenceCount = new HashMap<>();
         for (List<E> path : pathList) {
             for (E e : path) {
@@ -284,8 +271,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         this.overlappingEdges = set;
     }
 
-    private GraphPath<V, E> createGraphPath(List<E> edgeList, V startVertex, V endVertex)
-    {
+    private GraphPath<V, E> createGraphPath(List<E> edgeList, V startVertex, V endVertex) {
         double weight = 0;
         for (E edge : edgeList) {
             weight += originalGraph.getEdgeWeight(edge);
@@ -293,25 +279,22 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         return new GraphWalk<>(originalGraph, startVertex, endVertex, edgeList, weight);
     }
 
-    private V getEdgeSource(E e)
-    {
+    private V getEdgeSource(E e) {
         return this.workingGraph.containsEdge(e) ? this.workingGraph.getEdgeSource(e)
-            : this.originalGraph.getEdgeSource(e);
+                : this.originalGraph.getEdgeSource(e);
     }
 
-    private V getEdgeTarget(E e)
-    {
+    private V getEdgeTarget(E e) {
         return this.workingGraph.containsEdge(e) ? this.workingGraph.getEdgeTarget(e)
-            : this.originalGraph.getEdgeTarget(e);
+                : this.originalGraph.getEdgeTarget(e);
     }
 
     /**
      * Calculates the shortest paths for the current iteration. Path is not final; rather, it is
      * intended to be used in a "post-production" phase (see resolvePaths method).
-     * 
+     *
      * @param startVertex the start vertex
-     * @param endVertex the end vertex
-     * 
+     * @param endVertex   the end vertex
      * @return the shortest path between start and end vertices.
      */
     protected abstract GraphPath<V, E> calculateShortestPath(V startVertex, V endVertex);
@@ -319,7 +302,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
     /**
      * Prepares the working graph for next iteration. To be called from the second iteration and on
      * so implementation may assume a preceding {@link #calculateShortestPath} call.
-     * 
+     *
      * @param previousPath the path found at the previous iteration.
      */
     protected abstract void transformGraph(List<E> previousPath);

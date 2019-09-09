@@ -1,13 +1,13 @@
 package org.jheaps.tree;
 
+import org.jheaps.AddressableHeap;
+import org.jheaps.annotations.ConstantTime;
+import org.jheaps.annotations.LogarithmicTime;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
-
-import org.jheaps.AddressableHeap;
-import org.jheaps.annotations.ConstantTime;
-import org.jheaps.annotations.LogarithmicTime;
 
 /**
  * An explicit d-ary tree addressable heap. The heap is sorted according to the
@@ -42,13 +42,9 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- * 
  * @see AddressableHeap
  * @see Comparable
  * @see Comparator
@@ -102,9 +98,8 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
      * constraint (for example, the user attempts to put a string key into a
      * heap whose keys are integers), the {@code insert(Object key)} call will
      * throw a {@code ClassCastException}.
-     * 
-     * @param d
-     *            the branching factor. Should be a power of 2.
+     *
+     * @param d the branching factor. Should be a power of 2.
      */
     public DaryTreeAddressableHeap(int d) {
         this(d, null);
@@ -121,12 +116,10 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param d
-     *            the branching factor. Should be a power of 2.
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param d          the branching factor. Should be a power of 2.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     @SuppressWarnings("unchecked")
     public DaryTreeAddressableHeap(int d, Comparator<? super K> comparator) {
@@ -265,7 +258,7 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
         @LogarithmicTime
         @SuppressWarnings("unchecked")
         public void decreaseKey(K newKey) {
-            if (parent == null && root != this) { 
+            if (parent == null && root != this) {
                 throw new IllegalArgumentException("Invalid handle!");
             }
             int c;
@@ -288,10 +281,10 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
         @Override
         @LogarithmicTime
         public void delete() {
-            if (parent == null && root != this) { 
+            if (parent == null && root != this) {
                 throw new IllegalArgumentException("Invalid handle!");
             }
-            
+
             if (size == 0) {
                 throw new NoSuchElementException();
             }
@@ -323,15 +316,14 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
      * Start at the root and traverse the tree in order to find a particular
      * node based on its numbering on a level-order traversal of the tree. Uses
      * the bit representation to keep the cost log_d(n).
-     * 
-     * @param node
-     *            the node number assuming that the root node is number zero
+     *
+     * @param node the node number assuming that the root node is number zero
      */
     private Node findNode(long node) {
         if (node == 0)
             return root;
 
-        long mask = (long)d - 1;
+        long mask = (long) d - 1;
         long location = (node - 1);
         int log = log2(node - 1) / log2d;
 
@@ -351,8 +343,7 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
     /**
      * Calculate the floor of the binary logarithm of n.
      *
-     * @param n
-     *            the input number
+     * @param n the input number
      * @return the binary logarithm
      */
     private int log2(long n) {
@@ -449,11 +440,9 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
 
     /**
      * Swap two nodes
-     * 
-     * @param a
-     *            first node
-     * @param b
-     *            second node
+     *
+     * @param a first node
+     * @param b second node
      */
     private void swap(Node a, Node b) {
         if (a == null || b == null || a == b) {
@@ -481,16 +470,16 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
                         b.children[i].parent = b;
                     }
                 }
-                if (pa != null && pa.children[i] == a) { 
+                if (pa != null && pa.children[i] == a) {
                     whichChild = i;
                 }
             }
-            
+
             b.parent = pa;
-            if (pa != null) { 
+            if (pa != null) {
                 pa.children[whichChild] = b;
             }
-            
+
             for (int i = 0; i < d; i++) {
                 a.children[i] = aux[i];
                 if (a.children[i] != null) {
@@ -535,11 +524,11 @@ public class DaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, Ser
             } else {
                 a.parent = null;
             }
-            if (aIsChild>=0) { 
+            if (aIsChild >= 0) {
                 pa.children[aIsChild] = b;
                 b.parent = pa;
             }
-            if (bIsChild>=0) { 
+            if (bIsChild >= 0) {
                 pb.children[bIsChild] = a;
                 a.parent = pb;
             }

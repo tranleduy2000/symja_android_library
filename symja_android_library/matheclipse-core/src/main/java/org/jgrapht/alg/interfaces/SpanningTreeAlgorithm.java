@@ -17,8 +17,9 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * An algorithm which computes a <a href="https://en.wikipedia.org/wiki/Spanning_tree"> spanning
@@ -27,8 +28,7 @@ import java.util.*;
  *
  * @param <E> the graph edge type
  */
-public interface SpanningTreeAlgorithm<E>
-{
+public interface SpanningTreeAlgorithm<E> {
     /**
      * Computes a spanning tree.
      *
@@ -42,19 +42,18 @@ public interface SpanningTreeAlgorithm<E>
      * @param <E> the graph edge type
      */
     interface SpanningTree<E>
-        extends
-        Iterable<E>
-    {
+            extends
+            Iterable<E> {
         /**
          * Returns the weight of the spanning tree.
-         * 
+         *
          * @return weight of the spanning tree
          */
         double getWeight();
 
         /**
          * Set of edges of the spanning tree.
-         * 
+         *
          * @return edge set of the spanning tree
          */
         Set<E> getEdges();
@@ -74,10 +73,9 @@ public interface SpanningTreeAlgorithm<E>
      * @param <E> the graph edge type
      */
     class SpanningTreeImpl<E>
-        implements
-        SpanningTree<E>,
-        Serializable
-    {
+            implements
+            SpanningTree<E>,
+            Serializable {
         private static final long serialVersionUID = 402707108331703333L;
 
         private final double weight;
@@ -86,24 +84,21 @@ public interface SpanningTreeAlgorithm<E>
         /**
          * Construct a new spanning tree.
          *
-         * @param edges the edges
+         * @param edges  the edges
          * @param weight the weight
          */
-        public SpanningTreeImpl(Set<E> edges, double weight)
-        {
+        public SpanningTreeImpl(Set<E> edges, double weight) {
             this.edges = edges;
             this.weight = weight;
         }
 
         @Override
-        public double getWeight()
-        {
+        public double getWeight() {
             return weight;
         }
 
         @Override
-        public Set<E> getEdges()
-        {
+        public Set<E> getEdges() {
             return edges;
         }
 
@@ -113,8 +108,7 @@ public interface SpanningTreeAlgorithm<E>
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Spanning-Tree [weight=" + weight + ", edges=" + edges + "]";
         }
     }

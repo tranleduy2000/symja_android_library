@@ -17,23 +17,24 @@
  */
 package org.jgrapht.alg.util;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * The alias method for sampling from a discrete probability distribution.
- * 
+ *
  * <p>
  * The implementation is described in the paper: Michael D. Vose. A Linear Algorithm for Generating
  * Random Numbers with a Given Distribution. IEEE Transactions on Software Engineering,
  * 17(9):972--975, 1991.
- * 
+ *
  * <p>
  * Initialization takes $O(n)$ where $n$ is the number of items. Sampling takes $O(1)$.
  *
  * @author Dimitrios Michail
  */
-public class AliasMethodSampler
-{
+public class AliasMethodSampler {
     private final Random rng;
     private Comparator<Double> comparator;
 
@@ -42,48 +43,44 @@ public class AliasMethodSampler
 
     /**
      * Constructor
-     * 
+     *
      * @param p the probability distribution where position i of the array is $Prob(X=i)$
      * @throws IllegalArgumentException in case of a non-valid probability distribution
      */
-    public AliasMethodSampler(double[] p)
-    {
+    public AliasMethodSampler(double[] p) {
         this(p, new Random(), ToleranceDoubleComparator.DEFAULT_EPSILON);
     }
 
     /**
      * Constructor
-     * 
-     * @param p the probability distribution where position $i$ of the array is $Prob(X=i)$
+     *
+     * @param p    the probability distribution where position $i$ of the array is $Prob(X=i)$
      * @param seed seed to use for the random number generator
      */
-    public AliasMethodSampler(double[] p, long seed)
-    {
+    public AliasMethodSampler(double[] p, long seed) {
         this(p, new Random(seed), ToleranceDoubleComparator.DEFAULT_EPSILON);
     }
 
     /**
      * Constructor
-     * 
-     * @param p the probability distribution where position $i$ of the array is $Prob(X=i)$
+     *
+     * @param p   the probability distribution where position $i$ of the array is $Prob(X=i)$
      * @param rng the random number generator
      * @throws IllegalArgumentException in case of a non-valid probability distribution
      */
-    public AliasMethodSampler(double[] p, Random rng)
-    {
+    public AliasMethodSampler(double[] p, Random rng) {
         this(p, rng, ToleranceDoubleComparator.DEFAULT_EPSILON);
     }
 
     /**
      * Constructor
-     * 
-     * @param p the probability distribution where position $i$ of the array is $Prob(X=i)$
-     * @param rng the random number generator
+     *
+     * @param p       the probability distribution where position $i$ of the array is $Prob(X=i)$
+     * @param rng     the random number generator
      * @param epsilon tolerance used when comparing floating-point values
      * @throws IllegalArgumentException in case of a non-valid probability distribution
      */
-    public AliasMethodSampler(double[] p, Random rng, double epsilon)
-    {
+    public AliasMethodSampler(double[] p, Random rng, double epsilon) {
         this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
         this.comparator = new ToleranceDoubleComparator(epsilon);
 
@@ -148,11 +145,10 @@ public class AliasMethodSampler
 
     /**
      * Sample a value from the distribution.
-     * 
+     *
      * @return a sample from the distribution
      */
-    public int next()
-    {
+    public int next() {
         double u = rng.nextDouble() * prob.length;
         int j = (int) Math.floor(u);
         if (comparator.compare(u - j, prob[j]) <= 0) {

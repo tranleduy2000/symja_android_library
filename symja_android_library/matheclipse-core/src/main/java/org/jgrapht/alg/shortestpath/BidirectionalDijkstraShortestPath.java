@@ -17,14 +17,18 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.EdgeReversedGraph;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A bidirectional version of Dijkstra's algorithm.
@@ -45,9 +49,8 @@ import java.util.function.*;
  * @see DijkstraShortestPath
  */
 public final class BidirectionalDijkstraShortestPath<V, E>
-    extends
-    BaseBidirectionalShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseBidirectionalShortestPathAlgorithm<V, E> {
     private double radius;
     private final Supplier<AddressableHeap<Double, Pair<V, E>>> heapSupplier;
 
@@ -56,8 +59,7 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      *
      * @param graph the input graph
      */
-    public BidirectionalDijkstraShortestPath(Graph<V, E> graph)
-    {
+    public BidirectionalDijkstraShortestPath(Graph<V, E> graph) {
         this(graph, Double.POSITIVE_INFINITY, new Supplier<AddressableHeap<Double, Pair<V, E>>>() {
             @Override
             public AddressableHeap<Double, Pair<V, E>> get() {
@@ -70,23 +72,21 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      * Constructs a new instance for a specified graph. The constructed algorithm will use the heap
      * supplied by the {@code heapSupplier}.
      *
-     * @param graph the input graph
+     * @param graph        the input graph
      * @param heapSupplier supplier of the preferable heap implementation
      */
     public BidirectionalDijkstraShortestPath(
-        Graph<V, E> graph, Supplier<AddressableHeap<Double, Pair<V, E>>> heapSupplier)
-    {
+            Graph<V, E> graph, Supplier<AddressableHeap<Double, Pair<V, E>>> heapSupplier) {
         this(graph, Double.POSITIVE_INFINITY, heapSupplier);
     }
 
     /**
      * Constructs a new instance for a specified graph.
      *
-     * @param graph the input graph
+     * @param graph  the input graph
      * @param radius limit on path length, or Double.POSITIVE_INFINITY for unbounded search
      */
-    public BidirectionalDijkstraShortestPath(Graph<V, E> graph, double radius)
-    {
+    public BidirectionalDijkstraShortestPath(Graph<V, E> graph, double radius) {
         this(graph, radius, new Supplier<AddressableHeap<Double, Pair<V, E>>>() {
             @Override
             public AddressableHeap<Double, Pair<V, E>> get() {
@@ -99,14 +99,13 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      * Constructs a new instance for a specified graph. The constructed algorithm will use the heap
      * supplied by the {@code heapSupplier}.
      *
-     * @param graph the input graph
-     * @param radius limit on path length, or Double.POSITIVE_INFINITY for unbounded search
+     * @param graph        the input graph
+     * @param radius       limit on path length, or Double.POSITIVE_INFINITY for unbounded search
      * @param heapSupplier supplier of the preferable heap implementation
      */
     public BidirectionalDijkstraShortestPath(
-        Graph<V, E> graph, double radius,
-        Supplier<AddressableHeap<Double, Pair<V, E>>> heapSupplier)
-    {
+            Graph<V, E> graph, double radius,
+            Supplier<AddressableHeap<Double, Pair<V, E>>> heapSupplier) {
         super(graph);
         if (radius < 0.0) {
             throw new IllegalArgumentException("Radius must be non-negative");
@@ -119,21 +118,19 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      * Find a path between two vertices. For a more advanced search (e.g. limited by radius), use
      * the constructor instead.
      *
-     * @param graph the graph to be searched
+     * @param graph  the graph to be searched
      * @param source the vertex at which the path should start
-     * @param sink the vertex at which the path should end
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param sink   the vertex at which the path should end
+     * @param <V>    the graph vertex type
+     * @param <E>    the graph edge type
      * @return a shortest path, or null if no path exists
      */
-    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, V source, V sink)
-    {
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, V source, V sink) {
         return new BidirectionalDijkstraShortestPath<>(graph).getPath(source, sink);
     }
 
     @Override
-    public GraphPath<V, E> getPath(V source, V sink)
-    {
+    public GraphPath<V, E> getPath(V source, V sink) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -171,9 +168,8 @@ public final class BidirectionalDijkstraShortestPath<V, E>
         while (true) {
             // stopping condition
             if (frontier.heap.isEmpty() || otherFrontier.heap.isEmpty()
-                || frontier.heap.findMin().getKey()
-                    + otherFrontier.heap.findMin().getKey() >= bestPath)
-            {
+                    || frontier.heap.findMin().getKey()
+                    + otherFrontier.heap.findMin().getKey() >= bestPath) {
                 break;
             }
 
@@ -209,7 +205,7 @@ public final class BidirectionalDijkstraShortestPath<V, E>
         // create path if found
         if (Double.isFinite(bestPath) && bestPath <= radius) {
             return createPath(
-                forwardFrontier, backwardFrontier, bestPath, source, bestPathCommonVertex, sink);
+                    forwardFrontier, backwardFrontier, bestPath, source, bestPathCommonVertex, sink);
         } else {
             return createEmptyPath(source, sink);
         }
@@ -219,22 +215,19 @@ public final class BidirectionalDijkstraShortestPath<V, E>
      * Maintains search frontier during shortest path computation.
      */
     class DijkstraSearchFrontier
-        extends
-        BaseSearchFrontier
-    {
+            extends
+            BaseSearchFrontier {
 
         final AddressableHeap<Double, Pair<V, E>> heap;
         final Map<V, AddressableHeap.Handle<Double, Pair<V, E>>> seen;
 
-        DijkstraSearchFrontier(Graph<V, E> graph)
-        {
+        DijkstraSearchFrontier(Graph<V, E> graph) {
             super(graph);
             this.heap = heapSupplier.get();
             this.seen = new HashMap<>();
         }
 
-        void updateDistance(V v, E e, double distance)
-        {
+        void updateDistance(V v, E e, double distance) {
             AddressableHeap.Handle<Double, Pair<V, E>> node = seen.get(v);
             if (node == null) {
                 node = heap.insert(distance, new Pair<>(v, e));
@@ -248,8 +241,7 @@ public final class BidirectionalDijkstraShortestPath<V, E>
         }
 
         @Override
-        public double getDistance(V v)
-        {
+        public double getDistance(V v) {
             AddressableHeap.Handle<Double, Pair<V, E>> node = seen.get(v);
             if (node == null) {
                 return Double.POSITIVE_INFINITY;
@@ -259,8 +251,7 @@ public final class BidirectionalDijkstraShortestPath<V, E>
         }
 
         @Override
-        public E getTreeEdge(V v)
-        {
+        public E getTreeEdge(V v) {
             AddressableHeap.Handle<Double, Pair<V, E>> node = seen.get(v);
             if (node == null) {
                 return null;

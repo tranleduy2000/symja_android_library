@@ -17,9 +17,9 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Generates a <a href="http://mathworld.wolfram.com/StarGraph.html">star graph</a> of any size.
@@ -27,13 +27,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Andrew Newell
  */
 public class StarGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     public static final String CENTER_VERTEX = "Center Vertex";
 
     private final int order;
@@ -44,8 +42,7 @@ public class StarGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @param order number of total vertices including the center vertex
      * @throws IllegalArgumentException if the order is negative
      */
-    public StarGraphGenerator(int order)
-    {
+    public StarGraphGenerator(int order) {
         if (order < 0) {
             throw new IllegalArgumentException("Order must be non-negative");
         }
@@ -56,8 +53,7 @@ public class StarGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * Generates a star graph with the designated order from the constructor
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         if (order < 1) {
             return;
         }

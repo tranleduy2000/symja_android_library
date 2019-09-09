@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,17 +17,17 @@
  */
 package org.jheaps.tree;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.AddressableHeap;
 import org.jheaps.MergeableAddressableHeap;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LogLogTime;
 import org.jheaps.annotations.LogarithmicTime;
+
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * The costless meld variant of the pairing heaps. The heap is sorted according
@@ -40,7 +40,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * {@code insert}, amortized O(log(n)) for {@code deleteMin} and {@code delete}
  * and amortized O(loglog(n)) for the {@code decreaseKey} operation. The
  * operation {@code meld} takes amortized zero time.
- * 
+ *
  * <p>
  * This variant of the pairing heap is due to Amr Elmasry, described in detail
  * in the following
@@ -49,18 +49,18 @@ import org.jheaps.annotations.LogarithmicTime;
  * <li>Amr Elmasry, Pairing Heaps with Costless Meld, In Proceedings of the 18th
  * Annual European Symposium on Algorithms (ESA 2010), 183--193, 2010.</li>
  * </ul>
- * 
+ *
  * <p>
  * All the above bounds, however, assume that the user does not perform
  * cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
@@ -86,13 +86,9 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- * 
  * @see PairingHeap
  * @see FibonacciHeap
  */
@@ -149,7 +145,7 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
      * Used to reference the current heap or some other pairing heap in case of
      * melding, so that handles remain valid even after a meld, without having
      * to iterate over them.
-     * 
+     * <p>
      * In order to avoid maintaining a full-fledged union-find data structure,
      * we disallow a heap to be used in melding more than once. We use however,
      * path-compression in case of cascading melds, that it, a handle moves from
@@ -182,10 +178,9 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     @ConstantTime
     @SuppressWarnings("unchecked")
@@ -201,10 +196,9 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalStateException
-     *             if the heap has already been used in the right hand side of a
-     *             meld
+     *
+     * @throws IllegalStateException if the heap has already been used in the right hand side of a
+     *                               meld
      */
     @Override
     @LogarithmicTime(amortized = true)
@@ -227,10 +221,9 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalStateException
-     *             if the heap has already been used in the right hand side of a
-     *             meld
+     *
+     * @throws IllegalStateException if the heap has already been used in the right hand side of a
+     *                               meld
      */
     @Override
     @LogarithmicTime(amortized = true)
@@ -377,7 +370,7 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * This operation takes amortized zero cost.
      */
     @Override
@@ -588,9 +581,8 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * Delete a node.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      */
     private void delete(Node<K, V> n) {
         if (n != root && n.o_s == null && n.poolIndex == Node.NO_INDEX) {
@@ -843,9 +835,8 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * Cut the children of a node and return the list.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      * @return the first node in the children list
      */
     private Node<K, V> cutChildren(Node<K, V> n) {
@@ -859,9 +850,8 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * Cut the oldest child of a node.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      * @return the oldest child of a node or null
      */
     private Node<K, V> cutOldestChild(Node<K, V> n) {
@@ -879,9 +869,8 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
 
     /**
      * Cut a node from its parent.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      */
     private void cutFromParent(Node<K, V> n) {
         if (n.o_s != null) {
@@ -901,11 +890,9 @@ public class CostlessMeldPairingHeap<K, V> implements MergeableAddressableHeap<K
     /**
      * Put an orphan node into the position of another node. The other node
      * becomes an orphan.
-     * 
-     * @param orphan
-     *            the orphan node
-     * @param n
-     *            the node which will become an orphan
+     *
+     * @param orphan the orphan node
+     * @param n      the node which will become an orphan
      */
     private void linkInPlace(Node<K, V> orphan, Node<K, V> n) {
         // link orphan at node's position

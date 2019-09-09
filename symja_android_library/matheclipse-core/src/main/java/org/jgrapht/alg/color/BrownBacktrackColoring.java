@@ -17,27 +17,32 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Brown graph coloring algorithm.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Michael Behrisch
  */
 public class BrownBacktrackColoring<V, E>
-    implements
-    VertexColoringAlgorithm<V>
-{
+        implements
+        VertexColoringAlgorithm<V> {
     private final List<V> vertexList; // list of all vertices
     private final int[][] neighbors; // for every vertex v, neighbors[v] stores the neighbors of v
     private final Map<V, Integer> indexMap; // assigned unique index to each vertex. maps to vertex
-                                            // list
+    // list
 
     private int[] partialColorAssignment; // color assigned to a specific vertex
     private int[] colorCount; // Number of colors used up to the ith vertex that has been colored
@@ -49,11 +54,10 @@ public class BrownBacktrackColoring<V, E>
 
     /**
      * Construct a new Brown backtracking algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public BrownBacktrackColoring(Graph<V, E> graph)
-    {
+    public BrownBacktrackColoring(Graph<V, E> graph) {
         Objects.requireNonNull(graph, "Graph cannot be null");
         final int numVertices = graph.vertexSet().size();
         vertexList = new ArrayList<>(numVertices);
@@ -73,12 +77,11 @@ public class BrownBacktrackColoring<V, E>
         }
     }
 
-    private void recursiveColor(int pos)
-    {
+    private void recursiveColor(int pos) {
         colorCount[pos] = colorCount[pos - 1];
         allowedColors[pos].set(0, colorCount[pos] + 1); // To color the ith vertex, one can use the
-                                                        // number of colors needed to color the
-                                                        // i-1th vertex plus 1
+        // number of colors needed to color the
+        // i-1th vertex plus 1
         // Determine which colors have been used by the neighbors of the ith vertex
         for (int i = 0; i < neighbors[pos].length; i++) {
             final int nb = neighbors[pos][i];
@@ -91,16 +94,16 @@ public class BrownBacktrackColoring<V, E>
         // coloring will never be better than chromatic number of best solution found thus far
         for (int i = 1; (i <= colorCount[pos]) && (colorCount[pos] < chi); i++) {
             if (allowedColors[pos].get(i)) { // Try all available colors for vertex i. A color is
-                                             // available if its not used by its neighbor
+                // available if its not used by its neighbor
                 partialColorAssignment[pos] = i;
                 if (pos < (neighbors.length - 1)) { // If not all vertices have been colored,
-                                                    // proceed with the next uncolored vertex
+                    // proceed with the next uncolored vertex
                     recursiveColor(pos + 1);
                 } else { // Otherwise we have found a feasible coloring
                     chi = colorCount[pos];
                     System.arraycopy(
-                        partialColorAssignment, 0, completeColorAssignment, 0,
-                        partialColorAssignment.length);
+                            partialColorAssignment, 0, completeColorAssignment, 0,
+                            partialColorAssignment.length);
                 }
             }
         }
@@ -113,15 +116,14 @@ public class BrownBacktrackColoring<V, E>
             } else {
                 chi = colorCount[pos];
                 System.arraycopy(
-                    partialColorAssignment, 0, completeColorAssignment, 0,
-                    partialColorAssignment.length);
+                        partialColorAssignment, 0, completeColorAssignment, 0,
+                        partialColorAssignment.length);
             }
         }
         partialColorAssignment[pos] = 0;
     }
 
-    private void lazyComputeColoring()
-    {
+    private void lazyComputeColoring() {
         if (vertexColoring != null)
             return;
 
@@ -129,7 +131,7 @@ public class BrownBacktrackColoring<V, E>
         partialColorAssignment = new int[neighbors.length];
         completeColorAssignment = new int[neighbors.length];
         partialColorAssignment[0] = 1; // Prefix color of first vertex. Optimization: Could prefix
-                                       // all colors of largest clique
+        // all colors of largest clique
         colorCount = new int[neighbors.length];
         colorCount[0] = 1;
         allowedColors = new BitSet[neighbors.length];
@@ -147,18 +149,16 @@ public class BrownBacktrackColoring<V, E>
     /**
      * Returns the <a href="http://mathworld.wolfram.com/ChromaticNumber.html">chromatic number</a>
      * of the input graph
-     * 
+     *
      * @return chromatic number of the graph
      */
-    public int getChromaticNumber()
-    {
+    public int getChromaticNumber() {
         lazyComputeColoring();
         return vertexColoring.getNumberColors();
     }
 
     @Override
-    public Coloring<V> getColoring()
-    {
+    public Coloring<V> getColoring() {
         lazyComputeColoring();
         return vertexColoring;
     }

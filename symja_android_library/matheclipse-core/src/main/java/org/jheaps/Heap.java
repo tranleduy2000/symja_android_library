@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,9 +23,7 @@ import java.util.NoSuchElementException;
 /**
  * A heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public interface Heap<K> {
@@ -36,15 +34,14 @@ public interface Heap<K> {
      * ordering} of its keys.
      *
      * @return the comparator used to order the keys in this heap, or
-     *         {@code null} if this heap uses the natural ordering of its keys
+     * {@code null} if this heap uses the natural ordering of its keys
      */
     Comparator<? super K> comparator();
 
     /**
      * Insert a key into the heap.
      *
-     * @param key
-     *            the key to insert
+     * @param key the key to insert
      */
     void insert(K key);
 
@@ -52,8 +49,7 @@ public interface Heap<K> {
      * Find an element with the minimum key.
      *
      * @return an element with the minimum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     K findMin();
 
@@ -62,8 +58,7 @@ public interface Heap<K> {
      * elements exists, only one of them will be deleted.
      *
      * @return the deleted element with the minimum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     K deleteMin();
 

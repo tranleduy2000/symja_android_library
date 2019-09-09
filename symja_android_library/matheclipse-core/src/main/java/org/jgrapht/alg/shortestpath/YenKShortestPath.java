@@ -17,11 +17,14 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jheaps.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
+import org.jheaps.AddressableHeap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of Yen`s algorithm for finding $k$ shortest loopless paths.
@@ -48,9 +51,8 @@ import java.util.*;
  * @see YenShortestPathIterator
  */
 public class YenKShortestPath<V, E>
-    implements
-    KShortestPathAlgorithm<V, E>
-{
+        implements
+        KShortestPathAlgorithm<V, E> {
     /**
      * Underlying graph.
      */
@@ -61,8 +63,7 @@ public class YenKShortestPath<V, E>
      *
      * @param graph graph
      */
-    public YenKShortestPath(Graph<V, E> graph)
-    {
+    public YenKShortestPath(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null!");
     }
 
@@ -72,13 +73,12 @@ public class YenKShortestPath<V, E>
      * paths. The paths are produced in sorted order by weights.
      *
      * @param source the source vertex
-     * @param sink the target vertex
-     * @param k the number of shortest paths to return
+     * @param sink   the target vertex
+     * @param k      the number of shortest paths to return
      * @return a list of k shortest paths
      */
     @Override
-    public List<GraphPath<V, E>> getPaths(V source, V sink, int k)
-    {
+    public List<GraphPath<V, E>> getPaths(V source, V sink, int k) {
         if (k < 0) {
             throw new IllegalArgumentException("k should be positive");
         }

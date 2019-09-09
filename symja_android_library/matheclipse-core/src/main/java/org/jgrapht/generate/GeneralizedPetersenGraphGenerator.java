@@ -17,9 +17,11 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generator for <a href="http://mathworld.wolfram.com/GeneralizedPetersenGraph.html">Generalized
@@ -28,15 +30,13 @@ import java.util.*;
  * of a star polygon ${n,k}$. Several special cases of the generalized Petersen graph are predefined
  * in the {@link NamedGraphGenerator}.
  *
- * @author Joris Kinable
- *
  * @param <V> graph vertex type
  * @param <E> graph edge type
+ * @author Joris Kinable
  */
 public class GeneralizedPetersenGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, List<V>>
-    implements
-    GraphGenerator<V, E, List<V>>
-{
+        implements
+        GraphGenerator<V, E, List<V>> {
 
     private final int n;
     private final int k;
@@ -53,12 +53,11 @@ public class GeneralizedPetersenGraphGenerator<V, E> extends GraphGeneratorImpl<
     /**
      * Constructs a GeneralizedPetersenGraphGenerator used to generate a Generalized Petersen graphs
      * $GP(n,k)$.
-     * 
+     *
      * @param n size of the regular polygon (cycle graph $C_n$)
      * @param k size of the star polygon ${n,k}$
      */
-    public GeneralizedPetersenGraphGenerator(int n, int k)
-    {
+    public GeneralizedPetersenGraphGenerator(int n, int k) {
         if (n < 3)
             throw new IllegalArgumentException("n must be larger or equal than 3");
         if (k < 1 || k > Math.floor((n - 1) / 2.0))
@@ -70,17 +69,16 @@ public class GeneralizedPetersenGraphGenerator<V, E> extends GraphGeneratorImpl<
 
     /**
      * Generates the Generalized Petersen Graph
-     * 
-     * @param target receives the generated edges and vertices; if this is non-empty on entry, the
-     *        result will be a disconnected graph since generated elements will not be connected to
-     *        existing elements
+     *
+     * @param target    receives the generated edges and vertices; if this is non-empty on entry, the
+     *                  result will be a disconnected graph since generated elements will not be connected to
+     *                  existing elements
      * @param resultMap if non-null, the resultMap contains a mapping from the key "star" to a list
-     *        of vertices constituting the star polygon, as well as a key "regular" which maps to a
-     *        list of vertices constituting the regular polygon.
+     *                  of vertices constituting the star polygon, as well as a key "regular" which maps to a
+     *                  list of vertices constituting the regular polygon.
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, List<V>> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, List<V>> resultMap) {
         List<V> verticesU = new ArrayList<>(n); // Regular polygon vertices
         List<V> verticesV = new ArrayList<>(n); // Star polygon vertices
         for (int i = 0; i < n; i++) {

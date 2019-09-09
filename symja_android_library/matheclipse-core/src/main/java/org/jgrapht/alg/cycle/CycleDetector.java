@@ -17,12 +17,16 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
+import org.jgrapht.alg.interfaces.StrongConnectivityAlgorithm;
+import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Performs cycle detection on a graph. The <i>inspected graph</i> is specified at construction time
@@ -30,11 +34,9 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John V. Sichi
  */
-public class CycleDetector<V, E>
-{
+public class CycleDetector<V, E> {
     /**
      * Graph on which cycle detection is being performed.
      */
@@ -46,8 +48,7 @@ public class CycleDetector<V, E>
      *
      * @param graph the directed graph in which to detect cycles
      */
-    public CycleDetector(Graph<V, E> graph)
-    {
+    public CycleDetector(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph);
     }
 
@@ -56,8 +57,7 @@ public class CycleDetector<V, E>
      *
      * @return true iff the graph contains at least one cycle
      */
-    public boolean detectCycles()
-    {
+    public boolean detectCycles() {
         try {
             execute(null, null);
         } catch (CycleDetectedException ex) {
@@ -71,11 +71,9 @@ public class CycleDetector<V, E>
      * Performs yes/no cycle detection on an individual vertex.
      *
      * @param v the vertex to test
-     *
      * @return true if v is on at least one cycle
      */
-    public boolean detectCyclesContainingVertex(V v)
-    {
+    public boolean detectCyclesContainingVertex(V v) {
         try {
             execute(null, v);
         } catch (CycleDetectedException ex) {
@@ -90,12 +88,11 @@ public class CycleDetector<V, E>
      *
      * @return set of all vertices which participate in at least one cycle in this graph
      */
-    public Set<V> findCycles()
-    {
+    public Set<V> findCycles() {
         // ProbeIterator can't be used to handle this case,
         // so use StrongConnectivityAlgorithm instead.
         StrongConnectivityAlgorithm<V, E> inspector =
-            new KosarajuStrongConnectivityInspector<>(graph);
+                new KosarajuStrongConnectivityInspector<>(graph);
         List<Set<V>> components = inspector.stronglyConnectedSets();
 
         // A vertex participates in a cycle if either of the following is
@@ -129,19 +126,16 @@ public class CycleDetector<V, E>
      * connected component containing v.
      *
      * @param v the vertex to test
-     *
      * @return set of all vertices reachable from v via at least one cycle
      */
-    public Set<V> findCyclesContainingVertex(V v)
-    {
+    public Set<V> findCyclesContainingVertex(V v) {
         Set<V> set = new LinkedHashSet<>();
         execute(set, v);
 
         return set;
     }
 
-    private void execute(Set<V> s, V v)
-    {
+    private void execute(Set<V> s, V v) {
         ProbeIterator<V, E> iter = new ProbeIterator<>(graph, s, v);
 
         while (iter.hasNext()) {
@@ -154,9 +148,8 @@ public class CycleDetector<V, E>
      * caught by top-level detection method.
      */
     private static class CycleDetectedException
-        extends
-        RuntimeException
-    {
+            extends
+            RuntimeException {
         private static final long serialVersionUID = 3834305137802950712L;
     }
 
@@ -164,15 +157,13 @@ public class CycleDetector<V, E>
      * Version of DFS which maintains a backtracking path used to probe for cycles.
      */
     private static class ProbeIterator<V, E>
-        extends
-        DepthFirstIterator<V, E>
-    {
+            extends
+            DepthFirstIterator<V, E> {
         private List<V> path;
         private Set<V> cycleSet;
         private V root;
 
-        ProbeIterator(Graph<V, E> graph, Set<V> cycleSet, V startVertex)
-        {
+        ProbeIterator(Graph<V, E> graph, Set<V> cycleSet, V startVertex) {
             super(graph, startVertex);
             this.path = new ArrayList<>();
             this.cycleSet = cycleSet;
@@ -183,8 +174,7 @@ public class CycleDetector<V, E>
          * {@inheritDoc}
          */
         @Override
-        protected void encounterVertexAgain(V vertex, E edge)
-        {
+        protected void encounterVertexAgain(V vertex, E edge) {
             super.encounterVertexAgain(vertex, edge);
 
             int i;
@@ -220,8 +210,7 @@ public class CycleDetector<V, E>
          * {@inheritDoc}
          */
         @Override
-        protected V provideNextVertex()
-        {
+        protected V provideNextVertex() {
             V v = super.provideNextVertex();
 
             // backtrack

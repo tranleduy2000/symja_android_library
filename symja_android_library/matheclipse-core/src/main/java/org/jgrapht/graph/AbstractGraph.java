@@ -17,10 +17,13 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A skeletal implementation of the <tt>Graph</tt> interface, to minimize the effort required to
@@ -29,27 +32,23 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  * @see Graph
  */
 public abstract class AbstractGraph<V, E>
-    implements
-    Graph<V, E>
-{
+        implements
+        Graph<V, E> {
     /**
      * Construct a new empty graph object.
      */
-    protected AbstractGraph()
-    {
+    protected AbstractGraph() {
     }
 
     /**
      * @see Graph#containsEdge(Object, Object)
      */
     @Override
-    public boolean containsEdge(V sourceVertex, V targetVertex)
-    {
+    public boolean containsEdge(V sourceVertex, V targetVertex) {
         return getEdge(sourceVertex, targetVertex) != null;
     }
 
@@ -57,8 +56,7 @@ public abstract class AbstractGraph<V, E>
      * @see Graph#removeAllEdges(Collection)
      */
     @Override
-    public boolean removeAllEdges(Collection<? extends E> edges)
-    {
+    public boolean removeAllEdges(Collection<? extends E> edges) {
         boolean modified = false;
 
         for (E e : edges) {
@@ -72,8 +70,7 @@ public abstract class AbstractGraph<V, E>
      * @see Graph#removeAllEdges(Object, Object)
      */
     @Override
-    public Set<E> removeAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> removeAllEdges(V sourceVertex, V targetVertex) {
         Set<E> removed = getAllEdges(sourceVertex, targetVertex);
         if (removed == null) {
             return null;
@@ -87,8 +84,7 @@ public abstract class AbstractGraph<V, E>
      * @see Graph#removeAllVertices(Collection)
      */
     @Override
-    public boolean removeAllVertices(Collection<? extends V> vertices)
-    {
+    public boolean removeAllVertices(Collection<? extends V> vertices) {
         boolean modified = false;
 
         for (V v : vertices) {
@@ -106,8 +102,7 @@ public abstract class AbstractGraph<V, E>
      * @return a string representation of this graph.
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toStringFromSets(vertexSet(), edgeSet(), this.getType().isDirected());
     }
 
@@ -115,14 +110,11 @@ public abstract class AbstractGraph<V, E>
      * Ensures that the specified vertex exists in this graph, or else throws exception.
      *
      * @param v vertex
-     *
      * @return <code>true</code> if this assertion holds.
-     *
-     * @throws NullPointerException if specified vertex is <code>null</code>.
+     * @throws NullPointerException     if specified vertex is <code>null</code>.
      * @throws IllegalArgumentException if specified vertex does not exist in this graph.
      */
-    protected boolean assertVertexExist(V v)
-    {
+    protected boolean assertVertexExist(V v) {
         if (containsVertex(v)) {
             return true;
         } else if (v == null) {
@@ -138,14 +130,11 @@ public abstract class AbstractGraph<V, E>
      * This method will invoke the {@link Graph#removeEdge(Object)} method.
      *
      * @param edges edges to be removed from this graph.
-     *
      * @return <tt>true</tt> if this graph changed as a result of the call.
-     *
      * @see Graph#removeEdge(Object)
      * @see Graph#containsEdge(Object)
      */
-    protected boolean removeAllEdges(E[] edges)
-    {
+    protected boolean removeAllEdges(E[] edges) {
         boolean modified = false;
 
         for (E edge : edges) {
@@ -159,22 +148,19 @@ public abstract class AbstractGraph<V, E>
      * Helper for subclass implementations of toString( ).
      *
      * @param vertexSet the vertex set V to be printed
-     * @param edgeSet the edge set E to be printed
-     * @param directed true to use parens for each edge (representing directed); false to use curly
-     *        braces (representing undirected)
-     *
+     * @param edgeSet   the edge set E to be printed
+     * @param directed  true to use parens for each edge (representing directed); false to use curly
+     *                  braces (representing undirected)
      * @return a string representation of (V,E)
      */
     protected String toStringFromSets(
-        Collection<? extends V> vertexSet, Collection<? extends E> edgeSet, boolean directed)
-    {
+            Collection<? extends V> vertexSet, Collection<? extends E> edgeSet, boolean directed) {
         List<String> renderedEdges = new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
         for (E e : edgeSet) {
             if ((e.getClass() != DefaultEdge.class)
-                && (e.getClass() != DefaultWeightedEdge.class))
-            {
+                    && (e.getClass() != DefaultWeightedEdge.class)) {
                 sb.append(e.toString());
                 sb.append("=");
             }
@@ -206,12 +192,10 @@ public abstract class AbstractGraph<V, E>
      * edges weights.
      *
      * @return the hash code value this graph
-     *
      * @see Object#hashCode()
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = vertexSet().hashCode();
 
         for (E e : edgeSet()) {
@@ -239,14 +223,11 @@ public abstract class AbstractGraph<V, E>
      * identical vertices and edges sets with the same weights.
      *
      * @param obj object to be compared for equality with this graph
-     *
      * @return <code>true</code> if the specified object is equal to this graph
-     *
      * @see Object#equals(Object)
      */
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

@@ -32,13 +32,11 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Ewgenij Proschak
  */
 abstract class BaseBronKerboschCliqueFinder<V, E>
-    implements
-    MaximalCliqueEnumerationAlgorithm<V, E>
-{
+        implements
+        MaximalCliqueEnumerationAlgorithm<V, E> {
     /**
      * The underlying graph
      */
@@ -62,13 +60,12 @@ abstract class BaseBronKerboschCliqueFinder<V, E>
 
     /**
      * Constructor
-     * 
-     * @param graph the input graph; must be simple
+     *
+     * @param graph   the input graph; must be simple
      * @param timeout the maximum time to wait, if zero no timeout
-     * @param unit the time unit of the timeout argument
+     * @param unit    the time unit of the timeout argument
      */
-    public BaseBronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit)
-    {
+    public BaseBronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         if (timeout == 0L) {
             this.nanos = Long.MAX_VALUE;
@@ -82,8 +79,7 @@ abstract class BaseBronKerboschCliqueFinder<V, E>
     }
 
     @Override
-    public Iterator<Set<V>> iterator()
-    {
+    public Iterator<Set<V>> iterator() {
         lazyRun();
         return allMaximalCliques.iterator();
     }
@@ -94,8 +90,7 @@ abstract class BaseBronKerboschCliqueFinder<V, E>
      *
      * @return an iterator which returns only the maximum cliques of a graph
      */
-    public Iterator<Set<V>> maximumIterator()
-    {
+    public Iterator<Set<V>> maximumIterator() {
         lazyRun();
         List<Set<V>> list = new ArrayList<>();
         for (Set<V> c : allMaximalCliques) {
@@ -109,11 +104,10 @@ abstract class BaseBronKerboschCliqueFinder<V, E>
     /**
      * Check the computation has stopped due to a time limit or due to computing all maximal
      * cliques.
-     * 
+     *
      * @return true if the computation has stopped due to a time limit, false otherwise
      */
-    public boolean isTimeLimitReached()
-    {
+    public boolean isTimeLimitReached() {
         return timeLimitReached;
     }
 

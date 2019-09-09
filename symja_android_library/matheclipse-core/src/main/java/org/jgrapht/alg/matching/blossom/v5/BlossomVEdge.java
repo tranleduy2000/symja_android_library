@@ -17,9 +17,10 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jheaps.*;
+import org.jheaps.AddressableHeap;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * This class is a data structure for Kolmogorov's Blossom V algorithm.
@@ -51,8 +52,7 @@ import java.util.*;
  * @author Timofey Chudakov
  * @see KolmogorovWeightedPerfectMatching
  */
-class BlossomVEdge
-{
+class BlossomVEdge {
     /**
      * Position of this edge in the array {@code state.edges}. This helps to determine generic
      * counterpart of this edge in constant time.
@@ -107,8 +107,7 @@ class BlossomVEdge
     /**
      * Constructs a new edge by initializing the arrays
      */
-    public BlossomVEdge(int pos)
-    {
+    public BlossomVEdge(int pos) {
         headOriginal = new BlossomVNode[2];
         head = new BlossomVNode[2];
         next = new BlossomVEdge[2];
@@ -123,10 +122,9 @@ class BlossomVEdge
      * @param endpoint one of the current endpoints of this edge
      * @return node opposite to the {@code endpoint}
      */
-    public BlossomVNode getOpposite(BlossomVNode endpoint)
-    {
+    public BlossomVNode getOpposite(BlossomVNode endpoint) {
         if (endpoint != head[0] && endpoint != head[1]) { // we need this check during finishing
-                                                          // phase
+            // phase
             return null;
         }
         return head[0] == endpoint ? head[1] : head[0];
@@ -137,12 +135,11 @@ class BlossomVEdge
      *
      * @param endpoint one of the current endpoints of this edge
      * @return the original endpoint of this edge which has the same direction as {@code endpoint}
-     *         with respect to this edge
+     * with respect to this edge
      */
-    public BlossomVNode getCurrentOriginal(BlossomVNode endpoint)
-    {
+    public BlossomVNode getCurrentOriginal(BlossomVNode endpoint) {
         if (endpoint != head[0] && endpoint != head[1]) { // we need this check during finishing
-                                                          // phase
+            // phase
             return null;
         }
         return head[0] == endpoint ? headOriginal[0] : headOriginal[1];
@@ -155,17 +152,15 @@ class BlossomVEdge
      * @param current one of the current endpoints of this edge.
      * @return the direction from the {@code current}
      */
-    public int getDirFrom(BlossomVNode current)
-    {
+    public int getDirFrom(BlossomVNode current) {
         return head[0] == current ? 1 : 0;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "BlossomVEdge (" + head[0].pos + "," + head[1].pos + "), original: ["
-            + headOriginal[0].pos + "," + headOriginal[1].pos + "], slack: " + slack
-            + ", true slack: " + getTrueSlack() + (getTrueSlack() == 0 ? ", tight" : "");
+                + headOriginal[0].pos + "," + headOriginal[1].pos + "], slack: " + slack
+                + ", true slack: " + getTrueSlack() + (getTrueSlack() == 0 ? ", tight" : "");
     }
 
     /**
@@ -173,8 +168,7 @@ class BlossomVEdge
      *
      * @return the true slack of this edge
      */
-    public double getTrueSlack()
-    {
+    public double getTrueSlack() {
         double result = slack;
 
         if (head[0].tree != null) {
@@ -199,10 +193,9 @@ class BlossomVEdge
      * Moves the tail of the {@code edge} from the node {@code from} to the node {@code to}
      *
      * @param from the previous edge's tail
-     * @param to the new edge's tail
+     * @param to   the new edge's tail
      */
-    public void moveEdgeTail(BlossomVNode from, BlossomVNode to)
-    {
+    public void moveEdgeTail(BlossomVNode from, BlossomVNode to) {
         int dir = getDirFrom(from);
         from.removeEdge(this, dir);
         to.addEdge(this, dir);
@@ -214,8 +207,7 @@ class BlossomVEdge
      * @param root the root of the blossom
      * @return a new instance of blossom nodes iterator
      */
-    public BlossomNodesIterator blossomNodesIterator(BlossomVNode root)
-    {
+    public BlossomNodesIterator blossomNodesIterator(BlossomVNode root) {
         return new BlossomNodesIterator(root, this);
     }
 
@@ -231,9 +223,8 @@ class BlossomVEdge
      * direction is 0. This feature is needed to setup the blossomSibling references correctly
      */
     public static class BlossomNodesIterator
-        implements
-        Iterator<BlossomVNode>
-    {
+            implements
+            Iterator<BlossomVNode> {
         /**
          * Blossom's root
          */
@@ -258,12 +249,11 @@ class BlossomVEdge
         /**
          * Constructs a new BlossomNodeIterator for the {@code root} and {@code blossomFormingEdge}
          *
-         * @param root the root of the blossom (the node which isn't matched to another node in the
-         *        blossom)
+         * @param root               the root of the blossom (the node which isn't matched to another node in the
+         *                           blossom)
          * @param blossomFormingEdge a (+, +) edge in the blossom
          */
-        public BlossomNodesIterator(BlossomVNode root, BlossomVEdge blossomFormingEdge)
-        {
+        public BlossomNodesIterator(BlossomVNode root, BlossomVEdge blossomFormingEdge) {
             this.root = root;
             this.blossomFormingEdge = blossomFormingEdge;
             currentNode = current = blossomFormingEdge.head[0];
@@ -274,8 +264,7 @@ class BlossomVEdge
          * {@inheritDoc}
          */
         @Override
-        public boolean hasNext()
-        {
+        public boolean hasNext() {
             if (current != null) {
                 return true;
             }
@@ -286,8 +275,7 @@ class BlossomVEdge
         /**
          * @return the current direction of this iterator
          */
-        public int getCurrentDirection()
-        {
+        public int getCurrentDirection() {
             return currentDirection;
         }
 
@@ -295,8 +283,7 @@ class BlossomVEdge
          * {@inheritDoc}
          */
         @Override
-        public BlossomVNode next()
-        {
+        public BlossomVNode next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -310,8 +297,7 @@ class BlossomVEdge
          *
          * @return an unvisited node in the blossom
          */
-        private BlossomVNode advance()
-        {
+        private BlossomVNode advance() {
             if (currentNode == null) {
                 return null;
             }

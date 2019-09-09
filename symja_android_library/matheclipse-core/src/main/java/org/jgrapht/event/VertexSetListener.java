@@ -17,7 +17,7 @@
  */
 package org.jgrapht.event;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * A listener that is notified when the graph's vertex set changes. It should be used when
@@ -26,14 +26,12 @@ import java.util.*;
  * GraphListener</code>.
  *
  * @param <V> the graph vertex type
- *
  * @author Barak Naveh
  * @see GraphListener
  */
 public interface VertexSetListener<V>
-    extends
-    EventListener
-{
+        extends
+        EventListener {
     /**
      * Notifies that a vertex has been added to the graph.
      *

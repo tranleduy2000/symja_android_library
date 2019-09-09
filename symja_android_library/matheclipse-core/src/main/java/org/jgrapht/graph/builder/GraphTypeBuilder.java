@@ -17,11 +17,29 @@
  */
 package org.jgrapht.graph.builder;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+import org.jgrapht.graph.DefaultGraphType;
+import org.jgrapht.graph.DefaultUndirectedGraph;
+import org.jgrapht.graph.DefaultUndirectedWeightedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.DirectedPseudograph;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.jgrapht.graph.DirectedWeightedPseudograph;
+import org.jgrapht.graph.Multigraph;
+import org.jgrapht.graph.Pseudograph;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
+import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.graph.WeightedMultigraph;
+import org.jgrapht.graph.WeightedPseudograph;
+import org.jgrapht.util.SupplierUtil;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A builder class for the hierarchy of {@link Graph}s that the library provides.
@@ -29,50 +47,47 @@ import java.util.function.*;
  * <p>
  * The following example creates a directed graph which allows multiple (parallel) edges and
  * self-loops: <blockquote>
- * 
+ *
  * <pre>
  * Graph&lt;Integer,
  *     DefaultEdge&gt; g = GraphTypeBuilder
  *         .&lt;Integer, DefaultEdge&gt; directed().allowingMultipleEdges(true).allowingSelfLoops(true)
  *         .edgeClass(DefaultEdge.class).buildGraph();
  * </pre>
- * 
+ *
  * </blockquote>
- * 
+ * <p>
  * Similarly one could get a weighted multigraph by using: <blockquote>
- * 
+ *
  * <pre>
  * Graph&lt;Integer, DefaultWeightedEdge&gt; g = GraphTypeBuilder
  *     .&lt;Integer, DefaultWeightedEdge&gt; undirected().allowingMultipleEdges(true)
  *     .allowingSelfLoops(false).edgeClass(DefaultWeightedEdge.class).weighted(true).buildGraph();
  * </pre>
- * 
+ *
  * </blockquote>
- * 
+ *
  * <p>
  * The builder also provides the ability to construct a graph from another graph such as:
  * <blockquote>
- * 
+ *
  * <pre>
  * Graph&lt;Integer, DefaultWeightedEdge&gt; g1 = GraphTypeBuilder
  *     .&lt;Integer, DefaultWeightedEdge&gt; undirected().allowingMultipleEdges(true)
  *     .allowingSelfLoops(false).edgeClass(DefaultWeightedEdge.class).weighted(true).buildGraph();
- * 
+ *
  * Graph&lt;Integer, DefaultWeightedEdge&gt; g2 = GraphTypeBuilder.asGraph(g1).buildGraph();
  * </pre>
- * 
+ *
  * </blockquote>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
- * 
  * @see GraphType
  * @see GraphBuilder
  */
-public final class GraphTypeBuilder<V, E>
-{
+public final class GraphTypeBuilder<V, E> {
     private boolean undirected;
     private boolean directed;
     private boolean weighted;
@@ -81,8 +96,7 @@ public final class GraphTypeBuilder<V, E>
     private Supplier<V> vertexSupplier;
     private Supplier<E> edgeSupplier;
 
-    private GraphTypeBuilder(boolean directed, boolean undirected)
-    {
+    private GraphTypeBuilder(boolean directed, boolean undirected) {
         this.directed = directed;
         this.undirected = undirected;
         this.weighted = false;
@@ -92,52 +106,48 @@ public final class GraphTypeBuilder<V, E>
 
     /**
      * Create a graph type builder for a directed graph.
-     * 
-     * @return the graph type builder
+     *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
+     * @return the graph type builder
      */
-    public static <V, E> GraphTypeBuilder<V, E> directed()
-    {
+    public static <V, E> GraphTypeBuilder<V, E> directed() {
         return new GraphTypeBuilder<>(true, false);
     }
 
     /**
      * Create a graph type builder for an undirected graph.
-     * 
-     * @return the graph type builder
+     *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
+     * @return the graph type builder
      */
-    public static <V, E> GraphTypeBuilder<V, E> undirected()
-    {
+    public static <V, E> GraphTypeBuilder<V, E> undirected() {
         return new GraphTypeBuilder<>(false, true);
     }
 
     /**
      * Create a graph type builder for a mixed graph.
-     * 
-     * @return the graph type builder
+     *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
+     * @return the graph type builder
      */
-    public static <V, E> GraphTypeBuilder<V, E> mixed()
-    {
+    public static <V, E> GraphTypeBuilder<V, E> mixed() {
         return new GraphTypeBuilder<>(true, true);
     }
 
     /**
      * Create a graph type builder which will create a graph with the same type as the one provided.
-     * 
+     *
      * @param type the graph type
+     * @param <V>  the graph vertex type
+     * @param <E>  the graph edge type
      * @return the graph type builder
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
      */
-    public static <V, E> GraphTypeBuilder<V, E> forGraphType(GraphType type)
-    {
+    public static <V, E> GraphTypeBuilder<V, E> forGraphType(GraphType type) {
         GraphTypeBuilder<V, E> builder = new GraphTypeBuilder<>(
-            type.isDirected() || type.isMixed(), type.isUndirected() || type.isMixed());
+                type.isDirected() || type.isMixed(), type.isUndirected() || type.isMixed());
         builder.weighted = type.isWeighted();
         builder.allowingSelfLoops = type.isAllowingSelfLoops();
         builder.allowingMultipleEdges = type.isAllowingMultipleEdges();
@@ -147,14 +157,13 @@ public final class GraphTypeBuilder<V, E>
     /**
      * Create a graph type builder which will create the same graph type as the parameter graph. The
      * new graph will use the same vertex and edge suppliers as the input graph.
-     * 
+     *
      * @param graph a graph
+     * @param <V>   the graph vertex type
+     * @param <E>   the graph edge type
      * @return a type builder
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
      */
-    public static <V, E> GraphTypeBuilder<V, E> forGraph(Graph<V, E> graph)
-    {
+    public static <V, E> GraphTypeBuilder<V, E> forGraph(Graph<V, E> graph) {
         GraphTypeBuilder<V, E> builder = forGraphType(graph.getType());
         builder.vertexSupplier = graph.getVertexSupplier();
         builder.edgeSupplier = graph.getEdgeSupplier();
@@ -163,49 +172,45 @@ public final class GraphTypeBuilder<V, E>
 
     /**
      * Set whether the graph will be weighted or not.
-     * 
+     *
      * @param weighted if true the graph will be weighted
      * @return the graph type builder
      */
-    public GraphTypeBuilder<V, E> weighted(boolean weighted)
-    {
+    public GraphTypeBuilder<V, E> weighted(boolean weighted) {
         this.weighted = weighted;
         return this;
     }
 
     /**
      * Set whether the graph will allow self loops (edges with same source and target vertices).
-     * 
+     *
      * @param allowingSelfLoops if true the graph will allow self-loops
      * @return the graph type builder
      */
-    public GraphTypeBuilder<V, E> allowingSelfLoops(boolean allowingSelfLoops)
-    {
+    public GraphTypeBuilder<V, E> allowingSelfLoops(boolean allowingSelfLoops) {
         this.allowingSelfLoops = allowingSelfLoops;
         return this;
     }
 
     /**
      * Set whether the graph will allow multiple (parallel) edges between the same two vertices.
-     * 
+     *
      * @param allowingMultipleEdges if true the graph will allow multiple (parallel) edges
      * @return the graph type builder
      */
-    public GraphTypeBuilder<V, E> allowingMultipleEdges(boolean allowingMultipleEdges)
-    {
+    public GraphTypeBuilder<V, E> allowingMultipleEdges(boolean allowingMultipleEdges) {
         this.allowingMultipleEdges = allowingMultipleEdges;
         return this;
     }
 
     /**
      * Set the vertex supplier.
-     * 
+     *
      * @param vertexSupplier the vertex supplier to use
+     * @param <V1>           the graph vertex type
      * @return the graph type builder
-     * @param <V1> the graph vertex type
      */
-    public <V1 extends V> GraphTypeBuilder<V1, E> vertexSupplier(Supplier<V1> vertexSupplier)
-    {
+    public <V1 extends V> GraphTypeBuilder<V1, E> vertexSupplier(Supplier<V1> vertexSupplier) {
         GraphTypeBuilder<V1, E> newBuilder = TypeUtil.uncheckedCast(this);
         newBuilder.vertexSupplier = vertexSupplier;
         return newBuilder;
@@ -213,13 +218,12 @@ public final class GraphTypeBuilder<V, E>
 
     /**
      * Set the edge supplier.
-     * 
+     *
      * @param edgeSupplier the edge supplier to use
+     * @param <E1>         the graph edge type
      * @return the graph type builder
-     * @param <E1> the graph edge type
      */
-    public <E1 extends E> GraphTypeBuilder<V, E1> edgeSupplier(Supplier<E1> edgeSupplier)
-    {
+    public <E1 extends E> GraphTypeBuilder<V, E1> edgeSupplier(Supplier<E1> edgeSupplier) {
         GraphTypeBuilder<V, E1> newBuilder = TypeUtil.uncheckedCast(this);
         newBuilder.edgeSupplier = edgeSupplier;
         return newBuilder;
@@ -227,13 +231,12 @@ public final class GraphTypeBuilder<V, E>
 
     /**
      * Set the vertex class.
-     * 
+     *
      * @param vertexClass the vertex class
+     * @param <V1>        the graph vertex type
      * @return the graph type builder
-     * @param <V1> the graph vertex type
      */
-    public <V1 extends V> GraphTypeBuilder<V1, E> vertexClass(Class<V1> vertexClass)
-    {
+    public <V1 extends V> GraphTypeBuilder<V1, E> vertexClass(Class<V1> vertexClass) {
         GraphTypeBuilder<V1, E> newBuilder = TypeUtil.uncheckedCast(this);
         newBuilder.vertexSupplier = SupplierUtil.createSupplier(vertexClass);
         return newBuilder;
@@ -241,13 +244,12 @@ public final class GraphTypeBuilder<V, E>
 
     /**
      * Set the edge class.
-     * 
+     *
      * @param edgeClass the edge class
+     * @param <E1>      the graph edge type
      * @return the graph type builder
-     * @param <E1> the graph edge type
      */
-    public <E1 extends E> GraphTypeBuilder<V, E1> edgeClass(Class<E1> edgeClass)
-    {
+    public <E1 extends E> GraphTypeBuilder<V, E1> edgeClass(Class<E1> edgeClass) {
         GraphTypeBuilder<V, E1> newBuilder = TypeUtil.uncheckedCast(this);
         newBuilder.edgeSupplier = SupplierUtil.createSupplier(edgeClass);
         return newBuilder;
@@ -255,11 +257,10 @@ public final class GraphTypeBuilder<V, E>
 
     /**
      * Build the graph type.
-     * 
+     *
      * @return a graph type
      */
-    public GraphType buildType()
-    {
+    public GraphType buildType() {
         DefaultGraphType.Builder typeBuilder = new DefaultGraphType.Builder();
         if (directed && undirected) {
             typeBuilder = typeBuilder.mixed();
@@ -269,28 +270,26 @@ public final class GraphTypeBuilder<V, E>
             typeBuilder = typeBuilder.undirected();
         }
         return typeBuilder
-            .allowMultipleEdges(allowingMultipleEdges).allowSelfLoops(allowingSelfLoops)
-            .weighted(weighted).build();
+                .allowMultipleEdges(allowingMultipleEdges).allowSelfLoops(allowingSelfLoops)
+                .weighted(weighted).build();
     }
 
     /**
      * Build the graph and acquire a {@link GraphBuilder} in order to add vertices and edges.
-     * 
+     *
      * @return a graph builder
      */
-    public GraphBuilder<V, E, Graph<V, E>> buildGraphBuilder()
-    {
+    public GraphBuilder<V, E, Graph<V, E>> buildGraphBuilder() {
         return new GraphBuilder<V, E, Graph<V, E>>(buildGraph());
     }
 
     /**
      * Build the actual graph.
-     * 
+     *
      * @return the graph
      * @throws UnsupportedOperationException in case a graph type is not supported
      */
-    public Graph<V, E> buildGraph()
-    {
+    public Graph<V, E> buildGraph() {
         if (directed && undirected) {
             throw new UnsupportedOperationException("Mixed graphs are not supported");
         } else if (directed) {

@@ -17,23 +17,21 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.graph.builder.GraphBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A directed weighted pseudograph. A directed weighted pseudograph is a non-simple directed graph
  * in which both graph loops and multiple (parallel) edges are permitted, and edges have weights.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  */
 public class DirectedWeightedPseudograph<V, E>
-    extends
-    DirectedPseudograph<V, E>
-{
+        extends
+        DirectedPseudograph<V, E> {
     private static final long serialVersionUID = -4775269773843490859L;
 
     /**
@@ -41,49 +39,45 @@ public class DirectedWeightedPseudograph<V, E>
      *
      * @param edgeClass class on which to base the edge supplier
      */
-    public DirectedWeightedPseudograph(Class<? extends E> edgeClass)
-    {
+    public DirectedWeightedPseudograph(Class<? extends E> edgeClass) {
         this(null, SupplierUtil.createSupplier(edgeClass));
     }
 
     /**
      * Creates a new weighted graph.
-     * 
+     *
      * @param vertexSupplier the vertex supplier, can be null
-     * @param edgeSupplier the edge supplier, can be null
+     * @param edgeSupplier   the edge supplier, can be null
      */
-    public DirectedWeightedPseudograph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier)
-    {
+    public DirectedWeightedPseudograph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier) {
         super(vertexSupplier, edgeSupplier, true);
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeClass class on which to base factory for edges
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>       the graph vertex type
+     * @param <E>       the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V,
-        E> GraphBuilder<V, E, ? extends DirectedWeightedPseudograph<V, E>> createBuilder(
-            Class<? extends E> edgeClass)
-    {
+            E> GraphBuilder<V, E, ? extends DirectedWeightedPseudograph<V, E>> createBuilder(
+            Class<? extends E> edgeClass) {
         return new GraphBuilder<>(new DirectedWeightedPseudograph<V, E>(edgeClass));
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeSupplier the edge supplier
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V,
-        E> GraphBuilder<V, E, ? extends DirectedWeightedPseudograph<V, E>> createBuilder(
-            Supplier<E> edgeSupplier)
-    {
+            E> GraphBuilder<V, E, ? extends DirectedWeightedPseudograph<V, E>> createBuilder(
+            Supplier<E> edgeSupplier) {
         return new GraphBuilder<>(new DirectedWeightedPseudograph<V, E>(null, edgeSupplier));
     }
 

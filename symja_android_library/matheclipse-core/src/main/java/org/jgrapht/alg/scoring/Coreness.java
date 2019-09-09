@@ -17,15 +17,21 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Computes the coreness of each vertex in an undirected graph.
- * 
+ *
  * <p>
  * A $k$-core of a graph $G$ is a maximal connected subgraph of $G$ in which all vertices have
  * degree at least $k$. Equivalently, it is one of the connected components of the subgraph of $G$
@@ -49,24 +55,21 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public final class Coreness<V, E>
-    implements
-    VertexScoringAlgorithm<V, Integer>
-{
+        implements
+        VertexScoringAlgorithm<V, Integer> {
     private final Graph<V, E> g;
     private Map<V, Integer> scores;
     private int degeneracy;
 
     /**
      * Constructor
-     * 
+     *
      * @param g the input graph
      */
-    public Coreness(Graph<V, E> g)
-    {
+    public Coreness(Graph<V, E> g) {
         this.g = GraphTests.requireUndirected(g);
     }
 
@@ -74,8 +77,7 @@ public final class Coreness<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Map<V, Integer> getScores()
-    {
+    public Map<V, Integer> getScores() {
         lazyRun();
         return Collections.unmodifiableMap(scores);
     }
@@ -84,8 +86,7 @@ public final class Coreness<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Integer getVertexScore(V v)
-    {
+    public Integer getVertexScore(V v) {
         if (!g.containsVertex(v)) {
             throw new IllegalArgumentException("Cannot return score of unknown vertex");
         }
@@ -95,24 +96,22 @@ public final class Coreness<V, E>
 
     /**
      * Compute the degeneracy of a graph.
-     * 
+     *
      * <p>
      * The degeneracy of a graph is the smallest value of $k$ for which it is $k$-degenerate. In
      * graph theory, a $k$-degenerate graph is an undirected graph in which every subgraph has a
      * vertex of degree at most $k$: that is, some vertex in the subgraph touches $k$ or fewer of
      * the subgraph's edges.
-     * 
+     *
      * @return the degeneracy of a graph
      */
-    public int getDegeneracy()
-    {
+    public int getDegeneracy() {
         lazyRun();
         return degeneracy;
     }
 
     @SuppressWarnings("unchecked")
-    private void lazyRun()
-    {
+    private void lazyRun() {
         if (scores != null) {
             return;
         }

@@ -17,10 +17,15 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
-import org.jgrapht.event.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.event.ConnectedComponentTraversalEvent;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Provides a cross-connected-component traversal functionality for iterator subclasses.
@@ -28,23 +33,21 @@ import java.util.*;
  * @param <V> vertex type
  * @param <E> edge type
  * @param <D> type of data associated to seen vertices
- *
  * @author Barak Naveh
  */
 public abstract class CrossComponentIterator<V, E, D>
-    extends
-    AbstractGraphIterator<V, E>
-{
+        extends
+        AbstractGraphIterator<V, E> {
     private static final int CCS_BEFORE_COMPONENT = 1;
     private static final int CCS_WITHIN_COMPONENT = 2;
     private static final int CCS_AFTER_COMPONENT = 3;
 
     private final ConnectedComponentTraversalEvent ccFinishedEvent =
-        new ConnectedComponentTraversalEvent(
-            this, ConnectedComponentTraversalEvent.CONNECTED_COMPONENT_FINISHED);
+            new ConnectedComponentTraversalEvent(
+                    this, ConnectedComponentTraversalEvent.CONNECTED_COMPONENT_FINISHED);
     private final ConnectedComponentTraversalEvent ccStartedEvent =
-        new ConnectedComponentTraversalEvent(
-            this, ConnectedComponentTraversalEvent.CONNECTED_COMPONENT_STARTED);
+            new ConnectedComponentTraversalEvent(
+                    this, ConnectedComponentTraversalEvent.CONNECTED_COMPONENT_STARTED);
 
     /**
      * Stores the vertices that have been seen during iteration and (optionally) some additional
@@ -77,8 +80,7 @@ public abstract class CrossComponentIterator<V, E, D>
      *
      * @param g the graph to be iterated
      */
-    public CrossComponentIterator(Graph<V, E> g)
-    {
+    public CrossComponentIterator(Graph<V, E> g) {
         this(g, (V) null);
     }
 
@@ -87,14 +89,12 @@ public abstract class CrossComponentIterator<V, E, D>
      * vertex. If the specified start vertex is <code>
      * null</code>, Iteration will start at an arbitrary graph vertex.
      *
-     * @param g the graph to be iterated.
+     * @param g           the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
-     *
      * @throws IllegalArgumentException if <code>g==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
-    public CrossComponentIterator(Graph<V, E> g, V startVertex)
-    {
+    public CrossComponentIterator(Graph<V, E> g, V startVertex) {
         this(g, startVertex == null ? null : Collections.singletonList(startVertex));
     }
 
@@ -103,14 +103,12 @@ public abstract class CrossComponentIterator<V, E, D>
      * vertices. If the specified start vertices is <code>
      * null</code>, Iteration will start at an arbitrary graph vertex.
      *
-     * @param g the graph to be iterated.
+     * @param g             the graph to be iterated.
      * @param startVertices the vertices iteration to be started.
-     *
      * @throws IllegalArgumentException if <code>g==null</code> or does not contain
-     *         <code>startVertex</code>
+     *                                  <code>startVertex</code>
      */
-    public CrossComponentIterator(Graph<V, E> g, Iterable<V> startVertices)
-    {
+    public CrossComponentIterator(Graph<V, E> g, Iterable<V> startVertices) {
         super(g);
 
         /*
@@ -127,7 +125,7 @@ public abstract class CrossComponentIterator<V, E, D>
          * Initialize start vertex
          */
         Iterator<V> it =
-            crossComponentTraversal ? getEntireGraphVertexIterator() : startVertexIterator;
+                crossComponentTraversal ? getEntireGraphVertexIterator() : startVertexIterator;
         // pick a start vertex if possible
         if (it.hasNext()) {
             this.startVertex = it.next();
@@ -141,8 +139,7 @@ public abstract class CrossComponentIterator<V, E, D>
     }
 
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         if (startVertex != null) {
             encounterStartVertex();
         }
@@ -156,7 +153,7 @@ public abstract class CrossComponentIterator<V, E, D>
             }
 
             Iterator<V> it =
-                isCrossComponentTraversal() ? getEntireGraphVertexIterator() : startVertexIterator;
+                    isCrossComponentTraversal() ? getEntireGraphVertexIterator() : startVertexIterator;
             while (it != null && it.hasNext()) {
                 V v = it.next();
                 if (!graph.containsVertex(v)) {
@@ -177,8 +174,7 @@ public abstract class CrossComponentIterator<V, E, D>
     }
 
     @Override
-    public V next()
-    {
+    public V next() {
         if (startVertex != null) {
             encounterStartVertex();
         }
@@ -209,8 +205,7 @@ public abstract class CrossComponentIterator<V, E, D>
      *
      * @return iterator which provides start vertices for cross-component iteration
      */
-    protected Iterator<V> getEntireGraphVertexIterator()
-    {
+    protected Iterator<V> getEntireGraphVertexIterator() {
         if (entireGraphVertexIterator == null) {
             assert (isCrossComponentTraversal());
             entireGraphVertexIterator = graph.vertexSet().iterator();
@@ -223,7 +218,7 @@ public abstract class CrossComponentIterator<V, E, D>
      * connected component; <tt>false</tt> otherwise.
      *
      * @return <tt>true</tt> if there are no more uniterated vertices in the currently iterated
-     *         connected component; <tt>false</tt> otherwise.
+     * connected component; <tt>false</tt> otherwise.
      */
     protected abstract boolean isConnectedComponentExhausted();
 
@@ -231,8 +226,8 @@ public abstract class CrossComponentIterator<V, E, D>
      * Update data structures the first time we see a vertex.
      *
      * @param vertex the vertex encountered
-     * @param edge the edge via which the vertex was encountered, or null if the vertex is a
-     *        starting point
+     * @param edge   the edge via which the vertex was encountered, or null if the vertex is a
+     *               starting point
      */
     protected abstract void encounterVertex(V vertex, E edge);
 
@@ -248,14 +243,12 @@ public abstract class CrossComponentIterator<V, E, D>
      * Access the data stored for a seen vertex.
      *
      * @param vertex a vertex which has already been seen.
-     *
      * @return data associated with the seen vertex or <code>null</code> if no data was associated
-     *         with the vertex. A <code>null</code> return can also indicate that the vertex was
-     *         explicitly associated with <code>
+     * with the vertex. A <code>null</code> return can also indicate that the vertex was
+     * explicitly associated with <code>
      * null</code>.
      */
-    protected D getSeenData(V vertex)
-    {
+    protected D getSeenData(V vertex) {
         return seen.get(vertex);
     }
 
@@ -263,11 +256,9 @@ public abstract class CrossComponentIterator<V, E, D>
      * Determines whether a vertex has been seen yet by this traversal.
      *
      * @param vertex vertex in question
-     *
      * @return <tt>true</tt> if vertex has already been seen
      */
-    protected boolean isSeenVertex(V vertex)
-    {
+    protected boolean isSeenVertex(V vertex) {
         return seen.containsKey(vertex);
     }
 
@@ -275,7 +266,7 @@ public abstract class CrossComponentIterator<V, E, D>
      * Called whenever we re-encounter a vertex. The default implementation does nothing.
      *
      * @param vertex the vertex re-encountered
-     * @param edge the edge via which the vertex was re-encountered
+     * @param edge   the edge via which the vertex was re-encountered
      */
     protected abstract void encounterVertexAgain(V vertex, E edge);
 
@@ -283,15 +274,13 @@ public abstract class CrossComponentIterator<V, E, D>
      * Stores iterator-dependent data for a vertex that has been seen.
      *
      * @param vertex a vertex which has been seen.
-     * @param data data to be associated with the seen vertex.
-     *
+     * @param data   data to be associated with the seen vertex.
      * @return previous value associated with specified vertex or <code>
      * null</code> if no data was associated with the vertex. A <code>
      * null</code> return can also indicate that the vertex was explicitly associated with
-     *         <code>null</code>.
+     * <code>null</code>.
      */
-    protected D putSeenData(V vertex, D data)
-    {
+    protected D putSeenData(V vertex, D data) {
         return seen.put(vertex, data);
     }
 
@@ -301,15 +290,13 @@ public abstract class CrossComponentIterator<V, E, D>
      *
      * @param vertex vertex which has been finished
      */
-    protected void finishVertex(V vertex)
-    {
+    protected void finishVertex(V vertex) {
         if (nListeners != 0) {
             fireVertexFinished(createVertexTraversalEvent(vertex));
         }
     }
 
-    private void addUnseenChildrenOf(V vertex)
-    {
+    private void addUnseenChildrenOf(V vertex) {
         for (E edge : graph.outgoingEdgesOf(vertex)) {
             if (nListeners != 0) {
                 fireEdgeTraversed(createEdgeTraversalEvent(edge));
@@ -325,8 +312,7 @@ public abstract class CrossComponentIterator<V, E, D>
         }
     }
 
-    private void encounterStartVertex()
-    {
+    private void encounterStartVertex() {
         encounterVertex(startVertex, null);
         startVertex = null;
     }

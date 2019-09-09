@@ -17,45 +17,49 @@
  */
 package org.jgrapht.alg.spanning;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
+import org.jgrapht.alg.util.UnionFind;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Borůvka's algorithm for the computation of a minimum spanning tree.
- * 
+ *
  * <p>
  * See the article on
  * <a href="https://en.wikipedia.org/wiki/Bor%C5%AFvka%27s_algorithm">wikipedia</a> for more
  * information on the history of the algorithm.
- * 
+ *
  * <p>
  * This implementation uses a union-find data structure (with union by rank and path compression
  * heuristic) in order to track components. In graphs where edges have identical weights, edges with
  * equal weights are ordered lexicographically. The running time is $O((E+V) \log V)$ under the
  * assumption that the union-find uses path-compression.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class BoruvkaMinimumSpanningTree<V, E>
-    implements
-    SpanningTreeAlgorithm<E>
-{
+        implements
+        SpanningTreeAlgorithm<E> {
     private final Graph<V, E> graph;
     private final Comparator<Double> comparator;
 
     /**
      * Construct a new instance of the algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public BoruvkaMinimumSpanningTree(Graph<V, E> graph)
-    {
+    public BoruvkaMinimumSpanningTree(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         this.comparator = new ToleranceDoubleComparator();
     }
@@ -64,8 +68,7 @@ public class BoruvkaMinimumSpanningTree<V, E>
      * {@inheritDoc}
      */
     @Override
-    public SpanningTree<E> getSpanningTree()
-    {
+    public SpanningTree<E> getSpanningTree() {
         // create result placeholder
         Set<E> mstEdges = new LinkedHashSet<>();
         double mstWeight = 0d;

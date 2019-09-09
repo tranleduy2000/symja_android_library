@@ -17,18 +17,26 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
  * Betweenness centrality.
- * 
+ *
  * <p>
  * Computes the betweenness centrality of each vertex of a graph. The betweenness centrality of a
  * node $v$ is given by the expression: $g(v)= \sum_{s \neq v \neq
@@ -36,27 +44,24 @@ import java.util.function.Consumer;
  * from node $s$ to node $t$ and $\sigma_{st}(v)$ is the number of those paths that pass through
  * $v$. For more details see
  * <a href="https://en.wikipedia.org/wiki/Betweenness_centrality">wikipedia</a>.
- * 
+ * <p>
  * The algorithm is based on
  * <ul>
  * <li>Brandes, Ulrik (2001). "A faster algorithm for betweenness centrality". Journal of
  * Mathematical Sociology. 25 (2): 163–177.</li>
  * </ul>
- *
+ * <p>
  * The running time is $O(nm)$ and $O(nm +n^2 \log n)$ for unweighted and weighted graph
  * respectively, where $n$ is the number of vertices and $m$ the number of edges of the graph. The
  * space complexity is $O(n + m)$.
  *
- * 
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Assaf Mizrachi
  */
 public class BetweennessCentrality<V, E>
-    implements
-    VertexScoringAlgorithm<V, Double>
-{
+        implements
+        VertexScoringAlgorithm<V, Double> {
 
     /**
      * Underlying graph
@@ -73,23 +78,21 @@ public class BetweennessCentrality<V, E>
 
     /**
      * Construct a new instance.
-     * 
+     *
      * @param graph the input graph
      */
-    public BetweennessCentrality(Graph<V, E> graph)
-    {
+    public BetweennessCentrality(Graph<V, E> graph) {
         this(graph, false);
     }
 
     /**
      * Construct a new instance.
-     * 
-     * @param graph the input graph
+     *
+     * @param graph     the input graph
      * @param normalize whether to normalize by dividing the closeness by $(n-1) \cdot (n-2)$, where
-     *        $n$ is the number of vertices of the graph
+     *                  $n$ is the number of vertices of the graph
      */
-    public BetweennessCentrality(Graph<V, E> graph, boolean normalize)
-    {
+    public BetweennessCentrality(Graph<V, E> graph, boolean normalize) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
 
         this.scores = null;
@@ -100,8 +103,7 @@ public class BetweennessCentrality<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Map<V, Double> getScores()
-    {
+    public Map<V, Double> getScores() {
         if (scores == null) {
             compute();
         }
@@ -112,8 +114,7 @@ public class BetweennessCentrality<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Double getVertexScore(V v)
-    {
+    public Double getVertexScore(V v) {
         if (!graph.containsVertex(v)) {
             throw new IllegalArgumentException("Cannot return score of unknown vertex");
         }
@@ -126,8 +127,7 @@ public class BetweennessCentrality<V, E>
     /**
      * Compute the centrality index
      */
-    private void compute()
-    {
+    private void compute() {
         // initialize result container
         this.scores = new HashMap<>();
         this.graph.vertexSet().forEach(new Consumer<V>() {
@@ -170,8 +170,7 @@ public class BetweennessCentrality<V, E>
         }
     }
 
-    private void compute(V s)
-    {
+    private void compute(V s) {
         // initialize
         ArrayDeque<V> stack = new ArrayDeque<>();
         final Map<V, List<V>> predecessors = new HashMap<>();
@@ -203,7 +202,7 @@ public class BetweennessCentrality<V, E>
         distance.put(s, 0.0);
 
         MyQueue<V, Double> queue =
-            this.graph.getType().isWeighted() ? new WeightedQueue() : new UnweightedQueue();
+                this.graph.getType().isWeighted() ? new WeightedQueue() : new UnweightedQueue();
         queue.insert(s, 0.0);
 
         // 1. compute the length and the number of shortest paths between all s to v
@@ -247,7 +246,7 @@ public class BetweennessCentrality<V, E>
             V w = stack.pop();
             for (V v : predecessors.get(w)) {
                 dependency.put(
-                    v, dependency.get(v) + (sigma.get(v) / sigma.get(w)) * (1 + dependency.get(w)));
+                        v, dependency.get(v) + (sigma.get(v) / sigma.get(w)) * (1 + dependency.get(w)));
             }
             if (!w.equals(s)) {
                 this.scores.put(w, this.scores.get(w) + dependency.get(w));
@@ -255,8 +254,7 @@ public class BetweennessCentrality<V, E>
         }
     }
 
-    private interface MyQueue<T, D>
-    {
+    private interface MyQueue<T, D> {
         void insert(T t, D d);
 
         void update(T t, D d);
@@ -267,23 +265,20 @@ public class BetweennessCentrality<V, E>
     }
 
     private class WeightedQueue
-        implements
-        MyQueue<V, Double>
-    {
+            implements
+            MyQueue<V, Double> {
 
         AddressableHeap<Double, V> delegate = new PairingHeap<>();
         Map<V, AddressableHeap.Handle<Double, V>> seen = new HashMap<>();
 
         @Override
-        public void insert(V t, Double d)
-        {
+        public void insert(V t, Double d) {
             AddressableHeap.Handle<Double, V> node = delegate.insert(d, t);
             seen.put(t, node);
         }
 
         @Override
-        public void update(V t, Double d)
-        {
+        public void update(V t, Double d) {
             if (!seen.containsKey(t)) {
                 throw new IllegalArgumentException("Element " + t + " does not exist in queue");
             }
@@ -291,47 +286,40 @@ public class BetweennessCentrality<V, E>
         }
 
         @Override
-        public V remove()
-        {
+        public V remove() {
             return delegate.deleteMin().getValue();
         }
 
         @Override
-        public boolean isEmpty()
-        {
+        public boolean isEmpty() {
             return delegate.isEmpty();
         }
 
     }
 
     private class UnweightedQueue
-        implements
-        MyQueue<V, Double>
-    {
+            implements
+            MyQueue<V, Double> {
 
         Queue<V> delegate = new ArrayDeque<>();
 
         @Override
-        public void insert(V t, Double d)
-        {
+        public void insert(V t, Double d) {
             delegate.add(t);
         }
 
         @Override
-        public void update(V t, Double d)
-        {
+        public void update(V t, Double d) {
             // do nothing
         }
 
         @Override
-        public V remove()
-        {
+        public V remove() {
             return delegate.remove();
         }
 
         @Override
-        public boolean isEmpty()
-        {
+        public boolean isEmpty() {
             return delegate.isEmpty();
         }
 

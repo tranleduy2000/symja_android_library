@@ -45,26 +45,24 @@ import java.util.function.Function;
  * <a href="http://mathworld.wolfram.com/GraphCycle.html"> cycles</a> of four or more vertices have
  * a <a href="http://mathworld.wolfram.com/CycleChord.html"> chord</a>. A chord is an edge that is
  * not part of the cycle but connects two vertices of the cycle.
- *
+ * <p>
  * To compute the clique, this implementation relies on the {@link ChordalityInspector} to compute a
  * <a href=
  * "https://en.wikipedia.org/wiki/Chordal_graph#Perfect_elimination_and_efficient_recognition">
  * perfect elimination order</a>.
- *
+ * <p>
  * The maximum clique for a chordal graph is computed in $\mathcal{O}(|V| + |E|)$ time.
- *
+ * <p>
  * All the methods in this class are invoked in a lazy fashion, meaning that computations are only
  * started once the method gets invoked.
  *
  * @param <V> the graph vertex type.
  * @param <E> the graph edge type.
- *
  * @author Timofey Chudakov
  */
 public class ChordalGraphMaxCliqueFinder<V, E>
-    implements
-    CliqueAlgorithm<V>
-{
+        implements
+        CliqueAlgorithm<V> {
     private final Graph<V, E> graph;
     private final ChordalityInspector.IterationOrder iterationOrder;
 
@@ -77,8 +75,7 @@ public class ChordalGraphMaxCliqueFinder<V, E>
      *
      * @param graph graph
      */
-    public ChordalGraphMaxCliqueFinder(Graph<V, E> graph)
-    {
+    public ChordalGraphMaxCliqueFinder(Graph<V, E> graph) {
         this(graph, ChordalityInspector.IterationOrder.MCS);
     }
 
@@ -87,13 +84,12 @@ public class ChordalGraphMaxCliqueFinder<V, E>
      * this implementation uses either the {@link MaximumCardinalityIterator} iterator or the
      * {@link LexBreadthFirstIterator} iterator, depending on the parameter {@code iterationOrder}.
      *
-     * @param graph graph
+     * @param graph          graph
      * @param iterationOrder constant which defines iterator to be used by the
-     *        {@code ChordalityInspector} in this implementation.
+     *                       {@code ChordalityInspector} in this implementation.
      */
     public ChordalGraphMaxCliqueFinder(
-        Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder)
-    {
+            Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder) {
         this.graph = Objects.requireNonNull(graph);
         this.iterationOrder = Objects.requireNonNull(iterationOrder);
     }
@@ -101,8 +97,7 @@ public class ChordalGraphMaxCliqueFinder<V, E>
     /**
      * Lazily computes some maximum clique of the {@code graph}.
      */
-    private void lazyComputeMaximumClique()
-    {
+    private void lazyComputeMaximumClique() {
         if (maximumClique == null && isChordal) {
             ChordalGraphColoring<V, E> cgc = new ChordalGraphColoring<>(graph, iterationOrder);
             VertexColoringAlgorithm.Coloring<V> coloring = cgc.getColoring();
@@ -129,7 +124,7 @@ public class ChordalGraphMaxCliqueFinder<V, E>
                 }
             }
             Map.Entry<V,
-                Integer> maxEntry = seen ? best : null;
+                    Integer> maxEntry = seen ? best : null;
             if (maxEntry == null) {
                 maximumClique = new CliqueImpl<>(Collections.<V>emptySet());
             } else {
@@ -146,10 +141,9 @@ public class ChordalGraphMaxCliqueFinder<V, E>
      *
      * @param vertexOrder a list with vertices.
      * @return a mapping of vertices from {@code vertexOrder} to their indices in
-     *         {@code vertexOrder}.
+     * {@code vertexOrder}.
      */
-    private Map<V, Integer> getVertexInOrder(List<V> vertexOrder)
-    {
+    private Map<V, Integer> getVertexInOrder(List<V> vertexOrder) {
         Map<V, Integer> vertexInOrder = new HashMap<>(vertexOrder.size());
         int i = 0;
         for (V vertex : vertexOrder) {
@@ -164,12 +158,11 @@ public class ChordalGraphMaxCliqueFinder<V, E>
      * the index of {@code vertex}.
      *
      * @param vertexInOrder defines the mapping of vertices in {@code graph} to their indices in
-     *        order.
-     * @param vertex the vertex whose predecessors in order are to be returned.
+     *                      order.
+     * @param vertex        the vertex whose predecessors in order are to be returned.
      * @return the predecessors of {@code vertex} in order defines by {@code map}.
      */
-    private Set<V> getPredecessors(Map<V, Integer> vertexInOrder, V vertex)
-    {
+    private Set<V> getPredecessors(Map<V, Integer> vertexInOrder, V vertex) {
         Set<V> predecessors = new HashSet<>();
         Integer vertexPosition = vertexInOrder.get(vertex);
         Set<E> edges = graph.edgesOf(vertex);
@@ -188,8 +181,7 @@ public class ChordalGraphMaxCliqueFinder<V, E>
      *
      * @return a maximum clique of the {@code graph} if it is chordal, null otherwise.
      */
-    public Clique<V> getClique()
-    {
+    public Clique<V> getClique() {
         lazyComputeMaximumClique();
         return maximumClique;
     }

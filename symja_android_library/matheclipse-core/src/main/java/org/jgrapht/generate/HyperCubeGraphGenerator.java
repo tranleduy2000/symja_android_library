@@ -17,25 +17,24 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Generates a <a href="http://mathworld.wolfram.com/HypercubeGraph.html">hyper cube graph</a> of
  * any size. This is a graph that can be represented by bit strings, so for an n-dimensional
  * hypercube each vertex resembles an n-length bit string. Then, two vertices are adjacent if and
  * only if their bitstring differ by exactly one element.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Andrew Newell
  */
 public class HyperCubeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private int dim;
 
     /**
@@ -43,14 +42,12 @@ public class HyperCubeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      *
      * @param dim the dimension of the hypercube
      */
-    public HyperCubeGraphGenerator(int dim)
-    {
+    public HyperCubeGraphGenerator(int dim) {
         this.dim = dim;
     }
 
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         // Vertices are created, and they are included in the resultmap as their
         // bitstring representation
         int order = (int) Math.pow(2, dim);

@@ -17,24 +17,22 @@
  */
 package org.jgrapht.alg.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Generic pair.
- * 
+ *
  * <p>
  * Although the instances of this class are immutable, it is impossible to ensure that the
  * references passed to the constructor will not be modified by the caller.
- * 
+ *
  * @param <A> the first element type
  * @param <B> the second element type
- * 
  */
 public class Pair<A, B>
-    implements
-    Serializable
-{
+        implements
+        Serializable {
     private static final long serialVersionUID = 8176288675989092842L;
 
     /**
@@ -49,33 +47,30 @@ public class Pair<A, B>
 
     /**
      * Create a new pair
-     * 
+     *
      * @param a the first element
      * @param b the second element
      */
-    public Pair(A a, B b)
-    {
+    public Pair(A a, B b) {
         this.first = a;
         this.second = b;
     }
 
     /**
      * Get the first element of the pair
-     * 
+     *
      * @return the first element of the pair
      */
-    public A getFirst()
-    {
+    public A getFirst() {
         return first;
     }
 
     /**
      * Get the second element of the pair
-     * 
+     *
      * @return the second element of the pair
      */
-    public B getSecond()
-    {
+    public B getSecond() {
         return second;
     }
 
@@ -85,8 +80,7 @@ public class Pair<A, B>
      * @param f the element to be assigned.
      */
 
-    public void setFirst(A f)
-    {
+    public void setFirst(A f) {
         first = f;
     }
 
@@ -96,22 +90,18 @@ public class Pair<A, B>
      * @param s the element to be assigned.
      */
 
-    public void setSecond(B s)
-    {
+    public void setSecond(B s) {
         second = s;
     }
 
     /**
      * Assess if this pair contains an element.
      *
-     * @param e The element in question
-     *
-     * @return true if contains the element, false otherwise
-     * 
+     * @param e   The element in question
      * @param <E> the element type
+     * @return true if contains the element, false otherwise
      */
-    public <E> boolean hasElement(E e)
-    {
+    public <E> boolean hasElement(E e) {
         if (e == null) {
             return first == null || second == null;
         } else {
@@ -120,14 +110,12 @@ public class Pair<A, B>
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "(" + first + "," + second + ")";
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         else if (!(o instanceof Pair))
@@ -138,8 +126,7 @@ public class Pair<A, B>
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(first, second);
     }
 
@@ -147,14 +134,13 @@ public class Pair<A, B>
      * Creates new pair of elements pulling of the necessity to provide corresponding types of the
      * elements supplied.
      *
-     * @param a first element
-     * @param b second element
+     * @param a   first element
+     * @param b   second element
      * @param <A> the first element type
      * @param <B> the second element type
      * @return new pair
      */
-    public static <A, B> Pair<A, B> of(A a, B b)
-    {
+    public static <A, B> Pair<A, B> of(A a, B b) {
         return new Pair<>(a, b);
     }
 }

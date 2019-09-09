@@ -17,21 +17,20 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A strong connectivity inspector algorithm.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Sarah Komla-Ebri
  */
-public interface StrongConnectivityAlgorithm<V, E>
-{
+public interface StrongConnectivityAlgorithm<V, E> {
     /**
      * Return the underlying graph.
      *
@@ -67,7 +66,7 @@ public interface StrongConnectivityAlgorithm<V, E>
      * Compute the condensation of the given graph. If each strongly connected component is
      * contracted to a single vertex, the resulting graph is a directed acyclic graph, the
      * condensation of the graph.
-     * 
+     *
      * @return the condensation of the given graph
      */
     Graph<Graph<V, E>, DefaultEdge> getCondensation();

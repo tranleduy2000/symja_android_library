@@ -17,26 +17,25 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * An algorithm which computes multi-objective shortest paths between vertices.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
-public interface MultiObjectiveShortestPathAlgorithm<V, E>
-{
+public interface MultiObjectiveShortestPathAlgorithm<V, E> {
 
     /**
      * Get a shortest path from a source vertex to a sink vertex.
      *
      * @param source the source vertex
-     * @param sink the target vertex
+     * @param sink   the target vertex
      * @return a shortest path or null if no path exists
      */
     List<GraphPath<V, E>> getPaths(V source, V sink);
@@ -55,8 +54,7 @@ public interface MultiObjectiveShortestPathAlgorithm<V, E>
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
      */
-    interface MultiObjectiveSingleSourcePaths<V, E>
-    {
+    interface MultiObjectiveSingleSourcePaths<V, E> {
         /**
          * Returns the graph over which this set of paths is defined.
          *

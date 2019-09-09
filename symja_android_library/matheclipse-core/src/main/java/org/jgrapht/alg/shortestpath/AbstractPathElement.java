@@ -17,9 +17,14 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphPathImpl;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A new path is created from a path concatenated to an edge. It's like a linked list.<br>
@@ -30,10 +35,8 @@ import java.util.*;
  * <p>
  * NOTE jvs 1-Jan-2008: This is an internal data structure for use in algorithms. For returning
  * paths to callers, use the public {@link GraphPath} interface instead.
- *
  */
-abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
-{
+abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E> {
     /**
      * Number of hops of the path.
      */
@@ -58,10 +61,9 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      * Creates a path element by concatenation of an edge to a path element.
      *
      * @param pathElement
-     * @param edge edge reaching the end vertex of the path element created.
+     * @param edge        edge reaching the end vertex of the path element created.
      */
-    protected AbstractPathElement(Graph<V, E> graph, AbstractPathElement<V, E> pathElement, E edge)
-    {
+    protected AbstractPathElement(Graph<V, E> graph, AbstractPathElement<V, E> pathElement, E edge) {
         this.vertex = Graphs.getOppositeVertex(graph, edge, pathElement.getVertex());
         this.prevEdge = edge;
         this.prevPathElement = pathElement;
@@ -74,8 +76,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @param original source to copy from
      */
-    protected AbstractPathElement(AbstractPathElement<V, E> original)
-    {
+    protected AbstractPathElement(AbstractPathElement<V, E> original) {
         this.nHops = original.nHops;
         this.prevEdge = original.prevEdge;
         this.prevPathElement = original.prevPathElement;
@@ -87,8 +88,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @param vertex end vertex of the path element.
      */
-    protected AbstractPathElement(V vertex)
-    {
+    protected AbstractPathElement(V vertex) {
         this.vertex = vertex;
         this.prevEdge = null;
         this.prevPathElement = null;
@@ -101,8 +101,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @return list of <code>Edge</code>.
      */
-    public List<E> createEdgeListPath()
-    {
+    public List<E> createEdgeListPath() {
         List<E> path = new ArrayList<>();
         AbstractPathElement<V, E> pathElement = this;
 
@@ -123,8 +122,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @return .
      */
-    public int getHopCount()
-    {
+    public int getHopCount() {
         return this.nHops;
     }
 
@@ -133,8 +131,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @return <code>null</code> if the path is empty.
      */
-    public E getPrevEdge()
-    {
+    public E getPrevEdge() {
         return this.prevEdge;
     }
 
@@ -143,8 +140,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @return <code>null</code> is the path is empty.
      */
-    public AbstractPathElement<V, E> getPrevPathElement()
-    {
+    public AbstractPathElement<V, E> getPrevPathElement() {
         return this.prevPathElement;
     }
 
@@ -153,8 +149,7 @@ abstract class AbstractPathElement<V, E> extends GraphPathImpl<V, E>
      *
      * @return .
      */
-    public V getVertex()
-    {
+    public V getVertex() {
         return this.vertex;
     }
 }

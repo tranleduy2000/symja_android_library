@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,14 @@
  */
 package org.jheaps.array;
 
+import org.jheaps.AddressableHeap;
+import org.jheaps.annotations.LinearTime;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.jheaps.AddressableHeap;
-import org.jheaps.annotations.LinearTime;
 
 /**
  * An array based binary addressable heap. The heap is sorted according to the
@@ -41,7 +41,7 @@ import org.jheaps.annotations.LinearTime;
  * and {@code decreaseKey} take worst-case O(log(n)) time. The bounds are
  * worst-case if the user initializes the heap with a capacity larger or equal
  * to the total number of elements that are going to be inserted into the heap.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(Object[], Object[])} or
@@ -69,11 +69,8 @@ import org.jheaps.annotations.LinearTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap<K, V> implements Serializable {
@@ -125,8 +122,7 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param capacity
-     *            the initial heap capacity
+     * @param capacity the initial heap capacity
      */
     public BinaryArrayAddressableHeap(int capacity) {
         this(null, capacity);
@@ -147,10 +143,9 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
      * The initial capacity of the heap is {@link #DEFAULT_HEAP_CAPACITY} and
      * adjusts automatically based on the sequence of insertions and deletions.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public BinaryArrayAddressableHeap(Comparator<? super K> comparator) {
         this(comparator, DEFAULT_HEAP_CAPACITY);
@@ -173,12 +168,10 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
      */
     public BinaryArrayAddressableHeap(Comparator<? super K> comparator, int capacity) {
         super(comparator, capacity);
@@ -188,17 +181,12 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param <V>
-     *            the type of values maintained by the heap
-     * @param keys
-     *            an array of keys
-     * @param values
-     *            an array of values
+     * @param <K>    the type of keys maintained by the heap
+     * @param <V>    the type of values maintained by the heap
+     * @param keys   an array of keys
+     * @param values an array of values
      * @return a binary heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K, V> BinaryArrayAddressableHeap<K, V> heapify(K[] keys, V[] values) {
@@ -234,23 +222,17 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param <V>
-     *            the type of values maintained by the heap
-     * @param keys
-     *            an array of keys
-     * @param values
-     *            an array of values
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param <V>        the type of values maintained by the heap
+     * @param keys       an array of keys
+     * @param values     an array of values
+     * @param comparator the comparator to use
      * @return a binary heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K, V> BinaryArrayAddressableHeap<K, V> heapify(K[] keys, V[] values,
-            Comparator<? super K> comparator) {
+                                                                  Comparator<? super K> comparator) {
         if (keys == null) {
             throw new IllegalArgumentException("Keys array cannot be null");
         }
@@ -281,11 +263,11 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
 
     /**
      * Get an iterator for all handles currently in the heap.
-     * 
+     * <p>
      * This method is especially useful when building a heap using the heapify
      * method. Unspecified behavior will occur if the heap is modified while
      * using this iterator.
-     * 
+     *
      * @return an iterator which will return all handles of the heap
      */
     public Iterator<AddressableHeap.Handle<K, V>> handlesIterator() {
@@ -299,7 +281,7 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
 
             @Override
             public AddressableHeap.Handle<K, V> next() {
-                if (pos > size) { 
+                if (pos > size) {
                     throw new NoSuchElementException();
                 }
                 return array[pos++];
@@ -314,9 +296,8 @@ public class BinaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHe
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @Override
     @SuppressWarnings("unchecked")

@@ -17,12 +17,21 @@
  */
 package org.jgrapht.alg.lca;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithmImpl;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.util.VertexToIntegerMapping;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Algorithm for computing lowest common ancestors in rooted trees and forests based on <i>Berkman,
@@ -55,14 +64,12 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class EulerTourRMQLCAFinder<V, E>
         extends LowestCommonAncestorAlgorithmImpl<V>
         implements
-    LowestCommonAncestorAlgorithm<V>
-{
+        LowestCommonAncestorAlgorithm<V> {
     private final Graph<V, E> graph;
     private final Set<V> roots;
     private final int maxLevel;
@@ -89,10 +96,9 @@ public class EulerTourRMQLCAFinder<V, E>
      * Note: The constructor will NOT check if the input graph is a valid tree.
      *
      * @param graph the input graph
-     * @param root the root of the graph
+     * @param root  the root of the graph
      */
-    public EulerTourRMQLCAFinder(Graph<V, E> graph, V root)
-    {
+    public EulerTourRMQLCAFinder(Graph<V, E> graph, V root) {
         this(graph, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
     }
 
@@ -108,8 +114,7 @@ public class EulerTourRMQLCAFinder<V, E>
      * @param graph the input graph
      * @param roots the set of roots of the graph
      */
-    public EulerTourRMQLCAFinder(Graph<V, E> graph, Set<V> roots)
-    {
+    public EulerTourRMQLCAFinder(Graph<V, E> graph, Set<V> roots) {
         this.graph = Objects.requireNonNull(graph, "graph cannot be null");
         this.roots = Objects.requireNonNull(roots, "roots cannot be null");
         this.maxLevel = 1 + org.jgrapht.util.MathUtil.log2(graph.vertexSet().size());
@@ -123,15 +128,13 @@ public class EulerTourRMQLCAFinder<V, E>
         computeAncestorsStructure();
     }
 
-    private void normalizeGraph()
-    {
+    private void normalizeGraph() {
         VertexToIntegerMapping<V> vertexToIntegerMapping = Graphs.getVertexToIntegerMapping(graph);
         vertexMap = vertexToIntegerMapping.getVertexMap();
         indexList = vertexToIntegerMapping.getIndexList();
     }
 
-    private void dfsIterative(int u, int startLevel)
-    {
+    private void dfsIterative(int u, int startLevel) {
         // set of vertices for which the part of the if has been performed
         // (in other words: u ∈ explored iff dfs(u, ...) has been called as some point)
         Set<Integer> explored = new HashSet<>();
@@ -172,8 +175,7 @@ public class EulerTourRMQLCAFinder<V, E>
         }
     }
 
-    private void computeRMQ()
-    {
+    private void computeRMQ() {
         rmq = new int[maxLevel + 1][sizeTour];
         log2 = new int[sizeTour + 1];
 
@@ -198,8 +200,7 @@ public class EulerTourRMQLCAFinder<V, E>
         }
     }
 
-    private void computeAncestorsStructure()
-    {
+    private void computeAncestorsStructure() {
         normalizeGraph();
 
         eulerTour = new int[2 * graph.vertexSet().size()];
@@ -234,8 +235,7 @@ public class EulerTourRMQLCAFinder<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getLCA(V a, V b)
-    {
+    public V getLCA(V a, V b) {
         int indexA = vertexMap.getOrDefault(a, -1);
         if (indexA == -1)
             throw new IllegalArgumentException("invalid vertex: " + a);
@@ -273,14 +273,13 @@ public class EulerTourRMQLCAFinder<V, E>
 
     /**
      * Note: This operation is not supported.<br>
-     *
+     * <p>
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException if the method is called
      */
     @Override
-    public Set<V> getLCASet(V a, V b)
-    {
+    public Set<V> getLCASet(V a, V b) {
         throw new UnsupportedOperationException();
     }
 }

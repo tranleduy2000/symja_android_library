@@ -92,24 +92,22 @@ import java.util.function.Supplier;
  *
  * @param <V> the vertex type
  * @param <E> the edge type
- *
  * @author Barak Naveh
  * @see Graph
  * @see Set
  */
 public class AsSubgraph<V, E>
-    extends
-    AbstractGraph<V, E>
-    implements
-    Serializable
-{
+        extends
+        AbstractGraph<V, E>
+        implements
+        Serializable {
 
     private static final long serialVersionUID = -1471811754881775298L;
 
     private static final String NO_SUCH_EDGE_IN_BASE = "no such edge in base graph";
     private static final String NO_SUCH_VERTEX_IN_BASE = "no such vertex in base graph";
     private static final String CANNOT_CREATE_NEW_VERTICES_FROM_SUBGRAPH =
-        "Cannot create new vertices from subgraph";
+            "Cannot create new vertices from subgraph";
 
     protected final Set<E> edgeSet = new LinkedHashSet<>();
     protected final Set<V> vertexSet = new LinkedHashSet<>();
@@ -123,14 +121,13 @@ public class AsSubgraph<V, E>
     /**
      * Creates a new subgraph.
      *
-     * @param base the base (backing) graph on which the subgraph will be based.
+     * @param base         the base (backing) graph on which the subgraph will be based.
      * @param vertexSubset vertices to include in the subgraph. If <code>null</code> then all
-     *        vertices are included.
-     * @param edgeSubset edges to in include in the subgraph. If <code>null</code> then all the
-     *        edges whose vertices found in the graph are included.
+     *                     vertices are included.
+     * @param edgeSubset   edges to in include in the subgraph. If <code>null</code> then all the
+     *                     edges whose vertices found in the graph are included.
      */
-    public AsSubgraph(Graph<V, E> base, Set<? extends V> vertexSubset, Set<? extends E> edgeSubset)
-    {
+    public AsSubgraph(Graph<V, E> base, Set<? extends V> vertexSubset, Set<? extends E> edgeSubset) {
         super();
 
         this.base = GraphTests.requireDirectedOrUndirected(base);
@@ -149,12 +146,11 @@ public class AsSubgraph<V, E>
      * vertex subset as well as deletion of edges and vertices. If base it not listenable, this is
      * identical to the call Subgraph(base, vertexSubset, null).
      *
-     * @param base the base (backing) graph on which the subgraph will be based.
+     * @param base         the base (backing) graph on which the subgraph will be based.
      * @param vertexSubset vertices to include in the subgraph. If <code>null</code> then all
-     *        vertices are included.
+     *                     vertices are included.
      */
-    public AsSubgraph(Graph<V, E> base, Set<? extends V> vertexSubset)
-    {
+    public AsSubgraph(Graph<V, E> base, Set<? extends V> vertexSubset) {
         this(base, vertexSubset, null);
     }
 
@@ -165,8 +161,7 @@ public class AsSubgraph<V, E>
      *
      * @param base the base (backing) graph on which the subgraph will be based.
      */
-    public AsSubgraph(Graph<V, E> base)
-    {
+    public AsSubgraph(Graph<V, E> base) {
         this(base, null, null);
     }
 
@@ -174,8 +169,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         if (containsVertex(sourceVertex) && containsVertex(targetVertex)) {
             LinkedHashSet<E> es = new LinkedHashSet<>();
             for (E e : base
@@ -194,8 +188,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         Set<E> edges = getAllEdges(sourceVertex, targetVertex);
 
         if (edges == null) {
@@ -212,8 +205,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Supplier<V> getVertexSupplier()
-    {
+    public Supplier<V> getVertexSupplier() {
         return base.getVertexSupplier();
     }
 
@@ -221,8 +213,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Supplier<E> getEdgeSupplier()
-    {
+    public Supplier<E> getEdgeSupplier() {
         return base.getEdgeSupplier();
     }
 
@@ -231,19 +222,18 @@ public class AsSubgraph<V, E>
      * exist in the base graph. In case multiple such edges exist in the base graph, one that is not
      * already in the subgraph is chosen arbitrarily and added to the subgraph. In case all such
      * edges already exist in the subgraph, the method returns null.
-     * 
+     *
      * @param sourceVertex the source vertex
      * @param targetVertex the source vertex
      * @return the added edge or null if all such edges from the base graph already belong in the
-     *         subgraph
+     * subgraph
      * @throws IllegalArgumentException if the source or target vertex does not belong to the
-     *         subgraph
+     *                                  subgraph
      * @throws IllegalArgumentException if the base graph does not contain any edge between the two
-     *         end-points
+     *                                  end-points
      */
     @Override
-    public E addEdge(V sourceVertex, V targetVertex)
-    {
+    public E addEdge(V sourceVertex, V targetVertex) {
         assertVertexExist(sourceVertex);
         assertVertexExist(targetVertex);
 
@@ -267,8 +257,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         if (e == null) {
             throw new NullPointerException();
         }
@@ -287,8 +276,7 @@ public class AsSubgraph<V, E>
     }
 
     @Override
-    public V addVertex()
-    {
+    public V addVertex() {
         throw new UnsupportedOperationException(CANNOT_CREATE_NEW_VERTICES_FROM_SUBGRAPH);
     }
 
@@ -296,19 +284,15 @@ public class AsSubgraph<V, E>
      * Adds the specified vertex to this subgraph.
      *
      * @param v the vertex to be added.
-     *
      * @return <code>true</code> if the vertex was added, otherwise <code>
      * false</code>.
-     *
-     * @throws NullPointerException if v is null
+     * @throws NullPointerException     if v is null
      * @throws IllegalArgumentException if the base graph does not contain the vertex
-     *
      * @see AsSubgraph
      * @see Graph#addVertex(Object)
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         if (v == null) {
             throw new NullPointerException();
         }
@@ -322,8 +306,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsEdge(E e)
-    {
+    public boolean containsEdge(E e) {
         return edgeSet.contains(e);
     }
 
@@ -331,8 +314,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsVertex(V v)
-    {
+    public boolean containsVertex(V v) {
         return vertexSet.contains(v);
     }
 
@@ -340,8 +322,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgeSet()
-    {
+    public Set<E> edgeSet() {
         if (unmodifiableEdgeSet == null) {
             unmodifiableEdgeSet = Collections.unmodifiableSet(edgeSet);
         }
@@ -352,8 +333,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgesOf(V vertex)
-    {
+    public Set<E> edgesOf(V vertex) {
         assertVertexExist(vertex);
 
         LinkedHashSet<E> es = new LinkedHashSet<>();
@@ -367,14 +347,13 @@ public class AsSubgraph<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * By default this method returns the sum of in-degree and out-degree. The exact value returned
      * depends on the types of the underlying graph.
      */
     @Override
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         assertVertexExist(vertex);
 
         if (baseType.isUndirected()) {
@@ -403,8 +382,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         assertVertexExist(vertex);
 
         LinkedHashSet<E> es = new LinkedHashSet<>();
@@ -420,8 +398,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         if (baseType.isUndirected()) {
             return degreeOf(vertex);
         } else {
@@ -433,8 +410,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         assertVertexExist(vertex);
 
         LinkedHashSet<E> es = new LinkedHashSet<>();
@@ -450,8 +426,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         if (baseType.isUndirected()) {
             return degreeOf(vertex);
         } else {
@@ -463,8 +438,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeEdge(E e)
-    {
+    public boolean removeEdge(E e) {
         return edgeSet.remove(e);
     }
 
@@ -472,8 +446,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E removeEdge(V sourceVertex, V targetVertex)
-    {
+    public E removeEdge(V sourceVertex, V targetVertex) {
         E e = getEdge(sourceVertex, targetVertex);
 
         return edgeSet.remove(e) ? e : null;
@@ -483,8 +456,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeVertex(V v)
-    {
+    public boolean removeVertex(V v) {
         // If the base graph does NOT contain v it means we are here in
         // response to removal of v from the base. In such case we don't need
         // to remove all the edges of v as they were already removed.
@@ -499,8 +471,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<V> vertexSet()
-    {
+    public Set<V> vertexSet() {
         if (unmodifiableVertexSet == null) {
             unmodifiableVertexSet = Collections.unmodifiableSet(vertexSet);
         }
@@ -512,8 +483,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeSource(E e)
-    {
+    public V getEdgeSource(E e) {
         return base.getEdgeSource(e);
     }
 
@@ -521,8 +491,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeTarget(E e)
-    {
+    public V getEdgeTarget(E e) {
         return base.getEdgeTarget(e);
     }
 
@@ -530,8 +499,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphType getType()
-    {
+    public GraphType getType() {
         return base.getType();
     }
 
@@ -539,8 +507,7 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         return base.getEdgeWeight(e);
     }
 
@@ -548,13 +515,11 @@ public class AsSubgraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         base.setEdgeWeight(e, weight);
     }
 
-    private void initialize(Set<? extends V> vertexFilter, Set<? extends E> edgeFilter)
-    {
+    private void initialize(Set<? extends V> vertexFilter, Set<? extends E> edgeFilter) {
         if (vertexFilter == null && edgeFilter == null) {
             vertexSet.addAll(base.vertexSet());
             edgeSet.addAll(base.edgeSet());
@@ -616,18 +581,16 @@ public class AsSubgraph<V, E>
      * @author Barak Naveh
      */
     private class BaseGraphListener
-        implements
-        GraphListener<V, E>,
-        Serializable
-    {
+            implements
+            GraphListener<V, E>,
+            Serializable {
         private static final long serialVersionUID = 4343535244243546391L;
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void edgeAdded(GraphEdgeChangeEvent<V, E> e)
-        {
+        public void edgeAdded(GraphEdgeChangeEvent<V, E> e) {
             if (isInduced) {
                 E edge = e.getEdge();
                 V source = e.getEdgeSource();
@@ -642,8 +605,7 @@ public class AsSubgraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public void edgeRemoved(GraphEdgeChangeEvent<V, E> e)
-        {
+        public void edgeRemoved(GraphEdgeChangeEvent<V, E> e) {
             E edge = e.getEdge();
 
             removeEdge(edge);
@@ -658,8 +620,7 @@ public class AsSubgraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public void vertexAdded(GraphVertexChangeEvent<V> e)
-        {
+        public void vertexAdded(GraphVertexChangeEvent<V> e) {
             // we don't care
         }
 
@@ -667,8 +628,7 @@ public class AsSubgraph<V, E>
          * {@inheritDoc}
          */
         @Override
-        public void vertexRemoved(GraphVertexChangeEvent<V> e)
-        {
+        public void vertexRemoved(GraphVertexChangeEvent<V> e) {
             V vertex = e.getVertex();
 
             removeVertex(vertex);

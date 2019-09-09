@@ -17,11 +17,13 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A graph backed by the the graph specified at the constructor, which delegates all its methods to
@@ -37,19 +39,17 @@ import java.util.function.*;
  * This class is mostly used as a base for extending subclasses. It can also be used in order to
  * override the vertex and edge supplier of a graph.
  * </p>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
 public class GraphDelegator<V, E>
-    extends
-    AbstractGraph<V, E>
-    implements
-    Graph<V, E>,
-    Serializable
-{
+        extends
+        AbstractGraph<V, E>
+        implements
+        Graph<V, E>,
+        Serializable {
     private static final long serialVersionUID = -215068279981825448L;
 
     /*
@@ -64,21 +64,18 @@ public class GraphDelegator<V, E>
      *
      * @param graph the backing graph (the delegate).
      */
-    public GraphDelegator(Graph<V, E> graph)
-    {
+    public GraphDelegator(Graph<V, E> graph) {
         this(graph, null, null);
     }
 
     /**
-     * 
-     * @param graph the backing graph (the delegate).
+     * @param graph          the backing graph (the delegate).
      * @param vertexSupplier vertex supplier for the delegator. Can be null in which case the
-     *        backing graph vertex supplier will be used.
-     * @param edgeSupplier edge supplier for the delegator. Can be null in which case the backing
-     *        graph edge supplier will be used.
+     *                       backing graph vertex supplier will be used.
+     * @param edgeSupplier   edge supplier for the delegator. Can be null in which case the backing
+     *                       graph edge supplier will be used.
      */
-    public GraphDelegator(Graph<V, E> graph, Supplier<V> vertexSupplier, Supplier<E> edgeSupplier)
-    {
+    public GraphDelegator(Graph<V, E> graph, Supplier<V> vertexSupplier, Supplier<E> edgeSupplier) {
         super();
         this.delegate = Objects.requireNonNull(graph, "graph must not be null");
         this.vertexSupplier = vertexSupplier;
@@ -87,14 +84,13 @@ public class GraphDelegator<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * Returns the delegator's vertex supplier or the backing graph's vertex supplier in case of
      * null.
      */
     @Override
-    public Supplier<V> getVertexSupplier()
-    {
+    public Supplier<V> getVertexSupplier() {
         if (vertexSupplier != null) {
             return vertexSupplier;
         } else {
@@ -104,13 +100,12 @@ public class GraphDelegator<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * Returns the delegator's edge supplier or the backing graph's edge supplier in case of null.
      */
     @Override
-    public Supplier<E> getEdgeSupplier()
-    {
+    public Supplier<E> getEdgeSupplier() {
         if (edgeSupplier != null) {
             return edgeSupplier;
         } else {
@@ -122,8 +117,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         return delegate.getAllEdges(sourceVertex, targetVertex);
     }
 
@@ -131,8 +125,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         return delegate.getEdge(sourceVertex, targetVertex);
     }
 
@@ -140,8 +133,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E addEdge(V sourceVertex, V targetVertex)
-    {
+    public E addEdge(V sourceVertex, V targetVertex) {
         /*
          * Use our own edge supplier, if provided.
          */
@@ -156,8 +148,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         return delegate.addEdge(sourceVertex, targetVertex, e);
     }
 
@@ -165,8 +156,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V addVertex()
-    {
+    public V addVertex() {
         /*
          * Use our own vertex supplier, if provided.
          */
@@ -181,8 +171,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         return delegate.addVertex(v);
     }
 
@@ -190,8 +179,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsEdge(E e)
-    {
+    public boolean containsEdge(E e) {
         return delegate.containsEdge(e);
     }
 
@@ -199,8 +187,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsVertex(V v)
-    {
+    public boolean containsVertex(V v) {
         return delegate.containsVertex(v);
     }
 
@@ -210,8 +197,7 @@ public class GraphDelegator<V, E>
      * @param vertex vertex whose degree is to be calculated
      * @return the degree of the specified vertex
      */
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         return delegate.degreeOf(vertex);
     }
 
@@ -219,8 +205,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgeSet()
-    {
+    public Set<E> edgeSet() {
         return delegate.edgeSet();
     }
 
@@ -228,8 +213,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgesOf(V vertex)
-    {
+    public Set<E> edgesOf(V vertex) {
         return delegate.edgesOf(vertex);
     }
 
@@ -237,8 +221,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         return delegate.inDegreeOf(vertex);
     }
 
@@ -246,8 +229,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         return delegate.incomingEdgesOf(vertex);
     }
 
@@ -255,8 +237,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         return delegate.outDegreeOf(vertex);
     }
 
@@ -264,8 +245,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         return delegate.outgoingEdgesOf(vertex);
     }
 
@@ -273,8 +253,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeEdge(E e)
-    {
+    public boolean removeEdge(E e) {
         return delegate.removeEdge(e);
     }
 
@@ -282,8 +261,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E removeEdge(V sourceVertex, V targetVertex)
-    {
+    public E removeEdge(V sourceVertex, V targetVertex) {
         return delegate.removeEdge(sourceVertex, targetVertex);
     }
 
@@ -291,8 +269,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean removeVertex(V v)
-    {
+    public boolean removeVertex(V v) {
         return delegate.removeVertex(v);
     }
 
@@ -300,8 +277,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return delegate.toString();
     }
 
@@ -309,8 +285,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<V> vertexSet()
-    {
+    public Set<V> vertexSet() {
         return delegate.vertexSet();
     }
 
@@ -318,8 +293,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeSource(E e)
-    {
+    public V getEdgeSource(E e) {
         return delegate.getEdgeSource(e);
     }
 
@@ -327,8 +301,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeTarget(E e)
-    {
+    public V getEdgeTarget(E e) {
         return delegate.getEdgeTarget(e);
     }
 
@@ -336,8 +309,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         return delegate.getEdgeWeight(e);
     }
 
@@ -345,8 +317,7 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         delegate.setEdgeWeight(e, weight);
     }
 
@@ -354,18 +325,16 @@ public class GraphDelegator<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphType getType()
-    {
+    public GraphType getType() {
         return delegate.getType();
     }
 
     /**
      * Return the backing graph (the delegate).
-     * 
+     *
      * @return the backing graph (the delegate)
      */
-    protected Graph<V, E> getDelegate()
-    {
+    protected Graph<V, E> getDelegate() {
         return delegate;
     }
 

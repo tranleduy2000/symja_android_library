@@ -17,12 +17,15 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A closest-first iterator for a directed or undirected graph. For this iterator to work correctly
@@ -42,10 +45,9 @@ import java.util.function.*;
  * @author John V. Sichi
  */
 public class ClosestFirstIterator<V, E>
-    extends
-    CrossComponentIterator<V, E,
-        AddressableHeap.Handle<Double, ClosestFirstIterator.QueueEntry<V, E>>>
-{
+        extends
+        CrossComponentIterator<V, E,
+                AddressableHeap.Handle<Double, ClosestFirstIterator.QueueEntry<V, E>>> {
     /**
      * Priority queue of fringe vertices.
      */
@@ -64,11 +66,10 @@ public class ClosestFirstIterator<V, E>
      * vertex. If the specified start vertex is <code>null</code>, iteration will start at an
      * arbitrary vertex and will not be limited, that is, will be able to traverse all the graph.
      *
-     * @param g the graph to be iterated.
+     * @param g           the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
      */
-    public ClosestFirstIterator(Graph<V, E> g, V startVertex)
-    {
+    public ClosestFirstIterator(Graph<V, E> g, V startVertex) {
         this(g, startVertex, Double.POSITIVE_INFINITY);
     }
 
@@ -80,11 +81,10 @@ public class ClosestFirstIterator<V, E>
      * traversal is treated as if it were over a single connected component with respect to events
      * fired.
      *
-     * @param g the graph to be iterated.
+     * @param g             the graph to be iterated.
      * @param startVertices the vertices iteration to be started.
      */
-    public ClosestFirstIterator(Graph<V, E> g, Iterable<V> startVertices)
-    {
+    public ClosestFirstIterator(Graph<V, E> g, Iterable<V> startVertices) {
         this(g, startVertices, Double.POSITIVE_INFINITY);
     }
 
@@ -95,15 +95,14 @@ public class ClosestFirstIterator<V, E>
      * or equal to the specified radius. The specified start vertex may not be <code>
      * null</code>.
      *
-     * @param g the graph to be iterated.
+     * @param g           the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
-     * @param radius limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
-     *        search.
+     * @param radius      limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
+     *                    search.
      */
-    public ClosestFirstIterator(Graph<V, E> g, V startVertex, double radius)
-    {
+    public ClosestFirstIterator(Graph<V, E> g, V startVertex, double radius) {
         this(
-            g, startVertex == null ? null : Collections.singletonList(startVertex), radius,
+                g, startVertex == null ? null : Collections.singletonList(startVertex), radius,
                 new Supplier<AddressableHeap<Double, QueueEntry<V, E>>>() {
                     @Override
                     public AddressableHeap<Double, QueueEntry<V, E>> get() {
@@ -119,19 +118,18 @@ public class ClosestFirstIterator<V, E>
      * or equal to the specified radius. The specified start vertex may not be <code>
      * null</code>. This algorithm will use the heap supplied by the {@code heapSupplier}.
      *
-     * @param g the graph to be iterated.
-     * @param startVertex the vertex iteration to be started.
-     * @param radius limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
-     *        search.
+     * @param g            the graph to be iterated.
+     * @param startVertex  the vertex iteration to be started.
+     * @param radius       limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
+     *                     search.
      * @param heapSupplier supplier of the preferable heap implementation
      */
     public ClosestFirstIterator(
-        Graph<V, E> g, V startVertex, double radius,
-        Supplier<AddressableHeap<Double, QueueEntry<V, E>>> heapSupplier)
-    {
+            Graph<V, E> g, V startVertex, double radius,
+            Supplier<AddressableHeap<Double, QueueEntry<V, E>>> heapSupplier) {
         this(
-            g, startVertex == null ? null : Collections.singletonList(startVertex), radius,
-            heapSupplier);
+                g, startVertex == null ? null : Collections.singletonList(startVertex), radius,
+                heapSupplier);
     }
 
     /**
@@ -143,13 +141,12 @@ public class ClosestFirstIterator<V, E>
      * the order in which the start vertices are supplied. Because of this, the entire traversal is
      * treated as if it were over a single connected component with respect to events fired.
      *
-     * @param g the graph to be iterated.
+     * @param g             the graph to be iterated.
      * @param startVertices the vertices iteration to be started.
-     * @param radius limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
-     *        search.
+     * @param radius        limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
+     *                      search.
      */
-    public ClosestFirstIterator(Graph<V, E> g, Iterable<V> startVertices, double radius)
-    {
+    public ClosestFirstIterator(Graph<V, E> g, Iterable<V> startVertices, double radius) {
         this(g, startVertices, radius, new Supplier<AddressableHeap<Double, QueueEntry<V, E>>>() {
             @Override
             public AddressableHeap<Double, QueueEntry<V, E>> get() {
@@ -168,16 +165,15 @@ public class ClosestFirstIterator<V, E>
      * treated as if it were over a single connected component with respect to events fired. This
      * algorithm will use the heap supplied by the {@code heapSupplier}.
      *
-     * @param g the graph to be iterated.
+     * @param g             the graph to be iterated.
      * @param startVertices the vertices iteration to be started.
-     * @param radius limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
-     *        search.
-     * @param heapSupplier supplier of the preferable heap implementation
+     * @param radius        limit on weighted path length, or Double.POSITIVE_INFINITY for unbounded
+     *                      search.
+     * @param heapSupplier  supplier of the preferable heap implementation
      */
     public ClosestFirstIterator(
-        Graph<V, E> g, Iterable<V> startVertices, double radius,
-        Supplier<AddressableHeap<Double, QueueEntry<V, E>>> heapSupplier)
-    {
+            Graph<V, E> g, Iterable<V> startVertices, double radius,
+            Supplier<AddressableHeap<Double, QueueEntry<V, E>>> heapSupplier) {
         super(g, startVertices);
         this.radius = radius;
         Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
@@ -203,8 +199,7 @@ public class ClosestFirstIterator<V, E>
 
     // override AbstractGraphIterator
     @Override
-    public void setCrossComponentTraversal(boolean crossComponentTraversal)
-    {
+    public void setCrossComponentTraversal(boolean crossComponentTraversal) {
         if (initialized) {
             checkRadiusTraversal(crossComponentTraversal);
         }
@@ -218,10 +213,9 @@ public class ClosestFirstIterator<V, E>
      *
      * @param vertex vertex being sought from start vertex
      * @return weighted length of shortest path known, or Double.POSITIVE_INFINITY if no path found
-     *         yet
+     * yet
      */
-    public double getShortestPathLength(V vertex)
-    {
+    public double getShortestPathLength(V vertex) {
         AddressableHeap.Handle<Double, QueueEntry<V, E>> node = getSeenData(vertex);
 
         if (node == null) {
@@ -239,10 +233,9 @@ public class ClosestFirstIterator<V, E>
      *
      * @param vertex the spanned vertex.
      * @return the spanning tree edge, or null if the vertex either has not been seen yet or is a
-     *         start vertex.
+     * start vertex.
      */
-    public E getSpanningTreeEdge(V vertex)
-    {
+    public E getSpanningTreeEdge(V vertex) {
         AddressableHeap.Handle<Double, QueueEntry<V, E>> node = getSeenData(vertex);
 
         if (node == null) {
@@ -256,8 +249,7 @@ public class ClosestFirstIterator<V, E>
      * @see CrossComponentIterator#isConnectedComponentExhausted()
      */
     @Override
-    protected boolean isConnectedComponentExhausted()
-    {
+    protected boolean isConnectedComponentExhausted() {
         if (heap.size() == 0) {
             return true;
         } else {
@@ -275,8 +267,7 @@ public class ClosestFirstIterator<V, E>
      * @see CrossComponentIterator#encounterVertex(Object, Object)
      */
     @Override
-    protected void encounterVertex(V vertex, E edge)
-    {
+    protected void encounterVertex(V vertex, E edge) {
         double shortestPathLength;
         if (edge == null) {
             shortestPathLength = 0;
@@ -284,7 +275,7 @@ public class ClosestFirstIterator<V, E>
             shortestPathLength = calculatePathLength(vertex, edge);
         }
         AddressableHeap.Handle<Double, QueueEntry<V, E>> handle =
-            heap.insert(shortestPathLength, new QueueEntry<>(vertex, edge));
+                heap.insert(shortestPathLength, new QueueEntry<>(vertex, edge));
         putSeenData(vertex, handle);
     }
 
@@ -293,11 +284,10 @@ public class ClosestFirstIterator<V, E>
      * shorter path than the old edge.
      *
      * @param vertex the vertex re-encountered
-     * @param edge the edge via which the vertex was re-encountered
+     * @param edge   the edge via which the vertex was re-encountered
      */
     @Override
-    protected void encounterVertexAgain(V vertex, E edge)
-    {
+    protected void encounterVertexAgain(V vertex, E edge) {
         AddressableHeap.Handle<Double, QueueEntry<V, E>> node = getSeenData(vertex);
 
         if (node.getValue().frozen) {
@@ -317,16 +307,14 @@ public class ClosestFirstIterator<V, E>
      * @see CrossComponentIterator#provideNextVertex()
      */
     @Override
-    protected V provideNextVertex()
-    {
+    protected V provideNextVertex() {
         AddressableHeap.Handle<Double, QueueEntry<V, E>> node = heap.deleteMin();
         node.getValue().frozen = true;
 
         return node.getValue().vertex;
     }
 
-    private void assertNonNegativeEdge(E edge)
-    {
+    private void assertNonNegativeEdge(E edge) {
         if (getGraph().getEdgeWeight(edge) < 0) {
             throw new IllegalArgumentException("negative edge weights not allowed");
         }
@@ -337,11 +325,10 @@ public class ClosestFirstIterator<V, E>
      * opposite vertex.
      *
      * @param vertex the vertex for which to calculate the path length.
-     * @param edge the edge via which the path is being extended.
+     * @param edge   the edge via which the path is being extended.
      * @return calculated path length.
      */
-    private double calculatePathLength(V vertex, E edge)
-    {
+    private double calculatePathLength(V vertex, E edge) {
         assertNonNegativeEdge(edge);
 
         V otherVertex = Graphs.getOppositeVertex(getGraph(), edge, vertex);
@@ -350,19 +337,17 @@ public class ClosestFirstIterator<V, E>
         return otherEntry.getKey() + getGraph().getEdgeWeight(edge);
     }
 
-    private void checkRadiusTraversal(boolean crossComponentTraversal)
-    {
+    private void checkRadiusTraversal(boolean crossComponentTraversal) {
         if (crossComponentTraversal && (radius != Double.POSITIVE_INFINITY)) {
             throw new IllegalArgumentException(
-                "radius may not be specified for cross-component traversal");
+                    "radius may not be specified for cross-component traversal");
         }
     }
 
     /**
      * Private data to associate with each entry in the priority queue.
      */
-    static class QueueEntry<V, E>
-    {
+    static class QueueEntry<V, E> {
         /**
          * The vertex reached.
          */
@@ -378,8 +363,7 @@ public class ClosestFirstIterator<V, E>
          */
         boolean frozen;
 
-        QueueEntry(V vertex, E spanningTreeEdge)
-        {
+        QueueEntry(V vertex, E spanningTreeEdge) {
             this.vertex = vertex;
             this.spanningTreeEdge = spanningTreeEdge;
         }

@@ -17,10 +17,15 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.util.Pair;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The BFS Shortest Path algorithm.
@@ -35,21 +40,18 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Karri Sai Satish Kumar Reddy
  */
 public class BFSShortestPath<V, E>
-    extends
-    BaseShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseShortestPathAlgorithm<V, E> {
 
     /**
      * Construct a new instance.
      *
      * @param graph the input graph
      */
-    public BFSShortestPath(Graph<V, E> graph)
-    {
+    public BFSShortestPath(Graph<V, E> graph) {
         super(graph);
     }
 
@@ -57,8 +59,7 @@ public class BFSShortestPath<V, E>
      * {@inheritDoc}
      */
     @Override
-    public SingleSourcePaths<V, E> getPaths(V source)
-    {
+    public SingleSourcePaths<V, E> getPaths(V source) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -101,8 +102,7 @@ public class BFSShortestPath<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphPath<V, E> getPath(V source, V sink)
-    {
+    public GraphPath<V, E> getPath(V source, V sink) {
 
         if (!graph.containsVertex(sink)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SINK_VERTEX);
@@ -112,18 +112,15 @@ public class BFSShortestPath<V, E>
 
     /**
      * Find a path between two vertices.
-     * 
-     * @param graph the graph to be searched
-     * @param source the vertex at which the path should start
-     * @param sink the vertex at which the path should end
-     * 
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
      *
+     * @param graph  the graph to be searched
+     * @param source the vertex at which the path should start
+     * @param sink   the vertex at which the path should end
+     * @param <V>    the graph vertex type
+     * @param <E>    the graph edge type
      * @return a shortest path, or null if no path exists
      */
-    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, V source, V sink)
-    {
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, V source, V sink) {
         return new BFSShortestPath<>(graph).getPath(source, sink);
     }
 

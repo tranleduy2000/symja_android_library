@@ -17,20 +17,19 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A maximal clique enumeration algorithm.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public interface MaximalCliqueEnumerationAlgorithm<V, E>
-    extends
-    Iterable<Set<V>>
-{
+        extends
+        Iterable<Set<V>> {
 
     /**
      * Returns an iterator over all maximal cliques.

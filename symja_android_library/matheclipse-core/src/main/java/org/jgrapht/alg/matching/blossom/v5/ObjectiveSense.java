@@ -26,8 +26,7 @@ package org.jgrapht.alg.matching.blossom.v5;
  * @see KolmogorovWeightedMatching
  * @see KolmogorovWeightedPerfectMatching
  */
-public enum ObjectiveSense
-{
+public enum ObjectiveSense {
     MAXIMIZE,
     MINIMIZE
 }

@@ -34,18 +34,16 @@ import java.util.TreeSet;
  * "A modification of the greedy algorithm for vertex cover." Information Processing Letters 16.1
  * (1983): 23-25. The solution is guaranteed to be within $2$ times the optimum solution. Runtime:
  * $O(|E|\log |V|)$
- *
+ * <p>
  * Note: this class supports pseudo-graphs
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class ClarksonTwoApproxVCImpl<V, E>
-    implements
-    VertexCoverAlgorithm<V>
-{
+        implements
+        VertexCoverAlgorithm<V> {
 
     private static int vertexCounter = 0;
 
@@ -54,11 +52,10 @@ public class ClarksonTwoApproxVCImpl<V, E>
 
     /**
      * Constructs a new ClarksonTwoApproxVCImpl instance where all vertices have uniform weights.
-     * 
+     *
      * @param graph input graph
      */
-    public ClarksonTwoApproxVCImpl(Graph<V, E> graph)
-    {
+    public ClarksonTwoApproxVCImpl(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
         Map<V, Double> map = new HashMap<>();
         for (V vertex : graph
@@ -72,19 +69,17 @@ public class ClarksonTwoApproxVCImpl<V, E>
 
     /**
      * Constructs a new ClarksonTwoApproxVCImpl instance
-     * 
-     * @param graph input graph
+     *
+     * @param graph           input graph
      * @param vertexWeightMap mapping of vertex weights
      */
-    public ClarksonTwoApproxVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap)
-    {
+    public ClarksonTwoApproxVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap) {
         this.graph = GraphTests.requireUndirected(graph);
         this.vertexWeightMap = Objects.requireNonNull(vertexWeightMap);
     }
 
     @Override
-    public VertexCover<V> getVertexCover()
-    {
+    public VertexCover<V> getVertexCover() {
         // Result
         Set<V> cover = new LinkedHashSet<>();
         double weight = 0;
@@ -108,8 +103,8 @@ public class ClarksonTwoApproxVCImpl<V, E>
             vx.addNeighbor(ux);
 
             assert (ux.neighbors.get(vx).equals(
-                vx.neighbors.get(
-                    ux))) : " in an undirected graph, if vx is a neighbor of ux, then ux must be a neighbor of vx";
+                    vx.neighbors.get(
+                            ux))) : " in an undirected graph, if vx is a neighbor of ux, then ux must be a neighbor of vx";
         }
 
         TreeSet<RatioVertex<V>> workingGraph = new TreeSet<>();

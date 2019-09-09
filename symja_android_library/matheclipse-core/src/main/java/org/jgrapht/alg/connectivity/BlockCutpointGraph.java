@@ -17,10 +17,16 @@
  */
 package org.jgrapht.alg.connectivity;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Block-Cutpoint graph (also known as a block-cut tree). If $G$ is a graph, the block-cutpoint
@@ -38,17 +44,14 @@ import java.util.*;
  * <p>
  * Note: the block-cutpoint graph is not changed when the underlying graph is changed.
  *
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author France Telecom S.A
  * @author Joris Kinable
  */
 public class BlockCutpointGraph<V, E>
-    extends
-    SimpleGraph<Graph<V, E>, DefaultEdge>
-{
+        extends
+        SimpleGraph<Graph<V, E>, DefaultEdge> {
     private static final long serialVersionUID = -9101341117013163934L;
 
     /* Input graph */
@@ -68,12 +71,11 @@ public class BlockCutpointGraph<V, E>
      *
      * @param graph the input graph
      */
-    public BlockCutpointGraph(Graph<V, E> graph)
-    {
+    public BlockCutpointGraph(Graph<V, E> graph) {
         super(DefaultEdge.class);
         this.graph = graph;
         BiconnectivityInspector<V, E> biconnectivityInspector =
-            new BiconnectivityInspector<>(graph);
+                new BiconnectivityInspector<>(graph);
 
         // Construct the Block-cut point graph
         cutpoints = biconnectivityInspector.getCutpoints();
@@ -101,29 +103,26 @@ public class BlockCutpointGraph<V, E>
      * @param vertex vertex
      * @return the biconnected component containing the vertex
      */
-    public Graph<V, E> getBlock(V vertex)
-    {
+    public Graph<V, E> getBlock(V vertex) {
         assert this.graph.containsVertex(vertex);
         return this.vertex2block.get(vertex);
     }
 
     /**
      * Returns all blocks (biconnected components) in the graph
-     * 
+     *
      * @return all blocks (biconnected components) in the graph.
      */
-    public Set<Graph<V, E>> getBlocks()
-    {
+    public Set<Graph<V, E>> getBlocks() {
         return blocks;
     }
 
     /**
      * Returns the cutpoints of the initial graph.
-     * 
+     *
      * @return the cutpoints of the initial graph
      */
-    public Set<V> getCutpoints()
-    {
+    public Set<V> getCutpoints() {
         return cutpoints;
     }
 
@@ -133,8 +132,7 @@ public class BlockCutpointGraph<V, E>
      * @param vertex vertex in the initial graph.
      * @return <code>true</code> if the vertex is a cutpoint, <code>false</code> otherwise.
      */
-    public boolean isCutpoint(V vertex)
-    {
+    public boolean isCutpoint(V vertex) {
         return cutpoints.contains(vertex);
     }
 

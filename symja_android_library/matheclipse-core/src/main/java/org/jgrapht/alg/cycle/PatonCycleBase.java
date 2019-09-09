@@ -17,19 +17,27 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.CycleBasisAlgorithm;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Find a cycle basis of an undirected graph using a variant of Paton's algorithm.
- * 
+ *
  * <p>
  * See:<br>
  * K. Paton, An algorithm for finding a fundamental set of cycles for an undirected linear graph,
  * Comm. ACM 12 (1969), pp. 514-518.
- * 
+ *
  * <p>
  * Note that Paton's algorithm produces a fundamental cycle basis while this implementation produces
  * a <a href=
@@ -41,13 +49,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Nikolay Ognyanov
  */
 public class PatonCycleBase<V, E>
-    implements
-    CycleBasisAlgorithm<V, E>
-{
+        implements
+        CycleBasisAlgorithm<V, E> {
     private Graph<V, E> graph;
 
     /**
@@ -55,24 +61,22 @@ public class PatonCycleBase<V, E>
      *
      * @param graph the input graph
      * @throws IllegalArgumentException if the graph argument is <code>null</code> or the graph is
-     *         not undirected
+     *                                  not undirected
      */
-    public PatonCycleBase(Graph<V, E> graph)
-    {
+    public PatonCycleBase(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
     }
 
     /**
      * Return an undirected cycle basis of a graph. Works only for undirected graphs which do not
      * have multiple (parallel) edges.
-     * 
+     *
      * @return an undirected cycle basis
      * @throws IllegalArgumentException if the graph is not undirected
      * @throws IllegalArgumentException if the graph contains multiple edges between two vertices
      */
     @Override
-    public CycleBasis<V, E> getCycleBasis()
-    {
+    public CycleBasis<V, E> getCycleBasis() {
         GraphTests.requireUndirected(graph);
 
         if (GraphTests.hasMultipleEdges(graph)) {

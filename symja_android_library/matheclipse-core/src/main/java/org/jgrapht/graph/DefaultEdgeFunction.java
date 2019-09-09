@@ -17,23 +17,23 @@
  */
 package org.jgrapht.graph;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Default implementation of an edge function which uses a map to store values.
- * 
- * @author Dimitrios Michail
  *
  * @param <E> the edge type
  * @param <T> the value type
+ * @author Dimitrios Michail
  */
 public class DefaultEdgeFunction<E, T>
-    implements
-    Function<E, T>,
-    Serializable
-{
+        implements
+        Function<E, T>,
+        Serializable {
     private static final long serialVersionUID = -4247429315268336855L;
 
     protected final Map<E, T> map;
@@ -41,56 +41,51 @@ public class DefaultEdgeFunction<E, T>
 
     /**
      * Create a new function
-     * 
+     *
      * @param defaultValue the default value
      */
-    public DefaultEdgeFunction(T defaultValue)
-    {
+    public DefaultEdgeFunction(T defaultValue) {
         this(defaultValue, new HashMap<E, T>());
     }
 
     /**
      * Create a new function
-     * 
+     *
      * @param defaultValue the default value
-     * @param map the underlying map
+     * @param map          the underlying map
      */
-    public DefaultEdgeFunction(T defaultValue, Map<E, T> map)
-    {
+    public DefaultEdgeFunction(T defaultValue, Map<E, T> map) {
         this.defaultValue = Objects.requireNonNull(defaultValue, "Default value cannot be null");
         this.map = Objects.requireNonNull(map, "Map cannot be null");
     }
 
     /**
      * Get the function value for an edge.
-     * 
+     *
      * @param e the edge
      */
     @Override
-    public T apply(E e)
-    {
+    public T apply(E e) {
         return map.getOrDefault(e, defaultValue);
     }
 
     /**
      * Get the function value for an edge.
-     * 
+     *
      * @param e the edge
      * @return the function value for the edge
      */
-    public T get(E e)
-    {
+    public T get(E e) {
         return map.getOrDefault(e, defaultValue);
     }
 
     /**
      * Set the function value for an edge.
-     * 
-     * @param e the edge
+     *
+     * @param e     the edge
      * @param value the value
      */
-    public void set(E e, T value)
-    {
+    public void set(E e, T value) {
         map.put(e, value);
     }
 

@@ -20,8 +20,7 @@ package org.jgrapht.util;
 /**
  * Binary operator for edge weights. There are some prewritten operators.
  */
-public interface WeightCombiner
-{
+public interface WeightCombiner {
     /**
      * Sum of weights.
      */
@@ -87,7 +86,6 @@ public interface WeightCombiner
      *
      * @param a first weight
      * @param b second weight
-     *
      * @return result of the operator
      */
     double combine(double a, double b);

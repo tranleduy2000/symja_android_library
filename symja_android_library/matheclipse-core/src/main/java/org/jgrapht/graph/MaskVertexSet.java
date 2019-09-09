@@ -29,21 +29,18 @@ import java.util.function.Predicate;
 
 /**
  * Helper for {@link MaskSubgraph}.
- *
  */
 class MaskVertexSet<V>
-    extends
-    AbstractSet<V>
-    implements
-    Serializable
-{
+        extends
+        AbstractSet<V>
+        implements
+        Serializable {
     private static final long serialVersionUID = 3751931017141472763L;
 
     private final Set<V> vertexSet;
     private final Predicate<V> mask;
 
-    public MaskVertexSet(Set<V> vertexSet, Predicate<V> mask)
-    {
+    public MaskVertexSet(Set<V> vertexSet, Predicate<V> mask) {
         this.vertexSet = vertexSet;
         this.mask = mask;
     }
@@ -52,8 +49,7 @@ class MaskVertexSet<V>
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(Object o)
-    {
+    public boolean contains(Object o) {
         if (!vertexSet.contains(o)) {
             return false;
         }
@@ -65,8 +61,7 @@ class MaskVertexSet<V>
      * {@inheritDoc}
      */
     @Override
-    public Iterator<V> iterator()
-    {
+    public Iterator<V> iterator() {
         List<V> list = new ArrayList<>();
         Predicate<V> predicate = mask.negate();
         for (V v : vertexSet) {
@@ -81,8 +76,7 @@ class MaskVertexSet<V>
      * {@inheritDoc}
      */
     @Override
-    public int size()
-    {
+    public int size() {
         long count = 0L;
         Predicate<V> predicate = mask.negate();
         for (V v : vertexSet) {

@@ -37,22 +37,19 @@ import java.util.function.ToDoubleFunction;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Tom Conerly
  */
 public class KruskalMinimumSpanningTree<V, E>
-    implements
-    SpanningTreeAlgorithm<E>
-{
+        implements
+        SpanningTreeAlgorithm<E> {
     private final Graph<V, E> graph;
 
     /**
      * Construct a new instance of the algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public KruskalMinimumSpanningTree(Graph<V, E> graph)
-    {
+    public KruskalMinimumSpanningTree(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
     }
 
@@ -60,11 +57,10 @@ public class KruskalMinimumSpanningTree<V, E>
      * {@inheritDoc}
      */
     @Override
-    public SpanningTree<E> getSpanningTree()
-    {
+    public SpanningTree<E> getSpanningTree() {
         UnionFind<V> forest = new UnionFind<>(graph.vertexSet());
         ArrayList<E> allEdges = new ArrayList<>(graph.edgeSet());
-        allEdges.sort(DComparator.<E>comparingDouble(new ToDoubleFunction<E>() {
+        allEdges.sort(DComparator.comparingDouble(new ToDoubleFunction<E>() {
             @Override
             public double applyAsDouble(E e) {
                 return graph.getEdgeWeight(e);

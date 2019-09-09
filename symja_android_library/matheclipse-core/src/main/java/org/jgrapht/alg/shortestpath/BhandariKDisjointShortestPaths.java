@@ -17,9 +17,10 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * An implementation of Bhandari algorithm for finding $K$ edge-<em>disjoint</em> shortest paths.
@@ -30,7 +31,7 @@ import java.util.*;
  * <p>
  * The algorithm is running $k$ sequential Bellman-Ford iterations to find the shortest path at each
  * step. Hence, yielding a complexity of $k$*O(Bellman-Ford).
- * 
+ *
  * <ul>
  * <li>Bhandari, Ramesh 1999. Survivable networks: algorithms for diverse routing. 477. Springer. p.
  * 46. ISBN 0-7923-8381-8.
@@ -38,33 +39,28 @@ import java.util.*;
  * <a href="https://www.nas.ewi.tudelft.nl/people/Fernando/papers/Wiley.pdf"> Disjoint Paths in
  * Networks </a>. Wiley Encyclopedia of Electrical and Electronics Engineering. 1–11.
  * </ul>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Assaf Mizrachi
  */
 public class BhandariKDisjointShortestPaths<V, E>
-    extends
-    BaseKDisjointShortestPathsAlgorithm<V, E>
-{
+        extends
+        BaseKDisjointShortestPathsAlgorithm<V, E> {
     /**
      * Creates a new instance of the algorithm.
      *
      * @param graph graph on which shortest paths are searched.
-     *
      * @throws IllegalArgumentException if the graph is null.
      * @throws IllegalArgumentException if the graph is undirected.
      * @throws IllegalArgumentException if the graph is not simple.
      */
-    public BhandariKDisjointShortestPaths(Graph<V, E> graph)
-    {
+    public BhandariKDisjointShortestPaths(Graph<V, E> graph) {
         super(graph);
     }
 
     @Override
-    protected void transformGraph(List<E> previousPath)
-    {
+    protected void transformGraph(List<E> previousPath) {
 
         V source, target;
         E reversedEdge;
@@ -82,8 +78,7 @@ public class BhandariKDisjointShortestPaths<V, E>
     }
 
     @Override
-    protected GraphPath<V, E> calculateShortestPath(V startVertex, V endVertex)
-    {
+    protected GraphPath<V, E> calculateShortestPath(V startVertex, V endVertex) {
         return new BellmanFordShortestPath<>(this.workingGraph).getPath(startVertex, endVertex);
     }
 

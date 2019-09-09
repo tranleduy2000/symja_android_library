@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,14 @@
  */
 package org.jheaps.tree;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.AddressableHeap;
 import org.jheaps.MergeableAddressableHeap;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LogarithmicTime;
+
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * Skew heaps. The heap is sorted according to the {@linkplain Comparable
@@ -36,7 +36,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * amortized O(log(n)). Operation {@code findMin} is worst-case O(1). Note that
  * a skew-heap does not efficiently support the operation {@code decreaseKey}
  * which is amortized &#937;(log(n)).
- * 
+ *
  * <p>
  * Note that the ordering maintained by this heap, like any heap, and whether or
  * not an explicit comparator is provided, must be <em>consistent with
@@ -59,11 +59,8 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializable {
@@ -92,7 +89,7 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
      * Used to reference the current heap or some other heap in case of melding,
      * so that handles remain valid even after a meld, without having to iterate
      * over them.
-     * 
+     * <p>
      * In order to avoid maintaining a full-fledged union-find data structure,
      * we disallow a heap to be used in melding more than once. We use however,
      * path-compression in case of cascading melds, that it, a handle moves from
@@ -128,10 +125,9 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public SkewHeap(Comparator<? super K> comparator) {
         this.comparator = comparator;
@@ -415,11 +411,9 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Create a new node.
-     * 
-     * @param key
-     *            the key
-     * @param value
-     *            the value
+     *
+     * @param key   the key
+     * @param value the value
      * @return the newly created node
      */
     protected Node<K, V> createNode(K key, V value) {
@@ -428,9 +422,8 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Delete a node from the heap.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      */
     protected void delete(Node<K, V> n) {
         if (n == root) {
@@ -478,9 +471,8 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Unlink the two children of a node and union them forming a new tree.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      * @return the tree which is formed by the two children subtrees of the node
      */
     protected Node<K, V> unlinkAndUnionChildren(Node<K, V> n) {
@@ -508,9 +500,8 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Get the parent node of a given node.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      * @return the parent of a node
      */
     protected Node<K, V> getParent(Node<K, V> n) {
@@ -530,9 +521,8 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Unlink the right child of a node.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      * @return the right child after unlinking
      */
     protected Node<K, V> unlinkRightChild(Node<K, V> n) {
@@ -548,11 +538,9 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Top-down union of two skew heaps.
-     * 
-     * @param root1
-     *            the root of the first heap
-     * @param root2
-     *            the root of the right heap
+     *
+     * @param root1 the root of the first heap
+     * @param root2 the root of the right heap
      * @return the new root of the merged heap
      */
     @SuppressWarnings("unchecked")
@@ -632,11 +620,9 @@ public class SkewHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializa
 
     /**
      * Top-down union of two skew heaps with comparator.
-     * 
-     * @param root1
-     *            the root of the first heap
-     * @param root2
-     *            the root of the right heap
+     *
+     * @param root1 the root of the first heap
+     * @param root2 the root of the right heap
      * @return the new root of the merged heap
      */
     protected Node<K, V> unionWithComparator(Node<K, V> root1, Node<K, V> root2) {

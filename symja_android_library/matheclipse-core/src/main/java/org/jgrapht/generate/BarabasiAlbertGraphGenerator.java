@@ -29,17 +29,17 @@ import java.util.Set;
 
 /**
  * Barabási-Albert growth and preferential attachment graph generator.
- * 
+ *
  * <p>
  * The generator is described in the paper: A.-L. Barabási and R. Albert. Emergence of scaling in
  * random networks. Science, 286:509-512, 1999.
- * 
+ *
  * <p>
  * The generator starts with a complete graph of $m_0$ nodes and grows the network by adding $n -
  * m_0$ additional nodes. The additional nodes are added one by one and each of them is connected to
  * $m$ previously added nodes, where the probability of connecting to a node is proportional to its
  * degree.
- * 
+ *
  * <p>
  * Note that the Barabàsi-Albert model is designed for undirected networks. Nevertheless, this
  * generator also works with directed networks where the probabilities are proportional to the sum
@@ -48,16 +48,14 @@ import java.util.Set;
  *
  * <p>
  * For a version that generates trees/forests see {@link BarabasiAlbertForestGenerator}.
- * 
- * @author Dimitrios Michail
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Dimitrios Michail
  */
 public class BarabasiAlbertGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private final Random rng;
     private final int m0;
     private final int m;
@@ -65,42 +63,39 @@ public class BarabasiAlbertGraphGenerator<V, E> extends GraphGeneratorImpl<V, E,
 
     /**
      * Constructor
-     * 
+     *
      * @param m0 number of initial nodes
-     * @param m number of edges of each new node added during the network growth
-     * @param n final number of nodes
+     * @param m  number of edges of each new node added during the network growth
+     * @param n  final number of nodes
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public BarabasiAlbertGraphGenerator(int m0, int m, int n)
-    {
+    public BarabasiAlbertGraphGenerator(int m0, int m, int n) {
         this(m0, m, n, new Random());
     }
 
     /**
      * Constructor
-     * 
-     * @param m0 number of initial nodes
-     * @param m number of edges of each new node added during the network growth
-     * @param n final number of nodes
+     *
+     * @param m0   number of initial nodes
+     * @param m    number of edges of each new node added during the network growth
+     * @param n    final number of nodes
      * @param seed seed for the random number generator
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public BarabasiAlbertGraphGenerator(int m0, int m, int n, long seed)
-    {
+    public BarabasiAlbertGraphGenerator(int m0, int m, int n, long seed) {
         this(m0, m, n, new Random(seed));
     }
 
     /**
      * Constructor
-     * 
-     * @param m0 number of initial nodes
-     * @param m number of edges of each new node added during the network growth
-     * @param n final number of nodes
+     *
+     * @param m0  number of initial nodes
+     * @param m   number of edges of each new node added during the network growth
+     * @param n   final number of nodes
      * @param rng the random number generator to use
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public BarabasiAlbertGraphGenerator(int m0, int m, int n, Random rng)
-    {
+    public BarabasiAlbertGraphGenerator(int m0, int m, int n, Random rng) {
         if (m0 < 1) {
             throw new IllegalArgumentException("invalid initial nodes (" + m0 + " < 1)");
         }
@@ -114,7 +109,7 @@ public class BarabasiAlbertGraphGenerator<V, E> extends GraphGeneratorImpl<V, E,
         this.m = m;
         if (n < m0) {
             throw new IllegalArgumentException(
-                "total number of nodes must be at least equal to the initial set");
+                    "total number of nodes must be at least equal to the initial set");
         }
         this.n = n;
         this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
@@ -122,13 +117,12 @@ public class BarabasiAlbertGraphGenerator<V, E> extends GraphGeneratorImpl<V, E,
 
     /**
      * Generates an instance.
-     * 
-     * @param target the target graph
+     *
+     * @param target    the target graph
      * @param resultMap not used by this generator, can be null
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         /*
          * Create complete graph with m0 nodes
          */

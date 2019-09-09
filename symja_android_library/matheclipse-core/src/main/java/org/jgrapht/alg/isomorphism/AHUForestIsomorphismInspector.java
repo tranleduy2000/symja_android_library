@@ -17,12 +17,19 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMapping;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.AsGraphUnion;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -59,13 +66,11 @@ import java.util.function.Consumer;
  *
  * @param <V> the type of the vertices
  * @param <E> the type of the edges
- *
  * @author Alexandru Valeanu
  */
 public class AHUForestIsomorphismInspector<V, E>
-    implements
-    IsomorphismInspector<V, E>
-{
+        implements
+        IsomorphismInspector<V, E> {
     private final Graph<V, E> forest1;
     private final Graph<V, E> forest2;
 
@@ -77,23 +82,22 @@ public class AHUForestIsomorphismInspector<V, E>
 
     /**
      * Construct a new AHU rooted forest isomorphism inspector.
-     *
+     * <p>
      * Note: The constructor does NOT check if the input forests are valid trees.
      *
      * @param forest1 the first rooted forest
-     * @param roots1 the roots of the first forest
+     * @param roots1  the roots of the first forest
      * @param forest2 the second rooted forest
-     * @param roots2 the roots of the second forest
-     * @throws NullPointerException if {@code forest1} or {@code forest2} is {@code null}
-     * @throws NullPointerException if {@code roots1} or {@code roots2} is {@code null}
+     * @param roots2  the roots of the second forest
+     * @throws NullPointerException     if {@code forest1} or {@code forest2} is {@code null}
+     * @throws NullPointerException     if {@code roots1} or {@code roots2} is {@code null}
      * @throws IllegalArgumentException if {@code forest1} or {@code forest2} is empty
      * @throws IllegalArgumentException if {@code roots1} or {@code roots2} is empty
      * @throws IllegalArgumentException if {@code roots1} or {@code roots2} contain an invalid
-     *         vertex
+     *                                  vertex
      */
     public AHUForestIsomorphismInspector(
-        Graph<V, E> forest1, Set<V> roots1, Graph<V, E> forest2, Set<V> roots2)
-    {
+            Graph<V, E> forest1, Set<V> roots1, Graph<V, E> forest2, Set<V> roots2) {
         validateForest(forest1, roots1);
         this.forest1 = forest1;
         this.roots1 = roots1;
@@ -103,8 +107,7 @@ public class AHUForestIsomorphismInspector<V, E>
         this.roots2 = roots2;
     }
 
-    private void validateForest(Graph<V, E> forest, Set<V> roots)
-    {
+    private void validateForest(Graph<V, E> forest, Set<V> roots) {
         assert GraphTests.isSimple(forest);
         Objects.requireNonNull(forest, "input forest cannot be null");
         Objects.requireNonNull(roots, "set of roots cannot be null");
@@ -126,8 +129,7 @@ public class AHUForestIsomorphismInspector<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Iterator<GraphMapping<V, E>> getMappings()
-    {
+    public Iterator<GraphMapping<V, E>> getMappings() {
         GraphMapping<V, E> iterMapping = getMapping();
 
         if (iterMapping == null)
@@ -140,13 +142,11 @@ public class AHUForestIsomorphismInspector<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean isomorphismExists()
-    {
+    public boolean isomorphismExists() {
         return getMapping() != null;
     }
 
-    private Pair<V, Graph<V, E>> createSingleRootGraph(Graph<V, E> forest, Set<V> roots)
-    {
+    private Pair<V, Graph<V, E>> createSingleRootGraph(Graph<V, E> forest, Set<V> roots) {
         final Graph<V, E> freshForest = GraphTypeBuilder.forGraph(forest).weighted(false).buildGraph();
 
         roots.forEach(new Consumer<V>() {
@@ -168,8 +168,7 @@ public class AHUForestIsomorphismInspector<V, E>
      *
      * @return isomorphic mapping, {@code null} is none exists
      */
-    public IsomorphicGraphMapping<V, E> getMapping()
-    {
+    public IsomorphicGraphMapping<V, E> getMapping() {
         if (computed) {
             return isomorphicMapping;
         }
@@ -179,8 +178,8 @@ public class AHUForestIsomorphismInspector<V, E>
             V root2 = roots2.iterator().next();
 
             isomorphicMapping =
-                new AHURootedTreeIsomorphismInspector<>(forest1, root1, forest2, root2)
-                    .getMapping();
+                    new AHURootedTreeIsomorphismInspector<>(forest1, root1, forest2, root2)
+                            .getMapping();
         } else {
             Pair<V, Graph<V, E>> pair1 = createSingleRootGraph(forest1, roots1);
             Pair<V, Graph<V, E>> pair2 = createSingleRootGraph(forest2, roots2);
@@ -192,8 +191,8 @@ public class AHUForestIsomorphismInspector<V, E>
             Graph<V, E> freshForest2 = pair2.getSecond();
 
             IsomorphicGraphMapping<V, E> mapping =
-                new AHURootedTreeIsomorphismInspector<>(freshForest1, fresh1, freshForest2, fresh2)
-                    .getMapping();
+                    new AHURootedTreeIsomorphismInspector<>(freshForest1, fresh1, freshForest2, fresh2)
+                            .getMapping();
 
             if (mapping != null) {
                 Map<V, V> newForwardMapping = new HashMap<>(mapping.getForwardMapping());
@@ -204,7 +203,7 @@ public class AHUForestIsomorphismInspector<V, E>
                 newBackwardMapping.remove(fresh2);
 
                 isomorphicMapping = new IsomorphicGraphMapping<>(
-                    newForwardMapping, newBackwardMapping, forest1, forest2);
+                        newForwardMapping, newBackwardMapping, forest1, forest2);
             }
         }
 

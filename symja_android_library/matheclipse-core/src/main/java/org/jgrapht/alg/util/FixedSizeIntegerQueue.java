@@ -24,8 +24,7 @@ package org.jgrapht.alg.util;
  *
  * @author Joris Kinable
  */
-public final class FixedSizeIntegerQueue
-{
+public final class FixedSizeIntegerQueue {
     /* Storage array for the elements in the queue */
     private final int[] vs;
     /* Index of left most element in the queue */
@@ -38,8 +37,7 @@ public final class FixedSizeIntegerQueue
      *
      * @param capacity size of the queue
      */
-    public FixedSizeIntegerQueue(int capacity)
-    {
+    public FixedSizeIntegerQueue(int capacity) {
         assert capacity > 0;
         vs = new int[capacity];
     }
@@ -49,8 +47,7 @@ public final class FixedSizeIntegerQueue
      *
      * @param e element
      */
-    public void enqueue(int e)
-    {
+    public void enqueue(int e) {
         assert n < vs.length;
         vs[n++] = e;
     }
@@ -60,8 +57,7 @@ public final class FixedSizeIntegerQueue
      *
      * @return the first element.
      */
-    public int poll()
-    {
+    public int poll() {
         assert !isEmpty();
         return vs[i++];
     }
@@ -71,35 +67,33 @@ public final class FixedSizeIntegerQueue
      *
      * @return true if the queue is empty
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return i == n;
     }
 
     /**
      * Returns the number of items in the queue.
-     * 
+     *
      * @return number of items in the queue
      */
-    public int size()
-    {
+    public int size() {
         return n - i;
     }
 
-    /** Empty the queue. */
-    public void clear()
-    {
+    /**
+     * Empty the queue.
+     */
+    public void clear() {
         i = 0;
         n = 0;
     }
 
     /**
      * Returns a textual representation of the queue.
-     * 
+     *
      * @return a textual representation of the queue.
      */
-    public String toString()
-    {
+    public String toString() {
         StringBuilder s = new StringBuilder();
         for (int j = i; j < n; j++)
             s.append(vs[j]).append(" ");

@@ -17,7 +17,13 @@
  */
 package org.jgrapht.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Helper class for building a one-to-one mapping for a collection of vertices to the integer range
@@ -27,12 +33,10 @@ import java.util.*;
  * This class computes the mapping only once, on instantiation. It does not support live updates.
  * </p>
  *
- * @author Alexandru Valeanu
- *
  * @param <V> the graph vertex type
+ * @author Alexandru Valeanu
  */
-public class VertexToIntegerMapping<V>
-{
+public class VertexToIntegerMapping<V> {
 
     private final Map<V, Integer> vertexMap;
     private final List<V> indexList;
@@ -43,8 +47,7 @@ public class VertexToIntegerMapping<V>
      * @param vertices the input set of vertices
      * @throws NullPointerException if {@code vertices} is {@code null}
      */
-    public VertexToIntegerMapping(Set<V> vertices)
-    {
+    public VertexToIntegerMapping(Set<V> vertices) {
         Objects.requireNonNull(vertices, "the input collection of vertices cannot be null");
 
         vertexMap = new HashMap<>(vertices.size());
@@ -61,11 +64,10 @@ public class VertexToIntegerMapping<V>
      * {@code indexList} so it must not be modified.
      *
      * @param vertices the input list of vertices
-     * @throws NullPointerException if {@code vertices} is {@code null}
+     * @throws NullPointerException     if {@code vertices} is {@code null}
      * @throws IllegalArgumentException if the vertices are not distinct
      */
-    public VertexToIntegerMapping(List<V> vertices)
-    {
+    public VertexToIntegerMapping(List<V> vertices) {
         Objects.requireNonNull(vertices, "the input collection of vertices cannot be null");
 
         vertexMap = new HashMap<>(vertices.size());
@@ -86,11 +88,10 @@ public class VertexToIntegerMapping<V>
      * Create a new mapping from a collection of vertices.
      *
      * @param vertices the input collection of vertices
-     * @throws NullPointerException if {@code vertices} is {@code null}
+     * @throws NullPointerException     if {@code vertices} is {@code null}
      * @throws IllegalArgumentException if the vertices are not distinct
      */
-    public VertexToIntegerMapping(Collection<V> vertices)
-    {
+    public VertexToIntegerMapping(Collection<V> vertices) {
         Objects.requireNonNull(vertices, "the input collection of vertices cannot be null");
 
         vertexMap = new HashMap<>(vertices.size());
@@ -112,8 +113,7 @@ public class VertexToIntegerMapping<V>
      *
      * @return a mapping from vertices to integers
      */
-    public Map<V, Integer> getVertexMap()
-    {
+    public Map<V, Integer> getVertexMap() {
         return vertexMap;
     }
 
@@ -123,8 +123,7 @@ public class VertexToIntegerMapping<V>
      *
      * @return a mapping from integers to vertices
      */
-    public List<V> getIndexList()
-    {
+    public List<V> getIndexList() {
         return indexList;
     }
 }

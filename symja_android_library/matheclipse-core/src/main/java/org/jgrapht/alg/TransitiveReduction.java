@@ -17,9 +17,13 @@
  */
 package org.jgrapht.alg;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An implementation of Harry Hsu's
@@ -41,8 +45,7 @@ import java.util.*;
  * @author Christophe Thiebaud
  */
 
-public class TransitiveReduction
-{
+public class TransitiveReduction {
     /**
      * Singleton instance.
      */
@@ -51,8 +54,7 @@ public class TransitiveReduction
     /**
      * Private Constructor.
      */
-    private TransitiveReduction()
-    {
+    private TransitiveReduction() {
     }
 
     /**
@@ -64,8 +66,7 @@ public class TransitiveReduction
      *
      * @param matrix the original matrix to transform into a path matrix
      */
-    static void transformToPathMatrix(BitSet[] matrix)
-    {
+    static void transformToPathMatrix(BitSet[] matrix) {
         // compute path matrix
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) {
@@ -93,8 +94,7 @@ public class TransitiveReduction
      *
      * @param pathMatrix the path matrix to reduce
      */
-    static void transitiveReduction(BitSet[] pathMatrix)
-    {
+    static void transitiveReduction(BitSet[] pathMatrix) {
         // transitively reduce
         for (int j = 0; j < pathMatrix.length; j++) {
             for (int i = 0; i < pathMatrix.length; i++) {
@@ -115,7 +115,7 @@ public class TransitiveReduction
      * <p>
      * You may want to clone the graph before, as transitive edges will be pitilessly removed.
      * </p>
-     *
+     * <p>
      * e.g.
      *
      * <pre>
@@ -129,11 +129,10 @@ public class TransitiveReduction
      * </pre>
      *
      * @param directedGraph the directed graph that will be reduced transitively
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>           the graph vertex type
+     * @param <E>           the graph edge type
      */
-    public <V, E> void reduce(final Graph<V, E> directedGraph)
-    {
+    public <V, E> void reduce(final Graph<V, E> directedGraph) {
         GraphTests.requireDirected(directedGraph, "Graph must be directed");
 
         final List<V> vertices = new ArrayList<>(directedGraph.vertexSet());
@@ -177,7 +176,7 @@ public class TransitiveReduction
             for (int j = 0; j < n; j++) {
                 if (!transitivelyReducedMatrix[i].get(j)) {
                     directedGraph
-                        .removeEdge(directedGraph.getEdge(vertices.get(i), vertices.get(j)));
+                            .removeEdge(directedGraph.getEdge(vertices.get(i), vertices.get(j)));
                 }
             }
         }

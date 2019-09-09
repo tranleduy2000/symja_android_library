@@ -19,20 +19,18 @@ package org.jgrapht.util;
 
 /**
  * Math Utilities.
- * 
+ *
  * @author Assaf Lehr
  */
-public class MathUtil
-{
+public class MathUtil {
 
     /**
      * Calculate the factorial of $n$.
-     * 
+     *
      * @param n the input number
      * @return the factorial
      */
-    public static long factorial(int n)
-    {
+    public static long factorial(int n) {
         long multi = 1;
         for (int i = 1; i <= n; i++) {
             multi = multi * i;
@@ -46,8 +44,7 @@ public class MathUtil
      * @param n the input number
      * @return the binary logarithm
      */
-    public static int log2(int n)
-    {
+    public static int log2(int n) {
         // returns 0 for n=0
         int log = 0;
         if ((n & 0xffff0000) != 0) {

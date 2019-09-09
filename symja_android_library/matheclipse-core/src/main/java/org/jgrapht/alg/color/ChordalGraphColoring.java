@@ -17,12 +17,19 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.cycle.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.cycle.ChordalityInspector;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
+import org.jgrapht.traverse.LexBreadthFirstIterator;
+import org.jgrapht.traverse.MaximumCardinalityIterator;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -32,26 +39,24 @@ import java.util.function.Consumer;
  * <a href="http://mathworld.wolfram.com/GraphCycle.html"> cycles</a> of four or more vertices have
  * a <a href="http://mathworld.wolfram.com/CycleChord.html"> chord</a>. A chord is an edge that is
  * not part of the cycle but connects two vertices of the cycle.
- *
+ * <p>
  * To compute the vertex coloring, this implementation relies on the {@link ChordalityInspector} to
  * compute a <a href=
  * "https://en.wikipedia.org/wiki/Chordal_graph#Perfect_elimination_and_efficient_recognition">
  * perfect elimination order</a>.
- *
+ * <p>
  * The vertex coloring for a chordal graph is computed in $\mathcal{O}(|V| + |E|)$ time.
- *
+ * <p>
  * All the methods in this class are invoked in a lazy fashion, meaning that computations are only
  * started once the method gets invoked.
  *
  * @param <V> the graph vertex type.
  * @param <E> the graph edge type.
- *
  * @author Timofey Chudakov
  */
 public class ChordalGraphColoring<V, E>
-    implements
-    VertexColoringAlgorithm<V>
-{
+        implements
+        VertexColoringAlgorithm<V> {
 
     private final Graph<V, E> graph;
 
@@ -65,8 +70,7 @@ public class ChordalGraphColoring<V, E>
      *
      * @param graph graph
      */
-    public ChordalGraphColoring(Graph<V, E> graph)
-    {
+    public ChordalGraphColoring(Graph<V, E> graph) {
         this(graph, ChordalityInspector.IterationOrder.MCS);
     }
 
@@ -75,13 +79,12 @@ public class ChordalGraphColoring<V, E>
      * implementation uses either the {@link MaximumCardinalityIterator} iterator or the
      * {@link LexBreadthFirstIterator} iterator, depending on the parameter {@code iterationOrder}.
      *
-     * @param graph graph
+     * @param graph          graph
      * @param iterationOrder constant which defines iterator to be used by the
-     *        {@code ChordalityInspector} in this implementation.
+     *                       {@code ChordalityInspector} in this implementation.
      */
     public ChordalGraphColoring(
-        Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder)
-    {
+            Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder) {
         this.graph = Objects.requireNonNull(graph);
         chordalityInspector = new ChordalityInspector<>(graph, iterationOrder);
     }
@@ -89,8 +92,7 @@ public class ChordalGraphColoring<V, E>
     /**
      * Lazily computes the coloring of the graph.
      */
-    private void lazyComputeColoring()
-    {
+    private void lazyComputeColoring() {
         if (coloring == null && chordalityInspector.isChordal()) {
             List<V> perfectEliminationOrder = chordalityInspector.getPerfectEliminationOrder();
 
@@ -131,10 +133,9 @@ public class ChordalGraphColoring<V, E>
      *
      * @param vertexOrder a list with vertices.
      * @return a mapping of vertices from {@code vertexOrder} to their indices in
-     *         {@code vertexOrder}.
+     * {@code vertexOrder}.
      */
-    private Map<V, Integer> getVertexInOrder(List<V> vertexOrder)
-    {
+    private Map<V, Integer> getVertexInOrder(List<V> vertexOrder) {
         Map<V, Integer> vertexInOrder = new HashMap<>(vertexOrder.size());
         int i = 0;
         for (V vertex : vertexOrder) {
@@ -149,12 +150,11 @@ public class ChordalGraphColoring<V, E>
      * the index of {@code vertex}.
      *
      * @param vertexInOrder defines the mapping of vertices in {@code graph} to their indices in
-     *        order.
-     * @param vertex the vertex whose predecessors in order are to be returned.
+     *                      order.
+     * @param vertex        the vertex whose predecessors in order are to be returned.
      * @return the predecessors of {@code vertex} in order defines by {@code map}.
      */
-    private Set<V> getPredecessors(Map<V, Integer> vertexInOrder, V vertex)
-    {
+    private Set<V> getPredecessors(Map<V, Integer> vertexInOrder, V vertex) {
         Set<V> predecessors = new HashSet<>();
         Integer vertexPosition = vertexInOrder.get(vertex);
         Set<E> edges = graph.edgesOf(vertex);
@@ -175,8 +175,7 @@ public class ChordalGraphColoring<V, E>
      * @return a coloring of the {@code graph} if it is chordal, null otherwise.
      */
     @Override
-    public Coloring<V> getColoring()
-    {
+    public Coloring<V> getColoring() {
         lazyComputeColoring();
         return coloring;
     }
@@ -188,10 +187,9 @@ public class ChordalGraphColoring<V, E>
      * returns null if the graph is not chordal.
      *
      * @return the perfect elimination order used to create the coloring, or null if graph is not
-     *         chordal.
+     * chordal.
      */
-    public List<V> getPerfectEliminationOrder()
-    {
+    public List<V> getPerfectEliminationOrder() {
         return chordalityInspector.getPerfectEliminationOrder();
     }
 }

@@ -17,14 +17,15 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Provides an unweighted view on a graph.
- *
+ * <p>
  * Algorithms designed for unweighted graphs should also work on weighted graphs. This class
  * emulates an unweighted graph based on a weighted one by returning <code>Graph.DEFAULT_EDGE_WEIGHT
  * </code> for each edge weight. The underlying weighted graph is provided at the constructor.
@@ -38,12 +39,11 @@ import java.util.*;
  * @param <E> the graph edge type
  */
 public class AsUnweightedGraph<V, E>
-    extends
-    GraphDelegator<V, E>
-    implements
-    Serializable,
-    Graph<V, E>
-{
+        extends
+        GraphDelegator<V, E>
+        implements
+        Serializable,
+        Graph<V, E> {
 
     private static final long serialVersionUID = -5186421272597767751L;
     private static final String EDGE_WEIGHT_IS_NOT_SUPPORTED = "Edge weight is not supported";
@@ -54,26 +54,22 @@ public class AsUnweightedGraph<V, E>
      * @param g the backing directed graph over which an undirected view is to be created.
      * @throws NullPointerException if the graph is null
      */
-    public AsUnweightedGraph(Graph<V, E> g)
-    {
+    public AsUnweightedGraph(Graph<V, E> g) {
         super(Objects.requireNonNull(g));
     }
 
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         return Graph.DEFAULT_EDGE_WEIGHT;
     }
 
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         throw new UnsupportedOperationException(EDGE_WEIGHT_IS_NOT_SUPPORTED);
     }
 
     @Override
-    public GraphType getType()
-    {
+    public GraphType getType() {
         return super.getType().asUnweighted();
     }
 }

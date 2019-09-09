@@ -36,22 +36,19 @@ import java.util.TreeSet;
  * true minimal vertex cover is an NP-Complete problem. For more on the vertex cover problem, see
  * <a href="http://mathworld.wolfram.com/VertexCover.html">
  * http://mathworld.wolfram.com/VertexCover.html</a>
- *
+ * <p>
  * Note: this class supports pseudo-graphs Runtime: $O(|E| \log |V|)$ This class produces often, but
  * not always, better solutions than the 2-approximation algorithms. Nevertheless, there are
  * instances where the solution is significantly worse. In those cases, consider using
  * {@link ClarksonTwoApproxVCImpl}.
  *
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class GreedyVCImpl<V, E>
-    implements
-    VertexCoverAlgorithm<V>
-{
+        implements
+        VertexCoverAlgorithm<V> {
 
     private static int vertexCounter = 0;
 
@@ -60,11 +57,10 @@ public class GreedyVCImpl<V, E>
 
     /**
      * Constructs a new GreedyVCImpl instance where all vertices have uniform weights.
-     * 
+     *
      * @param graph input graph
      */
-    public GreedyVCImpl(Graph<V, E> graph)
-    {
+    public GreedyVCImpl(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
         Map<V, Double> map = new HashMap<>();
         for (V vertex : graph
@@ -78,12 +74,11 @@ public class GreedyVCImpl<V, E>
 
     /**
      * Constructs a new GreedyVCImpl instance
-     * 
-     * @param graph input graph
+     *
+     * @param graph           input graph
      * @param vertexWeightMap mapping of vertex weights
      */
-    public GreedyVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap)
-    {
+    public GreedyVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap) {
         this.graph = GraphTests.requireUndirected(graph);
         this.vertexWeightMap = Objects.requireNonNull(vertexWeightMap);
     }
@@ -97,8 +92,7 @@ public class GreedyVCImpl<V, E>
      * @return greedy solution
      */
     @Override
-    public VertexCover<V> getVertexCover()
-    {
+    public VertexCover<V> getVertexCover() {
         Set<V> cover = new LinkedHashSet<>();
         double weight = 0;
 
@@ -121,13 +115,13 @@ public class GreedyVCImpl<V, E>
             vx.addNeighbor(ux);
 
             assert (ux.neighbors.get(vx) == vx.neighbors.get(
-                ux)) : " in an undirected graph, if vx is a neighbor of ux, then ux must be a neighbor of vx";
+                    ux)) : " in an undirected graph, if vx is a neighbor of ux, then ux must be a neighbor of vx";
         }
 
         TreeSet<RatioVertex<V>> workingGraph = new TreeSet<>();
         workingGraph.addAll(vertexEncapsulationMap.values());
         assert (workingGraph.size() == vertexEncapsulationMap
-            .size()) : "vertices in vertexEncapsulationMap: " + graph.vertexSet().size()
+                .size()) : "vertices in vertexEncapsulationMap: " + graph.vertexSet().size()
                 + "vertices in working graph: " + workingGraph.size();
 
         while (!workingGraph.isEmpty()) { // Continue until all edges are covered

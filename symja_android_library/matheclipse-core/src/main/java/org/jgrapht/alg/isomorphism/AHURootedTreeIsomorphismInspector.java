@@ -17,13 +17,24 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.traverse.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMapping;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.util.RadixSort;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.function.Function;
 
 /**
@@ -61,13 +72,11 @@ import java.util.function.Function;
  *
  * @param <V> the type of the vertices
  * @param <E> the type of the edges
- *
  * @author Alexandru Valeanu
  */
 public class AHURootedTreeIsomorphismInspector<V, E>
-    implements
-    IsomorphismInspector<V, E>
-{
+        implements
+        IsomorphismInspector<V, E> {
     private final Graph<V, E> tree1;
     private final Graph<V, E> tree2;
 
@@ -79,20 +88,19 @@ public class AHURootedTreeIsomorphismInspector<V, E>
 
     /**
      * Construct a new AHU rooted tree isomorphism inspector.
-     *
+     * <p>
      * Note: The constructor does NOT check if the input trees are valid.
      *
      * @param tree1 the first rooted tree
      * @param root1 the root of the first tree
      * @param tree2 the second rooted tree
      * @param root2 the root of the second tree
-     * @throws NullPointerException if {@code tree1} or {@code tree2} is {@code null}
-     * @throws NullPointerException if {@code root1} or {@code root2} is {@code null}
+     * @throws NullPointerException     if {@code tree1} or {@code tree2} is {@code null}
+     * @throws NullPointerException     if {@code root1} or {@code root2} is {@code null}
      * @throws IllegalArgumentException if {@code tree1} or {@code tree2} is empty
      * @throws IllegalArgumentException if {@code root1} or {@code root2} is an invalid vertex
      */
-    public AHURootedTreeIsomorphismInspector(Graph<V, E> tree1, V root1, Graph<V, E> tree2, V root2)
-    {
+    public AHURootedTreeIsomorphismInspector(Graph<V, E> tree1, V root1, Graph<V, E> tree2, V root2) {
         validateTree(tree1, root1);
         this.tree1 = tree1;
         this.root1 = root1;
@@ -102,8 +110,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
         this.root2 = root2;
     }
 
-    private void validateTree(Graph<V, E> tree, V root)
-    {
+    private void validateTree(Graph<V, E> tree, V root) {
         assert GraphTests.isSimple(tree);
         Objects.requireNonNull(tree, "input forest cannot be null");
         Objects.requireNonNull(root, "root cannot be null");
@@ -117,8 +124,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
         }
     }
 
-    private void bfs(Graph<V, E> graph, V root, List<List<V>> levels)
-    {
+    private void bfs(Graph<V, E> graph, V root, List<List<V>> levels) {
         BreadthFirstIterator<V, E> bfs = new BreadthFirstIterator<>(graph, root);
 
         while (bfs.hasNext()) {
@@ -132,15 +138,13 @@ public class AHURootedTreeIsomorphismInspector<V, E>
         }
     }
 
-    private List<List<V>> computeLevels(Graph<V, E> graph, V root)
-    {
+    private List<List<V>> computeLevels(Graph<V, E> graph, V root) {
         List<List<V>> levels = new ArrayList<>();
         bfs(graph, root, levels);
         return levels;
     }
 
-    private void matchVerticesWithSameLabel(V root1, V root2, Map<V, Integer>[] canonicalName)
-    {
+    private void matchVerticesWithSameLabel(V root1, V root2, Map<V, Integer>[] canonicalName) {
         Queue<Pair<V, V>> queue = new ArrayDeque<>();
         queue.add(Pair.of(root1, root2));
 
@@ -161,13 +165,13 @@ public class AHURootedTreeIsomorphismInspector<V, E>
                 // avoid walking back "up" the tree.
                 if (!forwardMapping.containsKey(next)) {
                     labelList
-                        .computeIfAbsent(canonicalName[0].get(next), new Function<Integer, List<V>>() {
-                            @Override
-                            public List<V> apply(Integer x) {
-                                return new ArrayList<>();
-                            }
-                        })
-                        .add(next);
+                            .computeIfAbsent(canonicalName[0].get(next), new Function<Integer, List<V>>() {
+                                @Override
+                                public List<V> apply(Integer x) {
+                                    return new ArrayList<>();
+                                }
+                            })
+                            .add(next);
                 }
             }
 
@@ -190,8 +194,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
         }
     }
 
-    private boolean isomorphismExists(V root1, V root2)
-    {
+    private boolean isomorphismExists(V root1, V root2) {
         // already computed?
         if (forwardMapping != null) {
             return !forwardMapping.isEmpty();
@@ -201,7 +204,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
         this.backwardMapping = new HashMap<>();
 
         @SuppressWarnings("unchecked") Map<V, Integer>[] canonicalName =
-            (Map<V, Integer>[]) Array.newInstance(Map.class, 2);
+                (Map<V, Integer>[]) Array.newInstance(Map.class, 2);
         canonicalName[0] = new HashMap<>(tree1.vertexSet().size());
         canonicalName[1] = new HashMap<>(tree2.vertexSet().size());
 
@@ -219,7 +222,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
 
         for (int lvl = maxLevel; lvl >= 0; lvl--) {
             @SuppressWarnings("unchecked") List<V>[] level =
-                (List<V>[]) Array.newInstance(List.class, 2);
+                    (List<V>[]) Array.newInstance(List.class, 2);
 
             level[0] = nodesByLevel1.get(lvl);
             level[1] = nodesByLevel2.get(lvl);
@@ -276,8 +279,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Iterator<GraphMapping<V, E>> getMappings()
-    {
+    public Iterator<GraphMapping<V, E>> getMappings() {
         GraphMapping<V, E> iterMapping = getMapping();
 
         if (iterMapping == null)
@@ -290,8 +292,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean isomorphismExists()
-    {
+    public boolean isomorphismExists() {
         return isomorphismExists(this.root1, this.root2);
     }
 
@@ -300,8 +301,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
      *
      * @return isomorphic mapping, {@code null} is none exists
      */
-    public IsomorphicGraphMapping<V, E> getMapping()
-    {
+    public IsomorphicGraphMapping<V, E> getMapping() {
         if (isomorphismExists())
             return new IsomorphicGraphMapping<>(forwardMapping, backwardMapping, tree1, tree2);
         else

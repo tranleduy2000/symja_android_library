@@ -17,60 +17,59 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generate a set of fundamental cycles by building a spanning tree (forest) using a straightforward
  * implementation of BFS using a FIFO queue. The implementation first constructs the spanning forest
  * and then builds the fundamental-cycles set. It supports graphs with self-loops and/or graphs with
  * multiple (parallel) edges.
- * 
+ *
  * <p>
  * For information on algorithms computing fundamental cycle bases see the following paper: Narsingh
  * Deo, G. Prabhu, and M. S. Krishnamoorthy. Algorithms for Generating Fundamental Cycles in a
  * Graph. ACM Trans. Math. Softw. 8, 1, 26-42, 1982.
  * </p>
- * 
+ *
  * <p>
  * The total length of the fundamental-cycle set can be as large as $O(n^3)$ where $n$ is the number
  * of vertices of the graph.
  * </p>
- * 
+ *
  * @param <V> the vertex type
  * @param <E> the edge type
- *
  * @author Dimitrios Michail
  */
 public class QueueBFSFundamentalCycleBasis<V, E>
-    extends
-    AbstractFundamentalCycleBasis<V, E>
-{
+        extends
+        AbstractFundamentalCycleBasis<V, E> {
     /**
      * Constructor
-     * 
+     *
      * @param graph the input graph
      */
-    public QueueBFSFundamentalCycleBasis(Graph<V, E> graph)
-    {
+    public QueueBFSFundamentalCycleBasis(Graph<V, E> graph) {
         super(graph);
     }
 
     /**
      * Compute a spanning forest of the graph using a straightforward BFS implementation.
-     * 
+     *
      * <p>
      * The representation assumes that the map contains the predecessor edge of each vertex in the
      * forest. The predecessor edge is the forest edge that was used to discover the vertex. If no
      * such edge was used (the vertex is a leaf in the forest) then the corresponding entry must be
      * null.
-     * 
+     *
      * @return a map representation of a spanning forest.
      */
     @Override
-    protected Map<V, E> computeSpanningForest()
-    {
+    protected Map<V, E> computeSpanningForest() {
         Map<V, E> pred = new HashMap<>();
 
         ArrayDeque<V> queue = new ArrayDeque<>();

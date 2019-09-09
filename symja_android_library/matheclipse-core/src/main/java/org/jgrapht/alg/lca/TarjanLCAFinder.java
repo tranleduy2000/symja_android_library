@@ -17,11 +17,21 @@
  */
 package org.jgrapht.alg.lca;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithmImpl;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.alg.util.UnionFind;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -59,14 +69,12 @@ import java.util.function.Function;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class TarjanLCAFinder<V, E>
         extends LowestCommonAncestorAlgorithmImpl<V>
         implements
-    LowestCommonAncestorAlgorithm<V>
-{
+        LowestCommonAncestorAlgorithm<V> {
     private Graph<V, E> graph;
     private Set<V> roots;
 
@@ -88,10 +96,9 @@ public class TarjanLCAFinder<V, E>
      * Note: The constructor will NOT check if the input graph is a valid tree.
      *
      * @param graph the input graph
-     * @param root the root of the graph
+     * @param root  the root of the graph
      */
-    public TarjanLCAFinder(Graph<V, E> graph, V root)
-    {
+    public TarjanLCAFinder(Graph<V, E> graph, V root) {
         this(graph, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
     }
 
@@ -107,8 +114,7 @@ public class TarjanLCAFinder<V, E>
      * @param graph the input graph
      * @param roots the set of roots of the graph
      */
-    public TarjanLCAFinder(Graph<V, E> graph, Set<V> roots)
-    {
+    public TarjanLCAFinder(Graph<V, E> graph, Set<V> roots) {
         this.graph = Objects.requireNonNull(graph, "graph cannot be null");
         this.roots = Objects.requireNonNull(roots, "roots cannot be null");
 
@@ -123,8 +129,7 @@ public class TarjanLCAFinder<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getLCA(V a, V b)
-    {
+    public V getLCA(V a, V b) {
         return getBatchLCA(Collections.singletonList(Pair.of(a, b))).get(0);
     }
 
@@ -132,20 +137,17 @@ public class TarjanLCAFinder<V, E>
      * {@inheritDoc}
      */
     @Override
-    public List<V> getBatchLCA(List<Pair<V, V>> queries)
-    {
+    public List<V> getBatchLCA(List<Pair<V, V>> queries) {
         return computeTarjan(queries);
     }
 
-    private void initialize()
-    {
+    private void initialize() {
         unionFind = new UnionFind<>(Collections.<V>emptySet());
         ancestors = new HashMap<>();
         blackNodes = new HashSet<>();
     }
 
-    private void clear()
-    {
+    private void clear() {
         unionFind = null;
         ancestors = null;
         blackNodes = null;
@@ -155,8 +157,7 @@ public class TarjanLCAFinder<V, E>
         lowestCommonAncestors = null;
     }
 
-    private List<V> computeTarjan(List<Pair<V, V>> queries)
-    {
+    private List<V> computeTarjan(List<Pair<V, V>> queries) {
         initialize();
 
         this.queries = queries;
@@ -210,8 +211,7 @@ public class TarjanLCAFinder<V, E>
         return tmpRef;
     }
 
-    private void computeTarjanOLCA(V u, V p, Set<V> visited)
-    {
+    private void computeTarjanOLCA(V u, V p, Set<V> visited) {
         visited.add(u);
         unionFind.addElement(u);
         ancestors.put(u, u);
@@ -250,14 +250,13 @@ public class TarjanLCAFinder<V, E>
 
     /**
      * Note: This operation is not supported.<br>
-     *
+     * <p>
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException if the method is called
      */
     @Override
-    public Set<V> getLCASet(V a, V b)
-    {
+    public Set<V> getLCASet(V a, V b) {
         throw new UnsupportedOperationException();
     }
 }

@@ -17,50 +17,51 @@
  */
 package org.jgrapht.alg.connectivity;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.StrongConnectivityAlgorithm;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base implementation of the strongly connected components algorithm.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Christian Soltenborn
  * @author Christian Hammer
  * @author Dimitrios Michail
  */
 abstract class AbstractStrongConnectivityInspector<V, E>
-    implements
-    StrongConnectivityAlgorithm<V, E>
-{
+        implements
+        StrongConnectivityAlgorithm<V, E> {
     protected final Graph<V, E> graph;
     protected List<Set<V>> stronglyConnectedSets;
     protected List<Graph<V, E>> stronglyConnectedSubgraphs;
 
-    public AbstractStrongConnectivityInspector(Graph<V, E> graph)
-    {
+    public AbstractStrongConnectivityInspector(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph);
     }
 
     @Override
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
     @Override
-    public boolean isStronglyConnected()
-    {
+    public boolean isStronglyConnected() {
         return stronglyConnectedSets().size() == 1;
     }
 
     @Override
-    public List<Graph<V, E>> getStronglyConnectedComponents()
-    {
+    public List<Graph<V, E>> getStronglyConnectedComponents() {
         if (stronglyConnectedSubgraphs == null) {
             List<Set<V>> sets = stronglyConnectedSets();
             stronglyConnectedSubgraphs = new ArrayList<>(sets.size());
@@ -73,8 +74,7 @@ abstract class AbstractStrongConnectivityInspector<V, E>
     }
 
     @Override
-    public Graph<Graph<V, E>, DefaultEdge> getCondensation()
-    {
+    public Graph<Graph<V, E>, DefaultEdge> getCondensation() {
         List<Set<V>> sets = stronglyConnectedSets();
 
         Graph<Graph<V, E>, DefaultEdge> condensation = new SimpleDirectedGraph<>(DefaultEdge.class);

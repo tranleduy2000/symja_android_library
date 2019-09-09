@@ -17,21 +17,20 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.graph.builder.GraphBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A simple weighted graph.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
 public class SimpleWeightedGraph<V, E>
-    extends
-    SimpleGraph<V, E>
-{
+        extends
+        SimpleGraph<V, E> {
     private static final long serialVersionUID = -1568410577378365671L;
 
     /**
@@ -39,47 +38,43 @@ public class SimpleWeightedGraph<V, E>
      *
      * @param edgeClass class on which to base the edge supplier
      */
-    public SimpleWeightedGraph(Class<? extends E> edgeClass)
-    {
+    public SimpleWeightedGraph(Class<? extends E> edgeClass) {
         this(null, SupplierUtil.createSupplier(edgeClass));
     }
 
     /**
      * Creates a new simple weighted graph.
-     * 
+     *
      * @param vertexSupplier the vertex supplier, can be null
-     * @param edgeSupplier the edge supplier, can be null
+     * @param edgeSupplier   the edge supplier, can be null
      */
-    public SimpleWeightedGraph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier)
-    {
+    public SimpleWeightedGraph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier) {
         super(vertexSupplier, edgeSupplier, true);
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeClass class on which to base factory for edges
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>       the graph vertex type
+     * @param <E>       the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends SimpleWeightedGraph<V, E>> createBuilder(
-        Class<? extends E> edgeClass)
-    {
+            Class<? extends E> edgeClass) {
         return new GraphBuilder<>(new SimpleWeightedGraph<V, E>(edgeClass));
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeSupplier the edge supplier
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends SimpleWeightedGraph<V, E>> createBuilder(
-        Supplier<E> edgeSupplier)
-    {
+            Supplier<E> edgeSupplier) {
         return new GraphBuilder<>(new SimpleWeightedGraph<V, E>(null, edgeSupplier));
     }
 

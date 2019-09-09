@@ -17,18 +17,24 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.GraphWalk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Collection of helper methods related to cycles.
  *
  * @author Dimitrios Michail
  */
-public abstract class Cycles
-{
+public abstract class Cycles {
 
     /**
      * Transform a simple cycle from an edge set representation to a graph path. A simple cycle
@@ -37,13 +43,12 @@ public abstract class Cycles
      *
      * @param graph the graph
      * @param cycle the simple cycle
+     * @param <V>   graph vertex type
+     * @param <E>   graph edge type
      * @return the cycle as a graph path
-     * @param <V> graph vertex type
-     * @param <E> graph edge type
      * @throws IllegalArgumentException if the provided edge set is not a simple cycle (circuit)
      */
-    public static <V, E> GraphPath<V, E> simpleCycleToGraphPath(Graph<V, E> graph, List<E> cycle)
-    {
+    public static <V, E> GraphPath<V, E> simpleCycleToGraphPath(Graph<V, E> graph, List<E> cycle) {
         Objects.requireNonNull(graph, "Graph cannot be null");
         Objects.requireNonNull(cycle, "Cycle cannot be null");
 

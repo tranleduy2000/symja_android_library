@@ -17,12 +17,24 @@
  */
 package org.jgrapht.alg.connectivity;
 
-import org.jgrapht.*;
-import org.jgrapht.event.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.event.ConnectedComponentTraversalEvent;
+import org.jgrapht.event.GraphEdgeChangeEvent;
+import org.jgrapht.event.GraphListener;
+import org.jgrapht.event.GraphVertexChangeEvent;
+import org.jgrapht.event.TraversalListenerAdapter;
+import org.jgrapht.event.VertexSetListener;
+import org.jgrapht.event.VertexTraversalEvent;
+import org.jgrapht.graph.AsUndirectedGraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Allows obtaining various connectivity aspects of a graph. The <i>inspected graph</i> is specified
@@ -45,14 +57,12 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  * @author John V. Sichi
  */
 public class ConnectivityInspector<V, E>
-    implements
-    GraphListener<V, E>
-{
+        implements
+        GraphListener<V, E> {
     private List<Set<V>> connectedSets;
     private Map<V, Set<V>> vertexToConnectedSet;
     private Graph<V, E> graph;
@@ -62,8 +72,7 @@ public class ConnectivityInspector<V, E>
      *
      * @param g the graph for which a connectivity inspector to be created.
      */
-    public ConnectivityInspector(Graph<V, E> g)
-    {
+    public ConnectivityInspector(Graph<V, E> g) {
         init();
         this.graph = Objects.requireNonNull(g);
         if (g.getType().isDirected())
@@ -79,8 +88,7 @@ public class ConnectivityInspector<V, E>
      *
      * @return <code>true</code> if and only if inspected graph is connected.
      */
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return lazyFindConnectedSets().size() == 1;
     }
 
@@ -91,12 +99,10 @@ public class ConnectivityInspector<V, E>
      * http://www.nist.gov/dads/HTML/maximallyConnectedComponent.html</a>.
      *
      * @param vertex the vertex for which the connected set to be returned.
-     *
      * @return a set of all vertices that are in the maximally connected component together with the
-     *         specified vertex.
+     * specified vertex.
      */
-    public Set<V> connectedSetOf(V vertex)
-    {
+    public Set<V> connectedSetOf(V vertex) {
         Set<V> connectedSet = vertexToConnectedSet.get(vertex);
 
         if (connectedSet == null) {
@@ -122,10 +128,9 @@ public class ConnectivityInspector<V, E>
      * http://www.nist.gov/dads/HTML/maximallyConnectedComponent.html</a>.
      *
      * @return Returns a list of <code>Set</code> s, where each set contains all vertices that are
-     *         in the same maximally connected component.
+     * in the same maximally connected component.
      */
-    public List<Set<V>> connectedSets()
-    {
+    public List<Set<V>> connectedSets() {
         return lazyFindConnectedSets();
     }
 
@@ -133,8 +138,7 @@ public class ConnectivityInspector<V, E>
      * @see GraphListener#edgeAdded(GraphEdgeChangeEvent)
      */
     @Override
-    public void edgeAdded(GraphEdgeChangeEvent<V, E> e)
-    {
+    public void edgeAdded(GraphEdgeChangeEvent<V, E> e) {
         V source = e.getEdgeSource();
         V target = e.getEdgeTarget();
         Set<V> sourceSet = connectedSetOf(source);
@@ -157,10 +161,9 @@ public class ConnectivityInspector<V, E>
      * @see GraphListener#edgeRemoved(GraphEdgeChangeEvent)
      */
     @Override
-    public void edgeRemoved(GraphEdgeChangeEvent<V, E> e)
-    {
+    public void edgeRemoved(GraphEdgeChangeEvent<V, E> e) {
         init(); // for now invalidate cached results, in the future need to
-                // amend them. If the edge is a bridge, 2 components need to be split.
+        // amend them. If the edge is a bridge, 2 components need to be split.
     }
 
     @Override
@@ -174,13 +177,11 @@ public class ConnectivityInspector<V, E>
      *
      * @param sourceVertex one end of the path.
      * @param targetVertex another end of the path.
-     *
      * @return <code>true</code> if and only if the source and target vertex are in the same
-     *         connected component (undirected graph), or in the same weakly connected component
-     *         (directed graph).
+     * connected component (undirected graph), or in the same weakly connected component
+     * (directed graph).
      */
-    public boolean pathExists(V sourceVertex, V targetVertex)
-    {
+    public boolean pathExists(V sourceVertex, V targetVertex) {
         return connectedSetOf(sourceVertex).contains(targetVertex);
     }
 
@@ -188,8 +189,7 @@ public class ConnectivityInspector<V, E>
      * @see VertexSetListener#vertexAdded(GraphVertexChangeEvent)
      */
     @Override
-    public void vertexAdded(GraphVertexChangeEvent<V> e)
-    {
+    public void vertexAdded(GraphVertexChangeEvent<V> e) {
         Set<V> component = new HashSet<>();
         component.add(e.getVertex());
         connectedSets.add(component);
@@ -200,21 +200,18 @@ public class ConnectivityInspector<V, E>
      * @see VertexSetListener#vertexRemoved(GraphVertexChangeEvent)
      */
     @Override
-    public void vertexRemoved(GraphVertexChangeEvent<V> e)
-    {
+    public void vertexRemoved(GraphVertexChangeEvent<V> e) {
         init(); // for now invalidate cached results, in the future need to
-                // amend them. If the vertex is an articulation point, two
-                // components need to be split
+        // amend them. If the vertex is an articulation point, two
+        // components need to be split
     }
 
-    private void init()
-    {
+    private void init() {
         connectedSets = null;
         vertexToConnectedSet = new HashMap<>();
     }
 
-    private List<Set<V>> lazyFindConnectedSets()
-    {
+    private List<Set<V>> lazyFindConnectedSets() {
         if (connectedSets == null) {
             connectedSets = new ArrayList<>();
 
@@ -239,17 +236,15 @@ public class ConnectivityInspector<V, E>
      * @author Barak Naveh
      */
     private class MyTraversalListener
-        extends
-        TraversalListenerAdapter<V, E>
-    {
+            extends
+            TraversalListenerAdapter<V, E> {
         private Set<V> currentConnectedSet;
 
         /**
          * @see TraversalListenerAdapter#connectedComponentFinished(ConnectedComponentTraversalEvent)
          */
         @Override
-        public void connectedComponentFinished(ConnectedComponentTraversalEvent e)
-        {
+        public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {
             connectedSets.add(currentConnectedSet);
         }
 
@@ -257,8 +252,7 @@ public class ConnectivityInspector<V, E>
          * @see TraversalListenerAdapter#connectedComponentStarted(ConnectedComponentTraversalEvent)
          */
         @Override
-        public void connectedComponentStarted(ConnectedComponentTraversalEvent e)
-        {
+        public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {
             currentConnectedSet = new HashSet<>();
         }
 
@@ -266,8 +260,7 @@ public class ConnectivityInspector<V, E>
          * @see TraversalListenerAdapter#vertexTraversed(VertexTraversalEvent)
          */
         @Override
-        public void vertexTraversed(VertexTraversalEvent<V> e)
-        {
+        public void vertexTraversed(VertexTraversalEvent<V> e) {
             V v = e.getVertex();
             currentConnectedSet.add(v);
             vertexToConnectedSet.put(v, currentConnectedSet);

@@ -17,13 +17,16 @@
  */
 package org.jgrapht.graph.specifics;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.EdgeSetFactory;
+import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Plain implementation of DirectedSpecifics. This implementation requires the least amount of
@@ -31,18 +34,16 @@ import java.util.function.*;
  * getEdge(V u, V v), containsEdge(V u, V v), addEdge(V u, V v), etc may be relatively slow when the
  * average degree of a vertex is high (dense graphs). For a fast implementation, use
  * {@link FastLookupDirectedSpecifics}.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  * @author Joris Kinable
  */
 public class DirectedSpecifics<V, E>
-    implements
-    Specifics<V, E>,
-    Serializable
-{
+        implements
+        Specifics<V, E>,
+        Serializable {
     private static final long serialVersionUID = 5964807709682219859L;
 
     protected Graph<V, E> graph;
@@ -51,16 +52,15 @@ public class DirectedSpecifics<V, E>
 
     /**
      * Construct a new directed specifics.
-     * 
-     * @param graph the graph for which these specifics are for
-     * @param vertexMap map for the storage of vertex edge sets. Needs to have a predictable
-     *        iteration order.
+     *
+     * @param graph          the graph for which these specifics are for
+     * @param vertexMap      map for the storage of vertex edge sets. Needs to have a predictable
+     *                       iteration order.
      * @param edgeSetFactory factory for the creation of vertex edge sets
      */
     public DirectedSpecifics(
-        Graph<V, E> graph, Map<V, DirectedEdgeContainer<V, E>> vertexMap,
-        EdgeSetFactory<V, E> edgeSetFactory)
-    {
+            Graph<V, E> graph, Map<V, DirectedEdgeContainer<V, E>> vertexMap,
+            EdgeSetFactory<V, E> edgeSetFactory) {
         this.graph = Objects.requireNonNull(graph);
         this.vertexMap = Objects.requireNonNull(vertexMap);
         this.edgeSetFactory = Objects.requireNonNull(edgeSetFactory);
@@ -70,8 +70,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         DirectedEdgeContainer<V, E> ec = vertexMap.get(v);
         if (ec == null) {
             vertexMap.put(v, new DirectedEdgeContainer<>(edgeSetFactory, v));
@@ -84,8 +83,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<V> getVertexSet()
-    {
+    public Set<V> getVertexSet() {
         return vertexMap.keySet();
     }
 
@@ -93,8 +91,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         Set<E> edges = null;
 
         if (graph.containsVertex(sourceVertex) && graph.containsVertex(targetVertex)) {
@@ -116,8 +113,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         if (graph.containsVertex(sourceVertex) && graph.containsVertex(targetVertex)) {
             DirectedEdgeContainer<V, E> ec = getEdgeContainer(sourceVertex);
 
@@ -133,8 +129,7 @@ public class DirectedSpecifics<V, E>
 
     @Override
     @Deprecated
-    public void addEdgeToTouchingVertices(E e)
-    {
+    public void addEdgeToTouchingVertices(E e) {
         V source = graph.getEdgeSource(e);
         V target = graph.getEdgeTarget(e);
         getEdgeContainer(source).addOutgoingEdge(e);
@@ -145,16 +140,14 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addEdgeToTouchingVertices(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdgeToTouchingVertices(V sourceVertex, V targetVertex, E e) {
         getEdgeContainer(sourceVertex).addOutgoingEdge(e);
         getEdgeContainer(targetVertex).addIncomingEdge(e);
         return true;
     }
 
     @Override
-    public boolean addEdgeToTouchingVerticesIfAbsent(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdgeToTouchingVerticesIfAbsent(V sourceVertex, V targetVertex, E e) {
         // lookup for edge with same source and target
         DirectedEdgeContainer<V, E> ec = getEdgeContainer(sourceVertex);
         for (E outEdge : ec.outgoing) {
@@ -172,8 +165,7 @@ public class DirectedSpecifics<V, E>
 
     @Override
     public E createEdgeToTouchingVerticesIfAbsent(
-        V sourceVertex, V targetVertex, Supplier<E> edgeSupplier)
-    {
+            V sourceVertex, V targetVertex, Supplier<E> edgeSupplier) {
         // lookup for edge with same source and target
         DirectedEdgeContainer<V, E> ec = getEdgeContainer(sourceVertex);
         for (E e : ec.outgoing) {
@@ -194,8 +186,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         return inDegreeOf(vertex) + outDegreeOf(vertex);
     }
 
@@ -203,10 +194,9 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgesOf(V vertex)
-    {
+    public Set<E> edgesOf(V vertex) {
         ArrayUnenforcedSet<E> inAndOut =
-            new ArrayUnenforcedSet<>(getEdgeContainer(vertex).incoming);
+                new ArrayUnenforcedSet<>(getEdgeContainer(vertex).incoming);
 
         if (graph.getType().isAllowingSelfLoops()) {
             for (E e : getEdgeContainer(vertex).outgoing) {
@@ -226,8 +216,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         return getEdgeContainer(vertex).incoming.size();
     }
 
@@ -235,8 +224,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         return getEdgeContainer(vertex).getUnmodifiableIncomingEdges();
     }
 
@@ -244,8 +232,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         return getEdgeContainer(vertex).outgoing.size();
     }
 
@@ -253,21 +240,19 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         return getEdgeContainer(vertex).getUnmodifiableOutgoingEdges();
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @deprecated Use method {@link #removeEdgeFromTouchingVertices(Object, Object, Object)}
-     *             instead.
+     * instead.
      */
     @Override
     @Deprecated
-    public void removeEdgeFromTouchingVertices(E e)
-    {
+    public void removeEdgeFromTouchingVertices(E e) {
         V source = graph.getEdgeSource(e);
         V target = graph.getEdgeTarget(e);
 
@@ -279,8 +264,7 @@ public class DirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public void removeEdgeFromTouchingVertices(V sourceVertex, V targetVertex, E e)
-    {
+    public void removeEdgeFromTouchingVertices(V sourceVertex, V targetVertex, E e) {
         getEdgeContainer(sourceVertex).removeOutgoingEdge(e);
         getEdgeContainer(targetVertex).removeIncomingEdge(e);
     }
@@ -289,11 +273,9 @@ public class DirectedSpecifics<V, E>
      * Get the edge container for specified vertex.
      *
      * @param vertex a vertex in this graph.
-     *
      * @return an edge container
      */
-    protected DirectedEdgeContainer<V, E> getEdgeContainer(V vertex)
-    {
+    protected DirectedEdgeContainer<V, E> getEdgeContainer(V vertex) {
         DirectedEdgeContainer<V, E> ec = vertexMap.get(vertex);
 
         if (ec == null) {

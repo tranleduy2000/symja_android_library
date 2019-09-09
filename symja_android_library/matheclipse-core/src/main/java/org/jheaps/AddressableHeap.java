@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,16 +21,13 @@ import java.util.Comparator;
 
 /**
  * A heap whose elements can be addressed using handles.
- *
+ * <p>
  * An insert operation returns a {@link Handle} which can later
  * be used in order to manipulate the element, such as decreasing its key, or
  * deleting it. Storing the handle externally is the responsibility of the user.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public interface AddressableHeap<K, V> {
@@ -39,10 +36,8 @@ public interface AddressableHeap<K, V> {
      * A heap element handle. Allows someone to address an element already in a
      * heap and perform additional operations.
      *
-     * @param <K>
-     *            the type of keys maintained by this heap
-     * @param <V>
-     *            the type of values maintained by this heap
+     * @param <K> the type of keys maintained by this heap
+     * @param <V> the type of values maintained by this heap
      */
     interface Handle<K, V> {
 
@@ -62,32 +57,28 @@ public interface AddressableHeap<K, V> {
 
         /**
          * Set the value of the element.
-         * 
-         * @param value
-         *            the new value
+         *
+         * @param value the new value
          */
         void setValue(V value);
 
         /**
          * Decrease the key of the element.
          *
-         * @param newKey
-         *            the new key
-         * @throws IllegalArgumentException
-         *             if the new key is larger than the old key according to
-         *             the comparator used when constructing the heap or the
-         *             natural ordering of the elements if no comparator was
-         *             used
+         * @param newKey the new key
+         * @throws IllegalArgumentException if the new key is larger than the old key according to
+         *                                  the comparator used when constructing the heap or the
+         *                                  natural ordering of the elements if no comparator was
+         *                                  used
          */
         void decreaseKey(K newKey);
 
         /**
          * Delete the element from the heap that it belongs.
          *
-         * @throws IllegalArgumentException
-         *             in case this function is called twice on the same element
-         *             or the element has already been deleted using
-         *             {@link AddressableHeap#deleteMin()}.
+         * @throws IllegalArgumentException in case this function is called twice on the same element
+         *                                  or the element has already been deleted using
+         *                                  {@link AddressableHeap#deleteMin()}.
          */
         void delete();
 
@@ -99,19 +90,16 @@ public interface AddressableHeap<K, V> {
      * ordering} of its keys.
      *
      * @return the comparator used to order the keys in this heap, or
-     *         {@code null} if this addressable heap uses the natural ordering
-     *         of its keys
+     * {@code null} if this addressable heap uses the natural ordering
+     * of its keys
      */
     Comparator<? super K> comparator();
 
     /**
      * Insert a new element into the heap.
      *
-     * @param key
-     *            the element's key
-     * @param value
-     *            the element's value
-     * 
+     * @param key   the element's key
+     * @param value the element's value
      * @return a handle for the newly added element
      */
     Handle<K, V> insert(K key, V value);
@@ -119,8 +107,7 @@ public interface AddressableHeap<K, V> {
     /**
      * Insert a new element into the heap with a null value.
      *
-     * @param key
-     *            the element's key
+     * @param key the element's key
      * @return a handle for the newly added element
      */
     Handle<K, V> insert(K key);
@@ -137,7 +124,7 @@ public interface AddressableHeap<K, V> {
      * elements exists, only one of them will be deleted. After the element is
      * deleted the handle is invalidated and only method {@link Handle#getKey()}
      * and {@link Handle#getValue()} can be used.
-     * 
+     *
      * @return a handle to the deleted element with minimum key
      */
     Handle<K, V> deleteMin();

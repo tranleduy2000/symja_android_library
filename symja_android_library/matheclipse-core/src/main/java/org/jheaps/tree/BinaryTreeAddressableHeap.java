@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,14 @@
  */
 package org.jheaps.tree;
 
+import org.jheaps.AddressableHeap;
+import org.jheaps.annotations.ConstantTime;
+import org.jheaps.annotations.LogarithmicTime;
+
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
-
-import org.jheaps.AddressableHeap;
-import org.jheaps.annotations.ConstantTime;
-import org.jheaps.annotations.LogarithmicTime;
 
 /**
  * An explicit binary tree addressable heap. The heap is sorted according to the
@@ -59,13 +59,9 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- * 
  * @see AddressableHeap
  * @see Comparable
  * @see Comparator
@@ -120,10 +116,9 @@ public class BinaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, S
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public BinaryTreeAddressableHeap(Comparator<? super K> comparator) {
         this.comparator = comparator;
@@ -454,14 +449,14 @@ public class BinaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, S
      * Start at the root and traverse the tree in order to find the parent node
      * of a particular node. Uses the bit representation to keep the cost
      * log(n).
-     * 
+     *
      * @param node the node number assuming that the root node is number one
      */
     private Node findParentNode(long node) {
         // assert node > 0;
 
         // find bit representation of node
-        long[] s = { node };
+        long[] s = {node};
         BitSet bits = BitSet.valueOf(s);
 
         // traverse path to last node
@@ -516,11 +511,11 @@ public class BinaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, S
 
     /*
      * Swap a node with its parent
-     * 
+     *
      * @param n the node
-     * 
+     *
      * @param p the parent node
-     * 
+     *
      * @param pp the parent of the parent node, maybe null
      */
     private void swap(Node n, Node p, Node pp) {

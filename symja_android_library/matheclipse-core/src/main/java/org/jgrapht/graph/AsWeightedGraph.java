@@ -17,11 +17,15 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.GraphType;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Provides a weighted view of a graph. The class stores edge weights internally.
@@ -45,7 +49,7 @@ import java.util.function.*;
  * provided to calculate the weight of an edge. If the map does not contain a particular edge, or
  * the function does not provide a weight for a particular edge, the @link{getEdgeWeight} call is
  * propagated to the backing graph.
- *
+ * <p>
  * Finally, the view provides a @link{setEdgeWeight} method. This method behaves differently
  * depending on how the view is constructed. See @link{setEdgeWeight} for details.
  *
@@ -53,12 +57,11 @@ import java.util.function.*;
  * @param <E> the graph edge type
  */
 public class AsWeightedGraph<V, E>
-    extends
-    GraphDelegator<V, E>
-    implements
-    Serializable,
-    Graph<V, E>
-{
+        extends
+        GraphDelegator<V, E>
+        implements
+        Serializable,
+        Graph<V, E> {
 
     private static final long serialVersionUID = -6838132233557L;
     private final Function<E, Double> weightFunction;
@@ -71,12 +74,11 @@ public class AsWeightedGraph<V, E>
      * the @link{setEdgeWeight} method will update the map. Moreover, calls to @link{setEdgeWeight}
      * are propagated to the underlying graph.
      *
-     * @param graph the backing graph over which a weighted view is to be created.
+     * @param graph   the backing graph over which a weighted view is to be created.
      * @param weights the map containing the edge weights.
      * @throws NullPointerException if the graph or the weights are null.
      */
-    public AsWeightedGraph(Graph<V, E> graph, Map<E, Double> weights)
-    {
+    public AsWeightedGraph(Graph<V, E> graph, Map<E, Double> weights) {
         this(graph, weights, graph.getType().isWeighted());
     }
 
@@ -84,16 +86,15 @@ public class AsWeightedGraph<V, E>
      * Constructor for AsWeightedGraph which allows weight write propagation to be requested
      * explicitly.
      *
-     * @param graph the backing graph over which an weighted view is to be created
-     * @param weights the map containing the edge weights
+     * @param graph               the backing graph over which an weighted view is to be created
+     * @param weights             the map containing the edge weights
      * @param writeWeightsThrough if set to true, the weights will get propagated to the backing
-     *        graph in the <code>setEdgeWeight()</code> method.
-     * @throws NullPointerException if the graph or the weights are null
+     *                            graph in the <code>setEdgeWeight()</code> method.
+     * @throws NullPointerException     if the graph or the weights are null
      * @throws IllegalArgumentException if <code>writeWeightsThrough</code> is set to true and
-     *         <code>graph</code> is not a weighted graph
+     *                                  <code>graph</code> is not a weighted graph
      */
-    public AsWeightedGraph(Graph<V, E> graph, Map<E, Double> weights, boolean writeWeightsThrough)
-    {
+    public AsWeightedGraph(Graph<V, E> graph, Map<E, Double> weights, boolean writeWeightsThrough) {
         super(graph);
         this.weights = Objects.requireNonNull(weights);
         this.weightFunction = null;
@@ -116,20 +117,19 @@ public class AsWeightedGraph<V, E>
      * particularly useful when pre-computing all edge weights is expensive and it is expected that
      * the weights of only a subset of all edges will be queried.
      *
-     * @param graph the backing graph over which an weighted view is to be created
-     * @param weightFunction function which maps an edge to a weight
-     * @param cacheWeights if set to <code>true</code>, weights are cached once computed by the
-     *        weight function
+     * @param graph               the backing graph over which an weighted view is to be created
+     * @param weightFunction      function which maps an edge to a weight
+     * @param cacheWeights        if set to <code>true</code>, weights are cached once computed by the
+     *                            weight function
      * @param writeWeightsThrough if set to <code>true</code>, the weight set directly by
-     *        the @link{setEdgeWeight} method will be propagated to the backing graph.
-     * @throws NullPointerException if the graph or the weight function is null
+     *                            the @link{setEdgeWeight} method will be propagated to the backing graph.
+     * @throws NullPointerException     if the graph or the weight function is null
      * @throws IllegalArgumentException if <code>writeWeightsThrough</code> is set to true and
-     *         <code>graph</code> is not a weighted graph
+     *                                  <code>graph</code> is not a weighted graph
      */
     public AsWeightedGraph(
-        Graph<V, E> graph, Function<E, Double> weightFunction, boolean cacheWeights,
-        boolean writeWeightsThrough)
-    {
+            Graph<V, E> graph, Function<E, Double> weightFunction, boolean cacheWeights,
+            boolean writeWeightsThrough) {
         super(graph);
         this.weightFunction = Objects.requireNonNull(weightFunction);
         this.cacheWeights = cacheWeights;
@@ -155,12 +155,11 @@ public class AsWeightedGraph<V, E>
      * @throws NullPointerException if the edge is null
      */
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         Double weight;
         if (weightFunction != null) {
             if (cacheWeights) // If weights are cached, check map first before invoking the weight
-                              // function
+                // function
                 weight = weights.computeIfAbsent(e, weightFunction);
             else
                 weight = weightFunction.apply(e);
@@ -181,15 +180,14 @@ public class AsWeightedGraph<V, E>
      * true. This method can then be used to preset weights in the cache, or to overwrite existing
      * values.
      *
-     * @param e edge on which to set weight
+     * @param e      edge on which to set weight
      * @param weight new weight for edge
      * @throws NullPointerException if the edge is null
      */
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         assert weightFunction == null
-            || cacheWeights : "Cannot set an edge weight when a weight function is used and caching is disabled";
+                || cacheWeights : "Cannot set an edge weight when a weight function is used and caching is disabled";
         assert e != null;
 
         this.weights.put(e, weight);
@@ -199,8 +197,7 @@ public class AsWeightedGraph<V, E>
     }
 
     @Override
-    public GraphType getType()
-    {
+    public GraphType getType() {
         return super.getType().asWeighted();
     }
 

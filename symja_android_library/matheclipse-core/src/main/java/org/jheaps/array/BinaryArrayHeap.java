@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,9 @@
  */
 package org.jheaps.array;
 
-import java.util.Comparator;
-
 import org.jheaps.annotations.LinearTime;
+
+import java.util.Comparator;
 
 /**
  * An array based binary heap. The heap is sorted according to the
@@ -35,7 +35,7 @@ import org.jheaps.annotations.LinearTime;
  * {@code findMin}, is a worst-case O(1) operation. The bounds are worst-case if
  * the user initializes the heap with a capacity larger or equal to the total
  * number of elements that are going to be inserted into the heap.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(Object[])} or {@link #heapify(Object[], Comparator)}
@@ -63,9 +63,7 @@ import org.jheaps.annotations.LinearTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
@@ -117,8 +115,7 @@ public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param capacity
-     *            the initial heap capacity
+     * @param capacity the initial heap capacity
      */
     public BinaryArrayHeap(int capacity) {
         super(null, capacity);
@@ -140,10 +137,9 @@ public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * {@link BinaryArrayHeap#DEFAULT_HEAP_CAPACITY} and adjusts automatically
      * based on the sequence of insertions and deletions.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public BinaryArrayHeap(Comparator<? super K> comparator) {
         super(comparator, DEFAULT_HEAP_CAPACITY);
@@ -166,12 +162,10 @@ public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
      */
     public BinaryArrayHeap(Comparator<? super K> comparator, int capacity) {
         super(comparator, capacity);
@@ -181,13 +175,10 @@ public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
+     * @param <K>   the type of keys maintained by the heap
+     * @param array an array of elements
      * @return a binary heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> BinaryArrayHeap<K> heapify(K[] array) {
@@ -214,15 +205,11 @@ public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param array      an array of elements
+     * @param comparator the comparator to use
      * @return a binary heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> BinaryArrayHeap<K> heapify(K[] array, Comparator<? super K> comparator) {
@@ -247,9 +234,8 @@ public class BinaryArrayHeap<K> extends AbstractArrayHeap<K> {
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @Override
     @SuppressWarnings("unchecked")

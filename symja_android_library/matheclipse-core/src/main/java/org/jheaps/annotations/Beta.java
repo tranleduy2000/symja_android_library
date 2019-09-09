@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,11 +25,11 @@ import java.lang.annotation.Target;
 /**
  * Marker interface to indicate that a public API may change or be removed in
  * the future.
- * 
+ *
  * @author Dimitrios Michail
  */
 @Retention(RetentionPolicy.CLASS)
-@Target(value = { ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.TYPE,
-        ElementType.ANNOTATION_TYPE })
+@Target(value = {ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.TYPE,
+        ElementType.ANNOTATION_TYPE})
 public @interface Beta {
 }

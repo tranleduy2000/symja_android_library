@@ -28,18 +28,18 @@ import java.util.NoSuchElementException;
  * involve deleting an element such as {@code insert}, and {@code decreaseKey}.
  * Operations {@code deleteMin} and {@code delete} are amortized O(log(n)). The
  * operation {@code meld} is also amortized O(1).
- * 
+ *
  * <p>
  * All the above bounds, however, assume that the user does not perform
  * cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
@@ -65,13 +65,9 @@ import java.util.NoSuchElementException;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- *
  */
 public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializable {
 
@@ -114,7 +110,7 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
      * Used to reference the current heap or some other pairing heap in case of
      * melding, so that handles remain valid even after a meld, without having
      * to iterate over them.
-     * 
+     * <p>
      * In order to avoid maintaining a full-fledged union-find data structure,
      * we disallow a heap to be used in melding more than once. We use however,
      * path-compression in case of cascading melds, that it, a handle moves from
@@ -147,10 +143,9 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     @ConstantTime
     @SuppressWarnings("unchecked")
@@ -165,10 +160,9 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalStateException
-     *             if the heap has already been used in the right hand side of a
-     *             meld
+     *
+     * @throws IllegalStateException if the heap has already been used in the right hand side of a
+     *                               meld
      */
     @Override
     @ConstantTime(amortized = true)
@@ -191,17 +185,16 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
         } else {
             root = link(root, u);
         }
-        
+
         size++;
         return e;
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalStateException
-     *             if the heap has already been used in the right hand side of a
-     *             meld
+     *
+     * @throws IllegalStateException if the heap has already been used in the right hand side of a
+     *                               meld
      */
     @Override
     @ConstantTime(amortized = true)
@@ -356,8 +349,8 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
         HollowHeap<K, V> getOwner() {
             return node.getOwner();
         }
-        
-        private void checkInvalid() { 
+
+        private void checkInvalid() {
             if (node == null) {
                 throw new IllegalArgumentException("Invalid handle!");
             }
@@ -378,7 +371,7 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
         K key;
         HollowNode<K, V> child; // child
         HollowNode<K, V> next; // next sibling in list of children of first
-                               // parent
+        // parent
         HollowNode<K, V> sp; // second parent
         int rank;
 
@@ -419,16 +412,14 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
             }
             return heap;
         }
-        
+
     }
 
     /**
      * Decrease the key of an item.
-     * 
-     * @param n
-     *            the item
-     * @param newKey
-     *            the new key
+     *
+     * @param n      the item
+     * @param newKey the new key
      */
     @SuppressWarnings("unchecked")
     private void decreaseKey(Item<K, V> e, K newKey) {
@@ -457,7 +448,7 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
         v.item = e;
         e.node = v;
         e.key = newKey;
-        
+
         if (u.rank > 2) {
             v.rank = u.rank - 2;
         }
@@ -470,9 +461,8 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
 
     /**
      * Delete an item
-     * 
-     * @param e
-     *            the item
+     *
+     * @param e the item
      */
     private void delete(Item<K, V> e) {
         assert e.node != null;
@@ -491,29 +481,29 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
         // minimum deletion
         int maxRank = -1;
         while (root != null) {
-        	HollowNode<K, V> v = root;
+            HollowNode<K, V> v = root;
             root = root.next;
-        	
+
             HollowNode<K, V> w = v.child;
             while (w != null) {
                 HollowNode<K, V> u = w;
                 w = w.next;
                 u.next = null;
-                
+
                 if (u.item == null) { // hollow
-                	if (u.sp == null) { // v is the only parent
-                		u.next = root;
-                		root = u;
-                	} else { // two parents 
-                		if (u.sp == v) { // v is the second parent 
-                			u.sp = null;
-                		} else { // v is the first parent
-                			u.sp = null;
-                			u.next = null;
-                		}
-                	}
-                } else { 
-                	maxRank = Math.max(maxRank, doRankedLinks(u));
+                    if (u.sp == null) { // v is the only parent
+                        u.next = root;
+                        root = u;
+                    } else { // two parents
+                        if (u.sp == v) { // v is the second parent
+                            u.sp = null;
+                        } else { // v is the first parent
+                            u.sp = null;
+                            u.next = null;
+                        }
+                    }
+                } else {
+                    maxRank = Math.max(maxRank, doRankedLinks(u));
                 }
             }
             nodes--; // garbage collect v
@@ -529,14 +519,14 @@ public class HollowHeap<K, V> implements MergeableAddressableHeap<K, V>, Seriali
         while (aux[u.rank] != null) {
             u = link(u, aux[u.rank]);
             aux[u.rank] = null;
-            u.rank += 1;            
+            u.rank += 1;
         }
         aux[u.rank] = u;
         return u.rank;
     }
 
     private void doUnrankedLinks(int maxRank) {
-    	assert root == null;
+        assert root == null;
         for (int i = 0; i <= maxRank; i++) {
             HollowNode<K, V> u = aux[i];
             if (u != null) {

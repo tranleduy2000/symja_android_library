@@ -17,28 +17,34 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.graph.MaskSubgraph;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
  * List of simple paths in increasing order of weight.
- *
  */
 final class RankingPathElementList<V, E>
-    extends
-    AbstractPathElementList<V, E, RankingPathElement<V, E>>
-{
+        extends
+        AbstractPathElementList<V, E, RankingPathElement<V, E>> {
     /**
      * Vertex that paths of the list must not disconnect.
      */
     private V guardVertexToNotDisconnect = null;
 
     private Map<RankingPathElement<V, E>, Boolean> path2disconnect =
-        new HashMap<RankingPathElement<V, E>, Boolean>();
+            new HashMap<RankingPathElement<V, E>, Boolean>();
 
     /**
      * To be used on top of general path validations. May invalidate the path though they pass the
@@ -51,23 +57,20 @@ final class RankingPathElementList<V, E>
      *
      * @param maxSize max number of paths the list is able to store.
      */
-    RankingPathElementList(Graph<V, E> graph, int maxSize, RankingPathElement<V, E> pathElement)
-    {
+    RankingPathElementList(Graph<V, E> graph, int maxSize, RankingPathElement<V, E> pathElement) {
         this(graph, maxSize, pathElement, null);
     }
 
     /**
      * Creates a list with an empty path. The list size is 1.
      *
-     * @param maxSize max number of paths the list is able to store.
+     * @param maxSize       max number of paths the list is able to store.
      * @param pathValidator path validator to be used in addition to basic validations (path is from
-     *        source to target w/o loops)
-     * 
+     *                      source to target w/o loops)
      */
     RankingPathElementList(
-        Graph<V, E> graph, int maxSize, RankingPathElement<V, E> pathElement,
-        PathValidator<V, E> pathValidator)
-    {
+            Graph<V, E> graph, int maxSize, RankingPathElement<V, E> pathElement,
+            PathValidator<V, E> pathValidator) {
         super(graph, maxSize, pathElement);
         this.externalPathValidator = pathValidator;
     }
@@ -76,13 +79,12 @@ final class RankingPathElementList<V, E>
      * Creates paths obtained by concatenating the specified edge to the specified paths.
      *
      * @param elementList paths, list of <code>
-     * RankingPathElement</code>.
-     * @param edge edge reaching the end vertex of the created paths.
-     * @param maxSize maximum number of paths the list is able to store.
+     *                    RankingPathElement</code>.
+     * @param edge        edge reaching the end vertex of the created paths.
+     * @param maxSize     maximum number of paths the list is able to store.
      */
     RankingPathElementList(
-        Graph<V, E> graph, int maxSize, RankingPathElementList<V, E> elementList, E edge)
-    {
+            Graph<V, E> graph, int maxSize, RankingPathElementList<V, E> elementList, E edge) {
         this(graph, maxSize, elementList, edge, null);
 
         assert (!this.pathElements.isEmpty());
@@ -92,31 +94,29 @@ final class RankingPathElementList<V, E>
      * Creates paths obtained by concatenating the specified edge to the specified paths.
      *
      * @param elementList paths, list of <code>
-     * RankingPathElement</code>.
-     * @param edge edge reaching the end vertex of the created paths.
-     * @param maxSize maximum number of paths the list is able to store.
+     *                    RankingPathElement</code>.
+     * @param edge        edge reaching the end vertex of the created paths.
+     * @param maxSize     maximum number of paths the list is able to store.
      */
     RankingPathElementList(
-        Graph<V, E> graph, int maxSize, RankingPathElementList<V, E> elementList, E edge,
-        V guardVertexToNotDisconnect)
-    {
+            Graph<V, E> graph, int maxSize, RankingPathElementList<V, E> elementList, E edge,
+            V guardVertexToNotDisconnect) {
         this(graph, maxSize, elementList, edge, guardVertexToNotDisconnect, null);
     }
 
     /**
      * Creates paths obtained by concatenating the specified edge to the specified paths.
      *
-     * @param elementList paths, list of <code>
-     * RankingPathElement</code>.
-     * @param edge edge reaching the end vertex of the created paths.
-     * @param maxSize maximum number of paths the list is able to store.
+     * @param elementList   paths, list of <code>
+     *                      RankingPathElement</code>.
+     * @param edge          edge reaching the end vertex of the created paths.
+     * @param maxSize       maximum number of paths the list is able to store.
      * @param pathValidator path validator to be used in addition to basic validations (path is from
-     *        source to target w/o loops)
+     *                      source to target w/o loops)
      */
     RankingPathElementList(
-        Graph<V, E> graph, int maxSize, RankingPathElementList<V, E> elementList, E edge,
-        V guardVertexToNotDisconnect, PathValidator<V, E> pathValidator)
-    {
+            Graph<V, E> graph, int maxSize, RankingPathElementList<V, E> elementList, E edge,
+            V guardVertexToNotDisconnect, PathValidator<V, E> pathValidator) {
         super(graph, maxSize, elementList, edge);
         this.guardVertexToNotDisconnect = guardVertexToNotDisconnect;
         this.externalPathValidator = pathValidator;
@@ -132,7 +132,7 @@ final class RankingPathElementList<V, E>
 
             double weight = calculatePathWeight(prevPathElement, edge);
             RankingPathElement<V, E> newPathElement =
-                new RankingPathElement<>(this.graph, prevPathElement, edge, weight);
+                    new RankingPathElement<>(this.graph, prevPathElement, edge, weight);
 
             // the new path is inserted at the end of the list.
             this.pathElements.add(newPathElement);
@@ -144,21 +144,19 @@ final class RankingPathElementList<V, E>
      *
      * @param maxSize max number of paths the list is able to store.
      */
-    RankingPathElementList(Graph<V, E> graph, int maxSize, V vertex)
-    {
+    RankingPathElementList(Graph<V, E> graph, int maxSize, V vertex) {
         this(graph, maxSize, vertex, null);
     }
 
     /**
      * Creates an empty list. The list size is 0.
      *
-     * @param maxSize max number of paths the list is able to store.
+     * @param maxSize       max number of paths the list is able to store.
      * @param pathValidator path validator to be used in addition to basic validations (path is from
-     *        source to target w/o loops)
+     *                      source to target w/o loops)
      */
     RankingPathElementList(
-        Graph<V, E> graph, int maxSize, V vertex, PathValidator<V, E> pathValidator)
-    {
+            Graph<V, E> graph, int maxSize, V vertex, PathValidator<V, E> pathValidator) {
         super(graph, maxSize, vertex);
         this.externalPathValidator = pathValidator;
     }
@@ -169,7 +167,7 @@ final class RankingPathElementList<V, E>
      * specified edge $(v, y)$ to the paths <code>
      * elementList</code> at vertex $v$.
      * </p>
-     *
+     * <p>
      * Complexity =
      *
      * <ul>
@@ -182,15 +180,13 @@ final class RankingPathElementList<V, E>
      * </ul>
      *
      * @param elementList list of paths at vertex $v$.
-     * @param edge edge $(v, y)$.
-     *
+     * @param edge        edge $(v, y)$.
      * @return <code>true</code> if at least one path has been added in the list, <code>false</code>
-     *         otherwise.
+     * otherwise.
      */
-    public boolean addPathElements(RankingPathElementList<V, E> elementList, E edge)
-    {
+    public boolean addPathElements(RankingPathElementList<V, E> elementList, E edge) {
         assert (this.vertex
-            .equals(Graphs.getOppositeVertex(this.graph, edge, elementList.getVertex())));
+                .equals(Graphs.getOppositeVertex(this.graph, edge, elementList.getVertex())));
 
         boolean pathAdded = false;
 
@@ -205,7 +201,7 @@ final class RankingPathElementList<V, E>
             }
             double newPathWeight = calculatePathWeight(prevPathElement, edge);
             RankingPathElement<V, E> newPathElement =
-                new RankingPathElement<>(this.graph, prevPathElement, edge, newPathWeight);
+                    new RankingPathElement<>(this.graph, prevPathElement, edge, newPathWeight);
 
             // loop over the paths of the list at vertex y from yIndex to the
             // end.
@@ -262,8 +258,7 @@ final class RankingPathElementList<V, E>
     /**
      * @return list of <code>RankingPathElement</code>.
      */
-    List<RankingPathElement<V, E>> getPathElements()
-    {
+    List<RankingPathElement<V, E>> getPathElements() {
         return this.pathElements;
     }
 
@@ -271,14 +266,11 @@ final class RankingPathElementList<V, E>
      * Costs taken into account are the weights stored in <code>Edge</code> objects.
      *
      * @param pathElement
-     * @param edge the edge via which the vertex was encountered.
-     *
+     * @param edge        the edge via which the vertex was encountered.
      * @return the cost obtained by concatenation.
-     *
      * @see Graph#getEdgeWeight(E)
      */
-    private double calculatePathWeight(RankingPathElement<V, E> pathElement, E edge)
-    {
+    private double calculatePathWeight(RankingPathElement<V, E> pathElement, E edge) {
         double pathWeight = this.graph.getEdgeWeight(edge);
 
         // otherwise it's the start vertex.
@@ -293,10 +285,9 @@ final class RankingPathElementList<V, E>
      * Ensures that paths of the list do not disconnect the guard-vertex.
      *
      * @return <code>true</code> if the specified path element disconnects the guard-vertex,
-     *         <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
-    private boolean isGuardVertexDisconnected(RankingPathElement<V, E> prevPathElement)
-    {
+    private boolean isGuardVertexDisconnected(RankingPathElement<V, E> prevPathElement) {
         if (this.guardVertexToNotDisconnect == null) {
             return false;
         }
@@ -309,7 +300,7 @@ final class RankingPathElementList<V, E>
         final PathMask<V, E> connectivityMask = new PathMask<>(prevPathElement);
 
         MaskSubgraph<V, E> connectivityGraph = new MaskSubgraph<>(
-            this.graph, new Predicate<V>() {
+                this.graph, new Predicate<V>() {
             @Override
             public boolean test(V vertex1) {
                 return connectivityMask.isVertexMasked(vertex1);
@@ -337,8 +328,7 @@ final class RankingPathElementList<V, E>
         return false;
     }
 
-    private boolean isNotValidPath(RankingPathElement<V, E> prevPathElement, E edge)
-    {
+    private boolean isNotValidPath(RankingPathElement<V, E> prevPathElement, E edge) {
         if (!isSimplePath(prevPathElement, edge)) {
             return true;
         }
@@ -350,18 +340,16 @@ final class RankingPathElementList<V, E>
             GraphPath<V, E> prevPath;
             if (prevPathElement.getPrevEdge() == null) {
                 prevPath = new GraphWalk<>(
-                    graph, Collections.singletonList(prevPathElement.getVertex()),
-                    prevPathElement.getWeight());
+                        graph, Collections.singletonList(prevPathElement.getVertex()),
+                        prevPathElement.getWeight());
             } else {
                 List<E> prevEdges = prevPathElement.createEdgeListPath();
                 prevPath = new GraphWalk<V, E>(
-                    graph, graph.getEdgeSource(prevEdges.get(0)), prevPathElement.getVertex(),
-                    prevEdges, prevPathElement.getWeight());
+                        graph, graph.getEdgeSource(prevEdges.get(0)), prevPathElement.getVertex(),
+                        prevEdges, prevPathElement.getWeight());
             }
 
-            if (!externalPathValidator.isValidPath(prevPath, edge)) {
-                return true;
-            }
+            return !externalPathValidator.isValidPath(prevPath, edge);
         }
 
         return false;
@@ -373,13 +361,11 @@ final class RankingPathElementList<V, E>
      *
      * @param prevPathElement
      * @param edge
-     *
      * @return <code>true</code> if the resulting path (obtained by concatenating the specified edge
-     *         to the specified path) is simple, <code>
+     * to the specified path) is simple, <code>
      * false</code> otherwise.
      */
-    private boolean isSimplePath(RankingPathElement<V, E> prevPathElement, E edge)
-    {
+    private boolean isSimplePath(RankingPathElement<V, E> prevPathElement, E edge) {
         V endVertex = Graphs.getOppositeVertex(this.graph, edge, prevPathElement.getVertex());
         assert (endVertex.equals(this.vertex));
 
@@ -395,8 +381,7 @@ final class RankingPathElementList<V, E>
         return true;
     }
 
-    private static class PathMask<V, E>
-    {
+    private static class PathMask<V, E> {
         private Set<E> maskedEdges;
 
         private Set<V> maskedVertices;
@@ -407,8 +392,7 @@ final class RankingPathElementList<V, E>
          *
          * @param pathElement
          */
-        PathMask(RankingPathElement<V, E> pathElement)
-        {
+        PathMask(RankingPathElement<V, E> pathElement) {
             this.maskedEdges = new HashSet<>();
             this.maskedVertices = new HashSet<>();
 
@@ -420,13 +404,11 @@ final class RankingPathElementList<V, E>
             this.maskedVertices.add(pathElement.getVertex());
         }
 
-        public boolean isEdgeMasked(E edge)
-        {
+        public boolean isEdgeMasked(E edge) {
             return this.maskedEdges.contains(edge);
         }
 
-        public boolean isVertexMasked(V vertex)
-        {
+        public boolean isVertexMasked(V vertex) {
             return this.maskedVertices.contains(vertex);
         }
     }

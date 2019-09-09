@@ -17,11 +17,13 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.GraphDelegator;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Generates a <a href="http://mathworld.wolfram.com/WheelGraph.html">wheel graph</a> of any size.
@@ -31,13 +33,11 @@ import java.util.function.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John V. Sichi
  */
 public class WheelGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     /**
      * Role for the hub vertex.
      */
@@ -53,22 +53,19 @@ public class WheelGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      *
      * @param size number of vertices to be generated.
      */
-    public WheelGraphGenerator(int size)
-    {
+    public WheelGraphGenerator(int size) {
         this(size, true);
     }
 
     /**
      * Construct a new WheelGraphGenerator.
      *
-     * @param size number of vertices to be generated.
+     * @param size         number of vertices to be generated.
      * @param inwardSpokes if <code>true</code> and graph is directed, spokes are oriented from rim
-     *        to hub; else from hub to rim.
-     *
+     *                     to hub; else from hub to rim.
      * @throws IllegalArgumentException in case the number of vertices is negative
      */
-    public WheelGraphGenerator(int size, boolean inwardSpokes)
-    {
+    public WheelGraphGenerator(int size, boolean inwardSpokes) {
         if (size < 0) {
             throw new IllegalArgumentException("must be non-negative");
         }
@@ -81,8 +78,7 @@ public class WheelGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * {@inheritDoc}
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         if (size < 1) {
             return;
         }
@@ -102,10 +98,10 @@ public class WheelGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
         };
 
         Graph<V, E> targetWithRimVertexSupplier =
-            new GraphDelegator<>(target, rimVertexSupplier, null);
+                new GraphDelegator<>(target, rimVertexSupplier, null);
 
         new RingGraphGenerator<V, E>(size - 1)
-            .generateGraph(targetWithRimVertexSupplier, resultMap);
+                .generateGraph(targetWithRimVertexSupplier, resultMap);
 
         V hubVertex = target.addVertex();
 

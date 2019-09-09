@@ -17,20 +17,25 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Watts-Strogatz small-world graph generator.
- * 
+ *
  * <p>
  * The generator is described in the paper: D. J. Watts and S. H. Strogatz. Collective dynamics of
  * small-world networks. Nature 393(6684):440--442, 1998.
- * 
+ *
  * <p>
  * The following paragraph from the paper describes the construction.
- * 
+ *
  * <p>
  * "The generator starts with a ring of $n$ vertices, each connected to its $k$ nearest neighbors
  * ($k$ must be even). Then it chooses a vertex and the edge that connects it to its nearest
@@ -46,26 +51,24 @@ import java.util.*;
  * the graph becomes increasingly disordered until for $p = 1$, all edges are rewired randomly. For
  * intermediate values of $p$, the graph is a small-world network: highly clustered like a regular
  * graph, yet with small characteristic path length, like a random graph."
- * 
+ *
  * <p>
  * The authors require $n \gg k \gg \ln(n) \gg 1$ and specifically $k \gg \ln(n)$ guarantees that a
  * random graph will be connected.
- * 
+ *
  * <p>
  * Through the constructor parameter the model can be slightly changed into adding shortcut edges
  * instead of re-wiring. This variation was proposed in the paper: M. E. J. Newman and D. J. Watts,
  * Renormalization group analysis of the small-world network model, Physics Letters A, 263, 341,
  * 1999.
- * 
- * @author Dimitrios Michail
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Dimitrios Michail
  */
 public class WattsStrogatzGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private static final boolean DEFAULT_ADD_INSTEAD_OF_REWIRE = false;
 
     private final Random rng;
@@ -76,44 +79,41 @@ public class WattsStrogatzGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, 
 
     /**
      * Constructor
-     * 
+     *
      * @param n the number of nodes
      * @param k connect each node to its k nearest neighbors in a ring
      * @param p the probability of re-wiring each edge
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public WattsStrogatzGraphGenerator(int n, int k, double p)
-    {
+    public WattsStrogatzGraphGenerator(int n, int k, double p) {
         this(n, k, p, DEFAULT_ADD_INSTEAD_OF_REWIRE, new Random());
     }
 
     /**
      * Constructor
-     * 
-     * @param n the number of nodes
-     * @param k connect each node to its k nearest neighbors in a ring
-     * @param p the probability of re-wiring each edge
+     *
+     * @param n    the number of nodes
+     * @param k    connect each node to its k nearest neighbors in a ring
+     * @param p    the probability of re-wiring each edge
      * @param seed seed for the random number generator
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public WattsStrogatzGraphGenerator(int n, int k, double p, long seed)
-    {
+    public WattsStrogatzGraphGenerator(int n, int k, double p, long seed) {
         this(n, k, p, DEFAULT_ADD_INSTEAD_OF_REWIRE, new Random(seed));
     }
 
     /**
      * Constructor
-     * 
-     * @param n the number of nodes
-     * @param k connect each node to its k nearest neighbors in a ring
-     * @param p the probability of re-wiring each edge
+     *
+     * @param n                  the number of nodes
+     * @param k                  connect each node to its k nearest neighbors in a ring
+     * @param p                  the probability of re-wiring each edge
      * @param addInsteadOfRewire whether to add shortcut edges instead of re-wiring
-     * @param rng the random number generator to use
+     * @param rng                the random number generator to use
      * @throws IllegalArgumentException in case of invalid parameters
      */
     public WattsStrogatzGraphGenerator(
-        int n, int k, double p, boolean addInsteadOfRewire, Random rng)
-    {
+            int n, int k, double p, boolean addInsteadOfRewire, Random rng) {
         if (n < 3) {
             throw new IllegalArgumentException("number of vertices must be at least 3");
         }
@@ -139,13 +139,12 @@ public class WattsStrogatzGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, 
 
     /**
      * Generates a small-world graph based on the Watts-Strogatz model.
-     * 
-     * @param target the target graph
+     *
+     * @param target    the target graph
      * @param resultMap not used by this generator, can be null
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         // special cases
         if (n == 0) {
             return;

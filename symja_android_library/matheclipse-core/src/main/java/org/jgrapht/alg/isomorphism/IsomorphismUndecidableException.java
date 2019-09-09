@@ -22,9 +22,8 @@ package org.jgrapht.alg.isomorphism;
  * isomorphism inspectors
  */
 public class IsomorphismUndecidableException
-    extends
-    RuntimeException
-{
+        extends
+        RuntimeException {
 
     private static final long serialVersionUID = 4703220562690821852L;
 
@@ -32,8 +31,7 @@ public class IsomorphismUndecidableException
      * Constructs a new exception with null as its detail message. The cause is not initialized, and
      * may subsequently be initialized by a call to Throwable.initCause(java.lang.Throwable).
      */
-    public IsomorphismUndecidableException()
-    {
+    public IsomorphismUndecidableException() {
     }
 
     /**
@@ -41,10 +39,9 @@ public class IsomorphismUndecidableException
      * and may subsequently be initialized by a call to Throwable.initCause(java.lang.Throwable).
      *
      * @param message the detail message. The detail message is saved for later retrieval by the
-     *        Throwable.getMessage() method.
+     *                Throwable.getMessage() method.
      */
-    public IsomorphismUndecidableException(String message)
-    {
+    public IsomorphismUndecidableException(String message) {
         super(message);
     }
 
@@ -55,11 +52,10 @@ public class IsomorphismUndecidableException
      * throwables (for example, PrivilegedActionException).
      *
      * @param cause the cause (which is saved for later retrieval by the Throwable.getCause()
-     *        method). (A null value is permitted, and indicates that the cause is nonexistent or
-     *        unknown.)
+     *              method). (A null value is permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      */
-    public IsomorphismUndecidableException(Throwable cause)
-    {
+    public IsomorphismUndecidableException(Throwable cause) {
         super(cause);
     }
 
@@ -69,13 +65,12 @@ public class IsomorphismUndecidableException
      * message.
      *
      * @param message the detail message (which is saved for later retrieval by the
-     *        Throwable.getMessage() method).
-     * @param cause the cause (which is saved for later retrieval by the Throwable.getCause()
-     *        method). (A null value is permitted, and indicates that the cause is nonexistent or
-     *        unknown.)
+     *                Throwable.getMessage() method).
+     * @param cause   the cause (which is saved for later retrieval by the Throwable.getCause()
+     *                method). (A null value is permitted, and indicates that the cause is nonexistent or
+     *                unknown.)
      */
-    public IsomorphismUndecidableException(String message, Throwable cause)
-    {
+    public IsomorphismUndecidableException(String message, Throwable cause) {
         super(message, cause);
     }
 }

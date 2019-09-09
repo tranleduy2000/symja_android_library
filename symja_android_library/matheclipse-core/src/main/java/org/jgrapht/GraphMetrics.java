@@ -38,8 +38,7 @@ import java.util.function.ToIntFunction;
  * @author Joris Kinable
  * @author Alexandru Valeanu
  */
-public abstract class GraphMetrics
-{
+public abstract class GraphMetrics {
 
     /**
      * Compute the <a href="http://mathworld.wolfram.com/GraphDiameter.html">diameter</a> of the
@@ -53,12 +52,11 @@ public abstract class GraphMetrics
      * instead.
      *
      * @param graph input graph
-     * @param <V> graph vertex type
-     * @param <E> graph edge type
+     * @param <V>   graph vertex type
+     * @param <E>   graph edge type
      * @return the diameter of the graph.
      */
-    public static <V, E> double getDiameter(Graph<V, E> graph)
-    {
+    public static <V, E> double getDiameter(Graph<V, E> graph) {
         return new GraphMeasurer<>(graph).getDiameter();
     }
 
@@ -73,12 +71,11 @@ public abstract class GraphMetrics
      * instead.
      *
      * @param graph input graph
-     * @param <V> graph vertex type
-     * @param <E> graph edge type
+     * @param <V>   graph vertex type
+     * @param <E>   graph edge type
      * @return the diameter of the graph.
      */
-    public static <V, E> double getRadius(Graph<V, E> graph)
-    {
+    public static <V, E> double getRadius(Graph<V, E> graph) {
         return new GraphMeasurer<>(graph).getRadius();
     }
 
@@ -102,14 +99,13 @@ public abstract class GraphMetrics
      * An algorithm with the same worst case runtime complexity, but a potentially better average
      * runtime complexity of $O(n^2)$ is described in: Itai, A. Rodeh, M. Finding a minimum circuit
      * in a graph. SIAM J. Comput. Vol 7, No 4, 1987.
-     * 
+     *
      * @param graph input graph
-     * @param <V> graph vertex type
-     * @param <E> graph edge type
+     * @param <V>   graph vertex type
+     * @param <E>   graph edge type
      * @return girth of the graph, or {@link Integer#MAX_VALUE} if the graph is acyclic.
      */
-    public static <V, E> int getGirth(Graph<V, E> graph)
-    {
+    public static <V, E> int getGirth(Graph<V, E> graph) {
         final int NIL = -1;
         final boolean isAllowingMultipleEdges = graph.getType().isAllowingMultipleEdges();
 
@@ -165,7 +161,7 @@ public abstract class GraphMetrics
                         int indexV = indexMap.get(v);
 
                         if (parent[indexU] == indexV) { // Skip the parent of vertex u, unless there
-                                                        // are multiple edges between u and v
+                            // are multiple edges between u and v
                             if (!isAllowingMultipleEdges || graph.getAllEdges(u, v).size() == 1)
                                 continue;
                         }
@@ -214,7 +210,7 @@ public abstract class GraphMetrics
         }
 
         assert graph.getType().isUndirected() && graph.getType().isSimple() && girth >= 3
-            || graph.getType().isAllowingSelfLoops() && girth >= 1 || girth >= 2
+                || graph.getType().isAllowingSelfLoops() && girth >= 1 || girth >= 2
                 && (graph.getType().isDirected() || graph.getType().isAllowingMultipleEdges());
         return girth;
     }
@@ -223,14 +219,13 @@ public abstract class GraphMetrics
      * An $O(|V|^3)$ (assuming vertexSubset provides constant time indexing) naive implementation
      * for counting non-trivial triangles in an undirected graph induced by the subset of vertices.
      *
-     * @param graph the input graph
+     * @param graph        the input graph
      * @param vertexSubset the vertex subset
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return the number of triangles in the graph induced by vertexSubset
      */
-    static <V, E> long naiveCountTriangles(Graph<V, E> graph, List<V> vertexSubset)
-    {
+    static <V, E> long naiveCountTriangles(Graph<V, E> graph, List<V> vertexSubset) {
         long total = 0;
 
         for (int i = 0; i < vertexSubset.size(); i++) {
@@ -241,8 +236,7 @@ public abstract class GraphMetrics
                     V w = vertexSubset.get(k);
 
                     if (graph.containsEdge(u, v) && graph.containsEdge(v, w)
-                        && graph.containsEdge(w, u))
-                    {
+                            && graph.containsEdge(w, u)) {
                         total++;
                     }
                 }
@@ -262,14 +256,13 @@ public abstract class GraphMetrics
      * Cambridge University Press, Chapter 10
      *
      * @param graph the input graph
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>   the graph vertex type
+     * @param <E>   the graph edge type
      * @return the number of triangles in the graph
-     * @throws NullPointerException if {@code graph} is {@code null}
+     * @throws NullPointerException     if {@code graph} is {@code null}
      * @throws IllegalArgumentException if {@code graph} is not undirected
      */
-    public static <V, E> long getNumberOfTriangles(final Graph<V, E> graph)
-    {
+    public static <V, E> long getNumberOfTriangles(final Graph<V, E> graph) {
         GraphTests.requireUndirected(graph);
 
         final int sqrtV = (int) Math.sqrt(graph.vertexSet().size());
@@ -289,23 +282,23 @@ public abstract class GraphMetrics
         }
 
         Comparator<V> comparator = DComparator
-            .comparingInt(new ToIntFunction<V>() {
-                @Override
-                public int applyAsInt(V vertex) {
-                    return graph.degreeOf(vertex);
-                }
-            }).thenComparingInt(new ToIntFunction<Object>() {
+                .comparingInt(new ToIntFunction<V>() {
+                    @Override
+                    public int applyAsInt(V vertex) {
+                        return graph.degreeOf(vertex);
+                    }
+                }).thenComparingInt(new ToIntFunction<Object>() {
                     @Override
                     public int applyAsInt(Object x1) {
                         return System.identityHashCode(x1);
                     }
                 })
-            .thenComparingInt(new ToIntFunction<V>() {
-                @Override
-                public int applyAsInt(V key) {
-                    return vertexOrder.get(key);
-                }
-            });
+                .thenComparingInt(new ToIntFunction<V>() {
+                    @Override
+                    public int applyAsInt(V key) {
+                        return vertexOrder.get(key);
+                    }
+                });
 
         vertexList.sort(comparator);
 

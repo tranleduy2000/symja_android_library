@@ -98,13 +98,11 @@ import java.util.Set;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class EdmondsMaximumCardinalityMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
     /* The graph we are matching on. */
     private final Graph<V, E> graph;
     /* (Heuristic) matching algorithm used to compute an initial feasible solution */
@@ -123,16 +121,24 @@ public class EdmondsMaximumCardinalityMatching<V, E>
 
     /* -----Algorithm data structures below---------- */
 
-    /** Storage of the forest, even and odd levels */
+    /**
+     * Storage of the forest, even and odd levels
+     */
     private Levels levels;
 
-    /** Special 'NIL' vertex. */
+    /**
+     * Special 'NIL' vertex.
+     */
     private static final int NIL = -1;
 
-    /** Queue of 'even' (exposed) vertices */
+    /**
+     * Queue of 'even' (exposed) vertices
+     */
     private FixedSizeIntegerQueue queue;
 
-    /** Union-Find to store blossoms. */
+    /**
+     * Union-Find to store blossoms.
+     */
     private UnionFind<Integer> uf;
 
     /**
@@ -143,7 +149,9 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      */
     private final Map<Integer, Pair<Integer, Integer>> bridges = new HashMap<>();
 
-    /** Pre-allocated array which stores augmenting paths. */
+    /**
+     * Pre-allocated array which stores augmenting paths.
+     */
     private int[] path;
 
     /* Pre-allocated bit sets to track paths in the trees. */
@@ -152,23 +160,21 @@ public class EdmondsMaximumCardinalityMatching<V, E>
     /**
      * Constructs a new instance of the algorithm. {@link GreedyMaximumCardinalityMatching} is used
      * to quickly generate a near optimal initial solution.
-     * 
+     *
      * @param graph undirected graph (graph does not have to be simple)
      */
-    public EdmondsMaximumCardinalityMatching(Graph<V, E> graph)
-    {
+    public EdmondsMaximumCardinalityMatching(Graph<V, E> graph) {
         this(graph, new GreedyMaximumCardinalityMatching<>(graph, false));
     }
 
     /**
      * Constructs a new instance of the algorithm.
-     * 
-     * @param graph undirected graph (graph does not have to be simple)
+     *
+     * @param graph       undirected graph (graph does not have to be simple)
      * @param initializer heuristic matching algorithm used to quickly generate a (near optimal)
-     *        initial feasible solution.
+     *                    initial feasible solution.
      */
-    public EdmondsMaximumCardinalityMatching(Graph<V, E> graph, MatchingAlgorithm<V, E> initializer)
-    {
+    public EdmondsMaximumCardinalityMatching(Graph<V, E> graph, MatchingAlgorithm<V, E> initializer) {
         this.graph = GraphTests.requireUndirected(graph);
         this.initializer = initializer;
     }
@@ -176,8 +182,7 @@ public class EdmondsMaximumCardinalityMatching<V, E>
     /**
      * Prepares the data structures
      */
-    private void init()
-    {
+    private void init() {
         vertices = new ArrayList<>();
         vertices.addAll(graph.vertexSet());
         vertexIndexMap = new HashMap<>();
@@ -199,11 +204,10 @@ public class EdmondsMaximumCardinalityMatching<V, E>
 
     /**
      * Calculates an initial feasible matching.
-     * 
+     *
      * @param initializer algorithm used to compute the initial matching
      */
-    private void warmStart(MatchingAlgorithm<V, E> initializer)
-    {
+    private void warmStart(MatchingAlgorithm<V, E> initializer) {
         Matching<V, E> initialSolution = initializer.getMatching();
         for (E e : initialSolution.getEdges()) {
             V u = graph.getEdgeSource(e);
@@ -218,8 +222,7 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      *
      * @return true if an augmenting path was found, false otherwise
      */
-    private boolean augment()
-    {
+    private boolean augment() {
         // reset data structures
         levels.reset();
         uf.reset();
@@ -283,8 +286,7 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      * @param v endpoint of the bridge
      * @param w another endpoint the bridge
      */
-    private void blossom(int v, int w)
-    {
+    private void blossom(int v, int w) {
         // Compute the base of the blossom. Let p_1, p_2 be the paths from the root of the tree to v
         // resp. w. The base vertex is the last vertex p_1 and p_2 have in common. In a blossom, the
         // base vertex is unique in the sense that it is the only vertex incident to 2 unmatched
@@ -316,12 +318,11 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      * first vertex of the bridge returned by bridge.get(x) is always on the same side of the
      * blossom as $x$.
      *
-     * @param v an endpoint of the blossom bridge
-     * @param w another endpoint of the blossom bridge
+     * @param v    an endpoint of the blossom bridge
+     * @param w    another endpoint of the blossom bridge
      * @param base the base of the blossom
      */
-    private void blossomSupports(int v, int w, int base)
-    {
+    private void blossomSupports(int v, int w, int base) {
         Pair<Integer, Integer> bridge = new Pair<>(v, w);
         v = uf.find(v);
         int u = v;
@@ -338,13 +339,12 @@ public class EdmondsMaximumCardinalityMatching<V, E>
     /**
      * Computes the base of the blossom formed by bridge edge $(v,w)$. The base vertex is the
      * nearest common ancestor of $v$ and $w$.
-     * 
+     *
      * @param v one side of the bridge
      * @param w other side of the bridge
      * @return base of the blossom
      */
-    private int nearestCommonAncestor(int v, int w)
-    {
+    private int nearestCommonAncestor(int v, int w) {
         vAncestors.clear();
         vAncestors.set(uf.find(v));
         wAncestors.clear();
@@ -377,8 +377,7 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      * @param v even vertex
      * @return the nearest even ancestor of $v$
      */
-    private int parent(int v)
-    {
+    private int parent(int v) {
         v = uf.find(v); // even vertex
         int parent = uf.find(levels.getEven(v)); // odd vertex, or v if v is the root of its tree
         if (parent == v)
@@ -392,8 +391,7 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      *
      * @param v starting vertex (leaf in the tree)
      */
-    private void augment(int v)
-    {
+    private void augment(int v) {
         int n = buildPath(path, 0, v, NIL);
         for (int i = 2; i < n; i += 2) {
             matching.match(path[i], path[i - 1]);
@@ -404,14 +402,13 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      * Builds the path backwards from the specified start vertex to the end vertex. If the path
      * reaches a blossom then the path through the blossom is lifted to the original graph.
      *
-     * @param path path storage
-     * @param i offset (in path)
+     * @param path  path storage
+     * @param i     offset (in path)
      * @param start start vertex
-     * @param end end vertex
+     * @param end   end vertex
      * @return the total length of the path.
      */
-    private int buildPath(int[] path, int i, int start, int end)
-    {
+    private int buildPath(int[] path, int i, int start, int end) {
         while (true) {
 
             // Lift the path through the blossom. The buildPath method always starts from an even
@@ -457,12 +454,11 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      * Returns a matching of maximum cardinality. Each time this method is invoked, the matching is
      * computed from scratch. Consequently, it is possible to make changes to the graph and to
      * re-invoke this method on the altered graph.
-     * 
+     *
      * @return a matching of maximum cardinality.
      */
     @Override
-    public Matching<V, E> getMatching()
-    {
+    public Matching<V, E> getMatching() {
         this.init();
         if (initializer != null)
             this.warmStart(initializer);
@@ -504,12 +500,11 @@ public class EdmondsMaximumCardinalityMatching<V, E>
      * the runtime of this method equals the time required to test for the existence of a single
      * augmenting path.<br>
      * This method does NOT check whether the matching is valid.
-     * 
+     *
      * @param matching matching
      * @return true if the matching is maximum, false otherwise.
      */
-    public boolean isMaximumMatching(Matching<V, E> matching)
-    {
+    public boolean isMaximumMatching(Matching<V, E> matching) {
         // The matching is maximum if it is perfect, or if it leaves only one node exposed in a
         // graph with an odd number of vertices
         if (matching.getEdges().size() * 2 >= graph.vertexSet().size() - 1)
@@ -555,9 +550,9 @@ public class EdmondsMaximumCardinalityMatching<V, E>
         }
 
         Graph<V, E> subgraph = new AsSubgraph<>(graph, otherVertices, null); // Induced subgraph
-                                                                             // defined on all
-                                                                             // vertices which are
-                                                                             // not odd.
+        // defined on all
+        // vertices which are
+        // not odd.
         List<Set<V>> connectedComponents = new ConnectivityInspector<>(subgraph).connectedSets();
         long nrOddCardinalityComponents =
                 0L;
@@ -568,25 +563,23 @@ public class EdmondsMaximumCardinalityMatching<V, E>
         }
 
         return matching
-            .getEdges()
-            .size() == (graph.vertexSet().size() + oddVertices.size() - nrOddCardinalityComponents)
+                .getEdges()
+                .size() == (graph.vertexSet().size() + oddVertices.size() - nrOddCardinalityComponents)
                 / 2.0;
     }
 
     /**
      * Storage of the forest, even and odd levels.
-     * 
+     * <p>
      * We explicitly maintain a dirty mark in order to be able to cleanup only the values that we
      * have changed. This is important when the graph is sparse to avoid performing an $O(n)$
      * operation per augmentation.
      */
-    private static class Levels
-    {
+    private static class Levels {
         private int[] even, odd;
         private List<Integer> dirty;
 
-        public Levels(int n)
-        {
+        public Levels(int n) {
             this.even = new int[n];
             this.odd = new int[n];
             this.dirty = new ArrayList<>();
@@ -595,49 +588,41 @@ public class EdmondsMaximumCardinalityMatching<V, E>
             Arrays.fill(odd, NIL);
         }
 
-        public int getEven(int v)
-        {
+        public int getEven(int v) {
             return even[v];
         }
 
-        public void setEven(int v, int value)
-        {
+        public void setEven(int v, int value) {
             even[v] = value;
             if (value != NIL) {
                 dirty.add(v);
             }
         }
 
-        public int getOdd(int v)
-        {
+        public int getOdd(int v) {
             return odd[v];
         }
 
-        public void setOdd(int v, int value)
-        {
+        public void setOdd(int v, int value) {
             odd[v] = value;
             if (value != NIL) {
                 dirty.add(v);
             }
         }
 
-        public boolean isEven(int v)
-        {
+        public boolean isEven(int v) {
             return even[v] != NIL;
         }
 
-        public boolean isOddOrUnreached(int v)
-        {
+        public boolean isOddOrUnreached(int v) {
             return odd[v] == NIL;
         }
 
-        public boolean isOdd(int v)
-        {
+        public boolean isOdd(int v) {
             return odd[v] != NIL;
         }
 
-        public void reset()
-        {
+        public void reset() {
             for (int v : dirty) {
                 even[v] = NIL;
                 odd[v] = NIL;
@@ -649,14 +634,12 @@ public class EdmondsMaximumCardinalityMatching<V, E>
     /**
      * Simple representation of a matching
      */
-    private static class SimpleMatching
-    {
+    private static class SimpleMatching {
         private static final int UNMATCHED = -1;
         private final int[] match;
         private Set<Integer> exposed;
 
-        private SimpleMatching(int n)
-        {
+        private SimpleMatching(int n) {
             this.match = new int[n];
             this.exposed = new HashSet<>(n);
 
@@ -669,24 +652,21 @@ public class EdmondsMaximumCardinalityMatching<V, E>
         /**
          * Test whether a vertex is matched (i.e. incident to a matched edge).
          */
-        boolean isMatched(int v)
-        {
+        boolean isMatched(int v) {
             return match[v] != UNMATCHED;
         }
 
         /**
          * Test whether a vertex is exposed (i.e. not incident to a matched edge).
          */
-        boolean isExposed(int v)
-        {
+        boolean isExposed(int v) {
             return match[v] == UNMATCHED;
         }
 
         /**
          * For a given vertex v and matched edge (v,w), this function returns vertex w.
          */
-        int opposite(int v)
-        {
+        int opposite(int v) {
             assert isMatched(v);
             return match[v];
         }
@@ -694,24 +674,23 @@ public class EdmondsMaximumCardinalityMatching<V, E>
         /**
          * Add the edge $(u,v)$ to the matched edge set.
          */
-        void match(int u, int v)
-        {
+        void match(int u, int v) {
             match[u] = v;
             match[v] = u;
             exposed.remove(u);
             exposed.remove(v);
         }
 
-        Set<Integer> getExposed()
-        {
+        Set<Integer> getExposed() {
             return exposed;
         }
 
     }
 
-    /** Utility function to reverse part of an array */
-    private void reverse(int[] path, int i, int j)
-    {
+    /**
+     * Utility function to reverse part of an array
+     */
+    private void reverse(int[] path, int i, int j) {
         while (i < j) {
             int tmp = path[i];
             path[i] = path[j];

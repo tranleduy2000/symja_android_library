@@ -31,8 +31,7 @@ import java.util.Set;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public interface MatchingAlgorithm<V, E>
-{
+public interface MatchingAlgorithm<V, E> {
     /**
      * Default tolerance used by algorithms comparing floating point values.
      */
@@ -52,9 +51,8 @@ public interface MatchingAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     interface Matching<V, E>
-        extends
-        Iterable<E>
-    {
+            extends
+            Iterable<E> {
         /**
          * Returns the graph over which this matching is defined.
          *
@@ -98,14 +96,14 @@ public interface MatchingAlgorithm<V, E>
          * in the graph is incident to an edge in the matching.
          *
          * @return true if the matching is perfect. By definition, a perfect matching consists of
-         *         exactly $\frac{1}{2|V|}$ edges, and the number of vertices in the graph must be
-         *         even.
+         * exactly $\frac{1}{2|V|}$ edges, and the number of vertices in the graph must be
+         * even.
          */
         boolean isPerfect();
 
         /**
          * Returns an iterator over the edges in the matching.
-         * 
+         *
          * @return iterator over the edges in the matching.
          */
         @Override
@@ -114,15 +112,14 @@ public interface MatchingAlgorithm<V, E>
 
     /**
      * A default implementation of the matching interface.
-     * 
+     *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
      */
     class MatchingImpl<V, E>
-        implements
-        Matching<V, E>,
-        Serializable
-    {
+            implements
+            Matching<V, E>,
+            Serializable {
         private static final long serialVersionUID = 4767675421846527768L;
 
         private Graph<V, E> graph;
@@ -133,20 +130,18 @@ public interface MatchingAlgorithm<V, E>
         /**
          * Construct a new instance
          *
-         * @param graph graph on which the matching is defined
-         * @param edges the edges of the matching
+         * @param graph  graph on which the matching is defined
+         * @param edges  the edges of the matching
          * @param weight the weight of the matching
          */
-        public MatchingImpl(Graph<V, E> graph, Set<E> edges, double weight)
-        {
+        public MatchingImpl(Graph<V, E> graph, Set<E> edges, double weight) {
             this.graph = graph;
             this.edges = edges;
             this.weight = weight;
         }
 
         @Override
-        public Graph<V, E> getGraph()
-        {
+        public Graph<V, E> getGraph() {
             return graph;
         }
 
@@ -154,8 +149,7 @@ public interface MatchingAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public double getWeight()
-        {
+        public double getWeight() {
             return weight;
         }
 
@@ -163,8 +157,7 @@ public interface MatchingAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<E> getEdges()
-        {
+        public Set<E> getEdges() {
             return edges;
         }
 
@@ -182,8 +175,7 @@ public interface MatchingAlgorithm<V, E>
          * {@inheritDoc}
          */
 //        @Override
-        public boolean isMatched(V v)
-        {
+        public boolean isMatched(V v) {
             if (matchedVertices == null) { // lazily index the vertices that have been matched
                 matchedVertices = new HashSet<>();
                 for (E e : edges) {
@@ -198,8 +190,7 @@ public interface MatchingAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Matching [edges=" + edges + ", weight=" + weight + "]";
         }
 

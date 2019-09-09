@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2019, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,14 @@
  */
 package org.jheaps.array;
 
+import org.jheaps.AddressableHeap;
+import org.jheaps.annotations.LinearTime;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.jheaps.AddressableHeap;
-import org.jheaps.annotations.LinearTime;
 
 /**
  * An array based d-ary addressable heap. The heap is sorted according to the
@@ -42,7 +42,7 @@ import org.jheaps.annotations.LinearTime;
  * time. The bounds are worst-case if the user initializes the heap with a
  * capacity larger or equal to the total number of elements that are going to be
  * inserted into the heap.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(int, Object[], Object[])} or
@@ -70,11 +70,8 @@ import org.jheaps.annotations.LinearTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap<K, V> implements Serializable {
@@ -82,7 +79,7 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
     private static final long serialVersionUID = 1;
 
     private static final String D_ARY_HEAPS_MUST_HAVE_AT_LEAST_2_CHILDREN_PER_NODE = "D-ary heaps must have at least 2 children per node";
-    
+
     /**
      * Default initial capacity of the binary heap.
      */
@@ -109,11 +106,9 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
      * <p>
      * The initial capacity of the heap is {@link #DEFAULT_HEAP_CAPACITY} and
      * adjusts automatically based on the sequence of insertions and deletions.
-     * 
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     *
+     * @param d the number of children of each node in the d-ary heap
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayAddressableHeap(int d) {
         this(d, null, DEFAULT_HEAP_CAPACITY);
@@ -138,12 +133,9 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @param capacity
-     *            the initial heap capacity
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     * @param d        the number of children of each node in the d-ary heap
+     * @param capacity the initial heap capacity
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayAddressableHeap(int d, int capacity) {
         this(d, null, capacity);
@@ -164,14 +156,11 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
      * The initial capacity of the heap is {@link #DEFAULT_HEAP_CAPACITY} and
      * adjusts automatically based on the sequence of insertions and deletions.
      *
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2 *
+     * @param d          the number of children of each node in the d-ary heap
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @throws IllegalArgumentException in case the number of children per node are less than 2 *
      */
     public DaryArrayAddressableHeap(int d, Comparator<? super K> comparator) {
         this(d, comparator, DEFAULT_HEAP_CAPACITY);
@@ -194,16 +183,12 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     * @param d          the number of children of each node in the d-ary heap
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayAddressableHeap(int d, Comparator<? super K> comparator, int capacity) {
         super(comparator, capacity);
@@ -217,24 +202,16 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param <V>
-     *            the type of values maintained by the heap
-     * @param d
-     *            the number of children of the d-ary heap
-     * @param keys
-     *            an array of keys
-     * @param values
-     *            an array of values, can be null
+     * @param <K>    the type of keys maintained by the heap
+     * @param <V>    the type of values maintained by the heap
+     * @param d      the number of children of the d-ary heap
+     * @param keys   an array of keys
+     * @param values an array of values, can be null
      * @return a d-ary heap
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
-     * @throws IllegalArgumentException
-     *             in case the keys array is null
-     * @throws IllegalArgumentException
-     *             in case the values array has different length than the keys
-     *             array
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
+     * @throws IllegalArgumentException in case the keys array is null
+     * @throws IllegalArgumentException in case the values array has different length than the keys
+     *                                  array
      */
     @LinearTime
     public static <K, V> DaryArrayAddressableHeap<K, V> heapify(int d, K[] keys, V[] values) {
@@ -273,30 +250,21 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param <V>
-     *            the type of values maintained by the heap
-     * @param d
-     *            the number of children of the d-ary heap
-     * @param keys
-     *            an array of keys
-     * @param values
-     *            an array of values, can be null
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param <V>        the type of values maintained by the heap
+     * @param d          the number of children of the d-ary heap
+     * @param keys       an array of keys
+     * @param values     an array of values, can be null
+     * @param comparator the comparator to use
      * @return a d-ary heap
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
-     * @throws IllegalArgumentException
-     *             in case the keys array is null
-     * @throws IllegalArgumentException
-     *             in case the values array has different length than the keys
-     *             array
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
+     * @throws IllegalArgumentException in case the keys array is null
+     * @throws IllegalArgumentException in case the values array has different length than the keys
+     *                                  array
      */
     @LinearTime
     public static <K, V> DaryArrayAddressableHeap<K, V> heapify(int d, K[] keys, V[] values,
-            Comparator<? super K> comparator) {
+                                                                Comparator<? super K> comparator) {
         if (d < 2) {
             throw new IllegalArgumentException(D_ARY_HEAPS_MUST_HAVE_AT_LEAST_2_CHILDREN_PER_NODE);
         }
@@ -330,11 +298,11 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
 
     /**
      * Get an iterator for all handles currently in the heap.
-     * 
+     * <p>
      * This method is especially useful when building a heap using the heapify
      * method. Unspecified behavior will occur if the heap is modified while
      * using this iterator.
-     * 
+     *
      * @return an iterator which will return all handles of the heap
      */
     public Iterator<AddressableHeap.Handle<K, V>> handlesIterator() {
@@ -348,7 +316,7 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
 
             @Override
             public AddressableHeap.Handle<K, V> next() {
-                if (pos > size) { 
+                if (pos > size) {
                     throw new NoSuchElementException();
                 }
                 return array[pos++];
@@ -363,9 +331,8 @@ public class DaryArrayAddressableHeap<K, V> extends AbstractArrayAddressableHeap
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @Override
     @SuppressWarnings("unchecked")

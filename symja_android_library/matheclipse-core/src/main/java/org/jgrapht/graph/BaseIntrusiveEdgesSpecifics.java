@@ -17,26 +17,27 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.util.TypeUtil;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A base implementation for the intrusive edges specifics.
- * 
+ *
+ * @param <V>  the graph vertex type
+ * @param <E>  the graph edge type
+ * @param <IE> the intrusive edge type
  * @author Barak Naveh
  * @author Dimitrios Michail
- *
- * @param <V> the graph vertex type
- * @param <E> the graph edge type
- * @param <IE> the intrusive edge type
  */
 public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge>
-    implements
-    Serializable
-{
+        implements
+        Serializable {
     private static final long serialVersionUID = -7498268216742485L;
 
     protected Map<E, IE> edgeMap;
@@ -44,32 +45,29 @@ public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge
 
     /**
      * Constructor
-     * 
+     *
      * @param edgeMap the map to use for storage
      */
-    public BaseIntrusiveEdgesSpecifics(Map<E, IE> edgeMap)
-    {
+    public BaseIntrusiveEdgesSpecifics(Map<E, IE> edgeMap) {
         this.edgeMap = Objects.requireNonNull(edgeMap);
     }
 
     /**
      * Check if an edge exists
-     * 
+     *
      * @param e the edge
      * @return true if the edge exists, false otherwise
      */
-    public boolean containsEdge(E e)
-    {
+    public boolean containsEdge(E e) {
         return edgeMap.containsKey(e);
     }
 
     /**
      * Get the edge set.
-     * 
+     *
      * @return an unmodifiable edge set
      */
-    public Set<E> getEdgeSet()
-    {
+    public Set<E> getEdgeSet() {
         if (unmodifiableEdgeSet == null) {
             unmodifiableEdgeSet = Collections.unmodifiableSet(edgeMap.keySet());
         }
@@ -78,22 +76,20 @@ public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge
 
     /**
      * Remove an edge.
-     * 
+     *
      * @param e the edge
      */
-    public void remove(E e)
-    {
+    public void remove(E e) {
         edgeMap.remove(e);
     }
 
     /**
      * Get the source of an edge.
-     * 
+     *
      * @param e the edge
      * @return the source vertex of an edge
      */
-    public V getEdgeSource(E e)
-    {
+    public V getEdgeSource(E e) {
         IntrusiveEdge ie = getIntrusiveEdge(e);
         if (ie == null) {
             throw new IllegalArgumentException("no such edge in graph: " + e.toString());
@@ -103,12 +99,11 @@ public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge
 
     /**
      * Get the target of an edge.
-     * 
+     *
      * @param e the edge
      * @return the target vertex of an edge
      */
-    public V getEdgeTarget(E e)
-    {
+    public V getEdgeTarget(E e) {
         IntrusiveEdge ie = getIntrusiveEdge(e);
         if (ie == null) {
             throw new IllegalArgumentException("no such edge in graph: " + e.toString());
@@ -118,30 +113,28 @@ public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge
 
     /**
      * Get the weight of an edge.
-     * 
+     *
      * @param e the edge
      * @return the weight of an edge
      */
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         return Graph.DEFAULT_EDGE_WEIGHT;
     }
 
     /**
      * Set the weight of an edge
-     * 
-     * @param e the edge
+     *
+     * @param e      the edge
      * @param weight the new weight
      */
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * Add a new edge
-     * 
-     * @param e the edge
+     *
+     * @param e            the edge
      * @param sourceVertex the source vertex of the edge
      * @param targetVertex the target vertex of the edge
      * @return true if the edge was added, false if the edge was already present
@@ -150,7 +143,7 @@ public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge
 
     /**
      * Get the intrusive edge of an edge.
-     * 
+     *
      * @param e the edge
      * @return the intrusive edge
      */

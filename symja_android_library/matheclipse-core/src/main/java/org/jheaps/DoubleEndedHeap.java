@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,9 +22,7 @@ import java.util.NoSuchElementException;
 /**
  * A double-ended heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public interface DoubleEndedHeap<K> extends Heap<K> {
@@ -33,8 +31,7 @@ public interface DoubleEndedHeap<K> extends Heap<K> {
      * Find an element with the maximum key.
      *
      * @return an element with the maximum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     K findMax();
 
@@ -43,8 +40,7 @@ public interface DoubleEndedHeap<K> extends Heap<K> {
      * elements exists, only one of them will be deleted.
      *
      * @return the deleted element with the maximum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     K deleteMax();
 

@@ -17,9 +17,16 @@
  */
 package org.jgrapht.alg.connectivity;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Computes the strongly connected components of a directed graph. The implemented algorithm follows
@@ -28,13 +35,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Sarah Komla-Ebri
  */
 public class GabowStrongConnectivityInspector<V, E>
-    extends
-    AbstractStrongConnectivityInspector<V, E>
-{
+        extends
+        AbstractStrongConnectivityInspector<V, E> {
     // stores the vertices
     private Deque<VertexNumber<V>> stack = new ArrayDeque<>();
 
@@ -53,14 +58,12 @@ public class GabowStrongConnectivityInspector<V, E>
      * @param graph the graph to inspect
      * @throws NullPointerException in case the graph is null
      */
-    public GabowStrongConnectivityInspector(Graph<V, E> graph)
-    {
+    public GabowStrongConnectivityInspector(Graph<V, E> graph) {
         super(graph);
     }
 
     @Override
-    public List<Set<V>> stronglyConnectedSets()
-    {
+    public List<Set<V>> stronglyConnectedSets() {
         if (stronglyConnectedSets == null) {
             stronglyConnectedSets = new Vector<>();
 
@@ -86,8 +89,7 @@ public class GabowStrongConnectivityInspector<V, E>
      * Creates a VertexNumber object for every vertex in the graph and stores them in a HashMap.
      */
 
-    private void createVertexNumber()
-    {
+    private void createVertexNumber() {
         c = graph.vertexSet().size();
         vertexToVertexNumber = new HashMap<>(c);
 
@@ -102,8 +104,7 @@ public class GabowStrongConnectivityInspector<V, E>
     /*
      * The subroutine of DFS.
      */
-    private void dfsVisit(Graph<V, E> visitedGraph, VertexNumber<V> v)
-    {
+    private void dfsVisit(Graph<V, E> visitedGraph, VertexNumber<V> v) {
         VertexNumber<V> w;
         stack.add(v);
         B.add(v.setNumber(stack.size() - 1));
@@ -138,29 +139,24 @@ public class GabowStrongConnectivityInspector<V, E>
         }
     }
 
-    private static final class VertexNumber<V>
-    {
+    private static final class VertexNumber<V> {
         V vertex;
         int number;
 
-        private VertexNumber(V vertex, int number)
-        {
+        private VertexNumber(V vertex, int number) {
             this.vertex = vertex;
             this.number = number;
         }
 
-        int getNumber()
-        {
+        int getNumber() {
             return number;
         }
 
-        V getVertex()
-        {
+        V getVertex() {
             return vertex;
         }
 
-        Integer setNumber(int n)
-        {
+        Integer setNumber(int n) {
             return number = n;
         }
     }

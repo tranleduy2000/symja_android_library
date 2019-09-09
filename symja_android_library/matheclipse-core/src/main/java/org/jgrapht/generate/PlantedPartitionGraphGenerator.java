@@ -18,9 +18,14 @@
 
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Create a random $l$-planted partition graph. An $l$-planted partition graph is a random graph on
@@ -34,7 +39,7 @@ import java.util.*;
  * probability matrix is a constant, in the sense that $P_{ij}=p$ for all $i,j$, then the result is
  * the Erdős–Rényi model $\mathcal G(n,p)$. This case is degenerate—the partition into communities
  * becomes irrelevant— but it illustrates a close relationship to the Erdős–Rényi model.
- *
+ * <p>
  * For more information on planted graphs, refer to:
  * <ol>
  * <li>Condon, A. Karp, R.M. Algorithms for graph partitioning on the planted partition model,
@@ -45,13 +50,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Emilio Cruciani
  */
 public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private static final boolean DEFAULT_ALLOW_SELFLOOPS = false;
 
     private final int l;
@@ -76,55 +79,52 @@ public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, 
      * @throws IllegalArgumentException if p is not in [0,1]
      * @throws IllegalArgumentException if q is not in [0,1]
      */
-    public PlantedPartitionGraphGenerator(int l, int k, double p, double q)
-    {
+    public PlantedPartitionGraphGenerator(int l, int k, double p, double q) {
         this(l, k, p, q, new Random(), DEFAULT_ALLOW_SELFLOOPS);
     }
 
     /**
      * Construct a new PlantedPartitionGraphGenerator.
      *
-     * @param l number of groups
-     * @param k number of nodes in each group
-     * @param p probability of connecting vertices within a group
-     * @param q probability of connecting vertices between groups
+     * @param l         number of groups
+     * @param k         number of nodes in each group
+     * @param p         probability of connecting vertices within a group
+     * @param q         probability of connecting vertices between groups
      * @param selfLoops true if the graph allows self loops
      * @throws IllegalArgumentException if number of groups is negative
      * @throws IllegalArgumentException if number of nodes in each group is negative
      * @throws IllegalArgumentException if p is not in [0,1]
      * @throws IllegalArgumentException if q is not in [0,1]
      */
-    public PlantedPartitionGraphGenerator(int l, int k, double p, double q, boolean selfLoops)
-    {
+    public PlantedPartitionGraphGenerator(int l, int k, double p, double q, boolean selfLoops) {
         this(l, k, p, q, new Random(), selfLoops);
     }
 
     /**
      * Construct a new PlantedPartitionGraphGenerator.
      *
-     * @param l number of groups
-     * @param k number of nodes in each group
-     * @param p probability of connecting vertices within a group
-     * @param q probability of connecting vertices between groups
+     * @param l    number of groups
+     * @param k    number of nodes in each group
+     * @param p    probability of connecting vertices within a group
+     * @param q    probability of connecting vertices between groups
      * @param seed seed for the random number generator
      * @throws IllegalArgumentException if number of groups is negative
      * @throws IllegalArgumentException if number of nodes in each group is negative
      * @throws IllegalArgumentException if p is not in [0,1]
      * @throws IllegalArgumentException if q is not in [0,1]
      */
-    public PlantedPartitionGraphGenerator(int l, int k, double p, double q, long seed)
-    {
+    public PlantedPartitionGraphGenerator(int l, int k, double p, double q, long seed) {
         this(l, k, p, q, new Random(seed), DEFAULT_ALLOW_SELFLOOPS);
     }
 
     /**
      * Construct a new PlantedPartitionGraphGenerator.
      *
-     * @param l number of groups
-     * @param k number of nodes in each group
-     * @param p probability of connecting vertices within a group
-     * @param q probability of connecting vertices between groups
-     * @param seed seed for the random number generator
+     * @param l         number of groups
+     * @param k         number of nodes in each group
+     * @param p         probability of connecting vertices within a group
+     * @param q         probability of connecting vertices between groups
+     * @param seed      seed for the random number generator
      * @param selfLoops true if the graph allows self loops
      * @throws IllegalArgumentException if number of groups is negative
      * @throws IllegalArgumentException if number of nodes in each group is negative
@@ -132,19 +132,18 @@ public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, 
      * @throws IllegalArgumentException if q is not in [0,1]
      */
     public PlantedPartitionGraphGenerator(
-        int l, int k, double p, double q, long seed, boolean selfLoops)
-    {
+            int l, int k, double p, double q, long seed, boolean selfLoops) {
         this(l, k, p, q, new Random(seed), selfLoops);
     }
 
     /**
      * Construct a new PlantedPartitionGraphGenerator.
      *
-     * @param l number of groups
-     * @param k number of nodes in each group
-     * @param p probability of connecting vertices within a group
-     * @param q probability of connecting vertices between groups
-     * @param rng random number generator
+     * @param l         number of groups
+     * @param k         number of nodes in each group
+     * @param p         probability of connecting vertices within a group
+     * @param q         probability of connecting vertices between groups
+     * @param rng       random number generator
      * @param selfLoops true if the graph allows self loops
      * @throws IllegalArgumentException if number of groups is negative
      * @throws IllegalArgumentException if number of nodes in each group is negative
@@ -152,14 +151,13 @@ public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, 
      * @throws IllegalArgumentException if q is not in [0,1]
      */
     public PlantedPartitionGraphGenerator(
-        int l, int k, double p, double q, Random rng, boolean selfLoops)
-    {
+            int l, int k, double p, double q, Random rng, boolean selfLoops) {
         if (l < 0) {
             throw new IllegalArgumentException("number of groups must be non-negative");
         }
         if (k < 0) {
             throw new IllegalArgumentException(
-                "number of nodes in each group must be non-negative");
+                    "number of nodes in each group must be non-negative");
         }
         if (p < 0 || p > 1) {
             throw new IllegalArgumentException("invalid probability p");
@@ -179,20 +177,19 @@ public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, 
 
     /**
      * Generate an $l$-planted partition graph.
-     *
+     * <p>
      * Note that the method can be called only once. Must instantiate another
      * PlantedPartitionGraphGenerator object in order to generate another $l$-planted partition
      * graph.
      *
-     * @param target target graph
+     * @param target    target graph
      * @param resultMap result map
      * @throws IllegalArgumentException if target is directed
      * @throws IllegalArgumentException if self loops are requested but target does not allow them
-     * @throws IllegalStateException if generateGraph() is called more than once
+     * @throws IllegalStateException    if generateGraph() is called more than once
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         if (fired) {
             throw new IllegalStateException("generateGraph() can be only called once");
         }
@@ -291,14 +288,13 @@ public class PlantedPartitionGraphGenerator<V, E> extends GraphGeneratorImpl<V, 
      * Get the community structure of the graph. The method returns a list of communities,
      * represented as sets of nodes.
      *
-     * @throws IllegalStateException if getCommunities() is called before generating the graph
      * @return the community structure of the graph
+     * @throws IllegalStateException if getCommunities() is called before generating the graph
      */
-    public List<Set<V>> getCommunities()
-    {
+    public List<Set<V>> getCommunities() {
         if (communities == null)
             throw new IllegalStateException(
-                "must generate graph before getting community structure");
+                    "must generate graph before getting community structure");
 
         return communities;
     }

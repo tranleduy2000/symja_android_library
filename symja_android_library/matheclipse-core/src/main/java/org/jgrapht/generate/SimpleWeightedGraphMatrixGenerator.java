@@ -17,9 +17,10 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple weighted graph matrix generator.
@@ -28,47 +29,43 @@ import java.util.*;
  * @param <E> the graph edge type
  */
 public class SimpleWeightedGraphMatrixGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     protected List<V> vertices;
     protected double[][] weights;
 
     /**
      * Set the generator vertices.
-     * 
+     *
      * @param vertices the graph vertices
      * @return the generator
      */
-    public SimpleWeightedGraphMatrixGenerator<V, E> vertices(List<V> vertices)
-    {
+    public SimpleWeightedGraphMatrixGenerator<V, E> vertices(List<V> vertices) {
         this.vertices = vertices;
         return this;
     }
 
     /**
      * Set the weights of the generator.
-     * 
+     *
      * @param weights the weights
      * @return the generator
      */
-    public SimpleWeightedGraphMatrixGenerator<V, E> weights(double[][] weights)
-    {
+    public SimpleWeightedGraphMatrixGenerator<V, E> weights(double[][] weights) {
         this.weights = weights;
         return this;
     }
 
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         if (weights == null) {
             throw new IllegalArgumentException(
-                "Graph may not be constructed without weight-matrix specified");
+                    "Graph may not be constructed without weight-matrix specified");
         }
 
         if (vertices == null) {
             throw new IllegalArgumentException(
-                "Graph may not be constructed without vertex-set specified");
+                    "Graph may not be constructed without vertex-set specified");
         }
 
         assert vertices.size() == weights.length;
@@ -83,7 +80,7 @@ public class SimpleWeightedGraphMatrixGenerator<V, E> extends GraphGeneratorImpl
             for (int j = 0; j < vertices.size(); ++j) {
                 if (i != j) {
                     target.setEdgeWeight(
-                        target.addEdge(vertices.get(i), vertices.get(j)), weights[i][j]);
+                            target.addEdge(vertices.get(i), vertices.get(j)), weights[i][j]);
                 }
             }
         }

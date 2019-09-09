@@ -17,18 +17,17 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
+import org.jgrapht.GraphPath;
 
 /**
  * An exception used to notify about the detection of a negative cycle. The exception may carry the
  * negative cycle to the user.
- * 
+ *
  * @author Dimitrios Michail
  */
 public class NegativeCycleDetectedException
-    extends
-    RuntimeException
-{
+        extends
+        RuntimeException {
     private static final long serialVersionUID = -8064609917721881630L;
 
     private GraphPath<?, ?> cycle;
@@ -37,8 +36,7 @@ public class NegativeCycleDetectedException
      * Constructs a new exception with {@code null} as its detail message. The cause is not
      * initialized, and may subsequently be initialized by a call to {@link #initCause}.
      */
-    public NegativeCycleDetectedException()
-    {
+    public NegativeCycleDetectedException() {
         super();
     }
 
@@ -47,10 +45,9 @@ public class NegativeCycleDetectedException
      * and may subsequently be initialized by a call to {@link #initCause}.
      *
      * @param message the detail message. The detail message is saved for later retrieval by the
-     *        {@link #getMessage()} method.
+     *                {@link #getMessage()} method.
      */
-    public NegativeCycleDetectedException(String message)
-    {
+    public NegativeCycleDetectedException(String message) {
         super(message);
     }
 
@@ -59,32 +56,29 @@ public class NegativeCycleDetectedException
      * and may subsequently be initialized by a call to {@link #initCause}.
      *
      * @param message the detail message. The detail message is saved for later retrieval by the
-     *        {@link #getMessage()} method.
-     * @param cycle the negative weight cycle
+     *                {@link #getMessage()} method.
+     * @param cycle   the negative weight cycle
      */
-    public NegativeCycleDetectedException(String message, GraphPath<?, ?> cycle)
-    {
+    public NegativeCycleDetectedException(String message, GraphPath<?, ?> cycle) {
         super(message);
         this.cycle = cycle;
     }
 
     /**
      * Get the actual negative cycle, or null if not provided.
-     * 
+     *
      * @return the negative cycle or null.
      */
-    public GraphPath<?, ?> getCycle()
-    {
+    public GraphPath<?, ?> getCycle() {
         return cycle;
     }
 
     /**
      * Set the negative cycle.
-     * 
+     *
      * @param cycle the negative cycle.
      */
-    public void setCycle(GraphPath<?, ?> cycle)
-    {
+    public void setCycle(GraphPath<?, ?> cycle) {
         this.cycle = cycle;
     }
 

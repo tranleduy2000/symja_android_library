@@ -17,39 +17,40 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.jgrapht.graph.GraphWalk;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A base implementation of the shortest path interface.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 abstract class BaseShortestPathAlgorithm<V, E>
-    implements
-    ShortestPathAlgorithm<V, E>
-{
+        implements
+        ShortestPathAlgorithm<V, E> {
     /**
      * Error message for reporting the existence of a negative-weight cycle.
      */
     protected static final String GRAPH_CONTAINS_A_NEGATIVE_WEIGHT_CYCLE =
-        "Graph contains a negative-weight cycle";
+            "Graph contains a negative-weight cycle";
     /**
      * Error message for reporting that a source vertex is missing.
      */
     protected static final String GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX =
-        "Graph must contain the source vertex!";
+            "Graph must contain the source vertex!";
     /**
      * Error message for reporting that a sink vertex is missing.
      */
     protected static final String GRAPH_MUST_CONTAIN_THE_SINK_VERTEX =
-        "Graph must contain the sink vertex!";
+            "Graph must contain the sink vertex!";
 
     /**
      * The underlying graph.
@@ -58,11 +59,10 @@ abstract class BaseShortestPathAlgorithm<V, E>
 
     /**
      * Constructs a new instance of the algorithm for a given graph.
-     * 
+     *
      * @param graph the graph
      */
-    public BaseShortestPathAlgorithm(Graph<V, E> graph)
-    {
+    public BaseShortestPathAlgorithm(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph is null");
     }
 
@@ -70,8 +70,7 @@ abstract class BaseShortestPathAlgorithm<V, E>
      * {@inheritDoc}
      */
     @Override
-    public SingleSourcePaths<V, E> getPaths(V source)
-    {
+    public SingleSourcePaths<V, E> getPaths(V source) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException("graph must contain the source vertex");
         }
@@ -87,8 +86,7 @@ abstract class BaseShortestPathAlgorithm<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getPathWeight(V source, V sink)
-    {
+    public double getPathWeight(V source, V sink) {
         GraphPath<V, E> p = getPath(source, sink);
         if (p == null) {
             return Double.POSITIVE_INFINITY;
@@ -99,13 +97,12 @@ abstract class BaseShortestPathAlgorithm<V, E>
 
     /**
      * Create an empty path. Returns null if the source vertex is different than the target vertex.
-     * 
+     *
      * @param source the source vertex
-     * @param sink the sink vertex
+     * @param sink   the sink vertex
      * @return an empty path or null null if the source vertex is different than the target vertex
      */
-    protected final GraphPath<V, E> createEmptyPath(V source, V sink)
-    {
+    protected final GraphPath<V, E> createEmptyPath(V source, V sink) {
         if (source.equals(sink)) {
             return GraphWalk.singletonWalk(graph, source, 0d);
         } else {

@@ -17,15 +17,22 @@
  */
 package org.jgrapht.alg.spanning;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.alg.interfaces.CapacitatedSpanningTreeAlgorithm;
+import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.traverse.DepthFirstIterator;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -35,14 +42,12 @@ import java.util.function.Predicate;
  *
  * @param <V> the vertex type
  * @param <E> the edge type
- *
  * @author Christoph Grüne
  * @since July 18, 2018
  */
 public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
-    implements
-    CapacitatedSpanningTreeAlgorithm<V, E>
-{
+        implements
+        CapacitatedSpanningTreeAlgorithm<V, E> {
 
     /**
      * the input graph.
@@ -72,21 +77,20 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
     /**
      * Construct a new abstract capacitated minimum spanning tree algorithm.
      *
-     * @param graph the base graph to calculate the capacitated spanning tree for
-     * @param root the root of the capacitated spanning tree
+     * @param graph    the base graph to calculate the capacitated spanning tree for
+     * @param root     the root of the capacitated spanning tree
      * @param capacity the edge capacity constraint
-     * @param demands the demands of the vertices
+     * @param demands  the demands of the vertices
      */
     protected AbstractCapacitatedMinimumSpanningTree(
-        Graph<V, E> graph, V root, double capacity, Map<V, Double> demands)
-    {
+            Graph<V, E> graph, V root, double capacity, Map<V, Double> demands) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("Graph must be undirected");
         }
         if (!new ConnectivityInspector<>(graph).isConnected()) {
             throw new IllegalArgumentException(
-                "Graph must be connected. Otherwise, there is no capacitated minimum spanning tree.");
+                    "Graph must be connected. Otherwise, there is no capacitated minimum spanning tree.");
         }
         this.root = Objects.requireNonNull(root, "Root cannot be null");
         this.capacity = capacity;
@@ -96,11 +100,11 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
                 Double demand = demands.get(vertex);
                 if (demand == null) {
                     throw new IllegalArgumentException(
-                        "Demands does not provide a demand for every vertex.");
+                            "Demands does not provide a demand for every vertex.");
                 }
                 if (demand > capacity) {
                     throw new IllegalArgumentException(
-                        "Demands must not be greater than the capacity. Otherwise, there is no capacitated minimum spanning tree.");
+                            "Demands must not be greater than the capacity. Otherwise, there is no capacitated minimum spanning tree.");
                 }
             }
         }
@@ -117,9 +121,8 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
      * mapping can be calculated.
      */
     protected class CapacitatedSpanningTreeSolutionRepresentation
-        implements
-        Cloneable
-    {
+            implements
+            Cloneable {
 
         /**
          * labeling of the improvement graph vertices. There are two vertices in the improvement
@@ -141,8 +144,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
         /**
          * Constructs a new solution representation for the CMST problem.
          */
-        public CapacitatedSpanningTreeSolutionRepresentation()
-        {
+        public CapacitatedSpanningTreeSolutionRepresentation() {
             this(new HashMap<V, Integer>(), new HashMap<Integer, Pair<Set<V>, Double>>());
         }
 
@@ -150,12 +152,11 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * Constructs a new solution representation for the CMST problem based on
          * <code>labels</code> and <code>partition</code>. All labels have to be positive.
          *
-         * @param labels the labels of the subsets in the partition
+         * @param labels    the labels of the subsets in the partition
          * @param partition the partition map
          */
         public CapacitatedSpanningTreeSolutionRepresentation(
-            Map<V, Integer> labels, Map<Integer, Pair<Set<V>, Double>> partition)
-        {
+                Map<V, Integer> labels, Map<Integer, Pair<Set<V>, Double>> partition) {
             for (Integer i : labels.values()) {
                 if (i < 0) {
                     throw new IllegalArgumentException("Labels are not non-negative");
@@ -177,8 +178,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * @return the resulting spanning tree based on this solution representation
          */
         public CapacitatedSpanningTreeAlgorithm.CapacitatedSpanningTree<V,
-            E> calculateResultingSpanningTree()
-        {
+                E> calculateResultingSpanningTree() {
             Set<E> spanningTreeEdges = new HashSet<>();
             double weight = 0;
 
@@ -187,8 +187,8 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
                 Set<V> set = part.getFirst();
                 set.add(root);
                 SpanningTreeAlgorithm.SpanningTree<E> subtree =
-                    new PrimMinimumSpanningTree<>(new AsSubgraph<>(graph, set, graph.edgeSet()))
-                        .getSpanningTree();
+                        new PrimMinimumSpanningTree<>(new AsSubgraph<>(graph, set, graph.edgeSet()))
+                                .getSpanningTree();
                 set.remove(root);
 
                 // add the partial solution to the overall solution
@@ -203,19 +203,18 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * Moves <code>vertex</code> from the subset represented by <code>fromLabel</code> to the
          * subset represented by <code>toLabel</code>.
          *
-         * @param vertex the vertex to move
+         * @param vertex    the vertex to move
          * @param fromLabel the subset to move the vertex from
-         * @param toLabel the subset to move the vertex to
+         * @param toLabel   the subset to move the vertex to
          */
-        public void moveVertex(V vertex, Integer fromLabel, Integer toLabel)
-        {
+        public void moveVertex(V vertex, Integer fromLabel, Integer toLabel) {
             labels.put(vertex, toLabel);
 
             Set<V> oldPart = partition.get(fromLabel).getFirst();
             oldPart.remove(vertex);
             partition.put(
-                fromLabel,
-                Pair.of(oldPart, partition.get(fromLabel).getSecond() - demands.get(vertex)));
+                    fromLabel,
+                    Pair.of(oldPart, partition.get(fromLabel).getSecond() - demands.get(vertex)));
 
             if (!partition.keySet().contains(toLabel)) {
                 partition.put(toLabel, Pair.<Set<V>, Double>of(new HashSet<V>(), 0.0));
@@ -223,20 +222,19 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
             Set<V> newPart = partition.get(toLabel).getFirst();
             newPart.add(vertex);
             partition.put(
-                toLabel,
-                Pair.of(newPart, partition.get(toLabel).getSecond() + demands.get(vertex)));
+                    toLabel,
+                    Pair.of(newPart, partition.get(toLabel).getSecond() + demands.get(vertex)));
         }
 
         /**
          * Moves all vertices in <code>vertices</code> from the subset represented by
          * <code>fromLabel</code> to the subset represented by <code>toLabel</code>.
          *
-         * @param vertices the vertices to move
+         * @param vertices  the vertices to move
          * @param fromLabel the subset to move the vertices from
-         * @param toLabel the subset to move the vertices to
+         * @param toLabel   the subset to move the vertices to
          */
-        public void moveVertices(Set<V> vertices, Integer fromLabel, Integer toLabel)
-        {
+        public void moveVertices(Set<V> vertices, Integer fromLabel, Integer toLabel) {
             // update labels and calculate weight change
             double weightOfVertices = 0;
             for (V v : vertices) {
@@ -251,13 +249,13 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
             Set<V> newPart = partition.get(toLabel).getFirst();
             newPart.addAll(vertices);
             partition.put(
-                toLabel, Pair.of(newPart, partition.get(toLabel).getSecond() + weightOfVertices));
+                    toLabel, Pair.of(newPart, partition.get(toLabel).getSecond() + weightOfVertices));
 
             Set<V> oldPart = partition.get(fromLabel).getFirst();
             oldPart.removeAll(vertices);
             partition.put(
-                fromLabel,
-                Pair.of(oldPart, partition.get(fromLabel).getSecond() - weightOfVertices));
+                    fromLabel,
+                    Pair.of(oldPart, partition.get(fromLabel).getSecond() - weightOfVertices));
         }
 
         /**
@@ -265,13 +263,11 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * subtree in the subset <code>label</code> of the partition.
          *
          * @param vertexSubset the subset represented by <code>label</code>, that is the subset that
-         *        has to be refined
-         * @param label the label of the subset of the partition that were refined
-         *
+         *                     has to be refined
+         * @param label        the label of the subset of the partition that were refined
          * @return the set of all labels of subsets that were changed during the refinement
          */
-        public Set<Integer> partitionSubtreesOfSubset(Set<V> vertexSubset, int label)
-        {
+        public Set<Integer> partitionSubtreesOfSubset(Set<V> vertexSubset, int label) {
 
             List<Set<V>> subtreesOfSubset = new LinkedList<>();
 
@@ -282,9 +278,9 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
             // initialize a subgraph containing the MST of the subset
             vertexSubset.add(root);
             SpanningTreeAlgorithm.SpanningTree<E> spanningTree = new PrimMinimumSpanningTree<>(
-                new AsSubgraph<>(graph, vertexSubset, graph.edgeSet())).getSpanningTree();
+                    new AsSubgraph<>(graph, vertexSubset, graph.edgeSet())).getSpanningTree();
             Graph<V, E> spanningTreeGraph =
-                new AsSubgraph<>(graph, vertexSubset, spanningTree.getEdges());
+                    new AsSubgraph<>(graph, vertexSubset, spanningTree.getEdges());
 
             int degreeOfRoot = spanningTreeGraph.degreeOf(root);
             if (degreeOfRoot == 1) {
@@ -297,7 +293,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
 
             // search for subtrees rooted at root
             DepthFirstIterator<V, E> depthFirstIterator =
-                new DepthFirstIterator<>(spanningTreeGraph, root);
+                    new DepthFirstIterator<>(spanningTreeGraph, root);
             if (depthFirstIterator.hasNext()) {
                 depthFirstIterator.next();
             }
@@ -339,8 +335,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
         /**
          * Cleans up the solution representation by removing all empty sets from the partition.
          */
-        public void cleanUp()
-        {
+        public void cleanUp() {
             partition.entrySet().removeIf(new Predicate<Map.Entry<Integer, Pair<Set<V>, Double>>>() {
                 @Override
                 public boolean test(Map.Entry<Integer, Pair<Set<V>, Double>> entry) {
@@ -354,8 +349,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          *
          * @return the next free label in the label map respectively partition
          */
-        public int getNextFreeLabel()
-        {
+        public int getNextFreeLabel() {
             int freeLabel = nextFreeLabel;
             nextFreeLabel++;
             while (partition.keySet().contains(nextFreeLabel)) {
@@ -368,11 +362,9 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * Returns the label of the subset that contains <code>vertex</code>.
          *
          * @param vertex the vertex to return the label from
-         *
          * @return the label of <code>vertex</code>
          */
-        public int getLabel(V vertex)
-        {
+        public int getLabel(V vertex) {
             return labels.get(vertex);
         }
 
@@ -381,8 +373,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          *
          * @return the labels of all subsets
          */
-        public Set<Integer> getLabels()
-        {
+        public Set<Integer> getLabels() {
             return partition.keySet();
         }
 
@@ -390,11 +381,9 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * Returns the set of vertices that are in the subset with label <code>label</code>.
          *
          * @param label the label of the subset to return the vertices from
-         *
          * @return the set of vertices that are in the subset with label <code>label</code>
          */
-        public Set<V> getPartitionSet(Integer label)
-        {
+        public Set<V> getPartitionSet(Integer label) {
             return partition.get(label).getFirst();
         }
 
@@ -403,12 +392,10 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * <code>label</code>.
          *
          * @param label the label of the subset to return the weight from
-         *
          * @return the sum of the weights of all vertices that are in the subset with label
-         *         <code>label</code>
+         * <code>label</code>
          */
-        public double getPartitionWeight(Integer label)
-        {
+        public double getPartitionWeight(Integer label) {
             return partition.get(label).getSecond();
         }
 
@@ -416,24 +403,21 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * Returns a shallow copy of this solution representation instance. Vertices are not cloned.
          *
          * @return a shallow copy of this solution representation.
-         *
          * @throws RuntimeException in case the clone is not supported
-         *
          * @see Object#clone()
          */
-        public CapacitatedSpanningTreeSolutionRepresentation clone()
-        {
+        public CapacitatedSpanningTreeSolutionRepresentation clone() {
             try {
                 CapacitatedSpanningTreeSolutionRepresentation capacitatedSpanningTreeSolutionRepresentation =
-                    TypeUtil.uncheckedCast(super.clone());
+                        TypeUtil.uncheckedCast(super.clone());
                 capacitatedSpanningTreeSolutionRepresentation.labels = new HashMap<>(labels);
                 capacitatedSpanningTreeSolutionRepresentation.partition = new HashMap<>();
                 for (Map.Entry<Integer, Pair<Set<V>, Double>> entry : this.partition.entrySet()) {
                     capacitatedSpanningTreeSolutionRepresentation.partition.put(
-                        entry.getKey(),
+                            entry.getKey(),
                             Pair.<Set<V>, Double>of(
-                                new HashSet<>(entry.getValue().getFirst()),
-                                entry.getValue().getSecond()));
+                                    new HashSet<>(entry.getValue().getFirst()),
+                                    entry.getValue().getSecond()));
                 }
                 capacitatedSpanningTreeSolutionRepresentation.nextFreeLabel = this.nextFreeLabel;
 

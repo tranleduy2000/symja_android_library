@@ -41,21 +41,19 @@ import java.util.function.ToIntFunction;
  * <a href="https://doi.org/10.1007/s00224-016-9686-0">paper</a>: C. Berkholz, P. Bonsma, and M.
  * Grohe. Tight lower and upper bounds for the complexity of canonical colour refinement. Theory of
  * Computing Systems, 60(4), p581--614, 2017.
- * 
+ *
  * <p>
  * The complexity of this algorithm is $O((|V| + |E|)log |V|)$.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Christoph Grüne
  * @author Daniel Mock
  * @author Oliver Feith
  */
 public class ColorRefinementAlgorithm<V, E>
-    implements
-    VertexColoringAlgorithm<V>
-{
+        implements
+        VertexColoringAlgorithm<V> {
     private final Graph<V, E> graph;
     private final Coloring<V> alpha;
 
@@ -65,13 +63,12 @@ public class ColorRefinementAlgorithm<V, E>
      * @param graph the input graph
      * @param alpha the coloring on the graph to be refined
      */
-    public ColorRefinementAlgorithm(Graph<V, E> graph, Coloring<V> alpha)
-    {
+    public ColorRefinementAlgorithm(Graph<V, E> graph, Coloring<V> alpha) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         this.alpha = Objects.requireNonNull(alpha, "alpha cannot be null");
         if (!isAlphaConsistent(alpha, graph)) {
             throw new IllegalArgumentException(
-                "alpha is not a valid surjective l-coloring for the given graph.");
+                    "alpha is not a valid surjective l-coloring for the given graph.");
         }
     }
 
@@ -80,8 +77,7 @@ public class ColorRefinementAlgorithm<V, E>
      *
      * @param graph the input graph
      */
-    public ColorRefinementAlgorithm(Graph<V, E> graph)
-    {
+    public ColorRefinementAlgorithm(Graph<V, E> graph) {
         this(graph, getDefaultAlpha(graph.vertexSet()));
     }
 
@@ -92,8 +88,7 @@ public class ColorRefinementAlgorithm<V, E>
      * @return the calculated coloring
      */
     @Override
-    public Coloring<V> getColoring()
-    {
+    public Coloring<V> getColoring() {
         // initialize internal representation
         final ColoringRepresentation rep = new ColoringRepresentation(graph, alpha);
 
@@ -136,11 +131,10 @@ public class ColorRefinementAlgorithm<V, E>
      * color degree for every color.
      *
      * @param refiningColor color to refine
-     * @param rep the coloring representation
+     * @param rep           the coloring representation
      * @return the list of all colors that have at least one vertex with colorDegree >= 1
      */
-    private Set<Integer> calculateColorDegrees(int refiningColor, ColoringRepresentation rep)
-    {
+    private Set<Integer> calculateColorDegrees(int refiningColor, ColoringRepresentation rep) {
         int n = graph.vertexSet().size();
         Set<Integer> adjacentColors = new LinkedHashSet<>(n);
 
@@ -190,11 +184,10 @@ public class ColorRefinementAlgorithm<V, E>
      * Helper method that cleanups the internal representation of color degrees for a new iteration.
      *
      * @param adjacentColors the list of all colors that have at least one vertex with colorDegree
-     *        >= 1
-     * @param rep the coloring representation
+     *                       >= 1
+     * @param rep            the coloring representation
      */
-    private void cleanupColorDegrees(Set<Integer> adjacentColors, ColoringRepresentation rep)
-    {
+    private void cleanupColorDegrees(Set<Integer> adjacentColors, ColoringRepresentation rep) {
         for (int c : adjacentColors) {
             for (V v : rep.positiveDegreeColorClasses.get(c)) {
                 rep.colorDegree.put(v, 0);
@@ -207,12 +200,11 @@ public class ColorRefinementAlgorithm<V, E>
     /**
      * Helper method for splitting up a color.
      *
-     * @param color the color to split the color class for
+     * @param color       the color to split the color class for
      * @param refineStack the stack containing all colors that have to be refined
-     * @param rep the coloring representation
+     * @param rep         the coloring representation
      */
-    private void splitUpColor(Integer color, Deque<Integer> refineStack, ColoringRepresentation rep)
-    {
+    private void splitUpColor(Integer color, Deque<Integer> refineStack, ColoringRepresentation rep) {
         // Initialize and calculate numColorDegree (mapping from the color degree to the number of
         // vertices with that color degree).
         Map<Integer, Integer> numColorDegree = new HashMap<>();
@@ -220,11 +212,11 @@ public class ColorRefinementAlgorithm<V, E>
             numColorDegree.put(i, 0);
         }
         numColorDegree.put(
-            0,
-            rep.colorClasses.get(color).size() - rep.positiveDegreeColorClasses.get(color).size());
+                0,
+                rep.colorClasses.get(color).size() - rep.positiveDegreeColorClasses.get(color).size());
         for (V v : rep.positiveDegreeColorClasses.get(color)) {
             numColorDegree
-                .put(rep.colorDegree.get(v), numColorDegree.get(rep.colorDegree.get(v)) + 1);
+                    .put(rep.colorDegree.get(v), numColorDegree.get(rep.colorDegree.get(v)) + 1);
         }
 
         // Helper variable storing the index with the maximum number of vertices with the
@@ -279,8 +271,7 @@ public class ColorRefinementAlgorithm<V, E>
      * @param graph the graph that is colored by alpha
      * @return whether alpha is a valid surjective l-coloring for the given graph
      */
-    private boolean isAlphaConsistent(Coloring<V> alpha, Graph<V, E> graph)
-    {
+    private boolean isAlphaConsistent(Coloring<V> alpha, Graph<V, E> graph) {
         /*
          * Check if the coloring is restricted to the graph, i.e. there are exactly as many vertices
          * in the graph as in the coloring
@@ -317,8 +308,7 @@ public class ColorRefinementAlgorithm<V, E>
      * @param vertices the vertices that should be colored
      * @return the all-0 coloring
      */
-    private static <V> Coloring<V> getDefaultAlpha(Set<V> vertices)
-    {
+    private static <V> Coloring<V> getDefaultAlpha(Set<V> vertices) {
         Map<V, Integer> alpha = new HashMap<>();
         for (V v : vertices) {
             alpha.put(v, 0);
@@ -333,8 +323,7 @@ public class ColorRefinementAlgorithm<V, E>
      * @param alpha the surjective l-coloring
      * @return a canonically sorted stack of all colors of alpha
      */
-    private Deque<Integer> getSortedStack(Coloring<V> alpha)
-    {
+    private Deque<Integer> getSortedStack(Coloring<V> alpha) {
         int numberColors = alpha.getNumberColors();
         Deque<Integer> stack = new ArrayDeque<>(graph.vertexSet().size());
         for (int i = numberColors - 1; i >= 0; --i) {
@@ -343,8 +332,7 @@ public class ColorRefinementAlgorithm<V, E>
         return stack;
     }
 
-    private class ColoringRepresentation
-    {
+    private class ColoringRepresentation {
         /**
          * mapping from all colors to their classes
          */
@@ -376,8 +364,7 @@ public class ColorRefinementAlgorithm<V, E>
          */
         int lastUsedColor;
 
-        public ColoringRepresentation(Graph<V, E> graph, Coloring<V> alpha)
-        {
+        public ColoringRepresentation(Graph<V, E> graph, Coloring<V> alpha) {
             int n = graph.vertexSet().size();
             this.colorClasses = new HashMap<>(n);
             this.positiveDegreeColorClasses = new HashMap<>(n);

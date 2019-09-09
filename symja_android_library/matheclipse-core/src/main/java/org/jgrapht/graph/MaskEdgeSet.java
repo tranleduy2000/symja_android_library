@@ -30,14 +30,12 @@ import java.util.function.Predicate;
 
 /**
  * Helper for {@link MaskSubgraph}.
- *
  */
 class MaskEdgeSet<V, E>
-    extends
-    AbstractSet<E>
-    implements
-    Serializable
-{
+        extends
+        AbstractSet<E>
+        implements
+        Serializable {
     private static final long serialVersionUID = 4208908842850100708L;
 
     private final Graph<V, E> graph;
@@ -46,8 +44,7 @@ class MaskEdgeSet<V, E>
     private final Predicate<E> edgeMask;
 
     public MaskEdgeSet(
-        Graph<V, E> graph, Set<E> edgeSet, Predicate<V> vertexMask, Predicate<E> edgeMask)
-    {
+            Graph<V, E> graph, Set<E> edgeSet, Predicate<V> vertexMask, Predicate<E> edgeMask) {
         this.graph = graph;
         this.edgeSet = edgeSet;
         this.vertexMask = vertexMask;
@@ -58,23 +55,21 @@ class MaskEdgeSet<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(Object o)
-    {
+    public boolean contains(Object o) {
         if (!edgeSet.contains(o)) {
             return false;
         }
         E e = TypeUtil.uncheckedCast(o);
 
         return !edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))
-            && !vertexMask.test(graph.getEdgeTarget(e));
+                && !vertexMask.test(graph.getEdgeTarget(e));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Iterator<E> iterator()
-    {
+    public Iterator<E> iterator() {
         List<E> list = new ArrayList<>();
         for (E e : edgeSet) {
             if (!edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))
@@ -89,8 +84,7 @@ class MaskEdgeSet<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int size()
-    {
+    public int size() {
         long count = 0L;
         for (E e : edgeSet) {
             if (!edgeMask.test(e) && !vertexMask.test(graph.getEdgeSource(e))

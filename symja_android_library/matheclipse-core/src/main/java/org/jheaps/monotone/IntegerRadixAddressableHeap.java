@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ import java.lang.reflect.Array;
  * contains keys in the range {@literal [0, C]} or equivalently
  * {@literal [a,a+C]}. This implementation views integer values as signed
  * numbers.
- * 
+ *
  * <p>
  * <strong>Note that this implementation is not synchronized.</strong> If
  * multiple threads access a heap concurrently, and at least one of the threads
@@ -42,11 +42,8 @@ import java.lang.reflect.Array;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- * 
- * @param <V>
- *            the type of values maintained by this heap
- * 
  * @see Serializable
  */
 public class IntegerRadixAddressableHeap<V> extends AbstractRadixAddressableHeap<Integer, V> {
@@ -56,20 +53,16 @@ public class IntegerRadixAddressableHeap<V> extends AbstractRadixAddressableHeap
     /**
      * Constructs a new heap which can store values between a minimum and a
      * maximum key value (inclusive).
-     * 
+     * <p>
      * It is important to use the smallest key range as the heap uses O(logC)
      * where C=maxKey-minKey+1 buckets to store elements. Moreover, the
      * operation {@code deleteMin} requires amortized O(logC) time.
-     * 
-     * @param minKey
-     *            the non-negative minimum key that this heap supports
-     *            (inclusive)
-     * @param maxKey
-     *            the maximum key that this heap supports (inclusive)
-     * @throws IllegalArgumentException
-     *             if the minimum key is negative
-     * @throws IllegalArgumentException
-     *             if the maximum key is less than the minimum key
+     *
+     * @param minKey the non-negative minimum key that this heap supports
+     *               (inclusive)
+     * @param maxKey the maximum key that this heap supports (inclusive)
+     * @throws IllegalArgumentException if the minimum key is negative
+     * @throws IllegalArgumentException if the maximum key is less than the minimum key
      */
     @SuppressWarnings("unchecked")
     public IntegerRadixAddressableHeap(int minKey, int maxKey) {
@@ -78,7 +71,7 @@ public class IntegerRadixAddressableHeap<V> extends AbstractRadixAddressableHeap
             throw new IllegalArgumentException("Minimum key must be non-negative");
         }
         this.minKey = minKey;
-        this.lastDeletedKey = minKey;        
+        this.lastDeletedKey = minKey;
         if (maxKey < minKey) {
             throw new IllegalArgumentException("Maximum key cannot be less than the minimum");
         }
@@ -89,7 +82,7 @@ public class IntegerRadixAddressableHeap<V> extends AbstractRadixAddressableHeap
         if (maxKey == minKey) {
             numBuckets = 2;
         } else {
-            numBuckets = 2 + 1 + (int) Math.floor(Math.log((double)maxKey - minKey) / Math.log(2));
+            numBuckets = 2 + 1 + (int) Math.floor(Math.log((double) maxKey - minKey) / Math.log(2));
         }
 
         // construct representation

@@ -17,9 +17,13 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Generates directed or undirected
@@ -27,16 +31,14 @@ import java.util.*;
  * size. Scale-free network is a connected graph, where degrees of vertices are distributed in
  * unusual way. There are many vertices with small degrees and only small amount of vertices with
  * big degrees.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Ilya Razenshteyn
  */
 public class ScaleFreeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private final int size;
     private final Random rng;
 
@@ -45,8 +47,7 @@ public class ScaleFreeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      *
      * @param size number of vertices to be generated
      */
-    public ScaleFreeGraphGenerator(int size)
-    {
+    public ScaleFreeGraphGenerator(int size) {
         this(size, new Random());
     }
 
@@ -56,8 +57,7 @@ public class ScaleFreeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @param size number of vertices to be generated
      * @param seed initial seed for the random generator
      */
-    public ScaleFreeGraphGenerator(int size, long seed)
-    {
+    public ScaleFreeGraphGenerator(int size, long seed) {
         this(size, new Random(seed));
     }
 
@@ -65,10 +65,9 @@ public class ScaleFreeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * Constructor
      *
      * @param size number of vertices to be generated
-     * @param rng the random number generator
+     * @param rng  the random number generator
      */
-    public ScaleFreeGraphGenerator(int size, Random rng)
-    {
+    public ScaleFreeGraphGenerator(int size, Random rng) {
         if (size < 0) {
             throw new IllegalArgumentException("invalid size: " + size + " (must be non-negative)");
         }
@@ -79,14 +78,13 @@ public class ScaleFreeGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     /**
      * Generates scale-free network with <tt>size</tt> passed to the constructor.
      *
-     * @param target receives the generated edges and vertices; if this is non-empty on entry, the
-     *        result will be a disconnected graph since generated elements will not be connected to
-     *        existing elements
+     * @param target    receives the generated edges and vertices; if this is non-empty on entry, the
+     *                  result will be a disconnected graph since generated elements will not be connected to
+     *                  existing elements
      * @param resultMap unused parameter, can be null
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         List<V> vertexList = new ArrayList<>();
         List<Integer> degrees = new ArrayList<>();
         int degreeSum = 0;

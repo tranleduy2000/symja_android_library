@@ -17,9 +17,10 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generates a ring graph of any size. A ring graph is a graph that contains a single cycle that
@@ -28,24 +29,20 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John V. Sichi
  */
 public class RingGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private final int size;
 
     /**
      * Construct a new RingGraphGenerator.
      *
      * @param size number of vertices to be generated
-     *
      * @throws IllegalArgumentException if the specified size is negative.
      */
-    public RingGraphGenerator(int size)
-    {
+    public RingGraphGenerator(int size) {
         if (size < 0) {
             throw new IllegalArgumentException("must be non-negative");
         }
@@ -56,8 +53,7 @@ public class RingGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * {@inheritDoc}
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         if (size < 1) {
             return;
         }

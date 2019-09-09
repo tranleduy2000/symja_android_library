@@ -17,16 +17,20 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.cycle.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.cycle.Cycles;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Allows to derive an undirected <a href="https://en.wikipedia.org/wiki/Cycle_basis">cycle
  * basis</a> of a given graph.
- * 
+ *
  * <p>
  * Note that undirected cycle bases are defined for both undirected and directed graphs. For a
  * discussion of different kinds of cycle bases in graphs see the following paper.
@@ -37,26 +41,23 @@ import java.util.*;
  *
  * @param <V> vertex the graph vertex type
  * @param <E> edge the graph edge type
- * 
  * @author Dimitrios Michail
  */
-public interface CycleBasisAlgorithm<V, E>
-{
+public interface CycleBasisAlgorithm<V, E> {
     /**
      * Return a list of cycles forming an undirected cycle basis of a graph.
-     * 
+     *
      * @return an undirected cycle basis
      */
     CycleBasis<V, E> getCycleBasis();
 
     /**
      * An undirected cycle basis.
-     * 
+     *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
      */
-    interface CycleBasis<V, E>
-    {
+    interface CycleBasis<V, E> {
         /**
          * Return the set of cycles of the cycle basis.
          *
@@ -67,7 +68,7 @@ public interface CycleBasisAlgorithm<V, E>
         /**
          * Get the length of the cycle basis. The length of the cycle basis is the sum of the
          * lengths of its cycles. The length of a cycle is the total number of edges of the cycle.
-         * 
+         *
          * @return the length of the cycles basis
          */
         int getLength();
@@ -75,7 +76,7 @@ public interface CycleBasisAlgorithm<V, E>
         /**
          * Get the weight of the cycle basis. The weight of the cycle basis is the sum of the
          * weights of its cycles. The weight of a cycle is the sum of the weights of its edges.
-         * 
+         *
          * @return the length of the cycles basis
          */
         double getWeight();
@@ -95,10 +96,9 @@ public interface CycleBasisAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     class CycleBasisImpl<V, E>
-        implements
-        CycleBasis<V, E>,
-        Serializable
-    {
+            implements
+            CycleBasis<V, E>,
+            Serializable {
         private static final long serialVersionUID = -1420882459022219505L;
 
         private final Graph<V, E> graph;
@@ -112,21 +112,19 @@ public interface CycleBasisAlgorithm<V, E>
          *
          * @param graph the graph
          */
-        public CycleBasisImpl(Graph<V, E> graph)
-        {
+        public CycleBasisImpl(Graph<V, E> graph) {
             this(graph, Collections.<List<E>>emptySet(), 0, 0d);
         }
 
         /**
          * Construct a new instance.
          *
-         * @param graph the graph
+         * @param graph  the graph
          * @param cycles the cycles of the basis
          * @param length the length of the cycle basis
          * @param weight the weight of the cycle basis
          */
-        public CycleBasisImpl(Graph<V, E> graph, Set<List<E>> cycles, int length, double weight)
-        {
+        public CycleBasisImpl(Graph<V, E> graph, Set<List<E>> cycles, int length, double weight) {
             this.graph = graph;
             this.cycles = Collections.unmodifiableSet(cycles);
             this.length = length;
@@ -137,8 +135,7 @@ public interface CycleBasisAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<List<E>> getCycles()
-        {
+        public Set<List<E>> getCycles() {
             return cycles;
         }
 
@@ -146,8 +143,7 @@ public interface CycleBasisAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public int getLength()
-        {
+        public int getLength() {
             return length;
         }
 
@@ -155,8 +151,7 @@ public interface CycleBasisAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public double getWeight()
-        {
+        public double getWeight() {
             return weight;
         }
 
@@ -164,8 +159,7 @@ public interface CycleBasisAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Set<GraphPath<V, E>> getCyclesAsGraphPaths()
-        {
+        public Set<GraphPath<V, E>> getCyclesAsGraphPaths() {
             // lazily construct
             if (graphPaths == null) {
                 graphPaths = new LinkedHashSet<>();

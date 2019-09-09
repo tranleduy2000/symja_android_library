@@ -43,26 +43,24 @@ import java.util.function.Function;
 
 /**
  * Maximum weight matching in bipartite graphs.
- * 
+ *
  * <p>
  * Running time is $O(n(m+n \log n))$ where n is the number of vertices and m the number of edges of
  * the input graph. Uses exact arithmetic and produces a certificate of optimality in the form of a
  * tight vertex potential function.
- * 
+ *
  * <p>
  * This is the algorithm and implementation described in the
  * <a href="https://people.mpi-inf.mpg.de/~mehlhorn/LEDAbook.html">LEDA book</a>. See the LEDA
  * Platform of Combinatorial and Geometric Computing, Cambridge University Press, 1999.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class MaximumWeightBipartiteMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
     private final Graph<V, E> graph;
     private final Set<V> partition1;
     private final Set<V> partition2;
@@ -87,14 +85,13 @@ public class MaximumWeightBipartiteMatching<V, E>
 
     /**
      * Constructor.
-     * 
-     * @param graph the input graph
+     *
+     * @param graph      the input graph
      * @param partition1 the first partition of the vertex set
      * @param partition2 the second partition of the vertex set
      * @throws IllegalArgumentException if the graph is not undirected
      */
-    public MaximumWeightBipartiteMatching(Graph<V, E> graph, Set<V> partition1, Set<V> partition2)
-    {
+    public MaximumWeightBipartiteMatching(Graph<V, E> graph, Set<V> partition1, Set<V> partition2) {
         this(graph, partition1, partition2, new Function<Comparator<BigDecimal>, AddressableHeap<BigDecimal, V>>() {
             @Override
             public AddressableHeap<BigDecimal, V> apply(Comparator<BigDecimal> comparator) {
@@ -105,21 +102,20 @@ public class MaximumWeightBipartiteMatching<V, E>
 
     /**
      * Constructor.
-     * 
-     * @param graph the input graph
-     * @param partition1 the first partition of the vertex set
-     * @param partition2 the second partition of the vertex set
+     *
+     * @param graph        the input graph
+     * @param partition1   the first partition of the vertex set
+     * @param partition2   the second partition of the vertex set
      * @param heapSupplier a supplier for the addressable heap to use in the algorithm.
      * @throws IllegalArgumentException if the graph is not undirected
      */
     public MaximumWeightBipartiteMatching(
-        Graph<V, E> graph, Set<V> partition1, Set<V> partition2,
-        Function<Comparator<BigDecimal>, AddressableHeap<BigDecimal, V>> heapSupplier)
-    {
+            Graph<V, E> graph, Set<V> partition1, Set<V> partition2,
+            Function<Comparator<BigDecimal>, AddressableHeap<BigDecimal, V>> heapSupplier) {
         this.graph = GraphTests.requireUndirected(graph);
         this.partition1 = Objects.requireNonNull(partition1, "Partition 1 cannot be null");
         this.partition2 = Objects.requireNonNull(partition2, "Partition 2 cannot be null");
-        this.comparator = DComparator.<BigDecimal> naturalOrder();
+        this.comparator = DComparator.naturalOrder();
         this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
     }
 
@@ -127,8 +123,7 @@ public class MaximumWeightBipartiteMatching<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Matching<V, E> getMatching()
-    {
+    public Matching<V, E> getMatching() {
         /*
          * Test input instance
          */
@@ -179,15 +174,14 @@ public class MaximumWeightBipartiteMatching<V, E>
 
     /**
      * Get the vertex potentials.
-     * 
+     *
      * <p>
      * This is a tight non-negative potential function which proves the optimality of the maximum
      * weight matching. See any standard textbook about linear programming duality.
-     * 
+     *
      * @return the vertex potentials
      */
-    public Map<V, BigDecimal> getPotentials()
-    {
+    public Map<V, BigDecimal> getPotentials() {
         if (pot == null) {
             return Collections.emptyMap();
         } else {
@@ -197,22 +191,20 @@ public class MaximumWeightBipartiteMatching<V, E>
 
     /**
      * Get the weight of the matching.
-     * 
+     *
      * @return the weight of the matching
      */
-    public BigDecimal getMatchingWeight()
-    {
+    public BigDecimal getMatchingWeight() {
         return matchingWeight;
     }
 
     /**
      * Augment from a particular node. The algorithm always looks for augmenting paths from nodes in
      * partition1. In the following code partition1 is $A$ and partition2 is $B$.
-     * 
+     *
      * @param a the node
      */
-    private void augment(V a)
-    {
+    private void augment(V a) {
         dist.put(a, BigDecimal.ZERO);
         V bestInA = a;
         BigDecimal minA = pot.get(a);
@@ -228,7 +220,7 @@ public class MaximumWeightBipartiteMatching<V, E>
             if (!matching.contains(e1)) {
                 V b1 = Graphs.getOppositeVertex(graph, e1, a1);
                 BigDecimal db1 = dist.get(a1).add(pot.get(a1)).add(pot.get(b1)).subtract(
-                    BigDecimal.valueOf(graph.getEdgeWeight(e1)));
+                        BigDecimal.valueOf(graph.getEdgeWeight(e1)));
 
                 if (pred.get(b1) == null) {
                     dist.put(b1, db1);
@@ -288,8 +280,8 @@ public class MaximumWeightBipartiteMatching<V, E>
                         if (!matching.contains(e1)) {
                             V b1 = Graphs.getOppositeVertex(graph, e1, a1);
                             BigDecimal db1 =
-                                dist.get(a1).add(pot.get(a1)).add(pot.get(b1)).subtract(
-                                    BigDecimal.valueOf(graph.getEdgeWeight(e1)));
+                                    dist.get(a1).add(pot.get(a1)).add(pot.get(b1)).subtract(
+                                            BigDecimal.valueOf(graph.getEdgeWeight(e1)));
                             if (pred.get(b1) == null) {
                                 dist.put(b1, db1);
                                 pred.put(b1, e1);
@@ -335,8 +327,7 @@ public class MaximumWeightBipartiteMatching<V, E>
         }
     }
 
-    private void augmentPathTo(V v)
-    {
+    private void augmentPathTo(V v) {
         List<E> matched = new ArrayList<>();
         List<E> free = new ArrayList<>();
 
@@ -372,8 +363,7 @@ public class MaximumWeightBipartiteMatching<V, E>
         }
     }
 
-    private void simpleHeuristic()
-    {
+    private void simpleHeuristic() {
         for (V v : partition1) {
             E maxEdge = null;
             BigDecimal maxWeight = BigDecimal.ZERO;

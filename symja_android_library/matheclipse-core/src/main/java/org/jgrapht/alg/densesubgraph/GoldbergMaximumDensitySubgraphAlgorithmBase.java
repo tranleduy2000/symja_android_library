@@ -95,13 +95,11 @@ import java.util.function.Supplier;
  *
  * @param <V> Type of vertices
  * @param <E> Type of edges
- *
  * @author Andre Immig
  */
 public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
-    implements
-    MaximumDensitySubgraphAlgorithm<V, E>
-{
+        implements
+        MaximumDensitySubgraphAlgorithm<V, E> {
 
     private double lower, upper, epsilon;
     protected double guess;
@@ -115,19 +113,18 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
 
     /**
      * Constructor
-     * 
-     * @param graph input for computation
-     * @param s additional source vertex
-     * @param t additional target vertex
+     *
+     * @param graph        input for computation
+     * @param s            additional source vertex
+     * @param t            additional target vertex
      * @param checkWeights if true implementation will enforce all internal weights to be positive
-     * @param epsilon to use for internal computation
-     * @param algFactory function to construct the subalgorithm
+     * @param epsilon      to use for internal computation
+     * @param algFactory   function to construct the subalgorithm
      */
     public GoldbergMaximumDensitySubgraphAlgorithmBase(
-        Graph<V, E> graph, V s, V t, boolean checkWeights, double epsilon,
-        Function<Graph<V, DefaultWeightedEdge>,
-            MinimumSTCutAlgorithm<V, DefaultWeightedEdge>> algFactory)
-    {
+            Graph<V, E> graph, V s, V t, boolean checkWeights, double epsilon,
+            Function<Graph<V, DefaultWeightedEdge>,
+                    MinimumSTCutAlgorithm<V, DefaultWeightedEdge>> algFactory) {
         if (graph.containsVertex(s) || graph.containsVertex(t)) {
             throw new IllegalArgumentException("Source or sink vertex already in graph");
         }
@@ -149,11 +146,10 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
     /**
      * Helper method for constructing the internally used network
      */
-    private Graph<V, DefaultWeightedEdge> buildNetwork()
-    {
+    private Graph<V, DefaultWeightedEdge> buildNetwork() {
         return GraphTypeBuilder
-            .<V, DefaultWeightedEdge> directed().allowingMultipleEdges(true).allowingSelfLoops(true)
-            .weighted(true).edgeSupplier(new Supplier<DefaultWeightedEdge>() {
+                .<V, DefaultWeightedEdge>directed().allowingMultipleEdges(true).allowingSelfLoops(true)
+                .weighted(true).edgeSupplier(new Supplier<DefaultWeightedEdge>() {
                     @Override
                     public DefaultWeightedEdge get() {
                         return new DefaultWeightedEdge();
@@ -216,8 +212,7 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
      * in V to vertex set Adds edge sv and vt for each v in V to edge set Adds every edge uv and vu
      * from E to edge set Sets edge weights for all edges from E
      */
-    private void initializeNetwork()
-    {
+    private void initializeNetwork() {
         currentNetwork.addVertex(s);
         currentNetwork.addVertex(t);
         for (V v : this.graph.vertexSet()) {
@@ -227,9 +222,9 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
         }
         for (E e : this.graph.edgeSet()) {
             DefaultWeightedEdge e1 =
-                currentNetwork.addEdge(this.graph.getEdgeSource(e), this.graph.getEdgeTarget(e));
+                    currentNetwork.addEdge(this.graph.getEdgeSource(e), this.graph.getEdgeTarget(e));
             DefaultWeightedEdge e2 =
-                currentNetwork.addEdge(this.graph.getEdgeTarget(e), this.graph.getEdgeSource(e));
+                    currentNetwork.addEdge(this.graph.getEdgeTarget(e), this.graph.getEdgeSource(e));
             double weight = this.graph.getEdgeWeight(e);
             currentNetwork.setEdgeWeight(e1, weight);
             currentNetwork.setEdgeWeight(e2, weight);
@@ -241,7 +236,7 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
      * lower-upper until interval is smaller than epsilon In case no solution is found because
      * epsilon is too big, the computation continues until a (first) solution is found, thereby
      * avoiding to return an empty graph.
-     * 
+     *
      * @return max density subgraph of the graph
      */
 //    public Graph<V, E> calculateDensest()
@@ -269,7 +264,7 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
 
     /**
      * Computes density of a maximum density subgraph.
-     * 
+     *
      * @return the actual density of the maximum density subgraph
      */
 //    public double getDensity()
@@ -286,7 +281,7 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
 
     /**
      * Getter for network weights of edges su for u in V
-     * 
+     *
      * @param vertex of V
      * @return weight of the edge (s,v)
      */
@@ -294,7 +289,7 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
 
     /**
      * Getter for network weights of edges ut for u in V
-     * 
+     *
      * @param vertex of V
      * @return weight of the edge (v,t)
      */
@@ -315,8 +310,7 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
     /**
      * Check if denominator will be empty to avoid dividing by 0.
      */
-    private void checkForEmptySolution()
-    {
+    private void checkForEmptySolution() {
         if (Double.compare(computeDensityDenominator(this.graph), 0) == 0) {
             this.densestSubgraph = new AsSubgraph<>(this.graph, null);
         }

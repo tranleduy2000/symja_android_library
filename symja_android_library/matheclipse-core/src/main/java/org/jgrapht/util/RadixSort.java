@@ -17,19 +17,20 @@
  */
 package org.jgrapht.util;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Sorts the specified list of integers into ascending order using the Radix Sort method.
- *
+ * <p>
  * This algorithms runs in $O(N + V)$ time and uses $O(N + V)$ extra memory, where $V = 256$.
- *
+ * <p>
  * If $N \leq RadixSort.CUT\_OFF$ then the standard Java sorting algorithm is used.
- *
+ * <p>
  * The specified list must be modifiable, but need not be resizable.
  */
-public class RadixSort
-{
+public class RadixSort {
 
     public static int CUT_OFF = 40;
 
@@ -41,12 +42,10 @@ public class RadixSort
     private static int[] count = new int[SIZE_RADIX];
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private RadixSort()
-    {
+    private RadixSort() {
     }
 
-    private static void radixSort(int array[], int n, int tempArray[], int cnt[])
-    {
+    private static void radixSort(int[] array, int n, int[] tempArray, int[] cnt) {
         for (int d = 0, shift = 0; d < MAX_D; d++, shift += (MAX_DIGITS / MAX_D)) {
             Arrays.fill(cnt, 0);
 
@@ -68,8 +67,7 @@ public class RadixSort
      *
      * @param list the input list of integers
      */
-    public static void sort(List<Integer> list)
-    {
+    public static void sort(List<Integer> list) {
         if (list == null) {
             return;
         }

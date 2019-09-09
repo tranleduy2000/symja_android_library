@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,13 +17,13 @@
  */
 package org.jheaps.array;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LinearTime;
 import org.jheaps.annotations.LogarithmicTime;
+
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * An array based binary weak heap using bulk insertion. The heap is sorted
@@ -37,7 +37,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * {@link java.util.Vector} does, providing amortized O(1) time cost for the
  * {@code insert} and amortized O(log(n)) for the {@code deleteMin} operation.
  * Operation {@code findMin}, is a worst-case O(1) operation.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(Object[])} or {@link #heapify(Object[], Comparator)}
@@ -65,9 +65,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> implements Serializable {
@@ -135,8 +133,7 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
      * The initial capacity of the heap is provided by the user and is adjusted
      * automatically based on the sequence of insertions and deletions.
      *
-     * @param capacity
-     *            the initial heap capacity
+     * @param capacity the initial heap capacity
      */
     public BinaryArrayBulkInsertWeakHeap(int capacity) {
         this(null, capacity);
@@ -158,10 +155,9 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
      * {@link BinaryArrayBulkInsertWeakHeap#DEFAULT_HEAP_CAPACITY} and adjusts
      * automatically based on the sequence of insertions and deletions.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public BinaryArrayBulkInsertWeakHeap(Comparator<? super K> comparator) {
         this(comparator, DEFAULT_HEAP_CAPACITY);
@@ -183,12 +179,10 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
      * The initial capacity of the heap is provided by the user and is adjusted
      * automatically based on the sequence of insertions and deletions.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
      */
     @SuppressWarnings("unchecked")
     public BinaryArrayBulkInsertWeakHeap(Comparator<? super K> comparator, int capacity) {
@@ -213,7 +207,7 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
     @Override
     @ConstantTime
     public long size() {
-        return (long)size + insertionBufferSize;
+        return (long) size + insertionBufferSize;
     }
 
     /**
@@ -379,13 +373,10 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
+     * @param <K>   the type of keys maintained by the heap
+     * @param array an array of elements
      * @return a binary heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> BinaryArrayBulkInsertWeakHeap<K> heapify(K[] array) {
@@ -412,15 +403,11 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param array      an array of elements
+     * @param comparator the comparator to use
      * @return a binary heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> BinaryArrayBulkInsertWeakHeap<K> heapify(K[] array, Comparator<? super K> comparator) {
@@ -445,14 +432,14 @@ public class BinaryArrayBulkInsertWeakHeap<K> extends BinaryArrayWeakHeap<K> imp
 
     /**
      * Check if the bulk insertion buffer is full.
-     * 
+     *
      * @return true if the bulk insertion buffer is full, false otherwise
      */
     protected boolean isBulkInsertionBufferFull() {
         if (insertionBufferSize >= insertionBuffer.length) {
             return true;
         }
-        double sizeAsDouble = (double)size + insertionBufferSize;
+        double sizeAsDouble = (double) size + insertionBufferSize;
         return Math.getExponent(sizeAsDouble) + 3 >= insertionBuffer.length;
     }
 

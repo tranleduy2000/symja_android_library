@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,23 +17,23 @@
  */
 package org.jheaps.tree;
 
+import org.jheaps.AddressableHeap;
+import org.jheaps.MergeableAddressableHeap;
+import org.jheaps.annotations.ConstantTime;
+import org.jheaps.annotations.VisibleForTesting;
+
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.NoSuchElementException;
 
-import org.jheaps.AddressableHeap;
-import org.jheaps.MergeableAddressableHeap;
-import org.jheaps.annotations.ConstantTime;
-import org.jheaps.annotations.VisibleForTesting;
-
 /**
  * A binary tree soft addressable heap. The heap is sorted according to the
  * {@linkplain Comparable natural ordering} of its keys, or by a
  * {@link Comparator} provided at heap creation time, depending on which
  * constructor is used.
- * 
+ *
  * <p>
  * If n elements are inserted into a soft heap, then up to &#949;n of the
  * elements still contained in the heap, for a given error parameter &#949;, may
@@ -43,7 +43,7 @@ import org.jheaps.annotations.VisibleForTesting;
  * into the heaps, not the current number of elements in the heap which may be
  * considerably smaller. Moreover the user has no control on which elements may
  * be corrupted.
- * 
+ *
  * <p>
  * This variant of the soft heap is due to Kaplan and Zwick, described in detail
  * in the following
@@ -53,23 +53,23 @@ import org.jheaps.annotations.VisibleForTesting;
  * Chazelle's Soft Heaps, In Proceedings of the 20th Annual ACM-SIAM Symposium
  * on Discrete Algorithms (SODA 2009), 477--485, 2009.</li>
  * </ul>
- * 
+ *
  * <p>
  * Note that the operation {@code decreaseKey()} always throws an
  * {@link UnsupportedOperationException} as a soft heap does not support such an
  * operation.
- * 
+ *
  * <p>
  * All the above bounds, however, assume that the user does not perform
  * cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
@@ -95,11 +95,8 @@ import org.jheaps.annotations.VisibleForTesting;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressableHeap<K, V>, Serializable {
@@ -117,12 +114,12 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
     /**
      * Already computed values for target sizes.
      */
-    private static final long[] TARGET_SIZE = { 1, 2, 3, 5, 8, 12, 18, 27, 41, 62, 93, 140, 210, 315, 473, 710, 1065,
+    private static final long[] TARGET_SIZE = {1, 2, 3, 5, 8, 12, 18, 27, 41, 62, 93, 140, 210, 315, 473, 710, 1065,
             1598, 2397, 3596, 5394, 8091, 12137, 18206, 27309, 40964, 61446, 92169, 138254, 207381, 311072, 466608,
             699912, 1049868, 1574802, 2362203, 3543305, 5314958, 7972437, 11958656, 17937984, 26906976, 40360464,
             60540696, 90811044, 136216566, 204324849, 306487274, 459730911, 689596367, 1034394551, 1551591827,
             2327387741L, 3491081612L, 5236622418L, 7854933627L, 11782400441L, 17673600662L, 26510400993L, 39765601490L,
-            59648402235L, 89472603353L, 134208905030L };
+            59648402235L, 89472603353L, 134208905030L};
 
     /**
      * Tree nodes with less or equal than this rank will have no corrupted keys.
@@ -132,8 +129,7 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
     /**
      * The root list, in non-decreasing rank order.
      */
-    @VisibleForTesting
-    final RootList<K, V> rootList;
+    @VisibleForTesting final RootList<K, V> rootList;
 
     /**
      * Size of the heap.
@@ -144,7 +140,7 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
      * Used to reference the current heap or some other heap in case of melding,
      * so that handles remain valid even after a meld, without having to iterate
      * over them.
-     * 
+     * <p>
      * In order to avoid maintaining a full-fledged union-find data structure,
      * we disallow a heap to be used in melding more than once. We use however,
      * path-compression in case of cascading melds, that it, a handle moves from
@@ -162,13 +158,10 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
      * constraint (for example, the user attempts to put a string key into a
      * heap whose keys are integers), the {@code insert(Object key)} call will
      * throw a {@code ClassCastException}.
-     * 
-     * @param errorRate
-     *            the error rate
-     * @throws IllegalArgumentException
-     *             if the error rate is less or equal to zero
-     * @throws IllegalArgumentException
-     *             if the error rate is greater or equal to one
+     *
+     * @param errorRate the error rate
+     * @throws IllegalArgumentException if the error rate is less or equal to zero
+     * @throws IllegalArgumentException if the error rate is greater or equal to one
      */
     public BinaryTreeSoftAddressableHeap(double errorRate) {
         this(errorRate, null);
@@ -183,16 +176,12 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param errorRate
-     *            the error rate
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @throws IllegalArgumentException
-     *             if the error rate is less or equal to zero
-     * @throws IllegalArgumentException
-     *             if the error rate is greater or equal to one
+     * @param errorRate  the error rate
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @throws IllegalArgumentException if the error rate is less or equal to zero
+     * @throws IllegalArgumentException if the error rate is greater or equal to one
      */
     public BinaryTreeSoftAddressableHeap(double errorRate, Comparator<? super K> comparator) {
         if (Double.compare(errorRate, 0d) <= 0) {
@@ -247,9 +236,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalArgumentException
-     *             if {@code other} has a different error rate
+     *
+     * @throws IllegalArgumentException if {@code other} has a different error rate
      */
     @Override
     public void meld(MergeableAddressableHeap<K, V> other) {
@@ -518,9 +506,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
         /**
          * {@inheritDoc}
-         * 
-         * @throws UnsupportedOperationException
-         *             always, as this operation is not supported in soft heaps
+         *
+         * @throws UnsupportedOperationException always, as this operation is not supported in soft heaps
          */
         @Override
         public void decreaseKey(K newKey) {
@@ -561,9 +548,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
     /**
      * Compute the target size for a particular rank.
-     * 
-     * @param rank
-     *            the rank
+     *
+     * @param rank the rank
      * @return the target size
      */
     private long targetSize(int rank) {
@@ -573,9 +559,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
     /**
      * Sift elements from children nodes until the current node has enough
      * elements in its list.
-     * 
-     * @param x
-     *            the node
+     *
+     * @param x the node
      */
     @SuppressWarnings("unchecked")
     private void sift(TreeNode<K, V> x) {
@@ -596,7 +581,7 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
             // swap if needed
             if (xLeft == null || xRight != null
                     && ((comparator == null && ((Comparable<? super K>) xLeft.cKey).compareTo(xRight.cKey) > 0)
-                            || (comparator != null && comparator.compare(xLeft.cKey, xRight.cKey) > 0))) {
+                    || (comparator != null && comparator.compare(xLeft.cKey, xRight.cKey) > 0))) {
                 x.left = xRight;
                 x.right = xLeft;
                 xLeft = x.left;
@@ -634,11 +619,9 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
     /**
      * Combine two trees into a new tree.
-     * 
-     * @param x
-     *            the first tree
-     * @param y
-     *            the second tree
+     *
+     * @param x the first tree
+     * @param y the second tree
      * @return the combined tree
      */
     private TreeNode<K, V> combine(TreeNode<K, V> x, TreeNode<K, V> y) {
@@ -655,9 +638,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
     /**
      * Update all suffix minimum pointers for a node and all its predecessors in
      * the root list.
-     * 
-     * @param t
-     *            the node
+     *
+     * @param t the node
      */
     @SuppressWarnings("unchecked")
     private void updateSuffixMin(RootListNode<K, V> t) {
@@ -695,11 +677,9 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
     /**
      * Merge a list into the root list. Assumes that the two lists are sorted in
      * non-decreasing order of rank.
-     * 
-     * @param head
-     *            the list head
-     * @param tail
-     *            the list tail
+     *
+     * @param head the list head
+     * @param tail the list tail
      */
     @SuppressWarnings("squid:S2259")
     private void mergeInto(RootListNode<K, V> head, RootListNode<K, V> tail) {
@@ -768,102 +748,102 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
             if (rank1 <= rank2) {
                 switch (Integer.compare(rank1, resultRank)) {
-                case 0:
-                    // combine into result
-                    resultTail.root = combine(cur1.root, resultTail.root);
-                    resultTail.root.parent = resultTail;
-                    // remove cur1
-                    RootListNode<K, V> cur1next = cur1.next;
-                    cur1.next = null;
-                    if (cur1next != null) {
-                        cur1next.prev = null;
-                    }
-                    cur1 = cur1next;
-                    break;
-                case -1:
-                    // can happen if three same ranks
-                    cur1next = cur1.next;
-                    // add before tail into result
-                    cur1.next = resultTail;
-                    resultTail.prev = cur1;
-                    cur1.prev = resultTailPrev;
-                    if (resultTailPrev != null) {
-                        resultTailPrev.next = cur1;
-                    } else {
-                        resultHead = cur1;
-                    }
-                    resultTailPrev = cur1;
-                    // advance cur1
-                    if (cur1next != null) {
-                        cur1next.prev = null;
-                    }
-                    cur1 = cur1next;
-                    break;
-                case 1:
-                    // append into result
-                    resultTail.next = cur1;
-                    cur1.prev = resultTail;
-                    resultTailPrev = resultTail;
-                    resultTail = cur1;
-                    // remove cur1
-                    cur1 = cur1.next;
-                    resultTail.next = null;
-                    if (cur1 != null) {
-                        cur1.prev = null;
-                    }
-                    break;
-                default: 
-                    break;
+                    case 0:
+                        // combine into result
+                        resultTail.root = combine(cur1.root, resultTail.root);
+                        resultTail.root.parent = resultTail;
+                        // remove cur1
+                        RootListNode<K, V> cur1next = cur1.next;
+                        cur1.next = null;
+                        if (cur1next != null) {
+                            cur1next.prev = null;
+                        }
+                        cur1 = cur1next;
+                        break;
+                    case -1:
+                        // can happen if three same ranks
+                        cur1next = cur1.next;
+                        // add before tail into result
+                        cur1.next = resultTail;
+                        resultTail.prev = cur1;
+                        cur1.prev = resultTailPrev;
+                        if (resultTailPrev != null) {
+                            resultTailPrev.next = cur1;
+                        } else {
+                            resultHead = cur1;
+                        }
+                        resultTailPrev = cur1;
+                        // advance cur1
+                        if (cur1next != null) {
+                            cur1next.prev = null;
+                        }
+                        cur1 = cur1next;
+                        break;
+                    case 1:
+                        // append into result
+                        resultTail.next = cur1;
+                        cur1.prev = resultTail;
+                        resultTailPrev = resultTail;
+                        resultTail = cur1;
+                        // remove cur1
+                        cur1 = cur1.next;
+                        resultTail.next = null;
+                        if (cur1 != null) {
+                            cur1.prev = null;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             } else {
                 // symmetric case rank2 < rank1
                 switch (Integer.compare(rank2, resultRank)) {
-                case 0:
-                    // combine into result
-                    resultTail.root = combine(cur2.root, resultTail.root);
-                    resultTail.root.parent = resultTail;
-                    // remove cur2
-                    RootListNode<K, V> cur2next = cur2.next;
-                    cur2.next = null;
-                    if (cur2next != null) {
-                        cur2next.prev = null;
-                    }
-                    cur2 = cur2next;
-                    break;
-                case -1:
-                    // can happen if three same ranks
-                    cur2next = cur2.next;
-                    // add before tail into result
-                    cur2.next = resultTail;
-                    resultTail.prev = cur2;
-                    cur2.prev = resultTailPrev;
-                    if (resultTailPrev != null) {
-                        resultTailPrev.next = cur2;
-                    } else {
-                        resultHead = cur2;
-                    }
-                    resultTailPrev = cur2;
-                    // advance cur2
-                    if (cur2next != null) {
-                        cur2next.prev = null;
-                    }
-                    cur2 = cur2next;
-                    break;
-                case 1:
-                    // append into result
-                    resultTail.next = cur2;
-                    cur2.prev = resultTail;
-                    resultTailPrev = resultTail;
-                    resultTail = cur2;
-                    // remove cur2
-                    cur2 = cur2.next;
-                    resultTail.next = null;
-                    if (cur2 != null) {
-                        cur2.prev = null;
-                    }
-                    break;
-                default: 
-                    break;
+                    case 0:
+                        // combine into result
+                        resultTail.root = combine(cur2.root, resultTail.root);
+                        resultTail.root.parent = resultTail;
+                        // remove cur2
+                        RootListNode<K, V> cur2next = cur2.next;
+                        cur2.next = null;
+                        if (cur2next != null) {
+                            cur2next.prev = null;
+                        }
+                        cur2 = cur2next;
+                        break;
+                    case -1:
+                        // can happen if three same ranks
+                        cur2next = cur2.next;
+                        // add before tail into result
+                        cur2.next = resultTail;
+                        resultTail.prev = cur2;
+                        cur2.prev = resultTailPrev;
+                        if (resultTailPrev != null) {
+                            resultTailPrev.next = cur2;
+                        } else {
+                            resultHead = cur2;
+                        }
+                        resultTailPrev = cur2;
+                        // advance cur2
+                        if (cur2next != null) {
+                            cur2next.prev = null;
+                        }
+                        cur2 = cur2next;
+                        break;
+                    case 1:
+                        // append into result
+                        resultTail.next = cur2;
+                        cur2.prev = resultTail;
+                        resultTailPrev = resultTail;
+                        resultTail = cur2;
+                        // remove cur2
+                        cur2 = cur2.next;
+                        resultTail.next = null;
+                        if (cur2 != null) {
+                            cur2.prev = null;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -895,9 +875,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
     /**
      * Delete a node from the root list.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      */
     private void delete(RootListNode<K, V> n) {
         RootListNode<K, V> nPrev = n.prev;
@@ -920,9 +899,8 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
 
     /**
      * Delete an element.
-     * 
-     * @param n
-     *            the element to delete
+     *
+     * @param n the element to delete
      */
     @SuppressWarnings("unchecked")
     private void delete(SoftHandle<K, V> n) {

@@ -17,18 +17,23 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.util.AliasMethodSampler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Kleinberg's small-world graph generator.
- * 
+ *
  * <p>
  * The generator is described in the paper: J. Kleinberg, The Small-World Phenomenon: An Algorithmic
  * Perspective, in Proc. 32nd ACM Symp. Theory of Comp., 163-170, 2000.
- * 
+ *
  * <p>
  * The basic structure is a a two-dimensional grid and allows for edges to be directed. It begins
  * with a set of nodes (representing individuals in the social network) that are identified with the
@@ -38,16 +43,14 @@ import java.util.*;
  * from $u$ to $q$ other nodes (the long-range contacts) using independent random trials; the i-th
  * directed edge from $u$ has endpoint $v$ with probability proportional to \frac{1}{d(u,v)^r}$
  * where $d(u,v)$ is the lattice distance from $u$ to $v$.
- * 
- * @author Dimitrios Michail
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Dimitrios Michail
  */
 public class KleinbergSmallWorldGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private final Random rng;
 
     private final int n;
@@ -57,51 +60,48 @@ public class KleinbergSmallWorldGraphGenerator<V, E> extends GraphGeneratorImpl<
 
     /**
      * Constructor
-     * 
+     *
      * @param n generate set of lattice points in a $n$ by $n$ square
      * @param p lattice distance for which each node is connected to every other node in the lattice
-     *        (local connections)
+     *          (local connections)
      * @param q how many long-range contacts to add for each node
      * @param r probability distribution parameter which is a basic structural parameter measuring
-     *        how widely "networked" the underlying society of nodes is
+     *          how widely "networked" the underlying society of nodes is
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public KleinbergSmallWorldGraphGenerator(int n, int p, int q, int r)
-    {
+    public KleinbergSmallWorldGraphGenerator(int n, int p, int q, int r) {
         this(n, p, q, r, new Random());
     }
 
     /**
      * Constructor
-     * 
-     * @param n generate set of lattice points in a $n$ by $n$ square
-     * @param p lattice distance for which each node is connected to every other node in the lattice
-     *        (local connections)
-     * @param q how many long-range contacts to add for each node
-     * @param r probability distribution parameter which is a basic structural parameter measuring
-     *        how widely "networked" the underlying society of nodes is
+     *
+     * @param n    generate set of lattice points in a $n$ by $n$ square
+     * @param p    lattice distance for which each node is connected to every other node in the lattice
+     *             (local connections)
+     * @param q    how many long-range contacts to add for each node
+     * @param r    probability distribution parameter which is a basic structural parameter measuring
+     *             how widely "networked" the underlying society of nodes is
      * @param seed seed for the random number generator
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public KleinbergSmallWorldGraphGenerator(int n, int p, int q, int r, long seed)
-    {
+    public KleinbergSmallWorldGraphGenerator(int n, int p, int q, int r, long seed) {
         this(n, p, q, r, new Random(seed));
     }
 
     /**
      * Constructor
-     * 
-     * @param n generate set of lattice points in a $n \times n$ square
-     * @param p lattice distance for which each node is connected to every other node in the lattice
-     *        (local connections)
-     * @param q how many long-range contacts to add for each node
-     * @param r probability distribution parameter which is a basic structural parameter measuring
-     *        how widely "networked" the underlying society of nodes is
+     *
+     * @param n   generate set of lattice points in a $n \times n$ square
+     * @param p   lattice distance for which each node is connected to every other node in the lattice
+     *            (local connections)
+     * @param q   how many long-range contacts to add for each node
+     * @param r   probability distribution parameter which is a basic structural parameter measuring
+     *            how widely "networked" the underlying society of nodes is
      * @param rng the random number generator to use
      * @throws IllegalArgumentException in case of invalid parameters
      */
-    public KleinbergSmallWorldGraphGenerator(int n, int p, int q, int r, Random rng)
-    {
+    public KleinbergSmallWorldGraphGenerator(int n, int p, int q, int r, Random rng) {
         if (n < 1) {
             throw new IllegalArgumentException("parameter n must be positive");
         }
@@ -126,13 +126,12 @@ public class KleinbergSmallWorldGraphGenerator<V, E> extends GraphGeneratorImpl<
 
     /**
      * Generates a small-world graph.
-     * 
-     * @param target the target graph
+     *
+     * @param target    the target graph
      * @param resultMap not used by this generator, can be null
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         /*
          * Special cases
          */

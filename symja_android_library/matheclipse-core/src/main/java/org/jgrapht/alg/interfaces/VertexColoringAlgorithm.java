@@ -17,8 +17,13 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -27,8 +32,7 @@ import java.util.function.Function;
  *
  * @param <V> the graph vertex type
  */
-public interface VertexColoringAlgorithm<V>
-{
+public interface VertexColoringAlgorithm<V> {
 
     /**
      * Computes a vertex coloring.
@@ -43,18 +47,17 @@ public interface VertexColoringAlgorithm<V>
      *
      * @param <V> the graph vertex type
      */
-    interface Coloring<V>
-    {
+    interface Coloring<V> {
         /**
          * Get the number of colors.
-         * 
+         *
          * @return the number of colors
          */
         int getNumberColors();
 
         /**
          * Get the color map.
-         * 
+         *
          * @return the color map
          */
         Map<V, Integer> getColors();
@@ -75,10 +78,9 @@ public interface VertexColoringAlgorithm<V>
      * @param <V> the graph vertex type
      */
     class ColoringImpl<V>
-        implements
-        Coloring<V>,
-        Serializable
-    {
+            implements
+            Coloring<V>,
+            Serializable {
         private static final long serialVersionUID = -8456580091672353150L;
 
         private final int numberColors;
@@ -87,11 +89,10 @@ public interface VertexColoringAlgorithm<V>
         /**
          * Construct a new vertex coloring.
          *
-         * @param colors the color map
+         * @param colors       the color map
          * @param numberColors the total number of colors used
          */
-        public ColoringImpl(Map<V, Integer> colors, int numberColors)
-        {
+        public ColoringImpl(Map<V, Integer> colors, int numberColors) {
             this.numberColors = numberColors;
             this.colors = colors;
         }
@@ -100,8 +101,7 @@ public interface VertexColoringAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public int getNumberColors()
-        {
+        public int getNumberColors() {
             return numberColors;
         }
 
@@ -109,8 +109,7 @@ public interface VertexColoringAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public Map<V, Integer> getColors()
-        {
+        public Map<V, Integer> getColors() {
             return colors;
         }
 
@@ -118,8 +117,7 @@ public interface VertexColoringAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public List<Set<V>> getColorClasses()
-        {
+        public List<Set<V>> getColorClasses() {
             final Map<Integer, Set<V>> groups = new HashMap<>();
             colors.forEach(new BiConsumer<V, Integer>() {
                 @Override
@@ -142,8 +140,7 @@ public interface VertexColoringAlgorithm<V>
          * {@inheritDoc}
          */
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Coloring [number-of-colors=" + numberColors + ", colors=" + colors + "]";
         }
     }

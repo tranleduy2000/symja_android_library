@@ -17,42 +17,38 @@
  */
 package org.jgrapht.graph;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * A weighted variant of the intrusive edges specifics.
- * 
+ *
  * <p>
  * The implementation optimizes the use of {@link DefaultWeightedEdge} and subclasses. For other
  * custom user edge types, a map is used to store vertex source, target and weight.
- * 
- * @author Barak Naveh
- * @author Dimitrios Michail
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Barak Naveh
+ * @author Dimitrios Michail
  */
 public class WeightedIntrusiveEdgesSpecifics<V, E>
-    extends
-    BaseIntrusiveEdgesSpecifics<V, E, IntrusiveWeightedEdge>
-    implements
-    IntrusiveEdgesSpecifics<V, E>
-{
+        extends
+        BaseIntrusiveEdgesSpecifics<V, E, IntrusiveWeightedEdge>
+        implements
+        IntrusiveEdgesSpecifics<V, E> {
     private static final long serialVersionUID = 5327226615635500554L;
 
     /**
      * Constructor
-     * 
+     *
      * @param map the map to use for storage
      */
-    public WeightedIntrusiveEdgesSpecifics(Map<E, IntrusiveWeightedEdge> map)
-    {
+    public WeightedIntrusiveEdgesSpecifics(Map<E, IntrusiveWeightedEdge> map) {
         super(map);
     }
 
     @Override
-    public boolean add(E e, V sourceVertex, V targetVertex)
-    {
+    public boolean add(E e, V sourceVertex, V targetVertex) {
         IntrusiveWeightedEdge intrusiveEdge;
 
         if (e instanceof IntrusiveWeightedEdge) {
@@ -68,8 +64,7 @@ public class WeightedIntrusiveEdgesSpecifics<V, E>
     }
 
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         IntrusiveWeightedEdge ie = getIntrusiveEdge(e);
         if (ie == null) {
             throw new IllegalArgumentException("no such edge in graph: " + e.toString());
@@ -78,8 +73,7 @@ public class WeightedIntrusiveEdgesSpecifics<V, E>
     }
 
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         IntrusiveWeightedEdge ie = getIntrusiveEdge(e);
         if (ie == null) {
             throw new IllegalArgumentException("no such edge in graph: " + e.toString());
@@ -88,8 +82,7 @@ public class WeightedIntrusiveEdgesSpecifics<V, E>
     }
 
     @Override
-    protected IntrusiveWeightedEdge getIntrusiveEdge(E e)
-    {
+    protected IntrusiveWeightedEdge getIntrusiveEdge(E e) {
         if (e instanceof IntrusiveWeightedEdge) {
             return (IntrusiveWeightedEdge) e;
         }

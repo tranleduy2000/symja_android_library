@@ -17,14 +17,20 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The largest degree first greedy coloring algorithm.
- * 
+ *
  * <p>
  * This is the greedy coloring algorithm which orders the vertices by non-increasing degree. See the
  * following paper for details.
@@ -35,20 +41,17 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public class LargestDegreeFirstColoring<V, E>
-    extends
-    GreedyColoring<V, E>
-{
+        extends
+        GreedyColoring<V, E> {
     /**
      * Construct a new coloring algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public LargestDegreeFirstColoring(Graph<V, E> graph)
-    {
+    public LargestDegreeFirstColoring(Graph<V, E> graph) {
         super(graph);
     }
 
@@ -57,8 +60,7 @@ public class LargestDegreeFirstColoring<V, E>
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected Iterable<V> getVertexOrdering()
-    {
+    protected Iterable<V> getVertexOrdering() {
         // compute degrees and maximum degree
         int n = graph.vertexSet().size();
         int maxDegree = 0;

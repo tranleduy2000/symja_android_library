@@ -27,37 +27,44 @@ import java.util.Map;
  * unique ordering.
  *
  * @param <V> the graph vertex type
- *
  * @author Joris Kinable
  */
 public class RatioVertex<V>
-    implements
-    Comparable<RatioVertex<V>>
-{
-    /** original vertex **/
+        implements
+        Comparable<RatioVertex<V>> {
+    /**
+     * original vertex
+     **/
     public final V v;
 
-    /** weight of the vertex **/
+    /**
+     * weight of the vertex
+     **/
     public double weight;
 
-    /** unique id, used to guarantee that compareTo never returns 0 **/
+    /**
+     * unique id, used to guarantee that compareTo never returns 0
+     **/
     public final int ID;
 
-    /** degree of this vertex **/
+    /**
+     * degree of this vertex
+     **/
     protected int degree = 0;
 
-    /** Map of neighbors, and a count of the number of edges to this neighbor **/
+    /**
+     * Map of neighbors, and a count of the number of edges to this neighbor
+     **/
     public final Map<RatioVertex<V>, Integer> neighbors;
 
     /**
      * Create a new ratio vertex
-     * 
-     * @param ID unique id
-     * @param v the vertex
+     *
+     * @param ID     unique id
+     * @param v      the vertex
      * @param weight the vertex weight
      */
-    public RatioVertex(int ID, V v, double weight)
-    {
+    public RatioVertex(int ID, V v, double weight) {
         this.ID = ID;
         this.v = v;
         this.weight = weight;
@@ -66,11 +73,10 @@ public class RatioVertex<V>
 
     /**
      * Add a neighbor.
-     * 
+     *
      * @param v the neighbor
      */
-    public void addNeighbor(RatioVertex<V> v)
-    {
+    public void addNeighbor(RatioVertex<V> v) {
         if (!neighbors.containsKey(v))
             neighbors.put(v, 1);
         else
@@ -87,38 +93,34 @@ public class RatioVertex<V>
 
     /**
      * Remove a neighbor.
-     * 
+     *
      * @param v the neighbor to remove
      */
-    public void removeNeighbor(RatioVertex<V> v)
-    {
+    public void removeNeighbor(RatioVertex<V> v) {
         degree -= neighbors.get(v);
         neighbors.remove(v);
     }
 
     /**
      * Returns the degree of the vertex
-     * 
+     *
      * @return degree of the vertex
      */
-    public int getDegree()
-    {
+    public int getDegree() {
         return degree;
     }
 
     /**
      * Returns the ratio between the vertex' weight and its degree
-     * 
+     *
      * @return the ratio between the vertex' weight and its degree
      */
-    public double getRatio()
-    {
+    public double getRatio() {
         return weight / degree;
     }
 
     @Override
-    public int compareTo(RatioVertex<V> other)
-    {
+    public int compareTo(RatioVertex<V> other) {
         if (this.ID == other.ID) // Same vertex
             return 0;
         int result = Double.compare(this.getRatio(), other.getRatio());
@@ -129,14 +131,12 @@ public class RatioVertex<V>
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return ID;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         else if (!(o instanceof RatioVertex))
@@ -146,8 +146,7 @@ public class RatioVertex<V>
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "v" + ID + "(" + degree + ")";
     }
 }

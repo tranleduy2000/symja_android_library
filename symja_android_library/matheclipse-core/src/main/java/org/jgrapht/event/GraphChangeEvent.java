@@ -17,7 +17,7 @@
  */
 package org.jgrapht.event;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * An event which indicates that a graph has changed. This class is a root for graph change events.
@@ -25,9 +25,8 @@ import java.util.*;
  * @author Barak Naveh
  */
 public class GraphChangeEvent
-    extends
-    EventObject
-{
+        extends
+        EventObject {
     private static final long serialVersionUID = 3834592106026382391L;
 
     /**
@@ -39,10 +38,9 @@ public class GraphChangeEvent
      * Creates a new graph change event.
      *
      * @param eventSource the source of the event.
-     * @param type the type of event.
+     * @param type        the type of event.
      */
-    public GraphChangeEvent(Object eventSource, int type)
-    {
+    public GraphChangeEvent(Object eventSource, int type) {
         super(eventSource);
         this.type = type;
     }
@@ -52,8 +50,7 @@ public class GraphChangeEvent
      *
      * @return the event type.
      */
-    public int getType()
-    {
+    public int getType() {
         return type;
     }
 }

@@ -17,9 +17,9 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * This class stores data needed for the Kolmogorov's Blossom V algorithm; it is used by
@@ -36,8 +36,7 @@ import java.util.*;
  * @see BlossomVPrimalUpdater
  * @see BlossomVDualUpdater
  */
-class BlossomVState<V, E>
-{
+class BlossomVState<V, E> {
     /**
      * Number of nodes in the graph
      */
@@ -97,23 +96,22 @@ class BlossomVState<V, E>
     /**
      * Constructs the algorithm's initial state
      *
-     * @param graph the graph for which to find a matching
-     * @param nodes nodes used in the algorithm
-     * @param edges edges used in the algorithm
-     * @param nodeNum number of nodes in the graph
-     * @param edgeNum number of edges in the graph
-     * @param treeNum number of trees in the graph
+     * @param graph         the graph for which to find a matching
+     * @param nodes         nodes used in the algorithm
+     * @param edges         edges used in the algorithm
+     * @param nodeNum       number of nodes in the graph
+     * @param edgeNum       number of edges in the graph
+     * @param treeNum       number of trees in the graph
      * @param graphVertices generic vertices of the {@code graph} in the same order as nodes in
-     *        {@code nodes}
-     * @param graphEdges generic edges of the {@code graph} in the same order as edges in
-     *        {@code edges}
-     * @param options default or user defined options
+     *                      {@code nodes}
+     * @param graphEdges    generic edges of the {@code graph} in the same order as edges in
+     *                      {@code edges}
+     * @param options       default or user defined options
      */
     public BlossomVState(
-        Graph<V, E> graph, BlossomVNode[] nodes, BlossomVEdge[] edges, int nodeNum, int edgeNum,
-        int treeNum, List<V> graphVertices, List<E> graphEdges, BlossomVOptions options,
-        double minEdgeWeight)
-    {
+            Graph<V, E> graph, BlossomVNode[] nodes, BlossomVEdge[] edges, int nodeNum, int edgeNum,
+            int treeNum, List<V> graphVertices, List<E> graphEdges, BlossomVOptions options,
+            double minEdgeWeight) {
         this.graph = graph;
         this.nodes = nodes;
         this.edges = edges;

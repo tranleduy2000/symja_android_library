@@ -17,35 +17,40 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.util.VertexDegreeComparator;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Floyd-Warshall algorithm.
- * 
+ *
  * <p>
  * The <a href="http://en.wikipedia.org/wiki/Floyd-Warshall_algorithm"> Floyd-Warshall algorithm</a>
  * finds all shortest paths (all $n^2$ of them) in $O(n^3)$ time. Note that during construction
  * time, no computations are performed! All computations are performed the first time one of the
  * member methods of this class is invoked. The results are stored, so all subsequent calls to the
  * same method are computationally efficient.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Tom Larkworthy
  * @author Soren Davidsen (soren@tanesha.net)
  * @author Joris Kinable
  * @author Dimitrios Michail
  */
 public class FloydWarshallShortestPaths<V, E>
-    extends
-    BaseShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseShortestPathAlgorithm<V, E> {
     private final List<V> vertices;
     private final List<Integer> degrees;
     private final Map<V, Integer> vertexIndices;
@@ -60,11 +65,10 @@ public class FloydWarshallShortestPaths<V, E>
 
     /**
      * Create a new instance of the Floyd-Warshall all-pairs shortest path algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public FloydWarshallShortestPaths(Graph<V, E> graph)
-    {
+    public FloydWarshallShortestPaths(Graph<V, E> graph) {
         super(graph);
 
         /*
@@ -73,7 +77,7 @@ public class FloydWarshallShortestPaths<V, E>
          */
         this.vertices = new ArrayList<>(graph.vertexSet());
         Collections.sort(
-            vertices, new VertexDegreeComparator<>(graph, VertexDegreeComparator.Order.ASCENDING));
+                vertices, new VertexDegreeComparator<>(graph, VertexDegreeComparator.Order.ASCENDING));
         this.degrees = new ArrayList<>();
         this.vertexIndices = new HashMap<>(this.vertices.size());
 
@@ -104,11 +108,10 @@ public class FloydWarshallShortestPaths<V, E>
 
     /**
      * Get the total number of shortest paths. Does not count the paths from a vertex to itself.
-     * 
+     *
      * @return total number of shortest paths
      */
-    public int getShortestPathsCount()
-    {
+    public int getShortestPathsCount() {
         lazyCalculateMatrix();
 
         // count shortest paths
@@ -129,8 +132,7 @@ public class FloydWarshallShortestPaths<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphPath<V, E> getPath(V a, V b)
-    {
+    public GraphPath<V, E> getPath(V a, V b) {
         if (!graph.containsVertex(a)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -163,8 +165,7 @@ public class FloydWarshallShortestPaths<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getPathWeight(V source, V sink)
-    {
+    public double getPathWeight(V source, V sink) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -181,8 +182,7 @@ public class FloydWarshallShortestPaths<V, E>
      * {@inheritDoc}
      */
     @Override
-    public SingleSourcePaths<V, E> getPaths(V source)
-    {
+    public SingleSourcePaths<V, E> getPaths(V source) {
         return new FloydWarshallSingleSourcePaths(source);
     }
 
@@ -192,14 +192,13 @@ public class FloydWarshallShortestPaths<V, E>
      * If the next invocation would query the first hop on the shortest path from $c$ to $b$, vertex
      * $d$ would be returned, etc. This method is computationally cheaper than calling
      * {@link #getPath(Object, Object)} and then reading the first vertex.
-     * 
+     *
      * @param a source vertex
      * @param b target vertex
      * @return next hop on the shortest path from a to b, or null when there exists no path from $a$
-     *         to $b$.
+     * to $b$.
      */
-    public V getFirstHop(V a, V b)
-    {
+    public V getFirstHop(V a, V b) {
         lazyCalculateMatrix();
 
         int v_a = vertexIndices.get(a);
@@ -220,14 +219,13 @@ public class FloydWarshallShortestPaths<V, E>
      * $e$, vertex $d$ would be returned, etc. This method is computationally cheaper than calling
      * {@link #getPath(Object, Object)} and then reading the vertex. The first invocation of this
      * method populates a last hop matrix.
-     * 
+     *
      * @param a source vertex
      * @param b target vertex
      * @return last hop on the shortest path from $a$ to $b$, or null when there exists no path from
-     *         $a$ to $b$.
+     * $a$ to $b$.
      */
-    public V getLastHop(V a, V b)
-    {
+    public V getLastHop(V a, V b) {
         lazyCalculateMatrix();
 
         int v_a = vertexIndices.get(a);
@@ -245,8 +243,7 @@ public class FloydWarshallShortestPaths<V, E>
     /**
      * Calculates the matrix of all shortest paths, but does not populate the last hops matrix.
      */
-    private void lazyCalculateMatrix()
-    {
+    private void lazyCalculateMatrix() {
         if (d != null) {
             // already done
             return;
@@ -285,8 +282,8 @@ public class FloydWarshallShortestPaths<V, E>
                 }
             }
         } else { // This works for both Directed and Mixed graphs! Iterating over
-                 // the arcs and querying source/sink does not suffice for graphs
-                 // which contain both edges and arcs
+            // the arcs and querying source/sink does not suffice for graphs
+            // which contain both edges and arcs
             for (V v1 : graph.vertexSet()) {
                 int v_1 = vertexIndices.get(v1);
                 for (E e : graph.outgoingEdgesOf(v1)) {
@@ -327,8 +324,7 @@ public class FloydWarshallShortestPaths<V, E>
     /**
      * Populate the last hop matrix, using the earlier computed backtrace matrix.
      */
-    private void populateLastHopMatrix()
-    {
+    private void populateLastHopMatrix() {
         lazyCalculateMatrix();
 
         if (lastHopMatrix != null)
@@ -359,37 +355,31 @@ public class FloydWarshallShortestPaths<V, E>
     }
 
     class FloydWarshallSingleSourcePaths
-        implements
-        SingleSourcePaths<V, E>
-    {
+            implements
+            SingleSourcePaths<V, E> {
         private V source;
 
-        public FloydWarshallSingleSourcePaths(V source)
-        {
+        public FloydWarshallSingleSourcePaths(V source) {
             this.source = source;
         }
 
         @Override
-        public Graph<V, E> getGraph()
-        {
+        public Graph<V, E> getGraph() {
             return graph;
         }
 
         @Override
-        public V getSourceVertex()
-        {
+        public V getSourceVertex() {
             return source;
         }
 
         @Override
-        public double getWeight(V sink)
-        {
+        public double getWeight(V sink) {
             return FloydWarshallShortestPaths.this.getPathWeight(source, sink);
         }
 
         @Override
-        public GraphPath<V, E> getPath(V sink)
-        {
+        public GraphPath<V, E> getPath(V sink) {
             return FloydWarshallShortestPaths.this.getPath(source, sink);
         }
     }

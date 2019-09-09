@@ -40,28 +40,24 @@ import java.util.Map;
  * The complement is not defined for multigraphs. If a multigraph is provided as input to this
  * generator, it will be treated as if it is a simple graph.
  *
- * @author Joris Kinable
- *
- *
  * @param <V> vertex type
  * @param <E> edge type
+ * @author Joris Kinable
  */
 public class ComplementGraphGenerator<V, E>
         extends GraphGeneratorImpl<V, E, V>
         implements
-        GraphGenerator<V, E, V>
-{
+        GraphGenerator<V, E, V> {
 
     private final Graph<V, E> graph;
     private final boolean generateSelfLoops;
 
     /**
      * Complement Graph Generator
-     * 
+     *
      * @param graph input graph
      */
-    public ComplementGraphGenerator(Graph<V, E> graph)
-    {
+    public ComplementGraphGenerator(Graph<V, E> graph) {
         this(graph, false);
     }
 
@@ -70,19 +66,17 @@ public class ComplementGraphGenerator<V, E>
      * be defined by adding a self-loop to every vertex that does not have one in $G$. This behavior
      * can be controlled using the boolean <code>generateSelfLoops</code>.
      *
-     * @param graph input graph
+     * @param graph             input graph
      * @param generateSelfLoops indicator whether self loops should be generated. If false, no
-     *        self-loops are generated, independent of whether the target graph supports self-loops.
+     *                          self-loops are generated, independent of whether the target graph supports self-loops.
      */
-    public ComplementGraphGenerator(Graph<V, E> graph, boolean generateSelfLoops)
-    {
+    public ComplementGraphGenerator(Graph<V, E> graph, boolean generateSelfLoops) {
         this.graph = GraphTests.requireDirectedOrUndirected(graph);
         this.generateSelfLoops = generateSelfLoops;
     }
 
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         Graphs.addAllVertices(target, graph.vertexSet());
 
         if (graph.getType().isDirected()) {

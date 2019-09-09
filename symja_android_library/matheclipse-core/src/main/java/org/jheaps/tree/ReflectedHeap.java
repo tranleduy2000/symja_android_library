@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,22 +17,22 @@
  */
 package org.jheaps.tree;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.AddressableHeap;
 import org.jheaps.AddressableHeapFactory;
 import org.jheaps.MergeableAddressableHeap;
 import org.jheaps.MergeableDoubleEndedAddressableHeap;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * Reflected double ended heaps. The heap is sorted according to the
  * {@linkplain Comparable natural ordering} of its keys, or by a
  * {@link Comparator} provided at heap creation time, depending on which
  * constructor is used.
- * 
+ *
  * <p>
  * This class implements a general technique which uses two
  * {@link MergeableAddressableHeap}s to implement a double ended heap, described
@@ -42,19 +42,19 @@ import org.jheaps.MergeableDoubleEndedAddressableHeap;
  * <li>C. Makris, A. Tsakalidis, and K. Tsichlas. Reflected min-max heaps.
  * Information Processing Letters, 86(4), 209--214, 2003.</li>
  * </ul>
- * 
+ *
  * <p>
  * The running time bounds depend on the implementation of the underlying used
  * heap. All the above bounds, however, assume that the user does not perform
  * cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
@@ -79,12 +79,9 @@ import org.jheaps.MergeableDoubleEndedAddressableHeap;
  * (A structural modification is any operation that adds or deletes one or more
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
- * 
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
  *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<K, V>, Serializable {
@@ -123,7 +120,7 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
      * Used to reference the current heap or some other heap in case of melding,
      * so that handles remain valid even after a meld, without having to iterate
      * over them.
-     * 
+     * <p>
      * In order to avoid maintaining a full-fledged union-find data structure,
      * we disallow a heap to be used in melding more than once. We use however,
      * path-compression in case of cascading melds, that it, a handle moves from
@@ -141,11 +138,9 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
      * constraint (for example, the user attempts to put a string key into a
      * heap whose keys are integers), the {@code insert(Object key)} call will
      * throw a {@code ClassCastException}.
-     * 
-     * @param heapFactory
-     *            a factory for the underlying heap implementation
-     * @throws NullPointerException
-     *             if the heap factory is null
+     *
+     * @param heapFactory a factory for the underlying heap implementation
+     * @throws NullPointerException if the heap factory is null
      */
     public ReflectedHeap(AddressableHeapFactory<K, ?> heapFactory) {
         this(heapFactory, null);
@@ -160,15 +155,11 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param heapFactory
-     *            a factory for the underlying heap implementation
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * 
-     * @throws NullPointerException
-     *             if the heap factory is null
+     * @param heapFactory a factory for the underlying heap implementation
+     * @param comparator  the comparator that will be used to order this heap. If
+     *                    {@code null}, the {@linkplain Comparable natural ordering} of
+     *                    the keys will be used.
+     * @throws NullPointerException if the heap factory is null
      */
     @SuppressWarnings("unchecked")
     public ReflectedHeap(AddressableHeapFactory<K, ?> heapFactory, Comparator<? super K> comparator) {
@@ -501,11 +492,9 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
 
     /**
      * Insert a pair of elements, one in the min heap and one in the max heap.
-     * 
-     * @param handle1
-     *            a handle to the first element
-     * @param handle2
-     *            a handle to the second element
+     *
+     * @param handle1 a handle to the first element
+     * @param handle2 a handle to the second element
      */
     @SuppressWarnings("unchecked")
     private void insertPair(ReflectedHandle<K, V> handle1, ReflectedHandle<K, V> handle2) {
@@ -539,9 +528,8 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
 
     /**
      * Delete an element
-     * 
-     * @param n
-     *            a handle to the element
+     *
+     * @param n a handle to the element
      */
     private void delete(ReflectedHandle<K, V> n) {
         if (n.inner == null && free != n) {
@@ -578,11 +566,9 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
 
     /**
      * Decrease the key of an element.
-     * 
-     * @param n
-     *            the element
-     * @param newKey
-     *            the new key
+     *
+     * @param n      the element
+     * @param newKey the new key
      */
     @SuppressWarnings("unchecked")
     private void decreaseKey(ReflectedHandle<K, V> n, K newKey) {
@@ -633,11 +619,9 @@ public class ReflectedHeap<K, V> implements MergeableDoubleEndedAddressableHeap<
 
     /**
      * Increase the key of an element.
-     * 
-     * @param n
-     *            the element
-     * @param newKey
-     *            the new key
+     *
+     * @param n      the element
+     * @param newKey the new key
      */
     @SuppressWarnings("unchecked")
     private void increaseKey(ReflectedHandle<K, V> n, K newKey) {

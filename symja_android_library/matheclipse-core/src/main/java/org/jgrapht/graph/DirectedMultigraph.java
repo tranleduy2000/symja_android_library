@@ -17,22 +17,21 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.graph.builder.GraphBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A directed multigraph. A directed multigraph is a non-simple directed graph in which no loops are
  * permitted, but multiple (parallel) edges between any two vertices are.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
 public class DirectedMultigraph<V, E>
-    extends
-    AbstractBaseGraph<V, E>
-{
+        extends
+        AbstractBaseGraph<V, E> {
     private static final long serialVersionUID = 2919338637676573948L;
 
     /**
@@ -40,53 +39,49 @@ public class DirectedMultigraph<V, E>
      *
      * @param edgeClass class on which to base the edge supplier
      */
-    public DirectedMultigraph(Class<? extends E> edgeClass)
-    {
+    public DirectedMultigraph(Class<? extends E> edgeClass) {
         this(null, SupplierUtil.createSupplier(edgeClass), false);
     }
 
     /**
      * Creates a new graph.
-     * 
+     *
      * @param vertexSupplier the vertex supplier, can be null
-     * @param edgeSupplier the edge supplier, can be null
-     * @param weighted whether the graph is weighted or not
+     * @param edgeSupplier   the edge supplier, can be null
+     * @param weighted       whether the graph is weighted or not
      */
     public DirectedMultigraph(
-        Supplier<V> vertexSupplier, Supplier<E> edgeSupplier, boolean weighted)
-    {
+            Supplier<V> vertexSupplier, Supplier<E> edgeSupplier, boolean weighted) {
         super(
-            vertexSupplier, edgeSupplier,
-            new DefaultGraphType.Builder()
-                .directed().allowMultipleEdges(true).allowSelfLoops(false).weighted(weighted)
-                .build());
+                vertexSupplier, edgeSupplier,
+                new DefaultGraphType.Builder()
+                        .directed().allowMultipleEdges(true).allowSelfLoops(false).weighted(weighted)
+                        .build());
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeClass class on which to base factory for edges
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>       the graph vertex type
+     * @param <E>       the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends DirectedMultigraph<V, E>> createBuilder(
-        Class<? extends E> edgeClass)
-    {
+            Class<? extends E> edgeClass) {
         return new GraphBuilder<>(new DirectedMultigraph<V, E>(edgeClass));
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeSupplier the edge supplier of the new graph
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends DirectedMultigraph<V, E>> createBuilder(
-        Supplier<E> edgeSupplier)
-    {
+            Supplier<E> edgeSupplier) {
         return new GraphBuilder<>(new DirectedMultigraph<V, E>(null, edgeSupplier, false));
     }
 

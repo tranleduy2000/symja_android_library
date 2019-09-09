@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,40 +31,35 @@ package org.jheaps;
  * one of them uses a custom comparator or both use custom comparators but are
  * not the same by <em>equals</em>, an {@code IllegalArgumentException} is
  * thrown.
- * 
+ *
  * <p>
  * Note that all running time bounds on mergeable heaps are valid assuming that
  * the user does not perform cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * 
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public interface MergeableHeap<K> extends Heap<K> {
 
     /**
      * Meld a heap into the current heap.
-     *
+     * <p>
      * After the operation the {@code other} heap will be empty and will not
      * permit further insertions.
      *
-     * @param other
-     *            a merge-able heap
-     * @throws ClassCastException
-     *             if {@code other} is not compatible with this heap
-     * @throws IllegalArgumentException
-     *             if {@code other} does not have a compatible comparator
+     * @param other a merge-able heap
+     * @throws ClassCastException       if {@code other} is not compatible with this heap
+     * @throws IllegalArgumentException if {@code other} does not have a compatible comparator
      */
     void meld(MergeableHeap<K> other);
 

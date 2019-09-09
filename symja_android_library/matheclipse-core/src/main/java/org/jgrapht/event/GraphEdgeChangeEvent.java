@@ -17,7 +17,7 @@
  */
 package org.jgrapht.event;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
 /**
  * An event which indicates that a graph edge has changed, or is about to change. The event can be
@@ -27,13 +27,11 @@ import org.jgrapht.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
 public class GraphEdgeChangeEvent<V, E>
-    extends
-    GraphChangeEvent
-{
+        extends
+        GraphChangeEvent {
     private static final long serialVersionUID = -4421610303769803253L;
 
     /**
@@ -85,13 +83,12 @@ public class GraphEdgeChangeEvent<V, E>
      * Constructor for GraphEdgeChangeEvent.
      *
      * @param eventSource the source of this event.
-     * @param type the event type of this event.
-     * @param edge the edge that this event is related to.
-     * @param edgeSource edge source vertex
-     * @param edgeTarget edge target vertex
+     * @param type        the event type of this event.
+     * @param edge        the edge that this event is related to.
+     * @param edgeSource  edge source vertex
+     * @param edgeTarget  edge target vertex
      */
-    public GraphEdgeChangeEvent(Object eventSource, int type, E edge, V edgeSource, V edgeTarget)
-    {
+    public GraphEdgeChangeEvent(Object eventSource, int type, E edge, V edgeSource, V edgeTarget) {
         this(eventSource, type, edge, edgeSource, edgeTarget, Graph.DEFAULT_EDGE_WEIGHT);
     }
 
@@ -99,15 +96,14 @@ public class GraphEdgeChangeEvent<V, E>
      * Constructor for GraphEdgeChangeEvent.
      *
      * @param eventSource the source of this event.
-     * @param type the event type of this event.
-     * @param edge the edge that this event is related to.
-     * @param edgeSource edge source vertex
-     * @param edgeTarget edge target vertex
-     * @param edgeWeight edge weight
+     * @param type        the event type of this event.
+     * @param edge        the edge that this event is related to.
+     * @param edgeSource  edge source vertex
+     * @param edgeTarget  edge target vertex
+     * @param edgeWeight  edge weight
      */
     public GraphEdgeChangeEvent(
-        Object eventSource, int type, E edge, V edgeSource, V edgeTarget, double edgeWeight)
-    {
+            Object eventSource, int type, E edge, V edgeSource, V edgeTarget, double edgeWeight) {
         super(eventSource, type);
         this.edge = edge;
         this.edgeSource = edgeSource;
@@ -120,8 +116,7 @@ public class GraphEdgeChangeEvent<V, E>
      *
      * @return event edge
      */
-    public E getEdge()
-    {
+    public E getEdge() {
         return edge;
     }
 
@@ -130,8 +125,7 @@ public class GraphEdgeChangeEvent<V, E>
      *
      * @return event source vertex
      */
-    public V getEdgeSource()
-    {
+    public V getEdgeSource() {
         return edgeSource;
     }
 
@@ -140,8 +134,7 @@ public class GraphEdgeChangeEvent<V, E>
      *
      * @return event target vertex
      */
-    public V getEdgeTarget()
-    {
+    public V getEdgeTarget() {
         return edgeTarget;
     }
 
@@ -150,8 +143,7 @@ public class GraphEdgeChangeEvent<V, E>
      *
      * @return event edge weight
      */
-    public double getEdgeWeight()
-    {
+    public double getEdgeWeight() {
         return edgeWeight;
     }
 

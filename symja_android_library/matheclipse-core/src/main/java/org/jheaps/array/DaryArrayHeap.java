@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,9 @@
  */
 package org.jheaps.array;
 
-import java.util.Comparator;
-
 import org.jheaps.annotations.LinearTime;
+
+import java.util.Comparator;
 
 /**
  * An array based d-ary heap. The heap is sorted according to the
@@ -36,7 +36,7 @@ import org.jheaps.annotations.LinearTime;
  * bounds are worst-case if the user initializes the heap with a capacity larger
  * or equal to the total number of elements that are going to be inserted into
  * the heap.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(int, Object[])} or
@@ -64,9 +64,7 @@ import org.jheaps.annotations.LinearTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
@@ -100,11 +98,9 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * The initial capacity of the heap is
      * {@link DaryArrayHeap#DEFAULT_HEAP_CAPACITY} and adjusts automatically
      * based on the sequence of insertions and deletions.
-     * 
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     *
+     * @param d the number of children of each node in the d-ary heap
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayHeap(int d) {
         this(d, null, DEFAULT_HEAP_CAPACITY);
@@ -129,12 +125,9 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @param capacity
-     *            the initial heap capacity
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     * @param d        the number of children of each node in the d-ary heap
+     * @param capacity the initial heap capacity
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayHeap(int d, int capacity) {
         this(d, null, capacity);
@@ -156,14 +149,11 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * {@link DaryArrayHeap#DEFAULT_HEAP_CAPACITY} and adjusts automatically
      * based on the sequence of insertions and deletions.
      *
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     * @param d          the number of children of each node in the d-ary heap
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayHeap(int d, Comparator<? super K> comparator) {
         this(d, comparator, DEFAULT_HEAP_CAPACITY);
@@ -186,16 +176,12 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param d
-     *            the number of children of each node in the d-ary heap
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
+     * @param d          the number of children of each node in the d-ary heap
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
      */
     public DaryArrayHeap(int d, Comparator<? super K> comparator, int capacity) {
         super(comparator, capacity);
@@ -209,17 +195,12 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param d
-     *            the number of children of the d-ary heap
-     * @param array
-     *            an array of elements
+     * @param <K>   the type of keys maintained by the heap
+     * @param d     the number of children of the d-ary heap
+     * @param array an array of elements
      * @return a d-ary heap
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> DaryArrayHeap<K> heapify(int d, K[] array) {
@@ -249,19 +230,13 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param d
-     *            the number of children of the d-ary heap
-     * @param array
-     *            an array of elements
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param d          the number of children of the d-ary heap
+     * @param array      an array of elements
+     * @param comparator the comparator to use
      * @return a d-ary heap
-     * @throws IllegalArgumentException
-     *             in case the number of children per node are less than 2
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the number of children per node are less than 2
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> DaryArrayHeap<K> heapify(int d, K[] array, Comparator<? super K> comparator) {
@@ -289,9 +264,8 @@ public class DaryArrayHeap<K> extends AbstractArrayHeap<K> {
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @Override
     @SuppressWarnings("unchecked")

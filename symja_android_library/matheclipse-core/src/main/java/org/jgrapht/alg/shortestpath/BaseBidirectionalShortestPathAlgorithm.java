@@ -17,10 +17,12 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.GraphWalk;
 
-import java.util.*;
+import java.util.LinkedList;
 
 /**
  * Base class for the bidirectional shortest path algorithms. Currently known extensions are
@@ -31,17 +33,15 @@ import java.util.*;
  * @author Dimitrios Michail
  */
 public abstract class BaseBidirectionalShortestPathAlgorithm<V, E>
-    extends
-    BaseShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseShortestPathAlgorithm<V, E> {
 
     /**
      * Constructs a new instance of the algorithm for a given graph.
      *
      * @param graph the graph
      */
-    public BaseBidirectionalShortestPathAlgorithm(Graph<V, E> graph)
-    {
+    public BaseBidirectionalShortestPathAlgorithm(Graph<V, E> graph) {
         super(graph);
     }
 
@@ -49,18 +49,17 @@ public abstract class BaseBidirectionalShortestPathAlgorithm<V, E>
      * Builds shortest path between {@code source} and {@code sink} based on the information
      * provided by search frontiers and common vertex.
      *
-     * @param forwardFrontier forward direction frontier
+     * @param forwardFrontier  forward direction frontier
      * @param backwardFrontier backward direction frontier
-     * @param weight weight of the shortest path
-     * @param source path source
-     * @param commonVertex path common vertex
-     * @param sink path sink
+     * @param weight           weight of the shortest path
+     * @param source           path source
+     * @param commonVertex     path common vertex
+     * @param sink             path sink
      * @return shortest path between source and sink
      */
     protected GraphPath<V, E> createPath(
-        BaseSearchFrontier forwardFrontier, BaseSearchFrontier backwardFrontier, double weight,
-        V source, V commonVertex, V sink)
-    {
+            BaseSearchFrontier forwardFrontier, BaseSearchFrontier backwardFrontier, double weight,
+            V source, V commonVertex, V sink) {
         LinkedList<E> edgeList = new LinkedList<>();
         LinkedList<V> vertexList = new LinkedList<>();
 
@@ -101,8 +100,7 @@ public abstract class BaseBidirectionalShortestPathAlgorithm<V, E>
     /**
      * Base class of the search frontier used by bidirectional shortest path algorithms.
      */
-    abstract class BaseSearchFrontier
-    {
+    abstract class BaseSearchFrontier {
         /**
          * Frontier`s graph.
          */
@@ -113,8 +111,7 @@ public abstract class BaseBidirectionalShortestPathAlgorithm<V, E>
          *
          * @param graph graph
          */
-        BaseSearchFrontier(Graph<V, E> graph)
-        {
+        BaseSearchFrontier(Graph<V, E> graph) {
             this.graph = graph;
         }
 

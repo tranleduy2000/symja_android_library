@@ -17,9 +17,17 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * A maximum cardinality search iterator for an undirected graph.
@@ -43,9 +51,8 @@ import java.util.*;
  * @author Timofey Chudakov
  */
 public class MaximumCardinalityIterator<V, E>
-    extends
-    AbstractGraphIterator<V, E>
-{
+        extends
+        AbstractGraphIterator<V, E> {
     /**
      * The maximum index of non-empty set in {@code buckets}.
      */
@@ -73,8 +80,7 @@ public class MaximumCardinalityIterator<V, E>
      *
      * @param graph the graph to be iterated.
      */
-    public MaximumCardinalityIterator(Graph<V, E> graph)
-    {
+    public MaximumCardinalityIterator(Graph<V, E> graph) {
         super(graph);
         remainingVertices = graph.vertexSet().size();
         if (remainingVertices > 0) {
@@ -95,8 +101,7 @@ public class MaximumCardinalityIterator<V, E>
      * @return true if there exists unvisited vertex.
      */
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         if (current != null) {
             return true;
         }
@@ -113,8 +118,7 @@ public class MaximumCardinalityIterator<V, E>
      * @return the next vertex in the ordering.
      */
     @Override
-    public V next()
-    {
+    public V next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -132,8 +136,7 @@ public class MaximumCardinalityIterator<V, E>
      * Always returns true since this iterator doesn't care about connected components.
      */
     @Override
-    public boolean isCrossComponentTraversal()
-    {
+    public boolean isCrossComponentTraversal() {
         return true;
     }
 
@@ -144,8 +147,7 @@ public class MaximumCardinalityIterator<V, E>
      * {@link IllegalArgumentException}.
      */
     @Override
-    public void setCrossComponentTraversal(boolean crossComponentTraversal)
-    {
+    public void setCrossComponentTraversal(boolean crossComponentTraversal) {
         if (!crossComponentTraversal) {
             throw new IllegalArgumentException("Iterator is always cross-component");
         }
@@ -156,8 +158,7 @@ public class MaximumCardinalityIterator<V, E>
      *
      * @return vertex retrieved from {@code buckets}.
      */
-    private V advance()
-    {
+    private V advance() {
         if (remainingVertices > 0) {
             Set<V> bucket = buckets.get(maxCardinality);
             V vertex = bucket.iterator().next();
@@ -181,10 +182,9 @@ public class MaximumCardinalityIterator<V, E>
      *
      * @param vertex the vertex, which has to be removed from the bucket it was contained in.
      * @return the cardinality of the removed vertex or -1, if the vertex wasn't contained in any
-     *         bucket.
+     * bucket.
      */
-    private int removeFromBucket(V vertex)
-    {
+    private int removeFromBucket(V vertex) {
         if (cardinalityMap.containsKey(vertex)) {
             int cardinality = cardinalityMap.get(vertex);
             buckets.get(cardinality).remove(vertex);
@@ -200,11 +200,10 @@ public class MaximumCardinalityIterator<V, E>
     /**
      * Adds the {@code vertex} to the bucket with the given {@code cardinality}.
      *
-     * @param vertex the vertex, which has to be added to the the bucket.
+     * @param vertex      the vertex, which has to be added to the the bucket.
      * @param cardinality the cardinality of the destination bucket.
      */
-    private void addToBucket(V vertex, int cardinality)
-    {
+    private void addToBucket(V vertex, int cardinality) {
         cardinalityMap.put(vertex, cardinality);
         if (buckets.get(cardinality) == null) {
             buckets.set(cardinality, new HashSet<V>());
@@ -218,8 +217,7 @@ public class MaximumCardinalityIterator<V, E>
      *
      * @param vertex the vertex whose neighbours are to be updated.
      */
-    private void updateNeighbours(V vertex)
-    {
+    private void updateNeighbours(V vertex) {
         Set<V> processed = new HashSet<>();
         for (E edge : graph.edgesOf(vertex)) {
             V opposite = Graphs.getOppositeVertex(graph, edge, vertex);
@@ -229,8 +227,7 @@ public class MaximumCardinalityIterator<V, E>
             }
         }
         if (maxCardinality < graph.vertexSet().size() && maxCardinality >= 0
-            && buckets.get(maxCardinality + 1) != null)
-        {
+                && buckets.get(maxCardinality + 1) != null) {
             ++maxCardinality;
         }
     }

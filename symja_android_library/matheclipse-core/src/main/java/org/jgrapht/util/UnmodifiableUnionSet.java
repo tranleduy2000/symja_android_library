@@ -17,22 +17,24 @@
  */
 package org.jgrapht.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * An unmodifiable live view of the union of two sets.
  *
  * @param <E> the element type
- *
  * @author Dimitrios Michail
  */
 public class UnmodifiableUnionSet<E>
-    extends
-    AbstractSet<E>
-    implements
-    Serializable
-{
+        extends
+        AbstractSet<E>
+        implements
+        Serializable {
     private static final long serialVersionUID = -1937327799873331354L;
 
     private final Set<E> first;
@@ -40,12 +42,11 @@ public class UnmodifiableUnionSet<E>
 
     /**
      * Constructs a new set.
-     * 
-     * @param first the first set
+     *
+     * @param first  the first set
      * @param second the second set
      */
-    public UnmodifiableUnionSet(Set<E> first, Set<E> second)
-    {
+    public UnmodifiableUnionSet(Set<E> first, Set<E> second) {
         Objects.requireNonNull(first);
         Objects.requireNonNull(second);
         this.first = first;
@@ -53,19 +54,17 @@ public class UnmodifiableUnionSet<E>
     }
 
     @Override
-    public Iterator<E> iterator()
-    {
+    public Iterator<E> iterator() {
         return new UnionIterator(orderSetsBySize());
     }
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Since the view is live, this operation is no longer a constant time operation.
      */
     @Override
-    public int size()
-    {
+    public int size() {
         SetSizeOrdering ordering = orderSetsBySize();
         Set<E> bigger = ordering.bigger;
         int count = ordering.biggerSize;
@@ -78,13 +77,11 @@ public class UnmodifiableUnionSet<E>
     }
 
     @Override
-    public boolean contains(Object o)
-    {
+    public boolean contains(Object o) {
         return first.contains(o) || second.contains(o);
     }
 
-    private SetSizeOrdering orderSetsBySize()
-    {
+    private SetSizeOrdering orderSetsBySize() {
         int firstSize = first.size();
         int secondSize = second.size();
         if (secondSize > firstSize) {
@@ -98,15 +95,13 @@ public class UnmodifiableUnionSet<E>
     // declare them as non-static to avoid the clutter from
     // duplicating the generic type parameter
 
-    private class SetSizeOrdering
-    {
+    private class SetSizeOrdering {
         final Set<E> bigger;
         final Set<E> smaller;
         final int biggerSize;
         final int smallerSize;
 
-        SetSizeOrdering(Set<E> bigger, Set<E> smaller, int biggerSize, int smallerSize)
-        {
+        SetSizeOrdering(Set<E> bigger, Set<E> smaller, int biggerSize, int smallerSize) {
             this.bigger = bigger;
             this.smaller = smaller;
             this.biggerSize = biggerSize;
@@ -115,16 +110,14 @@ public class UnmodifiableUnionSet<E>
     }
 
     private class UnionIterator
-        implements
-        Iterator<E>
-    {
+            implements
+            Iterator<E> {
         private SetSizeOrdering ordering;
         private boolean inBiggerSet;
         private Iterator<E> iterator;
         private E cur;
 
-        UnionIterator(SetSizeOrdering ordering)
-        {
+        UnionIterator(SetSizeOrdering ordering) {
             this.ordering = ordering;
             this.inBiggerSet = true;
             this.iterator = ordering.bigger.iterator();
@@ -132,8 +125,7 @@ public class UnmodifiableUnionSet<E>
         }
 
         @Override
-        public boolean hasNext()
-        {
+        public boolean hasNext() {
             if (cur != null) {
                 return true;
             }
@@ -141,8 +133,7 @@ public class UnmodifiableUnionSet<E>
         }
 
         @Override
-        public E next()
-        {
+        public E next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -151,8 +142,7 @@ public class UnmodifiableUnionSet<E>
             return result;
         }
 
-        private E prefetch()
-        {
+        private E prefetch() {
             while (true) {
                 if (inBiggerSet) {
                     if (iterator.hasNext()) {

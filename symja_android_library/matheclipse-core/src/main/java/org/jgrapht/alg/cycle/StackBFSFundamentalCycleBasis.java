@@ -17,58 +17,57 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generate a set of fundamental cycles by building a spanning tree (forest) using an implementation
  * of BFS using a LIFO Stack. The implementation first constructs the spanning forest and then
  * builds the fundamental-cycles set. It supports graphs with self-loops and/or graphs with multiple
  * (parallel) edges.
- * 
+ *
  * <p>
  * The algorithm constructs the same fundamental cycle basis as the algorithm in the following
  * paper: K. Paton, An algorithm for finding a fundamental set of cycles for an undirected linear
  * graph, Comm. ACM 12 (1969), pp. 514-518.
- * 
+ *
  * <p>
  * The total length of the fundamental-cycle set can be as large as $O(n^3)$ where $n$ is the number
  * of vertices of the graph.
- * 
+ *
  * @param <V> the vertex type
  * @param <E> the edge type
- *
  * @author Dimitrios Michail
  */
 public class StackBFSFundamentalCycleBasis<V, E>
-    extends
-    AbstractFundamentalCycleBasis<V, E>
-{
+        extends
+        AbstractFundamentalCycleBasis<V, E> {
     /**
      * Constructor
-     * 
+     *
      * @param graph the input graph
      */
-    public StackBFSFundamentalCycleBasis(Graph<V, E> graph)
-    {
+    public StackBFSFundamentalCycleBasis(Graph<V, E> graph) {
         super(graph);
     }
 
     /**
      * Compute a spanning forest of the graph using a stack (LIFO) based BFS implementation.
-     * 
+     *
      * <p>
      * The representation assumes that the map contains the predecessor edge of each vertex in the
      * forest. The predecessor edge is the forest edge that was used to discover the vertex. If no
      * such edge was used (the vertex is a leaf in the forest) then the corresponding entry must be
      * null.
-     * 
+     *
      * @return a map representation of a spanning forest.
      */
     @Override
-    protected Map<V, E> computeSpanningForest()
-    {
+    protected Map<V, E> computeSpanningForest() {
         Map<V, E> pred = new HashMap<>();
 
         ArrayDeque<V> stack = new ArrayDeque<>();

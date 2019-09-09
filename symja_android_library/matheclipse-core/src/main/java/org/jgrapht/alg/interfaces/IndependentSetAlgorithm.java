@@ -17,20 +17,18 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.util.*;
+import org.jgrapht.util.WeightedUnmodifiableSet;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * Algorithm to compute an
  * <a href="http://mathworld.wolfram.com/IndependentVertexSet.html">Independent Set</a> in a graph.
  *
  * @param <V> vertex the graph vertex type
- *
  * @author Joris Kinable
  */
-public interface IndependentSetAlgorithm<V>
-{
+public interface IndependentSetAlgorithm<V> {
 
     /**
      * Computes an independent set; all vertices are considered to have equal weight.
@@ -46,9 +44,8 @@ public interface IndependentSetAlgorithm<V>
      * @param <V> the vertex type
      */
     interface IndependentSet<V>
-        extends
-        Set<V>
-    {
+            extends
+            Set<V> {
 
         /**
          * Returns the weight of the independent set. When solving a weighted independent set
@@ -67,21 +64,18 @@ public interface IndependentSetAlgorithm<V>
      * @param <V> the vertex type
      */
     class IndependentSetImpl<V>
-        extends
-        WeightedUnmodifiableSet<V>
-        implements
-        IndependentSet<V>
-    {
+            extends
+            WeightedUnmodifiableSet<V>
+            implements
+            IndependentSet<V> {
 
         private static final long serialVersionUID = 4572451196544323306L;
 
-        public IndependentSetImpl(Set<V> independentSet)
-        {
+        public IndependentSetImpl(Set<V> independentSet) {
             super(independentSet);
         }
 
-        public IndependentSetImpl(Set<V> independentSet, double weight)
-        {
+        public IndependentSetImpl(Set<V> independentSet, double weight) {
             super(independentSet, weight);
         }
     }

@@ -17,52 +17,58 @@
  */
 package org.jgrapht.alg.tour;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.spanning.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.HamiltonianCycleAlgorithm;
+import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A 2-approximation algorithm for the metric TSP problem.
- * 
+ *
  * <p>
  * The travelling salesman problem (TSP) asks the following question: "Given a list of cities and
  * the distances between each pair of cities, what is the shortest possible route that visits each
  * city exactly once and returns to the origin city?". In the metric TSP, the intercity distances
  * satisfy the triangle inequality.
- * 
+ *
  * <p>
  * This is an implementation of the folklore algorithm which returns a depth-first ordering of the
  * minimum spanning tree. The algorithm is a 2-approximation assuming that the instance satisfies
  * the triangle inequality. The implementation requires the input graph to be undirected and
  * complete. The running time is $O(|V|^2 \log |V|)$.
- * 
+ *
  * <p>
  * See <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">wikipedia</a> for more
  * details.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class TwoApproxMetricTSP<V, E>
-    implements
-    HamiltonianCycleAlgorithm<V, E>
-{
+        implements
+        HamiltonianCycleAlgorithm<V, E> {
     /**
      * Construct a new instance
      */
-    public TwoApproxMetricTSP()
-    {
+    public TwoApproxMetricTSP() {
     }
 
     /**
      * Computes a 2-approximate tour.
-     * 
+     *
      * @param graph the input graph
      * @return a tour
      * @throws IllegalArgumentException if the graph is not undirected
@@ -70,8 +76,7 @@ public class TwoApproxMetricTSP<V, E>
      * @throws IllegalArgumentException if the graph contains no vertices
      */
     @Override
-    public GraphPath<V, E> getTour(Graph<V, E> graph)
-    {
+    public GraphPath<V, E> getTour(Graph<V, E> graph) {
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("Graph must be undirected");
         }
@@ -88,7 +93,7 @@ public class TwoApproxMetricTSP<V, E>
         if (graph.vertexSet().size() == 1) {
             V start = graph.vertexSet().iterator().next();
             return new GraphWalk<>(
-                graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
+                    graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
         }
 
         /*

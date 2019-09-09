@@ -17,12 +17,23 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
+import org.jgrapht.graph.GraphWalk;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The Bellman-Ford algorithm.
@@ -30,7 +41,7 @@ import java.util.*;
  * <p>
  * Computes shortest paths from a single source vertex to all other vertices in a weighted graph.
  * The Bellman-Ford algorithm supports negative edge weights.
- * 
+ *
  * <p>
  * Negative weight cycles are not allowed and will be reported by the algorithm. This implies that
  * negative edge weights are not allowed in undirected graphs. In such cases the code will throw an
@@ -43,13 +54,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class BellmanFordShortestPath<V, E>
-    extends
-    BaseShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseShortestPathAlgorithm<V, E> {
     protected final Comparator<Double> comparator;
     protected final int maxHops;
 
@@ -58,33 +67,30 @@ public class BellmanFordShortestPath<V, E>
      *
      * @param graph the input graph
      */
-    public BellmanFordShortestPath(Graph<V, E> graph)
-    {
+    public BellmanFordShortestPath(Graph<V, E> graph) {
         this(graph, ToleranceDoubleComparator.DEFAULT_EPSILON);
     }
 
     /**
      * Construct a new instance.
      *
-     * @param graph the input graph
+     * @param graph   the input graph
      * @param epsilon tolerance when comparing floating point values
      */
-    public BellmanFordShortestPath(Graph<V, E> graph, double epsilon)
-    {
+    public BellmanFordShortestPath(Graph<V, E> graph, double epsilon) {
         this(graph, ToleranceDoubleComparator.DEFAULT_EPSILON, Integer.MAX_VALUE);
     }
 
     /**
      * Construct a new instance.
      *
-     * @param graph the input graph
+     * @param graph   the input graph
      * @param epsilon tolerance when comparing floating point values
      * @param maxHops execute the algorithm for at most this many iterations. If this is smaller
-     *        than the number of vertices, then the negative cycle detection feature is disabled.
+     *                than the number of vertices, then the negative cycle detection feature is disabled.
      * @throws IllegalArgumentException if the number of maxHops is not positive
      */
-    public BellmanFordShortestPath(Graph<V, E> graph, double epsilon, int maxHops)
-    {
+    public BellmanFordShortestPath(Graph<V, E> graph, double epsilon, int maxHops) {
         super(graph);
         this.comparator = new ToleranceDoubleComparator(epsilon);
         if (maxHops < 1) {
@@ -95,12 +101,11 @@ public class BellmanFordShortestPath<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws NegativeCycleDetectedException in case a negative weight cycle is detected
      */
     @Override
-    public GraphPath<V, E> getPath(V source, V sink)
-    {
+    public GraphPath<V, E> getPath(V source, V sink) {
         if (!graph.containsVertex(sink)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SINK_VERTEX);
         }
@@ -109,13 +114,12 @@ public class BellmanFordShortestPath<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws NegativeCycleDetectedException in case a negative weight cycle is detected
      */
     @Override
     @SuppressWarnings("unchecked")
-    public SingleSourcePaths<V, E> getPaths(V source)
-    {
+    public SingleSourcePaths<V, E> getPaths(V source) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -183,7 +187,7 @@ public class BellmanFordShortestPath<V, E>
                         // record update for negative cycle computation
                         pred.put(u, e);
                         throw new NegativeCycleDetectedException(
-                            GRAPH_CONTAINS_A_NEGATIVE_WEIGHT_CYCLE, computeNegativeCycle(e, pred));
+                                GRAPH_CONTAINS_A_NEGATIVE_WEIGHT_CYCLE, computeNegativeCycle(e, pred));
                     }
                 }
             }
@@ -201,32 +205,27 @@ public class BellmanFordShortestPath<V, E>
 
     /**
      * Find a path between two vertices.
-     * 
-     * @param graph the graph to be searched
-     * @param source the vertex at which the path should start
-     * @param sink the vertex at which the path should end
-     * 
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
      *
+     * @param graph  the graph to be searched
+     * @param source the vertex at which the path should start
+     * @param sink   the vertex at which the path should end
+     * @param <V>    the graph vertex type
+     * @param <E>    the graph edge type
      * @return a shortest path, or null if no path exists
      */
-    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, V source, V sink)
-    {
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, V source, V sink) {
         return new BellmanFordShortestPath<>(graph).getPath(source, sink);
     }
 
     /**
      * Computes a negative weight cycle assuming that the algorithm has already determined that it
      * exists.
-     * 
+     *
      * @param edge an edge which we know that belongs to the negative weight cycle
      * @param pred the predecessor array
-     * 
      * @return the negative weight cycle
      */
-    private GraphPath<V, E> computeNegativeCycle(E edge, Map<V, E> pred)
-    {
+    private GraphPath<V, E> computeNegativeCycle(E edge, Map<V, E> pred) {
         // find a vertex of the cycle
         Set<V> visited = new HashSet<>();
         V start = graph.getEdgeTarget(edge);

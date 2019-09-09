@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,17 +17,17 @@
  */
 package org.jheaps.tree;
 
-import java.util.Comparator;
-
 import org.jheaps.AddressableHeap;
 import org.jheaps.AddressableHeapFactory;
+
+import java.util.Comparator;
 
 /**
  * Reflected double ended heaps based on pairing heaps. The heap is sorted
  * according to the {@linkplain Comparable natural ordering} of its keys, or by
  * a {@link Comparator} provided at heap creation time, depending on which
  * constructor is used.
- * 
+ *
  * <p>
  * This class implements a general technique which uses two {@link PairingHeap}s
  * to implement a double ended heap, described in detail in the following
@@ -36,25 +36,25 @@ import org.jheaps.AddressableHeapFactory;
  * <li>C. Makris, A. Tsakalidis, and K. Tsichlas. Reflected min-max heaps.
  * Information Processing Letters, 86(4), 209--214, 2003.</li>
  * </ul>
- * 
+ *
  * <p>
  * This implementation provides amortized O(log(n)) time cost for the
  * {@code insert}, {@code deleteMin}, {@code deleteMax}, {@code decreaseKey},
  * {@code increaseKey}, and {@code delete} operations. {@code findMin} and
  * {@code findMax} are worst-case O(1) operations. The operation {@code meld} is
  * amortized O(log(n)).
- * 
+ *
  * <p>
  * All the above bounds, however, assume that the user does not perform
  * cascading melds on heaps such as:
- * 
+ *
  * <pre>
  * d.meld(e);
  * c.meld(d);
  * b.meld(c);
  * a.meld(b);
  * </pre>
- * 
+ * <p>
  * The above scenario, although efficiently supported by using union-find with
  * path compression, invalidates the claimed bounds.
  *
@@ -79,12 +79,9 @@ import org.jheaps.AddressableHeapFactory;
  * (A structural modification is any operation that adds or deletes one or more
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
- * 
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
  *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class ReflectedPairingHeap<K, V> extends ReflectedHeap<K, V> {
@@ -115,10 +112,9 @@ public class ReflectedPairingHeap<K, V> extends ReflectedHeap<K, V> {
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public ReflectedPairingHeap(Comparator<? super K> comparator) {
         super(new Factory<K, V>(), comparator);

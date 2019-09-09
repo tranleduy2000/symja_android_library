@@ -36,12 +36,12 @@ import java.util.Set;
  * should only provide a method for constructing a spanning forest of the graph. A cycle basis is
  * fundamental if and only if each cycle in the basis contains at least one edge which is not
  * contained in any other cycle in the basis.
- * 
+ *
  * <p>
  * For information on algorithms and heuristics for the computation of fundamental cycle bases see
  * the following paper: Narsingh Deo, G. Prabhu, and M. S. Krishnamoorthy. Algorithms for Generating
  * Fundamental Cycles in a Graph. ACM Trans. Math. Softw. 8, 1, 26-42, 1982.
- * 
+ *
  * <p>
  * The implementation returns a fundamental cycle basis as an undirected cycle basis. For a
  * discussion of different kinds of cycle bases in graphs see the following paper: Christian
@@ -50,22 +50,19 @@ import java.util.Set;
  *
  * @param <V> the vertex type
  * @param <E> the edge type
- *
  * @author Dimitrios Michail
  */
 public abstract class AbstractFundamentalCycleBasis<V, E>
-    implements
-    CycleBasisAlgorithm<V, E>
-{
+        implements
+        CycleBasisAlgorithm<V, E> {
     protected Graph<V, E> graph;
 
     /**
      * Constructor
-     * 
+     *
      * @param graph the input graph
      */
-    public AbstractFundamentalCycleBasis(Graph<V, E> graph)
-    {
+    public AbstractFundamentalCycleBasis(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirectedOrUndirected(graph);
     }
 
@@ -73,8 +70,7 @@ public abstract class AbstractFundamentalCycleBasis<V, E>
      * {@inheritDoc}
      */
     @Override
-    public CycleBasis<V, E> getCycleBasis()
-    {
+    public CycleBasis<V, E> getCycleBasis() {
         // compute spanning forest
         Map<V, E> spanningForest = computeSpanningForest();
 
@@ -107,26 +103,25 @@ public abstract class AbstractFundamentalCycleBasis<V, E>
 
     /**
      * Compute a spanning forest of the graph.
-     * 
+     *
      * <p>
      * The representation assumes that the map contains the predecessor edge of each vertex in the
      * forest. The predecessor edge is the forest edge that was used to discover the vertex. If no
      * such edge was used (the vertex is a leaf in the forest) then the corresponding entry must be
      * null.
-     * 
+     *
      * @return a map representation of a spanning forest.
      */
     protected abstract Map<V, E> computeSpanningForest();
 
     /**
      * Given a non-tree edge and a spanning tree (forest) build a fundamental cycle.
-     * 
-     * @param e a non-tree (forest) edge
+     *
+     * @param e              a non-tree (forest) edge
      * @param spanningForest the spanning tree (forest)
      * @return a fundamental cycle
      */
-    private Pair<List<E>, Double> buildFundamentalCycle(E e, Map<V, E> spanningForest)
-    {
+    private Pair<List<E>, Double> buildFundamentalCycle(E e, Map<V, E> spanningForest) {
         V source = graph.getEdgeSource(e);
         V target = graph.getEdgeTarget(e);
 

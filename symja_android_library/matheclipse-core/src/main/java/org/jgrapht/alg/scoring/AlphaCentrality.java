@@ -17,22 +17,25 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 /**
  * AlphaCentrality implementation.
- * 
+ *
  * <p>
  * The <a href="https://en.wikipedia.org/wiki/Alpha_centrality">wikipedia</a> article contains a
  * nice description of AlphaCentrality. You may also refer to this
  * <a href="http://www.leonidzhukov.net/hse/2016/networks/papers/bonacich2001.pdf">paper</a>
  * describing the implementation of the algorithm.
  * </p>
- * 
+ *
  * <p>
  * To implement EigenVector Centrality, call AlphaCentrality by passing the value of exogenous
  * factor as zero. Further description of EigenVector Centrality can be found in
@@ -54,17 +57,15 @@ import java.util.function.*;
  * The default value is {@link AlphaCentrality#MAX_ITERATIONS_DEFAULT}. Also in case of weighted
  * graphs, negative weights are not expected.
  * </p>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  * @author Pratik Tibrewal
  */
 public final class AlphaCentrality<V, E>
-    implements
-    VertexScoringAlgorithm<V, Double>
-{
+        implements
+        VertexScoringAlgorithm<V, Double> {
     /**
      * Default number of maximum iterations.
      */
@@ -91,95 +92,88 @@ public final class AlphaCentrality<V, E>
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
+     *
      * @param g the input graph
      */
-    public AlphaCentrality(Graph<V, E> g)
-    {
+    public AlphaCentrality(Graph<V, E> g) {
         this(
-            g, DAMPING_FACTOR_DEFAULT, EXOGENOUS_FACTOR_DEFAULT, MAX_ITERATIONS_DEFAULT,
-            TOLERANCE_DEFAULT);
+                g, DAMPING_FACTOR_DEFAULT, EXOGENOUS_FACTOR_DEFAULT, MAX_ITERATIONS_DEFAULT,
+                TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
+     *
+     * @param g             the input graph
      * @param dampingFactor the damping factor
      */
-    public AlphaCentrality(Graph<V, E> g, double dampingFactor)
-    {
+    public AlphaCentrality(Graph<V, E> g, double dampingFactor) {
         this(g, dampingFactor, EXOGENOUS_FACTOR_DEFAULT, MAX_ITERATIONS_DEFAULT, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
-     * @param dampingFactor the damping factor
+     *
+     * @param g               the input graph
+     * @param dampingFactor   the damping factor
      * @param exogenousFactor the exogenous factor
      */
-    public AlphaCentrality(Graph<V, E> g, double dampingFactor, double exogenousFactor)
-    {
+    public AlphaCentrality(Graph<V, E> g, double dampingFactor, double exogenousFactor) {
         this(g, dampingFactor, exogenousFactor, MAX_ITERATIONS_DEFAULT, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
-     * @param dampingFactor the damping factor
+     *
+     * @param g                       the input graph
+     * @param dampingFactor           the damping factor
      * @param exogenousFactorFunction ToDoubleFunction a provider of exogenous factors per vertex
      */
     public AlphaCentrality(
-        Graph<V, E> g, double dampingFactor, ToDoubleFunction<V> exogenousFactorFunction)
-    {
+            Graph<V, E> g, double dampingFactor, ToDoubleFunction<V> exogenousFactorFunction) {
         this(g, dampingFactor, exogenousFactorFunction, MAX_ITERATIONS_DEFAULT, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
-     * @param dampingFactor the damping factor
+     *
+     * @param g               the input graph
+     * @param dampingFactor   the damping factor
      * @param exogenousFactor the exogenous factor
-     * @param maxIterations the maximum number of iterations to perform
+     * @param maxIterations   the maximum number of iterations to perform
      */
     public AlphaCentrality(
-        Graph<V, E> g, double dampingFactor, double exogenousFactor, int maxIterations)
-    {
+            Graph<V, E> g, double dampingFactor, double exogenousFactor, int maxIterations) {
         this(g, dampingFactor, exogenousFactor, maxIterations, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
-     * @param dampingFactor the damping factor
+     *
+     * @param g                       the input graph
+     * @param dampingFactor           the damping factor
      * @param exogenousFactorFunction ToDoubleFunction a provider of exogenous factors per vertex
-     * @param maxIterations the maximum number of iterations to perform
+     * @param maxIterations           the maximum number of iterations to perform
      */
     public AlphaCentrality(
-        Graph<V, E> g, double dampingFactor, ToDoubleFunction<V> exogenousFactorFunction,
-        int maxIterations)
-    {
+            Graph<V, E> g, double dampingFactor, ToDoubleFunction<V> exogenousFactorFunction,
+            int maxIterations) {
         this(g, dampingFactor, exogenousFactorFunction, maxIterations, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
-     * @param dampingFactor the damping factor
+     *
+     * @param g               the input graph
+     * @param dampingFactor   the damping factor
      * @param exogenousFactor the exogenous factor
-     * @param maxIterations the maximum number of iterations to perform
-     * @param tolerance the calculation will stop if the difference of AlphaCentrality values
-     *        between iterations change less than this value
+     * @param maxIterations   the maximum number of iterations to perform
+     * @param tolerance       the calculation will stop if the difference of AlphaCentrality values
+     *                        between iterations change less than this value
      */
     public AlphaCentrality(
             Graph<V, E> g, double dampingFactor, final double exogenousFactor, int maxIterations,
-            double tolerance)
-    {
+            double tolerance) {
         this.g = g;
         this.scores = new HashMap<>();
 
@@ -195,18 +189,17 @@ public final class AlphaCentrality<V, E>
 
     /**
      * Create and execute an instance of AlphaCentrality.
-     * 
-     * @param g the input graph
-     * @param dampingFactor the damping factor
+     *
+     * @param g                       the input graph
+     * @param dampingFactor           the damping factor
      * @param exogenousFactorFunction ToDoubleFunction a provider of exogenous factors per vertex
-     * @param maxIterations the maximum number of iterations to perform
-     * @param tolerance the calculation will stop if the difference of AlphaCentrality values
-     *        between iterations change less than this value
+     * @param maxIterations           the maximum number of iterations to perform
+     * @param tolerance               the calculation will stop if the difference of AlphaCentrality values
+     *                                between iterations change less than this value
      */
     public AlphaCentrality(
-        Graph<V, E> g, double dampingFactor, ToDoubleFunction<V> exogenousFactorFunction,
-        int maxIterations, double tolerance)
-    {
+            Graph<V, E> g, double dampingFactor, ToDoubleFunction<V> exogenousFactorFunction,
+            int maxIterations, double tolerance) {
         this.g = g;
         this.scores = new HashMap<>();
 
@@ -218,8 +211,7 @@ public final class AlphaCentrality<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Map<V, Double> getScores()
-    {
+    public Map<V, Double> getScores() {
         return Collections.unmodifiableMap(scores);
     }
 
@@ -227,8 +219,7 @@ public final class AlphaCentrality<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Double getVertexScore(V v)
-    {
+    public Double getVertexScore(V v) {
         if (!g.containsVertex(v)) {
             throw new IllegalArgumentException("Cannot return score of unknown vertex");
         }
@@ -236,8 +227,7 @@ public final class AlphaCentrality<V, E>
     }
 
     /* Checks for the valid values of the parameters */
-    private void validate(double dampingFactor, int maxIterations, double tolerance)
-    {
+    private void validate(double dampingFactor, int maxIterations, double tolerance) {
         if (maxIterations <= 0) {
             throw new IllegalArgumentException("Maximum iterations must be positive");
         }
@@ -252,9 +242,8 @@ public final class AlphaCentrality<V, E>
     }
 
     private void run(
-        double dampingFactor, ToDoubleFunction<V> exofactorFunction, int maxIterations,
-        double tolerance)
-    {
+            double dampingFactor, ToDoubleFunction<V> exofactorFunction, int maxIterations,
+            double tolerance) {
         // initialization
         int totalVertices = g.vertexSet().size();
 

@@ -80,14 +80,12 @@ import java.util.function.Supplier;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class GusfieldGomoryHuCutTree<V, E>
-    implements
-    MaximumFlowAlgorithm<V, E>,
-    MinimumSTCutAlgorithm<V, E>
-{
+        implements
+        MaximumFlowAlgorithm<V, E>,
+        MinimumSTCutAlgorithm<V, E> {
 
     private final Graph<V, E> network;
     /* Number of vertices in the graph */
@@ -111,34 +109,31 @@ public class GusfieldGomoryHuCutTree<V, E>
 
     /**
      * Constructs a new GusfieldEquivalentFlowTree instance.
-     * 
+     *
      * @param network input graph
      */
-    public GusfieldGomoryHuCutTree(Graph<V, E> network)
-    {
+    public GusfieldGomoryHuCutTree(Graph<V, E> network) {
         this(network, MaximumFlowAlgorithmBase.DEFAULT_EPSILON);
     }
 
     /**
      * Constructs a new GusfieldEquivalentFlowTree instance.
-     * 
+     *
      * @param network input graph
      * @param epsilon precision
      */
-    public GusfieldGomoryHuCutTree(Graph<V, E> network, double epsilon)
-    {
+    public GusfieldGomoryHuCutTree(Graph<V, E> network, double epsilon) {
         this(network, new PushRelabelMFImpl<>(network, epsilon));
     }
 
     /**
      * Constructs a new GusfieldEquivalentFlowTree instance.
-     * 
-     * @param network input graph
+     *
+     * @param network               input graph
      * @param minimumSTCutAlgorithm algorithm used to compute the minimum s-t cuts
      */
     public GusfieldGomoryHuCutTree(
-        Graph<V, E> network, MinimumSTCutAlgorithm<V, E> minimumSTCutAlgorithm)
-    {
+            Graph<V, E> network, MinimumSTCutAlgorithm<V, E> minimumSTCutAlgorithm) {
         this.network = GraphTests.requireUndirected(network);
         this.N = network.vertexSet().size();
         if (N < 2) {
@@ -154,8 +149,7 @@ public class GusfieldGomoryHuCutTree<V, E>
     /**
      * Runs the algorithm
      */
-    private void calculateGomoryHuTree()
-    {
+    private void calculateGomoryHuTree() {
         flowMatrix = new double[N][N];
         p = new int[N];
         fl = new double[N];
@@ -163,9 +157,9 @@ public class GusfieldGomoryHuCutTree<V, E>
         for (int s = 1; s < N; s++) {
             int t = p[s];
             double flowValue =
-                minimumSTCutAlgorithm.calculateMinCut(vertexList.get(s), vertexList.get(t));
+                    minimumSTCutAlgorithm.calculateMinCut(vertexList.get(s), vertexList.get(t));
             Set<V> sourcePartition = minimumSTCutAlgorithm.getSourcePartition(); // Set X in the
-                                                                                 // paper
+            // paper
             fl[s] = flowValue;
 
             for (int i = 0; i < N; i++) {
@@ -195,11 +189,10 @@ public class GusfieldGomoryHuCutTree<V, E>
      * Returns the Gomory-Hu Tree as an actual tree (graph). Note that this tree is not necessarily
      * unique. The edge weights represent the flow values/cut weights. This method runs in $O(n)$
      * time.
-     * 
+     *
      * @return Gomory-Hu Tree
      */
-    public SimpleWeightedGraph<V, DefaultWeightedEdge> getGomoryHuTree()
-    {
+    public SimpleWeightedGraph<V, DefaultWeightedEdge> getGomoryHuTree() {
         if (p == null) // Lazy invocation of the algorithm
         {
             this.calculateGomoryHuTree();
@@ -208,7 +201,7 @@ public class GusfieldGomoryHuCutTree<V, E>
         // Compute the tree from scratch. Since we compute a new tree, the user is free to modify
         // this tree.
         SimpleWeightedGraph<V, DefaultWeightedEdge> gomoryHuTree =
-            new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+                new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
         Graphs.addAllVertices(gomoryHuTree, vertexList);
         for (int i = 1; i < N; i++) {
             Graphs.addEdge(gomoryHuTree, vertexList.get(i), vertexList.get(p[i]), fl[i]);
@@ -221,30 +214,27 @@ public class GusfieldGomoryHuCutTree<V, E>
 
     /**
      * Unsupported operation
-     * 
-     * @param source source of the flow inside the network
-     * @param sink sink of the flow inside the network
      *
+     * @param source source of the flow inside the network
+     * @param sink   sink of the flow inside the network
      * @return nothing
      */
     @Override
-    public MaximumFlow<E> getMaximumFlow(V source, V sink)
-    {
+    public MaximumFlow<E> getMaximumFlow(V source, V sink) {
         throw new UnsupportedOperationException(
-            "Flows calculated via Gomory-Hu trees only provide a maximum flow value, not the exact flow per edge/arc.");
+                "Flows calculated via Gomory-Hu trees only provide a maximum flow value, not the exact flow per edge/arc.");
     }
 
     /**
      * Returns the Maximum flow between source and sink. The algorithm is only executed once;
      * successive invocations of this method will return in $O(1)$ time.
-     * 
+     *
      * @param source source vertex
-     * @param sink sink vertex
+     * @param sink   sink vertex
      * @return the Maximum flow between source and sink.
      */
     @Override
-    public double getMaximumFlowValue(V source, V sink)
-    {
+    public double getMaximumFlowValue(V source, V sink) {
         assert indexMap.containsKey(source) && indexMap.containsKey(sink);
 
         lastInvokedSource = source;
@@ -261,34 +251,31 @@ public class GusfieldGomoryHuCutTree<V, E>
 
     /**
      * Unsupported operation
-     * 
+     *
      * @return nothing
      */
     @Override
-    public Map<E, Double> getFlowMap()
-    {
+    public Map<E, Double> getFlowMap() {
         throw new UnsupportedOperationException(
-            "Flows calculated via Gomory-Hu trees only provide a maximum flow value, not the exact flow per edge/arc.");
+                "Flows calculated via Gomory-Hu trees only provide a maximum flow value, not the exact flow per edge/arc.");
     }
 
     /**
      * Unsupported operation
-     * 
+     *
      * @param e edge
      * @return nothing
      */
     @Override
-    public V getFlowDirection(E e)
-    {
+    public V getFlowDirection(E e) {
         throw new UnsupportedOperationException(
-            "Flows calculated via Gomory-Hu trees only provide a maximum flow value, not the exact flow per edge/arc.");
+                "Flows calculated via Gomory-Hu trees only provide a maximum flow value, not the exact flow per edge/arc.");
     }
 
     /* ================== Minimum Cut ================== */
 
     @Override
-    public double calculateMinCut(V source, V sink)
-    {
+    public double calculateMinCut(V source, V sink) {
         return getMaximumFlowValue(source, sink);
     }
 
@@ -299,7 +286,7 @@ public class GusfieldGomoryHuCutTree<V, E>
      * minimum cut can be queried through the {@link #getSourcePartition()} and
      * {@link #getSinkPartition()} methods. After computing the Gomory-Hu Cut tree, this method runs
      * in $O(N)$ time.
-     * 
+     *
      * @return weight of the minimum cut in the graph
      */
     public double calculateMinCut() throws Throwable {
@@ -322,12 +309,12 @@ public class GusfieldGomoryHuCutTree<V, E>
             }
         }
         DefaultWeightedEdge cheapestEdge = (seen ? Optional.of(best) : Optional.<DefaultWeightedEdge>empty())
-            .orElseThrow(new Supplier<RuntimeException>() {
-                @Override
-                public RuntimeException get() {
-                    return new RuntimeException("graph is empty?!");
-                }
-            });
+                .orElseThrow(new Supplier<RuntimeException>() {
+                    @Override
+                    public RuntimeException get() {
+                        return new RuntimeException("graph is empty?!");
+                    }
+                });
         lastInvokedSource = gomoryHuTree.getEdgeSource(cheapestEdge);
         lastInvokedTarget = gomoryHuTree.getEdgeTarget(cheapestEdge);
         sourcePartitionLastInvokedSource = null;
@@ -335,14 +322,12 @@ public class GusfieldGomoryHuCutTree<V, E>
     }
 
     @Override
-    public double getCutCapacity()
-    {
+    public double getCutCapacity() {
         return calculateMinCut(lastInvokedSource, lastInvokedTarget);
     }
 
     @Override
-    public Set<V> getSourcePartition()
-    {
+    public Set<V> getSourcePartition() {
         if (sourcePartitionLastInvokedSource != null) {
             return sourcePartitionLastInvokedSource;
         }
@@ -352,7 +337,7 @@ public class GusfieldGomoryHuCutTree<V, E>
         }
 
         Set<DefaultWeightedEdge> pathEdges =
-            this.findPathBetween(gomoryHuTree, lastInvokedSource, lastInvokedTarget);
+                this.findPathBetween(gomoryHuTree, lastInvokedSource, lastInvokedTarget);
         boolean seen = false;
         DefaultWeightedEdge best = null;
         Comparator<DefaultWeightedEdge> comparator = DComparator.comparing(new Function<DefaultWeightedEdge, Double>() {
@@ -389,7 +374,7 @@ public class GusfieldGomoryHuCutTree<V, E>
 
         // Return the vertices in the component with the source vertex
         sourcePartitionLastInvokedSource =
-            new ConnectivityInspector<>(gomoryHuTree).connectedSetOf(lastInvokedSource);
+                new ConnectivityInspector<>(gomoryHuTree).connectedSetOf(lastInvokedSource);
 
         // Restore the internal tree structure by putting the edge back
         gomoryHuTree.addEdge(source, target, cheapestEdge);
@@ -400,15 +385,14 @@ public class GusfieldGomoryHuCutTree<V, E>
     /**
      * BFS method to find the edges in the shortest path from a source to a target vertex in a tree
      * graph.
-     * 
-     * @param tree input graph
+     *
+     * @param tree   input graph
      * @param source source
      * @param target target
      * @return edges constituting the shortest path between source and target
      */
     private Set<DefaultWeightedEdge> findPathBetween(
-        SimpleWeightedGraph<V, DefaultWeightedEdge> tree, V source, V target)
-    {
+            SimpleWeightedGraph<V, DefaultWeightedEdge> tree, V source, V target) {
         boolean[] visited = new boolean[vertexList.size()];
         Map<V, V> predecessorMap = new HashMap<V, V>();
         Queue<V> queue = new LinkedList<V>();
@@ -441,16 +425,14 @@ public class GusfieldGomoryHuCutTree<V, E>
     }
 
     @Override
-    public Set<V> getSinkPartition()
-    {
+    public Set<V> getSinkPartition() {
         Set<V> sinkPartition = new LinkedHashSet<>(network.vertexSet());
         sinkPartition.removeAll(this.getSourcePartition());
         return sinkPartition;
     }
 
     @Override
-    public Set<E> getCutEdges()
-    {
+    public Set<E> getCutEdges() {
         Set<E> cutEdges = new LinkedHashSet<>();
         Set<V> sourcePartion = this.getSourcePartition();
         for (E e : network.edgeSet()) {

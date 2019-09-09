@@ -23,19 +23,16 @@ package org.jgrapht.util;
  *
  * @author John V. Sichi
  */
-public class TypeUtil
-{
+public class TypeUtil {
     /**
      * Casts an object to a type.
      *
-     * @param o object to be cast
+     * @param o   object to be cast
      * @param <T> the type of the result
-     *
      * @return the result of the cast
      */
     @SuppressWarnings("unchecked")
-    public static <T> T uncheckedCast(Object o)
-    {
+    public static <T> T uncheckedCast(Object o) {
         return (T) o;
     }
 

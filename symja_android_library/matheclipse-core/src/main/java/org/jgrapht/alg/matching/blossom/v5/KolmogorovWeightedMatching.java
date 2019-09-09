@@ -17,12 +17,18 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.graph.builder.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphType;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.graph.AsGraphUnion;
+import org.jgrapht.graph.AsWeightedGraph;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.DEFAULT_OPTIONS;
@@ -44,9 +50,8 @@ import static org.jgrapht.alg.matching.blossom.v5.ObjectiveSense.MAXIMIZE;
  * @see KolmogorovWeightedPerfectMatching
  */
 public class KolmogorovWeightedMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
     /**
      * The graph we are matching on
      */
@@ -79,8 +84,7 @@ public class KolmogorovWeightedMatching<V, E>
      *
      * @param initialGraph the graph for which to find a weighted matching
      */
-    public KolmogorovWeightedMatching(Graph<V, E> initialGraph)
-    {
+    public KolmogorovWeightedMatching(Graph<V, E> initialGraph) {
         this(initialGraph, DEFAULT_OPTIONS, MAXIMIZE);
     }
 
@@ -89,11 +93,10 @@ public class KolmogorovWeightedMatching<V, E>
      * constructed algorithm is to maximize or minimize the weight of the resulting matching
      * depending on the {@code maximize} parameter.
      *
-     * @param initialGraph the graph for which to find a weighted matching
+     * @param initialGraph   the graph for which to find a weighted matching
      * @param objectiveSense objective sense of the algorithm
      */
-    public KolmogorovWeightedMatching(Graph<V, E> initialGraph, ObjectiveSense objectiveSense)
-    {
+    public KolmogorovWeightedMatching(Graph<V, E> initialGraph, ObjectiveSense objectiveSense) {
         this(initialGraph, DEFAULT_OPTIONS, objectiveSense);
     }
 
@@ -102,11 +105,10 @@ public class KolmogorovWeightedMatching<V, E>
      * the constructed algorithm is to minimize the weight of the resulting matching.
      *
      * @param initialGraph the graph for which to find a weighted matching
-     * @param options the options which define the strategies for the initialization and dual
-     *        updates
+     * @param options      the options which define the strategies for the initialization and dual
+     *                     updates
      */
-    public KolmogorovWeightedMatching(Graph<V, E> initialGraph, BlossomVOptions options)
-    {
+    public KolmogorovWeightedMatching(Graph<V, E> initialGraph, BlossomVOptions options) {
         this(initialGraph, options, MAXIMIZE);
     }
 
@@ -115,14 +117,13 @@ public class KolmogorovWeightedMatching<V, E>
      * the constructed algorithm is to maximize or minimize the weight of the resulting matching
      * depending on the {@code maximize} parameter.
      *
-     * @param initialGraph the graph for which to find a weighted matching
-     * @param options the options which define the strategies for the initialization and dual
-     *        updates
+     * @param initialGraph   the graph for which to find a weighted matching
+     * @param options        the options which define the strategies for the initialization and dual
+     *                       updates
      * @param objectiveSense objective sense of the algorithm
      */
     public KolmogorovWeightedMatching(
-        Graph<V, E> initialGraph, BlossomVOptions options, ObjectiveSense objectiveSense)
-    {
+            Graph<V, E> initialGraph, BlossomVOptions options, ObjectiveSense objectiveSense) {
         this.initialGraph = Objects.requireNonNull(initialGraph);
         this.options = Objects.requireNonNull(options);
         this.objectiveSense = objectiveSense;
@@ -135,8 +136,7 @@ public class KolmogorovWeightedMatching<V, E>
      * @return weighted matching in the {@code initialGraph}
      */
     @Override
-    public Matching<V, E> getMatching()
-    {
+    public Matching<V, E> getMatching() {
         if (matching == null) {
             lazyComputeMaximumWeightMatching();
         }
@@ -147,23 +147,22 @@ public class KolmogorovWeightedMatching<V, E>
      * Lazy computes optimal matching in the {@code initialGraph} by reducing the problem to the
      * optimal perfect matching problem.
      */
-    private void lazyComputeMaximumWeightMatching()
-    {
+    private void lazyComputeMaximumWeightMatching() {
         Map<V, V> duplicatedVertices = new HashMap<>();
         GraphType type = initialGraph.getType();
         Graph<V, E> graphCopy = GraphTypeBuilder
-            .undirected().allowingMultipleEdges(type.isAllowingMultipleEdges())
-            .allowingSelfLoops(type.isAllowingSelfLoops())
-            .vertexSupplier(initialGraph.getVertexSupplier())
-            .edgeSupplier(initialGraph.getEdgeSupplier()).weighted(type.isWeighted()).buildGraph();
+                .undirected().allowingMultipleEdges(type.isAllowingMultipleEdges())
+                .allowingSelfLoops(type.isAllowingSelfLoops())
+                .vertexSupplier(initialGraph.getVertexSupplier())
+                .edgeSupplier(initialGraph.getEdgeSupplier()).weighted(type.isWeighted()).buildGraph();
         for (V v : initialGraph.vertexSet()) {
             duplicatedVertices.put(v, graphCopy.addVertex());
         }
         for (E edge : initialGraph.edgeSet()) {
             Graphs.addEdgeWithVertices(
-                graphCopy, duplicatedVertices.get(initialGraph.getEdgeSource(edge)),
-                duplicatedVertices.get(initialGraph.getEdgeTarget(edge)),
-                initialGraph.getEdgeWeight(edge));
+                    graphCopy, duplicatedVertices.get(initialGraph.getEdgeSource(edge)),
+                    duplicatedVertices.get(initialGraph.getEdgeTarget(edge)),
+                    initialGraph.getEdgeWeight(edge));
         }
         Map<E, Double> zeroWeightFunction = new HashMap<>();
         for (Map.Entry<V, V> entry : duplicatedVertices.entrySet()) {
@@ -171,9 +170,9 @@ public class KolmogorovWeightedMatching<V, E>
             zeroWeightFunction.put(graphCopy.addEdge(entry.getKey(), entry.getValue()), 0d);
         }
         this.graph =
-            new AsGraphUnion<>(new AsWeightedGraph<>(graphCopy, zeroWeightFunction), initialGraph);
+                new AsGraphUnion<>(new AsWeightedGraph<>(graphCopy, zeroWeightFunction), initialGraph);
         this.perfectMatching =
-            new KolmogorovWeightedPerfectMatching<>(graph, options, objectiveSense);
+                new KolmogorovWeightedPerfectMatching<>(graph, options, objectiveSense);
         matching = perfectMatching.getMatching();
         Set<E> matchingEdges = matching.getEdges();
         matchingEdges.removeIf(new Predicate<E>() {
@@ -198,11 +197,10 @@ public class KolmogorovWeightedMatching<V, E>
      * bug.
      *
      * @return true iff the assigned dual variables satisfy the dual linear program formulation AND
-     *         complementary slackness conditions are also satisfied. The total error must not
-     *         exceed EPS
+     * complementary slackness conditions are also satisfied. The total error must not
+     * exceed EPS
      */
-    public boolean testOptimality()
-    {
+    public boolean testOptimality() {
         return perfectMatching.getError() < EPS;
     }
 
@@ -217,8 +215,7 @@ public class KolmogorovWeightedMatching<V, E>
      *
      * @return the total numeric error
      */
-    public double getError()
-    {
+    public double getError() {
         lazyComputeMaximumWeightMatching();
         return perfectMatching.getError();
     }

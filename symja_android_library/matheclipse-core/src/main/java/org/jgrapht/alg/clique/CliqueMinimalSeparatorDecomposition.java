@@ -17,12 +17,21 @@
  */
 package org.jgrapht.alg.clique;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
-import org.jgrapht.graph.builder.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
 
-import java.util.*;
-import java.util.Map.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Clique Minimal Separator Decomposition using MCS-M+ and Atoms algorithm as described in Berry et
@@ -37,14 +46,12 @@ import java.util.Map.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Florian Buenzli (fbuenzli@student.ethz.ch)
  * @author Thomas Tschager (thomas.tschager@inf.ethz.ch)
  * @author Tomas Hruz (tomas.hruz@inf.ethz.ch)
  * @author Philipp Hoppen
  */
-public class CliqueMinimalSeparatorDecomposition<V, E>
-{
+public class CliqueMinimalSeparatorDecomposition<V, E> {
     /**
      * Source graph to operate on
      */
@@ -93,8 +100,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @param g The graph to decompose.
      */
-    public CliqueMinimalSeparatorDecomposition(Graph<V, E> g)
-    {
+    public CliqueMinimalSeparatorDecomposition(Graph<V, E> g) {
         this.graph = GraphTests.requireUndirected(g);
         this.fillEdges = new HashSet<>();
     }
@@ -104,13 +110,12 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      * described in Berry et al. (2010), DOI:10.3390/a3020197
      * <a href="http://www.mdpi.com/1999-4893/3/2/197"> http://www.mdpi.com/1999-4893/3/2/197</a>
      */
-    private void computeMinimalTriangulation()
-    {
+    private void computeMinimalTriangulation() {
         // initialize chordGraph with same vertices as graph
         chordalGraph = GraphTypeBuilder
-            .<V, E> undirected().edgeSupplier(graph.getEdgeSupplier())
-            .vertexSupplier(graph.getVertexSupplier()).allowingMultipleEdges(false)
-            .allowingSelfLoops(false).buildGraph();
+                .<V, E>undirected().edgeSupplier(graph.getEdgeSupplier())
+                .vertexSupplier(graph.getVertexSupplier()).allowingMultipleEdges(false)
+                .allowingSelfLoops(false).buildGraph();
 
         for (V v : graph.vertexSet()) {
             chordalGraph.addVertex(v);
@@ -189,11 +194,9 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      * Get the vertex with the maximal label.
      *
      * @param vertexLabels Map that gives a label for each vertex.
-     *
      * @return Vertex with the maximal label.
      */
-    private V getMaxLabelVertex(Map<V, Integer> vertexLabels)
-    {
+    private V getMaxLabelVertex(Map<V, Integer> vertexLabels) {
         Iterator<Entry<V, Integer>> iterator = vertexLabels.entrySet().iterator();
         Entry<V, Integer> max = iterator.next();
         while (iterator.hasNext()) {
@@ -212,8 +215,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      * @param v the vertex
      * @param r the reach structure.
      */
-    private void addToReach(Integer k, V v, HashMap<Integer, HashSet<V>> r)
-    {
+    private void addToReach(Integer k, V v, HashMap<Integer, HashSet<V>> r) {
         if (r.containsKey(k)) {
             r.get(k).add(v);
         } else {
@@ -228,8 +230,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      * algorithm Atoms as described in Berry et al. (2010), DOI:10.3390/a3020197,
      * <a href="http://www.mdpi.com/1999-4893/3/2/197"> http://www.mdpi.com/1999-4893/3/2/197</a>
      */
-    private void computeAtoms()
-    {
+    private void computeAtoms() {
         if (chordalGraph == null) {
             computeMinimalTriangulation();
         }
@@ -254,7 +255,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
                     if (separator.size() > 0) {
                         if (separators.contains(separator)) {
                             fullComponentCount
-                                .put(separator, fullComponentCount.get(separator) + 1);
+                                    .put(separator, fullComponentCount.get(separator) + 1);
                         } else {
                             fullComponentCount.put(separator, 2);
                             separators.add(separator);
@@ -291,13 +292,11 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      * Check whether the subgraph of <code>graph</code> induced by the given <code>vertices</code>
      * is complete, i.e. a clique.
      *
-     * @param graph the graph.
+     * @param graph    the graph.
      * @param vertices the vertices to induce the subgraph from.
-     *
      * @return true if the induced subgraph is a clique.
      */
-    private static <V, E> boolean isClique(Graph<V, E> graph, Set<V> vertices)
-    {
+    private static <V, E> boolean isClique(Graph<V, E> graph, Set<V> vertices) {
         for (V v1 : vertices) {
             for (V v2 : vertices) {
                 if (!v1.equals(v2) && (graph.getEdge(v1, v2) == null)) {
@@ -312,14 +311,12 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      * Create a copy of a graph for internal use.
      *
      * @param graph the graph to copy.
-     *
      * @return A copy of the graph projected to a SimpleGraph.
      */
-    private static <V, E> Graph<V, E> copyAsSimpleGraph(Graph<V, E> graph)
-    {
+    private static <V, E> Graph<V, E> copyAsSimpleGraph(Graph<V, E> graph) {
         Graph<V,
-            E> copy = GraphTypeBuilder
-                .<V, E> undirected().edgeSupplier(graph.getEdgeSupplier())
+                E> copy = GraphTypeBuilder
+                .<V, E>undirected().edgeSupplier(graph.getEdgeSupplier())
                 .vertexSupplier(graph.getVertexSupplier()).allowingMultipleEdges(false)
                 .allowingSelfLoops(false).buildGraph();
 
@@ -344,8 +341,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return true if the graph is chordal, false otherwise.
      */
-    public boolean isChordal()
-    {
+    public boolean isChordal() {
         if (chordalGraph == null) {
             computeMinimalTriangulation();
         }
@@ -358,8 +354,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return Set of fill edges.
      */
-    public Set<E> getFillEdges()
-    {
+    public Set<E> getFillEdges() {
         if (fillEdges == null) {
             computeMinimalTriangulation();
         }
@@ -372,8 +367,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return Triangulated graph.
      */
-    public Graph<V, E> getMinimalTriangulation()
-    {
+    public Graph<V, E> getMinimalTriangulation() {
         if (chordalGraph == null) {
             computeMinimalTriangulation();
         }
@@ -387,8 +381,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return List of generators.
      */
-    public List<V> getGenerators()
-    {
+    public List<V> getGenerators() {
         if (generators == null) {
             computeMinimalTriangulation();
         }
@@ -401,8 +394,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return The minimal elimination ordering.
      */
-    public LinkedList<V> getMeo()
-    {
+    public LinkedList<V> getMeo() {
         if (meo == null) {
             computeMinimalTriangulation();
         }
@@ -415,8 +407,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return A map from separators to integers (component count).
      */
-    public Map<Set<V>, Integer> getFullComponentCount()
-    {
+    public Map<Set<V>, Integer> getFullComponentCount() {
         if (fullComponentCount == null) {
             computeAtoms();
         }
@@ -429,8 +420,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return Set of atoms, where each atom is described as the set of its vertices.
      */
-    public Set<Set<V>> getAtoms()
-    {
+    public Set<Set<V>> getAtoms() {
         if (atoms == null) {
             computeAtoms();
         }
@@ -443,8 +433,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return Set of separators, where each separator is described as the set of its vertices.
      */
-    public Set<Set<V>> getSeparators()
-    {
+    public Set<Set<V>> getSeparators() {
         if (separators == null) {
             computeAtoms();
         }
@@ -457,8 +446,7 @@ public class CliqueMinimalSeparatorDecomposition<V, E>
      *
      * @return Original graph.
      */
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 }

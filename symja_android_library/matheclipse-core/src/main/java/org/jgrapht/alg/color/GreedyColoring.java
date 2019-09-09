@@ -17,10 +17,15 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * The greedy coloring algorithm.
@@ -28,16 +33,14 @@ import java.util.*;
  * <p>
  * The algorithm iterates over all vertices and assigns the smallest possible color that is not used
  * by any neighbors. Subclasses may provide a different vertex ordering.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public class GreedyColoring<V, E>
-    implements
-    VertexColoringAlgorithm<V>
-{
+        implements
+        VertexColoringAlgorithm<V> {
     /**
      * Error message if the input graph contains self-loops.
      */
@@ -50,21 +53,19 @@ public class GreedyColoring<V, E>
 
     /**
      * Construct a new coloring algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public GreedyColoring(Graph<V, E> graph)
-    {
+    public GreedyColoring(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**
      * Get the ordering of the vertices used by the algorithm.
-     * 
+     *
      * @return the ordering of the vertices used by the algorithm
      */
-    protected Iterable<V> getVertexOrdering()
-    {
+    protected Iterable<V> getVertexOrdering() {
         return graph.vertexSet();
     }
 
@@ -72,8 +73,7 @@ public class GreedyColoring<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Coloring<V> getColoring()
-    {
+    public Coloring<V> getColoring() {
         int maxColor = -1;
         Map<V, Integer> colors = new HashMap<>();
         Set<Integer> used = new HashSet<>();

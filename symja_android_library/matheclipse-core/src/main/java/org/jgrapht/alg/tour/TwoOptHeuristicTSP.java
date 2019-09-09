@@ -17,43 +17,52 @@
  */
 package org.jgrapht.alg.tour;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.HamiltonianCycleAlgorithm;
+import org.jgrapht.graph.GraphWalk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * The 2-opt heuristic algorithm for the TSP problem.
- * 
+ *
  * <p>
  * The travelling salesman problem (TSP) asks the following question: "Given a list of cities and
  * the distances between each pair of cities, what is the shortest possible route that visits each
  * city exactly once and returns to the origin city?".
- * 
+ *
  * <p>
  * This is an implementation of the 2-opt improvement heuristic algorithm. The algorithm generates k
  * random initial tours and then iteratively improves the tours until a local minimum is reached. In
  * each iteration it applies the best possible 2-opt move which means to find the best pair of edges
  * $(i,i+1)$ and $(j,j+1)$ such that replacing them with $(i,j)$ and $(i+1,j+1)$ minimizes the tour
  * length.
- * 
+ *
  * <p>
  * See <a href="https://en.wikipedia.org/wiki/2-opt">wikipedia</a> for more details.
- * 
+ *
  * <p>
  * This implementation can also be used in order to try to improve an existing tour. See method
  * {@link #improveTour(GraphPath)}.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class TwoOptHeuristicTSP<V, E>
-    implements
-    HamiltonianCycleAlgorithm<V, E>
-{
+        implements
+        HamiltonianCycleAlgorithm<V, E> {
     private int k;
     private Random rng;
 
@@ -66,40 +75,36 @@ public class TwoOptHeuristicTSP<V, E>
     /**
      * Constructor. By default one initial random tour is used.
      */
-    public TwoOptHeuristicTSP()
-    {
+    public TwoOptHeuristicTSP() {
         this(1, new Random());
     }
 
     /**
      * Constructor
-     * 
+     *
      * @param k how many initial random tours to check
      */
-    public TwoOptHeuristicTSP(int k)
-    {
+    public TwoOptHeuristicTSP(int k) {
         this(k, new Random());
     }
 
     /**
      * Constructor
-     * 
-     * @param k how many initial random tours to check
+     *
+     * @param k    how many initial random tours to check
      * @param seed seed for the random number generator
      */
-    public TwoOptHeuristicTSP(int k, long seed)
-    {
+    public TwoOptHeuristicTSP(int k, long seed) {
         this(k, new Random(seed));
     }
 
     /**
      * Constructor
-     * 
-     * @param k how many initial random tours to check
+     *
+     * @param k   how many initial random tours to check
      * @param rng random number generator
      */
-    public TwoOptHeuristicTSP(int k, Random rng)
-    {
+    public TwoOptHeuristicTSP(int k, Random rng) {
         if (k < 1) {
             throw new IllegalArgumentException("k must be at least one");
         }
@@ -109,7 +114,7 @@ public class TwoOptHeuristicTSP<V, E>
 
     /**
      * Computes a 2-approximate tour.
-     * 
+     *
      * @param graph the input graph
      * @return a tour
      * @throws IllegalArgumentException if the graph is not undirected
@@ -117,8 +122,7 @@ public class TwoOptHeuristicTSP<V, E>
      * @throws IllegalArgumentException if the graph contains no vertices
      */
     @Override
-    public GraphPath<V, E> getTour(Graph<V, E> graph)
-    {
+    public GraphPath<V, E> getTour(Graph<V, E> graph) {
         /*
          * Initialize vertex index and distances
          */
@@ -130,7 +134,7 @@ public class TwoOptHeuristicTSP<V, E>
         if (graph.vertexSet().size() == 1) {
             V start = graph.vertexSet().iterator().next();
             return new GraphWalk<>(
-                graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
+                    graph, start, start, Collections.singletonList(start), Collections.<E>emptyList(), 0d);
         }
 
         /*
@@ -148,23 +152,21 @@ public class TwoOptHeuristicTSP<V, E>
 
     /**
      * Try to improve a tour by running the 2-opt heuristic.
-     * 
+     *
      * @param tour a tour
      * @return a possibly improved tour
      */
-    public GraphPath<V, E> improveTour(GraphPath<V, E> tour)
-    {
+    public GraphPath<V, E> improveTour(GraphPath<V, E> tour) {
         init(tour.getGraph());
         return tourToPath(improve(pathToTour(tour)));
     }
 
     /**
      * Initialize graph and mapping to integer vertices.
-     * 
+     *
      * @param graph the input graph
      */
-    private void init(Graph<V, E> graph)
-    {
+    private void init(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
 
         if (!GraphTests.isComplete(graph)) {
@@ -198,11 +200,10 @@ public class TwoOptHeuristicTSP<V, E>
 
     /**
      * Create a random tour
-     * 
+     *
      * @return a random tour
      */
-    private int[] createRandomTour()
-    {
+    private int[] createRandomTour() {
         int[] tour = new int[n + 1];
         for (int i = 0; i < n; i++) {
             tour[i] = i;
@@ -221,15 +222,14 @@ public class TwoOptHeuristicTSP<V, E>
      * Improve the tour using the 2-opt heuristic. In each iteration it applies the best possible
      * 2-opt move which means to find the best pair of edges $(i,i+1)$ and $(j,j+1)$ such that
      * replacing them with $(i,j)$ and $(i+1,j+1)$ minimizes the tour length.
-     * 
+     *
      * <p>
      * The returned array instance might or might not be the input array.
-     * 
+     *
      * @param tour the input tour
      * @return a possibly improved tour
      */
-    private int[] improve(int[] tour)
-    {
+    private int[] improve(int[] tour) {
         int[] newTour = new int[n + 1];
         double minChange;
         do {
@@ -274,12 +274,11 @@ public class TwoOptHeuristicTSP<V, E>
 
     /**
      * Transform from an array representation to a graph path.
-     * 
+     *
      * @param tour an array containing the index of the vertices of the tour
      * @return a graph path
      */
-    private GraphPath<V, E> tourToPath(int[] tour)
-    {
+    private GraphPath<V, E> tourToPath(int[] tour) {
         List<E> tourEdges = new ArrayList<E>(n);
         List<V> tourVertices = new ArrayList<>(n + 1);
         double tourWeight = 0d;
@@ -300,12 +299,11 @@ public class TwoOptHeuristicTSP<V, E>
 
     /**
      * Transform from a path representation to an array representation.
-     * 
+     *
      * @param path graph path
      * @return an array containing the index of the vertices of the tour
      */
-    private int[] pathToTour(GraphPath<V, E> path)
-    {
+    private int[] pathToTour(GraphPath<V, E> path) {
         Set<V> visited = new HashSet<>();
         int i = 0;
         int[] tour = new int[n + 1];

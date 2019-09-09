@@ -17,7 +17,7 @@
  */
 package org.jgrapht.event;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * A traversal event with respect to a connected component.
@@ -25,9 +25,8 @@ import java.util.*;
  * @author Barak Naveh
  */
 public class ConnectedComponentTraversalEvent
-    extends
-    EventObject
-{
+        extends
+        EventObject {
     private static final long serialVersionUID = 3834311717709822262L;
 
     /**
@@ -49,10 +48,9 @@ public class ConnectedComponentTraversalEvent
      * Creates a new ConnectedComponentTraversalEvent.
      *
      * @param eventSource the source of the event.
-     * @param type the type of event.
+     * @param type        the type of event.
      */
-    public ConnectedComponentTraversalEvent(Object eventSource, int type)
-    {
+    public ConnectedComponentTraversalEvent(Object eventSource, int type) {
         super(eventSource);
         this.type = type;
     }
@@ -62,8 +60,7 @@ public class ConnectedComponentTraversalEvent
      *
      * @return the event type.
      */
-    public int getType()
-    {
+    public int getType() {
         return type;
     }
 }

@@ -1,14 +1,14 @@
 package org.jheaps.array;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.Constants;
 import org.jheaps.ValueHeap;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LogarithmicTime;
+
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * An optimized array-based binary heap with integer keys.
@@ -21,7 +21,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * is a worst-case O(1) operation. All bounds are worst-case if the user
  * initializes the heap with a capacity larger or equal to the total number of
  * elements that are going to be inserted into the heap.
- * 
+ *
  * <p>
  * See the following papers for details about the optimizations:
  * <ul>
@@ -31,7 +31,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * <li>Peter Sanders. Fast Priority Queues for Cached Memory. Algorithms
  * Engineering and Experiments (ALENEX), 312--327, 1999.</li>
  * </ul>
- * 
+ *
  * <p>
  * <strong>Note that this implementation is not synchronized.</strong> If
  * multiple threads access a heap concurrently, and at least one of the threads
@@ -40,9 +40,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class BinaryArrayIntegerValueHeap<V> implements ValueHeap<Integer, V>, Serializable {
@@ -109,8 +107,7 @@ public class BinaryArrayIntegerValueHeap<V> implements ValueHeap<Integer, V>, Se
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param capacity
-     *            the initial heap capacity
+     * @param capacity the initial heap capacity
      */
     @SuppressWarnings("unchecked")
     public BinaryArrayIntegerValueHeap(int capacity) {
@@ -292,9 +289,8 @@ public class BinaryArrayIntegerValueHeap<V> implements ValueHeap<Integer, V>, Se
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @SuppressWarnings("unchecked")
     private void ensureCapacity(int capacity) {
@@ -313,13 +309,10 @@ public class BinaryArrayIntegerValueHeap<V> implements ValueHeap<Integer, V>, Se
 
     /**
      * Check that a capacity is valid.
-     * 
-     * @param capacity
-     *            the capacity
-     * 
-     * @throws IllegalArgumentException
-     *             if the capacity is negative or more than the maximum array
-     *             size
+     *
+     * @param capacity the capacity
+     * @throws IllegalArgumentException if the capacity is negative or more than the maximum array
+     *                                  size
      */
     private void checkCapacity(int capacity) {
         if (capacity < MIN_HEAP_CAPACITY) {

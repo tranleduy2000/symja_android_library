@@ -17,7 +17,7 @@
  */
 package org.jgrapht.alg.cycle;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * A common interface for classes implementing algorithms for enumeration of the simple cycles of a
@@ -25,11 +25,9 @@ import java.util.*;
  *
  * @param <V> the vertex type.
  * @param <E> the edge type.
- *
  * @author Nikolay Ognyanov
  */
-public interface DirectedSimpleCycles<V, E>
-{
+public interface DirectedSimpleCycles<V, E> {
     /**
      * Find the simple cycles of the graph.
      *

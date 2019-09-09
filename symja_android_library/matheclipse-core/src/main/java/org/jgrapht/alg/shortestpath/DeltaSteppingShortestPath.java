@@ -88,14 +88,13 @@ import java.util.function.Consumer;
  * @since January 2018
  */
 public class DeltaSteppingShortestPath<V, E>
-    extends
-    BaseShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseShortestPathAlgorithm<V, E> {
     /**
      * Error message for reporting the existence of an edge with negative weight.
      */
     private static final String NEGATIVE_EDGE_WEIGHT_NOT_ALLOWED =
-        "Negative edge weight not allowed";
+            "Negative edge weight not allowed";
     /**
      * Error message for reporting that delta must be positive.
      */
@@ -169,8 +168,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param graph graph
      */
-    public DeltaSteppingShortestPath(Graph<V, E> graph)
-    {
+    public DeltaSteppingShortestPath(Graph<V, E> graph) {
         this(graph, DEFAULT_PARALLELISM);
     }
 
@@ -180,19 +178,17 @@ public class DeltaSteppingShortestPath<V, E>
      * @param graph the graph
      * @param delta bucket width
      */
-    public DeltaSteppingShortestPath(Graph<V, E> graph, double delta)
-    {
+    public DeltaSteppingShortestPath(Graph<V, E> graph, double delta) {
         this(graph, delta, DEFAULT_PARALLELISM);
     }
 
     /**
      * Constructs a new instance of the algorithm for a given graph and parallelism.
      *
-     * @param graph the graph
+     * @param graph       the graph
      * @param parallelism maximum number of threads used in the computations
      */
-    public DeltaSteppingShortestPath(Graph<V, E> graph, int parallelism)
-    {
+    public DeltaSteppingShortestPath(Graph<V, E> graph, int parallelism) {
         this(graph, 0.0, parallelism);
     }
 
@@ -203,12 +199,11 @@ public class DeltaSteppingShortestPath<V, E>
      * specify it via this constructor, because processing the whole graph to compute this value may
      * significantly slow down the algorithm.
      *
-     * @param graph the graph
-     * @param delta bucket width
+     * @param graph       the graph
+     * @param delta       bucket width
      * @param parallelism maximum number of threads used in the computations
      */
-    public DeltaSteppingShortestPath(Graph<V, E> graph, double delta, int parallelism)
-    {
+    public DeltaSteppingShortestPath(Graph<V, E> graph, double delta, int parallelism) {
         super(graph);
         if (delta < 0) {
             throw new IllegalArgumentException(DELTA_MUST_BE_NON_NEGATIVE);
@@ -228,12 +223,11 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @return max edge weight
      */
-    private double getMaxEdgeWeight()
-    {
+    private double getMaxEdgeWeight() {
         ForkJoinTask<Double> task = ForkJoinPool.commonPool().submit(
-            new MaxEdgeWeightTask(
-                graph.edgeSet().spliterator(),
-                graph.edgeSet().size() / (TASKS_TO_THREADS_RATIO * parallelism) + 1));
+                new MaxEdgeWeightTask(
+                        graph.edgeSet().spliterator(),
+                        graph.edgeSet().size() / (TASKS_TO_THREADS_RATIO * parallelism) + 1));
         return task.join();
     }
 
@@ -243,9 +237,8 @@ public class DeltaSteppingShortestPath<V, E>
      * negative weights.
      */
     class MaxEdgeWeightTask
-        extends
-        RecursiveTask<Double>
-    {
+            extends
+            RecursiveTask<Double> {
         /**
          * Is used to split a collection and create new recursive tasks during the computation.
          */
@@ -258,11 +251,10 @@ public class DeltaSteppingShortestPath<V, E>
         /**
          * Constructs a new instance for the given spliterator and loadBalancing
          *
-         * @param spliterator spliterator
+         * @param spliterator   spliterator
          * @param loadBalancing loadBalancing
          */
-        MaxEdgeWeightTask(Spliterator<E> spliterator, long loadBalancing)
-        {
+        MaxEdgeWeightTask(Spliterator<E> spliterator, long loadBalancing) {
             this.spliterator = spliterator;
             this.loadBalancing = loadBalancing;
         }
@@ -276,10 +268,9 @@ public class DeltaSteppingShortestPath<V, E>
          * @return max edge weight
          */
         @Override
-        protected Double compute()
-        {
+        protected Double compute() {
             if (spliterator.estimateSize() <= loadBalancing) {
-                final double[] max = { 0 };
+                final double[] max = {0};
                 spliterator.forEachRemaining(new Consumer<E>() {
                     @Override
                     public void accept(E e) {
@@ -304,8 +295,7 @@ public class DeltaSteppingShortestPath<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphPath<V, E> getPath(V source, V sink)
-    {
+    public GraphPath<V, E> getPath(V source, V sink) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -319,8 +309,7 @@ public class DeltaSteppingShortestPath<V, E>
      * {@inheritDoc}
      */
     @Override
-    public SingleSourcePaths<V, E> getPaths(V source)
-    {
+    public SingleSourcePaths<V, E> getPaths(V source) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -347,8 +336,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @return bucket width
      */
-    private double findDelta()
-    {
+    private double findDelta() {
         if (maxEdgeWeight == 0) {
             return 1.0;
         } else {
@@ -370,8 +358,7 @@ public class DeltaSteppingShortestPath<V, E>
     /**
      * Fills {@link #distanceAndPredecessorMap} concurrently.
      */
-    private void fillDistanceAndPredecessorMap()
-    {
+    private void fillDistanceAndPredecessorMap() {
         for (V v : graph.vertexSet()) {
             distanceAndPredecessorMap.put(v, Pair.<Double, E>of(Double.POSITIVE_INFINITY, null));
         }
@@ -382,8 +369,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param source the source vertex
      */
-    private void computeShortestPaths(V source)
-    {
+    private void computeShortestPaths(V source) {
         relax(source, null, 0.0);
 
         int firstNonEmptyBucket = 0;
@@ -404,8 +390,7 @@ public class DeltaSteppingShortestPath<V, E>
             removed.clear();
             ++firstNonEmptyBucket;
             while (firstNonEmptyBucket < numOfBuckets
-                && bucketStructure[firstNonEmptyBucket].isEmpty())
-            { // skip empty buckets
+                    && bucketStructure[firstNonEmptyBucket].isEmpty()) { // skip empty buckets
                 ++firstNonEmptyBucket;
             }
         }
@@ -415,8 +400,7 @@ public class DeltaSteppingShortestPath<V, E>
     /**
      * Shuts down the {@link #executor}.
      */
-    private void shutDownExecutor()
-    {
+    private void shutDownExecutor() {
         executor.shutdown();
         try { // wait till the executor is shut down
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -432,8 +416,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param vertices vertices
      */
-    private void findAndRelaxLightRequests(Set<V> vertices)
-    {
+    private void findAndRelaxLightRequests(Set<V> vertices) {
         allVerticesAdded = false;
         int numOfVertices = vertices.size();
         int numOfTasks;
@@ -465,8 +448,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param verticesSets set of sets of vertices
      */
-    private void findAndRelaxHeavyRequests(List<Set<V>> verticesSets)
-    {
+    private void findAndRelaxHeavyRequests(List<Set<V>> verticesSets) {
         allVerticesAdded = false;
         int numOfVertices = 0;
         for (Set<V> vs : verticesSets) {
@@ -500,11 +482,10 @@ public class DeltaSteppingShortestPath<V, E>
      * Adds {@code numOfVertices} vertices to the {@link #verticesQueue} provided by the
      * {@code iterator}.
      *
-     * @param iterator vertices iterator
+     * @param iterator      vertices iterator
      * @param numOfVertices vertices amount
      */
-    private void addSetVertices(Iterator<V> iterator, int numOfVertices)
-    {
+    private void addSetVertices(Iterator<V> iterator, int numOfVertices) {
         for (int i = 0; i < numOfVertices && iterator.hasNext(); i++) {
             verticesQueue.add(iterator.next());
         }
@@ -515,8 +496,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param iterator vertices iterator
      */
-    private void addSetRemaining(Iterator<V> iterator)
-    {
+    private void addSetRemaining(Iterator<V> iterator) {
         while (iterator.hasNext()) {
             verticesQueue.add(iterator.next());
         }
@@ -527,12 +507,11 @@ public class DeltaSteppingShortestPath<V, E>
      * sets provided by the {@code setIterator}. Returns iterator of the set which vertex was added
      * last.
      *
-     * @param setIterator sets of vertices iterator
+     * @param setIterator   sets of vertices iterator
      * @param numOfVertices vertices amount
      * @return iterator of the last set
      */
-    private Iterator<V> addSetsVertices(Iterator<Set<V>> setIterator, int numOfVertices)
-    {
+    private Iterator<V> addSetsVertices(Iterator<Set<V>> setIterator, int numOfVertices) {
         int i = 0;
         Iterator<V> iterator = null;
         while (setIterator.hasNext() && i < numOfVertices) {
@@ -551,8 +530,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param setIterator sets of vertices iterator
      */
-    private void addSetsRemaining(Iterator<Set<V>> setIterator)
-    {
+    private void addSetsRemaining(Iterator<Set<V>> setIterator) {
         while (setIterator.hasNext()) {
             verticesQueue.addAll(setIterator.next());
         }
@@ -561,11 +539,10 @@ public class DeltaSteppingShortestPath<V, E>
     /**
      * Submits the {@code task} {@code numOfTasks} times to the {@link #completionService}.
      *
-     * @param task task to be submitted
+     * @param task       task to be submitted
      * @param numOfTasks amount of times task should be submitted
      */
-    private void submitTasks(Runnable task, int numOfTasks)
-    {
+    private void submitTasks(Runnable task, int numOfTasks) {
         for (int i = 0; i < numOfTasks; i++) {
             completionService.submit(task, null);
         }
@@ -576,8 +553,7 @@ public class DeltaSteppingShortestPath<V, E>
      *
      * @param numOfTasks amount of tasks
      */
-    private void waitForTasksCompletion(int numOfTasks)
-    {
+    private void waitForTasksCompletion(int numOfTasks) {
         for (int i = 0; i < numOfTasks; i++) {
             try {
                 completionService.take();
@@ -592,12 +568,11 @@ public class DeltaSteppingShortestPath<V, E>
      * tentative distance is less then removes {@code v} from the old bucket, adds is to the new
      * bucket and updates {@link #distanceAndPredecessorMap} value for {@code v}.
      *
-     * @param v vertex
-     * @param e edge to predecessor
+     * @param v        vertex
+     * @param e        edge to predecessor
      * @param distance distance
      */
-    private void relax(V v, E e, double distance)
-    {
+    private void relax(V v, E e, double distance) {
         int updatedBucket = bucketIndex(distance);
         synchronized (v) { // to make relaxation updates thread-safe
             Pair<Double, E> oldData = distanceAndPredecessorMap.get(v);
@@ -617,8 +592,7 @@ public class DeltaSteppingShortestPath<V, E>
      * @param distance distance
      * @return bucket index
      */
-    private int bucketIndex(double distance)
-    {
+    private int bucketIndex(double distance) {
         return (int) Math.round(distance / delta) % numOfBuckets;
     }
 
@@ -630,8 +604,7 @@ public class DeltaSteppingShortestPath<V, E>
      * @param bucketIndex bucket index
      * @return content of the bucket
      */
-    private Set getContentAndReplace(int bucketIndex)
-    {
+    private Set getContentAndReplace(int bucketIndex) {
         Set result = bucketStructure[bucketIndex];
         bucketStructure[bucketIndex] = new ConcurrentSkipListSet<V>();
         return result;
@@ -642,9 +615,8 @@ public class DeltaSteppingShortestPath<V, E>
      * light relax requests relaxation.
      */
     class LightRelaxTask
-        implements
-        Runnable
-    {
+            implements
+            Runnable {
         /**
          * Vertices which edges will be relaxed.
          */
@@ -655,8 +627,7 @@ public class DeltaSteppingShortestPath<V, E>
          *
          * @param vertices vertices
          */
-        LightRelaxTask(Queue<V> vertices)
-        {
+        LightRelaxTask(Queue<V> vertices) {
             this.vertices = vertices;
         }
 
@@ -664,8 +635,7 @@ public class DeltaSteppingShortestPath<V, E>
          * Performs relaxation of edges emanating from {@link #vertices}.
          */
         @Override
-        public void run()
-        {
+        public void run() {
 
             while (true) {
                 V v = vertices.poll();
@@ -679,9 +649,9 @@ public class DeltaSteppingShortestPath<V, E>
                     for (E e : graph.outgoingEdgesOf(v)) {
                         if (graph.getEdgeWeight(e) <= delta) {
                             relax(
-                                Graphs.getOppositeVertex(graph, e, v), e,
-                                distanceAndPredecessorMap.get(v).getFirst()
-                                    + graph.getEdgeWeight(e));
+                                    Graphs.getOppositeVertex(graph, e, v), e,
+                                    distanceAndPredecessorMap.get(v).getFirst()
+                                            + graph.getEdgeWeight(e));
                         }
                     }
                 }
@@ -694,9 +664,8 @@ public class DeltaSteppingShortestPath<V, E>
      * heavy relax requests relaxation.
      */
     class HeavyRelaxTask
-        implements
-        Runnable
-    {
+            implements
+            Runnable {
         /**
          * Vertices which edges will be relaxed.
          */
@@ -707,8 +676,7 @@ public class DeltaSteppingShortestPath<V, E>
          *
          * @param vertices vertices
          */
-        HeavyRelaxTask(Queue<V> vertices)
-        {
+        HeavyRelaxTask(Queue<V> vertices) {
             this.vertices = vertices;
         }
 
@@ -716,8 +684,7 @@ public class DeltaSteppingShortestPath<V, E>
          * Performs relaxation of edges emanating from {@link #vertices}.
          */
         @Override
-        public void run()
-        {
+        public void run() {
 
             while (true) {
                 V v = vertices.poll();
@@ -729,9 +696,9 @@ public class DeltaSteppingShortestPath<V, E>
                     for (E e : graph.outgoingEdgesOf(v)) {
                         if (graph.getEdgeWeight(e) > delta) {
                             relax(
-                                Graphs.getOppositeVertex(graph, e, v), e,
-                                distanceAndPredecessorMap.get(v).getFirst()
-                                    + graph.getEdgeWeight(e));
+                                    Graphs.getOppositeVertex(graph, e, v), e,
+                                    distanceAndPredecessorMap.get(v).getFirst()
+                                            + graph.getEdgeWeight(e));
                         }
                     }
                 }

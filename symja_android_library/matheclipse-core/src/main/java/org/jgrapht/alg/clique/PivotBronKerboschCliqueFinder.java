@@ -30,54 +30,49 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Bron-Kerbosch maximal clique enumeration algorithm with pivot.
- * 
+ *
  * <p>
  * The pivoting follows the rule from the paper
  * <ul>
  * <li>E. Tomita, A. Tanaka, and H. Takahashi. The worst-case time complexity for generating all
  * maximal cliques and computational experiments. Theor. Comput. Sci. 363(1):28–42, 2006.</li>
  * </ul>
- * 
+ *
  * <p>
  * where the authors show that using that rule guarantees that the Bron-Kerbosch algorithm has
  * worst-case running time $O(3^{n/3})$ where $n$ is the number of vertices of the graph, excluding
  * time to write the output, which is worst-case optimal.
- * 
+ *
  * <p>
  * The algorithm first computes all maximal cliques and then returns the result to the user. A
  * timeout can be set using the constructor parameters.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
+ * @author Dimitrios Michail
  * @see BronKerboschCliqueFinder
  * @see DegeneracyBronKerboschCliqueFinder
- *
- * @author Dimitrios Michail
  */
 public class PivotBronKerboschCliqueFinder<V, E>
-    extends
-    BaseBronKerboschCliqueFinder<V, E>
-{
+        extends
+        BaseBronKerboschCliqueFinder<V, E> {
     /**
      * Constructs a new clique finder.
      *
      * @param graph the input graph; must be simple
      */
-    public PivotBronKerboschCliqueFinder(Graph<V, E> graph)
-    {
+    public PivotBronKerboschCliqueFinder(Graph<V, E> graph) {
         this(graph, 0L, TimeUnit.SECONDS);
     }
 
     /**
      * Constructs a new clique finder.
      *
-     * @param graph the input graph; must be simple
+     * @param graph   the input graph; must be simple
      * @param timeout the maximum time to wait, if zero no timeout
-     * @param unit the time unit of the timeout argument
+     * @param unit    the time unit of the timeout argument
      */
-    public PivotBronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit)
-    {
+    public PivotBronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit) {
         super(graph, timeout, unit);
     }
 
@@ -85,8 +80,7 @@ public class PivotBronKerboschCliqueFinder<V, E>
      * Lazily execute the enumeration algorithm.
      */
     @Override
-    protected void lazyRun()
-    {
+    protected void lazyRun() {
         if (allMaximalCliques == null) {
             if (!GraphTests.isSimple(graph)) {
                 throw new IllegalArgumentException("Graph must be simple");
@@ -101,19 +95,18 @@ public class PivotBronKerboschCliqueFinder<V, E>
             }
 
             findCliques(
-                new HashSet<>(graph.vertexSet()), new HashSet<V>(), new HashSet<V>(), nanosTimeLimit);
+                    new HashSet<>(graph.vertexSet()), new HashSet<V>(), new HashSet<V>(), nanosTimeLimit);
         }
     }
 
     /**
      * Choose a pivot.
-     * 
+     *
      * @param P vertices to consider adding to the clique
      * @param X vertices which must be excluded from the clique
      * @return a pivot
      */
-    private V choosePivot(Set<V> P, Set<V> X)
-    {
+    private V choosePivot(Set<V> P, Set<V> X) {
         int max = -1;
         V pivot = null;
 
@@ -141,14 +134,13 @@ public class PivotBronKerboschCliqueFinder<V, E>
 
     /**
      * Recursive implementation of the Bron-Kerbosch with pivot.
-     * 
-     * @param P vertices to consider adding to the clique
-     * @param R a possibly non-maximal clique
-     * @param X vertices which must be excluded from the clique
+     *
+     * @param P              vertices to consider adding to the clique
+     * @param R              a possibly non-maximal clique
+     * @param X              vertices which must be excluded from the clique
      * @param nanosTimeLimit time limit
      */
-    protected void findCliques(Set<V> P, Set<V> R, Set<V> X, final long nanosTimeLimit)
-    {
+    protected void findCliques(Set<V> P, Set<V> R, Set<V> X, final long nanosTimeLimit) {
         /*
          * Check if maximal clique
          */

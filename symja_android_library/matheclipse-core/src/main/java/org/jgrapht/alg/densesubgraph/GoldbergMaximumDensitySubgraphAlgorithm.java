@@ -17,12 +17,12 @@
  */
 package org.jgrapht.alg.densesubgraph;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.flow.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.flow.PushRelabelMFImpl;
+import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.util.function.*;
+import java.util.function.Function;
 
 /**
  * This class computes a maximum density subgraph based on the algorithm described by Andrew
@@ -50,39 +50,35 @@ import java.util.function.*;
  *
  * @param <V> Type of vertices
  * @param <E> Type of edges
- *
  * @author Andre Immig
  */
 public class GoldbergMaximumDensitySubgraphAlgorithm<V, E>
-    extends
-    GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
-{
+        extends
+        GoldbergMaximumDensitySubgraphAlgorithmBase<V, E> {
     /**
      * Constructor
-     * 
+     *
      * @param algFactory factory to construct the algorithm to use
-     * @param graph input for computation
-     * @param s additional source vertex
-     * @param t additional target vertex
-     * @param epsilon to use for internal computation
+     * @param graph      input for computation
+     * @param s          additional source vertex
+     * @param t          additional target vertex
+     * @param epsilon    to use for internal computation
      */
     public GoldbergMaximumDensitySubgraphAlgorithm(
-        Graph<V, E> graph, V s, V t, double epsilon, Function<Graph<V, DefaultWeightedEdge>,
-            MinimumSTCutAlgorithm<V, DefaultWeightedEdge>> algFactory)
-    {
+            Graph<V, E> graph, V s, V t, double epsilon, Function<Graph<V, DefaultWeightedEdge>,
+            MinimumSTCutAlgorithm<V, DefaultWeightedEdge>> algFactory) {
         super(graph, s, t, false, epsilon, algFactory);
     }
 
     /**
      * Convenience constructor that uses PushRelabel as default MinimumSTCutAlgorithm
-     * 
-     * @param graph input for computation
-     * @param s additional source vertex
-     * @param t additional target vertex
+     *
+     * @param graph   input for computation
+     * @param s       additional source vertex
+     * @param t       additional target vertex
      * @param epsilon to use for internal computation
      */
-    public GoldbergMaximumDensitySubgraphAlgorithm(Graph<V, E> graph, V s, V t, double epsilon)
-    {
+    public GoldbergMaximumDensitySubgraphAlgorithm(Graph<V, E> graph, V s, V t, double epsilon) {
         this(graph, s, t, epsilon, new Function<Graph<V, DefaultWeightedEdge>, MinimumSTCutAlgorithm<V, DefaultWeightedEdge>>() {
             @Override
             public MinimumSTCutAlgorithm<V, DefaultWeightedEdge> apply(Graph<V, DefaultWeightedEdge> network) {
@@ -93,35 +89,32 @@ public class GoldbergMaximumDensitySubgraphAlgorithm<V, E>
 
     /**
      * Getter for network weights of edges su for u in V
-     * 
+     *
      * @param v of V
      * @return weight of the edge
      */
-    protected double getEdgeWeightFromSourceToVertex(V v)
-    {
+    protected double getEdgeWeightFromSourceToVertex(V v) {
         return this.graph.edgeSet().size();
     }
 
     /**
      * Getter for network weights of edges ut for u in V
-     * 
+     *
      * @param v of V
      * @return weight of the edge
      */
-    protected double getEdgeWeightFromVertexToSink(V v)
-    {
+    protected double getEdgeWeightFromVertexToSink(V v) {
         double sum = 0.0;
         for (E e : this.graph.outgoingEdgesOf(v)) {
             double edgeWeight = GoldbergMaximumDensitySubgraphAlgorithm.this.graph.getEdgeWeight(e);
             sum += edgeWeight;
         }
         return this.graph.edgeSet().size() + 2 * guess
-            - sum;
+                - sum;
     }
 
     @Override
-    protected double computeDensityNumerator(final Graph<V, E> g)
-    {
+    protected double computeDensityNumerator(final Graph<V, E> g) {
         double sum = 0.0;
         for (E e : g.edgeSet()) {
             double edgeWeight = g.getEdgeWeight(e);
@@ -131,8 +124,7 @@ public class GoldbergMaximumDensitySubgraphAlgorithm<V, E>
     }
 
     @Override
-    protected double computeDensityDenominator(Graph<V, E> g)
-    {
+    protected double computeDensityDenominator(Graph<V, E> g) {
         return g.vertexSet().size();
     }
 

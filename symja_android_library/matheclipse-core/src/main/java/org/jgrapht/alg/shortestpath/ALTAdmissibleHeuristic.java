@@ -17,13 +17,17 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.alg.util.ToleranceDoubleComparator;
+import org.jgrapht.graph.EdgeReversedGraph;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * An admissible heuristic for the A* algorithm using a set of landmarks and the triangle
@@ -61,15 +65,13 @@ import java.util.*;
  * vertices source and target, a good landmark appears "before" source or "after" target where
  * before and after are relative to the "direction" from source to target.
  *
- * @author Dimitrios Michail
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Dimitrios Michail
  */
 public class ALTAdmissibleHeuristic<V, E>
-    implements
-    AStarAdmissibleHeuristic<V>
-{
+        implements
+        AStarAdmissibleHeuristic<V> {
     private final Graph<V, E> graph;
     private final Comparator<Double> comparator;
     private final Map<V, Map<V, Double>> fromLandmark;
@@ -79,14 +81,12 @@ public class ALTAdmissibleHeuristic<V, E>
     /**
      * Constructs a new {@link AStarAdmissibleHeuristic} using a set of landmarks.
      *
-     * @param graph the graph
+     * @param graph     the graph
      * @param landmarks a set of vertices of the graph which will be used as landmarks
-     *
      * @throws IllegalArgumentException if no landmarks are provided
      * @throws IllegalArgumentException if the graph contains edges with negative weights
      */
-    public ALTAdmissibleHeuristic(Graph<V, E> graph, Set<V> landmarks)
-    {
+    public ALTAdmissibleHeuristic(Graph<V, E> graph, Set<V> landmarks) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         Objects.requireNonNull(landmarks, "Landmarks cannot be null");
         if (landmarks.isEmpty()) {
@@ -121,12 +121,10 @@ public class ALTAdmissibleHeuristic<V, E>
      *
      * @param u the source vertex
      * @param t the target vertex
-     *
      * @return an admissible heuristic estimate
      */
     @Override
-    public double getCostEstimate(V u, V t)
-    {
+    public double getCostEstimate(V u, V t) {
         double maxEstimate = 0d;
 
         /*
@@ -177,11 +175,10 @@ public class ALTAdmissibleHeuristic<V, E>
      *
      * @param landmark the landmark
      */
-    private void precomputeToFromLandmark(V landmark)
-    {
+    private void precomputeToFromLandmark(V landmark) {
         // compute distances from landmark
         SingleSourcePaths<V, E> fromLandmarkPaths =
-            new DijkstraShortestPath<>(graph).getPaths(landmark);
+                new DijkstraShortestPath<>(graph).getPaths(landmark);
         Map<V, Double> fromLandMarkDistances = new HashMap<>();
         for (V v : graph.vertexSet()) {
             fromLandMarkDistances.put(v, fromLandmarkPaths.getWeight(v));
@@ -192,7 +189,7 @@ public class ALTAdmissibleHeuristic<V, E>
         if (directed) {
             Graph<V, E> reverseGraph = new EdgeReversedGraph<>(graph);
             SingleSourcePaths<V, E> toLandmarkPaths =
-                new DijkstraShortestPath<>(reverseGraph).getPaths(landmark);
+                    new DijkstraShortestPath<>(reverseGraph).getPaths(landmark);
             Map<V, Double> toLandMarkDistances = new HashMap<>();
             for (V v : graph.vertexSet()) {
                 toLandMarkDistances.put(v, toLandmarkPaths.getWeight(v));
@@ -205,8 +202,7 @@ public class ALTAdmissibleHeuristic<V, E>
      * {@inheritDoc}
      */
     @Override
-    public <ET> boolean isConsistent(Graph<V, ET> graph)
-    {
+    public <ET> boolean isConsistent(Graph<V, ET> graph) {
         return true;
     }
 }

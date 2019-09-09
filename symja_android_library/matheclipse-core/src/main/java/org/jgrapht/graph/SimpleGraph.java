@@ -17,10 +17,10 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.graph.builder.GraphBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * Implementation of a <a href=http://mathworld.wolfram.com/SimpleGraph.html>Simple Graph</a>. A
@@ -28,15 +28,13 @@ import java.util.function.*;
  * <a href="http://mathworld.wolfram.com/GraphLoop.html">graph loops</a> or
  * <a href="http://mathworld.wolfram.com/MultipleEdge.html">multiple edges</a>. This particular
  * implementation supports both weighted and unweighted edges.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  */
 public class SimpleGraph<V, E>
-    extends
-    AbstractBaseGraph<V, E>
-{
+        extends
+        AbstractBaseGraph<V, E> {
     private static final long serialVersionUID = 4607246833824317836L;
 
     /**
@@ -44,52 +42,48 @@ public class SimpleGraph<V, E>
      *
      * @param edgeClass class on which to base the edge supplier
      */
-    public SimpleGraph(Class<? extends E> edgeClass)
-    {
+    public SimpleGraph(Class<? extends E> edgeClass) {
         this(null, SupplierUtil.createSupplier(edgeClass), false);
     }
 
     /**
      * Creates a new simple graph.
-     * 
+     *
      * @param vertexSupplier the vertex supplier, can be null
-     * @param edgeSupplier the edge supplier, can be null
-     * @param weighted whether the graph is weighted or not
+     * @param edgeSupplier   the edge supplier, can be null
+     * @param weighted       whether the graph is weighted or not
      */
-    public SimpleGraph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier, boolean weighted)
-    {
+    public SimpleGraph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier, boolean weighted) {
         super(
-            vertexSupplier, edgeSupplier,
-            new DefaultGraphType.Builder()
-                .undirected().allowMultipleEdges(false).allowSelfLoops(false).weighted(weighted)
-                .build());
+                vertexSupplier, edgeSupplier,
+                new DefaultGraphType.Builder()
+                        .undirected().allowMultipleEdges(false).allowSelfLoops(false).weighted(weighted)
+                        .build());
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeClass class on which to base factory for edges
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>       the graph vertex type
+     * @param <E>       the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends SimpleGraph<V, E>> createBuilder(
-        Class<? extends E> edgeClass)
-    {
+            Class<? extends E> edgeClass) {
         return new GraphBuilder<>(new SimpleGraph<V, E>(edgeClass));
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeSupplier the edge supplier of the new graph
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V,
-        E> GraphBuilder<V, E, ? extends SimpleGraph<V, E>> createBuilder(Supplier<E> edgeSupplier)
-    {
+            E> GraphBuilder<V, E, ? extends SimpleGraph<V, E>> createBuilder(Supplier<E> edgeSupplier) {
         return new GraphBuilder<>(new SimpleGraph<V, E>(null, edgeSupplier, false));
     }
 

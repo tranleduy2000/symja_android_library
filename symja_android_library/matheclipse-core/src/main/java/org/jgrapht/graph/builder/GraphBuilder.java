@@ -17,15 +17,15 @@
  */
 package org.jgrapht.graph.builder;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A builder class for {@link Graph}. This is a helper class which helps adding vertices and edges
  * into an already constructed graph instance.
- * 
+ *
  * <p>
  * Each graph implementation contains a static helper method for the construction of such a builder.
  * For example class {@link DefaultDirectedGraph} contains method
@@ -33,18 +33,16 @@ import java.util.function.*;
  *
  * <p>
  * See {@link GraphTypeBuilder} for a builder of the actual graph instance.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  * @param <G> type of the resulting graph
- * 
  * @author Andrew Chen
  * @see GraphTypeBuilder
  */
 public class GraphBuilder<V, E, G extends Graph<V, E>>
-    extends
-    AbstractGraphBuilder<V, E, G, GraphBuilder<V, E, G>>
-{
+        extends
+        AbstractGraphBuilder<V, E, G, GraphBuilder<V, E, G>> {
     /**
      * Creates a builder based on {@code baseGraph}. {@code baseGraph} must be mutable.
      *
@@ -58,14 +56,12 @@ public class GraphBuilder<V, E, G extends Graph<V, E>>
      *
      * @param baseGraph the graph object to base building on
      */
-    public GraphBuilder(G baseGraph)
-    {
+    public GraphBuilder(G baseGraph) {
         super(baseGraph);
     }
 
     @Override
-    protected GraphBuilder<V, E, G> self()
-    {
+    protected GraphBuilder<V, E, G> self() {
         return this;
     }
 

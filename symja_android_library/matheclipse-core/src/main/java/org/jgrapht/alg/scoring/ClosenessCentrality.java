@@ -17,17 +17,22 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
-import org.jgrapht.alg.shortestpath.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.alg.shortestpath.FloydWarshallShortestPaths;
+import org.jgrapht.graph.EdgeReversedGraph;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Closeness centrality.
- * 
+ *
  * <p>
  * Computes the closeness centrality of each vertex of a graph. The closeness of a vertex $x$ is
  * defined as the reciprocal of the farness, that is $H(x)= 1 / \sum_{y \neq x} d(x,y)$, where
@@ -47,22 +52,20 @@ import java.util.*;
  * When the graph is disconnected, the closeness centrality score equals $0$ for all vertices. In
  * the case of weakly connected digraphs, the closeness centrality of several vertices might be 0.
  * See {@link HarmonicCentrality} for a different approach in case of disconnected graphs.
- * 
+ *
  * <p>
  * Shortest paths are computed either by using Dijkstra's algorithm or Floyd-Warshall depending on
  * whether the graph has edges with negative edge weights. Thus, the running time is either $O(n (m
  * +n \log n))$ or $O(n^3)$ respectively, where $n$ is the number of vertices and $m$ the number of
  * edges of the graph.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public class ClosenessCentrality<V, E>
-    implements
-    VertexScoringAlgorithm<V, Double>
-{
+        implements
+        VertexScoringAlgorithm<V, Double> {
     /**
      * Underlying graph
      */
@@ -83,24 +86,22 @@ public class ClosenessCentrality<V, E>
     /**
      * Construct a new instance. By default the centrality is normalized and computed using outgoing
      * paths.
-     * 
+     *
      * @param graph the input graph
      */
-    public ClosenessCentrality(Graph<V, E> graph)
-    {
+    public ClosenessCentrality(Graph<V, E> graph) {
         this(graph, false, true);
     }
 
     /**
      * Construct a new instance.
-     * 
-     * @param graph the input graph
-     * @param incoming if true incoming paths are used, otherwise outgoing paths
+     *
+     * @param graph     the input graph
+     * @param incoming  if true incoming paths are used, otherwise outgoing paths
      * @param normalize whether to normalize by multiplying the closeness by $n-1$, where $n$ is the
-     *        number of vertices of the graph
+     *                  number of vertices of the graph
      */
-    public ClosenessCentrality(Graph<V, E> graph, boolean incoming, boolean normalize)
-    {
+    public ClosenessCentrality(Graph<V, E> graph, boolean incoming, boolean normalize) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         this.incoming = incoming;
         this.normalize = normalize;
@@ -111,8 +112,7 @@ public class ClosenessCentrality<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Map<V, Double> getScores()
-    {
+    public Map<V, Double> getScores() {
         if (scores == null) {
             compute();
         }
@@ -123,8 +123,7 @@ public class ClosenessCentrality<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Double getVertexScore(V v)
-    {
+    public Double getVertexScore(V v) {
         if (!graph.containsVertex(v)) {
             throw new IllegalArgumentException("Cannot return score of unknown vertex");
         }
@@ -136,11 +135,10 @@ public class ClosenessCentrality<V, E>
 
     /**
      * Get the shortest path algorithm for the paths computation.
-     * 
+     *
      * @return the shortest path algorithm
      */
-    protected ShortestPathAlgorithm<V, E> getShortestPathAlgorithm()
-    {
+    protected ShortestPathAlgorithm<V, E> getShortestPathAlgorithm() {
         // setup graph
         Graph<V, E> g;
         if (incoming && graph.getType().isDirected()) {
@@ -172,8 +170,7 @@ public class ClosenessCentrality<V, E>
     /**
      * Compute the centrality index
      */
-    protected void compute()
-    {
+    protected void compute() {
         // create result container
         this.scores = new HashMap<>();
 

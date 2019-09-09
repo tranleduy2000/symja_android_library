@@ -17,13 +17,22 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Generates a random tree using Prüfer sequences.
- * 
+ *
  * <p>
  * A Prüfer sequence of length $n$ is randomly generated and converted into the corresponding tree.
  * </p>
@@ -36,13 +45,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
 
     // number of vertices
     private final int n;
@@ -57,7 +64,7 @@ public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * Construct a new PruferTreeGenerator from an input Prüfer sequence. Note that the size of the
      * generated tree will be $l+2$ where $l$ is the length of the input sequence. The Prüfer
      * sequence must contain integers between $0$ and $l+1$ (inclusive).
-     *
+     * <p>
      * Note: In this case, the same tree will be generated every time.
      *
      * @param pruferSequence the input Prüfer sequence
@@ -65,8 +72,7 @@ public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @throws IllegalArgumentException if {@code pruferSequence} is {@code null}
      * @throws IllegalArgumentException if {@code pruferSequence} is invalid.
      */
-    public PruferTreeGenerator(int[] pruferSequence)
-    {
+    public PruferTreeGenerator(int[] pruferSequence) {
         if (Objects.isNull(pruferSequence)) {
             throw new IllegalArgumentException("pruferSequence cannot be null");
         }
@@ -92,33 +98,30 @@ public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @param n number of vertices to be generated
      * @throws IllegalArgumentException if {@code n} is &le; 0
      */
-    public PruferTreeGenerator(int n)
-    {
+    public PruferTreeGenerator(int n) {
         this(n, new Random());
     }
 
     /**
      * Construct a new PruferTreeGenerator.
      *
-     * @param n number of vertices to be generated
+     * @param n    number of vertices to be generated
      * @param seed seed for the random number generator
      * @throws IllegalArgumentException if {@code n} is &le; 0
      */
-    public PruferTreeGenerator(int n, long seed)
-    {
+    public PruferTreeGenerator(int n, long seed) {
         this(n, new Random(seed));
     }
 
     /**
      * Construct a new PruferTreeGenerator
      *
-     * @param n number of vertices to be generated
+     * @param n   number of vertices to be generated
      * @param rng the random number generator to use
      * @throws IllegalArgumentException if {@code n} is &le; 0
-     * @throws NullPointerException if {@code rng} is {@code null}
+     * @throws NullPointerException     if {@code rng} is {@code null}
      */
-    public PruferTreeGenerator(int n, Random rng)
-    {
+    public PruferTreeGenerator(int n, Random rng) {
         if (n <= 0) {
             throw new IllegalArgumentException("n must be greater than 0");
         }
@@ -136,15 +139,14 @@ public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * one vertex)
      * </p>
      *
-     * @param target the target graph
+     * @param target    the target graph
      * @param resultMap not used by this generator, can be null
-     * @throws NullPointerException if {@code target} is {@code null}
+     * @throws NullPointerException     if {@code target} is {@code null}
      * @throws IllegalArgumentException if {@code target} is not undirected
      * @throws IllegalArgumentException if {@code target} is not empty
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         GraphTests.requireUndirected(target);
 
         if (!target.vertexSet().isEmpty()) {

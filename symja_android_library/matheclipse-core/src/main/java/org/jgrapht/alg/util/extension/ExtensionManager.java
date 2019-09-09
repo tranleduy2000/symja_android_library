@@ -17,7 +17,8 @@
  */
 package org.jgrapht.alg.util.extension;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Convenience class to manage extensions/encapsulations. This class creates and manages object
@@ -30,10 +31,8 @@ import java.util.*;
  *
  * @param <T> class-type to be extended (class-type of original)
  * @param <B> class-type of extension
- *
  */
-public class ExtensionManager<T, B extends Extension>
-{
+public class ExtensionManager<T, B extends Extension> {
 
     /* Factory class to create new extensions */
     private ExtensionFactory<B> extensionFactory;
@@ -42,33 +41,30 @@ public class ExtensionManager<T, B extends Extension>
 
     /**
      * Create a new extension manager.
-     * 
+     *
      * @param factory the extension factory to use
      */
-    public ExtensionManager(ExtensionFactory<B> factory)
-    {
+    public ExtensionManager(ExtensionFactory<B> factory) {
         this.extensionFactory = factory;
     }
 
     /**
      * Creates and returns an extension object.
-     * 
+     *
      * @return Extension object
      */
-    public B createExtension()
-    {
+    public B createExtension() {
         return extensionFactory.create();
     }
 
     /**
      * Creates a new singleton extension object for original t if no such object exists, returns the
      * old one otherwise.
-     * 
+     *
      * @param t the original object
      * @return the extension object
      */
-    public B getExtension(T t)
-    {
+    public B getExtension(T t) {
         if (originalToExtensionMap.containsKey(t)) {
             return originalToExtensionMap.get(t);
         }

@@ -17,9 +17,12 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMapping;
+import org.jgrapht.GraphType;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
 
 /**
  * Base implementation of the VF2 algorithm using its feature of detecting
@@ -36,9 +39,8 @@ import java.util.*;
  * @param <E> the type of the edges
  */
 public abstract class VF2AbstractIsomorphismInspector<V, E>
-    implements
-    IsomorphismInspector<V, E>
-{
+        implements
+        IsomorphismInspector<V, E> {
     protected Graph<V, E> graph1, graph2;
 
     protected Comparator<V> vertexComparator;
@@ -49,21 +51,20 @@ public abstract class VF2AbstractIsomorphismInspector<V, E>
     /**
      * Construct a new base implementation of the VF2 isomorphism inspector.
      *
-     * @param graph1 the first graph
-     * @param graph2 the second graph
+     * @param graph1           the first graph
+     * @param graph2           the second graph
      * @param vertexComparator comparator for semantic equivalence of vertices
-     * @param edgeComparator comparator for semantic equivalence of edges
-     * @param cacheEdges if true, edges get cached for faster access
+     * @param edgeComparator   comparator for semantic equivalence of edges
+     * @param cacheEdges       if true, edges get cached for faster access
      */
     public VF2AbstractIsomorphismInspector(
-        Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
-        Comparator<E> edgeComparator, boolean cacheEdges)
-    {
+            Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
+            Comparator<E> edgeComparator, boolean cacheEdges) {
         GraphType type1 = graph1.getType();
         GraphType type2 = graph2.getType();
         if (type1.isAllowingMultipleEdges() || type2.isAllowingMultipleEdges()) {
             throw new IllegalArgumentException(
-                "graphs with multiple (parallel) edges are not supported");
+                    "graphs with multiple (parallel) edges are not supported");
         }
 
         if (type1.isMixed() || type2.isMixed()) {
@@ -71,10 +72,9 @@ public abstract class VF2AbstractIsomorphismInspector<V, E>
         }
 
         if (type1.isUndirected() && type2.isDirected()
-            || type1.isDirected() && type2.isUndirected())
-        {
+                || type1.isDirected() && type2.isUndirected()) {
             throw new IllegalArgumentException(
-                "can not match directed with " + "undirected graphs");
+                    "can not match directed with " + "undirected graphs");
         }
 
         this.graph1 = graph1;
@@ -88,28 +88,26 @@ public abstract class VF2AbstractIsomorphismInspector<V, E>
     /**
      * Construct a new base implementation of the VF2 isomorphism inspector.
      *
-     * @param graph1 the first graph
-     * @param graph2 the second graph
+     * @param graph1           the first graph
+     * @param graph2           the second graph
      * @param vertexComparator comparator for semantic equivalence of vertices
-     * @param edgeComparator comparator for semantic equivalence of edges
+     * @param edgeComparator   comparator for semantic equivalence of edges
      */
     public VF2AbstractIsomorphismInspector(
-        Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
-        Comparator<E> edgeComparator)
-    {
+            Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
+            Comparator<E> edgeComparator) {
         this(graph1, graph2, vertexComparator, edgeComparator, true);
     }
 
     /**
      * Construct a new base implementation of the VF2 isomorphism inspector.
      *
-     * @param graph1 the first graph
-     * @param graph2 the second graph
+     * @param graph1     the first graph
+     * @param graph2     the second graph
      * @param cacheEdges if true, edges get cached for faster access
      */
     public VF2AbstractIsomorphismInspector(
-        Graph<V, E> graph1, Graph<V, E> graph2, boolean cacheEdges)
-    {
+            Graph<V, E> graph1, Graph<V, E> graph2, boolean cacheEdges) {
         this(graph1, graph2, null, null, cacheEdges);
     }
 
@@ -119,8 +117,7 @@ public abstract class VF2AbstractIsomorphismInspector<V, E>
      * @param graph1 the first graph
      * @param graph2 the second graph
      */
-    public VF2AbstractIsomorphismInspector(Graph<V, E> graph1, Graph<V, E> graph2)
-    {
+    public VF2AbstractIsomorphismInspector(Graph<V, E> graph1, Graph<V, E> graph2) {
         this(graph1, graph2, true);
     }
 
@@ -128,8 +125,7 @@ public abstract class VF2AbstractIsomorphismInspector<V, E>
     public abstract Iterator<GraphMapping<V, E>> getMappings();
 
     @Override
-    public boolean isomorphismExists()
-    {
+    public boolean isomorphismExists() {
         Iterator<GraphMapping<V, E>> iter = getMappings();
         return iter.hasNext();
     }

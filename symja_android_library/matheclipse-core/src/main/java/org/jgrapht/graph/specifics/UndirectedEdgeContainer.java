@@ -17,10 +17,11 @@
  */
 package org.jgrapht.graph.specifics;
 
-import org.jgrapht.graph.*;
+import org.jgrapht.graph.EdgeSetFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * A container for vertex edges.
@@ -29,22 +30,19 @@ import java.util.*;
  * In this edge container we use array lists to minimize memory toll. However, for high-degree
  * vertices we replace the entire edge container with a direct access subclass (to be implemented).
  * </p>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
 public class UndirectedEdgeContainer<V, E>
-    implements
-    Serializable
-{
+        implements
+        Serializable {
     private static final long serialVersionUID = -6623207588411170010L;
     Set<E> vertexEdges;
     private transient Set<E> unmodifiableVertexEdges = null;
 
-    UndirectedEdgeContainer(EdgeSetFactory<V, E> edgeSetFactory, V vertex)
-    {
+    UndirectedEdgeContainer(EdgeSetFactory<V, E> edgeSetFactory, V vertex) {
         vertexEdges = edgeSetFactory.createEdgeSet(vertex);
     }
 
@@ -53,8 +51,7 @@ public class UndirectedEdgeContainer<V, E>
      *
      * @return an unmodifiable set of vertex edges
      */
-    public Set<E> getUnmodifiableVertexEdges()
-    {
+    public Set<E> getUnmodifiableVertexEdges() {
         if (unmodifiableVertexEdges == null) {
             unmodifiableVertexEdges = Collections.unmodifiableSet(vertexEdges);
         }
@@ -66,8 +63,7 @@ public class UndirectedEdgeContainer<V, E>
      *
      * @param e the edge to add
      */
-    public void addEdge(E e)
-    {
+    public void addEdge(E e) {
         vertexEdges.add(e);
     }
 
@@ -76,8 +72,7 @@ public class UndirectedEdgeContainer<V, E>
      *
      * @return the number of vertex edges
      */
-    public int edgeCount()
-    {
+    public int edgeCount() {
         return vertexEdges.size();
     }
 
@@ -86,8 +81,7 @@ public class UndirectedEdgeContainer<V, E>
      *
      * @param e the edge to remove
      */
-    public void removeEdge(E e)
-    {
+    public void removeEdge(E e) {
         vertexEdges.remove(e);
     }
 }

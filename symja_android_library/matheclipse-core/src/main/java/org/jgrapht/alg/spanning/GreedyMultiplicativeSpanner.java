@@ -65,42 +65,37 @@ import java.util.function.ToDoubleFunction;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Dimitrios Michail
  */
 public class GreedyMultiplicativeSpanner<V, E>
-    implements
-    SpannerAlgorithm<E>
-{
+        implements
+        SpannerAlgorithm<E> {
     private final Graph<V, E> graph;
     private final int k;
     private static final int MAX_K = 1 << 29;
 
     /**
      * Constructs instance to compute a $(2k-1)$-spanner of an undirected graph.
-     * 
+     *
      * @param graph an undirected graph
-     * @param k positive integer.
-     * 
+     * @param k     positive integer.
      * @throws IllegalArgumentException if the graph is not undirected
      * @throws IllegalArgumentException if k is not positive
      */
-    public GreedyMultiplicativeSpanner(Graph<V, E> graph, int k)
-    {
+    public GreedyMultiplicativeSpanner(Graph<V, E> graph, int k) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("graph is not undirected");
         }
         if (k <= 0) {
             throw new IllegalArgumentException(
-                "k should be positive in (2k-1)-spanner construction");
+                    "k should be positive in (2k-1)-spanner construction");
         }
         this.k = Math.min(k, MAX_K);
     }
 
     @Override
-    public Spanner<E> getSpanner()
-    {
+    public Spanner<E> getSpanner() {
         if (graph.getType().isWeighted()) {
             return new WeightedSpannerAlgorithm().run();
         } else {
@@ -109,14 +104,12 @@ public class GreedyMultiplicativeSpanner<V, E>
     }
 
     // base algorithm implementation
-    private abstract class SpannerAlgorithmBase
-    {
+    private abstract class SpannerAlgorithmBase {
         public abstract boolean isSpannerReachable(V s, V t, double distance);
 
         public abstract void addSpannerEdge(V s, V t, double weight);
 
-        public Spanner<E> run()
-        {
+        public Spanner<E> run() {
             // sort edges
             ArrayList<E> allEdges = new ArrayList<>(graph.edgeSet());
             allEdges.sort(DComparator.comparingDouble(new ToDoubleFunction<E>() {
@@ -155,19 +148,17 @@ public class GreedyMultiplicativeSpanner<V, E>
     }
 
     private class UnweightedSpannerAlgorithm
-        extends
-        SpannerAlgorithmBase
-    {
+            extends
+            SpannerAlgorithmBase {
         protected Graph<V, E> spanner;
         protected Map<V, Integer> vertexDistance;
         protected Deque<V> queue;
         protected Deque<V> touchedVertices;
 
-        public UnweightedSpannerAlgorithm()
-        {
+        public UnweightedSpannerAlgorithm() {
             spanner = GraphTypeBuilder
-                .<V, E> undirected().allowingMultipleEdges(false).allowingSelfLoops(false)
-                .edgeSupplier(graph.getEdgeSupplier()).buildGraph();
+                    .<V, E>undirected().allowingMultipleEdges(false).allowingSelfLoops(false)
+                    .edgeSupplier(graph.getEdgeSupplier()).buildGraph();
             touchedVertices = new ArrayDeque<V>(graph.vertexSet().size());
             for (V v : graph.vertexSet()) {
                 spanner.addVertex(v);
@@ -180,13 +171,12 @@ public class GreedyMultiplicativeSpanner<V, E>
         /**
          * Check if two vertices are reachable by a BFS in the spanner graph using only a certain
          * number of hops.
-         *
+         * <p>
          * We execute this procedure repeatedly, therefore we need to keep track of what it touches
          * and only clean those before the next execution.
          */
         @Override
-        public boolean isSpannerReachable(V s, V t, double hops)
-        {
+        public boolean isSpannerReachable(V s, V t, double hops) {
             // initialize distances and queue
             while (!touchedVertices.isEmpty()) {
                 V u = touchedVertices.pop();
@@ -225,22 +215,19 @@ public class GreedyMultiplicativeSpanner<V, E>
         }
 
         @Override
-        public void addSpannerEdge(V s, V t, double weight)
-        {
+        public void addSpannerEdge(V s, V t, double weight) {
             spanner.addEdge(s, t);
         }
     }
 
     private class WeightedSpannerAlgorithm
-        extends
-        SpannerAlgorithmBase
-    {
+            extends
+            SpannerAlgorithmBase {
         protected Graph<V, DefaultWeightedEdge> spanner;
         protected AddressableHeap<Double, V> heap;
         protected Map<V, AddressableHeap.Handle<Double, V>> nodes;
 
-        public WeightedSpannerAlgorithm()
-        {
+        public WeightedSpannerAlgorithm() {
             this.spanner = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
             for (V v : graph.vertexSet()) {
                 spanner.addVertex(v);
@@ -250,8 +237,7 @@ public class GreedyMultiplicativeSpanner<V, E>
         }
 
         @Override
-        public boolean isSpannerReachable(V s, V t, double distance)
-        {
+        public boolean isSpannerReachable(V s, V t, double distance) {
             // init
             heap.clear();
             nodes.clear();
@@ -291,8 +277,7 @@ public class GreedyMultiplicativeSpanner<V, E>
         }
 
         @Override
-        public void addSpannerEdge(V s, V t, double weight)
-        {
+        public void addSpannerEdge(V s, V t, double weight) {
             Graphs.addEdge(spanner, s, t, weight);
         }
 

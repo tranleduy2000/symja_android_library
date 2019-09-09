@@ -17,10 +17,11 @@
  */
 package org.jgrapht.alg.transform;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.BiFunction;
 
 /**
  * Converter which produces the <a href="http://mathworld.wolfram.com/LineGraph.html">line graph</a>
@@ -40,17 +41,13 @@ import java.util.function.*;
  * </ul>
  * <p>
  *
+ * @param <V>  vertex type of input graph
+ * @param <E>  edge type of input graph
+ * @param <EE> edge type of target graph
  * @author Joris Kinable
  * @author Nikhil Sharma
- *
- *
- * @param <V> vertex type of input graph
- * @param <E> edge type of input graph
- * @param <EE> edge type of target graph
- *
  */
-public class LineGraphConverter<V, E, EE>
-{
+public class LineGraphConverter<V, E, EE> {
 
     private final Graph<V, E> graph;
 
@@ -58,10 +55,9 @@ public class LineGraphConverter<V, E, EE>
      * Line Graph Converter
      *
      * @param graph graph to be converted. This implementation supports multigraphs and
-     *        pseudographs.
+     *              pseudographs.
      */
-    public LineGraphConverter(Graph<V, E> graph)
-    {
+    public LineGraphConverter(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
     }
 
@@ -71,8 +67,7 @@ public class LineGraphConverter<V, E, EE>
      *
      * @param target target graph
      */
-    public void convertToLineGraph(final Graph<E, EE> target)
-    {
+    public void convertToLineGraph(final Graph<E, EE> target) {
         this.convertToLineGraph(target, null);
     }
 
@@ -94,12 +89,11 @@ public class LineGraphConverter<V, E, EE>
      * since, by convention, the line graph of an undirected graph is commonly assumed to be a
      * simple graph.
      *
-     * @param target target graph
+     * @param target         target graph
      * @param weightFunction weight function
      */
     public void convertToLineGraph(
-        final Graph<E, EE> target, final BiFunction<E, E, Double> weightFunction)
-    {
+            final Graph<E, EE> target, final BiFunction<E, E, Double> weightFunction) {
         Graphs.addAllVertices(target, graph.edgeSet());
         if (graph.getType().isDirected()) {
             for (V vertex : graph.vertexSet()) {

@@ -27,12 +27,10 @@ import java.util.Map;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  * @param <T> type for returning implementation-specific mappings from String roles to graph
- *        elements
- *
+ *            elements
  * @author John V. Sichi
  */
-public interface GraphGenerator<V, E, T>
-{
+public interface GraphGenerator<V, E, T> {
 
     /**
      * Generate a graph structure. The topology of the generated graph is dependent on the
@@ -42,16 +40,15 @@ public interface GraphGenerator<V, E, T>
      * wheel graph would designate a hub vertex. Role names used as keys in resultMap should be
      * declared as public static final Strings by implementation classes.
      *
-     * @param target receives the generated edges and vertices; if this is non-empty on entry, the
-     *        result will be a disconnected graph since generated elements will not be connected to
-     *        existing elements
+     * @param target    receives the generated edges and vertices; if this is non-empty on entry, the
+     *                  result will be a disconnected graph since generated elements will not be connected to
+     *                  existing elements
      * @param resultMap if non-null, receives implementation-specific mappings from String roles to
-     *        graph elements (or collections of graph elements)
-     * 
+     *                  graph elements (or collections of graph elements)
      * @throws UnsupportedOperationException if the graph does not have appropriate vertex and edge
-     *         suppliers, in order to be able to create new vertices and edges. Methods
-     *         {@link Graph#getEdgeSupplier()} and {@link Graph#getVertexSupplier()} must not return
-     *         <code>null</code>.
+     *                                       suppliers, in order to be able to create new vertices and edges. Methods
+     *                                       {@link Graph#getEdgeSupplier()} and {@link Graph#getVertexSupplier()} must not return
+     *                                       <code>null</code>.
      */
     void generateGraph(Graph<V, E> target, Map<String, T> resultMap);
 
@@ -59,10 +56,10 @@ public interface GraphGenerator<V, E, T>
      * Generate a graph structure.
      *
      * @param target receives the generated edges and vertices; if this is non-empty on entry, the
-     *        result will be a disconnected graph since generated elements will not be connected to
-     *        existing elements
+     *               result will be a disconnected graph since generated elements will not be connected to
+     *               existing elements
      * @throws UnsupportedOperationException if the graph does not have appropriate vertex and edge
-     *         suppliers, in order to be able to create new vertices and edges
+     *                                       suppliers, in order to be able to create new vertices and edges
      */
     void generateGraph(Graph<V, E> target);
 

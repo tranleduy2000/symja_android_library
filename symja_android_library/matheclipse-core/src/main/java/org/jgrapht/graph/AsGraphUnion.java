@@ -17,33 +17,37 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.GraphType;
+import org.jgrapht.util.UnmodifiableUnionSet;
+import org.jgrapht.util.WeightCombiner;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Read-only union of two graphs.
- * 
+ *
  * <p>
  * Read-only union of two graphs: G<sub>1</sub> and G<sub>2</sub>. If G<sub>1</sub> =
  * (V<sub>1</sub>, E<sub>1</sub>) and G<sub>2</sub> = (V<sub>2</sub>, E<sub>2</sub>) then their
  * union G = (V, E), where V is the union of V<sub>1</sub> and V<sub>2</sub>, and E is the union of
  * E<sub>1</sub> and E<sub>2</sub>. A {@link WeightCombiner} in order to calculate edge weights.
- * 
+ *
  * @param <V> the vertex type
  * @param <E> the edge type
- * 
  * @author Ilya Razenshteyn
  */
 public class AsGraphUnion<V, E>
-    extends
-    AbstractGraph<V, E>
-    implements
-    Serializable
-{
+        extends
+        AbstractGraph<V, E>
+        implements
+        Serializable {
     private static final long serialVersionUID = -3848082143382987713L;
 
     private static final String READ_ONLY = "union of graphs is read-only";
@@ -57,13 +61,12 @@ public class AsGraphUnion<V, E>
 
     /**
      * Construct a new graph union.
-     * 
-     * @param g1 the first graph
-     * @param g2 the second graph
+     *
+     * @param g1       the first graph
+     * @param g2       the second graph
      * @param operator the weight combiner (policy for edge weight calculation)
      */
-    public AsGraphUnion(Graph<V, E> g1, Graph<V, E> g2, WeightCombiner operator)
-    {
+    public AsGraphUnion(Graph<V, E> g1, Graph<V, E> g2, WeightCombiner operator) {
         this.g1 = GraphTests.requireDirectedOrUndirected(g1);
         this.type1 = g1.getType();
 
@@ -85,19 +88,18 @@ public class AsGraphUnion<V, E>
             builder = builder.mixed();
         }
         this.type = builder
-            .allowSelfLoops(type1.isAllowingSelfLoops() || type2.isAllowingSelfLoops())
-            .allowMultipleEdges(true).weighted(true).modifiable(false).build();
+                .allowSelfLoops(type1.isAllowingSelfLoops() || type2.isAllowingSelfLoops())
+                .allowMultipleEdges(true).weighted(true).modifiable(false).build();
     }
 
     /**
      * Construct a new graph union. The union will use the {@link WeightCombiner#SUM} weight
      * combiner.
-     * 
+     *
      * @param g1 the first graph
      * @param g2 the second graph
      */
-    public AsGraphUnion(Graph<V, E> g1, Graph<V, E> g2)
-    {
+    public AsGraphUnion(Graph<V, E> g1, Graph<V, E> g2) {
         this(g1, g2, WeightCombiner.SUM);
     }
 
@@ -105,15 +107,14 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         boolean inG1 = g1.containsVertex(sourceVertex) && g1.containsVertex(targetVertex);
         boolean inG2 = g2.containsVertex(sourceVertex) && g2.containsVertex(targetVertex);
 
         if (inG1 && inG2) {
             return new UnmodifiableUnionSet<>(
-                g1.getAllEdges(sourceVertex, targetVertex),
-                g2.getAllEdges(sourceVertex, targetVertex));
+                    g1.getAllEdges(sourceVertex, targetVertex),
+                    g2.getAllEdges(sourceVertex, targetVertex));
         } else if (inG1) {
             return Collections.unmodifiableSet(g1.getAllEdges(sourceVertex, targetVertex));
         } else if (inG2) {
@@ -126,8 +127,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         E res = null;
         if (g1.containsVertex(sourceVertex) && g1.containsVertex(targetVertex)) {
             res = g1.getEdge(sourceVertex, targetVertex);
@@ -140,67 +140,61 @@ public class AsGraphUnion<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public Supplier<V> getVertexSupplier()
-    {
+    public Supplier<V> getVertexSupplier() {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public Supplier<E> getEdgeSupplier()
-    {
+    public Supplier<E> getEdgeSupplier() {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public E addEdge(V sourceVertex, V targetVertex)
-    {
+    public E addEdge(V sourceVertex, V targetVertex) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public V addVertex()
-    {
+    public V addVertex() {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
@@ -208,8 +202,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsEdge(E e)
-    {
+    public boolean containsEdge(E e) {
         return g1.containsEdge(e) || g2.containsEdge(e);
     }
 
@@ -217,8 +210,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean containsVertex(V v)
-    {
+    public boolean containsVertex(V v) {
         return g1.containsVertex(v) || g2.containsVertex(v);
     }
 
@@ -226,8 +218,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgeSet()
-    {
+    public Set<E> edgeSet() {
         return new UnmodifiableUnionSet<>(g1.edgeSet(), g2.edgeSet());
     }
 
@@ -235,8 +226,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgesOf(V vertex)
-    {
+    public Set<E> edgesOf(V vertex) {
         boolean inG1 = g1.containsVertex(vertex);
         boolean inG2 = g2.containsVertex(vertex);
 
@@ -255,14 +245,13 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         boolean inG1 = g1.containsVertex(vertex);
         boolean inG2 = g2.containsVertex(vertex);
 
         if (inG1 && inG2) {
             return new UnmodifiableUnionSet<>(
-                g1.incomingEdgesOf(vertex), g2.incomingEdgesOf(vertex));
+                    g1.incomingEdgesOf(vertex), g2.incomingEdgesOf(vertex));
         } else if (inG1) {
             return Collections.unmodifiableSet(g1.incomingEdgesOf(vertex));
         } else if (inG2) {
@@ -276,14 +265,13 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         boolean inG1 = g1.containsVertex(vertex);
         boolean inG2 = g2.containsVertex(vertex);
 
         if (inG1 && inG2) {
             return new UnmodifiableUnionSet<>(
-                g1.outgoingEdgesOf(vertex), g2.outgoingEdgesOf(vertex));
+                    g1.outgoingEdgesOf(vertex), g2.outgoingEdgesOf(vertex));
         } else if (inG1) {
             return Collections.unmodifiableSet(g1.outgoingEdgesOf(vertex));
         } else if (inG2) {
@@ -297,8 +285,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         if (type.isMixed()) {
             int d = 0;
             if (g1.containsVertex(vertex)) {
@@ -328,8 +315,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         if (type.isMixed()) {
             int d = 0;
             if (g1.containsVertex(vertex)) {
@@ -350,8 +336,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         if (type.isMixed()) {
             int d = 0;
             if (g1.containsVertex(vertex)) {
@@ -370,34 +355,31 @@ public class AsGraphUnion<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public E removeEdge(V sourceVertex, V targetVertex)
-    {
+    public E removeEdge(V sourceVertex, V targetVertex) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public boolean removeEdge(E e)
-    {
+    public boolean removeEdge(E e) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public boolean removeVertex(V v)
-    {
+    public boolean removeVertex(V v) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 
@@ -405,8 +387,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<V> vertexSet()
-    {
+    public Set<V> vertexSet() {
         return new UnmodifiableUnionSet<>(g1.vertexSet(), g2.vertexSet());
     }
 
@@ -414,8 +395,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeSource(E e)
-    {
+    public V getEdgeSource(E e) {
         if (g1.containsEdge(e)) {
             return g1.getEdgeSource(e);
         }
@@ -429,8 +409,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getEdgeTarget(E e)
-    {
+    public V getEdgeTarget(E e) {
         if (g1.containsEdge(e)) {
             return g1.getEdgeTarget(e);
         }
@@ -444,8 +423,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getEdgeWeight(E e)
-    {
+    public double getEdgeWeight(E e) {
         if (g1.containsEdge(e) && g2.containsEdge(e)) {
             return operator.combine(g1.getEdgeWeight(e), g2.getEdgeWeight(e));
         }
@@ -462,8 +440,7 @@ public class AsGraphUnion<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphType getType()
-    {
+    public GraphType getType() {
         return type;
     }
 
@@ -471,8 +448,7 @@ public class AsGraphUnion<V, E>
      * Throws {@link UnsupportedOperationException} since graph union is read-only.
      */
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         throw new UnsupportedOperationException(READ_ONLY);
     }
 }

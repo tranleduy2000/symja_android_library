@@ -17,20 +17,23 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * The greedy coloring algorithm with a random vertex ordering.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
 public class RandomGreedyColoring<V, E>
-    extends
-    GreedyColoring<V, E>
-{
+        extends
+        GreedyColoring<V, E> {
     /*
      * Random number generator
      */
@@ -38,22 +41,20 @@ public class RandomGreedyColoring<V, E>
 
     /**
      * Construct a new coloring algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public RandomGreedyColoring(Graph<V, E> graph)
-    {
+    public RandomGreedyColoring(Graph<V, E> graph) {
         this(graph, new Random());
     }
 
     /**
      * Construct a new coloring algorithm
-     * 
+     *
      * @param graph the input graph
-     * @param rng the random number generator
+     * @param rng   the random number generator
      */
-    public RandomGreedyColoring(Graph<V, E> graph, Random rng)
-    {
+    public RandomGreedyColoring(Graph<V, E> graph, Random rng) {
         super(graph);
         this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
     }
@@ -62,8 +63,7 @@ public class RandomGreedyColoring<V, E>
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<V> getVertexOrdering()
-    {
+    protected Iterable<V> getVertexOrdering() {
         List<V> order = new ArrayList<V>(graph.vertexSet());
         Collections.shuffle(order, rng);
         return order;

@@ -17,18 +17,18 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.AbstractList;
+import java.util.ArrayList;
 
 /**
  * List of paths <code>AbstractPathElement</code> with same target vertex.
- *
  */
 abstract class AbstractPathElementList<V, E, T extends AbstractPathElement<V, E>>
-    extends
-    AbstractList<T>
-{
+        extends
+        AbstractList<T> {
     protected Graph<V, E> graph;
 
     /**
@@ -49,17 +49,15 @@ abstract class AbstractPathElementList<V, E, T extends AbstractPathElement<V, E>
     /**
      * Creates paths obtained by concatenating the specified edge to the specified paths.
      *
-     * @param maxSize maximum number of paths the list is able to store.
+     * @param maxSize     maximum number of paths the list is able to store.
      * @param elementList paths, list of <code>AbstractPathElement</code>.
-     * @param edge edge reaching the end vertex of the created paths.
-     *
-     * @throws NullPointerException if the specified prevPathElementList or edge is
-     *         <code>null</code>.
+     * @param edge        edge reaching the end vertex of the created paths.
+     * @throws NullPointerException     if the specified prevPathElementList or edge is
+     *                                  <code>null</code>.
      * @throws IllegalArgumentException if <code>maxSize</code> is negative or $0$.
      */
     protected AbstractPathElementList(
-        Graph<V, E> graph, int maxSize, AbstractPathElementList<V, E, T> elementList, E edge)
-    {
+            Graph<V, E> graph, int maxSize, AbstractPathElementList<V, E, T> elementList, E edge) {
         if (maxSize <= 0) {
             throw new IllegalArgumentException("maxSize is negative or 0");
         }
@@ -79,14 +77,12 @@ abstract class AbstractPathElementList<V, E, T extends AbstractPathElement<V, E>
      * Creates a list with an empty path. The list size is $1$.
      *
      * @param maxSize maximum number of paths the list is able to store.
-     *
-     * @throws NullPointerException if the specified path-element is <code>
-     * null</code>.
+     * @throws NullPointerException     if the specified path-element is <code>
+     *                                  null</code>.
      * @throws IllegalArgumentException if <code>maxSize</code> is negative or 0.
      * @throws IllegalArgumentException if <code>pathElement</code> is not empty.
      */
-    protected AbstractPathElementList(Graph<V, E> graph, int maxSize, T pathElement)
-    {
+    protected AbstractPathElementList(Graph<V, E> graph, int maxSize, T pathElement) {
         if (maxSize <= 0) {
             throw new IllegalArgumentException("maxSize is negative or 0");
         }
@@ -108,11 +104,9 @@ abstract class AbstractPathElementList<V, E, T extends AbstractPathElement<V, E>
      * Creates an empty list. The list size is $0$.
      *
      * @param maxSize maximum number of paths the list is able to store.
-     *
      * @throws IllegalArgumentException if <code>maxSize</code> is negative or $0$.
      */
-    protected AbstractPathElementList(Graph<V, E> graph, int maxSize, V vertex)
-    {
+    protected AbstractPathElementList(Graph<V, E> graph, int maxSize, V vertex) {
         if (maxSize <= 0) {
             throw new IllegalArgumentException("maxSize is negative or 0");
         }
@@ -126,16 +120,14 @@ abstract class AbstractPathElementList<V, E, T extends AbstractPathElement<V, E>
      * Returns path <code>AbstractPathElement</code> stored at the specified index.
      */
     @Override
-    public T get(int index)
-    {
+    public T get(int index) {
         return this.pathElements.get(index);
     }
 
     /**
      * Returns target vertex.
      */
-    public V getVertex()
-    {
+    public V getVertex() {
         return this.vertex;
     }
 
@@ -143,8 +135,7 @@ abstract class AbstractPathElementList<V, E, T extends AbstractPathElement<V, E>
      * Returns the number of paths stored in the list.
      */
     @Override
-    public int size()
-    {
+    public int size() {
         return this.pathElements.size();
     }
 }

@@ -17,11 +17,19 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.MaximumFlowAlgorithm;
+import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class computes an Equivalent Flow Tree (EFT) using the algorithm proposed by Dan Gusfield.
@@ -60,13 +68,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class GusfieldEquivalentFlowTree<V, E>
-    implements
-    MaximumFlowAlgorithm<V, E>
-{
+        implements
+        MaximumFlowAlgorithm<V, E> {
 
     /* Number of vertices in the graph */
     private final int N;
@@ -87,34 +93,31 @@ public class GusfieldEquivalentFlowTree<V, E>
 
     /**
      * Constructs a new GusfieldEquivalentFlowTree instance.
-     * 
+     *
      * @param network input graph
      */
-    public GusfieldEquivalentFlowTree(Graph<V, E> network)
-    {
+    public GusfieldEquivalentFlowTree(Graph<V, E> network) {
         this(network, MaximumFlowAlgorithmBase.DEFAULT_EPSILON);
     }
 
     /**
      * Constructs a new GusfieldEquivalentFlowTree instance.
-     * 
+     *
      * @param network input graph
      * @param epsilon precision
      */
-    public GusfieldEquivalentFlowTree(Graph<V, E> network, double epsilon)
-    {
+    public GusfieldEquivalentFlowTree(Graph<V, E> network, double epsilon) {
         this(network, new PushRelabelMFImpl<>(network, epsilon));
     }
 
     /**
      * Constructs a new GusfieldEquivalentFlowTree instance.
-     * 
-     * @param network input graph
+     *
+     * @param network               input graph
      * @param minimumSTCutAlgorithm algorithm used to compute the minimum $s-t$ cuts
      */
     public GusfieldEquivalentFlowTree(
-        Graph<V, E> network, MinimumSTCutAlgorithm<V, E> minimumSTCutAlgorithm)
-    {
+            Graph<V, E> network, MinimumSTCutAlgorithm<V, E> minimumSTCutAlgorithm) {
         GraphTests.requireUndirected(network);
         this.N = network.vertexSet().size();
         if (N < 2)
@@ -128,8 +131,7 @@ public class GusfieldEquivalentFlowTree<V, E>
     /**
      * Runs the algorithm
      */
-    private void calculateEquivalentFlowTree()
-    {
+    private void calculateEquivalentFlowTree() {
         flowMatrix = new double[N][N];
         p = new int[N];
         neighbors = new int[N];
@@ -138,9 +140,9 @@ public class GusfieldEquivalentFlowTree<V, E>
             int t = p[s];
             neighbors[s] = t;
             double flowValue =
-                minimumSTCutAlgorithm.calculateMinCut(vertexList.get(s), vertexList.get(t));
+                    minimumSTCutAlgorithm.calculateMinCut(vertexList.get(s), vertexList.get(t));
             Set<V> sourcePartition = minimumSTCutAlgorithm.getSourcePartition(); // Set X in the
-                                                                                 // paper
+            // paper
             for (int i = s; i < N; i++)
                 if (sourcePartition.contains(vertexList.get(i)) && p[i] == t)
                     p[i] = s;
@@ -150,7 +152,7 @@ public class GusfieldEquivalentFlowTree<V, E>
             for (int i = 0; i < s; i++)
                 if (i != t)
                     flowMatrix[s][i] =
-                        flowMatrix[i][s] = Math.min(flowMatrix[s][t], flowMatrix[t][i]);
+                            flowMatrix[i][s] = Math.min(flowMatrix[s][t], flowMatrix[t][i]);
         }
     }
 
@@ -158,19 +160,18 @@ public class GusfieldEquivalentFlowTree<V, E>
      * Returns the Equivalent Flow Tree as an actual tree (graph). Note that this tree is not
      * necessarily unique. The edge weights represent the flow values/cut weights. This method runs
      * in $O(n)$ time
-     * 
+     *
      * @return Equivalent Flow Tree
      */
-    public SimpleWeightedGraph<V, DefaultWeightedEdge> getEquivalentFlowTree()
-    {
+    public SimpleWeightedGraph<V, DefaultWeightedEdge> getEquivalentFlowTree() {
         if (p == null) // Lazy invocation of the algorithm
             this.calculateEquivalentFlowTree();
         SimpleWeightedGraph<V, DefaultWeightedEdge> equivalentFlowTree =
-            new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+                new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
         Graphs.addAllVertices(equivalentFlowTree, vertexList);
         for (int i = 1; i < N; i++) {
             DefaultWeightedEdge e =
-                equivalentFlowTree.addEdge(vertexList.get(i), vertexList.get(neighbors[i]));
+                    equivalentFlowTree.addEdge(vertexList.get(i), vertexList.get(neighbors[i]));
             equivalentFlowTree.setEdgeWeight(e, flowMatrix[i][neighbors[i]]);
         }
         return equivalentFlowTree;
@@ -178,30 +179,27 @@ public class GusfieldEquivalentFlowTree<V, E>
 
     /**
      * Unsupported operation
-     * 
-     * @param source source of the flow inside the network
-     * @param sink sink of the flow inside the network
      *
+     * @param source source of the flow inside the network
+     * @param sink   sink of the flow inside the network
      * @return nothing
      */
     @Override
-    public MaximumFlow<E> getMaximumFlow(V source, V sink)
-    {
+    public MaximumFlow<E> getMaximumFlow(V source, V sink) {
         throw new UnsupportedOperationException(
-            "Flows calculated via Equivalent Flow trees only provide a maximum flow value, not the exact flow per edge/arc.");
+                "Flows calculated via Equivalent Flow trees only provide a maximum flow value, not the exact flow per edge/arc.");
     }
 
     /**
      * Returns the Maximum flow between source and sink. The algorithm is only executed once;
      * successive invocations of this method will return in $O(1)$ time.
-     * 
+     *
      * @param source source vertex
-     * @param sink sink vertex
+     * @param sink   sink vertex
      * @return the Maximum flow between source and sink.
      */
     @Override
-    public double getMaximumFlowValue(V source, V sink)
-    {
+    public double getMaximumFlowValue(V source, V sink) {
         assert indexMap.containsKey(source) && indexMap.containsKey(sink);
 
         lastInvokedSource = source;
@@ -214,27 +212,25 @@ public class GusfieldEquivalentFlowTree<V, E>
 
     /**
      * Unsupported operation
-     * 
+     *
      * @return nothing
      */
     @Override
-    public Map<E, Double> getFlowMap()
-    {
+    public Map<E, Double> getFlowMap() {
         throw new UnsupportedOperationException(
-            "Flows calculated via Equivalent Flow trees only provide a maximum flow value, not the exact flow per edge/arc.");
+                "Flows calculated via Equivalent Flow trees only provide a maximum flow value, not the exact flow per edge/arc.");
     }
 
     /**
      * Unsupported operation
-     * 
+     *
      * @param e edge
      * @return nothing
      */
     @Override
-    public V getFlowDirection(E e)
-    {
+    public V getFlowDirection(E e) {
         throw new UnsupportedOperationException(
-            "Flows calculated via Equivalent Flow trees only provide a maximum flow value, not the exact flow per edge/arc.");
+                "Flows calculated via Equivalent Flow trees only provide a maximum flow value, not the exact flow per edge/arc.");
     }
 
 }

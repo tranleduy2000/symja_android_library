@@ -28,49 +28,44 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Bron-Kerbosch maximal clique enumeration algorithm.
- * 
+ *
  * <p>
  * Implementation of the Bron-Kerbosch clique enumeration algorithm as described in:
  * <ul>
  * <li>R. Samudrala and J. Moult. A graph-theoretic algorithm for comparative modeling of protein
  * structure. Journal of Molecular Biology, 279(1):287--302, 1998.</li>
  * </ul>
- * 
+ *
  * <p>
  * The algorithm first computes all maximal cliques and then returns the result to the user. A
  * timeout can be set using the constructor parameters.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
+ * @author Ewgenij Proschak
  * @see PivotBronKerboschCliqueFinder
  * @see DegeneracyBronKerboschCliqueFinder
- *
- * @author Ewgenij Proschak
  */
 public class BronKerboschCliqueFinder<V, E>
-    extends
-    BaseBronKerboschCliqueFinder<V, E>
-{
+        extends
+        BaseBronKerboschCliqueFinder<V, E> {
     /**
      * Constructs a new clique finder.
      *
      * @param graph the input graph; must be simple
      */
-    public BronKerboschCliqueFinder(Graph<V, E> graph)
-    {
+    public BronKerboschCliqueFinder(Graph<V, E> graph) {
         this(graph, 0L, TimeUnit.SECONDS);
     }
 
     /**
      * Constructs a new clique finder.
      *
-     * @param graph the input graph; must be simple
+     * @param graph   the input graph; must be simple
      * @param timeout the maximum time to wait, if zero no timeout
-     * @param unit the time unit of the timeout argument
+     * @param unit    the time unit of the timeout argument
      */
-    public BronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit)
-    {
+    public BronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit) {
         super(graph, timeout, unit);
     }
 
@@ -78,8 +73,7 @@ public class BronKerboschCliqueFinder<V, E>
      * Lazily execute the enumeration algorithm.
      */
     @Override
-    protected void lazyRun()
-    {
+    protected void lazyRun() {
         if (allMaximalCliques == null) {
             if (!GraphTests.isSimple(graph)) {
                 throw new IllegalArgumentException("Graph must be simple");
@@ -94,15 +88,14 @@ public class BronKerboschCliqueFinder<V, E>
             }
 
             findCliques(
-                new ArrayList<V>(), new ArrayList<>(graph.vertexSet()), new ArrayList<V>(),
-                nanosTimeLimit);
+                    new ArrayList<V>(), new ArrayList<>(graph.vertexSet()), new ArrayList<V>(),
+                    nanosTimeLimit);
         }
     }
 
     private void findCliques(
-        List<V> potentialClique, List<V> candidates, List<V> alreadyFound,
-        final long nanosTimeLimit)
-    {
+            List<V> potentialClique, List<V> candidates, List<V> alreadyFound,
+            final long nanosTimeLimit) {
         /*
          * Termination condition: check if any already found node is connected to all candidate
          * nodes.

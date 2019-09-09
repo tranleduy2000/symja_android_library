@@ -17,18 +17,17 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Interface for flow algorithms
  *
- * @author Joris Kinable
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Joris Kinable
  */
-public interface FlowAlgorithm<V, E>
-{
+public interface FlowAlgorithm<V, E> {
 
 //    /**
 //     * Result object of a flow algorithm
@@ -64,8 +63,7 @@ public interface FlowAlgorithm<V, E>
      *
      * @param <E> graph edge type
      */
-    interface Flow<E>
-    {
+    interface Flow<E> {
         /**
          * Returns the flow on the {@code edge}
          *
@@ -90,9 +88,8 @@ public interface FlowAlgorithm<V, E>
      * @param <E> graph edge type
      */
     class FlowImpl<E>
-        implements
-        Flow<E>
-    {
+            implements
+            Flow<E> {
         /**
          * A mapping defining the flow on the network
          */
@@ -103,8 +100,7 @@ public interface FlowAlgorithm<V, E>
          *
          * @param flowMap the mapping defining the flow on the network
          */
-        public FlowImpl(Map<E, Double> flowMap)
-        {
+        public FlowImpl(Map<E, Double> flowMap) {
             this.flowMap = Collections.unmodifiableMap(flowMap);
         }
 
@@ -117,8 +113,7 @@ public interface FlowAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Map<E, Double> getFlowMap()
-        {
+        public Map<E, Double> getFlowMap() {
             return flowMap;
         }
     }

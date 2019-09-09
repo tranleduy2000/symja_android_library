@@ -25,7 +25,6 @@ package org.jgrapht.alg.util.extension;
  * is the original class, than a(b) would be its extension. This concept is similar to java's
  * extension where one class is derived from (extends) another class (original).
  */
-public interface Extension
-{
+public interface Extension {
 
 }

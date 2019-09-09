@@ -17,13 +17,20 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.matching.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
+import org.jgrapht.alg.matching.EdmondsMaximumCardinalityMatching;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.AsWeightedGraph;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 import static org.jgrapht.alg.matching.blossom.v5.BlossomVOptions.DualUpdateStrategy.MULTIPLE_TREE_CONNECTED_COMPONENTS;
@@ -86,40 +93,40 @@ import static org.jgrapht.alg.matching.blossom.v5.ObjectiveSense.MINIMIZE;
  * the set of all subsets of $V$ of odd cardinality containing at least 3 vertices, and $\delta(S),
  * S \subset V$ be the set of boundary edges of $V$. Then <b>minimum</b> weight perfect matching
  * problem has the following linear programming formulation:
- *
+ * <p>
  * \[ \begin{align} \mbox{minimize} \qquad &amp; \sum_{e\in E}c_e \cdot x_e &amp;\\ s.t. \qquad
  * &amp; \sum_{e\in \delta^(i)} x_e = 1 &amp; \forall i\in V\\ &amp; \sum_{e\in \delta(S)}x_e \ge 1
  * &amp; \forall S\in \mathcal{O} \\ &amp; x_e \ge 0 &amp; \forall e\in E \end{align}\] The
  * corresponding dual linear program has the following form:
- *
+ * <p>
  * \[ \begin{align} \mbox{maximize} \qquad &amp; \sum_{x \in V}y_e &amp;\\ s.t. \qquad &amp; y_u +
  * y_v + \sum_{S\in \mathcal{O}: e \in \delta(S)}y_S \le c_e &amp; \forall\ e = \{u, v\}\in E\\
  * &amp; x_S \ge 0 &amp; \forall S\in \mathcal{O} \end{align} \] Let's use the following notation:
  * $slack(e) = c_e - y_u - y_v - \sum_{S\in \mathcal{O}: e \in \delta(S)}y_S$. Complementary
  * slackness conditions have the following form:
- *
+ * <p>
  * \[ \begin{align} slack(e) &gt; 0 &amp;\Rightarrow x_e = 0 \\ y_S &gt; 0 &amp;\Rightarrow
  * \sum_{e\in \delta(S)}x_e = 1 \end{align} \] Therefore, the slacks of all edges will be
  * non-negative and the slacks of matched edges will be $0$.
  * <p>
  * The <b>maximum</b> weight perfect matching problem has the following linear programming
  * formulation:
- *
+ * <p>
  * \[ \begin{align} \mbox{maximize} \qquad &amp; \sum_{e\in E}c_e \cdot x_e &amp;\\ s.t. \qquad
  * &amp;\sum_{e\in \delta^(i)} x_e = 1 &amp; \forall i\in V\\ &amp; \sum_{e\in \delta(S)}x_e \ge 1
  * &amp; \forall S\in \mathcal{O} \\ &amp; x_e \ge 0 &amp; \forall e\in E \end{align} \]
- *
+ * <p>
  * The corresponding dual linear program has the following form:
- *
+ * <p>
  * \[ \begin{align} \mbox{minimize} \qquad &amp; \sum_{x \in V}y_e &amp;\\ s.t. \qquad &amp; y_u +
  * y_v + \sum_{S\in \mathcal{O}: e \in \delta(S)}y_S \ge c_e &amp; \forall\ e = \{u, v\}\in E\\
  * &amp; x_S \le 0 &amp; \forall S\in \mathcal{O} \end{align} \]
- *
+ * <p>
  * Complementary slackness conditions have the following form:
- *
+ * <p>
  * \[ \begin{align} slack(e) &lt; 0 &amp;\Rightarrow x_e = 0 \\ y_S &lt; 0 &amp;\Rightarrow
  * \sum_{e\in \delta(S)}x_e = 1 \end{align} \]
- *
+ * <p>
  * Therefore, the slacks of all edges will be non-positive and the slacks of matched edges will be
  * $0$.
  * <p>
@@ -139,9 +146,8 @@ import static org.jgrapht.alg.matching.blossom.v5.ObjectiveSense.MINIMIZE;
  * @see BlossomVDualUpdater
  */
 public class KolmogorovWeightedPerfectMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
     /**
      * Default epsilon used in the algorithm
      */
@@ -210,8 +216,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @param graph the graph for which to find a weighted perfect matching
      */
-    public KolmogorovWeightedPerfectMatching(Graph<V, E> graph)
-    {
+    public KolmogorovWeightedPerfectMatching(Graph<V, E> graph) {
         this(graph, DEFAULT_OPTIONS, MINIMIZE);
     }
 
@@ -220,11 +225,10 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * constructed algorithm is to maximize or minimize the weight of the resulting perfect matching
      * depending on the {@code maximize} parameter.
      *
-     * @param graph the graph for which to find a weighted perfect matching
+     * @param graph          the graph for which to find a weighted perfect matching
      * @param objectiveSense objective sense of the algorithm
      */
-    public KolmogorovWeightedPerfectMatching(Graph<V, E> graph, ObjectiveSense objectiveSense)
-    {
+    public KolmogorovWeightedPerfectMatching(Graph<V, E> graph, ObjectiveSense objectiveSense) {
         this(graph, DEFAULT_OPTIONS, objectiveSense);
     }
 
@@ -232,12 +236,11 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * Constructs a new instance of the algorithm with the specified {@code options}. The objective
      * sense of the constructed algorithm is to minimize the weight of the resulting matching
      *
-     * @param graph the graph for which to find a weighted perfect matching
+     * @param graph   the graph for which to find a weighted perfect matching
      * @param options the options which define the strategies for the initialization and dual
-     *        updates
+     *                updates
      */
-    public KolmogorovWeightedPerfectMatching(Graph<V, E> graph, BlossomVOptions options)
-    {
+    public KolmogorovWeightedPerfectMatching(Graph<V, E> graph, BlossomVOptions options) {
         this(graph, options, MINIMIZE);
     }
 
@@ -246,14 +249,13 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * the constructed algorithm is to maximize or minimize the weight of the resulting perfect
      * matching depending on the {@code maximize} parameter.
      *
-     * @param graph the graph for which to find a weighted perfect matching
-     * @param options the options which define the strategies for the initialization and dual
-     *        updates
+     * @param graph          the graph for which to find a weighted perfect matching
+     * @param options        the options which define the strategies for the initialization and dual
+     *                       updates
      * @param objectiveSense objective sense of the algorithm
      */
     public KolmogorovWeightedPerfectMatching(
-            final Graph<V, E> graph, BlossomVOptions options, ObjectiveSense objectiveSense)
-    {
+            final Graph<V, E> graph, BlossomVOptions options, ObjectiveSense objectiveSense) {
         Objects.requireNonNull(graph);
         this.objectiveSense = objectiveSense;
         if ((graph.vertexSet().size() & 1) == 1) {
@@ -279,8 +281,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * @return a weighted perfect matching for the {@code graph}
      */
     @Override
-    public MatchingAlgorithm.Matching<V, E> getMatching()
-    {
+    public MatchingAlgorithm.Matching<V, E> getMatching() {
         if (matching == null) {
             lazyComputeWeightedPerfectMatching();
         }
@@ -293,8 +294,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @return the solution to the dual linear program formulated on the {@code graph}
      */
-    public DualSolution<V, E> getDualSolution()
-    {
+    public DualSolution<V, E> getDualSolution() {
         dualSolution = lazyComputeDualSolution();
         return dualSolution;
     }
@@ -311,11 +311,10 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * bug.
      *
      * @return true iff the assigned dual variables satisfy the dual linear program formulation AND
-     *         complementary slackness conditions are also satisfied. The total error must not
-     *         exceed EPS
+     * complementary slackness conditions are also satisfied. The total error must not
+     * exceed EPS
      */
-    public boolean testOptimality()
-    {
+    public boolean testOptimality() {
         lazyComputeWeightedPerfectMatching();
         return getError() < EPS; // getError() won't return -1 since matching != null
     }
@@ -330,8 +329,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @return the total numeric error
      */
-    public double getError()
-    {
+    public double getError() {
         lazyComputeWeightedPerfectMatching();
         double error = testNonNegativity();
         Set<E> matchedEdges = matching.getEdges();
@@ -361,8 +359,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
     /**
      * Lazily runs the algorithm on the specified graph.
      */
-    private void lazyComputeWeightedPerfectMatching()
-    {
+    private void lazyComputeWeightedPerfectMatching() {
         if (matching != null) {
             return;
         }
@@ -378,8 +375,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
             int cycleTreeNum = state.treeNum;
 
             for (BlossomVNode currentRoot = state.nodes[state.nodeNum].treeSiblingNext;
-                currentRoot != null;)
-            {
+                 currentRoot != null; ) {
                 // initialize variables
                 BlossomVNode nextRoot = currentRoot.treeSiblingNext;
                 BlossomVNode nextNextRoot = null;
@@ -406,7 +402,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
                     if (DEBUG) {
                         printState();
                         System.out.println(
-                            "Current tree is " + tree + ", current root is " + currentRoot);
+                                "Current tree is " + tree + ", current root is " + currentRoot);
                     }
 
                     if (!tree.plusInfinityEdges.isEmpty()) {
@@ -469,8 +465,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
                 break;
             }
             if (cycleTreeNum == state.treeNum
-                && dualUpdater.updateDuals(options.dualUpdateStrategy) <= 0)
-            {
+                    && dualUpdater.updateDuals(options.dualUpdateStrategy) <= 0) {
                 dualUpdater.updateDuals(MULTIPLE_TREE_CONNECTED_COMPONENTS);
             }
         }
@@ -483,11 +478,9 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @param tree the tree whose adjacent trees' variables are modified
      */
-    private void setCurrentEdgesAndTryToAugment(BlossomVTree tree)
-    {
+    private void setCurrentEdgesAndTryToAugment(BlossomVTree tree) {
         for (BlossomVTree.TreeEdgeIterator iterator = tree.treeEdgeIterator();
-            iterator.hasNext();)
-        {
+             iterator.hasNext(); ) {
             BlossomVTreeEdge treeEdge = iterator.next();
             BlossomVTree opposite = treeEdge.head[iterator.getCurrentDirection()];
 
@@ -512,8 +505,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @return true iff the condition described above holds
      */
-    private double testNonNegativity()
-    {
+    private double testNonNegativity() {
         BlossomVNode[] nodes = state.nodes;
         double error = 0;
         for (int i = 0; i < state.nodeNum; i++) {
@@ -535,11 +527,10 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * Computes the sum of all duals from {@code start} inclusive to {@code end} inclusive
      *
      * @param start the node to start from
-     * @param end the node to end with
+     * @param end   the node to end with
      * @return the sum = start.dual + start.blossomParent.dual + ... + end.dual
      */
-    private double totalDual(BlossomVNode start, BlossomVNode end)
-    {
+    private double totalDual(BlossomVNode start, BlossomVNode end) {
         if (end == start) {
             return start.getTrueDual();
         } else {
@@ -563,9 +554,8 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * @param b the other vertex whose lca is to be found
      * @return either an lca blossom of {@code a} and {@code b} or their outermost blossoms
      */
-    private Pair<BlossomVNode, BlossomVNode> lca(BlossomVNode a, BlossomVNode b)
-    {
-        BlossomVNode[] branches = new BlossomVNode[] { a, b };
+    private Pair<BlossomVNode, BlossomVNode> lca(BlossomVNode a, BlossomVNode b) {
+        BlossomVNode[] branches = new BlossomVNode[]{a, b};
         int dir = 0;
         Pair<BlossomVNode, BlossomVNode> result;
         while (true) {
@@ -583,7 +573,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
                     result = new Pair<>(jumpNode, jumpNode);
                 } else {
                     result = dir == 0 ? new Pair<>(branches[dir], jumpNode)
-                        : new Pair<>(jumpNode, branches[dir]);
+                            : new Pair<>(jumpNode, branches[dir]);
                 }
                 break;
             }
@@ -601,8 +591,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @param node the node to start from
      */
-    private void clearMarked(BlossomVNode node)
-    {
+    private void clearMarked(BlossomVNode node) {
         do {
             node.isMarked = false;
             node = node.blossomParent;
@@ -612,8 +601,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
     /**
      * Clears the marking of all nodes and pseudonodes
      */
-    private void clearMarked()
-    {
+    private void clearMarked() {
         BlossomVNode[] nodes = state.nodes;
         for (int i = 0; i < state.nodeNum; i++) {
             BlossomVNode current = nodes[i];
@@ -642,8 +630,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * pseudonode to the set of nodes that are contracted in it. This map is needed to construct a
      * dual solution after the matching in the graph becomes valid.
      */
-    private void finish()
-    {
+    private void finish() {
         if (DEBUG) {
             System.out.println("Finishing matching");
         }
@@ -669,7 +656,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
                     BlossomVNode blossomRoot = blossom.matched.getCurrentOriginal(blossom);
                     if (blossomRoot == null) {
                         blossomRoot = blossom.matched.head[0].isProcessed
-                            ? blossom.matched.headOriginal[1] : blossom.matched.headOriginal[0];
+                                ? blossom.matched.headOriginal[1] : blossom.matched.headOriginal[0];
                     }
                     while (blossomRoot.blossomParent != blossom) {
                         blossomRoot = blossomRoot.blossomParent;
@@ -719,8 +706,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * Sets the blossomGrandparent references so that from a pseudonode we can make one step down to
      * some node that belongs to that pseudonode
      */
-    private void prepareForDualSolution()
-    {
+    private void prepareForDualSolution() {
         BlossomVNode[] nodes = state.nodes;
         for (int i = 0; i < state.nodeNum; i++) {
             BlossomVNode current = nodes[i];
@@ -740,11 +726,10 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * value into the {@code blossomNodes}. If {@code node} contains other pseudonodes which haven't
      * been processed already, recursively computes the same set for them.
      *
-     * @param pseudonode the pseudonode whose contracted nodes are computed
+     * @param pseudonode   the pseudonode whose contracted nodes are computed
      * @param blossomNodes the mapping from pseudonodes to the original nodes contained in them
      */
-    private Set<V> getBlossomNodes(BlossomVNode pseudonode, Map<BlossomVNode, Set<V>> blossomNodes)
-    {
+    private Set<V> getBlossomNodes(BlossomVNode pseudonode, Map<BlossomVNode, Set<V>> blossomNodes) {
         if (blossomNodes.containsKey(pseudonode)) {
             return blossomNodes.get(pseudonode);
         }
@@ -772,8 +757,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @return the solution to the dual linear program
      */
-    private DualSolution<V, E> lazyComputeDualSolution()
-    {
+    private DualSolution<V, E> lazyComputeDualSolution() {
         lazyComputeWeightedPerfectMatching();
         if (dualSolution != null) {
             return dualSolution;
@@ -799,7 +783,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
                         dualMap.put(getBlossomNodes(current, nodesInBlossoms), dual);
                     } else {
                         dualMap
-                            .put(Collections.singleton(state.graphVertices.get(current.pos)), dual);
+                                .put(Collections.singleton(state.graphVertices.get(current.pos)), dual);
                     }
                 }
                 current.isMarked = true;
@@ -816,8 +800,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
     /**
      * Prints the state of the algorithm. This is a debug method.
      */
-    private void printState()
-    {
+    private void printState() {
         BlossomVNode[] nodes = state.nodes;
         BlossomVEdge[] edges = state.edges;
         System.out.println();
@@ -850,12 +833,10 @@ public class KolmogorovWeightedPerfectMatching<V, E>
     /**
      * Debug method
      */
-    private void printTrees()
-    {
+    private void printTrees() {
         System.out.println("Printing trees");
         for (BlossomVNode root = state.nodes[state.nodeNum].treeSiblingNext; root != null;
-            root = root.treeSiblingNext)
-        {
+             root = root.treeSiblingNext) {
             BlossomVTree tree = root.tree;
             System.out.println(tree);
         }
@@ -864,8 +845,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
     /**
      * Debug method
      */
-    private void printMap()
-    {
+    private void printMap() {
         System.out.println(state.nodeNum + " " + state.edgeNum);
         for (int i = 0; i < state.nodeNum; i++) {
             System.out.println(state.graphVertices.get(i) + " -> " + state.nodes[i]);
@@ -877,8 +857,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      *
      * @return the statistics describing the algorithms characteristics
      */
-    public Statistics getStatistics()
-    {
+    public Statistics getStatistics() {
         return state.statistics;
     }
 
@@ -886,8 +865,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * Describes the performance characteristics of the algorithm and numeric data about the number
      * of performed dual operations during the main phase of the algorithm
      */
-    public static class Statistics
-    {
+    public static class Statistics {
         /**
          * Number of shrink operations
          */
@@ -925,74 +903,65 @@ public class KolmogorovWeightedPerfectMatching<V, E>
         /**
          * @return the number of shrink operations
          */
-        public int getShrinkNum()
-        {
+        public int getShrinkNum() {
             return shrinkNum;
         }
 
         /**
          * @return the number of expand operations
          */
-        public int getExpandNum()
-        {
+        public int getExpandNum() {
             return expandNum;
         }
 
         /**
          * @return the number of grow operations
          */
-        public int getGrowNum()
-        {
+        public int getGrowNum() {
             return growNum;
         }
 
         /**
          * @return the time spent during the augment operation in nanoseconds
          */
-        public long getAugmentTime()
-        {
+        public long getAugmentTime() {
             return augmentTime;
         }
 
         /**
          * @return the time spent during the expand operation in nanoseconds
          */
-        public long getExpandTime()
-        {
+        public long getExpandTime() {
             return expandTime;
         }
 
         /**
          * @return the time spent during the shrink operation in nanoseconds
          */
-        public long getShrinkTime()
-        {
+        public long getShrinkTime() {
             return shrinkTime;
         }
 
         /**
          * @return the time spent during the grow operation in nanoseconds
          */
-        public long getGrowTime()
-        {
+        public long getGrowTime() {
             return growTime;
         }
 
         /**
          * @return the time spent during the dual update phase (either single tree or global) in
-         *         nanoseconds
+         * nanoseconds
          */
-        public long getDualUpdatesTime()
-        {
+        public long getDualUpdatesTime() {
             return dualUpdatesTime;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Statistics{shrinkNum=" + shrinkNum + ", expandNum=" + expandNum + ", growNum="
-                + growNum + ", augmentTime=" + augmentTime + ", expandTime=" + expandTime
-                + ", shrinkTime=" + shrinkTime + ", growTime=" + growTime + '}';
+                    + growNum + ", augmentTime=" + augmentTime + ", expandTime=" + expandTime
+                    + ", shrinkTime=" + shrinkTime + ", growTime=" + growTime + '}';
         }
     }
 
@@ -1002,8 +971,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
      */
-    public static class DualSolution<V, E>
-    {
+    public static class DualSolution<V, E> {
         /**
          * The graph on which both primal and dual linear programs are formulated
          */
@@ -1018,12 +986,11 @@ public class KolmogorovWeightedPerfectMatching<V, E>
         /**
          * Constructs a new solution for the dual linear program
          *
-         * @param graph the graph on which the linear program is formulated
+         * @param graph         the graph on which the linear program is formulated
          * @param dualVariables the mapping from sets of vertices of odd cardinality to their dual
-         *        variables
+         *                      variables
          */
-        public DualSolution(Graph<V, E> graph, Map<Set<V>, Double> dualVariables)
-        {
+        public DualSolution(Graph<V, E> graph, Map<Set<V>, Double> dualVariables) {
             this.graph = graph;
             this.dualVariables = dualVariables;
         }
@@ -1031,8 +998,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
         /**
          * @return the graph on which the linear program is formulated
          */
-        public Graph<V, E> getGraph()
-        {
+        public Graph<V, E> getGraph() {
             return graph;
         }
 
@@ -1042,14 +1008,12 @@ public class KolmogorovWeightedPerfectMatching<V, E>
          *
          * @return the mapping from sets of vertices of odd cardinality to their dual variables
          */
-        public Map<Set<V>, Double> getDualVariables()
-        {
+        public Map<Set<V>, Double> getDualVariables() {
             return dualVariables;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             final StringBuilder sb = new StringBuilder("DualSolution{");
             sb.append("graph=").append(graph);
             sb.append(", dualVariables=").append(dualVariables);

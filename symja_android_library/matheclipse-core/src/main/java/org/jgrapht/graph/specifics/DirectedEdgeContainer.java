@@ -17,10 +17,11 @@
  */
 package org.jgrapht.graph.specifics;
 
-import org.jgrapht.graph.*;
+import org.jgrapht.graph.EdgeSetFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * A container for vertex edges.
@@ -28,24 +29,21 @@ import java.util.*;
  * <p>
  * In this edge container we use array lists to minimize memory toll. However, for high-degree
  * vertices we replace the entire edge container with a direct access subclass (to be implemented).
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
 public class DirectedEdgeContainer<V, E>
-    implements
-    Serializable
-{
+        implements
+        Serializable {
     private static final long serialVersionUID = 7494242245729767106L;
     Set<E> incoming;
     Set<E> outgoing;
     private transient Set<E> unmodifiableIncoming = null;
     private transient Set<E> unmodifiableOutgoing = null;
 
-    DirectedEdgeContainer(EdgeSetFactory<V, E> edgeSetFactory, V vertex)
-    {
+    DirectedEdgeContainer(EdgeSetFactory<V, E> edgeSetFactory, V vertex) {
         incoming = edgeSetFactory.createEdgeSet(vertex);
         outgoing = edgeSetFactory.createEdgeSet(vertex);
     }
@@ -55,8 +53,7 @@ public class DirectedEdgeContainer<V, E>
      *
      * @return an unmodifiable version of the incoming edge set
      */
-    public Set<E> getUnmodifiableIncomingEdges()
-    {
+    public Set<E> getUnmodifiableIncomingEdges() {
         if (unmodifiableIncoming == null) {
             unmodifiableIncoming = Collections.unmodifiableSet(incoming);
         }
@@ -69,8 +66,7 @@ public class DirectedEdgeContainer<V, E>
      *
      * @return an unmodifiable version of the outgoing edge set
      */
-    public Set<E> getUnmodifiableOutgoingEdges()
-    {
+    public Set<E> getUnmodifiableOutgoingEdges() {
         if (unmodifiableOutgoing == null) {
             unmodifiableOutgoing = Collections.unmodifiableSet(outgoing);
         }
@@ -83,8 +79,7 @@ public class DirectedEdgeContainer<V, E>
      *
      * @param e the edge to add
      */
-    public void addIncomingEdge(E e)
-    {
+    public void addIncomingEdge(E e) {
         incoming.add(e);
     }
 
@@ -93,8 +88,7 @@ public class DirectedEdgeContainer<V, E>
      *
      * @param e the edge to add
      */
-    public void addOutgoingEdge(E e)
-    {
+    public void addOutgoingEdge(E e) {
         outgoing.add(e);
     }
 
@@ -103,8 +97,7 @@ public class DirectedEdgeContainer<V, E>
      *
      * @param e the edge to remove
      */
-    public void removeIncomingEdge(E e)
-    {
+    public void removeIncomingEdge(E e) {
         incoming.remove(e);
     }
 
@@ -113,8 +106,7 @@ public class DirectedEdgeContainer<V, E>
      *
      * @param e the edge to remove
      */
-    public void removeOutgoingEdge(E e)
-    {
+    public void removeOutgoingEdge(E e) {
         outgoing.remove(e);
     }
 }

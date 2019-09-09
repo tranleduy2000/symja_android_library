@@ -17,10 +17,13 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of the Eppstein`s algorithm for finding $k$ shortest path between two vertices in
@@ -45,9 +48,8 @@ import java.util.*;
  * @see EppsteinShortestPathIterator
  */
 public class EppsteinKShortestPath<V, E>
-    implements
-    KShortestPathAlgorithm<V, E>
-{
+        implements
+        KShortestPathAlgorithm<V, E> {
     /**
      * Underlying graph.
      */
@@ -58,8 +60,7 @@ public class EppsteinKShortestPath<V, E>
      *
      * @param graph graph
      */
-    public EppsteinKShortestPath(Graph<V, E> graph)
-    {
+    public EppsteinKShortestPath(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null!");
     }
 
@@ -69,19 +70,18 @@ public class EppsteinKShortestPath<V, E>
      * produced in sorted order by weights.
      *
      * @param source the source vertex
-     * @param sink the target vertex
-     * @param k the number of shortest paths to return
+     * @param sink   the target vertex
+     * @param k      the number of shortest paths to return
      * @return a list of k shortest paths
      */
     @Override
-    public List<GraphPath<V, E>> getPaths(V source, V sink, int k)
-    {
+    public List<GraphPath<V, E>> getPaths(V source, V sink, int k) {
         if (k < 0) {
             throw new IllegalArgumentException("k must be non-negative");
         }
         List<GraphPath<V, E>> result = new ArrayList<>();
         EppsteinShortestPathIterator<V, E> iterator =
-            new EppsteinShortestPathIterator<>(graph, source, sink);
+                new EppsteinShortestPathIterator<>(graph, source, sink);
         for (int i = 0; i < k && iterator.hasNext(); i++) {
             result.add(iterator.next());
         }

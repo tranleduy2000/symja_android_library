@@ -17,14 +17,20 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The smallest degree last greedy coloring algorithm.
- * 
+ *
  * <p>
  * This is the greedy coloring algorithm with the smallest-last ordering of the vertices. The basic
  * idea is as follows: Assuming that vertices $v_{k+1}, \dotso, v_n$ have been already selected,
@@ -34,24 +40,21 @@ import java.util.*;
  * <li>D. Matula, G. Marble, and J. Isaacson. Graph coloring algorithms in Graph Theory and
  * Computing. Academic Press, 104--122, 1972.</li>
  * </ul>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Michael Behrisch
  * @author Dimitrios Michail
  */
 public class SmallestDegreeLastColoring<V, E>
-    extends
-    GreedyColoring<V, E>
-{
+        extends
+        GreedyColoring<V, E> {
     /**
      * Construct a new coloring algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public SmallestDegreeLastColoring(Graph<V, E> graph)
-    {
+    public SmallestDegreeLastColoring(Graph<V, E> graph) {
         super(graph);
     }
 
@@ -60,8 +63,7 @@ public class SmallestDegreeLastColoring<V, E>
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected Iterable<V> getVertexOrdering()
-    {
+    protected Iterable<V> getVertexOrdering() {
         // compute degrees and maximum degree
         int n = graph.vertexSet().size();
         int maxDegree = 0;

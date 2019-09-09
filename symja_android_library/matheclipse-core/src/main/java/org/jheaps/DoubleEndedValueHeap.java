@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,11 +22,8 @@ import java.util.NoSuchElementException;
 /**
  * A double-ended heap with values.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public interface DoubleEndedValueHeap<K, V> extends DoubleEndedHeap<K> {
@@ -34,10 +31,8 @@ public interface DoubleEndedValueHeap<K, V> extends DoubleEndedHeap<K> {
     /**
      * Insert an element into the heap.
      *
-     * @param key
-     *            the key to insert
-     * @param value
-     *            the value to insert
+     * @param key   the key to insert
+     * @param value the value to insert
      */
     void insert(K key, V value);
 
@@ -45,8 +40,7 @@ public interface DoubleEndedValueHeap<K, V> extends DoubleEndedHeap<K> {
      * Find the value of an element with the minimum key.
      *
      * @return the value of an element with the minimum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     V findMinValue();
 
@@ -54,8 +48,7 @@ public interface DoubleEndedValueHeap<K, V> extends DoubleEndedHeap<K> {
      * Find the value of an element with the maximum key.
      *
      * @return the value of an element with the maximum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     V findMaxValue();
 

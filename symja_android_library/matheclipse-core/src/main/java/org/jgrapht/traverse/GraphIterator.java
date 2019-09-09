@@ -17,27 +17,25 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.event.*;
+import org.jgrapht.event.TraversalListener;
 
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * A graph iterator.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
 public interface GraphIterator<V, E>
-    extends
-    Iterator<V>
-{
+        extends
+        Iterator<V> {
     /**
      * Test whether this iterator is set to traverse the graph across connected components.
      *
      * @return <code>true</code> if traverses across connected components, otherwise
-     *         <code>false</code>.
+     * <code>false</code>.
      */
     boolean isCrossComponentTraversal();
 
@@ -58,7 +56,7 @@ public interface GraphIterator<V, E>
      * should be used with care, especially in multithreaded environment.
      *
      * @param reuseEvents whether to reuse previously fired event objects instead of creating a new
-     *        event object for each event.
+     *                    event object for each event.
      */
     void setReuseEvents(boolean reuseEvents);
 
@@ -78,7 +76,7 @@ public interface GraphIterator<V, E>
 
     /**
      * Unsupported.
-     * 
+     *
      * @throws UnsupportedOperationException always since operation is not supported
      */
     @Override

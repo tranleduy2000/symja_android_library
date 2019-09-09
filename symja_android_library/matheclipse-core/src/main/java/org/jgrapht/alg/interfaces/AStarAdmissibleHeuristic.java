@@ -17,7 +17,7 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
 /**
  * Interface for an admissible heuristic used in A* search.
@@ -27,8 +27,7 @@ import org.jgrapht.*;
  * @author Jon Robison
  * @author Thomas Breitbart
  */
-public interface AStarAdmissibleHeuristic<V>
-{
+public interface AStarAdmissibleHeuristic<V> {
     /**
      * An admissible "heuristic estimate" of the distance from $x$, the sourceVertex, to the goal
      * (usually denoted $h(x)$). This is the good guess function which must never overestimate the
@@ -52,7 +51,7 @@ public interface AStarAdmissibleHeuristic<V>
      * Euclidean distance, are consistent heuristics.
      *
      * @param graph graph to test heuristic on
-     * @param <E> graph edges type
+     * @param <E>   graph edges type
      * @return true iff the heuristic is consistent wrt the {@code graph}, false otherwise
      */
     <E> boolean isConsistent(Graph<V, E> graph);

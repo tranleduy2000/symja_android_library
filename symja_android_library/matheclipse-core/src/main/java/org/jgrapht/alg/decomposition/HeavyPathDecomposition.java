@@ -17,11 +17,20 @@
  */
 package org.jgrapht.alg.decomposition;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.TreeToPathDecompositionAlgorithm;
+import org.jgrapht.util.VertexToIntegerMapping;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Algorithm for computing the heavy path decomposition of a rooted tree/forest.
@@ -39,11 +48,11 @@ import java.util.*;
  * <p>
  * In a heavy path decomposition, the edges set is partitioned into two sets, a set of heavy edges
  * and a set of light ones according to the relative number of nodes in the vertex's subtree.
- *
+ * <p>
  * We define the size of a vertex v in the forest, denoted by size(v), to be the number of
  * descendants of v, including v itself. We define a tree edge (v,parent(v)) to be heavy if
  * $2*size(v)$ &gt; $size(parent(v))$ and light, otherwise.
- *
+ * <p>
  * The set of heavy edges form the edges of the decomposition.
  *
  * <p>
@@ -59,15 +68,13 @@ import java.util.*;
  * nor heavy.
  * </p>
  *
- * @author Alexandru Valeanu
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Alexandru Valeanu
  */
 public class HeavyPathDecomposition<V, E>
-    implements
-    TreeToPathDecompositionAlgorithm<V, E>
-{
+        implements
+        TreeToPathDecompositionAlgorithm<V, E> {
 
     private final Graph<V, E> graph;
     private final Set<V> roots;
@@ -87,37 +94,34 @@ public class HeavyPathDecomposition<V, E>
     /**
      * Create an instance with a reference to the tree that we will decompose and to the root of the
      * tree.
-     *
+     * <p>
      * Note: The constructor will NOT check if the input graph is a valid tree.
      *
      * @param tree the input tree
      * @param root the root of the tree
      */
-    public HeavyPathDecomposition(Graph<V, E> tree, V root)
-    {
+    public HeavyPathDecomposition(Graph<V, E> tree, V root) {
         this(tree, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
     }
 
     /**
      * Create an instance with a reference to the forest that we will decompose and to the sets of
      * roots of the forest (one root per tree).
-     *
+     * <p>
      * Note: If two roots appear in the same tree, an error will be thrown. Note: The constructor
      * will NOT check if the input graph is a valid forest.
      *
      * @param forest the input forest
-     * @param roots the set of roots of the graph
+     * @param roots  the set of roots of the graph
      */
-    public HeavyPathDecomposition(Graph<V, E> forest, Set<V> roots)
-    {
+    public HeavyPathDecomposition(Graph<V, E> forest, Set<V> roots) {
         this.graph = Objects.requireNonNull(forest, "input tree/forrest cannot be null");
         this.roots = Objects.requireNonNull(roots, "set of roots cannot be null");
 
         decompose();
     }
 
-    private void allocateArrays()
-    {
+    private void allocateArrays() {
         final int n = graph.vertexSet().size();
 
         sizeSubtree = new int[n];
@@ -133,8 +137,7 @@ public class HeavyPathDecomposition<V, E>
         lightEdges = new HashSet<>();
     }
 
-    private void normalizeGraph()
-    {
+    private void normalizeGraph() {
         /*
          * Normalize the graph by mapping each vertex to an integer.
          */
@@ -145,7 +148,7 @@ public class HeavyPathDecomposition<V, E>
 
     /**
      * An iterative dfs implementation for computing the paths.
-     *
+     * <p>
      * For each node u we have to execute two sequences of operations: 1: before the 'recursive'
      * call (the then part of the if-statement) 2: after the 'recursive' call (the else part of the
      * if-statement)
@@ -153,8 +156,7 @@ public class HeavyPathDecomposition<V, E>
      * @param u the (normalized) vertex
      * @param c the component number to be used for u's tree
      */
-    private void dfsIterative(int u, int c)
-    {
+    private void dfsIterative(int u, int c) {
         // Set of vertices for which the the part of the if has been performed
         // (In other words: u ∈ explored iff dfs(u, c') has been called as some point)
         Set<Integer> explored = new HashSet<>();
@@ -235,8 +237,7 @@ public class HeavyPathDecomposition<V, E>
         }
     }
 
-    private void decompose()
-    {
+    private void decompose() {
         // If we already have a decomposition stop.
         if (path != null)
             return;
@@ -314,8 +315,7 @@ public class HeavyPathDecomposition<V, E>
      *
      * @return (immutable) set of heavy edges
      */
-    public Set<E> getHeavyEdges()
-    {
+    public Set<E> getHeavyEdges() {
         return this.heavyEdges;
     }
 
@@ -324,8 +324,7 @@ public class HeavyPathDecomposition<V, E>
      *
      * @return (immutable) set of light edges
      */
-    public Set<E> getLightEdges()
-    {
+    public Set<E> getLightEdges() {
         return this.lightEdges;
     }
 
@@ -333,28 +332,25 @@ public class HeavyPathDecomposition<V, E>
      * {@inheritDoc}
      */
     @Override
-    public PathDecomposition<V, E> getPathDecomposition()
-    {
+    public PathDecomposition<V, E> getPathDecomposition() {
         return new PathDecompositionImpl<>(graph, getHeavyEdges(), this.paths);
     }
 
     /**
      * Return the internal representation of the data.
-     *
+     * <p>
      * Note: this data representation is intended only for use by other components within JGraphT
      *
      * @return the internal state representation
      */
-    public InternalState getInternalState()
-    {
+    public InternalState getInternalState() {
         return new InternalState();
     }
 
     /**
      * Internal representation of the data
      */
-    public class InternalState
-    {
+    public class InternalState {
         /**
          * Returns the parent of vertex $v$ in the internal DFS tree/forest. If the vertex $v$ has
          * not been explored or it is the root of its tree, $null$ will be returned.
@@ -362,8 +358,7 @@ public class HeavyPathDecomposition<V, E>
          * @param v vertex
          * @return parent of vertex $v$ in the DFS tree/forest
          */
-        public V getParent(V v)
-        {
+        public V getParent(V v) {
             int index = vertexMap.getOrDefault(v, -1);
 
             if (index == -1 || parent[index] == -1)
@@ -385,8 +380,7 @@ public class HeavyPathDecomposition<V, E>
          * @param v vertex
          * @return depth of vertex $v$ in the DFS tree/forest
          */
-        public int getDepth(V v)
-        {
+        public int getDepth(V v) {
             int index = vertexMap.getOrDefault(v, -1);
 
             if (index == -1)
@@ -408,8 +402,7 @@ public class HeavyPathDecomposition<V, E>
          * @param v vertex
          * @return size of vertex $v$'s subtree in the DFS tree/forest
          */
-        public int getSizeSubtree(V v)
-        {
+        public int getSizeSubtree(V v) {
             int index = vertexMap.getOrDefault(v, -1);
 
             if (index == -1)
@@ -431,8 +424,7 @@ public class HeavyPathDecomposition<V, E>
          * @param v vertex
          * @return component id of vertex $v$ in the DFS tree/forest
          */
-        public int getComponent(V v)
-        {
+        public int getComponent(V v) {
             int index = vertexMap.getOrDefault(v, -1);
 
             if (index == -1)
@@ -443,33 +435,31 @@ public class HeavyPathDecomposition<V, E>
 
         /**
          * Return the vertex map, a mapping from vertices to unique integers.
-         *
+         * <p>
          * For each vertex $v \in V$, let $vertexMap(v) = x$ such that no two vertices share the
          * same x and all x's are integers between $0$ and $|V| - 1$. Let $indexList(x) = v$ be the
          * reverse mapping from integers to vertices.
-         *
+         * <p>
          * Note: The structure returned is immutable.
          *
          * @return the vertexMap
          */
-        public Map<V, Integer> getVertexMap()
-        {
+        public Map<V, Integer> getVertexMap() {
             return Collections.unmodifiableMap(vertexMap);
         }
 
         /**
          * Return the index list, a mapping from unique integers to vertices.
-         *
+         * <p>
          * For each vertex $v \in V$, let $vertexMap(v) = x$ such that no two vertices share the
          * same x and all x's are integers between $0$ and $|V| - 1$. Let $indexList(x) = v$ be the
          * reverse mapping from integers to vertices.
-         *
+         * <p>
          * Note: The structure returned is immutable.
          *
          * @return the indexList
          */
-        public List<V> getIndexList()
-        {
+        public List<V> getIndexList() {
             return Collections.unmodifiableList(indexList);
         }
 
@@ -479,8 +469,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal depth array
          */
-        public int[] getDepthArray()
-        {
+        public int[] getDepthArray() {
             return depth;
         }
 
@@ -490,8 +479,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal sizeSubtree array
          */
-        public int[] getSizeSubtreeArray()
-        {
+        public int[] getSizeSubtreeArray() {
             return sizeSubtree;
         }
 
@@ -501,8 +489,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal component array
          */
-        public int[] getComponentArray()
-        {
+        public int[] getComponentArray() {
             return component;
         }
 
@@ -515,8 +502,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal path array
          */
-        public int[] getPathArray()
-        {
+        public int[] getPathArray() {
             return path;
         }
 
@@ -527,8 +513,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal positionInPath array
          */
-        public int[] getPositionInPathArray()
-        {
+        public int[] getPositionInPathArray() {
             return positionInPath;
         }
 
@@ -541,8 +526,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal firstNodeInPath array
          */
-        public int[] getFirstNodeInPathArray()
-        {
+        public int[] getFirstNodeInPathArray() {
             return firstNodeInPath;
         }
 
@@ -553,8 +537,7 @@ public class HeavyPathDecomposition<V, E>
          *
          * @return internal parent array
          */
-        public int[] getParentArray()
-        {
+        public int[] getParentArray() {
             return parent;
         }
     }

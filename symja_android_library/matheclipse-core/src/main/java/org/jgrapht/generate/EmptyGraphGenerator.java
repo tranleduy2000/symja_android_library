@@ -17,9 +17,9 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Generates an <a href="http://mathworld.wolfram.com/EmptyGraph.html">empty graph</a> of any size.
@@ -27,13 +27,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John V. Sichi
  */
 public class EmptyGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     private final int size;
 
     /**
@@ -42,8 +40,7 @@ public class EmptyGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @param size number of vertices to be generated
      * @throws IllegalArgumentException if the specified size is negative.
      */
-    public EmptyGraphGenerator(int size)
-    {
+    public EmptyGraphGenerator(int size) {
         if (size < 0) {
             throw new IllegalArgumentException("size must be non-negative");
         }
@@ -54,8 +51,7 @@ public class EmptyGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * {@inheritDoc}
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         for (int i = 0; i < size; ++i) {
             target.addVertex();
         }

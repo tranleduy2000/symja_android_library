@@ -17,41 +17,40 @@
  */
 package org.jgrapht.alg.flow;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.extension.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.util.extension.ExtensionFactory;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Implementation of {@literal <a href = "https://en.wikipedia.org/wiki/Dinic%27s_algorithm">}Dinic
  * algorithm{@literal </a>} with scaling for
  * {@literal <a href = "https://en.wikipedia.org/wiki/Maximum_flow_problem"maximum"}maximum flow
  * problem{@literal </a>}.
- *
+ * <p>
  * The running time of the algorithm is $O(n^2m)$.
- *
+ * <p>
  * Dinic algorithm firstly was mentioned in {@literal <i>}DINIC, E. A. 1970. Algorithm for Solution
  * of a Problem of Maximum Flow in Networks With Power Estimation. Soviet Math. Dokl. 11,
  * 1277-1280.{@literal </>}
- *
+ * <p>
  * Scheme of the algorithm:
- *
+ * <p>
  * 1). Create a level graph. If we can't reach the sink return flow value.
- *
+ * <p>
  * 2). Find a blocking flow $f'$ in the level graph.
- *
+ * <p>
  * 3). Add $f'$ to the flow $f$. Move to the step $1$.
  *
  * @param <V> the graph vertex type.
  * @param <E> the graph edge type.
- *
  * @author Kirill Vishnyakov
  */
 
 public class DinicMFImpl<V, E>
-    extends
-    MaximumFlowAlgorithmBase<V, E>
-{
+        extends
+        MaximumFlowAlgorithmBase<V, E> {
 
     /**
      * Current source vertex.
@@ -73,10 +72,9 @@ public class DinicMFImpl<V, E>
      * @param network the network on which we calculate the maximum flow.
      * @param epsilon the tolerance for the comparison of floating point values.
      */
-    public DinicMFImpl(Graph<V, E> network, double epsilon)
-    {
+    public DinicMFImpl(Graph<V, E> network, double epsilon) {
         super(network, epsilon);
-        this.vertexExtensionsFactory =  new ExtensionFactory<VertexExtension>() {
+        this.vertexExtensionsFactory = new ExtensionFactory<VertexExtension>() {
             @Override
             public VertexExtension create() {
                 return new VertexExtension();
@@ -106,14 +104,12 @@ public class DinicMFImpl<V, E>
      *
      * @param network the network on which we calculate the maximum flow.
      */
-    public DinicMFImpl(Graph<V, E> network)
-    {
+    public DinicMFImpl(Graph<V, E> network) {
         this(network, DEFAULT_EPSILON);
     }
 
     @Override
-    public MaximumFlow<E> getMaximumFlow(V source, V sink)
-    {
+    public MaximumFlow<E> getMaximumFlow(V source, V sink) {
         this.calculateMaxFlow(source, sink);
         maxFlow = composeFlow();
         return new MaximumFlowImpl<>(maxFlowValue, maxFlow);
@@ -124,11 +120,10 @@ public class DinicMFImpl<V, E>
      * calculate the maximum flow in the network using Dinic algorithm with scaling.
      *
      * @param source source vertex.
-     * @param sink sink vertex.
+     * @param sink   sink vertex.
      * @return the value of the maximum flow in the network.
      */
-    private double calculateMaxFlow(V source, V sink)
-    {
+    private double calculateMaxFlow(V source, V sink) {
         super.init(source, sink, vertexExtensionsFactory, edgeExtensionsFactory);
 
         if (!network.containsVertex(source)) {
@@ -161,8 +156,7 @@ public class DinicMFImpl<V, E>
      *
      * @return true, if level graph has been constructed(i.e we reached the sink), otherwise false.
      */
-    private boolean bfs()
-    {
+    private boolean bfs() {
 
         for (V v : network.vertexSet()) {
             getVertexExtension(v).level = -1;
@@ -193,12 +187,11 @@ public class DinicMFImpl<V, E>
      * increment the pointer. So on each iteration we either saturate at least one edge or we
      * increment pointer.
      *
-     * @param v current vertex.
+     * @param v    current vertex.
      * @param flow we can push through.
      * @return value of the flow we can push.
      */
-    public double dfs(VertexExtension v, double flow)
-    {
+    public double dfs(VertexExtension v, double flow) {
         if (comparator.compare(0.0, flow) == 0) {
             return flow;
         }
@@ -229,9 +222,8 @@ public class DinicMFImpl<V, E>
      * Runs Dinic algorithm with scaling. Construct a level graph, then find blocking flow and
      * finally increase the flow.
      */
-    public void dinic()
-    {
-        for (;;) {
+    public void dinic() {
+        for (; ; ) {
             if (!bfs()) {
                 break;
             }
@@ -249,8 +241,7 @@ public class DinicMFImpl<V, E>
         }
     }
 
-    private VertexExtension getVertexExtension(V v)
-    {
+    private VertexExtension getVertexExtension(V v) {
         return (VertexExtension) vertexExtensionManager.getExtension(v);
     }
 
@@ -258,9 +249,8 @@ public class DinicMFImpl<V, E>
      * Extension for vertex class.
      */
     class VertexExtension
-        extends
-        VertexExtensionBase
-    {
+            extends
+            VertexExtensionBase {
 
         /**
          * Stores index of the first unexplored edge from current vertex.

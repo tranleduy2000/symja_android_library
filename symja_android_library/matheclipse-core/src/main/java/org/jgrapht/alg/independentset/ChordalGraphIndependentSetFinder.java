@@ -17,12 +17,18 @@
  */
 package org.jgrapht.alg.independentset;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.cycle.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.cycle.ChordalityInspector;
+import org.jgrapht.alg.interfaces.IndependentSetAlgorithm;
+import org.jgrapht.traverse.LexBreadthFirstIterator;
+import org.jgrapht.traverse.MaximumCardinalityIterator;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Calculates a <a href = "http://mathworld.wolfram.com/MaximumIndependentVertexSet.html">maximum
@@ -31,27 +37,25 @@ import java.util.*;
  * simple graph in which all <a href="http://mathworld.wolfram.com/GraphCycle.html"> cycles</a> of
  * four or more vertices have a <a href="http://mathworld.wolfram.com/CycleChord.html"> chord</a>. A
  * chord is an edge that is not part of the cycle but connects two vertices of the cycle.
- *
+ * <p>
  * To compute the independent set, this implementation relies on the {@link ChordalityInspector} to
  * compute a <a href=
  * "https://en.wikipedia.org/wiki/Chordal_graph#Perfect_elimination_and_efficient_recognition">
  * perfect elimination order</a>.
- *
+ * <p>
  * The maximum cardinality independent set for a chordal graph is computed in $\mathcal{O}(|V| +
  * |E|)$ time.
- *
+ * <p>
  * All the methods in this class are invoked in a lazy fashion, meaning that computations are only
  * started once the method gets invoked.
  *
  * @param <V> the graph vertex type.
  * @param <E> the graph edge type.
- *
  * @author Timofey Chudakov
  */
 public class ChordalGraphIndependentSetFinder<V, E>
-    implements
-    IndependentSetAlgorithm<V>
-{
+        implements
+        IndependentSetAlgorithm<V> {
 
     private final Graph<V, E> graph;
 
@@ -65,8 +69,7 @@ public class ChordalGraphIndependentSetFinder<V, E>
      *
      * @param graph graph
      */
-    public ChordalGraphIndependentSetFinder(Graph<V, E> graph)
-    {
+    public ChordalGraphIndependentSetFinder(Graph<V, E> graph) {
         this(graph, ChordalityInspector.IterationOrder.MCS);
     }
 
@@ -75,13 +78,12 @@ public class ChordalGraphIndependentSetFinder<V, E>
      * in this implementation uses either the {@link MaximumCardinalityIterator} iterator or the
      * {@link LexBreadthFirstIterator} iterator, depending on the parameter {@code iterationOrder}.
      *
-     * @param graph graph
+     * @param graph          graph
      * @param iterationOrder constant which defines iterator to be used by the
-     *        {@code ChordalityInspector} in this implementation.
+     *                       {@code ChordalityInspector} in this implementation.
      */
     public ChordalGraphIndependentSetFinder(
-        Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder)
-    {
+            Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder) {
         this.graph = Objects.requireNonNull(graph);
         chordalityInspector = new ChordalityInspector<>(graph, iterationOrder);
     }
@@ -89,8 +91,7 @@ public class ChordalGraphIndependentSetFinder<V, E>
     /**
      * Lazily computes a maximum independent set of the inspected {@code graph}.
      */
-    private void lazyComputeMaximumIndependentSet()
-    {
+    private void lazyComputeMaximumIndependentSet() {
         if (maximumIndependentSet == null && chordalityInspector.isChordal()) {
             // iterate the order from the end to the beginning
             // chooses vertices, that don't have neighbors in the current independent set
@@ -100,7 +101,7 @@ public class ChordalGraphIndependentSetFinder<V, E>
             Set<V> is = new HashSet<>();
             List<V> perfectEliminationOrder = chordalityInspector.getPerfectEliminationOrder();
             ListIterator<V> reverse =
-                perfectEliminationOrder.listIterator(perfectEliminationOrder.size());
+                    perfectEliminationOrder.listIterator(perfectEliminationOrder.size());
 
             while (reverse.hasPrevious()) {
                 V previous = reverse.previous();
@@ -126,8 +127,7 @@ public class ChordalGraphIndependentSetFinder<V, E>
      * @return a maximum independent set of the {@code graph} if it is chordal, null otherwise.
      */
     @Override
-    public IndependentSet<V> getIndependentSet()
-    {
+    public IndependentSet<V> getIndependentSet() {
         lazyComputeMaximumIndependentSet();
         return maximumIndependentSet;
     }

@@ -25,18 +25,15 @@ package org.jgrapht;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Assaf Lehr
  */
-public interface GraphMapping<V, E>
-{
+public interface GraphMapping<V, E> {
     /**
      * Gets the mapped value where the key is <code>vertex</code>
      *
-     * @param vertex vertex in one of the graphs
+     * @param vertex  vertex in one of the graphs
      * @param forward if true, uses mapping from graph1 to graph2; if false, use mapping from graph2
-     *        to graph1
-     *
+     *                to graph1
      * @return corresponding vertex in other graph, or null if none
      */
     V getVertexCorrespondence(V vertex, boolean forward);
@@ -44,10 +41,9 @@ public interface GraphMapping<V, E>
     /**
      * Gets the mapped value where the key is <code>edge</code>
      *
-     * @param edge edge in one of the graphs
+     * @param edge    edge in one of the graphs
      * @param forward if true, uses mapping from graph1 to graph2; if false, use mapping from graph2
-     *        to graph1
-     *
+     *                to graph1
      * @return corresponding edge in other graph, or null if none
      */
     E getEdgeCorrespondence(E edge, boolean forward);

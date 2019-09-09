@@ -17,10 +17,15 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.shortestpath.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMapping;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.shortestpath.TreeMeasurer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is an implementation of the AHU algorithm for detecting an (unweighted) isomorphism between
@@ -52,13 +57,11 @@ import java.util.*;
  *
  * @param <V> the type of the vertices
  * @param <E> the type of the edges
- *
  * @author Alexandru Valeanu
  */
 public class AHUUnrootedTreeIsomorphismInspector<V, E>
-    implements
-    IsomorphismInspector<V, E>
-{
+        implements
+        IsomorphismInspector<V, E> {
 
     private final Graph<V, E> tree1;
     private final Graph<V, E> tree2;
@@ -68,17 +71,16 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
 
     /**
      * Construct a new AHU unrooted tree isomorphism inspector.
-     *
+     * <p>
      * Note: The constructor does NOT check if the input trees are valid.
      *
      * @param tree1 the first tree
      * @param tree2 the second tree
-     * @throws NullPointerException if {@code tree1} or {@code tree2} is {@code null}
+     * @throws NullPointerException     if {@code tree1} or {@code tree2} is {@code null}
      * @throws IllegalArgumentException if {@code tree1} or {@code tree2} is not undirected
      * @throws IllegalArgumentException if {@code tree1} or {@code tree2} is empty
      */
-    public AHUUnrootedTreeIsomorphismInspector(Graph<V, E> tree1, Graph<V, E> tree2)
-    {
+    public AHUUnrootedTreeIsomorphismInspector(Graph<V, E> tree1, Graph<V, E> tree2) {
         validateTree(tree1);
         this.tree1 = tree1;
 
@@ -86,8 +88,7 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
         this.tree2 = tree2;
     }
 
-    private void validateTree(Graph<V, E> tree)
-    {
+    private void validateTree(Graph<V, E> tree) {
         GraphTests.requireUndirected(tree);
         assert GraphTests.isSimple(tree);
 
@@ -100,8 +101,7 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Iterator<GraphMapping<V, E>> getMappings()
-    {
+    public Iterator<GraphMapping<V, E>> getMappings() {
         GraphMapping<V, E> iterMapping = getMapping();
 
         if (iterMapping == null)
@@ -114,8 +114,7 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean isomorphismExists()
-    {
+    public boolean isomorphismExists() {
         if (computed) {
             if (ahuRootedTreeIsomorphismInspector != null) {
                 return ahuRootedTreeIsomorphismInspector.isomorphismExists();
@@ -134,14 +133,14 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
 
         if (centers1.size() == 1 && centers2.size() == 1) {
             ahuRootedTreeIsomorphismInspector = new AHURootedTreeIsomorphismInspector<>(
-                tree1, centers1.get(0), tree2, centers2.get(0));
+                    tree1, centers1.get(0), tree2, centers2.get(0));
         } else if (centers1.size() == 2 && centers2.size() == 2) {
             ahuRootedTreeIsomorphismInspector = new AHURootedTreeIsomorphismInspector<>(
-                tree1, centers1.get(0), tree2, centers2.get(0));
+                    tree1, centers1.get(0), tree2, centers2.get(0));
 
             if (!ahuRootedTreeIsomorphismInspector.isomorphismExists()) {
                 ahuRootedTreeIsomorphismInspector = new AHURootedTreeIsomorphismInspector<>(
-                    tree1, centers1.get(1), tree2, centers2.get(0));
+                        tree1, centers1.get(1), tree2, centers2.get(0));
             }
         } else {
             // different number of centers
@@ -156,8 +155,7 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
      *
      * @return isomorphic mapping, {@code null} is none exists
      */
-    public IsomorphicGraphMapping<V, E> getMapping()
-    {
+    public IsomorphicGraphMapping<V, E> getMapping() {
         if (isomorphismExists()) {
             return ahuRootedTreeIsomorphismInspector.getMapping();
         } else {

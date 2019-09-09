@@ -17,7 +17,7 @@
  */
 package org.jgrapht.alg.util;
 
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * A double comparator with adjustable tolerance.
@@ -25,9 +25,8 @@ import java.util.*;
  * @author Dimitrios Michail
  */
 public class ToleranceDoubleComparator
-    implements
-    Comparator<Double>
-{
+        implements
+        Comparator<Double> {
     /**
      * Default tolerance used by the comparator.
      */
@@ -38,18 +37,16 @@ public class ToleranceDoubleComparator
     /**
      * Construct a new comparator with a {@link #DEFAULT_EPSILON} tolerance.
      */
-    public ToleranceDoubleComparator()
-    {
+    public ToleranceDoubleComparator() {
         this(DEFAULT_EPSILON);
     }
 
     /**
      * Construct a new comparator with a specified tolerance.
-     * 
+     *
      * @param epsilon the tolerance
      */
-    public ToleranceDoubleComparator(double epsilon)
-    {
+    public ToleranceDoubleComparator(double epsilon) {
         if (epsilon <= 0.0) {
             throw new IllegalArgumentException("Tolerance must be positive");
         }
@@ -59,14 +56,13 @@ public class ToleranceDoubleComparator
     /**
      * Compares two floating point values. Returns 0 if they are equal, -1 if {@literal o1 < o2}, 1
      * otherwise
-     * 
+     *
      * @param o1 the first value
      * @param o2 the second value
      * @return 0 if they are equal, -1 if {@literal o1 < o2}, 1 otherwise
      */
     @Override
-    public int compare(Double o1, Double o2)
-    {
+    public int compare(Double o1, Double o2) {
         if (Math.abs(o1 - o2) < epsilon) {
             return 0;
         } else {

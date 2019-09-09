@@ -33,8 +33,7 @@ import java.util.Set;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public interface TreeToPathDecompositionAlgorithm<V, E>
-{
+public interface TreeToPathDecompositionAlgorithm<V, E> {
     /**
      * Computes a path decomposition.
      *
@@ -48,11 +47,10 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
      */
-    interface PathDecomposition<V, E>
-    {
+    interface PathDecomposition<V, E> {
         /**
          * Set of edges of the path decomposition.
-         * 
+         *
          * @return edge set of the path decomposition
          */
         Set<E> getEdges();
@@ -77,10 +75,9 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     class PathDecompositionImpl<V, E>
-        implements
-        PathDecomposition<V, E>,
-        Serializable
-    {
+            implements
+            PathDecomposition<V, E>,
+            Serializable {
 
         private static final long serialVersionUID = 8468626434814461297L;
         private final Set<E> edges;
@@ -93,8 +90,7 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
          * @param edges the edges
          * @param paths the vertex paths
          */
-        public PathDecompositionImpl(final Graph<V, E> graph, Set<E> edges, List<List<V>> paths)
-        {
+        public PathDecompositionImpl(final Graph<V, E> graph, Set<E> edges, List<List<V>> paths) {
             this.edges = edges;
 
             Set<GraphPath<V, E>> arrayUnenforcedSet =
@@ -108,14 +104,12 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
         }
 
         @Override
-        public Set<E> getEdges()
-        {
+        public Set<E> getEdges() {
             return edges;
         }
 
         @Override
-        public Set<GraphPath<V, E>> getPaths()
-        {
+        public Set<GraphPath<V, E>> getPaths() {
             return paths;
         }
 
@@ -125,8 +119,7 @@ public interface TreeToPathDecompositionAlgorithm<V, E>
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Path-Decomposition [edges=" + edges + "," + "paths=" + getPaths() + "]";
         }
     }

@@ -17,8 +17,8 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jheaps.MergeableAddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
 /**
  * This class is a data structure for Kolmogorov's Blossom V algorithm.
@@ -53,8 +53,7 @@ import org.jheaps.tree.*;
  * @see BlossomVTree
  * @see BlossomVEdge
  */
-class BlossomVTreeEdge
-{
+class BlossomVTreeEdge {
     /**
      * Two-element array of trees this edge is incident to.
      */
@@ -87,8 +86,7 @@ class BlossomVTreeEdge
     /**
      * Constructs a new tree edge by initializing arrays and heaps
      */
-    public BlossomVTreeEdge()
-    {
+    public BlossomVTreeEdge() {
         this.head = new BlossomVTree[2];
         this.prev = new BlossomVTreeEdge[2];
         this.next = new BlossomVTreeEdge[2];
@@ -100,8 +98,7 @@ class BlossomVTreeEdge
     /**
      * Removes this edge from both doubly linked lists of tree edges.
      */
-    public void removeFromTreeEdgeList()
-    {
+    public void removeFromTreeEdgeList() {
         for (int dir = 0; dir < 2; dir++) {
             if (prev[dir] != null) {
                 prev[dir].next[dir] = next[dir];
@@ -120,8 +117,7 @@ class BlossomVTreeEdge
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "BlossomVTreeEdge (" + head[0].id + ":" + head[1].id + ")";
     }
 
@@ -131,11 +127,10 @@ class BlossomVTreeEdge
      * {@link BlossomVTreeEdge#plusMinusEdges1} based upon the {@code direction}. The key is
      * edge.slack
      *
-     * @param edge an edge to add to the current heap of (-, +) cross-tree edges.
+     * @param edge      an edge to add to the current heap of (-, +) cross-tree edges.
      * @param direction direction of this tree edge wrt. current tree and opposite tree
      */
-    public void addToCurrentMinusPlusHeap(BlossomVEdge edge, int direction)
-    {
+    public void addToCurrentMinusPlusHeap(BlossomVEdge edge, int direction) {
         edge.handle = getCurrentMinusPlusHeap(direction).insert(edge.slack, edge);
     }
 
@@ -145,11 +140,10 @@ class BlossomVTreeEdge
      * {@link BlossomVTreeEdge#plusMinusEdges1} based upon the {@code direction}. The key is
      * edge.slack
      *
-     * @param edge an edge to add to the current heap of (+, -) cross-tree edges.
+     * @param edge      an edge to add to the current heap of (+, -) cross-tree edges.
      * @param direction direction of this tree edge wrt. current tree and opposite tree
      */
-    public void addToCurrentPlusMinusHeap(BlossomVEdge edge, int direction)
-    {
+    public void addToCurrentPlusMinusHeap(BlossomVEdge edge, int direction) {
         edge.handle = getCurrentPlusMinusHeap(direction).insert(edge.slack, edge);
     }
 
@@ -158,8 +152,7 @@ class BlossomVTreeEdge
      *
      * @param edge an edge to add to the heap of (+, +) cross-tree edges
      */
-    public void addPlusPlusEdge(BlossomVEdge edge)
-    {
+    public void addPlusPlusEdge(BlossomVEdge edge) {
         edge.handle = plusPlusEdges.insert(edge.slack, edge);
     }
 
@@ -170,8 +163,7 @@ class BlossomVTreeEdge
      *
      * @param edge an edge to remove
      */
-    public void removeFromCurrentMinusPlusHeap(BlossomVEdge edge)
-    {
+    public void removeFromCurrentMinusPlusHeap(BlossomVEdge edge) {
         edge.handle.delete();
         edge.handle = null;
     }
@@ -183,8 +175,7 @@ class BlossomVTreeEdge
      *
      * @param edge an edge to remove
      */
-    public void removeFromCurrentPlusMinusHeap(BlossomVEdge edge)
-    {
+    public void removeFromCurrentPlusMinusHeap(BlossomVEdge edge) {
         edge.handle.delete();
         edge.handle = null;
     }
@@ -194,8 +185,7 @@ class BlossomVTreeEdge
      *
      * @param edge an edge to remove
      */
-    public void removeFromPlusPlusHeap(BlossomVEdge edge)
-    {
+    public void removeFromPlusPlusHeap(BlossomVEdge edge) {
         edge.handle.delete();
         edge.handle = null;
     }
@@ -207,8 +197,7 @@ class BlossomVTreeEdge
      * @param currentDir the current direction of this edge
      * @return returns current heap of (-, +) cross-tree edges
      */
-    public MergeableAddressableHeap<Double, BlossomVEdge> getCurrentMinusPlusHeap(int currentDir)
-    {
+    public MergeableAddressableHeap<Double, BlossomVEdge> getCurrentMinusPlusHeap(int currentDir) {
         return currentDir == 0 ? plusMinusEdges0 : plusMinusEdges1;
     }
 
@@ -219,8 +208,7 @@ class BlossomVTreeEdge
      * @param currentDir the current direction of this edge
      * @return returns current heap of (+, -) cross-tree edges
      */
-    public MergeableAddressableHeap<Double, BlossomVEdge> getCurrentPlusMinusHeap(int currentDir)
-    {
+    public MergeableAddressableHeap<Double, BlossomVEdge> getCurrentPlusMinusHeap(int currentDir) {
         return currentDir == 0 ? plusMinusEdges1 : plusMinusEdges0;
     }
 }

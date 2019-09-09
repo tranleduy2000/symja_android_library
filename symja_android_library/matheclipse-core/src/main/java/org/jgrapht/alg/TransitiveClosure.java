@@ -17,11 +17,15 @@
  */
 package org.jgrapht.alg;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.DirectedAcyclicGraph;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -29,8 +33,7 @@ import java.util.function.Consumer;
  *
  * @author Vinayak R. Borkar
  */
-public class TransitiveClosure
-{
+public class TransitiveClosure {
     /**
      * Singleton instance.
      */
@@ -39,19 +42,17 @@ public class TransitiveClosure
     /**
      * Private Constructor.
      */
-    private TransitiveClosure()
-    {
+    private TransitiveClosure() {
     }
 
     /**
      * Computes the transitive closure of the given graph.
      *
      * @param graph - Graph to compute transitive closure for.
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>   the graph vertex type
+     * @param <E>   the graph edge type
      */
-    public <V, E> void closeSimpleDirectedGraph(SimpleDirectedGraph<V, E> graph)
-    {
+    public <V, E> void closeSimpleDirectedGraph(SimpleDirectedGraph<V, E> graph) {
         Set<V> vertexSet = graph.vertexSet();
 
         Set<V> newEdgeTargets = new HashSet<>();
@@ -98,8 +99,7 @@ public class TransitiveClosure
     /**
      * Computes floor($\log_2 (n)$) $+ 1$
      */
-    private int computeBinaryLog(int n)
-    {
+    private int computeBinaryLog(int n) {
         assert n >= 0;
 
         int result = 0;
@@ -115,11 +115,10 @@ public class TransitiveClosure
      * Computes the transitive closure of a directed acyclic graph in $O(nm)$
      *
      * @param graph - Graph to compute transitive closure for.
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>   the graph vertex type
+     * @param <E>   the graph edge type
      */
-    public <V, E> void closeDirectedAcyclicGraph(DirectedAcyclicGraph<V, E> graph)
-    {
+    public <V, E> void closeDirectedAcyclicGraph(DirectedAcyclicGraph<V, E> graph) {
         final Deque<V> orderedVertices = new ArrayDeque<>(graph.vertexSet().size());
         new TopologicalOrderIterator<>(graph).forEachRemaining(new Consumer<V>() {
             @Override

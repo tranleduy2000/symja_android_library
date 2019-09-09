@@ -1,18 +1,16 @@
 package org.jheaps.array;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
 import org.jheaps.Heap;
 import org.jheaps.annotations.ConstantTime;
 
+import java.io.Serializable;
+import java.util.Comparator;
+
 /**
  * An abstract weak heap with an array representation.
- * 
- * @author Dimitrios Michail
  *
- * @param <K>
- *            the type of keys maintained by this heap
+ * @param <K> the type of keys maintained by this heap
+ * @author Dimitrios Michail
  */
 abstract class AbstractArrayWeakHeap<K> implements Heap<K>, Serializable {
 
@@ -58,11 +56,9 @@ abstract class AbstractArrayWeakHeap<K> implements Heap<K>, Serializable {
 
     /**
      * Constructor
-     * 
-     * @param comparator
-     *            the comparator to use
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param comparator the comparator to use
+     * @param capacity   the requested capacity
      */
     public AbstractArrayWeakHeap(Comparator<? super K> comparator, int capacity) {
         checkCapacity(capacity);
@@ -109,13 +105,10 @@ abstract class AbstractArrayWeakHeap<K> implements Heap<K>, Serializable {
 
     /**
      * Check that a capacity is valid.
-     * 
-     * @param capacity
-     *            the capacity
-     * 
-     * @throws IllegalArgumentException
-     *             if the capacity is negative or more than the maximum array
-     *             size
+     *
+     * @param capacity the capacity
+     * @throws IllegalArgumentException if the capacity is negative or more than the maximum array
+     *                                  size
      */
     protected final void checkCapacity(int capacity) {
         if (capacity < MIN_HEAP_CAPACITY) {
@@ -128,51 +121,45 @@ abstract class AbstractArrayWeakHeap<K> implements Heap<K>, Serializable {
 
     /**
      * Initialize array representation.
-     * 
-     * @param capacity
-     *            the capacity
+     *
+     * @param capacity the capacity
      */
     protected abstract void initCapacity(int capacity);
 
     /**
      * Make sure the array representation can hold a certain number of elements.
-     * 
-     * @param capacity
-     *            the capacity
+     *
+     * @param capacity the capacity
      */
     protected abstract void ensureCapacity(int capacity);
 
     /**
      * Upwards fix starting from a particular element
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     protected abstract void fixup(int k);
 
     /**
      * Upwards fix starting from a particular element. Performs comparisons
      * using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     protected abstract void fixupWithComparator(int k);
 
     /**
      * Downwards fix starting from a particular element
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     protected abstract void fixdown(int k);
 
     /**
      * Downwards fix starting from a particular element. Performs comparisons
      * using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     protected abstract void fixdownWithComparator(int k);
 

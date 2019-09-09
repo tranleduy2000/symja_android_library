@@ -17,15 +17,20 @@
  */
 package org.jgrapht.alg.color;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * The Dsatur greedy coloring algorithm.
- * 
+ *
  * <p>
  * This is the greedy coloring algorithm using saturation degree ordering. The saturation degree of
  * a vertex is defined as the number of different colors to which it is adjacent. The algorithm
@@ -42,7 +47,7 @@ import java.util.*;
  * <li>The smallest hard-to-color graph for algorithm DSATUR. Discrete Mathematics, 236:151--165,
  * 2001.</li>
  * </ul>
- * 
+ *
  * <p>
  * This implementation requires $O(n^2)$ running time and space. The following paper discusses
  * possible improvements in the running time.
@@ -53,22 +58,19 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public class SaturationDegreeColoring<V, E>
-    implements
-    VertexColoringAlgorithm<V>
-{
+        implements
+        VertexColoringAlgorithm<V> {
     private final Graph<V, E> graph;
 
     /**
      * Construct a new coloring algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public SaturationDegreeColoring(Graph<V, E> graph)
-    {
+    public SaturationDegreeColoring(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
     }
 
@@ -77,8 +79,7 @@ public class SaturationDegreeColoring<V, E>
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Coloring<V> getColoring()
-    {
+    public Coloring<V> getColoring() {
         /*
          * Initialize data structures
          */
@@ -110,7 +111,7 @@ public class SaturationDegreeColoring<V, E>
             handles.put(v, new HeapHandle(v));
         }
         heap.bulkInsert(
-            handles.values().toArray((HeapHandle[]) Array.newInstance(HeapHandle.class, 0)));
+                handles.values().toArray((HeapHandle[]) Array.newInstance(HeapHandle.class, 0)));
 
         /*
          * Color vertices
@@ -167,21 +168,18 @@ public class SaturationDegreeColoring<V, E>
      * degree (maximum is better in both cases).
      */
     private class DSaturComparator
-        implements
-        Comparator<V>
-    {
+            implements
+            Comparator<V> {
         private Map<V, Integer> saturation;
         private Map<V, Integer> degree;
 
-        public DSaturComparator(Map<V, Integer> saturation, Map<V, Integer> degree)
-        {
+        public DSaturComparator(Map<V, Integer> saturation, Map<V, Integer> degree) {
             this.saturation = saturation;
             this.degree = degree;
         }
 
         @Override
-        public int compare(V o1, V o2)
-        {
+        public int compare(V o1, V o2) {
             int sat1 = saturation.get(o1);
             int sat2 = saturation.get(o2);
             if (sat1 > sat2) {
@@ -197,13 +195,11 @@ public class SaturationDegreeColoring<V, E>
     /*
      * An addressable heap handle.
      */
-    private class HeapHandle
-    {
+    private class HeapHandle {
         int index;
         V vertex;
 
-        public HeapHandle(V vertex)
-        {
+        public HeapHandle(V vertex) {
             this.vertex = vertex;
             this.index = -1;
         }
@@ -211,25 +207,22 @@ public class SaturationDegreeColoring<V, E>
 
     /*
      * An addressable binary heap.
-     * 
+     *
      * No checks are performed (on purpose) for invalid handle use, or capacity violations.
      */
-    private class Heap
-    {
+    private class Heap {
         private Comparator<V> comparator;
         private int size;
         private HeapHandle[] array;
 
         @SuppressWarnings("unchecked")
-        public Heap(int capacity, Comparator<V> comparator)
-        {
+        public Heap(int capacity, Comparator<V> comparator) {
             this.comparator = comparator;
             this.size = 0;
             this.array = (HeapHandle[]) Array.newInstance(HeapHandle.class, capacity + 1);
         }
 
-        private void fixdown(int k)
-        {
+        private void fixdown(int k) {
             HeapHandle h = array[k];
             while (2 * k <= size) {
                 int j = 2 * k;
@@ -247,8 +240,7 @@ public class SaturationDegreeColoring<V, E>
             h.index = k;
         }
 
-        private void fixup(int k)
-        {
+        private void fixup(int k) {
             HeapHandle h = array[k];
             while (k > 1 && comparator.compare(array[k / 2].vertex, h.vertex) > 0) {
                 array[k] = array[k / 2];
@@ -259,8 +251,7 @@ public class SaturationDegreeColoring<V, E>
             h.index = k;
         }
 
-        private void forceFixup(int k)
-        {
+        private void forceFixup(int k) {
             HeapHandle h = array[k];
             while (k > 1) {
                 array[k] = array[k / 2];
@@ -271,8 +262,7 @@ public class SaturationDegreeColoring<V, E>
             h.index = k;
         }
 
-        public HeapHandle deleteMin()
-        {
+        public HeapHandle deleteMin() {
             HeapHandle result = array[1];
             if (size == 1) {
                 array[1] = null;
@@ -287,32 +277,27 @@ public class SaturationDegreeColoring<V, E>
             return result;
         }
 
-        public int size()
-        {
+        public int size() {
             return size;
         }
 
-        public void fixup(HeapHandle handle)
-        {
+        public void fixup(HeapHandle handle) {
             fixup(handle.index);
         }
 
-        public void delete(HeapHandle handle)
-        {
+        public void delete(HeapHandle handle) {
             forceFixup(handle.index);
             deleteMin();
         }
 
-        public void insert(HeapHandle handle)
-        {
+        public void insert(HeapHandle handle) {
             size++;
             array[size] = handle;
             handle.index = size;
             fixup(size);
         }
 
-        public void bulkInsert(HeapHandle[] handles)
-        {
+        public void bulkInsert(HeapHandle[] handles) {
             for (int i = 0; i < handles.length; i++) {
                 size++;
                 array[size] = handles[i];

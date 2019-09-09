@@ -17,9 +17,9 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * This class is used to iterate over all existing (subgraph isomorphic) mappings between two
@@ -29,32 +29,28 @@ import java.util.*;
  * @param <E> the type of the edges
  */
 class VF2SubgraphMappingIterator<V, E>
-    extends
-    VF2MappingIterator<V, E>
-{
+        extends
+        VF2MappingIterator<V, E> {
     public VF2SubgraphMappingIterator(
-        GraphOrdering<V, E> ordering1, GraphOrdering<V, E> ordering2,
-        Comparator<V> vertexComparator, Comparator<E> edgeComparator)
-    {
+            GraphOrdering<V, E> ordering1, GraphOrdering<V, E> ordering2,
+            Comparator<V> vertexComparator, Comparator<E> edgeComparator) {
         super(ordering1, ordering2, vertexComparator, edgeComparator);
     }
 
     @Override
-    protected IsomorphicGraphMapping<V, E> match()
-    {
+    protected IsomorphicGraphMapping<V, E> match() {
         VF2State<V, E> s;
 
         if (stateStack.isEmpty()) {
             Graph<V, E> g1 = ordering1.getGraph(), g2 = ordering2.getGraph();
 
             if ((g1.vertexSet().size() < g2.vertexSet().size())
-                || (g1.edgeSet().size() < g2.edgeSet().size()))
-            {
+                    || (g1.edgeSet().size() < g2.edgeSet().size())) {
                 return null;
             }
 
             s = new VF2SubgraphIsomorphismState<>(
-                ordering1, ordering2, vertexComparator, edgeComparator);
+                    ordering1, ordering2, vertexComparator, edgeComparator);
 
             if (g2.vertexSet().isEmpty()) {
                 return (hadOneMapping != null) ? null : s.getCurrentMapping();

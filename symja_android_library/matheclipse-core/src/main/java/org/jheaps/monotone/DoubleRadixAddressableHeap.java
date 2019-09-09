@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ import java.math.BigInteger;
  * contains keys in the range {@literal [0, C]} or equivalently
  * {@literal [a,a+C]}. Note, however, that C here depends on the distance of the
  * minimum and maximum value when they are translated into unsigned longs.
- * 
+ *
  * <p>
  * <strong>Note that this implementation is not synchronized.</strong> If
  * multiple threads access a heap concurrently, and at least one of the threads
@@ -50,11 +50,8 @@ import java.math.BigInteger;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
- *
- * @param <V>
- *            the type of values maintained by this heap
- * 
  * @see Serializable
  */
 public class DoubleRadixAddressableHeap<V> extends AbstractRadixAddressableHeap<Double, V> {
@@ -64,20 +61,16 @@ public class DoubleRadixAddressableHeap<V> extends AbstractRadixAddressableHeap<
     /**
      * Constructs a new heap which can store values between a minimum and a
      * maximum key value (inclusive).
-     * 
+     * <p>
      * It is important to use the smallest key range as the heap uses O(logC)
      * where C=maxKey-minKey+1 buckets to store elements. Moreover, the
      * operation {@code deleteMin} requires amortized O(logC) time.
-     * 
-     * @param minKey
-     *            the non-negative minimum key that this heap supports
-     *            (inclusive)
-     * @param maxKey
-     *            the maximum key that this heap supports (inclusive)
-     * @throws IllegalArgumentException
-     *             if the minimum key is negative
-     * @throws IllegalArgumentException
-     *             if the maximum key is less than the minimum key
+     *
+     * @param minKey the non-negative minimum key that this heap supports
+     *               (inclusive)
+     * @param maxKey the maximum key that this heap supports (inclusive)
+     * @throws IllegalArgumentException if the minimum key is negative
+     * @throws IllegalArgumentException if the maximum key is less than the minimum key
      */
     @SuppressWarnings("unchecked")
     public DoubleRadixAddressableHeap(double minKey, double maxKey) {
@@ -116,14 +109,14 @@ public class DoubleRadixAddressableHeap<V> extends AbstractRadixAddressableHeap<
         long y = Double.doubleToLongBits(o2) ^ Long.MIN_VALUE;
 
         // assert
-        if (o1.doubleValue() < o2.doubleValue()) { 
-            assert x < y; 
-        } else if (o1.doubleValue() == o2.doubleValue()) { 
-            assert x == y; } 
-        else {
-          assert x > y; 
+        if (o1.doubleValue() < o2.doubleValue()) {
+            assert x < y;
+        } else if (o1.doubleValue() == o2.doubleValue()) {
+            assert x == y;
+        } else {
+            assert x > y;
         }
-         
+
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 

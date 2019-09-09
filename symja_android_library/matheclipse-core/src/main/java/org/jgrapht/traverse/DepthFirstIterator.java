@@ -17,14 +17,15 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * A depth-first iterator for a directed or undirected graph.
- * 
+ *
  * <p>
  * For this iterator to work correctly the graph must not be modified during iteration. Currently
  * there are no means to ensure that, nor to fail-fast. The results of such modifications are
@@ -32,14 +33,12 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Liviu Rau
  * @author Barak Naveh
  */
 public class DepthFirstIterator<V, E>
-    extends
-    CrossComponentIterator<V, E, DepthFirstIterator.VisitColor>
-{
+        extends
+        CrossComponentIterator<V, E, DepthFirstIterator.VisitColor> {
     /**
      * Sentinel object. Unfortunately, we can't use null, because ArrayDeque won't accept those. And
      * we don't want to rely on the caller to provide a sentinel object for us. So we have to play
@@ -50,8 +49,7 @@ public class DepthFirstIterator<V, E>
     /**
      * Standard vertex visit state enumeration.
      */
-    protected static enum VisitColor
-    {
+    protected enum VisitColor {
         /**
          * Vertex has not been returned via iterator yet.
          */
@@ -75,8 +73,7 @@ public class DepthFirstIterator<V, E>
      *
      * @param g the graph to be iterated.
      */
-    public DepthFirstIterator(Graph<V, E> g)
-    {
+    public DepthFirstIterator(Graph<V, E> g) {
         this(g, (V) null);
     }
 
@@ -86,11 +83,10 @@ public class DepthFirstIterator<V, E>
      * vertex. If the specified start vertex is <code>null</code>, iteration will start at an
      * arbitrary vertex and will not be limited, that is, will be able to traverse all the graph.
      *
-     * @param g the graph to be iterated.
+     * @param g           the graph to be iterated.
      * @param startVertex the vertex iteration to be started.
      */
-    public DepthFirstIterator(Graph<V, E> g, V startVertex)
-    {
+    public DepthFirstIterator(Graph<V, E> g, V startVertex) {
         super(g, startVertex);
     }
 
@@ -100,18 +96,16 @@ public class DepthFirstIterator<V, E>
      * vertices. If the specified start vertices is <code>null</code>, iteration will start at an
      * arbitrary vertex and will not be limited, that is, will be able to traverse all the graph.
      *
-     * @param g the graph to be iterated.
+     * @param g             the graph to be iterated.
      * @param startVertices the vertices iteration to be started.
      */
-    public DepthFirstIterator(Graph<V, E> g, Iterable<V> startVertices)
-    {
+    public DepthFirstIterator(Graph<V, E> g, Iterable<V> startVertices) {
         super(g, startVertices);
     }
 
     @Override
-    protected boolean isConnectedComponentExhausted()
-    {
-        for (;;) {
+    protected boolean isConnectedComponentExhausted() {
+        for (; ; ) {
             if (stack.isEmpty()) {
                 return true;
             }
@@ -132,15 +126,13 @@ public class DepthFirstIterator<V, E>
     }
 
     @Override
-    protected void encounterVertex(V vertex, E edge)
-    {
+    protected void encounterVertex(V vertex, E edge) {
         putSeenData(vertex, VisitColor.WHITE);
         stack.addLast(vertex);
     }
 
     @Override
-    protected void encounterVertexAgain(V vertex, E edge)
-    {
+    protected void encounterVertexAgain(V vertex, E edge) {
         VisitColor color = getSeenData(vertex);
         if (color != VisitColor.WHITE) {
             // We've already visited this vertex; no need to mess with the
@@ -160,10 +152,9 @@ public class DepthFirstIterator<V, E>
     }
 
     @Override
-    protected V provideNextVertex()
-    {
+    protected V provideNextVertex() {
         V v;
-        for (;;) {
+        for (; ; ) {
             Object o = stack.removeLast();
             if (o == SENTINEL) {
                 // This is a finish-time sentinel we previously pushed.
@@ -184,8 +175,7 @@ public class DepthFirstIterator<V, E>
         return v;
     }
 
-    private void recordFinish()
-    {
+    private void recordFinish() {
         V v = TypeUtil.uncheckedCast(stack.removeLast());
         putSeenData(v, VisitColor.BLACK);
         finishVertex(v);
@@ -199,8 +189,7 @@ public class DepthFirstIterator<V, E>
      *
      * @return stack
      */
-    public Deque<Object> getStack()
-    {
+    public Deque<Object> getStack() {
         return stack;
     }
 }

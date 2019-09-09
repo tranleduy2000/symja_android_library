@@ -17,13 +17,15 @@
  */
 package org.jgrapht.graph.specifics;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.EdgeSetFactory;
+import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Plain implementation of UndirectedSpecifics. This implementation requires the least amount of
@@ -34,15 +36,13 @@ import java.util.function.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  * @author Joris Kinable
  */
 public class UndirectedSpecifics<V, E>
-    implements
-    Specifics<V, E>,
-    Serializable
-{
+        implements
+        Specifics<V, E>,
+        Serializable {
     private static final long serialVersionUID = 4206026440450450992L;
 
     protected Graph<V, E> graph;
@@ -51,16 +51,15 @@ public class UndirectedSpecifics<V, E>
 
     /**
      * Construct a new undirected specifics.
-     * 
-     * @param graph the graph for which these specifics are for
-     * @param vertexMap map for the storage of vertex edge sets. Needs to have a predictable
-     *        iteration order.
+     *
+     * @param graph          the graph for which these specifics are for
+     * @param vertexMap      map for the storage of vertex edge sets. Needs to have a predictable
+     *                       iteration order.
      * @param edgeSetFactory factory for the creation of vertex edge sets
      */
     public UndirectedSpecifics(
-        Graph<V, E> graph, Map<V, UndirectedEdgeContainer<V, E>> vertexMap,
-        EdgeSetFactory<V, E> edgeSetFactory)
-    {
+            Graph<V, E> graph, Map<V, UndirectedEdgeContainer<V, E>> vertexMap,
+            EdgeSetFactory<V, E> edgeSetFactory) {
         this.graph = Objects.requireNonNull(graph);
         this.vertexMap = Objects.requireNonNull(vertexMap);
         this.edgeSetFactory = Objects.requireNonNull(edgeSetFactory);
@@ -70,8 +69,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         UndirectedEdgeContainer<V, E> ec = vertexMap.get(v);
         if (ec == null) {
             vertexMap.put(v, new UndirectedEdgeContainer<>(edgeSetFactory, v));
@@ -84,8 +82,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<V> getVertexSet()
-    {
+    public Set<V> getVertexSet() {
         return vertexMap.keySet();
     }
 
@@ -93,8 +90,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         Set<E> edges = null;
 
         if (graph.containsVertex(sourceVertex) && graph.containsVertex(targetVertex)) {
@@ -116,8 +112,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         if (graph.containsVertex(sourceVertex) && graph.containsVertex(targetVertex)) {
 
             for (E e : getEdgeContainer(sourceVertex).vertexEdges) {
@@ -132,20 +127,18 @@ public class UndirectedSpecifics<V, E>
         return null;
     }
 
-    private boolean isEqualsStraightOrInverted(Object sourceVertex, Object targetVertex, E e)
-    {
+    private boolean isEqualsStraightOrInverted(Object sourceVertex, Object targetVertex, E e) {
         boolean equalStraight = sourceVertex.equals(graph.getEdgeSource(e))
-            && targetVertex.equals(graph.getEdgeTarget(e));
+                && targetVertex.equals(graph.getEdgeTarget(e));
 
         boolean equalInverted = sourceVertex.equals(graph.getEdgeTarget(e))
-            && targetVertex.equals(graph.getEdgeSource(e));
+                && targetVertex.equals(graph.getEdgeSource(e));
         return equalStraight || equalInverted;
     }
 
     @Override
     @Deprecated
-    public void addEdgeToTouchingVertices(E e)
-    {
+    public void addEdgeToTouchingVertices(E e) {
         V source = graph.getEdgeSource(e);
         V target = graph.getEdgeTarget(e);
         getEdgeContainer(source).addEdge(e);
@@ -156,8 +149,7 @@ public class UndirectedSpecifics<V, E>
     }
 
     @Override
-    public boolean addEdgeToTouchingVertices(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdgeToTouchingVertices(V sourceVertex, V targetVertex, E e) {
         getEdgeContainer(sourceVertex).addEdge(e);
 
         if (!sourceVertex.equals(targetVertex)) {
@@ -167,8 +159,7 @@ public class UndirectedSpecifics<V, E>
     }
 
     @Override
-    public boolean addEdgeToTouchingVerticesIfAbsent(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdgeToTouchingVerticesIfAbsent(V sourceVertex, V targetVertex, E e) {
         // lookup for edge with same source and target
         UndirectedEdgeContainer<V, E> ec = getEdgeContainer(sourceVertex);
         for (E edge : ec.vertexEdges) {
@@ -185,8 +176,7 @@ public class UndirectedSpecifics<V, E>
 
     @Override
     public E createEdgeToTouchingVerticesIfAbsent(
-        V sourceVertex, V targetVertex, Supplier<E> edgeSupplier)
-    {
+            V sourceVertex, V targetVertex, Supplier<E> edgeSupplier) {
         // lookup for edge with same source and target
         UndirectedEdgeContainer<V, E> ec = getEdgeContainer(sourceVertex);
         for (E edge : ec.vertexEdges) {
@@ -207,8 +197,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         if (graph.getType().isAllowingSelfLoops()) {
             /*
              * Then we must count, and add loops twice
@@ -234,8 +223,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> edgesOf(V vertex)
-    {
+    public Set<E> edgesOf(V vertex) {
         return getEdgeContainer(vertex).getUnmodifiableVertexEdges();
     }
 
@@ -243,8 +231,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         return degreeOf(vertex);
     }
 
@@ -252,8 +239,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         return getEdgeContainer(vertex).getUnmodifiableVertexEdges();
     }
 
@@ -261,8 +247,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         return degreeOf(vertex);
     }
 
@@ -270,21 +255,19 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         return getEdgeContainer(vertex).getUnmodifiableVertexEdges();
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @deprecated Use method {@link #removeEdgeFromTouchingVertices(Object, Object, Object)}
-     *             instead.
+     * instead.
      */
     @Override
     @Deprecated
-    public void removeEdgeFromTouchingVertices(E e)
-    {
+    public void removeEdgeFromTouchingVertices(E e) {
         V source = graph.getEdgeSource(e);
         V target = graph.getEdgeTarget(e);
 
@@ -299,8 +282,7 @@ public class UndirectedSpecifics<V, E>
      * {@inheritDoc}
      */
     @Override
-    public void removeEdgeFromTouchingVertices(V sourceVertex, V targetVertex, E e)
-    {
+    public void removeEdgeFromTouchingVertices(V sourceVertex, V targetVertex, E e) {
         getEdgeContainer(sourceVertex).removeEdge(e);
 
         if (!sourceVertex.equals(targetVertex)) {
@@ -312,11 +294,9 @@ public class UndirectedSpecifics<V, E>
      * Get the edge container for a specified vertex.
      *
      * @param vertex a vertex in this graph
-     *
      * @return an edge container
      */
-    protected UndirectedEdgeContainer<V, E> getEdgeContainer(V vertex)
-    {
+    protected UndirectedEdgeContainer<V, E> getEdgeContainer(V vertex) {
         UndirectedEdgeContainer<V, E> ec = vertexMap.get(vertex);
 
         if (ec == null) {

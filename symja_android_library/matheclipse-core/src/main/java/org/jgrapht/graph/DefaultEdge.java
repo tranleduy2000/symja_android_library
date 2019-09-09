@@ -17,7 +17,7 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
 /**
  * A default implementation for edges in a {@link Graph}.
@@ -25,9 +25,8 @@ import org.jgrapht.*;
  * @author Barak Naveh
  */
 public class DefaultEdge
-    extends
-    IntrusiveEdge
-{
+        extends
+        IntrusiveEdge {
     private static final long serialVersionUID = 3258408452177932855L;
 
     /**
@@ -36,8 +35,7 @@ public class DefaultEdge
      *
      * @return source of this edge
      */
-    protected Object getSource()
-    {
+    protected Object getSource() {
         return source;
     }
 
@@ -47,14 +45,12 @@ public class DefaultEdge
      *
      * @return target of this edge
      */
-    protected Object getTarget()
-    {
+    protected Object getTarget() {
         return target;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "(" + source + " : " + target + ")";
     }
 }

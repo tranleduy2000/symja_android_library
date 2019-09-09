@@ -17,9 +17,16 @@
  */
 package org.jgrapht.traverse;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * A lexicographical breadth-first iterator for an undirected graph.
@@ -50,9 +57,8 @@ import java.util.*;
  * @author Timofey Chudakov
  */
 public class LexBreadthFirstIterator<V, E>
-    extends
-    AbstractGraphIterator<V, E>
-{
+        extends
+        AbstractGraphIterator<V, E> {
 
     /**
      * Reference to the {@code BucketList} that contains unvisited vertices.
@@ -69,8 +75,7 @@ public class LexBreadthFirstIterator<V, E>
      *
      * @param graph the graph to be iterated.
      */
-    public LexBreadthFirstIterator(Graph<V, E> graph)
-    {
+    public LexBreadthFirstIterator(Graph<V, E> graph) {
         super(graph);
         GraphTests.requireUndirected(graph);
         bucketList = new BucketList(graph.vertexSet());
@@ -82,8 +87,7 @@ public class LexBreadthFirstIterator<V, E>
      * @return true if there exist unvisited vertices.
      */
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         if (current != null) {
             return true;
         }
@@ -100,8 +104,7 @@ public class LexBreadthFirstIterator<V, E>
      * @return the next vertex in the ordering.
      */
     @Override
-    public V next()
-    {
+    public V next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -119,8 +122,7 @@ public class LexBreadthFirstIterator<V, E>
      * Always returns true since this iterator doesn't care about connected components.
      */
     @Override
-    public boolean isCrossComponentTraversal()
-    {
+    public boolean isCrossComponentTraversal() {
         return true;
     }
 
@@ -131,8 +133,7 @@ public class LexBreadthFirstIterator<V, E>
      * {@link IllegalArgumentException}.
      */
     @Override
-    public void setCrossComponentTraversal(boolean crossComponentTraversal)
-    {
+    public void setCrossComponentTraversal(boolean crossComponentTraversal) {
         if (!crossComponentTraversal) {
             throw new IllegalArgumentException("Iterator is always cross-component");
         }
@@ -143,8 +144,7 @@ public class LexBreadthFirstIterator<V, E>
      *
      * @return the vertex retrieved from the {@code bucketList}.
      */
-    private V advance()
-    {
+    private V advance() {
         V vertex = bucketList.poll();
         if (vertex != null) {
             bucketList.updateBuckets(getUnvisitedNeighbours(vertex));
@@ -159,8 +159,7 @@ public class LexBreadthFirstIterator<V, E>
      * @param vertex the vertex, whose neighbours are being explored.
      * @return neighbours of {@code vertex} which have yet to be visited by this iterator.
      */
-    private Set<V> getUnvisitedNeighbours(V vertex)
-    {
+    private Set<V> getUnvisitedNeighbours(V vertex) {
         Set<V> unmapped = new HashSet<>();
         Set<E> edges = graph.edgesOf(vertex);
         for (E edge : edges) {
@@ -179,8 +178,7 @@ public class LexBreadthFirstIterator<V, E>
      *
      * @author Timofey Chudakov
      */
-    class BucketList
-    {
+    class BucketList {
         /**
          * Bucket with the vertices that have lexicographically largest label.
          */
@@ -196,10 +194,9 @@ public class LexBreadthFirstIterator<V, E>
          * it.
          *
          * @param vertices the vertices of the graph, that should be stored in the {@code head}
-         *        bucket.
+         *                 bucket.
          */
-        BucketList(Collection<V> vertices)
-        {
+        BucketList(Collection<V> vertices) {
             head = new Bucket(vertices);
             bucketMap = new HashMap<>(vertices.size());
             for (V vertex : vertices) {
@@ -211,12 +208,11 @@ public class LexBreadthFirstIterator<V, E>
          * Checks whether there exists a bucket with the specified {@code vertex}.
          *
          * @param vertex the vertex whose presence in some {@code Bucket} in this {@code BucketList}
-         *        is checked.
+         *               is checked.
          * @return <tt>true</tt> if there exists a bucket with {@code vertex} in it, otherwise
-         *         <tt>false</tt>.
+         * <tt>false</tt>.
          */
-        boolean containsBucketWith(V vertex)
-        {
+        boolean containsBucketWith(V vertex) {
             return bucketMap.containsKey(vertex);
         }
 
@@ -227,10 +223,9 @@ public class LexBreadthFirstIterator<V, E>
          * Removes the head bucket if it becomes empty after the operation.
          *
          * @return vertex returned by {@link Bucket#poll()} invoked on head bucket or null if this
-         *         {@code BucketList} is empty.
+         * {@code BucketList} is empty.
          */
-        V poll()
-        {
+        V poll() {
             if (bucketMap.size() > 0) {
                 V res = head.poll();
                 bucketMap.remove(res);
@@ -256,8 +251,7 @@ public class LexBreadthFirstIterator<V, E>
          *
          * @param vertices the vertices, that should be moved to new buckets.
          */
-        void updateBuckets(Set<V> vertices)
-        {
+        void updateBuckets(Set<V> vertices) {
             Set<Bucket> visitedBuckets = new HashSet<>();
             for (V vertex : vertices) {
                 Bucket bucket = bucketMap.get(vertex);
@@ -288,8 +282,7 @@ public class LexBreadthFirstIterator<V, E>
          * Encapsulates operations of addition and removal of vertices from the bucket and removal
          * of a bucket from the data structure.
          */
-        private class Bucket
-        {
+        private class Bucket {
             /**
              * Reference of the bucket with lexicographically smaller label.
              */
@@ -308,8 +301,7 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @param vertices vertices to store in this bucket.
              */
-            Bucket(Collection<V> vertices)
-            {
+            Bucket(Collection<V> vertices) {
                 this.vertices = new HashSet<>(vertices);
             }
 
@@ -318,8 +310,7 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @param vertex the vertex to store in this bucket.
              */
-            Bucket(V vertex)
-            {
+            Bucket(V vertex) {
                 this.vertices = new HashSet<>();
                 vertices.add(vertex);
             }
@@ -329,16 +320,14 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @param vertex the vertex to remove.
              */
-            void removeVertex(V vertex)
-            {
+            void removeVertex(V vertex) {
                 vertices.remove(vertex);
             }
 
             /**
              * Removes this bucket from the data structure.
              */
-            void removeSelf()
-            {
+            void removeSelf() {
                 if (next != null) {
                     next.prev = prev;
                 }
@@ -352,8 +341,7 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @param bucket the bucket, that will be the next to this bucket.
              */
-            void insertBefore(Bucket bucket)
-            {
+            void insertBefore(Bucket bucket) {
                 this.next = bucket;
                 if (bucket != null) {
                     this.prev = bucket.prev;
@@ -371,8 +359,7 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @param vertex the vertex to add.
              */
-            void addVertex(V vertex)
-            {
+            void addVertex(V vertex) {
                 vertices.add(vertex);
             }
 
@@ -381,8 +368,7 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @return vertex, that was removed from this bucket, null if the bucket was empty.
              */
-            V poll()
-            {
+            V poll() {
                 if (vertices.isEmpty()) {
                     return null;
                 } else {
@@ -397,8 +383,7 @@ public class LexBreadthFirstIterator<V, E>
              *
              * @return <tt>true</tt> if this bucket doesn't contain any elements, otherwise false.
              */
-            boolean isEmpty()
-            {
+            boolean isEmpty() {
                 return vertices.size() == 0;
             }
         }

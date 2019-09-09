@@ -17,9 +17,9 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * ParanoidGraph provides a way to verify that objects added to a graph obey the standard
@@ -28,22 +28,19 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John Sichi
  */
 public class ParanoidGraph<V, E>
-    extends
-    GraphDelegator<V, E>
-{
+        extends
+        GraphDelegator<V, E> {
     private static final long serialVersionUID = 5075284167422166539L;
 
     /**
      * Create a new paranoid graph.
-     * 
+     *
      * @param g the underlying wrapped graph
      */
-    public ParanoidGraph(Graph<V, E> g)
-    {
+    public ParanoidGraph(Graph<V, E> g) {
         super(g);
     }
 
@@ -51,8 +48,7 @@ public class ParanoidGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         verifyAdd(edgeSet(), e);
         return super.addEdge(sourceVertex, targetVertex, e);
     }
@@ -61,23 +57,21 @@ public class ParanoidGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         verifyAdd(vertexSet(), v);
         return super.addVertex(v);
     }
 
-    private static <T> void verifyAdd(Set<T> set, T t)
-    {
+    private static <T> void verifyAdd(Set<T> set, T t) {
         for (T o : set) {
             if (o == t) {
                 continue;
             }
             if (o.equals(t) && (o.hashCode() != t.hashCode())) {
                 throw new IllegalArgumentException(
-                    "ParanoidGraph detected objects " + "o1 (hashCode=" + o.hashCode()
-                        + ") and o2 (hashCode=" + t.hashCode() + ") where o1.equals(o2) "
-                        + "but o1.hashCode() != o2.hashCode()");
+                        "ParanoidGraph detected objects " + "o1 (hashCode=" + o.hashCode()
+                                + ") and o2 (hashCode=" + t.hashCode() + ") where o1.equals(o2) "
+                                + "but o1.hashCode() != o2.hashCode()");
             }
         }
     }

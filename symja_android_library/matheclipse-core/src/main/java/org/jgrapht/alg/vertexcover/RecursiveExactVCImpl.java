@@ -42,7 +42,7 @@ import java.util.function.ToDoubleFunction;
  * Finds a minimum vertex cover in a undirected graph. The implementation relies on a recursive
  * algorithm. At each recursive step, the algorithm picks a unvisited vertex v and distinguishes two
  * cases: either v has to be added to the vertex cover or all of its neighbors.
- *
+ * <p>
  * In pseudo code, the algorithm (simplified) looks like this:
  *
  * <pre>
@@ -58,26 +58,28 @@ import java.util.function.ToDoubleFunction;
  *    return $N(v) \cup VC(G2)$
  * </code>
  * </pre>
- *
+ * <p>
  * To speed up the implementation, memoization and a bounding procedure are used. The current
  * implementation solves instances with 150-250 vertices efficiently to optimality.
- *
+ * <p>
  * TODO JK: determine runtime complexity and add it to class description. TODO JK: run this class
  * through a performance profiler
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class RecursiveExactVCImpl<V, E>
-    implements
-    VertexCoverAlgorithm<V>
-{
+        implements
+        VertexCoverAlgorithm<V> {
 
-    /** Input graph **/
+    /**
+     * Input graph
+     **/
     private Graph<V, E> graph;
-    /** Number of vertices in the graph **/
+    /**
+     * Number of vertices in the graph
+     **/
     private int N;
     /**
      * Neighbor cache TODO JK: It might be worth trying to replace the neighbors index by a bitset
@@ -86,14 +88,18 @@ public class RecursiveExactVCImpl<V, E>
      **/
     private NeighborCache<V, E> neighborCache;
 
-    /** Map for memoization **/
+    /**
+     * Map for memoization
+     **/
     private Map<BitSet, BitSetCover> memo;
 
     /**
      * Ordered list of vertices which will be iteratively considered to be included in a matching
      **/
     private List<V> vertices;
-    /** Mapping of a vertex to its index in the list of vertices **/
+    /**
+     * Mapping of a vertex to its index in the list of vertices
+     **/
     private Map<V, Integer> vertexIDDictionary;
 
     /**
@@ -102,7 +108,9 @@ public class RecursiveExactVCImpl<V, E>
      */
     private double upperBoundOnVertexCoverWeight;
 
-    /** Indicates whether we are solving a weighted or unweighted version of the problem **/
+    /**
+     * Indicates whether we are solving a weighted or unweighted version of the problem
+     **/
     private boolean weighted;
 
     private Map<V, Double> vertexWeightMap = null;
@@ -111,11 +119,10 @@ public class RecursiveExactVCImpl<V, E>
 
     /**
      * Constructs a new GreedyVCImpl instance
-     * 
+     *
      * @param graph input graph
      */
-    public RecursiveExactVCImpl(Graph<V, E> graph)
-    {
+    public RecursiveExactVCImpl(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
         Map<V, Double> map = new HashMap<>();
         for (V vertex : graph
@@ -130,20 +137,18 @@ public class RecursiveExactVCImpl<V, E>
 
     /**
      * Constructs a new GreedyVCImpl instance
-     * 
-     * @param graph input graph
+     *
+     * @param graph           input graph
      * @param vertexWeightMap mapping of vertex weights
      */
-    public RecursiveExactVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap)
-    {
+    public RecursiveExactVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap) {
         this.graph = GraphTests.requireUndirected(graph);
         this.vertexWeightMap = Objects.requireNonNull(vertexWeightMap);
         weighted = true;
     }
 
     @Override
-    public VertexCover<V> getVertexCover()
-    {
+    public VertexCover<V> getVertexCover() {
         // Initialize
         this.graph = GraphTests.requireUndirected(graph);
         memo = new HashMap<>();
@@ -176,14 +181,13 @@ public class RecursiveExactVCImpl<V, E>
         // Build solution
         Set<V> verticesInCover = new LinkedHashSet<>();
         for (int i = vertexCover.bitSetCover.nextSetBit(0); i >= 0 && i < N;
-            i = vertexCover.bitSetCover.nextSetBit(i + 1))
+             i = vertexCover.bitSetCover.nextSetBit(i + 1))
             verticesInCover.add(vertices.get(i));
         return new VertexCoverImpl<>(verticesInCover, vertexCover.weight);
     }
 
     private BitSetCover calculateCoverRecursively(
-        int indexNextCandidate, BitSet visited, double accumulatedWeight)
-    {
+            int indexNextCandidate, BitSet visited, double accumulatedWeight) {
         // Check memoization table
         if (memo.containsKey(visited)) {
             return memo.get(visited).copy(); // Cache hit
@@ -195,12 +199,11 @@ public class RecursiveExactVCImpl<V, E>
         int indexNextVertex = -1;
         Set<V> neighbors = Collections.emptySet();
         for (int index = visited.nextClearBit(indexNextCandidate); index >= 0 && index < N;
-            index = visited.nextClearBit(index + 1))
-        {
+             index = visited.nextClearBit(index + 1)) {
 
             neighbors = new LinkedHashSet<>(neighborCache.neighborsOf(vertices.get(index)));
-            for (Iterator<V> it = neighbors.iterator(); it.hasNext();) // Exclude all visited
-                                                                       // vertices
+            for (Iterator<V> it = neighbors.iterator(); it.hasNext(); ) // Exclude all visited
+                // vertices
                 if (visited.get(vertexIDDictionary.get(it.next())))
                     it.remove();
             if (!neighbors.isEmpty()) {
@@ -213,8 +216,8 @@ public class RecursiveExactVCImpl<V, E>
         if (indexNextVertex == -1) { // We've visited all vertices, return the base case
             BitSetCover vertexCover = new BitSetCover(N, 0);
             if (accumulatedWeight <= upperBoundOnVertexCoverWeight) { // Found new a solution that
-                                                                      // matches our bound. Tighten
-                                                                      // the bound.
+                // matches our bound. Tighten
+                // the bound.
                 upperBoundOnVertexCoverWeight = accumulatedWeight - 1;
             }
             return vertexCover;
@@ -242,7 +245,7 @@ public class RecursiveExactVCImpl<V, E>
 
         double weight = this.getWeight(neighbors);
         BitSetCover rightCover = calculateCoverRecursively(
-            indexNextVertex + 1, visitedRightBranch, accumulatedWeight + weight);
+                indexNextVertex + 1, visitedRightBranch, accumulatedWeight + weight);
         List<Integer> neighborsIndices =
                 new ArrayList<>();
         Map<V, Integer> vIntegerMap = vertexIDDictionary;
@@ -258,7 +261,7 @@ public class RecursiveExactVCImpl<V, E>
 
         weight = vertexWeightMap.get(vertices.get(indexNextVertex));
         BitSetCover leftCover = calculateCoverRecursively(
-            indexNextVertex + 1, visitedLeftBranch, accumulatedWeight + weight);
+                indexNextVertex + 1, visitedLeftBranch, accumulatedWeight + weight);
         leftCover.addVertex(indexNextVertex, weight); // Delayed update of the left cover
 
         // Return the best branch
@@ -276,12 +279,11 @@ public class RecursiveExactVCImpl<V, E>
      * Returns the weight of a collection of vertices. In case of the unweighted vertex cover
      * problem, the return value is the cardinality of the collection. In case of the weighted
      * version, the return value is the sum of the weights of the vertices
-     * 
+     *
      * @param vertices vertices
      * @return the total weight of the vertices in the collection.
      */
-    private double getWeight(Collection<V> vertices)
-    {
+    private double getWeight(Collection<V> vertices) {
         if (weighted) {
             Double acc = 0d;
             Map<V, Double> vDoubleMap = vertexWeightMap;
@@ -300,74 +302,67 @@ public class RecursiveExactVCImpl<V, E>
      * solution found by either the greedy heuristic, or Clarkson's 2-approximation. Neither of
      * these 2 algorithms dominates the other. //TODO JK: Are there better bounding procedures?
      */
-    private double calculateUpperBound()
-    {
+    private double calculateUpperBound() {
         return Math.min(
-            new GreedyVCImpl<>(graph, vertexWeightMap).getVertexCover().getWeight(),
-            new ClarksonTwoApproxVCImpl<>(graph, vertexWeightMap).getVertexCover().getWeight());
+                new GreedyVCImpl<>(graph, vertexWeightMap).getVertexCover().getWeight(),
+                new ClarksonTwoApproxVCImpl<>(graph, vertexWeightMap).getVertexCover().getWeight());
     }
 
     /**
      * Helper class which represents a vertex cover as a space efficient BitSet
      */
-    protected class BitSetCover
-    {
+    protected class BitSetCover {
         protected BitSet bitSetCover;
         protected double weight;
 
         /**
          * Construct a new empty vertex cover as a BitSet.
-         * 
-         * @param size initial capacity of the BitSet
+         *
+         * @param size          initial capacity of the BitSet
          * @param initialWeight the initial weight
          */
-        protected BitSetCover(int size, int initialWeight)
-        {
+        protected BitSetCover(int size, int initialWeight) {
             bitSetCover = new BitSet(size);
             this.weight = initialWeight;
         }
 
         /**
          * Copy constructor
-         * 
+         *
          * @param vertexCover the input vertex cover to copy
          */
-        protected BitSetCover(BitSetCover vertexCover)
-        {
+        protected BitSetCover(BitSetCover vertexCover) {
             this.bitSetCover = (BitSet) vertexCover.bitSetCover.clone();
             this.weight = vertexCover.weight;
         }
 
         /**
          * Copy a vertex cover.
-         * 
+         *
          * @return a copy of the vertex cover
          */
-        protected BitSetCover copy()
-        {
+        protected BitSetCover copy() {
             return new BitSetCover(this);
         }
 
         /**
          * Add a vertex in the vertex cover.
-         * 
+         *
          * @param vertexIndex the index of the vertex
-         * @param weight the weight of the vertex
+         * @param weight      the weight of the vertex
          */
-        protected void addVertex(int vertexIndex, double weight)
-        {
+        protected void addVertex(int vertexIndex, double weight) {
             bitSetCover.set(vertexIndex);
             this.weight += weight;
         }
 
         /**
          * Add multiple vertices in the vertex cover.
-         * 
+         *
          * @param vertexIndices the index of the vertices
-         * @param totalWeight the total weight of the vertices
+         * @param totalWeight   the total weight of the vertices
          */
-        protected void addAllVertices(List<Integer> vertexIndices, double totalWeight)
-        {
+        protected void addAllVertices(List<Integer> vertexIndices, double totalWeight) {
             vertexIndices.forEach(new Consumer<Integer>() {
                 @Override
                 public void accept(Integer bitIndex) {

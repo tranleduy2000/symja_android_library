@@ -17,11 +17,13 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.GraphType;
+import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * An undirected view of the backing directed graph specified in the constructor. This graph allows
@@ -47,16 +49,14 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author John V. Sichi
  */
 public class AsUndirectedGraph<V, E>
-    extends
-    GraphDelegator<V, E>
-    implements
-    Serializable,
-    Graph<V, E>
-{
+        extends
+        GraphDelegator<V, E>
+        implements
+        Serializable,
+        Graph<V, E> {
     private static final long serialVersionUID = 325983813283133557L;
 
     private static final String NO_EDGE_ADD = "this graph does not support edge addition";
@@ -67,8 +67,7 @@ public class AsUndirectedGraph<V, E>
      * @param g the backing directed graph over which an undirected view is to be created.
      * @throws IllegalArgumentException if the graph is not directed
      */
-    public AsUndirectedGraph(Graph<V, E> g)
-    {
+    public AsUndirectedGraph(Graph<V, E> g) {
         super(g);
         GraphTests.requireDirected(g);
     }
@@ -77,8 +76,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> getAllEdges(V sourceVertex, V targetVertex)
-    {
+    public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         Set<E> forwardList = super.getAllEdges(sourceVertex, targetVertex);
 
         if (sourceVertex.equals(targetVertex)) {
@@ -98,8 +96,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public E getEdge(V sourceVertex, V targetVertex)
-    {
+    public E getEdge(V sourceVertex, V targetVertex) {
         E edge = super.getEdge(sourceVertex, targetVertex);
 
         if (edge != null) {
@@ -112,23 +109,21 @@ public class AsUndirectedGraph<V, E>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public E addEdge(V sourceVertex, V targetVertex)
-    {
+    public E addEdge(V sourceVertex, V targetVertex) {
         throw new UnsupportedOperationException(NO_EDGE_ADD);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException always, since operation is unsupported
      */
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         throw new UnsupportedOperationException(NO_EDGE_ADD);
     }
 
@@ -136,8 +131,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int degreeOf(V vertex)
-    {
+    public int degreeOf(V vertex) {
         return super.degreeOf(vertex);
     }
 
@@ -145,8 +139,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> incomingEdgesOf(V vertex)
-    {
+    public Set<E> incomingEdgesOf(V vertex) {
         return super.edgesOf(vertex);
     }
 
@@ -154,8 +147,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int inDegreeOf(V vertex)
-    {
+    public int inDegreeOf(V vertex) {
         return super.degreeOf(vertex);
     }
 
@@ -163,8 +155,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Set<E> outgoingEdgesOf(V vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         return super.edgesOf(vertex);
     }
 
@@ -172,8 +163,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public int outDegreeOf(V vertex)
-    {
+    public int outDegreeOf(V vertex) {
         return super.degreeOf(vertex);
     }
 
@@ -181,8 +171,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphType getType()
-    {
+    public GraphType getType() {
         return super.getType().asUndirected();
     }
 
@@ -190,8 +179,7 @@ public class AsUndirectedGraph<V, E>
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return super.toStringFromSets(vertexSet(), edgeSet(), false);
     }
 }

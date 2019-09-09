@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,24 +21,19 @@ import java.util.Comparator;
 
 /**
  * An addressable heap factory.
- * 
- * @author Dimitrios Michail
  *
- * @param <K>
- *            the type of keys maintained by the heap
- * @param <V>
- *            the type of values maintained by the heap
+ * @param <K> the type of keys maintained by the heap
+ * @param <V> the type of values maintained by the heap
+ * @author Dimitrios Michail
  */
 public interface AddressableHeapFactory<K, V> {
 
     /**
      * Get a new heap.
-     * 
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * 
+     *
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      * @return a new heap
      */
     AddressableHeap<K, V> get(Comparator<? super K> comparator);

@@ -60,20 +60,18 @@ import java.util.Set;
  *
  * <p>
  * For more details see Andrew V. Goldberg's <i>Combinatorial Optimization (Lecture Notes)</i>.
- *
+ * <p>
  * Note: even though the algorithm accepts any kind of graph, currently only Simple directed and
  * undirected graphs are supported (and tested!).
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Ilya Razensteyn
  */
 
 public final class EdmondsKarpMFImpl<V, E>
-    extends
-    MaximumFlowAlgorithmBase<V, E>
-{
+        extends
+        MaximumFlowAlgorithmBase<V, E> {
 
     /* current source vertex */
     private VertexExtension currentSource;
@@ -92,8 +90,7 @@ public final class EdmondsKarpMFImpl<V, E>
      *
      * @param network network, where maximum flow will be calculated
      */
-    public EdmondsKarpMFImpl(Graph<V, E> network)
-    {
+    public EdmondsKarpMFImpl(Graph<V, E> network) {
         this(network, DEFAULT_EPSILON);
     }
 
@@ -105,8 +102,7 @@ public final class EdmondsKarpMFImpl<V, E>
      * @param network network, where maximum flow will be calculated
      * @param epsilon tolerance for comparing doubles
      */
-    public EdmondsKarpMFImpl(Graph<V, E> network, double epsilon)
-    {
+    public EdmondsKarpMFImpl(Graph<V, E> network, double epsilon) {
         super(network, epsilon);
         this.vertexExtensionsFactory = new ExtensionFactory<VertexExtension>() {
             @Override
@@ -142,12 +138,10 @@ public final class EdmondsKarpMFImpl<V, E>
      * network</tt> passed to the constructor, and they must be different.
      *
      * @param source source vertex
-     * @param sink sink vertex
-     *
+     * @param sink   sink vertex
      * @return a maximum flow
      */
-    public MaximumFlow<E> getMaximumFlow(V source, V sink)
-    {
+    public MaximumFlow<E> getMaximumFlow(V source, V sink) {
         this.calculateMaximumFlow(source, sink);
         maxFlow = composeFlow();
         return new MaximumFlowImpl<>(maxFlowValue, maxFlow);
@@ -161,12 +155,10 @@ public final class EdmondsKarpMFImpl<V, E>
      * can be queried afterwards; this will not require a new invocation of the algorithm.
      *
      * @param source source vertex
-     * @param sink sink vertex
-     *
+     * @param sink   sink vertex
      * @return the value of the maximum flow
      */
-    public double calculateMaximumFlow(V source, V sink)
-    {
+    public double calculateMaximumFlow(V source, V sink) {
         super.init(source, sink, vertexExtensionsFactory, edgeExtensionsFactory);
 
         if (!network.containsVertex(source)) {
@@ -183,7 +175,7 @@ public final class EdmondsKarpMFImpl<V, E>
         currentSource = getVertexExtension(source);
         currentSink = getVertexExtension(sink);
 
-        for (;;) {
+        for (; ; ) {
             breadthFirstSearch();
 
             if (!currentSink.visited) {
@@ -202,8 +194,7 @@ public final class EdmondsKarpMFImpl<V, E>
      * nodes are added to the queue, but nodes which are already in the queue are fully explored. As
      * such there's a chance that multiple paths are discovered.
      */
-    private void breadthFirstSearch()
-    {
+    private void breadthFirstSearch() {
         for (V v : network.vertexSet()) {
             getVertexExtension(v).visited = false;
             getVertexExtension(v).lastArcs = null;
@@ -258,15 +249,14 @@ public final class EdmondsKarpMFImpl<V, E>
      *
      * @return total increase in flow from source to sink
      */
-    private double augmentFlow()
-    {
+    private double augmentFlow() {
         double flowIncrease = 0;
         Set<VertexExtension> seen = new HashSet<>();
 
         for (AnnotatedFlowEdge ex : currentSink.lastArcs) {
             double deltaFlow = Math.min(ex.getSource().excess, ex.capacity - ex.flow);
 
-            if (augmentFlowAlongInternal(deltaFlow, ex.<VertexExtension> getSource(), seen)) {
+            if (augmentFlowAlongInternal(deltaFlow, ex.<VertexExtension>getSource(), seen)) {
                 pushFlowThrough(ex, deltaFlow);
                 flowIncrease += deltaFlow;
             }
@@ -275,8 +265,7 @@ public final class EdmondsKarpMFImpl<V, E>
     }
 
     private boolean augmentFlowAlongInternal(
-        double deltaFlow, VertexExtension node, Set<VertexExtension> seen)
-    {
+            double deltaFlow, VertexExtension node, Set<VertexExtension> seen) {
         if (node == currentSource) {
             return true;
         }
@@ -287,7 +276,7 @@ public final class EdmondsKarpMFImpl<V, E>
         seen.add(node);
 
         AnnotatedFlowEdge prev = node.lastArcs.get(0);
-        if (augmentFlowAlongInternal(deltaFlow, prev.<VertexExtension> getSource(), seen)) {
+        if (augmentFlowAlongInternal(deltaFlow, prev.<VertexExtension>getSource(), seen)) {
             pushFlowThrough(prev, deltaFlow);
             return true;
         }
@@ -295,18 +284,16 @@ public final class EdmondsKarpMFImpl<V, E>
         return false;
     }
 
-    private VertexExtension getVertexExtension(V v)
-    {
+    private VertexExtension getVertexExtension(V v) {
         return (VertexExtension) vertexExtensionManager.getExtension(v);
     }
 
     class VertexExtension
-        extends
-        VertexExtensionBase
-    {
+            extends
+            VertexExtensionBase {
         boolean visited; // this mark is used during BFS to mark visited nodes
         List<AnnotatedFlowEdge> lastArcs; // last arc(-s) in the shortest path used to reach this
-                                          // vertex
+        // vertex
 
     }
 }

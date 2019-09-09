@@ -17,18 +17,22 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Helper class for {@link KShortestSimplePaths}.
- *
  */
 class KShortestSimplePathsIterator<V, E>
-    implements
-    Iterator<Set<V>>
-{
+        implements
+        Iterator<Set<V>> {
     /**
      * End vertex.
      */
@@ -64,7 +68,6 @@ class KShortestSimplePathsIterator<V, E>
     /**
      * Performs path validations in addition to the basics (source and target are connected w/o
      * loops)
-     * 
      */
     private PathValidator<V, E> pathValidator = null;
 
@@ -81,27 +84,25 @@ class KShortestSimplePathsIterator<V, E>
     private int passNumber = 1;
 
     /**
-     * @param graph graph on which shortest paths are searched.
+     * @param graph       graph on which shortest paths are searched.
      * @param startVertex start vertex of the calculated paths.
-     * @param endVertex end vertex of the calculated paths.
-     * @param maxSize number of paths stored at end vertex of the graph.
+     * @param endVertex   end vertex of the calculated paths.
+     * @param maxSize     number of paths stored at end vertex of the graph.
      */
-    public KShortestSimplePathsIterator(Graph<V, E> graph, V startVertex, V endVertex, int maxSize)
-    {
+    public KShortestSimplePathsIterator(Graph<V, E> graph, V startVertex, V endVertex, int maxSize) {
         this(graph, startVertex, endVertex, maxSize, null);
     }
 
     /**
-     * @param graph graph on which shortest paths are searched.
-     * @param startVertex start vertex of the calculated paths.
-     * @param endVertex end vertex of the calculated paths.
-     * @param maxSize number of paths stored at end vertex of the graph.
+     * @param graph         graph on which shortest paths are searched.
+     * @param startVertex   start vertex of the calculated paths.
+     * @param endVertex     end vertex of the calculated paths.
+     * @param maxSize       number of paths stored at end vertex of the graph.
      * @param pathValidator the path validator to use
      */
     public KShortestSimplePathsIterator(
-        Graph<V, E> graph, V startVertex, V endVertex, int maxSize,
-        PathValidator<V, E> pathValidator)
-    {
+            Graph<V, E> graph, V startVertex, V endVertex, int maxSize,
+            PathValidator<V, E> pathValidator) {
         assertKShortestPathsIterator(graph, startVertex);
 
         this.graph = graph;
@@ -119,11 +120,10 @@ class KShortestSimplePathsIterator<V, E>
 
     /**
      * @return <code>true</code> if at least one path has been improved during the previous pass,
-     *         <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         if (!this.startVertexEncountered) {
             encounterStartVertex();
         }
@@ -144,8 +144,7 @@ class KShortestSimplePathsIterator<V, E>
      * @see Iterator#next()
      */
     @Override
-    public Set<V> next()
-    {
+    public Set<V> next() {
         if (!this.startVertexEncountered) {
             encounterStartVertex();
         }
@@ -174,8 +173,7 @@ class KShortestSimplePathsIterator<V, E>
      * @see Iterator#remove()
      */
     @Override
-    public void remove()
-    {
+    public void remove() {
         throw new UnsupportedOperationException();
     }
 
@@ -184,17 +182,14 @@ class KShortestSimplePathsIterator<V, E>
      * edges between the start vertex and the end vertex.
      *
      * @param endVertex end vertex.
-     *
      * @return list of <code>RankingPathElement</code>, or <code>null</code> of no path exists
-     *         between the start vertex and the end vertex.
+     * between the start vertex and the end vertex.
      */
-    RankingPathElementList<V, E> getPathElements(V endVertex)
-    {
+    RankingPathElementList<V, E> getPathElements(V endVertex) {
         return this.seenDataContainer.get(endVertex);
     }
 
-    private void assertKShortestPathsIterator(Graph<V, E> graph, V startVertex)
-    {
+    private void assertKShortestPathsIterator(Graph<V, E> graph, V startVertex) {
         if (graph == null) {
             throw new NullPointerException("graph is null");
         }
@@ -207,12 +202,10 @@ class KShortestSimplePathsIterator<V, E>
      * The first time we see a vertex, make up a new entry for it.
      *
      * @param vertex a vertex which has just been encountered.
-     * @param edge the edge via which the vertex was encountered.
-     *
+     * @param edge   the edge via which the vertex was encountered.
      * @return the new entry.
      */
-    private RankingPathElementList<V, E> createSeenData(V vertex, E edge)
-    {
+    private RankingPathElementList<V, E> createSeenData(V vertex, E edge) {
         V oppositeVertex = Graphs.getOppositeVertex(this.graph, edge, vertex);
 
         RankingPathElementList<V, E> oppositeData = this.prevSeenDataContainer.get(oppositeVertex);
@@ -221,16 +214,15 @@ class KShortestSimplePathsIterator<V, E>
         // the end-vertex
 
         return new RankingPathElementList<>(
-            this.graph, this.k, oppositeData, edge, this.endVertex, this.pathValidator);
+                this.graph, this.k, oppositeData, edge, this.endVertex, this.pathValidator);
     }
 
     /**
      * Initializes the list of paths at the start vertex and adds an empty path.
      */
-    private void encounterStartVertex()
-    {
+    private void encounterStartVertex() {
         RankingPathElementList<V, E> data = new RankingPathElementList<V, E>(
-            this.graph, this.k, new RankingPathElement<V, E>(this.startVertex), this.pathValidator);
+                this.graph, this.k, new RankingPathElement<V, E>(this.startVertex), this.pathValidator);
 
         this.seenDataContainer.put(this.startVertex, data);
         this.prevSeenDataContainer.put(this.startVertex, data);
@@ -242,13 +234,12 @@ class KShortestSimplePathsIterator<V, E>
         this.startVertexEncountered = true;
     }
 
-    private void savePassData(Set<V> improvedVertices)
-    {
+    private void savePassData(Set<V> improvedVertices) {
         for (V vertex : improvedVertices) {
             RankingPathElementList<V, E> pathElementList = this.seenDataContainer.get(vertex);
 
             RankingPathElementList<V, E> improvedPaths = new RankingPathElementList<>(
-                this.graph, pathElementList.maxSize, vertex, this.pathValidator);
+                    this.graph, pathElementList.maxSize, vertex, this.pathValidator);
 
             for (RankingPathElement<V, E> path : pathElementList) {
                 if (path.getHopCount() == this.passNumber) {
@@ -269,10 +260,9 @@ class KShortestSimplePathsIterator<V, E>
      * specified vertex provided that the path can be extended to the end-vertex.
      *
      * @param vertex vertex reached by a path.
-     * @param edge edge reaching the vertex.
+     * @param edge   edge reaching the vertex.
      */
-    private boolean tryToAddFirstPaths(V vertex, E edge)
-    {
+    private boolean tryToAddFirstPaths(V vertex, E edge) {
         // the vertex has not been reached yet
         RankingPathElementList<V, E> data = createSeenData(vertex, edge);
 
@@ -289,10 +279,9 @@ class KShortestSimplePathsIterator<V, E>
      * vertex provided that the path can be extended to the end-vertex.
      *
      * @param vertex a vertex which has just been encountered.
-     * @param edge the edge via which the vertex was encountered.
+     * @param edge   the edge via which the vertex was encountered.
      */
-    private boolean tryToAddNewPaths(V vertex, E edge)
-    {
+    private boolean tryToAddNewPaths(V vertex, E edge) {
         RankingPathElementList<V, E> data = this.seenDataContainer.get(vertex);
 
         V oppositeVertex = Graphs.getOppositeVertex(this.graph, edge, vertex);
@@ -309,7 +298,7 @@ class KShortestSimplePathsIterator<V, E>
      * vertex then the path is not added, otherwise it is added to the list of paths in increasing
      * order of weight.
      * </p>
-     *
+     * <p>
      * Complexity =
      *
      * <ul>
@@ -322,8 +311,7 @@ class KShortestSimplePathsIterator<V, E>
      * @param vertex
      * @param improvedVertices
      */
-    private void updateOutgoingVertices(V vertex, Set<V> improvedVertices)
-    {
+    private void updateOutgoingVertices(V vertex, Set<V> improvedVertices) {
         // try to add new paths for the target vertices of the outgoing edges
         // of the vertex in argument.
         for (E edge : this.graph.outgoingEdgesOf(vertex)) {

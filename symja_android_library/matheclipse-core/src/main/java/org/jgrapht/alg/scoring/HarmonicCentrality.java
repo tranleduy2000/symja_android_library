@@ -17,21 +17,21 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
 
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * Harmonic centrality.
- * 
+ *
  * <p>
  * The harmonic centrality of a vertex $x$ is defined as $H(x)=\sum_{y \neq x} 1/d(x,y)$, where
  * $d(x,y)$ is the shortest path distance from $x$ to $y$. In case a distance $d(x,y)=\infinity$,
  * then $1/d(x,y)=0$. When normalization is used the score is divided by $n-1$ where $n$ is the
  * total number of vertices in the graph.
- *
+ * <p>
  * For details see the following papers:
  * <ul>
  * <li>Yannick Rochat. Closeness centrality extended to unconnected graphs: The harmonic centrality
@@ -44,49 +44,44 @@ import java.util.*;
  * <p>
  * This implementation computes by default the centrality using outgoing paths and normalizes the
  * scores. This behavior can be adjusted by the constructor arguments.
- * 
+ *
  * <p>
  * Shortest paths are computed either by using Dijkstra's algorithm or Floyd-Warshall depending on
  * whether the graph has edges with negative edge weights. Thus, the running time is either $O(n (m
  * + n \log n))$ or $O(n^3)$ respectively, where $n$ is the number of vertices and $m$ the number of
  * edges of the graph.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public final class HarmonicCentrality<V, E>
-    extends
-    ClosenessCentrality<V, E>
-{
+        extends
+        ClosenessCentrality<V, E> {
     /**
      * Construct a new instance. By default the centrality is normalized and computed using outgoing
      * paths.
-     * 
+     *
      * @param graph the input graph
      */
-    public HarmonicCentrality(Graph<V, E> graph)
-    {
+    public HarmonicCentrality(Graph<V, E> graph) {
         this(graph, false, true);
     }
 
     /**
      * Construct a new instance.
-     * 
-     * @param graph the input graph
-     * @param incoming if true incoming paths are used, otherwise outgoing paths
+     *
+     * @param graph     the input graph
+     * @param incoming  if true incoming paths are used, otherwise outgoing paths
      * @param normalize whether to normalize by dividing the closeness by $n-1$, where $n$ is the
-     *        number of vertices of the graph
+     *                  number of vertices of the graph
      */
-    public HarmonicCentrality(Graph<V, E> graph, boolean incoming, boolean normalize)
-    {
+    public HarmonicCentrality(Graph<V, E> graph, boolean incoming, boolean normalize) {
         super(graph, incoming, normalize);
     }
 
     @Override
-    protected void compute()
-    {
+    protected void compute() {
         // create result container
         this.scores = new HashMap<>();
 

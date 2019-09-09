@@ -39,11 +39,10 @@ package org.jgrapht.util;
  * @author Barak Naveh
  */
 public class ModifiableInteger
-    extends
-    Number
-    implements
-    Comparable<ModifiableInteger>
-{
+        extends
+        Number
+        implements
+        Comparable<ModifiableInteger> {
     private static final long serialVersionUID = 3618698612851422261L;
 
     /**
@@ -62,8 +61,7 @@ public class ModifiableInteger
      * @deprecated not really deprecated, just marked so to avoid mistaken use.
      */
     @Deprecated
-    public ModifiableInteger()
-    {
+    public ModifiableInteger() {
     }
 
     /**
@@ -71,10 +69,9 @@ public class ModifiableInteger
      * specified <code>int</code> value.
      *
      * @param value the value to be represented by the <code>
-     * ModifiableInteger</code> object.
+     *              ModifiableInteger</code> object.
      */
-    public ModifiableInteger(int value)
-    {
+    public ModifiableInteger(int value) {
         this.value = value;
     }
 
@@ -83,8 +80,7 @@ public class ModifiableInteger
      *
      * @param value the new value to set.
      */
-    public void setValue(int value)
-    {
+    public void setValue(int value) {
         this.value = value;
     }
 
@@ -94,24 +90,21 @@ public class ModifiableInteger
      *
      * @return the value.
      */
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     /**
      * Adds one to the value of this modifiable integer.
      */
-    public void increment()
-    {
+    public void increment() {
         this.value++;
     }
 
     /**
      * Subtracts one from the value of this modifiable integer.
      */
-    public void decrement()
-    {
+    public void decrement() {
         this.value--;
     }
 
@@ -119,17 +112,15 @@ public class ModifiableInteger
      * Compares two <code>ModifiableInteger</code> objects numerically.
      *
      * @param anotherInteger the <code>ModifiableInteger</code> to be compared.
-     *
      * @return the value <code>0</code> if this <code>ModifiableInteger</code> is equal to the
-     *         argument <code>ModifiableInteger</code>; a value less than <code>0</code> if this
-     *         <code>ModifiableInteger</code> is numerically less than the argument
-     *         <code>ModifiableInteger</code>; and a value greater than <code>0</code> if this
-     *         <code>ModifiableInteger</code> is numerically greater than the argument
-     *         <code>ModifiableInteger</code> (signed comparison).
+     * argument <code>ModifiableInteger</code>; a value less than <code>0</code> if this
+     * <code>ModifiableInteger</code> is numerically less than the argument
+     * <code>ModifiableInteger</code>; and a value greater than <code>0</code> if this
+     * <code>ModifiableInteger</code> is numerically greater than the argument
+     * <code>ModifiableInteger</code> (signed comparison).
      */
     @Override
-    public int compareTo(ModifiableInteger anotherInteger)
-    {
+    public int compareTo(ModifiableInteger anotherInteger) {
         int thisVal = this.value;
         int anotherVal = anotherInteger.value;
 
@@ -140,8 +131,7 @@ public class ModifiableInteger
      * @see Number#doubleValue()
      */
     @Override
-    public double doubleValue()
-    {
+    public double doubleValue() {
         return this.value;
     }
 
@@ -152,12 +142,10 @@ public class ModifiableInteger
      * int</code> value as this object.
      *
      * @param o the object to compare with.
-     *
      * @return <code>true</code> if the objects are the same; <code>false</code> otherwise.
      */
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (o instanceof ModifiableInteger) {
             return this.value == ((ModifiableInteger) o).value;
         }
@@ -169,8 +157,7 @@ public class ModifiableInteger
      * @see Number#floatValue()
      */
     @Override
-    public float floatValue()
-    {
+    public float floatValue() {
         return this.value;
     }
 
@@ -181,8 +168,7 @@ public class ModifiableInteger
      * int</code> value represented by this <code>ModifiableInteger</code> object.
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.value;
     }
 
@@ -190,8 +176,7 @@ public class ModifiableInteger
      * @see Number#intValue()
      */
     @Override
-    public int intValue()
-    {
+    public int intValue() {
         return this.value;
     }
 
@@ -199,8 +184,7 @@ public class ModifiableInteger
      * @see Number#longValue()
      */
     @Override
-    public long longValue()
-    {
+    public long longValue() {
         return this.value;
     }
 
@@ -210,8 +194,7 @@ public class ModifiableInteger
      *
      * @return an <code>Integer</code> representation of the value of this object.
      */
-    public Integer toInteger()
-    {
+    public Integer toInteger() {
         return this.value;
     }
 
@@ -224,8 +207,7 @@ public class ModifiableInteger
      * @return a string representation of the value of this object in base&nbsp;10.
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return String.valueOf(this.value);
     }
 }

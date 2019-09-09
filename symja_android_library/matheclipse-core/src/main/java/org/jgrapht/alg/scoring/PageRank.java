@@ -17,14 +17,17 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * PageRank implementation.
- * 
+ *
  * <p>
  * The <a href="https://en.wikipedia.org/wiki/PageRank">wikipedia</a> article contains a nice
  * description of PageRank. The method can be found on the article: Sergey Brin and Larry Page: The
@@ -32,7 +35,7 @@ import java.util.*;
  * Conference, Brisbane, Australia, April 1998. See also the following
  * <a href="http://infolab.stanford.edu/~backrub/google.html">page</a>.
  * </p>
- * 
+ *
  * <p>
  * This is a simple iterative implementation of PageRank which stops after a given number of
  * iterations or if the PageRank values between two iterations do not change more than a predefined
@@ -45,22 +48,20 @@ import java.util.*;
  * $m$ the number of edges of the graph. The maximum number of iterations can be adjusted by the
  * caller. The default value is {@link PageRank#MAX_ITERATIONS_DEFAULT}.
  * </p>
- * 
+ *
  * <p>
  * If the graph is a weighted graph, a weighted variant is used where the probability of following
  * an edge e out of node $v$ is equal to the weight of $e$ over the sum of weights of all outgoing
  * edges of $v$.
  * </p>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Dimitrios Michail
  */
 public final class PageRank<V, E>
-    implements
-    VertexScoringAlgorithm<V, Double>
-{
+        implements
+        VertexScoringAlgorithm<V, Double> {
     /**
      * Default number of maximum iterations.
      */
@@ -82,48 +83,44 @@ public final class PageRank<V, E>
 
     /**
      * Create and execute an instance of PageRank.
-     * 
+     *
      * @param g the input graph
      */
-    public PageRank(Graph<V, E> g)
-    {
+    public PageRank(Graph<V, E> g) {
         this(g, DAMPING_FACTOR_DEFAULT, MAX_ITERATIONS_DEFAULT, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of PageRank.
-     * 
-     * @param g the input graph
+     *
+     * @param g             the input graph
      * @param dampingFactor the damping factor
      */
-    public PageRank(Graph<V, E> g, double dampingFactor)
-    {
+    public PageRank(Graph<V, E> g, double dampingFactor) {
         this(g, dampingFactor, MAX_ITERATIONS_DEFAULT, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of PageRank.
-     * 
-     * @param g the input graph
+     *
+     * @param g             the input graph
      * @param dampingFactor the damping factor
      * @param maxIterations the maximum number of iterations to perform
      */
-    public PageRank(Graph<V, E> g, double dampingFactor, int maxIterations)
-    {
+    public PageRank(Graph<V, E> g, double dampingFactor, int maxIterations) {
         this(g, dampingFactor, maxIterations, TOLERANCE_DEFAULT);
     }
 
     /**
      * Create and execute an instance of PageRank.
-     * 
-     * @param g the input graph
+     *
+     * @param g             the input graph
      * @param dampingFactor the damping factor
      * @param maxIterations the maximum number of iterations to perform
-     * @param tolerance the calculation will stop if the difference of PageRank values between
-     *        iterations change less than this value
+     * @param tolerance     the calculation will stop if the difference of PageRank values between
+     *                      iterations change less than this value
      */
-    public PageRank(Graph<V, E> g, double dampingFactor, int maxIterations, double tolerance)
-    {
+    public PageRank(Graph<V, E> g, double dampingFactor, int maxIterations, double tolerance) {
         this.g = g;
         this.scores = new HashMap<>();
 
@@ -146,8 +143,7 @@ public final class PageRank<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Map<V, Double> getScores()
-    {
+    public Map<V, Double> getScores() {
         return Collections.unmodifiableMap(scores);
     }
 
@@ -155,16 +151,14 @@ public final class PageRank<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Double getVertexScore(V v)
-    {
+    public Double getVertexScore(V v) {
         if (!g.containsVertex(v)) {
             throw new IllegalArgumentException("Cannot return score of unknown vertex");
         }
         return scores.get(v);
     }
 
-    private void run(double dampingFactor, int maxIterations, double tolerance)
-    {
+    private void run(double dampingFactor, int maxIterations, double tolerance) {
         // initialization
         int totalVertices = g.vertexSet().size();
         boolean weighted = g.getType().isWeighted();
@@ -211,7 +205,7 @@ public final class PageRank<V, E>
                     for (E e : g.incomingEdgesOf(v)) {
                         V w = Graphs.getOppositeVertex(g, e, v);
                         contribution +=
-                            dampingFactor * scores.get(w) * g.getEdgeWeight(e) / weights.get(w);
+                                dampingFactor * scores.get(w) * g.getEdgeWeight(e) / weights.get(w);
                     }
                 } else {
                     for (E e : g.incomingEdgesOf(v)) {

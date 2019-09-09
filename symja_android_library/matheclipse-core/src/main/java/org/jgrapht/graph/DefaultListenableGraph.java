@@ -17,11 +17,18 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
-import org.jgrapht.event.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.ListenableGraph;
+import org.jgrapht.event.GraphEdgeChangeEvent;
+import org.jgrapht.event.GraphListener;
+import org.jgrapht.event.GraphVertexChangeEvent;
+import org.jgrapht.event.VertexSetListener;
+import org.jgrapht.util.TypeUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A graph backed by the the graph specified at the constructor, which can be listened by
@@ -36,18 +43,16 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  * @see GraphListener
  * @see VertexSetListener
  */
 public class DefaultListenableGraph<V, E>
-    extends
-    GraphDelegator<V, E>
-    implements
-    ListenableGraph<V, E>,
-    Cloneable
-{
+        extends
+        GraphDelegator<V, E>
+        implements
+        ListenableGraph<V, E>,
+        Cloneable {
     private static final long serialVersionUID = -1156773351121025002L;
 
     private List<GraphListener<V, E>> graphListeners = new ArrayList<>();
@@ -61,8 +66,7 @@ public class DefaultListenableGraph<V, E>
      *
      * @param g the backing graph.
      */
-    public DefaultListenableGraph(Graph<V, E> g)
-    {
+    public DefaultListenableGraph(Graph<V, E> g) {
         this(g, false);
     }
 
@@ -72,14 +76,12 @@ public class DefaultListenableGraph<V, E>
      * object for each event. This option increases performance but should be used with care,
      * especially in multithreaded environment.
      *
-     * @param g the backing graph.
+     * @param g           the backing graph.
      * @param reuseEvents whether to reuse previously fired event objects instead of creating a new
-     *        event object for each event.
-     *
+     *                    event object for each event.
      * @throws IllegalArgumentException if the backing graph is already a listenable graph.
      */
-    public DefaultListenableGraph(Graph<V, E> g, boolean reuseEvents)
-    {
+    public DefaultListenableGraph(Graph<V, E> g, boolean reuseEvents) {
         super(g);
         this.reuseEvents = reuseEvents;
         reuseableEdgeEvent = new FlyweightEdgeEvent<>(this, -1, null);
@@ -97,10 +99,9 @@ public class DefaultListenableGraph<V, E>
      * increases performance but should be used with care, especially in multithreaded environment.
      *
      * @param reuseEvents whether to reuse previously fired event objects instead of creating a new
-     *        event object for each event.
+     *                    event object for each event.
      */
-    public void setReuseEvents(boolean reuseEvents)
-    {
+    public void setReuseEvents(boolean reuseEvents) {
         this.reuseEvents = reuseEvents;
     }
 
@@ -112,14 +113,12 @@ public class DefaultListenableGraph<V, E>
      *
      * @return the value of the <code>reuseEvents</code> flag.
      */
-    public boolean isReuseEvents()
-    {
+    public boolean isReuseEvents() {
         return reuseEvents;
     }
 
     @Override
-    public E addEdge(V sourceVertex, V targetVertex)
-    {
+    public E addEdge(V sourceVertex, V targetVertex) {
         E e = super.addEdge(sourceVertex, targetVertex);
 
         if (e != null) {
@@ -130,8 +129,7 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
         boolean added = super.addEdge(sourceVertex, targetVertex, e);
 
         if (added) {
@@ -142,14 +140,12 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public void addGraphListener(GraphListener<V, E> l)
-    {
+    public void addGraphListener(GraphListener<V, E> l) {
         addToListenerList(graphListeners, l);
     }
 
     @Override
-    public boolean addVertex(V v)
-    {
+    public boolean addVertex(V v) {
         boolean modified = super.addVertex(v);
 
         if (modified) {
@@ -160,14 +156,12 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public void addVertexSetListener(VertexSetListener<V> l)
-    {
+    public void addVertexSetListener(VertexSetListener<V> l) {
         addToListenerList(vertexSetListeners, l);
     }
 
     @Override
-    public Object clone()
-    {
+    public Object clone() {
         try {
             DefaultListenableGraph<V, E> g = TypeUtil.uncheckedCast(super.clone());
             g.graphListeners = new ArrayList<>();
@@ -182,8 +176,7 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public E removeEdge(V sourceVertex, V targetVertex)
-    {
+    public E removeEdge(V sourceVertex, V targetVertex) {
         E e = super.getEdge(sourceVertex, targetVertex);
         if (e != null) {
             double weight = super.getEdgeWeight(e);
@@ -195,8 +188,7 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public boolean removeEdge(E e)
-    {
+    public boolean removeEdge(E e) {
         V sourceVertex = getEdgeSource(e);
         V targetVertex = getEdgeTarget(e);
         double weight = getEdgeWeight(e);
@@ -211,14 +203,12 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public void removeGraphListener(GraphListener<V, E> l)
-    {
+    public void removeGraphListener(GraphListener<V, E> l) {
         graphListeners.remove(l);
     }
 
     @Override
-    public boolean removeVertex(V v)
-    {
+    public boolean removeVertex(V v) {
         if (containsVertex(v)) {
             Set<E> touchingEdgesList = edgesOf(v);
 
@@ -236,8 +226,7 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public void setEdgeWeight(E e, double weight)
-    {
+    public void setEdgeWeight(E e, double weight) {
         super.setEdgeWeight(e, weight);
 
         V sourceVertex = getEdgeSource(e);
@@ -247,23 +236,21 @@ public class DefaultListenableGraph<V, E>
     }
 
     @Override
-    public void removeVertexSetListener(VertexSetListener<V> l)
-    {
+    public void removeVertexSetListener(VertexSetListener<V> l) {
         vertexSetListeners.remove(l);
     }
 
     /**
      * Notify listeners that the specified edge was added.
      *
-     * @param edge the edge that was added.
+     * @param edge   the edge that was added.
      * @param source edge source
      * @param target edge target
      * @param weight edge weight
      */
-    protected void fireEdgeAdded(E edge, V source, V target, double weight)
-    {
+    protected void fireEdgeAdded(E edge, V source, V target, double weight) {
         GraphEdgeChangeEvent<V, E> e = createGraphEdgeChangeEvent(
-            GraphEdgeChangeEvent.EDGE_ADDED, edge, source, target, weight);
+                GraphEdgeChangeEvent.EDGE_ADDED, edge, source, target, weight);
 
         for (GraphListener<V, E> l : graphListeners) {
             l.edgeAdded(e);
@@ -273,15 +260,14 @@ public class DefaultListenableGraph<V, E>
     /**
      * Notify listeners that the specified edge was removed.
      *
-     * @param edge the edge that was removed.
+     * @param edge   the edge that was removed.
      * @param source edge source
      * @param target edge target
      * @param weight edge weight
      */
-    protected void fireEdgeRemoved(E edge, V source, V target, double weight)
-    {
+    protected void fireEdgeRemoved(E edge, V source, V target, double weight) {
         GraphEdgeChangeEvent<V, E> e = createGraphEdgeChangeEvent(
-            GraphEdgeChangeEvent.EDGE_REMOVED, edge, source, target, weight);
+                GraphEdgeChangeEvent.EDGE_REMOVED, edge, source, target, weight);
 
         for (GraphListener<V, E> l : graphListeners) {
             l.edgeRemoved(e);
@@ -291,15 +277,14 @@ public class DefaultListenableGraph<V, E>
     /**
      * Notify listeners that the weight of an edge has changed.
      *
-     * @param edge the edge whose weight has changed.
+     * @param edge   the edge whose weight has changed.
      * @param source edge source
      * @param target edge target
      * @param weight the edge weight
      */
-    protected void fireEdgeWeightUpdated(E edge, V source, V target, double weight)
-    {
+    protected void fireEdgeWeightUpdated(E edge, V source, V target, double weight) {
         GraphEdgeChangeEvent<V, E> e = createGraphEdgeChangeEvent(
-            GraphEdgeChangeEvent.EDGE_WEIGHT_UPDATED, edge, source, target, weight);
+                GraphEdgeChangeEvent.EDGE_WEIGHT_UPDATED, edge, source, target, weight);
 
         for (GraphListener<V, E> l : graphListeners) {
             l.edgeWeightUpdated(e);
@@ -311,10 +296,9 @@ public class DefaultListenableGraph<V, E>
      *
      * @param vertex the vertex that was added.
      */
-    protected void fireVertexAdded(V vertex)
-    {
+    protected void fireVertexAdded(V vertex) {
         GraphVertexChangeEvent<V> e =
-            createGraphVertexChangeEvent(GraphVertexChangeEvent.VERTEX_ADDED, vertex);
+                createGraphVertexChangeEvent(GraphVertexChangeEvent.VERTEX_ADDED, vertex);
 
         for (VertexSetListener<V> l : vertexSetListeners) {
             l.vertexAdded(e);
@@ -330,10 +314,9 @@ public class DefaultListenableGraph<V, E>
      *
      * @param vertex the vertex that was removed.
      */
-    protected void fireVertexRemoved(V vertex)
-    {
+    protected void fireVertexRemoved(V vertex) {
         GraphVertexChangeEvent<V> e =
-            createGraphVertexChangeEvent(GraphVertexChangeEvent.VERTEX_REMOVED, vertex);
+                createGraphVertexChangeEvent(GraphVertexChangeEvent.VERTEX_REMOVED, vertex);
 
         for (VertexSetListener<V> l : vertexSetListeners) {
             l.vertexRemoved(e);
@@ -344,16 +327,14 @@ public class DefaultListenableGraph<V, E>
         }
     }
 
-    private static <L extends EventListener> void addToListenerList(List<L> list, L l)
-    {
+    private static <L extends EventListener> void addToListenerList(List<L> list, L l) {
         if (!list.contains(l)) {
             list.add(l);
         }
     }
 
     private GraphEdgeChangeEvent<V, E> createGraphEdgeChangeEvent(
-        int eventType, E edge, V source, V target, double weight)
-    {
+            int eventType, E edge, V source, V target, double weight) {
         if (reuseEvents) {
             reuseableEdgeEvent.setType(eventType);
             reuseableEdgeEvent.setEdge(edge);
@@ -367,8 +348,7 @@ public class DefaultListenableGraph<V, E>
         }
     }
 
-    private GraphVertexChangeEvent<V> createGraphVertexChangeEvent(int eventType, V vertex)
-    {
+    private GraphVertexChangeEvent<V> createGraphVertexChangeEvent(int eventType, V vertex) {
         if (reuseEvents) {
             reuseableVertexEvent.setType(eventType);
             reuseableVertexEvent.setVertex(vertex);
@@ -385,16 +365,14 @@ public class DefaultListenableGraph<V, E>
      * @author Barak Naveh
      */
     private static class FlyweightEdgeEvent<VV, EE>
-        extends
-        GraphEdgeChangeEvent<VV, EE>
-    {
+            extends
+            GraphEdgeChangeEvent<VV, EE> {
         private static final long serialVersionUID = 3907207152526636089L;
 
         /**
          * @see GraphEdgeChangeEvent
          */
-        public FlyweightEdgeEvent(Object eventSource, int type, EE e)
-        {
+        public FlyweightEdgeEvent(Object eventSource, int type, EE e) {
             super(eventSource, type, e, null, null);
         }
 
@@ -403,23 +381,19 @@ public class DefaultListenableGraph<V, E>
          *
          * @param e the edge to be set.
          */
-        protected void setEdge(EE e)
-        {
+        protected void setEdge(EE e) {
             this.edge = e;
         }
 
-        protected void setEdgeSource(VV v)
-        {
+        protected void setEdgeSource(VV v) {
             this.edgeSource = v;
         }
 
-        protected void setEdgeTarget(VV v)
-        {
+        protected void setEdgeTarget(VV v) {
             this.edgeTarget = v;
         }
 
-        protected void setEdgeWeight(double weight)
-        {
+        protected void setEdgeWeight(double weight) {
             this.edgeWeight = weight;
         }
 
@@ -428,8 +402,7 @@ public class DefaultListenableGraph<V, E>
          *
          * @param type the type to be set.
          */
-        protected void setType(int type)
-        {
+        protected void setType(int type) {
             this.type = type;
         }
     }
@@ -440,16 +413,14 @@ public class DefaultListenableGraph<V, E>
      * @author Barak Naveh
      */
     private static class FlyweightVertexEvent<VV>
-        extends
-        GraphVertexChangeEvent<VV>
-    {
+            extends
+            GraphVertexChangeEvent<VV> {
         private static final long serialVersionUID = 3257848787857585716L;
 
         /**
          * @see GraphVertexChangeEvent#GraphVertexChangeEvent(Object, int, Object)
          */
-        public FlyweightVertexEvent(Object eventSource, int type, VV vertex)
-        {
+        public FlyweightVertexEvent(Object eventSource, int type, VV vertex) {
             super(eventSource, type, vertex);
         }
 
@@ -458,8 +429,7 @@ public class DefaultListenableGraph<V, E>
          *
          * @param type type to be set.
          */
-        protected void setType(int type)
-        {
+        protected void setType(int type) {
             this.type = type;
         }
 
@@ -468,8 +438,7 @@ public class DefaultListenableGraph<V, E>
          *
          * @param vertex the vertex to be set.
          */
-        protected void setVertex(VV vertex)
-        {
+        protected void setVertex(VV vertex) {
             this.vertex = vertex;
         }
     }

@@ -17,19 +17,17 @@
  */
 package org.jgrapht.event;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * A traversal event for a graph vertex.
  *
  * @param <V> the graph vertex type
- *
  * @author Barak Naveh
  */
 public class VertexTraversalEvent<V>
-    extends
-    EventObject
-{
+        extends
+        EventObject {
     private static final long serialVersionUID = 3688790267213918768L;
 
     /**
@@ -41,10 +39,9 @@ public class VertexTraversalEvent<V>
      * Creates a new VertexTraversalEvent.
      *
      * @param eventSource the source of the event.
-     * @param vertex the traversed vertex.
+     * @param vertex      the traversed vertex.
      */
-    public VertexTraversalEvent(Object eventSource, V vertex)
-    {
+    public VertexTraversalEvent(Object eventSource, V vertex) {
         super(eventSource);
         this.vertex = vertex;
     }
@@ -54,8 +51,7 @@ public class VertexTraversalEvent<V>
      *
      * @return the traversed vertex.
      */
-    public V getVertex()
-    {
+    public V getVertex() {
         return vertex;
     }
 }

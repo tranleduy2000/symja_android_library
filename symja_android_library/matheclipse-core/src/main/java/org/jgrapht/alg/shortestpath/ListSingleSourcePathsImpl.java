@@ -17,30 +17,30 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.graph.GraphWalk;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * An implementation of {@link SingleSourcePaths} which stores one path per vertex.
- * 
+ *
  * <p>
  * This is an explicit representation which stores all paths. For a more compact representation see
  * {@link TreeSingleSourcePathsImpl}.
- * 
- * @author Dimitrios Michail
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Dimitrios Michail
  */
 public class ListSingleSourcePathsImpl<V, E>
-    implements
-    SingleSourcePaths<V, E>,
-    Serializable
-{
+        implements
+        SingleSourcePaths<V, E>,
+        Serializable {
     private static final long serialVersionUID = -60070018446561686L;
 
     /**
@@ -60,13 +60,12 @@ public class ListSingleSourcePathsImpl<V, E>
 
     /**
      * Construct a new instance.
-     * 
-     * @param graph the graph
+     *
+     * @param graph  the graph
      * @param source the source vertex
-     * @param paths one path per target vertex
+     * @param paths  one path per target vertex
      */
-    public ListSingleSourcePathsImpl(Graph<V, E> graph, V source, Map<V, GraphPath<V, E>> paths)
-    {
+    public ListSingleSourcePathsImpl(Graph<V, E> graph, V source, Map<V, GraphPath<V, E>> paths) {
         this.graph = Objects.requireNonNull(graph, "Graph is null");
         this.source = Objects.requireNonNull(source, "Source vertex is null");
         this.paths = Objects.requireNonNull(paths, "Paths are null");
@@ -76,8 +75,7 @@ public class ListSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
@@ -85,8 +83,7 @@ public class ListSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getSourceVertex()
-    {
+    public V getSourceVertex() {
         return source;
     }
 
@@ -94,8 +91,7 @@ public class ListSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public double getWeight(V targetVertex)
-    {
+    public double getWeight(V targetVertex) {
         GraphPath<V, E> p = paths.get(targetVertex);
         if (p == null) {
             if (source.equals(targetVertex)) {
@@ -112,8 +108,7 @@ public class ListSingleSourcePathsImpl<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphPath<V, E> getPath(V targetVertex)
-    {
+    public GraphPath<V, E> getPath(V targetVertex) {
         GraphPath<V, E> p = paths.get(targetVertex);
         if (p == null) {
             if (source.equals(targetVertex)) {

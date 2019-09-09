@@ -17,9 +17,9 @@
  */
 package org.jgrapht.alg.util;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * Compares two vertices based on their degree.
@@ -31,22 +31,19 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Linda Buisman
  */
 public class VertexDegreeComparator<V, E>
-    implements
-    Comparator<V>
-{
+        implements
+        Comparator<V> {
 
     /**
      * Order in which we sort the vertices: ascending vertex degree or descending vertex degree
      */
-    public enum Order
-    {
+    public enum Order {
         ASCENDING,
         DESCENDING
-    };
+    }
 
     /**
      * The graph that contains the vertices to be compared.
@@ -64,19 +61,17 @@ public class VertexDegreeComparator<V, E>
      *
      * @param g graph with respect to which the degree is calculated.
      */
-    public VertexDegreeComparator(Graph<V, E> g)
-    {
+    public VertexDegreeComparator(Graph<V, E> g) {
         this(g, Order.ASCENDING);
     }
 
     /**
      * Creates a comparator for comparing the degrees of vertices in the specified graph.
      *
-     * @param g graph with respect to which the degree is calculated.
+     * @param g     graph with respect to which the degree is calculated.
      * @param order order in which the vertices are sorted (ascending or descending)
      */
-    public VertexDegreeComparator(Graph<V, E> g, Order order)
-    {
+    public VertexDegreeComparator(Graph<V, E> g, Order order) {
         graph = g;
         this.order = order;
     }
@@ -87,13 +82,11 @@ public class VertexDegreeComparator<V, E>
      *
      * @param v1 the first vertex to be compared.
      * @param v2 the second vertex to be compared.
-     *
      * @return -1 if <code>v1</code> comes before <code>v2</code>, +1 if <code>
      * v1</code> comes after <code>v2</code>, 0 if equal.
      */
     @Override
-    public int compare(V v1, V v2)
-    {
+    public int compare(V v1, V v2) {
         int comparison = Integer.compare(graph.degreeOf(v1), graph.degreeOf(v2));
 
         if (order == Order.ASCENDING)

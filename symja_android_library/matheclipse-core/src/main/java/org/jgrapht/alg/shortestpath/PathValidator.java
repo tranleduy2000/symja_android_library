@@ -17,29 +17,25 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
+import org.jgrapht.GraphPath;
 
 /**
  * May be used to provide external path validations in addition to the basic validations done by
  * {@link KShortestSimplePaths} - that the path is from source to target and that it does not
  * contain loops.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Assaf Mizrachi
- *
  */
-public interface PathValidator<V, E>
-{
+public interface PathValidator<V, E> {
 
     /**
      * Checks if an edge can be added to a previous path element.
-     * 
+     *
      * @param partialPath the path from source vertex up to the current vertex.
-     * @param edge the new edge to be added to the path.
-     * 
+     * @param edge        the new edge to be added to the path.
      * @return <code>true</code> if edge can be added, <code>false</code> otherwise.
      */
-    public boolean isValidPath(GraphPath<V, E> partialPath, E edge);
+    boolean isValidPath(GraphPath<V, E> partialPath, E edge);
 }

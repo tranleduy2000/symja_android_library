@@ -17,11 +17,11 @@
  */
 package org.jgrapht.alg.flow.mincost;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.MinimumCostFlowAlgorithm;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * This class represents a <a href="https://en.wikipedia.org/wiki/Minimum-cost_flow_problem">
@@ -39,8 +39,7 @@ import java.util.function.*;
  * @author Timofey Chudakov
  * @see MinimumCostFlowAlgorithm
  */
-public interface MinimumCostFlowProblem<V, E>
-{
+public interface MinimumCostFlowProblem<V, E> {
 
     /**
      * Returns the flow network
@@ -78,14 +77,13 @@ public interface MinimumCostFlowProblem<V, E>
 
     /**
      * Default implementation of a Minimum Cost Flow Problem
-     * 
+     *
      * @param <V> the graph vertex type
      * @param <E> the graph edge type
      */
     class MinimumCostFlowProblemImpl<V, E>
-        implements
-        MinimumCostFlowProblem<V, E>
-    {
+            implements
+            MinimumCostFlowProblem<V, E> {
 
         private final Graph<V, E> graph;
         private final Function<V, Integer> nodeSupplies;
@@ -95,14 +93,13 @@ public interface MinimumCostFlowProblem<V, E>
         /**
          * Constructs a new minimum cost flow problem without arc capacity lower bounds.
          *
-         * @param graph the flow network
-         * @param supplyMap the node demands
+         * @param graph                  the flow network
+         * @param supplyMap              the node demands
          * @param arcCapacityUpperBounds the arc capacity upper bounds
          */
         public MinimumCostFlowProblemImpl(
-            Graph<V, E> graph, Function<V, Integer> supplyMap,
-            Function<E, Integer> arcCapacityUpperBounds)
-        {
+                Graph<V, E> graph, Function<V, Integer> supplyMap,
+                Function<E, Integer> arcCapacityUpperBounds) {
             this(graph, supplyMap, arcCapacityUpperBounds, new Function<E, Integer>() {
                 @Override
                 public Integer apply(E a) {
@@ -114,16 +111,15 @@ public interface MinimumCostFlowProblem<V, E>
         /**
          * Constructs a new minimum cost flow problem
          *
-         * @param graph the flow network
-         * @param nodeSupplies the node demands
+         * @param graph                  the flow network
+         * @param nodeSupplies           the node demands
          * @param arcCapacityUpperBounds the arc capacity upper bounds
          * @param arcCapacityLowerBounds the arc capacity lower bounds
          */
         public MinimumCostFlowProblemImpl(
-            Graph<V, E> graph, Function<V, Integer> nodeSupplies,
-            Function<E, Integer> arcCapacityUpperBounds,
-            Function<E, Integer> arcCapacityLowerBounds)
-        {
+                Graph<V, E> graph, Function<V, Integer> nodeSupplies,
+                Function<E, Integer> arcCapacityUpperBounds,
+                Function<E, Integer> arcCapacityLowerBounds) {
             this.graph = Objects.requireNonNull(graph);
             this.nodeSupplies = Objects.requireNonNull(nodeSupplies);
             this.arcCapacityUpperBounds = Objects.requireNonNull(arcCapacityUpperBounds);
@@ -134,8 +130,7 @@ public interface MinimumCostFlowProblem<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Graph<V, E> getGraph()
-        {
+        public Graph<V, E> getGraph() {
             return graph;
         }
 
@@ -143,8 +138,7 @@ public interface MinimumCostFlowProblem<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Function<V, Integer> getNodeSupply()
-        {
+        public Function<V, Integer> getNodeSupply() {
             return nodeSupplies;
         }
 
@@ -152,8 +146,7 @@ public interface MinimumCostFlowProblem<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Function<E, Integer> getArcCapacityLowerBounds()
-        {
+        public Function<E, Integer> getArcCapacityLowerBounds() {
             return arcCapacityLowerBounds;
         }
 
@@ -161,8 +154,7 @@ public interface MinimumCostFlowProblem<V, E>
          * {@inheritDoc}
          */
         @Override
-        public Function<E, Integer> getArcCapacityUpperBounds()
-        {
+        public Function<E, Integer> getArcCapacityUpperBounds() {
             return arcCapacityUpperBounds;
         }
     }

@@ -17,21 +17,18 @@
  */
 package org.jgrapht.alg.util;
 
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * A default implementation for a check on equality (that always holds)
- * 
+ *
  * @param <T> type of elements to be compared
- * 
  */
 public class AlwaysEqualComparator<T>
-    implements
-    Comparator<T>
-{
+        implements
+        Comparator<T> {
     @Override
-    public int compare(T arg0, T arg1)
-    {
+    public int compare(T arg0, T arg1) {
         return 0;
     }
 }

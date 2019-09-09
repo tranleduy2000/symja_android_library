@@ -17,13 +17,17 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An algorithm which computes a capacitated (minimum) spanning tree of a given connected graph with
@@ -39,8 +43,7 @@ import java.util.*;
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
-public interface CapacitatedSpanningTreeAlgorithm<V, E>
-{
+public interface CapacitatedSpanningTreeAlgorithm<V, E> {
     /**
      * Computes a capacitated spanning tree.
      *
@@ -55,21 +58,19 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     interface CapacitatedSpanningTree<V, E>
-        extends
-        Iterable<E>,
-        SpanningTreeAlgorithm.SpanningTree<E>
-    {
+            extends
+            Iterable<E>,
+            SpanningTreeAlgorithm.SpanningTree<E> {
 
         /**
          * Tests whether <code>cmst</code> is a CMST on <code>graph</code> with root
          * <code>root</code>, capacity <code>capacity</code> and demand function
          * <code>demands</code>.
          *
-         * @param graph the graph
-         * @param root the expected root of cmst
+         * @param graph    the graph
+         * @param root     the expected root of cmst
          * @param capacity the expected capacity of cmst
-         * @param demands the demand function
-         *
+         * @param demands  the demand function
          * @return whether <code>cmst</code> is a CMST
          */
         boolean isCapacitatedSpanningTree(
@@ -99,10 +100,9 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
      * @param <E> the graph edge type
      */
     class CapacitatedSpanningTreeImpl<V, E>
-        implements
-        CapacitatedSpanningTree<V, E>,
-        Serializable
-    {
+            implements
+            CapacitatedSpanningTree<V, E>,
+            Serializable {
 
         private static final long serialVersionUID = 7088989899889893333L;
 
@@ -114,18 +114,17 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
         /**
          * Construct a new capacitated spanning tree.
          *
-         * @param labels the labelling of the vertices marking their subset membership in the
-         *        partition
+         * @param labels    the labelling of the vertices marking their subset membership in the
+         *                  partition
          * @param partition the implicitly defined partition of the vertices in the capacitated
-         *        spanning tree
-         * @param edges the edge set of the capacitated spanning tree
-         * @param weight the weight of the capacitated spanning tree, i.e. the sum of all edge
-         *        weights
+         *                  spanning tree
+         * @param edges     the edge set of the capacitated spanning tree
+         * @param weight    the weight of the capacitated spanning tree, i.e. the sum of all edge
+         *                  weights
          */
         public CapacitatedSpanningTreeImpl(
-            Map<V, Integer> labels, Map<Integer, Pair<Set<V>, Double>> partition, Set<E> edges,
-            double weight)
-        {
+                Map<V, Integer> labels, Map<Integer, Pair<Set<V>, Double>> partition, Set<E> edges,
+                double weight) {
             this.labels = labels;
             this.partition = partition;
             this.edges = edges;
@@ -134,8 +133,7 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
 
         @Override
         public boolean isCapacitatedSpanningTree(
-            Graph<V, E> graph, V root, double capacity, Map<V, Double> demands)
-        {
+                Graph<V, E> graph, V root, double capacity, Map<V, Double> demands) {
             if (this.getEdges().size() != graph.vertexSet().size() - 1) {
                 return false;
             }
@@ -167,10 +165,10 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
 
             // check if partition and tree correspond to each other
             Graph<V, E> spanningTreeGraph =
-                new AsSubgraph<>(graph, graph.vertexSet(), this.getEdges());
+                    new AsSubgraph<>(graph, graph.vertexSet(), this.getEdges());
 
             DepthFirstIterator<V, E> depthFirstIterator =
-                new DepthFirstIterator<>(spanningTreeGraph, root);
+                    new DepthFirstIterator<>(spanningTreeGraph, root);
             if (depthFirstIterator.hasNext()) {
                 depthFirstIterator.next();
             }
@@ -184,11 +182,10 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
                 if (spanningTreeGraph.containsEdge(root, next)) {
                     if (!currentSubtree.isEmpty()) {
                         if (!currentSubtree.equals(
-                            this
-                                .getPartition()
-                                .get(this.getLabels().get(currentSubtree.iterator().next()))
-                                .getFirst()))
-                        {
+                                this
+                                        .getPartition()
+                                        .get(this.getLabels().get(currentSubtree.iterator().next()))
+                                        .getFirst())) {
                             return false;
                         }
                         currentSubtree = new HashSet<>();
@@ -198,42 +195,33 @@ public interface CapacitatedSpanningTreeAlgorithm<V, E>
                 currentSubtree.add(next);
             }
 
-            if (numberOfRootEdgesExplored != spanningTreeGraph.degreeOf(root)) {
-                return false;
-            }
-
-            return true;
+            return numberOfRootEdgesExplored == spanningTreeGraph.degreeOf(root);
         }
 
         @Override
-        public Map<V, Integer> getLabels()
-        {
+        public Map<V, Integer> getLabels() {
             return labels;
         }
 
         @Override
-        public Map<Integer, Pair<Set<V>, Double>> getPartition()
-        {
+        public Map<Integer, Pair<Set<V>, Double>> getPartition() {
             return partition;
         }
 
         @Override
-        public double getWeight()
-        {
+        public double getWeight() {
             return weight;
         }
 
         @Override
-        public Set<E> getEdges()
-        {
+        public Set<E> getEdges() {
             return edges;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Capacitated Spanning-Tree [weight=" + weight + ", edges=" + edges + ", labels="
-                + labels + ", partition=" + partition + "]";
+                    + labels + ", partition=" + partition + "]";
         }
 
         @Override

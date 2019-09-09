@@ -17,20 +17,18 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import org.jgrapht.util.*;
+import org.jgrapht.util.WeightedUnmodifiableSet;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * Algorithm to compute a (weighted) <a href="http://mathworld.wolfram.com/Clique.html">Clique</a>
  * in a graph.
  *
  * @param <V> vertex the graph vertex type
- *
  * @author Joris Kinable
  */
-public interface CliqueAlgorithm<V>
-{
+public interface CliqueAlgorithm<V> {
 
     /**
      * Computes a clique.
@@ -45,9 +43,8 @@ public interface CliqueAlgorithm<V>
      * @param <V> the vertex type
      */
     interface Clique<V>
-        extends
-        Set<V>
-    {
+            extends
+            Set<V> {
 
         /**
          * Returns the weight of the clique. When solving a weighted clique problem, the weight
@@ -65,21 +62,18 @@ public interface CliqueAlgorithm<V>
      * @param <V> the vertex type
      */
     class CliqueImpl<V>
-        extends
-        WeightedUnmodifiableSet<V>
-        implements
-        Clique<V>
-    {
+            extends
+            WeightedUnmodifiableSet<V>
+            implements
+            Clique<V> {
 
         private static final long serialVersionUID = -4336873008459736342L;
 
-        public CliqueImpl(Set<V> clique)
-        {
+        public CliqueImpl(Set<V> clique) {
             super(clique);
         }
 
-        public CliqueImpl(Set<V> clique, double weight)
-        {
+        public CliqueImpl(Set<V> clique, double weight) {
             super(clique, weight);
         }
     }

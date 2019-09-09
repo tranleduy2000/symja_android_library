@@ -24,9 +24,8 @@ package org.jgrapht.graph;
  * @author John V. Sichi
  */
 public class DefaultWeightedEdge
-    extends
-    IntrusiveWeightedEdge
-{
+        extends
+        IntrusiveWeightedEdge {
     private static final long serialVersionUID = -3259071493169286685L;
 
     /**
@@ -35,8 +34,7 @@ public class DefaultWeightedEdge
      *
      * @return source of this edge
      */
-    protected Object getSource()
-    {
+    protected Object getSource() {
         return source;
     }
 
@@ -46,8 +44,7 @@ public class DefaultWeightedEdge
      *
      * @return target of this edge
      */
-    protected Object getTarget()
-    {
+    protected Object getTarget() {
         return target;
     }
 
@@ -57,14 +54,12 @@ public class DefaultWeightedEdge
      *
      * @return weight of this edge
      */
-    protected double getWeight()
-    {
+    protected double getWeight() {
         return weight;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "(" + source + " : " + target + ")";
     }
 

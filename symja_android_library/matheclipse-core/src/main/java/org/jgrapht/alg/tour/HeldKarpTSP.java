@@ -17,12 +17,18 @@
  */
 package org.jgrapht.alg.tour;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.HamiltonianCycleAlgorithm;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.util.VertexToIntegerMapping;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A dynamic programming algorithm for the TSP problem.
@@ -47,23 +53,19 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class HeldKarpTSP<V, E>
-    implements
-    HamiltonianCycleAlgorithm<V, E>
-{
+        implements
+        HamiltonianCycleAlgorithm<V, E> {
 
     /**
      * Construct a new instance
      */
-    public HeldKarpTSP()
-    {
+    public HeldKarpTSP() {
     }
 
-    private double memo(int previousNode, int state, double[][] C, double[][] W)
-    {
+    private double memo(int previousNode, int state, double[][] C, double[][] W) {
         // have we seen this state before?
         if (C[previousNode][state] != Double.MIN_VALUE)
             return C[previousNode][state];
@@ -82,7 +84,7 @@ public class HeldKarpTSP<V, E>
             for (int i = 0; i < W.length; i++) {
                 if (((state >> i) & 1) == 0 && W[previousNode][i] != Double.MAX_VALUE) {
                     totalCost =
-                        Math.min(totalCost, W[previousNode][i] + memo(i, state ^ (1 << i), C, W));
+                            Math.min(totalCost, W[previousNode][i] + memo(i, state ^ (1 << i), C, W));
                 }
             }
         }
@@ -99,8 +101,7 @@ public class HeldKarpTSP<V, E>
      * @throws IllegalArgumentException if the graph contains more than 31 vertices
      */
     @Override
-    public GraphPath<V, E> getTour(Graph<V, E> graph)
-    {
+    public GraphPath<V, E> getTour(Graph<V, E> graph) {
         final int n = graph.vertexSet().size(); // number of nodes
 
         if (n == 0) {
@@ -109,16 +110,16 @@ public class HeldKarpTSP<V, E>
 
         if (n > 31) {
             throw new IllegalArgumentException(
-                "The internal representation of the dynamic programming state "
-                    + "space cannot represent graphs containing more than 31 vertices. "
-                    + "The runtime complexity of this implementation, O(2^|V| x |V|^2),  makes it unsuitable "
-                    + "for graphs with more than 31 vertices.");
+                    "The internal representation of the dynamic programming state "
+                            + "space cannot represent graphs containing more than 31 vertices. "
+                            + "The runtime complexity of this implementation, O(2^|V| x |V|^2),  makes it unsuitable "
+                            + "for graphs with more than 31 vertices.");
         }
 
         if (n == 1) {
             V startNode = graph.vertexSet().iterator().next();
             return new GraphWalk<>(
-                graph, startNode, startNode, Collections.singletonList(startNode), null, 0);
+                    graph, startNode, startNode, Collections.singletonList(startNode), null, 0);
         }
 
         // W[u, v] = the cost of the minimum weight between u and v
@@ -178,11 +179,10 @@ public class HeldKarpTSP<V, E>
             int nextNode = -1;
             for (int node = 1; node < n; node++) {
                 if ((lastState & (1 << node)) == 0 && W[lastNode][node] != Double.MAX_VALUE
-                    && C[node][lastState ^ (1 << node)] != Double.MIN_VALUE
-                    && Double.compare(
+                        && C[node][lastState ^ (1 << node)] != Double.MIN_VALUE
+                        && Double.compare(
                         C[node][lastState ^ (1 << node)] + W[lastNode][node],
-                        C[lastNode][lastState]) == 0)
-                {
+                        C[lastNode][lastState]) == 0) {
                     nextNode = node;
                     break;
                 }
@@ -200,6 +200,6 @@ public class HeldKarpTSP<V, E>
         edgeList.add(graph.getEdge(indexList.get(lastNode), indexList.get(0)));
 
         return new GraphWalk<>(
-            graph, indexList.get(0), indexList.get(0), vertexList, edgeList, tourWeight);
+                graph, indexList.get(0), indexList.get(0), vertexList, edgeList, tourWeight);
     }
 }

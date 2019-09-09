@@ -17,7 +17,9 @@
  */
 package org.jgrapht.util;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Utility class to help implement an iterator/enumerator in which the hasNext() method needs to
@@ -54,28 +56,26 @@ import java.util.*;
  *
  *          });
  *      }
- *      
+ *
  *      // forwarding to nextSupplier and return its returned value
  *      public boolean hasMoreElements() {
  *          return this.nextSupplier.hasMoreElements();
  *      }
- *      
+ *
  *      // forwarding to nextSupplier and return its returned value
  *      public Object nextElement() {
  *          return this.nextSupplier.nextElement();
  *      }
  *  }</code>
  * </pre>
- * 
- * @param <E> the element type
  *
+ * @param <E> the element type
  * @author Assaf Lehr
  */
 public class PrefetchIterator<E>
-    implements
-    Iterator<E>,
-    Enumeration<E>
-{
+        implements
+        Iterator<E>,
+        Enumeration<E> {
     private NextElementFunctor<E> innerEnum;
     private E getNextLastResult;
     private boolean isGetNextLastResultUpToDate = false;
@@ -85,11 +85,10 @@ public class PrefetchIterator<E>
 
     /**
      * Construct a new prefetch iterator.
-     * 
+     *
      * @param aEnum the next element functor
      */
-    public PrefetchIterator(NextElementFunctor<E> aEnum)
-    {
+    public PrefetchIterator(NextElementFunctor<E> aEnum) {
         innerEnum = aEnum;
     }
 
@@ -97,8 +96,7 @@ public class PrefetchIterator<E>
      * Serves as one contact place to the functor; all must use it and not directly the
      * NextElementFunctor.
      */
-    private E getNextElementFromInnerFunctor()
-    {
+    private E getNextElementFromInnerFunctor() {
         innerFunctorUsageCounter++;
         E result = this.innerEnum.nextElement();
 
@@ -112,8 +110,7 @@ public class PrefetchIterator<E>
      * {@inheritDoc}
      */
     @Override
-    public E nextElement()
-    {
+    public E nextElement() {
         /*
          * 1. Retrieves the saved value or calculates it if it does not exist 2. Changes
          * isGetNextLastResultUpToDate to false. (Because it does not save the NEXT element now; it
@@ -134,8 +131,7 @@ public class PrefetchIterator<E>
      * {@inheritDoc}
      */
     @Override
-    public boolean hasMoreElements()
-    {
+    public boolean hasMoreElements() {
         /*
          * If (isGetNextLastResultUpToDate==true) returns true else 1. calculates getNext() and
          * saves it 2. sets isGetNextLastResultUpToDate to true.
@@ -163,16 +159,15 @@ public class PrefetchIterator<E>
      * hasMoreElements() now, only at initialization time. Efficiency: if nextElements(),
      * hasMoreElements() were never used, it activates the hasMoreElements() once. Else it is
      * immediately(O(1))
-     * 
+     *
      * @return true if the enumeration started as an empty one, false otherwise.
      */
-    public boolean isEnumerationStartedEmpty()
-    {
+    public boolean isEnumerationStartedEmpty() {
         if (this.innerFunctorUsageCounter == 0) {
             return !hasMoreElements();
         } else // it is not the first time , so use the saved value
-               // which was initilaizeed during a call to
-               // getNextElementFromInnerFunctor
+        // which was initilaizeed during a call to
+        // getNextElementFromInnerFunctor
         {
             return flagIsEnumerationStartedEmpty;
         }
@@ -182,8 +177,7 @@ public class PrefetchIterator<E>
      * {@inheritDoc}
      */
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return this.hasMoreElements();
     }
 
@@ -191,8 +185,7 @@ public class PrefetchIterator<E>
      * {@inheritDoc}
      */
     @Override
-    public E next()
-    {
+    public E next() {
         return this.nextElement();
     }
 
@@ -201,26 +194,24 @@ public class PrefetchIterator<E>
      */
     @Override
     public void remove()
-        throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * A functor for the calculation of the next element.
-     * 
+     *
      * @param <EE> the element type
      */
-    public interface NextElementFunctor<EE>
-    {
+    public interface NextElementFunctor<EE> {
         /**
          * Return the next element or throw a {@link NoSuchElementException} if there are no more
          * elements.
-         * 
+         *
          * @return the next element
          * @throws NoSuchElementException in case there is no next element
          */
         EE nextElement()
-            throws NoSuchElementException;
+                throws NoSuchElementException;
     }
 }

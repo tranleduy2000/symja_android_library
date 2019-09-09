@@ -17,11 +17,13 @@
  */
 package org.jgrapht.alg.vertexcover;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.VertexCoverAlgorithm;
+import org.jgrapht.graph.AsSubgraph;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Finds a 2-approximation for a minimum vertex cover A vertex cover is a set of vertices that
@@ -30,28 +32,25 @@ import java.util.*;
  * true minimal vertex cover is an NP-Complete problem. For more on the vertex cover problem, see
  * <a href="http://mathworld.wolfram.com/VertexCover.html">
  * http://mathworld.wolfram.com/VertexCover.html</a>
- *
+ * <p>
  * Note: this class supports pseudo-graphs
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Linda Buisman
  */
 public class EdgeBasedTwoApproxVCImpl<V, E>
-    implements
-    VertexCoverAlgorithm<V>
-{
+        implements
+        VertexCoverAlgorithm<V> {
 
     private final Graph<V, E> graph;
 
     /**
      * Constructs a new EdgeBasedTwoApproxVCImpl instance
-     * 
+     *
      * @param graph input graph
      */
-    public EdgeBasedTwoApproxVCImpl(Graph<V, E> graph)
-    {
+    public EdgeBasedTwoApproxVCImpl(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
     }
 
@@ -59,9 +58,9 @@ public class EdgeBasedTwoApproxVCImpl<V, E>
      * Finds a 2-approximation for a minimal vertex cover of the specified graph. The algorithm
      * promises a cover that is at most double the size of a minimal cover. The algorithm takes
      * O(|E|) time.
-     *
+     * <p>
      * Note: this class supports pseudo-graphs Runtime: O(|E|)
-     *
+     * <p>
      * Albeit the fact that this is a 2-approximation algorithm for vertex cover, its results are
      * often of lower quality than the results produced by {@link BarYehudaEvenTwoApproxVCImpl} or
      * {@link ClarksonTwoApproxVCImpl}.
@@ -73,12 +72,10 @@ public class EdgeBasedTwoApproxVCImpl<V, E>
      * http://www.cs.vassar.edu/~walter/cs241index/lectures/PDF/approx.pdf</a>.
      * </p>
      *
-     *
      * @return a set of vertices which is a vertex cover for the specified graph.
      */
     @Override
-    public VertexCover<V> getVertexCover()
-    {
+    public VertexCover<V> getVertexCover() {
         // C <-- {}
         Set<V> cover = new LinkedHashSet<>();
 

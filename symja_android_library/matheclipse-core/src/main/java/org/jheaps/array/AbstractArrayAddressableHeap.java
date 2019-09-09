@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,23 +17,21 @@
  */
 package org.jheaps.array;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.AddressableHeap;
 import org.jheaps.Constants;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LogarithmicTime;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
+
 /**
  * Abstract implementation of a heap using an array representation.
- * 
- * @author Dimitrios Michail
  *
- * @param <K>
- *            the type of keys maintained by this heap
+ * @param <K> the type of keys maintained by this heap
+ * @author Dimitrios Michail
  */
 abstract class AbstractArrayAddressableHeap<K, V> implements AddressableHeap<K, V>, Serializable {
 

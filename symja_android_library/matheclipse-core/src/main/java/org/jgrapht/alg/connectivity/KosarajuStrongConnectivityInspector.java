@@ -17,10 +17,18 @@
  */
 package org.jgrapht.alg.connectivity;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.EdgeReversedGraph;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Computes strongly connected components of a directed graph. The algorithm is implemented after
@@ -34,14 +42,12 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Christian Soltenborn
  * @author Christian Hammer
  */
 public class KosarajuStrongConnectivityInspector<V, E>
-    extends
-    AbstractStrongConnectivityInspector<V, E>
-{
+        extends
+        AbstractStrongConnectivityInspector<V, E> {
     // stores the vertices, ordered by their finishing time in first dfs
     private LinkedList<VertexData<V>> orderedVertices;
 
@@ -54,14 +60,12 @@ public class KosarajuStrongConnectivityInspector<V, E>
      * @param graph the input graph
      * @throws NullPointerException if the input graph is null
      */
-    public KosarajuStrongConnectivityInspector(Graph<V, E> graph)
-    {
+    public KosarajuStrongConnectivityInspector(Graph<V, E> graph) {
         super(graph);
     }
 
     @Override
-    public List<Set<V>> stronglyConnectedSets()
-    {
+    public List<Set<V>> stronglyConnectedSets() {
         if (stronglyConnectedSets == null) {
             orderedVertices = new LinkedList<VertexData<V>>();
             stronglyConnectedSets = new Vector<Set<V>>();
@@ -106,8 +110,7 @@ public class KosarajuStrongConnectivityInspector<V, E>
     /*
      * Creates a VertexData object for every vertex in the graph and stores them in a HashMap.
      */
-    private void createVertexData()
-    {
+    private void createVertexData() {
         vertexToVertexData = new HashMap<V, VertexData<V>>(graph.vertexSet().size());
 
         for (V vertex : graph.vertexSet()) {
@@ -120,8 +123,7 @@ public class KosarajuStrongConnectivityInspector<V, E>
      * set == null: finished vertices are stored (1st round). set != null: all vertices found will
      * be saved in the set (2nd round)
      */
-    private void dfsVisit(Graph<V, E> visitedGraph, VertexData<V> vertexData, Set<V> vertices)
-    {
+    private void dfsVisit(Graph<V, E> visitedGraph, VertexData<V> vertexData, Set<V> vertices) {
         Deque<VertexData<V>> stack = new ArrayDeque<VertexData<V>>();
         stack.add(vertexData);
 
@@ -140,7 +142,7 @@ public class KosarajuStrongConnectivityInspector<V, E>
                 // follow all edges
                 for (E edge : visitedGraph.outgoingEdgesOf(data.getVertex())) {
                     VertexData<V> targetData =
-                        vertexToVertexData.get(visitedGraph.getEdgeTarget(edge));
+                            vertexToVertexData.get(visitedGraph.getEdgeTarget(edge));
 
                     if (!targetData.isDiscovered()) {
                         // the "recursion"
@@ -158,8 +160,7 @@ public class KosarajuStrongConnectivityInspector<V, E>
     /*
      * Resets all VertexData objects.
      */
-    private void resetVertexData()
-    {
+    private void resetVertexData() {
         for (VertexData<V> data : vertexToVertexData.values()) {
             data.setDiscovered(false);
             data.setFinished(false);
@@ -169,29 +170,24 @@ public class KosarajuStrongConnectivityInspector<V, E>
     /*
      * Lightweight class storing some data for every vertex.
      */
-    private static abstract class VertexData<V>
-    {
+    private static abstract class VertexData<V> {
         private byte bitfield;
 
-        private VertexData(boolean discovered, boolean finished)
-        {
+        private VertexData(boolean discovered, boolean finished) {
             this.bitfield = 0;
             setDiscovered(discovered);
             setFinished(finished);
         }
 
-        private boolean isDiscovered()
-        {
+        private boolean isDiscovered() {
             return (bitfield & 1) == 1;
         }
 
-        private boolean isFinished()
-        {
+        private boolean isFinished() {
             return (bitfield & 2) == 2;
         }
 
-        private void setDiscovered(boolean discovered)
-        {
+        private void setDiscovered(boolean discovered) {
             if (discovered) {
                 bitfield |= 1;
             } else {
@@ -199,8 +195,7 @@ public class KosarajuStrongConnectivityInspector<V, E>
             }
         }
 
-        private void setFinished(boolean finished)
-        {
+        private void setFinished(boolean finished) {
             if (finished) {
                 bitfield |= 2;
             } else {
@@ -214,51 +209,43 @@ public class KosarajuStrongConnectivityInspector<V, E>
     }
 
     private static final class VertexData1<V>
-        extends
-        VertexData<V>
-    {
+            extends
+            VertexData<V> {
         private final VertexData<V> finishedData;
 
-        private VertexData1(VertexData<V> finishedData, boolean discovered, boolean finished)
-        {
+        private VertexData1(VertexData<V> finishedData, boolean discovered, boolean finished) {
             super(discovered, finished);
             this.finishedData = finishedData;
         }
 
         @Override
-        VertexData<V> getFinishedData()
-        {
+        VertexData<V> getFinishedData() {
             return finishedData;
         }
 
         @Override
-        V getVertex()
-        {
+        V getVertex() {
             return null;
         }
     }
 
     private static final class VertexData2<V>
-        extends
-        VertexData<V>
-    {
+            extends
+            VertexData<V> {
         private final V vertex;
 
-        private VertexData2(V vertex, boolean discovered, boolean finished)
-        {
+        private VertexData2(V vertex, boolean discovered, boolean finished) {
             super(discovered, finished);
             this.vertex = vertex;
         }
 
         @Override
-        VertexData<V> getFinishedData()
-        {
+        VertexData<V> getFinishedData() {
             return null;
         }
 
         @Override
-        V getVertex()
-        {
+        V getVertex() {
             return vertex;
         }
     }

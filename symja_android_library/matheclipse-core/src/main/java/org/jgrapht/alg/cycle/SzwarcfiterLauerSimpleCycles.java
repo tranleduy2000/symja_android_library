@@ -17,10 +17,18 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.connectivity.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -34,13 +42,11 @@ import java.util.function.Function;
  *
  * @param <V> the vertex type.
  * @param <E> the edge type.
- *
  * @author Nikolay Ognyanov
  */
 public class SzwarcfiterLauerSimpleCycles<V, E>
-    implements
-    DirectedSimpleCycles<V, E>
-{
+        implements
+        DirectedSimpleCycles<V, E> {
     // The graph.
     private Graph<V, E> graph;
 
@@ -59,40 +65,35 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
     /**
      * Create a simple cycle finder with an unspecified graph.
      */
-    public SzwarcfiterLauerSimpleCycles()
-    {
+    public SzwarcfiterLauerSimpleCycles() {
     }
 
     /**
      * Create a simple cycle finder for the specified graph.
      *
      * @param graph - the DirectedGraph in which to find cycles.
-     *
      * @throws IllegalArgumentException if the graph argument is <code>
-     * null</code>.
+     *                                  null</code>.
      */
-    public SzwarcfiterLauerSimpleCycles(Graph<V, E> graph)
-    {
+    public SzwarcfiterLauerSimpleCycles(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
     /**
      * Get the graph
-     * 
+     *
      * @return graph
      */
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
     /**
      * Set the graph
-     * 
+     *
      * @param graph graph
      */
-    public void setGraph(Graph<V, E> graph)
-    {
+    public void setGraph(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
@@ -100,8 +101,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
      * {@inheritDoc}
      */
     @Override
-    public List<List<V>> findSimpleCycles()
-    {
+    public List<List<V>> findSimpleCycles() {
         // Just a straightforward implementation of
         // the algorithm.
         if (graph == null) {
@@ -109,7 +109,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         }
         initState();
         KosarajuStrongConnectivityInspector<V, E> inspector =
-            new KosarajuStrongConnectivityInspector<>(graph);
+                new KosarajuStrongConnectivityInspector<>(graph);
         List<Set<V>> sccs = inspector.stronglyConnectedSets();
         for (Set<V> scc : sccs) {
             int maxInDegree = -1;
@@ -133,8 +133,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         return result;
     }
 
-    private boolean cycle(int v, int q)
-    {
+    private boolean cycle(int v, int q) {
         boolean foundCycle = false;
         V vV = toV(v);
         marked.add(vV);
@@ -192,8 +191,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         return foundCycle;
     }
 
-    private void noCycle(int x, int y)
-    {
+    private void noCycle(int x, int y) {
         V xV = toV(x);
         V yV = toV(y);
 
@@ -204,8 +202,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         axRemoved.add(yV);
     }
 
-    private void unmark(int x)
-    {
+    private void unmark(int x) {
         V xV = toV(x);
         marked.remove(xV);
         Set<V> bx = getBSet(xV);
@@ -220,8 +217,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
     }
 
     @SuppressWarnings("unchecked")
-    private void initState()
-    {
+    private void initState() {
         cycles = new ArrayList<>();
         iToV = (V[]) graph.vertexSet().toArray();
         vToI = new HashMap<>();
@@ -239,8 +235,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         }
     }
 
-    private void clearState()
-    {
+    private void clearState() {
         cycles = null;
         iToV = null;
         vToI = null;
@@ -253,18 +248,15 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         startVertices = null;
     }
 
-    private Integer toI(V v)
-    {
+    private Integer toI(V v) {
         return vToI.get(v);
     }
 
-    private V toV(int i)
-    {
+    private V toV(int i) {
         return iToV[i];
     }
 
-    private Set<V> getBSet(V v)
-    {
+    private Set<V> getBSet(V v) {
         // B sets are typically not all
         // needed, so instantiate lazily.
         return bSets.computeIfAbsent(v, new Function<V, Set<V>>() {
@@ -275,8 +267,7 @@ public class SzwarcfiterLauerSimpleCycles<V, E>
         });
     }
 
-    private Set<V> getRemoved(V v)
-    {
+    private Set<V> getRemoved(V v) {
         // Removed sets typically not all
         // needed, so instantiate lazily.
         return removed.computeIfAbsent(v, new Function<V, Set<V>>() {

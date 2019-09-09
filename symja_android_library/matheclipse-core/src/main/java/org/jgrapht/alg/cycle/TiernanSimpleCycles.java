@@ -17,9 +17,17 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Find all simple cycles of a directed graph using the Tiernan's algorithm.
@@ -31,52 +39,45 @@ import java.util.*;
  *
  * @param <V> the vertex type.
  * @param <E> the edge type.
- *
  * @author Nikolay Ognyanov
  */
 public class TiernanSimpleCycles<V, E>
-    implements
-    DirectedSimpleCycles<V, E>
-{
+        implements
+        DirectedSimpleCycles<V, E> {
     private Graph<V, E> graph;
 
     /**
      * Create a simple cycle finder with an unspecified graph.
      */
-    public TiernanSimpleCycles()
-    {
+    public TiernanSimpleCycles() {
     }
 
     /**
      * Create a simple cycle finder for the specified graph.
      *
      * @param graph - the DirectedGraph in which to find cycles.
-     *
      * @throws IllegalArgumentException if the graph argument is <code>
-     * null</code>.
+     *                                  null</code>.
      */
-    public TiernanSimpleCycles(Graph<V, E> graph)
-    {
+    public TiernanSimpleCycles(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
     /**
      * Get the graph
-     * 
+     *
      * @return graph
      */
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
     /**
      * Set the graph
-     * 
+     *
      * @param graph graph
      */
-    public void setGraph(Graph<V, E> graph)
-    {
+    public void setGraph(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
@@ -84,8 +85,7 @@ public class TiernanSimpleCycles<V, E>
      * {@inheritDoc}
      */
     @Override
-    public List<List<V>> findSimpleCycles()
-    {
+    public List<List<V>> findSimpleCycles() {
         if (graph == null) {
             throw new IllegalArgumentException("Null graph.");
         }

@@ -139,7 +139,7 @@ public class GlobalPosition extends GlobalCoordinates {
 
         buffer.append(super.toString());
         buffer.append("elevation=");
-        buffer.append(Double.toString(mElevation));
+        buffer.append(mElevation);
         buffer.append("m");
 
         return buffer.toString();

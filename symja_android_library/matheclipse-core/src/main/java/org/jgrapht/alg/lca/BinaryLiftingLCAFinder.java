@@ -17,11 +17,18 @@
  */
 package org.jgrapht.alg.lca;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithmImpl;
+import org.jgrapht.util.VertexToIntegerMapping;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.jgrapht.util.MathUtil.log2;
 
@@ -67,14 +74,12 @@ import static org.jgrapht.util.MathUtil.log2;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class BinaryLiftingLCAFinder<V, E>
-    extends LowestCommonAncestorAlgorithmImpl<V>
-    implements
-    LowestCommonAncestorAlgorithm<V>
-{
+        extends LowestCommonAncestorAlgorithmImpl<V>
+        implements
+        LowestCommonAncestorAlgorithm<V> {
 
     private final Graph<V, E> graph;
     private final Set<V> roots;
@@ -99,10 +104,9 @@ public class BinaryLiftingLCAFinder<V, E>
      * Note: The constructor will NOT check if the input graph is a valid tree.
      *
      * @param graph the input graph
-     * @param root the root of the graph
+     * @param root  the root of the graph
      */
-    public BinaryLiftingLCAFinder(Graph<V, E> graph, V root)
-    {
+    public BinaryLiftingLCAFinder(Graph<V, E> graph, V root) {
         this(graph, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
     }
 
@@ -118,8 +122,7 @@ public class BinaryLiftingLCAFinder<V, E>
      * @param graph the input graph
      * @param roots the set of roots of the graph
      */
-    public BinaryLiftingLCAFinder(Graph<V, E> graph, Set<V> roots)
-    {
+    public BinaryLiftingLCAFinder(Graph<V, E> graph, Set<V> roots) {
         this.graph = Objects.requireNonNull(graph, "graph cannot be null");
         this.roots = Objects.requireNonNull(roots, "roots cannot be null");
         this.maxLevel = log2(graph.vertexSet().size());
@@ -133,15 +136,13 @@ public class BinaryLiftingLCAFinder<V, E>
         computeAncestorMatrix();
     }
 
-    private void normalizeGraph()
-    {
+    private void normalizeGraph() {
         VertexToIntegerMapping<V> vertexToIntegerMapping = Graphs.getVertexToIntegerMapping(graph);
         vertexMap = vertexToIntegerMapping.getVertexMap();
         indexList = vertexToIntegerMapping.getIndexList();
     }
 
-    private void dfs(int u, int parent)
-    {
+    private void dfs(int u, int parent) {
         component[u] = numberComponent;
         timeIn[u] = ++clock;
 
@@ -163,8 +164,7 @@ public class BinaryLiftingLCAFinder<V, E>
         timeOut[u] = ++clock;
     }
 
-    private void computeAncestorMatrix()
-    {
+    private void computeAncestorMatrix() {
         ancestors = new int[maxLevel + 1][graph.vertexSet().size()];
 
         for (int l = 0; l < maxLevel; l++) {
@@ -194,8 +194,7 @@ public class BinaryLiftingLCAFinder<V, E>
         }
     }
 
-    private boolean isAncestor(int ancestor, int descendant)
-    {
+    private boolean isAncestor(int ancestor, int descendant) {
         return timeIn[ancestor] <= timeIn[descendant] && timeOut[descendant] <= timeOut[ancestor];
     }
 
@@ -203,8 +202,7 @@ public class BinaryLiftingLCAFinder<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getLCA(V a, V b)
-    {
+    public V getLCA(V a, V b) {
         int indexA = vertexMap.getOrDefault(a, -1);
         if (indexA == -1)
             throw new IllegalArgumentException("invalid vertex: " + a);
@@ -242,14 +240,13 @@ public class BinaryLiftingLCAFinder<V, E>
 
     /**
      * Note: This operation is not supported.<br>
-     *
+     * <p>
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException if the method is called
      */
     @Override
-    public Set<V> getLCASet(V a, V b)
-    {
+    public Set<V> getLCASet(V a, V b) {
         throw new UnsupportedOperationException();
     }
 }

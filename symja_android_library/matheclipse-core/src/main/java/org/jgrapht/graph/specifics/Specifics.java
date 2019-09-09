@@ -17,8 +17,8 @@
  */
 package org.jgrapht.graph.specifics;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * An interface encapsulating the basic graph operations. Different implementations have different
@@ -26,11 +26,9 @@ import java.util.function.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
-public interface Specifics<V, E>
-{
+public interface Specifics<V, E> {
     /**
      * Adds a vertex.
      *
@@ -41,7 +39,7 @@ public interface Specifics<V, E>
 
     /**
      * Get the vertex set.
-     * 
+     *
      * @return the vertex set
      */
     Set<V> getVertexSet();
@@ -53,7 +51,6 @@ public interface Specifics<V, E>
      *
      * @param sourceVertex source vertex of the edge.
      * @param targetVertex target vertex of the edge.
-     *
      * @return a set of all edges connecting source vertex to target vertex.
      */
     Set<E> getAllEdges(V sourceVertex, V targetVertex);
@@ -70,14 +67,13 @@ public interface Specifics<V, E>
      *
      * @param sourceVertex source vertex of the edge.
      * @param targetVertex target vertex of the edge.
-     *
      * @return an edge connecting source vertex to target vertex.
      */
     E getEdge(V sourceVertex, V targetVertex);
 
     /**
      * Adds the specified edge to the edge containers of its source and target vertices.
-     * 
+     *
      * @param e the edge
      * @deprecated Use method {@link #addEdgeToTouchingVertices(Object, Object, Object)} instead.
      */
@@ -86,10 +82,10 @@ public interface Specifics<V, E>
 
     /**
      * Adds the specified edge to the edge containers of its source and target vertices.
-     * 
+     *
      * @param sourceVertex the source vertex
      * @param targetVertex the target vertex
-     * @param e the edge
+     * @param e            the edge
      * @return true if the edge was added, false otherwise
      */
     boolean addEdgeToTouchingVertices(V sourceVertex, V targetVertex, E e);
@@ -97,10 +93,10 @@ public interface Specifics<V, E>
     /**
      * Adds the specified edge to the edge containers of its source and target vertices only if the
      * edge is not already in the graph.
-     * 
+     *
      * @param sourceVertex the source vertex
      * @param targetVertex the target vertex
-     * @param e the edge
+     * @param e            the edge
      * @return true if the edge was added, false otherwise
      */
     boolean addEdgeToTouchingVerticesIfAbsent(V sourceVertex, V targetVertex, E e);
@@ -109,12 +105,12 @@ public interface Specifics<V, E>
      * Creates an edge given an edge supplier and adds it to the edge containers of its source and
      * target vertices only if the graph does not contain other edges with the same source and
      * target vertices.
-     * 
+     *
      * @param sourceVertex the source vertex
      * @param targetVertex the target vertex
      * @param edgeSupplier the function which will create the edge
      * @return the newly created edge or null if an edge with the same source and target vertices
-     *         was already present
+     * was already present
      */
     E createEdgeToTouchingVerticesIfAbsent(
             V sourceVertex, V targetVertex, Supplier<E> edgeSupplier);
@@ -124,7 +120,6 @@ public interface Specifics<V, E>
      * the number of edges touching that vertex.
      *
      * @param vertex vertex whose degree is to be calculated.
-     *
      * @return the degree of the specified vertex.
      */
     int degreeOf(V vertex);
@@ -166,7 +161,6 @@ public interface Specifics<V, E>
      * Returns a set of all edges outgoing from the specified vertex.
      *
      * @param vertex the vertex for which the list of outgoing edges to be returned.
-     *
      * @return a set of all edges outgoing from the specified vertex.
      */
     Set<E> outgoingEdgesOf(V vertex);
@@ -176,7 +170,7 @@ public interface Specifics<V, E>
      *
      * @param e the edge
      * @deprecated Use method {@link #removeEdgeFromTouchingVertices(Object, Object, Object)}
-     *             instead.
+     * instead.
      */
     @Deprecated
     void removeEdgeFromTouchingVertices(E e);
@@ -186,7 +180,7 @@ public interface Specifics<V, E>
      *
      * @param sourceVertex the source vertex
      * @param targetVertex the target vertex
-     * @param e the edge
+     * @param e            the edge
      */
     void removeEdgeFromTouchingVertices(V sourceVertex, V targetVertex, E e);
 

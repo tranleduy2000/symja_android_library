@@ -17,9 +17,10 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Generates a bidirectional <a href="http://mathworld.wolfram.com/GridGraph.html">grid graph</a> of
@@ -30,13 +31,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Assaf Mizrachi
  */
 public class GridGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     /**
      * Role for the vertices at the corners.
      */
@@ -51,15 +50,14 @@ public class GridGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @param rows the number of rows
      * @param cols the number of columns
      */
-    public GridGraphGenerator(int rows, int cols)
-    {
+    public GridGraphGenerator(int rows, int cols) {
         if (rows < 2) {
             throw new IllegalArgumentException(
-                "illegal number of rows (" + rows + "). there must be at least two.");
+                    "illegal number of rows (" + rows + "). there must be at least two.");
         }
         if (cols < 2) {
             throw new IllegalArgumentException(
-                "illegal number of columns (" + cols + "). there must be at least two.");
+                    "illegal number of columns (" + cols + "). there must be at least two.");
         }
         this.rows = rows;
         this.cols = cols;
@@ -69,8 +67,7 @@ public class GridGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * {@inheritDoc}
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         Map<Integer, V> map = new TreeMap<>();
 
         // Adding all vertices to the set
@@ -80,7 +77,7 @@ public class GridGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
             map.put(i + 1, vertex);
 
             boolean isCorner = (i == 0) || (i == (cols - 1)) || (i == (cols * (rows - 1)))
-                || (i == ((rows * cols) - 1));
+                    || (i == ((rows * cols) - 1));
             if (isCorner && (resultMap != null)) {
                 resultMap.put(CORNER_VERTEX + ' ' + ++cornerCtr, vertex);
             }

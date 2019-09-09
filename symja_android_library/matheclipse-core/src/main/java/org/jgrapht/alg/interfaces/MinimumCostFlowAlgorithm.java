@@ -33,9 +33,8 @@ import java.util.Map;
  * @author Timofey Chudakov
  */
 public interface MinimumCostFlowAlgorithm<V, E>
-    extends
-    FlowAlgorithm<V, E>
-{
+        extends
+        FlowAlgorithm<V, E> {
 
     /**
      * Calculates feasible flow of minimum cost for the minimum cost flow problem.
@@ -59,9 +58,8 @@ public interface MinimumCostFlowAlgorithm<V, E>
      * @param <E> graph edge type
      */
     interface MinimumCostFlow<E>
-        extends
-        Flow<E>
-    {
+            extends
+            Flow<E> {
         /**
          * Returns the cost of the flow
          *
@@ -76,11 +74,10 @@ public interface MinimumCostFlowAlgorithm<V, E>
      * @param <E> graph edge type
      */
     class MinimumCostFlowImpl<E>
-        extends
-        FlowImpl<E>
-        implements
-        MinimumCostFlow<E>
-    {
+            extends
+            FlowImpl<E>
+            implements
+            MinimumCostFlow<E> {
         /**
          * The cost of the flow defined by the mapping {@code flowMap}
          */
@@ -89,11 +86,10 @@ public interface MinimumCostFlowAlgorithm<V, E>
         /**
          * Constructs a new instance of minimum cost flow
          *
-         * @param cost the cost of the flow
+         * @param cost    the cost of the flow
          * @param flowMap the mapping defining the flow on the network
          */
-        public MinimumCostFlowImpl(double cost, Map<E, Double> flowMap)
-        {
+        public MinimumCostFlowImpl(double cost, Map<E, Double> flowMap) {
             super(flowMap);
             this.cost = cost;
         }
@@ -102,8 +98,7 @@ public interface MinimumCostFlowAlgorithm<V, E>
          * {@inheritDoc}
          */
         @Override
-        public double getCost()
-        {
+        public double getCost() {
             return cost;
         }
     }

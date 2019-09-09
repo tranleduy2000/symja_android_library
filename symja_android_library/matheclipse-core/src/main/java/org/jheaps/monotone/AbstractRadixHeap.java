@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2018, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,22 +17,20 @@
  */
 package org.jheaps.monotone;
 
+import org.jheaps.Heap;
+import org.jheaps.annotations.ConstantTime;
+import org.jheaps.annotations.LogarithmicTime;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.jheaps.Heap;
-import org.jheaps.annotations.ConstantTime;
-import org.jheaps.annotations.LogarithmicTime;
-
 /**
  * Base abstract implementation of a radix heap.
- * 
- * @author Dimitrios Michail
  *
- * @param <K>
- *            the key type
+ * @param <K> the key type
+ * @author Dimitrios Michail
  */
 abstract class AbstractRadixHeap<K> implements Heap<K>, Serializable {
 
@@ -105,16 +103,12 @@ abstract class AbstractRadixHeap<K> implements Heap<K>, Serializable {
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws IllegalArgumentException
-     *             if the key is null
-     * @throws IllegalArgumentException
-     *             if the key is less than the minimum allowed key
-     * @throws IllegalArgumentException
-     *             if the key is more than the maximum allowed key
-     * @throws IllegalArgumentException
-     *             if the key is less than the last deleted key (or the minimum
-     *             key allowed if no key has been deleted)
+     *
+     * @throws IllegalArgumentException if the key is null
+     * @throws IllegalArgumentException if the key is less than the minimum allowed key
+     * @throws IllegalArgumentException if the key is more than the maximum allowed key
+     * @throws IllegalArgumentException if the key is less than the last deleted key (or the minimum
+     *                                  key allowed if no key has been deleted)
      */
     @Override
     @ConstantTime(amortized = true)
@@ -144,7 +138,7 @@ abstract class AbstractRadixHeap<K> implements Heap<K>, Serializable {
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * The cost of this operation is amortized O(logC) assuming the heap
      * contains keys in the range [0, C] or equivalently [a, a+C].
      */
@@ -239,9 +233,9 @@ abstract class AbstractRadixHeap<K> implements Heap<K>, Serializable {
     /**
      * Always returns {@code null} since this heap uses the
      * {@linkplain Comparable natural ordering} of its keys.
-     * 
+     *
      * @return {@code null} since this heap uses the natural ordering of its
-     *         keys
+     * keys
      */
     @Override
     public Comparator<? super K> comparator() {
@@ -253,22 +247,18 @@ abstract class AbstractRadixHeap<K> implements Heap<K>, Serializable {
      * or a positive integer as the first argument is less than, equal to, or
      * greater than the second.
      *
-     * @param o1
-     *            the first object to be compared.
-     * @param o2
-     *            the second object to be compared.
+     * @param o1 the first object to be compared.
+     * @param o2 the second object to be compared.
      * @return a negative integer, zero, or a positive integer as the first
-     *         argument is less than, equal to, or greater than the second.
+     * argument is less than, equal to, or greater than the second.
      */
     protected abstract int compare(K o1, K o2);
 
     /**
      * Compute the bucket of a key based on a minimum key.
-     * 
-     * @param key
-     *            the key
-     * @param minKey
-     *            the minimum key
+     *
+     * @param key    the key
+     * @param minKey the minimum key
      * @return the bucket where the key should go
      */
     protected int computeBucket(K key, K minKey) {
@@ -278,22 +268,19 @@ abstract class AbstractRadixHeap<K> implements Heap<K>, Serializable {
     /**
      * Compute the most significant digit which is different in the binary
      * representation of two values, or -1 if numbers are equal.
-     * 
-     * @param a
-     *            the first value
-     * @param b
-     *            the second value
+     *
+     * @param a the first value
+     * @param b the second value
      * @return the most significant digit which is different or -1 if numbers
-     *         are equal
+     * are equal
      */
     protected abstract int msd(K a, K b);
 
     /**
      * Helper method for finding and caching the minimum. Assumes that the heap
      * contains at least one element.
-     * 
-     * @param firstBucket
-     *            start looking for elements from this bucket
+     *
+     * @param firstBucket start looking for elements from this bucket
      */
     private void findAndCacheMinimum(int firstBucket) {
         if (currentMin == null) {

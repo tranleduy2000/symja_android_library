@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,11 +22,8 @@ import java.util.NoSuchElementException;
 /**
  * A heap with values.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public interface ValueHeap<K, V> extends Heap<K> {
@@ -34,10 +31,8 @@ public interface ValueHeap<K, V> extends Heap<K> {
     /**
      * Insert an element into the heap.
      *
-     * @param key
-     *            the key to insert
-     * @param value
-     *            the value to insert
+     * @param key   the key to insert
+     * @param value the value to insert
      */
     void insert(K key, V value);
 
@@ -45,8 +40,7 @@ public interface ValueHeap<K, V> extends Heap<K> {
      * Find the value of an element with the minimum key.
      *
      * @return the value of an element with the minimum key
-     * @throws NoSuchElementException
-     *             if the heap is empty
+     * @throws NoSuchElementException if the heap is empty
      */
     V findMinValue();
 

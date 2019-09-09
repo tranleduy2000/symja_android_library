@@ -21,13 +21,11 @@ package org.jgrapht.util;
  * Implements a node of the Fibonacci heap. It holds the information necessary for maintaining the
  * structure of the heap. It also holds the reference to the key value (which is used to determine
  * the heap structure).
- * 
- * @param <T> node data type
  *
+ * @param <T> node data type
  * @author Nathan Fiedler
  */
-public class FibonacciHeapNode<T>
-{
+public class FibonacciHeapNode<T> {
     /**
      * Node data.
      */
@@ -73,8 +71,7 @@ public class FibonacciHeapNode<T>
      *
      * @param data data for this node
      */
-    public FibonacciHeapNode(T data)
-    {
+    public FibonacciHeapNode(T data) {
         this.data = data;
     }
 
@@ -83,18 +80,16 @@ public class FibonacciHeapNode<T>
      *
      * @return the key
      */
-    public final double getKey()
-    {
+    public final double getKey() {
         return key;
     }
 
     /**
      * Obtain the data for this node.
-     * 
+     *
      * @return the data
      */
-    public final T getData()
-    {
+    public final T getData() {
         return data;
     }
 
@@ -104,8 +99,7 @@ public class FibonacciHeapNode<T>
      * @return string representing this object
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Double.toString(key);
     }
 

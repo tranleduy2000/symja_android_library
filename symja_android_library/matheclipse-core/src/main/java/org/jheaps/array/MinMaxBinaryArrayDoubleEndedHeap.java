@@ -1,20 +1,20 @@
 package org.jheaps.array;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.Constants;
 import org.jheaps.DoubleEndedHeap;
 import org.jheaps.annotations.LinearTime;
 import org.jheaps.annotations.VisibleForTesting;
+
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * An array based binary MinMax heap. The heap is sorted according to the
  * {@linkplain Comparable natural ordering} of its keys, or by a
  * {@link Comparator} provided at heap creation time, depending on which
  * constructor is used.
- * 
+ *
  * <p>
  * For details about the implementation see the following
  * <a href="http://doi.acm.org/10.1145/6617.6621">paper</a>:
@@ -22,7 +22,7 @@ import org.jheaps.annotations.VisibleForTesting;
  * <li>M. D. Atkinson, J.-R. Sack, N. Santoro, and T. Strothotte. Min-max Heaps
  * and Generalized Priority Queues. Commun. ACM, 29(10), 996--1000, 1986.</li>
  * </ul>
- * 
+ *
  * <p>
  * The implementation uses an array in order to store the elements and
  * automatically maintains the size of the array much like a
@@ -32,7 +32,7 @@ import org.jheaps.annotations.VisibleForTesting;
  * bounds are worst-case if the user initializes the heap with a capacity larger
  * or equal to the total number of elements that are going to be inserted into
  * the heap.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(Object[])} or {@link #heapify(Object[], Comparator)}
@@ -60,9 +60,7 @@ import org.jheaps.annotations.VisibleForTesting;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
@@ -115,8 +113,7 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param capacity
-     *            the initial heap capacity
+     * @param capacity the initial heap capacity
      */
     public MinMaxBinaryArrayDoubleEndedHeap(int capacity) {
         super(null, capacity);
@@ -137,10 +134,9 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * The initial capacity of the heap is {@link #DEFAULT_HEAP_CAPACITY} and
      * adjusts automatically based on the sequence of insertions and deletions.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public MinMaxBinaryArrayDoubleEndedHeap(Comparator<? super K> comparator) {
         super(comparator, DEFAULT_HEAP_CAPACITY);
@@ -163,12 +159,10 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * automatically based on the sequence of insertions and deletions.The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
      */
     public MinMaxBinaryArrayDoubleEndedHeap(Comparator<? super K> comparator, int capacity) {
         super(comparator, capacity);
@@ -178,13 +172,10 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
+     * @param <K>   the type of keys maintained by the heap
+     * @param array an array of elements
      * @return a heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> MinMaxBinaryArrayDoubleEndedHeap<K> heapify(K[] array) {
@@ -211,15 +202,11 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param array      an array of elements
+     * @param comparator the comparator to use
      * @return a heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> MinMaxBinaryArrayDoubleEndedHeap<K> heapify(K[] array, Comparator<? super K> comparator) {
@@ -244,9 +231,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -264,26 +250,26 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     @SuppressWarnings("unchecked")
     public K findMax() {
         switch (size) {
-        case 0:
-            throw new NoSuchElementException();
-        case 1:
-            return array[1];
-        case 2:
-            return array[2];
-        default:
-            if (comparator == null) {
-                if (((Comparable<? super K>) array[3]).compareTo(array[2]) > 0) {
-                    return array[3];
+            case 0:
+                throw new NoSuchElementException();
+            case 1:
+                return array[1];
+            case 2:
+                return array[2];
+            default:
+                if (comparator == null) {
+                    if (((Comparable<? super K>) array[3]).compareTo(array[2]) > 0) {
+                        return array[3];
+                    } else {
+                        return array[2];
+                    }
                 } else {
-                    return array[2];
+                    if (comparator.compare(array[3], array[2]) > 0) {
+                        return array[3];
+                    } else {
+                        return array[2];
+                    }
                 }
-            } else {
-                if (comparator.compare(array[3], array[2]) > 0) {
-                    return array[3];
-                } else {
-                    return array[2];
-                }
-            }
         }
     }
 
@@ -295,53 +281,53 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     public K deleteMax() {
         K result;
         switch (size) {
-        case 0:
-            throw new NoSuchElementException();
-        case 1:
-            result = array[1];
-            array[1] = null;
-            size--;
-            break;
-        case 2:
-            result = array[2];
-            array[2] = null;
-            size--;
-            break;
-        default:
-            if (comparator == null) {
-                if (((Comparable<? super K>) array[3]).compareTo(array[2]) > 0) {
-                    result = array[3];
-                    array[3] = array[size];
-                    array[size] = null;
-                    size--;
-                    if (size >= 3) {
-                        fixdownMax(3);
+            case 0:
+                throw new NoSuchElementException();
+            case 1:
+                result = array[1];
+                array[1] = null;
+                size--;
+                break;
+            case 2:
+                result = array[2];
+                array[2] = null;
+                size--;
+                break;
+            default:
+                if (comparator == null) {
+                    if (((Comparable<? super K>) array[3]).compareTo(array[2]) > 0) {
+                        result = array[3];
+                        array[3] = array[size];
+                        array[size] = null;
+                        size--;
+                        if (size >= 3) {
+                            fixdownMax(3);
+                        }
+                    } else {
+                        result = array[2];
+                        array[2] = array[size];
+                        array[size] = null;
+                        size--;
+                        fixdownMax(2);
                     }
                 } else {
-                    result = array[2];
-                    array[2] = array[size];
-                    array[size] = null;
-                    size--;
-                    fixdownMax(2);
-                }
-            } else {
-                if (comparator.compare(array[3], array[2]) > 0) {
-                    result = array[3];
-                    array[3] = array[size];
-                    array[size] = null;
-                    size--;
-                    if (size >= 3) {
-                        fixdownMaxWithComparator(3);
+                    if (comparator.compare(array[3], array[2]) > 0) {
+                        result = array[3];
+                        array[3] = array[size];
+                        array[size] = null;
+                        size--;
+                        if (size >= 3) {
+                            fixdownMaxWithComparator(3);
+                        }
+                    } else {
+                        result = array[2];
+                        array[2] = array[size];
+                        array[size] = null;
+                        size--;
+                        fixdownMaxWithComparator(2);
                     }
-                } else {
-                    result = array[2];
-                    array[2] = array[size];
-                    array[size] = null;
-                    size--;
-                    fixdownMaxWithComparator(2);
                 }
-            }
-            break;
+                break;
         }
 
         if (Constants.NOT_BENCHMARK) {
@@ -355,9 +341,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Upwards fix starting from a particular element
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -387,9 +372,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Upwards fix starting from a particular element
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     protected void fixupWithComparator(int k) {
         if (onMinLevel(k)) {
@@ -417,9 +401,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Upwards fix starting from a particular element at a minimum level
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @SuppressWarnings("unchecked")
     private void fixupMin(int k) {
@@ -436,9 +419,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     /**
      * Upwards fix starting from a particular element at a minimum level.
      * Performs comparisons using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     private void fixupMinWithComparator(int k) {
         K key = array[k];
@@ -453,9 +435,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Upwards fix starting from a particular element at a maximum level
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @SuppressWarnings("unchecked")
     private void fixupMax(int k) {
@@ -472,9 +453,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     /**
      * Upwards fix starting from a particular element at a maximum level.
      * Performs comparisons using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     private void fixupMaxWithComparator(int k) {
         K key = array[k];
@@ -489,9 +469,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Downwards fix starting from a particular element.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @Override
     protected void fixdown(int k) {
@@ -505,9 +484,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     /**
      * Downwards fix starting from a particular element. Performs comparisons
      * using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @Override
     protected void fixdownWithComparator(int k) {
@@ -520,9 +498,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Downwards fix starting from a particular element at a minimum level.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @SuppressWarnings("unchecked")
     private void fixdownMin(int k) {
@@ -558,9 +535,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     /**
      * Downwards fix starting from a particular element at a minimum level.
      * Performs comparisons using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     private void fixdownMinWithComparator(int k) {
         int c = 2 * k;
@@ -594,9 +570,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Downwards fix starting from a particular element at a maximum level.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     @SuppressWarnings("unchecked")
     private void fixdownMax(int k) {
@@ -632,9 +607,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
     /**
      * Downwards fix starting from a particular element at a maximum level.
      * Performs comparisons using the comparator.
-     * 
-     * @param k
-     *            the index of the starting element
+     *
+     * @param k the index of the starting element
      */
     private void fixdownMaxWithComparator(int k) {
         int c = 2 * k;
@@ -668,9 +642,8 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
     /**
      * Return true if on a minimum level, false otherwise.
-     * 
-     * @param k
-     *            the element
+     *
+     * @param k the element
      * @return true if on a minimum level, false otherwise
      */
     @VisibleForTesting
@@ -684,11 +657,10 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * Given a node at a maximum level, find its child or grandchild with the
      * maximum key. This method should not be called for a node which has no
      * children.
-     * 
-     * @param k
-     *            a node at a maximum level
+     *
+     * @param k a node at a maximum level
      * @return the child or grandchild with a maximum key, or undefined if there
-     *         are no children
+     * are no children
      */
     @SuppressWarnings("unchecked")
     private int maxChildOrGrandchild(int k) {
@@ -716,38 +688,38 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
         // less or equal to 3
         switch (size - gc) {
-        case 2:
-            // 3 grandchildren, two children
-            gcValue = array[gc];
-            maxgc = gc;
-            if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) > 0) {
+            case 2:
+                // 3 grandchildren, two children
                 gcValue = array[gc];
                 maxgc = gc;
-            }
-            if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) > 0) {
-                maxgc = gc;
-            }
-            return maxgc;
-        case 1:
-            // 2 grandchildren, maybe two children
-            gcValue = array[gc];
-            maxgc = gc;
-            if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) > 0) {
+                if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) > 0) {
+                    gcValue = array[gc];
+                    maxgc = gc;
+                }
+                if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) > 0) {
+                    maxgc = gc;
+                }
+                return maxgc;
+            case 1:
+                // 2 grandchildren, maybe two children
                 gcValue = array[gc];
                 maxgc = gc;
-            }
-            if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) > 0) {
-                maxgc = 2 * k + 1;
-            }
-            return maxgc;
-        case 0:
-            // 1 grandchild, maybe two children
-            gcValue = array[gc];
-            maxgc = gc;
-            if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) > 0) {
-                maxgc = 2 * k + 1;
-            }
-            return maxgc;
+                if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) > 0) {
+                    gcValue = array[gc];
+                    maxgc = gc;
+                }
+                if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) > 0) {
+                    maxgc = 2 * k + 1;
+                }
+                return maxgc;
+            case 0:
+                // 1 grandchild, maybe two children
+                gcValue = array[gc];
+                maxgc = gc;
+                if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) > 0) {
+                    maxgc = 2 * k + 1;
+                }
+                return maxgc;
         }
 
         // 0 grandchildren
@@ -763,11 +735,10 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * Given a node at a maximum level, find its child or grandchild with the
      * maximum key. This method should not be called for a node which has no
      * children.
-     * 
-     * @param k
-     *            a node at a maximum level
+     *
+     * @param k a node at a maximum level
      * @return the child or grandchild with a maximum key, or undefined if there
-     *         are no children
+     * are no children
      */
     private int maxChildOrGrandchildWithComparator(int k) {
         int gc = 4 * k;
@@ -794,38 +765,38 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
         // less or equal to 3
         switch (size - gc) {
-        case 2:
-            // 3 grandchildren, two children
-            gcValue = array[gc];
-            maxgc = gc;
-            if (comparator.compare(array[++gc], gcValue) > 0) {
+            case 2:
+                // 3 grandchildren, two children
                 gcValue = array[gc];
                 maxgc = gc;
-            }
-            if (comparator.compare(array[++gc], gcValue) > 0) {
-                maxgc = gc;
-            }
-            return maxgc;
-        case 1:
-            // 2 grandchildren, maybe two children
-            gcValue = array[gc];
-            maxgc = gc;
-            if (comparator.compare(array[++gc], gcValue) > 0) {
+                if (comparator.compare(array[++gc], gcValue) > 0) {
+                    gcValue = array[gc];
+                    maxgc = gc;
+                }
+                if (comparator.compare(array[++gc], gcValue) > 0) {
+                    maxgc = gc;
+                }
+                return maxgc;
+            case 1:
+                // 2 grandchildren, maybe two children
                 gcValue = array[gc];
                 maxgc = gc;
-            }
-            if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) > 0) {
-                maxgc = 2 * k + 1;
-            }
-            return maxgc;
-        case 0:
-            // 1 grandchild, maybe two children
-            gcValue = array[gc];
-            maxgc = gc;
-            if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) > 0) {
-                maxgc = 2 * k + 1;
-            }
-            return maxgc;
+                if (comparator.compare(array[++gc], gcValue) > 0) {
+                    gcValue = array[gc];
+                    maxgc = gc;
+                }
+                if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) > 0) {
+                    maxgc = 2 * k + 1;
+                }
+                return maxgc;
+            case 0:
+                // 1 grandchild, maybe two children
+                gcValue = array[gc];
+                maxgc = gc;
+                if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) > 0) {
+                    maxgc = 2 * k + 1;
+                }
+                return maxgc;
         }
 
         // 0 grandchildren
@@ -841,11 +812,10 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * Given a node at a minimum level, find its child or grandchild with the
      * minimum key. This method should not be called for a node which has no
      * children.
-     * 
-     * @param k
-     *            a node at a minimum level
+     *
+     * @param k a node at a minimum level
      * @return the child or grandchild with a minimum key, or undefined if there
-     *         are no children
+     * are no children
      */
     @SuppressWarnings("unchecked")
     private int minChildOrGrandchild(int k) {
@@ -873,38 +843,38 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
         // less or equal to 3
         switch (size - gc) {
-        case 2:
-            // 3 grandchildren, two children
-            gcValue = array[gc];
-            mingc = gc;
-            if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) < 0) {
+            case 2:
+                // 3 grandchildren, two children
                 gcValue = array[gc];
                 mingc = gc;
-            }
-            if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) < 0) {
-                mingc = gc;
-            }
-            return mingc;
-        case 1:
-            // 2 grandchildren, maybe two children
-            gcValue = array[gc];
-            mingc = gc;
-            if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) < 0) {
+                if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) < 0) {
+                    gcValue = array[gc];
+                    mingc = gc;
+                }
+                if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) < 0) {
+                    mingc = gc;
+                }
+                return mingc;
+            case 1:
+                // 2 grandchildren, maybe two children
                 gcValue = array[gc];
                 mingc = gc;
-            }
-            if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) < 0) {
-                mingc = 2 * k + 1;
-            }
-            return mingc;
-        case 0:
-            // 1 grandchild, maybe two children
-            gcValue = array[gc];
-            mingc = gc;
-            if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) < 0) {
-                mingc = 2 * k + 1;
-            }
-            return mingc;
+                if (((Comparable<? super K>) array[++gc]).compareTo(gcValue) < 0) {
+                    gcValue = array[gc];
+                    mingc = gc;
+                }
+                if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) < 0) {
+                    mingc = 2 * k + 1;
+                }
+                return mingc;
+            case 0:
+                // 1 grandchild, maybe two children
+                gcValue = array[gc];
+                mingc = gc;
+                if (2 * k + 1 <= size && ((Comparable<? super K>) array[2 * k + 1]).compareTo(gcValue) < 0) {
+                    mingc = 2 * k + 1;
+                }
+                return mingc;
         }
 
         // 0 grandchildren
@@ -920,11 +890,10 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
      * Given a node at a minimum level, find its child or grandchild with the
      * minimum key. This method should not be called for a node which has no
      * children.
-     * 
-     * @param k
-     *            a node at a minimum level
+     *
+     * @param k a node at a minimum level
      * @return the child or grandchild with a minimum key, or undefined if there
-     *         are no children
+     * are no children
      */
     private int minChildOrGrandchildWithComparator(int k) {
         int gc = 4 * k;
@@ -951,38 +920,38 @@ public class MinMaxBinaryArrayDoubleEndedHeap<K> extends AbstractArrayHeap<K>
 
         // less or equal to 3
         switch (size - gc) {
-        case 2:
-            // 3 grandchildren, two children
-            gcValue = array[gc];
-            mingc = gc;
-            if (comparator.compare(array[++gc], gcValue) < 0) {
+            case 2:
+                // 3 grandchildren, two children
                 gcValue = array[gc];
                 mingc = gc;
-            }
-            if (comparator.compare(array[++gc], gcValue) < 0) {
-                mingc = gc;
-            }
-            return mingc;
-        case 1:
-            // 2 grandchildren, maybe two children
-            gcValue = array[gc];
-            mingc = gc;
-            if (comparator.compare(array[++gc], gcValue) < 0) {
+                if (comparator.compare(array[++gc], gcValue) < 0) {
+                    gcValue = array[gc];
+                    mingc = gc;
+                }
+                if (comparator.compare(array[++gc], gcValue) < 0) {
+                    mingc = gc;
+                }
+                return mingc;
+            case 1:
+                // 2 grandchildren, maybe two children
                 gcValue = array[gc];
                 mingc = gc;
-            }
-            if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) < 0) {
-                mingc = 2 * k + 1;
-            }
-            return mingc;
-        case 0:
-            // 1 grandchild, maybe two children
-            gcValue = array[gc];
-            mingc = gc;
-            if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) < 0) {
-                mingc = 2 * k + 1;
-            }
-            return mingc;
+                if (comparator.compare(array[++gc], gcValue) < 0) {
+                    gcValue = array[gc];
+                    mingc = gc;
+                }
+                if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) < 0) {
+                    mingc = 2 * k + 1;
+                }
+                return mingc;
+            case 0:
+                // 1 grandchild, maybe two children
+                gcValue = array[gc];
+                mingc = gc;
+                if (2 * k + 1 <= size && comparator.compare(array[2 * k + 1], gcValue) < 0) {
+                    mingc = 2 * k + 1;
+                }
+                return mingc;
         }
 
         // 0 grandchildren

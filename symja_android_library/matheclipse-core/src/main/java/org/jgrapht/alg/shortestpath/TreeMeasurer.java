@@ -17,21 +17,25 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.traverse.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.traverse.BreadthFirstIterator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Algorithm class which computes a number of distance related metrics for trees.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
-public class TreeMeasurer<V, E>
-{
+public class TreeMeasurer<V, E> {
 
     /* Input graph */
     private final Graph<V, E> graph;
@@ -42,13 +46,11 @@ public class TreeMeasurer<V, E>
      * @param graph input graph
      * @throws NullPointerException if {@code graph} is {@code null}
      */
-    public TreeMeasurer(Graph<V, E> graph)
-    {
+    public TreeMeasurer(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph);
     }
 
-    private V computeFarthestVertex(BreadthFirstIterator<V, E> bfs)
-    {
+    private V computeFarthestVertex(BreadthFirstIterator<V, E> bfs) {
         V farthest = null;
         int dist = Integer.MIN_VALUE;
 
@@ -76,8 +78,7 @@ public class TreeMeasurer<V, E>
      * @return the graph center
      * @throws IllegalArgumentException if {@code graph} is not undirected
      */
-    public Set<V> getGraphCenter()
-    {
+    public Set<V> getGraphCenter() {
         GraphTests.requireUndirected(graph);
 
         if (graph.vertexSet().isEmpty())

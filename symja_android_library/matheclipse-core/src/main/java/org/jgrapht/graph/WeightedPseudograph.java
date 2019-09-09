@@ -17,10 +17,10 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.graph.builder.*;
-import org.jgrapht.util.*;
+import org.jgrapht.graph.builder.GraphBuilder;
+import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 /**
  * A weighted pseudograph. A weighted pseudograph is a non-simple undirected graph in which both
@@ -28,14 +28,13 @@ import java.util.function.*;
  * weights. If you're unsure about pseudographs, see:
  * <a href="http://mathworld.wolfram.com/Pseudograph.html">
  * http://mathworld.wolfram.com/Pseudograph.html</a>.
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
  */
 public class WeightedPseudograph<V, E>
-    extends
-    Pseudograph<V, E>
-{
+        extends
+        Pseudograph<V, E> {
     private static final long serialVersionUID = 3037964528481084240L;
 
     /**
@@ -43,47 +42,43 @@ public class WeightedPseudograph<V, E>
      *
      * @param edgeClass class on which to base the edge supplier
      */
-    public WeightedPseudograph(Class<? extends E> edgeClass)
-    {
+    public WeightedPseudograph(Class<? extends E> edgeClass) {
         this(null, SupplierUtil.createSupplier(edgeClass));
     }
 
     /**
      * Creates a new weighted graph.
-     * 
+     *
      * @param vertexSupplier the vertex supplier, can be null
-     * @param edgeSupplier the edge supplier, can be null
+     * @param edgeSupplier   the edge supplier, can be null
      */
-    public WeightedPseudograph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier)
-    {
+    public WeightedPseudograph(Supplier<V> vertexSupplier, Supplier<E> edgeSupplier) {
         super(vertexSupplier, edgeSupplier, true);
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeClass class on which to base factory for edges
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>       the graph vertex type
+     * @param <E>       the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends WeightedPseudograph<V, E>> createBuilder(
-        Class<? extends E> edgeClass)
-    {
+            Class<? extends E> edgeClass) {
         return new GraphBuilder<>(new WeightedPseudograph<V, E>(edgeClass));
     }
 
     /**
      * Create a builder for this kind of graph.
-     * 
+     *
      * @param edgeSupplier the edge supplier
-     * @param <V> the graph vertex type
-     * @param <E> the graph edge type
+     * @param <V>          the graph vertex type
+     * @param <E>          the graph edge type
      * @return a builder for this kind of graph
      */
     public static <V, E> GraphBuilder<V, E, ? extends WeightedPseudograph<V, E>> createBuilder(
-        Supplier<E> edgeSupplier)
-    {
+            Supplier<E> edgeSupplier) {
         return new GraphBuilder<>(new WeightedPseudograph<V, E>(null, edgeSupplier));
     }
 

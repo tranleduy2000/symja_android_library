@@ -17,8 +17,11 @@
  */
 package org.jgrapht.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.AbstractSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Implementation of a weighted, unmodifiable set. This class can for instance be used to store a
@@ -27,15 +30,13 @@ import java.util.*;
  * delegated to the underlying set.
  *
  * @param <E> element type
- *
  * @author Joris Kinable
  */
 public class WeightedUnmodifiableSet<E>
-    extends
-    AbstractSet<E>
-    implements
-    Serializable
-{
+        extends
+        AbstractSet<E>
+        implements
+        Serializable {
 
     private static final long serialVersionUID = -5913435131882975869L;
 
@@ -44,23 +45,21 @@ public class WeightedUnmodifiableSet<E>
 
     /**
      * Constructs a WeightedUnmodifiableSet instance
-     * 
+     *
      * @param backingSet underlying set
      */
-    public WeightedUnmodifiableSet(Set<E> backingSet)
-    {
+    public WeightedUnmodifiableSet(Set<E> backingSet) {
         this.backingSet = backingSet;
         this.weight = backingSet.size();
     }
 
     /**
      * Constructs a WeightedUnmodifiableSet instance
-     * 
+     *
      * @param backingSet underlying set
-     * @param weight weight of the set
+     * @param weight     weight of the set
      */
-    public WeightedUnmodifiableSet(Set<E> backingSet, double weight)
-    {
+    public WeightedUnmodifiableSet(Set<E> backingSet, double weight) {
         this.backingSet = backingSet;
         this.weight = weight;
     }
@@ -70,104 +69,88 @@ public class WeightedUnmodifiableSet<E>
      *
      * @return weight of the set
      */
-    public double getWeight()
-    {
+    public double getWeight() {
         return weight;
     }
 
     @Override
-    public int size()
-    {
+    public int size() {
         return backingSet.size();
     }
 
     @Override
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return backingSet.isEmpty();
     }
 
     @Override
-    public boolean contains(Object o)
-    {
+    public boolean contains(Object o) {
         return backingSet.contains(o);
     }
 
     @Override
-    public Iterator<E> iterator()
-    {
+    public Iterator<E> iterator() {
         return backingSet.iterator();
     }
 
     @Override
-    public Object[] toArray()
-    {
+    public Object[] toArray() {
         return backingSet.toArray();
     }
 
     @Override
-    public <T> T[] toArray(T[] a)
-    {
+    public <T> T[] toArray(T[] a) {
         return backingSet.toArray(a);
     }
 
     @Override
-    public boolean add(E v)
-    {
+    public boolean add(E v) {
         throw new UnsupportedOperationException("This set is unmodifiable");
     }
 
     @Override
-    public boolean remove(Object o)
-    {
+    public boolean remove(Object o) {
         throw new UnsupportedOperationException("This set is unmodifiable");
     }
 
     @Override
-    public boolean containsAll(Collection<?> c)
-    {
+    public boolean containsAll(Collection<?> c) {
         return backingSet.containsAll(c);
     }
 
     @Override
-    public boolean addAll(Collection<? extends E> c)
-    {
+    public boolean addAll(Collection<? extends E> c) {
         throw new UnsupportedOperationException("This set is unmodifiable");
     }
 
     @Override
-    public boolean retainAll(Collection<?> c)
-    {
+    public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException("This set is unmodifiable");
     }
 
     @Override
-    public boolean removeAll(Collection<?> c)
-    {
+    public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException("This set is unmodifiable");
     }
 
     @Override
-    public void clear()
-    {
+    public void clear() {
         throw new UnsupportedOperationException("This set is unmodifiable");
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof WeightedUnmodifiableSet))
             return false;
         @SuppressWarnings("unchecked") WeightedUnmodifiableSet<E> other =
-            (WeightedUnmodifiableSet<E>) o;
+                (WeightedUnmodifiableSet<E>) o;
         return this.backingSet.equals(other.backingSet);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return backingSet.hashCode();
     }
 }

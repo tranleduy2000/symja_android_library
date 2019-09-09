@@ -17,9 +17,17 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Find all simple cycles of a directed graph using the algorithm described by Hawick and James.
@@ -31,15 +39,12 @@ import java.util.*;
  *
  * @param <V> the vertex type.
  * @param <E> the edge type.
- *
  * @author Luiz Kill
  */
 public class HawickJamesSimpleCycles<V, E>
-    implements
-    DirectedSimpleCycles<V, E>
-{
-    private enum Operation
-    {
+        implements
+        DirectedSimpleCycles<V, E> {
+    private enum Operation {
         ENUMERATE,
         PRINT_ONLY,
         COUNT_ONLY
@@ -71,27 +76,23 @@ public class HawickJamesSimpleCycles<V, E>
     /**
      * Create a simple cycle finder with an unspecified graph.
      */
-    public HawickJamesSimpleCycles()
-    {
+    public HawickJamesSimpleCycles() {
     }
 
     /**
      * Create a simple cycle finder for the specified graph.
      *
      * @param graph the DirectedGraph in which to find cycles.
-     *
      * @throws IllegalArgumentException if the graph argument is <code>
-     * null</code>.
+     *                                  null</code>.
      */
     public HawickJamesSimpleCycles(Graph<V, E> graph)
-        throws IllegalArgumentException
-    {
+            throws IllegalArgumentException {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
     @SuppressWarnings("unchecked")
-    private void initState(Operation o)
-    {
+    private void initState(Operation o) {
         nCycles = 0;
         nVertices = graph.vertexSet().size();
         if (o == Operation.ENUMERATE) {
@@ -118,8 +119,7 @@ public class HawickJamesSimpleCycles<V, E>
     }
 
     @SuppressWarnings("unchecked")
-    private List<Integer>[] buildAdjacencyList()
-    {
+    private List<Integer>[] buildAdjacencyList() {
         @SuppressWarnings("rawtypes") List[] Ak = new ArrayList[nVertices];
         for (int j = 0; j < nVertices; j++) {
             V v = iToV[j];
@@ -134,8 +134,7 @@ public class HawickJamesSimpleCycles<V, E>
         return Ak;
     }
 
-    private void clearState()
-    {
+    private void clearState() {
         Ak = null;
         nVertices = 0;
         blocked = null;
@@ -147,8 +146,7 @@ public class HawickJamesSimpleCycles<V, E>
         B = null;
     }
 
-    private boolean circuit(Integer v, Operation o)
-    {
+    private boolean circuit(Integer v, Operation o) {
         boolean f = false;
 
         stack.push(v);
@@ -174,7 +172,7 @@ public class HawickJamesSimpleCycles<V, E>
                     for (Integer i : stack) {
                         System.out.print(iToV[i].toString() + " ");
                     }
-                    System.out.println("");
+                    System.out.println();
                 }
 
                 nCycles++;
@@ -206,8 +204,7 @@ public class HawickJamesSimpleCycles<V, E>
         return f;
     }
 
-    private void unblock(Integer u)
-    {
+    private void unblock(Integer u) {
         blocked[u] = false;
 
         for (int wPos = 0; wPos < B[u].size(); wPos++) {
@@ -224,11 +221,10 @@ public class HawickJamesSimpleCycles<V, E>
     /**
      * Remove all occurrences of a value from the list.
      *
-     * @param u the Integer to be removed.
+     * @param u    the Integer to be removed.
      * @param list the list from which all the occurrences of u must be removed.
      */
-    private int removeFromList(List<Integer> list, Integer u)
-    {
+    private int removeFromList(List<Integer> list, Integer u) {
         int nOccurrences = 0;
 
         Iterator<Integer> iterator = list.iterator();
@@ -245,21 +241,19 @@ public class HawickJamesSimpleCycles<V, E>
 
     /**
      * Get the graph
-     * 
+     *
      * @return graph
      */
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
     /**
      * Set the graph
-     * 
+     *
      * @param graph graph
      */
-    public void setGraph(Graph<V, E> graph)
-    {
+    public void setGraph(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
@@ -268,8 +262,7 @@ public class HawickJamesSimpleCycles<V, E>
      */
     @Override
     public List<List<V>> findSimpleCycles()
-        throws IllegalArgumentException
-    {
+            throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("Null graph.");
         }
@@ -295,8 +288,7 @@ public class HawickJamesSimpleCycles<V, E>
      * Print to the standard output all simple cycles without building a list to keep them, thus
      * avoiding high memory consumption when investigating large and much connected graphs.
      */
-    public void printSimpleCycles()
-    {
+    public void printSimpleCycles() {
         if (graph == null) {
             throw new IllegalArgumentException("Null graph.");
         }
@@ -318,11 +310,10 @@ public class HawickJamesSimpleCycles<V, E>
 
     /**
      * Count the number of simple cycles. It can count up to Long.MAX cycles in a graph.
-     * 
+     *
      * @return the number of simple cycles
      */
-    public long countSimpleCycles()
-    {
+    public long countSimpleCycles() {
         if (graph == null) {
             throw new IllegalArgumentException("Null graph.");
         }

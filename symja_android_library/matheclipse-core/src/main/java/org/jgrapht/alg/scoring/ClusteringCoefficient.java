@@ -17,11 +17,16 @@
  */
 package org.jgrapht.alg.scoring;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.alg.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMetrics;
+import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
+import org.jgrapht.alg.util.NeighborCache;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Clustering coefficient.
@@ -61,13 +66,11 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class ClusteringCoefficient<V, E>
-    implements
-    VertexScoringAlgorithm<V, Double>
-{
+        implements
+        VertexScoringAlgorithm<V, Double> {
 
     /**
      * Underlying graph
@@ -99,8 +102,7 @@ public class ClusteringCoefficient<V, E>
      * @param graph the input graph
      * @throws NullPointerException if {@code graph} is {@code null}
      */
-    public ClusteringCoefficient(Graph<V, E> graph)
-    {
+    public ClusteringCoefficient(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph);
         this.scores = new HashMap<>();
     }
@@ -116,8 +118,7 @@ public class ClusteringCoefficient<V, E>
      *
      * @return the global clustering coefficient
      */
-    public double getGlobalClusteringCoefficient()
-    {
+    public double getGlobalClusteringCoefficient() {
         if (!computed) {
             computeGlobalClusteringCoefficient();
         }
@@ -128,13 +129,12 @@ public class ClusteringCoefficient<V, E>
     /**
      * Computes the average clustering coefficient. The average clustering coefficient $\={C}$ is
      * defined as $\={C} = \frac{\sum_{i=1}^{n} C_i}{n}$ where $n$ is the number of vertices.
-     *
+     * <p>
      * Note: the average is $0$ if the graph is empty
      *
      * @return the average clustering coefficient
      */
-    public double getAverageClusteringCoefficient()
-    {
+    public double getAverageClusteringCoefficient() {
         if (graph.vertexSet().size() == 0)
             return 0;
 
@@ -152,8 +152,7 @@ public class ClusteringCoefficient<V, E>
         return averageClusteringCoefficient;
     }
 
-    private void computeGlobalClusteringCoefficient()
-    {
+    private void computeGlobalClusteringCoefficient() {
         NeighborCache<V, E> neighborCache = new NeighborCache<>(graph);
         computed = true;
         double numberTriplets = 0;
@@ -163,15 +162,14 @@ public class ClusteringCoefficient<V, E>
                 numberTriplets += 1.0 * graph.degreeOf(v) * (graph.degreeOf(v) - 1) / 2;
             } else {
                 numberTriplets += 1.0 * neighborCache.predecessorsOf(v).size()
-                    * neighborCache.successorsOf(v).size();
+                        * neighborCache.successorsOf(v).size();
             }
         }
 
         globalClusteringCoefficient = 3 * GraphMetrics.getNumberOfTriangles(graph) / numberTriplets;
     }
 
-    private double computeLocalClusteringCoefficient(V v)
-    {
+    private double computeLocalClusteringCoefficient(V v) {
         if (scores.containsKey(v)) {
             return scores.get(v);
         }
@@ -193,8 +191,7 @@ public class ClusteringCoefficient<V, E>
             return numberTriplets / (k * (k - 1));
     }
 
-    private void computeFullScoreMap()
-    {
+    private void computeFullScoreMap() {
         if (fullyComputedMap) {
             return;
         }
@@ -216,8 +213,7 @@ public class ClusteringCoefficient<V, E>
      * @return a map with all local clustering coefficients
      */
     @Override
-    public Map<V, Double> getScores()
-    {
+    public Map<V, Double> getScores() {
         computeFullScoreMap();
         return Collections.unmodifiableMap(scores);
     }
@@ -229,8 +225,7 @@ public class ClusteringCoefficient<V, E>
      * @return the local clustering coefficient
      */
     @Override
-    public Double getVertexScore(V v)
-    {
+    public Double getVertexScore(V v) {
         if (!graph.containsVertex(v)) {
             throw new IllegalArgumentException("Cannot return score of unknown vertex");
         }

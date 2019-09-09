@@ -17,42 +17,38 @@
  */
 package org.jgrapht.graph;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * An uniform weights variant of the intrusive edges specifics.
- * 
+ *
  * <p>
  * The implementation optimizes the use of {@link DefaultEdge} and subclasses. For other custom user
  * edge types, a map is used to store vertex source and target.
- * 
- * @author Barak Naveh
- * @author Dimitrios Michail
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
+ * @author Barak Naveh
+ * @author Dimitrios Michail
  */
 public class UniformIntrusiveEdgesSpecifics<V, E>
-    extends
-    BaseIntrusiveEdgesSpecifics<V, E, IntrusiveEdge>
-    implements
-    IntrusiveEdgesSpecifics<V, E>
-{
+        extends
+        BaseIntrusiveEdgesSpecifics<V, E, IntrusiveEdge>
+        implements
+        IntrusiveEdgesSpecifics<V, E> {
     private static final long serialVersionUID = -5736320893697031114L;
 
     /**
      * Constructor
-     * 
+     *
      * @param map the map to use for storage
      */
-    public UniformIntrusiveEdgesSpecifics(Map<E, IntrusiveEdge> map)
-    {
+    public UniformIntrusiveEdgesSpecifics(Map<E, IntrusiveEdge> map) {
         super(map);
     }
 
     @Override
-    public boolean add(E e, V sourceVertex, V targetVertex)
-    {
+    public boolean add(E e, V sourceVertex, V targetVertex) {
         IntrusiveEdge intrusiveEdge;
         if (e instanceof IntrusiveEdge) {
             intrusiveEdge = (IntrusiveEdge) e;
@@ -67,8 +63,7 @@ public class UniformIntrusiveEdgesSpecifics<V, E>
     }
 
     @Override
-    protected IntrusiveEdge getIntrusiveEdge(E e)
-    {
+    protected IntrusiveEdge getIntrusiveEdge(E e) {
         if (e instanceof IntrusiveEdge) {
             return (IntrusiveEdge) e;
         }

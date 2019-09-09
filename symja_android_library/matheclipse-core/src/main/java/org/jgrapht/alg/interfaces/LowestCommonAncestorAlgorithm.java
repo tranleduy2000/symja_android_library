@@ -27,18 +27,15 @@ import java.util.Set;
  * common ancestor</a> in a tree, forest or DAG.
  *
  * @param <V> vertex the graph vertex type
- *
  * @author Alexandru Valeanu
  */
-public interface LowestCommonAncestorAlgorithm<V>
-{
+public interface LowestCommonAncestorAlgorithm<V> {
 
     /**
      * Return the LCA of a and b
      *
      * @param a the first element to find LCA for
      * @param b the other element to find the LCA for
-     *
      * @return the LCA of a and b, or null if there is no LCA.
      */
     V getLCA(V a, V b);
@@ -56,10 +53,9 @@ public interface LowestCommonAncestorAlgorithm<V>
      *
      * @param a the first element to find LCA for
      * @param b the other element to find the LCA for
-     *
      * @return the set LCAs of a and b, or empty set if there is no LCA computed.
      * @throws UnsupportedOperationException - if the operation is not supported by the implementing
-     *         class
+     *                                       class
      */
     Set<V> getLCASet(V a, V b);
 

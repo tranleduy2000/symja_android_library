@@ -17,7 +17,7 @@
  */
 package org.jgrapht.alg.interfaces;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * Given a weighted graph $G(V,E)$ (directed or undirected). This class computes a minimum $s-t$
@@ -28,24 +28,22 @@ import java.util.*;
  * endpoint in $S$ and one endpoint in $T$ are counted. For a given $s$ and $t$, this class computes
  * two partitions $S$ and $T$ such that the capacity of the cut is minimized. When each edge has
  * equal weight, by definition this class minimizes the number of edges from $S$ to $T$.
- *
+ * <p>
  * Note: it is not recommended to use this class to calculate the overall minimum cut in a graph by
  * iteratively invoking this class for all source-sink pairs. This is computationally expensive.
  * Instead, use the StoerWagnerMinimumCut implementation.
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
-public interface MinimumSTCutAlgorithm<V, E>
-{
+public interface MinimumSTCutAlgorithm<V, E> {
 
     /**
      * Computes a minimum capacity $s-t$ cut.
-     * 
+     *
      * @param source s
-     * @param sink t
+     * @param sink   t
      * @return capacity of the cut
      */
     double calculateMinCut(V source, V sink);
@@ -53,7 +51,7 @@ public interface MinimumSTCutAlgorithm<V, E>
     /**
      * Returns the capacity of the cut obtained after the last invocation of
      * {@link #calculateMinCut(Object, Object)}
-     * 
+     *
      * @return capacity of the cut
      */
     double getCutCapacity();
@@ -61,7 +59,7 @@ public interface MinimumSTCutAlgorithm<V, E>
     /**
      * Returns the source partition $S$, $s \in S$, of the cut obtained after the last invocation of
      * {@link #calculateMinCut(Object, Object)}
-     * 
+     *
      * @return source partition S
      */
     Set<V> getSourcePartition();
@@ -69,7 +67,7 @@ public interface MinimumSTCutAlgorithm<V, E>
     /**
      * Returns the sink partition $T$, $t \in T$, of the cut obtained after the last invocation of
      * {@link #calculateMinCut(Object, Object)}
-     * 
+     *
      * @return source partition T
      */
     Set<V> getSinkPartition();
@@ -79,7 +77,7 @@ public interface MinimumSTCutAlgorithm<V, E>
      * invocation of {@link #calculateMinCut(Object, Object)} In case of a directed graph, only the
      * edges with their tail in $S$ and their head in $T$ are returned. In cased of a undirected
      * graph, all edges with one endpoint in $S$ and one endpoint in $T$ are returned.
-     * 
+     *
      * @return set of edges which run from $S$ to $T$
      */
     Set<E> getCutEdges();

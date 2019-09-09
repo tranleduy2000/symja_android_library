@@ -17,10 +17,17 @@
  */
 package org.jgrapht.alg.matching;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.MatchingAlgorithm;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The greedy algorithm for computing a maximum cardinality matching. The algorithm can run in two
@@ -37,24 +44,21 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class GreedyMaximumCardinalityMatching<V, E>
-    implements
-    MatchingAlgorithm<V, E>
-{
+        implements
+        MatchingAlgorithm<V, E> {
     private final Graph<V, E> graph;
     private final boolean sort;
 
     /**
      * Creates a new GreedyMaximumCardinalityMatching instance.
-     * 
+     *
      * @param graph graph
-     * @param sort sort the edges prior to starting the greedy algorithm
+     * @param sort  sort the edges prior to starting the greedy algorithm
      */
-    public GreedyMaximumCardinalityMatching(Graph<V, E> graph, boolean sort)
-    {
+    public GreedyMaximumCardinalityMatching(Graph<V, E> graph, boolean sort) {
         this.graph = GraphTests.requireUndirected(graph);
         this.sort = sort;
     }
@@ -65,8 +69,7 @@ public class GreedyMaximumCardinalityMatching<V, E>
      * @return a matching
      */
     @Override
-    public Matching<V, E> getMatching()
-    {
+    public Matching<V, E> getMatching() {
         Set<V> matched = new HashSet<>();
         Set<E> edges = new LinkedHashSet<>();
         double cost = 0;
@@ -107,16 +110,14 @@ public class GreedyMaximumCardinalityMatching<V, E>
     }
 
     private class EdgeDegreeComparator
-        implements
-        Comparator<E>
-    {
+            implements
+            Comparator<E> {
         @Override
-        public int compare(E e1, E e2)
-        {
+        public int compare(E e1, E e2) {
             int degreeE1 =
-                graph.degreeOf(graph.getEdgeSource(e1)) + graph.degreeOf(graph.getEdgeTarget(e1));
+                    graph.degreeOf(graph.getEdgeSource(e1)) + graph.degreeOf(graph.getEdgeTarget(e1));
             int degreeE2 =
-                graph.degreeOf(graph.getEdgeSource(e2)) + graph.degreeOf(graph.getEdgeTarget(e2));
+                    graph.degreeOf(graph.getEdgeSource(e2)) + graph.degreeOf(graph.getEdgeTarget(e2));
             return Integer.compare(degreeE1, degreeE2);
         }
     }

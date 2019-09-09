@@ -17,9 +17,17 @@
  */
 package org.jgrapht.alg.cycle;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -32,13 +40,11 @@ import java.util.function.Function;
  *
  * @param <V> the vertex type.
  * @param <E> the edge type.
- *
  * @author Nikolay Ognyanov
  */
 public class TarjanSimpleCycles<V, E>
-    implements
-    DirectedSimpleCycles<V, E>
-{
+        implements
+        DirectedSimpleCycles<V, E> {
     private Graph<V, E> graph;
 
     private List<List<V>> cycles;
@@ -51,40 +57,35 @@ public class TarjanSimpleCycles<V, E>
     /**
      * Create a simple cycle finder with an unspecified graph.
      */
-    public TarjanSimpleCycles()
-    {
+    public TarjanSimpleCycles() {
     }
 
     /**
      * Create a simple cycle finder for the specified graph.
      *
      * @param graph - the DirectedGraph in which to find cycles.
-     *
      * @throws IllegalArgumentException if the graph argument is <code>
-     * null</code>.
+     *                                  null</code>.
      */
-    public TarjanSimpleCycles(Graph<V, E> graph)
-    {
+    public TarjanSimpleCycles(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
     /**
      * Get the graph
-     * 
+     *
      * @return graph
      */
-    public Graph<V, E> getGraph()
-    {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
     /**
      * Set the graph
-     * 
+     *
      * @param graph graph
      */
-    public void setGraph(Graph<V, E> graph)
-    {
+    public void setGraph(Graph<V, E> graph) {
         this.graph = GraphTests.requireDirected(graph, "Graph must be directed");
     }
 
@@ -92,8 +93,7 @@ public class TarjanSimpleCycles<V, E>
      * {@inheritDoc}
      */
     @Override
-    public List<List<V>> findSimpleCycles()
-    {
+    public List<List<V>> findSimpleCycles() {
         if (graph == null) {
             throw new IllegalArgumentException("Null graph.");
         }
@@ -111,8 +111,7 @@ public class TarjanSimpleCycles<V, E>
         return result;
     }
 
-    private boolean backtrack(V start, V vertex)
-    {
+    private boolean backtrack(V start, V vertex) {
         boolean foundCycle = false;
         pointStack.push(vertex);
         marked.add(vertex);
@@ -159,8 +158,7 @@ public class TarjanSimpleCycles<V, E>
         return foundCycle;
     }
 
-    private void initState()
-    {
+    private void initState() {
         cycles = new ArrayList<>();
         marked = new HashSet<>();
         markedStack = new ArrayDeque<>();
@@ -173,8 +171,7 @@ public class TarjanSimpleCycles<V, E>
         }
     }
 
-    private void clearState()
-    {
+    private void clearState() {
         cycles = null;
         marked = null;
         markedStack = null;
@@ -182,13 +179,11 @@ public class TarjanSimpleCycles<V, E>
         vToI = null;
     }
 
-    private Integer toI(V v)
-    {
+    private Integer toI(V v) {
         return vToI.get(v);
     }
 
-    private Set<V> getRemoved(V v)
-    {
+    private Set<V> getRemoved(V v) {
         // Removed sets typically not all
         // needed, so instantiate lazily.
         return removed.computeIfAbsent(v, new Function<V, Set<V>>() {

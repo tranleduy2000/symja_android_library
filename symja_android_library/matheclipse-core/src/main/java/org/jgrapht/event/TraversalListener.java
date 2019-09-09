@@ -22,11 +22,9 @@ package org.jgrapht.event;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
-public interface TraversalListener<V, E>
-{
+public interface TraversalListener<V, E> {
     /**
      * Called to inform listeners that the traversal of the current connected component has
      * finished.

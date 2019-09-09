@@ -53,21 +53,18 @@ import java.util.Queue;
  * implementation first computes a minimum $s-t$ flow, after which a BFS is run on the residual
  * graph.
  * </p>
- *
+ * <p>
  * Note: even though the algorithm accepts any kind of graph, currently only Simple directed and
  * undirected graphs are supported (and tested!).
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  * @author Alexey Kudinkin
- *
  */
 public class PushRelabelMFImpl<V, E>
-    extends
-    MaximumFlowAlgorithmBase<V, E>
-{
+        extends
+        MaximumFlowAlgorithmBase<V, E> {
     // Diagnostic
     private static final boolean DIAGNOSTIC_ENABLED = false;
 
@@ -100,8 +97,7 @@ public class PushRelabelMFImpl<V, E>
      *
      * @param network the network
      */
-    public PushRelabelMFImpl(Graph<V, E> network)
-    {
+    public PushRelabelMFImpl(Graph<V, E> network) {
         this(network, DEFAULT_EPSILON);
     }
 
@@ -112,8 +108,7 @@ public class PushRelabelMFImpl<V, E>
      * @param epsilon tolerance used when comparing floating-point values
      */
     @SuppressWarnings("unchecked")
-    public PushRelabelMFImpl(Graph<V, E> network, double epsilon)
-    {
+    public PushRelabelMFImpl(Graph<V, E> network, double epsilon) {
         super(network, epsilon);
 
         this.vertexExtensionsFactory = new ExtensionFactory<VertexExtension>() {
@@ -138,8 +133,7 @@ public class PushRelabelMFImpl<V, E>
         this.vertexExtension = (VertexExtension[]) Array.newInstance(VertexExtension.class, N);
     }
 
-    private void enqueue(VertexExtension vx)
-    {
+    private void enqueue(VertexExtension vx) {
         if (!vx.active && vx.hasExcess()) {
             vx.active = true;
             activeVertices.add(vx);
@@ -151,10 +145,9 @@ public class PushRelabelMFImpl<V, E>
      * algorithms
      *
      * @param source source
-     * @param sink sink
+     * @param sink   sink
      */
-    void init(V source, V sink)
-    {
+    void init(V source, V sink) {
         super.init(source, sink, vertexExtensionsFactory, edgeExtensionsFactory);
 
         this.countHeight = new int[2 * N + 1];
@@ -172,12 +165,11 @@ public class PushRelabelMFImpl<V, E>
      * Initialization
      *
      * @param source the source
-     * @param sink the sink
+     * @param sink   the sink
      * @param active resulting queue with all active vertices
      */
     public void initialize(
-        VertexExtension source, VertexExtension sink, Queue<VertexExtension> active)
-    {
+            VertexExtension source, VertexExtension sink, Queue<VertexExtension> active) {
         this.activeVertices = active;
 
         for (int i = 0; i < N; i++) {
@@ -206,8 +198,7 @@ public class PushRelabelMFImpl<V, E>
     }
 
     @Override
-    public MaximumFlow<E> getMaximumFlow(V source, V sink)
-    {
+    public MaximumFlow<E> getMaximumFlow(V source, V sink) {
         this.calculateMaximumFlow(source, sink);
         maxFlow = composeFlow();
         return new MaximumFlowImpl<>(maxFlowValue, maxFlow);
@@ -220,11 +211,10 @@ public class PushRelabelMFImpl<V, E>
      * network</tt> passed to the constructor, and they must be different.
      *
      * @param source source vertex
-     * @param sink sink vertex
+     * @param sink   sink vertex
      * @return the value of the maximum flow
      */
-    public double calculateMaximumFlow(V source, V sink)
-    {
+    public double calculateMaximumFlow(V source, V sink) {
         /*
          * Note: this implementation uses the FIFO selection rule (check wiki for more details)
          */
@@ -259,10 +249,9 @@ public class PushRelabelMFImpl<V, E>
      * Push flow through an edge.
      *
      * @param ex the edge
-     * @param f the amount of flow to push through
+     * @param f  the amount of flow to push through
      */
-    protected void pushFlowThrough(AnnotatedFlowEdge ex, double f)
-    {
+    protected void pushFlowThrough(AnnotatedFlowEdge ex, double f) {
         ex.getSource().excess -= f;
         ex.getTarget().excess += f;
 
@@ -274,12 +263,11 @@ public class PushRelabelMFImpl<V, E>
     /*
      * The basic operation PUSH(u, v) is applied if u in an overflowing vertex (i.e. has excess) and
      * u.height = v.height + 1.
-     * 
+     *
      * The operation can be either saturating (if ux.excess >= ex.capacity - ex.flow) or
      * nonsaturating (otherwise).
      */
-    private void push(AnnotatedFlowEdge ex)
-    {
+    private void push(AnnotatedFlowEdge ex) {
         VertexExtension ux = ex.getSource();
         VertexExtension vx = ex.getTarget();
         double delta = Math.min(ux.excess, ex.capacity - ex.flow);
@@ -298,8 +286,7 @@ public class PushRelabelMFImpl<V, E>
         enqueue(vx);
     }
 
-    private void gapHeuristic(int l)
-    {
+    private void gapHeuristic(int l) {
         for (int i = 0; i < N; i++) {
             if (l < vertexExtension[i].height && vertexExtension[i].height < N) {
                 countHeight[vertexExtension[i].height]--;
@@ -312,12 +299,11 @@ public class PushRelabelMFImpl<V, E>
     /*
      * The basic operation RELABEL(u) is applied if u is overflowing (i.e. has excess) and if
      * u.height <= v.height + 1.
-     * 
+     *
      * We can relabel an overflowing vertex $u$ if for every vertex v for which there is residual
      * capacity from u to v, flow cannot be pushed from u to v because v is not downhill from u.
      */
-    private void relabel(VertexExtension ux)
-    {
+    private void relabel(VertexExtension ux) {
         int oldHeight = ux.height;
 
         // Increase the height of u; u.h = 1 + min(v.h : (u, v) in Ef)
@@ -327,7 +313,7 @@ public class PushRelabelMFImpl<V, E>
 
         for (AnnotatedFlowEdge ex : ux.getOutgoing()) {
             if (ex.hasCapacity()) {
-                ux.height = Math.min(ux.height, ex.<VertexExtension> getTarget().height + 1);
+                ux.height = Math.min(ux.height, ex.<VertexExtension>getTarget().height + 1);
             }
         }
 
@@ -349,8 +335,7 @@ public class PushRelabelMFImpl<V, E>
         }
     }
 
-    private void bfs(Queue<Integer> queue, boolean[] visited)
-    {
+    private void bfs(Queue<Integer> queue, boolean[] visited) {
         while (!queue.isEmpty()) {
             int vertexID = queue.poll();
 
@@ -369,11 +354,10 @@ public class PushRelabelMFImpl<V, E>
     /*
      * The global relabeling heuristic updates the height function by computing shortest path
      * distances in the residual graph from all nodes to the sink.
-     * 
+     *
      * This can be done in linear time by a backwards breadth-first search.
      */
-    private void recomputeHeightsHeuristic()
-    {
+    private void recomputeHeightsHeuristic() {
         Arrays.fill(countHeight, 0);
 
         Queue<Integer> queue = new ArrayDeque<>(N);
@@ -408,8 +392,7 @@ public class PushRelabelMFImpl<V, E>
      * edges to neighboring vertices, relabeling u as necessary to cause edges leaving u to become
      * admissible,
      */
-    private void discharge(VertexExtension ux)
-    {
+    private void discharge(VertexExtension ux) {
         while (ux.hasExcess()) {
             // If there are no more edges
             if (ux.currentArc >= ux.getOutgoing().size()) {
@@ -447,20 +430,17 @@ public class PushRelabelMFImpl<V, E>
         }
     }
 
-    private boolean isAdmissible(AnnotatedFlowEdge e)
-    {
+    private boolean isAdmissible(AnnotatedFlowEdge e) {
         return e.hasCapacity() && (e
-            .<VertexExtension> getSource().height == (e.<VertexExtension> getTarget().height + 1));
+                .<VertexExtension>getSource().height == (e.<VertexExtension>getTarget().height + 1));
     }
 
-    private VertexExtension getVertexExtension(V v)
-    {
+    private VertexExtension getVertexExtension(V v) {
         assert vertexExtensionManager != null;
         return (VertexExtension) vertexExtensionManager.getExtension(v);
     }
 
-    private class PushRelabelDiagnostic
-    {
+    private class PushRelabelDiagnostic {
         // Discharges
         Map<Pair<V, V>, Integer> discharges = new HashMap<>();
         long dischargesCounter = 0;
@@ -469,8 +449,7 @@ public class PushRelabelMFImpl<V, E>
         Map<Pair<Integer, Integer>, Integer> relabels = new HashMap<>();
         long relabelsCounter = 0;
 
-        private void incrementDischarges(AnnotatedFlowEdge ex)
-        {
+        private void incrementDischarges(AnnotatedFlowEdge ex) {
             Pair<V, V> p = Pair.of(ex.getSource().prototype, ex.getTarget().prototype);
             if (!discharges.containsKey(p)) {
                 discharges.put(p, 0);
@@ -480,8 +459,7 @@ public class PushRelabelMFImpl<V, E>
             dischargesCounter++;
         }
 
-        private void incrementRelabels(int from, int to)
-        {
+        private void incrementRelabels(int from, int to) {
             Pair<Integer, Integer> p = Pair.of(from, to);
             if (!relabels.containsKey(p)) {
                 relabels.put(p, 0);
@@ -491,8 +469,7 @@ public class PushRelabelMFImpl<V, E>
             relabelsCounter++;
         }
 
-        void dump()
-        {
+        void dump() {
             Map<Integer, Integer> labels = new HashMap<>();
 
             for (V v : network.vertexSet()) {
@@ -510,7 +487,7 @@ public class PushRelabelMFImpl<V, E>
             System.out.println(labels);
 
             List<Map.Entry<Pair<Integer, Integer>, Integer>> relabelsSorted =
-                new ArrayList<>(relabels.entrySet());
+                    new ArrayList<>(relabels.entrySet());
 
             relabelsSorted.sort(new Comparator<Map.Entry<Pair<Integer, Integer>, Integer>>() {
                 @Override
@@ -525,7 +502,7 @@ public class PushRelabelMFImpl<V, E>
             System.out.println("            " + relabelsSorted);
 
             List<Map.Entry<Pair<V, V>, Integer>> dischargesSorted =
-                new ArrayList<>(discharges.entrySet());
+                    new ArrayList<>(discharges.entrySet());
 
             dischargesSorted.sort(new Comparator<Map.Entry<Pair<V, V>, Integer>>() {
                 @Override
@@ -545,22 +522,19 @@ public class PushRelabelMFImpl<V, E>
      * Vertex extension for the push-relabel algorithm, which contains an additional height.
      */
     public class VertexExtension
-        extends
-        VertexExtensionBase
-    {
+            extends
+            VertexExtensionBase {
         private int id;
         private int height; // also called label (or distance label) in some papers
         private boolean active;
         private int currentArc;
 
-        private boolean hasExcess()
-        {
+        private boolean hasExcess() {
             return comparator.compare(excess, 0.0) > 0;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return prototype.toString() + String.format(" { HGT: %d } ", height);
         }
     }

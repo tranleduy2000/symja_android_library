@@ -34,10 +34,11 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * An implementation of Suurballe algorithm for finding K edge-<em>disjoint</em> shortest paths. The
@@ -47,7 +48,7 @@ import java.util.*;
  * <p>
  * The algorithm is running k sequential Dijkstra iterations to find the shortest path at each step.
  * Hence, yielding a complexity of k*O(Dijkstra).
- * 
+ *
  * <p>
  * For further reference see <a href="https://en.wikipedia.org/wiki/Suurballe%27s_algorithm">
  * Wikipedia page </a>
@@ -55,16 +56,14 @@ import java.util.*;
  * <li>Suurballe, J. W.; Tarjan, R. E. (1984), A quick method for finding shortest pairs of disjoint
  * paths.
  * </ul>
- * 
+ *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
  * @author Assaf Mizrachi
  */
 public class SuurballeKDisjointShortestPaths<V, E>
-    extends
-    BaseKDisjointShortestPathsAlgorithm<V, E>
-{
+        extends
+        BaseKDisjointShortestPathsAlgorithm<V, E> {
 
     private ShortestPathAlgorithm.SingleSourcePaths<V, E> singleSourcePaths;
 
@@ -72,25 +71,22 @@ public class SuurballeKDisjointShortestPaths<V, E>
      * Creates a new instance of the algorithm.
      *
      * @param graph graph on which shortest paths are searched.
-     *
      * @throws IllegalArgumentException if the graph is null.
      * @throws IllegalArgumentException if the graph is undirected.
      * @throws IllegalArgumentException if the graph is not simple.
      */
-    public SuurballeKDisjointShortestPaths(Graph<V, E> graph)
-    {
+    public SuurballeKDisjointShortestPaths(Graph<V, E> graph) {
 
         super(graph);
     }
 
     @Override
-    protected void transformGraph(List<E> previousPath)
-    {
+    protected void transformGraph(List<E> previousPath) {
         for (E edge : this.workingGraph.edgeSet()) {
             V source = workingGraph.getEdgeSource(edge);
             V target = workingGraph.getEdgeTarget(edge);
             double modifiedWeight = this.workingGraph.getEdgeWeight(edge)
-                - singleSourcePaths.getWeight(target) + singleSourcePaths.getWeight(source);
+                    - singleSourcePaths.getWeight(target) + singleSourcePaths.getWeight(source);
 
             this.workingGraph.setEdgeWeight(edge, modifiedWeight);
         }
@@ -115,10 +111,9 @@ public class SuurballeKDisjointShortestPaths<V, E>
     }
 
     @Override
-    protected GraphPath<V, E> calculateShortestPath(V startVertex, V endVertex)
-    {
+    protected GraphPath<V, E> calculateShortestPath(V startVertex, V endVertex) {
         this.singleSourcePaths =
-            new DijkstraShortestPath<>(this.workingGraph).getPaths(startVertex);
+                new DijkstraShortestPath<>(this.workingGraph).getPaths(startVertex);
         return singleSourcePaths.getPath(endVertex);
     }
 

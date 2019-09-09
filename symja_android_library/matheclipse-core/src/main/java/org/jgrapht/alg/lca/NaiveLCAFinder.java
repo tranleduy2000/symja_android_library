@@ -17,11 +17,18 @@
  */
 package org.jgrapht.alg.lca;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithmImpl;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Find the Lowest Common Ancestor of a directed graph.
@@ -48,7 +55,7 @@ import java.util.*;
  * 4. Repeat from step 3, with aSet now the parents of everything in aSet, and bSet the parents of everything in bSet
  * 5. If there are no more parents to descend to then there is no LCA
  * </pre>
- *
+ * <p>
  * The rationale for this working is that in each iteration of the loop we are considering all the
  * ancestors of a that have a path of length n back to a, where n is the depth of the recursion. The
  * same is true of b.
@@ -81,24 +88,21 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Leo Crawford
  * @author Alexandru Valeanu
  */
 public class NaiveLCAFinder<V, E>
         extends LowestCommonAncestorAlgorithmImpl<V>
         implements
-    LowestCommonAncestorAlgorithm<V>
-{
+        LowestCommonAncestorAlgorithm<V> {
     private Graph<V, E> graph;
 
     /**
      * Create a new instance of the naive LCA finder.
-     * 
+     *
      * @param graph the input graph
      */
-    public NaiveLCAFinder(Graph<V, E> graph)
-    {
+    public NaiveLCAFinder(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
     }
 
@@ -106,8 +110,7 @@ public class NaiveLCAFinder<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getLCA(V a, V b)
-    {
+    public V getLCA(V a, V b) {
         if (!graph.containsVertex(a))
             throw new IllegalArgumentException("invalid vertex: " + a);
 
@@ -115,18 +118,17 @@ public class NaiveLCAFinder<V, E>
             throw new IllegalArgumentException("invalid vertex: " + b);
 
         return findLca(
-            Collections.singleton(a), Collections.singleton(b), new LinkedHashSet<V>(),
-            new LinkedHashSet<V>());
+                Collections.singleton(a), Collections.singleton(b), new LinkedHashSet<V>(),
+                new LinkedHashSet<V>());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<V> getLCASet(V a, V b)
-    {
+    public Set<V> getLCASet(V a, V b) {
         @SuppressWarnings("unchecked") Set<V>[] visitedSets =
-            (Set<V>[]) Array.newInstance(Set.class, 2);
+                (Set<V>[]) Array.newInstance(Set.class, 2);
         // set of nodes visited from a
         visitedSets[0] = new LinkedHashSet<>();
         // set of nodes visited from b
@@ -171,10 +173,9 @@ public class NaiveLCAFinder<V, E>
      * has been visited from both a and b, it is no longer expanded in our search (we know that its
      * ancestors won't be part of the SLCA(x, y) set).
      */
-    private void doubleBfs(V a, V b, Set<V>[] visitedSets)
-    {
+    private void doubleBfs(V a, V b, Set<V>[] visitedSets) {
         @SuppressWarnings("unchecked") Queue<V>[] queues =
-            (Queue<V>[]) Array.newInstance(Queue.class, 2);
+                (Queue<V>[]) Array.newInstance(Queue.class, 2);
         queues[0] = new ArrayDeque<>();
         queues[1] = new ArrayDeque<>();
 
@@ -209,8 +210,7 @@ public class NaiveLCAFinder<V, E>
      * every member of aSet and bSet
      */
     private V findLca(
-        Set<V> aSet, Set<V> bSet, LinkedHashSet<V> aSeenSet, LinkedHashSet<V> bSeenSet)
-    {
+            Set<V> aSet, Set<V> bSet, LinkedHashSet<V> aSeenSet, LinkedHashSet<V> bSeenSet) {
         while (true) {
             // if there is no LCA...
             if ((aSet.size() == 0) && (bSet.size() == 0)) {
@@ -249,11 +249,9 @@ public class NaiveLCAFinder<V, E>
      * those parents
      *
      * @param vertexSet the set of vertex to find parents of
-     *
      * @return a set of every parent of every vertex passed in
      */
-    private Set<V> allParents(Set<V> vertexSet)
-    {
+    private Set<V> allParents(Set<V> vertexSet) {
         HashSet<V> result = new HashSet<>();
         for (V e : vertexSet) {
             for (E edge : graph.incomingEdgesOf(e)) {
@@ -272,11 +270,9 @@ public class NaiveLCAFinder<V, E>
      *
      * @param x set containing vertex
      * @param y set containing vertex, which may be ordered to give predictable results
-     *
      * @return the first element of $y$ that is also in $x$, or null if no such element
      */
-    private V overlappingMember(Set<V> x, Set<V> y)
-    {
+    private V overlappingMember(Set<V> x, Set<V> y) {
         y.retainAll(x);
         return y.iterator().next();
     }

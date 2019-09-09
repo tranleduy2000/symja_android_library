@@ -17,14 +17,16 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
+import org.jgrapht.GraphMapping;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 abstract class VF2MappingIterator<V, E>
-    implements
-    Iterator<GraphMapping<V, E>>
-{
+        implements
+        Iterator<GraphMapping<V, E>> {
     protected Comparator<V> vertexComparator;
     protected Comparator<E> edgeComparator;
 
@@ -36,9 +38,8 @@ abstract class VF2MappingIterator<V, E>
     protected ArrayDeque<VF2State<V, E>> stateStack;
 
     public VF2MappingIterator(
-        GraphOrdering<V, E> ordering1, GraphOrdering<V, E> ordering2,
-        Comparator<V> vertexComparator, Comparator<E> edgeComparator)
-    {
+            GraphOrdering<V, E> ordering1, GraphOrdering<V, E> ordering2,
+            Comparator<V> vertexComparator, Comparator<E> edgeComparator) {
         this.ordering1 = ordering1;
         this.ordering2 = ordering2;
         this.vertexComparator = vertexComparator;
@@ -54,8 +55,7 @@ abstract class VF2MappingIterator<V, E>
      */
     protected abstract IsomorphicGraphMapping<V, E> match();
 
-    protected IsomorphicGraphMapping<V, E> matchAndCheck()
-    {
+    protected IsomorphicGraphMapping<V, E> matchAndCheck() {
         IsomorphicGraphMapping<V, E> rel = match();
         if (rel != null) {
             hadOneMapping = true;
@@ -64,15 +64,13 @@ abstract class VF2MappingIterator<V, E>
     }
 
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return nextMapping != null || (nextMapping = matchAndCheck()) != null;
 
     }
 
     @Override
-    public IsomorphicGraphMapping<V, E> next()
-    {
+    public IsomorphicGraphMapping<V, E> next() {
         if (nextMapping != null) {
             IsomorphicGraphMapping<V, E> tmp = nextMapping;
             nextMapping = null;
@@ -87,8 +85,7 @@ abstract class VF2MappingIterator<V, E>
     }
 
     @Override
-    public void remove()
-    {
+    public void remove() {
         throw new UnsupportedOperationException();
     }
 }

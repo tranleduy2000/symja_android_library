@@ -22,11 +22,9 @@ package org.jgrapht.alg.interfaces;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Andre Immig
  */
-public interface MaximumDensitySubgraphAlgorithm<V, E>
-{
+public interface MaximumDensitySubgraphAlgorithm<V, E> {
 
     /**
      * Calculate a maximum density subgraph

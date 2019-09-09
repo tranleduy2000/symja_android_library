@@ -17,19 +17,17 @@
  */
 package org.jgrapht.event;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * A traversal event for a graph edge.
  *
  * @param <E> the graph edge type
- *
  * @author Barak Naveh
  */
 public class EdgeTraversalEvent<E>
-    extends
-    EventObject
-{
+        extends
+        EventObject {
     private static final long serialVersionUID = 4050768173789820979L;
 
     /**
@@ -41,10 +39,9 @@ public class EdgeTraversalEvent<E>
      * Creates a new EdgeTraversalEvent.
      *
      * @param eventSource the source of the event.
-     * @param edge the traversed edge.
+     * @param edge        the traversed edge.
      */
-    public EdgeTraversalEvent(Object eventSource, E edge)
-    {
+    public EdgeTraversalEvent(Object eventSource, E edge) {
         super(eventSource);
         this.edge = edge;
     }
@@ -54,8 +51,7 @@ public class EdgeTraversalEvent<E>
      *
      * @return the traversed edge.
      */
-    public E getEdge()
-    {
+    public E getEdge() {
         return edge;
     }
 }

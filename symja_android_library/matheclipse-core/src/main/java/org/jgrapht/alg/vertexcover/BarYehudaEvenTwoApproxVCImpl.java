@@ -34,25 +34,23 @@ import java.util.Set;
  * Algorithms 2:198-203, 1981. The solution is guaranteed to be within $2$ times the optimum
  * solution. An easier-to-read version of this algorithm can be found here: <a href=
  * "https://www.cs.umd.edu/class/spring2011/cmsc651/vc.pdf">https://www.cs.umd.edu/class/spring2011/cmsc651/vc.pdf</a>
- *
+ * <p>
  * Note: this class supports pseudo-graphs Runtime: $O(|E|)$ This is a fast algorithm, guaranteed to
  * give a $2$-approximation. A solution of higher quality (same approximation ratio) at the
  * expensive of a higher runtime can be obtained using {@link BarYehudaEvenTwoApproxVCImpl}.
- *
- *
+ * <p>
+ * <p>
  * TODO: Remove the UndirectedSubgraph dependency! Querying vertex degrees on these graphs is
  * actually slow! This does affect the runtime complexity. Better would be to just work on a clone
  * of the original graph!
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
 public class BarYehudaEvenTwoApproxVCImpl<V, E>
-    implements
-    VertexCoverAlgorithm<V>
-{
+        implements
+        VertexCoverAlgorithm<V> {
 
     private final Graph<V, E> graph;
     private final Map<V, Double> vertexWeightMap;
@@ -60,11 +58,10 @@ public class BarYehudaEvenTwoApproxVCImpl<V, E>
     /**
      * Constructs a new BarYehudaEvenTwoApproxVCImpl instance where all vertices have uniform
      * weights.
-     * 
+     *
      * @param graph input graph
      */
-    public BarYehudaEvenTwoApproxVCImpl(Graph<V, E> graph)
-    {
+    public BarYehudaEvenTwoApproxVCImpl(Graph<V, E> graph) {
         this.graph = GraphTests.requireUndirected(graph);
         Map<V, Double> map = new HashMap<>();
         for (V vertex : graph
@@ -78,19 +75,17 @@ public class BarYehudaEvenTwoApproxVCImpl<V, E>
 
     /**
      * Constructs a new BarYehudaEvenTwoApproxVCImpl instance
-     * 
-     * @param graph input graph
+     *
+     * @param graph           input graph
      * @param vertexWeightMap mapping of vertex weights
      */
-    public BarYehudaEvenTwoApproxVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap)
-    {
+    public BarYehudaEvenTwoApproxVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap) {
         this.graph = GraphTests.requireUndirected(graph);
         this.vertexWeightMap = Objects.requireNonNull(vertexWeightMap);
     }
 
     @Override
-    public VertexCover<V> getVertexCover()
-    {
+    public VertexCover<V> getVertexCover() {
         Set<V> cover = new LinkedHashSet<>();
         double weight = 0;
         Graph<V, E> copy = new AsSubgraph<>(graph, null, null);

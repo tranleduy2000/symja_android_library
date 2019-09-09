@@ -24,13 +24,11 @@ package org.jgrapht.event;
  * {@link GraphChangeEvent#getType()} method.
  *
  * @param <V> the graph vertex type
- *
  * @author Barak Naveh
  */
 public class GraphVertexChangeEvent<V>
-    extends
-    GraphChangeEvent
-{
+        extends
+        GraphChangeEvent {
     private static final long serialVersionUID = 3690189962679104053L;
 
     /**
@@ -62,11 +60,10 @@ public class GraphVertexChangeEvent<V>
      * Creates a new GraphVertexChangeEvent object.
      *
      * @param eventSource the source of the event.
-     * @param type the type of the event.
-     * @param vertex the vertex that the event is related to.
+     * @param type        the type of the event.
+     * @param vertex      the vertex that the event is related to.
      */
-    public GraphVertexChangeEvent(Object eventSource, int type, V vertex)
-    {
+    public GraphVertexChangeEvent(Object eventSource, int type, V vertex) {
         super(eventSource, type);
         this.vertex = vertex;
     }
@@ -76,8 +73,7 @@ public class GraphVertexChangeEvent<V>
      *
      * @return the vertex that this event is related to.
      */
-    public V getVertex()
-    {
+    public V getVertex() {
         return vertex;
     }
 }

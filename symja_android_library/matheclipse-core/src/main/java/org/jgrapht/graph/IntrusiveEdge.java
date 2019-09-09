@@ -17,7 +17,7 @@
  */
 package org.jgrapht.graph;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * IntrusiveEdge encapsulates the internals for the default edge implementation. It is not intended
@@ -26,10 +26,9 @@ import java.io.*;
  * @author John V. Sichi
  */
 class IntrusiveEdge
-    implements
-    Cloneable,
-    Serializable
-{
+        implements
+        Cloneable,
+        Serializable {
     private static final long serialVersionUID = 3258408452177932855L;
 
     Object source;
@@ -40,8 +39,7 @@ class IntrusiveEdge
      * @see Object#clone()
      */
     @Override
-    public Object clone()
-    {
+    public Object clone() {
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {

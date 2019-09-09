@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ import java.util.LinkedList;
  * Operations {@code insert}, {@code deleteMin}, {@code decreaseKey}, and
  * {@code delete} take worst-case O(log(n)). Operation {@code findMin} is
  * worst-case O(1).
- * 
+ *
  * <p>
  * Note that the ordering maintained by this heap, like any heap, and whether or
  * not an explicit comparator is provided, must be <em>consistent with
@@ -53,11 +53,8 @@ import java.util.LinkedList;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- * @param <V>
- *            the type of values maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
+ * @param <V> the type of values maintained by this heap
  * @author Dimitrios Michail
  */
 public class LeftistHeap<K, V> extends SkewHeap<K, V> {
@@ -92,10 +89,9 @@ public class LeftistHeap<K, V> extends SkewHeap<K, V> {
      * heap that violates this constraint, the {@code insert(Object key)} call
      * will throw a {@code ClassCastException}.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public LeftistHeap(Comparator<? super K> comparator) {
         super(comparator);
@@ -116,11 +112,9 @@ public class LeftistHeap<K, V> extends SkewHeap<K, V> {
 
     /**
      * Factory method for new node creation
-     * 
-     * @param key
-     *            the key
-     * @param value
-     *            the value
+     *
+     * @param key   the key
+     * @param value the value
      * @return the newly created node
      */
     protected Node<K, V> createNode(K key, V value) {
@@ -129,9 +123,8 @@ public class LeftistHeap<K, V> extends SkewHeap<K, V> {
 
     /**
      * Swap the children of a node.
-     * 
-     * @param n
-     *            the node
+     *
+     * @param n the node
      */
     protected void swapChildren(Node<K, V> n) {
         Node<K, V> left = n.o_c;
@@ -147,11 +140,9 @@ public class LeftistHeap<K, V> extends SkewHeap<K, V> {
 
     /**
      * Top-down union two skew heaps
-     * 
-     * @param root1
-     *            the root of the first heap
-     * @param root2
-     *            the root of the right heap
+     *
+     * @param root1 the root of the first heap
+     * @param root2 the root of the right heap
      * @return the new root of the merged heap
      */
     @Override
@@ -261,11 +252,9 @@ public class LeftistHeap<K, V> extends SkewHeap<K, V> {
 
     /**
      * Top-down union of two leftist heaps with comparator.
-     * 
-     * @param root1
-     *            the root of the first heap
-     * @param root2
-     *            the root of the right heap
+     *
+     * @param root1 the root of the first heap
+     * @param root2 the root of the right heap
      * @return the new root of the merged heap
      */
     @Override

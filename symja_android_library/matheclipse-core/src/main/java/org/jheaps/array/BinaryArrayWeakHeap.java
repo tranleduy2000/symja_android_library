@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +17,15 @@
  */
 package org.jheaps.array;
 
-import java.io.Serializable;
-import java.util.BitSet;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import org.jheaps.Constants;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LinearTime;
 import org.jheaps.annotations.LogarithmicTime;
+
+import java.io.Serializable;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 /**
  * An array based binary weak heap. The heap is sorted according to the
@@ -41,7 +41,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * {@code findMin}, is a worst-case O(1) operation. The bounds are worst-case if
  * the user initializes the heap with a capacity larger or equal to the total
  * number of elements that are going to be inserted into the heap.
- * 
+ *
  * <p>
  * Constructing such a heap from an array of elements can be performed using the
  * method {@link #heapify(Object[])} or {@link #heapify(Object[], Comparator)}
@@ -69,9 +69,7 @@ import org.jheaps.annotations.LogarithmicTime;
  * elements or changing the key of some element.) This is typically accomplished
  * by synchronizing on some object that naturally encapsulates the heap.
  *
- * @param <K>
- *            the type of keys maintained by this heap
- *
+ * @param <K> the type of keys maintained by this heap
  * @author Dimitrios Michail
  */
 public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements Serializable {
@@ -129,8 +127,7 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param capacity
-     *            the initial heap capacity
+     * @param capacity the initial heap capacity
      */
     public BinaryArrayWeakHeap(int capacity) {
         super(null, capacity);
@@ -152,10 +149,9 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
      * {@link BinaryArrayWeakHeap#DEFAULT_HEAP_CAPACITY} and adjusts
      * automatically based on the sequence of insertions and deletions.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
      */
     public BinaryArrayWeakHeap(Comparator<? super K> comparator) {
         super(comparator, DEFAULT_HEAP_CAPACITY);
@@ -178,12 +174,10 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
      * automatically based on the sequence of insertions and deletions. The
      * capacity will never become smaller than the initial requested capacity.
      *
-     * @param comparator
-     *            the comparator that will be used to order this heap. If
-     *            {@code null}, the {@linkplain Comparable natural ordering} of
-     *            the keys will be used.
-     * @param capacity
-     *            the initial heap capacity
+     * @param comparator the comparator that will be used to order this heap. If
+     *                   {@code null}, the {@linkplain Comparable natural ordering} of
+     *                   the keys will be used.
+     * @param capacity   the initial heap capacity
      */
     public BinaryArrayWeakHeap(Comparator<? super K> comparator, int capacity) {
         super(comparator, capacity);
@@ -193,13 +187,10 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
+     * @param <K>   the type of keys maintained by the heap
+     * @param array an array of elements
      * @return a heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> BinaryArrayWeakHeap<K> heapify(K[] array) {
@@ -226,15 +217,11 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
      * Create a heap from an array of elements. The elements of the array are
      * not destroyed. The method has linear time complexity.
      *
-     * @param <K>
-     *            the type of keys maintained by the heap
-     * @param array
-     *            an array of elements
-     * @param comparator
-     *            the comparator to use
+     * @param <K>        the type of keys maintained by the heap
+     * @param array      an array of elements
+     * @param comparator the comparator to use
      * @return a heap
-     * @throws IllegalArgumentException
-     *             in case the array is null
+     * @throws IllegalArgumentException in case the array is null
      */
     @LinearTime
     public static <K> BinaryArrayWeakHeap<K> heapify(K[] array, Comparator<? super K> comparator) {
@@ -346,9 +333,8 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
 
     /**
      * Ensure that the array representation has the necessary capacity.
-     * 
-     * @param capacity
-     *            the requested capacity
+     *
+     * @param capacity the requested capacity
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -364,9 +350,8 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
 
     /**
      * Return the distinguished ancestor of an element.
-     * 
-     * @param j
-     *            the element
+     *
+     * @param j the element
      * @return the distinguished ancestor of the element
      */
     protected int dancestor(int j) {
@@ -378,11 +363,9 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
 
     /**
      * Join two weak heaps into one.
-     * 
-     * @param i
-     *            root of the first weak heap
-     * @param j
-     *            root of the second weak heap
+     *
+     * @param i root of the first weak heap
+     * @param j root of the second weak heap
      * @return true if already a weak heap, false if a flip was needed
      */
     @SuppressWarnings("unchecked")
@@ -399,11 +382,9 @@ public class BinaryArrayWeakHeap<K> extends AbstractArrayWeakHeap<K> implements 
 
     /**
      * Join two weak heaps into one.
-     * 
-     * @param i
-     *            root of the first weak heap
-     * @param j
-     *            root of the second weak heap
+     *
+     * @param i root of the first weak heap
+     * @param j root of the second weak heap
      * @return true if already a weak heap, false if a flip was needed
      */
     protected boolean joinWithComparator(int i, int j) {

@@ -17,7 +17,7 @@
  */
 package org.jgrapht.graph;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
 /**
  * IntrusiveEdge extension for weighted edges. IntrusiveWeightedEdge encapsulates the internals for
@@ -27,9 +27,8 @@ import org.jgrapht.*;
  * @author Dimitrios Michail
  */
 class IntrusiveWeightedEdge
-    extends
-    IntrusiveEdge
-{
+        extends
+        IntrusiveEdge {
     private static final long serialVersionUID = 2890534758523920741L;
 
     double weight = Graph.DEFAULT_EDGE_WEIGHT;

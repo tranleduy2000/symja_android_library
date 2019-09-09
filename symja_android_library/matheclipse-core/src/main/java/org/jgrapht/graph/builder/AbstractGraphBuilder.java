@@ -17,8 +17,9 @@
  */
 package org.jgrapht.graph.builder;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.AsUnmodifiableGraph;
 
 /**
  * Base class for builders of {@link Graph}
@@ -27,12 +28,10 @@ import org.jgrapht.graph.*;
  * @param <E> the graph edge type
  * @param <G> type of the resulting graph
  * @param <B> type of this builder
- * 
  * @author Andrew Chen
  */
 public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
-    B extends AbstractGraphBuilder<V, E, G, B>>
-{
+        B extends AbstractGraphBuilder<V, E, G, B>> {
     protected final G graph;
 
     /**
@@ -40,8 +39,7 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param baseGraph the graph object to base building on
      */
-    public AbstractGraphBuilder(G baseGraph)
-    {
+    public AbstractGraphBuilder(G baseGraph) {
         this.graph = baseGraph;
     }
 
@@ -54,13 +52,10 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * Adds {@code vertex} to the graph being built.
      *
      * @param vertex the vertex to add
-     *
      * @return this builder object
-     *
      * @see Graph#addVertex(Object)
      */
-    public B addVertex(V vertex)
-    {
+    public B addVertex(V vertex) {
         this.graph.addVertex(vertex);
         return this.self();
     }
@@ -69,14 +64,11 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * Adds each vertex of {@code vertices} to the graph being built.
      *
      * @param vertices the vertices to add
-     *
      * @return this builder object
-     *
      * @see #addVertex(Object)
      */
     @SafeVarargs
-    public final B addVertices(V... vertices)
-    {
+    public final B addVertices(V... vertices) {
         for (V vertex : vertices) {
             this.addVertex(vertex);
         }
@@ -89,13 +81,10 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param source source vertex of the edge.
      * @param target target vertex of the edge.
-     *
      * @return this builder object
-     *
      * @see Graphs#addEdgeWithVertices(Graph, Object, Object)
      */
-    public B addEdge(V source, V target)
-    {
+    public B addEdge(V source, V target) {
         Graphs.addEdgeWithVertices(this.graph, source, target);
         return this.self();
     }
@@ -106,13 +95,11 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param source source vertex of the edge.
      * @param target target vertex of the edge.
-     * @param edge edge to be added to this graph.
+     * @param edge   edge to be added to this graph.
      * @return this builder object
-     *
      * @see Graph#addEdge(Object, Object, Object)
      */
-    public B addEdge(V source, V target, E edge)
-    {
+    public B addEdge(V source, V target, E edge) {
         this.addVertex(source);
         this.addVertex(target);
         this.graph.addEdge(source, target, edge);
@@ -123,16 +110,14 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * Adds a chain of edges to the graph being built. The vertices are added to the graph, if not
      * already included.
      *
-     * @param first the first vertex
+     * @param first  the first vertex
      * @param second the second vertex
-     * @param rest the remaining vertices
+     * @param rest   the remaining vertices
      * @return this builder object
-     *
      * @see #addEdge(Object, Object)
      */
     @SafeVarargs
-    public final B addEdgeChain(V first, V second, V... rest)
-    {
+    public final B addEdgeChain(V first, V second, V... rest) {
         this.addEdge(first, second);
         V last = second;
         for (V vertex : rest) {
@@ -147,11 +132,9 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param sourceGraph the source graph
      * @return this builder object
-     *
      * @see Graphs#addGraph(Graph, Graph)
      */
-    public B addGraph(Graph<? extends V, ? extends E> sourceGraph)
-    {
+    public B addGraph(Graph<? extends V, ? extends E> sourceGraph) {
         Graphs.addGraph(this.graph, sourceGraph);
         return this.self();
     }
@@ -160,13 +143,10 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * Removes {@code vertex} from the graph being built, if such vertex exist in graph.
      *
      * @param vertex the vertex to remove
-     *
      * @return this builder object
-     *
      * @see Graph#removeVertex(Object)
      */
-    public B removeVertex(V vertex)
-    {
+    public B removeVertex(V vertex) {
         this.graph.removeVertex(vertex);
         return this.self();
     }
@@ -176,14 +156,11 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * graph.
      *
      * @param vertices the vertices to remove
-     *
      * @return this builder object
-     *
      * @see #removeVertex(Object)
      */
     @SafeVarargs
-    public final B removeVertices(V... vertices)
-    {
+    public final B removeVertices(V... vertices) {
         for (V vertex : vertices) {
             this.removeVertex(vertex);
         }
@@ -196,13 +173,10 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param source source vertex of the edge.
      * @param target target vertex of the edge.
-     *
      * @return this builder object
-     *
      * @see Graph#removeVertex(Object)
      */
-    public B removeEdge(V source, V target)
-    {
+    public B removeEdge(V source, V target) {
         this.graph.removeEdge(source, target);
         return this.self();
     }
@@ -213,11 +187,9 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param edge edge to be removed from this graph, if present.
      * @return this builder object
-     *
      * @see Graph#removeEdge(Object)
      */
-    public B removeEdge(E edge)
-    {
+    public B removeEdge(E edge) {
         this.graph.removeEdge(edge);
         return this.self();
     }
@@ -229,13 +201,10 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * @param source source vertex of the edge.
      * @param target target vertex of the edge.
      * @param weight weight of the edge.
-     *
      * @return this builder object
-     *
      * @see Graphs#addEdgeWithVertices(Graph, Object, Object, double)
      */
-    public B addEdge(V source, V target, double weight)
-    {
+    public B addEdge(V source, V target, double weight) {
         Graphs.addEdgeWithVertices(this.graph, source, target, weight);
         return this.self();
     }
@@ -246,16 +215,13 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @param source source vertex of the edge.
      * @param target target vertex of the edge.
-     * @param edge edge to be added to this graph.
+     * @param edge   edge to be added to this graph.
      * @param weight weight of the edge.
-     *
      * @return this builder object
-     *
      * @see Graph#addEdge(Object, Object, Object)
      * @see Graph#setEdgeWeight(Object, double)
      */
-    public B addEdge(V source, V target, E edge, double weight)
-    {
+    public B addEdge(V source, V target, E edge, double weight) {
         this.graph.addEdge(source, target, edge);
         this.graph.setEdgeWeight(edge, weight);
         return this.self();
@@ -267,8 +233,7 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      *
      * @return the built graph.
      */
-    public G build()
-    {
+    public G build() {
         return this.graph;
     }
 
@@ -277,11 +242,9 @@ public abstract class AbstractGraphBuilder<V, E, G extends Graph<V, E>,
      * builder object after calling this method is undefined behaviour.
      *
      * @return the built unmodifiable graph.
-     *
      * @see #build()
      */
-    public Graph<V, E> buildAsUnmodifiable()
-    {
+    public Graph<V, E> buildAsUnmodifiable() {
         return new AsUnmodifiableGraph<>(this.graph);
     }
 }

@@ -39,12 +39,10 @@ import java.util.Objects;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  */
 public class KShortestSimplePaths<V, E>
-    implements
-    KShortestPathAlgorithm<V, E>
-{
+        implements
+        KShortestPathAlgorithm<V, E> {
     /**
      * Graph on which shortest paths are searched.
      */
@@ -59,8 +57,7 @@ public class KShortestSimplePaths<V, E>
      *
      * @param graph graph on which shortest paths are searched
      */
-    public KShortestSimplePaths(Graph<V, E> graph)
-    {
+    public KShortestSimplePaths(Graph<V, E> graph) {
         this(graph, graph.vertexSet().size() - 1, null);
     }
 
@@ -70,24 +67,21 @@ public class KShortestSimplePaths<V, E>
      * used in addition to the basic path validations which are that the path is from start to
      * target with no loops.
      *
-     * @param graph graph on which shortest paths are searched.
+     * @param graph         graph on which shortest paths are searched.
      * @param pathValidator the path validator to use
      */
-    public KShortestSimplePaths(Graph<V, E> graph, PathValidator<V, E> pathValidator)
-    {
+    public KShortestSimplePaths(Graph<V, E> graph, PathValidator<V, E> pathValidator) {
         this(graph, graph.vertexSet().size() - 1, pathValidator);
     }
 
     /**
      * Constructs an object to calculate ranking shortest paths in a graph.
      *
-     * @param graph graph on which shortest paths are searched
+     * @param graph    graph on which shortest paths are searched
      * @param nMaxHops maximum number of edges of the calculated paths
-     *
      * @throws IllegalArgumentException if nMaxHops is negative or 0.
      */
-    public KShortestSimplePaths(Graph<V, E> graph, int nMaxHops)
-    {
+    public KShortestSimplePaths(Graph<V, E> graph, int nMaxHops) {
         this(graph, nMaxHops, null);
     }
 
@@ -97,14 +91,12 @@ public class KShortestSimplePaths<V, E>
      * validations will be used in addition to the basic path validations which are that the path is
      * from start to target with no loops.
      *
-     * @param graph graph on which shortest paths are searched
-     * @param nMaxHops maximum number of edges of the calculated paths
+     * @param graph         graph on which shortest paths are searched
+     * @param nMaxHops      maximum number of edges of the calculated paths
      * @param pathValidator the path validator to use
-     *
      * @throws IllegalArgumentException if nMaxHops is negative or 0.
      */
-    public KShortestSimplePaths(Graph<V, E> graph, int nMaxHops, PathValidator<V, E> pathValidator)
-    {
+    public KShortestSimplePaths(Graph<V, E> graph, int nMaxHops, PathValidator<V, E> pathValidator) {
         this.graph = Objects.requireNonNull(graph, "graph is null");
         this.nMaxHops = nMaxHops;
         if (nMaxHops <= 0) {
@@ -117,17 +109,15 @@ public class KShortestSimplePaths<V, E>
      * Returns a list of the $k$ shortest simple paths in increasing order of weight.
      *
      * @param startVertex source vertex of the calculated paths.
-     * @param endVertex target vertex of the calculated paths.
-     *
+     * @param endVertex   target vertex of the calculated paths.
      * @return an iterator of paths between the start vertex and the end vertex
      * @throws IllegalArgumentException if the graph does not contain the startVertex or the
-     *         endVertex
+     *                                  endVertex
      * @throws IllegalArgumentException if the startVertex and the endVertex are the same vertices
      * @throws IllegalArgumentException if k is negative or zero
      */
     @Override
-    public List<GraphPath<V, E>> getPaths(final V startVertex, V endVertex, int k)
-    {
+    public List<GraphPath<V, E>> getPaths(final V startVertex, V endVertex, int k) {
         Objects.requireNonNull(startVertex, "Start vertex cannot be null");
         Objects.requireNonNull(endVertex, "End vertex cannot be null");
         if (endVertex.equals(startVertex)) {
@@ -144,7 +134,7 @@ public class KShortestSimplePaths<V, E>
         }
 
         KShortestSimplePathsIterator<V, E> iter =
-            new KShortestSimplePathsIterator<>(graph, startVertex, endVertex, k, pathValidator);
+                new KShortestSimplePathsIterator<>(graph, startVertex, endVertex, k, pathValidator);
 
         /*
          * at the i-th pass the shortest paths with less (or equal) than i edges are calculated
@@ -155,7 +145,7 @@ public class KShortestSimplePaths<V, E>
 
         RankingPathElementList<V, E> pathElements = iter.getPathElements(endVertex);
         if (pathElements == null) {
-            return Collections.<GraphPath<V, E>> emptyList();
+            return Collections.emptyList();
         } else {
             ArrayList<GraphPath<V, E>> graphPaths = new ArrayList<>();
             for (RankingPathElement<V, E> e : pathElements) {

@@ -17,10 +17,17 @@
  */
 package org.jgrapht.alg;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphTests;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
  * Implements the <a href="http://dl.acm.org/citation.cfm?id=263872">Stoer and Wagner minimum cut
@@ -31,12 +38,10 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Robby McKilliam
  * @author Ernst de Ridder
  */
-public class StoerWagnerMinimumCut<V, E>
-{
+public class StoerWagnerMinimumCut<V, E> {
     final Graph<Set<V>, DefaultWeightedEdge> workingGraph;
 
     protected double bestCutWeight = Double.POSITIVE_INFINITY;
@@ -46,12 +51,10 @@ public class StoerWagnerMinimumCut<V, E>
      * Will compute the minimum cut in graph.
      *
      * @param graph graph over which to run algorithm
-     *
      * @throws IllegalArgumentException if a negative weight edge is found
      * @throws IllegalArgumentException if graph has less than 2 vertices
      */
-    public StoerWagnerMinimumCut(Graph<V, E> graph)
-    {
+    public StoerWagnerMinimumCut(Graph<V, E> graph) {
         GraphTests.requireUndirected(graph, "Graph must be undirected");
 
         if (graph.vertexSet().size() < 2) {
@@ -85,7 +88,7 @@ public class StoerWagnerMinimumCut<V, E>
                 workingGraph.setEdgeWeight(eNew, graph.getEdgeWeight(e));
             } else {
                 workingGraph
-                    .setEdgeWeight(eNew, workingGraph.getEdgeWeight(eNew) + graph.getEdgeWeight(e));
+                        .setEdgeWeight(eNew, workingGraph.getEdgeWeight(eNew) + graph.getEdgeWeight(e));
             }
         }
 
@@ -99,11 +102,10 @@ public class StoerWagnerMinimumCut<V, E>
 
     /**
      * Implements the MinimumCutPhase function of Stoer and Wagner.
-     * 
+     *
      * @param a the vertex
      */
-    protected void minimumCutPhase(Set<V> a)
-    {
+    protected void minimumCutPhase(Set<V> a) {
         // The last and before last vertices added to A.
         Set<V> last = a, beforelast = null;
 
@@ -159,35 +161,31 @@ public class StoerWagnerMinimumCut<V, E>
 
     /**
      * Return the weight of the minimum cut
-     * 
+     *
      * @return the weight of the minimum cut
      */
-    public double minCutWeight()
-    {
+    public double minCutWeight() {
         return bestCutWeight;
     }
 
     /**
      * Return a set of vertices on one side of the cut
-     * 
+     *
      * @return a set of vertices on one side of the cut
      */
-    public Set<V> minCut()
-    {
+    public Set<V> minCut() {
         return bestCut;
     }
 
     /**
      * Merges vertex $t$ into vertex $s$, summing the weights as required. Returns the merged vertex
      * and the sum of its weights
-     * 
+     *
      * @param s the first vertex
      * @param t the second vertex
-     * 
      * @return the merged vertex and its weight
      */
-    protected VertexAndWeight mergeVertices(Set<V> s, Set<V> t)
-    {
+    protected VertexAndWeight mergeVertices(Set<V> s, Set<V> t) {
         // construct the new combinedvertex
         Set<V> set = new HashSet<>();
         set.addAll(s);
@@ -223,12 +221,11 @@ public class StoerWagnerMinimumCut<V, E>
 
     /**
      * Compute the sum of the weights entering a vertex
-     * 
+     *
      * @param v the vertex
      * @return the sum of the weights entering a vertex
      */
-    public double vertexWeight(Set<V> v)
-    {
+    public double vertexWeight(Set<V> v) {
         double wsum = 0.0;
         for (DefaultWeightedEdge e : workingGraph.edgesOf(v)) {
             wsum += workingGraph.getEdgeWeight(e);
@@ -240,22 +237,20 @@ public class StoerWagnerMinimumCut<V, E>
      * Class for weighted vertices
      */
     protected class VertexAndWeight
-        implements
-        Comparable<VertexAndWeight>
-    {
+            implements
+            Comparable<VertexAndWeight> {
         public Set<V> vertex;
         public Double weight;
         public boolean active; // active == neighbour in A
 
         /**
          * Construct a new weighted vertex.
-         * 
-         * @param v the vertex
-         * @param w the weight of the vertex
+         *
+         * @param v      the vertex
+         * @param w      the weight of the vertex
          * @param active whether it is active
          */
-        public VertexAndWeight(Set<V> v, double w, boolean active)
-        {
+        public VertexAndWeight(Set<V> v, double w, boolean active) {
             this.vertex = v;
             this.weight = w;
             this.active = active;
@@ -266,8 +261,7 @@ public class StoerWagnerMinimumCut<V, E>
          * extract-min.
          */
         @Override
-        public int compareTo(VertexAndWeight that)
-        {
+        public int compareTo(VertexAndWeight that) {
             if (this.active && that.active) {
                 return -Double.compare(weight, that.weight);
             }
@@ -283,8 +277,7 @@ public class StoerWagnerMinimumCut<V, E>
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "(" + vertex + ", " + weight + ")";
         }
     }

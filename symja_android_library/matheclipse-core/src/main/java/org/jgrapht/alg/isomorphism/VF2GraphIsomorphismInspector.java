@@ -17,9 +17,9 @@
  */
 package org.jgrapht.alg.isomorphism;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * This is an implementation of the VF2 algorithm using its feature of detecting
@@ -36,49 +36,45 @@ import java.util.*;
  * @param <E> the type of the edges
  */
 public class VF2GraphIsomorphismInspector<V, E>
-    extends
-    VF2AbstractIsomorphismInspector<V, E>
-{
+        extends
+        VF2AbstractIsomorphismInspector<V, E> {
     /**
      * Construct a new VF2 isomorphism inspector.
      *
-     * @param graph1 the first graph
-     * @param graph2 the second graph
+     * @param graph1           the first graph
+     * @param graph2           the second graph
      * @param vertexComparator comparator for semantic equivalence of vertices
-     * @param edgeComparator comparator for semantic equivalence of edges
-     * @param cacheEdges if true, edges get cached for faster access
+     * @param edgeComparator   comparator for semantic equivalence of edges
+     * @param cacheEdges       if true, edges get cached for faster access
      */
     public VF2GraphIsomorphismInspector(
-        Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
-        Comparator<E> edgeComparator, boolean cacheEdges)
-    {
+            Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
+            Comparator<E> edgeComparator, boolean cacheEdges) {
         super(graph1, graph2, vertexComparator, edgeComparator, cacheEdges);
     }
 
     /**
      * Construct a new VF2 isomorphism inspector.
      *
-     * @param graph1 the first graph
-     * @param graph2 the second graph
+     * @param graph1           the first graph
+     * @param graph2           the second graph
      * @param vertexComparator comparator for semantic equivalence of vertices
-     * @param edgeComparator comparator for semantic equivalence of edges
+     * @param edgeComparator   comparator for semantic equivalence of edges
      */
     public VF2GraphIsomorphismInspector(
-        Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
-        Comparator<E> edgeComparator)
-    {
+            Graph<V, E> graph1, Graph<V, E> graph2, Comparator<V> vertexComparator,
+            Comparator<E> edgeComparator) {
         super(graph1, graph2, vertexComparator, edgeComparator, true);
     }
 
     /**
      * Construct a new VF2 isomorphism inspector.
      *
-     * @param graph1 the first graph
-     * @param graph2 the second graph
+     * @param graph1     the first graph
+     * @param graph2     the second graph
      * @param cacheEdges if true, edges get cached for faster access
      */
-    public VF2GraphIsomorphismInspector(Graph<V, E> graph1, Graph<V, E> graph2, boolean cacheEdges)
-    {
+    public VF2GraphIsomorphismInspector(Graph<V, E> graph1, Graph<V, E> graph2, boolean cacheEdges) {
         super(graph1, graph2, null, null, cacheEdges);
     }
 
@@ -88,15 +84,13 @@ public class VF2GraphIsomorphismInspector<V, E>
      * @param graph1 the first graph
      * @param graph2 the second graph
      */
-    public VF2GraphIsomorphismInspector(Graph<V, E> graph1, Graph<V, E> graph2)
-    {
+    public VF2GraphIsomorphismInspector(Graph<V, E> graph1, Graph<V, E> graph2) {
         super(graph1, graph2, true);
     }
 
     @Override
-    public VF2GraphMappingIterator<V, E> getMappings()
-    {
+    public VF2GraphMappingIterator<V, E> getMappings() {
         return new VF2GraphMappingIterator<>(
-            ordering1, ordering2, vertexComparator, edgeComparator);
+                ordering1, ordering2, vertexComparator, edgeComparator);
     }
 }

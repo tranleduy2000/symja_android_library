@@ -17,9 +17,11 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generator for <a href="http://mathworld.wolfram.com/WindmillGraph.html">Windmill Graphs</a>,
@@ -32,20 +34,17 @@ import java.util.*;
  * $n=3$, $D_n^{(m)}$ and $W_n^{(m)}$ are identical. The class of graphs $D_3^{(m)}$ is sometimes
  * referred to as the Friendship graph, denoted by $F_m$.
  *
- * @author Joris Kinable
- *
  * @param <V> graph vertex type
  * @param <E> graph edge type
+ * @author Joris Kinable
  */
 public class WindmillGraphsGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        implements
+        GraphGenerator<V, E, V> {
     /**
      * WINDMILL and DUTCHWINDMILL Modes for the Constructor
      */
-    public enum Mode
-    {
+    public enum Mode {
         WINDMILL,
         DUTCHWINDMILL
     }
@@ -57,15 +56,14 @@ public class WindmillGraphsGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     /**
      * Constructs a GeneralizedPetersenGraphGenerator used to generate a Generalized Petersen graphs
      * $GP(n,k)$.
-     * 
+     *
      * @param mode indicate whether the generator should generate Windmill graphs or Dutch Windmill
-     *        graphs
-     * @param m number of copies of $C_n$ (Dutch Windmill graph) or $K_n$ (Windmill graph)
-     * @param n size of $C_n$ (Dutch Windmill graph) or $K_n$ (Windmill graph). To generate
-     *        friendship graphs, set $n=3$ (the mode is irrelevant).
+     *             graphs
+     * @param m    number of copies of $C_n$ (Dutch Windmill graph) or $K_n$ (Windmill graph)
+     * @param n    size of $C_n$ (Dutch Windmill graph) or $K_n$ (Windmill graph). To generate
+     *             friendship graphs, set $n=3$ (the mode is irrelevant).
      */
-    public WindmillGraphsGenerator(Mode mode, int m, int n)
-    {
+    public WindmillGraphsGenerator(Mode mode, int m, int n) {
         if (m < 2)
             throw new IllegalArgumentException("m must be larger or equal than 2");
         if (n < 3)
@@ -77,8 +75,7 @@ public class WindmillGraphsGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
     }
 
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         V center = target.addVertex();
         List<V> sub = new ArrayList<>(n);
 

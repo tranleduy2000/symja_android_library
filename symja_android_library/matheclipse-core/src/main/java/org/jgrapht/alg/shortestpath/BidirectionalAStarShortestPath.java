@@ -17,14 +17,21 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristicImpl;
+import org.jgrapht.graph.EdgeReversedGraph;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A bidirectional version of A* algorithm.
@@ -55,9 +62,8 @@ import java.util.function.*;
  * @see AStarShortestPath
  */
 public class BidirectionalAStarShortestPath<V, E>
-    extends
-    BaseBidirectionalShortestPathAlgorithm<V, E>
-{
+        extends
+        BaseBidirectionalShortestPathAlgorithm<V, E> {
     /**
      * Heuristic used for forward search.
      */
@@ -72,11 +78,10 @@ public class BidirectionalAStarShortestPath<V, E>
     /**
      * Constructs a new instance of the algorithm for a given graph and heuristic.
      *
-     * @param graph the graph
+     * @param graph     the graph
      * @param heuristic heuristic that estimates distances between nodes
      */
-    public BidirectionalAStarShortestPath(Graph<V, E> graph, AStarAdmissibleHeuristic<V> heuristic)
-    {
+    public BidirectionalAStarShortestPath(Graph<V, E> graph, AStarAdmissibleHeuristic<V> heuristic) {
         this(graph, heuristic, new Supplier<AddressableHeap<Double, V>>() {
             @Override
             public AddressableHeap<Double, V> get() {
@@ -88,23 +93,22 @@ public class BidirectionalAStarShortestPath<V, E>
     /**
      * Constructs a new instance of the algorithm for a given graph, heuristic and heap supplier.
      *
-     * @param graph the graph
-     * @param heuristic heuristic that estimates distances between nodes
+     * @param graph        the graph
+     * @param heuristic    heuristic that estimates distances between nodes
      * @param heapSupplier supplier of the preferable heap implementation
      */
     public BidirectionalAStarShortestPath(
-        Graph<V, E> graph, AStarAdmissibleHeuristic<V> heuristic,
-        Supplier<AddressableHeap<Double, V>> heapSupplier)
-    {
+            Graph<V, E> graph, AStarAdmissibleHeuristic<V> heuristic,
+            Supplier<AddressableHeap<Double, V>> heapSupplier) {
         super(graph);
         this.forwardHeuristic =
-            Objects.requireNonNull(heuristic, "Heuristic function cannot be null!");
+                Objects.requireNonNull(heuristic, "Heuristic function cannot be null!");
         if (graph.getType().isDirected()) {
             backwardHeuristic = new ReversedGraphHeuristic(
-                Objects.requireNonNull(heuristic, "Heuristic function cannot be null!"));
+                    Objects.requireNonNull(heuristic, "Heuristic function cannot be null!"));
         } else {
             this.backwardHeuristic =
-                Objects.requireNonNull(heuristic, "Heuristic function cannot be null!");
+                    Objects.requireNonNull(heuristic, "Heuristic function cannot be null!");
         }
         this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null!");
     }
@@ -113,8 +117,7 @@ public class BidirectionalAStarShortestPath<V, E>
      * {@inheritDoc}
      */
     @Override
-    public GraphPath<V, E> getPath(V source, V sink)
-    {
+    public GraphPath<V, E> getPath(V source, V sink) {
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException(GRAPH_MUST_CONTAIN_THE_SOURCE_VERTEX);
         }
@@ -129,11 +132,11 @@ public class BidirectionalAStarShortestPath<V, E>
 
         // create frontiers
         AStarSearchFrontier forwardFrontier =
-            new AStarSearchFrontier(graph, sink, forwardHeuristic);
+                new AStarSearchFrontier(graph, sink, forwardHeuristic);
         AStarSearchFrontier backwardFrontier;
         if (graph.getType().isDirected()) {
             backwardFrontier =
-                new AStarSearchFrontier(new EdgeReversedGraph<>(graph), source, backwardHeuristic);
+                    new AStarSearchFrontier(new EdgeReversedGraph<>(graph), source, backwardHeuristic);
         } else {
             backwardFrontier = new AStarSearchFrontier(graph, source, backwardHeuristic);
         }
@@ -152,7 +155,7 @@ public class BidirectionalAStarShortestPath<V, E>
         if (forwardHeuristic.isConsistent(graph)) {
             double sourceTargetEstimate = forwardFrontier.heuristic.getCostEstimate(source, sink);
             condition = new ConsistentTerminationCriterion(
-                forwardFrontier, backwardFrontier, sourceTargetEstimate);
+                    forwardFrontier, backwardFrontier, sourceTargetEstimate);
         } else {
             condition = new InconsistentTerminationCriterion(forwardFrontier, backwardFrontier);
         }
@@ -178,13 +181,13 @@ public class BidirectionalAStarShortestPath<V, E>
                 double gScore_current = frontier.getDistance(v);
                 double tentativeGScore = gScore_current + edgeWeight;
                 double fScore = tentativeGScore
-                    + frontier.heuristic.getCostEstimate(successor, frontier.endVertex);
+                        + frontier.heuristic.getCostEstimate(successor, frontier.endVertex);
 
                 frontier.updateDistance(successor, edge, tentativeGScore, fScore);
 
                 // check if best path can be updated
                 double pathDistance =
-                    gScore_current + edgeWeight + otherFrontier.getDistance(successor);
+                        gScore_current + edgeWeight + otherFrontier.getDistance(successor);
                 if (pathDistance < bestPath) {
                     bestPath = pathDistance;
                     bestPathCommonVertex = successor;
@@ -204,7 +207,7 @@ public class BidirectionalAStarShortestPath<V, E>
         // create path if found
         if (Double.isFinite(bestPath)) {
             return createPath(
-                forwardFrontier, backwardFrontier, bestPath, source, bestPathCommonVertex, sink);
+                    forwardFrontier, backwardFrontier, bestPath, source, bestPathCommonVertex, sink);
         } else {
             return createEmptyPath(source, sink);
         }
@@ -214,9 +217,8 @@ public class BidirectionalAStarShortestPath<V, E>
      * Maintains search frontier during shortest path computation.
      */
     class AStarSearchFrontier
-        extends
-        BaseSearchFrontier
-    {
+            extends
+            BaseSearchFrontier {
         /**
          * End vertex of the frontier.
          */
@@ -244,8 +246,7 @@ public class BidirectionalAStarShortestPath<V, E>
          */
         final Map<V, E> cameFrom;
 
-        AStarSearchFrontier(Graph<V, E> graph, V endVertex, AStarAdmissibleHeuristic<V> heuristic)
-        {
+        AStarSearchFrontier(Graph<V, E> graph, V endVertex, AStarAdmissibleHeuristic<V> heuristic) {
             super(graph);
             this.endVertex = endVertex;
             this.heuristic = heuristic;
@@ -256,8 +257,7 @@ public class BidirectionalAStarShortestPath<V, E>
             cameFrom = new HashMap<>();
         }
 
-        void updateDistance(V v, E e, double tentativeGScore, double fScore)
-        {
+        void updateDistance(V v, E e, double tentativeGScore, double fScore) {
             AddressableHeap.Handle<Double, V> node = vertexToHeapNodeMap.get(v);
             if (vertexToHeapNodeMap.containsKey(v)) { // We re-encountered a vertex. It's
                 // either in the open or closed list.
@@ -284,8 +284,7 @@ public class BidirectionalAStarShortestPath<V, E>
         }
 
         @Override
-        double getDistance(V v)
-        {
+        double getDistance(V v) {
             Double distance = gScoreMap.get(v);
             if (distance == null) {
                 return Double.POSITIVE_INFINITY;
@@ -295,14 +294,9 @@ public class BidirectionalAStarShortestPath<V, E>
         }
 
         @Override
-        E getTreeEdge(V v)
-        {
+        E getTreeEdge(V v) {
             E e = cameFrom.get(v);
-            if (e == null) {
-                return null;
-            } else {
-                return e;
-            }
+            return e;
         }
     }
 
@@ -310,21 +304,18 @@ public class BidirectionalAStarShortestPath<V, E>
      * Helper class for backward search, since it should operate on the reversed graph.
      */
     class ReversedGraphHeuristic
-        extends AStarAdmissibleHeuristicImpl<V>
-        implements
-        AStarAdmissibleHeuristic<V>
-    {
+            extends AStarAdmissibleHeuristicImpl<V>
+            implements
+            AStarAdmissibleHeuristic<V> {
 
         private final AStarAdmissibleHeuristic<V> heuristic;
 
-        ReversedGraphHeuristic(AStarAdmissibleHeuristic<V> heuristic)
-        {
+        ReversedGraphHeuristic(AStarAdmissibleHeuristic<V> heuristic) {
             this.heuristic = heuristic;
         }
 
         @Override
-        public double getCostEstimate(V sourceVertex, V targetVertex)
-        {
+        public double getCostEstimate(V sourceVertex, V targetVertex) {
             return heuristic.getCostEstimate(targetVertex, sourceVertex);
         }
     }
@@ -332,13 +323,11 @@ public class BidirectionalAStarShortestPath<V, E>
     /**
      * Termination criterion for the heuristic search.
      */
-    abstract class TerminationCriterion
-    {
+    abstract class TerminationCriterion {
         final AStarSearchFrontier forward;
         final AStarSearchFrontier backward;
 
-        TerminationCriterion(AStarSearchFrontier forward, AStarSearchFrontier backward)
-        {
+        TerminationCriterion(AStarSearchFrontier forward, AStarSearchFrontier backward) {
             this.forward = forward;
             this.backward = backward;
         }
@@ -356,23 +345,20 @@ public class BidirectionalAStarShortestPath<V, E>
      * Termination criterion for the consistent heuristics.
      */
     class ConsistentTerminationCriterion
-        extends
-        TerminationCriterion
-    {
+            extends
+            TerminationCriterion {
         final double sourceTargetEstimate;
 
         ConsistentTerminationCriterion(
-            AStarSearchFrontier forward, AStarSearchFrontier backward, double sourceTargetEstimate)
-        {
+                AStarSearchFrontier forward, AStarSearchFrontier backward, double sourceTargetEstimate) {
             super(forward, backward);
             this.sourceTargetEstimate = sourceTargetEstimate;
         }
 
         @Override
-        boolean stop(double bestPath)
-        {
+        boolean stop(double bestPath) {
             return forward.openList.isEmpty() || backward.openList.isEmpty()
-                || forward.openList.findMin().getKey()
+                    || forward.openList.findMin().getKey()
                     + backward.openList.findMin().getKey() >= bestPath + sourceTargetEstimate;
         }
     }
@@ -381,19 +367,16 @@ public class BidirectionalAStarShortestPath<V, E>
      * Termination criterion for the inconsistent heuristics.
      */
     class InconsistentTerminationCriterion
-        extends
-        TerminationCriterion
-    {
-        InconsistentTerminationCriterion(AStarSearchFrontier forward, AStarSearchFrontier backward)
-        {
+            extends
+            TerminationCriterion {
+        InconsistentTerminationCriterion(AStarSearchFrontier forward, AStarSearchFrontier backward) {
             super(forward, backward);
         }
 
         @Override
-        boolean stop(double bestPath)
-        {
+        boolean stop(double bestPath) {
             return forward.openList.isEmpty() || backward.openList.isEmpty()
-                || Math.max(
+                    || Math.max(
                     forward.openList.findMin().getKey(),
                     backward.openList.findMin().getKey()) >= bestPath;
         }

@@ -2,7 +2,7 @@
  * (C) Copyright 2014-2016, by Dimitrios Michail
  *
  * JHeaps Library
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * Marker interface to indicate that an operation takes O(log(n)) time where n
  * is the size of the input. The primary purpose of this interface is to allow
  * generic algorithms to alter their behavior to provide good performance.
- * 
+ *
  * @author Dimitrios Michail
  */
 @Retention(RetentionPolicy.RUNTIME)

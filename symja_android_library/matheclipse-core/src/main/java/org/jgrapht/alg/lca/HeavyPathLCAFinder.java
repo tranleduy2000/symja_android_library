@@ -17,11 +17,16 @@
  */
 package org.jgrapht.alg.lca;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.decomposition.*;
-import org.jgrapht.alg.interfaces.*;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.decomposition.HeavyPathDecomposition;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
+import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithmImpl;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Algorithm for computing lowest common ancestors in rooted trees and forests based on
@@ -46,14 +51,12 @@ import java.util.*;
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class HeavyPathLCAFinder<V, E>
         extends LowestCommonAncestorAlgorithmImpl<V>
         implements
-    LowestCommonAncestorAlgorithm<V>
-{
+        LowestCommonAncestorAlgorithm<V> {
 
     private final Graph<V, E> graph;
     private final Set<V> roots;
@@ -75,10 +78,9 @@ public class HeavyPathLCAFinder<V, E>
      * Note: The constructor will NOT check if the input graph is a valid tree.
      *
      * @param graph the input graph
-     * @param root the root of the graph
+     * @param root  the root of the graph
      */
-    public HeavyPathLCAFinder(Graph<V, E> graph, V root)
-    {
+    public HeavyPathLCAFinder(Graph<V, E> graph, V root) {
         this(graph, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
     }
 
@@ -94,8 +96,7 @@ public class HeavyPathLCAFinder<V, E>
      * @param graph the input graph
      * @param roots the set of roots of the graph
      */
-    public HeavyPathLCAFinder(Graph<V, E> graph, Set<V> roots)
-    {
+    public HeavyPathLCAFinder(Graph<V, E> graph, Set<V> roots) {
         this.graph = Objects.requireNonNull(graph, "graph cannot be null");
         this.roots = Objects.requireNonNull(roots, "roots cannot be null");
 
@@ -112,8 +113,7 @@ public class HeavyPathLCAFinder<V, E>
      * Compute the heavy path decomposition and get the corresponding arrays from the internal
      * state.
      */
-    private void computeHeavyPathDecomposition()
-    {
+    private void computeHeavyPathDecomposition() {
         HeavyPathDecomposition<V, E> heavyPath = new HeavyPathDecomposition<>(graph, roots);
         HeavyPathDecomposition<V, E>.InternalState state = heavyPath.getInternalState();
 
@@ -132,8 +132,7 @@ public class HeavyPathLCAFinder<V, E>
      * {@inheritDoc}
      */
     @Override
-    public V getLCA(V a, V b)
-    {
+    public V getLCA(V a, V b) {
         int indexA = vertexMap.getOrDefault(a, -1);
         if (indexA == -1)
             throw new IllegalArgumentException("invalid vertex: " + a);
@@ -183,19 +182,18 @@ public class HeavyPathLCAFinder<V, E>
         }
 
         return positionInPath[indexA] < positionInPath[indexB] ? indexList.get(indexA)
-            : indexList.get(indexB);
+                : indexList.get(indexB);
     }
 
     /**
      * Note: This operation is not supported.<br>
-     *
+     * <p>
      * {@inheritDoc}
-     * 
+     *
      * @throws UnsupportedOperationException if the method is called
      */
     @Override
-    public Set<V> getLCASet(V a, V b)
-    {
+    public Set<V> getLCASet(V a, V b) {
         throw new UnsupportedOperationException();
     }
 }

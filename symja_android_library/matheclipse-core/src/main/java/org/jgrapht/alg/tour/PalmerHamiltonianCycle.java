@@ -17,17 +17,20 @@
  */
 package org.jgrapht.alg.tour;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.GraphTests;
+import org.jgrapht.alg.interfaces.HamiltonianCycleAlgorithm;
+import org.jgrapht.graph.GraphWalk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Palmer's algorithm for computing Hamiltonian cycles in graphs that meet Ore's condition. Ore gave
  * a sufficient condition for a graph to be Hamiltonian, essentially stating that a graph with
  * sufficiently many edges must contain a Hamilton cycle.
- *
+ * <p>
  * Specifically, Ore's theorem considers the sum of the degrees of pairs of non-adjacent vertices:
  * if every such pair has a sum that at least equals the total number of vertices in the graph, then
  * the graph is Hamiltonian.
@@ -48,25 +51,22 @@ import java.util.*;
  * The original algorithm is described in: Palmer, E. M. (1997), "The hidden algorithm of Ore's
  * theorem on Hamiltonian cycles", Computers &amp; Mathematics with Applications, 34 (11): 113–119,
  * doi:10.1016/S0898-1221(97)00225-3
- *
+ * <p>
  * See <a href="https://en.wikipedia.org/wiki/Ore%27s_theorem">wikipedia</a> for a short description
  * of Ore's theorem and Palmer's algorithm.
  * </p>
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  */
 public class PalmerHamiltonianCycle<V, E>
-    implements
-    HamiltonianCycleAlgorithm<V, E>
-{
+        implements
+        HamiltonianCycleAlgorithm<V, E> {
     /**
      * Construct a new instance
      */
-    public PalmerHamiltonianCycle()
-    {
+    public PalmerHamiltonianCycle() {
     }
 
     /**
@@ -74,12 +74,10 @@ public class PalmerHamiltonianCycle<V, E>
      *
      * @param graph the input graph
      * @return a Hamiltonian tour
-     *
      * @throws IllegalArgumentException if the graph doesn't meet Ore's condition
      * @see GraphTests#hasOreProperty(Graph)
      */
-    public GraphPath<V, E> getTour(Graph<V, E> graph)
-    {
+    public GraphPath<V, E> getTour(Graph<V, E> graph) {
         if (!GraphTests.hasOreProperty(graph))
             throw new IllegalArgumentException("Graph doesn't have Ore's property");
 
@@ -107,7 +105,8 @@ public class PalmerHamiltonianCycle<V, E>
             // graph)
             int x = 0;
 
-            search: do {
+            search:
+            do {
                 // check if we found a gap in our cycle
                 if (!graph.containsEdge(indexList.get(x), indexList.get(R[x]))) {
                     changed = true;
@@ -124,8 +123,7 @@ public class PalmerHamiltonianCycle<V, E>
 
                         if (v != p && u != p && u != q) {
                             if (graph.containsEdge(indexList.get(u), indexList.get(p))
-                                && graph.containsEdge(indexList.get(v), indexList.get(q)))
-                            {
+                                    && graph.containsEdge(indexList.get(v), indexList.get(q))) {
                                 R[u] = L[u];
                                 L[u] = p;
                                 R[v] = R[v];
@@ -168,6 +166,6 @@ public class PalmerHamiltonianCycle<V, E>
         vertexList.add(indexList.get(0));
 
         return new GraphWalk<>(
-            graph, indexList.get(0), indexList.get(0), vertexList, edgeList, edgeList.size());
+                graph, indexList.get(0), indexList.get(0), vertexList, edgeList, edgeList.size());
     }
 }

@@ -17,11 +17,14 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
-import org.jheaps.*;
+import org.jheaps.AddressableHeap;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.*;
+import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.INFINITY;
+import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.MINUS;
+import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.PLUS;
 
 /**
  * This class is a data structure for Kolmogorov's Blossom V algorithm.
@@ -62,8 +65,7 @@ import static org.jgrapht.alg.matching.blossom.v5.BlossomVNode.Label.*;
  * @author Timofey Chudakov
  * @see KolmogorovWeightedPerfectMatching
  */
-class BlossomVNode
-{
+class BlossomVNode {
     /**
      * Node from the heap this node is stored in
      */
@@ -187,8 +189,7 @@ class BlossomVNode
     /**
      * Constructs a new "+" node with a {@link Label#PLUS} label.
      */
-    public BlossomVNode(int pos)
-    {
+    public BlossomVNode(int pos) {
         this.first = new BlossomVEdge[2];
         this.label = PLUS;
         this.pos = pos;
@@ -199,10 +200,9 @@ class BlossomVNode
      * direction {@code dir}
      *
      * @param edge edge to insert in the linked list of incident edges
-     * @param dir the direction of this edge with respect to this node
+     * @param dir  the direction of this edge with respect to this node
      */
-    public void addEdge(BlossomVEdge edge, int dir)
-    {
+    public void addEdge(BlossomVEdge edge, int dir) {
         if (first[dir] == null) {
             // the list in the direction dir is empty
             first[dir] = edge.next[dir] = edge.prev[dir] = edge;
@@ -226,10 +226,9 @@ class BlossomVNode
      * first[dir] reference if needed.
      *
      * @param edge the edge to remove
-     * @param dir the directions of the {@code edge} with respect to this node
+     * @param dir  the directions of the {@code edge} with respect to this node
      */
-    public void removeEdge(BlossomVEdge edge, int dir)
-    {
+    public void removeEdge(BlossomVEdge edge, int dir) {
         if (edge.prev[dir] == edge) {
             // it is the only edge of this node in the direction dir
             first[dir] = null;
@@ -248,8 +247,7 @@ class BlossomVNode
      *
      * @return the tree grandparent of this node
      */
-    public BlossomVNode getTreeGrandparent()
-    {
+    public BlossomVNode getTreeGrandparent() {
         BlossomVNode t = parentEdge.getOpposite(this);
         return t.parentEdge.getOpposite(t);
     }
@@ -259,8 +257,7 @@ class BlossomVNode
      *
      * @return node's tree parent or null if this node has no tree parent
      */
-    public BlossomVNode getTreeParent()
-    {
+    public BlossomVNode getTreeParent() {
         return parentEdge == null ? null : parentEdge.getOpposite(this);
     }
 
@@ -273,12 +270,11 @@ class BlossomVNode
      * {@code null} so that all its tree structure variables are changed. This allows us to avoid
      * overwriting the fields during tree destroying.
      *
-     * @param child the new child of this node
+     * @param child      the new child of this node
      * @param parentEdge the edge between this node and {@code child}
-     * @param grow true if {@code child} is being grown
+     * @param grow       true if {@code child} is being grown
      */
-    public void addChild(BlossomVNode child, BlossomVEdge parentEdge, boolean grow)
-    {
+    public void addChild(BlossomVNode child, BlossomVEdge parentEdge, boolean grow) {
         child.parentEdge = parentEdge;
         child.tree = tree;
         child.treeSiblingNext = firstTreeChild;
@@ -301,8 +297,7 @@ class BlossomVNode
      *
      * @return a node this node is matched to.
      */
-    public BlossomVNode getOppositeMatched()
-    {
+    public BlossomVNode getOppositeMatched() {
         return matched.getOpposite(this);
     }
 
@@ -311,8 +306,7 @@ class BlossomVNode
      * linked list. Otherwise, removes this vertex from the doubly linked list of tree children and
      * updates parent.firstTreeChild accordingly.
      */
-    public void removeFromChildList()
-    {
+    public void removeFromChildList() {
         if (isTreeRoot) {
             treeSiblingPrev.treeSiblingNext = treeSiblingNext;
             if (treeSiblingNext != null) {
@@ -344,8 +338,7 @@ class BlossomVNode
      *
      * @param blossom the node to which the children of the current node are moved
      */
-    public void moveChildrenTo(BlossomVNode blossom)
-    {
+    public void moveChildrenTo(BlossomVNode blossom) {
         if (firstTreeChild != null) {
             if (blossom.firstTreeChild == null) {
                 blossom.firstTreeChild = firstTreeChild;
@@ -372,8 +365,7 @@ class BlossomVNode
      *
      * @return the penultimate blossom of this node
      */
-    public BlossomVNode getPenultimateBlossom()
-    {
+    public BlossomVNode getPenultimateBlossom() {
         BlossomVNode current = this;
         while (true) {
             if (!current.blossomGrandparent.isOuter) {
@@ -409,8 +401,7 @@ class BlossomVNode
      *
      * @return the penultimate blossom of this node
      */
-    public BlossomVNode getPenultimateBlossomAndFixBlossomGrandparent()
-    {
+    public BlossomVNode getPenultimateBlossomAndFixBlossomGrandparent() {
         BlossomVNode current = this;
         BlossomVNode prev = null;
         while (true) {
@@ -446,8 +437,7 @@ class BlossomVNode
      *
      * @return true if the label of this node is {@link Label#PLUS}, false otherwise
      */
-    public boolean isPlusNode()
-    {
+    public boolean isPlusNode() {
         return label == PLUS;
     }
 
@@ -456,8 +446,7 @@ class BlossomVNode
      *
      * @return true if the label of this node is {@link Label#MINUS}, false otherwise
      */
-    public boolean isMinusNode()
-    {
+    public boolean isMinusNode() {
         return label == MINUS;
     }
 
@@ -466,8 +455,7 @@ class BlossomVNode
      *
      * @return true if the label of this node is {@link Label#INFINITY}, false otherwise
      */
-    public boolean isInfinityNode()
-    {
+    public boolean isInfinityNode() {
         return label == INFINITY;
     }
 
@@ -477,8 +465,7 @@ class BlossomVNode
      *
      * @return the actual dual variable of this node
      */
-    public double getTrueDual()
-    {
+    public double getTrueDual() {
         if (isInfinityNode() || !isOuter) {
             return dual;
         }
@@ -490,26 +477,23 @@ class BlossomVNode
      *
      * @return a new instance of IncidentEdgeIterator for this node
      */
-    public IncidentEdgeIterator incidentEdgesIterator()
-    {
+    public IncidentEdgeIterator incidentEdgesIterator() {
         return new IncidentEdgeIterator();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "BlossomVNode pos = " + pos + ", dual: " + dual + ", true dual: " + getTrueDual()
-            + ", label: " + label + (isMarked ? ", marked" : "")
-            + (isProcessed ? ", processed" : "")
-            + (blossomParent == null || isOuter ? "" : ", blossomParent = " + blossomParent.pos)
-            + (matched == null ? "" : ", matched = " + matched);
+                + ", label: " + label + (isMarked ? ", marked" : "")
+                + (isProcessed ? ", processed" : "")
+                + (blossomParent == null || isOuter ? "" : ", blossomParent = " + blossomParent.pos)
+                + (matched == null ? "" : ", matched = " + matched);
     }
 
     /**
      * Represents nodes' labels
      */
-    public enum Label
-    {
+    public enum Label {
         /**
          * The node is on an even layer in the tree (root has layer 0)
          */
@@ -532,9 +516,8 @@ class BlossomVNode
      * example).
      */
     public class IncidentEdgeIterator
-        implements
-        Iterator<BlossomVEdge>
-    {
+            implements
+            Iterator<BlossomVEdge> {
 
         /**
          * The direction of the current edge
@@ -554,8 +537,7 @@ class BlossomVNode
         /**
          * Constructs a new instance of the IncidentEdgeIterator.
          */
-        public IncidentEdgeIterator()
-        {
+        public IncidentEdgeIterator() {
             nextDir = first[0] == null ? 1 : 0;
             nextEdge = first[nextDir];
         }
@@ -565,20 +547,17 @@ class BlossomVNode
          *
          * @return the direction of the edge returned by this iterator
          */
-        public int getDir()
-        {
+        public int getDir() {
             return currentDir;
         }
 
         @Override
-        public boolean hasNext()
-        {
+        public boolean hasNext() {
             return nextEdge != null;
         }
 
         @Override
-        public BlossomVEdge next()
-        {
+        public BlossomVEdge next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -592,8 +571,7 @@ class BlossomVNode
          * direction 0, then the direction of this iterator changes. If previous edge was the last
          * incident edge, then {@code nextEdge} becomes null.
          */
-        private void advance()
-        {
+        private void advance() {
             currentDir = nextDir;
             nextEdge = nextEdge.next[nextDir];
             if (nextEdge == first[0]) {

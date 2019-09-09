@@ -17,10 +17,20 @@
  */
 package org.jgrapht.alg.connectivity;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.AsSubgraph;
+import org.jgrapht.graph.AsUndirectedGraph;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Allows obtaining various connectivity aspects of a graph. The <i>inspected graph</i> is specified
@@ -38,27 +48,23 @@ import java.util.*;
  * linear time $O(|V|+|E|)$ and is based on a recursive depth-first search. More information about
  * this subject be be found in this wikipedia
  * <a href="https://en.wikipedia.org/wiki/Biconnected_component">article</a>.
- * 
+ *
  * <p>
  * The inspector methods work in a lazy fashion: no computations are performed unless immediately
  * necessary. Computation are done once and results are cached within this class for future need.
  * The core of this class is built around a recursive Depth-first search.
  *
- *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Joris Kinable
  */
-public class BiconnectivityInspector<V, E>
-{
+public class BiconnectivityInspector<V, E> {
     /**
      * Constructs a new BiconnectivityInspector
-     * 
+     *
      * @param graph the input graph
      */
-    public BiconnectivityInspector(Graph<V, E> graph)
-    {
+    public BiconnectivityInspector(Graph<V, E> graph) {
         this.graph = Objects.requireNonNull(graph);
         if (graph.getType().isDirected())
             this.graph = new AsUndirectedGraph<>(graph);
@@ -104,8 +110,7 @@ public class BiconnectivityInspector<V, E>
      *
      * @return the cutpoints of the graph
      */
-    public Set<V> getCutpoints()
-    {
+    public Set<V> getCutpoints() {
         performLazyInspection();
         return this.cutpoints;
     }
@@ -118,8 +123,7 @@ public class BiconnectivityInspector<V, E>
      *
      * @return the graph's bridges
      */
-    public Set<E> getBridges()
-    {
+    public Set<E> getBridges() {
         performLazyInspection();
         return this.bridges;
     }
@@ -132,8 +136,7 @@ public class BiconnectivityInspector<V, E>
      * @param vertex vertex in the initial graph.
      * @return the blocks containing the given vertex
      */
-    public Set<Graph<V, E>> getBlocks(V vertex)
-    {
+    public Set<Graph<V, E>> getBlocks(V vertex) {
         assert graph.containsVertex(vertex);
 
         if (vertex2blocks == null) {
@@ -152,11 +155,10 @@ public class BiconnectivityInspector<V, E>
     /**
      * Returns all <a href="http://mathworld.wolfram.com/Block.html">blocks</a> (biconnected
      * components) in the graph. A block is a maximal biconnected subgraph.
-     * 
+     *
      * @return all blocks (biconnected components) in the graph.
      */
-    public Set<Graph<V, E>> getBlocks()
-    {
+    public Set<Graph<V, E>> getBlocks() {
         performLazyInspection();
         return this.blocks;
     }
@@ -164,12 +166,11 @@ public class BiconnectivityInspector<V, E>
     /**
      * Returns all connected components in the graph. In case the graph is directed, this method
      * returns all weakly connected components.
-     * 
+     *
      * @return all connected components in the graph if the graph is undirected, or all weakly
-     *         connected components if the graph is directed.
+     * connected components if the graph is directed.
      */
-    public Set<Graph<V, E>> getConnectedComponents()
-    {
+    public Set<Graph<V, E>> getConnectedComponents() {
         if (connectedComponents == null) {
             performLazyInspection();
             connectedComponents = new LinkedHashSet<>();
@@ -182,13 +183,12 @@ public class BiconnectivityInspector<V, E>
     /**
      * Returns the connected component containing the given vertex. If the underlying graph is
      * directed, this method returns a weakly connected component.
-     * 
+     *
      * @param vertex vertex
      * @return the connected component containing the given vertex, or a weakly connected component
-     *         if the underlying graph is directed.
+     * if the underlying graph is directed.
      */
-    public Graph<V, E> getConnectedComponent(V vertex)
-    {
+    public Graph<V, E> getConnectedComponent(V vertex) {
         assert this.graph.containsVertex(vertex);
         if (vertex2components == null) {
             vertex2components = new HashMap<>();
@@ -205,8 +205,7 @@ public class BiconnectivityInspector<V, E>
      *
      * @return true if the graph is biconnected, false otherwise
      */
-    public boolean isBiconnected()
-    {
+    public boolean isBiconnected() {
         performLazyInspection();
         return graph.vertexSet().size() >= 2 && blocks.size() == 1;
     }
@@ -220,14 +219,12 @@ public class BiconnectivityInspector<V, E>
      *
      * @return <code>true</code> if and only if inspected graph is connected.
      */
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         performLazyInspection();
         return connectedSets.size() == 1;
     }
 
-    private void init()
-    {
+    private void init() {
         blocks = new LinkedHashSet<>();
         cutpoints = new LinkedHashSet<>();
         bridges = new LinkedHashSet<>();
@@ -237,8 +234,7 @@ public class BiconnectivityInspector<V, E>
             discTime.put(v, -1);
     }
 
-    private void performLazyInspection()
-    {
+    private void performLazyInspection() {
         if (blocks == null) {
             init();
             // Iterate over all connected components
@@ -258,10 +254,10 @@ public class BiconnectivityInspector<V, E>
             if (this.graph.getType().isAllowingMultipleEdges()) {
                 // check parallel edges: an edge is not a bridge when there are multiple edges
                 // between the same pair of vertices
-                for (Iterator<E> it = bridges.iterator(); it.hasNext();) {
+                for (Iterator<E> it = bridges.iterator(); it.hasNext(); ) {
                     E edge = it.next();
                     int nrParallelEdges = graph
-                        .getAllEdges(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)).size();
+                            .getAllEdges(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)).size();
                     if (nrParallelEdges > 1)
                         it.remove();
                 }
@@ -271,11 +267,10 @@ public class BiconnectivityInspector<V, E>
 
     /**
      * Each time a cutpoint is discovered, this method computes the biconnected component
-     * 
+     *
      * @param discTimeCutpoint discovery time of cutpoint
      */
-    private void buildBlock(int discTimeCutpoint)
-    {
+    private void buildBlock(int discTimeCutpoint) {
         Set<V> vertexComponent = new HashSet<>();
 
         while (!stack.isEmpty()) {
@@ -293,13 +288,12 @@ public class BiconnectivityInspector<V, E>
 
     /**
      * Performs a depth-first search, starting from vertex v
-     * 
-     * @param v vertex
+     *
+     * @param v      vertex
      * @param parent parent of v
      * @return lowpoint of v
      */
-    private int dfs(V v, V parent)
-    {
+    private int dfs(V v, V parent) {
         int lowV = ++this.time;
         discTime.put(v, time);
         connectedSet.add(v);
@@ -322,13 +316,12 @@ public class BiconnectivityInspector<V, E>
                 // lowpoint(y) >= depth(v)
                 // 2. root vertex v is a cutpoint if it has more than 1 child
                 if ((parent != null && lowNV >= discTime.get(v))
-                    || (parent == null && children > 1))
-                {
+                        || (parent == null && children > 1)) {
                     this.cutpoints.add(v); // v is a cutpoint
                     buildBlock(discTime.get(v)); // construct biconnected component
                 }
             } else if ((discTime.get(nv) < discTime.get(v)) && !nv.equals(parent)) { // found
-                                                                                     // backedge
+                // backedge
                 this.stack.push(edge);
                 lowV = Math.min(discTime.get(nv), lowV);
             }

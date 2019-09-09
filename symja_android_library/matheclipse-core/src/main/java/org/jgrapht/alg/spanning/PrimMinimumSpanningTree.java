@@ -17,41 +17,44 @@
  */
 package org.jgrapht.alg.spanning;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.interfaces.*;
-import org.jgrapht.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
+import org.jgrapht.util.FibonacciHeap;
+import org.jgrapht.util.FibonacciHeapNode;
+import org.jgrapht.util.VertexToIntegerMapping;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/Prim's_algorithm"> Prim's
  * algorithm</a> that finds a minimum spanning tree/forest subject to connectivity of the supplied
  * weighted undirected graph. The algorithm was developed by Czech mathematician V. Jarník and later
  * independently by computer scientist Robert C. Prim and rediscovered by E. Dijkstra.
- *
+ * <p>
  * This implementation relies on a Fibonacci heap, and runs in $O(|E| + |V|log(|V|))$.
- *
  *
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- *
  * @author Alexandru Valeanu
  * @author Alexey Kudinkin
  */
 public class PrimMinimumSpanningTree<V, E>
-    implements
-    SpanningTreeAlgorithm<E>
-{
+        implements
+        SpanningTreeAlgorithm<E> {
     private final Graph<V, E> g;
 
     /**
      * Construct a new instance of the algorithm.
-     * 
+     *
      * @param graph the input graph
      */
-    public PrimMinimumSpanningTree(Graph<V, E> graph)
-    {
+    public PrimMinimumSpanningTree(Graph<V, E> graph) {
         this.g = Objects.requireNonNull(graph, "Graph cannot be null");
     }
 
@@ -60,8 +63,7 @@ public class PrimMinimumSpanningTree<V, E>
      */
     @Override
     @SuppressWarnings("unchecked")
-    public SpanningTree<E> getSpanningTree()
-    {
+    public SpanningTree<E> getSpanningTree() {
         Set<E> minimumSpanningTreeEdgeSet = new HashSet<>(g.vertexSet().size());
         double spanningTreeWeight = 0d;
 
@@ -76,7 +78,7 @@ public class PrimMinimumSpanningTree<V, E>
 
         VertexInfo[] vertices = (VertexInfo[]) Array.newInstance(VertexInfo.class, N);
         FibonacciHeapNode<VertexInfo>[] fibNodes =
-            (FibonacciHeapNode<VertexInfo>[]) Array.newInstance(FibonacciHeapNode.class, N);
+                (FibonacciHeapNode<VertexInfo>[]) Array.newInstance(FibonacciHeapNode.class, N);
         FibonacciHeap<VertexInfo> fibonacciHeap = new FibonacciHeap<>();
 
         for (int i = 0; i < N; i++) {
@@ -123,8 +125,7 @@ public class PrimMinimumSpanningTree<V, E>
         return new SpanningTreeImpl<>(minimumSpanningTreeEdgeSet, spanningTreeWeight);
     }
 
-    private class VertexInfo
-    {
+    private class VertexInfo {
         public int id;
         public boolean spanned;
         public double distance;

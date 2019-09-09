@@ -17,9 +17,12 @@
  */
 package org.jgrapht.generate;
 
-import org.jgrapht.*;
+import org.jgrapht.Graph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Create a random graph based on the $G(n, p)$ Erdős–Rényi model. See the Wikipedia article for
@@ -27,27 +30,24 @@ import java.util.*;
  * Graphs</a> and the
  * <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi model</a>
  * .
- * 
+ *
  * <p>
  * In the $G(n, p)$ model, a graph is constructed by connecting nodes randomly. Each edge is
  * included in the graph with probability $p$ independent from every other edge. The complexity of
  * the generator is $O(n^2)$ where $n$ is the number of vertices.
- * 
+ *
  * <p>
  * For the $G(n, M)$ model please see {@link GnmRandomGraphGenerator}.
  *
- * @author Dimitrios Michail
- * 
  * @param <V> the graph vertex type
  * @param <E> the graph edge type
- * 
+ * @author Dimitrios Michail
  * @see GnmRandomGraphGenerator
  */
 public class GnpRandomGraphGenerator<V, E>
-    extends GraphGeneratorImpl<V, E, V>
-    implements
-    GraphGenerator<V, E, V>
-{
+        extends GraphGeneratorImpl<V, E, V>
+        implements
+        GraphGenerator<V, E, V> {
     private static final boolean DEFAULT_ALLOW_LOOPS = false;
 
     private final Random rng;
@@ -57,50 +57,46 @@ public class GnpRandomGraphGenerator<V, E>
 
     /**
      * Create a new $G(n, p)$ random graph generator. The generator does not create self-loops.
-     * 
+     *
      * @param n the number of nodes
      * @param p the edge probability
      */
-    public GnpRandomGraphGenerator(int n, double p)
-    {
+    public GnpRandomGraphGenerator(int n, double p) {
         this(n, p, new Random(), DEFAULT_ALLOW_LOOPS);
     }
 
     /**
      * Create a new $G(n, p)$ random graph generator. The generator does not create self-loops.
-     * 
-     * @param n the number of nodes
-     * @param p the edge probability
+     *
+     * @param n    the number of nodes
+     * @param p    the edge probability
      * @param seed seed for the random number generator
      */
-    public GnpRandomGraphGenerator(int n, double p, long seed)
-    {
+    public GnpRandomGraphGenerator(int n, double p, long seed) {
         this(n, p, new Random(seed), DEFAULT_ALLOW_LOOPS);
     }
 
     /**
      * Create a new $G(n, p)$ random graph generator.
-     * 
-     * @param n the number of nodes
-     * @param p the edge probability
-     * @param seed seed for the random number generator
+     *
+     * @param n           the number of nodes
+     * @param p           the edge probability
+     * @param seed        seed for the random number generator
      * @param createLoops whether the generated graph may create loops
      */
-    public GnpRandomGraphGenerator(int n, double p, long seed, boolean createLoops)
-    {
+    public GnpRandomGraphGenerator(int n, double p, long seed, boolean createLoops) {
         this(n, p, new Random(seed), createLoops);
     }
 
     /**
      * Create a new $G(n, p)$ random graph generator.
-     * 
-     * @param n the number of nodes
-     * @param p the edge probability
-     * @param rng the random number generator to use
+     *
+     * @param n           the number of nodes
+     * @param p           the edge probability
+     * @param rng         the random number generator to use
      * @param createLoops whether the generated graph may create loops
      */
-    public GnpRandomGraphGenerator(int n, double p, Random rng, boolean createLoops)
-    {
+    public GnpRandomGraphGenerator(int n, double p, Random rng, boolean createLoops) {
         if (n < 0) {
             throw new IllegalArgumentException("number of vertices must be non-negative");
         }
@@ -115,13 +111,12 @@ public class GnpRandomGraphGenerator<V, E>
 
     /**
      * Generates a random graph based on the $G(n, p)$ model.
-     * 
-     * @param target the target graph
+     *
+     * @param target    the target graph
      * @param resultMap not used by this generator, can be null
      */
     @Override
-    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap)
-    {
+    public void generateGraph(Graph<V, E> target, Map<String, V> resultMap) {
         // special case
         if (n == 0) {
             return;
@@ -141,7 +136,7 @@ public class GnpRandomGraphGenerator<V, E>
 
         if (target.vertexSet().size() != previousVertexSetSize + n) {
             throw new IllegalArgumentException(
-                "Vertex factory did not produce " + n + " distinct vertices.");
+                    "Vertex factory did not produce " + n + " distinct vertices.");
         }
 
         // check if graph is directed
