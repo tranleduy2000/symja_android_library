@@ -22,7 +22,7 @@ public class CompatibleTest extends TestCase {
 
 
                 // Problem with Objc ARC
-                "java.util.concurrent.ThreadPoolExecutor",
+                "s.ThreadPoolExecutor",
 
                 // Problem with Objc ARC
                 "java.util.concurrent.Executors",
@@ -36,9 +36,7 @@ public class CompatibleTest extends TestCase {
         };
 
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");
-        if (!sourceDir.exists()){
-            return;
-        }
+        assertTrue(sourceDir.exists());
         Collection<File> javaFiles = FileUtils.listFiles(sourceDir, new String[]{"java"}, true);
         for (File javaFile : javaFiles) {
             String content = FileUtils.readFileToString(javaFile);

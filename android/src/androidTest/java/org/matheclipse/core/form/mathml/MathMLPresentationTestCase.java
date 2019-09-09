@@ -49,8 +49,8 @@ public class MathMLPresentationTestCase extends TestCase {
 		check("\"hello\nthis is & and < to > \\\" world\"",
 				"<mtext>hello</mtext><mspace linebreak='newline' /><mtext>this&nbsp;is&nbsp;&amp;&nbsp;and&nbsp;&lt;&nbsp;to&nbsp;&gt;&nbsp;&quot;&nbsp;world</mtext><mspace linebreak='newline' />");
 		check("x /.y", "<mrow><mi>x</mi><mo>/.</mo><mi>y</mi></mrow>");
-		check("f(x_,y_):={x,y}/;x>y",
-				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mtext>x_</mtext><mspace linebreak='newline' /><mo>,</mo><mtext>y_</mtext><mspace linebreak='newline' /></mrow><mo>)</mo></mrow></mrow><mo>:=</mo><mrow><mrow><mo>{</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>}</mo></mrow><mo>/;</mo><mrow><mi>x</mi><mo>&gt;</mo><mi>y</mi></mrow></mrow></mrow>");
+		check("f(x_,y_):={x,y}/;x>y", //
+				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mtext>x_</mtext><mo>,</mo><mtext>y_</mtext></mrow><mo>)</mo></mrow></mrow><mo>:=</mo><mrow><mrow><mo>{</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>}</mo></mrow><mo>/;</mo><mrow><mi>x</mi><mo>&gt;</mo><mi>y</mi></mrow></mrow></mrow>");
 
 		check("f(x)&",
 				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>&amp;</mo></mrow>");
@@ -68,7 +68,7 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(F.complexNum(-0.5, -4.0), //
 				"<mrow><mn>-0.5</mn><mo>-</mo><mn>4.0</mn><mo>&#0183;</mo><mi>&#x2148;</mi></mrow>");
 		check(F.pattern(F.x), //
-				"<mtext>x_</mtext><mspace linebreak='newline' />");
+				"<mtext>x_</mtext>");
 		check(F.complexNum(0.5, 4.0), //
 				"<mrow><mn>0.5</mn><mo>+</mo><mn>4.0</mn><mo>&#0183;</mo><mi>&#x2148;</mi></mrow>");
 		check(F.complexNum(-0.5, -4.0), //
@@ -322,6 +322,24 @@ public class MathMLPresentationTestCase extends TestCase {
 				"<mrow><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>a</mi><mo>)</mo></mrow><mo>+</mo><mfrac><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mi>a</mi></mfrac><mo>+</mo><mfrac><mrow><mo>-</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup></mrow><mrow><mn>2</mn><mo>&#0183;</mo><msup><mi>a</mi><mn>2</mn></msup></mrow></mfrac><mo>+</mo><mfrac><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>3</mn></msup><mrow><mn>3</mn><mo>&#0183;</mo><msup><mi>a</mi><mn>3</mn></msup></mrow></mfrac><mo>+</mo><msup><mrow><mi>O</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mn>4</mn></msup></mrow>");
 	}
 
+	public void testEdge() {
+		IExpr expr = EvalEngine.get().evaluate("DirectedEdge(a,b)");
+		check(expr, "<mrow><mi>a</mi><mo>-&gt;</mo><mi>b</mi></mrow>");
+		expr = EvalEngine.get().evaluate("UndirectedEdge(a,b)");
+		check(expr, "<mrow><mi>a</mi><mo>&lt;-&gt;</mo><mi>b</mi></mrow>");
+
+		check("Graph({1,2,3},{1<->2,2<->3})", //
+				"<mrow><mi>Graph</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mo>{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>}</mo></mrow><mo>,</mo><mrow><mo>{</mo><mrow><mrow><mn>1</mn><mo>&lt;-&gt;</mo><mn>2</mn></mrow><mo>,</mo><mrow><mn>2</mn><mo>&lt;-&gt;</mo><mn>3</mn></mrow></mrow><mo>}</mo></mrow></mrow><mo>)</mo></mrow></mrow>");
+		check("Graph({1,2,3},{1->2,2->3})", //
+				"<mrow><mi>Graph</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mo>{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>}</mo></mrow><mo>,</mo><mrow><mo>{</mo><mrow><mrow><mn>1</mn><mo>-&gt;</mo><mn>2</mn></mrow><mo>,</mo><mrow><mn>2</mn><mo>-&gt;</mo><mn>3</mn></mrow></mrow><mo>}</mo></mrow></mrow><mo>)</mo></mrow></mrow>");
+	}
+	public void testInequality() {
+		IExpr expr = EvalEngine.get().evaluate("Inequality(c,Less,0,Less,a)");
+		check(expr, "<mrow><mi>c</mi><mo>&lt;</mo><mn>0</mn><mo>&lt;</mo><mi>a</mi></mrow>");
+
+		expr = EvalEngine.get().evaluate("Inequality(a,Less,0,LessEqual,b, Equal,c, Unequal,d)");
+		check(expr, "<mrow><mi>a</mi><mo>&lt;</mo><mn>0</mn><mo>&lt;=</mo><mi>b</mi><mo>==</mo><mi>c</mi><mo>!=</mo><mi>d</mi></mrow>");
+	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		mathUtil.toMathML(strEval, stw);
@@ -340,6 +358,11 @@ public class MathMLPresentationTestCase extends TestCase {
 
 	}
 
+	public void testMissing() {
+		IExpr expr = EvalEngine.get().evaluate("Missing(\"test1\", \"test2\")");
+		check(expr,
+				"<mrow><mi>Missing</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mtext>test1</mtext><mo>,</mo><mtext>test2</mtext></mrow><mo>)</mo></mrow></mrow>");
+	}
 	/**
 	 * The JUnit setup method
 	 */

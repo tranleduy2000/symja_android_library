@@ -4,6 +4,9 @@ import junit.framework.TestCase;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TeXUtilities;
+import org.matheclipse.core.expression.ASTRealMatrix;
+import org.matheclipse.core.expression.ASTRealVector;
+import org.matheclipse.core.interfaces.IExpr;
 
 import java.io.StringWriter;
 
@@ -217,12 +220,13 @@ public class BasicTeXTestCase extends TestCase {
 	public void testTeX022() {
 		// issue #116
 		check("-I*1/2*Sqrt(2)", //
-				"\\left( \\frac{-1}{2}\\,i \\right) \\,\\sqrt{2}");
+				"\\frac{ - i }{\\sqrt{2}}");
 	}
 	
 	public void testTeX023() {
 		// issue #117
-		check("5*3^(5*x)*Log(3)", "5\\cdot 3^{5\\,x}\\,\\log (3)");
+		check("5*3^(5*x)*Log(3)", //
+				"5\\cdot 3^{5\\,x}\\,\\log (3)");
 	}
 	
 	public void testTeX024() {
@@ -232,9 +236,49 @@ public class BasicTeXTestCase extends TestCase {
 				"\\textnormal{hello\n" + //
 						"this is \\& and $<$ to $>$ \" world}");
 	}
+	public void testTeX025() {
+		StringWriter stw = new StringWriter();
+		TeXUtilities localTexUtil = new TeXUtilities(EvalEngine.get(), true, 5, 7);
+		localTexUtil.toTeX("1.3 - 1.0", stw);
+		assertEquals(stw.toString(), "0.3");
+	}
+	public void testTeX026() {
+		check("DirectedEdge(a,b)",
+				"a\\to b");
+		check("UndirectedEdge(a,b)",
+				"a\\leftrightarrow b");
+		check("Graph({1,2,3},{1<->2,2<->3})", //
+				"\\text{Graph}(\\{1,2,3\\},\\{1\\leftrightarrow 2,2\\leftrightarrow 3\\})");
+		check("Graph({1,2,3},{1->2,2->3})", //
+				"\\text{Graph}(\\{1,2,3\\},\\{1\\to 2,2\\to 3\\})");
+	}
+	public void testTeX027() {
+		check(new ASTRealMatrix(new double[][] { { 1.0, 2.0, 3.0 }, { 3.3, 4.4, 5.5 } }, false), //
+				"\\left(\n" + "\\begin{array}{ccc}\n" + "1.0 & 2.0 & 3.0 \\\\\n" + "3.3 & 4.4 & 5.5 \n"
+						+ "\\end{array}\n" + "\\right) ");
+	}
+
+	public void testTeX028() {
+		check(new ASTRealVector(new double[] { 1.0, 2.0, 3.0 }, false), //
+				"\\{1.0,2.0,3.0\\}");
+	}
+	public void testTeX029() {
+		check("Inequality(c,Greater,0,GreaterEqual,a)", //
+				"c > 0\\geq a");
+
+		check("Inequality(a,Less,0,LessEqual,b, Equal,c, Unequal,d)", //
+				"a < 0\\leq b == c\\neq d");
+
+	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		texUtil.toTeX(strEval, stw);
+		assertEquals(stw.toString(), strResult);
+	}
+
+	public void check(IExpr expr, String strResult) {
+		StringWriter stw = new StringWriter();
+		texUtil.toTeX(expr, stw);
 		assertEquals(stw.toString(), strResult);
 
 	}

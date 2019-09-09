@@ -36,7 +36,6 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(BasicPatternPropertiesTestCase.class);
 		suite.addTestSuite(CompareToTestCase.class);
 		suite.addTestSuite(PatternMatchingTestCase.class);
-		suite.addTestSuite(RubiIntegrationTest.class);
 		suite.addTestSuite(CombinatoricTestCase.class);
 
 		suite.addTestSuite(MathMLPresentationTestCase.class);
@@ -49,7 +48,9 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(NumberTest.class);
 		suite.addTestSuite(JavaFormTestCase.class);
 
+		suite.addTestSuite(MainTestCase.class);
 		suite.addTestSuite(LowercaseTestCase.class);
+		suite.addTestSuite(RubiIntegrationTest.class);
 		suite.addTestSuite(DistributionTest.class);
 		suite.addTestSuite(SeriesTest.class);
 		suite.addTestSuite(SerializableTest.class);
@@ -65,6 +66,7 @@ public class CompleteTestSuite extends TestCase {
 //		suite.addTestSuite(ConsoleTestCase.class);
 		suite.addTestSuite(AssumptionTestCase.class);
 		suite.addTestSuite(WXFTestCase.class);
+		suite.addTestSuite(IntegerTestCase.class);
 
 		return suite;
 

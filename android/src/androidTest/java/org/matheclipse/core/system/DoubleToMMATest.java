@@ -1,8 +1,8 @@
 package org.matheclipse.core.system;
 
-import junit.framework.TestCase;
-
 import org.matheclipse.core.form.DoubleToMMA;
+
+import junit.framework.TestCase;
 
 /**
  * Convert a Java <code>double</code> value into a string similar to the Mathematica output format.
