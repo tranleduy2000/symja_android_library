@@ -295,4 +295,5 @@ public class Config {
 	 */
 	public static boolean PACKAGE_MODE = true;
 
+	public static boolean USE_MATHCELL = false;
 }
