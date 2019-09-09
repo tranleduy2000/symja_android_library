@@ -239,11 +239,12 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				return;
 			}
 			if (Config.USE_MATHCELL && function.headID() < 0) {
-				buf.append("eval(");
+				// avoid generating JavaScript eval(head) here
+				buf.append("(window[");
 				convert(buf, head);
-				buf.append(").apply(null, [");
+				buf.append("](");
 				convertArgs(buf, head, function);
-				buf.append("])");
+				buf.append("))");
 				return;
 			}
 		}
