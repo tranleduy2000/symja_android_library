@@ -62,6 +62,8 @@ public interface ISignedNumber extends INumber {
     /**
      * Return the integer part of this number
      *
+     * This method raises ArithmeticException if a numeric value cannot be represented by an longtype.
+     *
      * @return
      */
      IInteger integerPart();

@@ -602,10 +602,13 @@ public class IntegerFunctions {
 			// }
 			try {
 				ISignedNumber signedNumber = arg1.evalReal();
-				if (signedNumber != null && //
-						(signedNumber.isLT(F.C1) && signedNumber.isGT(F.CN1))) {
+				if (signedNumber != null) {
+					if (signedNumber.isLT(F.C1) && signedNumber.isGT(F.CN1)) {
 					// arg1 is in the interval ]-1, 1[
 					return arg1;
+				}
+					IInteger intValue = signedNumber.integerPart();
+					return F.Subtract(arg1, intValue);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
