@@ -16626,7 +16626,57 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"1");
 	}
 
-	public void testSolve() {
+	public void testSolve1() {
+		// TODO improve method QuarticSolver#quadraticSolve()
+		// check("Solve(a*x^2+b==0,x)", //
+		// "");
+
+		check("Solve(x==0,x)", //
+				"{{x->0}}");
+		check("Solve(5*y^x==8,x)", //
+				"{{x->Log(8/5)/Log(y)}}");
+		check("Solve(x^y+8==a*b,x)", //
+				"{{x->(-8+a*b)^(1/y)}}");
+		check("Solve(x^2==0,x)", //
+				"{{x->0}}");
+		check("Solve(x^3==0,x)", //
+				"{{x->0}}");
+		check("Solve(x+1==0,x)", //
+				"{{x->-1}}");
+		check("Solve(x^2+1==0,x)", //
+				"{{x->-I},{x->I}}");
+		check("Solve(2*x^2+1==0,x)", //
+				"{{x->-I/Sqrt(2)},{x->I/Sqrt(2)}}");
+		check("Solve(3*(x+5)*(x-4)==0,x)", //
+				"{{x->-5},{x->4}}");
+		check("Solve(3*(x+a)*(x-b)==0,x)", //
+				"{{x->-a},{x->b}}");
+		check("Solve(a*x^2+b==0,x)", //
+				"{{x->(-I*Sqrt(a*b))/a},{x->(I*Sqrt(a*b))/a}}");
+		check("Solve(x^2+2*x+1==0,x)", //
+				"{{x->-1},{x->-1}}");
+		//  TODO simplify result
+		check("Solve(-5*Sqrt(14)*x-14*x^2*Sqrt(83)-10==0,x)", //
+				"{{x->(-5*Sqrt(14)-Sqrt(350-560*Sqrt(83)))/(28*Sqrt(83))},{x->(-5*Sqrt(14)+Sqrt(\n" +
+				"350-560*Sqrt(83)))/(28*Sqrt(83))}}");
+
+		check("Solve(8*x^3-26x^2+3x+9==0,x)", //
+				"{{x->-1/2},{x->3/4},{x->3}}");
+
+		check("Solve((a*x^2+1)==0,x)", //
+				"{{x->-I/Sqrt(a)},{x->I/Sqrt(a)}}");
+		check("Solve(Sqrt(x)-2*x+x^2==0,x)", //
+				"{{x->0},{x->1}}");
+		check("Solve((2*x+x^2)^2-x==0,x)", //
+				"{{x->0},{x->-4/3+(43/2+3/2*Sqrt(177))^(1/3)/3+4/3*2^(1/3)/(43+3*Sqrt(177))^(1/3)},{x->\n"
+						+ "-4/3-2/3*2^(1/3)/(43+3*Sqrt(177))^(1/3)+(I*2*2^(1/3))/(Sqrt(3)*(43+3*Sqrt(177))^(\n"
+						+ "1/3))-(43+3*Sqrt(177))^(1/3)/(6*2^(1/3))+(-I*1/2*(43+3*Sqrt(177))^(1/3))/(2^(1/3)*Sqrt(\n"
+						+ "3))},{x->-4/3-2/3*2^(1/3)/(43+3*Sqrt(177))^(1/3)+(-I*2*2^(1/3))/(Sqrt(3)*(43+3*Sqrt(\n"
+						+ "177))^(1/3))-(43+3*Sqrt(177))^(1/3)/(6*2^(1/3))+(I*1/2*(43+3*Sqrt(177))^(1/3))/(\n"
+						+ "2^(1/3)*Sqrt(3))}}");
+		check("Solve((5*x^4-2)/(x+1)/(x^2-1)==0,x)", //
+				"{{x->((-2)^(1/4)*(-1)^(1/4))/5^(1/4)},{x->(-(-2)^(1/4)*(-1)^(1/4))/5^(1/4)},{x->((\n"
+						+ "-2)^(1/4)*(-1)^(3/4))/5^(1/4)},{x->(-(-2)^(1/4)*(-1)^(3/4))/5^(1/4)}}");
 		check("Solve({x^2-11==y, x+y==-9}, {x,y})", //
 				"{{x->-2,y->-7},{x->1,y->-10}}");
 		check("Solve(30*x/0.0002==30,{x})", //
@@ -16825,7 +16875,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "4*E+k^2*q^2*Q^2))},{r->Sqrt(1/(2*E))*Sqrt(k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))},{r->-Sqrt(\n"
 						+ "1/(2*E))*Sqrt(k*q*Q+Sqrt(4*E+k^2*q^2*Q^2))}}");
 		check("Solve((k*Q*q)/r^2+1/r^4==0,r)", //
-				"{{r->Sqrt(-k*q*Q)/(k*q*Q)},{r->-Sqrt(-k*q*Q)/(k*q*Q)}}");
+				"{{r->-I/Sqrt(k*q*Q)},{r->I/Sqrt(k*q*Q)}}");
 		check("Solve(Abs(x-1) ==1,{x})", //
 				"{{x->0},{x->2}}");
 		check("Solve(Abs(x^2-1) ==0,{x})", //

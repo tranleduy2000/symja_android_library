@@ -4,6 +4,7 @@ import com.duy.annotations.Nonnull;
 
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -18,7 +19,6 @@ import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
 import static org.matheclipse.core.expression.F.C1D3;
-import static org.matheclipse.core.expression.F.C1D4;
 import static org.matheclipse.core.expression.F.C2;
 import static org.matheclipse.core.expression.F.C3;
 import static org.matheclipse.core.expression.F.C4;
@@ -29,7 +29,6 @@ import static org.matheclipse.core.expression.F.CN3;
 import static org.matheclipse.core.expression.F.CN4;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.QQ;
 import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Times;
 import static org.matheclipse.core.expression.F.ZZ;
@@ -96,10 +95,10 @@ public class QuarticSolver {
 						final IExpr base = arg.base();
 						if (x.equals(base)) {
 							exponent = arg.exponent().toIntDefault(Integer.MIN_VALUE);
-//							try {
-//								exponent = Validate.checkPowerExponent((IAST) arg);
-//							} catch (WrongArgumentType e) {
-//							}
+							// try {
+							// exponent = Validate.checkPowerExponent((IAST) arg);
+							// } catch (WrongArgumentType e) {
+							// }
 							if (exponent < 0 || exponent > 4) {
 								return false;
 							}
@@ -141,8 +140,8 @@ public class QuarticSolver {
 	}
 
 	/**
-	 * <code>Solve(a*x^4+b*x^3+c*x^2+d*x+e==0,x)</code>. See <a href="http://en.wikipedia.org/wiki/Quartic_equation">Wikipedia - Quartic
-	 * equation</a>
+	 * <code>Solve(a*x^4+b*x^3+c*x^2+d*x+e==0,x)</code>. See
+	 * <a href="http://en.wikipedia.org/wiki/Quartic_equation">Wikipedia - Quartic equation</a>
 	 * 
 	 * @param e
 	 * @param a
@@ -335,66 +334,55 @@ public class QuarticSolver {
 
 	}
 
+	// private static IAST depressedQuarticSolve(IExpr A, IExpr B, IExpr a, IExpr b, IExpr c) {
+	// IASTAppendable result = F.ListAlloc(5);
+	// // -(a^2/12+c)
+	// IExpr P = F.eval(Times(CN1, Plus(Times(QQ(1L, 12L), Power(a, C2)), c)));
+	// // -a^3/108 + (a*c)/3 - (b^2)/8
+	// IExpr Q = F.eval(Plus(Times(QQ(-1L, 108L), Power(a, C3)), Times(C1D3, a, c), Times(QQ(-1L, 8L), Power(b, C2))));
+	//
+	// IExpr y;
+	// if (P.isZero()) {
+	// // -5/6*a - Q^(1/3)
+	// y = F.eval(Plus(Times(QQ(-5L, 6L), a), Times(CN1, Power(Q, C1D3))));
+	// } else {
+	// // (-Q/2 + Sqrt[Q^2/4 + P^3/27])^(1/3)
+	// IExpr U = F.eval(Power(
+	// Plus(Times(C1D2, CN1, Q), Sqrt(Plus(Times(C1D4, Power(Q, C2)), Times(QQ(1L, 27L), Power(P, C3))))),
+	// C1D3));
+	// // -5/6*a - U - P/(3*U)
+	// y = Plus(Times(QQ(-5L, 6L), a), Times(CN1, U), Times(CN1, P, Power(Times(C3, U), CN1)));
+	// }
+	// // Sqrt[a+2*y]
+	// IExpr w = Sqrt(Plus(a, Times(C2, y)));
+	// // b/(2*w)
+	// // IExpr z = Times(b, Power(Times(C2, w), CN1));
+	//
+	// // -B/(4*A) + 1/2 * (w + Sqrt[-(a+2*y)-2*(a+b/w)])
+	// result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(w,
+	// Sqrt(Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(b, Power(w, CN1))))))))));
+	// // -B/(4*A) + 1/2 * (w - Sqrt[-(a+2*y)-2*(a+b/w)])
+	// result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(w, Times(CN1,
+	// Sqrt(Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(b, Power(w, CN1)))))))))));
+	// // -B/(4*A) + 1/2 * (-w + Sqrt[-(a+2*y)-2*(a-b/w)])
+	// result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(Times(CN1, w), Sqrt(
+	// Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(CN1, b, Power(w, CN1))))))))));
+	// // -B/(4*A) + 1/2 * (-w - Sqrt[-(a+2*y)-2*(a-b/w)])
+	// result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(Times(CN1, w), Times(CN1, Sqrt(
+	// Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(CN1, b, Power(w, CN1)))))))))));
+	// //
+	// return createSet(result);
+	// }
 	/**
-	 * <code>Solve(a*x^4+b*x^3+c*x^2+d*x+e==0,x)</code>. See <a href="http://en.wikipedia.org/wiki/Quartic_equation">Wikipedia - Quartic
-	 * equation</a>
-	 * 
-	 * @param e
+	 * <code>Solve(a*x^3+b*x^2+c*x+d==0,x)</code>. See
+	 * <a href= "http://en.wikipedia.org/wiki/Cubic_function#General_formula_of_roots"> Wikipedia - Cubic function</a>
+	 *
 	 * @param a
 	 * @param b
 	 * @param c
 	 * @param d
-	 * @return
-	 */
-	public static IAST depressedQuarticSolve(IExpr A, IExpr B, IExpr a, IExpr b, IExpr c) {
-		IASTAppendable result = F.ListAlloc(5);
-		// -(a^2/12+c)
-		IExpr P = F.eval(Times(CN1, Plus(Times(QQ(1L, 12L), Power(a, C2)), c)));
-		// -a^3/108 + (a*c)/3 - (b^2)/8
-		IExpr Q = F.eval(Plus(Times(QQ(-1L, 108L), Power(a, C3)), Times(C1D3, a, c), Times(QQ(-1L, 8L), Power(b, C2))));
-
-		IExpr y;
-		if (P.isZero()) {
-			// -5/6*a - Q^(1/3)
-			y = F.eval(Plus(Times(QQ(-5L, 6L), a), Times(CN1, Power(Q, C1D3))));
-		} else {
-			// (-Q/2 + Sqrt[Q^2/4 + P^3/27])^(1/3)
-			IExpr U = F.eval(Power(
-					Plus(Times(C1D2, CN1, Q), Sqrt(Plus(Times(C1D4, Power(Q, C2)), Times(QQ(1L, 27L), Power(P, C3))))),
-					C1D3));
-			// -5/6*a - U - P/(3*U)
-			y = Plus(Times(QQ(-5L, 6L), a), Times(CN1, U), Times(CN1, P, Power(Times(C3, U), CN1)));
-		}
-		// Sqrt[a+2*y]
-		IExpr w = Sqrt(Plus(a, Times(C2, y)));
-		// b/(2*w)
-		// IExpr z = Times(b, Power(Times(C2, w), CN1));
-
-		// -B/(4*A) + 1/2 * (w + Sqrt[-(a+2*y)-2*(a+b/w)])
-		result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(w,
-				Sqrt(Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(b, Power(w, CN1))))))))));
-		// -B/(4*A) + 1/2 * (w - Sqrt[-(a+2*y)-2*(a+b/w)])
-		result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(w, Times(CN1,
-				Sqrt(Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(b, Power(w, CN1)))))))))));
-		// -B/(4*A) + 1/2 * (-w + Sqrt[-(a+2*y)-2*(a-b/w)])
-		result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(Times(CN1, w), Sqrt(
-				Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(CN1, b, Power(w, CN1))))))))));
-		// -B/(4*A) + 1/2 * (-w - Sqrt[-(a+2*y)-2*(a-b/w)])
-		result.append(Plus(Times(CN1, B, Power(Times(C4, A), CN1)), Times(C1D2, Plus(Times(CN1, w), Times(CN1, Sqrt(
-				Plus(Times(CN1, Plus(a, Times(C2, y))), Times(CN1, C2, Plus(a, Times(CN1, b, Power(w, CN1)))))))))));
-		//
-		return createSet(result);
-	}
-
-	/**
-	 * <code>Solve(a*x^3+b*x^2+c*x+d==0,x)</code>. See <a href= "http://en.wikipedia.org/wiki/Cubic_function#General_formula_of_roots">
-	 * Wikipedia - Cubic function</a>
-	 * 
-	 * @param a
-	 * @param b
-	 * @param c
-	 * @param d
-	 * @param additionalSulution TODO
+	 * @param additionalSulution
+	 *            TODO
 	 * @return
 	 */
 	public static IASTAppendable cubicSolve(IExpr a, IExpr b, IExpr c, IExpr d, IExpr additionalSulution) {
@@ -494,14 +482,16 @@ public class QuarticSolver {
 	}
 
 	/**
-	 * <code>Solve(a*x^2+b*x+c==0,x)</code>. See <a href="http://en.wikipedia.org/wiki/Quadratic_equation">Wikipedia - Quadratic
-	 * equation</a>
+	 * <code>Solve(a*x^2+b*x+c==0,x)</code>. See <a href="http://en.wikipedia.org/wiki/Quadratic_equation">Wikipedia -
+	 * Quadratic equation</a>
 	 * 
 	 * @param a
 	 * @param b
 	 * @param c
-	 * @param solution1 TODO
-	 * @param solution2 TODO
+	 * @param solution1
+	 *            TODO
+	 * @param solution2
+	 *            TODO
 	 * @return
 	 */
 	public static IASTAppendable quadraticSolve(IExpr a, IExpr b, IExpr c, IExpr solution1, IExpr solution2) {
@@ -520,10 +510,29 @@ public class QuarticSolver {
 				}
 			} else {
 				if (b.isZero()) {
-					IExpr discriminant = F.evalExpand(a.times(c).negate());
+					IExpr nominator = a.times(c);
+					if (nominator.equals(a)) {
+						IExpr discriminant = F.evalExpand(nominator.negate());
+						IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(discriminant);
+						if (negExpr.isPresent()) {
+							nominator = negExpr;
+							discriminant = F.CI;
+						} else {
+							discriminant = F.C1;
+						}
+						result.append(Times(discriminant, Power(F.Sqrt(nominator), -1L)));
+						result.append(Times(discriminant.negate(), Power(F.Sqrt(nominator), -1L)));
+					} else {
+						IExpr discriminant = F.evalExpand(nominator.negate());
+						IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(discriminant);
+						if (negExpr.isPresent()) {
+							discriminant = F.Times(F.CI, negExpr.sqrt());
+						} else {
 					discriminant = discriminant.sqrt();
+						}
 					result.append(Times(discriminant, Power(a, -1L)));
 					result.append(Times(discriminant.negate(), Power(a, -1L)));
+					}
 				} else {
 					IExpr discriminant = F.evalExpand(Plus(F.Sqr(b), a.times(c).times(F.C4).negate()));
 					discriminant = discriminant.sqrt();
