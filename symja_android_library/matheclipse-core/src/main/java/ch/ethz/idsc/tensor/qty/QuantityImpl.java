@@ -266,7 +266,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	/** {@inheritDoc} */
 	@Override
 	public boolean isOne() {
-		return false;
+		return false;// arg1.isOne();
 	}
 
 	// @Override
@@ -311,7 +311,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	/** {@inheritDoc} */
 	@Override
 	public boolean isZero() {
-		return false;
+		return false; // arg1.isZero();
 	}
 
 	@Override
