@@ -2,9 +2,34 @@ package org.matheclipse.core.integrate.rubi;
 
 
 import static org.matheclipse.core.expression.F.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.*;
-import static org.matheclipse.core.integrate.rubi.UtilityFunctions.*;
-import org.matheclipse.core.interfaces.IAST;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.BinomialQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Dist;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.EqQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ExpandIntegrand;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ExpandToSum;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.F;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfExponential;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfExponentialFunction;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.FunctionOfExponentialQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.GtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IGtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.ILtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Int;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IntHide;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.IntegersQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.InverseFunctionQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LeQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearMatchQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LinearQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.LtQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NeQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.NormalizeIntegrand;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.RationalQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Rt;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Simp;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Subst;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.SumQ;
+import static org.matheclipse.core.integrate.rubi.UtilityFunctionCtors.Unintegrable;
 
 /** 
  * IndefiniteIntegrationRules from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi -
@@ -99,13 +124,13 @@ IIntegrate(2288,Int(Times(y_DEFAULT,Power(F_,u_),Plus(v_,w_)),x_Symbol),
 IIntegrate(2289,Int(Times(Power(F_,u_),Power(v_,n_DEFAULT),w_),x_Symbol),
     Condition(With(List(Set(z,Plus(Times(Log(FSymbol),v,D(u,x)),Times(Plus(n,C1),D(v,x))))),Condition(Simp(Times(Coefficient(w,x,Exponent(w,x)),Power(FSymbol,u),Power(v,Plus(n,C1)),Power(Coefficient(z,x,Exponent(z,x)),CN1)),x),And(EqQ(Exponent(w,x),Exponent(z,x)),EqQ(Times(w,Coefficient(z,x,Exponent(z,x))),Times(z,Coefficient(w,x,Exponent(w,x))))))),And(FreeQ(List(FSymbol,n),x),PolynomialQ(u,x),PolynomialQ(v,x),PolynomialQ(w,x))));
 IIntegrate(2290,Int(Times(Power(Plus(a_DEFAULT,Times(b_DEFAULT,Power(F_,Times(c_DEFAULT,Sqrt(Plus(d_DEFAULT,Times(e_DEFAULT,x_))),Power(Plus(f_DEFAULT,Times(g_DEFAULT,x_)),CN1D2))))),n_DEFAULT),Power(Plus(A_DEFAULT,Times(B_DEFAULT,x_),Times(C_DEFAULT,Sqr(x_))),CN1)),x_Symbol),
-    Condition(Dist(Times(C2,e,g,Power(Times(CSymbol,Subtract(Times(e,f),Times(d,g))),CN1)),Subst(Int(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,x)))),n),Power(x,CN1)),x),x,Times(Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,BSymbol,CSymbol,FSymbol),x),EqQ(Subtract(Times(CSymbol,d,f),Times(ASymbol,e,g)),C0),EqQ(Subtract(Times(BSymbol,e,g),Times(CSymbol,Plus(Times(e,f),Times(d,g)))),C0),IGtQ(n,C0))));
+    Condition(Dist(Times(C2,e,g,Power(Times(C,Subtract(Times(e,f),Times(d,g))),CN1)),Subst(Int(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,x)))),n),Power(x,CN1)),x),x,Times(Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,BSymbol,C,FSymbol),x),EqQ(Subtract(Times(C,d,f),Times(ASymbol,e,g)),C0),EqQ(Subtract(Times(BSymbol,e,g),Times(C,Plus(Times(e,f),Times(d,g)))),C0),IGtQ(n,C0))));
 IIntegrate(2291,Int(Times(Power(Plus(a_DEFAULT,Times(b_DEFAULT,Power(F_,Times(c_DEFAULT,Sqrt(Plus(d_DEFAULT,Times(e_DEFAULT,x_))),Power(Plus(f_DEFAULT,Times(g_DEFAULT,x_)),CN1D2))))),n_DEFAULT),Power(Plus(A_,Times(C_DEFAULT,Sqr(x_))),CN1)),x_Symbol),
-    Condition(Dist(Times(C2,e,g,Power(Times(CSymbol,Subtract(Times(e,f),Times(d,g))),CN1)),Subst(Int(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,x)))),n),Power(x,CN1)),x),x,Times(Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,CSymbol,FSymbol),x),EqQ(Subtract(Times(CSymbol,d,f),Times(ASymbol,e,g)),C0),EqQ(Plus(Times(e,f),Times(d,g)),C0),IGtQ(n,C0))));
+    Condition(Dist(Times(C2,e,g,Power(Times(C,Subtract(Times(e,f),Times(d,g))),CN1)),Subst(Int(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,x)))),n),Power(x,CN1)),x),x,Times(Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,C,FSymbol),x),EqQ(Subtract(Times(C,d,f),Times(ASymbol,e,g)),C0),EqQ(Plus(Times(e,f),Times(d,g)),C0),IGtQ(n,C0))));
 IIntegrate(2292,Int(Times(Power(Plus(a_DEFAULT,Times(b_DEFAULT,Power(F_,Times(c_DEFAULT,Sqrt(Plus(d_DEFAULT,Times(e_DEFAULT,x_))),Power(Plus(f_DEFAULT,Times(g_DEFAULT,x_)),CN1D2))))),n_),Power(Plus(A_DEFAULT,Times(B_DEFAULT,x_),Times(C_DEFAULT,Sqr(x_))),CN1)),x_Symbol),
-    Condition(Unintegrable(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))))),n),Power(Plus(ASymbol,Times(BSymbol,x),Times(CSymbol,Sqr(x))),CN1)),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,BSymbol,CSymbol,FSymbol,n),x),EqQ(Subtract(Times(CSymbol,d,f),Times(ASymbol,e,g)),C0),EqQ(Subtract(Times(BSymbol,e,g),Times(CSymbol,Plus(Times(e,f),Times(d,g)))),C0),Not(IGtQ(n,C0)))));
+    Condition(Unintegrable(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))))),n),Power(Plus(ASymbol,Times(BSymbol,x),Times(C,Sqr(x))),CN1)),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,BSymbol,C,FSymbol,n),x),EqQ(Subtract(Times(C,d,f),Times(ASymbol,e,g)),C0),EqQ(Subtract(Times(BSymbol,e,g),Times(C,Plus(Times(e,f),Times(d,g)))),C0),Not(IGtQ(n,C0)))));
 IIntegrate(2293,Int(Times(Power(Plus(a_DEFAULT,Times(b_DEFAULT,Power(F_,Times(c_DEFAULT,Sqrt(Plus(d_DEFAULT,Times(e_DEFAULT,x_))),Power(Plus(f_DEFAULT,Times(g_DEFAULT,x_)),CN1D2))))),n_),Power(Plus(A_,Times(C_DEFAULT,Sqr(x_))),CN1)),x_Symbol),
-    Condition(Unintegrable(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))))),n),Power(Plus(ASymbol,Times(CSymbol,Sqr(x))),CN1)),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,CSymbol,FSymbol,n),x),EqQ(Subtract(Times(CSymbol,d,f),Times(ASymbol,e,g)),C0),EqQ(Plus(Times(e,f),Times(d,g)),C0),Not(IGtQ(n,C0)))));
+    Condition(Unintegrable(Times(Power(Plus(a,Times(b,Power(FSymbol,Times(c,Sqrt(Plus(d,Times(e,x))),Power(Plus(f,Times(g,x)),CN1D2))))),n),Power(Plus(ASymbol,Times(C,Sqr(x))),CN1)),x),And(FreeQ(List(a,b,c,d,e,f,g,ASymbol,C,FSymbol,n),x),EqQ(Subtract(Times(C,d,f),Times(ASymbol,e,g)),C0),EqQ(Plus(Times(e,f),Times(d,g)),C0),Not(IGtQ(n,C0)))));
 IIntegrate(2294,Int(Times(Plus(A_DEFAULT,Times(Log(Times(c_DEFAULT,Power(Plus(d_DEFAULT,Times(e_DEFAULT,x_)),n_DEFAULT))),B_DEFAULT)),Power(Plus(Times(Log(Times(c_DEFAULT,Power(Plus(d_DEFAULT,Times(e_DEFAULT,x_)),n_DEFAULT))),b_DEFAULT),a_),CN1D2)),x_Symbol),
     Condition(Plus(Simp(Times(BSymbol,Plus(d,Times(e,x)),Sqrt(Plus(a,Times(b,Log(Times(c,Power(Plus(d,Times(e,x)),n)))))),Power(Times(b,e),CN1)),x),Dist(Times(Subtract(Times(C2,ASymbol,b),Times(BSymbol,Plus(Times(C2,a),Times(b,n)))),Power(Times(C2,b),CN1)),Int(Power(Plus(a,Times(b,Log(Times(c,Power(Plus(d,Times(e,x)),n))))),CN1D2),x),x)),FreeQ(List(a,b,c,d,e,ASymbol,BSymbol,n),x)));
 IIntegrate(2295,Int(Log(Times(c_DEFAULT,Power(x_,n_DEFAULT))),x_Symbol),
