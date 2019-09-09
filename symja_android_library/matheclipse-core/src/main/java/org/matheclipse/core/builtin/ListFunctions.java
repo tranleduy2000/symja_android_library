@@ -33,7 +33,6 @@ import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
-import org.matheclipse.core.interfaces.IArrayFunction;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
@@ -4026,6 +4025,7 @@ public final class ListFunctions {
 					final TableGenerator generator = new TableGenerator(iterList, resultList, new UnaryRangeFunction());
 					return generator.table();
 				}
+			} catch (final ArithmeticException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
 			}
@@ -5424,9 +5424,9 @@ public final class ListFunctions {
 							new TableFunction(engine, ast.arg1()), defaultValue);
 					return generator.table();
 				}
+			} catch (final NoEvalException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
-			} catch (final NoEvalException e) {
 			}
 			return F.NIL;
 		}
@@ -5448,9 +5448,9 @@ public final class ListFunctions {
 							new TableFunction(engine, ast.arg1()), defaultValue);
 					return generator.tableThrow();
 				}
+			} catch (final NoEvalException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
-			} catch (final NoEvalException e) {
 			}
 			return F.NIL;
 		}

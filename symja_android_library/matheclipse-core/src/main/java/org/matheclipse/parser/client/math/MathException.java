@@ -17,6 +17,7 @@ public class MathException extends RuntimeException {
 	 * @see FlowControlException
 	 */
     public MathException() {
+		super(null, null, false, false);
     }
 
     public MathException(String message) {
@@ -32,7 +33,7 @@ public class MathException extends RuntimeException {
     }
 
     /**
-     * @param tensors
+	 * @param exprs
      * @return exception with message consisting of truncated string expressions of given tensors
 	 * @throws Exception
 	 *             if any of the listed tensors is null

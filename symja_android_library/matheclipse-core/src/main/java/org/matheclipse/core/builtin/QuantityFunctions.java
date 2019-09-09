@@ -11,6 +11,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.math.MathException;
 
+import ch.ethz.idsc.tensor.qty.IQuantity;
 import ch.ethz.idsc.tensor.qty.IQuantityStatic;
 import ch.ethz.idsc.tensor.qty.IUnit;
 import ch.ethz.idsc.tensor.qty.IUnitStatic;
@@ -174,9 +175,8 @@ public class QuantityFunctions {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					IExpr arg2 = engine.evaluate(ast.arg2());
 					if (arg1.isQuantity()) {
-						ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
 						IUnit unit = IUnitStatic.of(arg2.toString());
-						return unitConvert.to(unit).apply(arg1);
+						return unitConvert((IQuantity)arg1, unit);
 					}
 				}
 			} catch (MathException e) {
@@ -204,4 +204,8 @@ public class QuantityFunctions {
 
 	}
 
+	public  static IExpr unitConvert(IQuantity arg1, IUnit unit) {
+		ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+		return unitConvert.to(unit).apply(arg1);
+	}
 }

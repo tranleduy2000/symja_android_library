@@ -622,9 +622,9 @@ public final class Programming {
 				});
 				final DoIterator generator = new DoIterator(iterList, engine);
 				return generator.doIt(ast.arg1());
+			} catch (final NoEvalException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
-			} catch (final NoEvalException e) {
 			}
 			return F.NIL;
 		}

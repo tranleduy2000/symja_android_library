@@ -50,6 +50,8 @@ import org.matheclipse.core.interfaces.ITernaryComparator;
 import java.util.List;
 import java.util.Map;
 
+import ch.ethz.idsc.tensor.qty.IQuantity;
+
 public final class BooleanFunctions {
 	public final static Equal CONST_EQUAL = new Equal();
 	public final static Greater CONST_GREATER = new Greater();
@@ -1377,6 +1379,12 @@ public final class BooleanFunctions {
 				return IExpr_COMPARE_TERNARY.TRUE;
 			} else if (a0.isInterval1() && a1.isInterval1()) {
 				return compareGreaterIntervalTernary(a0.lower(), a0.upper(), a1.lower(), a1.upper());
+			} else if (a0.isQuantity() && a1.isQuantity()) {
+				int comp = quantityCompareTo((IQuantity) a0, (IQuantity) a1);
+				if (comp != Integer.MIN_VALUE) {
+					return comp > 0 ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+				}
+				return IExpr_COMPARE_TERNARY.UNDEFINED;
 			}
 
 			if (a0.equals(a1) && a0.isRealResult() && a1.isRealResult() && !a0.isList()) {
@@ -1687,6 +1695,12 @@ public final class BooleanFunctions {
 		public IExpr_COMPARE_TERNARY compareTernary(final IExpr a0, final IExpr a1) {
 			if (a0.equals(a1) && a0.isRealResult() && a1.isRealResult()) {
 				return IExpr_COMPARE_TERNARY.TRUE;
+			} else if (a0.isQuantity() && a1.isQuantity()) {
+				int comp = quantityCompareTo((IQuantity) a0, (IQuantity) a1);
+				if (comp != Integer.MIN_VALUE) {
+					return comp >= 0 ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+				}
+				return IExpr_COMPARE_TERNARY.UNDEFINED;
 			}
 			return super.compareTernary(a0, a1);
 		}
@@ -2042,6 +2056,12 @@ public final class BooleanFunctions {
 			// don't compare strings
 			if (a0.equals(a1) && a0.isRealResult() && a1.isRealResult()) {
 				return IExpr_COMPARE_TERNARY.TRUE;
+			} else if (a0.isQuantity() && a1.isQuantity()) {
+				int comp = quantityCompareTo((IQuantity) a0, (IQuantity) a1);
+				if (comp != Integer.MIN_VALUE) {
+					return comp <= 0 ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+				}
+				return IExpr_COMPARE_TERNARY.UNDEFINED;
 			}
 			// swap arguments
 			return super.compareTernary(a1, a0);
@@ -3768,6 +3788,9 @@ public final class BooleanFunctions {
 	 */
 	public static IExpr equalNull(final IExpr a1, final IExpr a2, EvalEngine engine) {
 		if (a1.isExactNumber() && a2.isExactNumber()) {
+			if (a1.isQuantity() && a2.isQuantity()) {
+				return F.bool(quantityEquals((IQuantity) a1, (IQuantity) a2));
+			}
 			return a1.equals(a2) ? F.True : F.False;
 		}
 		IExpr_COMPARE_TERNARY b;
@@ -3785,6 +3808,36 @@ public final class BooleanFunctions {
 		return Equal.simplifyCompare(F.Equal, arg1, arg2);
 	}
 
+	private static boolean quantityEquals(IQuantity q1, IQuantity q2) {
+		if (!q1.unit().equals(q2.unit())) {
+			ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+			q2 = (IQuantity) unitConvert.to(q1.unit()).apply(q2);
+		}
+		if (q1.unit().equals(q2.unit())) {
+			return q1.value().equals(q2.value());
+		}
+		return false;
+	}
+
+	/**
+	 * If the <code>IQuantity#compareTo()</code> method could be executed because the same types could be used for
+	 * comparison, return the result <code>-1, 0 or 1</code> otherwise return <code>Integer.MIN_VALUE</code>
+	 *
+	 * @param q1
+	 * @param q2
+	 * @return <code>Integer.MIN_VALUE</code> if the <code>compareTo()</code> method could not be executed, because of
+	 *         different unit types
+	 */
+	private static int quantityCompareTo(IQuantity q1, IQuantity q2) {
+		if (!q1.unit().equals(q2.unit())) {
+			ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+			q2 = (IQuantity) unitConvert.to(q1.unit()).apply(q2);
+		}
+		if (q1.unit().equals(q2.unit())) {
+			return q1.value().compareTo(q2.value());
+		}
+		return Integer.MIN_VALUE;
+	}
 	/**
 	 * Compare if the first and second argument are unequal after expanding the arguments.
 	 *
@@ -3796,6 +3849,9 @@ public final class BooleanFunctions {
 	 */
 	public static IExpr unequalNull(IExpr a1, IExpr a2, EvalEngine engine) {
 		if (a1.isExactNumber() && a2.isExactNumber()) {
+			if (a1.isQuantity() && a2.isQuantity()) {
+				return F.bool(quantityEquals((IQuantity) a1, (IQuantity) a2));
+			}
 			return a1.equals(a2) ? F.False : F.True;
 		}
 		IExpr_COMPARE_TERNARY b;

@@ -2,6 +2,7 @@ package ch.ethz.idsc.tensor.qty;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.parser.client.math.MathException;
 
 /**
@@ -42,10 +43,13 @@ public class IQuantityStatic {
      */
     public static IExpr of(IExpr value, IUnit unit) {
         if (value instanceof IQuantity) {
-//			return value;
             throw MathException.of(value);
         }
         return QuantityImpl.of(value, unit);
+    }
+
+    public static IQuantity of(ISignedNumber value, IUnit unit) {
+        return new QuantityImpl(value, null, unit);
     }
 
     /**
