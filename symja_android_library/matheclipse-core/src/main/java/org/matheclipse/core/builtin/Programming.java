@@ -62,44 +62,46 @@ public final class Programming {
 	private static class Initializer {
 
 		private static void init() {
-		F.Abort.setEvaluator(new Abort());
-		F.Break.setEvaluator(new Break());
-		F.Block.setEvaluator(new Block());
-		F.Catch.setEvaluator(new Catch());
+			F.Abort.setEvaluator(new Abort());
+			F.Break.setEvaluator(new Break());
+			F.Block.setEvaluator(new Block());
+			F.Catch.setEvaluator(new Catch());
+			F.Check.setEvaluator(new Check());
 			F.CompiledFunction.setEvaluator(new CompiledFunction());
-		F.CompoundExpression.setEvaluator(new CompoundExpression());
-		F.Condition.setEvaluator(new Condition());
-		F.Continue.setEvaluator(new Continue());
-		F.Defer.setEvaluator(new Defer());
-		F.Do.setEvaluator(new Do());
-		F.FixedPoint.setEvaluator(new FixedPoint());
-		F.FixedPointList.setEvaluator(new FixedPointList());
-		F.For.setEvaluator(new For());
-		F.If.setEvaluator(new If());
-		F.List.setEvaluator(new ListFunction());
-		F.Module.setEvaluator(new Module());
-		F.Nest.setEvaluator(new Nest());
-		F.NestList.setEvaluator(new NestList());
-		F.NestWhile.setEvaluator(new NestWhile());
-		F.NestWhileList.setEvaluator(new NestWhileList());
-		F.On.setEvaluator(new On());
-		F.Off.setEvaluator(new Off());
-		F.Part.setEvaluator(new Part());
-		F.Print.setEvaluator(new Print());
-		F.Quiet.setEvaluator(new Quiet());
-		F.Reap.setEvaluator(new Reap());
-		F.Return.setEvaluator(new Return());
-		F.Sow.setEvaluator(new Sow());
-		F.Switch.setEvaluator(new Switch());
-		F.TimeConstrained.setEvaluator(new TimeConstrained());
-		F.Timing.setEvaluator(new Timing());
-		F.Throw.setEvaluator(new Throw());
-		F.Trace.setEvaluator(new Trace());
-		F.Unevaluated.setEvaluator(new Unevaluated());
-		F.Which.setEvaluator(new Which());
-		F.While.setEvaluator(new While());
-		F.With.setEvaluator(new With());
-	}
+			F.CompoundExpression.setEvaluator(new CompoundExpression());
+			F.Condition.setEvaluator(new Condition());
+			F.Continue.setEvaluator(new Continue());
+			F.Defer.setEvaluator(new Defer());
+			F.Do.setEvaluator(new Do());
+			F.FixedPoint.setEvaluator(new FixedPoint());
+			F.FixedPointList.setEvaluator(new FixedPointList());
+			F.For.setEvaluator(new For());
+			F.If.setEvaluator(new If());
+			F.Interrupt.setEvaluator(new Interrupt());
+			F.List.setEvaluator(new ListFunction());
+			F.Module.setEvaluator(new Module());
+			F.Nest.setEvaluator(new Nest());
+			F.NestList.setEvaluator(new NestList());
+			F.NestWhile.setEvaluator(new NestWhile());
+			F.NestWhileList.setEvaluator(new NestWhileList());
+			F.On.setEvaluator(new On());
+			F.Off.setEvaluator(new Off());
+			F.Part.setEvaluator(new Part());
+			F.Print.setEvaluator(new Print());
+			F.Quiet.setEvaluator(new Quiet());
+			F.Reap.setEvaluator(new Reap());
+			F.Return.setEvaluator(new Return());
+			F.Sow.setEvaluator(new Sow());
+			F.Switch.setEvaluator(new Switch());
+			F.TimeConstrained.setEvaluator(new TimeConstrained());
+			F.Timing.setEvaluator(new Timing());
+			F.Throw.setEvaluator(new Throw());
+			F.Trace.setEvaluator(new Trace());
+			F.Unevaluated.setEvaluator(new Unevaluated());
+			F.Which.setEvaluator(new Which());
+			F.While.setEvaluator(new While());
+			F.With.setEvaluator(new With());
+		}
 	}
 
 	/**
@@ -255,6 +257,33 @@ public final class Programming {
 
 	}
 
+	private final static class Check extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			// messageShortcut may be null
+			String messageShortcut = engine.getMessageShortcut();
+			try {
+				engine.setMessageShortcut(null);
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				if (engine.getMessageShortcut() != null) {
+					return ast.arg2();
+				}
+				return arg1;
+			} finally {
+				engine.setMessageShortcut(messageShortcut);
+			}
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
 
 	/**
 	 * <pre>
@@ -312,8 +341,8 @@ public final class Programming {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * places an additional constraint on <code>pattern</code> that only allows it to match if <code>expr</code> evaluates to
-	 * <code>True</code>.
+	 * places an additional constraint on <code>pattern</code> that only allows it to match if <code>expr</code>
+	 * evaluates to <code>True</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -1060,6 +1089,22 @@ public final class Programming {
 
 	}
 
+	private final static class Interrupt extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			throw new AbortException();
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_0_0;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
 	/**
 	 * <pre>
 	 * <code>List(e1, e2, ..., ei)
@@ -1299,8 +1344,8 @@ public final class Programming {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * applies a function <code>f</code> repeatedly on an expression <code>expr</code>, until applying <code>test</code> on the result
-	 * no longer yields <code>True</code>.
+	 * applies a function <code>f</code> repeatedly on an expression <code>expr</code>, until applying <code>test</code>
+	 * on the result no longer yields <code>True</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -1558,8 +1603,8 @@ public final class Programming {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * switch on the interactive trace only for the defined <code>head</code> s. The output is printed only once for a combination of
-	 * <em>unevaluated</em> input expression and <em>evaluated</em> output expression.
+	 * switch on the interactive trace only for the defined <code>head</code> s. The output is printed only once for a
+	 * combination of <em>unevaluated</em> input expression and <em>evaluated</em> output expression.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
@@ -2859,12 +2904,17 @@ public final class Programming {
 	}
 
 	/**
-	 * Remember which local variable names we use in the given <code>assignedValues</code> and <code>assignedRules</code>.
+	 * Remember which local variable names we use in the given <code>assignedValues</code> and
+	 * <code>assignedRules</code>.
 	 *
-	 * @param variablesList  initializer variables list from the <code>Block</code> function
-	 * @param assignedValues the variables mapped to their values (IExpr) before evaluating the block
-	 * @param assignedRules  the variables mapped to their rules (RulesData) before evaluating the block
-	 * @param engine         the evaluation engine
+	 * @param variablesList
+	 *            initializer variables list from the <code>Block</code> function
+	 * @param assignedValues
+	 *            the variables mapped to their values (IExpr) before evaluating the block
+	 * @param assignedRules
+	 *            the variables mapped to their rules (RulesData) before evaluating the block
+	 * @param engine
+	 *            the evaluation engine
 	 */
 	public static void rememberBlockVariables(IAST variablesList, final ISymbol[] symbolList,
 			final IExpr[] assignedValues, final RulesData[] assignedRules, final EvalEngine engine) {
@@ -2923,8 +2973,11 @@ public final class Programming {
 	/**
 	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;module-block&quot;..
 	 *
-	 * @param intializerList list of variables which should be substituted by appending <code>$<number></code> to the variable names
-	 * @param moduleBlock    the module block where the variables should be replaced with temporary variables
+	 * @param intializerList
+	 *            list of variables which should be substituted by appending <code>$<number></code> to the variable
+	 *            names
+	 * @param moduleBlock
+	 *            the module block where the variables should be replaced with temporary variables
 	 * @param engine
 	 * @return
 	 */
@@ -2942,8 +2995,11 @@ public final class Programming {
 	/**
 	 * Substitute the variable names from the list with temporary dummy variable names in the &quot;with-block&quot;..
 	 *
-	 * @param intializerList list of variables which should be substituted by appending <code>$<number></code> to the variable names
-	 * @param withBlock      the with block where the variables should be replaced with temporary variables
+	 * @param intializerList
+	 *            list of variables which should be substituted by appending <code>$<number></code> to the variable
+	 *            names
+	 * @param withBlock
+	 *            the with block where the variables should be replaced with temporary variables
 	 * @param engine
 	 * @return
 	 */

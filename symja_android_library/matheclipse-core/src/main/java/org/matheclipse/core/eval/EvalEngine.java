@@ -169,6 +169,7 @@ public class EvalEngine implements Serializable {
 
 	transient String fSessionID;
 
+	transient String fMessageShortcut;
 	/**
 	 * If <code>true</code> the engine evaluates in &quot;Trace()&quot; function mode.
 	 *
@@ -1807,10 +1808,14 @@ public class EvalEngine implements Serializable {
 	public PrintStream getErrorPrintStream() {
 		return fErrorPrintStream;
 	}
+
 	public int getIterationLimit() {
 		return fIterationLimit;
 	}
 
+	public String getMessageShortcut( ) {
+		return fMessageShortcut;
+	}
 
 	/**
 	 * Get the list of modified variables
@@ -1913,12 +1918,9 @@ public class EvalEngine implements Serializable {
 		fStopRequested = false;
 		fSeconds = 0;
 		fModifiedVariablesList = null;
+		fMessageShortcut=null;
 		fContextPathStack = new Stack<ContextPath>();
 		fContextPath = ContextPath.initialContext();
-		// Swift changed: call clear() before assign null value
-		if (REMEMBER_AST_CACHE != null) {
-			REMEMBER_AST_CACHE.cleanUp();
-		}
 		REMEMBER_AST_CACHE = null;
 	}
 
@@ -2150,6 +2152,9 @@ public class EvalEngine implements Serializable {
 		fIterationLimit = i;
 	}
 
+	public void setMessageShortcut(final String messageShortcut) {
+		fMessageShortcut = messageShortcut;
+	}
 	/**
 	 * @param b
 	 */

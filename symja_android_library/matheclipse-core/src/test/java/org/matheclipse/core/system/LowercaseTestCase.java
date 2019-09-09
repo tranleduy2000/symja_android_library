@@ -1991,6 +1991,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"13-I*6-6*z+z^2");
 	}
 
+	public void testCheck() {
+		check("Check(2^(3), failure)", //
+				"8");
+		check("Check(0^(-42), failure)", //
+				"failure");
+		check("Check(0^0, failure)", //
+				"failure");
+	}
 	public void testChebyshevT() {
 		check("ChebyshevT(-1/2, z)", //
 				"Cos(ArcCos(z)/2)");

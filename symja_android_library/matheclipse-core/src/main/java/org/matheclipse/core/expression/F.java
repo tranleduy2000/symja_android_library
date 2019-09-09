@@ -484,10 +484,10 @@ public class F {
     public final static IBuiltInSymbol ChebyshevT = F.initFinalSymbol("ChebyshevT", ID.ChebyshevT);
 	/** ChebyshevU(n, x) - returns the Chebyshev polynomial of the second kind `U_n(x)`. */
     public final static IBuiltInSymbol ChebyshevU = F.initFinalSymbol("ChebyshevU", ID.ChebyshevU);
-    /**
-     * ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and
-     * `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.
-     */
+    /***/
+    public final static IBuiltInSymbol Check = F.initFinalSymbol("Check", ID.Check);
+
+    /** ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.*/
     public final static IBuiltInSymbol ChessboardDistance = F.initFinalSymbol("ChessboardDistance",
             ID.ChessboardDistance);
     /***/
@@ -1226,6 +1226,8 @@ public class F {
             ID.InterpolatingPolynomial);
     /***/
     public final static IBuiltInSymbol Interpolation = F.initFinalSymbol("Interpolation", ID.Interpolation);
+    /***/
+    public final static IBuiltInSymbol Interrupt = F.initFinalSymbol("Interrupt", ID.Interrupt);
 	/***/
 	public final static IBuiltInSymbol IntersectingQ = F.initFinalSymbol("IntersectingQ", ID.IntersectingQ);
 	/** Intersection(set1, set2, ...) - get the intersection set from `set1` and `set2` .... */

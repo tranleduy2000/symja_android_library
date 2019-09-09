@@ -6,6 +6,7 @@ import org.apfloat.ApfloatRuntimeException;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.NullArgumentException;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IComplexNumImpl;
@@ -578,11 +579,13 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 		if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_TOLERANCE)) {
 			ISignedNumber sn = val.re();
 			if (sn.isNegative()) {
-				EvalEngine.get().printMessage("Infinite expression 0^(negative number)");
+				IOFunctions.printMessage(F.Power, "infy", F.List(F.Power(F.C0, sn)), EvalEngine.get());
+				// EvalEngine.get().printMessage("Infinite expression 0^(negative number)");
 				return INF;
 			}
 			if (sn.isZero()) {
-				EvalEngine.get().printMessage("Infinite expression 0^0.");
+				IOFunctions.printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
+				// EvalEngine.get().printMessage("Infinite expression 0^0.");
 				return NaN;
 			}
 			return ZERO;

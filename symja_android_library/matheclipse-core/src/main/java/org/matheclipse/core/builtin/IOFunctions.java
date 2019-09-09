@@ -18,7 +18,7 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.matheclipse.core.eval.util.SuggestTree.*;
+import static org.matheclipse.core.eval.util.SuggestTree.Node;
 
 public class IOFunctions {
 
@@ -142,6 +142,7 @@ public class IOFunctions {
 			"heads", "Heads `1` and `2` are expected to be the same.", //
 			"ilsnn", "Single or list of non-negative integers expected at position `1`.", //
 			"indet", "Indeterminate expression `1` encountered.", //
+			"infy", "Infinite expression `1` encountered.", //
 			"innf", "Non-negative integer or Infinity expected at position `1`.", //
 			"int", "Integer expected.", //
 			"intp", "Positive integer expected.", //
@@ -228,17 +229,18 @@ public class IOFunctions {
 			message = temp.toString();
 		} else {
 			temp = F.General.evalMessage(messageShortcut);
-		if (temp.isPresent()) {
+			if (temp.isPresent()) {
 				message = temp.toString();
 			}
 		}
 
-			if (message != null) {
-				for (int i = 1; i < ast.size(); i++) {
+		if (message != null) {
+			for (int i = 1; i < ast.size(); i++) {
 				message = message.replace("`" + (i) + "`", ast.get(i).toString());
-				}
-				engine.printMessage(symbol.toString() + ": " + message);
 			}
+			engine.setMessageShortcut(messageShortcut);
+			engine.printMessage(symbol.toString() + ": " + message);
+		}
 		return F.NIL;
 	}
 
