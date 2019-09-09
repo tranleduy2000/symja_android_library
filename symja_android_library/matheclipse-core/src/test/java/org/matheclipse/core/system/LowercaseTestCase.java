@@ -13935,6 +13935,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("RandomPrime(100000000000000000000000000)", //
 		// "87660272303062923753002687");
 		//
+		// check("RandomInteger()", //
+		// "0");
 		// check("RandomInteger(-10)", //
 		// "-4");
 		// check("RandomInteger(100)", "");

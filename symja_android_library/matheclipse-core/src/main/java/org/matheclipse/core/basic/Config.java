@@ -295,5 +295,12 @@ public class Config {
 	 */
 	public static boolean PACKAGE_MODE = true;
 
+	/**
+	 * Use mathcell JavaScript library for the <code>Manipulate()</code> function
+	 */
 	public static boolean USE_MATHCELL = false;
+	/**
+	 * Use visjs.org JavaScript library for visualizing graph theory objects
+	 */
+	public static boolean USE_VISJS = false;
 }

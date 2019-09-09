@@ -33,6 +33,44 @@ import java.util.concurrent.TimeUnit;
  */
 public class Console {
 
+	protected final static String VISJS_PAGE = //
+			"<html>\n" + //
+					"<head>\n" + //
+					"<meta charset=\"utf-8\">\n" + //
+					"<head>\n" + //
+					"  <title>VIS-Network</title>\n" + //
+					"\n" + //
+					"  <script type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/vis-network@5.0.0/dist/vis-network.min.js\"></script>\n"
+					+ //
+					"  <style type=\"text/css\">\n" + //
+					"    #mynetwork {\n" + //
+					"      width: 600px;\n" + //
+					"      height: 400px;\n" + //
+					"      border: 1px solid lightgray;\n" + //
+					"    }\n" + //
+					"  </style>\n" + //
+					"</head>\n" + //
+					"<body>\n" + //
+					"\n" + //
+					"<h1>VIS-Network</h1>\n" + //
+					"\n" + //
+					"<div id=\"vis\"></div>\n" + //
+					"\n" + //
+					"<script type=\"text/javascript\">\n" + //
+					"`1`\n" + //
+					"  // create a network\n" + //
+					"  var container = document.getElementById('vis');\n" + //
+					"  var data = {\n" + //
+					"    nodes: nodes,\n" + //
+					"    edges: edges\n" + //
+					"  };\n" + //
+					"  var options = {};\n" + //
+					"  var network = new vis.Network(container, data, options);\n" + //
+					"</script>\n" + //
+					"\n" + //
+					"\n" + //
+					"</body>\n" + //
+					"</html>";//
 	protected final static String MATHCELL_PAGE = //
 			"<html>\n" + //
 					"<head>\n" + //
@@ -327,6 +365,7 @@ public class Console {
 	public Console() {
 		// activate MathCell JavaScript output for Plot, Plot3D
 		Config.USE_MATHCELL = true;
+		Config.USE_VISJS = true;
 		fEvaluator = new ExprEvaluator(false, 100);
 		fOutputFactory = OutputFormFactory.get(true, false, 5, 7);
 		fEvaluator.getEvalEngine().setFileSystemEnabled(true);
@@ -546,6 +585,13 @@ public class Console {
 //						if (Config.SHOW_STACKTRACE) {
 //							ex.printStackTrace();
 //						}
+//					}
+//				} else if (result.head().equals(F.Graph) && result instanceof IDataExpr) {
+//					String javaScriptStr = GraphFunctions.graphToJSForm((IDataExpr) result);
+//					if (javaScriptStr != null) {
+//						String html = VISJS_PAGE;
+//						html = html.replaceAll("`1`", javaScriptStr);
+//						return Console.openHTMLOnDesktop(html);
 //					}
 //				} else if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {
 //					try {
