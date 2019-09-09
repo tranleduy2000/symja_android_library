@@ -247,14 +247,15 @@ public class Characters {
 	private static class Initializer {
 
 		private static void init() {
-		for (int i = 0; i < NamedCharacters.length; i += 2) {
-			NamedCharactersMap.put(NamedCharacters[i], NamedCharacters[i + 1]);
-		}
-		CharacterNamesMap.put(NamedCharactersMap.get("Infinity"), "Infinity");
-		CharacterNamesMap.put(NamedCharactersMap.get("ImaginaryI"), "I");
-		CharacterNamesMap.put(NamedCharactersMap.get("ImaginaryJ"), "I");
-		CharacterNamesMap.put(NamedCharactersMap.get("Pi"), "Pi");
+			for (int i = 0; i < NamedCharacters.length; i += 2) {
+				NamedCharactersMap.put(NamedCharacters[i], NamedCharacters[i + 1]);
+			}
+			CharacterNamesMap.put(NamedCharactersMap.get("Infinity"), "Infinity");
+			CharacterNamesMap.put(NamedCharactersMap.get("ImaginaryI"), "I");
+			CharacterNamesMap.put(NamedCharactersMap.get("ImaginaryJ"), "I");
+			CharacterNamesMap.put(NamedCharactersMap.get("Pi"), "Pi");
 
+			CharacterNamesMap.put(NamedCharactersMap.get("Degree"), "Degree");
 	}
 	}
 

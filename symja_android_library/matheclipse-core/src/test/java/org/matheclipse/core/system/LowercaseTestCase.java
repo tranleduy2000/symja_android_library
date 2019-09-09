@@ -3613,6 +3613,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testDegree() {
+		check("\\[Pi]", //
+				"Pi");
+		check("\\[Degree]", //
+				"Pi/180");
+		check("\u00B0", //
+				"Pi/180");
+		check("Sin(30*\\[Pi])", //
+				"0");
+		check("Sin(30*\\[Degree])", //
+				"1/2");
+		check("Sin(30\\[Degree])", //
+				"1/2");
 		check("Sin(30*Degree)", //
 				"1/2");
 		check("Degree == Pi / 180", //
