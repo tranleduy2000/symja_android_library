@@ -405,6 +405,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 
     IExpr of(Boolean... args);
 
+    double ofN(double... args);
+
     /**
      * This method returns <code>F.NIL</code> if no evaluation was possible. Evaluate this symbol for the arguments as
      * function <code>symbol(arg1, arg2, .... ,argN)</code>.

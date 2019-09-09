@@ -55,6 +55,15 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     }
 
     @Override
+    public double ofN(double... args) {
+        IExpr[] array = new IExpr[args.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = F.num(args[i]);
+        }
+        return of(array).evalDouble();
+    }
+
+    @Override
     public int ordinal() {
         return ID.UNKNOWN;
     }
