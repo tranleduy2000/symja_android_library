@@ -6395,10 +6395,60 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("GraphData(\"PappusGraph\")", //
 				"Graph({1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18}," //
 				+ "{1<->2,1<->3,1<->4,2<->5,2<->6,5<->7,5<->8,7<->9,7<->\n" + //
-				"10,9<->3,9<->11,3<->12,4<->13,4<->14,6<->15,6<->16,8<->13,8<->17,10<->16,10<->18,11<->17,11<->14,12<->15,12<->18,15<->17,13<->18,16<->\n" +
-				"14})");
+						"10,9<->3,9<->11,3<->12,4<->13,4<->14,6<->15,6<->16,8<->13,8<->17,10<->16,10<->18,11<->17,11<->14,12<->15,12<->18,15<->17,13<->18,16<->\n"
+						+ "14})");
 		check("GraphData(\"PetersenGraph\")", //
 				"Graph({1,2,3,4,5,6,7,8,9,10},{1<->3,1<->2,2<->6,3<->5,3<->4,4<->8,5<->7,5<->6,6<->10,7<->9,7<->8,8<->2,9<->1,9<->10,10<->4})");
+	}
+	public void testGraphCenter() {
+		check("GraphCenter(Graph({DirectedEdge(1, 2), DirectedEdge(2, 3), DirectedEdge(3, 1),  DirectedEdge(3, 4), DirectedEdge(4, 5), DirectedEdge(5, 3)}))", //
+				"{3}");
+
+		check("GraphCenter(Graph({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)}, "
+				+ //
+				"{EdgeWeight->{1.6,2.0,1.4,1.9,0.62}}))", //
+				"{1,3}");
+		check("GraphCenter({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)})", //
+				"{1,3}");
+	}
+
+	public void testGraphDiameter() {
+		check("GraphDiameter(Graph({DirectedEdge(1, 2), DirectedEdge(2, 3), DirectedEdge(3, 1),  DirectedEdge(3, 4), DirectedEdge(4, 5), DirectedEdge(5, 3)}))", //
+				"4");
+
+		check("GraphDiameter(Graph({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)}, "
+				+ //
+				"{EdgeWeight->{1.6,2.0,1.4,1.9,0.62}}))", //
+				"2.52");
+		check("GraphDiameter({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)})", //
+				"2");
+	}
+
+	public void testGraphRadius() {
+		check("GraphRadius(Graph({DirectedEdge(1, 2), DirectedEdge(2, 3), DirectedEdge(3, 1),  DirectedEdge(3, 4), DirectedEdge(4, 5), DirectedEdge(5, 3)}))", //
+				"2");
+
+		check("GraphRadius(Graph({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)}, "
+				+ //
+				"{EdgeWeight->{1.6,2.0,1.4,1.9,0.62}}))", //
+				"2.0");
+		check("GraphRadius({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)})", //
+				"1");
+	}
+
+	public void testGraphPeriphery() {
+		check("GraphPeriphery(Graph({DirectedEdge(1, 2), DirectedEdge(2, 3), DirectedEdge(3, 1),  DirectedEdge(3, 4), DirectedEdge(4, 5), DirectedEdge(5, 3)}))", //
+				"{1,4}");
+
+		check("GraphPeriphery(Graph({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)}, "
+				+ //
+				"{EdgeWeight->{1.6,2.0,1.4,1.9,0.62}}))", //
+				"{2,4}");
+		check("GraphPeriphery({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)})", //
+				"{2,4}");
+
+		check("GraphPeriphery({UndirectedEdge(1, 2), UndirectedEdge(2, 3), UndirectedEdge(3, 1), UndirectedEdge(3, 4), UndirectedEdge(3, 4), UndirectedEdge(4, 5), UndirectedEdge(5, 3)})", //
+				"{1,2,4,5}");
 	}
 	public void testGraphQ() {
 		check("GraphQ(Graph({1 -> 2, 2 -> 3, 1 -> 3, 4 -> 2}) )", //
@@ -19542,6 +19592,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{1,2,3}");
 	}
 
+	public void testVertexEccentricity() {
+		check("VertexEccentricity({1 -> 2, 2 -> 3, 3 -> 1, 3 -> 4, 4 -> 5, 5 -> 3}, 1)", //
+				"4");
+
+		check("VertexEccentricity(Graph({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)}, "
+				+ //
+				"{EdgeWeight->{1.6,1.4,0.62,1.9,2.1}}), 4)", //
+				"2.22");
+		check("VertexEccentricity({UndirectedEdge(1, 2), UndirectedEdge(1, 3), UndirectedEdge(1, 4),  UndirectedEdge(2, 3), UndirectedEdge(3, 4)}, 4)", //
+				"2");
+
+	}
 	public void testVertexQ() {
 		check("VertexQ(Graph({1 -> 2, 2 -> 3, 1 -> 3, 4 -> 2}),3)", //
 				"True");

@@ -1050,10 +1050,20 @@ public class F {
     /***/
     public final static IBuiltInSymbol Graph = F.initFinalSymbol("Graph", ID.Graph);
 
+	/***/
+	public final static IBuiltInSymbol GraphCenter = F.initFinalSymbol("GraphCenter", ID.GraphCenter);
     /***/
     public final static IBuiltInSymbol GraphData = F.initFinalSymbol("GraphData", ID.GraphData);
-    /** GraphQ(expr) - test if `expr` is a graph object.*/
+	/***/
+	public final static IBuiltInSymbol GraphDiameter = F.initFinalSymbol("GraphDiameter", ID.GraphDiameter);
+
+	/***/
+	public final static IBuiltInSymbol GraphPeriphery = F.initFinalSymbol("GraphPeriphery", ID.GraphPeriphery);
+
+	/** GraphQ(expr) - test if `expr` is a graph object. */
     public final static IBuiltInSymbol GraphQ = F.initFinalSymbol("GraphQ", ID.GraphQ);
+	/***/
+	public final static IBuiltInSymbol GraphRadius = F.initFinalSymbol("GraphRadius", ID.GraphRadius);
     /***/
     public final static IBuiltInSymbol Graphics = F.initFinalSymbol("Graphics", ID.Graphics);
     /***/
@@ -2458,7 +2468,10 @@ public class F {
     public final static IBuiltInSymbol VectorAngle = F.initFinalSymbol("VectorAngle", ID.VectorAngle);
 	/** VectorQ(v) - returns `True` if `v` is a list of elements which are not themselves lists. */
     public final static IBuiltInSymbol VectorQ = F.initFinalSymbol("VectorQ", ID.VectorQ);
-    /** VertexList(graph) - convert the `graph` into a list of vertices.*/
+	/***/
+	public final static IBuiltInSymbol VertexEccentricity = F.initFinalSymbol("VertexEccentricity", ID.VertexEccentricity);
+
+	/** VertexList(graph) - convert the `graph` into a list of vertices. */
     public final static IBuiltInSymbol VertexList = F.initFinalSymbol("VertexList", ID.VertexList);
 
     /** VertexQ(graph, vertex) - test if `vertex` is a vertex in the `graph` object.*/
@@ -2481,8 +2494,13 @@ public class F {
     /***/
     public final static IBuiltInSymbol WeierstrassPPrime = F.initFinalSymbol("WeierstrassPPrime", ID.WeierstrassPPrime);
     /***/
-    public final static IBuiltInSymbol WeightedAdjacencyMatrix = F.initFinalSymbol("WeightedAdjacencyMatrix", ID.WeightedAdjacencyMatrix);
-    /** Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2` evaluates to `True`, etc.*/
+	public final static IBuiltInSymbol WeightedAdjacencyMatrix = F.initFinalSymbol("WeightedAdjacencyMatrix",
+			ID.WeightedAdjacencyMatrix);
+
+	/**
+	 * Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2`
+	 * evaluates to `True`, etc.
+	 */
     public final static IBuiltInSymbol Which = F.initFinalSymbol("Which", ID.Which);
     /** While(test, body) - evaluates `body` as long as test evaluates to `True`.*/
     public final static IBuiltInSymbol While = F.initFinalSymbol("While", ID.While);
@@ -3239,8 +3257,8 @@ public class F {
 			GraphFunctions.initialize();
 			GraphDataFunctions.initialize();
 			GeodesyFunctions.initialize();
-            ImageFunctions.initialize();
 			ManipulateFunction.initialize();
+            ImageFunctions.initialize();
             ComputationalGeometryFunctions.initialize();
 
             F.Integrate.setEvaluator(org.matheclipse.core.reflection.system.Integrate.CONST);
@@ -3524,33 +3542,6 @@ public class F {
         return org.matheclipse.core.expression.Pattern.valueOf(symbol, check, def);
     }
 
-    /**
-     * Create a pattern for pattern-matching and term rewriting
-     *
-     * @param symbol
-     * @param check
-     *            additional condition which should be checked in pattern-matching
-     * @param defaultValue
-     *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
-     * @return IPattern
-     */
-    // public static IPattern pattern(final ISymbol symbol, final IExpr check, final IExpr defaultValue) {
-    // return org.matheclipse.core.expression.Pattern.valueOf(symbol, check, defaultValue);
-    // }
-
-    /**
-     * Create a pattern for pattern-matching and term rewriting
-     *
-     * @param symbolName
-     * @param check
-     *            additional condition which should be checked in pattern-matching
-     * @param defaultValue
-     *            use this <code>defaultValue</code> in pattern-matching if an argument is optional
-     * @return IPattern
-     */
-    // public static IPattern $p(@Nonnull final String symbolName, final IExpr check, final IExpr defaultValue) {
-    // return org.matheclipse.core.expression.Pattern.valueOf($s(symbolName), check, defaultValue);
-    // }
 
     /**
      * Create a pattern for pattern-matching and term rewriting
