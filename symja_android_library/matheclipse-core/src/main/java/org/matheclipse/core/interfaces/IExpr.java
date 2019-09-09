@@ -30,6 +30,7 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
+ *
  * (I)nterface for a mathematical (Expr)ession<br />
  *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:

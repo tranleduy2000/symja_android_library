@@ -5107,8 +5107,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testExpand() {
 		// performance test
-		// check("f = (x + y + z + w)^15;LeafCount(Expand(f*(f+w)))", //
+		// check("Expand((x + y + z + w)^15 * ((x + y + z + w)^15+w));", //
 		// "?");
+		// check("test = (x + y + z + w)^15;Length(Expand(test*(test+w)))", //
+		// "6272");
 		check("Expand((x + 3)^(5/2)+(x + 1)^(3/2))", //
 				"Sqrt(1+x)+x*Sqrt(1+x)+9*Sqrt(3+x)+6*x*Sqrt(3+x)+x^2*Sqrt(3+x)");
 		check("Expand((x + 1)^(5/2))", //
@@ -5459,6 +5461,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"-3+Log(-1+x)+Log(1+x)");
 		System.out.print('.');
 		check("TrigToExp(Log(x+1)+Log(x-1)-3)", //
+				"-3+Log(-1+x)+Log(1+x)");
+		check("-3+Log(1+x)+Log(-1+x)", //
 				"-3+Log(-1+x)+Log(1+x)");
 
 		// example from paper

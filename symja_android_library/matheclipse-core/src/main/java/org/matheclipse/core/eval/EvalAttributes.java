@@ -17,8 +17,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Static methods for evaluating <code>ISymbol.FLAT, ISymbol.LISTABLE</code> and <code>ISymbol.ORDERLESS</code>
- * attributes.
+ * Static methods for evaluating <code>ISymbol.FLAT, ISymbol.LISTABLE</code> and <code>ISymbol.ORDERLESS</code> attributes.
  *
  * @see org.matheclipse.core.interfaces.ISymbol#FLAT
  * @see org.matheclipse.core.interfaces.ISymbol#LISTABLE
@@ -42,11 +41,10 @@ public class EvalAttributes {
 	}
 
 	/**
-	 * Flatten the list (i.e. typically the ASTs head has the attribute ISymbol.FLAT) example: suppose the head f should
-	 * be flattened out: <code>f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,u,v,z]</code>
+	 * Flatten the list (i.e. typically the ASTs head has the attribute ISymbol.FLAT) example: suppose the head f should be flattened
+	 * out: <code>f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,u,v,z]</code>
 	 * 
-	 * @param ast
-	 *            the <code>AST</code> whose elements should be flattened.
+	 * @param ast the <code>AST</code> whose elements should be flattened.
 	 * 
 	 * @return returns the flattened list or <code>F.NIL</code>
 	 */
@@ -68,14 +66,11 @@ public class EvalAttributes {
 	}
 
 	/**
-	 * Flatten the list (i.e. the ASTs head element has the same head) example: suppose the head f should be flattened
-	 * out:<br>
+	 * Flatten the list (i.e. the ASTs head element has the same head) example: suppose the head f should be flattened out:<br>
 	 * <code>f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,u,v,z]</code>
 	 * 
-	 * @param head
-	 *            the head of the expression, which should be flattened.
-	 * @param ast
-	 *            the <code>sublist</code> which should be added to the <code>result</code> list.
+	 * @param head the head of the expression, which should be flattened.
+	 * @param ast  the <code>sublist</code> which should be added to the <code>result</code> list.
 	 * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>F#NIL</code>..
 	 */
 	public static IASTAppendable flatten(final ISymbol head, final IAST ast) {
@@ -113,16 +108,13 @@ public class EvalAttributes {
 	}
 
 	/**
-	 * Flatten all positions in the given list (i.e. the ASTs head element has the same head) example: suppose the head
-	 * f should be flattened out:<br>
+	 * Flatten all positions in the given list (i.e. the ASTs head element has the same head) example: suppose the head f should be
+	 * flattened out:<br>
 	 * <code>f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,u,v,z]</code>
 	 * 
-	 * @param head
-	 *            the head of the expression, which should be flattened.
-	 * @param ast
-	 *            the <code>sublist</code> which should be added to the <code>result</code> list.
-	 * @param positions
-	 *            the positions which should be flattened
+	 * @param head      the head of the expression, which should be flattened.
+	 * @param ast       the <code>sublist</code> which should be added to the <code>result</code> list.
+	 * @param positions the positions which should be flattened
 	 * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>F#NIL</code>..
 	 */
 	public static IASTAppendable flattenAt(final ISymbol head, final IAST ast, int[] positions) {
@@ -180,20 +172,16 @@ public class EvalAttributes {
 	}
 
 	/**
-	 * Flatten the list (i.e. the ASTs head element has the same head) element has the same head) example: suppose the
-	 * head f should be flattened out: <br>
+	 * Flatten the list (i.e. the ASTs head element has the same head) element has the same head) example: suppose the head f should be
+	 * flattened out: <br>
 	 * <code>f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,u,v,z]</code>
 	 * 
-	 * @param head
-	 *            the head of the expression, which should be flattened.
-	 * @param sublist
-	 *            the <code>sublist</code> which should be added to the <code>result</code> list.
-	 * @param result
-	 *            the <code>result</code> list, where all sublist elements with the same <code>head</code> should be
-	 *            appended.
+	 * @param head             the head of the expression, which should be flattened.
+	 * @param sublist          the <code>sublist</code> which should be added to the <code>result</code> list.
+	 * @param result           the <code>result</code> list, where all sublist elements with the same <code>head</code> should be
+	 *                         appended.
 	 * @param recursionCounter
-	 * @param level
-	 *            the recursion level up to which the list should be flattened
+	 * @param level            the recursion level up to which the list should be flattened
 	 * @return <code>true</code> if a sublist was flattened out into the <code>result</code> list.
 	 */
 	public static boolean flatten(final ISymbol head, final IAST sublist, final IASTAppendable result,
@@ -247,8 +235,7 @@ public class EvalAttributes {
 	 * Sort the <code>ast</code> in place using function <code>Less(a, b)</code>.
 	 * </p>
 	 * 
-	 * @param ast
-	 *            the AST will be sorted in place.
+	 * @param ast the AST will be sorted in place.
 	 */
 	public static final void sortLess(IASTMutable ast) {
 		sort(ast, new Predicates.IsBinaryFalse(F.Less));
@@ -260,12 +247,39 @@ public class EvalAttributes {
 	 * </p>
 	 * <b>Example:</b> suppose the Symbol f has the attribute ISymbol.ORDERLESS <code>f(z,d,a,b) ==> f(a,b,d,z)</code>
 	 * 
-	 * @param ast
-	 *            the AST will be sorted in place.
+	 * @param ast the AST will be sorted in place.
 	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
 	 */
 	public static final boolean sort(IASTMutable ast) {
-		if ((ast.getEvalFlags() & IAST.IS_SORTED) == IAST.IS_SORTED) {
+		final int astSize = ast.size();
+		if (astSize > 2) {
+			switch (astSize) {
+			case 3:
+				return sort2Args(ast, false);
+			case 4:
+				return sort3Args(ast, false);
+			default:
+				sort(ast, Comparators.ExprComparator.CONS);
+				if (Config.SHOW_STACKTRACE) {
+					checkCachedHashcode(ast);
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * <p>
+	 * Sort the <code>ast</code> in place using function <code>Order</code>.
+	 * </p>
+	 * <b>Example:</b> suppose the Symbol f has the attribute ISymbol.ORDERLESS <code>f(z,d,a,b) ==> f(a,b,d,z)</code>
+	 *
+	 * @param ast the AST will be sorted in place.
+	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
+	 */
+	public static final boolean sortWithFlags(IASTMutable ast) {
+		if (ast.isEvalFlagOn(IAST.IS_SORTED)) {
 			return false;
 		}
 
@@ -273,9 +287,9 @@ public class EvalAttributes {
 		if (astSize > 2) {
 			switch (astSize) {
 			case 3:
-				return sort2Args(ast);
+				return sort2Args(ast, true);
 			case 4:
-				return sort3Args(ast);
+				return sort3Args(ast, true);
 			default:
 				sort(ast, Comparators.ExprComparator.CONS);
 				ast.addEvalFlags(IAST.IS_SORTED);
@@ -295,8 +309,7 @@ public class EvalAttributes {
 	 * </p>
 	 * <b>Example:</b> suppose the Symbol f has the attribute ISymbol.ORDERLESS <code>f(z,d,a,b) ==> f(a,b,d,z)</code>
 	 * 
-	 * @param ast
-	 *            the AST will be sorted in place.
+	 * @param ast the AST will be sorted in place.
 	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
 	 */
 	public static final void sort(final IASTMutable ast, Comparator<IExpr> comparator) {
@@ -311,35 +324,37 @@ public class EvalAttributes {
 	/**
 	 * Sort an AST with 2 arguments using function <code>Order</code>.
 	 * 
-	 * @param ast
-	 *            an ast with 2 arguments
+	 * @param ast an ast with 2 arguments
 	 * @return
 	 */
-	private static boolean sort2Args(final IASTMutable ast) {
+	private static boolean sort2Args(final IASTMutable ast, final boolean setFlag) {
 		IExpr temp;
 		if (ast.arg1().compareTo(ast.arg2()) > 0) {
 			// swap arguments
 			temp = ast.arg2();
 			ast.set(2, ast.arg1());
 			ast.set(1, temp);
+			if (setFlag) {
 			ast.addEvalFlags(IAST.IS_SORTED);
+			}
 			if (Config.SHOW_STACKTRACE) {
 				checkCachedHashcode(ast);
 			}
 			return true;
 		}
+		if (setFlag) {
 		ast.addEvalFlags(IAST.IS_SORTED);
+		}
 		return false;
 	}
 
 	/**
 	 * Sort an AST with 3 arguments using function <code>Order</code>.
 	 * 
-	 * @param ast
-	 *            an ast with 3 arguments
+	 * @param ast an ast with 3 arguments
 	 * @return
 	 */
-	private static boolean sort3Args(final IASTMutable ast) {
+	private static boolean sort3Args(final IASTMutable ast, final boolean setFlag) {
 		IExpr temp;
 		// http://stackoverflow.com/questions/4793251/sorting-int-array-with-only-3-elements
 		boolean evaled = false;
@@ -363,7 +378,9 @@ public class EvalAttributes {
 				ast.set(1, temp);
 			}
 		}
+		if (setFlag) {
 		ast.addEvalFlags(IAST.IS_SORTED);
+		}
 		if (evaled) {
 			if (Config.SHOW_STACKTRACE) {
 				checkCachedHashcode(ast);
@@ -373,16 +390,13 @@ public class EvalAttributes {
 	}
 
 	/**
-	 * Thread through all (sub-)lists in the arguments of the IAST (i.e. typically the ASTs head has the attribute
-	 * ISymbol.LISTABLE) example: <code>Sin[{2,x,Pi}] ==> {Sin[2],Sin[x],Sin[Pi]}</code>
+	 * Thread through all (sub-)lists in the arguments of the IAST (i.e. typically the ASTs head has the attribute ISymbol.LISTABLE)
+	 * example: <code>Sin[{2,x,Pi}] ==> {Sin[2],Sin[x],Sin[Pi]}</code>
 	 * 
 	 * @param ast
-	 * @param listHead
-	 *            the lists head (typically <code>F.List</code>)
-	 * @param argHead
-	 *            the arguments head (typically <code>ast.head()</code>)
-	 * @param listLength
-	 *            the length of the list
+	 * @param listHead   the lists head (typically <code>F.List</code>)
+	 * @param argHead    the arguments head (typically <code>ast.head()</code>)
+	 * @param listLength the length of the list
 	 * @return the resulting ast with the <code>argHead</code> threaded into each ast argument.
 	 */
 	public static IASTAppendable threadList(final IAST ast, final IExpr listHead, final IExpr argHead,

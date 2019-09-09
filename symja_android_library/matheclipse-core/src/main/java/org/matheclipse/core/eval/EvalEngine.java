@@ -359,8 +359,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Add an expression to the <code>Out[]</code> list. To avoid memory leaks you can disable the appending of expressions to the
-	 * output history.
+	 * Add an expression to the <code>Out[]</code> list. To avoid memory leaks you can disable the appending of
+	 * expressions to the output history.
 	 *
 	 * @param arg0
 	 */
@@ -503,14 +503,20 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Evaluate the i-th argument of <code>ast</code>. This method may set evaluation flags in <code>ast</code> or <code>result0</code>
+	 * Evaluate the i-th argument of <code>ast</code>. This method may set evaluation flags in <code>ast</code> or
+	 * <code>result0</code>
 	 *
-	 * @param result0           store the result of the evaluation in the i-th argument of the ast in <code>result0[0]</code>.
-	 *                          <code>result0[0]</code> should be <code>F.NIL</code> if no evaluation occured.
-	 * @param ast               the original <code>ast</code> for whixh the arguments should be evaluated
-	 * @param arg               the i-th argument of <code>ast</code>
-	 * @param i                 <code>arg</code> is the i-th argument of <code>ast</code>
-	 * @param isNumericFunction if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
+	 * @param result0
+	 *            store the result of the evaluation in the i-th argument of the ast in <code>result0[0]</code>.
+	 *            <code>result0[0]</code> should be <code>F.NIL</code> if no evaluation occured.
+	 * @param ast
+	 *            the original <code>ast</code> for whixh the arguments should be evaluated
+	 * @param arg
+	 *            the i-th argument of <code>ast</code>
+	 * @param i
+	 *            <code>arg</code> is the i-th argument of <code>ast</code>
+	 * @param isNumericFunction
+	 *            if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
 	 */
 	private void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) {
 		IExpr temp = evalLoop(arg);
@@ -637,8 +643,8 @@ public class EvalEngine implements Serializable {
 
 
 	/**
-	 * Evaluate an AST with only one argument (i.e. <code>head[arg1]</code>). The evaluation steps are controlled by the header
-	 * attributes.
+	 * Evaluate an AST with only one argument (i.e. <code>head[arg1]</code>). The evaluation steps are controlled by the
+	 * header attributes.
 	 *
 	 * @param ast
 	 * @return
@@ -860,7 +866,7 @@ public class EvalEngine implements Serializable {
 
 			if (astSize > 2 && (ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
 				// commutative symbol
-				EvalAttributes.sort(tempAST);
+				EvalAttributes.sortWithFlags(tempAST);
 			}
 			return returnResult;
 		}
@@ -1057,14 +1063,14 @@ public class EvalEngine implements Serializable {
 					if ((result = EvalAttributes.flatten(resultList)).isPresent()) {
 						resultList = result;
 						if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
-							EvalAttributes.sort(resultList);
+							EvalAttributes.sortWithFlags(resultList);
 						}
 						resultList.addEvalFlags(IAST.IS_FLAT_ORDERLESS_EVALED);
 						return resultList;
 					}
 				}
 				if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
-					EvalAttributes.sort(resultList);
+					EvalAttributes.sortWithFlags(resultList);
 				}
 			}
 			resultList.addEvalFlags(IAST.IS_FLAT_ORDERLESS_EVALED);
@@ -1077,14 +1083,14 @@ public class EvalEngine implements Serializable {
 			if ((result = EvalAttributes.flatten(ast)).isPresent()) {
 				resultList = result;
 				if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
-					EvalAttributes.sort(resultList);
+					EvalAttributes.sortWithFlags(resultList);
 				}
 				resultList.addEvalFlags(IAST.IS_FLAT_ORDERLESS_EVALED);
 				return resultList;
 			}
 		}
 		if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
-			if (EvalAttributes.sort((IASTMutable) ast)) {
+			if (EvalAttributes.sortWithFlags((IASTMutable) ast)) {
 				ast.addEvalFlags(IAST.IS_FLAT_ORDERLESS_EVALED);
 				return ast;
 			}
@@ -1095,8 +1101,8 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 * Evaluate the ast recursively, according to the attributes Flat, HoldAll, HoldFirst, HoldRest, Orderless to create
-	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>, <code>SetDelayed[]</code>,
-	 * <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
+	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>,
+	 * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
 	 *
 	 * @param ast
 	 * @return <code>ast</code> if no evaluation was executed.
@@ -1271,7 +1277,8 @@ public class EvalEngine implements Serializable {
 	 * returns the input expression.
 	 * </p>
 	 *
-	 * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
 	 * @return the evaluated object
 	 */
 	public final IExpr evalPattern(@Nonnull final IExpr expr) {
@@ -1435,8 +1442,8 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 * Evaluate the ast recursively, according to the attributes Flat, HoldAll, HoldFirst, HoldRest, Orderless to create
-	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>, <code>SetDelayed[]</code>,
-	 * <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
+	 * pattern-matching expressions directly or for the left-hand-side of a <code>Set[]</code>,
+	 * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
 	 *
 	 * @param ast
 	 * @return <code>ast</code> if no evaluation was executed.
@@ -1550,7 +1557,7 @@ public class EvalEngine implements Serializable {
 	 */
 	private IExpr evalSetOrderless(IAST ast, final int attr, boolean noEvaluation, int level) {
 		if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
-			EvalAttributes.sort((IASTMutable) ast);
+			EvalAttributes.sortWithFlags((IASTMutable) ast);
 			if (level > 0 && !noEvaluation && ast.isFreeOfPatterns()) {
 				if (ast.isPlus()) {
 					return Arithmetic.CONST_PLUS.evaluate(ast, this);
@@ -1608,11 +1615,12 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 * Test if <code>expr</code> could be evaluated to <code>True</code>. If a
-	 * <code>org.matheclipse.parser.client.math.MathException</code> occurs during evaluation, return <code>False</code>.
+	 * <code>org.matheclipse.parser.client.math.MathException</code> occurs during evaluation, return
+	 * <code>False</code>.
 	 *
 	 * @param expr
-	 * @return <code>true</code> if the expression could be evaluated to symbol <code>True</code> and <code>false</code> in all other
-	 *         cases
+	 * @return <code>true</code> if the expression could be evaluated to symbol <code>True</code> and <code>false</code>
+	 *         in all other cases
 	 */
 	public final boolean evalTrue(final IExpr expr) {
 		if (expr.isBuiltInSymbol()) {
@@ -1634,10 +1642,11 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric mode to the
-	 * value stored before the evaluation starts. If evaluation is not possible return the input object.
+	 * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric
+	 * mode to the value stored before the evaluation starts. If evaluation is not possible return the input object.
 	 *
-	 * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
 	 * @return the evaluated object
 	 */
 	public final IExpr evaluate(final IExpr expr) {
@@ -1653,9 +1662,11 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Parse the given <code>expression String</code> into an IExpr and evaluate it.
 	 *
-	 * @param expression an expression in math formula notation
+	 * @param expression
+	 *            an expression in math formula notation
 	 * @return
-	 * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
 	 */
 	final public IExpr evaluate(String expression) {
 		return evaluate(parse(expression));
@@ -1664,19 +1675,23 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Parse the given <code>expression String</code> into an IExpr and evaluate it.
 	 *
-	 * @param expression    an expression in math formula notation
-	 * @param explicitTimes if <code>true</code> require times operator &quot;*&quot;
+	 * @param expression
+	 *            an expression in math formula notation
+	 * @param explicitTimes
+	 *            if <code>true</code> require times operator &quot;*&quot;
 	 * @return
-	 * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
 	 */
 	final public IExpr evaluate(String expression, boolean explicitTimes) {
 		return evaluate(parse(expression, explicitTimes));
 	}
 	/**
-	 * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric mode to the
-	 * value stored before the evaluation starts. If evaluation is not possible return the input object.
+	 * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric
+	 * mode to the value stored before the evaluation starts. If evaluation is not possible return the input object.
 	 *
-	 * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
 	 * @return the evaluated object
 	 */
 	public final IExpr evaluateNonNumeric(final IExpr expr) {
@@ -1692,10 +1707,11 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 *
-	 * Evaluate an object and reset the numeric mode to the value before the evaluation step. If evaluation is not possible return
-	 * <code>F.NIL</code>.
+	 * Evaluate an object and reset the numeric mode to the value before the evaluation step. If evaluation is not
+	 * possible return <code>F.NIL</code>.
 	 *
-	 * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
 	 * @return the evaluated object or <code>F.NIL</code> if no evaluation was possible
 	 */
 	public final IExpr evaluateNull(final IExpr expr) {
@@ -1708,10 +1724,11 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Evaluate an object without resetting the numeric mode after the evaluation step. If evaluation is not possible return the input
-	 * object,
+	 * Evaluate an object without resetting the numeric mode after the evaluation step. If evaluation is not possible
+	 * return the input object,
 	 *
-	 * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
 	 * @return the evaluated object
 	 *
 	 */
@@ -1945,8 +1962,9 @@ public class EvalEngine implements Serializable {
 		return fOnOffMode;
 	}
 	/**
-	 * Check if the appending of expressions to the history list for the <code>Out[]</code> function is enabled. If enabled, the special
-	 * variable <code>$ans</code> returns the result from the last evluation done with this evaluation engine.
+	 * Check if the appending of expressions to the history list for the <code>Out[]</code> function is enabled. If
+	 * enabled, the special variable <code>$ans</code> returns the result from the last evluation done with this
+	 * evaluation engine.
 	 *
 	 * @return
 	 */
@@ -1959,7 +1977,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are shown in the evaluation).
+	 * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are shown in the
+	 * evaluation).
 	 *
 	 * @return
 	 * @see org.matheclipse.core.builtin.function.Quiet
@@ -1991,8 +2010,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * If the trace mode is set the system writes an evaluation trace list or if additionally the <i>stop after evaluation mode</i> is
-	 * set returns the first evaluated result.
+	 * If the trace mode is set the system writes an evaluation trace list or if additionally the <i>stop after
+	 * evaluation mode</i> is set returns the first evaluated result.
 	 *
 	 * @return
 	 */
@@ -2010,10 +2029,12 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Parse the given <code>expression String</code> into an IExpr without evaluation.
 	 *
-	 * @param expression an expression in math formula notation
+	 * @param expression
+	 *            an expression in math formula notation
 	 *
 	 * @return
-	 * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
 	 */
 	final public IExpr parse(String expression) {
 		return parse(expression, Config.EXPLICIT_TIMES_OPERATOR);
@@ -2024,10 +2045,13 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Parse the given <code>expression String</code> into an IExpr without evaluation.
 	 *
-	 * @param expression    an expression in math formula notation
-	 * @param explicitTimes if <code>true</code> require times operator &quot;*&quot;
+	 * @param expression
+	 *            an expression in math formula notation
+	 * @param explicitTimes
+	 *            if <code>true</code> require times operator &quot;*&quot;
 	 * @return
-	 * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
 	 */
 
 	final public IExpr parse(String expression, boolean explicitTimes) {
@@ -2039,7 +2063,8 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Print a message to the <code>Out</code> stream, if the engine is not in &quot;quiet mode&quot;.
 	 *
-	 * @param str the message which should be printed
+	 * @param str
+	 *            the message which should be printed
 	 */
 	public IAST printMessage(String str) {
 		if (!isQuietMode()) {
@@ -2141,10 +2166,12 @@ public class EvalEngine implements Serializable {
 
 	/**
 	 *
-	 * @param outListDisabled if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no history
-	 *                        of the last calculations will be saved and the <code>Out()</code> function (or % operator) will be
-	 *                        unevaluated.
-	 * @param historyCapacity the number of last entries of the calculations which should be stored.
+	 * @param outListDisabled
+	 *            if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no
+	 *            history of the last calculations will be saved and the <code>Out()</code> function (or % operator)
+	 *            will be unevaluated.
+	 * @param historyCapacity
+	 *            the number of last entries of the calculations which should be stored.
 	 */
 	public void setOutListDisabled(boolean outListDisabled, int historyCapacity) {
 		if (outListDisabled == false) {
@@ -2160,10 +2187,13 @@ public class EvalEngine implements Serializable {
 	/**
 	 * Set the mode for the <code>On()</code> or <code>Off()</code> function
 	 *
-	 * @param onOffMode      if <code>true</code> every evaluation step will be printd to the defined out stream.
-	 * @param headSymbolsMap the header symbols which should trigger an output in the trace
-	 * @param uniqueTrace    the output is printed only once for a combination of _unevaluated_ input expression and _evaluated_ output
-	 *                       expression.
+	 * @param onOffMode
+	 *            if <code>true</code> every evaluation step will be printd to the defined out stream.
+	 * @param headSymbolsMap
+	 *            the header symbols which should trigger an output in the trace
+	 * @param uniqueTrace
+	 *            the output is printed only once for a combination of _unevaluated_ input expression and _evaluated_
+	 *            output expression.
 	 */
 	public void setOnOffMode(final boolean onOffMode, IdentityHashMap<ISymbol, ISymbol> headSymbolsMap,
 			boolean uniqueTrace) {
@@ -2188,7 +2218,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are showw in the evaluation).
+	 * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are showw in the
+	 * evaluation).
 	 *
 	 * @param quietMode
 	 */
@@ -2198,7 +2229,8 @@ public class EvalEngine implements Serializable {
 
 
 	/**
-	 * @param reapList the reapList to set
+	 * @param reapList
+	 *            the reapList to set
 	 */
 	public void setReapList(java.util.List<IExpr> reapList) {
 		this.fReapList = reapList;
@@ -2212,7 +2244,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * @param fRelaxedSyntax the fRelaxedSyntax to set
+	 * @param fRelaxedSyntax
+	 *            the fRelaxedSyntax to set
 	 */
 	public void setRelaxedSyntax(boolean fRelaxedSyntax) {
 		this.fRelaxedSyntax = fRelaxedSyntax;
@@ -2229,10 +2262,12 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Set the step listener for this evaluation engine. The method also calls <code>setTraceMode(true)</code> to enable the trace mode.
-	 * The caller is responsible for calling <code>setTraceMode(false)</code> if no further listening is desirable.
+	 * Set the step listener for this evaluation engine. The method also calls <code>setTraceMode(true)</code> to enable
+	 * the trace mode. The caller is responsible for calling <code>setTraceMode(false)</code> if no further listening is
+	 * desirable.
 	 *
-	 * @param stepListener the listener which should listen to the evaluation steps.
+	 * @param stepListener
+	 *            the listener which should listen to the evaluation steps.
 	 */
 	public void setStepListener(IEvalStepListener stepListener) {
 		setTraceMode(true);
@@ -2240,14 +2275,16 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * @param stopRequested The stopRequested to set.
+	 * @param stopRequested
+	 *            The stopRequested to set.
 	 */
 	public void setStopRequested(final boolean stopRequested) {
 		fStopRequested = stopRequested;
 	}
 
 	/**
-	 * Throw an <code>IllegalArgument</code> exception if an error message is printed in method <code>printMessage()</code>.
+	 * Throw an <code>IllegalArgument</code> exception if an error message is printed in method
+	 * <code>printMessage()</code>.
 	 *
 	 * @param throwError
 	 */
@@ -2279,8 +2316,8 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
-	 * Thread through all lists in the arguments of the IAST (i.e. the ast's head has the attribute <code>ISymbol.LISTABLE</code>)
-	 * example: <code>Sin[{2,x,Pi}] ==> {Sin[2],Sin[x],Sin[Pi]}</code>
+	 * Thread through all lists in the arguments of the IAST (i.e. the ast's head has the attribute
+	 * <code>ISymbol.LISTABLE</code>) example: <code>Sin[{2,x,Pi}] ==> {Sin[2],Sin[x],Sin[Pi]}</code>
 	 *
 	 * @param ast
 	 * @return the resulting ast with the <code>argHead</code> threaded into each ast argument or <code>F.NIL</code>
