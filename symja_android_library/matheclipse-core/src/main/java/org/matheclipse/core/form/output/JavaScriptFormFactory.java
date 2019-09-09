@@ -44,6 +44,10 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		FUNCTIONS_STR.put(F.Tan, "Math.tan");
 		FUNCTIONS_STR.put(F.Tanh, "Math.tanh");
 
+//		FUNCTIONS_STR.put(F.Cot, "cot");
+//		FUNCTIONS_STR.put(F.Coth, "coth");
+//		FUNCTIONS_STR.put(F.ArcCot, "arccot");
+//		FUNCTIONS_STR.put(F.ArcCoth, "arccoth");
 	}
 
 	private JavaScriptFormFactory(final boolean relaxedSyntax, final boolean reversed, int exponentFigures,
