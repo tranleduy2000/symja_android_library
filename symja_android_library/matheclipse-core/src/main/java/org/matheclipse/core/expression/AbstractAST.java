@@ -1214,6 +1214,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		final IExpr head = head();
 		if (head.isCoreFunctionSymbol()) {
+			IBuiltInSymbol header = ((IBuiltInSymbol) head);
+			if ((header.getAttributes() & ISymbol.SEQUENCEHOLD) != ISymbol.SEQUENCEHOLD) {
+				IExpr temp;
+				if ((temp = engine.flattenSequences(this)).isPresent()) {
+					return temp;
+				}
+			}
 			ICoreFunctionEvaluator functionEvaluator = (ICoreFunctionEvaluator) ((IBuiltInSymbol) head).getEvaluator();
 			int[] expected;
 			if ((expected = functionEvaluator.expectedArgSize()) != null) {
