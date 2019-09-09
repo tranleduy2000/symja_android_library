@@ -5510,21 +5510,17 @@ public final class Arithmetic {
 					}
 				}
 				if (arg1.isRational()) {
-					if (exponent2.isNegative()) {
-						IExpr temp = timesPowerPower(((IRational) arg1).numerator(), ((IRational) arg1).denominator(),
-								F.C1, //
-								((IRational) base2).denominator(), ((IRational) base2).numerator(),
-								(IFraction) exponent2.negate(), false);
+					IExpr temp = timesRationalPower((IRational) arg1, base2, exponent2);
 						if (temp.isPresent()) {
 							return temp;
 						}
-					} else {
-						IExpr temp = timesPowerPower(((IRational) arg1).numerator(), ((IRational) arg1).denominator(),
-								F.C1, //
-								((IRational) base2).numerator(), ((IRational) base2).denominator(),
-								(IFraction) exponent2, false);
+				} else if (arg1.isComplex() && ((IComplex) arg1).getRealPart().isZero()) {
+					IComplex complex1 = (IComplex) arg1;
+					IRational complex1Im = complex1.getImaginaryPart();
+					if (!complex1Im.isOne() && !complex1Im.isMinusOne()) {
+						IExpr temp = timesRationalPower(complex1Im, base2, exponent2);
 						if (temp.isPresent()) {
-							return temp;
+							return F.Times(F.CI, temp);
 						}
 					}
 				}
@@ -5564,7 +5560,35 @@ public final class Arithmetic {
 			if (arg1.isRational() && !exponent2.isNumber()) {
 				return timesPowerPower(arg1, F.C1, base2, exponent2);
                 }
+			return F.NIL;
+		}
 
+		/**
+		 * Evaluate <code>&lt;rational-arg1&gt; * base2 ^ exponent2</code>
+		 *
+		 * @param rationalArg1
+		 * @param base2
+		 * @param exponent2
+		 * @return
+		 */
+		private IExpr timesRationalPower(final IRational rationalArg1, IExpr base2, IExpr exponent2) {
+			if (exponent2.isNegative()) {
+				IExpr temp = timesPowerPower(((IRational) rationalArg1).numerator(),
+						((IRational) rationalArg1).denominator(), F.C1, //
+						((IRational) base2).denominator(), ((IRational) base2).numerator(),
+						(IFraction) exponent2.negate(), false);
+				if (temp.isPresent()) {
+					return temp;
+				}
+			} else {
+				IExpr temp = timesPowerPower(((IRational) rationalArg1).numerator(),
+						((IRational) rationalArg1).denominator(), F.C1, //
+						((IRational) base2).numerator(), ((IRational) base2).denominator(), (IFraction) exponent2,
+						false);
+				if (temp.isPresent()) {
+					return temp;
+				}
+			}
             return F.NIL;
         }
 

@@ -10,6 +10,7 @@ import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.visit.VisitorReplaceAllDFS;
 
 /**
  * <pre>
@@ -43,23 +44,26 @@ public class TrigToExp extends AbstractEvaluator {
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
-			if (temp.isPresent()) {
-				return temp;
-			}
+		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
+		if (temp.isPresent()) {
+			return temp;
+		}
 
 		IExpr arg1 = ast.arg1();
-		return arg1.replaceAll(new Function<IExpr, IExpr>() {
+		Function<IExpr, IExpr> fun = new Function<IExpr, IExpr>() {
 			@Override
 			public IExpr apply(IExpr x) {
 				IExpr t = x.rewrite(ID.Exp);
 				if (!t.isPresent()) {
-					t = x.rewrite(ID.Log);
+					return x.rewrite(ID.Log);
 				}
-				return t;
+				return t.rewrite(ID.Log).orElse(t);
 			}
-		}).orElse(arg1);
+		};
+		VisitorReplaceAllDFS dfs = new VisitorReplaceAllDFS(fun, 1);
+		return arg1.accept(dfs).orElse(arg1);
 	}
+
 	@Override
 	public int[] expectedArgSize() {
 		return IOFunctions.ARGS_1_1;

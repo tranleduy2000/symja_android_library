@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class VisitorReplaceAll extends VisitorExpr {
 	final Function<IExpr, IExpr> fFunction;
+	Function<IASTMutable, IExpr> fPostProcessing;
 	final int fOffset;
 
 	public VisitorReplaceAll(Function<IExpr, IExpr> function) {
@@ -189,10 +190,25 @@ public class VisitorReplaceAll extends VisitorExpr {
 				}
 				i++;
 			}
-		return result;
+				return postProcessing(result);
 	}
 			i++;
 		}
 		return F.NIL;
+	}
+	private IExpr postProcessing(IASTMutable result) {
+		if (fPostProcessing != null) {
+			return fPostProcessing.apply(result);
+		}
+		return result;
+	}
+
+	/**
+	 * Define an optional post-processing function for the result of a substitution.
+	 *
+	 * @param postProcessing
+	 */
+	public void setPostProcessing(Function<IASTMutable, IExpr> postProcessing) {
+		this.fPostProcessing = postProcessing;
 	}
 }
