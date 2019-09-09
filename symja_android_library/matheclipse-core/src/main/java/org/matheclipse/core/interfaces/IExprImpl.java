@@ -3367,6 +3367,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return defaultValue;
     }
 
+    @Override
+    public int toIntDefault() {
+        return toIntDefault(Integer.MIN_VALUE);
+    }
+
     /**
      * The 'highest level' head of the expression, before Symbol, Integer, Real or String. for example while the head of
      * a[b][c] is a[b], the top head is a.

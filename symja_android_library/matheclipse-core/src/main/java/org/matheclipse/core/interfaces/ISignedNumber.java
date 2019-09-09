@@ -208,6 +208,41 @@ public interface ISignedNumber extends INumber {
      * @throws ArithmeticException if conversion to <code>int</code> is not possible.
      */
     int toInt() throws ArithmeticException;
+    /**
+     * This real number is in the interval <code>[from, to]</code> inclusive
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    boolean isRange(ISignedNumber from, ISignedNumber to);
+
+    /**
+     * This real number is in the interval <code>]from, to[</code> exclusive
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+     boolean isRangeExclExcl(ISignedNumber from, ISignedNumber to);
+
+    /**
+     * This real number is in the interval <code>]from, to]</code>
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    boolean isRangeExclIncl(ISignedNumber from, ISignedNumber to);
+
+    /**
+     * This real number is in the interval <code>]from, to]</code>
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    boolean isRangeInclExcl(ISignedNumber from, ISignedNumber to);
 
     /**
      * Converts this number to <code>long</code>; unlike {@link #longValue} this method raises

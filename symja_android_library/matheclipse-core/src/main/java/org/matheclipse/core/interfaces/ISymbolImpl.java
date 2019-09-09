@@ -2,6 +2,7 @@ package org.matheclipse.core.interfaces;
 
 import com.duy.lambda.DoubleFunction;
 
+import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 
@@ -33,6 +34,24 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
 
     public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
         return F.NIL;
+    }
+
+    @Override
+    public IExpr of(Number... args) {
+        IExpr[] array = new IExpr[args.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = Object2Expr.convert(args[i]);
+        }
+        return of(array);
+    }
+
+    @Override
+    public IExpr of(Boolean... args) {
+        IExpr[] array = new IExpr[args.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = args[i].booleanValue() ? F.True : F.False;
+        }
+        return of(array);
     }
 
     @Override

@@ -399,6 +399,10 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      */
     public IExpr of(EvalEngine engine, IExpr... args);
 
+    IExpr of(Number... args);
+
+    IExpr of(Boolean... args);
+
     /**
      * This method returns <code>F.NIL</code> if no evaluation was possible. Evaluate this symbol for the arguments as
      * function <code>symbol(arg1, arg2, .... ,argN)</code>.

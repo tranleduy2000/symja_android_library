@@ -3,6 +3,7 @@ package org.matheclipse.core.convert;
 import com.duy.lambda.IntFunction;
 import com.gx.common.util.concurrent.AtomicDouble;
 
+import org.apfloat.Apfloat;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.AST;
 import org.matheclipse.core.expression.ASTRealMatrix;
@@ -13,8 +14,6 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -64,35 +63,7 @@ public class Object2Expr {
 			return ((Boolean) obj).booleanValue() ? F.True : F.False;
 			}
 		if (obj instanceof Number) {
-		if (obj instanceof BigInteger) {
-			return F.integer((BigInteger) obj);
-		}
-			if (obj instanceof BigDecimal) {
-				return F.num(((BigDecimal) obj).doubleValue());
-			}
-
-			if (obj instanceof Double) {
-				return F.num(((Double) obj).doubleValue());
-			}
-			if (obj instanceof Integer) {
-				return F.num(((Integer) obj).longValue());
-			}
-			if (obj instanceof Long) {
-				return F.num(((Long) obj).longValue());
-			}
-			if (obj instanceof AtomicDouble) {
-				return F.num(((AtomicDouble) obj).doubleValue());
-			}
-			if (obj instanceof AtomicInteger) {
-				return F.ZZ(((AtomicInteger) obj).longValue());
-			}
-			if (obj instanceof AtomicLong) {
-				return F.ZZ(((AtomicLong) obj).longValue());
-			}
-			if (obj instanceof Float) {
-				return F.num(((Float) obj).doubleValue());
-			}
-			return F.num(((Number) obj).doubleValue());
+			return convert((Number) obj);
 		}
 		if (obj instanceof String) {
 			final ExprParser parser = new ExprParser(EvalEngine.get());
@@ -149,6 +120,36 @@ public class Object2Expr {
 		return F.$str(obj.toString());
 	}
 
+	private static IExpr convert(Number n) {
+		if (n instanceof Integer) {
+			return F.ZZ(((Integer) n).longValue());
+		}
+		if (n instanceof Double) {
+			return F.num(((Double) n).doubleValue());
+		}
+		if (n instanceof Long) {
+			return F.ZZ(((Long) n).longValue());
+		}
+		if (n instanceof BigInteger) {
+			return F.integer((BigInteger) n);
+		}
+		if (n instanceof BigDecimal) {
+			return F.num(new Apfloat(((BigDecimal) n).doubleValue()));
+		}
+		if (n instanceof Float) {
+			return F.num(((Float) n).doubleValue());
+		}
+		if (n instanceof AtomicDouble) {
+			return F.num(((AtomicDouble) n).doubleValue());
+		}
+		if (n instanceof AtomicInteger) {
+			return F.ZZ(((AtomicInteger) n).longValue());
+		}
+		if (n instanceof AtomicLong) {
+			return F.ZZ(((AtomicLong) n).longValue());
+		}
+		return F.num(((Number) n).doubleValue());
+	}
 	public static IExpr convertList(java.util.Collection<?> lst) {
 		if (lst.size() == 0) {
 			return List();

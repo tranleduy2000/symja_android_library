@@ -136,4 +136,28 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
 
     @Override
     public abstract ISignedNumber opposite();
+
+    @Override
+    public boolean isRange(ISignedNumber from, ISignedNumber to) {
+        return isGE(from) && isLE(to);
+
+    }
+
+    @Override
+    public boolean isRangeExclExcl(ISignedNumber from, ISignedNumber to) {
+        return isGT(from) && isLT(to);
+
+    }
+
+    @Override
+    public boolean isRangeExclIncl(ISignedNumber from, ISignedNumber to) {
+        return isGT(from) && isLE(to);
+
+    }
+
+    @Override
+    public boolean isRangeInclExcl(ISignedNumber from, ISignedNumber to) {
+        return isGE(from) && isLT(to);
+
+    }
 }

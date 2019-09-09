@@ -2312,6 +2312,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     int toIntDefault(int Value);
 
     /**
+     * Converts this number to an <code>int</code> value; unlike {@link #intValue} this method returns
+     * <code>Integer.MIN_VALUE</code> if the value of this integer isn't in the range <code>Integer.MIN_VALUE</code> to
+     * <code>Integer.MAX_VALUE</code> or the expression is not convertible to the <code>int</code> range.
+     *
+     * @return the numeric value represented by this integer after conversion to type <code>int</code>.
+     */
+    int toIntDefault();
+
+    /**
      * The 'highest level' head of the expression, before Symbol, Integer, Real or String. for example while the head of
      * a[b][c] is a[b], the top head is a.
      *

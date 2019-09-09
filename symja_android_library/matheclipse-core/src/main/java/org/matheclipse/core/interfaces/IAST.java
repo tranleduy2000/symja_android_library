@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ *
  * <p>
  * (I)nterface for the (A)bstract (S)yntax (T)ree of a given function.
  * </p>
@@ -27,14 +28,14 @@ import java.util.Set;
  * implicit in the tree structure, and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by
  * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
- * <p>
+ *
  * Internally an AST is represented as a list which contains
  * <ul>
  * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
  * <code>0</code> and</li>
  * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
- * <p>
+ *
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>,
  * <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
