@@ -650,7 +650,8 @@ public class Algebra {
 
 		/**
 		 *
-		 * @param powerTimesAST an <code>Times[...] or Power[...]</code> AST, where common factors should be canceled out.
+		 * @param powerTimesAST
+		 *            an <code>Times[...] or Power[...]</code> AST, where common factors should be canceled out.
 		 * @return <code>F.NIL</code> is no evaluation was possible
 		 * @throws JASConversionException
 		 */
@@ -1531,7 +1532,8 @@ public class Algebra {
 			}
 
 			/**
-			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to Integer.MAX_VALUE.
+			 * Expand <code>(a+b)^i</code> with <code>i</code> an integer number in the range Integer.MIN_VALUE to
+			 * Integer.MAX_VALUE.
 			 *
 			 * @param powerAST
 			 * @return
@@ -2395,6 +2397,28 @@ public class Algebra {
 				result.append(jas.integerPoly2Expr(iPoly));
 				return result;
 			} catch (JASConversionException e1) {
+//				try {
+//					if (variableList.isAST1()) {
+//						IAST list = PolynomialFunctions.rootsOfExprPolynomial(expr, variableList, true);
+//						if (list.isList()) {
+//							IExpr x = variableList.arg1();
+//							IASTAppendable result = F.TimesAlloc(list.size());
+//							list.forEach(arg -> result.append(F.Plus(x, arg)));
+//							// for (int i = 1; i < list.size(); i++) {
+//							// result.append(F.Plus(x, list.get(i)));
+//							// }
+//							return result;
+//						}
+//					}
+//				} catch (ClassCastException e2) {
+//					if (Config.SHOW_STACKTRACE) {
+//						e2.printStackTrace();
+//					}
+//				} catch (JASConversionException e2) {
+//					if (Config.SHOW_STACKTRACE) {
+//						e2.printStackTrace();
+//					}
+//				}
 
 			}
 			return ast.arg1();
@@ -2456,8 +2480,8 @@ public class Algebra {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * works like <code>Simplify</code> but additionally tries some <code>FunctionExpand</code> rule transformations to simplify
-	 * <code>expr</code>.
+	 * works like <code>Simplify</code> but additionally tries some <code>FunctionExpand</code> rule transformations to
+	 * simplify <code>expr</code>.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -4844,7 +4868,7 @@ public class Algebra {
 			if (temp.isAST()) {
 				IExpr result = togetherPlusTimesPower((IAST) temp, engine);
 				if (result.isPresent()) {
-					return F.eval(result);
+					return engine.evaluate(result);
 				}
 			}
 			if (evaled) {
@@ -4855,7 +4879,8 @@ public class Algebra {
 
 		/**
 		 *
-		 * @param plusAST a <code>Plus[...]</code> expresion
+		 * @param plusAST
+		 *            a <code>Plus[...]</code> expresion
 		 * @return <code>null</code> couldn't be transformed by <code>ExpandAll(()</code> od <code>togetherAST()</code>
 		 */
 		private static IExpr togetherPlus(final IAST plusAST) {
@@ -4992,7 +5017,7 @@ public class Algebra {
 						result = togetherPower(ast, result, engine);
 					}
 					if (result.isPresent()) {
-						IExpr temp = F.eval(result);
+						IExpr temp = engine.evaluate(result);
 						if (temp.isTimes() || temp.isPower()) {
 							return Cancel.togetherPowerTimes(temp).orElse(temp);
 						}

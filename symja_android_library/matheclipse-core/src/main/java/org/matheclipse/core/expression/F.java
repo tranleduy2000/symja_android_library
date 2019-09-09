@@ -8326,7 +8326,7 @@ public class F {
      *
      * @return
      */
-    public static IAST Times() {
+    public static IASTAppendable Times() {
         return ast(Times);
     }
 
