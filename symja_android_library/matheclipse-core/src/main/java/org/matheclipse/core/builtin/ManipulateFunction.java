@@ -271,10 +271,11 @@ public class ManipulateFunction {
 
 				variable.append("var ");
 				variable.append(sliderSymbol);
-				// variable.append(" = getVariable( id, '");
-				variable.append(" = document.getElementById( id + '");
+				// variable.append(" = document.getElementById( id + '");
+				variable.append(" = getVariable(id, '");
 				variable.append(sliderSymbol);
-				variable.append("' ).value;\n");
+				// variable.append("' ).value;\n");
+				variable.append("');\n");
 				return true;
 			}
 			return false;
@@ -320,10 +321,11 @@ public class ManipulateFunction {
 				variable.append("var ");
 				variable.append(sliderSymbol);
 
-				// variable.append(" = getVariable( id, '");
-				variable.append(" = document.getElementById( id + '");
+				// variable.append(" = document.getElementById( id + '");
+				variable.append(" = getVariable(id, '");
 				variable.append(sliderSymbol);
-				variable.append("' ).value;\n");
+				// variable.append("' ).value;\n");
+				variable.append("');\n");
 				js = js.replace("`2`", variable.toString());
 
 				js = js.replace("`3`", "");
