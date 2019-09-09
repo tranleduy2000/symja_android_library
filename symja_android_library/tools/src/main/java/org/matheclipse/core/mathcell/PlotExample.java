@@ -18,7 +18,7 @@ public class PlotExample {
 					"\n" + //
 					"<body>\n" + //
 					"\n" + //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.1/build/math.js\"></script>" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.2/build/math.js\"></script>" + //
 					"\n" + //
 					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.7.0/build/mathcell.js\"></script>\n"
 					+ //
@@ -51,9 +51,10 @@ public class PlotExample {
 		try {
 			Config.USE_MATHCELL=true;
 			ExprEvaluator util = new ExprEvaluator();
-			//Cot(x)+ArcCot(x)
 			IExpr result = util.eval(
-					"Manipulate(Plot(Sin(a*x + b), {x, 0, 6}), {{a, 2, \"Multiplier\"}, 1, 4}, {{b, 0, \"Phase\"}, 0, 10})");
+					"Plot3D(Sin(x + y^2), {x, -3, 3}, {y, -2, 2})");
+//			IExpr result = util.eval(
+//					"Manipulate(Plot(Sin(a*x + b), {x, 0, 6}), {{a, 2, \"Multiplier\"}, 1, 4}, {{b, 0, \"Phase\"}, 0, 10})");
 			// IExpr result = util.eval("Manipulate(Plot({Sin(a*x+b),Cos(a*x+b)}, {x, -3*Pi, 3*Pi} ),{a,1,3},{b,1,3})");
 			// IExpr result = util.eval("Manipulate(Plot(Sin(x)*Cos(1 + a*x), {x, 0, 2*Pi}), {a,0,10})");
 			if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {
