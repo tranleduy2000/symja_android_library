@@ -221,6 +221,11 @@ public class F {
     public final static IBuiltInSymbol AddTo = F.initFinalSymbol("AddTo", ID.AddTo);
     /** AdjacencyMatrix(graph) - convert the `graph` into a adjacency matrix.*/
     public final static IBuiltInSymbol AdjacencyMatrix = F.initFinalSymbol("AdjacencyMatrix", ID.AdjacencyMatrix);
+	/***/
+	public final static IBuiltInSymbol AiryAi = F.initFinalSymbol("AiryAi", ID.AiryAi);
+
+	/***/
+	public final static IBuiltInSymbol AiryBi = F.initFinalSymbol("AiryBi", ID.AiryBi);
     /***/
     public final static IBuiltInSymbol AlgebraicNumber = F.initFinalSymbol("AlgebraicNumber", ID.AlgebraicNumber);
     /***/
@@ -432,7 +437,7 @@ public class F {
     public final static IBuiltInSymbol ByteArrayQ = F.initFinalSymbol("ByteArrayQ", ID.ByteArrayQ);
 	/***/
 	public final static IBuiltInSymbol ByteCount = F.initFinalSymbol("ByteCount", ID.ByteCount);
-	/***/
+	/** C(n) - represents the `n`-th constant in a solution to a differential equation. */
 	public final static IBuiltInSymbol C = F.initFinalSymbol("C", ID.C);
 	/** CDF(distribution, value) - returns the cumulative distribution function of `value`. */
     public final static IBuiltInSymbol CDF = F.initFinalSymbol("CDF", ID.CDF);
@@ -1058,6 +1063,11 @@ public class F {
     public final static IBuiltInSymbol HamiltonianGraphQ = F.initFinalSymbol("HamiltonianGraphQ", ID.HamiltonianGraphQ);
     /***/
     public final static IBuiltInSymbol HammingWindow = F.initFinalSymbol("HammingWindow", ID.HammingWindow);
+	/***/
+	public final static IBuiltInSymbol HankelH1 = F.initFinalSymbol("HankelH1", ID.HankelH1);
+
+	/***/
+	public final static IBuiltInSymbol HankelH2 = F.initFinalSymbol("HankelH2", ID.HankelH2);
     /***/
     public final static IBuiltInSymbol HannWindow = F.initFinalSymbol("HannWindow", ID.HannWindow);
 	/***/
@@ -1292,7 +1302,7 @@ public class F {
     public final static IBuiltInSymbol LaplaceTransform = F.initFinalSymbol("LaplaceTransform", ID.LaplaceTransform);
 	/** Last(expr) - returns the last element in `expr`. */
     public final static IBuiltInSymbol Last = F.initFinalSymbol("Last", ID.Last);
-    /***/
+	/** LeafCount(expr) - returns the total number of indivisible subexpressions in `expr`. */
     public final static IBuiltInSymbol LeafCount = F.initFinalSymbol("LeafCount", ID.LeafCount);
 	/** LeastSquares(matrix, right) - solves the linear least-squares problem 'matrix . x = right'. */
     public final static IBuiltInSymbol LeastSquares = F.initFinalSymbol("LeastSquares", ID.LeastSquares);
@@ -1401,7 +1411,10 @@ public class F {
      * or vertical moves in the grid like Manhattan city layout to get from `u` to `v`.
      */
     public final static IBuiltInSymbol ManhattanDistance = F.initFinalSymbol("ManhattanDistance", ID.ManhattanDistance);
-    /** Manipulate(plot, {x, min, max}) - generate a JavaScript control for the expression `plot` which can be manipulated by a range slider `{x, min, max}`.*/
+	/**
+	 * Manipulate(plot, {x, min, max}) - generate a JavaScript control for the expression `plot` which can be
+	 * manipulated by a range slider `{x, min, max}`.
+	 */
     public final static IBuiltInSymbol Manipulate = F.initFinalSymbol("Manipulate", ID.Manipulate);
     /***/
     public final static IBuiltInSymbol MantissaExponent = F.initFinalSymbol("MantissaExponent", ID.MantissaExponent);
@@ -1581,7 +1594,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol NegativeLexicographic = F.initFinalSymbol("NegativeLexicographic", ID.NegativeLexicographic);
 
-    /** Nest(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns the final result.*/
+	/** Nest(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns the final result. */
     public final static IBuiltInSymbol Nest = F.initFinalSymbol("Nest", ID.Nest);
     /**
      * NestList(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns a list of all
@@ -2138,6 +2151,17 @@ public class F {
     public final static IBuiltInSymbol Sow = F.initFinalSymbol("Sow", ID.Sow);
 	/** Span - is the head of span ranges like `1;;3`. */
     public final static IBuiltInSymbol Span = F.initFinalSymbol("Span", ID.Span);
+	/***/
+	public final static IBuiltInSymbol SphericalBesselJ = F.initFinalSymbol("SphericalBesselJ", ID.SphericalBesselJ);
+
+	/***/
+	public final static IBuiltInSymbol SphericalBesselY = F.initFinalSymbol("SphericalBesselY", ID.SphericalBesselY);
+
+	/***/
+	public final static IBuiltInSymbol SphericalHankelH1 = F.initFinalSymbol("SphericalHankelH1", ID.SphericalHankelH1);
+
+	/***/
+	public final static IBuiltInSymbol SphericalHankelH2 = F.initFinalSymbol("SphericalHankelH2", ID.SphericalHankelH2);
 	/** Split(list) - splits `list` into collections of consecutive identical elements. */
     public final static IBuiltInSymbol Split = F.initFinalSymbol("Split", ID.Split);
     /**
