@@ -4206,10 +4206,18 @@ public final class Arithmetic {
 						res[0].append(F.Sign(res[1]));
 					}
 					return res[0];
-				}
-			} else if (arg1.isPower() && arg1.exponent().isReal()) {
-				return F.Power(F.Sign(arg1.base()), arg1.exponent());
-			}
+                }
+            } else if (arg1.isPower()) {
+                if (arg1.exponent().isReal()) {
+                    return F.Power(F.Sign(arg1.base()), arg1.exponent());
+                }
+                if (arg1.base().isE()) {
+                    // E^z   == >   E^(I*Im(z))
+                    return F.Power(F.E, F.Times(F.CI, F.Im(arg1.exponent())));
+                }
+            } else if (arg1.isAST(F.Sign, 2)) {
+                return arg1;
+            }
 			if (AbstractAssumptions.assumeNegative(arg1)) {
 				return F.CN1;
 			}

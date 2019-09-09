@@ -26,14 +26,14 @@ public enum QuantityParser {
                 return IQuantityStatic.of( //
                         F.fromString(string.substring(0, index)), //
                         IUnitStatic.of(string.substring(index + 1, last)));
-            throw new RuntimeException(string);
+            throw new IllegalArgumentException(string);
         }
         try {
             EvalEngine engine = new EvalEngine(true);
             return engine.evaluate(string, true);
         } catch (RuntimeException rex) {
             rex.printStackTrace();
-            throw new RuntimeException(string);
+            throw new IllegalArgumentException(string);
         }
     }
 

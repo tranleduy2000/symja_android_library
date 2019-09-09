@@ -1367,10 +1367,10 @@ public class F {
 
     /***/
 	public final static IBuiltInSymbol ListLinePlot = F.initFinalSymbol("ListLinePlot", ID.ListLinePlot);
-    /***/
+    /** ListPlot( { list-of-points } ) - generate a JavaScript list plot control for the `list-of-points`.*/
     public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
 
-    /***/
+    /** ListPlot3D( { list-of-points } ) - generate a JavaScript list plot 3D control for the `list-of-points`.*/
     public final static IBuiltInSymbol ListPlot3D = F.initFinalSymbol("ListPlot3D", ID.ListPlot3D);
     /** ListQ(expr) - tests whether `expr` is a `List`.*/
     public final static IBuiltInSymbol ListQ = F.initFinalSymbol("ListQ", ID.ListQ);
@@ -1470,6 +1470,8 @@ public class F {
 	/** Max(e_1, e_2, ..., e_i) - returns the expression with the greatest value among the `e_i`. */
     public final static IBuiltInSymbol Max = F.initFinalSymbol("Max", ID.Max);
     /***/
+    public final static IBuiltInSymbol MaxFilter = F.initFinalSymbol("MaxFilter", ID.MaxFilter);
+    /***/
     public final static IBuiltInSymbol MaxIterations = F.initFinalSymbol("MaxIterations", ID.MaxIterations);
     /***/
     public final static IBuiltInSymbol MaxPoints = F.initFinalSymbol("MaxPoints", ID.MaxPoints);
@@ -1478,9 +1480,13 @@ public class F {
 	/** Mean(list) - returns the statistical mean of `list`. */
     public final static IBuiltInSymbol Mean = F.initFinalSymbol("Mean", ID.Mean);
     /***/
+    public final static IBuiltInSymbol MeanFilter = F.initFinalSymbol("MeanFilter", ID.MeanFilter);
+    /***/
     public final static IBuiltInSymbol MeanDeviation = F.initFinalSymbol("MeanDeviation", ID.MeanDeviation);
 	/** Median(list) - returns the median of `list`. */
     public final static IBuiltInSymbol Median = F.initFinalSymbol("Median", ID.Median);
+    /***/
+    public final static IBuiltInSymbol MedianFilter = F.initFinalSymbol("MedianFilter", ID.MedianFilter);
     /***/
     public final static IBuiltInSymbol MeijerG = F.initFinalSymbol("MeijerG", ID.MeijerG);
 	/** MemberQ(list, pattern) - returns `True` if pattern matches any element of `list`, or `False` otherwise. */
@@ -1511,6 +1517,8 @@ public class F {
     public final static IBuiltInSymbol Method = F.initFinalSymbol("Method", ID.Method);
 	/** Min(e_1, e_2, ..., e_i) - returns the expression with the lowest value among the `e_i`. */
     public final static IBuiltInSymbol Min = F.initFinalSymbol("Min", ID.Min);
+    /***/
+    public final static IBuiltInSymbol MinFilter = F.initFinalSymbol("MinFilter", ID.MinFilter);
     /***/
     public final static IBuiltInSymbol MinimalPolynomial = F.initFinalSymbol("MinimalPolynomial", ID.MinimalPolynomial);
 	/** Minimize(unary-function, variable) - returns the minimum of the unary function for the given `variable`. */

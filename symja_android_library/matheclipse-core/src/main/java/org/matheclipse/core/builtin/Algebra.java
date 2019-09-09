@@ -4527,6 +4527,9 @@ public class Algebra {
 			if (arg1.isAtom() && ast.isAST1()) {
 				return arg1;
 			}
+			if (arg1.isList()) {
+				return ((IAST) arg1).mapThread(ast, 1);
+			}
 
 			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
 			if (result != null) {
@@ -5203,7 +5206,7 @@ public class Algebra {
 		}
 		IAST localAST = ast;
 		IAST tempAST = F.NIL;
-		if ((localAST.getEvalFlags() & IAST.IS_SORTED) != IAST.IS_SORTED) {
+		if (localAST.isEvalFlagOff(IAST.IS_SORTED)) {
 			tempAST = engine.evalFlatOrderlessAttributesRecursive(localAST);
 			if (tempAST.isPresent()) {
 				localAST = tempAST;
