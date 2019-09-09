@@ -608,10 +608,10 @@ public final class RulesData implements Serializable {
 		}
 
 		final PatternMatcherAndEvaluator pmEvaluator;
-			int patternHash = 0;
-			if (!isComplicatedPatternRule(leftHandSide)) {
-				patternHash = ((IAST) leftHandSide).patternHashCode();
-			}
+		int patternHash = 0;
+		if (!isComplicatedPatternRule(leftHandSide) && !leftHandSide.isCondition()) {
+			patternHash = ((IAST) leftHandSide).patternHashCode();
+		}
 		if (leftHandSide.isAST(F.Integrate)) {
 			pmEvaluator = new PatternMatcherAndEvaluator(setSymbol, leftHandSide, rightHandSide, false, patternHash);
 			// keep Integrate rules in order predefined by Rubi project
@@ -624,12 +624,12 @@ public final class RulesData implements Serializable {
 			return pmEvaluator;
 		} else {
 			pmEvaluator = new PatternMatcherAndEvaluator(setSymbol, leftHandSide, rightHandSide, true, patternHash);
-		if (pmEvaluator.isRuleWithoutPatterns()) {
-			fEqualDownRules = getEqualDownRules();
-			PatternMatcherEquals pmEquals = new PatternMatcherEquals(setSymbol, leftHandSide, rightHandSide);
-			fEqualDownRules.put(leftHandSide, pmEquals);
-			return pmEquals;
-		}
+			if (pmEvaluator.isRuleWithoutPatterns()) {
+				fEqualDownRules = getEqualDownRules();
+				PatternMatcherEquals pmEquals = new PatternMatcherEquals(setSymbol, leftHandSide, rightHandSide);
+				fEqualDownRules.put(leftHandSide, pmEquals);
+				return pmEquals;
+			}
 		}
 
 		if (PatternMap.DEFAULT_RULE_PRIORITY!=priority) {

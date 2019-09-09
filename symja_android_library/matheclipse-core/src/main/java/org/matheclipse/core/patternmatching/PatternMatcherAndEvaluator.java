@@ -313,7 +313,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	public final IPatternMap determinePatterns() {
 		int[] result = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
 		IPatternMap patternMap = IPatternMapImpl.determinePatterns(fLhsPatternExpr, result);
-		// int result = super.determinePatterns();
+		fLHSPriority=result[0];
+// int result = super.determinePatterns();
 		if (fRightHandSide != null) {
 			if (fRightHandSide.isCondition()) {
 				fLHSPriority -= fRightHandSide.second().leafCount();

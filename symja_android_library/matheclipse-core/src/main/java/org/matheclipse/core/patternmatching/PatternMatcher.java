@@ -331,12 +331,16 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 			this.fPatternCondition = patternExpr.second();
 		}
 		if (initAll) {
-			int[] priority = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+			int[] priority = new int[]{IPatternMapImpl.DEFAULT_RULE_PRIORITY};
 			fPatternMap = determinePatterns(priority);
 			this.fLHSPriority = priority[0];
+			if (patternExpr.isCondition()) {
+				this.fLHSPriority -= 100;
+			}
+		}
 	}
-	}
-    /**
+
+	/**
      * Check if the condition for this pattern matcher evaluates to <code>true</code>.
      */
 	final public boolean checkCondition(EvalEngine engine) {
@@ -651,7 +655,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 					return true;
 				}
 						final int lastPosition = lhsPatternAST.argSize();
-                        if (lhsPatternAST.get(lastPosition).isAST(F.PatternTest, 3)) {
+				if (lastPosition == 1 && lhsPatternAST.get(lastPosition).isAST(F.PatternTest, 3)) {
 					if (lhsPatternAST.size() <= lhsEvalSize) {
                             IAST patternTest = (IAST) lhsPatternAST.get(lastPosition);
                             if (patternTest.arg1().isPatternSequence(false)) {
