@@ -12,13 +12,16 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ComplexResultException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractArg12;
+import org.matheclipse.core.eval.interfaces.AbstractArg12Rewrite;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
+import org.matheclipse.core.eval.interfaces.AbstractTrigArg1Rewrite;
 import org.matheclipse.core.eval.interfaces.INumeric;
+import org.matheclipse.core.eval.interfaces.IRewrite;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.expression.ComplexUtils;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -190,7 +193,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_trigonometric functions" > Inverse_trigonometric functions</a>
 	 */
-	private final static class ArcCos extends AbstractTrigArg1 implements INumeric, ArcCosRules, DoubleUnaryOperator {
+	private final static class ArcCos extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, ArcCosRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -258,6 +262,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ Pi/2 + I*Log(I*arg1 + Sqrt(1 - arg1^2)) $]
+			F.Plus(F.CPiHalf, F.Times(F.CI, F.Log(F.Plus(F.Times(F.CI, arg1), F.Sqrt(F.Subtract(F.C1, F.Sqr(arg1))))))); // $$;
+		}
 	}
 
 	/**
@@ -265,7 +274,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_hyperbolic_function"> Inverse hyperbolic functions</a>
 	 */
-	private final static class ArcCosh extends AbstractTrigArg1 implements INumeric, ArcCoshRules, DoubleUnaryOperator {
+	private final static class ArcCosh extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, ArcCoshRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -323,6 +333,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ Log(arg1 + Sqrt(-1 + arg1)*Sqrt(1 + arg1)) $]
+			F.Log(F.Plus(arg1, F.Times(F.Sqrt(F.Plus(F.CN1, arg1)), F.Sqrt(F.Plus(F.C1, arg1))))); // $$;
+		}
 	}
 
 	/**
@@ -330,7 +345,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_trigonometric functions" > Inverse_trigonometric functions</a>
 	 */
-	private final static class ArcCot extends AbstractTrigArg1 implements ArcCotRules, DoubleUnaryOperator {
+	private final static class ArcCot extends AbstractTrigArg1Rewrite implements IRewrite, ArcCotRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -408,6 +423,12 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ (1/2)*I*Log(1 - I/arg1) - (1/2)*I*Log(1 + I/arg1) $]
+			F.Plus(F.Times(F.C1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CNI, F.Power(arg1, F.CN1))))),
+					F.Times(F.CN1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CI, F.Power(arg1, F.CN1)))))); // $$;
+		}
 	}
 
 	/**
@@ -415,7 +436,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_hyperbolic_function"> Inverse hyperbolic functions</a>
 	 */
-	private final static class ArcCoth extends AbstractTrigArg1 implements ArcCothRules, DoubleUnaryOperator {
+	private final static class ArcCoth extends AbstractTrigArg1Rewrite implements IRewrite, ArcCothRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -498,6 +519,12 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ (-(1/2))*Log(1 - 1/arg1) + (1/2)*Log(1 + 1/arg1) $]
+			F.Plus(F.Times(F.CN1D2, F.Log(F.Subtract(F.C1, F.Power(arg1, F.CN1)))),
+					F.Times(F.C1D2, F.Log(F.Plus(F.C1, F.Power(arg1, F.CN1))))); // $$;
+		}
 	}
 
 	/**
@@ -505,7 +532,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="https://en.wikipedia.org/wiki/Inverse_trigonometric_functions">Inverse trigonometric functions</a>
 	 */
-	private final static class ArcCsc extends AbstractTrigArg1 implements ArcCscRules {
+	private final static class ArcCsc extends AbstractTrigArg1Rewrite implements IRewrite, ArcCscRules {
 		@Override
 		public IExpr e1ComplexArg(final Complex arg1) {
 			if (arg1.equals(Complex.ZERO)) {
@@ -549,6 +576,12 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ (-I)*Log(Sqrt(1 - 1/arg1^2) + I/arg1) $]
+			F.Times(F.CNI,
+					F.Log(F.Plus(F.Sqrt(F.Subtract(F.C1, F.Power(arg1, F.CN2))), F.Times(F.CI, F.Power(arg1, F.CN1))))); // $$;
+		}
 	}
 
 	/**
@@ -556,7 +589,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_hyperbolic_function"> Inverse hyperbolic functions</a>
 	 */
-	private final static class ArcCsch extends AbstractTrigArg1 implements ArcCschRules {
+	private final static class ArcCsch extends AbstractTrigArg1Rewrite implements IRewrite, ArcCschRules {
 
 		@Override
 		public IAST getRuleAST() {
@@ -591,6 +624,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ Log(Sqrt(1 + 1/arg1^2) + 1/arg1) $]
+			F.Log(F.Plus(F.Sqrt(F.Plus(F.C1, F.Power(arg1, F.CN2))), F.Power(arg1, F.CN1))); // $$;
+		}
 	}
 
 	/**
@@ -598,7 +636,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_hyperbolic_function"> Inverse hyperbolic functions</a>
 	 */
-	private final static class ArcSech extends AbstractTrigArg1 implements ArcSechRules {
+	private final static class ArcSech extends AbstractTrigArg1Rewrite implements IRewrite, ArcSechRules {
 
 		@Override
 		public IAST getRuleAST() {
@@ -624,9 +662,17 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ Log(Sqrt(-1 + 1/arg1)*Sqrt(1 + 1/arg1) + 1/arg1) $]
+			F.Log(F.Plus(
+					F.Times(F.Sqrt(F.Plus(F.CN1, F.Power(arg1, F.CN1))), F.Sqrt(F.Plus(F.C1, F.Power(arg1, F.CN1)))),
+					F.Power(arg1, F.CN1))); // $$;
 	}
 
-	private final static class ArcSec extends AbstractTrigArg1 implements ArcSecRules {
+	}
+
+	private final static class ArcSec extends AbstractTrigArg1Rewrite implements IRewrite, ArcSecRules {
 		@Override
 		public IExpr e1ComplexArg(final Complex arg1) {
 			if (arg1.equals(Complex.ZERO)) {
@@ -658,6 +704,12 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ Pi/2 + I*Log(Sqrt(1 - 1/arg1^2) + I/arg1) $]
+			F.Plus(F.CPiHalf, F.Times(F.CI, F
+					.Log(F.Plus(F.Sqrt(F.Subtract(F.C1, F.Power(arg1, F.CN2))), F.Times(F.CI, F.Power(arg1, F.CN1)))))); // $$;
+		}
 	}
 
 	/**
@@ -665,7 +717,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_trigonometric functions" > Inverse_trigonometric functions</a>
 	 */
-	private final static class ArcSin extends AbstractTrigArg1 implements INumeric, ArcSinRules, DoubleUnaryOperator {
+	private final static class ArcSin extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, ArcSinRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -743,6 +796,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ -I*Log(I*arg1+Sqrt(1-arg1^2)) $]
+			F.Times(F.CNI, F.Log(F.Plus(F.Times(F.CI, arg1), F.Sqrt(F.Subtract(F.C1, F.Sqr(arg1)))))); // $$;
+		}
 	}
 
 	/**
@@ -750,7 +808,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_hyperbolic_function"> Inverse hyperbolic functions</a>
 	 */
-	private final static class ArcSinh extends AbstractTrigArg1 implements INumeric, ArcSinhRules, DoubleUnaryOperator {
+	private final static class ArcSinh extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, ArcSinhRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -808,6 +867,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ Log(arg1 + Sqrt(1 + arg1^2)) $]
+			F.Log(F.Plus(arg1, F.Sqrt(F.Plus(F.C1, F.Sqr(arg1))))); // $$;
+		}
 	}
 
 	/**
@@ -815,7 +879,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_trigonometric functions" > Inverse_trigonometric functions</a>
 	 */
-	private final static class ArcTan extends AbstractArg12 implements INumeric, ArcTanRules {
+	private final static class ArcTan extends AbstractArg12Rewrite implements INumeric, IRewrite, ArcTanRules {
 
 		@Override
 		public IAST getRuleAST() {
@@ -920,6 +984,19 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ (1/2)*I*Log(1 - I*arg1) - (1/2)*I*Log(1 + I*arg1) $]
+			F.Plus(F.Times(F.C1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CNI, arg1)))),
+					F.Times(F.CN1D2, F.CI, F.Log(F.Plus(F.C1, F.Times(F.CI, arg1))))); // $$;
+		}
+
+		public IExpr rewriteLog(IExpr arg1, IExpr arg2, EvalEngine engine) {
+			return
+			// [$ (-I)*Log((arg1 + I*arg2)/Sqrt(arg1^2 + arg2^2)) $]
+			F.Times(F.CNI, F.Log(
+					F.Times(F.Plus(arg1, F.Times(F.CI, arg2)), F.Power(F.Plus(F.Sqr(arg1), F.Sqr(arg2)), F.CN1D2)))); // $$;
+		}
 	}
 
 	/**
@@ -927,7 +1004,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Inverse_hyperbolic_function"> Inverse hyperbolic functions</a>
 	 */
-	private final static class ArcTanh extends AbstractTrigArg1 implements INumeric, ArcTanhRules, DoubleUnaryOperator {
+	private final static class ArcTanh extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, ArcTanhRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -996,6 +1074,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteLog(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ (-(1/2))*Log(1 - arg1) + (1/2)*Log(1 + arg1) $]
+			F.Plus(F.Times(F.CN1D2, F.Log(F.Subtract(F.C1, arg1))), F.Times(F.C1D2, F.Log(F.Plus(F.C1, arg1)))); // $$;
+		}
 	}
 
 	private static class CirclePoints extends AbstractFunctionEvaluator {
@@ -1040,7 +1123,8 @@ public class ExpTrigsFunctions {
 	 * <a href="http://en.wikipedia.org/wiki/Exact_trigonometric_constants"> Wikipedia - Exact trigonometric
 	 * constants</a>
 	 */
-	private final static class Cos extends AbstractTrigArg1 implements INumeric, CosRules, DoubleUnaryOperator {
+	private final static class Cos extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, CosRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -1184,6 +1268,14 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			if (arg1.isTrigFunction() || arg1.isHyperbolicFunction()) {
+				arg1 = arg1.rewrite(ID.Exp);
+			}
+			return
+			// [$ Exp(arg1*I)/ 2 + Exp(-arg1*I)/ 2 $]
+			F.Plus(F.Times(F.C1D2, F.Exp(F.Times(arg1, F.CI))), F.Times(F.C1D2, F.Exp(F.Times(F.CN1, arg1, F.CI)))); // $$;
+		}
 	}
 
 	/**
@@ -1191,7 +1283,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
-	private final static class Coth extends AbstractTrigArg1 implements INumeric, CothRules, DoubleUnaryOperator {
+	private final static class Coth extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, CothRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -1276,6 +1369,13 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg, EvalEngine engine) {
+			IAST negexp = F.Exp(F.Times(F.CN1, arg));
+			IAST posexp = F.Exp(arg);
+			return
+			// [$ (posexp + negexp)/(posexp - negexp) $]
+			F.Times(F.Plus(posexp, negexp), F.Power(F.Plus(F.Negate(negexp), posexp), F.CN1)); // $$;
+		}
 	}
 
 	/**
@@ -1283,7 +1383,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Trigonometric_functions">Trigonometric functions</a>
 	 */
-	private final static class Csc extends AbstractTrigArg1 implements INumeric, CscRules, DoubleUnaryOperator {
+	private final static class Csc extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, CscRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -1418,6 +1519,12 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ -((2*I)/(E^((-I)*arg1) - E^(I*arg1))) $]
+			F.Times(F.CN1, F.C2, F.CI,
+					F.Power(F.Subtract(F.Exp(F.Times(F.CNI, arg1)), F.Exp(F.Times(F.CI, arg1))), F.CN1)); // $$;
+		}
 	}
 
 	/**
@@ -1425,7 +1532,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
-	private final static class Cosh extends AbstractTrigArg1 implements INumeric, CoshRules, DoubleUnaryOperator {
+	private final static class Cosh extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, CoshRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -1514,6 +1622,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ 1/(E^arg1*2) + E^arg1/2 $]
+			F.Plus(F.Power(F.Times(F.Exp(arg1), F.C2), F.CN1), F.Times(F.C1D2, F.Exp(arg1))); // $$;
+		}
 	}
 
 	/**
@@ -1521,7 +1634,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Trigonometric_functions">Trigonometric functions</a>
 	 */
-	private final static class Cot extends AbstractTrigArg1 implements INumeric, CotRules, DoubleUnaryOperator {
+	private final static class Cot extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, CotRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -1653,6 +1767,12 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ -((I*(E^((-I)*arg1) + E^(I*arg1)))/(E^((-I)*arg1) - E^(I*arg1))) $]
+			F.Times(F.CN1, F.CI, F.Plus(F.Exp(F.Times(F.CNI, arg1)), F.Exp(F.Times(F.CI, arg1))),
+					F.Power(F.Subtract(F.Exp(F.Times(F.CNI, arg1)), F.Exp(F.Times(F.CI, arg1))), F.CN1)); // $$;
+		}
 	}
 
 	/**
@@ -1660,7 +1780,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic functions</a>
 	 */
-	private final static class Csch extends AbstractTrigArg1 implements INumeric, CschRules, DoubleUnaryOperator {
+	private final static class Csch extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, CschRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -1748,6 +1869,12 @@ public class ExpTrigsFunctions {
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
+		}
+
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ 2/(-E^(-arg1) + E^arg1) $]
+			F.Times(F.C2, F.Power(F.Plus(F.Negate(F.Exp(F.Negate(arg1))), F.Exp(arg1)), F.CN1)); // $$;
 		}
 	}
 
@@ -1991,7 +2118,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Trigonometric_functions">Trigonometric functions</a>
 	 */
-	private final static class Sec extends AbstractTrigArg1 implements INumeric, SecRules, DoubleUnaryOperator {
+	private final static class Sec extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, SecRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2123,6 +2251,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ 2/(E^((-I)*arg1) + E^(I*arg1)) $]
+			F.Times(F.C2, F.Power(F.Plus(F.Exp(F.Times(F.CNI, arg1)), F.Exp(F.Times(F.CI, arg1))), F.CN1)); // $$;
+		}
 	}
 
 	/**
@@ -2130,7 +2263,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic functions</a>
 	 */
-	private final static class Sech extends AbstractTrigArg1 implements INumeric, SechRules, DoubleUnaryOperator {
+	private final static class Sech extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, SechRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2219,6 +2353,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ 2/(E^(-arg1) + E^arg1) $]
+			F.Times(F.C2, F.Power(F.Plus(F.Exp(F.Negate(arg1)), F.Exp(arg1)), F.CN1)); // $$;
+		}
 	}
 
 	/**
@@ -2226,7 +2365,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Trigonometric_functions">Trigonometric functions</a>
 	 */
-	private final static class Sin extends AbstractTrigArg1 implements INumeric, SinRules, DoubleUnaryOperator {
+	private final static class Sin extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, SinRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2431,6 +2571,15 @@ public class ExpTrigsFunctions {
 			super.setUp(newSymbol);
 		}
 
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			if (arg1.isTrigFunction() || arg1.isHyperbolicFunction()) {
+				arg1 = arg1.rewrite(ID.Exp);
+			}
+			return
+			// [$ Exp(arg1*I) / (2*I) - Exp(-arg1*I) / (2*I) $]
+			F.Plus(F.Times(F.CN1, F.Power(F.Times(F.C2, F.CI), F.CN1), F.Exp(F.Times(F.CN1, arg1, F.CI))),
+					F.Times(F.Power(F.Times(F.C2, F.CI), F.CN1), F.Exp(F.Times(arg1, F.CI)))); // $$;
+		}
 	}
 
 	/**
@@ -2438,7 +2587,7 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Sinc_function">Sinc function</a>
 	 */
-	private static class Sinc extends AbstractTrigArg1 implements INumeric, SincRules, DoubleUnaryOperator {
+	private static class Sinc extends AbstractTrigArg1Rewrite implements INumeric, SincRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2536,7 +2685,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
-	private final static class Sinh extends AbstractTrigArg1 implements INumeric, SinhRules, DoubleUnaryOperator {
+	private final static class Sinh extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, SinhRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2625,6 +2775,11 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ -(1/(E^arg1*2)) + E^arg1/2 $]
+			F.Plus(F.Negate(F.Power(F.Times(F.Exp(arg1), F.C2), F.CN1)), F.Times(F.C1D2, F.Exp(arg1))); // $$;
+		}
 	}
 
 	/**
@@ -2632,7 +2787,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Trigonometric_functions">Trigonometric functions</a>
 	 */
-	private final static class Tan extends AbstractTrigArg1 implements INumeric, TanRules, DoubleUnaryOperator {
+	private final static class Tan extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, TanRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2749,6 +2905,16 @@ public class ExpTrigsFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			if (arg1.isTrigFunction() || arg1.isHyperbolicFunction()) {
+				arg1 = arg1.rewrite(ID.Exp);
+			}
+			IAST negexp = F.Exp(F.Times(arg1, F.CNI));
+			IAST posexp = F.Exp(F.Times(arg1, F.CI));
+			return
+			// [$ I*(negExp - posExp)/(negExp + posExp) $]
+			F.Times(F.CI, F.Subtract(negexp, posexp), F.Power(F.Plus(negexp, posexp), F.CN1)); // $$;
+		}
 	}
 
 	/**
@@ -2756,7 +2922,8 @@ public class ExpTrigsFunctions {
 	 * 
 	 * See <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
-	private final static class Tanh extends AbstractTrigArg1 implements INumeric, TanhRules, DoubleUnaryOperator {
+	private final static class Tanh extends AbstractTrigArg1Rewrite
+			implements INumeric, IRewrite, TanhRules, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -2840,6 +3007,12 @@ public class ExpTrigsFunctions {
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
+		}
+		public IExpr rewriteExp(IExpr arg1, EvalEngine engine) {
+			return
+			// [$ -(1/(E^arg1*(E^(-arg1) + E^arg1))) + E^arg1/(E^(-arg1) + E^arg1) $]
+			F.Plus(F.Negate(F.Power(F.Times(F.Exp(arg1), F.Plus(F.Exp(F.Negate(arg1)), F.Exp(arg1))), F.CN1)),
+					F.Times(F.Exp(arg1), F.Power(F.Plus(F.Exp(F.Negate(arg1)), F.Exp(arg1)), F.CN1))); // $$;
 		}
 	}
 

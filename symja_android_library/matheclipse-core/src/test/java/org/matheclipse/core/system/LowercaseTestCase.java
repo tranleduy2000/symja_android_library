@@ -7100,7 +7100,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FullSimplify((b*Cosh(x)+c*Sinh(x))/Cosh(x))", //
 				"b+c*Tanh(x)");
 		check("Simplify(Cos(n*ArcCos(x)) == ChebyshevT(n, x))", //
-				"Cos(n*ArcCos(x))==ChebyshevT(n,x)");
+				"-ChebyshevT(n,x)+Cos(n*ArcCos(x))==0");
 		// FullSimplify uses FunctionExpand and can test the equation:
 		check("FullSimplify(Cos(n*ArcCos(x)) == ChebyshevT(n, x))", //
 				"True");
@@ -7164,6 +7164,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFunctionExpand() {
+		check("FunctionExpand(Degree)", //
+				"Pi/180");
+		check("FunctionExpand(GoldenRatio)", //
+				"1/2*(1+Sqrt(5))");
 		check("FunctionExpand(Cos(Sqrt(x^2)))", //
 				"Cos(x)");
 		check("FunctionExpand(Sin(Sqrt(x^2)))", //
@@ -7495,6 +7499,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 		}
 	}
 
+	public void testGoldenAngle() {
+		// check("IntegerPart[GoldenAngle^100]", //
+		// "");
+		check("NumericQ(GoldenAngle)", //
+				"True");
+		check("N(GoldenAngle)", //
+				"2.39996");
+		check("Attributes(GoldenAngle)", //
+				"{Constant,Protected}");
+		check("FunctionExpand[GoldenAngle]", //
+				"(3-Sqrt(5))*Pi");
+
+	}
 	public void testGoldenRatio() {
 		check("N(GoldenRatio)", //
 				"1.61803");
@@ -11534,8 +11551,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNumericQ() {
-		check("NumericQ(Sqrt(3))", "True");
-		check("NumericQ(Glaisher)", "True");
+		check("NumericQ(GoldenRatio)", //
+				"True");
+		check("NumericQ(Sqrt(3))", //
+				"True");
+		check("NumericQ(Glaisher)", //
+				"True");
 		check("1<Glaisher<2<E<3", "True");
 		check("NumericQ(Sqrt(sin(2)))", "True");
 		check("NumericQ(E+Pi)", "True");
@@ -18861,11 +18882,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"1/3+4/3*2^(1/3)/(11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3)+(11+Sqrt(-256+(11-27*a)^2)\n"
 						+ "-27*a)^(1/3)/(3*2^(1/3))");
 		check("ToRadicals(Root((#^3-#^2-#+a)&, 2))", //
-				"1/3+4/3*2^(1/3)/((11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3)*E^(I*2/3*Pi))+((11+Sqrt(\n"
-						+ "-256+(11-27*a)^2)-27*a)^(1/3)*E^(I*2/3*Pi))/(3*2^(1/3))");
+				"1/3+4/3*(2^(1/3)*(-1/2-I*1/2*Sqrt(3)))/(11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3)+((\n"
+						+ "-1/2+I*1/2*Sqrt(3))*(11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3))/(3*2^(1/3))");
 		check("ToRadicals(Root((#^3-#^2-#+a)&, 3))", //
-				"1/3+4/3*2^(1/3)/((11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3)*E^(I*4/3*Pi))+((11+Sqrt(\n"
-						+ "-256+(11-27*a)^2)-27*a)^(1/3)*E^(I*4/3*Pi))/(3*2^(1/3))");
+				"1/3+4/3*(2^(1/3)*(-1/2+I*1/2*Sqrt(3)))/(11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3)+((\n"
+						+ "-1/2-I*1/2*Sqrt(3))*(11+Sqrt(-256+(11-27*a)^2)-27*a)^(1/3))/(3*2^(1/3))");
 	}
 
 	public void testToString() {

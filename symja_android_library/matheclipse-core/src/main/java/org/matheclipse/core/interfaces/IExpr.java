@@ -15,6 +15,7 @@ import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -1567,6 +1568,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is the function <code>Power[&lt;arg1&gt;, &lt;arg2&gt;]</code>
      */
     boolean isPower();
+    /**
+     * Test if this expression is the function <code>Power[&lt;arg1&gt;, &lt;arg2&gt;]</code>
+     *
+     * @return
+     */
+    boolean isExp();
 
     /**
      * <p>
@@ -1801,6 +1808,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean isTrigFunction();
+
+    /**
+     * Test if this expression is a hyperbolic function.
+     *
+     * @return
+     */
+    boolean isHyperbolicFunction();
 
     /**
      * Test if this expression is a special pattern-matching function (i.e. Alternatives, Except,...)
@@ -2238,6 +2252,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see IExpr#head()
      */
     IAST rest();
+
+    IExpr rewrite(int functionID);
 
     /**
      * Get the second element of this <code>AST</code> list (i.e. get(2)). Return <code>F.NIL</code> if this object

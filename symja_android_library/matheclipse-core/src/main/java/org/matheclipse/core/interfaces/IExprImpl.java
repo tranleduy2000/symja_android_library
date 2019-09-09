@@ -2229,6 +2229,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isExp() {
+        return isPower() && first().isE();
+    }
+
     /**
      * <p>
      * Test if this expression is the function <code>Power[&lt;arg1&gt;, -1]</code> (i.e.
@@ -2627,6 +2632,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isTrigFunction() {
+        return false;
+    }
+
+    @Override
+    public boolean isHyperbolicFunction() {
         return false;
     }
 
@@ -3235,6 +3245,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IAST rest() {
         return F.NIL;
+    }
+
+    @Override
+    public IExpr rewrite(int functionID) {
+        return F.NIL;
+
     }
 
     /**

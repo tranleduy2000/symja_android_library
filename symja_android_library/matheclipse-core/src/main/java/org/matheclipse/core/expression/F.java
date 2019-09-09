@@ -1036,33 +1036,33 @@ public class F {
     public final static IBuiltInSymbol GeometricDistribution = F.initFinalSymbol("GeometricDistribution", ID.GeometricDistribution);
     /***/
     public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
-	/**
-	 * Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't
-	 * work in the web interface. A file system has to be available to load a package.
-	 */
+    /** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't work in the web interface. A file system has to be available to load a package. */
     public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
 	/** Glaisher constant. */
     public final static IBuiltInSymbol Glaisher = F.initFinalSymbol("Glaisher", ID.Glaisher);
-	/** GoldenRatio - is the golden ratio. */
+    /** */
+    public final static IBuiltInSymbol GoldenAngle = F.initFinalSymbol("GoldenAngle", ID.GoldenAngle);
+
+    /** GoldenRatio - is the golden ratio.*/
     public final static IBuiltInSymbol GoldenRatio = F.initFinalSymbol("GoldenRatio", ID.GoldenRatio);
 	/** Grad(function, list-of-variables) - gives the gradient of the function. */
     public final static IBuiltInSymbol Grad = F.initFinalSymbol("Grad", ID.Grad);
     /***/
     public final static IBuiltInSymbol Graph = F.initFinalSymbol("Graph", ID.Graph);
 
-	/***/
+    /** GraphCenter(graph) - compute the `graph` center. The center of a `graph` is the set of vertices of graph eccentricity equal to the `graph` radius.*/
 	public final static IBuiltInSymbol GraphCenter = F.initFinalSymbol("GraphCenter", ID.GraphCenter);
     /***/
     public final static IBuiltInSymbol GraphData = F.initFinalSymbol("GraphData", ID.GraphData);
-	/***/
+    /** GraphDiameter(graph) - return the diameter of the `graph`.*/
 	public final static IBuiltInSymbol GraphDiameter = F.initFinalSymbol("GraphDiameter", ID.GraphDiameter);
 
-	/***/
+    /** GraphPeriphery(graph) - compute the `graph` periphery. The periphery of a `graph` is the set of vertices of graph eccentricity equal to the graph diameter.  */
 	public final static IBuiltInSymbol GraphPeriphery = F.initFinalSymbol("GraphPeriphery", ID.GraphPeriphery);
 
-	/** GraphQ(expr) - test if `expr` is a graph object. */
+    /** GraphQ(expr) - test if `expr` is a graph object.*/
     public final static IBuiltInSymbol GraphQ = F.initFinalSymbol("GraphQ", ID.GraphQ);
-	/***/
+    /** GraphRadius(graph) - return the radius of the `graph`.*/
 	public final static IBuiltInSymbol GraphRadius = F.initFinalSymbol("GraphRadius", ID.GraphRadius);
     /***/
     public final static IBuiltInSymbol Graphics = F.initFinalSymbol("Graphics", ID.Graphics);

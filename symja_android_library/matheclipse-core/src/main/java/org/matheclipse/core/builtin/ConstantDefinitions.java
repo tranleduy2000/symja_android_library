@@ -36,55 +36,56 @@ public class ConstantDefinitions {
 	private static class Initializer {
 
 		private static void init() {
-		Properties properties = ResourceData.properties("/version.txt");
+			Properties properties = ResourceData.properties("/version.txt");
 
-		String versionString = properties.getProperty("version");
-		if (versionString != null && versionString.charAt(0) != '$') {
-			VERSION = versionString;
-		}
-
-		String timestamp = properties.getProperty("timestamp");
-		if (timestamp != null && timestamp.charAt(0) != '$') {
-			TIMESTAMP = timestamp;
-			try {
-				YEAR = Integer.parseInt(TIMESTAMP.substring(0, 4));
-				MONTH = Integer.parseInt(TIMESTAMP.substring(4, 6));
-				DAY = Integer.parseInt(TIMESTAMP.substring(6, 8));
-				HOUR = Integer.parseInt(TIMESTAMP.substring(8, 10));
-				MINUTE = Integer.parseInt(TIMESTAMP.substring(10, 12));
-				SECOND = Integer.parseInt(TIMESTAMP.substring(12, 14));
-			} catch (NumberFormatException nfe) {
-				nfe.printStackTrace();
+			String versionString = properties.getProperty("version");
+			if (versionString != null && versionString.charAt(0) != '$') {
+				VERSION = versionString;
 			}
-		}
 
-		// System.out.println(VERSION);
-		// System.out.println(TIMESTAMP);
-		F.$Context.setEvaluator(new $Context());
-		F.$ContextPath.setEvaluator(new $ContextPath());
-		F.$CreationDate.setEvaluator(new $CreationDate());
+			String timestamp = properties.getProperty("timestamp");
+			if (timestamp != null && timestamp.charAt(0) != '$') {
+				TIMESTAMP = timestamp;
+				try {
+					YEAR = Integer.parseInt(TIMESTAMP.substring(0, 4));
+					MONTH = Integer.parseInt(TIMESTAMP.substring(4, 6));
+					DAY = Integer.parseInt(TIMESTAMP.substring(6, 8));
+					HOUR = Integer.parseInt(TIMESTAMP.substring(8, 10));
+					MINUTE = Integer.parseInt(TIMESTAMP.substring(10, 12));
+					SECOND = Integer.parseInt(TIMESTAMP.substring(12, 14));
+				} catch (NumberFormatException nfe) {
+					nfe.printStackTrace();
+				}
+			}
+
+			// System.out.println(VERSION);
+			// System.out.println(TIMESTAMP);
+			F.$Context.setEvaluator(new $Context());
+			F.$ContextPath.setEvaluator(new $ContextPath());
+			F.$CreationDate.setEvaluator(new $CreationDate());
 			F.$HomeDirectory.setEvaluator(new $HomeDirectory());
-		F.$MachineEpsilon.setEvaluator(new $MachineEpsilon());
-		F.$MachinePrecision.setEvaluator(new $MachinePrecision());
+			F.$MachineEpsilon.setEvaluator(new $MachineEpsilon());
+			F.$MachinePrecision.setEvaluator(new $MachinePrecision());
 			F.$UserName.setEvaluator(new $UserName());
-		F.$Version.setEvaluator(new $Version());
+			F.$Version.setEvaluator(new $Version());
 
-		// System.out.println(F.$CreationDate.of().toString());
-		F.Catalan.setEvaluator(new Catalan());
-		F.ComplexInfinity.setEvaluator(new ComplexInfinity());
-		F.Degree.setEvaluator(new Degree());
-		F.E.setEvaluator(new E());
-		F.EulerGamma.setEvaluator(new EulerGamma());
-		F.Glaisher.setEvaluator(new Glaisher());
-		F.GoldenRatio.setEvaluator(new GoldenRatio());
-		F.I.setEvaluator(new I());
-		F.Infinity.setEvaluator(new Infinity());
-		F.Khinchin.setEvaluator(new Khinchin());
-		F.Pi.setEvaluator(new Pi());
-		F.False.setEvaluator(NILEvaluator.CONST);
-		F.True.setEvaluator(NILEvaluator.CONST);
-		F.Null.setEvaluator(NILEvaluator.CONST);
-	}
+			// System.out.println(F.$CreationDate.of().toString());
+			F.Catalan.setEvaluator(new Catalan());
+			F.ComplexInfinity.setEvaluator(new ComplexInfinity());
+			F.Degree.setEvaluator(new Degree());
+			F.E.setEvaluator(new E());
+			F.EulerGamma.setEvaluator(new EulerGamma());
+			F.Glaisher.setEvaluator(new Glaisher());
+			F.GoldenAngle.setEvaluator(new GoldenAngle());
+			F.GoldenRatio.setEvaluator(new GoldenRatio());
+			F.I.setEvaluator(new I());
+			F.Infinity.setEvaluator(new Infinity());
+			F.Khinchin.setEvaluator(new Khinchin());
+			F.Pi.setEvaluator(new Pi());
+			F.False.setEvaluator(NILEvaluator.CONST);
+			F.True.setEvaluator(NILEvaluator.CONST);
+			F.Null.setEvaluator(NILEvaluator.CONST);
+		}
 	}
 
 
@@ -446,6 +447,31 @@ public class ConstantDefinitions {
 
 	}
 
+	private static class GoldenAngle extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+		final static public double GOLDEN_ANGLE =  2.3999632297286533222315555066336138531249990110581;
+		@Override
+		public IExpr evaluate(final ISymbol symbol) {
+			// (3-Sqrt(5))*Pi
+			// return F.Times(F.Subtract(F.C3, F.Sqrt(F.C5)), F.Pi);
+			return F.NIL;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.CONSTANT);
+		}
+
+		@Override
+		public IExpr numericEval(final ISymbol symbol) {
+			return F.num(GOLDEN_ANGLE);
+		}
+
+		@Override
+		public double evalReal() {
+			return GOLDEN_ANGLE;
+		}
+
+	}
 	/**
 	 * <pre>
 	 * GoldenRatio

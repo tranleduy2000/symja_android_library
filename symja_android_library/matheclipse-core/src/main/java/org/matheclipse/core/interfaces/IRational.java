@@ -172,4 +172,6 @@ public interface IRational extends ISignedNumber, IBigNumber {
      * @return denominator
      */
     public BigInteger toBigNumerator();
+
+    IInteger trunc();
 }

@@ -71,4 +71,9 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
 
     public abstract IRational subtract(IRational parm1);
 
+    @Override
+    public IInteger trunc() {
+        return isNegative() ? ceil() : floor();
+    }
+
 }

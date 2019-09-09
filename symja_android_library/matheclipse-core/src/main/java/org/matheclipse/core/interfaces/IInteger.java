@@ -78,6 +78,10 @@ public interface IInteger extends IRational {
      */
     public IInteger[] divideAndRemainder(final IInteger that);
 
+    public IInteger iquo(final IInteger that);
+
+    public IInteger irem(final IInteger that);
+
     /**
      * Return the divisors of this integer number.
      * <p>

@@ -26,6 +26,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.IRewrite;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.ObjIntPredicate;
@@ -70,7 +71,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.jgrapht.graph.DefaultGraphType.*;
+import static org.jgrapht.graph.DefaultGraphType.Builder;
 
 public abstract class AbstractAST extends IASTMutableImpl {
 	protected static final class ASTIterator implements ListIterator<IExpr> {
@@ -3267,15 +3268,31 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		int id = headID();
 		if (id >= 0) {
 			if (size() == 2) {
-				return id == ID.Cos || id == ID.Cosh || id == ID.ArcCos || id == ID.ArcCosh || //
-						id == ID.Cot || id == ID.Coth || id == ID.ArcCot || id == ID.ArcCoth || //
-						id == ID.Csc || id == ID.Csch || id == ID.ArcCsc || id == ID.ArcCsch || //
-						id == ID.Sec || id == ID.Sech || id == ID.ArcSec || id == ID.ArcSech || //
-						id == ID.Sin || id == ID.Sinh || id == ID.ArcSin || id == ID.ArcSinh || //
-						id == ID.Tan || id == ID.Tanh || id == ID.ArcTan || id == ID.ArcTanh;
+				return id == ID.Cos || id == ID.ArcCos || //
+						id == ID.Cot || id == ID.ArcCot || //
+						id == ID.Csc || id == ID.ArcCsc || //
+						id == ID.Sec || id == ID.ArcSec || //
+						id == ID.Sin || id == ID.ArcSin || //
+						id == ID.Tan || id == ID.ArcTan;
 			}
 			if (size() == 3) {
 				return id == ID.ArcTan;
+			}
+		}
+		return false;
+	}
+	/** {@inheritDoc} */
+	@Override
+	public boolean isHyperbolicFunction() {
+		int id = headID();
+		if (id >= 0) {
+			if (size() == 2) {
+				return id == ID.Cosh || id == ID.ArcCosh || //
+						id == ID.Coth || id == ID.ArcCoth || //
+						id == ID.Csch || id == ID.ArcCsch || //
+						id == ID.Sech || id == ID.ArcSech || //
+						id == ID.Sinh || id == ID.ArcSinh || //
+						id == ID.Tanh || id == ID.ArcTanh;
 			}
 		}
 		return false;
@@ -3902,6 +3919,16 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return list;
 	}
 
+	public IExpr rewrite(int functionID) {
+		int headID = headID();
+		if (headID > 0) {
+			IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
+			if (evaluator instanceof IRewrite) {
+				return ((IRewrite) evaluator).rewrite(this, EvalEngine.get(), functionID);
+			}
+		}
+		return F.NIL;
+	}
 	/**
 	 * Rotate the ranges elements to the left by n places and append the resulting elements to the <code>list</code>
 	 *

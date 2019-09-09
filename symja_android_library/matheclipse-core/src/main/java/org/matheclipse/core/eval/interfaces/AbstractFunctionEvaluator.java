@@ -258,7 +258,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 	/**
-	 * This assumes plusAST to be an Plus() expression. The multiple of Pi returned is a IRational number or assumed to
+	 * This assumes plusAST to be a Plus() expression. The multiple of Pi returned is a IRational number or assumed to
 	 * be an expression with Integer result.
 	 *
 	 * @param plusAST
