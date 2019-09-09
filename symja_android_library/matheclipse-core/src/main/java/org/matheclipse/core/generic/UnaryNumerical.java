@@ -15,8 +15,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import java.util.Deque;
-
 /**
  * Unary numerical function for functions like Plot
  * 
@@ -42,8 +40,8 @@ public class UnaryNumerical implements Function<IExpr, IExpr>, UnivariateDiffere
 		fVariable = v;
 		fFunction = fn;
 		fEngine = engine;
-		IExpr temp = engine.evaluate(F.D(fFunction, fVariable));
 		if (firstDerivative) {
+			IExpr temp = engine.evaluate(F.D(fFunction, fVariable));
 			fFirstDerivative = new UnaryNumerical(temp, fVariable, engine, false);
 		}
 	}
