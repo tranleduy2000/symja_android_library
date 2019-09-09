@@ -2879,7 +2879,7 @@ public final class BooleanFunctions {
 			}
 
 			boolean evaled = false;
-			IAST flattenedAST = EvalAttributes.flatten(ast);
+			IAST flattenedAST = EvalAttributes.flattenDeep(ast);
 			if (flattenedAST.isPresent()) {
 				evaled = true;
 			} else {

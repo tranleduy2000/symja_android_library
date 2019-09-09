@@ -987,6 +987,11 @@ public class OutputFormFactory {
 			}
 				if (functionID > ID.UNKNOWN) {
 					switch (functionID) {
+					case ID.Inequality:
+						if (list.size() > 3 && convertInequality(buf, list, precedence)) {
+							return;
+						}
+						break;
 					case ID.Quantity:
 						// if (head.equals(F.SeriesData) && (list.size() == 7)) {
 						if (list instanceof IQuantity) {
