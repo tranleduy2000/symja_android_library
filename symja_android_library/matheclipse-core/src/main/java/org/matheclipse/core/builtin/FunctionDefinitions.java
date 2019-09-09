@@ -7,7 +7,6 @@ import static org.matheclipse.core.expression.F.ComplexExpand;
 import static org.matheclipse.core.expression.F.CreateDirectory;
 import static org.matheclipse.core.expression.F.D;
 import static org.matheclipse.core.expression.F.DSolve;
-import static org.matheclipse.core.expression.F.Default;
 import static org.matheclipse.core.expression.F.Derivative;
 import static org.matheclipse.core.expression.F.EasterSunday;
 import static org.matheclipse.core.expression.F.ElementData;
@@ -64,7 +63,6 @@ public final class FunctionDefinitions {
 			Compile.setEvaluator(new org.matheclipse.core.reflection.system.Compile());
 			CreateDirectory.setEvaluator(new org.matheclipse.core.reflection.system.CreateDirectory());
 			D.setEvaluator(new org.matheclipse.core.reflection.system.D());
-			Default.setEvaluator(new org.matheclipse.core.reflection.system.Default());
 			Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
 			DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
 			EasterSunday.setEvaluator(new org.matheclipse.core.reflection.system.EasterSunday());

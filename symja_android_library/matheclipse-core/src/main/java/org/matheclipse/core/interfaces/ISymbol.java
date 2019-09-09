@@ -249,7 +249,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * <code>Times</code>, <code>0</code> is the default value for <code>Plus</code>). The general default value is used
      * in pattern-matching for expressions like <code>a_. * b_. + c_</code>
      *
-     * @return the default value or <code>null</code> if undefined.
+     * @return the default value or <code>F.NIL</code> if undefined.
      */
     public IExpr getDefaultValue();
 
@@ -269,7 +269,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * for expressions like <code>a ^ b_.</code>
      *
      * @param position the position for the default value
-     * @return the default value or <code>null</code> if undefined.
+     * @return the default value or <code>F.NIL</code> if undefined.
      */
     public IExpr getDefaultValue(int position);
 

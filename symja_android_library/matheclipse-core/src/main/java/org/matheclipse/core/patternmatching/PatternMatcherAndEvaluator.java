@@ -2,6 +2,7 @@ package org.matheclipse.core.patternmatching;
 
 import com.duy.annotations.Nonnull;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ReturnException;
@@ -215,9 +216,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				boolean matched = false;
 				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
 				try {
-//					if (fLhsPatternExpr.isAST(F.Integrate)) {
-//						System.out.println(" :: " + getLHSPriority()+ " "+fLhsPatternExpr +" -> " +rhs);
-//					}
+					// if (fLhsPatternExpr.isAST(F.Integrate)) {
+					// System.out.println(" :: " + getLHSPriority()+ " "+fLhsPatternExpr +" -> " +rhs);
+					// }
 					// System.out.println(rhs.toString());
 					fReturnResult = engine.evaluate(rhs);
 					matched = true;
@@ -251,7 +252,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 					}
 					return result;
 				} catch (final ConditionException e) {
+					if (Config.SHOW_STACKTRACE) {
 					logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
+					}
 					return F.NIL;
 				} catch (final ReturnException e) {
 					return e.getValue();
@@ -291,7 +294,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				}
 					return result;
 			} catch (final ConditionException e) {
+					if (Config.SHOW_STACKTRACE) {
 				logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
+					}
 				return F.NIL;
 			} catch (final ReturnException e) {
 					return e.getValue();
@@ -309,24 +314,6 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		return F.NIL;
 	}
 
-	@Override
-	public final IPatternMap determinePatterns() {
-		int[] result = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
-		IPatternMap patternMap = IPatternMapImpl.determinePatterns(fLhsPatternExpr, result);
-		fLHSPriority=result[0];
-// int result = super.determinePatterns();
-		if (fRightHandSide != null) {
-			if (fRightHandSide.isCondition()) {
-				fLHSPriority -= fRightHandSide.second().leafCount();
-			} else if (fRightHandSide.isModuleOrWithCondition()) {
-				if (fRightHandSide.second().isCondition()) {
-					fLHSPriority -= fRightHandSide.second().second().leafCount();
-				}
-			}
-		}
-		// return result;
-		return patternMap;
-	}
 
 	/**
 	 * Get the flags for this matcher.

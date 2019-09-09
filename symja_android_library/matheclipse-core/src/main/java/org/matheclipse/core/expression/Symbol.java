@@ -102,6 +102,21 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return visitor.visit(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final ISymbol head() {
+        return F.Symbol;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final int hierarchy() {
+        return SYMBOLID;
+    }
 
     /**
      * {@inheritDoc}
@@ -111,46 +126,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return F.function(this, expressions);
     }
 
-    /**
-     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
-     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
-     */
-    @Override
-    public int compareTo(final IExpr expr) {
-        if (expr instanceof ISymbol) {
-            // O-2
-            if (this == expr) {
-                // Symbols are unique objects
-                // Makes no sense to compare the symbol names, if they are equal
-                return 0;
-            }
-            // sort lexicographically
-            return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
-        }
-        if (expr.isAST()) {
-            final int id = expr.headID();
-            if (id >= ID.Not && id <= ID.Power) {
-                if (expr.isNot() && expr.first().isSymbol()) {
-                    final int cp = compareTo(expr.first());
-                    return cp != 0 ? cp : -1;
-                } else if (expr.isPower()) {
-                // O-4
-                int baseCompare = this.compareTo(expr.base());
-                if (baseCompare == 0) {
-                    return F.C1.compareTo(expr.exponent());
-                }
-                return baseCompare;
-            }
-            }
-            if (!expr.isDirectedInfinity()) {
-                return -1 * expr.compareTo(this);
-            }
-            return -1;
-        }
-        int x = hierarchy();
-        int y = expr.hierarchy();
-        return (x < y) ? -1 : ((x == y) ? 0 : 1);
-    }
     /**
      * {@inheritDoc}
      */
@@ -265,21 +240,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      * {@inheritDoc}
      */
     @Override
-    public final ISymbol head() {
-        return F.Symbol;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final int hierarchy() {
-        return SYMBOLID;
-    }
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String internalFormString(boolean symbolsAsFactoryMethod, int depth) {
         return internalJavaString(symbolsAsFactoryMethod, depth, false, false, false);
     }
@@ -333,7 +293,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     public final boolean isAtom() {
         return true;
     }
-
 
     /**
      * {@inheritDoc}
@@ -443,6 +402,46 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return uv2s.apply(this);
     }
 
+    /**
+     * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
+     * integer as this expression is canonical less than, equal to, or greater than the specified expression.
+     */
+    @Override
+    public int compareTo(final IExpr expr) {
+        if (expr instanceof ISymbol) {
+            // O-2
+            if (this == expr) {
+                // Symbols are unique objects
+                // Makes no sense to compare the symbol names, if they are equal
+                return 0;
+            }
+            // sort lexicographically
+            return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
+        }
+        if (expr.isAST()) {
+            final int id = expr.headID();
+            if (id >= ID.Not && id <= ID.Power) {
+                if (expr.isNot() && expr.first().isSymbol()) {
+                    final int cp = compareTo(expr.first());
+                    return cp != 0 ? cp : -1;
+                } else if (expr.isPower()) {
+                    // O-4
+                    int baseCompare = this.compareTo(expr.base());
+                    if (baseCompare == 0) {
+                        return F.C1.compareTo(expr.exponent());
+                    }
+                    return baseCompare;
+                }
+            }
+            if (!expr.isDirectedInfinity()) {
+                return -1 * expr.compareTo(this);
+            }
+            return -1;
+        }
+        int x = hierarchy();
+        int y = expr.hierarchy();
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
 
     /**
      * {@inheritDoc}
@@ -637,7 +636,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     @Override
     public IExpr getDefaultValue() {
         // special case for a general default value
-        return fRulesData != null ? fRulesData.getDefaultValue(RulesData.DEFAULT_VALUE_INDEX) : null;
+        IExpr value = fRulesData != null ? fRulesData.getDefaultValue(RulesData.DEFAULT_VALUE_INDEX) : null;
+        return value == null ? F.NIL : value;
     }
 
     /**
@@ -655,7 +655,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     @Override
     public IExpr getDefaultValue(int pos) {
         // default value at this position
-        return fRulesData != null ? fRulesData.getDefaultValue(pos) : null;
+        IExpr value = fRulesData != null ? fRulesData.getDefaultValue(pos) : null;
+        return value == null ? F.NIL : value;
     }
 
     /**
@@ -880,6 +881,24 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IExpr[] reassignSymbolValue(Function<IExpr, IExpr> function, ISymbol functionSymbol, EvalEngine engine) {
+        if (fValue != null) {
+            IExpr[] result = new IExpr[2];
+            result[0] = fValue;
+            IExpr calculatedResult = function.apply(fValue);
+            if (calculatedResult.isPresent()) {
+                assign(calculatedResult);
+                result[1] = calculatedResult;
+                return result;
+            }
+        }
+        engine.printMessage(toString() + " is not a variable with a value, so its value cannot be changed.");
+        return null;
+    }
 
     /**
      * {@inheritDoc}
@@ -1073,24 +1092,6 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return fContext == Context.DUMMY ? this : fContext.get(fSymbolName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IExpr[] reassignSymbolValue(Function<IExpr, IExpr> function, ISymbol functionSymbol, EvalEngine engine) {
-        if (fValue != null) {
-            IExpr[] result = new IExpr[2];
-            result[0] = fValue;
-            IExpr calculatedResult = function.apply(fValue);
-            if (calculatedResult.isPresent()) {
-                assign(calculatedResult);
-                result[1] = calculatedResult;
-                return result;
-            }
-        }
-        engine.printMessage(toString() + " is not a variable with a value, so its value cannot be changed.");
-        return null;
-    }
     private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
         stream.writeUTF(fSymbolName);
         stream.write(fAttributes);

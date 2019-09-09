@@ -3345,7 +3345,7 @@ public class StatisticsFunctions {
 				IAST vector = (IAST) ast.arg1();
 				int size = vector.size();
 				final IASTAppendable sum = F.PlusAlloc(size);
-				final IExpr mean = F.eval(F.Mean(F.Negate(vector)));
+				final IExpr mean = F.Mean.of(engine, F.Negate(vector));
 				vector.forEach(new Consumer<IExpr>() {
 					@Override
 					public void accept(IExpr x) {

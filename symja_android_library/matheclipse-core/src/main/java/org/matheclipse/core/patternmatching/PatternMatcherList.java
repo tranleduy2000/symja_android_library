@@ -3,6 +3,7 @@ package org.matheclipse.core.patternmatching;
 
 import com.duy.annotations.Nonnull;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
 import org.matheclipse.core.eval.exception.ReturnException;
@@ -45,8 +46,6 @@ public class PatternMatcherList extends PatternMatcherAndEvaluator {
 				if (!(fLhsPatternExpr.isFlatAST() && leftHandSide.isFlatAST())) {
 					return F.NIL;
 				}
-				// replaceSubExpressionOrderlessFlat() below implements equals matching for
-				// special cases, if the AST is Orderless or Flat
 			}
 			if (fLhsPatternExpr.size() == leftHandSide.size()) {
 				return F.NIL;
@@ -75,7 +74,9 @@ public class PatternMatcherList extends PatternMatcherAndEvaluator {
 					}
 					return result;
 				} catch (final ConditionException e) {
+					if (Config.SHOW_STACKTRACE) {
 					logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
+					}
 					return F.NIL;
 				} catch (final ReturnException e) {
 					return e.getValue();

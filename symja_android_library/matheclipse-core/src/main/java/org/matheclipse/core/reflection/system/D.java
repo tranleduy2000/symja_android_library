@@ -1,6 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.BiFunction;
+import com.duy.lambda.Consumer;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 
@@ -249,9 +250,16 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 		}
 		IASTAppendable derivativeHead2 = F.ast(derivativeHead1);
 		derivativeHead2.append(header);
-		IASTAppendable derivativeAST = F.ast(derivativeHead2, size, false);
-		derivativeAST.appendArgs(args);
-		// args.forEach(x -> derivativeAST.append(x));
+		final IASTAppendable derivativeAST = F.ast(derivativeHead2, size, false);
+		args.forEach(new Consumer<IExpr>() {
+			@Override
+			public void accept(IExpr x) {
+				derivativeAST.append(x);
+			}
+		});
+		// for (int i = 1; i < size; i++) {
+		// derivativeAST.append(args.get(i));
+		// }
 		return derivativeAST;
 	}
 

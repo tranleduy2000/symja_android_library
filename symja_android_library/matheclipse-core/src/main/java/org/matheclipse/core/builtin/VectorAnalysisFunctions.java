@@ -1,5 +1,6 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Consumer;
 import com.duy.lambda.IntFunction;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -131,14 +132,20 @@ public class VectorAnalysisFunctions {
 	private static final class Grad extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IExpr function = ast.arg1();
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			final IExpr function = ast.arg1();
 			if (ast.arg2().isVector() > 0) {
 				IAST variables = (IAST) ast.arg2();
-				IASTAppendable dList = F.ListAlloc(variables.argSize());
-				for (int i = 1; i < variables.size(); i++) {
-					dList.append(engine.evaluate(F.D(function, variables.get(i))));
-				}
+				final IASTAppendable dList = F.ListAlloc(variables.argSize());
+				variables.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						dList.append(engine.evaluate(F.D(function, x)));
+					}
+				});
+				// for (int i = 1; i < variables.size(); i++) {
+				// dList.append(engine.evaluate(F.D(function, variables.get(i))));
+				// }
 				return dList;
 			}
 

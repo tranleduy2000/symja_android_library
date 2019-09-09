@@ -1,5 +1,7 @@
 package org.matheclipse.core.convert;
 
+import com.duy.lambda.ObjIntConsumer;
+
 import org.logicng.formulas.And;
 import org.logicng.formulas.CFalse;
 import org.logicng.formulas.CTrue;
@@ -166,37 +168,61 @@ public class LogicFormula {
 				switch (functionID) {
 				case ID.And:
 			if (ast.isAnd()) {
-				Formula[] result = new Formula[ast.argSize()];
-				for (int i = 1; i < ast.size(); i++) {
-					result[i - 1] = expr2BooleanFunction(ast.get(i));
-				}
+						final Formula[] result = new Formula[ast.argSize()];
+						ast.forEach(new ObjIntConsumer<IExpr>() {
+							@Override
+							public void accept(IExpr x, int i) {
+								result[i - 1] = LogicFormula.this.expr2BooleanFunction(x);
+							}
+						});
+						// for (int i = 1; i < ast.size(); i++) {
+						// result[i - 1] = expr2BooleanFunction(ast.get(i));
+						// }
 				return factory.and(result);
 					}
 					break;
 				case ID.Or:
 					if (ast.isOr()) {
-				Formula[] result = new Formula[ast.argSize()];
-				for (int i = 1; i < ast.size(); i++) {
-					result[i - 1] = expr2BooleanFunction(ast.get(i));
-				}
+						final Formula[] result = new Formula[ast.argSize()];
+						ast.forEach(new ObjIntConsumer<IExpr>() {
+							@Override
+							public void accept(IExpr x, int i) {
+								result[i - 1] = LogicFormula.this.expr2BooleanFunction(x);
+							}
+						});
+						// for (int i = 1; i < ast.size(); i++) {
+						// result[i - 1] = expr2BooleanFunction(ast.get(i));
+						// }
 				return factory.or(result);
 					}
 					break;
 				case ID.Nand:
 					if (ast.isSameHeadSizeGE(F.Nand, 3)) {
-				Formula[] result = new Formula[ast.argSize()];
-				for (int i = 1; i < ast.size(); i++) {
-					result[i - 1] = factory.not(expr2BooleanFunction(ast.get(i)));
-				}
+						final Formula[] result = new Formula[ast.argSize()];
+						ast.forEach(new ObjIntConsumer<IExpr>() {
+							@Override
+							public void accept(IExpr x, int i) {
+								result[i - 1] = factory.not(LogicFormula.this.expr2BooleanFunction(x));
+							}
+						});
+						// for (int i = 1; i < ast.size(); i++) {
+						// result[i - 1] = factory.not(expr2BooleanFunction(ast.get(i)));
+						// }
 				return factory.or(result);
 					}
 					break;
 				case ID.Nor:
 					if (ast.isSameHeadSizeGE(F.Nor, 3)) {
-				Formula[] result = new Formula[ast.argSize()];
-				for (int i = 1; i < ast.size(); i++) {
-					result[i - 1] = factory.not(expr2BooleanFunction(ast.get(i)));
-				}
+				final Formula[] result = new Formula[ast.argSize()];
+						ast.forEach(new ObjIntConsumer<IExpr>() {
+							@Override
+							public void accept(IExpr x, int i) {
+								result[i - 1] = factory.not(LogicFormula.this.expr2BooleanFunction(x));
+							}
+						});
+						// for (int i = 1; i < ast.size(); i++) {
+						// result[i - 1] = factory.not(expr2BooleanFunction(ast.get(i)));
+						// }
 				return factory.and(result);
 					}
 					break;

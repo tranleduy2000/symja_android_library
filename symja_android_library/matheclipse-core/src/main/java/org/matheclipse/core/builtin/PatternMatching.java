@@ -58,40 +58,41 @@ public final class PatternMatching {
 	private static class Initializer {
 
 		private static void init() {
-		F.BeginPackage.setEvaluator(new BeginPackage());
-		F.EndPackage.setEvaluator(new EndPackage());
-		F.Begin.setEvaluator(new Begin());
-		F.End.setEvaluator(new End());
-		F.Blank.setEvaluator(Blank.CONST);
-		F.BlankSequence.setEvaluator(BlankSequence.CONST);
-		F.BlankNullSequence.setEvaluator(BlankNullSequence.CONST);
-		F.Clear.setEvaluator(new Clear());
-		F.ClearAll.setEvaluator(new ClearAll());
-		F.Context.setEvaluator(new ContextFunction());
-		F.Definition.setEvaluator(new Definition());
-		F.Evaluate.setEvaluator(new Evaluate());
-		F.Get.setEvaluator(new Get());
-		F.Hold.setEvaluator(new Hold());
-		F.HoldPattern.setEvaluator(new HoldPattern());
-		F.Identity.setEvaluator(new Identity());
-		F.Information.setEvaluator(new Information());
-		F.Literal.setEvaluator(new Literal());
-		F.MessageName.setEvaluator(new MessageName());
-		F.Optional.setEvaluator(Optional.CONST);
+			F.BeginPackage.setEvaluator(new BeginPackage());
+			F.EndPackage.setEvaluator(new EndPackage());
+			F.Begin.setEvaluator(new Begin());
+			F.End.setEvaluator(new End());
+			F.Blank.setEvaluator(Blank.CONST);
+			F.BlankSequence.setEvaluator(BlankSequence.CONST);
+			F.BlankNullSequence.setEvaluator(BlankNullSequence.CONST);
+			F.Clear.setEvaluator(new Clear());
+			F.ClearAll.setEvaluator(new ClearAll());
+			F.Context.setEvaluator(new ContextFunction());
+			F.Default.setEvaluator(new Default());
+			F.Definition.setEvaluator(new Definition());
+			F.Evaluate.setEvaluator(new Evaluate());
+			F.Get.setEvaluator(new Get());
+			F.Hold.setEvaluator(new Hold());
+			F.HoldPattern.setEvaluator(new HoldPattern());
+			F.Identity.setEvaluator(new Identity());
+			F.Information.setEvaluator(new Information());
+			F.Literal.setEvaluator(new Literal());
+			F.MessageName.setEvaluator(new MessageName());
+			F.Optional.setEvaluator(Optional.CONST);
 			F.Options.setEvaluator(new Options());
-		F.Pattern.setEvaluator(Pattern.CONST);
-		F.Put.setEvaluator(new Put());
-		F.Rule.setEvaluator(new Rule());
-		F.RuleDelayed.setEvaluator(new RuleDelayed());
-		F.Set.setEvaluator(new Set());
-		F.SetDelayed.setEvaluator(new SetDelayed());
-		F.TagSet.setEvaluator(new TagSet());
-		F.TagSetDelayed.setEvaluator(new TagSetDelayed());
-		F.Unique.setEvaluator(new Unique());
-		F.Unset.setEvaluator(new Unset());
-		F.UpSet.setEvaluator(new UpSet());
-		F.UpSetDelayed.setEvaluator(new UpSetDelayed());
-	}
+			F.Pattern.setEvaluator(Pattern.CONST);
+			F.Put.setEvaluator(new Put());
+			F.Rule.setEvaluator(new Rule());
+			F.RuleDelayed.setEvaluator(new RuleDelayed());
+			F.Set.setEvaluator(new Set());
+			F.SetDelayed.setEvaluator(new SetDelayed());
+			F.TagSet.setEvaluator(new TagSet());
+			F.TagSetDelayed.setEvaluator(new TagSetDelayed());
+			F.Unique.setEvaluator(new Unique());
+			F.Unset.setEvaluator(new Unset());
+			F.UpSet.setEvaluator(new UpSet());
+			F.UpSetDelayed.setEvaluator(new UpSetDelayed());
+		}
 	}
 
 	private final static class Begin extends AbstractCoreFunctionEvaluator {
@@ -357,6 +358,52 @@ public final class PatternMatching {
 		}
 	}
 
+	/**
+	 * Get the default value for a symbol (i.e. <code>1</code> is the default value for <code>Times</code>,
+	 * <code>0</code> is the default value for <code>Plus</code>).
+	 */
+	private final static class Default extends AbstractFunctionEvaluator implements ISetEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			ISymbol symbol = Validate.checkSymbolType(ast, 1);
+
+			if (ast.size() > 2) {
+				int pos = ast.arg2().toIntDefault();
+				if (pos > 0) {
+					return symbol.getDefaultValue(pos);
+				}
+			} else {
+				return symbol.getDefaultValue();
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) {
+			if (leftHandSide.isAST(F.Default)) {
+				if (leftHandSide.size() == 2 && leftHandSide.first().isSymbol()) {
+					ISymbol symbol = (ISymbol) leftHandSide.first();
+					symbol.setDefaultValue(rightHandSide);
+					return rightHandSide;
+				} else if (leftHandSide.size() == 3 && leftHandSide.first().isSymbol()) {
+					ISymbol symbol = (ISymbol) leftHandSide.first();
+					int pos = leftHandSide.second().toIntDefault();
+					if (pos > 1) {
+						symbol.setDefaultValue(rightHandSide);
+						return rightHandSide;
+					}
+				}
+			}
+			return F.NIL;
+
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
+	}
 	/**
 	 * <pre>
 	 * Definition(symbol)
@@ -747,6 +794,7 @@ public final class PatternMatching {
 	 *
 	 * @deprecated use {@link HoldPattern}
 	 */
+	@Deprecated
 	private final static class Literal extends HoldPattern {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1430,7 +1478,7 @@ public final class PatternMatching {
 	private static IExpr setDownRule(IExpr leftHandSide, int flags, IExpr rightHandSide, boolean packageMode) {
 		// final Object[] result = new Object[] { null, rightHandSide };
 		if (leftHandSide.isAST()) {
-			final ISymbol lhsSymbol = determineRuleTag((IAST) leftHandSide);
+			final ISymbol lhsSymbol = determineRuleTag(leftHandSide);
 			if (lhsSymbol.isProtected()) {
 				IOFunctions.printMessage(F.SetDelayed, "write", F.List(lhsSymbol, leftHandSide), EvalEngine.get());
 				throw new FailedException();
@@ -1453,7 +1501,7 @@ public final class PatternMatching {
 	private static ISymbol determineRuleTag(IExpr leftHandSide) {
 		while (leftHandSide.isCondition()) {
 			if (leftHandSide.first().isAST()) {
-				leftHandSide = (IAST) leftHandSide.first();
+				leftHandSide = leftHandSide.first();
 				continue;
 			}
 			break;
@@ -1493,7 +1541,7 @@ public final class PatternMatching {
 				symbol.putMessage(IPatternMatcher.SET_DELAYED, messageName, message);
 				return;
 			}
-			final ISymbol lhsSymbol = determineRuleTag((IAST) leftHandSide);
+			final ISymbol lhsSymbol = determineRuleTag(leftHandSide);
 			// final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
 
 			if (lhsSymbol.isProtected()) {
@@ -1552,7 +1600,7 @@ public final class PatternMatching {
 					} catch (final ReturnException e) {
 						rightHandSide = e.getValue();
 					}
-					IExpr temp = engine.threadASTListArgs((IASTMutable) F.TagSet(symbol, leftHandSide, rightHandSide));
+					IExpr temp = engine.threadASTListArgs(F.TagSet(symbol, leftHandSide, rightHandSide));
 					if (temp.isPresent()) {
 						return engine.evaluate(temp);
 					}

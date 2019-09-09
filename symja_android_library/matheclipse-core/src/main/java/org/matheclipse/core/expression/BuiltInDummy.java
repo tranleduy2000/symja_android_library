@@ -419,14 +419,16 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	@Override
 	public IExpr getDefaultValue() {
 		// special case for a general default value
-		return fRulesData != null ? fRulesData.getDefaultValue(RulesData.DEFAULT_VALUE_INDEX) : null;
+		IExpr value = fRulesData != null ? fRulesData.getDefaultValue(RulesData.DEFAULT_VALUE_INDEX) : null;
+		return value == null ? F.NIL : value;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public IExpr getDefaultValue(int pos) {
 		// default value at this position
-		return fRulesData != null ? fRulesData.getDefaultValue(pos) : null;
+		IExpr value = fRulesData != null ? fRulesData.getDefaultValue(pos) : null;
+		return value == null ? F.NIL : value;
 	}
 
 	/**
