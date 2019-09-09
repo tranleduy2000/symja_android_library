@@ -2,6 +2,7 @@ package org.matheclipse.core.eval;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.exception.AbortException;
+import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
@@ -482,6 +483,15 @@ public class MMAConsole {
 		} catch (final AbortException re) {
 			try {
 				return printResult(F.$Aborted);
+			} catch (IOException e) {
+				Validate.printException(buf, e);
+				stderr.println(buf.toString());
+				stderr.flush();
+				return "";
+			}
+		} catch (final FailedException re) {
+			try {
+				return printResult(F.$Failed);
 			} catch (IOException e) {
 				Validate.printException(buf, e);
 				stderr.println(buf.toString());

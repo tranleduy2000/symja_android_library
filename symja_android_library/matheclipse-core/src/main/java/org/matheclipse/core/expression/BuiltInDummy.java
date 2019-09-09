@@ -665,6 +665,11 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		}
 		return false;
 	}
+	/** {@inheritDoc} */
+	@Override
+	public boolean isProtected() {
+		return false;
+	}
 
 	/** {@inheritDoc} */
 	@Override

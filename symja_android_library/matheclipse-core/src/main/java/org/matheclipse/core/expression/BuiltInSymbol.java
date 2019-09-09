@@ -235,6 +235,11 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
+	final public boolean isProtected() {
+		return true;
+	}
+	/** {@inheritDoc} */
+	@Override
 	final public boolean isRealConstant() {
 		return fEvaluator instanceof ISignedNumberConstant;
 	}

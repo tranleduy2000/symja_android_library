@@ -352,6 +352,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
 
     boolean isNumericFunctionAttribute();
 
+    boolean isProtected();
+
     /**
      * Tests if this symbols name equals the given string
      *

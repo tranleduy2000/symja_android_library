@@ -235,7 +235,7 @@ public class IOFunctions {
 
 			if (message != null) {
 				for (int i = 1; i < ast.size(); i++) {
-					message = message.replaceAll("`" + (i) + "`", ast.get(i).toString());
+				message = message.replace("`" + (i) + "`", ast.get(i).toString());
 				}
 				engine.printMessage(symbol.toString() + ": " + message);
 			}
@@ -244,7 +244,7 @@ public class IOFunctions {
 
 	private static String rawMessage(final IAST ast, String message) {
 				for (int i = 2; i < ast.size(); i++) {
-					message = message.replaceAll("`" + (i - 1) + "`", ast.get(i).toString());
+			message = message.replace("`" + (i - 1) + "`", ast.get(i).toString());
 				}
 		return message;
 	}

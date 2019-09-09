@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
+import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.exception.Validate;
@@ -1330,7 +1331,7 @@ public final class PatternMatching {
 				}
 			}
 
-			return setDownRule(flags[0], leftHandSide, rightHandSide, packageMode);
+			return setDownRule(leftHandSide, flags[0], rightHandSide, packageMode);
 		}
 
 		@Override
@@ -1426,6 +1427,29 @@ public final class PatternMatching {
 
 	}
 
+	private static IExpr setDownRule(IExpr leftHandSide, int flags, IExpr rightHandSide, boolean packageMode) {
+		// final Object[] result = new Object[] { null, rightHandSide };
+		if (leftHandSide.isAST()) {
+			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
+			if (lhsSymbol.isProtected()) {
+				IOFunctions.printMessage(F.SetDelayed, "write", F.List(lhsSymbol, leftHandSide), EvalEngine.get());
+				throw new FailedException();
+			}
+			lhsSymbol.putDownRule(IPatternMatcher.SET, false, leftHandSide, rightHandSide, packageMode);
+			return rightHandSide;
+		}
+		if (leftHandSide.isSymbol()) {
+			final ISymbol lhsSymbol = (ISymbol) leftHandSide;
+			if (lhsSymbol.isProtected()) {
+				IOFunctions.printMessage(F.SetDelayed, "write", F.List(lhsSymbol, leftHandSide), EvalEngine.get());
+				throw new FailedException();
+			}
+			lhsSymbol.assign(rightHandSide);
+			return rightHandSide;
+		}
+
+		throw new RuleCreationError(leftHandSide);
+	}
 	public static IExpr setDownRule(int flags, IExpr leftHandSide, IExpr rightHandSide, boolean packageMode) {
 		// final Object[] result = new Object[] { null, rightHandSide };
 		if (leftHandSide.isAST()) {
@@ -1458,10 +1482,19 @@ public final class PatternMatching {
 			}
 			final ISymbol lhsSymbol = ((IAST) leftHandSide).topHead();
 
+			if (lhsSymbol.isProtected()) {
+				IOFunctions.printMessage(F.SetDelayed, "write", F.List(lhsSymbol, leftHandSide), EvalEngine.get());
+				throw new FailedException();
+			}
 			lhsSymbol.putDownRule(flags | IPatternMatcher.SET_DELAYED, false, leftHandSide, rightHandSide, packageMode);
 			return;
 		}
 		if (leftHandSide.isSymbol()) {
+			final ISymbol lhsSymbol = (ISymbol) leftHandSide;
+			if (lhsSymbol.isProtected()) {
+				IOFunctions.printMessage(F.SetDelayed, "write", F.List(lhsSymbol, leftHandSide), EvalEngine.get());
+				throw new FailedException();
+			}
 			((ISymbol) leftHandSide).assign(rightHandSide);
 			return;
 		}
@@ -1490,10 +1523,14 @@ public final class PatternMatching {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = ast.arg1();
-			if (arg1.isSymbol() && !arg1.isBuiltInSymbol()) {
+			if (arg1.isSymbol()) {
 				ISymbol symbol = (ISymbol) arg1;
 				final IExpr leftHandSide = ast.arg2();
 				IExpr rightHandSide = ast.arg3();
+				if (symbol.isProtected()) {
+					IOFunctions.printMessage(F.SetDelayed, "write", F.List(symbol, leftHandSide), EvalEngine.get());
+					throw new FailedException();
+				}
 				if (leftHandSide.isList()) {
 					// thread over lists
 					try {
@@ -1554,10 +1591,14 @@ public final class PatternMatching {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = ast.arg1();
-			if (arg1.isSymbol() && !arg1.isBuiltInSymbol()) {
+			if (arg1.isSymbol()) {
 				ISymbol symbol = (ISymbol) arg1;
 				final IExpr leftHandSide = ast.arg2();
 				final IExpr rightHandSide = ast.arg3();
+				if (symbol.isProtected()) {
+					IOFunctions.printMessage(F.SetDelayed, "write", F.List(symbol, leftHandSide), EvalEngine.get());
+					throw new FailedException();
+				}
 
 				createPatternMatcher(symbol, leftHandSide, rightHandSide, false, engine);
 

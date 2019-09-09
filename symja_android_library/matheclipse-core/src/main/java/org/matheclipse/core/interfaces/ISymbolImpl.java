@@ -78,6 +78,12 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     }
 
     @Override
+    public boolean isProtected() {
+        return ((getAttributes() & PROTECTED) == PROTECTED);
+
+    }
+
+    @Override
     public boolean isConstantAttribute() {
         return (getAttributes() & CONSTANT) == CONSTANT;
     }

@@ -9,4 +9,9 @@ public class BuiltInRubi extends BuiltInDummy {
 	public final Context getContext() {
 		return Context.RUBI;
 	}
+	/** {@inheritDoc} */
+	@Override
+	public boolean isProtected() {
+		return true;
+	}
 }

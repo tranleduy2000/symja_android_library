@@ -8,6 +8,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.AbortException;
+import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.ASTSeriesData;
@@ -676,6 +677,10 @@ public class Integrate extends AbstractFunctionEvaluator {
 			} catch (AbortException ae) {
 				if (Config.DEBUG) {
 					ae.printStackTrace();
+				}
+			} catch (final FailedException fe) {
+				if (Config.DEBUG) {
+					fe.printStackTrace();
 				}
 			} finally {
 				engine.setRecursionLimit(limit);
