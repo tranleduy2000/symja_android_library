@@ -13,6 +13,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IStringX;
+import org.matheclipse.core.trie.Tries;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.function.Supplier;
  */
 public class GraphDataFunctions {
 
-	private static Map<String, Supplier<Graph>> GRAPH_MAP = new HashMap<String, Supplier<Graph>>();
+	private static Map<String, Supplier<Graph>> GRAPH_MAP = Tries.forStrings();
 
 	/**
 	 * 

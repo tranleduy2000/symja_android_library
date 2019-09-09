@@ -6,7 +6,7 @@ import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.util.SuggestTree;
+import org.matheclipse.core.trie.SuggestTree;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -18,7 +18,7 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.matheclipse.core.eval.util.SuggestTree.Node;
+import static org.matheclipse.core.trie.SuggestTree.Node;
 
 public class IOFunctions {
 

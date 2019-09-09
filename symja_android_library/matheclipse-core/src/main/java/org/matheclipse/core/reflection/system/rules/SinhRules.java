@@ -12,13 +12,13 @@ import static org.matheclipse.core.expression.F.ArcTanh;
 import static org.matheclipse.core.expression.F.C0;
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C1DSqrt2;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
 import static org.matheclipse.core.expression.F.CN1;
 import static org.matheclipse.core.expression.F.CN1D2;
 import static org.matheclipse.core.expression.F.CNI;
-import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.Complex;
 import static org.matheclipse.core.expression.F.Cosh;
@@ -64,7 +64,7 @@ public interface SinhRules {
       CC(0L,1L,1L,2L)),
     // Sinh(1/4*Pi*I)=1/2*Sqrt(2)*I
     ISet(Sinh(Times(CC(0L,1L,1L,4L),Pi)),
-      Times(CC(0L,1L,1L,2L),CSqrt2)),
+      Times(CI,C1DSqrt2)),
     // Sinh(1/3*Pi*I)=1/2*Sqrt(3)*I
     ISet(Sinh(Times(CC(0L,1L,1L,3L),Pi)),
       Times(CC(0L,1L,1L,2L),CSqrt3)),
@@ -76,7 +76,7 @@ public interface SinhRules {
       Times(CC(0L,1L,1L,2L),CSqrt3)),
     // Sinh(3/4*Pi*I)=1/2*Sqrt(2)*I
     ISet(Sinh(Times(CC(0L,1L,3L,4L),Pi)),
-      Times(CC(0L,1L,1L,2L),CSqrt2)),
+      Times(CI,C1DSqrt2)),
     // Sinh(5/6*Pi*I)=I/2
     ISet(Sinh(Times(CC(0L,1L,5L,6L),Pi)),
       CC(0L,1L,1L,2L)),
@@ -88,7 +88,7 @@ public interface SinhRules {
       CC(0L,1L,-1L,2L)),
     // Sinh(5/4*Pi*I)=-1/2*Sqrt(2)*I
     ISet(Sinh(Times(CC(0L,1L,5L,4L),Pi)),
-      Times(CC(0L,1L,-1L,2L),CSqrt2)),
+      Times(CNI,C1DSqrt2)),
     // Sinh(4/3*Pi*I)=-1/2*Sqrt(3)*I
     ISet(Sinh(Times(CC(0L,1L,4L,3L),Pi)),
       Times(CC(0L,1L,-1L,2L),CSqrt3)),
@@ -100,7 +100,7 @@ public interface SinhRules {
       Times(CC(0L,1L,-1L,2L),CSqrt3)),
     // Sinh(7/4*Pi*I)=-1/2*Sqrt(2)*I
     ISet(Sinh(Times(CC(0L,1L,7L,4L),Pi)),
-      Times(CC(0L,1L,-1L,2L),CSqrt2)),
+      Times(CNI,C1DSqrt2)),
     // Sinh(11/6*Pi*I)=-I/2
     ISet(Sinh(Times(CC(0L,1L,11L,6L),Pi)),
       CC(0L,1L,-1L,2L)),

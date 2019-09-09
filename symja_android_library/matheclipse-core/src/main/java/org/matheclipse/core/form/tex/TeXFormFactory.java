@@ -27,10 +27,12 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.Characters;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -1036,7 +1038,7 @@ public class TeXFormFactory {
 	/**
 	 * Table for constant symbols
 	 */
-	public final static HashMap<String, Object> CONSTANT_SYMBOLS = new HashMap<String, Object>(199);
+	public final static Map<String, Object> CONSTANT_SYMBOLS = Tries.forStrings();
 
 	/**
 	 * Table for constant expressions

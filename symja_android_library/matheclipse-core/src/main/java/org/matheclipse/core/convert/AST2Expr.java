@@ -9,7 +9,7 @@ import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.eval.util.SuggestTree;
+import org.matheclipse.core.trie.SuggestTree;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.interfaces.IAST;
@@ -19,6 +19,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.ast.FloatNode;
 import org.matheclipse.parser.client.ast.FractionNode;
@@ -31,7 +32,6 @@ import org.matheclipse.parser.client.ast.StringNode;
 import org.matheclipse.parser.client.ast.SymbolNode;
 import org.matheclipse.parser.client.eval.DoubleNode;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -182,7 +182,7 @@ public class AST2Expr {
 
 	public static Map<String, Integer> RUBI_STATISTICS_MAP;
 
-	public static final Map<String, String> PREDEFINED_SYMBOLS_MAP = new HashMap<String, String>(997);
+	public static final Map<String, String> PREDEFINED_SYMBOLS_MAP = Tries.forStrings();
 
 	private final static String[] ALIASES_STRINGS = { "ACos", "ASin", "ATan", "ACosh", "ASinh", "ATanh", "Divergence",
 			"Diff", "EvalF", "Int", "Ln", "Trunc", "NthRoot" };
@@ -192,7 +192,7 @@ public class AST2Expr {
 	/**
 	 * Aliases which are mapped to the standard function symbols.
 	 */
-	public static final Map<String, String> PREDEFINED_ALIASES_MAP = new HashMap<String, String>(97);
+	public static final Map<String, String> PREDEFINED_ALIASES_MAP = Tries.forStrings();
 
 	public static final String TIMES_STRING = Config.PARSER_USE_LOWERCASE_SYMBOLS ? "times" : "Times";
 	public static final String TRUE_STRING = "true";// : "True";

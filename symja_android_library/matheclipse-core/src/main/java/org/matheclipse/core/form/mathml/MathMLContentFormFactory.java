@@ -12,10 +12,11 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generates MathML presentation output
@@ -85,25 +86,25 @@ public class MathMLContentFormFactory extends AbstractMathMLFormFactory {
 		}
 	}
 
-//	private class Operator {
-//		String fOperator;
+	// private class Operator {
+	// String fOperator;
 //
-//		Operator(final String oper) {
-//			fOperator = oper;
-//		}
+	// Operator(final String oper) {
+	// fOperator = oper;
+	// }
 //
-//		public void convert(final StringBuilder buf) {
-//			tagStart(buf, "mo");
-//			buf.append(fOperator);
-//			tagEnd(buf, "mo");
-//		}
+	// public void convert(final StringBuilder buf) {
+	// tagStart(buf, "mo");
+	// buf.append(fOperator);
+	// tagEnd(buf, "mo");
+	// }
 //
-//		@Override
-//		public String toString() {
-//			return fOperator;
-//		}
+	// @Override
+	// public String toString() {
+	// return fOperator;
+	// }
 //
-//	}
+	// }
 
 	/**
 	 * The conversion wasn't called with an operator preceding the <code>IExpr</code> object.
@@ -118,12 +119,12 @@ public class MathMLContentFormFactory extends AbstractMathMLFormFactory {
 	/**
 	 * Table for constant symbols
 	 */
-	public final static HashMap<String, Object> CONSTANT_SYMBOLS = new HashMap<String, Object>(199);
+	public final static Map<String, Object> CONSTANT_SYMBOLS = Tries.forStrings();
 
 	/**
 	 * Description of the Field
 	 */
-	public final static HashMap<String, AbstractConverter> operTab = new HashMap<String, AbstractConverter>(199);
+	public final static Map<String, AbstractConverter> operTab = Tries.forStrings();
 
 	/**
 	 * Constructor

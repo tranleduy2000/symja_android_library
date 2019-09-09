@@ -6,6 +6,7 @@ import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
@@ -94,7 +95,6 @@ public class MMAConsole {
 			e1.printStackTrace();
 			return;
 		}
-		String inputExpression = null;
 		String trimmedInput = null;
 		try {
 			console.setArgs(args);
@@ -130,7 +130,7 @@ public class MMAConsole {
 
 		while (true) {
 			try {
-				inputExpression = console.readString(stdout, ">> ");
+				String inputExpression = console.readString(stdout, ">> ");
 				if (inputExpression != null) {
 					trimmedInput = inputExpression.trim();
 					if (trimmedInput.length() >= 4 && trimmedInput.charAt(0) == '/') {
@@ -206,47 +206,8 @@ public class MMAConsole {
 		}
 	}
 
-	/**
-	 * Load the documentation from resources folder if available and print to output.
-	 *
-	 * @param symbolName
-	 */
-	// private static void printDocumentation(String symbolName) {
-	// // read markdown file
-	// String fileName = symbolName + ".md";
-	//
-	// // Get file from resources folder
-	// ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-	//
-	// try {
-	// InputStream is = classloader.getResourceAsStream(fileName);
-	// final BufferedReader f = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-	// String line;
-	// boolean emptyLine = false;
-	// while ((line = f.readLine()) != null) {
-	// if (line.startsWith("```")) {
-	// continue;
-	// }
-	// if (line.trim().length() == 0) {
-	// if (emptyLine) {
-	// continue;
-	// }
-	// emptyLine = true;
-	// } else {
-	// emptyLine = false;
-	// }
-	// stdout.println(line);
-	// }
-	// stdout.flush();
-	// f.close();
-	// is.close();
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	// }
-
-	private String resultPrinter(String inputExpression) {
-		String outputExpression = interpreter(inputExpression);
+	private String resultPrinter(String trimmedInput) {
+		String outputExpression = interpreter(trimmedInput);
 		if (outputExpression.length() > 0) {
 			stdout.println("Out[" + COUNTER + "]: " + outputExpression);
 			stdout.flush();
@@ -254,11 +215,6 @@ public class MMAConsole {
 		return outputExpression;
 	}
 
-	// private void prettyPrinter(String inputExpression) {
-	// stdout.println();
-	// String[] outputExpression = prettyPrinter3Lines(inputExpression);
-	// ASCIIPrettyPrinter3.prettyPrinter(stdout, outputExpression, "Out[" + COUNTER + "]: ");
-	// }
 
 	/**
 	 * Prints the usage of how to use this class to stdout
@@ -381,7 +337,7 @@ public class MMAConsole {
 					stdout.println(msg);
 					throw ReturnException.RETURN_FALSE;
 				}
-					String outputExpression = interpreter(args[i + 1]);
+				String outputExpression = interpreter(args[i + 1].trim());
 					if (outputExpression.length() > 0) {
 						stdout.print(outputExpression);
 					}
@@ -461,17 +417,21 @@ public class MMAConsole {
 	/**
 	 * Evaluates the given string-expression and returns the result in <code>OutputForm</code>
 	 *
-	 * @param inputExpression
+	 * @param trimmedInput a trimmed input string
 	 * @return
 	 */
-	public String interpreter(final String inputExpression) {
+	public String interpreter(final String trimmedInput) {
 		IExpr result;
 		final StringWriter buf = new StringWriter();
 		try {
+			if (trimmedInput.length() > 1 && trimmedInput.charAt(0) == '?') {
+				IExpr doc = Documentation.findDocumentation(trimmedInput);
+				return printResult(doc);
+			}
 			if (fSeconds <= 0) {
-				result = fEvaluator.eval(inputExpression);
+				result = fEvaluator.eval(trimmedInput);
 			} else {
-				result = fEvaluator.evaluateWithTimeout(inputExpression, fSeconds, TimeUnit.SECONDS, true,
+				result = fEvaluator.evaluateWithTimeout(trimmedInput, fSeconds, TimeUnit.SECONDS, true,
 						new EvalControlledCallable(fEvaluator.getEvalEngine()));
 			}
 			if (result != null) {

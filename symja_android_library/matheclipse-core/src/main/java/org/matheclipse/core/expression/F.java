@@ -89,6 +89,7 @@ import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
+import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.SyntaxError;
 
 import java.math.BigDecimal;
@@ -138,11 +139,13 @@ public class F {
     /**
      * The map for predefined strings for the {@link IExpr#internalFormString(boolean, int)} method.
      */
-    public final static Map<String, String> PREDEFINED_INTERNAL_FORM_STRINGS = new HashMap<String, String>(61);
-    public final static Map<String, IPattern> PREDEFINED_PATTERN_MAP = new HashMap<String, IPattern>(61);
-    public final static Map<String, IPatternSequence> PREDEFINED_PATTERNSEQUENCE_MAP = new HashMap<String, IPatternSequence>(
-            61);
-    public final static Map<String, ISymbol> HIDDEN_SYMBOLS_MAP = new HashMap<String, ISymbol>(197);
+	public final static Map<String, String> PREDEFINED_INTERNAL_FORM_STRINGS = Tries.forStrings();
+
+	public final static Map<String, IPattern> PREDEFINED_PATTERN_MAP = Tries.forStrings();
+
+	public final static Map<String, IPatternSequence> PREDEFINED_PATTERNSEQUENCE_MAP = Tries.forStrings();
+
+	public final static Map<String, ISymbol> HIDDEN_SYMBOLS_MAP = Tries.forStrings();
 	public static ISymbolObserver SYMBOL_OBSERVER = new ISymbolObserver() {
 		@Override
 		public final boolean createPredefinedSymbol(String symbol) {
@@ -657,7 +660,10 @@ public class F {
     public final static IBuiltInSymbol DSolve = F.initFinalSymbol("DSolve", ID.DSolve);
 	/** Decrement(x) - decrements `x` by `1`, returning the original value of `x`. */
     public final static IBuiltInSymbol Decrement = F.initFinalSymbol("Decrement", ID.Decrement);
-    /***/
+	/**
+	 * Default(symbol) - `Default` returns the default value associated with the `symbol` for a pattern default `_.`
+	 * expression.
+	 */
     public final static IBuiltInSymbol Default = F.initFinalSymbol("Default", ID.Default);
 	/** Defer(expr) - `Defer` doesn't evaluate `expr` and didn't appear in the output */
     public final static IBuiltInSymbol Defer = F.initFinalSymbol("Defer", ID.Defer);
@@ -889,12 +895,27 @@ public class F {
     /** FindEulerianCycle(graph) - find an eulerian cycle in the `graph`.*/
     public final static IBuiltInSymbol FindEulerianCycle = F.initFinalSymbol("FindEulerianCycle", ID.FindEulerianCycle);
 
-    /** FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the Levenberg-Marquardt algorithm.*/
+	/**
+	 * FindFit(list-of-data-points, function, parameters, variable) - solve a least squares problem using the
+	 * Levenberg-Marquardt algorithm.
+	 */
     public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
-    /** FindHamiltonianCycle(graph) - find an hamiltonian cycle in the `graph`.*/
-    public final static IBuiltInSymbol FindHamiltonianCycle = F.initFinalSymbol("FindHamiltonianCycle", ID.FindHamiltonianCycle);
+	/** FindHamiltonianCycle(graph) - find an hamiltonian cycle in the `graph`. */
+	public final static IBuiltInSymbol FindHamiltonianCycle = F.initFinalSymbol("FindHamiltonianCycle",
+			ID.FindHamiltonianCycle);
 
-    /** FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables `vars`.*/
+	/***/
+	public final static IBuiltInSymbol FindIndependentEdgeSet = F.initFinalSymbol("FindIndependentEdgeSet",
+			ID.FindIndependentEdgeSet);
+
+	/***/
+	public final static IBuiltInSymbol FindIndependentVertexSet = F.initFinalSymbol("FindIndependentVertexSet",
+			ID.FindIndependentVertexSet);
+
+	/**
+	 * FindInstance(equations, vars) - attempts to find one solution which solves the `equations` for the variables
+	 * `vars`.
+	 */
     public final static IBuiltInSymbol FindInstance = F.initFinalSymbol("FindInstance", ID.FindInstance);
     /** FindRoot(f, {x, xmin, xmax}) - searches for a numerical root of `f` for the variable `x`, in the range `xmin` to `xmax`. */
     public final static IBuiltInSymbol FindRoot = F.initFinalSymbol("FindRoot", ID.FindRoot);
@@ -906,7 +927,10 @@ public class F {
 
     /** FindSpanningTree(graph) - find the minimum spanning tree in the `graph`.*/
     public final static IBuiltInSymbol FindSpanningTree = F.initFinalSymbol("FindSpanningTree", ID.FindSpanningTree);
-    /***/
+	/**
+	 * FindVertexCover(graph) - algorithm to find a vertex cover for a `graph`. A vertex cover is a set of vertices that
+	 * touches all the edges in the graph.
+	 */
     public final static IBuiltInSymbol FindVertexCover = F.initFinalSymbol("FindVertexCover", ID.FindVertexCover);
     /** First(expr) - returns the first element in `expr`.*/
     public final static IBuiltInSymbol First = F.initFinalSymbol("First", ID.First);
@@ -1378,7 +1402,7 @@ public class F {
 	/** ListCorrelate(kernel-list, tensor-list) - create the correlation of the `kernel-list` with `tensor-list`. */
     public final static IBuiltInSymbol ListCorrelate = F.initFinalSymbol("ListCorrelate", ID.ListCorrelate);
 
-    /***/
+	/** ListLinePlot( { list-of-points } ) - generate a JavaScript list line plot control for the `list-of-points`. */
 	public final static IBuiltInSymbol ListLinePlot = F.initFinalSymbol("ListLinePlot", ID.ListLinePlot);
     /** ListPlot( { list-of-points } ) - generate a JavaScript list plot control for the `list-of-points`.*/
     public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
@@ -1493,12 +1517,13 @@ public class F {
 	/** Mean(list) - returns the statistical mean of `list`. */
     public final static IBuiltInSymbol Mean = F.initFinalSymbol("Mean", ID.Mean);
     /***/
+	public final static IBuiltInSymbol MeanDeviation = F.initFinalSymbol("MeanDeviation", ID.MeanDeviation);
+
+	/** MeanFilter(list, r) - filter which evaluates the `Mean` of `list` for the radius `r`. */
     public final static IBuiltInSymbol MeanFilter = F.initFinalSymbol("MeanFilter", ID.MeanFilter);
-    /***/
-    public final static IBuiltInSymbol MeanDeviation = F.initFinalSymbol("MeanDeviation", ID.MeanDeviation);
 	/** Median(list) - returns the median of `list`. */
     public final static IBuiltInSymbol Median = F.initFinalSymbol("Median", ID.Median);
-    /***/
+	/** MedianFilter(list, r) - filter which evaluates the `Median` of `list` for the radius `r`. */
     public final static IBuiltInSymbol MedianFilter = F.initFinalSymbol("MedianFilter", ID.MedianFilter);
     /***/
     public final static IBuiltInSymbol MeijerG = F.initFinalSymbol("MeijerG", ID.MeijerG);
@@ -1530,7 +1555,7 @@ public class F {
     public final static IBuiltInSymbol Method = F.initFinalSymbol("Method", ID.Method);
 	/** Min(e_1, e_2, ..., e_i) - returns the expression with the lowest value among the `e_i`. */
     public final static IBuiltInSymbol Min = F.initFinalSymbol("Min", ID.Min);
-    /***/
+	/** MinFilter(list, r) - filter which evaluates the `Min` of `list` for the radius `r`. */
     public final static IBuiltInSymbol MinFilter = F.initFinalSymbol("MinFilter", ID.MinFilter);
     /***/
     public final static IBuiltInSymbol MinimalPolynomial = F.initFinalSymbol("MinimalPolynomial", ID.MinimalPolynomial);
@@ -2470,7 +2495,10 @@ public class F {
     public final static IBuiltInSymbol VectorAngle = F.initFinalSymbol("VectorAngle", ID.VectorAngle);
 	/** VectorQ(v) - returns `True` if `v` is a list of elements which are not themselves lists. */
     public final static IBuiltInSymbol VectorQ = F.initFinalSymbol("VectorQ", ID.VectorQ);
-	/***/
+	/**
+	 * VertexEccentricity(graph, vertex) - compute the eccentricity of `vertex` in the `graph`. It's the length of the
+	 * longest shortest path from the `vertex` to every other vertex in the `graph`.
+	 */
 	public final static IBuiltInSymbol VertexEccentricity = F.initFinalSymbol("VertexEccentricity", ID.VertexEccentricity);
 
 	/** VertexList(graph) - convert the `graph` into a list of vertices. */
@@ -5874,7 +5902,7 @@ public class F {
      * </p>
      *
      * <pre>
-?	 * &gt;&gt; InexactNumberQ(4.0+I)
+     * &gt;&gt; InexactNumberQ(4.0+I)
      * True
      * </pre>
      */
@@ -5920,13 +5948,11 @@ public class F {
     // return temp;
     // }
     public static IBuiltInSymbol initFinalSymbol(final String symbolName, int ordinal) {
-        String str = symbolName;
+		String str;
         if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-            if (str.length() != 1) {
-                str = symbolName.toLowerCase();
-            } else {
-                str = symbolName;
-            }
+            str = (symbolName.length() == 1) ? symbolName : symbolName.toLowerCase();
+        } else {
+            str = symbolName;
         }
         IBuiltInSymbol temp = new BuiltInSymbol(str, ordinal);
         BUILT_IN_SYMBOLS[ordinal] = temp;
@@ -6839,6 +6865,9 @@ public class F {
         return new AST1(Missing, a0);
     }
 
+	public static IAST Missing(final IExpr a0, final IExpr a1) {
+		return new AST2(Missing, a0, a1);
+	}
     /**
      * <pre>
      * MissingQ(expr)

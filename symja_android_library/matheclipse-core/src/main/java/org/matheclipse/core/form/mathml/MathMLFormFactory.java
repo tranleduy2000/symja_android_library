@@ -30,6 +30,7 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generates MathML presentation output
@@ -1001,17 +1003,17 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	/**
 	 * Table for constant symbols
 	 */
-	public final static HashMap<String, Object> CONSTANT_SYMBOLS = new HashMap<String, Object>(199);
+	public final static Map<String, Object> CONSTANT_SYMBOLS = Tries.forStrings();
 
 	/**
 	 * Table for constant expressions
 	 */
-	public final static HashMap<IExpr, String> CONSTANT_EXPRS = new HashMap<IExpr, String>(199);
+	public final static HashMap<IExpr, String> CONSTANT_EXPRS = new HashMap<IExpr, String>();
 
 	/**
 	 * Description of the Field
 	 */
-	public final static HashMap<String, AbstractConverter> OPERATORS = new HashMap<String, AbstractConverter>(199);
+	public final static Map<String, AbstractConverter> OPERATORS = Tries.forStrings();
 
 	private int plusPrec;
 
@@ -2051,13 +2053,16 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 	@Override
 	public void convertString(final StringBuilder buf, final String str) {
 		String[] splittedStr = str.split("\\n");
-		for (int i = 0; i < splittedStr.length; i++) {
+		final int splittedStrLength = splittedStr.length;
+		for (int i = 0; i < splittedStrLength; i++) {
 			tagStart(buf, "mtext");
 			String text = splittedStr[i].replaceAll("\\&", "&amp;").replaceAll("\\<", "&lt;").replaceAll("\\>", "&gt;");
 			text = text.replaceAll("\\\"", "&quot;").replaceAll(" ", "&nbsp;");
 			buf.append(text);
 			tagEnd(buf, "mtext");
+			if (splittedStrLength > 1) {
 			buf.append("<mspace linebreak='newline' />");
+		}
 		}
 
 	}

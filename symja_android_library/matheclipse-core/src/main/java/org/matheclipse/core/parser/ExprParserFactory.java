@@ -25,12 +25,13 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.trie.Trie;
+import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.ast.IParserFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -303,11 +304,11 @@ public class ExprParserFactory implements IParserFactory {
 
 	/**
 	 */
-	private static HashMap<String, Operator> fOperatorMap;
+	private static Trie<String, Operator> fOperatorMap;
 
 	/**
 	 */
-	private static HashMap<String, ArrayList<Operator>> fOperatorTokenStartSet;
+	private static Trie<String, ArrayList<Operator>> fOperatorTokenStartSet;
 
 	/**
 	 *
@@ -384,8 +385,8 @@ public class ExprParserFactory implements IParserFactory {
 					new InfixExprOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE) };
 
 		StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
-		fOperatorMap = new HashMap<String, Operator>();
-		fOperatorTokenStartSet = new HashMap<String, ArrayList<Operator>>();
+			fOperatorMap = Tries.forStrings();
+			fOperatorTokenStartSet = Tries.forStrings();
 		for (int i = 0; i < HEADER_STRINGS.length; i++) {
 			addOperator(fOperatorMap, fOperatorTokenStartSet, OPERATOR_STRINGS[i], HEADER_STRINGS[i], OPERATORS[i]);
 			String unicodeChar = org.matheclipse.parser.client.Characters.NamedCharactersMap.get(HEADER_STRINGS[i]);

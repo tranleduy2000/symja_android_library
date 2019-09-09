@@ -4,10 +4,10 @@ import org.matheclipse.core.interfaces.IAST;
 
 import static org.matheclipse.core.expression.F.ArcSinh;
 import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1DSqrt2;
 import static org.matheclipse.core.expression.F.CC;
 import static org.matheclipse.core.expression.F.CComplexInfinity;
 import static org.matheclipse.core.expression.F.CI;
-import static org.matheclipse.core.expression.F.CSqrt2;
 import static org.matheclipse.core.expression.F.CSqrt3;
 import static org.matheclipse.core.expression.F.DirectedInfinity;
 import static org.matheclipse.core.expression.F.IInit;
@@ -38,7 +38,7 @@ public interface ArcSinhRules {
     ISet(ArcSinh(CC(0L,1L,1L,2L)),
       Times(CC(0L,1L,1L,6L),Pi)),
     // ArcSinh(I/2*Sqrt(2))=Pi*I/4
-    ISet(ArcSinh(Times(CC(0L,1L,1L,2L),CSqrt2)),
+    ISet(ArcSinh(Times(CI,C1DSqrt2)),
       Times(CC(0L,1L,1L,4L),Pi)),
     // ArcSinh(I/2*Sqrt(3))=Pi*I/3
     ISet(ArcSinh(Times(CC(0L,1L,1L,2L),CSqrt3)),

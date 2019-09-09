@@ -21,27 +21,25 @@
  *
  * (MIT License)
  */
-package org.matheclipse.core.eval.util;
+package org.matheclipse.core.trie;
+
+import com.duy.util.ThreadLocalRandom;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 /**
- * An autocomplete data structure that enables you to quickly look up the top k
- * terms with a given prefix in a set of weighted terms. The structure is based
- * on a compressed trie of the terms (implemented as a randomized ternary search
- * tree) in which each node holds a weight-ordered list of the k
- * highest-weighted terms in its subtree.
+ * An auto-complete data structure that enables you to quickly look up the top k terms with a given prefix in a set of
+ * weighted terms. The structure is based on a compressed trie of the terms (implemented as a randomized ternary search
+ * tree) in which each node holds a weight-ordered list of the k highest-weighted terms in its subtree.
  *
  * <p>
- * Note that this implementation is not synchronized. If multiple threads access
- * a Suggest Tree concurrently, and at least one of the threads modifies the
- * tree, it must be synchronized externally.
+ * Note that this implementation is not synchronized. If multiple threads access a Suggest Tree concurrently, and at
+ * least one of the threads modifies the tree, it must be synchronized externally.
  */
 public class SuggestTree {
 
-    private final Random random = new Random();
+	private final ThreadLocalRandom random = ThreadLocalRandom.current();
     private final int k;
     private Node root;
     private int size;
@@ -50,8 +48,7 @@ public class SuggestTree {
      * Creates a Suggest Tree with the specified k-value.
      *
      * @param k
-     *            the maximum number of auto-complete suggestions to return for a
-     *            given prefix
+	 *            the maximum number of auto-complete suggestions to return for a given prefix
      * @throws IllegalArgumentException
      *             if the specified k-value is less than 1
      */
@@ -65,13 +62,13 @@ public class SuggestTree {
     }
 
     /**
-     * Returns the k highest-weighted terms in the tree that start with the
-     * specified prefix, or null if there is no such term.
+	 * Returns the k highest-weighted terms in the tree that start with the specified prefix, or null if there is no
+	 * such term.
      *
      * @param prefix
      *            the prefix for which to return autocomplete suggestions
-     * @return the k highest-weighted terms in the tree that start with the
-     *         specified prefix, or null if there is no such term
+	 * @return the k highest-weighted terms in the tree that start with the specified prefix, or null if there is no
+	 *         such term
      * @throws IllegalArgumentException
      *             if the specified prefix is an empty string
      * @throws NullPointerException
@@ -82,13 +79,11 @@ public class SuggestTree {
     }
 
     /**
-     * Returns the tree entry for the specified term, or null if there is no
-     * such entry.
+	 * Returns the tree entry for the specified term, or null if there is no such entry.
      *
      * @param term
      *            the term for which to return the corresponding tree entry
-     * @return the tree entry for the specified term, or null if there is no
-     *         such entry
+	 * @return the tree entry for the specified term, or null if there is no such entry
      * @throws IllegalArgumentException
      *             if the specified term is an empty string
      * @throws NullPointerException

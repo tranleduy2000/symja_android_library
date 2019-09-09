@@ -6,6 +6,7 @@ import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
@@ -87,7 +88,6 @@ public class Console {
             e1.printStackTrace();
             return;
         }
-        String inputExpression = null;
         String trimmedInput = null;
         try {
             console.setArgs(args);
@@ -120,7 +120,7 @@ public class Console {
 
         while (true) {
             try {
-				inputExpression = console.readString(stdout, ">> ");
+				String inputExpression = console.readString(stdout, ">> ");
                 if (inputExpression != null) {
                     trimmedInput = inputExpression.trim();
                     if (trimmedInput.length() >= 4 && trimmedInput.charAt(0) == '/') {
@@ -187,17 +187,17 @@ public class Console {
 					// Documentation.findDocumentation(stdout, trimmedInput);
 					// continue;
 					// }
-                    String postfix = Scanner.balanceCode(inputExpression);
+					String postfix = Scanner.balanceCode(trimmedInput);
                     if (postfix != null && postfix.length() > 0) {
 						stderr.println("Automatically closing brackets: " + postfix);
-                        inputExpression = inputExpression + postfix;
+						trimmedInput = trimmedInput + postfix;
                     }
-					stdout.println("In [" + COUNTER + "]: " + inputExpression);
+					stdout.println("In [" + COUNTER + "]: " + trimmedInput);
 					stdout.flush();
                     // if (console.fPrettyPrinter) {
                     // console.prettyPrinter(inputExpression);
                     // } else {
-                        console.resultPrinter(inputExpression);
+					console.resultPrinter(trimmedInput);
                     // }
                     COUNTER++;
                 }
@@ -325,7 +325,7 @@ public class Console {
 					stdout.println(msg);
 					throw ReturnException.RETURN_FALSE;
 				}
-                    String outputExpression = interpreter(args[i + 1]);
+				String outputExpression = interpreter(args[i + 1].trim());
                     if (outputExpression.length() > 0) {
 						stdout.print(outputExpression);
                     }
@@ -409,17 +409,22 @@ public class Console {
     /**
      * Evaluates the given string-expression and returns the result in <code>OutputForm</code>
      *
-     * @param inputExpression
+	 * @param trimmedInput
+	 *            a trimmed input string
      * @return
      */
-    public String interpreter(final String inputExpression) {
+	public String interpreter(final String trimmedInput) {
         IExpr result;
         final StringWriter buf = new StringWriter();
         try {
+			if (trimmedInput.length() > 1 && trimmedInput.charAt(0) == '?') {
+				IExpr doc = Documentation.findDocumentation(trimmedInput);
+				return printResult(doc);
+			}
             if (fSeconds <= 0) {
-                result = fEvaluator.eval(inputExpression);
+				result = fEvaluator.eval(trimmedInput);
             } else {
-                result = fEvaluator.evaluateWithTimeout(inputExpression, fSeconds, TimeUnit.SECONDS, true,
+				result = fEvaluator.evaluateWithTimeout(trimmedInput, fSeconds, TimeUnit.SECONDS, true,
                         new EvalControlledCallable(fEvaluator.getEvalEngine()));
             }
             if (result != null) {
