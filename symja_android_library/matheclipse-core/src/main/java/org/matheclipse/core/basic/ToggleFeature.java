@@ -45,4 +45,8 @@ public class ToggleFeature {
 	 * If <code>true</code>, enable experimental financial functions
 	 */
 	public static boolean FINANCE = true;
+	/**
+	 * If <code>true</code>, enable experimental f<code>MANIPULATE()</code> function
+	 */
+	public static boolean MANIPULATE = true;
 }

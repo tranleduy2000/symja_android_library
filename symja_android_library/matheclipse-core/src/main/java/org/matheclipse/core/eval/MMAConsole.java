@@ -15,13 +15,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -564,28 +560,32 @@ public class MMAConsole {
 			//Android changed: java.awt is not available in Android framework
 //			if (Desktop.isDesktopSupported()) {
 //				IExpr outExpr = result;
-//				if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
-//					outExpr = F.Show(outExpr);
-//				}
-//				if (outExpr.isASTSizeGE(F.Show, 2)) {
-//					try {
-//						IAST show = (IAST) outExpr;
-//						if (show.size() > 1 && show.get(1).isASTSizeGE(F.Graphics, 2)) {
-//							StringBuilder stw = new StringBuilder();
-//							Show2SVG.graphicsToSVG(show.getAST(1), stw);
-//							File temp = File.createTempFile("tempfile", ".svg");
-//							BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
-//							bw.write(stw.toString());
-//							bw.close();
-//							Desktop.getDesktop().open(temp);
-//							return temp.toString();
+//					if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
+//						outExpr = F.Show(outExpr);
+//					}
+//					if (outExpr.isSameHeadSizeGE(F.Show, 2)) {
+//						try {
+//							IAST show = (IAST) outExpr;
+//							if (show.size() > 1 && show.arg1().isSameHeadSizeGE(F.Graphics, 2)) {
+//								return Console.openSVGOnDesktop(show);
+//							}
+//						} catch (Exception ex) {
+//							if (Config.SHOW_STACKTRACE) {
+//								ex.printStackTrace();
+//							}
 //						}
-//					} catch (Exception ex) {
-//						if (Config.SHOW_STACKTRACE) {
-//							ex.printStackTrace();
+//					} else if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {
+//						try {
+//							String manipulateStr = ((IAST) result).arg1().toString();
+//							String html = Console.MATHCELL_PAGE;
+//							html = html.replaceAll("`1`", manipulateStr);
+//							return Console.openHTMLOnDesktop(html);
+//						} catch (Exception ex) {
+//							if (Config.SHOW_STACKTRACE) {
+//								ex.printStackTrace();
+//							}
 //						}
 //					}
-//				}
 //			}
 
 		StringBuilder strBuffer = new StringBuilder();

@@ -7,8 +7,6 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
-import org.matheclipse.core.graphics.Show2SVG;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.SyntaxError;
@@ -25,8 +23,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +33,39 @@ import java.util.concurrent.TimeUnit;
  */
 public class Console {
 
+	protected final static String MATHCELL_PAGE = //
+			"<html>\n" + //
+					"<head>\n" + //
+					"<title>MathCell</title>\n" + //
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n" + //
+					"<style></style>\n" + //
+					"</head>\n" + //
+					"\n" + //
+					"<body>\n" + //
+					"\n" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.3.0/build/mathcell.js\"></script>\n"
+					+ //
+					"\n" + //
+					"<p style=\"text-align: center; line-height: 2\"><span style=\"font-size: 20pt\">MathCell</span></p>\n"
+					+ //
+					"\n" + //
+					"<div class=\"mathcell\" style=\"height: 4in\">\n" + //
+					"<script>\n" + //
+					"\n" + //
+					"var parent = document.scripts[ document.scripts.length - 1 ].parentNode;\n" + //
+					"\n" + //
+					"var id = generateId();\n" + //
+					"parent.id = id;\n" + //
+					"\n" + //
+					"`1`\n" + //
+					"\n" + //
+					"parent.update( id );\n" + //
+					"\n" + //
+					"</script>\n" + //
+					"</div>\n" + //
+					"\n" + //
+					"</body>\n" + //
+					"</html>";//
 	/**
 	 * 60 seconds timeout limit as the default value for Symja expression evaluation.
 	 */
@@ -497,19 +526,23 @@ public class Console {
 //				if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
 //					outExpr = F.Show(outExpr);
 //				}
-//				if (outExpr.isASTSizeGE(F.Show, 2)) {
+//				if (outExpr.isSameHeadSizeGE(F.Show, 2)) {
 //					try {
 //						IAST show = (IAST) outExpr;
-//						if (show.size() > 1 && show.get(1).isASTSizeGE(F.Graphics, 2)) {
-//							StringBuilder stw = new StringBuilder();
-//							Show2SVG.graphicsToSVG(show.getAST(1), stw);
-//							File temp = File.createTempFile("tempfile", ".svg");
-//							BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
-//							bw.write(stw.toString());
-//							bw.close();
-//							Desktop.getDesktop().open(temp);
-//							return temp.toString();
+//						if (show.size() > 1 && show.arg1().isSameHeadSizeGE(F.Graphics, 2)) {
+//							return openSVGOnDesktop(show);
 //						}
+//					} catch (Exception ex) {
+//						if (Config.SHOW_STACKTRACE) {
+//							ex.printStackTrace();
+//						}
+//					}
+//				} else if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {
+//					try {
+//						String manipulateStr = ((IAST) result).arg1().toString();
+//						String html = MATHCELL_PAGE;
+//						html = html.replaceAll("`1`", manipulateStr);
+//						return Console.openHTMLOnDesktop(html);
 //					} catch (Exception ex) {
 //						if (Config.SHOW_STACKTRACE) {
 //							ex.printStackTrace();
@@ -535,6 +568,17 @@ public class Console {
 //		Desktop.getDesktop().open(temp);
 //		return temp.toString();
 //	}
+
+    public static String openHTMLOnDesktop(String html) throws IOException {
+//        File temp = File.createTempFile("tempfile", ".html");
+//        BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+//        bw.write(html);
+//        bw.close();
+//        Desktop.getDesktop().open(temp);
+//        return temp.toString();
+        throw new UnsupportedOperationException();
+    }
+
     // private String[] prettyPrinter3Lines(final String inputExpression) {
     // IExpr result;
     //
@@ -673,7 +717,7 @@ public class Console {
 
 			stdout.println(temp.toURI().toString());
 
-			//Android changed: android doesn't have package: java.awt
+			//Android changed: Android doesn't have package: java.awt
 //			java.awt.Desktop.getDesktop().browse(temp.toURI());
 		} catch (IOException e) {
 			e.printStackTrace();

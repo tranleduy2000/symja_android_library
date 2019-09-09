@@ -17,6 +17,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.HornerScheme;
 
+import java.io.IOException;
 import java.io.StringWriter;
 
 public final class OutputFunctions {
@@ -324,10 +325,7 @@ public final class OutputFunctions {
 			}
 				}
 				if (floatJava) {
-					DoubleFormFactory factory = DoubleFormFactory.get(true, false);
-					StringBuilder buf = new StringBuilder();
-					factory.convert(buf, arg1);
-					return F.$str(buf.toString());
+					return F.$str(toJavaDouble(arg1));
 				}
 			String resultStr = javaForm(arg1, strictJava, usePrefix);
 			return F.$str(resultStr);
@@ -355,10 +353,7 @@ public final class OutputFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
 				IExpr arg1 = engine.evaluate(ast.arg1());
-				DoubleFormFactory factory = DoubleFormFactory.get(true, false);
-				StringBuilder buf = new StringBuilder();
-				factory.convert(buf, arg1);
-				return F.$str(buf.toString());
+				return F.$str(toJavaScript(arg1));
 			} catch (Exception rex) {
 				if (Config.SHOW_STACKTRACE) {
 					rex.printStackTrace();
@@ -445,6 +440,19 @@ public final class OutputFunctions {
 		}
 	}
 
+	public static String toJavaDouble(final IExpr arg1) throws IOException {
+		DoubleFormFactory factory = DoubleFormFactory.get(true, false);
+		StringBuilder buf = new StringBuilder();
+		factory.convert(buf, arg1);
+		return buf.toString();
+	}
+
+	public static String toJavaScript(final IExpr arg1) throws IOException {
+		DoubleFormFactory factory = DoubleFormFactory.get(true, false);
+		StringBuilder buf = new StringBuilder();
+		factory.convert(buf, arg1);
+		return buf.toString();
+	}
 
 	public static void initialize() {
 		Initializer.init();

@@ -36,6 +36,7 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.IntegerFunctions;
 import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.builtin.ListFunctions;
+import org.matheclipse.core.builtin.ManipulateFunction;
 import org.matheclipse.core.builtin.MinMaxFunctions;
 import org.matheclipse.core.builtin.NumberTheory;
 import org.matheclipse.core.builtin.OutputFunctions;
@@ -1225,10 +1226,16 @@ public class F {
             ID.InverseLaplaceTransform);
 	/** InverseSeries( series ) - return the inverse series. */
     public final static IBuiltInSymbol InverseSeries = F.initFinalSymbol("InverseSeries", ID.InverseSeries);
-    /** JSForm(expre) - returns the JavaScript form of the `expr`.  */
+	/** JSForm(expre) - returns the JavaScript form of the `expr`. */
     public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
 
-    /** JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.*/
+	public final static IBuiltInSymbol JSFormData = F.initFinalSymbol("JSFormData", ID.JSFormData);
+
+	/**
+	 * JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean 1-D lists `u` and
+	 * `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is `len(u)` and `c_ij` is the number of
+	 * occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
+	 */
     public final static IBuiltInSymbol JaccardDissimilarity = F.initFinalSymbol("JaccardDissimilarity", ID.JaccardDissimilarity);
 
     /** JacobiMatrix(matrix, var) - creates a Jacobian matrix.*/
@@ -1252,10 +1259,19 @@ public class F {
     public final static IBuiltInSymbol Khinchin = F.initFinalSymbol("Khinchin", ID.Khinchin);
     /***/
     public final static IBuiltInSymbol KnownUnitQ = F.initFinalSymbol("KnownUnitQ", ID.KnownUnitQ);
-    /** KolmogorovSmirnovTest(data) - Computes the `p-value`, or <i>observed significance level</i>, of a one-sample [Wikipedia:Kolmogorov-Smirnov test](http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test) evaluating the null hypothesis that `data` conforms to the `NormalDistribution()`.*/
-    public final static IBuiltInSymbol KolmogorovSmirnovTest = F.initFinalSymbol("KolmogorovSmirnovTest", ID.KolmogorovSmirnovTest);
 
-    /** KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`, otherwise return `0`. */
+	/**
+	 * KolmogorovSmirnovTest(data) - Computes the `p-value`, or <i>observed significance level</i>, of a one-sample
+	 * [Wikipedia:Kolmogorov-Smirnov test](http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test) evaluating the null
+	 * hypothesis that `data` conforms to the `NormalDistribution()`.
+	 */
+	public final static IBuiltInSymbol KolmogorovSmirnovTest = F.initFinalSymbol("KolmogorovSmirnovTest",
+			ID.KolmogorovSmirnovTest);
+
+	/**
+	 * KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`, otherwise return
+	 * `0`.
+	 */
     public final static IBuiltInSymbol KroneckerDelta = F.initFinalSymbol("KroneckerDelta", ID.KroneckerDelta);
 	/** Kurtosis(list) - gives the Pearson measure of kurtosis for `list` (a measure of existing outliers). */
     public final static IBuiltInSymbol Kurtosis = F.initFinalSymbol("Kurtosis", ID.Kurtosis);
@@ -1815,8 +1831,6 @@ public class F {
     public final static IBuiltInSymbol PreDecrement = F.initFinalSymbol("PreDecrement", ID.PreDecrement);
 	/** PreIncrement(x) - increments `x` by `1`, returning the new value of `x`. */
     public final static IBuiltInSymbol PreIncrement = F.initFinalSymbol("PreIncrement", ID.PreIncrement);
-    /***/
-//    public final static IBuiltInSymbol PrePlus = F.initFinalSymbol("PrePlus", ID.PrePlus);
     /***/
     public final static IBuiltInSymbol Precision = F.initFinalSymbol("Precision", ID.Precision);
     /***/
@@ -3158,6 +3172,7 @@ public class F {
 			MinMaxFunctions.initialize();
 			GraphFunctions.initialize();
 			GeodesyFunctions.initialize();
+			ManipulateFunction.initialize();
             ComputationalGeometryFunctions.initialize();
 
             F.Integrate.setEvaluator(org.matheclipse.core.reflection.system.Integrate.CONST);
@@ -6258,6 +6273,9 @@ public class F {
         // return -epsilon < x && x < epsilon;
     }
 
+	public static IAST JSFormData(final String a0, final String format) {
+		return binaryAST2(JSFormData, F.$str(a0), F.$str(format));
+	}
     public static IAST Join(final IExpr a0, final IExpr a1) {
         return binaryAST2(Join, a0, a1);
     }
