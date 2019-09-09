@@ -219,6 +219,9 @@ public class AttributeFunctions {
 				case ID.NumericFunction:
 							sym.clearAttributes(ISymbol.NUMERICFUNCTION);
 					break;
+				case ID.SequenceHold:
+					sym.clearAttributes(ISymbol.SEQUENCEHOLD);
+					break;
 					}
 
 				}
@@ -371,6 +374,9 @@ public class AttributeFunctions {
 				case ID.ReadProtected:
 					sym.addAttributes(ISymbol.READPROTECTED);
 					break;
+				case ID.SequenceHold:
+					sym.addAttributes(ISymbol.SEQUENCEHOLD);
+					break;
 					}
 				}
 			}
@@ -422,6 +428,9 @@ public class AttributeFunctions {
 			if ((attributes & ISymbol.HOLDREST) != ISymbol.NOATTRIBUTE) {
 				result.append(F.HoldRest);
 			}
+		}
+		if ((attributes & ISymbol.SEQUENCEHOLD) == ISymbol.SEQUENCEHOLD) {
+			result.append(F.SequenceHold);
 		}
 
 		if ((attributes & ISymbol.NHOLDALL) == ISymbol.NHOLDALL) {

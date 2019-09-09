@@ -108,7 +108,7 @@ public class ListLinePlot extends AbstractEvaluator {
 				}
 			}
 		}
-		return F.Null;
+		return F.NIL;
 	}
  
 	@Override

@@ -6,7 +6,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
-import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.BinaryNumerical;
 import org.matheclipse.core.interfaces.IAST;
@@ -23,7 +22,7 @@ import static org.matheclipse.core.expression.F.SurfaceGraphics;
 /**
  * Represents the Plot3D function
  * 
- * @see OptionArgs
+ * @see org.matheclipse.core.eval.util.OptionArgs
  */
 public class Plot3D extends AbstractEvaluator {
 	/**
@@ -96,7 +95,7 @@ public class Plot3D extends AbstractEvaluator {
 				}
 			}
 		}
-		return F.Null;
+		return F.NIL;
 	}
 
 	/**

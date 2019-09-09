@@ -201,6 +201,8 @@ public class F {
     public final static IBuiltInSymbol $MinMachineNumber = F.initFinalSymbol("$MinMachineNumber", ID.$MinMachineNumber);
     /***/
     public final static IBuiltInSymbol $PrePrint = F.initFinalSymbol("$PrePrint", ID.$PrePrint);
+	/***/
+	public final static IBuiltInSymbol $PreRead = F.initFinalSymbol("$PreRead", ID.$PreRead);
     /***/
     public final static IBuiltInSymbol $RecursionLimit = F.initFinalSymbol("$RecursionLimit", ID.$RecursionLimit);
 	/***/
@@ -2062,6 +2064,7 @@ public class F {
     public final static IBuiltInSymbol Select = F.initFinalSymbol("Select", ID.Select);
     /***/
     public final static IBuiltInSymbol Sequence = F.initFinalSymbol("Sequence", ID.Sequence);
+	public final static IBuiltInSymbol SequenceHold = F.initFinalSymbol("SequenceHold", ID.SequenceHold);
 	/** Series(expr, {x, x0, n}) - create a power series of `expr` up to order `(x- x0)^n` at the point `x = x0` */
     public final static IBuiltInSymbol Series = F.initFinalSymbol("Series", ID.Series);
 	/** SeriesCoefficient(expr, {x, x0, n}) - get the coefficient of `(x- x0)^n` at the point `x = x0` */
@@ -2346,7 +2349,10 @@ public class F {
     /***/
     public final static IBuiltInSymbol UndirectedEdge = F.initFinalSymbol("UndirectedEdge", ID.UndirectedEdge);
 
-    /** Unequal(x, y) - yields `False` if `x` and `y` are known to be equal, or `True` if `x` and `y` are known to be unequal.*/
+	/**
+	 * Unequal(x, y) - yields `False` if `x` and `y` are known to be equal, or `True` if `x` and `y` are known to be
+	 * unequal.
+	 */
     public final static IBuiltInSymbol Unequal = F.initFinalSymbol("Unequal", ID.Unequal);
     /***/
     public final static IBuiltInSymbol Unevaluated = F.initFinalSymbol("Unevaluated", ID.Unevaluated);
@@ -6659,6 +6665,9 @@ public class F {
         return unaryAST1(MachineNumberQ, a0);
     }
 
+	public static IAST Manipulate(final IExpr a0) {
+		return unaryAST1(Manipulate, a0);
+	}
     public static IAST Manipulate(final IExpr a0, final IExpr a1) {
         return binaryAST2(Manipulate, a0, a1);
     }
@@ -7188,6 +7197,13 @@ public class F {
         return binaryAST2(Piecewise, a0, a1);
     }
 
+	public static IAST Plot(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Plot, a0, a1);
+	}
+
+	public static IAST Plot3D(final IExpr a0, final IExpr a1) {
+		return binaryAST2(Plot3D, a0, a1);
+	}
     public static IExpr plus(IExpr a, Integer i) {
         return Plus(a, integer(i.longValue()));
     }

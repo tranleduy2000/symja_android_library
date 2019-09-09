@@ -347,11 +347,17 @@ public class MMAConsole {
 	public MMAConsole() {
 		EvalEngine engine = new EvalEngine(false);
 		fEvaluator = new ExprEvaluator(engine, false, 100);
-		fEvaluator.getEvalEngine().setFileSystemEnabled(true);
+		EvalEngine evalEngine = fEvaluator.getEvalEngine();
+		evalEngine.setFileSystemEnabled(true);
 		fOutputFactory = OutputFormFactory.get(false, false, 5, 7);
 		fOutputTraditionalFactory = OutputFormFactory.get(true, false, 5, 7);
 		fInputFactory = OutputFormFactory.get(false, false, 5, 7);
 		fInputFactory.setQuotes(true);
+		F.$PreRead.assign(//
+				F.Function(F.ReplaceAll(F.Unevaluated(F.Slot1), //
+						F.List(F.RuleDelayed(F.binaryAST2(F.Plot, F.x_, F.y_), F.Manipulate(F.binaryAST2(F.Plot, F.x, F.y))), //
+								F.RuleDelayed(F.ternaryAST3(F.Plot3D, F.x_, F.y_, F.z_), F.Manipulate(F.ternaryAST3(F.Plot3D, F.x, F.y, F.z))//
+								)))));
 	}
 
 	/**
