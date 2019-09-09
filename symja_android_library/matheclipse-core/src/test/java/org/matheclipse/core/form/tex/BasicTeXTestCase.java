@@ -262,6 +262,14 @@ public class BasicTeXTestCase extends TestCase {
 		check(new ASTRealVector(new double[] { 1.0, 2.0, 3.0 }, false), //
 				"\\{1.0,2.0,3.0\\}");
 	}
+	public void testTeX029() {
+		check("Inequality(c,Greater,0,GreaterEqual,a)", //
+				"c > 0\\geq a");
+
+		check("Inequality(a,Less,0,LessEqual,b, Equal,c, Unequal,d)", //
+				"a < 0\\leq b == c\\neq d");
+
+	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		texUtil.toTeX(strEval, stw);

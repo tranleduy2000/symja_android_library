@@ -11,9 +11,11 @@ import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.form.DoubleToMMA;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
@@ -1145,7 +1147,7 @@ public class TeXFormFactory {
 					}
 				}
 			}
-			convertAST(buf, f);
+			convertAST(buf, f, precedence);
 			return;
 		}
 		if (o instanceof IInteger) {
@@ -1183,7 +1185,18 @@ public class TeXFormFactory {
 		convertString(buf, o.toString());
 	}
 
-	public void convertAST(StringBuilder buf, final IAST f) {
+	public void convertAST(StringBuilder buf, final IAST f, int precedence) {
+
+		int functionID = ((ISymbol) f.head()).ordinal();
+		if (functionID > ID.UNKNOWN) {
+			switch (functionID) {
+			case ID.Inequality:
+				if (f.size() > 3 && convertInequality(buf, f, precedence)) {
+					return;
+				}
+				break;
+			}
+		}
 		convertHead(buf, f.head());
 		buf.append("(");
 		for (int i = 1; i < f.size(); i++) {
@@ -1196,6 +1209,60 @@ public class TeXFormFactory {
 
 	}
 
+	private boolean convertInequality(final StringBuilder buf, final IAST inequality, final int precedence) {
+		int operPrecedence = ASTNodeFactory.EQUAL_PRECEDENCE;
+		StringBuilder tempBuffer = new StringBuilder();
+
+		if (operPrecedence < precedence) {
+			tempBuffer.append("(");
+		}
+
+		final int listSize = inequality.size();
+		int i = 1;
+		while (i < listSize) {
+			convert(tempBuffer, inequality.get(i++), 0);
+			if (i == listSize) {
+				if (operPrecedence < precedence) {
+					tempBuffer.append(")");
+				}
+				buf.append(tempBuffer);
+				return true;
+			}
+			IExpr head = inequality.get(i++);
+			if (head.isBuiltInSymbol()) {
+				int id = ((IBuiltInSymbol) head).ordinal();
+				switch (id) {
+				case ID.Equal:
+					tempBuffer.append(" == ");
+					break;
+				case ID.Greater:
+					tempBuffer.append(" > ");
+					break;
+				case ID.GreaterEqual:
+					tempBuffer.append( "\\geq ");
+					break;
+				case ID.Less:
+					tempBuffer.append(" < ");
+					break;
+				case ID.LessEqual:
+					tempBuffer.append("\\leq ");
+					break;
+				case ID.Unequal:
+					tempBuffer.append("\\neq ");
+					break;
+				default:
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+		if (operPrecedence < precedence) {
+			tempBuffer.append(")");
+		}
+		buf.append(tempBuffer);
+		return true;
+	}
 	public void convertAST(StringBuilder buf, final IAST f, String headString) {
 		buf.append(headString);
 		buf.append("(");
@@ -1262,24 +1329,6 @@ public class TeXFormFactory {
 		}
 	}
 
-	// public void convertFraction(final StringBuilder buf, final BigFraction f, final int precedence) {
-	// boolean negative = f.compareTo(BigFraction.ZERO) < 0;
-	// if (negative && (precedence > plusPrec)) {
-	// buf.append("\\left( ");
-	// }
-	// if (f.getDenominator().equals(BigInteger.ONE)) {
-	// buf.append(f.getNumerator().toString());
-	// } else {
-	// buf.append("\\frac{");
-	// buf.append(f.getNumerator().toString());
-	// buf.append("}{");
-	// buf.append(f.getDenominator().toString());
-	// buf.append('}');
-	// }
-	// if (negative && (precedence > plusPrec)) {
-	// buf.append("\\right) ");
-	// }
-	// }
 
 	public void convertDoubleComplex(final StringBuilder buf, final IComplexNum dc, final int precedence) {
 		double re = dc.getRealPart();
@@ -1561,7 +1610,7 @@ public class TeXFormFactory {
 		operTab.put(F.Alternatives, new AbstractOperator(this,
 				ASTNodeFactory.MMA_STYLE_FACTORY.get("Alternatives").getPrecedence(), "\\text{|}"));
 		operTab.put(F.Equal,
-				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Equal").getPrecedence(), " = "));
+				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Equal").getPrecedence(), " == "));
 		operTab.put(F.DirectedEdge, new AbstractOperator(this,
 				ASTNodeFactory.MMA_STYLE_FACTORY.get("DirectedEdge").getPrecedence(), "\\to "));
 		operTab.put(F.Divide, new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Divide").getPrecedence(),
@@ -1569,7 +1618,7 @@ public class TeXFormFactory {
 		operTab.put(F.Apply, new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Apply").getPrecedence(),
 				"\\text{@@}"));
 		operTab.put(F.Set,
-				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Set").getPrecedence(), "\\text{=}"));
+				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Set").getPrecedence(), " = "));
 		// operTab.put(F.Minus,
 		// new PreOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Minus").getPrecedence(), "\\text{-}"));
 		operTab.put(F.Map,
@@ -1581,7 +1630,7 @@ public class TeXFormFactory {
 		operTab.put(F.PreIncrement, new PreOperator(this,
 				ASTNodeFactory.MMA_STYLE_FACTORY.get("PreIncrement").getPrecedence(), "\\text{++}"));
 		operTab.put(F.Unequal, new AbstractOperator(this,
-				ASTNodeFactory.MMA_STYLE_FACTORY.get("Unequal").getPrecedence(), "\\text{!=}"));
+				ASTNodeFactory.MMA_STYLE_FACTORY.get("Unequal").getPrecedence(), "\\neq "));
 		operTab.put(F.Or,
 				new AbstractOperator(this, ASTNodeFactory.MMA_STYLE_FACTORY.get("Or").getPrecedence(), " \\lor "));
 		// operTab.put(F.PrePlus,
