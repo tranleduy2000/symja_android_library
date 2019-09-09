@@ -18350,6 +18350,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testToeplitzMatrix() {
+		check("ToeplitzMatrix({1, 2, 3, 4, 5, 6}, {1, a, b, c})", //
+				"{{1,a,b,c},\n" + //
+						" {2,1,a,b},\n" + //
+						" {3,2,1,a},\n" + //
+						" {4,3,2,1},\n" + //
+						" {5,4,3,2},\n" + //
+						" {6,5,4,3}}");
+
+		check("ToeplitzMatrix({1, a, b, c}, {1, 2, 3, 4, 5, 6})", //
+				"{{1,2,3,4,5,6},\n" +  //
+				" {a,1,2,3,4,5},\n" +  //
+				" {b,a,1,2,3,4},\n" +  //
+				" {c,b,a,1,2,3}}");
 		check("ToeplitzMatrix(-3)", //
 				"ToeplitzMatrix(-3)");
 		check("ToeplitzMatrix(3)", //

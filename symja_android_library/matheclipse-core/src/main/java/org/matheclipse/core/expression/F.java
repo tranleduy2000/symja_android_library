@@ -984,6 +984,8 @@ public class F {
     /** FromPolarCoordinates({r, t}) - return the cartesian coordinates for the polar coordinates `{r, t}`.*/
     public final static IBuiltInSymbol FromPolarCoordinates = F.initFinalSymbol("FromPolarCoordinates", ID.FromPolarCoordinates);
 
+    /***/
+    public final static IBuiltInSymbol Full = F.initFinalSymbol("Full", ID.Full);
     /** FullForm(expression) - shows the internal representation of the given `expression`.*/
     public final static IBuiltInSymbol FullForm = F.initFinalSymbol("FullForm", ID.FullForm);
     /**
