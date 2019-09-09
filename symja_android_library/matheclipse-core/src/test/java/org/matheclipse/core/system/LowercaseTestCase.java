@@ -1006,7 +1006,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Attributes(fun) = {ReadProtected, Protected}", //
 				"{ReadProtected,Protected}");
 		check("Attributes(Plus)", //
-				"{Flat,Listable,OneIdentity,Orderless,NumericFunction}");
+				"{Flat,Listable,NumericFunction,OneIdentity,Orderless,Protected}");
 	}
 
 	public void testBeginPackage() {
@@ -2783,7 +2783,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testConstant() {
 		check("Attributes(E)", //
-				"{Constant}");
+				"{Constant,Protected}");
 		check("Solve(x + E == 0, E) ", //
 				"Solve(E+x==0,E)");
 	}
@@ -5055,7 +5055,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Evaluate(a,b)", //
 				"Sequence(a,b)");
 		check("x=Plus; {Attributes(x), Attributes(Evaluate(x))}", //
-				"{{},{Flat,Listable,OneIdentity,Orderless,NumericFunction}}");
+				"{{},{Flat,Listable,NumericFunction,OneIdentity,Orderless,Protected}}");
 	}
 
 	public void testExactNumberQ() {
@@ -9691,7 +9691,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testLogIntegral() {
 		check("Attributes(LogIntegral)", //
-				"{Listable,NumericFunction}");
+				"{Listable,NumericFunction,Protected}");
 		check("LogIntegral(20.0)", //
 				"9.9053");
 		check("LogIntegral(Infinity)", //
@@ -11624,7 +11624,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testOr() {
 		check("Attributes(Or)", //
-				"{Flat,OneIdentity,HoldAll}");
+				"{Flat,HoldAll,OneIdentity,Protected}");
 		check("Or(p, p, p) /. Or(a_, b_) :> {a, b}", //
 				"{p,p||p}");
 		check("Or(p, p, p) /. Or(a_., b_.) :> {a, b}", //
@@ -13780,6 +13780,16 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"2/3*(-1/2+3/2*x^2)");
 	}
 
+	public void testProtect() {
+		check("Protect(test1, test2, test3)", //
+				"{test1,test2,test3}");
+		check("Attributes({test1,test2,test3,Plus,Times})", //
+				"{{Protected},{Protected},{Protected},{Flat,Listable,NumericFunction,OneIdentity,Orderless,Protected},{Flat,Listable,NumericFunction,OneIdentity,Orderless,Protected}}");
+		check("Unprotect(test1, test2)", //
+				"{test1,test2}");
+		check("Unprotect(test1, test2, test3)", //
+				"{test3}");
+	}
 	public void testPseudoInverse() {
 		check("PseudoInverse({1, {2}})", "PseudoInverse({1,{2}})");
 		check("PseudoInverse(PseudoInverse({{1, 2}, {2, 3}, {3, 4}}))", //
@@ -15850,7 +15860,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testSetDelayed() {
 		check("Attributes(SetDelayed)  ", //
-				"{HoldAll,SequenceHold}");
+				"{HoldAll,Protected,SequenceHold}");
 		check("a = 1", //
 				"1");
 		check("x := a", //

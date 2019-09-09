@@ -1,5 +1,8 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RuleCreationError;
@@ -21,10 +24,12 @@ public class AttributeFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.Attributes.setEvaluator(new Attributes());
-		F.ClearAttributes.setEvaluator(new ClearAttributes());
-		F.SetAttributes.setEvaluator(new SetAttributes());
-	}
+			F.Attributes.setEvaluator(new Attributes());
+			F.ClearAttributes.setEvaluator(new ClearAttributes());
+			F.SetAttributes.setEvaluator(new SetAttributes());
+			F.Protect.setEvaluator(new Protect());
+			F.Unprotect.setEvaluator(new Unprotect());
+		}
 	}
 
 	/**
@@ -48,8 +53,29 @@ public class AttributeFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1() && ast.arg1().isSymbol()) {
+			if (ast.isAST1()) {
+				if (ast.arg1().isSymbol()) {
 				return attributesList(((ISymbol) ast.arg1()));
+			}
+				if (ast.arg1().isList()) {
+					IAST list = (IAST) ast.arg1();
+					if (list.exists(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							return !x.isSymbol();
+						}
+					})) {
+						return F.NIL;
+					}
+					final IASTAppendable result = F.ListAlloc(list.size());
+					list.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							result.append(attributesList(((ISymbol) x)));
+						}
+					});
+					return result;
+				}
 			}
 
 			return F.NIL;
@@ -223,10 +249,77 @@ public class AttributeFunctions {
 					sym.clearAttributes(ISymbol.SEQUENCEHOLD);
 					break;
 					}
+			}
+		}
 
+	}
+
+	private final static class Protect extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.exists(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return !x.isSymbol();
+				}
+			})) {
+				return F.NIL;
+			}
+			final IASTAppendable result = F.ListAlloc(ast.size());
+			ast.forEach(new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr x) {
+					ISymbol symbol = (ISymbol) x;
+					if (!symbol.isProtected()) {
+						symbol.addAttributes(ISymbol.PROTECTED);
+						result.append(x);
+					}
+				}
+			});
+			return result;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 				}
 			}
 
+	private final static class Unprotect extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (Config.UNPROTECT_ALLOWED) {
+				if (ast.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return !x.isSymbol();
+					}
+				})) {
+					return F.NIL;
+				}
+
+				final IASTAppendable result = F.ListAlloc(ast.size());
+				ast.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						ISymbol symbol = (ISymbol) x;
+						if (symbol.isProtected()) {
+							symbol.clearAttributes(ISymbol.PROTECTED);
+							result.append(x);
+						}
+					}
+				});
+				return result;
+			}
+			return engine.printMessage("Unprotect: not allowed. Set Config.UNPROTECT_ALLOWED if necessary");
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
+		}
 	}
 
 	/**
@@ -402,17 +495,6 @@ public class AttributeFunctions {
 			result.append(F.Flat);
 		}
 
-		if ((attributes & ISymbol.LISTABLE) != ISymbol.NOATTRIBUTE) {
-			result.append(F.Listable);
-		}
-
-		if ((attributes & ISymbol.ONEIDENTITY) != ISymbol.NOATTRIBUTE) {
-			result.append(F.OneIdentity);
-		}
-
-		if ((attributes & ISymbol.ORDERLESS) != ISymbol.NOATTRIBUTE) {
-			result.append(F.Orderless);
-		}
 
 		if ((attributes & ISymbol.HOLDALLCOMPLETE) == ISymbol.HOLDALLCOMPLETE) {
 			result.append(F.HoldAllComplete);
@@ -429,8 +511,8 @@ public class AttributeFunctions {
 				result.append(F.HoldRest);
 			}
 		}
-		if ((attributes & ISymbol.SEQUENCEHOLD) == ISymbol.SEQUENCEHOLD) {
-			result.append(F.SequenceHold);
+		if ((attributes & ISymbol.LISTABLE) != ISymbol.NOATTRIBUTE) {
+			result.append(F.Listable);
 		}
 
 		if ((attributes & ISymbol.NHOLDALL) == ISymbol.NHOLDALL) {
@@ -447,6 +529,21 @@ public class AttributeFunctions {
 
 		if ((attributes & ISymbol.NUMERICFUNCTION) != ISymbol.NOATTRIBUTE) {
 			result.append(F.NumericFunction);
+		}
+		if ((attributes & ISymbol.ONEIDENTITY) != ISymbol.NOATTRIBUTE) {
+			result.append(F.OneIdentity);
+		}
+
+		if ((attributes & ISymbol.ORDERLESS) != ISymbol.NOATTRIBUTE) {
+			result.append(F.Orderless);
+		}
+
+		if ((attributes & ISymbol.PROTECTED) != ISymbol.NOATTRIBUTE) {
+			result.append(F.Protected);
+		}
+
+		if ((attributes & ISymbol.SEQUENCEHOLD) == ISymbol.SEQUENCEHOLD) {
+			result.append(F.SequenceHold);
 		}
 		return result;
 	}

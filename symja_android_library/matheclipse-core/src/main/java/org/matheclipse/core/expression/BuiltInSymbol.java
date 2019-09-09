@@ -90,6 +90,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		super(symbolName, Context.SYSTEM);
 		fEvaluator = DUMMY_EVALUATOR;
 		fOrdinal = ordinal;
+		fAttributes = ISymbol.PROTECTED;
 	}
 
 	// private BuiltInSymbol(final String symbolName, final IEvaluator evaluator) {
@@ -235,11 +236,6 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
-	final public boolean isProtected() {
-		return true;
-	}
-	/** {@inheritDoc} */
-	@Override
 	final public boolean isRealConstant() {
 		return fEvaluator instanceof ISignedNumberConstant;
 	}
@@ -289,6 +285,11 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return F.NIL;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public final void setAttributes(final int attributes) {
+		super.setAttributes(attributes | ISymbol.PROTECTED);
+	}
 	/** {@inheritDoc} */
 	@Override
 	public final void setEvaluator(final IEvaluator evaluator) {

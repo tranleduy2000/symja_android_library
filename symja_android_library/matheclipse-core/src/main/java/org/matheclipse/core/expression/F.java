@@ -1900,6 +1900,8 @@ public class F {
     public final static IBuiltInSymbol ProductLog = F.initFinalSymbol("ProductLog", ID.ProductLog);
 	/** Projection(vector1, vector2) - Find the orthogonal projection of `vector1` onto another `vector2`. */
     public final static IBuiltInSymbol Projection = F.initFinalSymbol("Projection", ID.Projection);
+	/***/
+	public final static IBuiltInSymbol Protect = F.initFinalSymbol("Protect", ID.Protect);
     /***/
     public final static IBuiltInSymbol Protected = F.initFinalSymbol("Protected", ID.Protected);
     /**
