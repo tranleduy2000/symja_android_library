@@ -703,6 +703,8 @@ public class F {
     /***/
     public final static IBuiltInSymbol Direction = F.initFinalSymbol("Direction", ID.Direction);
     /***/
+    public final static IBuiltInSymbol DirichletEta = F.initFinalSymbol("DirichletEta", ID.DirichletEta);
+    /***/
     public final static IBuiltInSymbol DirichletWindow = F.initFinalSymbol("DirichletWindow", ID.DirichletWindow);
     /** DiscreteDelta(n1, n2, n3, ...) - `DiscreteDelta` function returns `1` if all the `ni` are `0`. Returns `0` otherwise.*/
     public final static IBuiltInSymbol DiscreteDelta = F.initFinalSymbol("DiscreteDelta", ID.DiscreteDelta);
@@ -1228,7 +1230,10 @@ public class F {
             ID.InverseLaplaceTransform);
 	/** InverseSeries( series ) - return the inverse series. */
     public final static IBuiltInSymbol InverseSeries = F.initFinalSymbol("InverseSeries", ID.InverseSeries);
-	/** JSForm(expre) - returns the JavaScript form of the `expr`. */
+    /***/
+    public final static IBuiltInSymbol InverseWeierstrassP = F.initFinalSymbol("InverseWeierstrassP", ID.InverseWeierstrassP);
+
+    /** JSForm(expre) - returns the JavaScript form of the `expr`.  */
     public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
 
 	public final static IBuiltInSymbol JSFormData = F.initFinalSymbol("JSFormData", ID.JSFormData);
@@ -1396,7 +1401,7 @@ public class F {
      * or vertical moves in the grid like Manhattan city layout to get from `u` to `v`.
      */
     public final static IBuiltInSymbol ManhattanDistance = F.initFinalSymbol("ManhattanDistance", ID.ManhattanDistance);
-    /***/
+    /** Manipulate(plot, {x, min, max}) - generate a JavaScript control for the expression `plot` which can be manipulated by a range slider `{x, min, max}`.*/
     public final static IBuiltInSymbol Manipulate = F.initFinalSymbol("Manipulate", ID.Manipulate);
     /***/
     public final static IBuiltInSymbol MantissaExponent = F.initFinalSymbol("MantissaExponent", ID.MantissaExponent);
@@ -2420,6 +2425,17 @@ public class F {
     /** WeibullDistribution(a, b) - returns a Weibull distribution.*/
     public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution", ID.WeibullDistribution);
 
+    /***/
+    public final static IBuiltInSymbol WeierstrassHalfPeriods = F.initFinalSymbol("WeierstrassHalfPeriods", ID.WeierstrassHalfPeriods);
+
+    /***/
+    public final static IBuiltInSymbol WeierstrassInvariants = F.initFinalSymbol("WeierstrassInvariants", ID.WeierstrassInvariants);
+
+    /***/
+    public final static IBuiltInSymbol WeierstrassP = F.initFinalSymbol("WeierstrassP", ID.WeierstrassP);
+
+    /***/
+    public final static IBuiltInSymbol WeierstrassPPrime = F.initFinalSymbol("WeierstrassPPrime", ID.WeierstrassPPrime);
     /***/
     public final static IBuiltInSymbol WeightedAdjacencyMatrix = F.initFinalSymbol("WeightedAdjacencyMatrix", ID.WeightedAdjacencyMatrix);
     /** Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2` evaluates to `True`, etc.*/
