@@ -1,10 +1,10 @@
 package org.matheclipse.core.visit;
 
+import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Supplier;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -166,33 +166,27 @@ public class VisitorExpr extends AbstractVisitor {
 	 */
 	protected IExpr visitAST(IAST ast) {
 		IExpr temp;
-		IASTAppendable result = F.NIL;
+		// IASTAppendable result = F.NIL;
 		int i = 1;
 		int size = ast.size();
 		while (i < size) {
 			temp = ast.get(i).accept(this);
 			if (temp.isPresent()) {
 				// something was evaluated - return a new IAST:
-				result = ast.copyAppendable();
-				for (int j = 1; j < i; j++) {
-					result.set(j, ast.get(j));
-				}
-				result.set(i++, temp);
-				break;
+				final IASTMutable result = ast.setAtCopy(i++, temp);
+				ast.forEach(i, size, new ObjIntConsumer<IExpr>() {
+					@Override
+					public void accept(IExpr x, int j) {
+						IExpr t = x.accept(VisitorExpr.this);
+						if (t.isPresent()) {
+							result.set(j, t);
+						}
+					}
+				});
+				return result;
 			}
 			i++;
 		}
-		if (result.isPresent()) {
-			while (i < size) {
-				temp = ast.get(i).accept(this);
-				if (temp.isPresent()) {
-					result.set(i, temp);
-				} else {
-					result.set(i, ast.get(i));
-				}
-				i++;
-			}
-		}
-		return result;
+		return F.NIL;
 	}
 }

@@ -1,6 +1,7 @@
 package org.matheclipse.core.visit;
 
 import com.duy.lambda.Function;
+import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Supplier;
 
 import org.matheclipse.core.eval.EvalEngine;
@@ -182,20 +183,23 @@ public class VisitorReplaceAll extends VisitorExpr {
 			IExpr temp = ast.get(i).accept(this);
 			if (temp.isPresent()) {
 				// something was evaluated - return a new IAST:
-				IASTMutable result = ast.setAtCopy(i++, temp);
-			while (i < size) {
-					temp = ast.get(i).accept(this);
-				if (temp.isPresent()) {
-					result.set(i, temp);
-				}
-				i++;
-			}
+				final IASTMutable result = ast.setAtCopy(i++, temp);
+				ast.forEach(i, size, new ObjIntConsumer<IExpr>() {
+					@Override
+					public void accept(IExpr x, int j) {
+						IExpr t = x.accept(VisitorReplaceAll.this);
+						if (t.isPresent()) {
+							result.set(j, t);
+						}
+					}
+				});
 				return postProcessing(result);
-	}
+			}
 			i++;
 		}
 		return F.NIL;
 	}
+
 	private IExpr postProcessing(IASTMutable result) {
 		if (fPostProcessing != null) {
 			return fPostProcessing.apply(result);
