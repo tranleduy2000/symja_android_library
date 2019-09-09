@@ -1,5 +1,7 @@
 package org.matheclipse.core.rubi;
 
+import org.matheclipse.core.basic.Config;
+
 public class TrigFunctions extends AbstractRubiTestCase {
     static boolean init=true;
 

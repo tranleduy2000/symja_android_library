@@ -8,7 +8,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
-public class MathCellExample {
+public class PlotExample {
 	private final static String WEB_PAGE = //
 			"<html>\n" + //
 					"<head>\n" + //
@@ -53,10 +53,7 @@ public class MathCellExample {
 			ExprEvaluator util = new ExprEvaluator();
 			//Cot(x)+ArcCot(x)
 			IExpr result = util.eval(
-					"Manipulate(Plot(a*n*b*(1.1+I*3.1), {x, -2*Pi, 2*Pi}, PlotRange->{-7.0, 7.0}), {a,0,10})");
-//			IExpr result = util.eval(
-//					"Manipulate(Plot(Sin(a*x + b), {x, 0, 6}), " //
-//					+ "{{a, 2, \"Multiplier\"}, 1, 4}, {{b, 0, \"Phase\"}, 0, 10})");
+					"Manipulate(Plot(Sin(a*x + b), {x, 0, 6}), {{a, 2, \"Multiplier\"}, 1, 4}, {{b, 0, \"Phase\"}, 0, 10})");
 			// IExpr result = util.eval("Manipulate(Plot({Sin(a*x+b),Cos(a*x+b)}, {x, -3*Pi, 3*Pi} ),{a,1,3},{b,1,3})");
 			// IExpr result = util.eval("Manipulate(Plot(Sin(x)*Cos(1 + a*x), {x, 0, 2*Pi}), {a,0,10})");
 			if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {

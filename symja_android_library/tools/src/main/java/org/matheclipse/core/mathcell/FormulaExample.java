@@ -8,7 +8,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
-public class MathCellFormulaExample {
+public class FormulaExample {
 	private final static String WEB_PAGE = //
 			"<html>\n" + //
 					"<head>\n" + //
