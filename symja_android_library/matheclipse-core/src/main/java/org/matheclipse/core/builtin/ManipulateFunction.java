@@ -29,7 +29,7 @@ public class ManipulateFunction {
 					// " var p2 = plot( x => Math.cos(x-phase), [0, 2*Math.PI], { color: 'purple' } );\n" + //
 					// "\n" + //
 					// " var data = [ p1, p2 ];\n" + //
-					"\n" + //
+					// "\n" + //
 					// " var config = { type: 'svg' };\n" + //
 					// "\n" + //
 					// " evaluate( id, data, config );\n" + //
