@@ -128,7 +128,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
             return StringX.US_COLLATOR.compare(fSymbolName, ((ISymbol) expr).getSymbolName());
         }
         if (expr.isAST()) {
-            if (expr.isPower()) {
+            final int id = expr.headID();
+            if (id >= ID.Not && id <= ID.Power) {
+                if (expr.isNot() && expr.first().isSymbol()) {
+                    final int cp = compareTo(expr.first());
+                    return cp != 0 ? cp : -1;
+                } else if (expr.isPower()) {
                 // O-4
                 int baseCompare = this.compareTo(expr.base());
                 if (baseCompare == 0) {
@@ -136,13 +141,11 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
                 }
                 return baseCompare;
             }
-            if (expr.isNot() && expr.first().isSymbol()) {
-                final int cp = compareTo(expr.first());
-                return cp != 0 ? cp : -1;
             }
             if (!expr.isDirectedInfinity()) {
                 return -1 * expr.compareTo(this);
             }
+            return -1;
         }
         int x = hierarchy();
         int y = expr.hierarchy();
