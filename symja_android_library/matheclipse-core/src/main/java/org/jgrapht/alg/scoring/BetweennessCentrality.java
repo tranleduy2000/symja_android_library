@@ -17,6 +17,12 @@
  */
 package org.jgrapht.alg.scoring;
 
+import com.duy.lambda.BiConsumer;
+import com.duy.lambda.Consumer;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
@@ -29,10 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * Betweenness centrality.
@@ -93,7 +96,7 @@ public class BetweennessCentrality<V, E>
      *                  $n$ is the number of vertices of the graph
      */
     public BetweennessCentrality(Graph<V, E> graph, boolean normalize) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
 
         this.scores = null;
         this.normalize = normalize;
@@ -130,7 +133,7 @@ public class BetweennessCentrality<V, E>
     private void compute() {
         // initialize result container
         this.scores = new HashMap<>();
-        this.graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(this.graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V v) {
                 BetweennessCentrality.this.scores.put(v, 0.0);
@@ -138,7 +141,7 @@ public class BetweennessCentrality<V, E>
         });
 
         // compute for each source
-        this.graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(this.graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V s) {
                 BetweennessCentrality.this.compute(s);
@@ -148,7 +151,7 @@ public class BetweennessCentrality<V, E>
         // For undirected graph, divide scores by two as each shortest path
         // considered twice.
         if (!this.graph.getType().isDirected()) {
-            this.scores.forEach(new BiConsumer<V, Double>() {
+            new MapWrapper<>(this.scores).forEach(new BiConsumer<V, Double>() {
                 @Override
                 public void accept(V v, Double score) {
                     BetweennessCentrality.this.scores.put(v, score / 2);
@@ -160,7 +163,7 @@ public class BetweennessCentrality<V, E>
             int n = this.graph.vertexSet().size();
             final int normalizationFactor = (n - 1) * (n - 2);
             if (normalizationFactor != 0) {
-                this.scores.forEach(new BiConsumer<V, Double>() {
+                new MapWrapper<>(this.scores).forEach(new BiConsumer<V, Double>() {
                     @Override
                     public void accept(V v, Double score) {
                         BetweennessCentrality.this.scores.put(v, score / normalizationFactor);
@@ -174,7 +177,7 @@ public class BetweennessCentrality<V, E>
         // initialize
         ArrayDeque<V> stack = new ArrayDeque<>();
         final Map<V, List<V>> predecessors = new HashMap<>();
-        this.graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(this.graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V w) {
                 predecessors.put(w, new ArrayList<V>());
@@ -183,7 +186,7 @@ public class BetweennessCentrality<V, E>
 
         // Number of shortest paths from s to v
         final Map<V, Double> sigma = new HashMap<>();
-        this.graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(this.graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V t) {
                 sigma.put(t, 0.0);
@@ -193,7 +196,7 @@ public class BetweennessCentrality<V, E>
 
         // Distance (Weight) of the shortest path from s to v
         final Map<V, Double> distance = new HashMap<>();
-        this.graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(this.graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V t) {
                 distance.put(t, Double.POSITIVE_INFINITY);
@@ -235,7 +238,7 @@ public class BetweennessCentrality<V, E>
         // 2. sum all pair dependencies.
         // The pair-dependency of s and v in w
         final Map<V, Double> dependency = new HashMap<>();
-        this.graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(this.graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V v) {
                 dependency.put(v, 0.0);

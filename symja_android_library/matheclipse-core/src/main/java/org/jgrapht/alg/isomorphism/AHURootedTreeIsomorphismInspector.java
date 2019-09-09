@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.isomorphism;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMapping;
 import org.jgrapht.GraphTests;
@@ -33,9 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.function.Function;
 
 /**
  * This is an implementation of the AHU algorithm for detecting an (unweighted) isomorphism between
@@ -112,8 +114,8 @@ public class AHURootedTreeIsomorphismInspector<V, E>
 
     private void validateTree(Graph<V, E> tree, V root) {
         assert GraphTests.isSimple(tree);
-        Objects.requireNonNull(tree, "input forest cannot be null");
-        Objects.requireNonNull(root, "root cannot be null");
+        DObjects.requireNonNull(tree, "input forest cannot be null");
+        DObjects.requireNonNull(root, "root cannot be null");
 
         if (tree.vertexSet().isEmpty()) {
             throw new IllegalArgumentException("tree cannot be empty");
@@ -164,7 +166,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
                 // The check if only needed when the input graph is undirected in order to
                 // avoid walking back "up" the tree.
                 if (!forwardMapping.containsKey(next)) {
-                    labelList
+                    new MapWrapper<>(labelList)
                             .computeIfAbsent(canonicalName[0].get(next), new Function<Integer, List<V>>() {
                                 @Override
                                 public List<V> apply(Integer x) {
@@ -242,7 +244,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
                     List<Integer> list = new ArrayList<>();
                     for (E edge : graph.outgoingEdgesOf(u)) {
                         V v = Graphs.getOppositeVertex(graph, edge, u);
-                        int name = canonicalName[k].getOrDefault(v, -1);
+                        int name = new MapWrapper<>(canonicalName[k]).getOrDefault(v, -1);
 
                         if (name != -1) {
                             list.add(name);

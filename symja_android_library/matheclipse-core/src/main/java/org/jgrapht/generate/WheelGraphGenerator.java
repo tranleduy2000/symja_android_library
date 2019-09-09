@@ -23,7 +23,7 @@ import org.jgrapht.graph.GraphDelegator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * Generates a <a href="http://mathworld.wolfram.com/WheelGraph.html">wheel graph</a> of any size.

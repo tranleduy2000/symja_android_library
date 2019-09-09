@@ -17,7 +17,10 @@
  */
 package org.jgrapht.alg.spanning;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.ToDoubleFunction;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
+import com.duy.util.ListWrapper;
 
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
@@ -25,9 +28,7 @@ import org.jgrapht.alg.util.UnionFind;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.ToDoubleFunction;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/Kruskal's_algorithm">Kruskal's minimum
@@ -50,7 +51,7 @@ public class KruskalMinimumSpanningTree<V, E>
      * @param graph the input graph
      */
     public KruskalMinimumSpanningTree(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**
@@ -60,7 +61,7 @@ public class KruskalMinimumSpanningTree<V, E>
     public SpanningTree<E> getSpanningTree() {
         UnionFind<V> forest = new UnionFind<>(graph.vertexSet());
         ArrayList<E> allEdges = new ArrayList<>(graph.edgeSet());
-        allEdges.sort(DComparator.comparingDouble(new ToDoubleFunction<E>() {
+        new ListWrapper<>(allEdges).sort(ComparatorWrapper.comparingDouble(new ToDoubleFunction<E>() {
             @Override
             public double applyAsDouble(E e) {
                 return graph.getEdgeWeight(e);

@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.matching;
 
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.Graphs;
@@ -77,7 +79,7 @@ public class GreedyMaximumCardinalityMatching<V, E>
         if (sort) {
             // sort edges in increasing order of the total degree of their endpoints
             List<E> allEdges = new ArrayList<>(graph.edgeSet());
-            allEdges.sort(new EdgeDegreeComparator());
+            new ListWrapper<>(allEdges).sort(new EdgeDegreeComparator());
 
             for (E e : allEdges) {
                 V v = graph.getEdgeSource(e);

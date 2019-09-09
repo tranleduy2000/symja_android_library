@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.decomposition;
 
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.TreeToPathDecompositionAlgorithm;
@@ -115,8 +118,8 @@ public class HeavyPathDecomposition<V, E>
      * @param roots  the set of roots of the graph
      */
     public HeavyPathDecomposition(Graph<V, E> forest, Set<V> roots) {
-        this.graph = Objects.requireNonNull(forest, "input tree/forrest cannot be null");
-        this.roots = Objects.requireNonNull(roots, "set of roots cannot be null");
+        this.graph = DObjects.requireNonNull(forest, "input tree/forrest cannot be null");
+        this.roots = DObjects.requireNonNull(roots, "set of roots cannot be null");
 
         decompose();
     }
@@ -178,7 +181,7 @@ public class HeavyPathDecomposition<V, E>
 
                 V vertexU = indexList.get(u);
                 for (E edge : graph.edgesOf(vertexU)) {
-                    int child = vertexMap.get(Graphs.getOppositeVertex(graph, edge, vertexU));
+                    int child = new MapWrapper<>(vertexMap).get(Graphs.getOppositeVertex(graph, edge, vertexU));
 
                     // Check if child has not been explored (i.e. dfs(child, c) has not been called)
                     if (!explored.contains(child)) {
@@ -199,7 +202,7 @@ public class HeavyPathDecomposition<V, E>
 
                 V vertexU = indexList.get(u);
                 for (E edge : graph.edgesOf(vertexU)) {
-                    int child = vertexMap.get(Graphs.getOppositeVertex(graph, edge, vertexU));
+                    int child = new MapWrapper<>(vertexMap).get(Graphs.getOppositeVertex(graph, edge, vertexU));
 
                     // Check if child is a descendant of u and not its parent
                     if (child != parent[u]) {
@@ -254,7 +257,7 @@ public class HeavyPathDecomposition<V, E>
         // Iterate through all roots and compute the paths for each tree individually
         int numberComponent = 0;
         for (V root : roots) {
-            Integer u = vertexMap.get(root);
+            Integer u = new MapWrapper<>(vertexMap).get(root);
 
             if (u == null) {
                 throw new IllegalArgumentException("root: " + root + " not contained in graph");
@@ -359,7 +362,7 @@ public class HeavyPathDecomposition<V, E>
          * @return parent of vertex $v$ in the DFS tree/forest
          */
         public V getParent(V v) {
-            int index = vertexMap.getOrDefault(v, -1);
+            int index = new MapWrapper<>(vertexMap).getOrDefault(v, -1);
 
             if (index == -1 || parent[index] == -1)
                 return null;
@@ -381,7 +384,7 @@ public class HeavyPathDecomposition<V, E>
          * @return depth of vertex $v$ in the DFS tree/forest
          */
         public int getDepth(V v) {
-            int index = vertexMap.getOrDefault(v, -1);
+            int index = new MapWrapper<>(vertexMap).getOrDefault(v, -1);
 
             if (index == -1)
                 return -1;
@@ -403,7 +406,7 @@ public class HeavyPathDecomposition<V, E>
          * @return size of vertex $v$'s subtree in the DFS tree/forest
          */
         public int getSizeSubtree(V v) {
-            int index = vertexMap.getOrDefault(v, -1);
+            int index = new MapWrapper<>(vertexMap).getOrDefault(v, -1);
 
             if (index == -1)
                 return 0;
@@ -425,7 +428,7 @@ public class HeavyPathDecomposition<V, E>
          * @return component id of vertex $v$ in the DFS tree/forest
          */
         public int getComponent(V v) {
-            int index = vertexMap.getOrDefault(v, -1);
+            int index = new MapWrapper<>(vertexMap).getOrDefault(v, -1);
 
             if (index == -1)
                 return -1;

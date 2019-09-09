@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.isomorphism;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMapping;
 
@@ -93,11 +95,11 @@ public class IsomorphicGraphMapping<V, E>
      */
     public IsomorphicGraphMapping(
             Map<V, V> forwardMapping, Map<V, V> backwardMapping, Graph<V, E> graph1, Graph<V, E> graph2) {
-        this.forwardMapping = Objects.requireNonNull(forwardMapping);
-        this.backwardMapping = Objects.requireNonNull(backwardMapping);
+        this.forwardMapping = DObjects.requireNonNull(forwardMapping);
+        this.backwardMapping = DObjects.requireNonNull(backwardMapping);
 
-        this.graph1 = Objects.requireNonNull(graph1);
-        this.graph2 = Objects.requireNonNull(graph2);
+        this.graph1 = DObjects.requireNonNull(graph1);
+        this.graph2 = DObjects.requireNonNull(graph2);
     }
 
     @Override

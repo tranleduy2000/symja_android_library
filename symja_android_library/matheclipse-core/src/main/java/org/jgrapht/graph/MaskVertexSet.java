@@ -17,6 +17,9 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Predicate;
+import com.duy.lambda.PredicateWrapper;
+
 import org.jgrapht.util.TypeUtil;
 
 import java.io.Serializable;
@@ -25,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * Helper for {@link MaskSubgraph}.
@@ -63,7 +65,7 @@ class MaskVertexSet<V>
     @Override
     public Iterator<V> iterator() {
         List<V> list = new ArrayList<>();
-        Predicate<V> predicate = mask.negate();
+        Predicate<V> predicate = new PredicateWrapper<>(mask).negate();
         for (V v : vertexSet) {
             if (predicate.test(v)) {
                 list.add(v);
@@ -78,7 +80,7 @@ class MaskVertexSet<V>
     @Override
     public int size() {
         long count = 0L;
-        Predicate<V> predicate = mask.negate();
+        Predicate<V> predicate = new PredicateWrapper<>(mask).negate();
         for (V v : vertexSet) {
             if (predicate.test(v)) {
                 count++;

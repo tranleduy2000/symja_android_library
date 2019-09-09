@@ -1,11 +1,11 @@
 package ch.ethz.idsc.tensor.qty;
 
 import com.duy.lambda.UnaryOperator;
+import com.duy.util.DObjects;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.util.Objects;
 import java.util.Properties;
 
 public class QuantityMagnitude {
@@ -20,7 +20,7 @@ public class QuantityMagnitude {
      * @throws Exception if given {@link UnitSystem} is null
      */
     public QuantityMagnitude(UnitSystem unitSystem) {
-        this.unitSystem = Objects.requireNonNull(unitSystem);
+        this.unitSystem = DObjects.requireNonNull(unitSystem);
     }
 
     /**

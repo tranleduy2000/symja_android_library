@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.clique;
 
+import com.duy.lambda.Consumer;
+import com.duy.lang.DMath;
+import com.duy.util.IteratorWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.Graphs;
@@ -27,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * Bron-Kerbosch maximal clique enumeration algorithm with pivot and degeneracy ordering.
@@ -94,13 +97,13 @@ public class DegeneracyBronKerboschCliqueFinder<V, E>
 
             long nanosTimeLimit;
             try {
-                nanosTimeLimit = Math.addExact(System.nanoTime(), nanos);
+                nanosTimeLimit = DMath.addExact(System.nanoTime(), nanos);
             } catch (ArithmeticException ignore) {
                 nanosTimeLimit = Long.MAX_VALUE;
             }
 
             final List<V> ordering = new ArrayList<>();
-            new DegeneracyOrderingIterator<V, E>(graph).forEachRemaining(new Consumer<V>() {
+            new IteratorWrapper<>(new DegeneracyOrderingIterator<V, E>(graph)).forEachRemaining(new Consumer<V>() {
                 @Override
                 public void accept(V e1) {
                     ordering.add(e1);

@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.connectivity;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.AsSubgraph;
@@ -29,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -65,7 +66,7 @@ public class BiconnectivityInspector<V, E> {
      * @param graph the input graph
      */
     public BiconnectivityInspector(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         if (graph.getType().isDirected())
             this.graph = new AsUndirectedGraph<>(graph);
     }

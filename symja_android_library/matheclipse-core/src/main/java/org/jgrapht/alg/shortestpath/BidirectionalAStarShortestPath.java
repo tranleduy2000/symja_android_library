@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lambda.Supplier;
+import com.duy.lang.DDouble;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -29,9 +33,7 @@ import org.jheaps.tree.PairingHeap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * A bidirectional version of A* algorithm.
@@ -102,15 +104,15 @@ public class BidirectionalAStarShortestPath<V, E>
             Supplier<AddressableHeap<Double, V>> heapSupplier) {
         super(graph);
         this.forwardHeuristic =
-                Objects.requireNonNull(heuristic, "Heuristic function cannot be null!");
+                DObjects.requireNonNull(heuristic, "Heuristic function cannot be null!");
         if (graph.getType().isDirected()) {
             backwardHeuristic = new ReversedGraphHeuristic(
-                    Objects.requireNonNull(heuristic, "Heuristic function cannot be null!"));
+                    DObjects.requireNonNull(heuristic, "Heuristic function cannot be null!"));
         } else {
             this.backwardHeuristic =
-                    Objects.requireNonNull(heuristic, "Heuristic function cannot be null!");
+                    DObjects.requireNonNull(heuristic, "Heuristic function cannot be null!");
         }
-        this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null!");
+        this.heapSupplier = DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null!");
     }
 
     /**
@@ -205,7 +207,7 @@ public class BidirectionalAStarShortestPath<V, E>
         }
 
         // create path if found
-        if (Double.isFinite(bestPath)) {
+        if (DDouble.isFinite(bestPath)) {
             return createPath(
                     forwardFrontier, backwardFrontier, bestPath, source, bestPathCommonVertex, sink);
         } else {

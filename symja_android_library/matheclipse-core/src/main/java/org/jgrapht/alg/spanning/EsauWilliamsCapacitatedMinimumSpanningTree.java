@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.spanning;
 
+import com.duy.lambda.Function;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;
 
@@ -26,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Implementation of a randomized version of the Esau-Williams heuristic, a greedy randomized
@@ -190,7 +192,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                 closestVertex.put(v, closestVertexToV);
                 // store the maximum saving and the corresponding vertex
                 savings.put(
-                        v, getDistance(shortestGate.getOrDefault(bestSolution.getLabel(v), v), root)
+                        v, getDistance(new MapWrapper<>(shortestGate).getOrDefault(bestSolution.getLabel(v), v), root)
                                 - getDistance(v, closestVertexToV));
             }
 
@@ -205,9 +207,9 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                 V closestMoveVertex = closestVertex.get(vertexToMove);
                 Integer labelOfClosestMoveVertex = bestSolution.getLabel(closestMoveVertex);
 
-                V shortestGate1 = shortestGate.getOrDefault(labelOfVertexToMove, vertexToMove);
+                V shortestGate1 = new MapWrapper<>(shortestGate).getOrDefault(labelOfVertexToMove, vertexToMove);
                 V shortestGate2 =
-                        shortestGate.getOrDefault(labelOfClosestMoveVertex, closestMoveVertex);
+                        new MapWrapper<>(shortestGate).getOrDefault(labelOfClosestMoveVertex, closestMoveVertex);
 
                 /*
                  * Do improving move. The case distinction is important such that the the
@@ -334,7 +336,7 @@ public class EsauWilliamsCapacitatedMinimumSpanningTree<V, E>
                                  * this part, so add the part to the restricted parts
                                  */
                                 Set<Integer> restriction =
-                                        restrictionMap.computeIfAbsent(vertex, new Function<V, Set<Integer>>() {
+                                        new MapWrapper<>(restrictionMap).computeIfAbsent(vertex, new Function<V, Set<Integer>>() {
                                             @Override
                                             public Set<Integer> apply(V k) {
                                                 return new HashSet<>();

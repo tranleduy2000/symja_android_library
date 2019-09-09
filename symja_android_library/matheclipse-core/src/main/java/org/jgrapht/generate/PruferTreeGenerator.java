@@ -17,6 +17,8 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 
@@ -26,7 +28,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -73,7 +74,7 @@ public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
      * @throws IllegalArgumentException if {@code pruferSequence} is invalid.
      */
     public PruferTreeGenerator(int[] pruferSequence) {
-        if (Objects.isNull(pruferSequence)) {
+        if (DObjects.isNull(pruferSequence)) {
             throw new IllegalArgumentException("pruferSequence cannot be null");
         }
 
@@ -127,7 +128,7 @@ public class PruferTreeGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
         }
 
         this.n = n;
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
         this.inputPruferSeq = null;
     }
 

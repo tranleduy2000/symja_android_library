@@ -17,7 +17,9 @@
  */
 package org.jgrapht.alg.clique;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.Function;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -34,9 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Calculates a <a href = "http://mathworld.wolfram.com/MaximumClique.html">maximum cardinality
@@ -90,8 +90,8 @@ public class ChordalGraphMaxCliqueFinder<V, E>
      */
     public ChordalGraphMaxCliqueFinder(
             Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder) {
-        this.graph = Objects.requireNonNull(graph);
-        this.iterationOrder = Objects.requireNonNull(iterationOrder);
+        this.graph = DObjects.requireNonNull(graph);
+        this.iterationOrder = DObjects.requireNonNull(iterationOrder);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ChordalGraphMaxCliqueFinder<V, E>
             Map<V, Integer> vertexInOrder = getVertexInOrder(perfectEliminationOrder);
             boolean seen = false;
             Map.Entry<V, Integer> best = null;
-            Comparator<Map.Entry<V, Integer>> comparator = DComparator.comparing(new Function<Map.Entry<V, Integer>, Integer>() {
+            Comparator<Map.Entry<V, Integer>> comparator = ComparatorWrapper.comparing(new Function<Map.Entry<V, Integer>, Integer>() {
                 @Override
                 public Integer apply(Map.Entry<V, Integer> vIntegerEntry1) {
                     return vIntegerEntry1.getValue();

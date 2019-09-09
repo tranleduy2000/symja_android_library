@@ -7,8 +7,8 @@ public class SFunction {
      * @param <T> the type of the input and output objects to the function
      * @return a function that always returns its input argument
      */
-    public static <T> java.util.function.Function<T, T> identity() {
-        return new java.util.function.Function<T, T>() {
+    public static <T> com.duy.lambda.Function<T, T> identity() {
+        return new com.duy.lambda.Function<T, T>() {
             @Override
             public T apply(T t) {
                 return t;

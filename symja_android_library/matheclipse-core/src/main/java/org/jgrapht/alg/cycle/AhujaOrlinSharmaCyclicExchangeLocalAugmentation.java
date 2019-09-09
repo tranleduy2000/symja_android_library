@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.graph.GraphWalk;
 import org.jgrapht.util.TypeUtil;
@@ -87,12 +89,12 @@ public class AhujaOrlinSharmaCyclicExchangeLocalAugmentation<V, E> {
      */
     public AhujaOrlinSharmaCyclicExchangeLocalAugmentation(
             Graph<V, E> graph, int lengthBound, Map<V, Integer> labelMap, boolean bestImprovement) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
         if (!graph.getType().isDirected()) {
             throw new IllegalArgumentException("The graph has to be directed.");
         }
         this.lengthBound = lengthBound;
-        this.labelMap = Objects.requireNonNull(labelMap, "Labels cannot be null");
+        this.labelMap = DObjects.requireNonNull(labelMap, "Labels cannot be null");
         for (V vertex : graph.vertexSet()) {
             if (!labelMap.containsKey(vertex)) {
                 throw new IllegalArgumentException(

@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.partition;
 
+import com.duy.lang.DMath;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.PartitioningAlgorithm;
@@ -26,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.jgrapht.GraphTests.isEmpty;
@@ -59,7 +61,7 @@ public class BipartitePartitioning<V, E>
      * @param graph the input graph;
      */
     public BipartitePartitioning(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "graph cannot be null");
     }
 
     /**
@@ -73,7 +75,7 @@ public class BipartitePartitioning<V, E>
         }
         try {
             // at most n^2/4 edges
-            if (Math.multiplyExact(4, graph.edgeSet().size()) > Math
+            if (DMath.multiplyExact(4, graph.edgeSet().size()) > DMath
                     .multiplyExact(graph.vertexSet().size(), graph.vertexSet().size())) {
                 return false;
             }
@@ -133,7 +135,7 @@ public class BipartitePartitioning<V, E>
      */
     @Override
     public boolean isValidPartitioning(Partitioning<V> partitioning) {
-        Objects.requireNonNull(partitioning, "Partition cannot be null");
+        DObjects.requireNonNull(partitioning, "Partition cannot be null");
 
         if (partitioning.getNumberPartitions() != 2)
             return false;
@@ -141,8 +143,8 @@ public class BipartitePartitioning<V, E>
         Set<V> firstPartition = partitioning.getPartition(0);
         Set<V> secondPartition = partitioning.getPartition(1);
 
-        Objects.requireNonNull(firstPartition, "First partition class cannot be null");
-        Objects.requireNonNull(secondPartition, "Second partition class cannot be null");
+        DObjects.requireNonNull(firstPartition, "First partition class cannot be null");
+        DObjects.requireNonNull(secondPartition, "Second partition class cannot be null");
 
         if (graph.vertexSet().size() != firstPartition.size() + secondPartition.size()) {
             return false;

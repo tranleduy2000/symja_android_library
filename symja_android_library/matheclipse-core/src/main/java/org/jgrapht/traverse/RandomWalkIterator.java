@@ -17,6 +17,8 @@
  */
 package org.jgrapht.traverse;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 
@@ -25,7 +27,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -160,7 +161,7 @@ public class RandomWalkIterator<V, E>
         }
 
         this.sinkReached = false;
-        this.random = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.random = DObjects.requireNonNull(rng, "Random number generator cannot be null");
     }
 
     /**

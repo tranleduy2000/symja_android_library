@@ -20,7 +20,7 @@ package org.jgrapht.graph.builder;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * A builder class for {@link Graph}. This is a helper class which helps adding vertices and edges

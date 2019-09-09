@@ -17,13 +17,14 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -112,7 +113,7 @@ public class BarabasiAlbertGraphGenerator<V, E> extends GraphGeneratorImpl<V, E,
                     "total number of nodes must be at least equal to the initial set");
         }
         this.n = n;
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
     }
 
     /**

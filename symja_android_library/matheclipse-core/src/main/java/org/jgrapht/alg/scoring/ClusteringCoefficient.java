@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.scoring;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMetrics;
 import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
@@ -25,7 +27,6 @@ import org.jgrapht.alg.util.NeighborCache;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -103,7 +104,7 @@ public class ClusteringCoefficient<V, E>
      * @throws NullPointerException if {@code graph} is {@code null}
      */
     public ClusteringCoefficient(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         this.scores = new HashMap<>();
     }
 

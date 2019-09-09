@@ -30,7 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.Predicate;
+import com.duy.lambda.Predicate;
 
 /**
  * Implementation of the algorithm by Padberg and Rao to compute Odd Minimum Cut-Sets. Let $G=(V,E)$

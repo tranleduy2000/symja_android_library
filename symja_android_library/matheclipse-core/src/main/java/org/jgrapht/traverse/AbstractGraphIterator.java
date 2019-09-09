@@ -17,6 +17,8 @@
  */
 package org.jgrapht.traverse;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.event.ConnectedComponentTraversalEvent;
 import org.jgrapht.event.EdgeTraversalEvent;
@@ -24,7 +26,6 @@ import org.jgrapht.event.TraversalListener;
 import org.jgrapht.event.VertexTraversalEvent;
 
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -57,7 +58,7 @@ public abstract class AbstractGraphIterator<V, E>
      * @param graph the graph
      */
     public AbstractGraphIterator(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "graph must not be null");
+        this.graph = DObjects.requireNonNull(graph, "graph must not be null");
         this.reusableEdgeEvent = new FlyweightEdgeEvent<>(this, null);
         this.reusableVertexEvent = new FlyweightVertexEvent<>(this, null);
         this.crossComponentTraversal = true;

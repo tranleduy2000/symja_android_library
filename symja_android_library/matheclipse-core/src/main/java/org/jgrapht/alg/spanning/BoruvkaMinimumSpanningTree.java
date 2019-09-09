@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.spanning;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
 import org.jgrapht.alg.util.ToleranceDoubleComparator;
@@ -27,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,7 +61,7 @@ public class BoruvkaMinimumSpanningTree<V, E>
      * @param graph the input graph
      */
     public BoruvkaMinimumSpanningTree(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
         this.comparator = new ToleranceDoubleComparator();
     }
 

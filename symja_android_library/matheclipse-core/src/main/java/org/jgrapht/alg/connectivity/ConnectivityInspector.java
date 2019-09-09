@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.connectivity;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.event.ConnectedComponentTraversalEvent;
 import org.jgrapht.event.GraphEdgeChangeEvent;
@@ -33,7 +35,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -74,7 +75,7 @@ public class ConnectivityInspector<V, E>
      */
     public ConnectivityInspector(Graph<V, E> g) {
         init();
-        this.graph = Objects.requireNonNull(g);
+        this.graph = DObjects.requireNonNull(g);
         if (g.getType().isDirected())
             this.graph = new AsUndirectedGraph<>(g);
     }

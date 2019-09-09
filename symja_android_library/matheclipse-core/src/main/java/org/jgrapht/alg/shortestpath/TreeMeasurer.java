@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.traverse.BreadthFirstIterator;
@@ -25,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -47,7 +48,7 @@ public class TreeMeasurer<V, E> {
      * @throws NullPointerException if {@code graph} is {@code null}
      */
     public TreeMeasurer(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
     }
 
     private V computeFarthestVertex(BreadthFirstIterator<V, E> bfs) {

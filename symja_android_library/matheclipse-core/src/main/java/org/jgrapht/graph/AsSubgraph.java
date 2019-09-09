@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * A subgraph is a graph that has a subset of vertices and a subset of edges with respect to some

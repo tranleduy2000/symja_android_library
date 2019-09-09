@@ -22,7 +22,7 @@ import org.jgrapht.graph.*;
 import org.jgrapht.util.*;
 import org.junit.*;
 
-import java.util.function.*;
+import com.duy.lambda.*;
 
 import static org.junit.Assert.assertTrue;
 

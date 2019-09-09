@@ -20,7 +20,7 @@ package org.jgrapht.graph;
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * The default implementation of an undirected weighted graph. A default undirected weighted graph

@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.color;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
@@ -26,7 +28,6 @@ import java.util.BitSet;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The Dsatur greedy coloring algorithm.
@@ -71,7 +72,7 @@ public class SaturationDegreeColoring<V, E>
      * @param graph the input graph
      */
     public SaturationDegreeColoring(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**

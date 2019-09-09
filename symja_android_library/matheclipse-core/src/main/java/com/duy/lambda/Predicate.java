@@ -11,4 +11,6 @@ public interface Predicate<T> {
      * otherwise {@code false}
      */
     boolean test(T t);
+
+
 }

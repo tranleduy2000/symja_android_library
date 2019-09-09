@@ -17,13 +17,14 @@
  */
 package org.jgrapht.alg.util;
 
+import com.duy.util.DObjects;
+import com.duy.util.StringJoiner;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/Disjoint-set_data_structure">Union
@@ -212,7 +213,7 @@ public class UnionFind<T> {
                 .keySet()) {
             StringJoiner result = new StringJoiner(",");
             for (T t : setRep.get(key)) {
-                String toString = Objects.toString(t);
+                String toString = DObjects.toString(t);
                 result.add(toString);
             }
             String s = "{" + key + ":" + result.toString() + "}";

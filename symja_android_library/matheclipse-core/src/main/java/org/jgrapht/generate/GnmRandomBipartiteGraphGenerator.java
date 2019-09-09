@@ -17,12 +17,14 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.lang.DMath;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -107,7 +109,7 @@ public class GnmRandomBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V
             throw new IllegalArgumentException("number of edges must be non-negative");
         }
         this.m = m;
-        this.rng = Objects.requireNonNull(rng);
+        this.rng = DObjects.requireNonNull(rng);
     }
 
     /**
@@ -146,10 +148,10 @@ public class GnmRandomBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V
         int maxAllowedEdges;
         try {
             if (isDirected) {
-                maxAllowedEdges = Math.multiplyExact(2, Math.multiplyExact(n1, n2));
+                maxAllowedEdges = DMath.multiplyExact(2, DMath.multiplyExact(n1, n2));
             } else {
                 // assume undirected
-                maxAllowedEdges = Math.multiplyExact(n1, n2);
+                maxAllowedEdges = DMath.multiplyExact(n1, n2);
             }
         } catch (ArithmeticException e) {
             maxAllowedEdges = Integer.MAX_VALUE;

@@ -1,11 +1,10 @@
 package ch.ethz.idsc.tensor.qty;
 
 import com.duy.lambda.UnaryOperator;
+import com.duy.util.DObjects;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-
-import java.util.Objects;
 
 public class UnitConvert {
   /** @return instance of UnitConvert that uses the built-in SI convention */
@@ -18,7 +17,7 @@ public class UnitConvert {
   /** @param unitSystem
    * @throws Exception if given {@link UnitSystem} is null */
     public UnitConvert(UnitSystem unitSystem) {
-        this.unitSystem = Objects.requireNonNull(unitSystem);
+        this.unitSystem = DObjects.requireNonNull(unitSystem);
     }
 
   /** Example:

@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.vertexcover;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.alg.interfaces.VertexCoverAlgorithm;
@@ -25,7 +27,6 @@ import org.jgrapht.graph.AsSubgraph;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -81,7 +82,7 @@ public class BarYehudaEvenTwoApproxVCImpl<V, E>
      */
     public BarYehudaEvenTwoApproxVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap) {
         this.graph = GraphTests.requireUndirected(graph);
-        this.vertexWeightMap = Objects.requireNonNull(vertexWeightMap);
+        this.vertexWeightMap = DObjects.requireNonNull(vertexWeightMap);
     }
 
     @Override

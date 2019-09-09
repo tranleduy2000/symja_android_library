@@ -17,6 +17,11 @@
  */
 package org.jgrapht.alg.decomposition;
 
+import com.duy.lambda.Consumer;
+import com.duy.util.DObjects;
+import com.duy.util.IterableWrapper;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.alg.interfaces.MatchingAlgorithm;
@@ -26,9 +31,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.builder.GraphBuilder;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * <p>
@@ -95,7 +98,7 @@ public class DulmageMendelsohnDecomposition<V, E> {
      * @param partition2 the second partition, $V_2$, of vertices in the bipartite graph
      */
     public DulmageMendelsohnDecomposition(Graph<V, E> graph, Set<V> partition1, Set<V> partition2) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         this.partition1 = partition1;
         this.partition2 = partition2;
         assert GraphTests.isBipartite(graph);
@@ -273,7 +276,7 @@ public class DulmageMendelsohnDecomposition<V, E> {
     private void getUnmatched(Matching<V, E> matching, final Set<V> unmatched1, final Set<V> unmatched2) {
         unmatched1.addAll(partition1);
         unmatched2.addAll(partition2);
-        matching.forEach(new Consumer<E>() {
+        new IterableWrapper<>(matching).forEach(new Consumer<E>() {
             @Override
             public void accept(E e) {
                 V source = graph.getEdgeSource(e);
@@ -292,13 +295,13 @@ public class DulmageMendelsohnDecomposition<V, E> {
     private Graph<V, DefaultEdge> asDirectedGraph(final Matching<V, E> matching) {
         final GraphBuilder<V, DefaultEdge, ? extends DefaultDirectedGraph<V, DefaultEdge>> builder =
                 DefaultDirectedGraph.createBuilder(DefaultEdge.class);
-        graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V v) {
                 builder.addVertex(v);
             }
         });
-        graph.edgeSet().forEach(new Consumer<E>() {
+        new SetWrapper<>(graph.edgeSet()).forEach(new Consumer<E>() {
             @Override
             public void accept(E e) {
                 V v1 = graph.getEdgeSource(e);

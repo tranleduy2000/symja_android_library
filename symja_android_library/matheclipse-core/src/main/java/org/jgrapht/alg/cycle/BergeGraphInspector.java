@@ -17,6 +17,11 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.lambda.Predicate;
+import com.duy.stream.StreamWrapper;
+import com.duy.util.OptionalInt;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphTests;
@@ -33,9 +38,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * <p>
@@ -128,7 +131,7 @@ public class BergeGraphInspector<V, E> {
                 }
             }
             if (b
-                    || T.getVertexList().stream().anyMatch(
+                    || new StreamWrapper<>(T.getVertexList()).stream().anyMatch(
                     new Predicate<V>() {
                         @Override
                         public boolean test(V t) {
@@ -140,7 +143,7 @@ public class BergeGraphInspector<V, E> {
             List<V> intersection = intersectGraphPaths(S, T);
             if (intersection.size() != 1 || !intersection.contains(m))
                 return null;
-            if (S.getVertexList().stream().anyMatch(
+            if (new StreamWrapper<>(S.getVertexList()).anyMatch(
                     new Predicate<V>() {
                         @Override
                         public boolean test(V s) {
@@ -298,7 +301,7 @@ public class BergeGraphInspector<V, E> {
                                     for (V m1 : M) {
                                         Set<V> validInterior = new HashSet<>();
                                         validInterior.addAll(M);
-                                        validInterior.removeIf(
+                                        new SetWrapper<>(validInterior).removeIf(
                                                 new Predicate<V>() {
                                                     @Override
                                                     public boolean test(V i) {
@@ -322,7 +325,7 @@ public class BergeGraphInspector<V, E> {
                                     for (V m2 : M) {
                                         Set<V> validInterior = new HashSet<>();
                                         validInterior.addAll(M);
-                                        validInterior.removeIf(
+                                        new SetWrapper<>(validInterior).removeIf(
                                                 new Predicate<V>() {
                                                     @Override
                                                     public boolean test(V i) {
@@ -345,7 +348,7 @@ public class BergeGraphInspector<V, E> {
                                     for (V m3 : M) {
                                         Set<V> validInterior = new HashSet<>();
                                         validInterior.addAll(M);
-                                        validInterior.removeIf(
+                                        new SetWrapper<>(validInterior).removeIf(
                                                 new Predicate<V>() {
                                                     @Override
                                                     public boolean test(V i) {
@@ -579,7 +582,7 @@ public class BergeGraphInspector<V, E> {
                     if (set.size() < 7 || subg.vertexSet().size() != set.size()
                             || subg.edgeSet().size() != subg.vertexSet().size()
                             || subg.vertexSet().size() % 2 == 0
-                            || subg.vertexSet().stream().anyMatch(new Predicate<V>() {
+                            || new StreamWrapper<>(subg.vertexSet()).anyMatch(new Predicate<V>() {
                         @Override
                         public boolean test(V t) {
                             return subg.degreeOf(t) != 2;
@@ -936,7 +939,7 @@ public class BergeGraphInspector<V, E> {
      */
     private Set<V> findMaximalConnectedSubset(final Graph<V, E> g, final Set<V> X, final V v1, final V v2, final V v5) {
         Set<V> FPrime = new ConnectivityInspector<>(g).connectedSetOf(v5);
-        FPrime.removeIf(
+        new SetWrapper<>(FPrime).removeIf(
                 new Predicate<V>() {
                     @Override
                     public boolean test(V t) {

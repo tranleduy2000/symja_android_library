@@ -17,7 +17,10 @@
  */
 package org.jgrapht.alg.flow;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.Optional;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
@@ -35,11 +38,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * This class computes a Gomory-Hu tree (GHT) using the algorithm proposed by Dan Gusfield. For a
@@ -295,7 +295,7 @@ public class GusfieldGomoryHuCutTree<V, E>
         }
         boolean seen = false;
         DefaultWeightedEdge best = null;
-        Comparator<DefaultWeightedEdge> comparator = DComparator.comparing(new Function<DefaultWeightedEdge, Double>() {
+        Comparator<DefaultWeightedEdge> comparator = ComparatorWrapper.comparing(new Function<DefaultWeightedEdge, Double>() {
             @Override
             public Double apply(DefaultWeightedEdge e) {
                 return gomoryHuTree.getEdgeWeight(e);
@@ -340,7 +340,7 @@ public class GusfieldGomoryHuCutTree<V, E>
                 this.findPathBetween(gomoryHuTree, lastInvokedSource, lastInvokedTarget);
         boolean seen = false;
         DefaultWeightedEdge best = null;
-        Comparator<DefaultWeightedEdge> comparator = DComparator.comparing(new Function<DefaultWeightedEdge, Double>() {
+        Comparator<DefaultWeightedEdge> comparator = ComparatorWrapper.comparing(new Function<DefaultWeightedEdge, Double>() {
             @Override
             public Double apply(DefaultWeightedEdge e) {
                 return gomoryHuTree.getEdgeWeight(e);

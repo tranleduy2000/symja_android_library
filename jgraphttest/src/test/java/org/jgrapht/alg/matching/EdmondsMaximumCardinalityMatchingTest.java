@@ -1170,9 +1170,9 @@ public final class EdmondsMaximumCardinalityMatchingTest
     private static int maxEdges(int n)
     {
         if (n % 2 == 0) {
-            return Math.multiplyExact(n / 2, n - 1);
+            return DMath.multiplyExact(n / 2, n - 1);
         } else {
-            return Math.multiplyExact(n, (n - 1) / 2);
+            return DMath.multiplyExact(n, (n - 1) / 2);
         }
     }
 

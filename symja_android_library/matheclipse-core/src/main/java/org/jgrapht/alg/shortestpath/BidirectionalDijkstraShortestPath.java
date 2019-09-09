@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lambda.Supplier;
+import com.duy.lang.DDouble;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -27,8 +31,6 @@ import org.jheaps.tree.PairingHeap;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 /**
  * A bidirectional version of Dijkstra's algorithm.
@@ -110,7 +112,7 @@ public final class BidirectionalDijkstraShortestPath<V, E>
         if (radius < 0.0) {
             throw new IllegalArgumentException("Radius must be non-negative");
         }
-        this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
+        this.heapSupplier = DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
         this.radius = radius;
     }
 
@@ -203,7 +205,7 @@ public final class BidirectionalDijkstraShortestPath<V, E>
         }
 
         // create path if found
-        if (Double.isFinite(bestPath) && bestPath <= radius) {
+        if (DDouble.isFinite(bestPath) && bestPath <= radius) {
             return createPath(
                     forwardFrontier, backwardFrontier, bestPath, source, bestPathCommonVertex, sink);
         } else {

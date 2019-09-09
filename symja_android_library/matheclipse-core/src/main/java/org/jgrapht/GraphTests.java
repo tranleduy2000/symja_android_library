@@ -17,6 +17,10 @@
  */
 package org.jgrapht;
 
+import com.duy.lang.DMath;
+import com.duy.util.DObjects;
+import com.duy.util.OptionalInt;
+
 import org.jgrapht.alg.connectivity.BiconnectivityInspector;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
@@ -32,7 +36,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.Set;
 
 /**
@@ -61,7 +64,7 @@ public abstract class GraphTests {
      * @return true if the graph is empty, false otherwise
      */
     public static <V, E> boolean isEmpty(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         return graph.edgeSet().isEmpty();
     }
 
@@ -75,7 +78,7 @@ public abstract class GraphTests {
      * @return true if a graph is simple, false otherwise
      */
     public static <V, E> boolean isSimple(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
 
         GraphType type = graph.getType();
         if (type.isSimple()) {
@@ -106,7 +109,7 @@ public abstract class GraphTests {
      * @return true if a graph has self-loops, false otherwise
      */
     public static <V, E> boolean hasSelfLoops(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
 
         if (!graph.getType().isAllowingSelfLoops()) {
             return false;
@@ -131,7 +134,7 @@ public abstract class GraphTests {
      * @return true if a graph has multiple edges, false otherwise
      */
     public static <V, E> boolean hasMultipleEdges(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
 
         if (!graph.getType().isAllowingMultipleEdges()) {
             return false;
@@ -162,16 +165,16 @@ public abstract class GraphTests {
      * @return true if the graph is complete, false otherwise
      */
     public static <V, E> boolean isComplete(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         int n = graph.vertexSet().size();
         int allEdges;
         if (graph.getType().isDirected()) {
-            allEdges = Math.multiplyExact(n, n - 1);
+            allEdges = DMath.multiplyExact(n, n - 1);
         } else if (graph.getType().isUndirected()) {
             if (n % 2 == 0) {
-                allEdges = Math.multiplyExact(n / 2, n - 1);
+                allEdges = DMath.multiplyExact(n / 2, n - 1);
             } else {
-                allEdges = Math.multiplyExact(n, (n - 1) / 2);
+                allEdges = DMath.multiplyExact(n, (n - 1) / 2);
             }
         } else {
             throw new IllegalArgumentException(GRAPH_MUST_BE_DIRECTED_OR_UNDIRECTED);
@@ -197,7 +200,7 @@ public abstract class GraphTests {
      * @see ConnectivityInspector
      */
     public static <V, E> boolean isConnected(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         return new ConnectivityInspector<>(graph).isConnected();
     }
 
@@ -217,7 +220,7 @@ public abstract class GraphTests {
      * @see BiconnectivityInspector
      */
     public static <V, E> boolean isBiconnected(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         return new BiconnectivityInspector<>(graph).isBiconnected();
     }
 
@@ -255,7 +258,7 @@ public abstract class GraphTests {
      * @see KosarajuStrongConnectivityInspector
      */
     public static <V, E> boolean isStronglyConnected(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         if (graph.getType().isUndirected()) {
             return isConnected(graph);
         } else {
@@ -431,7 +434,7 @@ public abstract class GraphTests {
      * @see HierholzerEulerianCycle#isEulerian(Graph)
      */
     public static <V, E> boolean isEulerian(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         return new HierholzerEulerianCycle<V, E>().isEulerian(graph);
     }
 
@@ -447,7 +450,7 @@ public abstract class GraphTests {
      * @see ChordalityInspector#isChordal()
      */
     public static <V, E> boolean isChordal(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         return new ChordalityInspector<>(graph).isChordal();
     }
 
@@ -473,7 +476,7 @@ public abstract class GraphTests {
      * @see WeakChordalityInspector#isWeaklyChordal()
      */
     public static <V, E> boolean isWeaklyChordal(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
         return new WeakChordalityInspector<>(graph).isWeaklyChordal();
     }
 
@@ -542,7 +545,7 @@ public abstract class GraphTests {
 //     */
 //    public static <V, E> boolean isPerfect(Graph<V, E> graph)
 //    {
-//        Objects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
+//        DObjects.requireNonNull(graph, GRAPH_CANNOT_BE_NULL);
 //        return new BergeGraphInspector<V, E>().isBerge(graph);
 //    }
 

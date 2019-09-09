@@ -30,8 +30,8 @@ import org.jgrapht.graph.specifics.UndirectedEdgeContainer;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Function;
 
 /**
  * The fast lookup specifics strategy implementation.

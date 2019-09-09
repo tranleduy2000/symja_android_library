@@ -20,7 +20,7 @@ package org.jgrapht.graph;
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * A simple directed weighted graph. A simple directed weighted graph is a simple directed graph for

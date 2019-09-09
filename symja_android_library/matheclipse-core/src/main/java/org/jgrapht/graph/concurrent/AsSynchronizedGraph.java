@@ -17,6 +17,11 @@
  */
 package org.jgrapht.graph.concurrent;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Predicate;
+import com.duy.util.DObjects;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.graph.GraphDelegator;
 
@@ -26,14 +31,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Create a synchronized (thread-safe) Graph backed by the specified Graph. This Graph is designed
@@ -705,7 +706,7 @@ public class AsSynchronizedGraph<V, E>
          * @param copyless      whether copyless mode should be used
          */
         private CopyOnDemandSet(Set<E> s, ReadWriteLock readWriteLock, boolean copyless) {
-            set = Objects.requireNonNull(s, "s must not be null");
+            set = DObjects.requireNonNull(s, "s must not be null");
             copy = null;
             this.readWriteLock = readWriteLock;
             this.copyless = copyless;
@@ -861,11 +862,11 @@ public class AsSynchronizedGraph<V, E>
          * {@inheritDoc}
          */
         // Override default methods in Collection
-        @Override
+//        @Override
         public void forEach(Consumer<? super E> action) {
             readWriteLock.readLock().lock();
             try {
-                set.forEach(action);
+                new SetWrapper<>(set).forEach(action);
             } finally {
                 readWriteLock.readLock().unlock();
             }
@@ -874,7 +875,7 @@ public class AsSynchronizedGraph<V, E>
         /**
          * {@inheritDoc}
          */
-        @Override
+//        @Override
         public boolean removeIf(Predicate<? super E> filter) {
             throw new UnsupportedOperationException(UNMODIFIABLE);
         }
@@ -885,10 +886,10 @@ public class AsSynchronizedGraph<V, E>
          * @return a <code>Spliterator</code> over the elements in the backing set's unmodifiable
          * copy.
          */
-        @Override
-        public Spliterator<E> spliterator() {
-            return getCopy().spliterator();
-        }
+//        @Override
+//        public Spliterator<E> spliterator() {
+//            return getCopy().spliterator();
+//        }
 
         /**
          * Return a sequential <code>Stream</code> with the backing set's unmodifiable copy as its

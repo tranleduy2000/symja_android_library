@@ -23,7 +23,7 @@ import org.jgrapht.alg.util.Pair;
 import org.jheaps.AddressableHeap;
 import org.jheaps.tree.PairingHeap;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * An implementation of <a href="http://mathworld.wolfram.com/DijkstrasAlgorithm.html">Dijkstra's

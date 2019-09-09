@@ -30,8 +30,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
+import com.duy.util.IteratorWrapper;
+import com.duy.util.MapWrapper;
 
 /**
  * Find all simple cycles of a directed graph using the Johnson's algorithm.
@@ -245,7 +247,7 @@ public class JohnsonSimpleCycles<V, E>
             int successorIndex = toI(successor);
             if (successorIndex == startIndex) {
                 final List<V> cycle = new ArrayList<>(stack.size());
-                stack.descendingIterator().forEachRemaining(new Consumer<V>() {
+                new IteratorWrapper<>(stack.descendingIterator()).forEachRemaining(new Consumer<V>() {
                     @Override
                     public void accept(V e1) {
                         cycle.add(e1);
@@ -335,7 +337,7 @@ public class JohnsonSimpleCycles<V, E>
     private Set<V> getBSet(V v) {
         // B sets typically not all needed,
         // so instantiate lazily.
-        return bSets.computeIfAbsent(v, new Function<V, Set<V>>() {
+        return new MapWrapper<>(bSets).computeIfAbsent(v, new Function<V, Set<V>>() {
             @Override
             public Set<V> apply(V k) {
                 return new HashSet<>();

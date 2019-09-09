@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -33,9 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * A* shortest path.
@@ -125,9 +126,9 @@ public class AStarShortestPath<V, E>
             Supplier<AddressableHeap<Double, V>> heapSupplier) {
         super(graph);
         this.admissibleHeuristic =
-                Objects.requireNonNull(admissibleHeuristic, "Heuristic function cannot be null!");
+                DObjects.requireNonNull(admissibleHeuristic, "Heuristic function cannot be null!");
         this.comparator = new ToleranceDoubleComparator();
-        this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null!");
+        this.heapSupplier = DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null!");
     }
 
     /**

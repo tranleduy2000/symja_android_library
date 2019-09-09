@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.flow.mincost;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MinimumCostFlowAlgorithm;
 import org.jgrapht.alg.util.Pair;
@@ -30,7 +32,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -215,7 +216,7 @@ public class CapacityScalingMinimumCostFlow<V, E>
     @Override
     public MinimumCostFlow<E> getMinimumCostFlow(
             final MinimumCostFlowProblem<V, E> minimumCostFlowProblem) {
-        this.problem = Objects.requireNonNull(minimumCostFlowProblem);
+        this.problem = DObjects.requireNonNull(minimumCostFlowProblem);
         if (problem.getGraph().getType().isUndirected()) {
             throw new IllegalArgumentException(
                     "The algorithm doesn't support undirected flow networks");

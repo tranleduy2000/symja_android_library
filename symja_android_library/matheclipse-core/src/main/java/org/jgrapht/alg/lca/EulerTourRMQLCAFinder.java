@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.lca;
 
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
@@ -99,7 +102,7 @@ public class EulerTourRMQLCAFinder<V, E>
      * @param root  the root of the graph
      */
     public EulerTourRMQLCAFinder(Graph<V, E> graph, V root) {
-        this(graph, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
+        this(graph, Collections.singleton(DObjects.requireNonNull(root, "root cannot be null")));
     }
 
     /**
@@ -115,8 +118,8 @@ public class EulerTourRMQLCAFinder<V, E>
      * @param roots the set of roots of the graph
      */
     public EulerTourRMQLCAFinder(Graph<V, E> graph, Set<V> roots) {
-        this.graph = Objects.requireNonNull(graph, "graph cannot be null");
-        this.roots = Objects.requireNonNull(roots, "roots cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "graph cannot be null");
+        this.roots = DObjects.requireNonNull(roots, "roots cannot be null");
         this.maxLevel = 1 + org.jgrapht.util.MathUtil.log2(graph.vertexSet().size());
 
         if (this.roots.isEmpty())
@@ -157,7 +160,7 @@ public class EulerTourRMQLCAFinder<V, E>
 
                 V vertexU = indexList.get(u);
                 for (E edge : graph.outgoingEdgesOf(vertexU)) {
-                    int child = vertexMap.get(Graphs.getOppositeVertex(graph, edge, vertexU));
+                    int child = new MapWrapper<>(vertexMap).get(Graphs.getOppositeVertex(graph, edge, vertexU));
 
                     // check if child has not been explored (i.e. dfs(child, ...) has not been
                     // called)
@@ -211,7 +214,7 @@ public class EulerTourRMQLCAFinder<V, E>
         component = new int[graph.vertexSet().size()];
 
         for (V root : roots) {
-            int u = vertexMap.get(root);
+            int u = new MapWrapper<>(vertexMap).get(root);
 
             if (component[u] == 0) {
                 numberComponent++;
@@ -236,11 +239,11 @@ public class EulerTourRMQLCAFinder<V, E>
      */
     @Override
     public V getLCA(V a, V b) {
-        int indexA = vertexMap.getOrDefault(a, -1);
+        int indexA = new MapWrapper<>(vertexMap).getOrDefault(a, -1);
         if (indexA == -1)
             throw new IllegalArgumentException("invalid vertex: " + a);
 
-        int indexB = vertexMap.getOrDefault(b, -1);
+        int indexB = new MapWrapper<>(vertexMap).getOrDefault(b, -1);
         if (indexB == -1)
             throw new IllegalArgumentException("invalid vertex: " + b);
 

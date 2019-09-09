@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.spanning;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
@@ -28,7 +30,6 @@ import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -55,7 +56,7 @@ public class PrimMinimumSpanningTree<V, E>
      * @param graph the input graph
      */
     public PrimMinimumSpanningTree(Graph<V, E> graph) {
-        this.g = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.g = DObjects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**

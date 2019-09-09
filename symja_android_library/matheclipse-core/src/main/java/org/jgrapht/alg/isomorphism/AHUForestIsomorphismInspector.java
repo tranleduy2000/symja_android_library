@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.isomorphism;
 
+import com.duy.lambda.Consumer;
+import com.duy.util.DObjects;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMapping;
 import org.jgrapht.GraphTests;
@@ -28,9 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * This is an implementation of the AHU algorithm for detecting an (unweighted) isomorphism between
@@ -109,8 +111,8 @@ public class AHUForestIsomorphismInspector<V, E>
 
     private void validateForest(Graph<V, E> forest, Set<V> roots) {
         assert GraphTests.isSimple(forest);
-        Objects.requireNonNull(forest, "input forest cannot be null");
-        Objects.requireNonNull(roots, "set of roots cannot be null");
+        DObjects.requireNonNull(forest, "input forest cannot be null");
+        DObjects.requireNonNull(roots, "set of roots cannot be null");
 
         if (forest.vertexSet().isEmpty()) {
             throw new IllegalArgumentException("input forest cannot be empty");
@@ -149,7 +151,7 @@ public class AHUForestIsomorphismInspector<V, E>
     private Pair<V, Graph<V, E>> createSingleRootGraph(Graph<V, E> forest, Set<V> roots) {
         final Graph<V, E> freshForest = GraphTypeBuilder.forGraph(forest).weighted(false).buildGraph();
 
-        roots.forEach(new Consumer<V>() {
+        new SetWrapper<>(roots).forEach(new Consumer<V>() {
             @Override
             public void accept(V v) {
                 freshForest.addVertex(v);

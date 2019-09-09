@@ -17,13 +17,14 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphType;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * A graph backed by the the graph specified at the constructor, which delegates all its methods to
@@ -77,7 +78,7 @@ public class GraphDelegator<V, E>
      */
     public GraphDelegator(Graph<V, E> graph, Supplier<V> vertexSupplier, Supplier<E> edgeSupplier) {
         super();
-        this.delegate = Objects.requireNonNull(graph, "graph must not be null");
+        this.delegate = DObjects.requireNonNull(graph, "graph must not be null");
         this.vertexSupplier = vertexSupplier;
         this.edgeSupplier = edgeSupplier;
     }

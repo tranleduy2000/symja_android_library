@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.scoring;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
@@ -28,7 +30,6 @@ import org.jgrapht.graph.EdgeReversedGraph;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Closeness centrality.
@@ -102,7 +103,7 @@ public class ClosenessCentrality<V, E>
      *                  number of vertices of the graph
      */
     public ClosenessCentrality(Graph<V, E> graph, boolean incoming, boolean normalize) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
         this.incoming = incoming;
         this.normalize = normalize;
         this.scores = null;

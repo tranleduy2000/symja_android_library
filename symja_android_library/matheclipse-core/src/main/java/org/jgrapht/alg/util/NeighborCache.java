@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.util;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.event.GraphEdgeChangeEvent;
@@ -31,9 +35,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Maintains a cache of each vertex's neighbors. While lists of neighbors can be obtained from
@@ -65,7 +67,7 @@ public class NeighborCache<V, E>
      * @throws NullPointerException if the input graph is null
      */
     public NeighborCache(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
     }
 
     /**
@@ -136,7 +138,7 @@ public class NeighborCache<V, E>
     }
 
     private Set<V> fetch(V vertex, Map<V, Neighbors<V>> map, Function<V, Neighbors<V>> func) {
-        return map.computeIfAbsent(vertex, func).getNeighbors();
+        return new MapWrapper<>(map).computeIfAbsent(vertex, func).getNeighbors();
     }
 
     @Override

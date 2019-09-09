@@ -26,7 +26,7 @@ import org.junit.*;
 import org.junit.experimental.categories.*;
 
 import java.util.*;
-import java.util.function.*;
+import com.duy.lambda.*;
 
 import static org.junit.Assert.*;
 

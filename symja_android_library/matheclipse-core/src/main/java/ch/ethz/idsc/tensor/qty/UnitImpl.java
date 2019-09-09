@@ -1,7 +1,7 @@
 package ch.ethz.idsc.tensor.qty;
 
 import com.duy.lambda.BiFunction;
-import com.duy.util.DMap;
+import com.duy.util.MapWrapper;
 import com.duy.util.DStringJoiner;
 
 import org.matheclipse.core.expression.F;
@@ -33,7 +33,7 @@ import java.util.TreeMap;
         //
         TreeMap<String, IExpr> map = new TreeMap<>();
         for (Entry<String, IExpr> entry : navigableMap.entrySet()) {
-            DMap.merge(map, entry.getKey(), entry.getValue().negate(), new BiFunction<IExpr, IExpr, IExpr>() {
+            MapWrapper.merge(map, entry.getKey(), entry.getValue().negate(), new BiFunction<IExpr, IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr e1, IExpr e2) {
                     return null;

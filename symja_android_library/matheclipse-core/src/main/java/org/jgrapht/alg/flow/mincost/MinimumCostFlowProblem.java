@@ -17,11 +17,11 @@
  */
 package org.jgrapht.alg.flow.mincost;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MinimumCostFlowAlgorithm;
-
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * This class represents a <a href="https://en.wikipedia.org/wiki/Minimum-cost_flow_problem">
@@ -120,10 +120,10 @@ public interface MinimumCostFlowProblem<V, E> {
                 Graph<V, E> graph, Function<V, Integer> nodeSupplies,
                 Function<E, Integer> arcCapacityUpperBounds,
                 Function<E, Integer> arcCapacityLowerBounds) {
-            this.graph = Objects.requireNonNull(graph);
-            this.nodeSupplies = Objects.requireNonNull(nodeSupplies);
-            this.arcCapacityUpperBounds = Objects.requireNonNull(arcCapacityUpperBounds);
-            this.arcCapacityLowerBounds = Objects.requireNonNull(arcCapacityLowerBounds);
+            this.graph = DObjects.requireNonNull(graph);
+            this.nodeSupplies = DObjects.requireNonNull(nodeSupplies);
+            this.arcCapacityUpperBounds = DObjects.requireNonNull(arcCapacityUpperBounds);
+            this.arcCapacityLowerBounds = DObjects.requireNonNull(arcCapacityLowerBounds);
         }
 
         /**

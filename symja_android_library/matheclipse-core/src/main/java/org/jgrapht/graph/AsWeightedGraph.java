@@ -17,6 +17,10 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.GraphType;
@@ -24,8 +28,6 @@ import org.jgrapht.GraphType;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Provides a weighted view of a graph. The class stores edge weights internally.
@@ -96,7 +98,7 @@ public class AsWeightedGraph<V, E>
      */
     public AsWeightedGraph(Graph<V, E> graph, Map<E, Double> weights, boolean writeWeightsThrough) {
         super(graph);
-        this.weights = Objects.requireNonNull(weights);
+        this.weights = DObjects.requireNonNull(weights);
         this.weightFunction = null;
         this.cacheWeights = false;
         this.writeWeightsThrough = writeWeightsThrough;
@@ -131,7 +133,7 @@ public class AsWeightedGraph<V, E>
             Graph<V, E> graph, Function<E, Double> weightFunction, boolean cacheWeights,
             boolean writeWeightsThrough) {
         super(graph);
-        this.weightFunction = Objects.requireNonNull(weightFunction);
+        this.weightFunction = DObjects.requireNonNull(weightFunction);
         this.cacheWeights = cacheWeights;
         this.writeWeightsThrough = writeWeightsThrough;
         this.weights = new HashMap<>();
@@ -160,14 +162,14 @@ public class AsWeightedGraph<V, E>
         if (weightFunction != null) {
             if (cacheWeights) // If weights are cached, check map first before invoking the weight
                 // function
-                weight = weights.computeIfAbsent(e, weightFunction);
+                weight = new MapWrapper<>(weights).computeIfAbsent(e, weightFunction);
             else
                 weight = weightFunction.apply(e);
         } else {
             weight = weights.get(e);
         }
 
-        if (Objects.isNull(weight))
+        if (DObjects.isNull(weight))
             weight = super.getEdgeWeight(e);
 
         return weight;

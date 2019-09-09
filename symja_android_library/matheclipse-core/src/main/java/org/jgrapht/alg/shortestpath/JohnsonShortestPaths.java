@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphTests;
@@ -222,7 +224,7 @@ public class JohnsonShortestPaths<V, E>
 
             // transform result
             for (V u : g.vertexSet()) {
-                Pair<Double, E> pair = distanceAndPredecessorMap
+                Pair<Double, E> pair = new MapWrapper<>(distanceAndPredecessorMap)
                         .getOrDefault(u, Pair.<Double, E>of(Double.POSITIVE_INFINITY, null));
                 distance[vertexIndices.get(v)][vertexIndices.get(u)] = pair.getFirst();
                 pred[vertexIndices.get(v)][vertexIndices.get(u)] = pair.getSecond();

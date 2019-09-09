@@ -17,11 +17,13 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Default implementation of an edge function which uses a map to store values.
@@ -55,8 +57,8 @@ public class DefaultEdgeFunction<E, T>
      * @param map          the underlying map
      */
     public DefaultEdgeFunction(T defaultValue, Map<E, T> map) {
-        this.defaultValue = Objects.requireNonNull(defaultValue, "Default value cannot be null");
-        this.map = Objects.requireNonNull(map, "Map cannot be null");
+        this.defaultValue = DObjects.requireNonNull(defaultValue, "Default value cannot be null");
+        this.map = DObjects.requireNonNull(map, "Map cannot be null");
     }
 
     /**
@@ -66,7 +68,7 @@ public class DefaultEdgeFunction<E, T>
      */
     @Override
     public T apply(E e) {
-        return map.getOrDefault(e, defaultValue);
+        return new MapWrapper<>(map).getOrDefault(e, defaultValue);
     }
 
     /**
@@ -76,7 +78,7 @@ public class DefaultEdgeFunction<E, T>
      * @return the function value for the edge
      */
     public T get(E e) {
-        return map.getOrDefault(e, defaultValue);
+        return new MapWrapper<>(map).getOrDefault(e, defaultValue);
     }
 
     /**

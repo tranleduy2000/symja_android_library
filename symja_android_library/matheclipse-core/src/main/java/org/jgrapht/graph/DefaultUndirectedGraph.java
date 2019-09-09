@@ -17,10 +17,10 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Supplier;
+
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.util.SupplierUtil;
-
-import java.util.function.Supplier;
 
 /**
  * The default implementation of an undirected graph. A default undirected graph is a non-simple

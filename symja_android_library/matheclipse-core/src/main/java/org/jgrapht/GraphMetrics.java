@@ -17,7 +17,7 @@
  */
 package org.jgrapht;
 
-import com.duy.stream.DComparator;
+import com.duy.stream.ComparatorWrapper;
 
 import org.jgrapht.alg.shortestpath.GraphMeasurer;
 import org.jgrapht.alg.util.NeighborCache;
@@ -30,7 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.function.ToIntFunction;
+import com.duy.lambda.ToIntFunction;
+import com.duy.util.ListWrapper;
 
 /**
  * Collection of methods which provide numerical graph information.
@@ -281,7 +282,7 @@ public abstract class GraphMetrics {
             vertexOrder.put(v, k++);
         }
 
-        Comparator<V> comparator = DComparator
+        Comparator<V> comparator = ComparatorWrapper
                 .comparingInt(new ToIntFunction<V>() {
                     @Override
                     public int applyAsInt(V vertex) {
@@ -300,7 +301,7 @@ public abstract class GraphMetrics {
                     }
                 });
 
-        vertexList.sort(comparator);
+        new ListWrapper<>(vertexList).sort(comparator);
 
         // vertex v is a heavy-hitter iff degree(v) >= sqrtV
         List<V> heavyHitterVertices =

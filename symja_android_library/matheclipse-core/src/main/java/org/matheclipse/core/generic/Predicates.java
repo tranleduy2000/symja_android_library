@@ -255,7 +255,7 @@ public class Predicates {
 
 	/**
 	 *
-	 * @return a <code>java.util.function.Predicate</code> predicate of one argument.
+	 * @return a <code>com.duy.lambda.Predicate</code> predicate of one argument.
 	 */
 	public static Predicate<IExpr> isUnaryVariableOrPattern() {
 		return new Predicate<IExpr>() {

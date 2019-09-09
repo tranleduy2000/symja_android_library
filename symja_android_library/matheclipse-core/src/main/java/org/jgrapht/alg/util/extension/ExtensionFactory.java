@@ -22,7 +22,6 @@ package org.jgrapht.alg.util.extension;
  *
  * @param <B> class-type of extension
  */
-@FunctionalInterface
 public interface ExtensionFactory<B extends Extension> {
     /**
      * Factory method which creates a new object which extends Extension

@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
@@ -28,8 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 /**
  * A light-weight version of the closest-first iterator for a directed or undirected graphs. For
@@ -126,9 +127,9 @@ class DijkstraClosestFirstIterator<V, E>
     public DijkstraClosestFirstIterator(
             Graph<V, E> graph, V source, double radius,
             Supplier<AddressableHeap<Double, Pair<V, E>>> heapSupplier) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
-        this.source = Objects.requireNonNull(source, "Source vertex cannot be null");
-        Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
+        this.source = DObjects.requireNonNull(source, "Source vertex cannot be null");
+        DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
         if (radius < 0.0) {
             throw new IllegalArgumentException("Radius must be non-negative");
         }

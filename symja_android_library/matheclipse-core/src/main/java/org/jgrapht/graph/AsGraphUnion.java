@@ -17,6 +17,9 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.GraphType;
@@ -26,9 +29,7 @@ import org.jgrapht.util.WeightCombiner;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * Read-only union of two graphs.
@@ -76,7 +77,7 @@ public class AsGraphUnion<V, E>
         if (g1 == g2) {
             throw new IllegalArgumentException("g1 is equal to g2");
         }
-        this.operator = Objects.requireNonNull(operator, "Weight combiner cannot be null");
+        this.operator = DObjects.requireNonNull(operator, "Weight combiner cannot be null");
 
         // compute result type
         DefaultGraphType.Builder builder = new DefaultGraphType.Builder();

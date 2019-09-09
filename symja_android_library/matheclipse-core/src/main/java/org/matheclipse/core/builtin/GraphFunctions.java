@@ -49,7 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
+import com.duy.lambda.Consumer;
+import com.duy.util.SetWrapper;
 
 /**
  * Functions for graph theory algorithms.
@@ -701,7 +702,7 @@ public class GraphFunctions {
 						return F.List();
 					}
 					final IASTAppendable result = F.ListAlloc(10);
-					cover.forEach(new Consumer<IExpr>() {
+					new SetWrapper<>(cover).forEach(new Consumer<IExpr>() {
 						@Override
 						public void accept(IExpr x) {
 							result.append(x);

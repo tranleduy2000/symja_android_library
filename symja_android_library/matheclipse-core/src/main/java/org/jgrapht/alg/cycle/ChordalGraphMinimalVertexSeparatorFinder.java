@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 
@@ -24,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -90,7 +91,7 @@ public class ChordalGraphMinimalVertexSeparatorFinder<V, E> {
      * @param graph the graph minimal separators to search in
      */
     public ChordalGraphMinimalVertexSeparatorFinder(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         chordalityInspector =
                 new ChordalityInspector<>(graph, ChordalityInspector.IterationOrder.MCS);
     }

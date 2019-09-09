@@ -26,7 +26,7 @@ import static com.gx.common.base.Preconditions.checkNotNull;
 
 /**
  * Static utility methods pertaining to {@code com.gx.common.base.Function} instances; see that
- * class for information about migrating to {@code java.util.function}.
+ * class for information about migrating to {@code com.duy.lambda}.
  * <p>
  * <p>All methods return serializable functions as long as they're given serializable parameters.
  * <p>
@@ -53,7 +53,7 @@ public final class Functions {
      * <p>
      * <p><b>Warning:</b> as with all function types in this package, avoid depending on the specific
      * {@code equals}, {@code hashCode} or {@code toString} behavior of the returned function. A
-     * future migration to {@code java.util.function} will not preserve this behavior.
+     * future migration to {@code com.duy.lambda} will not preserve this behavior.
      * <p>
      * <p><b>For Java 8 users:</b> use the method reference {@code Object::toString} instead. In the
      * future, when this class requires Java 8, this method will be deprecated. See {@link Function}

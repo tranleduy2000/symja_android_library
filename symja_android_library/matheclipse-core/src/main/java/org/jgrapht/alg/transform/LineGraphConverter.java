@@ -17,11 +17,11 @@
  */
 package org.jgrapht.alg.transform;
 
+import com.duy.lambda.BiFunction;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
-
-import java.util.Objects;
-import java.util.function.BiFunction;
 
 /**
  * Converter which produces the <a href="http://mathworld.wolfram.com/LineGraph.html">line graph</a>
@@ -58,7 +58,7 @@ public class LineGraphConverter<V, E, EE> {
      *              pseudographs.
      */
     public LineGraphConverter(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**

@@ -17,7 +17,9 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.ToDoubleFunction;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -36,9 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.ToDoubleFunction;
 
 /**
  * A base implementation of a $k$ disjoint shortest paths algorithm based on the strategy used in
@@ -113,8 +113,8 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         if (k <= 0) {
             throw new IllegalArgumentException("Number of paths must be positive");
         }
-        Objects.requireNonNull(startVertex, "startVertex is null");
-        Objects.requireNonNull(endVertex, "endVertex is null");
+        DObjects.requireNonNull(startVertex, "startVertex is null");
+        DObjects.requireNonNull(endVertex, "endVertex is null");
         if (endVertex.equals(startVertex)) {
             throw new IllegalArgumentException("The end vertex is the same as the start vertex!");
         }
@@ -175,7 +175,7 @@ abstract class BaseKDisjointShortestPathsAlgorithm<V, E>
         List<GraphPath<V, E>> paths = buildPaths(startVertex, endVertex);
 
         // sort paths by overall weight (ascending)
-        Collections.sort(paths, DComparator.comparingDouble(new ToDoubleFunction<GraphPath<V, E>>() {
+        Collections.sort(paths, ComparatorWrapper.comparingDouble(new ToDoubleFunction<GraphPath<V, E>>() {
             @Override
             public double applyAsDouble(GraphPath<V, E> value) {
 //                return GraphPath.getWeight(value);

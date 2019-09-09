@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
@@ -25,7 +27,6 @@ import org.jgrapht.graph.GraphWalk;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The algorithm determines the k shortest simple paths in increasing order of weight. Weights can
@@ -97,7 +98,7 @@ public class KShortestSimplePaths<V, E>
      * @throws IllegalArgumentException if nMaxHops is negative or 0.
      */
     public KShortestSimplePaths(Graph<V, E> graph, int nMaxHops, PathValidator<V, E> pathValidator) {
-        this.graph = Objects.requireNonNull(graph, "graph is null");
+        this.graph = DObjects.requireNonNull(graph, "graph is null");
         this.nMaxHops = nMaxHops;
         if (nMaxHops <= 0) {
             throw new IllegalArgumentException("Max number of hops must be positive");
@@ -118,8 +119,8 @@ public class KShortestSimplePaths<V, E>
      */
     @Override
     public List<GraphPath<V, E>> getPaths(final V startVertex, V endVertex, int k) {
-        Objects.requireNonNull(startVertex, "Start vertex cannot be null");
-        Objects.requireNonNull(endVertex, "End vertex cannot be null");
+        DObjects.requireNonNull(startVertex, "Start vertex cannot be null");
+        DObjects.requireNonNull(endVertex, "End vertex cannot be null");
         if (endVertex.equals(startVertex)) {
             throw new IllegalArgumentException("The end vertex is the same as the start vertex!");
         }

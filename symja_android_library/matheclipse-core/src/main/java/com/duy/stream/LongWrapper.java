@@ -4,7 +4,7 @@ package com.duy.stream;
  * Created by Duy on 10/3/2017.
  */
 
-public class DLong {
+public class LongWrapper {
     /**
      * Compares two {@code long} values numerically.
      * The value returned is identical to what would be returned by:

@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -33,8 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Martin's algorithm for the multi-objective shortest paths problem.
@@ -72,7 +73,7 @@ public class MartinShortestPath<V, E>
     public MartinShortestPath(Graph<V, E> graph, Function<E, double[]> edgeWeightFunction) {
         super(graph);
         this.edgeWeightFunction =
-                Objects.requireNonNull(edgeWeightFunction, "Function cannot be null");
+                DObjects.requireNonNull(edgeWeightFunction, "Function cannot be null");
         this.objectives = validateEdgeWeightFunction(edgeWeightFunction);
         this.nodeLabels = new HashMap<>();
         this.heap = new DaryArrayHeap<>(3, new LabelComparator());

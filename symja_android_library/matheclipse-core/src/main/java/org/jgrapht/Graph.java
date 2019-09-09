@@ -20,7 +20,7 @@ package org.jgrapht;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * The root interface in the graph hierarchy. A mathematical graph-theory graph object

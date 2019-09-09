@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.color;
 
+import com.duy.lambda.Consumer;
+import com.duy.util.DObjects;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.cycle.ChordalityInspector;
@@ -28,9 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Calculates a <a href="http://mathworld.wolfram.com/MinimumVertexColoring.html">minimum vertex
@@ -85,7 +87,7 @@ public class ChordalGraphColoring<V, E>
      */
     public ChordalGraphColoring(
             Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         chordalityInspector = new ChordalityInspector<>(graph, iterationOrder);
     }
 
@@ -101,7 +103,7 @@ public class ChordalGraphColoring<V, E>
             for (V vertex : perfectEliminationOrder) {
                 Set<V> predecessors = getPredecessors(vertexInOrder, vertex);
                 final Set<Integer> predecessorColors = new HashSet<>(predecessors.size());
-                predecessors.forEach(new Consumer<V>() {
+                new SetWrapper<>(predecessors).forEach(new Consumer<V>() {
                     @Override
                     public void accept(V v) {
                         predecessorColors.add(vertexColoring.get(v));

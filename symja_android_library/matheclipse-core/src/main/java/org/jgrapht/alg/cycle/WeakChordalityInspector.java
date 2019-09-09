@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.lambda.Consumer;
+import com.duy.util.DObjects;
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -37,10 +41,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Tests whether a graph is <a href="http://www.graphclasses.org/classes/gc_14.html">weakly
@@ -124,7 +126,7 @@ public class WeakChordalityInspector<V, E> {
      * @param graph the inspected {@code graph}
      */
     public WeakChordalityInspector(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         if (graph.getType().isDirected()) {
             this.graph = new AsUndirectedGraph<>(graph);
         }
@@ -404,7 +406,7 @@ public class WeakChordalityInspector<V, E> {
         }
         final List<Integer> labels = new ArrayList<>(Collections.nCopies(n, -1));
         final Set<Integer> unvisited = new HashSet<>(separator.size());
-        separator.forEach(new Consumer<Pair<Integer, Integer>>() {
+        new ListWrapper<>(separator).forEach(new Consumer<Pair<Integer, Integer>>() {
             @Override
             public void accept(Pair<Integer, Integer> pair) {
                 unvisited.add(pair.getFirst());

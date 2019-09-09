@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.tour;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphTests;
@@ -30,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -109,7 +110,7 @@ public class TwoOptHeuristicTSP<V, E>
             throw new IllegalArgumentException("k must be at least one");
         }
         this.k = k;
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
     }
 
     /**

@@ -18,7 +18,7 @@
 package org.jgrapht.graph.specifics;
 
 import java.util.Set;
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * An interface encapsulating the basic graph operations. Different implementations have different

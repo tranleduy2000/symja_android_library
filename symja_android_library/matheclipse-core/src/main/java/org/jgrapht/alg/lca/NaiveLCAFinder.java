@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.lca;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
 import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithmImpl;
@@ -26,7 +28,6 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 
@@ -103,7 +104,7 @@ public class NaiveLCAFinder<V, E>
      * @param graph the input graph
      */
     public NaiveLCAFinder(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**

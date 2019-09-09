@@ -24,7 +24,7 @@ import org.jgrapht.alg.interfaces.VertexScoringAlgorithm;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
+import com.duy.lambda.ToDoubleFunction;
 
 /**
  * AlphaCentrality implementation.

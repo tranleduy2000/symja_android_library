@@ -17,11 +17,12 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -105,7 +106,7 @@ public class GnpRandomGraphGenerator<V, E>
             throw new IllegalArgumentException("not valid probability of edge existence");
         }
         this.p = p;
-        this.rng = Objects.requireNonNull(rng);
+        this.rng = DObjects.requireNonNull(rng);
         this.createLoops = createLoops;
     }
 

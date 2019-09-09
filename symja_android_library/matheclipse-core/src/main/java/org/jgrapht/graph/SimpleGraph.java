@@ -20,7 +20,7 @@ package org.jgrapht.graph;
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * Implementation of a <a href=http://mathworld.wolfram.com/SimpleGraph.html>Simple Graph</a>. A

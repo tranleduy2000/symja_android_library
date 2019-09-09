@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lang.DDouble;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
@@ -26,7 +29,6 @@ import org.jgrapht.graph.EdgeReversedGraph;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -87,8 +89,8 @@ public class ALTAdmissibleHeuristic<V, E>
      * @throws IllegalArgumentException if the graph contains edges with negative weights
      */
     public ALTAdmissibleHeuristic(Graph<V, E> graph, Set<V> landmarks) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
-        Objects.requireNonNull(landmarks, "Landmarks cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
+        DObjects.requireNonNull(landmarks, "Landmarks cannot be null");
         if (landmarks.isEmpty()) {
             throw new IllegalArgumentException("At least one landmark must be provided");
         }
@@ -162,7 +164,7 @@ public class ALTAdmissibleHeuristic<V, E>
             }
 
             // max over all landmarks
-            if (Double.isFinite(estimate)) {
+            if (DDouble.isFinite(estimate)) {
                 maxEstimate = Math.max(maxEstimate, estimate);
             }
         }

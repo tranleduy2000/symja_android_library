@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MatchingAlgorithm;
 import org.jgrapht.alg.matching.EdmondsMaximumCardinalityMatching;
@@ -29,9 +32,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 import static org.jgrapht.alg.matching.blossom.v5.BlossomVOptions.DualUpdateStrategy.MULTIPLE_TREE_CONNECTED_COMPONENTS;
 import static org.jgrapht.alg.matching.blossom.v5.ObjectiveSense.MAXIMIZE;
@@ -256,7 +257,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
      */
     public KolmogorovWeightedPerfectMatching(
             final Graph<V, E> graph, BlossomVOptions options, ObjectiveSense objectiveSense) {
-        Objects.requireNonNull(graph);
+        DObjects.requireNonNull(graph);
         this.objectiveSense = objectiveSense;
         if ((graph.vertexSet().size() & 1) == 1) {
             throw new IllegalArgumentException(NO_PERFECT_MATCHING);
@@ -271,7 +272,7 @@ public class KolmogorovWeightedPerfectMatching<V, E>
             this.graph = graph;
         }
         this.initialGraph = graph;
-        this.options = Objects.requireNonNull(options);
+        this.options = DObjects.requireNonNull(options);
     }
 
     /**

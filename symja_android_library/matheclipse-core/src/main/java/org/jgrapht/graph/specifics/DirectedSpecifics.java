@@ -17,6 +17,9 @@
  */
 package org.jgrapht.graph.specifics;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.graph.EdgeSetFactory;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -24,9 +27,7 @@ import org.jgrapht.util.ArrayUnenforcedSet;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * Plain implementation of DirectedSpecifics. This implementation requires the least amount of
@@ -61,9 +62,9 @@ public class DirectedSpecifics<V, E>
     public DirectedSpecifics(
             Graph<V, E> graph, Map<V, DirectedEdgeContainer<V, E>> vertexMap,
             EdgeSetFactory<V, E> edgeSetFactory) {
-        this.graph = Objects.requireNonNull(graph);
-        this.vertexMap = Objects.requireNonNull(vertexMap);
-        this.edgeSetFactory = Objects.requireNonNull(edgeSetFactory);
+        this.graph = DObjects.requireNonNull(graph);
+        this.vertexMap = DObjects.requireNonNull(vertexMap);
+        this.edgeSetFactory = DObjects.requireNonNull(edgeSetFactory);
     }
 
     /**

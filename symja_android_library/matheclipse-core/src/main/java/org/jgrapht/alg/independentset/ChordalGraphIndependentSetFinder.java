@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.independentset;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.cycle.ChordalityInspector;
@@ -27,7 +29,6 @@ import org.jgrapht.traverse.MaximumCardinalityIterator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -84,7 +85,7 @@ public class ChordalGraphIndependentSetFinder<V, E>
      */
     public ChordalGraphIndependentSetFinder(
             Graph<V, E> graph, ChordalityInspector.IterationOrder iterationOrder) {
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         chordalityInspector = new ChordalityInspector<>(graph, iterationOrder);
     }
 

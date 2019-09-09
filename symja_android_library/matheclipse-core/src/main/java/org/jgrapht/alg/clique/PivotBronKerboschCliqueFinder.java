@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.clique;
 
+import com.duy.lang.DMath;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.Graphs;
@@ -89,7 +91,7 @@ public class PivotBronKerboschCliqueFinder<V, E>
 
             long nanosTimeLimit;
             try {
-                nanosTimeLimit = Math.addExact(System.nanoTime(), nanos);
+                nanosTimeLimit = DMath.addExact(System.nanoTime(), nanos);
             } catch (ArithmeticException ignore) {
                 nanosTimeLimit = Long.MAX_VALUE;
             }

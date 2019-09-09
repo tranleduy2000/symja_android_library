@@ -17,7 +17,11 @@
  */
 package org.jgrapht.alg.matching;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
+import com.duy.util.SetWrapper;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
@@ -36,10 +40,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Maximum weight matching in bipartite graphs.
@@ -113,10 +114,10 @@ public class MaximumWeightBipartiteMatching<V, E>
             Graph<V, E> graph, Set<V> partition1, Set<V> partition2,
             Function<Comparator<BigDecimal>, AddressableHeap<BigDecimal, V>> heapSupplier) {
         this.graph = GraphTests.requireUndirected(graph);
-        this.partition1 = Objects.requireNonNull(partition1, "Partition 1 cannot be null");
-        this.partition2 = Objects.requireNonNull(partition2, "Partition 2 cannot be null");
-        this.comparator = DComparator.naturalOrder();
-        this.heapSupplier = Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
+        this.partition1 = DObjects.requireNonNull(partition1, "Partition 1 cannot be null");
+        this.partition2 = DObjects.requireNonNull(partition2, "Partition 2 cannot be null");
+        this.comparator = ComparatorWrapper.naturalOrder();
+        this.heapSupplier = DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
     }
 
     /**
@@ -150,7 +151,7 @@ public class MaximumWeightBipartiteMatching<V, E>
         heap = heapSupplier.apply(comparator);
         nodeInHeap = new HashMap<>();
         pred = new HashMap<>();
-        graph.vertexSet().forEach(new Consumer<V>() {
+        new SetWrapper<>(graph.vertexSet()).forEach(new Consumer<V>() {
             @Override
             public void accept(V v) {
                 pot.put(v, BigDecimal.ZERO);

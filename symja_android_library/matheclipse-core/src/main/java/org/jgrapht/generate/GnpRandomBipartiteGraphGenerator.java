@@ -17,12 +17,13 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -105,7 +106,7 @@ public class GnpRandomBipartiteGraphGenerator<V, E> extends GraphGeneratorImpl<V
             throw new IllegalArgumentException("not valid probability of edge existence");
         }
         this.p = p;
-        this.rng = Objects.requireNonNull(rng);
+        this.rng = DObjects.requireNonNull(rng);
     }
 
     /**

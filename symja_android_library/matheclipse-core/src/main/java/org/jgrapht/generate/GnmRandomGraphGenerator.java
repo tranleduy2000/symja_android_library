@@ -17,11 +17,13 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.lang.DMath;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -125,7 +127,7 @@ public class GnmRandomGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
             throw new IllegalArgumentException("number of edges must be non-negative");
         }
         this.m = m;
-        this.rng = Objects.requireNonNull(rng);
+        this.rng = DObjects.requireNonNull(rng);
         this.loops = loops;
         this.multipleEdges = multipleEdges;
     }
@@ -243,13 +245,13 @@ public class GnmRandomGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
         int maxAllowedEdges;
         try {
             if (isDirected) {
-                maxAllowedEdges = Math.multiplyExact(n, n - 1);
+                maxAllowedEdges = DMath.multiplyExact(n, n - 1);
             } else {
                 // assume undirected
                 if (n % 2 == 0) {
-                    maxAllowedEdges = Math.multiplyExact(n / 2, n - 1);
+                    maxAllowedEdges = DMath.multiplyExact(n / 2, n - 1);
                 } else {
-                    maxAllowedEdges = Math.multiplyExact(n, (n - 1) / 2);
+                    maxAllowedEdges = DMath.multiplyExact(n, (n - 1) / 2);
                 }
             }
 
@@ -258,10 +260,10 @@ public class GnmRandomGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, V>
                     return Integer.MAX_VALUE;
                 } else {
                     if (isDirected) {
-                        maxAllowedEdges = Math.addExact(maxAllowedEdges, Math.multiplyExact(2, n));
+                        maxAllowedEdges = DMath.addExact(maxAllowedEdges, DMath.multiplyExact(2, n));
                     } else {
                         // assume undirected
-                        maxAllowedEdges = Math.addExact(maxAllowedEdges, n);
+                        maxAllowedEdges = DMath.addExact(maxAllowedEdges, n);
                     }
                 }
             } else {

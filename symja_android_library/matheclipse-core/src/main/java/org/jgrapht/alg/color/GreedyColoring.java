@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.color;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
@@ -24,7 +26,6 @@ import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -57,7 +58,7 @@ public class GreedyColoring<V, E>
      * @param graph the input graph
      */
     public GreedyColoring(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
     }
 
     /**

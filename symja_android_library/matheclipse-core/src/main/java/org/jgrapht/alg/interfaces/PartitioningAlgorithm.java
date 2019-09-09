@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.interfaces;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Algorithm to compute a vertex partitioning of a graph.
@@ -120,7 +122,7 @@ public interface PartitioningAlgorithm<V> {
          */
         public PartitioningImpl(List<Set<V>> classes) {
             List<Set<V>> list = new ArrayList<>();
-            for (Set<V> vs : Objects.requireNonNull(classes)) {
+            for (Set<V> vs : DObjects.requireNonNull(classes)) {
                 Set<V> unmodifiableSet = Collections.unmodifiableSet(vs);
                 list.add(unmodifiableSet);
             }
@@ -135,12 +137,12 @@ public interface PartitioningAlgorithm<V> {
          * @throws NullPointerException if {@code vertexToPartitionMap} is {@code null}
          */
         public PartitioningImpl(Map<V, Integer> vertexToPartitionMap) {
-            Objects.requireNonNull(vertexToPartitionMap);
+            DObjects.requireNonNull(vertexToPartitionMap);
 
             Map<Integer, Set<V>> partitionIndexToVertexMap = new HashMap<>();
 
             for (Map.Entry<V, Integer> entry : vertexToPartitionMap.entrySet()) {
-                partitionIndexToVertexMap
+                new MapWrapper<>(partitionIndexToVertexMap)
                         .computeIfAbsent(entry.getValue(), new Function<Integer, Set<V>>() {
                             @Override
                             public Set<V> apply(Integer x) {

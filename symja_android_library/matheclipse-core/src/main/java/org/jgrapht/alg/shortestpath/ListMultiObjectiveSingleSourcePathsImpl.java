@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.MultiObjectiveShortestPathAlgorithm.MultiObjectiveSingleSourcePaths;
@@ -26,7 +28,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * An implementation of {@link MultiObjectiveSingleSourcePaths} which stores one list of paths per
@@ -66,9 +67,9 @@ public class ListMultiObjectiveSingleSourcePathsImpl<V, E>
      */
     public ListMultiObjectiveSingleSourcePathsImpl(
             Graph<V, E> graph, V source, Map<V, List<GraphPath<V, E>>> paths) {
-        this.graph = Objects.requireNonNull(graph, "Graph is null");
-        this.source = Objects.requireNonNull(source, "Source vertex is null");
-        this.paths = Objects.requireNonNull(paths, "Paths are null");
+        this.graph = DObjects.requireNonNull(graph, "Graph is null");
+        this.source = DObjects.requireNonNull(source, "Source vertex is null");
+        this.paths = DObjects.requireNonNull(paths, "Paths are null");
     }
 
     @Override

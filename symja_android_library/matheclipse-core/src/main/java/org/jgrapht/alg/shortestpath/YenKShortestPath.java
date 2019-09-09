@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
@@ -24,7 +26,6 @@ import org.jheaps.AddressableHeap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Implementation of Yen`s algorithm for finding $k$ shortest loopless paths.
@@ -64,7 +65,7 @@ public class YenKShortestPath<V, E>
      * @param graph graph
      */
     public YenKShortestPath(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null!");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null!");
     }
 
     /**

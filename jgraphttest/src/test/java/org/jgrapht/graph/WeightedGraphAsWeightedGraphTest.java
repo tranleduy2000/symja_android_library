@@ -21,7 +21,7 @@ import org.jgrapht.*;
 import org.junit.*;
 
 import java.util.*;
-import java.util.function.*;
+import com.duy.lambda.*;
 
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;

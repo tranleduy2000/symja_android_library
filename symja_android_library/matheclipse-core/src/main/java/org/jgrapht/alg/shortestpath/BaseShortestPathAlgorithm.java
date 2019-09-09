@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
@@ -24,7 +26,6 @@ import org.jgrapht.graph.GraphWalk;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * A base implementation of the shortest path interface.
@@ -63,7 +64,7 @@ abstract class BaseShortestPathAlgorithm<V, E>
      * @param graph the graph
      */
     public BaseShortestPathAlgorithm(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph is null");
+        this.graph = DObjects.requireNonNull(graph, "Graph is null");
     }
 
     /**

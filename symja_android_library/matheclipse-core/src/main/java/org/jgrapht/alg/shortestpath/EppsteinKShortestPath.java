@@ -17,13 +17,14 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Implementation of the Eppstein`s algorithm for finding $k$ shortest path between two vertices in
@@ -61,7 +62,7 @@ public class EppsteinKShortestPath<V, E>
      * @param graph graph
      */
     public EppsteinKShortestPath(Graph<V, E> graph) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null!");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null!");
     }
 
     /**

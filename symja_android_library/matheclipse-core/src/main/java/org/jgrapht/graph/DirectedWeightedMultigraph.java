@@ -20,7 +20,7 @@ package org.jgrapht.graph;
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.util.SupplierUtil;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * A directed weighted multigraph. A directed weighted multigraph is a non-simple directed graph in

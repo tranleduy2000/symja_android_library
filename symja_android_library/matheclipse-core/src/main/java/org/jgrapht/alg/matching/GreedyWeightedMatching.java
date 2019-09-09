@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.matching;
 
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MatchingAlgorithm;
 import org.jgrapht.alg.util.ToleranceDoubleComparator;
@@ -111,7 +113,7 @@ public class GreedyWeightedMatching<V, E>
         // (the lambda uses e1 and e2 in the reverse order on purpose)
         List<E> allEdges = new ArrayList<>(graph.edgeSet());
         if (normalizeEdgeCosts) {
-            allEdges.sort(new Comparator<E>() {
+            new ListWrapper<>(allEdges).sort(new Comparator<E>() {
                 @Override
                 public int compare(E e1, E e2) {
                     double degreeE1 = graph.degreeOf(graph.getEdgeSource(e1))
@@ -123,7 +125,7 @@ public class GreedyWeightedMatching<V, E>
                 }
             });
         } else {
-            allEdges.sort(
+            new ListWrapper<>(allEdges).sort(
                     new Comparator<E>() {
                         @Override
                         public int compare(E e1, E e2) {

@@ -17,8 +17,9 @@
  */
 package org.jgrapht.alg.util;
 
+import com.duy.util.DObjects;
+
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -81,7 +82,7 @@ public class AliasMethodSampler {
      * @throws IllegalArgumentException in case of a non-valid probability distribution
      */
     public AliasMethodSampler(double[] p, Random rng, double epsilon) {
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
         this.comparator = new ToleranceDoubleComparator(epsilon);
 
         if (p == null || p.length < 1) {

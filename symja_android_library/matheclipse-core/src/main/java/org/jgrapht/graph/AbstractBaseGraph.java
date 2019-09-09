@@ -17,6 +17,9 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphType;
 import org.jgrapht.Graphs;
@@ -28,9 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * The most general implementation of the {@link org.jgrapht.Graph} interface.
@@ -110,17 +111,17 @@ public abstract class AbstractBaseGraph<V, E>
             GraphSpecificsStrategy<V, E> graphSpecificsStrategy) {
         this.vertexSupplier = vertexSupplier;
         this.edgeSupplier = edgeSupplier;
-        this.type = Objects.requireNonNull(type);
+        this.type = DObjects.requireNonNull(type);
         if (type.isMixed()) {
             throw new IllegalArgumentException(MIXED_GRAPH_NOT_SUPPORTED);
         }
 
         this.graphSpecificsStrategy =
-                Objects.requireNonNull(graphSpecificsStrategy, GRAPH_SPECIFICS_STRATEGY_REQUIRED);
-        this.specifics = Objects.requireNonNull(
+                DObjects.requireNonNull(graphSpecificsStrategy, GRAPH_SPECIFICS_STRATEGY_REQUIRED);
+        this.specifics = DObjects.requireNonNull(
                 graphSpecificsStrategy.getSpecificsFactory().apply(this, type),
                 GRAPH_SPECIFICS_MUST_NOT_BE_NULL);
-        this.intrusiveEdgesSpecifics = Objects.requireNonNull(
+        this.intrusiveEdgesSpecifics = DObjects.requireNonNull(
                 graphSpecificsStrategy.getIntrusiveEdgesSpecificsFactory().apply(type),
                 GRAPH_SPECIFICS_MUST_NOT_BE_NULL);
     }

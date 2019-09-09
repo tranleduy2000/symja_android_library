@@ -27,8 +27,8 @@ import org.jgrapht.graph.specifics.UndirectedEdgeContainer;
 import org.jgrapht.graph.specifics.UndirectedSpecifics;
 
 import java.util.LinkedHashMap;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Function;
 
 /**
  * A default lookup specifics strategy implementation.

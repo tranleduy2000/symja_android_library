@@ -2,7 +2,7 @@ package org.matheclipse.core.patternmatching;
 
 import com.duy.annotations.Nonnull;
 import com.duy.lambda.Predicate;
-import com.duy.util.DCollection;
+import com.duy.util.CollectionWrapper;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -733,7 +733,7 @@ public final class RulesData implements Serializable {
 		}
 
 			if (fPatternDownRules != null) {
-			return DCollection.removeIf(fPatternDownRules, new Predicate<IPatternMatcher>() {
+			return new CollectionWrapper<>(fPatternDownRules).removeIf(new Predicate<IPatternMatcher>() {
 				@Override
 				public boolean test(IPatternMatcher x) {
 					return x.equivalentLHS(pmEvaluator) == 0;

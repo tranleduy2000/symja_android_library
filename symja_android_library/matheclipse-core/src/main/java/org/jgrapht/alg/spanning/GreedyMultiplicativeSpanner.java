@@ -17,7 +17,10 @@
  */
 package org.jgrapht.alg.spanning;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.ToDoubleFunction;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
+import com.duy.util.ListWrapper;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -35,9 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.ToDoubleFunction;
 
 /**
  * Greedy algorithm for $(2k-1)$-multiplicative spanner construction (for any integer
@@ -83,7 +84,7 @@ public class GreedyMultiplicativeSpanner<V, E>
      * @throws IllegalArgumentException if k is not positive
      */
     public GreedyMultiplicativeSpanner(Graph<V, E> graph, int k) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("graph is not undirected");
         }
@@ -112,7 +113,7 @@ public class GreedyMultiplicativeSpanner<V, E>
         public Spanner<E> run() {
             // sort edges
             ArrayList<E> allEdges = new ArrayList<>(graph.edgeSet());
-            allEdges.sort(DComparator.comparingDouble(new ToDoubleFunction<E>() {
+            new ListWrapper<>(allEdges).sort(ComparatorWrapper.comparingDouble(new ToDoubleFunction<E>() {
                 @Override
                 public double applyAsDouble(E e1) {
                     return graph.getEdgeWeight(e1);

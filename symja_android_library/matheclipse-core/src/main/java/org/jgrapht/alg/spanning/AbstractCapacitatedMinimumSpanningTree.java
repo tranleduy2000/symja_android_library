@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.spanning;
 
+import com.duy.lambda.Predicate;
+import com.duy.util.DObjects;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.alg.interfaces.CapacitatedSpanningTreeAlgorithm;
@@ -31,9 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * This is an abstract class for capacitated minimum spanning tree algorithms. This class manages
@@ -84,7 +86,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
      */
     protected AbstractCapacitatedMinimumSpanningTree(
             Graph<V, E> graph, V root, double capacity, Map<V, Double> demands) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
         if (!graph.getType().isUndirected()) {
             throw new IllegalArgumentException("Graph must be undirected");
         }
@@ -92,9 +94,9 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
             throw new IllegalArgumentException(
                     "Graph must be connected. Otherwise, there is no capacitated minimum spanning tree.");
         }
-        this.root = Objects.requireNonNull(root, "Root cannot be null");
+        this.root = DObjects.requireNonNull(root, "Root cannot be null");
         this.capacity = capacity;
-        this.demands = Objects.requireNonNull(demands, "Demands cannot be null");
+        this.demands = DObjects.requireNonNull(demands, "Demands cannot be null");
         for (V vertex : graph.vertexSet()) {
             if (vertex != root) {
                 Double demand = demands.get(vertex);
@@ -336,7 +338,7 @@ public abstract class AbstractCapacitatedMinimumSpanningTree<V, E>
          * Cleans up the solution representation by removing all empty sets from the partition.
          */
         public void cleanUp() {
-            partition.entrySet().removeIf(new Predicate<Map.Entry<Integer, Pair<Set<V>, Double>>>() {
+            new SetWrapper<>(partition.entrySet()).removeIf(new Predicate<Map.Entry<Integer, Pair<Set<V>, Double>>>() {
                 @Override
                 public boolean test(Map.Entry<Integer, Pair<Set<V>, Double>> entry) {
                     return entry.getValue().getFirst().isEmpty();

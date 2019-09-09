@@ -17,6 +17,9 @@
  */
 package org.jgrapht.traverse;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jheaps.AddressableHeap;
@@ -24,8 +27,6 @@ import org.jheaps.tree.PairingHeap;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 /**
  * A closest-first iterator for a directed or undirected graph. For this iterator to work correctly
@@ -176,7 +177,7 @@ public class ClosestFirstIterator<V, E>
             Supplier<AddressableHeap<Double, QueueEntry<V, E>>> heapSupplier) {
         super(g, startVertices);
         this.radius = radius;
-        Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
+        DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
         this.heap = heapSupplier.get();
         checkRadiusTraversal(isCrossComponentTraversal());
         initialized = true;

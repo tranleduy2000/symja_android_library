@@ -22,7 +22,7 @@ public class CompatibleTest extends TestCase {
 
 
                 // Problem with Objc ARC
-                "java.util.concurrent.ThreadPoolExecutor",
+                "s.ThreadPoolExecutor",
 
                 // Problem with Objc ARC
                 "java.util.concurrent.Executors",

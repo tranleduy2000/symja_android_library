@@ -17,7 +17,11 @@
  */
 package org.jgrapht.alg.color;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.ToIntFunction;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
+import com.duy.util.ListWrapper;
+import com.duy.util.MapWrapper;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -31,9 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.ToIntFunction;
 
 /**
  * Color refinement algorithm that finds the coarsest stable coloring of a graph based on a given
@@ -64,8 +66,8 @@ public class ColorRefinementAlgorithm<V, E>
      * @param alpha the coloring on the graph to be refined
      */
     public ColorRefinementAlgorithm(Graph<V, E> graph, Coloring<V> alpha) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
-        this.alpha = Objects.requireNonNull(alpha, "alpha cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
+        this.alpha = DObjects.requireNonNull(alpha, "alpha cannot be null");
         if (!isAlphaConsistent(alpha, graph)) {
             throw new IllegalArgumentException(
                     "alpha is not a valid surjective l-coloring for the given graph.");
@@ -109,7 +111,7 @@ public class ColorRefinementAlgorithm<V, E>
                     toSort.add(c);
                 }
             }
-            toSort.sort(DComparator.comparingInt(new ToIntFunction<Integer>() {
+            new ListWrapper<>(toSort).sort(ComparatorWrapper.comparingInt(new ToIntFunction<Integer>() {
                 @Override
                 public int applyAsInt(Integer o) {
                     return o;
@@ -259,7 +261,7 @@ public class ColorRefinementAlgorithm<V, E>
             if (!newMapping.get(rep.colorDegree.get(v)).equals(color)) {
                 rep.colorClasses.get(color).remove(v);
                 rep.colorClasses.get(newMapping.get(rep.colorDegree.get(v))).add(v);
-                rep.coloring.replace(v, newMapping.get(rep.colorDegree.get(v)));
+                MapWrapper.replace(rep.coloring, v, newMapping.get(rep.colorDegree.get(v)));
             }
         }
     }

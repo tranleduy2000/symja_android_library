@@ -206,7 +206,7 @@ public final class DStringJoiner {
      * @throws NullPointerException if the other {@code StringJoiner} is null
      */
     public DStringJoiner merge(DStringJoiner other) {
-        Objects.requireNonNull(other);
+        DObjects.requireNonNull(other);
         if (other.value != null) {
             final int length = other.value.length();
             // lock the length so that we can seize the data to be appended

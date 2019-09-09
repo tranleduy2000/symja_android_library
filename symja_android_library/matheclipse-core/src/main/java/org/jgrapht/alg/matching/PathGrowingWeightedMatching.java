@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.matching;
 
+import com.duy.util.Optional;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.MatchingAlgorithm;
@@ -28,7 +30,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.Set;
 
 /**

@@ -17,7 +17,9 @@
  */
 package org.jgrapht.alg.cycle;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.ToIntFunction;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -35,9 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.ToIntFunction;
 
 /**
  * Tests whether a graph is <a href="https://en.wikipedia.org/wiki/Chordal_graph">chordal</a>. A
@@ -116,7 +116,7 @@ public class ChordalityInspector<V, E> {
      *                       {@code ChordalityInspector}.
      */
     public ChordalityInspector(Graph<V, E> graph, IterationOrder iterationOrder) {
-        Objects.requireNonNull(graph);
+        DObjects.requireNonNull(graph);
         if (graph.getType().isDirected()) {
             this.graph = new AsUndirectedGraph<>(graph);
         } else {
@@ -222,7 +222,7 @@ public class ChordalityInspector<V, E> {
                 Set<V> predecessors = getPredecessors(vertexInOrder, vertex);
                 if (predecessors.size() > 0) {
                     V maxPredecessor =
-                            Collections.max(predecessors, DComparator.comparingInt(new ToIntFunction<Object>() {
+                            Collections.max(predecessors, ComparatorWrapper.comparingInt(new ToIntFunction<Object>() {
                                 @Override
                                 public int applyAsInt(Object key) {
                                     return vertexInOrder.get(key);

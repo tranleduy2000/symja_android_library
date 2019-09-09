@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.isomorphism;
 
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ class GraphOrdering<V, E> {
 
         List<V> vertexSet = new ArrayList<>(graph.vertexSet());
         if (orderByDegree) {
-            vertexSet.sort(new GeneralVertexDegreeComparator<>(graph));
+            new ListWrapper<>(vertexSet).sort(new GeneralVertexDegreeComparator<>(graph));
         }
 
         vertexCount = vertexSet.size();

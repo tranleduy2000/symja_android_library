@@ -17,6 +17,8 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedPseudograph;
 import org.jgrapht.graph.Pseudograph;
@@ -24,7 +26,6 @@ import org.jgrapht.graph.Pseudograph;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -100,7 +101,7 @@ public class LinearizedChordDiagramGraphGenerator<V, E> extends GraphGeneratorIm
             throw new IllegalArgumentException("invalid edges per node (" + m + " <= 0");
         }
         this.m = m;
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
     }
 
     /**

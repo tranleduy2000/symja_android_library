@@ -17,6 +17,12 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Consumer;
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+import com.duy.util.IteratorWrapper;
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.jgrapht.util.SupplierUtil;
@@ -34,12 +40,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * A directed acyclic graph (DAG).
@@ -175,9 +178,9 @@ public class DirectedAcyclicGraph<V, E>
                         .directed().allowMultipleEdges(allowMultipleEdges).allowSelfLoops(false)
                         .weighted(weighted).allowCycles(false).build());
         this.visitedStrategyFactory =
-                Objects.requireNonNull(visitedStrategyFactory, "Visited factory cannot be null");
+                DObjects.requireNonNull(visitedStrategyFactory, "Visited factory cannot be null");
         this.topoOrderMap =
-                Objects.requireNonNull(topoOrderMap, "Topological order map cannot be null");
+                DObjects.requireNonNull(topoOrderMap, "Topological order map cannot be null");
         this.topoComparator = new TopoComparator();
     }
 
@@ -338,7 +341,7 @@ public class DirectedAcyclicGraph<V, E>
             iterator.next();
         }
 
-        iterator.forEachRemaining(new Consumer<V>() {
+        new IteratorWrapper<>(iterator).forEachRemaining(new Consumer<V>() {
             @Override
             public void accept(V e) {
                 ancestors.add(e);
@@ -363,7 +366,7 @@ public class DirectedAcyclicGraph<V, E>
             iterator.next();
         }
 
-        iterator.forEachRemaining(new Consumer<V>() {
+        new IteratorWrapper<>(iterator).forEachRemaining(new Consumer<V>() {
             @Override
             public void accept(V e) {
                 descendants.add(e);
@@ -521,8 +524,8 @@ public class DirectedAcyclicGraph<V, E>
         List<V> topoDf = new ArrayList<>(df);
         List<V> topoDb = new ArrayList<>(db);
 
-        topoDf.sort(topoComparator);
-        topoDb.sort(topoComparator);
+        new ListWrapper<>(topoDf).sort(topoComparator);
+        new ListWrapper<>(topoDb).sort(topoComparator);
 
         // merge these suckers together in topological order
         SortedSet<Integer> availableTopoIndices = new TreeSet<>();

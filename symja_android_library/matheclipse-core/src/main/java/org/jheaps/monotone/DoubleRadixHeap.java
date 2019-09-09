@@ -17,6 +17,8 @@
  */
 package org.jheaps.monotone;
 
+import com.duy.lang.DDouble;
+
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -74,12 +76,12 @@ public class DoubleRadixHeap extends AbstractRadixHeap<Double> {
     @SuppressWarnings("unchecked")
     public DoubleRadixHeap(double minKey, double maxKey) {
         super();
-        if (!Double.isFinite(minKey) || minKey < 0.0) {
+        if (!DDouble.isFinite(minKey) || minKey < 0.0) {
             throw new IllegalArgumentException("Minimum key must be finite and non-negative");
         }
         this.minKey = minKey;
         this.lastDeletedKey = minKey;
-        if (!Double.isFinite(maxKey) || maxKey < minKey) {
+        if (!DDouble.isFinite(maxKey) || maxKey < minKey) {
             throw new IllegalArgumentException("Maximum key must be finite and not less than the minimum");
         }
         this.maxKey = maxKey;

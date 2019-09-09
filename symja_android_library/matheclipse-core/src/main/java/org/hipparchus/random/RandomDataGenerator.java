@@ -21,6 +21,8 @@
  */
 package org.hipparchus.random;
 
+import com.duy.lang.FunctionalInterface;
+
 import org.hipparchus.distribution.EnumeratedDistribution;
 import org.hipparchus.distribution.IntegerDistribution;
 import org.hipparchus.distribution.RealDistribution;
@@ -963,7 +965,6 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
     /**
      * Interface for samplers of discrete distributions.
      */
-    @FunctionalInterface
     private interface IntegerDistributionSampler {
         /**
          * Return the next sample following the given distribution.

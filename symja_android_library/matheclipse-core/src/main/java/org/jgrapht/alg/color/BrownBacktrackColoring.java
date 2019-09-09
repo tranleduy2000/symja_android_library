@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.color;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
@@ -27,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Brown graph coloring algorithm.
@@ -58,7 +59,7 @@ public class BrownBacktrackColoring<V, E>
      * @param graph the input graph
      */
     public BrownBacktrackColoring(Graph<V, E> graph) {
-        Objects.requireNonNull(graph, "Graph cannot be null");
+        DObjects.requireNonNull(graph, "Graph cannot be null");
         final int numVertices = graph.vertexSet().size();
         vertexList = new ArrayList<>(numVertices);
         neighbors = new int[numVertices][];

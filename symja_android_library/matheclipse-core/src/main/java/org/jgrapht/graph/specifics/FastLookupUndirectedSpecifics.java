@@ -17,6 +17,9 @@
  */
 package org.jgrapht.graph.specifics;
 
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.alg.util.UnorderedPair;
@@ -24,9 +27,7 @@ import org.jgrapht.graph.EdgeSetFactory;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * Fast implementation of UndirectedSpecifics. This class uses additional data structures to improve
@@ -63,7 +64,7 @@ public class FastLookupUndirectedSpecifics<V, E>
             Graph<V, E> graph, Map<V, UndirectedEdgeContainer<V, E>> vertexMap,
             Map<Pair<V, V>, Set<E>> touchingVerticesToEdgeMap, EdgeSetFactory<V, E> edgeSetFactory) {
         super(graph, vertexMap, edgeSetFactory);
-        this.touchingVerticesToEdgeMap = Objects.requireNonNull(touchingVerticesToEdgeMap);
+        this.touchingVerticesToEdgeMap = DObjects.requireNonNull(touchingVerticesToEdgeMap);
     }
 
     @Override

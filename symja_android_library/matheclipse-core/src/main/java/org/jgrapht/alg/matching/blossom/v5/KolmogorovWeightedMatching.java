@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.matching.blossom.v5;
 
+import com.duy.lambda.Predicate;
+import com.duy.util.DObjects;
+import com.duy.util.SetWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphType;
 import org.jgrapht.Graphs;
@@ -27,9 +31,7 @@ import org.jgrapht.graph.builder.GraphTypeBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.DEFAULT_OPTIONS;
 import static org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching.EPS;
@@ -124,8 +126,8 @@ public class KolmogorovWeightedMatching<V, E>
      */
     public KolmogorovWeightedMatching(
             Graph<V, E> initialGraph, BlossomVOptions options, ObjectiveSense objectiveSense) {
-        this.initialGraph = Objects.requireNonNull(initialGraph);
-        this.options = Objects.requireNonNull(options);
+        this.initialGraph = DObjects.requireNonNull(initialGraph);
+        this.options = DObjects.requireNonNull(options);
         this.objectiveSense = objectiveSense;
     }
 
@@ -175,7 +177,7 @@ public class KolmogorovWeightedMatching<V, E>
                 new KolmogorovWeightedPerfectMatching<>(graph, options, objectiveSense);
         matching = perfectMatching.getMatching();
         Set<E> matchingEdges = matching.getEdges();
-        matchingEdges.removeIf(new Predicate<E>() {
+        new SetWrapper<>(matchingEdges).removeIf(new Predicate<E>() {
             @Override
             public boolean test(E e) {
                 return !initialGraph.containsEdge(e);

@@ -17,16 +17,17 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphType;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * An unmodifiable subgraph induced by a vertex/edge masking function. The subgraph will keep track
@@ -65,10 +66,10 @@ public class MaskSubgraph<V, E>
      */
     public MaskSubgraph(Graph<V, E> base, Predicate<V> vertexMask, Predicate<E> edgeMask) {
         super();
-        this.base = Objects.requireNonNull(base, "Invalid graph provided");
+        this.base = DObjects.requireNonNull(base, "Invalid graph provided");
         this.baseType = base.getType();
-        this.vertexMask = Objects.requireNonNull(vertexMask, "Invalid vertex mask provided");
-        this.edgeMask = Objects.requireNonNull(edgeMask, "Invalid edge mask provided");
+        this.vertexMask = DObjects.requireNonNull(vertexMask, "Invalid vertex mask provided");
+        this.edgeMask = DObjects.requireNonNull(edgeMask, "Invalid edge mask provided");
         this.vertices = new MaskVertexSet<>(base.vertexSet(), vertexMask);
         this.edges = new MaskEdgeSet<>(base, base.edgeSet(), vertexMask, edgeMask);
     }

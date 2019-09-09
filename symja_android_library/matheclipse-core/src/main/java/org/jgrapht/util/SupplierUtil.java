@@ -22,7 +22,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.Serializable;
 import java.util.UUID;
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * Helper class for suppliers.

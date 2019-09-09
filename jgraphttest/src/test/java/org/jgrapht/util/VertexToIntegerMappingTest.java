@@ -20,7 +20,7 @@ package org.jgrapht.util;
 import org.junit.*;
 
 import java.util.*;
-import java.util.function.*;
+import com.duy.lambda.*;
 import java.util.stream.*;
 
 /**

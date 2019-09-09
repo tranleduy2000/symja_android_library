@@ -22,7 +22,7 @@ import org.jgrapht.alg.flow.PushRelabelMFImpl;
 import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.util.function.Function;
+import com.duy.lambda.Function;
 
 /**
  * This class computes a maximum density subgraph based on the algorithm described by Andrew

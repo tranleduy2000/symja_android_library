@@ -166,7 +166,7 @@ public final class DObjects {
      * and constructors, as demonstrated below:
      * <blockquote><pre>
      * public Foo(Bar bar) {
-     *     this.bar = Objects.requireNonNull(bar);
+     *     this.bar = DObjects.requireNonNull(bar);
      * }
      * </pre></blockquote>
      *
@@ -188,8 +188,8 @@ public final class DObjects {
      * constructors with multiple parameters, as demonstrated below:
      * <blockquote><pre>
      * public Foo(Bar bar, Baz baz) {
-     *     this.bar = Objects.requireNonNull(bar, "bar must not be null");
-     *     this.baz = Objects.requireNonNull(baz, "baz must not be null");
+     *     this.bar = DObjects.requireNonNull(bar, "bar must not be null");
+     *     this.baz = DObjects.requireNonNull(baz, "baz must not be null");
      * }
      * </pre></blockquote>
      *

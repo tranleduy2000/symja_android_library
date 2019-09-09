@@ -18,7 +18,7 @@ import org.matheclipse.core.trie.Tries;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * Functions for graph theory algorithms.

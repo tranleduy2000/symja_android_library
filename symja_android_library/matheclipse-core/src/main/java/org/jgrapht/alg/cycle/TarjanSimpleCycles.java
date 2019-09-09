@@ -28,7 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import com.duy.lambda.Function;
+import com.duy.util.MapWrapper;
 
 /**
  * Find all simple cycles of a directed graph using the Tarjan's algorithm.
@@ -186,7 +187,7 @@ public class TarjanSimpleCycles<V, E>
     private Set<V> getRemoved(V v) {
         // Removed sets typically not all
         // needed, so instantiate lazily.
-        return removed.computeIfAbsent(v, new Function<V, Set<V>>() {
+        return new MapWrapper<>(removed).computeIfAbsent(v, new Function<V, Set<V>>() {
             @Override
             public Set<V> apply(V k) {
                 return new HashSet<>();

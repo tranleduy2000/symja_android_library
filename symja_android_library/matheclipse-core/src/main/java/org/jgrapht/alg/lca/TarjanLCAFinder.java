@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.lca;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
@@ -32,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Tarjan's offline algorithm for computing lowest common ancestors in rooted trees and forests.
@@ -115,8 +118,8 @@ public class TarjanLCAFinder<V, E>
      * @param roots the set of roots of the graph
      */
     public TarjanLCAFinder(Graph<V, E> graph, Set<V> roots) {
-        this.graph = Objects.requireNonNull(graph, "graph cannot be null");
-        this.roots = Objects.requireNonNull(roots, "roots cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "graph cannot be null");
+        this.roots = DObjects.requireNonNull(roots, "roots cannot be null");
 
         if (this.roots.isEmpty())
             throw new IllegalArgumentException("roots cannot be empty");
@@ -178,13 +181,13 @@ public class TarjanLCAFinder<V, E>
             if (a.equals(b))
                 this.lowestCommonAncestors.add(a);
             else {
-                queryOccurs.computeIfAbsent(a, new Function<V, Set<Integer>>() {
+                new MapWrapper<>(queryOccurs).computeIfAbsent(a, new Function<V, Set<Integer>>() {
                     @Override
                     public Set<Integer> apply(V x) {
                         return new HashSet<>();
                     }
                 }).add(i);
-                queryOccurs.computeIfAbsent(b, new Function<V, Set<Integer>>() {
+                new MapWrapper<>(queryOccurs).computeIfAbsent(b, new Function<V, Set<Integer>>() {
                     @Override
                     public Set<Integer> apply(V x) {
                         return new HashSet<>();
@@ -228,7 +231,7 @@ public class TarjanLCAFinder<V, E>
 
         blackNodes.add(u);
 
-        for (int index : queryOccurs.computeIfAbsent(u, new Function<V, Set<Integer>>() {
+        for (int index : new MapWrapper<>(queryOccurs).computeIfAbsent(u, new Function<V, Set<Integer>>() {
             @Override
             public Set<Integer> apply(V x) {
                 return new HashSet<>();

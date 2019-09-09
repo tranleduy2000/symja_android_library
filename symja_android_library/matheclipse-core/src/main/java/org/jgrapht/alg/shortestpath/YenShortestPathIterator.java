@@ -17,6 +17,12 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -36,11 +42,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * Iterator over the shortest loopless paths between two vertices in a graph sorted by weight.
@@ -159,7 +161,7 @@ public class YenShortestPathIterator<V, E>
     public YenShortestPathIterator(
             Graph<V, E> graph, V source, V sink,
             Supplier<AddressableHeap<Double, GraphPath<V, E>>> heapSupplier) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null!");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null!");
         if (!graph.containsVertex(source)) {
             throw new IllegalArgumentException("Graph should contain source vertex!");
         }
@@ -168,7 +170,7 @@ public class YenShortestPathIterator<V, E>
             throw new IllegalArgumentException("Graph should contain sink vertex!");
         }
         this.sink = sink;
-        Objects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
+        DObjects.requireNonNull(heapSupplier, "Heap supplier cannot be null");
         this.resultList = new ArrayList<>();
         this.candidatePaths = heapSupplier.get();
         this.deviations = new HashMap<>();
@@ -290,7 +292,7 @@ public class YenShortestPathIterator<V, E>
                 deviations.put(candidate, recoverVertex);
 
                 if (weightsFrequencies.containsKey(candidateWeight)) {
-                    weightsFrequencies
+                    new MapWrapper<>(weightsFrequencies)
                             .computeIfPresent(candidateWeight, new BiFunction<Double, Integer, Integer>() {
                                 @Override
                                 public Integer apply(Double weight, Integer frequency) {

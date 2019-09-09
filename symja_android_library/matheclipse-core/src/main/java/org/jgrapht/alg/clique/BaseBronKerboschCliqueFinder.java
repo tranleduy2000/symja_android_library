@@ -17,13 +17,14 @@
  */
 package org.jgrapht.alg.clique;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MaximalCliqueEnumerationAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +67,7 @@ abstract class BaseBronKerboschCliqueFinder<V, E>
      * @param unit    the time unit of the timeout argument
      */
     public BaseBronKerboschCliqueFinder(Graph<V, E> graph, long timeout, TimeUnit unit) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null");
         if (timeout == 0L) {
             this.nanos = Long.MAX_VALUE;
         } else {

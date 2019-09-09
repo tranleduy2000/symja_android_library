@@ -17,7 +17,11 @@
  */
 package org.jgrapht.alg.vertexcover;
 
-import com.duy.stream.DComparator;
+import com.duy.lambda.Consumer;
+import com.duy.lambda.ToDoubleFunction;
+import com.duy.stream.ComparatorWrapper;
+import com.duy.util.DObjects;
+import com.duy.util.ListWrapper;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
@@ -33,10 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.ToDoubleFunction;
 
 /**
  * Finds a minimum vertex cover in a undirected graph. The implementation relies on a recursive
@@ -143,7 +144,7 @@ public class RecursiveExactVCImpl<V, E>
      */
     public RecursiveExactVCImpl(Graph<V, E> graph, Map<V, Double> vertexWeightMap) {
         this.graph = GraphTests.requireUndirected(graph);
-        this.vertexWeightMap = Objects.requireNonNull(vertexWeightMap);
+        this.vertexWeightMap = DObjects.requireNonNull(vertexWeightMap);
         weighted = true;
     }
 
@@ -159,7 +160,7 @@ public class RecursiveExactVCImpl<V, E>
         N = vertices.size();
         // Sort vertices based on their weight/degree ratio in ascending order
         // TODO JK: Are there better orderings?
-        vertices.sort(DComparator.comparingDouble(new ToDoubleFunction<V>() {
+        new ListWrapper<>(vertices).sort(ComparatorWrapper.comparingDouble(new ToDoubleFunction<V>() {
             @Override
             public double applyAsDouble(V v) {
                 return vertexWeightMap.get(v) / graph.degreeOf(v);
@@ -363,7 +364,7 @@ public class RecursiveExactVCImpl<V, E>
          * @param totalWeight   the total weight of the vertices
          */
         protected void addAllVertices(List<Integer> vertexIndices, double totalWeight) {
-            vertexIndices.forEach(new Consumer<Integer>() {
+            new ListWrapper<>(vertexIndices).forEach(new Consumer<Integer>() {
                 @Override
                 public void accept(Integer bitIndex) {
                     bitSetCover.set(bitIndex);

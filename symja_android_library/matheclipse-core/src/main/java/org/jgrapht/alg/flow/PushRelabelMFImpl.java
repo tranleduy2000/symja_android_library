@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.flow;
 
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.alg.util.ToleranceDoubleComparator;
@@ -489,7 +491,7 @@ public class PushRelabelMFImpl<V, E>
             List<Map.Entry<Pair<Integer, Integer>, Integer>> relabelsSorted =
                     new ArrayList<>(relabels.entrySet());
 
-            relabelsSorted.sort(new Comparator<Map.Entry<Pair<Integer, Integer>, Integer>>() {
+            new ListWrapper<>(relabelsSorted).sort(new Comparator<Map.Entry<Pair<Integer, Integer>, Integer>>() {
                 @Override
                 public int compare(Map.Entry<Pair<Integer, Integer>, Integer> o1, Map.Entry<Pair<Integer, Integer>, Integer> o2) {
                     return -(o1.getValue() - o2.getValue());
@@ -504,7 +506,7 @@ public class PushRelabelMFImpl<V, E>
             List<Map.Entry<Pair<V, V>, Integer>> dischargesSorted =
                     new ArrayList<>(discharges.entrySet());
 
-            dischargesSorted.sort(new Comparator<Map.Entry<Pair<V, V>, Integer>>() {
+            new ListWrapper<>(dischargesSorted).sort(new Comparator<Map.Entry<Pair<V, V>, Integer>>() {
                 @Override
                 public int compare(Map.Entry<Pair<V, V>, Integer> one, Map.Entry<Pair<V, V>, Integer> other) {
                     return -(one.getValue() - other.getValue());

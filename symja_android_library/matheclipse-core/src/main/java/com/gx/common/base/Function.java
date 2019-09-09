@@ -72,7 +72,7 @@ public interface Function<F, T> {
      * <p>
      * <p>Historically, {@code Function} instances in this library have implemented this method to
      * recognize certain cases where distinct {@code Function} instances would in fact behave
-     * identically. However, as code migrates to {@code java.util.function}, that behavior will
+     * identically. However, as code migrates to {@code com.duy.lambda}, that behavior will
      * disappear. It is best not to depend on it.
      */
     @Override

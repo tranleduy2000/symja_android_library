@@ -17,6 +17,9 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Function;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphPathImpl;
@@ -28,8 +31,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * A walk in a graph is an alternating sequence of vertices and edges, starting and ending at a
@@ -143,7 +144,7 @@ public class GraphWalk<V, E>
             throw new IllegalArgumentException(
                     "Either the start and end vertices must both be null, or they must both be not null (one of them is null)");
 
-        this.graph = Objects.requireNonNull(graph);
+        this.graph = DObjects.requireNonNull(graph);
         this.startVertex = startVertex;
         this.endVertex = endVertex;
         this.vertexList = vertexList;

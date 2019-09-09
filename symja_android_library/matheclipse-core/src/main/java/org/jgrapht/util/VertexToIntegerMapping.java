@@ -17,12 +17,13 @@
  */
 package org.jgrapht.util;
 
+import com.duy.util.DObjects;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -48,7 +49,7 @@ public class VertexToIntegerMapping<V> {
      * @throws NullPointerException if {@code vertices} is {@code null}
      */
     public VertexToIntegerMapping(Set<V> vertices) {
-        Objects.requireNonNull(vertices, "the input collection of vertices cannot be null");
+        DObjects.requireNonNull(vertices, "the input collection of vertices cannot be null");
 
         vertexMap = new HashMap<>(vertices.size());
         indexList = new ArrayList<>(vertices.size());
@@ -68,7 +69,7 @@ public class VertexToIntegerMapping<V> {
      * @throws IllegalArgumentException if the vertices are not distinct
      */
     public VertexToIntegerMapping(List<V> vertices) {
-        Objects.requireNonNull(vertices, "the input collection of vertices cannot be null");
+        DObjects.requireNonNull(vertices, "the input collection of vertices cannot be null");
 
         vertexMap = new HashMap<>(vertices.size());
         indexList = vertices;
@@ -92,7 +93,7 @@ public class VertexToIntegerMapping<V> {
      * @throws IllegalArgumentException if the vertices are not distinct
      */
     public VertexToIntegerMapping(Collection<V> vertices) {
-        Objects.requireNonNull(vertices, "the input collection of vertices cannot be null");
+        DObjects.requireNonNull(vertices, "the input collection of vertices cannot be null");
 
         vertexMap = new HashMap<>(vertices.size());
         indexList = new ArrayList<>(vertices.size());

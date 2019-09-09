@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.color;
 
+import com.duy.lang.IntegerWrapper;
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 
 import java.lang.reflect.Array;
@@ -78,10 +81,10 @@ public class LargestDegreeFirstColoring<V, E>
              * Order vertices by degree by using a comparison based sort.
              */
             List<V> nodes = new ArrayList<>(graph.vertexSet());
-            nodes.sort(new Comparator<V>() {
+            new ListWrapper<>(nodes).sort(new Comparator<V>() {
                 @Override
                 public int compare(V u, V v) {
-                    return -1 * Integer.compare(degree.get(u), degree.get(v));
+                    return -1 * IntegerWrapper.compare(degree.get(u), degree.get(v));
                 }
             });
             return nodes;

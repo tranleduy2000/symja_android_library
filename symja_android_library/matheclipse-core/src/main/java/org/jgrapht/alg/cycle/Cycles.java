@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.util.DObjects;
+import com.duy.util.Optional;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -26,8 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Collection of helper methods related to cycles.
@@ -49,8 +50,8 @@ public abstract class Cycles {
      * @throws IllegalArgumentException if the provided edge set is not a simple cycle (circuit)
      */
     public static <V, E> GraphPath<V, E> simpleCycleToGraphPath(Graph<V, E> graph, List<E> cycle) {
-        Objects.requireNonNull(graph, "Graph cannot be null");
-        Objects.requireNonNull(cycle, "Cycle cannot be null");
+        DObjects.requireNonNull(graph, "Graph cannot be null");
+        DObjects.requireNonNull(cycle, "Cycle cannot be null");
 
         if (cycle.isEmpty()) {
             return null;

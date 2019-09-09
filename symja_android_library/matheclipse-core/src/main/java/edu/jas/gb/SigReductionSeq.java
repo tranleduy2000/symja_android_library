@@ -6,7 +6,7 @@ package edu.jas.gb;
 
 
 import com.duy.lambda.ToLongFunction;
-import com.duy.stream.DComparator;
+import com.duy.stream.ComparatorWrapper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -496,7 +496,7 @@ public class SigReductionSeq<C extends RingElem<C>> implements SigReduction<C> {
                 return cSigPair.getSigmaDegree();
             }
         };
-        Comparator<SigPair<C>> sigcmp = DComparator.comparingLong(function);
+        Comparator<SigPair<C>> sigcmp = ComparatorWrapper.comparingLong(function);
 //        List<SigPair<C>> ff = list.stream()
 //                .sorted(sigcmp)
 //                .collect(Collectors.toList());

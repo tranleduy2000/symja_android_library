@@ -17,6 +17,8 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 
 import java.util.AbstractMap;
@@ -217,8 +219,8 @@ public class RandomRegularGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, 
                     if (s1 != s2 && !edges.contains(edge)) {
                         edges.add(edge);
                     } else {
-                        potentialEdges.put(s1, potentialEdges.getOrDefault(s1, 0) + 1);
-                        potentialEdges.put(s2, potentialEdges.getOrDefault(s2, 0) + 1);
+                        potentialEdges.put(s1, new MapWrapper<>(potentialEdges).getOrDefault(s1, 0) + 1);
+                        potentialEdges.put(s2, new MapWrapper<>(potentialEdges).getOrDefault(s2, 0) + 1);
                     }
                 }
 

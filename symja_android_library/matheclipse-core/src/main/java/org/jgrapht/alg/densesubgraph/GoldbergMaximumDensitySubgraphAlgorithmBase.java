@@ -17,6 +17,10 @@
  */
 package org.jgrapht.alg.densesubgraph;
 
+import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MaximumDensitySubgraphAlgorithm;
 import org.jgrapht.alg.interfaces.MinimumSTCutAlgorithm;
@@ -25,10 +29,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * This abstract base class computes a maximum density subgraph based on the algorithm described by
@@ -128,9 +129,9 @@ public abstract class GoldbergMaximumDensitySubgraphAlgorithmBase<V, E>
         if (graph.containsVertex(s) || graph.containsVertex(t)) {
             throw new IllegalArgumentException("Source or sink vertex already in graph");
         }
-        this.s = Objects.requireNonNull(s, "Source vertex is null");
-        this.t = Objects.requireNonNull(t, "Sink vertex is null");
-        this.graph = Objects.requireNonNull(graph, "Graph is null");
+        this.s = DObjects.requireNonNull(s, "Source vertex is null");
+        this.t = DObjects.requireNonNull(t, "Sink vertex is null");
+        this.graph = DObjects.requireNonNull(graph, "Graph is null");
         this.epsilon = epsilon;
         this.guess = 0;
         this.lower = 0;

@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphPathImpl;
@@ -36,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -131,7 +132,7 @@ public class EppsteinShortestPathIterator<V, E>
      * @param sink   sink vertex
      */
     public EppsteinShortestPathIterator(Graph<V, E> graph, V source, V sink) {
-        this.graph = Objects.requireNonNull(graph, "Graph cannot be null!");
+        this.graph = DObjects.requireNonNull(graph, "Graph cannot be null!");
         GraphType type = graph.getType();
         if (!(type.isDirected() && type.isSimple())) {
             throw new IllegalArgumentException("graph must be simple and directed");

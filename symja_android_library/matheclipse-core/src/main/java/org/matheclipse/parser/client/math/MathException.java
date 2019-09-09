@@ -17,7 +17,7 @@ public class MathException extends RuntimeException {
 	 * @see FlowControlException
 	 */
     public MathException() {
-		super(null, null, false, false);
+		super(null, null);
     }
 
     public MathException(String message) {

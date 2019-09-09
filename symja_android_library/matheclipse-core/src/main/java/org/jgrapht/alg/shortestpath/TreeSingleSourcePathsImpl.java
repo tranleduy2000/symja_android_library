@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -78,8 +80,8 @@ public class TreeSingleSourcePathsImpl<V, E>
      */
     public TreeSingleSourcePathsImpl(
             Graph<V, E> g, V source, Map<V, Pair<Double, E>> distanceAndPredecessorMap) {
-        this.g = Objects.requireNonNull(g, "Graph is null");
-        this.source = Objects.requireNonNull(source, "Source vertex is null");
+        this.g = DObjects.requireNonNull(g, "Graph is null");
+        this.source = DObjects.requireNonNull(source, "Source vertex is null");
         this.map = Objects
                 .requireNonNull(distanceAndPredecessorMap, "Distance and predecessor map is null");
     }

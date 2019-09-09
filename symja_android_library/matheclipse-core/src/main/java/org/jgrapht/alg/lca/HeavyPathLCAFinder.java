@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.lca;
 
+import com.duy.util.DObjects;
+import com.duy.util.MapWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.alg.decomposition.HeavyPathDecomposition;
 import org.jgrapht.alg.interfaces.LowestCommonAncestorAlgorithm;
@@ -97,8 +100,8 @@ public class HeavyPathLCAFinder<V, E>
      * @param roots the set of roots of the graph
      */
     public HeavyPathLCAFinder(Graph<V, E> graph, Set<V> roots) {
-        this.graph = Objects.requireNonNull(graph, "graph cannot be null");
-        this.roots = Objects.requireNonNull(roots, "roots cannot be null");
+        this.graph = DObjects.requireNonNull(graph, "graph cannot be null");
+        this.roots = DObjects.requireNonNull(roots, "roots cannot be null");
 
         if (this.roots.isEmpty())
             throw new IllegalArgumentException("roots cannot be empty");
@@ -133,11 +136,11 @@ public class HeavyPathLCAFinder<V, E>
      */
     @Override
     public V getLCA(V a, V b) {
-        int indexA = vertexMap.getOrDefault(a, -1);
+        int indexA = new MapWrapper<>(vertexMap).getOrDefault(a, -1);
         if (indexA == -1)
             throw new IllegalArgumentException("invalid vertex: " + a);
 
-        int indexB = vertexMap.getOrDefault(b, -1);
+        int indexB = new MapWrapper<>(vertexMap).getOrDefault(b, -1);
         if (indexB == -1)
             throw new IllegalArgumentException("invalid vertex: " + b);
 

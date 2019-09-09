@@ -27,8 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
 
 /**
  * A collection of utilities to assist with graph manipulation.

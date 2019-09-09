@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
@@ -24,7 +26,6 @@ import org.jgrapht.graph.GraphWalk;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * An implementation of {@link SingleSourcePaths} which stores one path per vertex.
@@ -66,9 +67,9 @@ public class ListSingleSourcePathsImpl<V, E>
      * @param paths  one path per target vertex
      */
     public ListSingleSourcePathsImpl(Graph<V, E> graph, V source, Map<V, GraphPath<V, E>> paths) {
-        this.graph = Objects.requireNonNull(graph, "Graph is null");
-        this.source = Objects.requireNonNull(source, "Source vertex is null");
-        this.paths = Objects.requireNonNull(paths, "Paths are null");
+        this.graph = DObjects.requireNonNull(graph, "Graph is null");
+        this.source = DObjects.requireNonNull(source, "Source vertex is null");
+        this.paths = DObjects.requireNonNull(paths, "Paths are null");
     }
 
     /**

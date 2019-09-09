@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg;
 
+import com.duy.lambda.Consumer;
+import com.duy.util.IteratorWrapper;
+
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -26,7 +29,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Constructs the transitive closure of the input graph.
@@ -120,7 +122,7 @@ public class TransitiveClosure {
      */
     public <V, E> void closeDirectedAcyclicGraph(DirectedAcyclicGraph<V, E> graph) {
         final Deque<V> orderedVertices = new ArrayDeque<>(graph.vertexSet().size());
-        new TopologicalOrderIterator<>(graph).forEachRemaining(new Consumer<V>() {
+        new IteratorWrapper<>(new TopologicalOrderIterator<>(graph)).forEachRemaining(new Consumer<V>() {
             @Override
             public void accept(V e) {
                 orderedVertices.addFirst(e);

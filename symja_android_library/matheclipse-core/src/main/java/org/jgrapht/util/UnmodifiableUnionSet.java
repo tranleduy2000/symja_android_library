@@ -17,11 +17,12 @@
  */
 package org.jgrapht.util;
 
+import com.duy.util.DObjects;
+
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -47,8 +48,8 @@ public class UnmodifiableUnionSet<E>
      * @param second the second set
      */
     public UnmodifiableUnionSet(Set<E> first, Set<E> second) {
-        Objects.requireNonNull(first);
-        Objects.requireNonNull(second);
+        DObjects.requireNonNull(first);
+        DObjects.requireNonNull(second);
         this.first = first;
         this.second = second;
     }

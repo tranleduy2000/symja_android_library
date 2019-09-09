@@ -17,6 +17,8 @@
  */
 package org.jgrapht.util;
 
+import com.duy.util.ListWrapper;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -75,7 +77,7 @@ public class RadixSort {
         final int n = list.size();
 
         if (n <= CUT_OFF) {
-            list.sort(null);
+            new ListWrapper<>(list).sort(null);
             return;
         }
 

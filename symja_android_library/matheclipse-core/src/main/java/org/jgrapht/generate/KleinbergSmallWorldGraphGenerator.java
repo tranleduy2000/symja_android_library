@@ -17,6 +17,8 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.alg.util.AliasMethodSampler;
@@ -24,7 +26,6 @@ import org.jgrapht.alg.util.AliasMethodSampler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -121,7 +122,7 @@ public class KleinbergSmallWorldGraphGenerator<V, E> extends GraphGeneratorImpl<
             throw new IllegalArgumentException("parameter r must be non-negative");
         }
         this.r = r;
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
     }
 
     /**

@@ -17,13 +17,14 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.util.TypeUtil;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -49,7 +50,7 @@ public abstract class BaseIntrusiveEdgesSpecifics<V, E, IE extends IntrusiveEdge
      * @param edgeMap the map to use for storage
      */
     public BaseIntrusiveEdgesSpecifics(Map<E, IE> edgeMap) {
-        this.edgeMap = Objects.requireNonNull(edgeMap);
+        this.edgeMap = DObjects.requireNonNull(edgeMap);
     }
 
     /**

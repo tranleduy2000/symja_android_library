@@ -39,7 +39,7 @@ import org.jgrapht.graph.WeightedPseudograph;
 import org.jgrapht.util.SupplierUtil;
 import org.jgrapht.util.TypeUtil;
 
-import java.util.function.Supplier;
+import com.duy.lambda.Supplier;
 
 /**
  * A builder class for the hierarchy of {@link Graph}s that the library provides.

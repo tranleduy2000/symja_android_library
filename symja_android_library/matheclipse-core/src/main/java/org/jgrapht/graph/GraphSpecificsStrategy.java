@@ -22,8 +22,8 @@ import org.jgrapht.GraphType;
 import org.jgrapht.graph.specifics.Specifics;
 
 import java.io.Serializable;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Function;
 
 /**
  * A graph specifics construction factory.

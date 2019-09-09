@@ -17,10 +17,10 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.lambda.Supplier;
+
 import org.jgrapht.graph.builder.GraphBuilder;
 import org.jgrapht.util.SupplierUtil;
-
-import java.util.function.Supplier;
 
 /**
  * A directed pseudograph. A directed pseudograph is a non-simple directed graph in which both graph

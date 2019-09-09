@@ -17,13 +17,14 @@
  */
 package org.jgrapht.generate;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -133,7 +134,7 @@ public class WattsStrogatzGraphGenerator<V, E> extends GraphGeneratorImpl<V, E, 
             throw new IllegalArgumentException("invalid probability");
         }
         this.p = p;
-        this.rng = Objects.requireNonNull(rng, "Random number generator cannot be null");
+        this.rng = DObjects.requireNonNull(rng, "Random number generator cannot be null");
         this.addInsteadOfRewire = addInsteadOfRewire;
     }
 
