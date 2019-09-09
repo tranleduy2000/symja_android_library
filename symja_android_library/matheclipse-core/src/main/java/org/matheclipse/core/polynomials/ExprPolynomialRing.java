@@ -23,7 +23,6 @@ import java.util.Set;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
 import edu.jas.structure.RingFactory;
-import edu.jas.structure.Element;
 import edu.jas.util.CartesianProduct;
 import edu.jas.util.CartesianProductInfinite;
 import edu.jas.util.LongIterable;
@@ -151,8 +150,6 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *            factory for coefficients of type C.
 	 * @param listOfVariables
 	 *            names for the variables.
-	 * @param n
-	 *            number of variables.
 	 */
 	public ExprPolynomialRing(ExprRingFactory cf, IAST listOfVariables ) {
 		this(cf, listOfVariables, listOfVariables.argSize(), ExprTermOrderByName.Lexicographic);

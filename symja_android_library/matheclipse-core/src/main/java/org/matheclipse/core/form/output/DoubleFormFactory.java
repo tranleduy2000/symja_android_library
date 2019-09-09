@@ -1300,7 +1300,6 @@ public abstract class DoubleFormFactory {
 	 * @param pow
 	 *            the power expression of the factor
 	 * @param call
-	 * @param operPrecedence
 	 * @return the current call status
 	 * @throws IOException
 	 */

@@ -113,7 +113,7 @@ public interface IRational extends ISignedNumber, IBigNumber {
      * mod(8, 4) == 0
      * </pre>
      *
-     * @param that
+     * @param m
      * @return
      * @throws ArithmeticException - if m <= 0
      */

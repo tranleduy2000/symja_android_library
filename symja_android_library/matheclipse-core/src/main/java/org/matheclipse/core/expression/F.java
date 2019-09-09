@@ -8548,6 +8548,15 @@ public class F {
         return AbstractIntegerSym.valueOf(integerValue);
     }
 
+	/**
+	 * Create an integer number.
+	 *
+	 * @param integerValue
+	 * @return
+	 */
+	public static IInteger ZZ(final int integerValue) {
+		return AbstractIntegerSym.valueOf(integerValue);
+	}
     /**
      * Create an integer number.
      *
