@@ -1,6 +1,7 @@
 package org.matheclipse.core.form.output;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplex;
@@ -8,6 +9,7 @@ import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.math.MathException;
+import org.matheclipse.parser.client.operator.ASTNodeFactory;
 import org.matheclipse.parser.client.operator.Operator;
 
 import java.io.IOException;
@@ -228,6 +230,15 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 	}
 
 	public void convertAST(final Appendable buf, final IAST function) throws IOException {
+		if (function.isNumericFunction()) {
+			try {
+				double value = EvalEngine.get().evalDouble(function);
+				buf.append("(" + value + ")");
+				return;
+			} catch (RuntimeException rex) {
+				//
+			}
+		}
 		IExpr head = function.head();
 		if (head.isSymbol()) {
 			String str = functionHead((ISymbol) head);
@@ -305,6 +316,34 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 					buf.append(")");
 					return;
 				}
+			} else if (function.head() == F.Piecewise && function.size() > 1) {
+				int[] dim = function.arg1().isMatrix();
+				if (dim != null && dim[1] == 2) {
+					IAST list = (IAST) function.arg1();
+					for (int i = 1; i < list.size(); i++) {
+						IAST row = (IAST) list.get(i);
+						if (i == 1) {
+							buf.append("if (");
+							convert(buf, row.second());
+							buf.append(") {");
+						} else {
+							buf.append(" else if (");
+							convert(buf, row.second());
+							buf.append(") {");
+						}
+						buf.append(" return ");
+						convert(buf, row.first());
+						buf.append("}");
+					}
+					buf.append(" else {");
+					if (function.isAST2()) {
+						convert(buf, function.second());
+					} else {
+						buf.append(" return NaN; ");
+					}
+					buf.append("}");
+					return;
+				}
 			}
 			if (function.headID() > 0) {
 				throw new MathException("illegal JavaScript arg");
@@ -349,15 +388,29 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 	}
 	protected boolean convertOperator(final Operator operator, final IAST list, final Appendable buf,
 									  final int precedence, ISymbol head) throws IOException {
+		if (!super.convertOperator(operator, list, buf, precedence, head)) {
 		if (Config.USE_MATHCELL) {
 			convertAST(buf, list);
 			return true;
 		}
+			return false;
+		}
 
-		super.convertOperator(operator, list, buf, precedence, head);
 		return true;
 	}
 
+	public Operator getOperator(ISymbol head) {
+		if (Config.USE_MATHCELL) {
+			Operator operator = null;
+			if (head == F.Equal || head == F.Unequal || head == F.Less || head == F.LessEqual || head == F.Greater
+					|| head == F.GreaterEqual || head == F.And || head == F.Or || head == F.Not) {
+				String str = head.toString();
+				operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+			}
+			return operator;
+		}
+		return super.getOperator(head);
+	}
 	public void convertComplex(final Appendable buf, final IComplex c, final int precedence, boolean caller)
 			throws IOException {
 		buf.append("complex(");

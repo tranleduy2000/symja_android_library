@@ -8654,7 +8654,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("JSForm(a+b)", //
 				"a+b");
 		check("JSForm(E^3-Cos(Pi^2/x) )", //
-				"Math.pow(Math.E,3)-Math.cos(Math.pow(Math.PI,2)/x)");
+				"(20.085536923187664)-Math.cos((9.869604401089358)/x)");
 	}
 	public void testJoin() {
 		// http://oeis.org/A001597 - Perfect powers: m^k where m > 0 and k >= 2. //
@@ -12413,6 +12413,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPiecewise() {
+		check("Piecewise({{x^2, x < 0}, {x, x > 0}}) /. x->3", //
+				"3");
 		check("Piecewise({{(a^0*Log(a)^n)/n!,n>=0}},0)", //
 				"Piecewise({{Log(a)^n/n!,n>=0}},0)");
 		check("Piecewise({})", //
