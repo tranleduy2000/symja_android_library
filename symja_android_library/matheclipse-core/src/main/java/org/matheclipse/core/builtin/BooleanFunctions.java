@@ -1411,7 +1411,7 @@ public final class BooleanFunctions {
 		 */
 		private IAST createComparatorResult(IExpr lhs, IExpr rhs, boolean useOppositeHeader, ISymbol originalHead,
 				ISymbol oppositeHead) {
-			return F.binary(useOppositeHeader ? oppositeHead : originalHead, lhs, rhs);
+			return F.binaryAST2(useOppositeHeader ? oppositeHead : originalHead, lhs, rhs);
 		}
 
 		@Override
@@ -1815,7 +1815,7 @@ public final class BooleanFunctions {
 			if (ast.size() == 4) {
 				for (IBuiltInSymbol sym : COMPARATOR_SYMBOLS) {
 					if (sym.equals(ast.arg2())) {
-						return F.binary(ast.arg2(), ast.arg1(), ast.arg3());
+							return F.binaryAST2(ast.arg2(), ast.arg1(), ast.arg3());
 					}
 				}
 				return F.NIL;

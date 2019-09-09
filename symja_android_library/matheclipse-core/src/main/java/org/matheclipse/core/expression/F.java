@@ -57,7 +57,6 @@ import org.matheclipse.core.builtin.WXFFunctions;
 import org.matheclipse.core.builtin.WindowFunctions;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.convert.Object2Expr;
-import org.matheclipse.core.eval.Console;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
@@ -72,7 +71,6 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
-import org.matheclipse.core.interfaces.IDataExpr;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
@@ -3812,14 +3810,10 @@ public class F {
     }
 
     public static ISymbol $rubi(final String symbolName, IEvaluator evaluator) {
-        String name = symbolName;
-        if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-            if (symbolName.length() == 1) {
-                name = symbolName;
-            } else {
-                name = symbolName.toLowerCase(Locale.ENGLISH);
-            }
-        }
+		String name = Config.PARSER_USE_LOWERCASE_SYMBOLS //
+				? (symbolName.length() == 1 ? symbolName : //
+						symbolName.toLowerCase(Locale.ENGLISH))//
+				: symbolName;
         ISymbol symbol = org.matheclipse.core.expression.Context.RUBI.get(name);
         if (symbol != null) {
             return symbol;
@@ -7201,7 +7195,7 @@ public class F {
         return unaryAST1(OrderedQ, a);
     }
 
-    public static IAST Part() {
+	public static IASTAppendable Part() {
         return ast(Part);
     }
 
@@ -7273,7 +7267,7 @@ public class F {
      *
      * @return
      */
-    public static IAST Plus() {
+	public static IASTAppendable Plus() {
         return ast(Plus);
     }
 
