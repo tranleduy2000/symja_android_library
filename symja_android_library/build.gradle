@@ -45,6 +45,7 @@ android {
             manifest.srcFile 'AndroidManifest.xml'
             resources.srcDirs = ['src/main/resources']
             java.srcDirs += 'matheclipse-core/src/main/java/'
+            assets.srcDirs += 'matheclipse-core/src/main/resources/'
         }
         test {
             java.srcDirs += "matheclipse-core/src/test/java/"
