@@ -35,20 +35,21 @@ public class HypergeometricFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.CosIntegral.setEvaluator(new CosIntegral());
-		F.CoshIntegral.setEvaluator(new CoshIntegral());
-		F.ExpIntegralE.setEvaluator(new ExpIntegralE());
-		F.ExpIntegralEi.setEvaluator(new ExpIntegralEi());
-		F.FresnelC.setEvaluator(new FresnelC());
-		F.FresnelS.setEvaluator(new FresnelS());
-		F.GegenbauerC.setEvaluator(new GegenbauerC());
-		F.Hypergeometric0F1.setEvaluator(new Hypergeometric0F1());
-		F.Hypergeometric1F1.setEvaluator(new Hypergeometric1F1());
-		F.Hypergeometric2F1.setEvaluator(new Hypergeometric2F1());
-		F.LogIntegral.setEvaluator(new LogIntegral());
-		F.SinIntegral.setEvaluator(new SinIntegral());
-		F.SinhIntegral.setEvaluator(new SinhIntegral());
-	}
+			F.CosIntegral.setEvaluator(new CosIntegral());
+			F.CoshIntegral.setEvaluator(new CoshIntegral());
+			F.ExpIntegralE.setEvaluator(new ExpIntegralE());
+			F.ExpIntegralEi.setEvaluator(new ExpIntegralEi());
+			F.FresnelC.setEvaluator(new FresnelC());
+			F.FresnelS.setEvaluator(new FresnelS());
+			F.GegenbauerC.setEvaluator(new GegenbauerC());
+			F.Hypergeometric0F1.setEvaluator(new Hypergeometric0F1());
+			F.Hypergeometric1F1.setEvaluator(new Hypergeometric1F1());
+			F.Hypergeometric2F1.setEvaluator(new Hypergeometric2F1());
+			// F.HypergeometricU.setEvaluator(new HypergeometricU());
+			F.LogIntegral.setEvaluator(new LogIntegral());
+			F.SinIntegral.setEvaluator(new SinIntegral());
+			F.SinhIntegral.setEvaluator(new SinhIntegral());
+		}
 
 	}
 

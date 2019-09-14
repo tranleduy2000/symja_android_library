@@ -390,4 +390,5 @@ public class Config {
 					"\n" + //
 					"</body>\n" + //
 					"</html>";//
+	public final static double DEFAULT_CHOP_DELTA = 1.0e-10;
 }

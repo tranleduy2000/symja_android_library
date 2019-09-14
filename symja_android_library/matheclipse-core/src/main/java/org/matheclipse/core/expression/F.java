@@ -19,6 +19,7 @@ import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.AssumptionFunctions;
 import org.matheclipse.core.builtin.AttributeFunctions;
+import org.matheclipse.core.builtin.BesselFunctions;
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.Combinatoric;
 import org.matheclipse.core.builtin.ComputationalGeometryFunctions;
@@ -232,7 +233,11 @@ public class F {
 	public final static IBuiltInSymbol AiryAi = F.initFinalSymbol("AiryAi", ID.AiryAi);
 
 	/***/
+	public final static IBuiltInSymbol AiryAiPrime = F.initFinalSymbol("AiryAiPrime", ID.AiryAiPrime);
+	/***/
 	public final static IBuiltInSymbol AiryBi = F.initFinalSymbol("AiryBi", ID.AiryBi);
+	/***/
+	public final static IBuiltInSymbol AiryBiPrime = F.initFinalSymbol("AiryBiPrime", ID.AiryBiPrime);
     /***/
     public final static IBuiltInSymbol AlgebraicNumber = F.initFinalSymbol("AlgebraicNumber", ID.AlgebraicNumber);
     /***/
@@ -265,7 +270,10 @@ public class F {
     /** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix.*/
     public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ", ID.AntisymmetricMatrixQ);
 
-    /** AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates to `True`.*/
+	/**
+	 * AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates
+	 * to `True`.
+	 */
     public final static IBuiltInSymbol AnyTrue = F.initFinalSymbol("AnyTrue", ID.AnyTrue);
 	/** Apart(expr) - rewrites `expr` as a sum of individual fractions. */
     public final static IBuiltInSymbol Apart = F.initFinalSymbol("Apart", ID.Apart);
@@ -892,7 +900,10 @@ public class F {
     public final static IBuiltInSymbol False = F.initFinalSymbol("False", ID.False);
 	/** Fibonacci(n) - returns the Fibonacci number of the integer `n` */
     public final static IBuiltInSymbol Fibonacci = F.initFinalSymbol("Fibonacci", ID.Fibonacci);
-    /** FindEulerianCycle(graph) - find an eulerian cycle in the `graph`.*/
+	/***/
+	public final static IBuiltInSymbol FindEdgeCover = F.initFinalSymbol("FindEdgeCover", ID.FindEdgeCover);
+
+	/** FindEulerianCycle(graph) - find an eulerian cycle in the `graph`. */
     public final static IBuiltInSymbol FindEulerianCycle = F.initFinalSymbol("FindEulerianCycle", ID.FindEulerianCycle);
 
 	/**
@@ -1168,6 +1179,8 @@ public class F {
             ID.HypergeometricDistribution);
     /***/
     public final static IBuiltInSymbol HypergeometricPFQ = F.initFinalSymbol("HypergeometricPFQ", ID.HypergeometricPFQ);
+	/***/
+	public final static IBuiltInSymbol HypergeometricU = F.initFinalSymbol("HypergeometricU", ID.HypergeometricU);
     /***/
     public final static IBuiltInSymbol HypergeometricPFQRegularized = F.initFinalSymbol("HypergeometricPFQRegularized",
             ID.HypergeometricPFQRegularized);
@@ -1263,7 +1276,10 @@ public class F {
     /***/
     public final static IBuiltInSymbol InverseBetaRegularized = F.initFinalSymbol("InverseBetaRegularized", ID.InverseBetaRegularized);
 
-    /** InverseCDF(dist, q) - returns the inverse cumulative distribution for the distribution `dist` as a function of `q` */
+	/**
+	 * InverseCDF(dist, q) - returns the inverse cumulative distribution for the distribution `dist` as a function of
+	 * `q`
+	 */
     public final static IBuiltInSymbol InverseCDF = F.initFinalSymbol("InverseCDF", ID.InverseCDF);
 	/** InverseErf(z) - returns the inverse error function of `z`. */
     public final static IBuiltInSymbol InverseErf = F.initFinalSymbol("InverseErf", ID.InverseErf);
@@ -1506,7 +1522,7 @@ public class F {
     public final static IBuiltInSymbol MatrixRank = F.initFinalSymbol("MatrixRank", ID.MatrixRank);
 	/** Max(e_1, e_2, ..., e_i) - returns the expression with the greatest value among the `e_i`. */
     public final static IBuiltInSymbol Max = F.initFinalSymbol("Max", ID.Max);
-    /***/
+	/** MaxFilter(list, r) - filter which evaluates the `Max` of `list` for the radius `r`. */
     public final static IBuiltInSymbol MaxFilter = F.initFinalSymbol("MaxFilter", ID.MaxFilter);
     /***/
     public final static IBuiltInSymbol MaxIterations = F.initFinalSymbol("MaxIterations", ID.MaxIterations);
@@ -3266,6 +3282,7 @@ public class F {
             ListFunctions.initialize();
             Combinatoric.initialize();
             IntegerFunctions.initialize();
+			BesselFunctions.initialize();
             SpecialFunctions.initialize();
             StringFunctions.initialize();
             OutputFunctions.initialize();
@@ -4493,7 +4510,7 @@ public class F {
 	 * @param arg
 	 *            a numeric number
 	 * @param delta
-	 *            the delta for which
+	 *            the delta for which the number should be set to zero
      * @return <code>arg</code> if the argument couldn't be chopped
      */
     public static INumber chopNumber(INumber arg, double delta) {
@@ -4502,13 +4519,14 @@ public class F {
                 return C0;
             }
         } else if (arg instanceof IComplexNum) {
-            if (isZero(((IComplexNum) arg).getRealPart(), delta)) {
-                if (isZero(((IComplexNum) arg).getImaginaryPart(), delta)) {
+			Complex c = ((IComplexNum) arg).evalComplex();
+			if (isZero(c.getReal(), delta)) {
+				if (isZero(c.getImaginary(), delta)) {
                     return C0;
                 }
-                return complexNum(0.0, ((IComplexNum) arg).getImaginaryPart());
+				return complexNum(0.0, c.getImaginary());
             }
-            if (isZero(((IComplexNum) arg).getImaginaryPart(), delta)) {
+			if (isZero(c.getImaginary(), delta)) {
                 return num(((IComplexNum) arg).getRealPart());
             }
 
@@ -4516,6 +4534,40 @@ public class F {
         return arg;
     }
 
+	/**
+	 * Set real or imaginary parts of a numeric argument to zero, those absolute value is less than
+	 * <code>Config.DEFAULT_CHOP_DELTA</code>
+	 *
+	 * @param arg
+	 *            a numeric number
+	 * @return <code>arg</code> if the argument couldn't be chopped
+	 */
+	public static org.hipparchus.complex.Complex chopComplex(org.hipparchus.complex.Complex arg) {
+		return chopComplex(arg, Config.DEFAULT_CHOP_DELTA);
+	}
+
+	/**
+	 * Set real or imaginary parts of a numeric argument to zero, those absolute value is less than a delta.
+	 *
+	 * @param arg
+	 *            a numeric number
+	 * @param delta
+	 *            the delta for which the number should be set to zero
+	 * @return <code>arg</code> if the argument couldn't be chopped
+	 */
+	public static org.hipparchus.complex.Complex chopComplex(org.hipparchus.complex.Complex arg, double delta) {
+		org.hipparchus.complex.Complex c = arg;
+		if (isZero(c.getReal(), delta)) {
+			if (isZero(c.getImaginary(), delta)) {
+				return org.hipparchus.complex.Complex.ZERO;
+			}
+			return new org.hipparchus.complex.Complex(0.0, c.getImaginary());
+		}
+		if (isZero(c.getImaginary(), delta)) {
+			return new org.hipparchus.complex.Complex(c.getReal());
+		}
+		return arg;
+	}
     public static IAST CentralMoment(final IExpr a0, final IExpr a1) {
         return new AST2(CentralMoment, a0, a1);
     }
