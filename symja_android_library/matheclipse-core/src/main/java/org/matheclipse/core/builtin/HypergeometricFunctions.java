@@ -45,6 +45,7 @@ public class HypergeometricFunctions {
 		F.Hypergeometric0F1.setEvaluator(new Hypergeometric0F1());
 		F.Hypergeometric1F1.setEvaluator(new Hypergeometric1F1());
 		F.Hypergeometric2F1.setEvaluator(new Hypergeometric2F1());
+			// F.HypergeometricU.setEvaluator(new HypergeometricU());
 		F.LogIntegral.setEvaluator(new LogIntegral());
 		F.SinIntegral.setEvaluator(new SinIntegral());
 		F.SinhIntegral.setEvaluator(new SinhIntegral());

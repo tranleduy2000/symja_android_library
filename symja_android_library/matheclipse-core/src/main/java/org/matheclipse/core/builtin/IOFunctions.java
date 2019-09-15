@@ -2,11 +2,11 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.trie.SuggestTree;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -14,6 +14,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
+import org.matheclipse.core.trie.SuggestTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -265,6 +266,7 @@ public class IOFunctions {
 			exact = false;
 		}
 		SuggestTree suggestTree = AST2Expr.getSuggestTree();
+		name = Config.PARSER_USE_LOWERCASE_SYMBOLS ? name.toLowerCase() : name;
 		Node n = suggestTree.getAutocompleteSuggestions(name);
 		if (n != null) {
 			IASTAppendable list = F.ListAlloc(n.listLength());
@@ -288,6 +290,7 @@ public class IOFunctions {
 			return list;
 		}
 		SuggestTree suggestTree = AST2Expr.getSuggestTree();
+		namePrefix = Config.PARSER_USE_LOWERCASE_SYMBOLS ? namePrefix.toLowerCase() : namePrefix;
 		Node n = suggestTree.getAutocompleteSuggestions(namePrefix);
 		if (n != null) {
 			for (int i = 0; i < n.listLength(); i++) {
