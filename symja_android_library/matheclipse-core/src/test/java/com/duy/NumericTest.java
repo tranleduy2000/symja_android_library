@@ -2,7 +2,6 @@ package com.duy;
 
 import junit.framework.TestCase;
 
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -41,7 +40,6 @@ public class NumericTest extends TestCase {
      */
     public void testSurd() {
         ExprEvaluator exprEvaluator = new ExprEvaluator();
-        Config.UNPROTECT_ALLOWED = true;
         assertEquals(exprEvaluator.eval("Surd(-8,3)").toString(),
                 "-2");
         assertEquals(exprEvaluator.eval("Surd(-8.0,3)").toString(),
@@ -56,6 +54,16 @@ public class NumericTest extends TestCase {
                 "Surd(x,2)");
         assertEquals(exprEvaluator.eval("D(x^(1/2),x)").toString(),
                 "1/(2*Sqrt(x))");
+    }
+
+    public void testListable() {
+        ExprEvaluator exprEvaluator = new ExprEvaluator();
+        assertEquals(exprEvaluator.eval("Sin({1,2,3})").toString(),
+                "{Sin(1),Sin(2),Sin(3)}");
+        assertEquals(exprEvaluator.eval("LCM({1,2,3},3)").toString(),
+                "{3,6,3}");
+        assertEquals(exprEvaluator.eval("Cos({1,2,3},4,{1,2,4})").toString(),
+                "{Cos(1,4,1),Cos(2,4,2),Cos(3,4,4)}");
     }
 
 }

@@ -111,7 +111,8 @@ import edu.jas.kern.PreemptStatus;
  */
 public class F {
     // private static final Cache<IAST, IAST> PARSER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(1024).build();
-	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 10];
+    // Android changed: more symbols
+	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 200];
 
 	/**
 	 * <p>
