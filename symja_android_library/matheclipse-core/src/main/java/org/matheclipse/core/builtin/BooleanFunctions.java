@@ -2148,7 +2148,7 @@ public final class BooleanFunctions {
 				}
 			}
 
-			IAST resultList = EvalAttributes.flatten(F.List, ast);
+			IAST resultList = EvalAttributes.flattenDeep(F.List, ast);
 			if (resultList.isPresent()) {
 				return maximum(resultList, true);
 			}
@@ -2292,7 +2292,7 @@ public final class BooleanFunctions {
 				}
 			}
 
-			IAST resultList = EvalAttributes.flatten(F.List, ast);
+			IAST resultList = EvalAttributes.flattenDeep(F.List, ast);
 			if (resultList.isPresent()) {
 				return minimum(resultList, true);
 			}
@@ -3817,7 +3817,7 @@ public final class BooleanFunctions {
 			return F.True;
 		}
 
-		return Equal.simplifyCompare(F.Equal, arg1, arg2);
+		return Equal.simplifyCompare(F.Equal, a1, a2 );
 	}
 
 	/**
