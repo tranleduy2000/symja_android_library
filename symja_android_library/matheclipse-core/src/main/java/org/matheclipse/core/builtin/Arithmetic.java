@@ -4569,6 +4569,17 @@ public final class Arithmetic {
                             return F.Indeterminate;
                         }
                     }
+                }
+                // Android changed: check numeric value is integer or not
+                else if (arg2.isNumeric() && !arg2.isComplex() && arg2.isNumEqualInteger(((INum) arg2).integerPart())) {
+                    IInteger root = ((INum) arg2).integerPart();
+                    if (base.isNegative()) {
+                        if (root.isEven()) {
+                            // necessary for two double args etc
+                            engine.printMessage("Surd(a,b) - undefined for negative \"a\" and even \"b\" values");
+                            return F.Indeterminate;
+                        }
+                    }
                 } else {
                     engine.printMessage("Surd(a,b) - b should be an integer");
                     return F.NIL;

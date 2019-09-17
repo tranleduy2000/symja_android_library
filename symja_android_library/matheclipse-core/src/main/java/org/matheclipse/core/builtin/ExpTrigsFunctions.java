@@ -916,8 +916,8 @@ public class ExpTrigsFunctions {
 					return F.CPiHalf;
 				}
 				if (y.isNegativeResult()) {
-					return F.CNPiHalf;
-				}
+				return F.CNPiHalf;
+			}
 				return F.NIL;
 			}
 			if (y.isZero() && x.isNumericFunction() && !x.isZero()) {

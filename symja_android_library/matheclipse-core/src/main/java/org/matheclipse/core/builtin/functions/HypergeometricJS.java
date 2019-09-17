@@ -5,7 +5,6 @@ import com.gx.common.math.DoubleMath;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.builtin.Arithmetic;
 
-
 /**
  * 
  * Ported from JavaScript file

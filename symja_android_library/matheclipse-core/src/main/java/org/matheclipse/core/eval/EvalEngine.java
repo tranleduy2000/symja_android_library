@@ -814,9 +814,9 @@ public class EvalEngine implements Serializable {
 			IASTMutable returnResult = F.NIL;
 
 			if ((attr & ISymbol.SEQUENCEHOLD) != ISymbol.SEQUENCEHOLD) {
-			if ((result = flattenSequences(tempAST)).isPresent()) {
-				return result;
-			}
+				if ((result = flattenSequences(tempAST)).isPresent()) {
+					return result;
+				}
 			}
 
 			// ONEIDENTITY is checked in the evalASTArg1() method!

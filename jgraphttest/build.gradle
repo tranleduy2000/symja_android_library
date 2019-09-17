@@ -1,4 +1,4 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
@@ -21,6 +21,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "mode"
+    productFlavors {
+        lite {
+            dimension "mode"
+        }
+        full {
+            dimension "mode"
         }
     }
 

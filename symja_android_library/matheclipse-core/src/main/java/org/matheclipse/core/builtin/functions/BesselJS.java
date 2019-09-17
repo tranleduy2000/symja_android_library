@@ -7,7 +7,6 @@ import org.hipparchus.special.Gamma;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.expression.F;
 
-
 /**
  * 
  * Ported from JavaScript file
