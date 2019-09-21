@@ -4,8 +4,13 @@
 Tan(expr)
 ```
 
-> the tangent function.
+> returns the tangent of `expr` (measured in radians).
  
+`Tan(expr)` will evaluate automatically in the case `expr` is a multiple of `Pi`.
+
+See:
+* [Wikipedia - Trigonometric functions](https://en.wikipedia.org/wiki/Trigonometric_functions)
+
 ### Examples
 ```
 >> Tan(1/4*Pi)
