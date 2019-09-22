@@ -8,7 +8,7 @@ Coefficient(polynomial, variable, exponent)
 
 
 See:  
-* [Wikipedia - Coefficient Coefficient](http://en.wikipedia.org/wiki/Coefficient)
+* [Wikipedia - Coefficient](http://en.wikipedia.org/wiki/Coefficient)
   
 ### Examples
 
@@ -40,7 +40,7 @@ The next line gives the coefficient of `x^5`.  As expected there is more than on
 >> Coefficient(poly, x^5)
 84*c^5*y^2-84*c^5*y*z+21*c^5*z^2
 ```
-
+ 
 
 We can get the same result as the previous example if we use the next line.
 
@@ -49,19 +49,20 @@ We can get the same result as the previous example if we use the next line.
 84*c^5*y^2-84*c^5*y*z+21*c^5*z^2
 ```
 
-One can't get the result above directly from CoefficientList. Instead pieces of the above result are included in the result of `CoefficientList(poly,{x,y,z})`.
+One can't get the result above directly from CoefficientList. Instead pieces of the above result are included in the result of `CoefficientList(poly,{x,y,z})`.  
 The line below can be used to get pieces of the result above.  Specifically `coeff[[6]]` contains all coefficients of x^5 (including those that are zero).
 
 ```
 >> coeff[[6]]
 {{0,0,21*c^5,0,0,0,0,0},{0,-84*c^5,0,0,0,0,0,0},{84*c^5,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}}
 ```
-* `Part(coeff,6,1,3)` is `21*c^5` the coefficient of `(x^(6 - 1) * y^(1 - 1) * z^(3 - 1)) = (x^5 * z^2)` in poly.
-* `Part(coeff,6,2,2)` is `(-84*c^5)` the coefficient of `(x^(6 - 1) * y^(2 - 1) * z^(2 - 1)) = (x^5 * y * z)` in poly.
+
+* `Part(coeff,6,1,3)` is `21*c^5` the coefficient of `(x^(6 - 1) * y^(1 - 1) * z^(3 - 1)) = (x^5 * z^2)` in poly. 
+* `Part(coeff,6,2,2)` is `(-84*c^5)` the coefficient of `(x^(6 - 1) * y^(2 - 1) * z^(2 - 1)) = (x^5 * y * z)` in poly. 
 * `Part(coeff,6,3,1)` is `(84*c^5)` the coeficient of `(x^(6 - 1) * y^(3 - 1) * z^(1 - 1)) = (x^5 * y^2)` in poly.
 
-All other coefficients under `coeff[[6]]` are zero which agrees with the result of `Coefficient(poly, x^5)`.
+All other coefficients under `coeff[[6]]` are zero which agrees with the result of `Coefficient(poly, x^5)`. 
 
 ### Related terms
 
-[CoefficientList](CoefficientList.md), [Exponent](Exponent.md)
+[CoefficientList](CoefficientList.md), [Exponent](Exponent.md)    
