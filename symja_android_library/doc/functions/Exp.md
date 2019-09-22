@@ -1,13 +1,17 @@
 ## Exp
 
-``` 
+```
 Exp(z)
-``` 
-> returns the exponential function of `z`.
+```
+
+> the exponential function `E^z`.
  
+See
+* [Wikipedia - Exponential function](https://en.wikipedia.org/wiki/Exponential_function)
+
 
 ### Examples
-``` 
+```
 >> Exp(1)   
 E   
  
