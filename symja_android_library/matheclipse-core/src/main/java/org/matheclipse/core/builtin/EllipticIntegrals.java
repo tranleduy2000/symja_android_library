@@ -629,6 +629,13 @@ public class EllipticIntegrals {
 				return F.CComplexInfinity;
 			}
 
+			// if (z.isNumeric() && m.isNumeric()) {
+			// try {
+			// return F.complexNum(EllipticIntegralsJS.jacobiZeta(z.evalComplex(), m.evalComplex()));
+			// } catch (RuntimeException rte) {
+			// return engine.printMessage("EllipticPi: " + rte.getMessage());
+			// }
+			// }
 			return F.NIL;
 		}
 
