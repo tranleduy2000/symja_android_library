@@ -5055,8 +5055,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testJacobiZeta() {
-//		check("JacobiZeta(2,0.5)", //
-//				"-0.117772");
+		// check("JacobiZeta(2,0.5)", //
+		// "-0.117772");
 		check("JacobiZeta(z, 0)", //
 				"0");
 		check("JacobiZeta(-5/4, 1)", //
@@ -5072,7 +5072,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEqual() {
-		//https://github.com/axkr/symja_android_library/issues/142
+		// https://github.com/axkr/symja_android_library/issues/142
 		check("20-x*y*(x+y)==0", //
 				"x*y*(x+y)==20");
 		check("Tan(5*ArcTan(29/278) + 7 ArcTan(3/79))==1", //
@@ -6526,6 +6526,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindEulerianCycle() {
+		check("FindEulerianCycle(Graph({1 -> 2, 2 -> 3, 3 -> 4, 4 -> 1}))", //
+				"{4->1,1->2,2->3,3->4}");
 		check("FindEulerianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
 				"{4->1,1->3,3->1,1->2,2->3,3->4}");
 		check("FindEulerianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
@@ -6533,6 +6535,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindHamiltonianCycle() {
+		check("FindHamiltonianCycle( {1 -> 2, 2 -> 3, 3 -> 4, 4 -> 1} )", //
+				"{1->2,2->3,3->4,4->1}");
 		check("FindHamiltonianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1 })", //
 				"{1->2,2->3,3->4,4->1}");
 		check("FindHamiltonianCycle({1 -> 2, 2 -> 3, 3 -> 1, 1 -> 3, 3 -> 4, 4 -> 1, 4 -> 7})", //
