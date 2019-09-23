@@ -1,7 +1,9 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.lambda.BiFunction;
+import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
+import com.duy.util.SetWrapper;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
@@ -49,8 +51,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.duy.lambda.Consumer;
-import com.duy.util.SetWrapper;
 
 /**
  * Functions for graph theory algorithms.
@@ -125,7 +125,7 @@ public class GraphFunctions {
 						}
 					} else {
 						if (edgeWeight.isList()) {
-							GraphExpr<IExprWeightedEdge> gex = createWeightedGraph((IAST) ast.arg1(), (IAST) ast.arg1(),
+							GraphExpr<IExprWeightedEdge> gex = createWeightedGraph((IAST) ast.arg1(), (IAST) ast.arg2(),
 									(IAST) edgeWeight);
 							if (gex != null) {
 								return gex;
