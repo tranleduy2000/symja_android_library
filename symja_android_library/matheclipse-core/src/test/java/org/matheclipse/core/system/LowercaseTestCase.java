@@ -6977,6 +6977,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFold() {
+		check("Fold(test, t1, {a, b, c, d})", //
+				"test(test(test(test(t1,a),b),c),d)");
 		check("Fold(f, x, {a, b, c, d})", //
 				"f(f(f(f(x,a),b),c),d)");
 		check("Fold(List, x, {a, b, c, d})", //
@@ -7055,6 +7057,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFourier() {
+		check("Fourier({1,2-I, -I, -1+2*I})", //
+				"{1.0,2.0+I*2.0,I*(-1.0),-1.0+I*(-1.0)}");
 		check("Fourier({1 + 2*I, 3 + 11*I})", //
 				"{2.82843+I*9.19239,-1.41421+I*(-6.36396)}");
 		check("Fourier({1,2,0,0})", //
@@ -7704,6 +7708,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testGeoDistance() {
+		// distance between Oslo and Berlin
+		check("GeoDistance({59.914, 10.752}, {52.523, 13.412})", //
+				"UnitConvert(Quantity(839160.1,m),mi)");
+		check("UnitConvert(GeoDistance({59.914, 10.752}, {52.523, 13.412}),\"km\")", //
+				"UnitConvert(UnitConvert(Quantity(839160.1,m),mi),km)");
 		check("GeoDistance({37, -109}, {40.113, -88.261})", //
 				"UnitConvert(Quantity(1.83601*10^6,m),mi)");
 		check("GeoDistance({30, 40}, {-40, 120})", //
@@ -7950,6 +7959,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testHermitianMatrixQ() {
+		// example from https://en.wikipedia.org/wiki/Hermitian_matrix
+		check("HermitianMatrixQ({{2, 2 + I, 4}, {2-I, 3, I}, {4, -I, 1}})", //
+				"True");
 		check("HermitianMatrixQ({{1, 3 + 4*I}, {3 - 4*I, 2}})", //
 				"True");
 		check("HermitianMatrixQ({{1, 3 + 3*I}, {3 - 4*I, 2}})", //
