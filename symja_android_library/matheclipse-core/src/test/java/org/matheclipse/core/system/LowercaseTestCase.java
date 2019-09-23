@@ -5012,6 +5012,20 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testEllipticTheta() {
+		check("EllipticTheta(1,0,x)", //
+				"0");
+		check("EllipticTheta(1,x,0)", //
+				"0");
+		check("EllipticTheta(2,x,0)", //
+				"0");
+		check("EllipticTheta(3,x,0)", //
+				"1");
+		check("EllipticTheta(4,x,0)", //
+				"1");
+		check("EllipticTheta(1,Pi,1/2)", //
+				"0");
+		check("EllipticTheta({1, 2, 3, 4}, z, q)", //
+				"{EllipticTheta(1,z,q),EllipticTheta(2,z,q),EllipticTheta(3,z,q),EllipticTheta(4,z,q)}");
 		check("EllipticTheta(3, 0.4+I, 0.5 )", //
 				"2.89461+I*(-6.54061)");
 		check("EllipticTheta(1, 2., 1/3)", //
@@ -5037,7 +5051,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		// TODO: improve for case "EllipticTheta: Unsupported elliptic nome"
 		check("EllipticTheta(3, 0.4+I, 0.5+I)", //
-				"EllipticTheta(3.0,0.4+I*1.0,0.5+I*1.0)");
+				"EllipticTheta(3,0.4+I*1.0,0.5+I*1.0)");
 	}
 
 	public void testJacobiZeta() {

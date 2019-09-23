@@ -6403,6 +6403,19 @@ public class F {
         return isZero(value, Config.DOUBLE_TOLERANCE);
     }
 
+
+    /**
+     * Test if the absolute value is less <code>Config.DOUBLE_TOLERANCE</code>.
+     *
+     * @param value
+     * @return
+     */
+    public static boolean isZero(org.hipparchus.complex.Complex value) {
+        //Swift changed: use DOUBLE_TOLERANCE in order to avoid infinity loop.
+        return isZero(value.getReal(), Config.DOUBLE_TOLERANCE)&& isZero(value.getImaginary(), Config.DOUBLE_TOLERANCE);
+    }
+
+
     /**
      * Test if the absolute value is less than the given epsilon.
      *
