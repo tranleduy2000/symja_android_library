@@ -93,6 +93,11 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     }
 
     @Override
+    public boolean isSymbolID(int... ids) {
+        return false;
+    }
+
+    @Override
     public boolean isConstantAttribute() {
         return (getAttributes() & CONSTANT) == CONSTANT;
     }
