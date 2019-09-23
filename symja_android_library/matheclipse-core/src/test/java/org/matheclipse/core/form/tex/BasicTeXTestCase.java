@@ -270,6 +270,10 @@ public class BasicTeXTestCase extends TestCase {
 				"a < 0\\leq b == c\\neq d");
 
 	}
+	public void testTeX30() {
+		check("Quantity(3,\"m\")", //
+				"\\text{Quantity}(3,\\textnormal{m})");
+	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		texUtil.toTeX(strEval, stw);

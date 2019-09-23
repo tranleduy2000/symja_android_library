@@ -802,6 +802,8 @@ public class F {
     public final static IBuiltInSymbol EllipticK = F.initFinalSymbol("EllipticK", ID.EllipticK);
 	/** EllipticPi(n,m) - returns the complete elliptic integral of the third kind. */
     public final static IBuiltInSymbol EllipticPi = F.initFinalSymbol("EllipticPi", ID.EllipticPi);
+	/***/
+	public final static IBuiltInSymbol EllipticTheta = F.initFinalSymbol("EllipticTheta", ID.EllipticTheta);
 	/** End( ) - end a context definition started with `Begin` */
     public final static IBuiltInSymbol End = F.initFinalSymbol("End", ID.End);
 	/** EndPackage( ) - end a package definition */
