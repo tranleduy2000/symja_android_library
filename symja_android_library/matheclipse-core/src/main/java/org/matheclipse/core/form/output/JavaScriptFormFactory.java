@@ -3,6 +3,7 @@ package org.matheclipse.core.form.output;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -14,6 +15,7 @@ import org.matheclipse.parser.client.operator.Operator;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,10 +24,12 @@ import java.util.Map;
  */
 public class JavaScriptFormFactory extends DoubleFormFactory {
 	/**
-	 * If <code>true</code> the <code>Piecewise()</code> function was used in an expression, which need to do inline operators with the
-	 * JavaScript ternary operator. If <code>false</code> the converter will use <code>if(...){...}</code> statements.
+	 * If <code>true</code> the <code>Piecewise()</code> function was used in an expression, which need to do inline
+	 * operators with the JavaScript ternary operator. If <code>false</code> the converter will use
+	 * <code>if(...){...}</code> statements.
 	 */
 	public boolean INLINE_PIECEWISE = true;
+	private List<String> sliderNames;
 	private final static Map<ISymbol, String> FUNCTIONS_STR = new HashMap<ISymbol, String>();
 	static {
 
@@ -155,11 +159,16 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		}
 	}
 
-	private JavaScriptFormFactory(final boolean relaxedSyntax, final boolean reversed, int exponentFigures,
+	public JavaScriptFormFactory(final boolean relaxedSyntax, final boolean reversed, int exponentFigures,
 			int significantFigures) {
 		super(relaxedSyntax, reversed, exponentFigures, significantFigures);
 	}
 
+	public JavaScriptFormFactory(final boolean relaxedSyntax, final boolean reversed, int exponentFigures,
+			int significantFigures, List<String> sliderNames) {
+		super(relaxedSyntax, reversed, exponentFigures, significantFigures);
+		this.sliderNames = sliderNames;
+	}
 	/**
 	 * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user readable string.
 	 * 
@@ -220,6 +229,10 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				buf.append(str);
 				return;
 			}
+		}
+		if (sliderNames != null && sliderNames.contains(symbol.toString())) {
+			buf.append(symbol.toString() + ".Value()");
+			return;
 		}
 		super.convertSymbol(buf,symbol);
 	}
@@ -435,8 +448,16 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 	public Operator getOperator(ISymbol head) {
 		if (Config.USE_MATHCELL) {
 			Operator operator = null;
-			if (head == F.Equal || head == F.Unequal || head == F.Less || head == F.LessEqual || head == F.Greater
-					|| head == F.GreaterEqual || head == F.And || head == F.Or || head == F.Not) {
+			if (head.isSymbolID(ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater, ID.GreaterEqual, ID.And, ID.Or,
+					ID.Not)) {
+				String str = head.toString();
+				operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+			}
+			return operator;
+		} else if (Config.USE_JSXGRAPH) {
+			Operator operator = null;
+			if (head.isSymbolID(ID.Plus, ID.Times, ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater,
+					ID.GreaterEqual, ID.And, ID.Or, ID.Not)) {
 				String str = head.toString();
 				operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
 			}

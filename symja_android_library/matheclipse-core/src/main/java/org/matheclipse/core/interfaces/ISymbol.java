@@ -372,6 +372,16 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public boolean isSymbolName(String name);
 
     /**
+     * Returns <code>true</code>, if this symbol is in the set of defined <code>ids</code>.
+     *
+     * @param ids
+     *            the symbol ordinal number
+     * @return
+     * @see org.matheclipse.core.expression.ID
+     */
+    boolean isSymbolID(int... ids);
+
+    /**
      * If this symbol has attribute <code>ISymbol.CONSTANT</code> and the symbol's evaluator is of instance
      * <code>INumericConstant</code>, then apply the constants double value to the given function and return the result,
      * otherwise return <code>F.NIL</code>.
