@@ -292,6 +292,12 @@ class BlossomVEdge {
             return result;
         }
 
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+
+        }
+
         /**
          * Advances this iterator to the next node in the blossom
          *

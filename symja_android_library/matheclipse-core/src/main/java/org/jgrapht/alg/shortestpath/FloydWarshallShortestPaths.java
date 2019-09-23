@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.shortestpath;
 
+import com.duy.lang.DDouble;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -119,7 +121,7 @@ public class FloydWarshallShortestPaths<V, E>
         int nShortestPaths = 0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (i != j && Double.isFinite(d[i][j])) {
+                if (i != j && DDouble.isFinite(d[i][j])) {
                     nShortestPaths++;
                 }
             }

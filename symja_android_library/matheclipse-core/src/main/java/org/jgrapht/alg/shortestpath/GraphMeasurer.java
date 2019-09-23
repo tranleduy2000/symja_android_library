@@ -209,7 +209,7 @@ public class GraphMeasurer<V, E> {
                 double eccentricity = 0;
                 for (V v : graph.vertexSet())
                     eccentricity =
-                            Double.max(eccentricity, shortestPathAlgorithm.getPathWeight(u, v));
+                            Math.max(eccentricity, shortestPathAlgorithm.getPathWeight(u, v));
                 eccentricityMap.put(u, eccentricity);
             }
         }

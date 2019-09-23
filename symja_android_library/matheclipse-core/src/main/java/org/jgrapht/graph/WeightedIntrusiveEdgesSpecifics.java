@@ -17,6 +17,8 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.util.MapWrapper;
+
 import java.util.Map;
 
 /**
@@ -60,7 +62,7 @@ public class WeightedIntrusiveEdgesSpecifics<V, E>
         intrusiveEdge.source = sourceVertex;
         intrusiveEdge.target = targetVertex;
 
-        return edgeMap.putIfAbsent(e, intrusiveEdge) == null;
+        return new MapWrapper<>(edgeMap).putIfAbsent(e, intrusiveEdge) == null;
     }
 
     @Override

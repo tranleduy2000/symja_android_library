@@ -17,6 +17,9 @@
  */
 package org.jgrapht.alg.isomorphism;
 
+import com.duy.lang.IntegerWrapper;
+import com.duy.util.ListWrapper;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMapping;
 import org.jgrapht.GraphTests;
@@ -324,19 +327,19 @@ public class ColorRefinementIsomorphismInspector<V, E>
      * @param coloring     the coloring
      */
     private void sortColorClasses(List<Set<V>> colorClasses, final Coloring<V> coloring) {
-        colorClasses.sort(new Comparator<Set<V>>() {
+        new ListWrapper<>(colorClasses).sort(new Comparator<Set<V>>() {
             @Override
             public int compare(Set<V> o1, Set<V> o2) {
                 if (o1.size() == o2.size()) {
                     Iterator<V> it1 = o1.iterator();
                     Iterator<V> it2 = o2.iterator();
                     if (!it1.hasNext() || !it2.hasNext()) {
-                        return Integer.compare(o1.size(), o2.size());
+                        return IntegerWrapper.compare(o1.size(), o2.size());
                     }
                     return coloring
                             .getColors().get(it1.next()).compareTo(coloring.getColors().get(it2.next()));
                 }
-                return Integer.compare(o1.size(), o2.size());
+                return IntegerWrapper.compare(o1.size(), o2.size());
             }
         });
     }

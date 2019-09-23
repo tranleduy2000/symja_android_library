@@ -222,6 +222,12 @@ public class YenShortestPathIterator<V, E>
         return path;
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("remove");
+
+    }
+
     /**
      * Builds unique loopless deviations from the given path in the {@code graph}. First receives
      * the deviation vertex of the current path as well as sets of vertices and edges to be masked
@@ -482,7 +488,7 @@ public class YenShortestPathIterator<V, E>
          * @param v vertex which should be updated
          */
         void correctDistanceForward(V v) {
-            super.map.putIfAbsent(v, new Pair<Double, E>(Double.POSITIVE_INFINITY, null));
+            new MapWrapper<>(super.map).putIfAbsent(v, new Pair<Double, E>(Double.POSITIVE_INFINITY, null));
 
             for (E e : super.g.outgoingEdgesOf(v)) {
                 V successor = Graphs.getOppositeVertex(super.g, e, v);

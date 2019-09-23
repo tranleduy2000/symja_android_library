@@ -187,6 +187,12 @@ public class EppsteinShortestPathIterator<V, E>
         return result;
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("remove");
+
+    }
+
     /**
      * Adds all one-edge extension of the {@code path} wrt the paths graph.
      *

@@ -342,6 +342,11 @@ class BlossomVTree {
             return result;
         }
 
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+
         /**
          * Advances the iterator to the next tree node
          *
@@ -424,6 +429,11 @@ class BlossomVTree {
             BlossomVTreeEdge res = result;
             result = null;
             return res;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
         }
 
         /**

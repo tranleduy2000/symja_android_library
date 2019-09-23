@@ -143,6 +143,12 @@ public class UnmodifiableUnionSet<E>
             return result;
         }
 
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+
+        }
+
         private E prefetch() {
             while (true) {
                 if (inBiggerSet) {

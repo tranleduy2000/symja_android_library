@@ -566,6 +566,11 @@ class BlossomVNode {
             return result;
         }
 
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+
         /**
          * Advances this iterator to the next incident edge. If previous edge was the last one with
          * direction 0, then the direction of this iterator changes. If previous edge was the last

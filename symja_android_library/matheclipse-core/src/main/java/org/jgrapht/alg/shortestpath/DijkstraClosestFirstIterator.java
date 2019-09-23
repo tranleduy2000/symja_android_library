@@ -184,6 +184,12 @@ class DijkstraClosestFirstIterator<V, E>
         return v;
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("remove");
+
+    }
+
     /**
      * Return the paths computed by this iterator. Only the paths to vertices which are already
      * returned by the iterator will be shortest paths. Additional paths to vertices which are not
