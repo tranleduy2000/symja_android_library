@@ -5,6 +5,9 @@ Not(expr)
 ``` 
 > negates the logical expression `expr`.
 
+See
+* [Wikipedia - Negation](https://en.wikipedia.org/wiki/Negation)
+
 ### Examples
 ```
 >> !True
