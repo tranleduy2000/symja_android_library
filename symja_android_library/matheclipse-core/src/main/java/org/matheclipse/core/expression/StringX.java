@@ -52,16 +52,29 @@ public class StringX extends IStringXImpl implements IStringX {
 	}
 
 	/**
-	 * Be cautious with this method, no new internal String object is created
+	 * Mime type <code>IStringX#TEXT_PLAIN</code> will be used.
 	 *
 	 * @param value
+	 *            the internal Java string value
 	 * @return
 	 */
 	protected static StringX newInstance(final String value) {
-		StringX d;
-		d = new StringX(null);
-		d.fString = value;
-		return d;
+		return new StringX(value);
+	}
+	/**
+	 *
+	 * @param value
+	 *            the internal Java string value
+	 * @param mimeType
+	 *            the mime type of the string
+	 * @return
+	 * @see IStringX#TEXT_PLAIN
+	 * @see IStringX#TEXT_LATEX
+	 * @see IStringX#TEXT_MATHML
+	 * @see IStringX#TEXT_HTML
+	 */
+	protected static StringX newInstance(final String value, short mimeType) {
+		return new StringX(value, mimeType);
 	}
     /**
      * @param b
@@ -137,13 +150,23 @@ public class StringX extends IStringXImpl implements IStringX {
         return newInstance(String.valueOf(obj));
     }
 
+	public static StringX valueOf(final Object obj, final short mimeType) {
+		return newInstance(String.valueOf(obj), mimeType);
+	}
     public static StringX valueOf(final StringBuilder builder) {
         return newInstance(builder.toString());
     }
 
+	private short fMimeType;
 	private String fString;
 
 	private StringX(final String str) {
+		fMimeType = TEXT_PLAIN;
+		fString = str;
+	}
+
+	private StringX(final String str, short mimeType) {
+		fMimeType = mimeType;
 		fString = str;
 	}
 
@@ -253,6 +276,9 @@ public class StringX extends IStringXImpl implements IStringX {
         return fString.endsWith(suffix);
     }
 
+	/**
+	 * Equals doesn't compare the mime type.
+	 */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -265,6 +291,8 @@ public class StringX extends IStringXImpl implements IStringX {
     }
 
     /**
+	 * <code>equalsIgnoreCase</code> doesn't compare the mime type.
+	 *
      * @param anotherString
      * @return
      */
@@ -305,6 +333,9 @@ public class StringX extends IStringXImpl implements IStringX {
         fString.getChars(srcBegin, srcEnd, dst, dstBegin);
     }
 
+	public short getMimeType() {
+		return fMimeType;
+	}
     @Override
     public int hashCode() {
         return (fString == null) ? 37 : 37 + fString.hashCode();
@@ -477,10 +508,7 @@ public class StringX extends IStringXImpl implements IStringX {
         return fString.subSequence(start, end);
     }
 
-    /**
-     * @param beginIndex
-     * @return
-     */
+	@Override
     public String substring(final int beginIndex) {
         return fString.substring(beginIndex);
     }

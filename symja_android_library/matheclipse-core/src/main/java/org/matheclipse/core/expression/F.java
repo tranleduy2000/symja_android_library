@@ -3895,6 +3895,9 @@ public class F {
         return StringX.valueOf(str);
     }
 
+	final static public IStringX $str(final String str, final short mimeType) {
+		return StringX.valueOf(str, mimeType);
+	}
     // --- generated source codes:
     public static IAST Abs(final IExpr a0) {
         return new AST1(Abs, a0);
@@ -8154,15 +8157,31 @@ public class F {
     }
 
     /**
-     * Create a string expression
+	 * Create a Symja string expression with mime type TEXT_PLAIN.
      *
      * @param str
      * @return
+	 * @see IStringX#TEXT_PLAIN
      */
     final static public IStringX stringx(final String str) {
         return StringX.valueOf(str);
     }
 
+	/**
+	 * reate a Symja string expression.
+	 *
+	 * @param str
+	 * @param mimeType
+	 *            the mime type of the string
+	 * @return
+	 * @see IStringX#TEXT_PLAIN
+	 * @see IStringX#TEXT_LATEX
+	 * @see IStringX#TEXT_MATHML
+	 * @see IStringX#TEXT_HTML
+	 */
+	final static public IStringX stringx(final String str, final short mimeType) {
+		return StringX.valueOf(str, mimeType);
+	}
     /**
      * Create a string expression
      *
