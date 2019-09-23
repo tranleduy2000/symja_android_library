@@ -42,7 +42,7 @@ public class ManipulateFunction {
 					"}";
 
 	/**
-	 * 
+	 *
 	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
 	 * initializer</a>
 	 */
@@ -96,13 +96,9 @@ public class ManipulateFunction {
 					// }
 					// }
 				}
-			} catch (IOException ioex) {
+			} catch (Exception ex) {
 				if (Config.SHOW_STACKTRACE) {
-					ioex.printStackTrace();
-				}
-			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
-					rex.printStackTrace();
+					ex.printStackTrace();
 				}
 			}
 			return F.NIL;
@@ -404,51 +400,51 @@ public class ManipulateFunction {
 					// }
 					return F.NIL;
 				} else {
-					StringBuilder function = new StringBuilder();
-					if (ast.arg1().isAST(F.ListLinePlot)) {
-						function.append("var data = [ listPlot( [\n");
-						for (int i = 1; i < pointList.size(); i++) {
-							function.append("[ ");
-							function.append(i);
-							function.append(",");
-							function.append(OutputFunctions.toJavaScript(pointList.get(i)));
-							function.append("] ");
-							if (i < pointList.size() - 1) {
-								function.append(",");
-							}
-							function.append("\n");
-						}
-						function.append("], { })];");
-					} else {
-						function.append("var data = [\n");
-						// point( [ 2*Math.random() - 1, 2*Math.random() - 1, 2*Math.random() - 1 ],
-						// { color: 'hsl(' + 360*Math.random() + ',100%,50%)', size: 5 } )
-						for (int i = 1; i < pointList.size(); i++) {
-							function.append("point( [ ");
-							function.append(i);
-							function.append(",");
-							function.append(OutputFunctions.toJavaScript(pointList.get(i)));
-							function.append("], ");
-							function.append(" {size: 2 } )");
-							if (i < pointList.size() - 1) {
-								function.append(",");
-							}
-							function.append("\n");
-						}
-						function.append("];");
-					}
-
-					js = js.replace("`3`", function.toString());
-
-					StringBuilder graphicControl = new StringBuilder();
-
-					// var config = dim === 'two' ? { type: 'svg', ticks: false }
-					// : { type: 'threejs', axesLabels: false };
-					graphicControl.append("var config = { type: 'svg' };\n");
-					graphicControl.append("evaluate( id, data, config );\n");
-					js = js.replace("`4`", graphicControl.toString());
-
-					return F.JSFormData(js, "jsxgraph");
+					// StringBuilder function = new StringBuilder();
+					// if (ast.arg1().isAST(F.ListLinePlot)) {
+					// function.append("var data = [ listPlot( [\n");
+					// for (int i = 1; i < pointList.size(); i++) {
+					// function.append("[ ");
+					// function.append(i);
+					// function.append(",");
+					// function.append(OutputFunctions.toJavaScript(pointList.get(i)));
+					// function.append("] ");
+					// if (i < pointList.size() - 1) {
+					// function.append(",");
+					// }
+					// function.append("\n");
+					// }
+					// function.append("], { })];");
+					// } else {
+					// function.append("var data = [\n");
+					// // point( [ 2*Math.random() - 1, 2*Math.random() - 1, 2*Math.random() - 1 ],
+					// // { color: 'hsl(' + 360*Math.random() + ',100%,50%)', size: 5 } )
+					// for (int i = 1; i < pointList.size(); i++) {
+					// function.append("point( [ ");
+					// function.append(i);
+					// function.append(",");
+					// function.append(OutputFunctions.toJavaScript(pointList.get(i)));
+					// function.append("], ");
+					// function.append(" {size: 2 } )");
+					// if (i < pointList.size() - 1) {
+					// function.append(",");
+					// }
+					// function.append("\n");
+					// }
+					// function.append("];");
+					// }
+					//
+					// js = js.replace("`3`", function.toString());
+					//
+					// StringBuilder graphicControl = new StringBuilder();
+					//
+					// // var config = dim === 'two' ? { type: 'svg', ticks: false }
+					// // : { type: 'threejs', axesLabels: false };
+					// graphicControl.append("var config = { type: 'svg' };\n");
+					// graphicControl.append("evaluate( id, data, config );\n");
+					// js = js.replace("`4`", graphicControl.toString());
+					//
+					// return F.JSFormData(js, "jsxgraph");
 				}
 			}
 			return F.NIL;
@@ -645,7 +641,7 @@ public class ManipulateFunction {
 					if (plot.size() >= 3 && plot.arg2().isList()) {
 						IAST plotRangeX = (IAST) plot.arg2();
 						// TODO find better default Y plot range instead of [-5, 5]
-						IAST plotRangeY = F.List(F.CN5, F.C5);
+						IAST plotRangeY = F.NIL;
 						if (plot.size() >= 4 && plot.arg3().isList()) {
 							plotRangeY = (IAST) plot.arg3();
 						}
@@ -666,13 +662,9 @@ public class ManipulateFunction {
 						}
 					}
 				}
-			} catch (IOException ioex) {
+			} catch (Exception ex) {
 				if (Config.SHOW_STACKTRACE) {
-					ioex.printStackTrace();
-				}
-			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
-					rex.printStackTrace();
+					ex.printStackTrace();
 				}
 			}
 			return F.NIL;
@@ -728,8 +720,18 @@ public class ManipulateFunction {
 
 							// function z1(x,y) { return [ x, y, Math.sin( a * x * y ) ]; }
 									StringBuilder function = new StringBuilder();
+			IAST listOfFunctions;
+			if (plot.arg1().isList()) {
+				listOfFunctions = (IAST) plot.arg1();
+			} else {
+				listOfFunctions = F.unaryAST1(F.List, plot.arg1());
+			}
 			if (plotID == ID.Plot3D) {
-							function.append("function z1(");
+				if (!plotRangeY.isPresent()) {
+					return F.NIL;
+				}
+				for (int i = 1; i < listOfFunctions.size(); i++) {
+					function.append("function z" + i + "(");
 								ISymbol plotSymbolY = (ISymbol) plotRangeY.arg1();
 								function.append(OutputFunctions.toJavaScript(plotSymbolX));
 								function.append(",");
@@ -739,11 +741,10 @@ public class ManipulateFunction {
 								function.append(", ");
 								function.append(OutputFunctions.toJavaScript(plotSymbolY));
 								function.append(", ");
-								function.append(OutputFunctions.toJavaScript(plot.arg1()));
+					function.append(OutputFunctions.toJavaScript(listOfFunctions.get(i)));
 								function.append(" ]; }\n");
+				}
 							} else {
-				if (plot.arg1().isList()) {
-					IAST listOfFunctions = (IAST) plot.arg1();
 					for (int i = 1; i < listOfFunctions.size(); i++) {
 						function.append("function z");
 						function.append(i);
@@ -753,13 +754,6 @@ public class ManipulateFunction {
 						function.append(OutputFunctions.toJavaScript(listOfFunctions.get(i)));
 						function.append("; }\n");
 					}
-				} else {
-					function.append("function z1(");
-					function.append(OutputFunctions.toJavaScript(plotSymbolX));
-					function.append(") { return ");
-					function.append(OutputFunctions.toJavaScript(plot.arg1()));
-					function.append("; }\n");
-				}
 
 			}
 			js = js.replace("`3`", function.toString());
@@ -771,26 +765,31 @@ public class ManipulateFunction {
 				if (!plotRangeY.isPresent()) {
 					return F.NIL;
 				}
-				graphicControl.append("var p1 = ");
-				graphicControl.append("parametric( z1, ");
+				for (int i = 1; i < listOfFunctions.size(); i++) {
+					graphicControl.append("var p" + i + " = ");
+					graphicControl.append("parametric( z" + i + ", ");
 				range(graphicControl, plotRangeX, -1);
 				graphicControl.append(", ");
 				range(graphicControl, plotRangeY, -1);
-				graphicControl.append(", { colormap: (x,y) => ( 1 - Math.sin(x*y) ) / 2 } );\n\n\n");
-
-				graphicControl.append("  var config = { type: 'threejs' };\n");
-				graphicControl.append("  var data = [ p1 ];\n");
+					graphicControl.append(", { colormap: (x,y) => ( 1 - Math.sin(x*y) ) / 2 } );\n");
+				}
+				graphicControl.append("\n  var config = { type: 'threejs' };\n");
+				graphicControl.append("  var data = [");
+				for (int i = 1; i < listOfFunctions.size(); i++) {
+					graphicControl.append("p" + i);
+					if (i < listOfFunctions.size() - 1) {
+						graphicControl.append(",");
+					}
+					;
+				}
+				graphicControl.append("];\n");
 			} else {
-				if (plot.arg1().isList()) {
-					IAST listOfFunctions = (IAST) plot.arg1();
 					if (plotID == ID.ParametricPlot) {
 						graphicControl.append("var data = [ parametric( ");
 						graphicControl.append(OutputFunctions.toJavaScript(plotSymbolX));
 						graphicControl.append(" => [");
 						for (int i = 1; i < listOfFunctions.size(); i++) {
-							graphicControl.append("z");
-							graphicControl.append(i);
-							graphicControl.append("(");
+						graphicControl.append("z" + i + "(");
 							graphicControl.append(OutputFunctions.toJavaScript(plotSymbolX));
 							graphicControl.append(")");
 							if (i < listOfFunctions.size() - 1) {
@@ -802,18 +801,13 @@ public class ManipulateFunction {
 						graphicControl.append(", { } )];\n");
 					} else {
 					for (int i = 1; i < listOfFunctions.size(); i++) {
-						graphicControl.append("var p");
-						graphicControl.append(i);
-						graphicControl.append(" = ");
-						graphicControl.append("plot( z");
-						graphicControl.append(i);
-						graphicControl.append(", ");
+						graphicControl.append("var p" + i + " = plot( z" + i + ", ");
 							range(graphicControl, plotRangeX, -1);
 						graphicControl.append(", { } );\n");
 						}
 
 						// var data = [ p1, p2 ];
-						if (plot.arg1().isList()) {
+					// if (plot.arg1().isList()) {
 							// listOfFunctions = (IAST) plot.arg1();
 							graphicControl.append("var data = [ ");
 							for (int i = 1; i < listOfFunctions.size(); i++) {
@@ -824,34 +818,9 @@ public class ManipulateFunction {
 								}
 							}
 							graphicControl.append(" ];\n");
-						} else {
-							graphicControl.append("var data = [ p1 ];\n");
-						}
 
-					}
-						graphicControl.append("var config = { type: 'svg' };\n");
-				} else {
-					graphicControl.append("var p1 = ");
-								graphicControl.append("plot( z1, ");
-					range(graphicControl, plotRangeX, -1);
-					graphicControl.append(", { } );\n");
-
-							// var data = [ p1, p2 ];
-			if (plot.arg1().isList()) {
-				IAST listOfFunctions = (IAST) plot.arg1();
-				graphicControl.append("var data = [ ");
-				for (int i = 1; i < listOfFunctions.size(); i++) {
-					graphicControl.append("p");
-					graphicControl.append(i);
-					if (i < listOfFunctions.size() - 1) {
-						graphicControl.append(", ");
-					}
-				}
-				graphicControl.append(" ];\n");
-			} else {
-				graphicControl.append("var data = [ p1 ];\n");
 			}
-					graphicControl.append("var config = { type: 'svg'");
+				graphicControl.append("var config = { type: 'svg' ");
 					if (optionPlotRange.isPresent()) {
 						IExpr option = optionPlotRange.arg2();
 					if (option.isAST(F.List, 3)) {
@@ -869,7 +838,6 @@ public class ManipulateFunction {
 
 				}
 
-			}
 			graphicControl.append("evaluate( id, data, config );\n");
 			js = js.replace("`4`", graphicControl.toString());
 
