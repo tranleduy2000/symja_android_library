@@ -4,18 +4,17 @@
 PrimeQ(n)
 ```
 
-> returns `True` if `n` is a integer prime number.
-
+> returns `True` if `n` is a integer prime number.   
+  
 ```
 PrimeQ(n, GaussianIntegers->True)
 ```
- 
-> returns `True` if `n` is a Gaussian prime number.
 
-For very large numbers, `PrimeQ` uses [probabilistic prime testing](https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving), so it might be wrong sometimes
-(a number might be composite even though `PrimeQ` says it is prime).
+> returns `True` if `n` is a Gaussian prime number.  
 
-See:
+For very large numbers, `PrimeQ` uses [probabilistic prime testing](https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving), so it might be wrong sometimes (i.e. a number might be composite even though `PrimeQ` says it is prime).
+
+See
 * [Wikipedia - Prime number](https://en.wikipedia.org/wiki/Prime_number)
 * [Wikipedia - Gaussian primes](https://en.wikipedia.org/wiki/Gaussian_integer#Gaussian_primes)
 
@@ -36,14 +35,14 @@ False
 False   
 ```
 
-All prime numbers between 1 and 100:   
-
+All prime numbers between 1 and 100:
+   
 ```
 >> Select(Range(100), PrimeQ)   
  = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97}   
 ```
 
-'PrimeQ' has attribute 'Listable':
+'PrimeQ' has attribute 'Listable': 
 
 ```
 >> PrimeQ(Range(20))   
