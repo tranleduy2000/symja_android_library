@@ -70,10 +70,10 @@ android {
 
     }
     compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_7
         sourceCompatibility JavaVersion.VERSION_1_7
-//        targetCompatibility JavaVersion.VERSION_1_7
+//        sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_7
+//        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -89,5 +89,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.jsoup:jsoup:1.11.2'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
-
+    // implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
 }

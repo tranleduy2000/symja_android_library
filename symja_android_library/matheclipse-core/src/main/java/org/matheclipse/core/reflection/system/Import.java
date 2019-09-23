@@ -2,6 +2,9 @@ package org.matheclipse.core.reflection.system;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.io.ImportException;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.AST2Expr;
@@ -9,6 +12,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -22,6 +26,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 
 /**
  * Import some data from file system.
@@ -29,33 +34,15 @@ import java.io.Reader;
  */
 public class Import extends AbstractEvaluator {
 
-    public Import() {
-    }
+	public Import() {
+	}
 
-    public static IExpr of(File file, EvalEngine engine) throws IOException {
-//        String filename = file.getName();
-//        Extension extension = Extension.importFilename(filename);
-//        // Extension extension = filename.extension();
-//        if (extension.equals(Extension.JPG) || extension.equals(Extension.PNG)) {
-//            // if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
-//            return ImageFormat.from(ImageIO.read(file));
-//        }
-//
-//        AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
-//        final Parser parser = new Parser(engine.isRelaxedSyntax(), true);
-//        String str = com.google.common.io.Files.asCharSource(file, Charset.defaultCharset()).read();
-//        final ASTNode node = parser.parse(str);
-//        return ast2Expr.convert(node);
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public IExpr evaluate(final IAST ast, EvalEngine engine) {
-        if (Config.isFileSystemEnabled(engine)) {
-
-            if (!(ast.arg1() instanceof IStringX)) {
-                throw new WrongNumberOfArguments(ast, 1, ast.argSize());
-            }
+	@Override
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		if (Config.isFileSystemEnabled(engine)) {
+			if (!(ast.arg1() instanceof IStringX)) {
+				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
+			}
 
             IStringX arg1 = (IStringX) ast.arg1();
             Extension format = Extension.importFilename(arg1.toString());
@@ -99,9 +86,8 @@ public class Import extends AbstractEvaluator {
                     case STRING:
                         return of(file, engine);
                     case WXF:
-//                        byte[] byteArray = com.google.common.io.Files.toByteArray(file);
-//                        return WL.deserialize(byteArray);
-                        throw new UnsupportedOperationException();
+					byte[] byteArray = com.gx.common.io.Files.toByteArray(file);
+					return WL.deserialize(byteArray);
                     default:
                 }
 
@@ -127,44 +113,79 @@ public class Import extends AbstractEvaluator {
         return IOFunctions.ARGS_1_2;
     }
 
-//    private GraphMLImporter<IExpr, DefaultEdge> createGraphImporter(Graph<IExpr, DefaultEdge> g,
-//                                                                    Map<String, Map<String, Attribute>> vertexAttributes,
-//                                                                    Map<DefaultEdge, Map<String, Attribute>> edgeAttributes, EvalEngine engine) {
-//        return createGraphImporter(g, (label, attributes) -> {
-//            vertexAttributes.put(label, attributes);
-//            return engine.parse(label);
-//        }, (from, to, label, attributes) -> {
-//            DefaultEdge e = g.getEdgeSupplier().get();
-//            edgeAttributes.put(e, attributes);
-//            return e;
+	public static IExpr of(File file, EvalEngine engine) throws IOException {
+		String filename = file.getName();
+		Extension extension = Extension.importFilename(filename);
+		// Extension extension = filename.extension();
+		if (extension.equals(Extension.JPG) || extension.equals(Extension.PNG)) {
+			// if (filename.hasExtension("jpg") || filename.hasExtension("png")) {
+//			return ImageFormat.from(ImageIO.read(file));
+            throw new UnsupportedOperationException();
+		}
+
+		AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
+		final Parser parser = new Parser(engine.isRelaxedSyntax(), true);
+		String str = com.gx.common.io.Files.asCharSource(file, Charset.defaultCharset()).read();
+		final ASTNode node = parser.parse(str);
+		return ast2Expr.convert(node);
+	}
+
+//	private GraphMLImporter<IExpr, DefaultEdge> createGraphImporter(final Graph<IExpr, DefaultEdge> g,
+//                                                                    final Map<String, Map<String, Attribute>> vertexAttributes,
+//                                                                    final Map<DefaultEdge, Map<String, Attribute>> edgeAttributes, final EvalEngine engine) {
+//		return createGraphImporter(g, new VertexProvider<IExpr>() {
+//            @Override
+//            public IExpr buildVertex(String label, Map<String, Attribute> attributes) {
+//                vertexAttributes.put(label, attributes);
+//                return engine.parse(label);
+//            }
+//        }, new EdgeProvider<IExpr, DefaultEdge>() {
+//            @Override
+//            public DefaultEdge buildEdge(IExpr from, IExpr to, String label, Map<String, Attribute> attributes) {
+//                DefaultEdge e = g.getEdgeSupplier().get();
+//                edgeAttributes.put(e, attributes);
+//                return e;
+//            }
 //        });
-//    }
+//	}
 
-//    private GraphMLImporter<IExpr, DefaultEdge> createGraphImporter(Graph<IExpr, DefaultEdge> g,
-//                                                                    VertexProvider<IExpr> vp, EdgeProvider<IExpr, DefaultEdge> ep) {
-//        return new GraphMLImporter<IExpr, DefaultEdge>(vp, ep);
-//    }
+//	private GraphMLImporter<IExpr, DefaultEdge> createGraphImporter(Graph<IExpr, DefaultEdge> g,
+//			VertexProvider<IExpr> vp, EdgeProvider<IExpr, DefaultEdge> ep) {
+//		return new GraphMLImporter<IExpr, DefaultEdge>(vp, ep);
+//	}
 
-    private IExpr graphImport(Reader reader, Extension format, EvalEngine engine) throws RuntimeException {
-//        Graph<IExpr, DefaultEdge> result;
-//        switch (format) {
-//            case DOT:
-//                DOTImporter<IExpr, DefaultEdge> dotImporter = new DOTImporter<IExpr, DefaultEdge>(
-//                        (label, attributes) -> engine.parse(label), (from, to, label, attributes) -> new DefaultEdge());
+	private IExpr graphImport(Reader reader, Extension format, final EvalEngine engine) throws ImportException {
+		Graph<IExpr, DefaultEdge> result;
+		switch (format) {
+		case DOT:
+//			DOTImporter<IExpr, DefaultEdge> dotImporter = new DOTImporter<IExpr, DefaultEdge>(
+//                    new VertexProvider<IExpr>() {
+//                        @Override
+//                        public IExpr buildVertex(String label, Map<String, Attribute> attributes) {
+//                            return engine.parse(label);
+//                        }
+//                    }, new EdgeProvider<IExpr, DefaultEdge>() {
+//                @Override
+//                public DefaultEdge buildEdge(IExpr from, IExpr to, String label, Map<String, Attribute> attributes) {
+//                    return new DefaultEdge();
+//                }
+//            });
 //
-//                result = new DefaultDirectedGraph<IExpr, DefaultEdge>(DefaultEdge.class);
-//                dotImporter.importGraph(result, reader);
-//                return DataExpr.newInstance(F.Graph, result);
-//            case GRAPHML:
-//                result = new DefaultDirectedGraph<IExpr, DefaultEdge>(DefaultEdge.class);
-//                Map<String, Map<String, Attribute>> vertexAttributes = new HashMap<>();
-//                Map<DefaultEdge, Map<String, Attribute>> edgeAttributes = new HashMap<DefaultEdge, Map<String, Attribute>>();
-//                GraphMLImporter<IExpr, DefaultEdge> graphmlImporter = createGraphImporter(result, vertexAttributes,
-//                        edgeAttributes, engine);
-//                graphmlImporter.importGraph(result, reader);
-//                return DataExpr.newInstance(F.Graph, result);
-//            default:
-//        }
+//			result = new DefaultDirectedGraph<IExpr, DefaultEdge>(DefaultEdge.class);
+//			dotImporter.importGraph(result, reader);
+//			return GraphExpr.newInstance(result);
+            throw new UnsupportedOperationException("DOTImporter");
+		case GRAPHML:
+//			result = new DefaultDirectedGraph<IExpr, DefaultEdge>(DefaultEdge.class);
+//			Map<String, Map<String, Attribute>> vertexAttributes = new HashMap<>();
+//			Map<DefaultEdge, Map<String, Attribute>> edgeAttributes = new HashMap<DefaultEdge, Map<String, Attribute>>();
+//			GraphMLImporter<IExpr, DefaultEdge> graphmlImporter = createGraphImporter(result, vertexAttributes,
+//					edgeAttributes, engine);
+//			graphmlImporter.importGraph(result, reader);
+//			return GraphExpr.newInstance(result);
+            throw new UnsupportedOperationException("GraphMLImporter");
+		default:
+		}
         return F.NIL;
     }
 }

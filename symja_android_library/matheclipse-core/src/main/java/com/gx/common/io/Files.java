@@ -16,6 +16,7 @@ package com.gx.common.io;
 
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
+import com.gx.common.base.Optional;
 import com.gx.common.base.Predicate;
 import com.gx.common.collect.ImmutableSet;
 import com.gx.common.collect.TreeTraverser;
@@ -23,6 +24,8 @@ import com.gx.common.graph.SuccessorsFunction;
 import com.gx.common.graph.Traverser;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -73,6 +76,15 @@ public final class Files {
     }
 
     /**
+     * Returns a new {@link ByteSource} for reading bytes from the given file.
+     *
+     * @since 14.0
+     */
+    public static ByteSource asByteSource(File file) {
+        return new FileByteSource(file);
+    }
+
+    /**
      * Returns a new {@link ByteSink} for writing bytes to the given file. The given {@code modes}
      * control how the file is opened for writing. When no mode is provided, the file will be
      * truncated before writing. When the {@link FileWriteMode#APPEND APPEND} mode is provided, writes
@@ -82,6 +94,16 @@ public final class Files {
      */
     public static ByteSink asByteSink(File file, FileWriteMode... modes) {
         return new FileByteSink(file, modes);
+    }
+
+    /**
+     * Returns a new {@link CharSource} for reading character data from the given file using the given
+     * character set.
+     *
+     * @since 14.0
+     */
+    public static CharSource asCharSource(File file, Charset charset) {
+        return asByteSource(file).asCharSource(charset);
     }
 
     /**
@@ -95,11 +117,25 @@ public final class Files {
     public static CharSink asCharSink(File file, Charset charset, FileWriteMode... modes) {
         return asByteSink(file, modes).asCharSink(charset);
     }
+    /**
+     * Reads all bytes from a file into a byte array.
+     * <p>
+     * <p><b>{link java.nio.file.Path} equivalent:</b> {link java.nio.file.Files#readAllBytes}.
+     *
+     * @param file the file to read from
+     * @return a byte array containing all the bytes from file
+     * @throws IllegalArgumentException if the file is bigger than the largest possible byte array
+     *                                  (2^31 - 1)
+     * @throws IOException              if an I/O error occurs
+     */
+    public static byte[] toByteArray(File file) throws IOException {
+        return asByteSource(file).read();
+    }
 
     /**
      * Overwrites a file with the contents of a byte array.
      * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
+     * <p><b>{link java.nio.file.Path} equivalent:</b> {link
      * java.nio.file.Files#write(java.nio.file.Path, byte[], java.nio.file.OpenOption...)}.
      *
      * @param from the bytes to write
@@ -139,7 +175,7 @@ public final class Files {
      * <p>This method assumes that the temporary volume is writable, has free inodes and free blocks,
      * and that it will not be called thousands of times per second.
      * <p>
-     * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
+     * <p><b>{link java.nio.file.Path} equivalent:</b> {link
      * java.nio.file.Files#createTempDirectory}.
      *
      * @return the newly-created directory
@@ -250,7 +286,7 @@ public final class Files {
      * this case, iterables created by this traverser could contain files that are outside of the
      * given directory or even be infinite if there is a symbolic link loop.
      * <p>
-     * <p>If available, consider using {@link MoreFiles#fileTraverser()} instead. It behaves the same
+     * <p>If available, consider using {link MoreFiles#fileTraverser()} instead. It behaves the same
      * except that it doesn't follow symbolic links and returns {@code Path} instances.
      * <p>
      * <p>If the {@link File} passed to one of the {@link Traverser} methods does not exist or is not
@@ -319,6 +355,55 @@ public final class Files {
             public String toString() {
                 return "Files.isFile()";
             }
+        }
+    }
+
+    private static final class FileByteSource extends ByteSource {
+
+        private final File file;
+
+        private FileByteSource(File file) {
+            this.file = checkNotNull(file);
+        }
+
+        @Override
+        public FileInputStream openStream() throws IOException {
+            return new FileInputStream(file);
+        }
+
+        @Override
+        public Optional<Long> sizeIfKnown() {
+            if (file.isFile()) {
+                return Optional.of(file.length());
+            } else {
+                return Optional.absent();
+            }
+        }
+
+        @Override
+        public long size() throws IOException {
+            if (!file.isFile()) {
+                throw new FileNotFoundException(file.toString());
+            }
+            return file.length();
+        }
+
+        @Override
+        public byte[] read() throws IOException {
+            Closer closer = Closer.create();
+            try {
+                FileInputStream in = closer.register(openStream());
+                return ByteStreams.toByteArray(in, in.getChannel().size());
+            } catch (Throwable e) {
+                throw closer.rethrow(e);
+            } finally {
+                closer.close();
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Files.asByteSource(" + file + ")";
         }
     }
 
