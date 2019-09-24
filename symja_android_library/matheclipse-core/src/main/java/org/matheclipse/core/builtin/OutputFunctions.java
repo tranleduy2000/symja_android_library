@@ -397,7 +397,7 @@ public final class OutputFunctions {
 			IExpr arg1 = ast.arg1();
 			StringWriter stw = new StringWriter();
 			mathMLUtil.toMathML(arg1, stw);
-			return F.stringx(stw.toString());
+			return F.stringx(stw.toString(), IStringX.TEXT_MATHML);
 		}
 
 		@Override
@@ -461,7 +461,29 @@ public final class OutputFunctions {
 	}
 
 	public static String toJavaScript(final IExpr arg1, List<String> sliderNames) throws IOException {
-		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames);
+		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames, JavaScriptFormFactory.USE_PURE_JS);
+		StringBuilder buf = new StringBuilder();
+		factory.convert(buf, arg1);
+		return buf.toString();
+	}
+
+	public static String toMathcell(final IExpr arg1) throws IOException {
+		return toMathcell(arg1, new ArrayList<String>());
+	}
+
+	public static String toMathcell(final IExpr arg1, List<String> sliderNames) throws IOException {
+		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames, JavaScriptFormFactory.USE_MATHCELL);
+		StringBuilder buf = new StringBuilder();
+		factory.convert(buf, arg1);
+		return buf.toString();
+	}
+
+	public static String toJSXGraph(final IExpr arg1) throws IOException {
+		return toJSXGraph(arg1, new ArrayList<String>());
+	}
+
+	public static String toJSXGraph(final IExpr arg1, List<String> sliderNames) throws IOException {
+		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames, JavaScriptFormFactory.USE_JSXGRAPH);
 		StringBuilder buf = new StringBuilder();
 		factory.convert(buf, arg1);
 		return buf.toString();
