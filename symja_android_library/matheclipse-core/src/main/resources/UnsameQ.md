@@ -11,13 +11,12 @@ x=!=y
 ### Examples
 
 Any object is the same as itself:
+
 ```
 >> a=!=a
- = False
-```
- 
-```
->> 1=!=1
+False
+
+>> 1=!=1.0
 True
 ```
 
