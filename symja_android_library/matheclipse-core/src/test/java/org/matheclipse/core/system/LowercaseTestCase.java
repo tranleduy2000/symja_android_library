@@ -13061,6 +13061,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialGCD() {
+		// wikipedia example https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor
+		check("PolynomialGCD(x^2 + 7*x + 6, x^2-5*x-6)", //
+				"1+x");
 		check("PolynomialGCD(a,b )", //
 				"1");
 		check("PolynomialGCD(e*x^2 + d, ( -2*d*e^2*Sqrt(-e/d) )*x + 2*d*e^2 )", //
@@ -13103,6 +13106,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialLCM() {
+		// wikipedia example https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor
+		check("PolynomialLCM(x^2 + 7*x + 6, x^2-5*x-6)", //
+				"-36-36*x+x^2+x^3");
 		// TODO difference to MMA the product is expanded out although GCD==1
 		check("PolynomialLCM(a+b*x,c+d*x)", //
 				"a*c+b*c*x+a*d*x+b*d*x^2");
@@ -13211,6 +13217,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testPolynomialQuotient() {
 
+		check("PolynomialQuotient(x^2 + 7*x + 6, x^2-5*x-6, x)", //
+				"1");
 		check("PolynomialQuotient(a+b*x,1,x)^3", //
 				"(a+b*x)^3");
 		check("PolynomialQuotient(x^2, x + a,x)", //
@@ -13226,6 +13234,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialQuotientRemainder() {
+		check("PolynomialQuotientRemainder(x^2 + 7*x + 6, x^2-5*x-6, x)", //
+				"{1,12+12*x}");
 		check("PolynomialQuotientRemainder[a,b,x]", //
 				"{a/b,0}");
 		check("PolynomialQuotientRemainder(e*x^2 + d, ( -2*d*e^2*Sqrt(-e/d) )*x + 2*d*e^2, x )", //
@@ -13244,6 +13254,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialRemainder() {
+		check("PolynomialRemainder(x^2 + 7*x + 6, x^2-5*x-6, x)", //
+				"12+12*x");
 		check("PolynomialRemainder(1,Sin(e+f*x),x)", //
 				"PolynomialRemainder(1,Sin(e+f*x),x)");
 		check("PolynomialRemainder(x^2, x + a,x)", //
@@ -14025,6 +14037,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPrimitiveRootList() {
+		check("PrimitiveRootList(14)", //
+				"{3,5}");
 		check("PrimitiveRootList(2*Prime(5))", //
 				"{7,13,17,19}");
 		check("PrimitiveRootList(9)", //
