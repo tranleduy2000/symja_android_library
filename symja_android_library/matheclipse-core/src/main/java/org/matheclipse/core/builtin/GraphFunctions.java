@@ -1036,17 +1036,18 @@ public class GraphFunctions {
 	private static IASTAppendable[] edgesToIExpr(Graph<IExpr, ?> g) {
 		Set<Object> edgeSet = (Set<Object>) g.edgeSet();
 		IASTAppendable edges = F.ListAlloc(edgeSet.size());
-		IASTAppendable weights = F.ListAlloc(edgeSet.size());
-		boolean hasWeights = false;
+		IASTAppendable weights = null;
 		GraphType type = g.getType();
 		for (Object edge : edgeSet) {
 			if (edge instanceof IExprWeightedEdge) {
-				hasWeights = true;
 				IExprWeightedEdge weightedEdge = (IExprWeightedEdge) edge;
 		if (type.isDirected()) {
 					edges.append(F.DirectedEdge(weightedEdge.lhs(), weightedEdge.rhs()));
 				} else {
 					edges.append(F.UndirectedEdge(weightedEdge.lhs(), weightedEdge.rhs()));
+				}
+				if (weights == null) {
+					weights = F.ListAlloc(edgeSet.size());
 				}
 				weights.append(F.num(weightedEdge.weight()));
 			} else if (edge instanceof IExprEdge) {
@@ -1058,46 +1059,8 @@ public class GraphFunctions {
 				}
 			}
 		}
-		if (hasWeights) {
 			return new IASTAppendable[] { edges, weights };
 		}
-		return new IASTAppendable[] { edges, null };
-		// return edges;
-		// GraphType type = g.getType();
-		// if (type.isDirected()) {
-		// if (type.isWeighted()) {
-		// Set<IExprWeightedEdge> edgeSet = (Set<IExprWeightedEdge>) g.edgeSet();
-		// IASTAppendable edges = F.ListAlloc(edgeSet.size());
-		// for (IExprWeightedEdge edge : edgeSet) {
-		// edges.append(F.DirectedEdge(edge.lhs(), edge.rhs()));
-		// }
-		// return edges;
-		// } else {
-		// Set<IExprEdge> edgeSet = (Set<IExprEdge>) g.edgeSet();
-		// IASTAppendable edges = F.ListAlloc(edgeSet.size());
-		// for (IExprEdge edge : edgeSet) {
-		// edges.append(F.DirectedEdge(edge.lhs(), edge.rhs()));
-		// }
-		// return edges;
-		// }
-		// } else {
-		// if (type.isWeighted()) {
-		// Set<IExprWeightedEdge> edgeSet = (Set<IExprWeightedEdge>) g.edgeSet();
-		// IASTAppendable edges = F.ListAlloc(edgeSet.size());
-		// for (IExprWeightedEdge edge : edgeSet) {
-		// edges.append(F.UndirectedEdge(edge.lhs(), edge.rhs()));
-		// }
-		// return edges;
-		// } else {
-		// Set<IExprEdge> edgeSet = (Set<IExprEdge>) g.edgeSet();
-		// IASTAppendable edges = F.ListAlloc(edgeSet.size());
-		// for (IExprEdge edge : edgeSet) {
-		// edges.append(F.UndirectedEdge(edge.lhs(), edge.rhs()));
-		// }
-		// return edges;
-		// }
-		// }
-	}
 
 	/**
 	 * Return an array of 2 lists. At index 0 the list of edges. At index 1 the list of corresponding weights.
