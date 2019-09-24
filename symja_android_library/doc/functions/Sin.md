@@ -4,9 +4,15 @@
 Sin(expr)
 ```
 
-> the sine function.
+> returns the sine of `expr` (measured in radians).
  
+`Sin(expr)` will evaluate automatically in the case `expr` is a multiple of `Pi, Pi/2, Pi/3, Pi/4` and `Pi/6`.
+
+See
+* [Wikipedia - Sine](https://en.wikipedia.org/wiki/Sine)
+
 ### Examples
+
 ```
 >> Sin(0)
 0

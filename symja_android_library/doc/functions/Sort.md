@@ -4,7 +4,7 @@
 Sort(list)
 ``` 
 
-> sorts $list$ (or the leaves of any other expression) according to canonical ordering.
+> sorts `list` (or the leaves of any other expression) according to canonical ordering.
 
 ``` 
 Sort(list, p) 
