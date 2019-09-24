@@ -922,13 +922,13 @@ public class GraphFunctions {
 				DefaultDirectedWeightedGraph gw = (DefaultDirectedWeightedGraph<IExpr, IExprWeightedEdge>) g;
 				for (int i = 1; i < list.size(); i++) {
 					IAST edge = list.getAST(i);
-					gw.setEdgeWeight(gw.getEdge(edge.arg1(), edge.arg2()), edgeWeight.get(i).evalDouble());
+					gw.setEdgeWeight(edge.arg1(), edge.arg2(), edgeWeight.get(i).evalDouble());
 				}
 			} else {
 				DefaultUndirectedWeightedGraph gw = (DefaultUndirectedWeightedGraph<IExpr, IExprWeightedEdge>) g;
 				for (int i = 1; i < list.size(); i++) {
 					IAST edge = list.getAST(i);
-					gw.setEdgeWeight(gw.getEdge(edge.arg1(), edge.arg2()), edgeWeight.get(i).evalDouble());
+					gw.setEdgeWeight(edge.arg1(), edge.arg2(), edgeWeight.get(i).evalDouble());
 				}
 			}
 
@@ -1121,12 +1121,12 @@ public class GraphFunctions {
 		if (g.getType().isWeighted()) {
 			weightedGraphToVisjs(map, buf, (AbstractBaseGraph<IExpr, IExprWeightedEdge>) g);
 		} else {
-			graphToVisjs(map, buf, (AbstractBaseGraph<IExpr, IExprEdge>) g);
+			graphToVisjs(map, buf, (AbstractBaseGraph<IExpr, IExprWeightedEdge>) g);
 		}
 		return buf.toString();
 	}
 
-	public static void graphToVisjs(Map<IExpr, Integer> map, StringBuilder buf, AbstractBaseGraph<IExpr, IExprEdge> g) {
+	public static void graphToVisjs(Map<IExpr, Integer> map, StringBuilder buf, AbstractBaseGraph<IExpr, IExprWeightedEdge> g) {
 		vertexToVisjs(map, buf, g);
 		edgesToVisjs(map, buf, g);
 	}
@@ -1160,14 +1160,14 @@ public class GraphFunctions {
 		buf.append("]);\n");
 	}
 
-	private static void edgesToVisjs(Map<IExpr, Integer> map, StringBuilder buf, Graph<IExpr, IExprEdge> g) {
-		Set<IExprEdge> edgeSet = g.edgeSet();
+	private static void edgesToVisjs(Map<IExpr, Integer> map, StringBuilder buf, Graph<IExpr, IExprWeightedEdge> g) {
+		Set<IExprWeightedEdge> edgeSet = g.edgeSet();
 		IASTAppendable edges = F.ListAlloc(edgeSet.size());
 		GraphType type = g.getType();
 		boolean first = true;
 		if (type.isDirected()) {
 			buf.append("var edges = new vis.DataSet([\n");
-			for (IExprEdge edge : edgeSet) {
+			for (IExprWeightedEdge edge : edgeSet) {
 				// {from: 1, to: 3},
 				if (first) {
 					buf.append("  {from: ");
@@ -1186,7 +1186,7 @@ public class GraphFunctions {
 		} else {
 			//
 			buf.append("var edges = new vis.DataSet([\n");
-			for (IExprEdge edge : edgeSet) {
+			for (IExprWeightedEdge edge : edgeSet) {
 				// {from: 1, to: 3},
 				if (first) {
 					buf.append("  {from: ");

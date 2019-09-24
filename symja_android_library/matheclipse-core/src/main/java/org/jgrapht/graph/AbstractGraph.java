@@ -94,6 +94,11 @@ public abstract class AbstractGraph<V, E>
         return modified;
     }
 
+    @Override
+    public void setEdgeWeight(V sourceVertex, V targetVertex, double weight) {
+        this.setEdgeWeight(this.getEdge(sourceVertex, targetVertex), weight);
+    }
+
     /**
      * Returns a string of the parenthesized pair (V, E) representing this G=(V,E) graph. 'V' is the
      * string representation of the vertex set, and 'E' is the string representation of the edge
