@@ -34,7 +34,7 @@ public class DefaultWeightedEdge
      *
      * @return source of this edge
      */
-    protected Object getSource() {
+    public Object getSource() {
         return source;
     }
 
@@ -44,7 +44,7 @@ public class DefaultWeightedEdge
      *
      * @return target of this edge
      */
-    protected Object getTarget() {
+    public Object getTarget() {
         return target;
     }
 

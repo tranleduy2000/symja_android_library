@@ -25,7 +25,7 @@ import java.io.Serializable;
  *
  * @author John V. Sichi
  */
-class IntrusiveEdge
+public class IntrusiveEdge
         implements
         Cloneable,
         Serializable {
@@ -46,5 +46,24 @@ class IntrusiveEdge
             // shouldn't happen as we are Cloneable
             throw new InternalError();
         }
+    }
+    /**
+     * Retrieves the source of this edge. This is protected, for use by subclasses only (e.g. for
+     * implementing toString).
+     *
+     * @return source of this edge
+     */
+    public Object getSource() {
+        return source;
+    }
+
+    /**
+     * Retrieves the target of this edge. This is protected, for use by subclasses only (e.g. for
+     * implementing toString).
+     *
+     * @return target of this edge
+     */
+    public Object getTarget() {
+        return target;
     }
 }

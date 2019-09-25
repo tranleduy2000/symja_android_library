@@ -3,6 +3,7 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
 import com.duy.util.SetWrapper;
 
 import org.gavaghan.geodesy.Ellipsoid;
@@ -30,6 +31,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.jgrapht.graph.DefaultUndirectedWeightedGraph;
+import org.jgrapht.graph.IntrusiveEdge;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -58,7 +60,7 @@ import java.util.Set;
  */
 public class GraphFunctions {
 	/**
-	 * 
+	 *
 	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
 	 * initializer</a>
 	 */
@@ -444,7 +446,12 @@ public class GraphFunctions {
 					Graph<IExpr, IExprEdge> g = gex.toData();
 					SpanningTreeAlgorithm<IExprEdge> k = new BoruvkaMinimumSpanningTree<IExpr, IExprEdge>(g);
 					Set<IExprEdge> edgeSet = k.getSpanningTree().getEdges();
-					Graph<IExpr, IExprEdge> gResult = new DefaultDirectedGraph<IExpr, IExprEdge>(IExprEdge.class);
+					Graph<IExpr, IExprEdge> gResult = new DefaultDirectedGraph<IExpr, IExprEdge>(null, new Supplier<IExprEdge>() {
+						@Override
+						public IExprEdge get() {
+							return new IExprEdge();
+						}
+					}, false);
 					Graphs.addAllEdges(gResult, g, edgeSet);
 					return GraphExpr.newInstance(gResult);
 				}
@@ -1121,12 +1128,12 @@ public class GraphFunctions {
 		if (g.getType().isWeighted()) {
 			weightedGraphToVisjs(map, buf, (AbstractBaseGraph<IExpr, IExprWeightedEdge>) g);
 		} else {
-			graphToVisjs(map, buf, (AbstractBaseGraph<IExpr, IExprWeightedEdge>) g);
+			graphToVisjs(map, buf, (AbstractBaseGraph<IExpr, IntrusiveEdge>) g);
 		}
 		return buf.toString();
 	}
 
-	public static void graphToVisjs(Map<IExpr, Integer> map, StringBuilder buf, AbstractBaseGraph<IExpr, IExprWeightedEdge> g) {
+	public static void graphToVisjs(Map<IExpr, Integer> map, StringBuilder buf, AbstractBaseGraph<IExpr, IntrusiveEdge> g) {
 		vertexToVisjs(map, buf, g);
 		edgesToVisjs(map, buf, g);
 	}
@@ -1160,48 +1167,48 @@ public class GraphFunctions {
 		buf.append("]);\n");
 	}
 
-	private static void edgesToVisjs(Map<IExpr, Integer> map, StringBuilder buf, Graph<IExpr, IExprWeightedEdge> g) {
-		Set<IExprWeightedEdge> edgeSet = g.edgeSet();
+	private static void edgesToVisjs(Map<IExpr, Integer> map, StringBuilder buf, Graph<IExpr, IntrusiveEdge> g) {
+		Set<IntrusiveEdge> edgeSet = g.edgeSet();
 		IASTAppendable edges = F.ListAlloc(edgeSet.size());
 		GraphType type = g.getType();
 		boolean first = true;
-		if (type.isDirected()) {
-			buf.append("var edges = new vis.DataSet([\n");
-			for (IExprWeightedEdge edge : edgeSet) {
-				// {from: 1, to: 3},
-				if (first) {
-					buf.append("  {from: ");
-				} else {
-					buf.append(", {from: ");
-				}
-				buf.append(map.get(edge.lhs()));
-				buf.append(", to: ");
-				buf.append(map.get(edge.rhs()));
-				// , arrows: { to: { enabled: true, type: 'arrow'}}
-				buf.append(" , arrows: { to: { enabled: true, type: 'arrow'}}");
-				buf.append("}\n");
-				first = false;
-			}
-			buf.append("]);\n");
-		} else {
-			//
-			buf.append("var edges = new vis.DataSet([\n");
-			for (IExprWeightedEdge edge : edgeSet) {
-				// {from: 1, to: 3},
-				if (first) {
-					buf.append("  {from: ");
-				} else {
-					buf.append(", {from: ");
-			}
-				buf.append(map.get(edge.lhs()));
-				buf.append(", to: ");
-				buf.append(map.get(edge.rhs()));
-				buf.append("}\n");
-				first = false;
-			}
-			buf.append("]);\n");
-		}
-	}
+        if (type.isDirected()) {
+            buf.append("var edges = new vis.DataSet([\n");
+            for (IntrusiveEdge edge : edgeSet) {
+                // {from: 1, to: 3},
+                if (first) {
+                    buf.append("  {from: ");
+                } else {
+                    buf.append(", {from: ");
+                }
+                buf.append(map.get(edge.getSource()));
+                buf.append(", to: ");
+                buf.append(map.get(edge.getTarget()));
+                // , arrows: { to: { enabled: true, type: 'arrow'}}
+                buf.append(" , arrows: { to: { enabled: true, type: 'arrow'}}");
+                buf.append("}\n");
+                first = false;
+            }
+            buf.append("]);\n");
+        } else {
+            //
+            buf.append("var edges = new vis.DataSet([\n");
+            for (IntrusiveEdge edge : edgeSet) {
+                // {from: 1, to: 3},
+                if (first) {
+                    buf.append("  {from: ");
+                } else {
+                    buf.append(", {from: ");
+                }
+                buf.append(map.get(edge.getSource()));
+                buf.append(", to: ");
+                buf.append(map.get(edge.getTarget()));
+                buf.append("}\n");
+                first = false;
+            }
+            buf.append("]);\n");
+        }
+    }
 
 	private static void weightedEdgesToVisjs(Map<IExpr, Integer> map, StringBuilder buf,
 			Graph<IExpr, IExprWeightedEdge> graph) {

@@ -17,6 +17,10 @@
  */
 package org.jgrapht;
 
+import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
+import com.duy.util.DObjects;
+
 import org.jgrapht.graph.AsUndirectedGraph;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.util.VertexToIntegerMapping;
@@ -25,10 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import com.duy.lambda.Predicate;
-import com.duy.lambda.Supplier;
 
 /**
  * A collection of utilities to assist with graph manipulation.
@@ -549,6 +550,6 @@ public abstract class Graphs {
      * @see VertexToIntegerMapping
      */
     public static <V, E> VertexToIntegerMapping<V> getVertexToIntegerMapping(Graph<V, E> graph) {
-        return new VertexToIntegerMapping<>(Objects.requireNonNull(graph).vertexSet());
+        return new VertexToIntegerMapping<>(DObjects.requireNonNull(graph).vertexSet());
     }
 }
