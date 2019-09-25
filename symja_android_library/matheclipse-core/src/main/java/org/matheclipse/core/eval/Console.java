@@ -74,13 +74,19 @@ public class Console {
 	 */
 	private static PrintWriter stderr = new PrintWriter(new OutputStreamWriter(System.err, Charset.forName("UTF-8")),
 			true);
+	static {
+		// distinguish between lower- and uppercase identifiers
+		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
+		Config.USE_MANIPULATE_JS = true;
+		Config.USE_VISJS = true;
+		F.initSymbols(null, null, true);
+	}
 	public static void runConsole(final String args[], PrintWriter out, PrintWriter err) {
 		stdout = out;
 		stderr = err;
 		main(args);
 	}
     public static void main(final String args[]) {
-        F.initSymbols(null, null, true);
         Console console;
         try {
             console = new Console();
@@ -291,9 +297,6 @@ public class Console {
 	 * Create a console which appends each evaluation output in a history list.
      */
 	public Console() {
-		// activate MathCell JavaScript output for Plot, Plot3D
-		Config.USE_MANIPULATE_JS = true;
-		Config.USE_VISJS = true;
 		fEvaluator = new ExprEvaluator(false, 100);
 		fOutputFactory = OutputFormFactory.get(true, false, 5, 7);
 		fEvaluator.getEvalEngine().setFileSystemEnabled(true);

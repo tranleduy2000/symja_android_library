@@ -496,10 +496,16 @@ public class F {
     public final static IBuiltInSymbol ChebyshevT = F.initFinalSymbol("ChebyshevT", ID.ChebyshevT);
 	/** ChebyshevU(n, x) - returns the Chebyshev polynomial of the second kind `U_n(x)`. */
     public final static IBuiltInSymbol ChebyshevU = F.initFinalSymbol("ChebyshevU", ID.ChebyshevU);
-    /***/
+	/**
+	 * Check(expr, failure) - evaluates `expr`, and returns the result, unless messages were generated, in which case
+	 * `failure` will be returned.
+	 */
     public final static IBuiltInSymbol Check = F.initFinalSymbol("Check", ID.Check);
 
-    /** ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.*/
+	/**
+	 * ChessboardDistance(u, v) - returns the chessboard distance (also known as Chebyshev distance) between `u` and
+	 * `v`, which is the number of moves a king on a chessboard needs to get from square `u` to square `v`.
+	 */
     public final static IBuiltInSymbol ChessboardDistance = F.initFinalSymbol("ChessboardDistance",
             ID.ChessboardDistance);
     /***/
@@ -628,7 +634,10 @@ public class F {
     public final static IBuiltInSymbol CoprimeQ = F.initFinalSymbol("CoprimeQ", ID.CoprimeQ);
 	/** Correlation(a, b) - computes Pearson's correlation of two equal-sized vectors `a` and `b`. */
     public final static IBuiltInSymbol Correlation = F.initFinalSymbol("Correlation", ID.Correlation);
-	/** Cos(expr) - returns the cosine of `expr` (measured in radians). */
+	/**
+	 * Cos(expr) - returns the cosine of `expr` (measured in radians). `Cos(expr)` will evaluate automatically in the
+	 * case `expr` is a multiple of `Pi, Pi/2, Pi/3, Pi/4` and `Pi/6`.
+	 */
     public final static IBuiltInSymbol Cos = F.initFinalSymbol("Cos", ID.Cos);
     /***/
     public final static IBuiltInSymbol CosIntegral = F.initFinalSymbol("CosIntegral", ID.CosIntegral);
@@ -1079,16 +1088,16 @@ public class F {
     public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
     /** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't work in the web interface. A file system has to be available to load a package. */
     public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
-	/** Glaisher constant. */
+	/** Glaisher - Glaisher constant. */
     public final static IBuiltInSymbol Glaisher = F.initFinalSymbol("Glaisher", ID.Glaisher);
     /** */
     public final static IBuiltInSymbol GoldenAngle = F.initFinalSymbol("GoldenAngle", ID.GoldenAngle);
 
-    /** GoldenRatio - is the golden ratio.*/
+	/** GoldenRatio - is the golden ratio `(1+Sqrt(5))/2`. */
     public final static IBuiltInSymbol GoldenRatio = F.initFinalSymbol("GoldenRatio", ID.GoldenRatio);
 	/** Grad(function, list-of-variables) - gives the gradient of the function. */
     public final static IBuiltInSymbol Grad = F.initFinalSymbol("Grad", ID.Grad);
-    /***/
+	/** Graph({edge1,...,edgeN}) - create a graph from the given edges `edge1,...,edgeN`. */
     public final static IBuiltInSymbol Graph = F.initFinalSymbol("Graph", ID.Graph);
 
     /** GraphCenter(graph) - compute the `graph` center. The center of a `graph` is the set of vertices of graph eccentricity equal to the `graph` radius.*/
@@ -1185,11 +1194,11 @@ public class F {
             ID.HypergeometricDistribution);
     /***/
     public final static IBuiltInSymbol HypergeometricPFQ = F.initFinalSymbol("HypergeometricPFQ", ID.HypergeometricPFQ);
-	/***/
-	public final static IBuiltInSymbol HypergeometricU = F.initFinalSymbol("HypergeometricU", ID.HypergeometricU);
     /***/
     public final static IBuiltInSymbol HypergeometricPFQRegularized = F.initFinalSymbol("HypergeometricPFQRegularized",
             ID.HypergeometricPFQRegularized);
+	/***/
+	public final static IBuiltInSymbol HypergeometricU = F.initFinalSymbol("HypergeometricU", ID.HypergeometricU);
     /**
      * I - Imaginary unit - internally converted to the complex number `0+1*i`. `I` represents the imaginary number
      * `Sqrt(-1)`. `I^2` will be evaluated to `-1`.
@@ -1203,11 +1212,7 @@ public class F {
     public final static IBuiltInSymbol If = F.initFinalSymbol("If", ID.If);
 	/** Im(z) - returns the imaginary component of the complex number `z`. */
     public final static IBuiltInSymbol Im = F.initFinalSymbol("Im", ID.Im);
-    /**
-     * Implies(arg1, arg2) - Logical implication. `Implies(A, B)` is equivalent to `!A || B`. `Implies(expr1, expr2)`
-     * evaluates each argument in turn, returning `True` as soon as the first argument evaluates to `False`. If the
-     * first argument evaluates to `True`, `Implies` returns the second argument.
-     */
+	/** Implies(arg1, arg2) - Logical implication. */
     public final static IBuiltInSymbol Implies = F.initFinalSymbol("Implies", ID.Implies);
     /**
      * Import("path-to-filename", "WXF") - if the file system is enabled, import an expression in WXF format from the
@@ -1269,13 +1274,13 @@ public class F {
             ID.InterpolatingPolynomial);
     /***/
     public final static IBuiltInSymbol Interpolation = F.initFinalSymbol("Interpolation", ID.Interpolation);
-    /***/
+	/** Interrupt( ) - Interrupt an evaluation and returns `$Aborted`. */
     public final static IBuiltInSymbol Interrupt = F.initFinalSymbol("Interrupt", ID.Interrupt);
 	/***/
 	public final static IBuiltInSymbol IntersectingQ = F.initFinalSymbol("IntersectingQ", ID.IntersectingQ);
 	/** Intersection(set1, set2, ...) - get the intersection set from `set1` and `set2` .... */
     public final static IBuiltInSymbol Intersection = F.initFinalSymbol("Intersection", ID.Intersection);
-    /***/
+	/** Interval({a, b}) - represents the interval from `a` to `b`. */
     public final static IBuiltInSymbol Interval = F.initFinalSymbol("Interval", ID.Interval);
 	/** Inverse(matrix) - computes the inverse of the `matrix`. */
     public final static IBuiltInSymbol Inverse = F.initFinalSymbol("Inverse", ID.Inverse);
@@ -1291,7 +1296,10 @@ public class F {
     public final static IBuiltInSymbol InverseErf = F.initFinalSymbol("InverseErf", ID.InverseErf);
 	/** InverseErfc(z) - returns the inverse complementary error function of `z`. */
     public final static IBuiltInSymbol InverseErfc = F.initFinalSymbol("InverseErfc", ID.InverseErfc);
-    /** InverseFourier(vector-of-complex-numbers) - Inverse discrete Fourier transform of a `vector-of-complex-numbers`. Fourier transform is restricted to vectors with length of power of 2.  */
+	/**
+	 * InverseFourier(vector-of-complex-numbers) - Inverse discrete Fourier transform of a `vector-of-complex-numbers`.
+	 * Fourier transform is restricted to vectors with length of power of 2.
+	 */
     public final static IBuiltInSymbol InverseFourier = F.initFinalSymbol("InverseFourier", ID.InverseFourier);
 
 	/** InverseFunction(head) - returns the inverse function for the symbol `head`. */
@@ -1309,9 +1317,10 @@ public class F {
     /***/
     public final static IBuiltInSymbol InverseWeierstrassP = F.initFinalSymbol("InverseWeierstrassP", ID.InverseWeierstrassP);
 
-    /** JSForm(expre) - returns the JavaScript form of the `expr`.  */
+	/** JSForm(expre) - returns the JavaScript form of the `expr`. */
     public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
 
+	/***/
 	public final static IBuiltInSymbol JSFormData = F.initFinalSymbol("JSFormData", ID.JSFormData);
 
 	/**
@@ -1856,9 +1865,15 @@ public class F {
     public final static IBuiltInSymbol Pi = F.initFinalSymbol("Pi", ID.Pi);
 	/** Piecewise({{expr1, cond1}, ...}) - represents a piecewise function. */
     public final static IBuiltInSymbol Piecewise = F.initFinalSymbol("Piecewise", ID.Piecewise);
-    /** Plot(function, {x, xMin, xMax}, PlotRange->{yMin,yMax}) - generate a JavaScript control for the expression `function` in the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.*/
+	/**
+	 * Plot(function, {x, xMin, xMax}, PlotRange->{yMin,yMax}) - generate a JavaScript control for the expression
+	 * `function` in the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.
+	 */
     public final static IBuiltInSymbol Plot = F.initFinalSymbol("Plot", ID.Plot);
-    /** Plot3D(function, {x, xMin, xMax}, {y,yMin,yMax}) - generate a JavaScript control for the expression `function` in the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.*/
+	/**
+	 * Plot3D(function, {x, xMin, xMax}, {y,yMin,yMax}) - generate a JavaScript control for the expression `function` in
+	 * the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.
+	 */
     public final static IBuiltInSymbol Plot3D = F.initFinalSymbol("Plot3D", ID.Plot3D);
     /***/
     public final static IBuiltInSymbol PlotRange = F.initFinalSymbol("PlotRange", ID.PlotRange);
@@ -2282,7 +2297,7 @@ public class F {
     public final static IBuiltInSymbol String = F.initFinalSymbol("String", ID.String);
     /***/
     public final static IBuiltInSymbol StringDrop = F.initFinalSymbol("StringDrop", ID.StringDrop);
-    /***/
+	/** StringJoin(str1, str2, ... strN) - concatenate the strings `str1, str2, ... strN` into one string. */
     public final static IBuiltInSymbol StringJoin = F.initFinalSymbol("StringJoin", ID.StringJoin);
     /***/
     public final static IBuiltInSymbol StringLength = F.initFinalSymbol("StringLength", ID.StringLength);
@@ -2555,24 +2570,33 @@ public class F {
 	 * evaluates to `True`, etc.
 	 */
     public final static IBuiltInSymbol Which = F.initFinalSymbol("Which", ID.Which);
-    /** While(test, body) - evaluates `body` as long as test evaluates to `True`.*/
+	/** While(test, body) - evaluates `body` as long as test evaluates to `True`. */
     public final static IBuiltInSymbol While = F.initFinalSymbol("While", ID.While);
     /***/
     public final static IBuiltInSymbol White = F.initFinalSymbol("White", ID.White);
-    /** With({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by replacing the local variables in `expr`.*/
+	/**
+	 * With({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by replacing the
+	 * local variables in `expr`.
+	 */
     public final static IBuiltInSymbol With = F.initFinalSymbol("With", ID.With);
     /***/
     public final static IBuiltInSymbol WriteString = F.initFinalSymbol("WriteString", ID.WriteString);
-    /** Xor(arg1, arg2, ...) - Logical XOR (exclusive OR) function. Returns `True` if an odd number of the arguments are `True` and the rest are `False`. Returns `False` if an even number of the arguments are `True` and the rest are `False`.*/
+	/**
+	 * Xor(arg1, arg2, ...) - Logical XOR (exclusive OR) function. Returns `True` if an odd number of the arguments are
+	 * `True` and the rest are `False`. Returns `False` if an even number of the arguments are `True` and the rest are
+	 * `False`.
+	 */
     public final static IBuiltInSymbol Xor = F.initFinalSymbol("Xor", ID.Xor);
-    /** YuleDissimilarity(u, v) - returns the Yule dissimilarity between the two boolean 1-D lists `u` and `v`, which is defined as R / (c_tt * c_ff + R / 2) where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`, and `R = 2 * c_tf * c_ft`.*/
+	/**
+	 * YuleDissimilarity(u, v) - returns the Yule dissimilarity between the two boolean 1-D lists `u` and `v`, which is
+	 * defined as R / (c_tt * c_ff + R / 2) where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and
+	 * `v(k)=j` for `k<n`, and `R = 2 * c_tf * c_ft`.
+	 */
     public final static IBuiltInSymbol YuleDissimilarity = F.initFinalSymbol("YuleDissimilarity", ID.YuleDissimilarity);
     /***/
     public final static IBuiltInSymbol ZeroSymmetric = F.initFinalSymbol("ZeroSymmetric", ID.ZeroSymmetric);
-    /** Zeta(z) - returns the Riemann zeta function of `z`.*/
+	/** Zeta(z) - returns the Riemann zeta function of `z`. */
     public final static IBuiltInSymbol Zeta = F.initFinalSymbol("Zeta", ID.Zeta);
-	// public final static ISymbol $PowerSeries = initFinalHiddenSymbol(
-	// Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$powerseries" : "$PowerSeries");
 	public final static ISymbol $RealVector = initFinalHiddenSymbol(
 			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realvector" : "$RealVector");
 	public final static ISymbol $RealMatrix = initFinalHiddenSymbol(
