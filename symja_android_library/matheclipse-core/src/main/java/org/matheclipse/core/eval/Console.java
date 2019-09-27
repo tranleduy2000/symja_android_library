@@ -24,7 +24,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -74,18 +73,15 @@ public class Console {
 	 */
 	private static PrintWriter stderr = new PrintWriter(new OutputStreamWriter(System.err, Charset.forName("UTF-8")),
 			true);
-	static {
-		// distinguish between lower- and uppercase identifiers
-		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
-		Config.USE_VISJS = true;
-		F.initSymbols(null, null, true);
-	}
 	public static void runConsole(final String args[], PrintWriter out, PrintWriter err) {
 		stdout = out;
 		stderr = err;
 		main(args);
 	}
     public static void main(final String args[]) {
+		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
+		Config.USE_VISJS = true;
+		F.initSymbols(null, null, true);
         Console console;
         try {
             console = new Console();
@@ -634,7 +630,7 @@ public class Console {
 	 *
      */
 
-	public void printPrompt(final PrintWriter out, final String prompt) {
+	private void printPrompt(final PrintWriter out, final String prompt) {
         out.print(prompt);
         out.flush();
     }
@@ -645,9 +641,9 @@ public class Console {
      * @return the input string (without the newline)
      */
 
-    public String readString() {
+	private String readString() {
         final StringBuilder input = new StringBuilder();
-		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
         boolean done = false;
 
         try {
@@ -682,7 +678,7 @@ public class Console {
 	 * @return the input string (without the newline)
 	 */
 
-	public String readString(final PrintWriter out, final String prompt) {
+	private String readString(final PrintWriter out, final String prompt) {
 		printPrompt(out, prompt);
 		return readString();
 	}
@@ -694,7 +690,7 @@ public class Console {
      *
      * @return default rules textfile name
      */
-    public String getDefaultSystemRulesFilename() {
+	private String getDefaultSystemRulesFilename() {
         return fDefaultSystemRulesFilename;
     }
 
