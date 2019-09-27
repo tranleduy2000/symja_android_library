@@ -18452,6 +18452,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSymmetricMatrixQ() {
+		// example from https://en.wikipedia.org/wiki/Symmetric_matrix
+		check("SymmetricMatrixQ({{1,7,3}, {7,4,-5}, {3,-5,6}})", //
+				"True");
 		check("SymmetricMatrixQ({{1, 3 + 4*I}, {3 - 4*I, 2}})", //
 				"False");
 		check("SymmetricMatrixQ({{1, 3 + 3*I}, {3 + 3*I, 2}})", //
@@ -20103,6 +20106,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testWeierstrassP() {
+		check("WeierstrassP(z, {0, 0}) ", //
+				"1/z^2");
+		check("WeierstrassP(z, {3, 1}) ", //
+				"1+3/2*Cot(Sqrt(3/2)*z)^2");
 		check("WeierstrassP(5., {1, 2}) ", //
 				"18.35051+I*1.32213*10^-9");
 		check("WeierstrassP(12., {3, 2}) ", //
@@ -20124,6 +20131,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testWeierstrassPPrime() {
+		check("WeierstrassPPrime(z, {0, 0}) ", //
+				"-2/z^3");
+		check("WeierstrassPPrime(z, {3, 1}) ", //
+				"-3*Sqrt(3/2)*Cot(Sqrt(3/2)*z)*Csc(Sqrt(3/2)*z)^2");
 		check("WeierstrassPPrime(2.0, {1,2} )", //
 				"8.39655+I*1.76202*10^-10");
 		check("WeierstrassPPrime(5., {1, 2}) ", //
