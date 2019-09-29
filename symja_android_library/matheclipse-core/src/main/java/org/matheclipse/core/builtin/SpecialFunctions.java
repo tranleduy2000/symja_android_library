@@ -8,6 +8,8 @@ import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.hipparchus.complex.Complex;
+import org.hipparchus.distribution.continuous.BetaDistribution;
+import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -36,8 +38,6 @@ import org.matheclipse.core.reflection.system.rules.StruveHRules;
 import org.matheclipse.core.reflection.system.rules.StruveLRules;
 
 import java.math.BigDecimal;
-
-import de.lab4inf.math.functions.Bessel;
 
 import static org.matheclipse.core.expression.F.BernoulliB;
 import static org.matheclipse.core.expression.F.C1;
@@ -656,6 +656,7 @@ public class SpecialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			try {
 			if (ast.isAST3()) {
 				IExpr z = ast.arg1();
 				IExpr a = ast.arg2();
@@ -668,6 +669,10 @@ public class SpecialFunctions {
 						return F.C1;
 					}
 				}
+					if (z.isNumeric() && a.isNumeric() && b.isNumeric()) {
+						BetaDistribution beta = new BetaDistribution(a.evalDouble(), b.evalDouble());
+						return F.num(beta.inverseCumulativeProbability(z.evalDouble()));
+					}
 			} else {
 				IExpr z1 = ast.arg1();
 				IExpr z2 = ast.arg2();
@@ -680,6 +685,13 @@ public class SpecialFunctions {
 					return F.InverseBetaRegularized(z2, a, b);
 				}
 
+				}
+			} catch (MathIllegalArgumentException miae) {
+				return IOFunctions.printMessage(F.InverseBetaRegularized, "argillegal",
+						F.List(F.stringx(miae.getMessage()), ast), engine);
+			} catch (RuntimeException rex) {
+				return IOFunctions.printMessage(F.InverseBetaRegularized, "argillegal",
+						F.List(F.stringx(rex.getMessage()), ast), engine);
 			}
 			return F.NIL;
 		}

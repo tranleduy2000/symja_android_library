@@ -613,6 +613,15 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
+				if (a.isNumeric() || b.isNumeric() || k.isNumeric()) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
+								b.evalDouble()) //
+										.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ (Piecewise({{BetaRegularized(#, a, b), 0 < # < 1}, {1, # >= 1}}, 0)&) $]
 						F.Function(F
@@ -630,6 +639,15 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
+				if (a.isNumeric() || b.isNumeric() || k.isNumeric()) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
+								b.evalDouble()) //
+										.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(Piecewise({{InverseBetaRegularized(#, a, b), 0 < # < 1}, {0, # <=
 						// 0}}, 1), 0 <= # <= 1)& ) $]
@@ -4641,6 +4659,14 @@ public class StatisticsFunctions {
 		public IExpr cdf(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
+				if (n.isNumeric() || k.isNumeric()) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.TDistribution(n.evalDouble()) //
+								.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				//
 				IExpr function =
 						// [$ Piecewise({{(1/2)*BetaRegularized(n/(#^2 + n), n/2, 1/2), # <= 0}}, (1/2)*(1 +
@@ -4665,6 +4691,14 @@ public class StatisticsFunctions {
 		public IExpr inverseCDF(IAST dist, IExpr k) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
+				if (n.isNumeric() || k.isNumeric()) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.TDistribution(n.evalDouble()) //
+								.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(Piecewise({{(-Sqrt(n))*Sqrt(-1 + 1/InverseBetaRegularized(2*#,
 						// n/2, 1/2)), 0 < # < 1/2}, {0, # == 1/2}, {Sqrt(n)*Sqrt(-1 + 1/InverseBetaRegularized(2*(1 -
