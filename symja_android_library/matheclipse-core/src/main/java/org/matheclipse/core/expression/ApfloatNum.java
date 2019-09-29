@@ -362,6 +362,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	}
 
 
+	@Override
 	public IExpr sqrt() {
 		return valueOf(ApfloatMath.sqrt(fApfloat));
 	}
@@ -409,13 +410,19 @@ public class ApfloatNum extends INumImpl implements INum {
 	@Override
 	public boolean isZero() {
 		return fApfloat.equals(Apcomplex.ZERO);
-		// return fDouble == 0.0;
 	}
 
 	@Override
 	public IInteger round() {
 		Apfloat f = ApfloatMath.round(fApfloat, 1, RoundingMode.HALF_EVEN);
 		return F.integer(ApfloatMath.floor(f).toBigInteger());
+	}
+
+	@Override
+	public ISignedNumber roundClosest(ISignedNumber multiple) {
+		final long precision = precision();
+		Apfloat factor = multiple.apfloatNumValue(precision).fApfloat;
+		return F.num(ApfloatMath.round(fApfloat.divide(factor), 1, RoundingMode.HALF_EVEN).multiply(factor));
 	}
 
 	@Override

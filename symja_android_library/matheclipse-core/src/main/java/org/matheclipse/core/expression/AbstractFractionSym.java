@@ -2,6 +2,7 @@ package org.matheclipse.core.expression;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -28,6 +29,7 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -354,6 +356,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 		return result;
 	}
 
+	@Override
 	public IAST factorSmallPrimes(int numerator, int root) {
 		BigInteger b = toBigNumerator();
 		boolean isNegative = false;
@@ -420,6 +423,17 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	@Override
 	public double reDoubleValue() {
 		return doubleValue();
+	}
+
+	@Override
+	public ISignedNumber roundClosest(ISignedNumber multiple) {
+		if (multiple.isRational()) {
+			IInteger ii = this.divideBy((IRational) multiple).round();
+			return ii.multiply((IRational) multiple);
+		}
+		Apfloat value = this.apfloatNumValue(15L).fApfloat;
+		Apfloat factor = multiple.apfloatNumValue(15L).fApfloat;
+		return F.num(ApfloatMath.round(value.divide(factor), 1, RoundingMode.HALF_EVEN).multiply(factor));
 	}
 
 	@Override

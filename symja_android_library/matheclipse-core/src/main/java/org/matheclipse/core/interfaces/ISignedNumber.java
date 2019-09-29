@@ -183,6 +183,14 @@ public interface ISignedNumber extends INumber {
     IInteger round();
 
     /**
+     * Round <code>this</code> number to the closest <code>ISignedNumber</code> multiple of the <code>factor</code>.
+     *
+     * @param factor
+     * @return the closest integer to the argument.
+     */
+    public ISignedNumber roundClosest(ISignedNumber factor);
+
+    /**
      * Returns the signum function of this number (i.e., -1, 0 or 1 as the value of this number is negative, zero or
      * positive).
      *

@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.INumeric;
@@ -13,6 +14,8 @@ import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IComplex;
+import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
@@ -1124,12 +1127,12 @@ public class IntegerFunctions {
 	 * -4
 	 * </pre>
 	 */
-	private static class Round extends AbstractFunctionEvaluator implements INumeric {
+	private static class Round extends AbstractCoreFunctionEvaluator implements INumeric {
 
 		private final static class RoundPlusFunction implements Function<IExpr, IExpr> {
 			@Override
 			public IExpr apply(IExpr expr) {
-				if (expr.isInteger()) {
+				if (expr.isIntegerResult()) {
 					return expr;
 				}
 				return F.NIL;
@@ -1155,13 +1158,69 @@ public class IntegerFunctions {
 
 			try {
 				IExpr arg1 = engine.evaluate(ast.arg1());
+				if (arg1.isList()) {
+					return ((IAST) arg1).mapThread(ast.setAtCopy(1, F.Null), 1);
+				}
+				if (ast.isAST2()) {
+					// Round(z, a)
+					ISignedNumber multiple = ast.arg2().evalReal();
+					if (multiple!=null) {
+						if (multiple.isZero()) {
+							return F.Indeterminate;
+						}
 				ISignedNumber signedNumber = arg1.evalReal();
 				if (signedNumber != null) {
-					return signedNumber.round();
+							return signedNumber.roundClosest(multiple);
+						}
+						if (arg1.isComplexNumeric()) {
+							IComplexNum cmp = (IComplexNum) arg1;
+							ISignedNumber re = cmp.re().roundClosest(multiple);
+							ISignedNumber im = cmp.im().roundClosest(multiple);
+							return F.Complex(re, im);
+						}
+						if (arg1.isComplex()) {
+							IComplex cmp = (IComplex) arg1;
+							ISignedNumber re = cmp.re().roundClosest(multiple);
+							ISignedNumber im = cmp.im().roundClosest(multiple);
+							return F.Complex(re, im);
+						}
+
+						if (arg1.isInfinity()) {
+							return F.CInfinity;
+						}
+						if (arg1.isNegativeInfinity()) {
+							return F.CNInfinity;
+						}
+					}
+
+					return F.NIL;
 				}
 
 				if (arg1.isIntegerResult()) {
 					return arg1;
+				}
+				ISignedNumber signedNumber = arg1.evalReal();
+				if (signedNumber != null) {
+					return signedNumber.round();
+				}
+				if (arg1.isComplexNumeric()) {
+					IComplexNum cmp = (IComplexNum) arg1;
+					IInteger re = cmp.re().round();
+					IInteger im = cmp.im().round();
+					return F.complex(re, im);
+				}
+				if (arg1.isComplex()) {
+					IComplex cmp = (IComplex) arg1;
+					IInteger re = cmp.re().round();
+					IInteger im = cmp.im().round();
+					return F.complex(re, im);
+				}
+
+				if (arg1.isInfinity()) {
+					return F.CInfinity;
+				}
+				if (arg1.isNegativeInfinity()) {
+					return F.CNInfinity;
 				}
 
 				if (arg1.isPlus()) {
@@ -1184,11 +1243,11 @@ public class IntegerFunctions {
 		}
 
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_1_1;
+			return IOFunctions.ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 			super.setUp(newSymbol);
 		}
 	}

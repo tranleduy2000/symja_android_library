@@ -2,6 +2,7 @@ package org.matheclipse.core.expression;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
 import org.hipparchus.util.ArithmeticUtils;
 import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.NumberTheory;
@@ -23,6 +24,7 @@ import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.Externalizable;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -485,6 +487,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		return result;
 	}
 	/** {@inheritDoc} */
+	@Override
 	public IAST factorSmallPrimes(int numerator, int root) {
 		SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
 		IASTAppendable result = F.NIL;
@@ -574,6 +577,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		return this;
 	}
 
+	@Override
 	public IInteger factorial() {
 		int ni = toIntDefault(Integer.MIN_VALUE);
 		if (ni > Integer.MIN_VALUE) {
@@ -615,6 +619,17 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	@Override
 	public double reDoubleValue() {
 		return doubleValue();
+	}
+
+	@Override
+	public ISignedNumber roundClosest(ISignedNumber multiple) {
+		if (multiple.isRational()) {
+			IInteger ii = this.divideBy((IRational) multiple).round();
+			return ii.multiply((IRational) multiple);
+		}
+		Apfloat value = this.apfloatNumValue(15L).fApfloat;
+		Apfloat factor = multiple.apfloatNumValue(15L).fApfloat;
+		return F.num(ApfloatMath.round(value.divide(factor), 1, RoundingMode.HALF_EVEN).multiply(factor));
 	}
 
 	@Override

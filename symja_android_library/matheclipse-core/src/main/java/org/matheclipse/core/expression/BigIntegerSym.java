@@ -160,8 +160,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	}
 
 	/**
-	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive integer as this
-	 * expression is canonical less than, equal to, or greater than the specified expression.
+	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
+	 * integer as this expression is canonical less than, equal to, or greater than the specified expression.
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {
@@ -685,8 +685,10 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	 * Returns the nth-root of this integer.
 	 * 
 	 * @return <code>k<code> such as <code>k^n <= this < (k + 1)^n</code>
-	 * @throws IllegalArgumentException if {@code this < 0}
-	 * @throws ArithmeticException      if this integer is negative and n is even.
+	 * @throws IllegalArgumentException
+	 *             if {@code this < 0}
+	 * @throws ArithmeticException
+	 *             if this integer is negative and n is even.
 	 */
 	@Override
 	public IExpr nthRoot(int n) throws ArithmeticException {
@@ -803,8 +805,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	/**
 	 * Returns the integer square root of this integer.
 	 * 
-	 * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative or it's impossible to find a
-	 *         square root return <code>F.Sqrt(this)</code>.
+	 * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative or it's
+	 *         impossible to find a square root return <code>F.Sqrt(this)</code>.
 	 */
 	public IExpr sqrt() {
 		try {
