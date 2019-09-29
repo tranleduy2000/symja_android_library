@@ -9312,10 +9312,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testInverseWeierstrassP() {
-//		check("InverseWeierstrassP(2.0,{1,2})", //
-//				"-0.715096");
-//		 check("Table[InverseWeierstrassP[x, {1, 2}], {x, 2.0, 6.0}]",
-//				 "");
+		// check("InverseWeierstrassP(2.0,{1,2})", //
+		// "-0.715096");
+		// check("Table[InverseWeierstrassP[x, {1, 2}], {x, 2.0, 6.0}]",
+		// "");
 	}
 	public void testLaplaceTransform() {
 		check("LaplaceTransform(E^2,t,-3+s)", //
@@ -15818,6 +15818,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"230");
 		check("Round(226, -10)", //
 				"230");
+		check("Round({12.5, 62.1, 68.3, 74.5, 80.7}, 5)", //
+				"{10,60,70,75,80}");
 		check("Round({5, 15, 25, 35, 45}, 10)", //
 				"{0,20,20,40,40}");
 		check("Round(75.345677/7.56)", //
