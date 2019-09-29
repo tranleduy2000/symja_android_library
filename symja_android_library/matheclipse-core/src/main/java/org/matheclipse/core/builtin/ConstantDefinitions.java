@@ -2,6 +2,8 @@ package org.matheclipse.core.builtin;
 
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
+import org.apfloat.Apint;
+import org.apfloat.Aprational;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractSymbolEvaluator;
@@ -325,6 +327,13 @@ public class ConstantDefinitions {
 		}
 
 		@Override
+		public IExpr apfloatEval(ISymbol symbol, EvalEngine engine) {
+			// Pi / 180
+			Apfloat pi = ApfloatMath.pi(engine.getNumericPrecision());
+			return F.num(pi.divide(new Apint(180)));
+		}
+
+		@Override
 		public IExpr numericEval(final ISymbol symbol) {
 			return F.num(DEGREE);
 		}
@@ -462,6 +471,14 @@ public class ConstantDefinitions {
 		}
 
 		@Override
+		public IExpr apfloatEval(ISymbol symbol, EvalEngine engine) {
+			// (3-Sqrt(5)) * Pi
+			Apfloat pi = ApfloatMath.pi(engine.getNumericPrecision());
+			Apfloat five = new Apfloat(5, engine.getNumericPrecision());
+			return F.num(ApfloatMath.sqrt(five).negate().add(new Apint(3)).multiply(pi));
+		}
+
+		@Override
 		public IExpr numericEval(final ISymbol symbol) {
 			return F.num(GOLDEN_ANGLE);
 		}
@@ -510,6 +527,13 @@ public class ConstantDefinitions {
 			newSymbol.setAttributes(ISymbol.CONSTANT);
 		}
 
+		@Override
+		public IExpr apfloatEval(ISymbol symbol, EvalEngine engine) {
+			// (1/2)*(1+Sqrt(5))
+			Apfloat five = new Apfloat(5, engine.getNumericPrecision());
+			Apfloat half = new Aprational(Apint.ONE, new Apint(2));
+			return F.num(ApfloatMath.sqrt(five).add(Apfloat.ONE).multiply(half));
+		}
 		@Override
 		public IExpr numericEval(final ISymbol symbol) {
 			return F.num(GOLDEN_RATIO);
