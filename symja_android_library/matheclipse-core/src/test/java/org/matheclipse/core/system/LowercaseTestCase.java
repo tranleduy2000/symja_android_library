@@ -18381,7 +18381,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("SurvivalFunction(NormalDistribution(), {0.2, 0.3})", //
 				"{0.42074,0.382089}");
 		check("SurvivalFunction(BetaDistribution(1/2,1/2), {{0.0, 0.0}, {0.2, 0.2}, {0.3, 0.3}})", //
-				"{{1,1},{0.704833,0.704833},{0.63099,0.63099}}");
+				"{{1.0,1.0},{0.704833,0.704833},{0.63099,0.63099}}");
 		check("SurvivalFunction(NormalDistribution(0, 1), x)", //
 				"1-Erfc(-x/Sqrt(2))/2");
 		check("CDF(NormalDistribution(0, 1), x)", //
