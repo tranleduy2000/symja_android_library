@@ -669,7 +669,8 @@ public class SpecialFunctions {
 						return F.C1;
 					}
 				}
-					if (z.isNumeric() && a.isNumeric() && b.isNumeric()) {
+					if (engine.isNumericMode() && //
+							(z.isNumericFunction() && a.isNumericFunction() && b.isNumericFunction())) {
 						BetaDistribution beta = new BetaDistribution(a.evalDouble(), b.evalDouble());
 						return F.num(beta.inverseCumulativeProbability(z.evalDouble()));
 					}

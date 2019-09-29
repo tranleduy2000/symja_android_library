@@ -1983,6 +1983,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"0.0523");
 		check("CDF(BetaDistribution(2,3), 0.9)", //
 				"0.9963");
+		check("CDF(ChiSquareDistribution(3), 0.1)", //
+				"0.00816258");
+		check("CDF(ChiSquareDistribution(3), 0.9)", //
+				"0.174572");
+		check("CDF(ExponentialDistribution(3), 0.1)", //
+				"0.259182");
+		check("CDF(ExponentialDistribution(3), 0.9)", //
+				"0.932794");
 		// github #56
 		check("CDF(NormalDistribution(),-0.41)", //
 				"0.340903");
@@ -8874,6 +8882,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"0.142559");
 		check("InverseCDF(BetaDistribution(2,3), 0.9)", //
 				"0.679539");
+		check("InverseCDF(ChiSquareDistribution(3), 0.1)", //
+				"0.584374");
+		check("InverseCDF(ChiSquareDistribution(3), 0.9)", //
+				"6.25139");
+		check("InverseCDF(ExponentialDistribution(3), 0.1)", //
+				"0.0351202");
+		check("InverseCDF(ExponentialDistribution(3), 0.9)", //
+				"0.767528");
 		check("InverseCDF(GammaDistribution(a,b,g,d))", //
 				"ConditionalExpression(Piecewise({{d+b*InverseGammaRegularized(a,0,#1)^(1/g),0<#1<\n"
 						+ "1},{d,#1<=0}},Infinity),0<=#1<=1)&");
