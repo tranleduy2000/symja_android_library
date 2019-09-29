@@ -6,7 +6,6 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,7 +109,7 @@ public class JavaDoubleFormFactory extends DoubleFormFactory {
 		return get(false);
 	}
 
-	public void convertAST(final Appendable buf, final IAST function) throws IOException {
+	public void convertAST(final StringBuilder buf, final IAST function)  {
 		if (function.isNumericFunction()) {
 			try {
 				double value = EvalEngine.get().evalDouble(function);

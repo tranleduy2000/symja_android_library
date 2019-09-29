@@ -9,10 +9,9 @@ import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.math.MathException;
-import org.matheclipse.parser.client.operator.ASTNodeFactory;
 import org.matheclipse.parser.client.operator.Operator;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,14 +163,26 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 
 	public JavaScriptFormFactory(final boolean relaxedSyntax, final boolean reversed, int exponentFigures,
 			int significantFigures) {
-		this(relaxedSyntax, reversed, exponentFigures, significantFigures, null, USE_PURE_JS);
+		this(relaxedSyntax, reversed, exponentFigures, significantFigures, USE_PURE_JS);
 	}
 
+	/**
+	 * JavaScript converter constructor.
+	 *
+	 * @param relaxedSyntax
+	 * @param reversed
+	 * @param exponentFigures
+	 * @param significantFigures
+	 * @param javascriptFlavor
+	 */
 	public JavaScriptFormFactory(final boolean relaxedSyntax, final boolean reversed, int exponentFigures,
-			int significantFigures, List<String> sliderNames, int javascriptFlavor) {
+			int significantFigures, int javascriptFlavor) {
 		super(relaxedSyntax, reversed, exponentFigures, significantFigures);
-		this.sliderNames = sliderNames;
+		this.sliderNames = new ArrayList<String>();
 		this.javascriptFlavor = javascriptFlavor;
+	}
+	public void appendSlider(String sliderName) {
+		sliderNames.add(sliderName);
 	}
 	/**
 	 * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user readable string.
@@ -228,7 +239,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		return FUNCTIONS_STR_PURE_JS.get(symbol);
 	}
 
-	public void convertSymbol(final Appendable buf, final ISymbol symbol) throws IOException {
+	public void convertSymbol(final StringBuilder buf, final ISymbol symbol) {
 
 		if (symbol.isBuiltInSymbol()) {
 			String str = functionHead((ISymbol) symbol);
@@ -254,7 +265,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		return get(false);
 	}
 
-	public void convertAST(final Appendable buf, final IAST function) throws IOException {
+	public void convertAST(final StringBuilder buf, final IAST function) {
 		if (function.isNumericFunction()) {
 			try {
 				double value = EvalEngine.get().evalDouble(function);
@@ -452,8 +463,8 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		convert(buf, head);
 		convertArgs(buf, head, function);
 	}
-	protected boolean convertOperator(final Operator operator, final IAST list, final Appendable buf,
-									  final int precedence, ISymbol head) throws IOException {
+	protected boolean convertOperator(final Operator operator, final IAST list, final StringBuilder buf,
+			final int precedence, ISymbol head) {
 		if (!super.convertOperator(operator, list, buf, precedence, head)) {
 			if (javascriptFlavor == USE_MATHCELL) {
 			convertAST(buf, list);
@@ -467,26 +478,33 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 
 	public Operator getOperator(ISymbol head) {
 		if (javascriptFlavor == USE_MATHCELL) {
-			Operator operator = null;
 			if (head.isSymbolID(ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater, ID.GreaterEqual, ID.And, ID.Or,
 					ID.Not)) {
-				String str = head.toString();
-				operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+				return OutputFormFactory.getOperator(head);
+				// String str = head.toString();
+				// if (fRelaxedSyntax) {
+				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
+				// } else {
+				// operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+				// }
 			}
-			return operator;
+			return null;
 		} else if (javascriptFlavor == USE_JSXGRAPH) {
-			Operator operator = null;
 			if (head.isSymbolID(ID.Plus, ID.Times, ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater,
 					ID.GreaterEqual, ID.And, ID.Or, ID.Not)) {
-				String str = head.toString();
-				operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+				return OutputFormFactory.getOperator(head);
+				// String str = head.toString();
+				// if (fRelaxedSyntax) {
+				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
+				// } else {
+				// operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+				// }
 			}
-			return operator;
+			return null;
 		}
 		return super.getOperator(head);
 	}
-	public void convertComplex(final Appendable buf, final IComplex c, final int precedence, boolean caller)
-			throws IOException {
+	public void convertComplex(final StringBuilder buf, final IComplex c, final int precedence, boolean caller) {
 		buf.append("complex(");
 		convertFraction(buf, c.getRealPart(), 0, NO_PLUS_CALL);
 		buf.append(",");
@@ -494,8 +512,8 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		buf.append(")");
 	}
 
-	public void convertDoubleComplex(final Appendable buf, final IComplexNum dc, final int precedence, boolean caller)
-			throws IOException {
+	public void convertDoubleComplex(final StringBuilder buf, final IComplexNum dc, final int precedence,
+			boolean caller) {
 		buf.append("complex(");
 		convertDoubleString(buf, convertDoubleToFormattedString(dc.getRealPart()), 0, false);
 		buf.append(",");

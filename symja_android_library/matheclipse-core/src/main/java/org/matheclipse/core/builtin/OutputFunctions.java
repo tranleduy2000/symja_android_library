@@ -22,8 +22,6 @@ import org.matheclipse.core.polynomials.HornerScheme;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class OutputFunctions {
 
@@ -456,34 +454,8 @@ public final class OutputFunctions {
 		return buf.toString();
 	}
 
-	public static String toJavaScript(final IExpr arg1) throws IOException {
-		return toJavaScript(arg1, new ArrayList<String>());
-	}
-
-	public static String toJavaScript(final IExpr arg1, List<String> sliderNames) throws IOException {
-		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames, JavaScriptFormFactory.USE_PURE_JS);
-		StringBuilder buf = new StringBuilder();
-		factory.convert(buf, arg1);
-		return buf.toString();
-	}
-
-	public static String toMathcell(final IExpr arg1) throws IOException {
-		return toMathcell(arg1, new ArrayList<String>());
-	}
-
-	public static String toMathcell(final IExpr arg1, List<String> sliderNames) throws IOException {
-		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames, JavaScriptFormFactory.USE_MATHCELL);
-		StringBuilder buf = new StringBuilder();
-		factory.convert(buf, arg1);
-		return buf.toString();
-	}
-
-	public static String toJSXGraph(final IExpr arg1) throws IOException {
-		return toJSXGraph(arg1, new ArrayList<String>());
-	}
-
-	public static String toJSXGraph(final IExpr arg1, List<String> sliderNames) throws IOException {
-		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, sliderNames, JavaScriptFormFactory.USE_JSXGRAPH);
+	public static String toJavaScript(final IExpr arg1) {
+		DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, JavaScriptFormFactory.USE_PURE_JS);
 		StringBuilder buf = new StringBuilder();
 		factory.convert(buf, arg1);
 		return buf.toString();
