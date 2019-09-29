@@ -1086,7 +1086,7 @@ public class F {
     public final static IBuiltInSymbol GeometricDistribution = F.initFinalSymbol("GeometricDistribution", ID.GeometricDistribution);
     /***/
     public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
-    /** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. This function doesn't work in the web interface. A file system has to be available to load a package. */
+	/** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. */
     public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
 	/** Glaisher - Glaisher constant. */
     public final static IBuiltInSymbol Glaisher = F.initFinalSymbol("Glaisher", ID.Glaisher);
@@ -1995,7 +1995,10 @@ public class F {
     public final static IBuiltInSymbol PseudoInverse = F.initFinalSymbol("PseudoInverse", ID.PseudoInverse);
     /***/
     public final static IBuiltInSymbol Put = F.initFinalSymbol("Put", ID.Put);
-	/** QRDecomposition(matrix) - computes the QR decomposition of the `matrix`. */
+	/**
+	 * QRDecomposition(A) - computes the QR decomposition of the matrix `A`. The QR decomposition is a decomposition of
+	 * a matrix `A` into a product `A = Q.R` of an unitary matrix `Q` and an upper triangular matrix `R`.
+	 */
     public final static IBuiltInSymbol QRDecomposition = F.initFinalSymbol("QRDecomposition", ID.QRDecomposition);
 	/** Quantile(list, q) - returns the `q`-Quantile of `list`. */
     public final static IBuiltInSymbol Quantile = F.initFinalSymbol("Quantile", ID.Quantile);
@@ -2042,7 +2045,7 @@ public class F {
     public final static IBuiltInSymbol Re = F.initFinalSymbol("Re", ID.Re);
     /***/
     public final static IBuiltInSymbol ReadProtected = F.initFinalSymbol("ReadProtected", ID.ReadProtected);
-	/** Real - is the head of real (inexact) numbers. */
+	/** Real - is the head of real (floating point) numbers. */
     public final static IBuiltInSymbol Real = F.initFinalSymbol("Real", ID.Real);
 	/** RealNumberQ(expr) - returns `True` if `expr` is an explicit number with no imaginary component. */
     public final static IBuiltInSymbol RealNumberQ = F.initFinalSymbol("RealNumberQ", ID.RealNumberQ);
@@ -2234,11 +2237,11 @@ public class F {
             ID.SokalSneathDissimilarity);
 	/** Solve(equations, vars) - attempts to solve `equations` for the variables `vars`. */
     public final static IBuiltInSymbol Solve = F.initFinalSymbol("Solve", ID.Solve);
-	/** Sort(list) - sorts $list$ (or the leaves of any other expression) according to canonical ordering. */
+	/** Sort(list) - sorts `list` (or the leaves of any other expression) according to canonical ordering. */
     public final static IBuiltInSymbol Sort = F.initFinalSymbol("Sort", ID.Sort);
 	/**
-	 * Sort(list, f) - sorts `list` (or the leaves of any other expression) according to canonical ordering of the keys
-	 * that are extracted from the `list`'s elements using `f`. Chunks of leaves that appear the same under `f` are
+	 * SortBy(list, f) - sorts `list` (or the leaves of any other expression) according to canonical ordering of the
+	 * keys that are extracted from the `list`'s elements using `f`. Chunks of leaves that appear the same under `f` are
 	 * sorted according to their natural order (without applying `f`).
 	 */
 	public final static IBuiltInSymbol SortBy = F.initFinalSymbol("SortBy", ID.SortBy);
@@ -2397,7 +2400,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol TextString = F.initFinalSymbol("TextString", ID.TextString);
 
-    /** Thread(f(args) - threads `f` over any lists that appear in `args`.*/
+	/** Thread(f(args) - threads `f` over any lists that appear in `args`. */
     public final static IBuiltInSymbol Thread = F.initFinalSymbol("Thread", ID.Thread);
 	/** Through(p(f)[x]) - gives `p(f(x))`. */
     public final static IBuiltInSymbol Through = F.initFinalSymbol("Through", ID.Through);
@@ -2405,7 +2408,7 @@ public class F {
     public final static IBuiltInSymbol Throw = F.initFinalSymbol("Throw", ID.Throw);
     /***/
     public final static IBuiltInSymbol TimeConstrained = F.initFinalSymbol("TimeConstrained", ID.TimeConstrained);
-	/** TimeValue(p, i, n) - returns an time value calculation. */
+	/** TimeValue(p, i, n) - returns a time value calculation. */
     public final static IBuiltInSymbol TimeValue = F.initFinalSymbol("TimeValue", ID.TimeValue);
 	/** Times(a, b, ...) - represents the product of the terms `a, b, ...`. */
     public final static IBuiltInSymbol Times = F.initFinalSymbol("Times", ID.Times);
