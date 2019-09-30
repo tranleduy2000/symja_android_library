@@ -1964,6 +1964,13 @@ public class EvalEngine implements Serializable {
 	}
 
 	/**
+	 * @return <code>true</code> if the EvalEngine runs in numeric mode and Java <code>double</code> numbers should be
+	 *         used for evaluating numeric functions.
+	 */
+	public final boolean isDoubleMode() {
+		return fNumericMode && !isApfloat();
+	}
+	/**
 	 * Check if the <code>On()</code> has enabled the interactive trace
 	 *
 	 * @return
