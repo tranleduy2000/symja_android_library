@@ -459,12 +459,20 @@ public class SpecialFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			
+			try {
 			IExpr a = ast.arg1();
-			IExpr z = ast.arg2();
+				IExpr z1 = ast.arg2();
 			if (ast.isAST3()) {
+					IExpr z2 = ast.arg3();
+					if (engine.isNumericMode() && //
+							a.isNumericFunction() && z1.isNumericFunction()) {
+						double x = a.evalDouble();
+						return F.num(org.hipparchus.special.Gamma.regularizedGammaQ(x, z1.evalDouble()) - //
+								org.hipparchus.special.Gamma.regularizedGammaQ(x, z2.evalDouble()));
+					}
 				if (a.isOne()) {
 					// E^(-arg2)-E^(-arg3)
-					return F.Subtract(F.Power(F.E, F.Negate(z)), F.Power(F.E, F.Negate(ast.arg3())));
+						return F.Subtract(F.Power(F.E, F.Negate(z1)), F.Power(F.E, F.Negate(z2)));
 				}
 				if (a.isInteger()&&a.isNegative()) {
 					return F.C0;
@@ -473,22 +481,25 @@ public class SpecialFunctions {
 
 
 
-				// return F.Subtract(F.GammaRegularized(a, z), F.GammaRegularized(a, ast.arg3()));
 				return F.NIL;
 			}
 			if (a.isZero()) {
 				return F.C0;
 			} else if (a.isNumEqualRational(F.C1D2)) {
 				// Erfc(Sqrt(z))
-				return F.Erfc(F.Sqrt(z));
+					return F.Erfc(F.Sqrt(z1));
 			} else if (a.isOne()) {
 				// E^(-z)
-				return F.Power(F.E, F.Negate(F.z));
+					return F.Power(F.E, F.Negate(z1));
 			} else if (a.isInteger() && a.isNegative()) {
 				return F.C0;
 			}
+				if (engine.isNumericMode() && //
+						a.isNumericFunction() && z1.isNumericFunction()) {
+					return F.num(org.hipparchus.special.Gamma.regularizedGammaQ(a.evalDouble(), z1.evalDouble()));
+				}
 
-			if (z.isZero()) {
+				if (z1.isZero()) {
 				IExpr temp = a.re();
 				if (temp.isPositive()) {
 					return F.C1;
@@ -496,9 +507,16 @@ public class SpecialFunctions {
 				if (temp.isNegative()) {
 					return F.CComplexInfinity;
 				}
-			} else if (z.isMinusOne()) {
+				} else if (z1.isMinusOne()) {
 				// (E/Gamma[a])*Subfactorial(a - 1)
 				return F.Times(F.E, F.Power(F.Gamma(a), -1), F.Subfactorial(F.Plus(F.CN1, a)));
+			}
+			} catch (MathIllegalArgumentException miae) {
+				return IOFunctions.printMessage(F.GammaRegularized, "argillegal",
+						F.List(F.stringx(miae.getMessage()), ast), engine);
+			} catch (RuntimeException rex) {
+				return IOFunctions.printMessage(F.GammaRegularized, "argillegal",
+						F.List(F.stringx(rex.getMessage()), ast), engine);
 			}
 			return F.NIL;
 		}
