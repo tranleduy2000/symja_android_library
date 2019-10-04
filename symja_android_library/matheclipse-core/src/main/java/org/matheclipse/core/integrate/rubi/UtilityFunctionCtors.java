@@ -23,9 +23,8 @@ import static org.matheclipse.core.expression.F.senary;
 
 /**
  * UtilityFunction constructors from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- *
+ * <p>
  * TODO a lot of functions are only placeholders at the moment.
- *
  */
 public class UtilityFunctionCtors {
 
@@ -56,22 +55,22 @@ public class UtilityFunctionCtors {
 
     public static ISymbol Dist = org.matheclipse.core.expression.F.$rubi("Dist");
     public static ISymbol IntegerPowerQ = org.matheclipse.core.expression.F.$rubi("IntegerPowerQ");
-	public static ISymbol FractionalPowerQ = org.matheclipse.core.expression.F.$rubi("FractionalPowerQ");
+    public static ISymbol FractionalPowerQ = org.matheclipse.core.expression.F.$rubi("FractionalPowerQ");
 
-	public static ISymbol EqQ = F.$rubi("EqQ");
-	public static ISymbol GeQ = F.$rubi("GeQ");
-	public static ISymbol GtQ = F.$rubi("GtQ");
-	public static ISymbol IGtQ = F.$rubi("IGtQ");
-	public static ISymbol IGeQ = F.$rubi("IGeQ");
-	public static ISymbol ILtQ = F.$rubi("ILtQ");
-	public static ISymbol ILeQ = F.$rubi("ILeQ");
+    public static ISymbol EqQ = F.$rubi("EqQ");
+    public static ISymbol GeQ = F.$rubi("GeQ");
+    public static ISymbol GtQ = F.$rubi("GtQ");
+    public static ISymbol IGtQ = F.$rubi("IGtQ");
+    public static ISymbol IGeQ = F.$rubi("IGeQ");
+    public static ISymbol ILtQ = F.$rubi("ILtQ");
+    public static ISymbol ILeQ = F.$rubi("ILeQ");
 
-	public static ISymbol LtQ = F.$rubi("LtQ");
-	public static ISymbol LeQ = F.$rubi("LeQ");
-	public static ISymbol NegQ = F.$rubi("NegQ");
-	public static ISymbol NeQ = F.$rubi("NeQ");
-	public static ISymbol PolyQ = F.$rubi("PolyQ");
-	public static ISymbol PosQ = F.$rubi("PosQ");
+    public static ISymbol LtQ = F.$rubi("LtQ");
+    public static ISymbol LeQ = F.$rubi("LeQ");
+    public static ISymbol NegQ = F.$rubi("NegQ");
+    public static ISymbol NeQ = F.$rubi("NeQ");
+    public static ISymbol PolyQ = F.$rubi("PolyQ");
+    public static ISymbol PosQ = F.$rubi("PosQ");
 
     public static ISymbol ReapList = org.matheclipse.core.expression.F.$rubi("ReapList");
 
@@ -219,7 +218,7 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST IntBinomialQ(final IExpr... a) {
-		return function(F.$rubi("IntBinomialQ"), a);
+        return function(F.$rubi("IntBinomialQ"), a);
     }
 
     public static IAST IntHide(final IExpr a0, final IExpr a1) {
@@ -227,11 +226,11 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST IntLinearQ(final IExpr... a) {
-		return function(F.$rubi("IntLinearQ"), a);
+        return function(F.$rubi("IntLinearQ"), a);
     }
 
     public static IAST IntQuadraticQ(final IExpr... a) {
-		return function(F.$rubi("IntQuadraticQ"), a);
+        return function(F.$rubi("IntQuadraticQ"), a);
     }
 
     public static IAST Dist(final IExpr a0, final IExpr a1) {
@@ -439,15 +438,15 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST EqQ(final IExpr a0) {
-		return new AST1(EqQ, a0);
+        return new AST1(EqQ, a0);
     }
 
     public static IAST EqQ(final IExpr a0, final IExpr a1) {
-		return new AST2(EqQ, a0, a1);
+        return new AST2(EqQ, a0, a1);
     }
 
     public static IAST EqQ(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return new AST3(EqQ, a0, a1, a2);
+        return new AST3(EqQ, a0, a1, a2);
     }
 
     public static IAST EulerIntegrandQ(final IExpr a0, final IExpr a1) {
@@ -610,11 +609,11 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST FractionOrNegativeQ(final IExpr... a) {
-		return function(F.$rubi("FractionOrNegativeQ"), a);
+        return function(F.$rubi("FractionOrNegativeQ"), a);
     }
 
     public static IAST FractionQ(final IExpr... a) {
-		return function(FractionQ, a);
+        return function(FractionQ, a);
     }
 
     public static IAST FractionalPowerFreeQ(final IExpr a0) {
@@ -787,36 +786,36 @@ public class UtilityFunctionCtors {
         return new AST3(F.$rubi("FunctionOfTrigQ"), a0, a1, a2);
     }
 
-	// public static IAST GE(final IExpr a0, final IExpr a1) {
-	// return new AST2(F.$rubi("GE"), a0, a1);
-	// }
-	//
-	// public static IAST GE(final IExpr a0, final IExpr a1, final IExpr a2) {
-	// return new AST3(F.$rubi("GE"), a0, a1, a2);
-	// }
-	//
-	// public static IAST GT(final IExpr a0, final IExpr a1) {
-	// return new AST2(F.$rubi("GT"), a0, a1);
-	// }
-	//
-	// public static IAST GT(final IExpr a0, final IExpr a1, final IExpr a2) {
-	// return new AST3(F.$rubi("GT"), a0, a1, a2);
-	// }
+    // public static IAST GE(final IExpr a0, final IExpr a1) {
+    // return new AST2(F.$rubi("GE"), a0, a1);
+    // }
+    //
+    // public static IAST GE(final IExpr a0, final IExpr a1, final IExpr a2) {
+    // return new AST3(F.$rubi("GE"), a0, a1, a2);
+    // }
+    //
+    // public static IAST GT(final IExpr a0, final IExpr a1) {
+    // return new AST2(F.$rubi("GT"), a0, a1);
+    // }
+    //
+    // public static IAST GT(final IExpr a0, final IExpr a1, final IExpr a2) {
+    // return new AST3(F.$rubi("GT"), a0, a1, a2);
+    // }
 
     public static IAST GtQ(final IExpr a0, final IExpr a1) {
-		return new AST2(GtQ, a0, a1);
+        return new AST2(GtQ, a0, a1);
     }
 
     public static IAST GtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return new AST3(GtQ, a0, a1, a2);
+        return new AST3(GtQ, a0, a1, a2);
     }
 
     public static IAST GeQ(final IExpr a0, final IExpr a1) {
-		return new AST2(GeQ, a0, a1);
+        return new AST2(GeQ, a0, a1);
     }
 
     public static IAST GeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return new AST3(GeQ, a0, a1, a2);
+        return new AST3(GeQ, a0, a1, a2);
     }
 
 
@@ -881,19 +880,19 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST IGtQ(final IExpr a0, final IExpr a1) {
-		return new AST2(IGtQ, a0, a1);
+        return new AST2(IGtQ, a0, a1);
     }
 
     public static IAST IGeQ(final IExpr a0, final IExpr a1) {
-		return new AST2(IGeQ, a0, a1);
+        return new AST2(IGeQ, a0, a1);
     }
 
     public static IAST ILtQ(final IExpr a0, final IExpr a1) {
-		return new AST2(ILtQ, a0, a1);
+        return new AST2(ILtQ, a0, a1);
     }
 
     public static IAST ILeQ(final IExpr a0, final IExpr a1) {
-		return new AST2(ILeQ, a0, a1);
+        return new AST2(ILeQ, a0, a1);
     }
 
     public static IAST ImaginaryNumericQ(final IExpr a0) {
@@ -957,7 +956,7 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST IntegersQ(final IExpr... a) {
-		return function(IntegersQ, a);
+        return function(IntegersQ, a);
     }
 
     public static IAST Integral(final IExpr a0, final IExpr a1) {
@@ -1020,37 +1019,37 @@ public class UtilityFunctionCtors {
         return new AST3(F.$rubi("KnownTrigIntegrandQ"), a0, a1, a2);
     }
 
-	// public static IAST LE(final IExpr a0, final IExpr a1) {
-	// return new AST2(F.$rubi("LE"), a0, a1);
-	// }
-	//
-	// public static IAST LE(final IExpr a0, final IExpr a1, final IExpr a2) {
-	// return new AST3(F.$rubi("LE"), a0, a1, a2);
-	// }
+    // public static IAST LE(final IExpr a0, final IExpr a1) {
+    // return new AST2(F.$rubi("LE"), a0, a1);
+    // }
+    //
+    // public static IAST LE(final IExpr a0, final IExpr a1, final IExpr a2) {
+    // return new AST3(F.$rubi("LE"), a0, a1, a2);
+    // }
 
     public static IAST LtQ(final IExpr a0, final IExpr a1) {
-		return new AST2(LtQ, a0, a1);
+        return new AST2(LtQ, a0, a1);
     }
 
     public static IAST LtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return new AST3(LtQ, a0, a1, a2);
+        return new AST3(LtQ, a0, a1, a2);
     }
 
     public static IAST LeQ(final IExpr a0, final IExpr a1) {
-		return new AST2(LeQ, a0, a1);
+        return new AST2(LeQ, a0, a1);
     }
 
     public static IAST LeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return new AST3(LeQ, a0, a1, a2);
+        return new AST3(LeQ, a0, a1, a2);
     }
 
-	// public static IAST LT(final IExpr a0, final IExpr a1) {
-	// return new AST2(F.$rubi("LT"), a0, a1);
-	// }
-	//
-	// public static IAST LT(final IExpr a0, final IExpr a1, final IExpr a2) {
-	// return new AST3(F.$rubi("LT"), a0, a1, a2);
-	// }
+    // public static IAST LT(final IExpr a0, final IExpr a1) {
+    // return new AST2(F.$rubi("LT"), a0, a1);
+    // }
+    //
+    // public static IAST LT(final IExpr a0, final IExpr a1, final IExpr a2) {
+    // return new AST3(F.$rubi("LT"), a0, a1, a2);
+    // }
 
     public static IAST LeadBase(final IExpr a0) {
         return new AST1(F.$rubi("LeadBase"), a0);
@@ -1157,7 +1156,7 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST NegativeIntegerQ(final IExpr... a) {
-		return function(F.$rubi("NegativeIntegerQ"), a);
+        return function(F.$rubi("NegativeIntegerQ"), a);
     }
 
     public static IAST NegativeOrZeroQ(final IExpr a0) {
@@ -1169,11 +1168,11 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST NegQ(final IExpr a0) {
-		return new AST1(NegQ, a0);
+        return new AST1(NegQ, a0);
     }
 
     public static IAST NegQ(final IExpr a0, final IExpr a1) {
-		return new AST2(NegQ, a0, a1);
+        return new AST2(NegQ, a0, a1);
     }
 
     public static IAST NegSumBaseQ(final IExpr a0) {
@@ -1181,11 +1180,11 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST NeQ(final IExpr a0) {
-		return new AST1(NeQ, a0);
+        return new AST1(NeQ, a0);
     }
 
     public static IAST NeQ(final IExpr a0, final IExpr a1) {
-		return new AST2(NeQ, a0, a1);
+        return new AST2(NeQ, a0, a1);
     }
 
     public static IAST NiceSqrtAuxQ(final IExpr a0) {
@@ -1288,9 +1287,9 @@ public class UtilityFunctionCtors {
         return new AST2(F.$rubi("NormalizeTrigReduce"), a0, a1);
     }
 
-	// public static IAST NotFalseQ(final IExpr a0) {
-	// return new AST1(F.$rubi("NotFalseQ"), a0);
-	// }
+    // public static IAST NotFalseQ(final IExpr a0) {
+    // return new AST1(F.$rubi("NotFalseQ"), a0);
+    // }
 
     public static IAST NotIntegrableQ(final IExpr a0, final IExpr a1) {
         return new AST2(F.$rubi("NotIntegrableQ"), a0, a1);
@@ -1316,13 +1315,13 @@ public class UtilityFunctionCtors {
         return new AST3(F.$rubi("OddTrigPowerQ"), a0, a1, a2);
     }
 
-	// public static IAST OneQ(final IExpr a0) {
-	// return new AST1(F.$rubi("OneQ"), a0);
-	// }
-	//
-	// public static IAST OneQ(final IExpr... a) {
-	// return function(F.$rubi("OneQ"), a);
-	// }
+    // public static IAST OneQ(final IExpr a0) {
+    // return new AST1(F.$rubi("OneQ"), a0);
+    // }
+    //
+    // public static IAST OneQ(final IExpr... a) {
+    // return function(F.$rubi("OneQ"), a);
+    // }
 
     public static IAST PerfectPowerTest(final IExpr a0, final IExpr a1) {
         return new AST2(F.$rubi("PerfectPowerTest"), a0, a1);
@@ -1345,11 +1344,11 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST PolyQ(final IExpr a0, final IExpr a1) {
-		return new AST2(PolyQ, a0, a1);
+        return new AST2(PolyQ, a0, a1);
     }
 
     public static IAST PolyQ(final IExpr a0, final IExpr a1, final IExpr a2) {
-		return new AST3(PolyQ, a0, a1, a2);
+        return new AST3(PolyQ, a0, a1, a2);
     }
 
     public static IAST PolynomialDivide(final IExpr a0, final IExpr a1, final IExpr a2) {
@@ -1389,7 +1388,7 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST PosQ(final IExpr a0) {
-		return new AST1(PosQ, a0);
+        return new AST1(PosQ, a0);
     }
 
     public static IAST PositiveFactors(final IExpr a0) {
@@ -1401,7 +1400,7 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST PositiveIntegerQ(final IExpr... a) {
-		return function(F.$rubi("PositiveIntegerQ"), a);
+        return function(F.$rubi("PositiveIntegerQ"), a);
     }
 
     public static IAST PositiveOrZeroQ(final IExpr a0) {
@@ -1545,7 +1544,7 @@ public class UtilityFunctionCtors {
     }
 
     public static IAST RationalQ(final IExpr... a) {
-		return function(F.$rubi("RationalQ"), a);
+        return function(F.$rubi("RationalQ"), a);
     }
 
     // public static IAST RealNumericQ(final IExpr a0) {
@@ -1947,17 +1946,16 @@ public class UtilityFunctionCtors {
      * </pre>
      *
      * @param astTimes
-	 * @param engine
-	 *            TODO
+     * @param engine   TODO
      * @return
      */
-	public static IExpr evalRubiDistTimes(IAST astTimes, EvalEngine engine) {
+    public static IExpr evalRubiDistTimes(IAST astTimes, EvalEngine engine) {
         for (int i = 1; i < astTimes.size(); i++) {
             IExpr temp = astTimes.get(i);
             if (temp.isAST(Dist) && temp.size() == 4) {
-				IAST dist = engine.evalArgs((IAST) temp, ISymbol.NOATTRIBUTE).orElse((IAST) temp);
+                IAST dist = engine.evalArgs((IAST) temp, ISymbol.NOATTRIBUTE).orElse((IAST) temp);
                 temp = astTimes.removeAtCopy(i).oneIdentity1();
-				temp = engine.evaluate(temp);
+                temp = engine.evaluate(temp);
                 if (!temp.isMinusOne()) {
                     // System.out.println("w_*Dist[u_,v_,x_]");
                     // Dist[ temp *u,v,x]
@@ -1977,7 +1975,7 @@ public class UtilityFunctionCtors {
      *     0,
      *     Dist[u+w,v,x]]
      * </pre>
-	 *
+     * <p>
      * Rule 2:
      *
      * <pre>
@@ -1988,24 +1986,23 @@ public class UtilityFunctionCtors {
      * </pre>
      *
      * @param astPlus
-	 * @param engine
-	 *            TODO
+     * @param engine  TODO
      * @return
      */
-	public static IExpr evalRubiDistPlus(IAST astPlus, EvalEngine engine) {
+    public static IExpr evalRubiDistPlus(IAST astPlus, EvalEngine engine) {
         for (int i = 1; i < astPlus.size() - 1; i++) {
             IExpr arg1 = astPlus.get(i);
             if (arg1.isAST(Dist) && arg1.size() == 4) {
                 // dist1 = Dist[u_,v_,x_]
-				IAST dist1 = engine.evalArgs((IAST) arg1, ISymbol.NOATTRIBUTE).orElse((IAST) arg1);// (IAST) arg1;
+                IAST dist1 = engine.evalArgs((IAST) arg1, ISymbol.NOATTRIBUTE).orElse((IAST) arg1);// (IAST) arg1;
                 IExpr v = dist1.arg2();
-				IExpr x = dist1.arg3();
+                IExpr x = dist1.arg3();
                 for (int j = i + 1; j < astPlus.size(); j++) {
                     IExpr arg2 = astPlus.get(j);
-					if (arg2.isAST(Dist) && arg2.size() == 4 && arg2.getAt(2).equals(v) && arg2.getAt(3).equals(x)) {
+                    if (arg2.isAST(Dist) && arg2.size() == 4 && arg2.getAt(2).equals(v) && arg2.getAt(3).equals(x)) {
                         // dist2=Dist[w_,v_,x_]
-						IAST dist2 = engine.evalArgs((IAST) arg2, ISymbol.NOATTRIBUTE).orElse((IAST) arg2);// (IAST)
-																											// arg2;
+                        IAST dist2 = engine.evalArgs((IAST) arg2, ISymbol.NOATTRIBUTE).orElse((IAST) arg2);// (IAST)
+                        // arg2;
                         IASTAppendable result = astPlus.removeAtClone(j);
                         result.remove(i);
                         // Dist /: Dist[u_,v_,x_]+Dist[w_,v_,x_] :=
@@ -2018,9 +2015,9 @@ public class UtilityFunctionCtors {
                     }
                     if (arg2.isTimes() && arg2.size() == 3 && arg2.first().isMinusOne() && arg2.second().isAST(Dist)) {
                         // -1 * Dist[w_,v_,x_]
-						IAST dist2 = engine.evalArgs((IAST) arg2.second(), ISymbol.NOATTRIBUTE)
-								.orElse((IAST) arg2.second());// (IAST) arg2.second();
-						if (dist2.size() == 4 && dist2.getAt(2).equals(v) && dist2.getAt(3).equals(x)) {
+                        IAST dist2 = engine.evalArgs((IAST) arg2.second(), ISymbol.NOATTRIBUTE)
+                                .orElse((IAST) arg2.second());// (IAST) arg2.second();
+                        if (dist2.size() == 4 && dist2.getAt(2).equals(v) && dist2.getAt(3).equals(x)) {
                             IASTAppendable result = astPlus.removeAtClone(j);
                             result.remove(i);
                             // Dist /: Dist[u_,v_,x_]-Dist[w_,v_,x_] :=
@@ -2035,16 +2032,16 @@ public class UtilityFunctionCtors {
                 }
             } else if (arg1.isTimes() && arg1.size() == 3 && arg1.first().isMinusOne() && arg1.second().isAST(Dist)) {
                 // -1 * Dist[w_,v_,x_]
-				IAST dist1 = engine.evalArgs((IAST) arg1.second(), ISymbol.NOATTRIBUTE).orElse((IAST) arg1.second());// (IAST)
-																														// arg1.second();
+                IAST dist1 = engine.evalArgs((IAST) arg1.second(), ISymbol.NOATTRIBUTE).orElse((IAST) arg1.second());// (IAST)
+                // arg1.second();
                 IExpr v = dist1.arg2();
-				IExpr x = dist1.arg3();
+                IExpr x = dist1.arg3();
                 for (int j = i + 1; j < astPlus.size(); j++) {
                     IExpr arg2 = astPlus.get(j);
-					if (arg2.isAST(Dist) && arg2.size() == 4 && arg2.getAt(2).equals(v) && arg2.getAt(3).equals(x)) {
+                    if (arg2.isAST(Dist) && arg2.size() == 4 && arg2.getAt(2).equals(v) && arg2.getAt(3).equals(x)) {
                         // dist2 = Dist[u_,v_,x_]
-						IAST dist2 = engine.evalArgs((IAST) arg2, ISymbol.NOATTRIBUTE).orElse((IAST) arg2);// (IAST)
-																											// arg2;
+                        IAST dist2 = engine.evalArgs((IAST) arg2, ISymbol.NOATTRIBUTE).orElse((IAST) arg2);// (IAST)
+                        // arg2;
                         IASTAppendable result = astPlus.removeAtClone(j);
                         result.remove(i);
                         // Dist /: Dist[u_,v_,x_]-Dist[w_,v_,x_] :=

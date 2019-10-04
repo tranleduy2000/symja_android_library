@@ -158,8 +158,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 			org.matheclipse.core.integrate.rubi.UtilityFunctions28.initialize();
 			org.matheclipse.core.integrate.rubi.UtilityFunctions29.initialize();
 			org.matheclipse.core.integrate.rubi.UtilityFunctions30.initialize();
-			org.matheclipse.core.integrate.rubi.UtilityFunctions31.initialize();
-
+			org.matheclipse.core.integrate.rubi.UtilityFunctions31.initialize(); 
+			
 			// org.matheclipse.core.integrate.rubi.UtilityFunctions.init();
 		}
 
@@ -365,7 +365,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			org.matheclipse.core.integrate.rubi.IntRules197.initialize();
 			org.matheclipse.core.integrate.rubi.IntRules198.initialize();
 			org.matheclipse.core.integrate.rubi.IntRules199.initialize();
-
+			
 			org.matheclipse.core.integrate.rubi.IntRules200.initialize();
 			org.matheclipse.core.integrate.rubi.IntRules201.initialize();
 			org.matheclipse.core.integrate.rubi.IntRules202.initialize();
@@ -702,7 +702,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 		return ast.mapThread(F.Integrate(null, x), 1);
 	}
 
-
 	/**
 	 * Check if the polynomial has maximum degree 2 in 1 variable and return the coefficients.
 	 * 
@@ -748,7 +747,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 		}
 		return false;
 	}
-
 
 	/**
 	 * See <a href="http://en.wikipedia.org/wiki/Integration_by_parts">Wikipedia- Integration by parts</a>
@@ -828,8 +826,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 						rex.printStackTrace();
 					}
 					engine.setRecursionLimit(limit);
-					return engine.printMessage("Integrate Rubi recursion limit " + Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT
-							+ " RuntimeException: " + ast.toString());
+					return engine.printMessage("Integrate Rubi recursion limit "
+							+ Config.INTEGRATE_RUBI_RULES_RECURSION_LIMIT + " RuntimeException: " + ast.toString());
 
 				}
 
@@ -844,10 +842,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 			} finally {
 				engine.setRecursionLimit(limit);
 				if (newCache) {
-					// Swift changed: call clear() before assign null value
-					if (engine.REMEMBER_AST_CACHE != null) {
-						engine.REMEMBER_AST_CACHE.cleanUp();
-					}
 					engine.REMEMBER_AST_CACHE = null;
 				}
 				engine.setQuietMode(quietMode);
@@ -924,7 +918,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 		}
 	}
 
-
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -952,8 +945,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 		F.ISet(F.$s("§$inversetrigfunctions"), F.List(F.ArcSin, F.ArcCos, F.ArcTan, F.ArcCot, F.ArcSec, F.ArcCsc));
 		F.ISet(F.$s("§$inversehyperbolicfunctions"),
 				F.List(F.ArcSinh, F.ArcCosh, F.ArcTanh, F.ArcCoth, F.ArcSech, F.ArcCsch));
-		F.ISet(F.$s("§$calculusfunctions"), F.List(F.D, F.Sum, F.Product, F.Integrate,
-				F.$rubi("Unintegrable"), F.$rubi("CannotIntegrate"), F.$rubi("Dif"), F.$rubi("Subst")));
+		F.ISet(F.$s("§$calculusfunctions"), F.List(F.D, F.Sum, F.Product, F.Integrate, F.$rubi("Unintegrable"),
+				F.$rubi("CannotIntegrate"), F.$rubi("Dif"), F.$rubi("Subst")));
 		F.ISet(F.$s("§$stopfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern, F.If, F.Integrate,
 				F.$rubi("Unintegrable"), F.$rubi("CannotIntegrate")));
 		F.ISet(F.$s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
@@ -965,6 +958,5 @@ public class Integrate extends AbstractFunctionEvaluator {
 				F.Function(
 						F.And(F.SameQ(F.Head(F.Slot1), F.Power), F.SameQ(F.Head(F.Part(F.Slot1, F.C2)), F.Rational))));
 	}
-
 
 }
