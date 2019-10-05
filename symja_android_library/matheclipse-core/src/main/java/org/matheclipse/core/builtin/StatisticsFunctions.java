@@ -241,9 +241,12 @@ public class StatisticsFunctions {
 		 * </ul>
 		 *
 		 * @param x
+		 * @param engine
+		 *            TODO
+		 *
 		 * @return
 		 */
-		IExpr pdf(IAST dist, IExpr x);
+		IExpr pdf(IAST dist, IExpr x, EvalEngine engine);
 		/**
 		 * Call the pure (CDF, InverseCDF, PDF,...) function.
 		 *
@@ -561,7 +564,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr p = dist.arg1();
 				//
@@ -716,11 +719,21 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
+				if (!engine.isApfloat() && //
+						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
+								b.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( Piecewise({{((1 - #)^(-1 + b)*#^(-1 + a))/Beta(a, b), 0 < #< 1}}, 0)&) $]
 						F.Function(
@@ -1162,7 +1175,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
@@ -1328,9 +1341,18 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr v = dist.arg1();
+				if (!engine.isApfloat() && //
+						(v.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.ChiSquaredDistribution(v.evalDouble()) //
+								.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{#^(-1 + v/2)/(2^(v/2)*E^(#/2)*Gamma(v/2)), # > 0}}, 0) & $]
 						F.Function(
@@ -1552,10 +1574,20 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(
+								new org.hipparchus.distribution.continuous.FDistribution(n.evalDouble(), m.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{(#^(-1 + n/2)*m^(m/2)*n^(n/2)*(m + #*n)^((1/2)*(-m - n)))/Beta(n/2, m/2), # >
 						// 0}}, 0) & $]
@@ -1686,7 +1718,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
@@ -1903,11 +1935,21 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
+				if (!engine.isApfloat() && //
+						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.GammaDistribution(a.evalDouble(),
+								b.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( Piecewise({{#^(-1 + a)/(b^a*E^(#/b)*Gamma(a)), # > 0}}, 0) & ) $]
 						F.Function(
@@ -2030,7 +2072,7 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
 				//
@@ -2186,7 +2228,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
@@ -2388,7 +2430,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST3()) {
 				IExpr n = dist.arg1();
 				IExpr ns = dist.arg2();
@@ -2675,7 +2717,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			IExpr[] minMax = minmax(dist);
 			if (minMax != null) {
 				IExpr a = minMax[0];
@@ -2795,7 +2837,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
@@ -3043,7 +3085,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
 				//
@@ -3303,6 +3345,16 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.LogNormalDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{(1/2)*Erfc((n - Log(#))/(Sqrt(2)*m)), # > 0}}, 0) & $]
 						F.Function(
@@ -3321,6 +3373,16 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.LogNormalDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(Piecewise({{E^(n - Sqrt(2)*m*InverseErfc(2*#)), 0 < # < 1}, {0, #
 						// <= 0}}, Infinity), 0 <= # <= 1)& ) $]
@@ -3338,11 +3400,21 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.LogNormalDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ (Piecewise({{1/(E^((-n + Log(#))^2/(2*m^2))*(#*m*Sqrt(2*Pi))), # > 0}}, 0)) & $]
 						F.Function(
@@ -3653,6 +3725,16 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.NakagamiDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{GammaRegularized(n, 0, (#^2*n)/m), # > 0}}, 0) & $]
 						F.Function(F.Piecewise(F
@@ -3669,6 +3751,16 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.NakagamiDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(Piecewise({{Sqrt((m*InverseGammaRegularized(n, 0, #))/n), 0 < # <
 						// 1}, {0, # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
@@ -3684,11 +3776,21 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.NakagamiDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ (Piecewise({{(2*#^(-1 + 2*n)*(n/m)^n)/(E^((#^2*n)/m)*Gamma(n)), # > 0}}, 0)) & $]
 						F.Function(
@@ -3845,6 +3947,16 @@ public class StatisticsFunctions {
 				//
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.NormalDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( (1/2)*Erfc((-# + n)/(Sqrt(2)*m)) &) $]
 						F.Function(F.Times(F.C1D2,
@@ -3865,6 +3977,16 @@ public class StatisticsFunctions {
 			} else if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.NormalDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(n - Sqrt(2)*m*InverseErfc(2*#1), 0 <= #1 <= 1) &) $]
 						F.Function(F.ConditionalExpression(
@@ -3876,7 +3998,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST0()) {
 				IExpr function =
 						// [$ ( 1/(E^(#^2/2)*Sqrt(2*Pi)) & ) $]
@@ -3886,6 +4008,16 @@ public class StatisticsFunctions {
 				//
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.NormalDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( 1/(E^((# - n)^2/(2*m^2))*(m*Sqrt(2*Pi))) & ) $]
 						F.Function(F.Power(F.Times(F.Exp(
@@ -4098,7 +4230,7 @@ public class StatisticsFunctions {
 										IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
 										if (evaluator instanceof IPDF) {
 											IPDF pdf = (IPDF) evaluator;
-											return pdf.pdf(dist, xArg);
+										return pdf.pdf(dist, xArg, engine);
 										}
 									}
 								}
@@ -4182,7 +4314,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr p = dist.arg1();
 				//
@@ -4854,10 +4986,19 @@ public class StatisticsFunctions {
 			return F.NIL;
 		}
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
 				//
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.TDistribution(n.evalDouble()) //
+								.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ (n/(#^2 + n))^((1 + n)/2)/(Sqrt(n)*Beta(n/2, 1/2)) & $]
 						F.Function(F.Times(
@@ -5034,6 +5175,16 @@ public class StatisticsFunctions {
 			if (minMax != null) {
 				IExpr a = minMax[0];
 				IExpr b = minMax[1];
+				if (!engine.isApfloat() && //
+						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.UniformRealDistribution(a.evalDouble(),
+								b.evalDouble()) //
+										.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{(# - a)/(b - a), a <= # <= b}, {1, # > b}}, 0) & $]
 						F.Function(
@@ -5051,6 +5202,16 @@ public class StatisticsFunctions {
 			if (minMax != null) {
 				IExpr a = minMax[0];
 				IExpr b = minMax[1];
+				if (!engine.isApfloat() && //
+						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.UniformRealDistribution(a.evalDouble(),
+								b.evalDouble()) //
+										.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(Piecewise({{(1 - #)*a + #*b, 0 < # < 1}, {a, # <= 0}}, b), 0 <= #
 						// <= 1)& ) $]
@@ -5067,7 +5228,7 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			IExpr[] minMax = minmax(dist);
 			if (minMax != null) {
 				IExpr a = minMax[0];
@@ -5297,6 +5458,16 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.WeibullDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.cumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{1 - E^(-(#/m)^n),# > 0}}, 0) & $]
 						F.Function(
@@ -5333,11 +5504,21 @@ public class StatisticsFunctions {
 		}
 
 		@Override
-		public IExpr pdf(IAST dist, IExpr k) {
+		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.WeibullDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.density(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ Piecewise({{((#/m)^(-1 + n)*n)/(E^(#/m)^n*m), # > 0}}, 0) & $]
 						F.Function(F.Piecewise(F.List(F.List(
