@@ -86,6 +86,7 @@ public class MMAConsole {
 		// distinguish between lower- and uppercase identifiers
 		Config.PARSER_USE_LOWERCASE_SYMBOLS = false;
 		Config.USE_VISJS = true;
+		Config.FILESYSTEM_ENABLED = true;
 		F.initSymbols(null, null, true);
 		MMAConsole console;
 		try {

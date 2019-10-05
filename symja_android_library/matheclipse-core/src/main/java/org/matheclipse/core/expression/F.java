@@ -222,7 +222,7 @@ public class F {
     public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
     /** Abs(expr) - returns the absolute value of the real or complex number `expr`.*/
     public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
-    /** AbsArg(expr) - returns a list the 2 values of the real or complex number `Abs(expr), Arg(expr)`.*/
+    /** AbsArg(expr) - returns a list of 2 values of the complex number `Abs(expr), Arg(expr)`.*/
     public final static IBuiltInSymbol AbsArg = F.initFinalSymbol("AbsArg", ID.AbsArg);
 	/** Accumulate(list) - accumulate the values of `list` returning a new list. */
     public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
@@ -1239,7 +1239,11 @@ public class F {
      */
     public final static IBuiltInSymbol Inner = F.initFinalSymbol("Inner", ID.Inner);
     /***/
+    public final static IBuiltInSymbol Input = F.initFinalSymbol("Input", ID.Input);
+    /***/
     public final static IBuiltInSymbol InputForm = F.initFinalSymbol("InputForm", ID.InputForm);
+    /***/
+    public final static IBuiltInSymbol InputString = F.initFinalSymbol("InputString", ID.InputString);
     /***/
     public final static IBuiltInSymbol Insert = F.initFinalSymbol("Insert", ID.Insert);
 	/** Integer - is the head of integers. */
