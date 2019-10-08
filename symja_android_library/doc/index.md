@@ -97,7 +97,7 @@ I ^ 2
 Tan(I + 0.5)
 ```
 
-Abs calculates absolute values:
+`Abs` calculates absolute values:
 
 ```
 Abs(-3)
@@ -318,6 +318,7 @@ for a full description of their possible arguments, options, etc., see their ent
 * [Det](functions/Det.md)
 * [Diagonal](functions/Diagonal.md)
 * [DiagonalMatrix](functions/DiagonalMatrix.md)
+* [DialogInput](functions/DialogInput.md)
 * [DiceDissimilarity](functions/DiceDissimilarity.md)
 * [Diff](functions/Diff.md)
 * [DigitQ](functions/DigitQ.md)
@@ -470,6 +471,8 @@ for a full description of their possible arguments, options, etc., see their ent
 * [InexactNumberQ](functions/InexactNumberQ.md)
 * [Infinity](functions/Infinity.md)
 * [Inner](functions/Inner.md)
+* [Input](functions/Input.md)
+* [InputString](functions/InputString.md)
 * [Int](functions/Int.md)
 * [Integer](functions/Integer.md)
 * [IntegerDigits](functions/IntegerDigits.md)
@@ -769,6 +772,7 @@ for a full description of their possible arguments, options, etc., see their ent
 * [SymbolQ](functions/SymbolQ.md)
 * [SymmetricMatrixQ](functions/SymmetricMatrixQ.md)
 * [SyntaxQ](functions/SyntaxQ.md)
+* [SystemDialogInput](functions/SystemDialogInput.md)
 * [Table](functions/Table.md)
 * [Take](functions/Take.md)
 * [Tan](functions/Tan.md)
@@ -791,6 +795,7 @@ for a full description of their possible arguments, options, etc., see their ent
 * [Tr](functions/Tr.md)
 * [Trace](functions/Trace.md)
 * [Transpose](functions/Transpose.md)
+* [TreeForm](functions/TreeForm.md)
 * [TrigExpand](functions/TrigExpand.md)
 * [TrigReduce](functions/TrigReduce.md)
 * [TrigToExp](functions/TrigToExp.md)
