@@ -34,8 +34,6 @@ Infeasible systems are reported:
 
 ```
 >> LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 3})
- : Linear equation encountered that has no solution.
- 
 LinearSolve({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, {1, -2, 3})
 ```
 

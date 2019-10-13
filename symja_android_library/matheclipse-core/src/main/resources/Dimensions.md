@@ -11,14 +11,14 @@ Dimensions(expr)
 A vector of length 3:
 ``` 
 >> Dimensions({a, b, c})
- = {3}
+{3}
 ``` 
 
 A 3x2 matrix:
 
 ``` 
 >> Dimensions({{a, b}, {c, d}, {e, f}})
- = {3, 2}
+{3, 2}
 ``` 
 
 Ragged arrays are not taken into account:
