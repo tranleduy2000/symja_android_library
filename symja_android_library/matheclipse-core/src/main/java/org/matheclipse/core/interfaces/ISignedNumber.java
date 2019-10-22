@@ -1,5 +1,6 @@
 package org.matheclipse.core.interfaces;
 
+import org.apfloat.Apfloat;
 import org.matheclipse.core.expression.ApfloatNum;
 
 /**
@@ -20,6 +21,8 @@ public interface ISignedNumber extends INumber {
      * @return this signed number represented as an ApfloatNum
      */
     ApfloatNum apfloatNumValue(long precision);
+
+    public Apfloat apfloatValue(long precision);
 
     /**
      * {@inheritDoc}

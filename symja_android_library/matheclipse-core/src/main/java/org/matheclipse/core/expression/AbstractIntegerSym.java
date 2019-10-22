@@ -276,6 +276,11 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	@Override
+	public Apfloat  apfloatValue(long precision) {
+		return new Apfloat(toBigNumerator(), precision);
+	}
+
+	@Override
 	public IInteger ceil() {
 		return this;
 	}

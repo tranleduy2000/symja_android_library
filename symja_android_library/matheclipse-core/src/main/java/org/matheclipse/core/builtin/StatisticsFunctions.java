@@ -286,7 +286,7 @@ public class StatisticsFunctions {
 		}
 		@Override
 		public IExpr e2ApfloatArg(final ApfloatNum a, final ApfloatNum b) {
-			return F.num(ApfloatMath.agm(a.apfloatValue(), b.apfloatValue()));
+			return F.num(ApfloatMath.agm(a.apfloatValue(a.precision()), b.apfloatValue(b.precision())));
 		}
 
 		@Override
@@ -5486,6 +5486,16 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
+				if (!engine.isApfloat() && //
+						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
+					try {
+						return F.num(new org.hipparchus.distribution.continuous.WeibullDistribution(n.evalDouble(),
+								m.evalDouble()) //
+										.inverseCumulativeProbability(k.evalDouble()));
+					} catch (RuntimeException rex) {
+						//
+					}
+				}
 				IExpr function =
 						// [$ ( ConditionalExpression(Piecewise({{m*(-Log(1 - #))^(1/n), 0 < # < 1}, {0, # <= 0}},
 						// Infinity), 0 <= # <= 1)& ) $]
