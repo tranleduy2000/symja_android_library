@@ -99,42 +99,41 @@ public class ExpTrigsFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.AngleVector.setEvaluator(new AngleVector());
-		F.ArcCos.setEvaluator(new ArcCos());
-		F.ArcCosh.setEvaluator(new ArcCosh());
-		F.ArcCot.setEvaluator(new ArcCot());
-		F.ArcCoth.setEvaluator(new ArcCoth());
-		F.ArcCsc.setEvaluator(new ArcCsc());
-		F.ArcCsch.setEvaluator(new ArcCsch());
-		F.ArcSec.setEvaluator(new ArcSec());
-		F.ArcSech.setEvaluator(new ArcSech());
-		F.ArcSin.setEvaluator(new ArcSin());
-		F.ArcSinh.setEvaluator(new ArcSinh());
-		F.ArcTan.setEvaluator(new ArcTan());
-		F.ArcTanh.setEvaluator(new ArcTanh());
-		F.CirclePoints.setEvaluator(new CirclePoints());
-		F.Cos.setEvaluator(new Cos());
-		F.Cosh.setEvaluator(new Cosh());
-		F.Cot.setEvaluator(new Cot());
-		F.Coth.setEvaluator(new Coth());
-		F.Csc.setEvaluator(new Csc());
-		F.Csch.setEvaluator(new Csch());
-		F.Exp.setEvaluator(new Exp());
-		F.Haversine.setEvaluator(new Haversine());
-		F.InverseHaversine.setEvaluator(new InverseHaversine());
-		F.Log.setEvaluator(new Log());
-		F.LogisticSigmoid.setEvaluator(new LogisticSigmoid());
-		F.Log10.setEvaluator(new Log10());
-		F.Log2.setEvaluator(new Log2());
-		F.Sec.setEvaluator(new Sec());
-		F.Sech.setEvaluator(new Sech());
-		F.Sin.setEvaluator(new Sin());
-		F.Sinc.setEvaluator(new Sinc());
-		F.Sinh.setEvaluator(new Sinh());
-		F.Tan.setEvaluator(new Tan());
-		F.Tanh.setEvaluator(new Tanh());
-
-	}
+			F.AngleVector.setEvaluator(new AngleVector());
+			F.ArcCos.setEvaluator(new ArcCos());
+			F.ArcCosh.setEvaluator(new ArcCosh());
+			F.ArcCot.setEvaluator(new ArcCot());
+			F.ArcCoth.setEvaluator(new ArcCoth());
+			F.ArcCsc.setEvaluator(new ArcCsc());
+			F.ArcCsch.setEvaluator(new ArcCsch());
+			F.ArcSec.setEvaluator(new ArcSec());
+			F.ArcSech.setEvaluator(new ArcSech());
+			F.ArcSin.setEvaluator(new ArcSin());
+			F.ArcSinh.setEvaluator(new ArcSinh());
+			F.ArcTan.setEvaluator(new ArcTan());
+			F.ArcTanh.setEvaluator(new ArcTanh());
+			F.CirclePoints.setEvaluator(new CirclePoints());
+			F.Cos.setEvaluator(new Cos());
+			F.Cosh.setEvaluator(new Cosh());
+			F.Cot.setEvaluator(new Cot());
+			F.Coth.setEvaluator(new Coth());
+			F.Csc.setEvaluator(new Csc());
+			F.Csch.setEvaluator(new Csch());
+			F.Exp.setEvaluator(new Exp());
+			F.Haversine.setEvaluator(new Haversine());
+			F.InverseHaversine.setEvaluator(new InverseHaversine());
+			F.Log.setEvaluator(new Log());
+			F.LogisticSigmoid.setEvaluator(new LogisticSigmoid());
+			F.Log10.setEvaluator(new Log10());
+			F.Log2.setEvaluator(new Log2());
+			F.Sec.setEvaluator(new Sec());
+			F.Sech.setEvaluator(new Sech());
+			F.Sin.setEvaluator(new Sin());
+			F.Sinc.setEvaluator(new Sinc());
+			F.Sinh.setEvaluator(new Sinh());
+			F.Tan.setEvaluator(new Tan());
+			F.Tanh.setEvaluator(new Tanh());
+		}
 	}
 
 	private final static class AngleVector extends AbstractFunctionEvaluator {

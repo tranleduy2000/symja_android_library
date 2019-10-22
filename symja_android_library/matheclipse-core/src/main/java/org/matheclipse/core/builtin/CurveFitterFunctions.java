@@ -30,9 +30,9 @@ public class CurveFitterFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.FindFit.setEvaluator(new FindFit());
-		F.Fit.setEvaluator(new Fit());
-	}
+			F.FindFit.setEvaluator(new FindFit());
+			F.Fit.setEvaluator(new Fit());
+		}
 	}
 
 	/**

@@ -22,10 +22,10 @@ public class WXFFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.BinarySerialize.setEvaluator(new BinarySerialize());
-		F.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
-		F.ByteArray.setEvaluator(new ByteArray());
-	}
+			F.BinarySerialize.setEvaluator(new BinarySerialize());
+			F.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
+			F.ByteArray.setEvaluator(new ByteArray());
+		}
 	}
 
 	private static class BinarySerialize extends AbstractCoreFunctionEvaluator {

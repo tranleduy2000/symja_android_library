@@ -19,11 +19,11 @@ public class VectorAnalysisFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.Curl.setEvaluator(new Curl());
-		F.Div.setEvaluator(new Div());
-		F.Grad.setEvaluator(new Grad());
-		F.RotationMatrix.setEvaluator(new RotationMatrix());
-	}
+			F.Curl.setEvaluator(new Curl());
+			F.Div.setEvaluator(new Div());
+			F.Grad.setEvaluator(new Grad());
+			F.RotationMatrix.setEvaluator(new RotationMatrix());
+		}
 	}
 
 	/**

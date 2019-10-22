@@ -125,52 +125,52 @@ public final class Arithmetic {
 	 */
 	private static class Initializer {
 
-		private static void init() {
-        F.Plus.setDefaultValue(F.C0);
-        F.Plus.setEvaluator(CONST_PLUS);
-        F.Times.setDefaultValue(F.C1);
-        F.Times.setEvaluator(CONST_TIMES);
-        F.Power.setDefaultValue(2, F.C1);
-        F.Power.setEvaluator(CONST_POWER);
-        F.Sqrt.setEvaluator(new Sqrt());
-        F.Surd.setEvaluator(new Surd());
-        F.Minus.setEvaluator(new Minus());
+        private static void init() {
+            F.Plus.setDefaultValue(F.C0);
+            F.Plus.setEvaluator(CONST_PLUS);
+            F.Times.setDefaultValue(F.C1);
+            F.Times.setEvaluator(CONST_TIMES);
+            F.Power.setDefaultValue(2, F.C1);
+            F.Power.setEvaluator(CONST_POWER);
+            F.Sqrt.setEvaluator(new Sqrt());
+            F.Surd.setEvaluator(new Surd());
+            F.Minus.setEvaluator(new Minus());
 
-        F.Abs.setEvaluator(new Abs());
-			F.AbsArg.setEvaluator(new AbsArg());
-        F.AddTo.setEvaluator(new AddTo());
-        F.Arg.setEvaluator(new Arg());
-        F.Chop.setEvaluator(new Chop());
-        F.Clip.setEvaluator(new Clip());
-        F.Complex.setEvaluator(CONST_COMPLEX);
-        F.ConditionalExpression.setEvaluator(new ConditionalExpression());
-        F.Conjugate.setEvaluator(new Conjugate());
-        F.Decrement.setEvaluator(new Decrement());
-		F.Differences.setEvaluator(new Differences());
-        F.DirectedInfinity.setEvaluator(new DirectedInfinity());
-        F.Divide.setEvaluator(new Divide());
-        F.DivideBy.setEvaluator(new DivideBy());
-        F.Gamma.setEvaluator(new Gamma());
-        F.GCD.setEvaluator(new GCD());
-        F.HarmonicNumber.setEvaluator(new HarmonicNumber());
-        F.Im.setEvaluator(new Im());
-        F.Increment.setEvaluator(new Increment());
-        F.LCM.setEvaluator(new LCM());
-        F.N.setEvaluator(new N());
-        F.Piecewise.setEvaluator(new Piecewise());
-        F.Pochhammer.setEvaluator(new Pochhammer());
-        F.Precision.setEvaluator(new Precision());
-        F.PreDecrement.setEvaluator(new PreDecrement());
-        F.PreIncrement.setEvaluator(new PreIncrement());
-        F.Rational.setEvaluator(CONST_RATIONAL);
-        F.Re.setEvaluator(new Re());
-			F.Sign.setEvaluator(new Sign());
-			F.SignCmp.setEvaluator(new SignCmp());
-        F.Subtract.setEvaluator(new Subtract());
-        F.SubtractFrom.setEvaluator(new SubtractFrom());
-        F.TimesBy.setEvaluator(new TimesBy());
+            F.Abs.setEvaluator(new Abs());
+            F.AbsArg.setEvaluator(new AbsArg());
+            F.AddTo.setEvaluator(new AddTo());
+            F.Arg.setEvaluator(new Arg());
+            F.Chop.setEvaluator(new Chop());
+            F.Clip.setEvaluator(new Clip());
+            F.Complex.setEvaluator(CONST_COMPLEX);
+            F.ConditionalExpression.setEvaluator(new ConditionalExpression());
+            F.Conjugate.setEvaluator(new Conjugate());
+            F.Decrement.setEvaluator(new Decrement());
+            F.Differences.setEvaluator(new Differences());
+            F.DirectedInfinity.setEvaluator(new DirectedInfinity());
+            F.Divide.setEvaluator(new Divide());
+            F.DivideBy.setEvaluator(new DivideBy());
+            F.Gamma.setEvaluator(new Gamma());
+            F.GCD.setEvaluator(new GCD());
+            F.HarmonicNumber.setEvaluator(new HarmonicNumber());
+            F.Im.setEvaluator(new Im());
+            F.Increment.setEvaluator(new Increment());
+            F.LCM.setEvaluator(new LCM());
+            F.N.setEvaluator(new N());
+            F.Piecewise.setEvaluator(new Piecewise());
+            F.Pochhammer.setEvaluator(new Pochhammer());
+            F.Precision.setEvaluator(new Precision());
+            F.PreDecrement.setEvaluator(new PreDecrement());
+            F.PreIncrement.setEvaluator(new PreIncrement());
+            F.Rational.setEvaluator(CONST_RATIONAL);
+            F.Re.setEvaluator(new Re());
+            F.Sign.setEvaluator(new Sign());
+            F.SignCmp.setEvaluator(new SignCmp());
+            F.Subtract.setEvaluator(new Subtract());
+            F.SubtractFrom.setEvaluator(new SubtractFrom());
+            F.TimesBy.setEvaluator(new TimesBy());
 
-    }
+        }
 	}
 
     /**

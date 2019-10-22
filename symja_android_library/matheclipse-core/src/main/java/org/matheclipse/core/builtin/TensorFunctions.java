@@ -29,15 +29,15 @@ public class TensorFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.ArrayReshape.setEvaluator(new ArrayReshape());
-		F.Ordering.setEvaluator(new Ordering());
-		F.ListConvolve.setEvaluator(new ListConvolve());
-		F.ListCorrelate.setEvaluator(new ListCorrelate());
-		F.TensorDimensions.setEvaluator(new TensorDimensions());
-		F.TensorProduct.setEvaluator(new TensorProduct());
-		F.TensorRank.setEvaluator(new TensorRank());
-		F.TensorSymmetry.setEvaluator(new TensorSymmetry());
-	}
+			F.ArrayReshape.setEvaluator(new ArrayReshape());
+			F.Ordering.setEvaluator(new Ordering());
+			F.ListConvolve.setEvaluator(new ListConvolve());
+			F.ListCorrelate.setEvaluator(new ListCorrelate());
+			F.TensorDimensions.setEvaluator(new TensorDimensions());
+			F.TensorProduct.setEvaluator(new TensorProduct());
+			F.TensorRank.setEvaluator(new TensorRank());
+			F.TensorSymmetry.setEvaluator(new TensorSymmetry());
+		}
 	}
 
 	/**

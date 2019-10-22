@@ -39,7 +39,7 @@ public class ConvertRubi {
 	 *
 	 * See <a href="https://github.com/axkr/symja_android_library/issues/149">Github issue 149</a>
 	 */
-	private static int NUMBER_OF_RULES_PER_FILE = 25;
+	private static int NUMBER_OF_RULES_PER_FILE = 20;
 
 	public static List<ASTNode> parseFileToList(String fileName) {
 		try {
@@ -72,6 +72,7 @@ public class ConvertRubi {
 	public static void writeFile(String fileName, StringBuffer buffer) {
 		try {
 			File file = new File(fileName);
+			file.getParentFile().mkdirs();
 			final BufferedWriter f = new BufferedWriter(new FileWriter(file));
 			f.append(buffer);
 			f.close();
@@ -628,7 +629,7 @@ public class ConvertRubi {
 		addPredefinedSymbols();
 		// use same order as in Rubi.m
 		String[] fileNames = { //
-				"./Rubi/RubiRules4.16.0_FullLHS.m", };
+				"./symja_android_library/Rubi/RubiRules4.16.0_FullLHS.m", };
 
 		int fcnt = 0;
 		for (int i = 0; i < fileNames.length; i++) {

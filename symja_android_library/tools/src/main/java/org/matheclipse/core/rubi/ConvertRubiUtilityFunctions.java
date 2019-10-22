@@ -42,7 +42,7 @@ public class ConvertRubiUtilityFunctions {
 	 *
 	 * See <a href="https://github.com/axkr/symja_android_library/issues/149">Github issue 149</a>
 	 */
-	private static int NUMBER_OF_RULES_PER_FILE = 25;
+	private static int NUMBER_OF_RULES_PER_FILE = 20;
 
 	public static List<ASTNode> parseFileToList(String fileName) {
 		try {
@@ -150,7 +150,7 @@ public class ConvertRubiUtilityFunctions {
 		EvalEngine.set(new EvalEngine(false));
 		ConvertRubi.addPredefinedSymbols();
 
-		String[] fileNames = { "./Rubi/IntegrationUtilityFunctions.m" };
+		String[] fileNames = { "./symja_android_library/Rubi/IntegrationUtilityFunctions.m" };
 		for (int i = 0; i < fileNames.length; i++) {
 			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>");
 			System.out.println(">>>>> File name: " + fileNames[i]);

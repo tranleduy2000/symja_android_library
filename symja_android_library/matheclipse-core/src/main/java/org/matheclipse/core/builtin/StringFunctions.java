@@ -32,22 +32,22 @@ public final class StringFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.FromCharacterCode.setEvaluator(new FromCharacterCode());
-		F.LetterQ.setEvaluator(new LetterQ());
-		F.LowerCaseQ.setEvaluator(new LowerCaseQ());
-		F.StringDrop.setEvaluator(new StringDrop());
-		F.StringJoin.setEvaluator(new StringJoin());
-		F.StringLength.setEvaluator(new StringLength());
-		F.StringReplace.setEvaluator(new StringReplace());
+			F.FromCharacterCode.setEvaluator(new FromCharacterCode());
+			F.LetterQ.setEvaluator(new LetterQ());
+			F.LowerCaseQ.setEvaluator(new LowerCaseQ());
+			F.StringDrop.setEvaluator(new StringDrop());
+			F.StringJoin.setEvaluator(new StringJoin());
+			F.StringLength.setEvaluator(new StringLength());
+			F.StringReplace.setEvaluator(new StringReplace());
 			F.StringRiffle.setEvaluator(new StringRiffle());
-		F.StringTake.setEvaluator(new StringTake());
-		F.SyntaxLength.setEvaluator(new SyntaxLength());
+			F.StringTake.setEvaluator(new StringTake());
+			F.SyntaxLength.setEvaluator(new SyntaxLength());
 			F.TextString.setEvaluator(new TextString());
-		F.ToCharacterCode.setEvaluator(new ToCharacterCode());
-		F.ToExpression.setEvaluator(new ToExpression());
-		F.ToString.setEvaluator(new ToString());
-		F.ToUnicode.setEvaluator(new ToUnicode());
-	}
+			F.ToCharacterCode.setEvaluator(new ToCharacterCode());
+			F.ToExpression.setEvaluator(new ToExpression());
+			F.ToString.setEvaluator(new ToString());
+			F.ToUnicode.setEvaluator(new ToUnicode());
+		}
 	}
 
 	private static class FromCharacterCode extends AbstractFunctionEvaluator {
