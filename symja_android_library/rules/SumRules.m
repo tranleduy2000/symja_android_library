@@ -1,9 +1,6 @@
 {
 {
 
-Sum(c_^i_, {i_Symbol,1,n_Symbol}) := c*(c^n-1)*(c-1)^(-1)
-  /; FreeQ(c,i)&&FreeQ(n,i),
-  
 Sum(c_^i_, {i_Symbol,1,Infinity}) := -c*(c-1)^(-1)
   /; FreeQ(c,i) && (!NumberQ(c) || (c>(-1) && c<1)),
   
@@ -25,6 +22,13 @@ Sum(Ceiling(Log(a_,i_)), {i_Symbol,1,n_Symbol}):=
   /; FreeQ(a,i)&&FreeQ(n,i)
   
 },{
+
+Sum(c_^i_, {i_Symbol,0,n_Symbol}) := (-1 + c^(1 + n))/(-1 + c)
+  /; FreeQ(c,i)&&FreeQ(n,i),
+
+Sum(i_*c_^i_, {i_Symbol,0,n_Symbol}) := (c + c^(1 + n)*(-1 - n + c*n))/(1 - c)^2
+  /; FreeQ(c,i)&&FreeQ(n,i),
+
 Sum(Binomial(n_, i_), {i_Symbol,0,n_Symbol}) := 2^n
   /; FreeQ(n,i),
   
