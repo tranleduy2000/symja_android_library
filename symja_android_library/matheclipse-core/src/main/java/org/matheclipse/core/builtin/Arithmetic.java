@@ -2483,7 +2483,7 @@ public final class Arithmetic {
             if (number instanceof Num) {
                 complexNumber = F.complexNum(((Num) number).doubleValue());
             } else {
-                complexNumber = F.complexNum(((ApfloatNum) number).apfloatValue());
+				complexNumber = F.complexNum(number.apfloatValue(number.precision()));
             }
             for (int i = start; i < ast.size(); i++) {
                 IExpr temp = ast.get(i);
@@ -2492,7 +2492,7 @@ public final class Arithmetic {
                     if (number instanceof Num) {
                         complexNumber = complexNumber.add(F.complexNum(((Num) number).doubleValue()));
                     } else {
-                        complexNumber = complexNumber.add(F.complexNum(((ApfloatNum) number).apfloatValue()));
+						complexNumber = complexNumber.add(F.complexNum(number.apfloatValue(number.precision())));
                     }
                 } else if (temp instanceof IComplexNum) {
                     if (complexNumber instanceof ApcomplexNum) {
@@ -2615,7 +2615,7 @@ public final class Arithmetic {
 			ORDERLESS_MATCHER.defineHashRule(F.ArcTan(F.C1D3), F.ArcTan(F.C1D2), //
 					Times(F.C1D4, Pi));
 			// ArcTan(1/3) + ArcTan(1/7) = ArcTan(1/2)
-						ORDERLESS_MATCHER.defineHashRule(F.ArcTan(F.C1D3), F.ArcTan(QQ(1L,7L)), //
+			ORDERLESS_MATCHER.defineHashRule(F.ArcTan(F.C1D3), F.ArcTan(F.QQ(1L, 7L)), //
 								F.ArcTan(F.C1D2));
             // ORDERLESS_MATCHER.setUpHashRule("-ArcTan[x_]", "-ArcTan[y_]",
             // "-Pi/2", "Positive[x]&&(y==1/x)");
@@ -3481,7 +3481,7 @@ public final class Arithmetic {
 					IInteger expDenominator = ((IFraction) exponent).denominator();
 					IInteger expDiv = expNumerator.div(expDenominator);
 					IInteger expMod = expNumerator.mod(expDenominator);
-					return F.Times(base.power(expDiv), base.power(QQ(expMod, expDenominator)));
+					return F.Times(base.power(expDiv), base.power(F.QQ(expMod, expDenominator)));
 				} else if (((IFraction) exponent).isLT(F.CN1)) {
 					// exponent < -1
 					IInteger expNumerator = ((IFraction) exponent).numerator().negate();
@@ -3489,7 +3489,7 @@ public final class Arithmetic {
 					IInteger expDiv = expNumerator.div(expDenominator);
 					IInteger expMod = expNumerator.mod(expDenominator);
 					return F.Times(F.Power(base.power(expDiv), F.CN1),
-							F.Power(base.power(QQ(expMod, expDenominator)), F.CN1));
+							F.Power(base.power(F.QQ(expMod, expDenominator)), F.CN1));
 				} else if (base.isNegative() && ((IFraction) exponent).isNegative()) {
 					return F.Times(F.CN1, F.Power(F.CN1, F.C1.add(exponent)), F.Power(base.negate(), exponent));
 				}
@@ -5144,7 +5144,7 @@ public final class Arithmetic {
             if (number instanceof Num) {
                 complexNumber = F.complexNum(((Num) number).doubleValue());
             } else {
-                complexNumber = F.complexNum(((ApfloatNum) number).apfloatValue());
+				complexNumber = F.complexNum(number.apfloatValue(number.precision()));
             }
             for (int i = start; i < ast.size(); i++) {
                 IExpr temp = ast.get(i);
@@ -5153,7 +5153,7 @@ public final class Arithmetic {
                     if (number instanceof Num) {
                         complexNumber = complexNumber.multiply(F.complexNum(((Num) number).doubleValue()));
                     } else {
-                        complexNumber = complexNumber.multiply(F.complexNum(((ApfloatNum) number).apfloatValue()));
+						complexNumber = complexNumber.multiply(F.complexNum(number.apfloatValue(number.precision())));
                     }
                 } else if (temp instanceof IComplexNum) {
                     if (complexNumber instanceof ApcomplexNum) {

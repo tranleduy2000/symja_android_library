@@ -283,6 +283,12 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	}
 
 	@Override
+	public Apfloat apfloatValue(long precision) {
+		Apfloat n = new Apfloat(toBigNumerator(), precision);
+		Apfloat d = new Apfloat(toBigDenominator(), precision);
+		return n.divide(d);
+	}
+	@Override
 	public abstract IInteger ceilFraction();
 
 	/** {@inheritDoc} */
