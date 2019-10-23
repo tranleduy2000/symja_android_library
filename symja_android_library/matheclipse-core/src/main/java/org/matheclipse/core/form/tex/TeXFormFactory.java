@@ -9,7 +9,6 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ApcomplexNum;
-import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -921,7 +920,7 @@ public class TeXFormFactory {
 		 */
 		public boolean convertTimesFraction(final StringBuilder buf, final IAST f, final int precedence,
 				final int caller) {
-			IExpr[] parts = Algebra.fractionalPartsTimesPower(f, false, true, false, false, false);
+			IExpr[] parts = Algebra.fractionalPartsTimesPower(f, false, true, false, false, false, false);
 			if (parts == null) {
 				convertTimesOperator(buf, f, precedence, caller);
 				return true;
