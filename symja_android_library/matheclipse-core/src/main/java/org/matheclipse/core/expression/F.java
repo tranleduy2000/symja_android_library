@@ -180,6 +180,8 @@ public class F {
     public final static IBuiltInSymbol $Aborted = F.initFinalSymbol("$Aborted", ID.$Aborted);
     /***/
     public final static IBuiltInSymbol $Assumptions = F.initFinalSymbol("$Assumptions", ID.$Assumptions);
+//	/***/
+//	public final static IBuiltInSymbol $Cancel = F.initFinalSymbol("$Cancel", ID.$Cancel);
     /***/
     public final static IBuiltInSymbol $Context = F.initFinalSymbol("$Context", ID.$Context);
     /***/
@@ -218,7 +220,7 @@ public class F {
 	public final static IBuiltInSymbol $UserName = F.initFinalSymbol("$UserName", ID.$UserName);
     /***/
     public final static IBuiltInSymbol $Version = F.initFinalSymbol("$Version", ID.$Version);
-    /** Abort() - aborts an evaluation completely and returns `$Aborted`.*/
+	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
     public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
     /** Abs(expr) - returns the absolute value of the real or complex number `expr`.*/
     public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
@@ -447,6 +449,8 @@ public class F {
             ID.BrayCurtisDistance);
 	/** Break() - exits a `For`, `While`, or `Do` loop. */
     public final static IBuiltInSymbol Break = F.initFinalSymbol("Break", ID.Break);
+	/***/
+	public final static IBuiltInSymbol Button = F.initFinalSymbol("Button", ID.Button);
 	/** ByteArray({list-of-byte-values}) - converts the `list-of-byte-values` into a byte array. */
     public final static IBuiltInSymbol ByteArray = F.initFinalSymbol("ByteArray", ID.ByteArray);
     /***/
@@ -979,17 +983,20 @@ public class F {
 	 */
     public final static IBuiltInSymbol FindShortestPath = F.initFinalSymbol("FindShortestPath", ID.FindShortestPath);
 
-    /** FindShortestTour({{p11, p12}, {p21, p22}, {p31, p32}, ...}) - find a shortest tour in the `graph` with minimum `EuclideanDistance`.*/
+	/**
+	 * FindShortestTour({{p11, p12}, {p21, p22}, {p31, p32}, ...}) - find a shortest tour in the `graph` with minimum
+	 * `EuclideanDistance`.
+	 */
     public final static IBuiltInSymbol FindShortestTour = F.initFinalSymbol("FindShortestTour", ID.FindShortestTour);
 
-    /** FindSpanningTree(graph) - find the minimum spanning tree in the `graph`.*/
+	/** FindSpanningTree(graph) - find the minimum spanning tree in the `graph`. */
     public final static IBuiltInSymbol FindSpanningTree = F.initFinalSymbol("FindSpanningTree", ID.FindSpanningTree);
 	/**
 	 * FindVertexCover(graph) - algorithm to find a vertex cover for a `graph`. A vertex cover is a set of vertices that
 	 * touches all the edges in the graph.
 	 */
     public final static IBuiltInSymbol FindVertexCover = F.initFinalSymbol("FindVertexCover", ID.FindVertexCover);
-    /** First(expr) - returns the first element in `expr`.*/
+	/** First(expr) - returns the first element in `expr`. */
     public final static IBuiltInSymbol First = F.initFinalSymbol("First", ID.First);
     /**
      * Fit(list-of-data-points, degree, variable) - solve a least squares problem using the Levenberg-Marquardt
@@ -2493,7 +2500,7 @@ public class F {
     public final static IBuiltInSymbol TraditionalForm = F.initFinalSymbol("TraditionalForm", ID.TraditionalForm);
 	/** Transpose(m) - transposes rows and columns in the matrix `m`. */
     public final static IBuiltInSymbol Transpose = F.initFinalSymbol("Transpose", ID.Transpose);
-	/***/
+	/** TreeForm(expr) - create a tree visualization from the given expression `expr`. */
 	public final static IBuiltInSymbol TreeForm = F.initFinalSymbol("TreeForm", ID.TreeForm);
     /***/
     public final static IBuiltInSymbol Trig = F.initFinalSymbol("Trig", ID.Trig);
@@ -4291,6 +4298,17 @@ public class F {
         return new AST(head, arr);
     }
 
+	public static IASTAppendable ast(final ISymbol head, final int[] arr) {
+		return AST.newInstance(head, arr);
+	}
+
+	public static IASTAppendable ast(final ISymbol head, final org.hipparchus.complex.Complex[] arr) {
+		return AST.newInstance(head, false, arr);
+	}
+
+	public static IASTAppendable ast(final ISymbol head, boolean evalComplex, org.hipparchus.complex.Complex[] arr) {
+		return AST.newInstance(head, evalComplex, arr);
+	}
     /**
      * <pre>
      * AtomQ(x)
@@ -4478,6 +4496,9 @@ public class F {
         return new AST1(Cancel, a);
     }
 
+	public static IAST CancelButton() {
+		return new AST0(CancelButton);
+	}
     public static IAST CarmichaelLambda(final IExpr a0) {
         return new AST1(CarmichaelLambda, a0);
     }
@@ -5047,6 +5068,13 @@ public class F {
         return new AST1(Det, a0);
     }
 
+	public static IAST DialogReturn() {
+		return new AST0(DialogReturn);
+	}
+
+	public static IAST DialogReturn(final IExpr a0) {
+		return new AST1(DialogReturn, a0);
+	}
     /**
      * <pre>
      * DigitQ(str)
@@ -8603,6 +8631,9 @@ public class F {
         return ast;
     }
 
+	public static IAST ToExpression(final IExpr a0) {
+		return new AST1(ToExpression, a0);
+	}
     public static IAST Together(final IExpr a0) {
         return new AST1(Together, a0);
     }

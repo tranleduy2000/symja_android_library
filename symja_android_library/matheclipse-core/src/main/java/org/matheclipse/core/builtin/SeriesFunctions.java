@@ -6,7 +6,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Assumptions;
@@ -701,7 +700,6 @@ public class SeriesFunctions {
          */
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkRange(ast, 3, 4);
 
 			IExpr arg1 = ast.arg1();
 			IExpr arg2 = ast.arg2();

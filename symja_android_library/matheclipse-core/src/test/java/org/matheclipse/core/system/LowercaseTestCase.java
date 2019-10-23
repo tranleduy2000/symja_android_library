@@ -6389,7 +6389,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFibonacci() {
 		check("Fibonacci(0.2114411444411100011, 5)", //
-				"1.598551917369153725*10^-1");
+				"1.598551917369153727*10^-1");
 		check("Fibonacci(5.8)", //
 				"7.26639");
 		check("Fibonacci(1+I/2)//N", //
@@ -9145,7 +9145,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("ArcSin(1.3038404810405297)",
 		// "1.5707963267948966+I*(-7.610396837318266e-1)");
 		checkNumeric("ArcSin(1.3038404810405297)", //
-				"1.5707963267948966+I*(-0.7610396837318266)");
+				"1.5707963267948966+I*(-7.610396837318266*10^-1)");
 		checkNumeric("InverseHaversine(1.7)", //
 				"3.141592653589793+I*(-1.5220793674636532)");
 	}
