@@ -7,6 +7,8 @@ import org.hipparchus.analysis.integration.TrapezoidIntegrator;
 import org.hipparchus.analysis.integration.UnivariateIntegrator;
 import org.hipparchus.analysis.integration.gauss.GaussIntegrator;
 import org.hipparchus.analysis.integration.gauss.GaussIntegratorFactory;
+import org.hipparchus.exception.LocalizedCoreFormats;
+import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.util.Precision;
 import org.matheclipse.core.basic.Config;
@@ -111,6 +113,11 @@ public class NIntegrate extends AbstractFunctionEvaluator {
 		} else if ("Trapezoid".equalsIgnoreCase(method)) {
 			integrator = new TrapezoidIntegrator();
 		} else {
+			if (maxPoints > 1000) {
+				// github 150 - avoid StackOverflow from recursion
+				// see also https://github.com/Hipparchus-Math/hipparchus/issues/61
+				throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_LARGE, maxPoints, 1000);
+			}
 			// default: LegendreGauss
 			GaussIntegrator integ = factory.legendre(maxPoints, min, max);
 			return integ.integrate(f);
