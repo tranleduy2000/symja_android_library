@@ -3228,6 +3228,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCos() {
+		check("Cos(1.20000000000000000000000)", //
+				"3.623577544766735776383733*10^-1");
 		// print argx message
 		check("Cos( )", //
 				"Cos()");
@@ -5760,7 +5762,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// https://www.research.ed.ac.uk/portal/files/413486/Solving_Symbolic_Equations_%20with_PRESS.pdf
 		System.out.print('.');
 		check("Factor(4^(2*x+1)*5^(x-2)-6^(1-x))", //
-/				"-6*5^x*(-2^(1+4*x)/75+1/(5^x*6^x))");
+				"(2^(2-x)*(-75/2+2^(5*x)*3^x*5^x))/(25*3^x)");
 
 		System.out.print('.');
 		check("Factor(E^x+E^(2*x))", //
@@ -12136,6 +12138,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNumerator() {
+		check("Numerator( a*x^n*y^- m*Exp(a - b - 2 c + 3 d) )", //
+				"a*E^(a+3*d)*x^n");
+		check("Numerator(a^-b/x)", //
+				"1");
 		// github #151
 		check("N(Numerator(Cos(Pi)/Pi))", //
 				"-1.0");
