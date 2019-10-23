@@ -379,10 +379,15 @@ public class F {
 	/** BesselJ(n, z) - Bessel function of the first kind. */
     public final static IBuiltInSymbol BesselJ = F.initFinalSymbol("BesselJ", ID.BesselJ);
     /***/
+    public final static IBuiltInSymbol BesselJZero = F.initFinalSymbol("BesselJZero", ID.BesselJZero);
+    /***/
     public final static IBuiltInSymbol BesselK = F.initFinalSymbol("BesselK", ID.BesselK);
     /***/
     public final static IBuiltInSymbol BesselY = F.initFinalSymbol("BesselY", ID.BesselY);
-	/** Beta(a, b) - is the beta function of the numbers `a`,`b`. */
+    /***/
+    public final static IBuiltInSymbol BesselYZero = F.initFinalSymbol("BesselYZero", ID.BesselYZero);
+
+    /** Beta(a, b) - is the beta function of the numbers `a`,`b`.*/
     public final static IBuiltInSymbol Beta = F.initFinalSymbol("Beta", ID.Beta);
     /***/
     public final static IBuiltInSymbol BetaDistribution = F.initFinalSymbol("BetaDistribution", ID.BetaDistribution);

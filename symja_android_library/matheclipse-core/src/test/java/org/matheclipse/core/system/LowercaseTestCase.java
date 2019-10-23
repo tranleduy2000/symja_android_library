@@ -1237,6 +1237,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBesselI() {
+		checkNumeric("BesselI(I+1, -I*Infinity)", //
+				"0");
+		checkNumeric("BesselI(42, I*Infinity)", //
+				"0");
+
+		checkNumeric("BesselI(0, 0)", //
+				"1");
+		checkNumeric("BesselI(4, 0)", //
+				"0");
+		checkNumeric("BesselI(-42, 0)", //
+				"0");
+		checkNumeric("BesselI(-42.5, 0)", //
+				"ComplexInfinity");
+		checkNumeric("BesselI(I, 0)", //
+				"Indeterminate");
 		checkNumeric("BesselI(0,2.0 )", //
 				"2.279585302336067");
 		checkNumeric("BesselI(3 + I, 1.5 - I)", //
@@ -1245,23 +1260,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{1.2660658777520082,0.565159103992485,0.1357476697670383}");
 	}
 
-	public void testBesselK() {
-		checkNumeric("BesselK(0,0.53)", //
-				"0.876560380458217");
-		checkNumeric("BesselK(0,4.0)", //
-				"0.011159676384823675");
-		checkNumeric("BesselK(1 + I, 3.0  - 2* I)", //
-				"-0.022510755137173245+I*0.016960737347051183");
-	}
-
-	public void testBesselY() {
-		checkNumeric("BesselY(0,2.5)", //
-				"0.49807035955610557");
-		checkNumeric("BesselY(0,1.0)", //
-				"0.08825696423952921");
-		checkNumeric("BesselY(0.5*I, 3.0 - I)", //
-				"1.0468646059976179+I*0.8847844476971232");
-	}
 	public void testBesselJ() {
 		checkNumeric("BesselJ(0,5.2)", //
 				"-0.1102904415027928");
@@ -1316,6 +1314,67 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{0.242268,0.440051,0.557937}");
 	}
 
+	public void testBesselJZero() {
+		checkNumeric("BesselJZero(0.0,1)", //
+				"2.404825524156817");
+		checkNumeric("BesselJZero(0.0,2)", //
+				"5.520077944691967");
+		checkNumeric("BesselJZero(1.0,5)", //
+				"16.470629751205134");
+		checkNumeric("BesselJZero(0, {1, 2, 3}) // N", //
+				"{2.404825524156817,5.520077944691967,8.653727993213547}");
+		checkNumeric("BesselJZero(1, 1)/Pi // N", //
+				"1.2196698399880057");
+	}
+
+	public void testBesselK() {
+		checkNumeric("BesselK(I+1, -I*Infinity)", //
+				"0");
+		checkNumeric("BesselK(42, I*Infinity)", //
+				"0");
+
+		checkNumeric("BesselK(0, 0)", //
+				"Infinity");
+		checkNumeric("BesselK(4, 0)", //
+				"ComplexInfinity");
+		checkNumeric("BesselK(I, 0)", //
+				"Indeterminate");
+
+		checkNumeric("BesselK(0,0.53)", //
+				"0.876560380458217");
+		checkNumeric("BesselK(0,4.0)", //
+				"0.011159676384823675");
+		checkNumeric("BesselK(1 + I, 3.0  - 2* I)", //
+				"-0.022510755137173245+I*0.016960737347051183");
+	}
+
+	public void testBesselY() {
+		checkNumeric("BesselY(I+1, -Infinity)", //
+				"0");
+		checkNumeric("BesselY(42, Infinity)", //
+				"0");
+
+		checkNumeric("BesselY(0, 0)", //
+				"-Infinity");
+		checkNumeric("BesselY(4, 0)", //
+				"ComplexInfinity");
+		checkNumeric("BesselY(I, 0)", //
+				"Indeterminate");
+
+		checkNumeric("BesselY(0,2.5)", //
+				"0.49807035955610557");
+		checkNumeric("BesselY(0,1.0)", //
+				"0.08825696423952921");
+		checkNumeric("BesselY(0.5*I, 3.0 - I)", //
+				"1.0468646059976179+I*0.8847844476971232");
+	}
+
+	public void testBesselYZero() {
+//		checkNumeric("BesselYZero(0.0,2)", //
+//				" ");
+//		checkNumeric("BesselYZero(0.0,1)", //
+//				" ");
+	}
 	public void testBeta() {
 		// TODO improve bad precision
 		// check("Beta(0.5, 3.2, 1.5)", "0.19168");
