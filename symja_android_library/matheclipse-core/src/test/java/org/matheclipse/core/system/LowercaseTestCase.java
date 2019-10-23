@@ -8859,7 +8859,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"False");
 		check("3<=Pi", //
 				"True");
-		// check("Max(Interval({4,2}))", "4");
 		check("Interval({5,8})>2", //
 				"True");
 		check("Interval({3,4})>Pi", //
@@ -14879,6 +14878,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("RandomReal()", "0.53275");
 		//
 		// check("{Exp[x], x^2, 1/x, 2}", "{E^x,x^2,1/x,2}");
+		// check("RandomReal(5, {7, 11}) // TableForm", //
+		// "{{2.18257,2.53954,2.41443,0.310558},{4.86753,4.93809,1.74144,0.188952},{3.15764,4.69217,2.01985,2.71322}}");
 	}
 
 	public void testRandomChoice() {
@@ -18674,6 +18675,18 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"34");
 	}
 
+	public void testTableForm() {
+		check("TableForm(Array(a, {2}))", //
+				"a(1)\n" + "a(2)\n");
+		check("TableForm(Array(a, {2,2}))", //
+				"a(1,1) a(1,2)\n" + //
+						"a(2,1) a(2,2)");
+		// check("TableForm(RandomReal(5, {3, 4}))", //
+		// "3.3966021212581032 0.37386691098759195 3.3714636398631437 4.888805919349176 \n" +
+		// "3.977341548616806 0.7908229654057569 0.4052451831886883 1.455709563360077 \n" +
+		// "1.0028599118204118 1.2764414981301953 4.024172644043268 1.3404548410990742");
+
+	}
 	public void testTake() {
 		check("Take({a, b, c, d}, -2)", //
 				"{c,d}");
