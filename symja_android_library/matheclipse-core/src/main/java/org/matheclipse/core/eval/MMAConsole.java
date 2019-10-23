@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class MMAConsole {
 	/**
-	 * 60 seconds timeout limit as the default value for Symja expression evaluation.
+	 * No timeout limit as the default value for Symja expression evaluation.
 	 */
-	private long fSeconds = 60;
+	private long fSeconds = -1;
 
 	private final static int OUTPUTFORM = 0;
 
@@ -597,9 +597,15 @@ public class MMAConsole {
 			while (!done) {
 				final String s = in.readLine();
 				if (s != null) {
+					if (s.trim().length()==0) {
+						done = true;
+						break;
+					}
 					if ((s.length() > 0) && (s.charAt(s.length() - 1) != '\\')) {
 						input.append(s);
+						if (org.matheclipse.parser.client.Scanner.isBalancedCode(input)) {
 						done = true;
+						}
 					} else {
 						if (s.length() > 1) {
 							input.append(s.substring(0, s.length() - 1));
