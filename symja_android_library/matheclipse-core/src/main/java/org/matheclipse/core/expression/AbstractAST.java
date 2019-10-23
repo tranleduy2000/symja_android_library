@@ -440,6 +440,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		public boolean isList() {
 			return false;
 		}
+		/** {@inheritDoc} */
+		@Override
+		public boolean isList(Predicate<IExpr> pred) {
+			return false;
+		}
 
 		/** {@inheritDoc} */
 		@Override
@@ -2622,6 +2627,21 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	@Override
 	public boolean isList() {
 		return isSameHeadSizeGE(F.List, 1);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isList(Predicate<IExpr> pred) {
+		if (head().equals(F.List)) {
+			for (int i = 1; i < size(); i++) {
+				if (!pred.test(get(i))) {
+					// the row is no list
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/** {@inheritDoc} */

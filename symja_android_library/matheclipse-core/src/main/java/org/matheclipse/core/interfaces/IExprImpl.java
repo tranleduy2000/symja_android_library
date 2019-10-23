@@ -1597,6 +1597,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isList(Predicate<IExpr> pred) {
+        return false;
+    }
+
     /**
      * Test if this expression is a list of lists
      *
