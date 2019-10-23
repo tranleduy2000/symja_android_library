@@ -450,7 +450,7 @@ public class Algebra {
 			} else if (splitPowerPlusExponents && exponent.isPlus()) {
 				// base ^ (a+b+c...)
 				IAST plusAST = (IAST) exponent;
-				IAST[] result = plusAST.filter(new Function<IExpr, IExpr>() {
+				IAST[] result = plusAST.filterNIL(new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
 						IExpr positiveExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(x);

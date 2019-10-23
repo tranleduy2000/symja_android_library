@@ -1292,7 +1292,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 	/** {@inheritDoc} */
 	@Override
-	public final IASTAppendable[] filter(final Function<IExpr, IExpr> function) {
+	public final IASTAppendable[] filterNIL(final Function<IExpr, IExpr> function) {
 		IASTAppendable[] result = new IASTAppendable[2];
 		result[0] = copyHead();
 		result[1] = copyHead();
