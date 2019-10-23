@@ -2045,8 +2045,7 @@ public final class NumberTheory {
 				int n = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
 				if (n > Integer.MIN_VALUE) {
 					if (ast.isAST2()) {
-						// TODO add fibonacci polynomials
-						return F.NIL;
+						return fibonacciPolynomialIterative(n, ast.arg2(), engine);
 					}
 					return fibonacci(n);
 				}
@@ -2054,6 +2053,46 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		/**
+		 * Create Fibonacci polynomial with iteration.
+		 *
+		 * @param n
+		 *            an integer <code>n >= 0</code>
+		 * @param x
+		 *            the variable expression of the polynomial
+		 * @return
+		 */
+		public IExpr fibonacciPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+			int iArg = n;
+			if (n < 0) {
+				n *= (-1);
+			}
+
+			IExpr previousFibonacci = F.C0;
+			IExpr fibonacci = F.C1;
+			if (n == 0) {
+				return previousFibonacci;
+			}
+			if (n == 1) {
+				return fibonacci;
+			}
+
+			for (int i = 1; i < n; i++) {
+				IExpr temp = fibonacci;
+				if (fibonacci.isPlus()) {
+					fibonacci = ((IAST) fibonacci).mapThread(F.Times(x, null), 2);
+				} else {
+					fibonacci = F.Times(x, fibonacci);
+				}
+				fibonacci = F.Expand.of(engine, F.Plus(fibonacci, previousFibonacci));
+				previousFibonacci = temp;
+			}
+			if (iArg < 0 && ((iArg & 0x00000001) == 0x00000000)) {
+				return F.Negate(fibonacci);
+			}
+
+			return fibonacci;
+		}
 		@Override
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_2;
@@ -2445,14 +2484,20 @@ public final class NumberTheory {
 			if (arg1.isInteger()) {
 				int n = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
 				if (n > Integer.MIN_VALUE) {
-					if (n < 0) {
-						n *= (-1);
-					}
 					if (ast.isAST2()) {
 						return lucasLPolynomialIterative(n, ast.arg2(), engine);
 					}
+					int iArg = n;
+					if (n < 0) {
+						n *= (-1);
+					}
 					// LucasL(n) = Fibonacci(n-1) + Fibonacci(n+1)
-					return fibonacci(n - 1).add(fibonacci(n + 1));
+					IExpr lucalsL= fibonacci(n - 1).add(fibonacci(n + 1));
+					if (iArg < 0 && ((iArg & 0x00000001) == 0x00000001)) {
+						return F.Negate(lucalsL);
+					}
+
+					return lucalsL;
 				}
 			}
 			return F.NIL;
@@ -2505,6 +2550,10 @@ public final class NumberTheory {
 		 * @return
 		 */
 		public IExpr lucasLPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+			int iArg = n;
+			if (n < 0) {
+				n *= (-1);
+			}
 			IExpr previousLucasL = F.C2;
 			IExpr lucalsL = x;
 			if (n == 0) {
@@ -2523,6 +2572,9 @@ public final class NumberTheory {
 				}
 				lucalsL = F.Expand.of(engine, F.Plus(lucalsL, previousLucasL));
 				previousLucasL = temp;
+			}
+			if (iArg < 0 && ((iArg & 0x00000001) == 0x00000001)) {
+				return F.Negate(lucalsL);
 			}
 			return lucalsL;
 		}
