@@ -21,7 +21,6 @@ import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.OptionArgs;
@@ -1140,32 +1139,40 @@ public class Algebra {
 	 * </code>
 	 * </pre>
 	 */
-	private static class Denominator extends AbstractEvaluator {
+	private static class Denominator extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			boolean trig = false;
-			if (ast.isAST2()) {
-				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-				IExpr option = options.getOption(F.Trig);
+			boolean numericMode = engine.isNumericMode();
+			try {
+				engine.setNumericMode(false);
+				boolean trig = false;
+				if (ast.isAST2()) {
+					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine, true);
+					if (options.isInvalidPosition()) {
+						return IOFunctions.printMessage(F.Denominator, "nonopt",
+								F.List(ast.arg2(), F.ZZ(options.getInvalidPosition() - 1), ast), engine);
+					}
+					IExpr option = options.getOption(F.Trig);
 
-				if (option.isTrue()) {
-					trig = true;
-				} else if (!option.isPresent()) {
-					throw new WrongArgumentType(ast, ast.arg2(), 2, "Option expected!");
+					if (option.isTrue()) {
+						trig = true;
+					}
 				}
-			}
 
-			IExpr expr = ast.arg1();
-			if (expr.isRational()) {
-				return ((IRational) expr).denominator();
+				IExpr expr = engine.evaluate(ast.arg1());
+				if (expr.isRational()) {
+					return ((IRational) expr).denominator();
+				}
+				IExpr[] parts = fractionalParts(expr, trig);
+				if (parts == null) {
+					return F.C1;
+				}
+				return parts[1];
+			} finally {
+				engine.setNumericMode(numericMode);
 			}
-			IExpr[] parts = fractionalParts(expr, trig);
-			if (parts == null) {
-				return F.C1;
-			}
-			return parts[1];
 		}
 
 		public int[] expectedArgSize() {
@@ -2588,7 +2595,7 @@ public class Algebra {
 			IExpr function = ast.arg1();
 			IExpr xExpr = ast.arg2();
 			IExpr yExpr = ast.arg3();
-			IBuiltInSymbol domain=F.Reals;
+			IBuiltInSymbol domain = F.Reals;
 			if (xExpr.isSymbol() && yExpr.isSymbol()) {
 				ISymbol x = (ISymbol) xExpr;
 				ISymbol y = (ISymbol) yExpr;
@@ -2659,24 +2666,29 @@ public class Algebra {
 	 * </code>
 	 * </pre>
 	 */
-	private static class Numerator extends AbstractEvaluator {
+	private static class Numerator extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			boolean numericMode = engine.isNumericMode();
+			try {
+				engine.setNumericMode(false);
 			boolean trig = false;
 			if (ast.isAST2()) {
-				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
+					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine, true);
+					if (options.isInvalidPosition()) {
+						return IOFunctions.printMessage(F.Numerator, "nonopt",
+								F.List(ast.arg2(), F.ZZ(options.getInvalidPosition() - 1), ast), engine);
+					}
 				IExpr option = options.getOption(F.Trig);
 
 				if (option.isTrue()) {
 					trig = true;
-				} else if (!option.isPresent()) {
-					throw new WrongArgumentType(ast, ast.arg2(), 2, "Option expected!");
 				}
 			}
 
-			IExpr arg = ast.arg1();
+				IExpr arg = engine.evaluate(ast.arg1());
 			if (arg.isRational()) {
 				return ((IRational) arg).numerator();
 			}
@@ -2685,6 +2697,9 @@ public class Algebra {
 				return arg;
 			}
 			return parts[0];
+			} finally {
+				engine.setNumericMode(numericMode);
+			}
 		}
 
 		public int[] expectedArgSize() {
