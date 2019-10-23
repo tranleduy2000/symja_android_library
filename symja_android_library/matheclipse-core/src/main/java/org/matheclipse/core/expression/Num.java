@@ -272,6 +272,9 @@ public class Num extends INumImpl implements INum {
 		return F.NIL;
 	}
 
+	public INumber evaluatePrecision(EvalEngine engine) {
+		return this;
+	}
 	@Override
 	public ISignedNumber evalReal() {
 		return this;
@@ -539,13 +542,14 @@ public class Num extends INumImpl implements INum {
 	@Override
 	public IExpr plus(final IExpr that) {
 		if (that instanceof ApfloatNum) {
-			return add(ApfloatNum.valueOf(fDouble, ((ApfloatNum) that).fApfloat.precision()));
+			ApfloatNum arg2 = (ApfloatNum) that;
+			return valueOf(fDouble + arg2.doubleValue());
 		}
 		if (that instanceof Num) {
 			return valueOf(fDouble + ((Num) that).fDouble);
 		}
 		if (that instanceof ApcomplexNum) {
-			return ApcomplexNum.valueOf(fDouble, ((ApcomplexNum) that).fApcomplex.precision()).add((ApcomplexNum) that);
+			return ComplexNum.valueOf(fDouble).add(((ApcomplexNum) that).complexNumValue());
 		}
 		if (that instanceof ComplexNum) {
 			return ComplexNum.valueOf(fDouble).add((ComplexNum) that);
@@ -631,14 +635,14 @@ public class Num extends INumImpl implements INum {
 	@Override
 	public IExpr times(final IExpr that) {
 		if (that instanceof ApfloatNum) {
-			return multiply(ApfloatNum.valueOf(fDouble, ((ApfloatNum) that).fApfloat.precision()));
+			ApfloatNum arg2 = (ApfloatNum) that;
+			return valueOf(fDouble * arg2.doubleValue());
 		}
 		if (that instanceof Num) {
 			return valueOf(fDouble * ((Num) that).fDouble);
 		}
 		if (that instanceof ApcomplexNum) {
-			return ApcomplexNum.valueOf(fDouble, ((ApcomplexNum) that).fApcomplex.precision())
-					.multiply((ApcomplexNum) that);
+			return ComplexNum.valueOf(fDouble).multiply(((ApcomplexNum) that).complexNumValue());
 		}
 		if (that instanceof ComplexNum) {
 			return ComplexNum.valueOf(fDouble).multiply((ComplexNum) that);

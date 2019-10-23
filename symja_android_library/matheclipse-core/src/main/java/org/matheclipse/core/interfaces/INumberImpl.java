@@ -1,5 +1,6 @@
 package org.matheclipse.core.interfaces;
 
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 
 /**
@@ -46,6 +47,11 @@ public abstract class INumberImpl extends IExprImpl implements INumber {
     @Deprecated
     public IExpr eabs() {
         return abs();
+    }
+
+    @Override
+    public INumber evaluatePrecision(EvalEngine engine) {
+        return this;
     }
 
     @Override

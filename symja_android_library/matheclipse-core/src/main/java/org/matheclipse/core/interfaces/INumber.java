@@ -1,5 +1,6 @@
 package org.matheclipse.core.interfaces;
 
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ComplexNum;
 
@@ -89,6 +90,8 @@ public interface INumber extends IExpr {
      * @return
      */
     public boolean equalsInt(int i);
+
+    INumber evaluatePrecision(EvalEngine engine);
 
     /**
      * Returns the largest (closest to positive infinity) <code>IInteger</code> value that is not greater than

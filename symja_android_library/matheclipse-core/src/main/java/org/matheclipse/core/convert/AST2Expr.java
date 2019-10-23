@@ -274,7 +274,7 @@ public class AST2Expr {
 		Initializer.init();
 	}
 
-	private int fPrecision;
+	private long fPrecision;
 
 	private boolean fLowercaseEnabled;
 
