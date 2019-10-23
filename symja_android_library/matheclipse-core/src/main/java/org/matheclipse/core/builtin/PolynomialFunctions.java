@@ -1636,6 +1636,9 @@ public class PolynomialFunctions {
 				if (n == 0 || k == 0) {
 					return F.C0;
 				}
+				if (n < k) {
+					return F.C0;
+				}
 				int max = n - k + 2;
 				if (max >= 0) {
 					return bellY(n, k, (IAST) ast.arg3());
@@ -1862,8 +1865,15 @@ public class PolynomialFunctions {
 		int a = 1;
 		int max = n - k + 2;
 		for (int m = 1; m < max; m++) {
-			if (!symbols.get(m).isZero()) {
-			s = s.plus(F.Times(a, bellY(n - m, k - 1, symbols), symbols.get(m)));
+			if ((m < symbols.size()) && !symbols.get(m).isZero()) {
+				IExpr bellY = bellY(n - m, k - 1, symbols);
+				if (bellY.isPlus()) {
+					bellY = ((IAST) bellY).mapThread(F.Times(a, null, symbols.get(m)), 2);
+				} else {
+					bellY = F.Times(a, bellY, symbols.get(m));
+
+				}
+				s = s.plus(bellY);
 			}
 			a = a * (n - m) / m;
 		}
