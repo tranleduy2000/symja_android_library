@@ -5656,6 +5656,9 @@ public class F {
         return new AST1(Fibonacci, a0);
     }
 
+	public static IAST Fibonacci(final IExpr a0, final IExpr a1) {
+		return new AST2(Fibonacci, a0, a1);
+	}
     public static IAST FindFit(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
         return quaternary(FindFit, a0, a1, a2, a3);
     }
@@ -6861,6 +6864,10 @@ public class F {
     public static IAST LucasL(final IExpr a) {
         return new AST1(LucasL, a);
     }
+
+	public static IAST LucasL(final IExpr a, final IExpr b) {
+		return new AST2(LucasL, a, b);
+	}
 
     /**
      * <pre>
