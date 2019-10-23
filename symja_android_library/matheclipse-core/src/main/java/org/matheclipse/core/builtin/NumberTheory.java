@@ -2449,7 +2449,7 @@ public final class NumberTheory {
 						n *= (-1);
 					}
 					if (ast.isAST2()) {
-						return lucasLPolynomial(n, ast.arg2(), engine);
+						return lucasLPolynomialIterative(n, ast.arg2(), engine);
 					}
 					// LucasL(n) = Fibonacci(n-1) + Fibonacci(n+1)
 					return fibonacci(n - 1).add(fibonacci(n + 1));
@@ -2467,7 +2467,7 @@ public final class NumberTheory {
 		 *            the variable expression of the polynomial
 		 * @return
 		 */
-		private static IExpr lucasLPolynomial(int n, IExpr x, final EvalEngine engine) {
+		private static IExpr lucasLPolynomial(final int n, final IExpr x, final EvalEngine engine) {
 			if (n == 0) {
 				return F.C2;
 			}
@@ -2495,6 +2495,37 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
+		/**
+		 * Create LucasL polynomial with iteration. Performs much better than recursion.
+		 *
+		 * @param n
+		 *            an integer <code>n >= 0</code>
+		 * @param x
+		 *            the variable expression of the polynomial
+		 * @return
+		 */
+		public IExpr lucasLPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+			IExpr previousLucasL = F.C2;
+			IExpr lucalsL = x;
+			if (n == 0) {
+				return previousLucasL;
+			}
+			if (n == 1) {
+				return lucalsL;
+			}
+
+			for (int i = 1; i < n; i++) {
+				IExpr temp = lucalsL;
+				if (lucalsL.isPlus()) {
+					lucalsL = ((IAST) lucalsL).mapThread(F.Times(x, null), 2);
+				} else {
+					lucalsL = F.Times(x, lucalsL);
+				}
+				lucalsL = F.Expand.of(engine, F.Plus(lucalsL, previousLucasL));
+				previousLucasL = temp;
+			}
+			return lucalsL;
+		}
 		@Override
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_2;
