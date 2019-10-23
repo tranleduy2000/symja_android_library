@@ -2029,7 +2029,7 @@ public final class NumberTheory {
 	 * 280571172992510140037611932413038677189525
 	 * </pre>
 	 */
-	private static class Fibonacci extends AbstractTrigArg1 {
+	private static class Fibonacci extends AbstractFunctionEvaluator {
 
 		/**
 		 * <p>
@@ -2493,7 +2493,7 @@ public final class NumberTheory {
 	 * </p>
 	 * See: <a href= "https://en.wikipedia.org/wiki/Lucas_number">Wikipedia: Lucas number</a>
 	 */
-	private static class LucasL extends AbstractTrigArg1 {
+	private static class LucasL extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {

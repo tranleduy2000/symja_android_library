@@ -5,7 +5,9 @@ import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ComplexNum;
 
 /**
+ *
  * Implemented by all number interfaces
+ *
  */
 public interface INumber extends IExpr {
 
@@ -152,7 +154,6 @@ public interface INumber extends IExpr {
     /**
      * Return the rational Factor of this number. For IComplex numbers check if real and imaginary parts are equal and
      * or real part is zero.
-     *
      * @return <code>null</code> if no factor could be extracted
      */
     IRational rationalFactor();
