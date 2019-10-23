@@ -265,7 +265,7 @@ public class F {
     public final static IBuiltInSymbol AnnuityDue = F.initFinalSymbol("AnnuityDue", ID.AnnuityDue);
     /***/
     public final static IBuiltInSymbol AntiSymmetric = F.initFinalSymbol("AntiSymmetric", ID.AntiSymmetric);
-    /** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix.*/
+     /** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix.*/
     public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ", ID.AntihermitianMatrixQ);
 
     /** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix.*/
@@ -2454,6 +2454,8 @@ public class F {
     public final static IBuiltInSymbol TraditionalForm = F.initFinalSymbol("TraditionalForm", ID.TraditionalForm);
 	/** Transpose(m) - transposes rows and columns in the matrix `m`. */
     public final static IBuiltInSymbol Transpose = F.initFinalSymbol("Transpose", ID.Transpose);
+	/***/
+	public final static IBuiltInSymbol TreeForm = F.initFinalSymbol("TreeForm", ID.TreeForm);
     /***/
     public final static IBuiltInSymbol Trig = F.initFinalSymbol("Trig", ID.Trig);
 	/** TrigExpand(expr) - expands out trigonometric expressions in `expr`. */
