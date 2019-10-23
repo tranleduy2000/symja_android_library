@@ -24,14 +24,22 @@ import org.matheclipse.core.visit.AbstractVisitor;
 public class Matcher implements Function<IExpr, IExpr> {
 	private static class MatcherVisitor extends AbstractVisitor {
 		final Matcher matcher;
+		final Function<IAST, IExpr> function;
 
-		public MatcherVisitor(Matcher matcher) {
+		public MatcherVisitor(Matcher matcher, Function<IAST, IExpr> function) {
 			this.matcher = matcher;
+			this.function = function;
 		}
 
 		@Override
 		public IExpr visit(IASTMutable ast) {
 			IAST list = ast;
+			if (function != null) {
+				IExpr temp = function.apply(list);
+				if (temp.isPresent()) {
+					return temp;
+				}
+			}
 			boolean evaled = false;
 			IExpr temp = matcher.apply(list);
 			if (temp.isPresent()) {
@@ -280,9 +288,21 @@ public class Matcher implements Function<IExpr, IExpr> {
 	 * @return <code>F.NIL</code> if no rule of the rule set matched an expression.
 	 */
 	public IExpr replaceAll(IExpr expression) {
-		return expression.accept(new MatcherVisitor(this));
+		return replaceAll(expression, null);
 	}
 
+	/**
+	 * Replace all (sub-) expressions with the given rule set. If no substitution matches, the method returns the given
+	 * <code>expression</code>.
+	 *
+	 * @param expression
+	 * @param function
+	 *            if not <code>null</code> evaluate before the rules apply
+	 * @return <code>F.NIL</code> if no rule of the rule set matched an expression.
+	 */
+	public IExpr replaceAll(IExpr expression, Function<IAST, IExpr> function) {
+		return expression.accept(new MatcherVisitor(this, function));
+	}
 
 	// public static IExpr evalTest(PatternMap pm) {
 	// return F.List(pm.val(F.y));
