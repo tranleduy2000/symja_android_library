@@ -295,6 +295,16 @@ public class IOFunctions {
 		return F.NIL;
 	}
 
+	public static IAST printMessage(ISymbol symbol, Exception ex, EvalEngine engine) {
+		String message = ex.getMessage();
+		if (message != null) {
+			engine.printMessage(symbol.toString() + ": " + message);
+		} else {
+			engine.printMessage(symbol.toString() + ": " + ex.getClass().toString());
+		}
+		return F.NIL;
+	}
+
 	private static String rawMessage(final IAST ast, String message) {
 				for (int i = 2; i < ast.size(); i++) {
 			message = message.replace("`" + (i - 1) + "`", ast.get(i).toString());

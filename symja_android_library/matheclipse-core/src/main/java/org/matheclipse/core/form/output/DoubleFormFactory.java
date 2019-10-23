@@ -418,6 +418,12 @@ public abstract class DoubleFormFactory {
 		} else if (symbol == F.Pi) {
 			buf.append("Math.PI");
 			return;
+		} else if (symbol == F.False) {
+			buf.append("false");
+			return;
+		} else if (symbol == F.True) {
+			buf.append("true");
+			return;
 		}
 		if (symbol.isConstantAttribute()) {
 			try {
@@ -1071,13 +1077,13 @@ public abstract class DoubleFormFactory {
 	}
 
 	public Operator getOperator(ISymbol head) {
-//		Operator operator = null;
+		// Operator operator = null;
 		if (head == F.Plus || head == F.Times || head == F.Equal || head == F.Unequal || head == F.Less
 				|| head == F.LessEqual || head == F.Greater || head == F.GreaterEqual || head == F.And || head == F.Or
 				|| head == F.Not) {
 			return OutputFormFactory.getOperator(head);
-//			String str = head.toString();
-//			operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+			// String str = head.toString();
+			// operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
 		}
 		return null;
 	}

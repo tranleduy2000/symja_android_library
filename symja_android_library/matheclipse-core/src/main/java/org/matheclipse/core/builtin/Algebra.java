@@ -116,35 +116,36 @@ public class Algebra {
 	private static class Initializer {
 
 		private static void init() {
-		F.Apart.setEvaluator(new Apart());
-		F.Cancel.setEvaluator(new Cancel());
-		F.Collect.setEvaluator(new Collect());
-		F.Denominator.setEvaluator(new Denominator());
-		F.Distribute.setEvaluator(new Distribute());
-		F.Expand.setEvaluator(new Expand());
-		F.ExpandAll.setEvaluator(new ExpandAll());
-		F.Factor.setEvaluator(new Factor());
-		F.FactorSquareFree.setEvaluator(new FactorSquareFree());
-		F.FactorSquareFreeList.setEvaluator(new FactorSquareFreeList());
-		F.FactorTerms.setEvaluator(new FactorTerms());
-		F.FullSimplify.setEvaluator(new FullSimplify());
-		F.Numerator.setEvaluator(new Numerator());
+			F.Apart.setEvaluator(new Apart());
+			F.Cancel.setEvaluator(new Cancel());
+			F.Collect.setEvaluator(new Collect());
+			F.Denominator.setEvaluator(new Denominator());
+			F.Distribute.setEvaluator(new Distribute());
+			F.Expand.setEvaluator(new Expand());
+			F.ExpandAll.setEvaluator(new ExpandAll());
+			F.Factor.setEvaluator(new Factor());
+			F.FactorSquareFree.setEvaluator(new FactorSquareFree());
+			F.FactorSquareFreeList.setEvaluator(new FactorSquareFreeList());
+			F.FactorTerms.setEvaluator(new FactorTerms());
+			F.FullSimplify.setEvaluator(new FullSimplify());
+			F.FunctionRange.setEvaluator(new FunctionRange());
+			F.Numerator.setEvaluator(new Numerator());
 
-		F.PolynomialExtendedGCD.setEvaluator(new PolynomialExtendedGCD());
-		F.PolynomialGCD.setEvaluator(new PolynomialGCD());
-		F.PolynomialLCM.setEvaluator(new PolynomialLCM());
-		F.PolynomialQ.setEvaluator(new PolynomialQ());
-		F.PolynomialQuotient.setEvaluator(new PolynomialQuotient());
-		F.PolynomialQuotientRemainder.setEvaluator(new PolynomialQuotientRemainder());
-		F.PolynomialRemainder.setEvaluator(new PolynomialRemainder());
+			F.PolynomialExtendedGCD.setEvaluator(new PolynomialExtendedGCD());
+			F.PolynomialGCD.setEvaluator(new PolynomialGCD());
+			F.PolynomialLCM.setEvaluator(new PolynomialLCM());
+			F.PolynomialQ.setEvaluator(new PolynomialQ());
+			F.PolynomialQuotient.setEvaluator(new PolynomialQuotient());
+			F.PolynomialQuotientRemainder.setEvaluator(new PolynomialQuotientRemainder());
+			F.PolynomialRemainder.setEvaluator(new PolynomialRemainder());
 
-		F.PowerExpand.setEvaluator(new PowerExpand());
-		F.Root.setEvaluator(new Root());
-		F.Simplify.setEvaluator(new Simplify());
-		F.Together.setEvaluator(new Together());
-		F.ToRadicals.setEvaluator(new ToRadicals());
-		F.Variables.setEvaluator(new Variables());
-	}
+			F.PowerExpand.setEvaluator(new PowerExpand());
+			F.Root.setEvaluator(new Root());
+			F.Simplify.setEvaluator(new Simplify());
+			F.Together.setEvaluator(new Together());
+			F.ToRadicals.setEvaluator(new ToRadicals());
+			F.Variables.setEvaluator(new Variables());
+		}
 	}
 
 	protected static class InternalFindCommonFactorPlus {
@@ -2526,6 +2527,49 @@ public class Algebra {
         }
 	}
 
+	private final static class FunctionRange extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr function = ast.arg1();
+			IExpr xExpr = ast.arg2();
+			IExpr yExpr = ast.arg3();
+			IBuiltInSymbol domain=F.Reals;
+			if (xExpr.isSymbol() && yExpr.isSymbol()) {
+				ISymbol x = (ISymbol) xExpr;
+				ISymbol y = (ISymbol) yExpr;
+				IExpr f = function.replaceAll(F.Rule(x, F.Interval(F.CNInfinity, F.CInfinity))).orElse(function);
+				IExpr result = engine.evaluate(f);
+				if (result.isInterval1()) {
+					IAST list = (IAST) result.first();
+					if (list.arg1().isReal()) {
+						if (list.arg2().isReal()) {
+							return F.LessEqual(list.arg1(), y, list.arg2());
+						} else if (list.arg2().isInfinity()) {
+							return F.GreaterEqual(y, list.arg1());
+						}
+					} else if (list.arg2().isReal()) {
+						if (list.arg1().isNegativeInfinity()) {
+							return F.LessEqual(y, list.arg2());
+						}
+					}
+				} else if (domain.equals(F.Reals)) {
+//					if (result.isPower()) {
+//
+//					}
+				}
+				// if (function.isSin() || function.isCos()) {
+				// return F.LessEqual(F.CN1, y, F.C1);
+				// }
+			}
+			return F.NIL;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
+		}
+
+	}
 	/**
 	 * <h2>Numerator</h2>
 	 *

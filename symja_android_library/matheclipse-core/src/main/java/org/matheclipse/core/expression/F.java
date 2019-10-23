@@ -1051,6 +1051,8 @@ public class F {
     public final static IBuiltInSymbol Function = F.initFinalSymbol("Function", ID.Function);
 	/** FunctionExpand(f) - expands the special function `f`. */
     public final static IBuiltInSymbol FunctionExpand = F.initFinalSymbol("FunctionExpand", ID.FunctionExpand);
+    /***/
+    public final static IBuiltInSymbol FunctionRange = F.initFinalSymbol("FunctionRange", ID.FunctionRange);
 	/** GCD(n1, n2, ...) - computes the greatest common divisor of the given integers. */
     public final static IBuiltInSymbol GCD = F.initFinalSymbol("GCD", ID.GCD);
 	/** Gamma(z) - is the gamma function on the complex number `z`. */
@@ -1238,7 +1240,7 @@ public class F {
      * an addition function `g`.
      */
     public final static IBuiltInSymbol Inner = F.initFinalSymbol("Inner", ID.Inner);
-    /***/
+    /** Input() - if the file system is enabled, the user can input an expression. After input this expression will be evaluated immediately.*/
     public final static IBuiltInSymbol Input = F.initFinalSymbol("Input", ID.Input);
     /***/
     public final static IBuiltInSymbol InputForm = F.initFinalSymbol("InputForm", ID.InputForm);

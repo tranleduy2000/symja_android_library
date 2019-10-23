@@ -7440,6 +7440,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("(Function@@{{x},x==2})[2]", "True");
 	}
 
+	public void testFunctionRange() {
+		// TODO
+//		check("FunctionRange(Sqrt(Sin(2*x)),x,y)", //
+//				"0<=y<=1");
+		check("FunctionRange(Sin(x)*Cos(x),x,y)", //
+				"-1<=y<=1");
+		check("FunctionRange(Sin(x),x,y)", //
+				"-1<=y<=1");
+		check("FunctionRange(Cos(x),x,y)", //
+				"-1<=y<=1");
+	}
 	public void testFunctionExpand() {
 		check("FunctionExpand(Degree)", //
 				"Pi/180");
@@ -8795,7 +8806,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("Sin(Interval({2, 7}))", "Interval({-1,Sin(2)})");
 		// check("Sin(Interval({2, 8}))", "Interval({-1,1})");
 
-		check("Interval({-1,1})/Infinity", "0");
+		check("Interval({3,-1})", //
+				"Interval({-1,3})");
+		check("Interval({-1,1})*Interval({-1,1})", //
+				"Interval({-1,1})");
+		check("Interval({-1,1})/Infinity", //
+				"0");
 		check("Interval({1,1})", //
 				"Interval({1,1})");
 
@@ -9170,21 +9186,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"(20.085536923187664)-Math.cos((9.869604401089358)/x)");
 		// Mathcell syntax
 		check("JSForm(Manipulate(Plot(Sin(x)*Cos(1 + a*x), {x, 0, 2*Pi}, PlotRange->{-1,2}), {a,0,10}))", //
-				"MathCell( id, [ { type: 'slider', min: 0, max: 10, name: 'a', label: 'a' }\n" + //
-						" ] );\n" + //
-						"\n" + //
-						"parent.update = function( id ) {\n" + //
-						"\n" + //
-						"var a = getVariable(id, 'a');\n" + //
-						"\n" + //
-						"function z1(x) { return mul(cos(add(1,mul(a,x))),sin(x)); }\n" + //
-						"\n" + //
-						"var p1 = plot( z1, [0, (6.283185307179586)], { } );\n" + //
-						"var data = [ p1 ];\n" + //
-						"var config = { type: 'svg' , yMin: -1, yMax: 2 };\n" + //
-						"evaluate( id, data, config );\n" + //
-						"\n" + //
-						"}");
+				"var board = JXG.JSXGraph.initBoard('jxgbox', {axis:true,boundingbox:[-0.3141592653589793,2.15,6.5973445725385655,-1.15]});\n" +
+				"board.suspendUpdate();\n" +
+				"var a = board.create('slider',[[0.37699111843077515,1.8199999999999998],[5.906194188748811,1.8199999999999998],[0,0,10]],{name:'a'});\n" +
+				"\n" +
+				"function z1(x) { return mul(cos(add(1,mul(a.Value(),x))),sin(x)); }\n" +
+				"var p1 = board.create('functiongraph',[z1, 0, (6.283185307179586)]);\n" +
+				"var data = [ p1 ];\n" +
+				"\n" +
+				"\n" +
+				"board.unsuspendUpdate();\n" +
+				"");
 		// Mathcell syntax / generate TeX for MathJAX
 		check("JSForm(Manipulate(Factor(x^n + 1), {n, 1, 5, 1}))", //
 				"MathCell( id, [ { type: 'slider', min: 1, max: 5, step: 1, name: 'n', label: 'n' }\n" + //
@@ -10169,6 +10181,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testLog() {
+		check("Log(Interval({0, 3}))", //
+				"Interval({-Infinity,Log(3)})");
+		check("Log(Interval({-1, 3}))", //
+				"Log(Interval({-1,3}))");
 		// github #134
 		check("Log(10,1)", //
 				"0");
@@ -11785,6 +11801,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNIntegrate() {
+		// github #150
+		// checkNumeric("NIntegrate(1/x, {x, 0, 1}, MaxPoints->1000)", //
+		// "14.97094172112369");
 		// github #61
 		// these methods correctly show "NIntegrate(method=method-nsme) maximal count (xxxxx) exceeded"
 		checkNumeric("NIntegrate(1/x, {x,0,5}, Method->Romberg)", //
@@ -16943,7 +16962,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSin() {
-		check("Sin(5*Pi/12)",
+		check("Sin(Interval({-Infinity,Infinity}))", //
+				"Interval({-1,1})");
+		check("Sin(5*Pi/12)", //
 				"(1+Sqrt(3))/(2*Sqrt(2))");
 		// check("Sin(Quantity(90,\"Degree\"))",
 		// "");
