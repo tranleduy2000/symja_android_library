@@ -1370,10 +1370,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBesselYZero() {
-//		checkNumeric("BesselYZero(0.0,2)", //
-//				" ");
-//		checkNumeric("BesselYZero(0.0,1)", //
-//				" ");
+		// checkNumeric("BesselYZero(0.0,2)", //
+		// " ");
+		// checkNumeric("BesselYZero(0.0,1)", //
+		// " ");
 	}
 	public void testBeta() {
 		// TODO improve bad precision
@@ -16163,6 +16163,22 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testRound() {
 		// github #145
 		// TODO add tests for big (Apfloat) numbers
+		// Rationalize(2.1675 => 867/400
+		check("Round(Rationalize(867/400),10^(-3))", //
+				"271/125");
+		check("Round(Rationalize(2.1675),10^(-3))", //
+				"271/125");
+		check("Round(2.1675, 0.001)", //
+				"2.168");
+		check("Round(2.1675, 1/1000)", //
+				"271/125");
+		check("Round(500,10^(-3))", //
+				"500");
+		check("Round(500, 10)", //
+				"500");
+
+		check("Round(75.345677/7.56)", //
+				"10");
 		check("Round(1.234512, 0.01)", //
 				"1.23");
 		check("Round(-1.234512, 0.01)", //

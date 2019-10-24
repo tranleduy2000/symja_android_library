@@ -88,7 +88,7 @@ public interface INumber extends IExpr {
     /**
      * Check if this number equals the given <code>int</code> number?
      *
-     * @param i the integer number
+`     * @param i the integer number
      * @return
      */
     public boolean equalsInt(int i);
@@ -152,8 +152,9 @@ public interface INumber extends IExpr {
     public INumber opposite();
 
     /**
-     * Return the rational Factor of this number. For IComplex numbers check if real and imaginary parts are equal and
-     * or real part is zero.
+     * Return the rational Factor of this number. For IComplex numbers check if real and imaginary parts are equal or
+     * real part or imaginary part is zero.
+     *
      * @return <code>null</code> if no factor could be extracted
      */
     IRational rationalFactor();
