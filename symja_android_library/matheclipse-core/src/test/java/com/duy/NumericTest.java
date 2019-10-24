@@ -69,8 +69,8 @@ public class NumericTest extends TestCase {
     public void testRound() {
         ExprEvaluator exprEvaluator = new ExprEvaluator();
         exprEvaluator.eval("TiRound[x_, y_] := Round[x, 10^(-y)]");
-        assertEquals(exprEvaluator.eval("TiRound(Rationalize(2.1675),3)").toString(),
-                "2.123");
+        assertEquals(exprEvaluator.eval("N[TiRound(Rationalize(2.1675),3.0)]").toString(),
+                "2.168");
     }
 
 }

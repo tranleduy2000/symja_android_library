@@ -1164,12 +1164,12 @@ public class IntegerFunctions {
 				if (ast.isAST2()) {
 					// Round(z, a)
 					ISignedNumber multiple = ast.arg2().evalReal();
-					if (multiple!=null) {
+					if (multiple != null) {
 						if (multiple.isZero()) {
 							return F.Indeterminate;
 						}
-				ISignedNumber signedNumber = arg1.evalReal();
-				if (signedNumber != null) {
+						ISignedNumber signedNumber = arg1.evalReal();
+						if (signedNumber != null) {
 							return signedNumber.roundClosest(multiple);
 						}
 						if (arg1.isComplexNumeric()) {
