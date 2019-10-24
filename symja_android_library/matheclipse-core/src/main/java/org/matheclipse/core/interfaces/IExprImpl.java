@@ -2837,6 +2837,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     @Override
+    public IExpr map(Function<? super IExpr, ? extends IExpr> mapper) {
+        return mapper.apply(this);
+    }
+
+    @Override
     public IExpr mod(final IExpr that) {
         return F.Mod.of(this, that);
     }

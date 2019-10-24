@@ -1974,6 +1974,16 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     IExpr minus(final IExpr that);
 
+    /**
+     * If a value is present (i.e. this unequals F.NIL), apply the provided mapping function to it, and if the result is
+     * non-NIL, return the result. Otherwise return <code>F.NIL</code>
+     *
+     * @param mapper a mapping function to apply to the value, if present
+     * @return an IExpr describing the result of applying a mapping function to the value of this object, if a value is
+     * present, otherwise return <code>F.NIL</code>.
+     */
+    IExpr map(Function<? super IExpr, ? extends IExpr> mapper);
+
     IExpr mod(final IExpr that);
 
     /**
