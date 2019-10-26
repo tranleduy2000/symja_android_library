@@ -4,6 +4,7 @@ import com.duy.lambda.Consumer;
 
 import org.matheclipse.combinatoric.IStepVisitor;
 import org.matheclipse.combinatoric.MultisetPartitionsIterator;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -19,6 +20,20 @@ import org.matheclipse.core.patternmatching.PatternMatcher.StackMatcher;
 public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVisitor {
 	protected int[] multiset;
 
+	/**
+	 *
+	 * @param sym
+	 * @param lhsPatternAST
+	 * @param lhsEvalAST
+	 * @param patternMatcher
+	 * @param patternMap
+	 * @deprecated used only for JUnit tests
+	 */
+	public FlatOrderlessStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST,
+			PatternMatcher patternMatcher, IPatternMap patternMap) {
+		this(sym, lhsPatternAST, lhsEvalAST, //
+				patternMatcher.new StackMatcher(EvalEngine.get()), patternMap);
+	}
 	public FlatOrderlessStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST, StackMatcher stackMatcher,
 			IPatternMap patternMap) {
 		super(sym, lhsPatternAST, lhsEvalAST, stackMatcher, patternMap);
