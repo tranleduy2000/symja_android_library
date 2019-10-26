@@ -1395,8 +1395,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 	/**
 	 * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append
-	 * the result elements for which the <code>function</code> returns non <code>F.NIL</code> elements to the <code>filterAST</code>,
-	 * or otherwise append the argument to the <code>restAST</code>.
+	 * the result elements for which the <code>function</code> returns non <code>F.NIL</code> elements to the
+	 * <code>filterAST</code>, or otherwise append the argument to the <code>restAST</code>.
 	 *
 	 * @param filterAST
 	 *            the non <code>F.NIL</code> elements which were returned by the <code>function#apply()</code> method
