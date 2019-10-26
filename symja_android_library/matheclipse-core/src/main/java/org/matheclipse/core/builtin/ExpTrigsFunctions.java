@@ -19,7 +19,8 @@ import org.matheclipse.core.eval.interfaces.AbstractTrigArg1Rewrite;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.eval.interfaces.IRewrite;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
-import org.matheclipse.core.expression.ComplexUtils;
+import org.matheclipse.core.expression.ApcomplexNum;
+import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.interfaces.IAST;
@@ -949,8 +950,19 @@ public class ExpTrigsFunctions {
 		}
 
 		@Override
-		public IExpr e1DblComArg(final IComplexNum c) {
-			return ComplexUtils.atan(c);
+		public IExpr e1DblComArg(final IComplexNum val) {
+			if (val instanceof ApcomplexNum) {
+				return F.complexNum(ApcomplexMath.atan(((ApcomplexNum) val).apcomplexValue()));
+			}
+			ComplexNum z = (ComplexNum) val;
+			if (z.isNaN()) {
+				return F.Indeterminate;
+			}
+
+			IComplexNum temp = ComplexNum.I.add(z).divide(ComplexNum.I.subtract(z));
+			IComplexNum logValue = log(temp.complexNumValue());
+			return ComplexNum.I.multiply(logValue).divide(ComplexNum.valueOf(2.0, 0.0))
+					.complexNumValue();
 		}
 
 		@Override
@@ -1999,7 +2011,7 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr e1DblComArg(final IComplexNum arg1) {
-			return ComplexUtils.log(arg1);
+			return log(arg1);
 		}
 
 		@Override
@@ -3146,6 +3158,16 @@ public class ExpTrigsFunctions {
 		return F.NIL;
 	}
 
+	private static IComplexNum log(final IComplexNum val) {
+		if (val instanceof ApcomplexNum) {
+			return ApcomplexNum.valueOf(ApcomplexMath.log(((ApcomplexNum) val).apcomplexValue()));
+		}
+		ComplexNum z = (ComplexNum) val;
+		if (z.isNaN()) {
+			return ComplexNum.NaN;
+		}
+		return ComplexNum.valueOf(Math.log(z.dabs()), Math.atan2(z.imDoubleValue(), z.reDoubleValue()));
+	}
 	/**
 	 * Try simplifying <code>ArcSin(Sin(z))</code>
 	 *

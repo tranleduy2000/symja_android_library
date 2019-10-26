@@ -245,9 +245,8 @@ public class Structure {
 						return expr;
 					}
 				}
-			} catch (final MathException e) {
+			} catch (final RuntimeException e) {
 				return engine.printMessage("Apply: " + e.getMessage());
-			} catch (final ArithmeticException e) {
 
 			}
 			return F.NIL;
@@ -1035,8 +1034,8 @@ public class Structure {
 	 *
 	 * <blockquote>
 	 * <p>
-	 * applies <code>f</code> to each part on the first level of <code>expr</code> and appending the elements position as a list in the
-	 * second argument.
+	 * applies <code>f</code> to each part on the first level of <code>expr</code> and appending the elements position
+	 * as a list in the second argument.
 	 * </p>
 	 * </blockquote>
 	 *
@@ -1096,7 +1095,7 @@ public class Structure {
 				if (arg2.isAST()) {
 					return level.visitAST(((IAST) arg2), new int[0]).orElse(arg2);
 				}
-			} catch (final MathException e) {
+			} catch (final RuntimeException e) {
 				return engine.printMessage("MapIndexed: " + e.getMessage());
 			}
 			return F.NIL;
