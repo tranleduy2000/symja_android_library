@@ -210,6 +210,8 @@ public class F {
     public final static IBuiltInSymbol $MessageList = F.initFinalSymbol("$MessageList", ID.$MessageList);
     /***/
     public final static IBuiltInSymbol $MinMachineNumber = F.initFinalSymbol("$MinMachineNumber", ID.$MinMachineNumber);
+	/***/
+	public final static IBuiltInSymbol $OutputSizeLimit = F.initFinalSymbol("$OutputSizeLimit", ID.$OutputSizeLimit);
     /***/
     public final static IBuiltInSymbol $PrePrint = F.initFinalSymbol("$PrePrint", ID.$PrePrint);
 	/***/
@@ -716,7 +718,9 @@ public class F {
     public final static IBuiltInSymbol DeleteCases = F.initFinalSymbol("DeleteCases", ID.DeleteCases);
 	/** DeleteDuplicates(list) - deletes duplicates from `list`. */
     public final static IBuiltInSymbol DeleteDuplicates = F.initFinalSymbol("DeleteDuplicates", ID.DeleteDuplicates);
-	/** Denominator(expr) - gives the denominator in `expr`. */
+	/**
+	 * Denominator(expr) - gives the denominator in `expr`. Denominator collects expressions with negative exponents.
+	 */
     public final static IBuiltInSymbol Denominator = F.initFinalSymbol("Denominator", ID.Denominator);
 	/** Depth(expr) - gives the depth of `expr`. */
     public final static IBuiltInSymbol Depth = F.initFinalSymbol("Depth", ID.Depth);
@@ -921,6 +925,8 @@ public class F {
     public final static IBuiltInSymbol Export = F.initFinalSymbol("Export", ID.Export);
     /***/
     public final static IBuiltInSymbol ExportString = F.initFinalSymbol("ExportString", ID.ExportString);
+	/***/
+	public final static IBuiltInSymbol Expression = F.initFinalSymbol("Expression", ID.Expression);
 	/** ExtendedGCD(n1, n2, ...) - computes the extended greatest common divisor of the given integers. */
     public final static IBuiltInSymbol ExtendedGCD = F.initFinalSymbol("ExtendedGCD", ID.ExtendedGCD);
     /***/
