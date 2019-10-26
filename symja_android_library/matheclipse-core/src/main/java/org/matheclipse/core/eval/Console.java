@@ -73,7 +73,7 @@ public class Console {
 	 */
 	private static PrintWriter stderr = new PrintWriter(new OutputStreamWriter(System.err, Charset.forName("UTF-8")),
 			true);
-	public static void runConsole(final String args[], PrintWriter out, PrintWriter err) {
+	/* package private */ static void runConsole(final String args[], PrintWriter out, PrintWriter err) {
 		stdout = out;
 		stderr = err;
 		main(args);
@@ -412,7 +412,7 @@ public class Console {
 	 *            a trimmed input string
      * @return
      */
-	public String interpreter(final String trimmedInput) {
+	/* package private */ String interpreter(final String trimmedInput) {
         IExpr result;
         final StringWriter buf = new StringWriter();
         try {
@@ -492,8 +492,11 @@ public class Console {
 		case TRADITIONALFORM:
 			StringBuilder traditionalBuffer = new StringBuilder();
 			fOutputTraditionalFactory.reset();
-			fOutputTraditionalFactory.convert(traditionalBuffer, result);
+			if (fOutputTraditionalFactory.convert(traditionalBuffer, result)) {
 			return traditionalBuffer.toString();
+			} else {
+				return "ERROR-IN-TRADITIONALFORM";
+			}
 		case PRETTYFORM:
 			ASCIIPrettyPrinter3 prettyBuffer = new ASCIIPrettyPrinter3();
 			prettyBuffer.convert(result);
@@ -504,73 +507,30 @@ public class Console {
 		case INPUTFORM:
 			StringBuilder inputBuffer = new StringBuilder();
 			fInputFactory.reset();
-			fInputFactory.convert(inputBuffer, result);
+			if (fInputFactory.convert(inputBuffer, result)) {
 			return inputBuffer.toString();
+			} else {
+				return "ERROR-IN-INPUTFORM";
+			}
 		default:
-		    //Android changed: package java.awt not available
 //			if (Desktop.isDesktopSupported()) {
 //				IExpr outExpr = result;
 //				if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
 //					outExpr = F.Show(outExpr);
 //				}
-//				if (outExpr.isSameHeadSizeGE(F.Show, 2)) {
-//					try {
-//						IAST show = (IAST) outExpr;
-//						if (show.size() > 1 && show.arg1().isSameHeadSizeGE(F.Graphics, 2)) {
-//							return openSVGOnDesktop(show);
-//						}
-//					} catch (Exception ex) {
-//						if (Config.SHOW_STACKTRACE) {
-//							ex.printStackTrace();
-//						}
-//					}
-//				} else if (result.head().equals(F.Graph) && result instanceof IDataExpr) {
-//					String javaScriptStr = GraphFunctions.graphToJSForm((IDataExpr) result);
-//					if (javaScriptStr != null) {
-//						String html = VISJS_PAGE;
-//						html = html.replaceAll("`1`", javaScriptStr);
-//						return Console.openHTMLOnDesktop(html);
-//					}
-//				} else if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {
-//					try {
-//						String manipulateStr = ((IAST) result).arg1().toString();
-//						String html = MATHCELL_PAGE;
-//						html = html.replaceAll("`1`", manipulateStr);
-//						return Console.openHTMLOnDesktop(html);
-//					} catch (Exception ex) {
-//						if (Config.SHOW_STACKTRACE) {
-//							ex.printStackTrace();
-//						}
-//					}
+//				String html = F.show(outExpr);
+//				if (html != null) {
+//					return html;
 //				}
 //			}
 			StringBuilder strBuffer = new StringBuilder();
 			fOutputFactory.reset();
-			fOutputFactory.convert(strBuffer, result);
+			if (fOutputFactory.convert(strBuffer, result)) {
 			return strBuffer.toString();
 		}
+			return "ERROR-IN-OUTPUTFORM";
 	}
 
-	// Android changed: Unsupported openSVGOnDesktop
-//	public static String openSVGOnDesktop(IAST show) throws IOException {
-//		StringBuilder stw = new StringBuilder();
-//		Show2SVG.graphicsToSVG(show.getAST(1), stw);
-//		File temp = File.createTempFile("tempfile", ".svg");
-//		BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
-//		bw.write(stw.toString());
-//		bw.close();
-//		Desktop.getDesktop().open(temp);
-//		return temp.toString();
-//	}
-
-    public static String openHTMLOnDesktop(String html) throws IOException {
-//        File temp = File.createTempFile("tempfile", ".html");
-//        BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
-//        bw.write(html);
-//        bw.close();
-//        Desktop.getDesktop().open(temp);
-//        return temp.toString();
-        throw new UnsupportedOperationException();
     }
 
     // private String[] prettyPrinter3Lines(final String inputExpression) {

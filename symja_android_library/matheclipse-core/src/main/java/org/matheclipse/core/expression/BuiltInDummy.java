@@ -232,7 +232,9 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		buf.append(attributesList.toString());
 		buf.append("\n");
 		for (int i = 1; i < list.size(); i++) {
-			off.convert(buf, list.get(i));
+			if (!off.convert(buf, list.get(i))) {
+				return "ERROR-IN-OUTPUTFORM";
+			}
 			if (i < list.size() - 1) {
 				buf.append("\n");
 				off.setColumnCounter(0);

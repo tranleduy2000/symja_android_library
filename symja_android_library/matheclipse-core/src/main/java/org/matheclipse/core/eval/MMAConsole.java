@@ -419,7 +419,7 @@ public class MMAConsole {
 	 *            a trimmed input string
 	 * @return
 	 */
-	public String interpreter(final String trimmedInput) {
+	/* package private */ String interpreter(final String trimmedInput) {
 		IExpr result;
 		final StringWriter buf = new StringWriter();
 		try {
@@ -498,7 +498,7 @@ public class MMAConsole {
 	 *
 	 */
 
-	public void printPrompt(final PrintWriter out, final String prompt) {
+	private void printPrompt(final PrintWriter out, final String prompt) {
 		out.print(prompt);
 		out.flush();
 	}
@@ -517,8 +517,11 @@ public class MMAConsole {
 		case TRADITIONALFORM:
 			StringBuilder traditionalBuffer = new StringBuilder();
 			fOutputTraditionalFactory.reset();
-			fOutputTraditionalFactory.convert(traditionalBuffer, result);
+				if (fOutputTraditionalFactory.convert(traditionalBuffer, result)) {
 			return traditionalBuffer.toString();
+				} else {
+					return "ERROR-IN-TRADITIONALFORM";
+				}
 		case PRETTYFORM:
 			ASCIIPrettyPrinter3 prettyBuffer = new ASCIIPrettyPrinter3();
 			prettyBuffer.convert(result);
@@ -529,54 +532,33 @@ public class MMAConsole {
 		case INPUTFORM:
 			StringBuilder inputBuffer = new StringBuilder();
 			fInputFactory.reset();
-			fInputFactory.convert(inputBuffer, result);
+				if (fInputFactory.convert(inputBuffer, result)) {
 			return inputBuffer.toString();
-		default:
-			//Android changed: java.awt is not available in Android framework
-//			if (Desktop.isDesktopSupported()) {
-//				IExpr outExpr = result;
+				} else {
+					return "ERROR-IN-INPUTFORM";
+				}
+			default:
+//				if (Desktop.isDesktopSupported()) {
+//					IExpr outExpr = result;
 //					if (result.isAST(F.Graphics)) {// || result.isAST(F.Graphics3D)) {
 //						outExpr = F.Show(outExpr);
 //					}
-//					if (outExpr.isSameHeadSizeGE(F.Show, 2)) {
-//						try {
-//							IAST show = (IAST) outExpr;
-//							if (show.size() > 1 && show.arg1().isSameHeadSizeGE(F.Graphics, 2)) {
-//								return Console.openSVGOnDesktop(show);
-//							}
-//						} catch (Exception ex) {
-//							if (Config.SHOW_STACKTRACE) {
-//								ex.printStackTrace();
-//							}
-//						}
-//					} else if (result.head().equals(F.Graph) && result instanceof IDataExpr) {
-//						String javaScriptStr = GraphFunctions.graphToJSForm((IDataExpr) result);
-//						if (javaScriptStr != null) {
-//							String html = Console.VISJS_PAGE;
-//							html = html.replaceAll("`1`", javaScriptStr);
-//							return Console.openHTMLOnDesktop(html);
-//						}
-//					} else if (result.isAST(F.JSFormData, 3) && result.second().toString().equals("mathcell")) {
-//						try {
-//							String manipulateStr = ((IAST) result).arg1().toString();
-//							String html = Console.MATHCELL_PAGE;
-//							html = html.replaceAll("`1`", manipulateStr);
-//							return Console.openHTMLOnDesktop(html);
-//						} catch (Exception ex) {
-//							if (Config.SHOW_STACKTRACE) {
-//								ex.printStackTrace();
-//							}
-//						}
+//					String html = F.show(outExpr);
+//					if (html != null) {
+//						return html;
 //					}
-//			}
+//				}
 
-		StringBuilder strBuffer = new StringBuilder();
-		fOutputFactory.reset();
-		fOutputFactory.convert(strBuffer, result);
-		return strBuffer.toString();
-			}
+				StringBuilder strBuffer = new StringBuilder();
+				fOutputFactory.reset();
+				if (fOutputFactory.convert(strBuffer, result)) {
+					return strBuffer.toString();
+				} else {
+					return "ERROR-IN-OUTPUTFORM";
+				}
+		}
 		} finally {
-	}
+		}
 	}
 
 	/**
@@ -587,7 +569,7 @@ public class MMAConsole {
 	 * @return the input string (without the newline)
 	 */
 
-	public String readString(final PrintWriter out) {
+	private String readString(final PrintWriter out) {
 		final StringBuilder input = new StringBuilder();
 		//Android Changed: Java 7 doesn't have UTF-8 field, use Charset.forName instead
 		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
@@ -631,7 +613,7 @@ public class MMAConsole {
 	 * @return the input string (without the newline)
 	 */
 
-	public String readString(final PrintWriter out, final String prompt) {
+	private String readString(final PrintWriter out, final String prompt) {
 		printPrompt(out, prompt);
 		return readString(out);
 	}
@@ -643,7 +625,7 @@ public class MMAConsole {
 	 *
 	 * @return default rules textfile name
 	 */
-	public String getDefaultSystemRulesFilename() {
+	private String getDefaultSystemRulesFilename() {
 		return fDefaultSystemRulesFilename;
 	}
 }

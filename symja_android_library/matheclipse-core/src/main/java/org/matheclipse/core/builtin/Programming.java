@@ -43,7 +43,6 @@ import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.parser.client.SyntaxError;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -1997,26 +1996,26 @@ public final class Programming {
 			}
 			final StringBuilder buf = new StringBuilder();
 			final OutputFormFactory out = OutputFormFactory.get();
+			final boolean[] convert = new boolean[] { true };
 			ast.forEach(new Consumer<IExpr>() {
-                @Override
-                public void accept(IExpr x) {
-                    IExpr temp = engine.evaluate(x);
-                    if (temp instanceof IStringX) {
-                        buf.append(temp.toString());
-                    } else {
-                        try {
-                            out.convert(buf, temp);
-                        } catch (IOException e) {
-                            stream.println(e.getMessage());
-                            if (Config.DEBUG) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
+				@Override
+				public void accept(IExpr x) {
+					IExpr temp = engine.evaluate(x);
+					if (temp instanceof IStringX) {
+						buf.append(temp.toString());
+					} else {
+						if (convert[0] && !out.convert(buf, temp)) {
+							convert[0] = true;
+						}
+					}
 
 
+				}
+			});
+			if (!convert[0] ) {
+				stream.println("ERROR-IN-OUTPUTFORM");
+				return F.Null;
                 }
-            });
 			stream.println(buf.toString());
 			return F.Null;
 		}

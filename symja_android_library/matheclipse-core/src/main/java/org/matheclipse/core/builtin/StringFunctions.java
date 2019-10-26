@@ -625,11 +625,12 @@ public final class StringFunctions {
 			OutputFormFactory off = OutputFormFactory.get(relaxedSyntax, false);
 			off.setIgnoreNewLine(true);
 			off.setQuotes(true);
-			off.convert(buf, expression);
+			if (off.convert(buf, expression)) {
 			return buf.toString();
-		} catch (IOException e) {
+			}
+		} catch (RuntimeException rex) {
 			if (Config.SHOW_STACKTRACE) {
-				e.printStackTrace();
+				rex.printStackTrace();
 			}
 		}
 		return null;
