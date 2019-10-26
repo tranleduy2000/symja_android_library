@@ -1372,7 +1372,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol InverseWeierstrassP = F.initFinalSymbol("InverseWeierstrassP", ID.InverseWeierstrassP);
 
-	/** JSForm(expre) - returns the JavaScript form of the `expr`. */
+    /** JSForm(expr) - returns the JavaScript form of the `expr`.  */
     public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
 
 	/***/
@@ -2421,7 +2421,10 @@ public class F {
     public final static IBuiltInSymbol SyntaxLength = F.initFinalSymbol("SyntaxLength", ID.SyntaxLength);
 	/** SyntaxQ(str) - is `True` if the given `str` is a string which has the correct syntax. */
     public final static IBuiltInSymbol SyntaxQ = F.initFinalSymbol("SyntaxQ", ID.SyntaxQ);
-	/** Table(expr, {i, n}) - evaluates `expr` with `i` ranging from `1` to `n`, returning a list of the results. */
+    /** SystemDialogInput("FileOpen") - if the file system is enabled, open a file chooser dialog box. */
+    public final static IBuiltInSymbol SystemDialogInput = F.initFinalSymbol("SystemDialogInput", ID.SystemDialogInput);
+
+    /** Table(expr, {i, n}) - evaluates `expr` with `i` ranging from `1` to `n`, returning a list of the results.*/
     public final static IBuiltInSymbol Table = F.initFinalSymbol("Table", ID.Table);
     /***/
     public final static IBuiltInSymbol TableForm = F.initFinalSymbol("TableForm", ID.TableForm);
@@ -2454,6 +2457,8 @@ public class F {
     public final static IBuiltInSymbol TensorRank = F.initFinalSymbol("TensorRank", ID.TensorRank);
     /***/
     public final static IBuiltInSymbol TensorSymmetry = F.initFinalSymbol("TensorSymmetry", ID.TensorSymmetry);
+    /***/
+    public final static IBuiltInSymbol TextCell = F.initFinalSymbol("TextCell", ID.TextCell);
     /***/
     public final static IBuiltInSymbol TextString = F.initFinalSymbol("TextString", ID.TextString);
 
@@ -7804,6 +7809,9 @@ public class F {
         return new AST2(Rational, a0, a1);
     }
 
+	public static IAST Rationalize(final IExpr a0) {
+		return new AST1(Rationalize, a0);
+	}
     public static IExpr Re(final IExpr a0) {
         if (a0 != null && a0.isNumber()) {
             return ((INumber) a0).re();
@@ -8970,6 +8978,7 @@ public class F {
     }
 
     public static IExpr zeroInteger() {
+
         return C0;
     }
 
