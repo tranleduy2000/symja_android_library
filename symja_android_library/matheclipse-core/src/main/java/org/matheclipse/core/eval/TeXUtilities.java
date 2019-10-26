@@ -1,10 +1,12 @@
 package org.matheclipse.core.eval;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.form.tex.TeXFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
 
+import java.io.IOException;
 import java.io.Writer;
 
 /**
@@ -46,17 +48,20 @@ public class TeXUtilities {
 	 * @param inputExpression
 	 * @param out
 	 */
-	synchronized public void toTeX(final String inputExpression, final Writer out) {
+	synchronized public boolean toTeX(final String inputExpression, final Writer out) {
 		IExpr parsedExpression = null;
 		if (inputExpression != null) {
 			try {
 				parsedExpression = fParser.parse(inputExpression);
+				return toTeX(parsedExpression, out);
 				// parsedExpression = AST2Expr.CONST.convert(node);
-			} catch (final Throwable e) {
-				// parsedExpression == null ==> fError occured
+			} catch (final RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
 			}
 		}
-		toTeX(parsedExpression, out);
+		}
+		return false;
 	}
 
 	/**
@@ -65,25 +70,32 @@ public class TeXUtilities {
 	 * @param objectExpression
 	 * @param out
 	 */
-	synchronized public void toTeX(final IExpr objectExpression, final Writer out) {
+	synchronized public boolean toTeX(final IExpr objectExpression, final Writer out) {
 		final StringBuilder buf = new StringBuilder();
 
 		if (objectExpression != null) {
+			try {
 			IExpr result = objectExpression;
 			if (objectExpression.isAST()) {
 				fEvalEngine.reset();
 				result = fEvalEngine.evalHoldPattern((IAST) objectExpression, true, true);
 			}
-			try {
 				if (fTeXFactory.convert(buf, result, 0)) {
 				out.write(buf.toString());
+					return true;
 				} else {
 					out.write("ERROR-IN-TEXFORM");
 				}
-			} catch (final Throwable e) {
+			} catch (final IOException ioe) {
 				// parsedExpression == null ==> fError occured
+			} catch (final RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
 			}
 		}
+			return false;
+		}
+		return true;
 	}
 
 	public void stopRequest() {
