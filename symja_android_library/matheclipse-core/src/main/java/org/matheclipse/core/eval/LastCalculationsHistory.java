@@ -58,12 +58,11 @@ public class LastCalculationsHistory implements Serializable {
 	 * <code>-1</code> to <code>-fAllEntriesCounter</code>.
 	 * 
 	 * @param index
-	 * @return <code>null</code> if the output history isn't available for the given <code>index</code>.
-	 * @deprecated use {@link #entry(int)}
+	 * @return <code>F.NIL</code> if the output history isn't available for the given <code>index</code>.
 	 */
-	public IExpr get(int index) {
+	public IExpr entry(int index) {
 		if (index > fAllEntriesCounter || index == 0) {
-			return null;
+			return F.NIL;
 		}
 		if (index > 0) {
 			// determine the negative index from the end
@@ -72,28 +71,22 @@ public class LastCalculationsHistory implements Serializable {
 		if (index <= 0) {
 			index *= -1;
 			if (fMaximumCapacity < index) {
-				return null;
+				return F.NIL;
 			}
+			IExpr temp;
 			if (index > fIndex) {
-				return fOutHistory[fMaximumCapacity + fIndex - index];
+				temp = fOutHistory[fMaximumCapacity + fIndex - index];
+			} else {
+				temp = fOutHistory[fIndex - index];
 			}
-			return fOutHistory[fIndex - index];
+			if (temp == null) {
+				return F.NIL;
+			}
+			return temp;
 		}
-		return null;
+		return F.NIL;
 	}
 
-	/**
-	 * Get the history entry at the given <code>index</code>. If the <code>index</code> is positive it ranges from
-	 * <code>1</code> to <code>fAllEntriesCounter</code>. If the <code>index</code> is negative it ranges from
-	 * <code>-1</code> to <code>-fAllEntriesCounter</code>.
-	 *
-	 * @param index
-	 * @return <code>F.NIL</code> if the output history isn't available for the given <code>index</code>.
-	 */
-	public IExpr entry(int index) {
-		IExpr temp = get(index);
-		return temp == null ? F.nilPtr() : temp;
-	}
 	public int size() {
 		return fOutHistory.length;
 	}
