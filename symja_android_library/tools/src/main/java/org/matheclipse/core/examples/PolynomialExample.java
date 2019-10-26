@@ -1,7 +1,7 @@
 package org.matheclipse.core.examples;
 
 import org.matheclipse.core.eval.ExprEvaluator;
-import org.matheclipse.core.expression.ExprRingFactory;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -19,8 +19,8 @@ public class PolynomialExample {
 			IExpr expr = util.eval("x^2+y+a*x+b*y+c");
 			System.out.println(expr.toString());
 
-			final IAST variables = F.List(F.x, F.y);
-			ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, variables, variables.size() - 1,
+			final IAST variables = F.List(F.symbol("x"), F.symbol("y"));
+			ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, variables, variables.argSize(),
 					ExprTermOrderByName.Lexicographic, false);
 
 			ExprPolynomial poly = ring.create(expr);

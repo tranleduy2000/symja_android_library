@@ -2,7 +2,6 @@ package org.matheclipse.core.polynomials;
 
 import com.duy.util.ThreadLocalRandom;
 
-import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;

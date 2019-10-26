@@ -1,5 +1,6 @@
-package org.matheclipse.core.expression;
+package org.matheclipse.core.polynomials;
 
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.io.Reader;

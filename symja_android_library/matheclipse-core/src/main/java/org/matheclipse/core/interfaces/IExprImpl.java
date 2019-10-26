@@ -22,7 +22,7 @@ import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.ExprField;
-import org.matheclipse.core.expression.ExprRingFactory;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;

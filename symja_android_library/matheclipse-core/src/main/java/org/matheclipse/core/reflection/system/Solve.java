@@ -1169,7 +1169,7 @@ public class Solve extends AbstractFunctionEvaluator {
 	protected static IASTMutable solveEquations(IASTMutable termsEqualZeroList, IAST inequationsList, IAST variables,
 			int maximumNumberOfResults, EvalEngine engine) {
 		try {
-			IASTMutable list = GroebnerBasis.solveGroebnerBasis(termsEqualZeroList, variables);
+			IASTMutable list = PolynomialFunctions.solveGroebnerBasis(termsEqualZeroList, variables);
 			if (list.isPresent()) {
 				termsEqualZeroList = list;
 			}

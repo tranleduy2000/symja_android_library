@@ -3,8 +3,9 @@ package org.matheclipse.core.convert;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.JASConversionException;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.ASTSeriesData;
-import org.matheclipse.core.expression.ExprRingFactory;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -213,12 +214,12 @@ public class JASIExpr {
 					int ix = leer.indexVar(base.toString(), fPolyFactory.getVars());
 					if (ix >= 0) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-//						int exponent = -1;
-//						try {
-//							exponent = Validate.checkPowerExponent(ast);
-//						} catch (WrongArgumentType e) {
-//							//
-//						}
+						// int exponent = -1;
+						// try {
+						// exponent = Validate.checkPowerExponent(ast);
+						// } catch (WrongArgumentType e) {
+						// //
+						// }
 						if (exponent < 0) {
 							throw new ArithmeticException(
 									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
@@ -413,5 +414,46 @@ public class JASIExpr {
 			}
 		}
 		return false;
+	}
+	/**
+	 * Map the <code>MonomialOrder-&gt;...</code> option to JAS TermOrder.
+	 *
+	 * @param defaultTermOrder
+	 *            the term order which should be used as default if no MonomialOrder option is set.
+	 * @return
+	 */
+	public static TermOrder monomialOrder(OptionArgs optionArgs, final TermOrder defaultTermOrder) {
+		TermOrder termOrder = defaultTermOrder;
+		IExpr option = optionArgs.getOption(F.MonomialOrder);
+		if (option.isSymbol()) {
+			// String orderStr = option.toString();
+			termOrder = monomialOrder((ISymbol) option, termOrder);
+		}
+		return termOrder;
+	}
+
+	/**
+	 * Map the polynomial order option symbol to JAS TermOrder.
+	 *
+	 * @param orderOption
+	 * @param defaultTermOrder
+	 * @return
+	 */
+	public static TermOrder monomialOrder(ISymbol orderOption, TermOrder defaultTermOrder) {
+		TermOrder termOrder = defaultTermOrder;
+		if (orderOption == F.Lexicographic) {
+			termOrder = TermOrderByName.Lexicographic;
+		} else if (orderOption == F.NegativeLexicographic) {
+			termOrder = TermOrderByName.NegativeLexicographic;
+		} else if (orderOption == F.DegreeLexicographic) {
+			termOrder = TermOrderByName.DegreeLexicographic;
+		} else if (orderOption == F.DegreeReverseLexicographic) {
+			termOrder = TermOrderByName.DegreeReverseLexicographic;
+		} else if (orderOption == F.NegativeDegreeLexicographic) {
+			termOrder = TermOrderByName.NegativeDegreeLexicographic;
+		} else if (orderOption == F.NegativeDegreeReverseLexicographic) {
+			termOrder = TermOrderByName.NegativeDegreeReverseLexicographic;
+		}
+		return termOrder;
 	}
 }
