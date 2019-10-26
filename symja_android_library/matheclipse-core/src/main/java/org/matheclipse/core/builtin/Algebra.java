@@ -18,13 +18,13 @@ import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.JASConversionException;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.OptionArgs;
-import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.generic.ObjIntPredicate;
@@ -49,6 +49,7 @@ import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
 import org.matheclipse.core.polynomials.ExprMonomial;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.polynomials.IPartialFractionGenerator;
 import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.polynomials.PolynomialHomogenization;
@@ -3384,6 +3385,8 @@ public class Algebra {
 					result[0] = divRem[0].getExpr();
 					result[1] = divRem[1].getExpr();
 					return result;
+				} catch (LimitException le) {
+					throw le;
 				} catch (RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
 						rex.printStackTrace();

@@ -14,6 +14,7 @@ import org.matheclipse.core.convert.CreamConvert;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.JASConversionException;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.NoEvalException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -947,6 +948,8 @@ public class Solve extends AbstractFunctionEvaluator {
 						IAST resultList = converter.integerSolve(equationsAndInequations, variables);
 						EvalAttributes.sort((IASTMutable) resultList);
 						return resultList;
+					} catch (LimitException le) {
+						throw le;
 					} catch (RuntimeException rex) {
 						if (Config.SHOW_STACKTRACE) {
 							rex.printStackTrace();
@@ -969,6 +972,8 @@ public class Solve extends AbstractFunctionEvaluator {
 			IASTMutable termsEqualZeroList = lists[0];
 			IExpr result = solveRecursive(termsEqualZeroList, lists[1], numericFlag, variables, engine);
 			return checkDomain(result, domain);
+		} catch (LimitException le) {
+			throw le;
 		} catch (RuntimeException rex) {
 			if (Config.SHOW_STACKTRACE) {
 				rex.printStackTrace();
@@ -1310,6 +1315,8 @@ public class Solve extends AbstractFunctionEvaluator {
 			return list;
 		}
 		return resultList;
+		} catch (LimitException le) {
+			throw le;
 		} catch (RuntimeException rex) {
 			if (Config.SHOW_STACKTRACE) {
 				rex.printStackTrace();

@@ -11,6 +11,7 @@ import com.gx.common.util.concurrent.TimeLimiter;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.BreakException;
 import org.matheclipse.core.eval.exception.ConditionException;
@@ -2383,6 +2384,8 @@ public final class Programming {
 				} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
 					return F.$Aborted;
 				} catch (final RecursionLimitExceeded re) {
+					throw re;
+				} catch (final ASTElementLimitExceeded re) {
 					throw re;
 				} catch (final RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
