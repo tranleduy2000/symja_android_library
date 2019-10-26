@@ -10,10 +10,7 @@ import java.io.Serializable;
  * 
  */
 public class LastCalculationsHistory implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5003679826481359674L;
+	private static final long serialVersionUID = -5542189869048554333L;
 
 	final private IExpr[] fOutHistory;
 	final private int fMaximumCapacity;
@@ -69,6 +66,9 @@ public class LastCalculationsHistory implements Serializable {
 			index -= (fAllEntriesCounter + 1);
 		}
 		if (index <= 0) {
+			if (index == Integer.MIN_VALUE) {
+				return F.NIL;
+			}
 			index *= -1;
 			if (fMaximumCapacity < index) {
 				return F.NIL;
