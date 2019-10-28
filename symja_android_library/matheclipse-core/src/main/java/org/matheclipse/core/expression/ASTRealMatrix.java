@@ -10,6 +10,7 @@ import org.hipparchus.linear.RealMatrix;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -82,7 +83,16 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 */
 	RealMatrix matrix;
 
+	/**
+	 *
+	 * @param matrix
+	 * @param deepCopy
+	 *            if <code>true</code> allocate new memory and copy all elements from the matrix
+	 */
 	public ASTRealMatrix(double[][] matrix, boolean deepCopy) {
+		if (Config.MAX_AST_SIZE < matrix.length) {
+			throw new ASTElementLimitExceeded(matrix.length * matrix[0].length);
+		}
 		this.matrix = new Array2DRowRealMatrix(matrix, deepCopy);
 	}
 
@@ -92,9 +102,12 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 * @param matrix
 	 *            the matrix which should be wrapped in this object.
 	 * @param deepCopy
-	 *            TODO
+	 *            if <code>true</code> allocate new memory and copy all elements from the matrix
 	 */
 	public ASTRealMatrix(RealMatrix matrix, boolean deepCopy) {
+		if (Config.MAX_AST_SIZE < matrix.getRowDimension()) {
+			throw new ASTElementLimitExceeded(matrix.getRowDimension() * matrix.getColumnDimension());
+		}
 		if (deepCopy) {
 			this.matrix = matrix.copy();
 		} else {

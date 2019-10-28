@@ -4105,6 +4105,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public double[] toDoubleVector() {
+		if (Config.MAX_AST_SIZE < size()) {
+			throw new ASTElementLimitExceeded(size());
+		}
 		double[] result = new double[argSize()];
 		ISignedNumber signedNumber;
 		for (int i = 1; i < size(); i++) {

@@ -80,8 +80,12 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	 * 
 	 * @param vector
 	 * @param deepCopy
+	 *            if <code>true</code> allocate new memory and copy all elements from the vector
 	 */
 	public ASTRealVector(double[] vector, boolean deepCopy) {
+		if (Config.MAX_AST_SIZE < vector.length) {
+			throw new ASTElementLimitExceeded(vector.length);
+		}
 		this.vector = new ArrayRealVector(vector, deepCopy);
 	}
 
@@ -91,9 +95,12 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	 * @param vector
 	 *            the vector which should be wrapped in this object.
 	 * @param deepCopy
-	 *            TODO
+	 *            if <code>true</code> allocate new memory and copy all elements from the vector
 	 */
 	public ASTRealVector(RealVector vector, boolean deepCopy) {
+		if (Config.MAX_AST_SIZE < vector.getDimension()) {
+			throw new ASTElementLimitExceeded(vector.getDimension());
+		}
 		if (deepCopy) {
 			this.vector = vector.copy();
 		} else {
