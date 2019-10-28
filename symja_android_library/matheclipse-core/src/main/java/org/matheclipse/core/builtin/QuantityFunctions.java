@@ -123,7 +123,7 @@ public class QuantityFunctions {
 						return suo.apply(arg1);
 					}
 				}
-			} catch (MathException e) {
+			} catch (RuntimeException e) {
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
@@ -179,7 +179,7 @@ public class QuantityFunctions {
 						return unitConvert((IQuantity)arg1, unit);
 					}
 				}
-			} catch (MathException e) {
+			} catch (RuntimeException e) {
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}

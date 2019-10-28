@@ -22,6 +22,9 @@ import org.matheclipse.core.polynomials.HornerScheme;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class OutputFunctions {
 
@@ -43,6 +46,7 @@ public final class OutputFunctions {
 			F.MathMLForm.setEvaluator(new MathMLForm());
 			F.TableForm.setEvaluator(new TableForm());
 			F.TeXForm.setEvaluator(new TeXForm());
+			F.TreeForm.setEvaluator(new TreeForm());
 		}
 	}
 
@@ -115,6 +119,44 @@ public final class OutputFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
+				int[] dim = arg1.isMatrix();
+				if (dim != null) {
+					IAST matrix = (IAST) arg1;
+					StringBuilder[] sb = new StringBuilder[dim[0]];
+					for (int j = 0; j < dim[0]; j++) {
+						sb[j] = new StringBuilder();
+					}
+					int rowLength = 0;
+					for (int i = 0; i < dim[1]; i++) {
+						int columnLength = 0;
+						for (int j = 0; j < dim[0]; j++) {
+							String str = matrix.getPart(j + 1, i + 1).toString();
+							if (str.length() > columnLength) {
+								columnLength = str.length();
+							}
+							sb[j].append(str);
+						}
+						if (i < dim[1] - 1) {
+							rowLength += columnLength + 1;
+						} else {
+							rowLength += columnLength;
+						}
+						for (int j = 0; j < dim[0]; j++) {
+							int rest = rowLength - sb[j].length();
+							for (int k = 0; k < rest; k++) {
+								sb[j].append(' ');
+							}
+						}
+					}
+					StringBuilder result = new StringBuilder();
+					for (int i = 0; i < dim[0]; i++) {
+						result.append(sb[i]);
+						if (i < dim[0] - 1) {
+							result.append("\n");
+						}
+					}
+					return F.stringx(result.toString(), IStringX.TEXT_PLAIN);
+				}
 				if (arg1.isList()) {
 					IAST list = (IAST)arg1;
 					StringBuilder sb=new StringBuilder();
@@ -130,6 +172,11 @@ public final class OutputFunctions {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
 	}
 
@@ -447,6 +494,111 @@ public final class OutputFunctions {
 		}
 	}
 
+	private static class TreeForm extends AbstractCoreFunctionEvaluator {
+		private static void vertexToVisjs(StringBuilder buf, List<SimpleImmutableEntry<String, Integer>> vertexSet) {
+			buf.append("var nodes = new vis.DataSet([\n");
+			boolean first = true;
+			int counter = 1;
+			for (SimpleImmutableEntry<String, Integer> expr : vertexSet) {
+				// {id: 1, label: 'Node 1'},
+				if (first) {
+					buf.append("  {id: ");
+				} else {
+					buf.append(", {id: ");
+				}
+				buf.append(counter++);
+				buf.append(", label: '");
+				buf.append(expr.getKey().toString());
+				buf.append("', level: ");
+				buf.append(expr.getValue().toString());
+				buf.append("}\n");
+				first = false;
+			}
+			buf.append("]);\n");
+		}
+
+		private static void edgesToVisjs(StringBuilder buf, List<SimpleImmutableEntry<Integer, Integer>> edgeSet) {
+			boolean first = true;
+
+			buf.append("var edges = new vis.DataSet([\n");
+			for (SimpleImmutableEntry<Integer, Integer> edge : edgeSet) {
+				// {from: 1, to: 3},
+				if (first) {
+					buf.append("  {from: ");
+				} else {
+					buf.append(", {from: ");
+				}
+				buf.append(edge.getKey());
+				buf.append(", to: ");
+				buf.append(edge.getValue());
+				// , arrows: { to: { enabled: true, type: 'arrow'}}
+				buf.append(" , arrows: { to: { enabled: true, type: 'arrow'}}");
+				buf.append("}\n");
+				first = false;
+			}
+			buf.append("]);\n");
+
+		}
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
+				int maxLevel = Integer.MAX_VALUE;
+				if (ast.isAST2()) {
+					maxLevel = ast.arg2().toIntDefault();
+					if (maxLevel < 0) {
+						return F.NIL;
+					}
+				}
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				List<SimpleImmutableEntry<String, Integer>> vertexList = new ArrayList<SimpleImmutableEntry<String, Integer>>();
+				List<SimpleImmutableEntry<Integer, Integer>> edgeList = new ArrayList<SimpleImmutableEntry<Integer, Integer>>();
+				StringBuilder jsControl = new StringBuilder();
+				if (maxLevel > 0 && arg1.isAST()) {
+					IAST tree = (IAST) arg1;
+					int[] currentCount = new int[] { 1 };
+					treeToGraph(tree, 0, maxLevel, currentCount, vertexList, edgeList);
+					vertexToVisjs(jsControl, vertexList);
+					edgesToVisjs(jsControl, edgeList);
+					return F.JSFormData(jsControl.toString(), "treeform");
+				} else {
+					vertexList.add(new SimpleImmutableEntry<String, Integer>(arg1.toString(), Integer.valueOf(0)));
+					vertexToVisjs(jsControl, vertexList);
+					edgesToVisjs(jsControl, edgeList);
+					return F.JSFormData(jsControl.toString(), "treeform");
+				}
+
+			} catch (Exception rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
+				return engine.printMessage("TreeForm: " + rex.getMessage());
+			}
+		}
+
+		private static void treeToGraph(IAST tree, final int level, final int maxLevel, int[] currentCount,
+				List<SimpleImmutableEntry<String, Integer>> vertexList, List<SimpleImmutableEntry<Integer, Integer>> edgeList) {
+			vertexList.add(new SimpleImmutableEntry<String, Integer>(tree.head().toString(), Integer.valueOf(level)));
+			int currentNode = vertexList.size();
+			final int nextLevel = level + 1;
+			for (int i = 1; i < tree.size(); i++) {
+				currentCount[0]++;
+				edgeList.add(new SimpleImmutableEntry<Integer, Integer>(currentNode, currentCount[0]));
+				IExpr arg = tree.get(i);
+				if (nextLevel >= maxLevel || !arg.isAST()) {
+					vertexList.add(new SimpleImmutableEntry<String, Integer>(arg.toString(), nextLevel));
+				} else {
+					treeToGraph((IAST) arg, nextLevel, maxLevel, currentCount, vertexList, edgeList);
+				}
+			}
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
+
+	}
 	public static String toJavaDouble(final IExpr arg1) throws IOException {
 		DoubleFormFactory factory = JavaDoubleFormFactory.get(true, false);
 		StringBuilder buf = new StringBuilder();

@@ -108,10 +108,20 @@ import static org.matheclipse.core.expression.F.y_;
 
 public final class Arithmetic {
 	private static int g = 7;
-	private static double[] p = { 0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
-			-176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6,
-			1.5056327351493116e-7 };
-	private static org.hipparchus.complex.Complex[] pComplex = null;
+	// private static double[] p = { 0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+	// -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6,
+	// 1.5056327351493116e-7 };
+	private static org.hipparchus.complex.Complex[] pComplex = new org.hipparchus.complex.Complex[] {
+			new org.hipparchus.complex.Complex(0.99999999999980993), //
+			new org.hipparchus.complex.Complex(676.5203681218851), //
+			new org.hipparchus.complex.Complex(-1259.1392167224028), //
+			new org.hipparchus.complex.Complex(771.32342877765313), //
+			new org.hipparchus.complex.Complex(-176.61502916214059), //
+			new org.hipparchus.complex.Complex(12.507343278686905), //
+			new org.hipparchus.complex.Complex(-0.13857109526572012), //
+			new org.hipparchus.complex.Complex(9.9843695780195716e-6), //
+			new org.hipparchus.complex.Complex(1.5056327351493116e-7) //
+	};
     public final static Plus CONST_PLUS = new Plus();
     public final static Times CONST_TIMES = new Times();
     public final static Power CONST_POWER = new Power();
@@ -290,7 +300,7 @@ public final class Arithmetic {
             }
 
             if (arg1.isTimes()) {
-                IASTAppendable[] result = ((IAST) arg1).filter(new AbsTimesFunction());
+                IASTAppendable[] result = ((IAST) arg1).filterNIL(new AbsTimesFunction());
                 if (result[0].size() > 1) {
                     if (result[1].size() > 1) {
                         result[0].append(F.Abs(result[1]));
@@ -2152,9 +2162,9 @@ public final class Arithmetic {
         public IExpr numericEval(final IAST ast, EvalEngine engine) {
 
             final boolean numericMode = engine.isNumericMode();
-            final int oldPrecision = engine.getNumericPrecision();
+			final long oldPrecision = engine.getNumericPrecision();
             try {
-                int numericPrecision = Config.MACHINE_PRECISION;
+				long numericPrecision = Config.MACHINE_PRECISION;
                 if (ast.isAST2()) {
 					IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
 					numericPrecision = Validate.checkIntType(arg2);
@@ -4279,7 +4289,7 @@ public final class Arithmetic {
 					return F.Sign(directedInfininty.arg1());
 				}
 			} else if (arg1.isTimes()) {
-				IASTAppendable[] res = ((IAST) arg1).filter(new SignTimesFunction());
+				IASTAppendable[] res = ((IAST) arg1).filterNIL(new SignTimesFunction());
 				if (res[0].size() > 1) {
 					if (res[1].size() > 1) {
 						res[0].append(F.Sign(res[1]));
@@ -4986,6 +4996,14 @@ public final class Arithmetic {
 			// return ((IAST) arg2).map(x -> x.negate(), 1);
 			// }
 
+			if (arg1.isInterval1() || arg2.isInterval1()) {
+				if (arg1.isRealResult() || arg2.isRealResult() || //
+						(arg1.isInterval1() && arg2.isInterval1())) {
+					return timesInterval(arg1, arg2);
+				}
+				// donn't create Power(...,...)
+				return F.NIL;
+			}
 			if (arg1.equals(arg2)) {
 				return F.Power(arg1, C2);
             }
@@ -5040,13 +5058,6 @@ public final class Arithmetic {
                         return temp;
                     }
                 }
-					}
-					break;
-				case ID.Interval:
-					if (arg1.isInterval1()) {
-						if (arg2.isInterval1() || arg2.isReal()) {
-							return timesInterval(arg1, arg2);
-						}
 					}
 					break;
 				case ID.Quantity:
@@ -5875,13 +5886,6 @@ public final class Arithmetic {
 		// return new org.hipparchus.complex.Complex(gResult.real(), gResult.imag());
 		// }
 
-		if (pComplex == null) {
-			// lazy initialization
-			pComplex = new org.hipparchus.complex.Complex[p.length];
-			for (int i = 0; i < p.length; i++) {
-				pComplex[i] = new org.hipparchus.complex.Complex(p[i]);
-			}
-		}
 
 		// if (F.isZero(z.getImaginary())) {
 		// return new org.hipparchus.complex.Complex(org.hipparchus.special.Gamma.gamma(z.getReal()));

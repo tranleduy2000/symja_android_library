@@ -5,6 +5,7 @@ import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
+import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -60,6 +61,9 @@ public class DoubleStackEvaluator {
 		if (result.isReal()) {
 			return ((ISignedNumber) result).doubleValue();
 		}
+		if (result instanceof IComplexNum && F.isZero(((IComplexNum) result).imDoubleValue())) {
+			return ((IComplexNum) result).reDoubleValue();
+		}
 		throw new UnsupportedOperationException("EvalDouble#evalAST(): " + ast);
 	}
 
@@ -69,6 +73,9 @@ public class DoubleStackEvaluator {
 		}
 		if (expr instanceof ISignedNumber) {
 			return ((ISignedNumber) expr).doubleValue();
+		}
+		if (expr instanceof IComplexNum && F.isZero(((IComplexNum) expr).imDoubleValue())) {
+			return ((IComplexNum) expr).reDoubleValue();
 		}
 		if (expr instanceof ISymbol) {
 			return evalSymbol(((ISymbol) expr));

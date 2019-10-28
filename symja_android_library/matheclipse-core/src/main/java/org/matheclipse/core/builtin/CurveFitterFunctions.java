@@ -19,7 +19,6 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.math.MathException;
 
 public class CurveFitterFunctions {
 	/**
@@ -268,7 +267,7 @@ public class CurveFitterFunctions {
 								return convertToRulesList(listOfSymbols, values);
 							}
 						}
-					} catch (MathException ex) {
+					} catch (RuntimeException ex) {
 						return engine.printMessage("FindFit: " + ex.getMessage());
 					}
 				}
@@ -315,7 +314,7 @@ public class CurveFitterFunctions {
 					if (addWeightedObservedPoints(data, obs)) {
 						try {
 							return Convert.polynomialFunction2Expr(fitter.fit(obs.toList()), (ISymbol) ast.arg3());
-						} catch (MathException ex) {
+						} catch (RuntimeException ex) {
 							return engine.printMessage("Fit: " + ex.getMessage());
 						}
 					}

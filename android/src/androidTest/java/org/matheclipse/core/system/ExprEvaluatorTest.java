@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
-import org.matheclipse.core.expression.ExprRingFactory;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
@@ -19,9 +19,6 @@ import org.matheclipse.parser.client.math.MathException;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 import static org.matheclipse.core.expression.F.Cos;
 import static org.matheclipse.core.expression.F.D;

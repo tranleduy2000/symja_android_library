@@ -484,6 +484,22 @@ public class QuarticSolver {
 	/**
 	 * <code>Solve(a*x^2+b*x+c==0,x)</code>. See <a href="http://en.wikipedia.org/wiki/Quadratic_equation">Wikipedia -
 	 * Quadratic equation</a>
+	 *
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param solution1
+	 *            TODO
+	 * @param solution2
+	 *            TODO
+	 * @return
+	 */
+	public static IASTAppendable quadraticSolve(IExpr a, IExpr b, IExpr c) {
+		return quadraticSolve(a, b, c, null, null);
+	}
+	/**
+	 * <code>Solve(a*x^2+b*x+c==0,x)</code>. See <a href="http://en.wikipedia.org/wiki/Quadratic_equation">Wikipedia -
+	 * Quadratic equation</a>
 	 * 
 	 * @param a
 	 * @param b

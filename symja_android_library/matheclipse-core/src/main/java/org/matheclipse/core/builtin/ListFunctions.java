@@ -1198,7 +1198,7 @@ public final class ListFunctions {
 		public static IAST cases(final IAST ast, final IExpr pattern, @Nonnull EvalEngine engine) {
 			if (pattern.isRuleAST()) {
 				Function<IExpr, IExpr> function = Functors.rules((IAST) pattern, engine);
-				IAST[] results = ast.filter(function);
+				IAST[] results = ast.filterNIL(function);
 				return results[0];
 			}
 			final IPatternMatcher matcher = engine.evalPatternMatcher(pattern);
@@ -2154,7 +2154,7 @@ public final class ListFunctions {
 							return F.NIL;
 						}
 					}
-					if (indx >= 0 && indx <= list.size()) {
+					if (indx <= list.size()) {
 						return list.get(indx);
 					}
 				} else if (ast.arg2().isList()) {
@@ -3124,7 +3124,7 @@ public final class ListFunctions {
 				// throws MathException if Level isn't defined correctly
 				new VisitorLevelSpecification(null, arg1, false, engine);
 				return F.True;
-			} catch (MathException me) {
+			} catch (RuntimeException rex) {
 				// thrown in VisitorLevelSpecification ctor
 			}
 			return F.False;
@@ -5919,7 +5919,7 @@ public final class ListFunctions {
 					try {
 						engine.setThrowError(true);
 						return engine.evaluate(temp);
-					} catch (MathException mex) {
+					} catch (RuntimeException rex) {
 						return F.NIL;
 					} finally {
 						engine.setThrowError(te);

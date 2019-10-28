@@ -427,9 +427,22 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return false;
 		}
 
+		public final boolean isInterval() {
+			return false;
+		}
+
+		public final boolean isInterval1() {
+			return false;
+		}
+
 		/** {@inheritDoc} */
 		@Override
 		public boolean isList() {
+			return false;
+		}
+		/** {@inheritDoc} */
+		@Override
+		public boolean isList(Predicate<IExpr> pred) {
 			return false;
 		}
 
@@ -563,6 +576,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return false;
 		}
 
+		@Override
+		public IExpr map(Function<? super IExpr,? extends IExpr> mapper) {
+			return this;
+		}
+
+		@Override
 		public final IAST orElse(final IAST other) {
 			return other;
 		}
@@ -1279,7 +1298,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 	/** {@inheritDoc} */
 	@Override
-	public final IASTAppendable[] filter(final Function<IExpr, IExpr> function) {
+	public final IASTAppendable[] filterNIL(final Function<IExpr, IExpr> function) {
 		IASTAppendable[] result = new IASTAppendable[2];
 		result[0] = copyHead();
 		result[1] = copyHead();
@@ -1376,14 +1395,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	}
 	/**
 	 * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append
-	 * the result elements for which the <code>function</code> returns non-null elements to the <code>filterAST</code>,
-	 * or otherwise append the argument to the <code>restAST</code>.
+	 * the result elements for which the <code>function</code> returns non <code>F.NIL</code> elements to the
+	 * <code>filterAST</code>, or otherwise append the argument to the <code>restAST</code>.
 	 *
 	 * @param filterAST
-	 *            the non-null elements which were returned by the <code>function#apply()</code> method
+	 *            the non <code>F.NIL</code> elements which were returned by the <code>function#apply()</code> method
 	 * @param restAST
 	 *            the arguments in this <code>AST</code> for which the <code>function#apply()</code> method returned
-	 *            <code>null</code>
+	 *            <code>F.NIL</code>
 	 * @param function
 	 *            the function which filters each argument by returning a value which unequals <code>F.NIL</code>
 	 * @return the given <code>filterAST</code>
@@ -2592,7 +2611,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isInterval() {
+	public boolean isInterval() {
 		if (isSameHeadSizeGE(F.Interval, 2)) {
 			for (int i = 1; i < size(); i++) {
 				if (!(get(i).isVector() == 2)) {
@@ -2606,7 +2625,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean isInterval1() {
+	public boolean isInterval1() {
 		return isSameHead(F.Interval, 2) && arg1().isAST(F.List, 3);
 	}
 
@@ -2614,6 +2633,21 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	@Override
 	public boolean isList() {
 		return isSameHeadSizeGE(F.List, 1);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isList(Predicate<IExpr> pred) {
+		if (head().equals(F.List)) {
+			for (int i = 1; i < size(); i++) {
+				if (!pred.test(get(i))) {
+					// the row is no list
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/** {@inheritDoc} */
@@ -4149,16 +4183,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	public String toString() {
 		try {
 			StringBuilder sb = new StringBuilder();
-			OutputFormFactory.get(EvalEngine.get().isRelaxedSyntax()).convert(sb, this);
+			if (OutputFormFactory.get(EvalEngine.get().isRelaxedSyntax()).convert(sb, this)) {
 			return sb.toString();
-		} catch (IOException ioe) {
-			if (Config.SHOW_STACKTRACE) {
-				ioe.printStackTrace();
 			}
-		} catch (RuntimeException e1) {
-		}
+			sb = null;
 
-		try {
 			final StringBuilder buf = new StringBuilder();
 			if (size() > 0 && isList()) {
 				buf.append('{');
@@ -4189,7 +4218,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			} else {
 				return toFullFormString();
 			}
-		} catch (NullPointerException e) {
+		} catch (RuntimeException e) {
 			if (Config.SHOW_STACKTRACE) {
 				System.out.println(fullFormString());
 			}

@@ -15,8 +15,9 @@
  */
 package org.matheclipse.parser.client.eval;
 
+import com.duy.lang.DDouble;
+
 import org.matheclipse.parser.client.ast.ASTNode;
-import org.matheclipse.parser.client.math.MathUtils;
 
 /**
  * 
@@ -47,8 +48,7 @@ final public class DoubleNode extends ASTNode {
 
 	@Override
 	public int hashCode() {
-		return MathUtils.hash(value);// Double.doubleToLongBits(value);
-		// return (int)(bits ^ (bits >>> 32));
+		return DDouble.hashCode(value);
 	}
 
 	@Override

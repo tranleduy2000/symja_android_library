@@ -7,13 +7,13 @@ import org.matheclipse.core.interfaces.IExpr;
  * Create a DefaultWeightedEdge for usage in jgrapht.org library
  *
  */
-public class IExprWeightedEdge extends DefaultWeightedEdge {
+public class ExprWeightedEdge extends DefaultWeightedEdge {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2672050124122743886L;
 
-	public IExprWeightedEdge() {
+	public ExprWeightedEdge() {
 		super();
 	}
 

@@ -56,6 +56,14 @@ public class Config {
 	 * <code>Together()</code>.
 	 */
 	public static final int MAX_SIMPLIFY_TOGETHER_LEAFCOUNT = 65;
+	/**
+	 * Maximum output size in characters for an output form (i.e. TeXForm, MathMLForm,...I)
+	 */
+	public static int MAX_OUTPUT_SIZE = Integer.MAX_VALUE;
+	/**
+	 * Maximum number of elements which could be allocated for an AST
+	 **/
+	public static int MAX_AST_SIZE = Integer.MAX_VALUE;
 	static {
 		EXPR_CACHE = CacheBuilder.newBuilder().maximumSize(MAX_EXPR_CACHE_SIZE).weakKeys().weakValues().build();
 	}
@@ -241,7 +249,7 @@ public class Config {
 	/**
 	 * Use <code>Num</code> objects for numeric calculations up to 16 digits precision.
 	 */
-	public static final int MACHINE_PRECISION = 16;
+	public static final long MACHINE_PRECISION = 16L;
 
 	/**
 	 * Print trigonometric functions in lower case characters.
@@ -343,7 +351,8 @@ public class Config {
 					"    nodes: nodes,\n" + //
 					"    edges: edges\n" + //
 					"  };\n" + //
-					"  var options = {};\n" + //
+					"`2`\n" + //
+					// " var options = {};\n" + //
 					"  var network = new vis.Network(container, data, options);\n" + //
 					"</script>\n" + //
 					"\n" + //
@@ -364,7 +373,7 @@ public class Config {
 					"</head>\n" + //
 					"\n" + //
 					"<body>\n" + //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.4/build/math.js\"></script>" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.5/build/math.js\"></script>" + //
 					"\n" + //
 					"\n" + //
 					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.7.7/build/mathcell.js\"></script>\n"
@@ -401,11 +410,12 @@ public class Config {
 					"\n" + //
 					"<body>\n" + //
 					"\n" + //
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.3.5/jsxgraph.css\" />\n"
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraph.css\" />\n"
 					+ //
-					"<script src='https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.3.5/jsxgraphcore.js'\n" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.5/build/math.js\"\\n></script>"
+					+ "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.js\"\n" + //
 					"        type='text/javascript'></script>\n" + //
-					"<script src='https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.3.5/geonext.min.js'\n" + //
+					"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/geonext.min.js\"\n" + //
 					"        type='text/javascript'></script>\n" + //
 					"\n" + //
 					"<div id=\"jxgbox\" class=\"jxgbox\" style=\"display: flex; width:99%; height:99%; margin: 0; flex-direction: column; overflow: hidden\">\n"

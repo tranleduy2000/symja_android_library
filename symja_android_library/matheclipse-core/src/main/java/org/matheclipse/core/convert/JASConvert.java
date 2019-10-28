@@ -773,4 +773,50 @@ public class JASConvert<C extends RingElem<C>> {
 		}
 		return result;
 	}
+	/**
+	 * Check if the polynomial has maximum degree 2 in 1 variable and return the coefficients.
+	 *
+	 * @param poly
+	 * @return <code>false</code> if the polynomials degree > 2 and number of variables <> 1
+	 */
+	private static boolean isQuadratic(GenPolynomial<BigRational> poly, BigRational[] result) {
+		if (poly.degree() <= 2 && poly.numberOfVariables() == 1) {
+			result[0] = BigRational.ZERO;
+			result[1] = BigRational.ZERO;
+			result[2] = BigRational.ZERO;
+			for (Monomial<BigRational> monomial : poly) {
+				BigRational coeff = monomial.coefficient();
+				ExpVector exp = monomial.exponent();
+				for (int i = 0; i < exp.length(); i++) {
+					result[(int) exp.getVal(i)] = coeff;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if the polynomial has maximum degree 2 in 1 variable and return the coefficients.
+	 *
+	 * @param poly
+	 * @return <code>false</code> if the polynomials degree > 2 and number of variables <> 1
+	 */
+	private static boolean isQuadratic(GenPolynomial<edu.jas.arith.BigInteger> poly,
+			edu.jas.arith.BigInteger[] result) {
+		if (poly.degree() <= 2 && poly.numberOfVariables() == 1) {
+			result[0] = edu.jas.arith.BigInteger.ZERO;
+			result[1] = edu.jas.arith.BigInteger.ZERO;
+			result[2] = edu.jas.arith.BigInteger.ZERO;
+			for (Monomial<edu.jas.arith.BigInteger> monomial : poly) {
+				edu.jas.arith.BigInteger coeff = monomial.coefficient();
+				ExpVector exp = monomial.exponent();
+				for (int i = 0; i < exp.length(); i++) {
+					result[(int) exp.getVal(i)] = coeff;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 }

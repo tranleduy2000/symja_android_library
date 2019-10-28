@@ -66,7 +66,7 @@ public final class AST3 extends AST2 {
 	 * @param arg3
 	 *            the thirs argument of the function
 	 */
-	public AST3(IExpr head, IExpr arg1, IExpr arg2, IExpr arg3) {
+	/* package private */ AST3(IExpr head, IExpr arg1, IExpr arg2, IExpr arg3) {
 		super(head, arg1, arg2);
 		this.arg3 = arg3;
 	}

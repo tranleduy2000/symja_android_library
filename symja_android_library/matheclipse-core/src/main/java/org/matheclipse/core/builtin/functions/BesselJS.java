@@ -2,10 +2,15 @@ package org.matheclipse.core.builtin.functions;
 
 import com.gx.common.math.DoubleMath;
 
+import org.hipparchus.analysis.differentiation.UnivariateDifferentiableFunction;
+import org.hipparchus.analysis.solvers.BisectionSolver;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.special.Gamma;
 import org.matheclipse.core.builtin.Arithmetic;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.generic.UnaryNumerical;
+import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * 
@@ -37,6 +42,31 @@ public class BesselJS {
 
 	}
 
+	/**
+	 *
+	 * @param n
+	 *            a positive value
+	 * @param m
+	 * @return
+	 */
+	public static double besselJZero(double n, int m) {
+		// if ( n < 0 ) throw Error( 'Negative order for Bessel zero' );
+		// if ( !Number.isInteger(m) ) throw Error( 'Nonintegral index for Bessel zero' );
+
+		// approximations from dlmf.nist.gov/10.21#vi
+		double delta = .9 * Math.PI / 2.0;
+
+		double a = (m + n / 2 - 1 / 4) * Math.PI;
+		double e = a - (4 * (n * n) - 1) / (8 * a);
+		BisectionSolver solver = new BisectionSolver();
+		ISymbol x = F.Dummy("x");
+		UnivariateDifferentiableFunction f = new UnaryNumerical(F.BesselJ(F.num(n), x), x, EvalEngine.get(), true);
+		return solver.solve(100, f, e - delta, e + delta);
+	}
+
+	// private static double diffBesselJ(int n, double x) {
+	// return Bessel.jn(-1 + n, x) - Bessel.jn(1 + n, x) * 0.5;
+	// }
 	public static Complex besselY(double n, double x) {
 		// for averaging over integer orders until write code for limit
 		double delta = 1e-5;
@@ -45,6 +75,7 @@ public class BesselJS {
 			return besselY(new Complex(n), new Complex(x));
 		}
 		if (DoubleMath.isMathematicalInteger(n)) {
+			// return new Complex((diffBesselJ((int) n, x) + diffBesselJ((int) -n, x) * Math.pow(-1, n)) / Math.PI);
 			return (besselY(n + delta, x).add(besselY(n - delta, x))).divide(2.0);
 		}
 		return besselJ(n, x).multiply(Math.cos(n * Math.PI)).subtract(besselJ(-n, x)).divide(Math.sin(n * Math.PI));
@@ -64,6 +95,27 @@ public class BesselJS {
 
 	}
 
+	/**
+	 *
+	 * @param n
+	 *            a positive value
+	 * @param m
+	 * @return
+	 */
+//	public static double besselYZero(double n, int m) {
+//		// if ( n < 0 ) throw Error( 'Negative order for Bessel zero' );
+//		// if ( !Number.isInteger(m) ) throw Error( 'Nonintegral index for Bessel zero' );
+//
+//		// approximations from dlmf.nist.gov/10.21#vi
+//		double delta = .9 * Math.PI / 2.0;
+//
+//		double a = (m + n / 2 - 3 / 4) * Math.PI;
+//		double e = a - (4 * (n * n) - 1) / (8 * a);
+//		BisectionSolver solver = new BisectionSolver();
+//		ISymbol x = F.Dummy("x");
+//		UnivariateDifferentiableFunction f = new UnaryNumerical(F.BesselY(F.num(n), x), x, EvalEngine.get(), true);
+//		return solver.solve(100, f, e - delta, e + delta);
+//	}
 	public static Complex besselI(double n, double x) {
 		if (DoubleMath.isMathematicalInteger(n) && n < 0)
 			return besselI(-n, x);

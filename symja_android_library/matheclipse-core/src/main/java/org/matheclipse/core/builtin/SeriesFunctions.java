@@ -6,7 +6,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Assumptions;
@@ -578,7 +577,7 @@ public class SeriesFunctions {
             IExpr y = F.Power(x, F.CN1); // substituting by 1/x
             IExpr temp = F.evalQuiet(F.subst(arg1, x, y));
             if (temp.isTimes()) {
-				IExpr[] parts = Algebra.fractionalPartsTimesPower((IAST) temp, false, false, true, true, true);
+				IExpr[] parts = Algebra.fractionalPartsTimesPower((IAST) temp, false, false, true, true, true, true);
                 if (parts != null) {
                     if (!parts[1].isOne()) { // denominator != 1
                         LimitData ndData = new LimitData(x, F.C0, F.Rule(x, F.C0), data.getDirection());
@@ -602,7 +601,7 @@ public class SeriesFunctions {
 			if (!isFreeResult.arg1().isOne()) {
 				return F.Times(isFreeResult.arg1(), data.limit(isFreeResult.arg2()));
             }
-			IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, false, false, true, true, true);
+			IExpr[] parts = Algebra.fractionalPartsTimesPower(timesAST, false, false, true, true, true, true);
 			if (parts == null) {
 				IAST[] timesPolyFiltered = timesAST.filter(new Predicate<IExpr>() {
                     @Override
@@ -701,7 +700,6 @@ public class SeriesFunctions {
          */
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            Validate.checkRange(ast, 3, 4);
 
 			IExpr arg1 = ast.arg1();
 			IExpr arg2 = ast.arg2();
@@ -759,6 +757,10 @@ public class SeriesFunctions {
             }
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
         @Override
         public IAST getRuleAST() {
             return RULES;

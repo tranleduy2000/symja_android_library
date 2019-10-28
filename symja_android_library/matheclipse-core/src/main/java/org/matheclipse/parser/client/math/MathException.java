@@ -10,27 +10,6 @@ public class MathException extends RuntimeException {
      */
     private static final long serialVersionUID = 3520033778672500363L;
 
-	/**
-	 * Constructs a new MathException with the specified detail <code>message=null</code>, <code>cause=null</code>,
-	 * <code>enableSuppression=false</code>, and <code>writableStackTrace=false</code> .
-	 *
-	 * @see FlowControlException
-	 */
-    public MathException() {
-		super(null, null);
-    }
-
-    public MathException(String message) {
-        super(message);
-    }
-
-    public MathException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public MathException(Throwable cause) {
-        super(cause);
-    }
 
     /**
 	 * @param exprs
@@ -49,6 +28,26 @@ public class MathException extends RuntimeException {
         return new MathException(buf.toString());
     }
 
+	/**
+	 * Constructs a new MathException with the specified detail <code>message=null</code>, <code>cause=null</code>,
+	 * <code>enableSuppression=false</code>, and <code>writableStackTrace=false</code> .
+	 *
+	 * @see FlowControlException
+	 */
+	public MathException() {
+	}
+
+	public MathException(String message) {
+		super(message);
+	}
+
+	public MathException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public MathException(Throwable cause) {
+		super(cause);
+	}
     @Override
     public synchronized Throwable fillInStackTrace() {
         if (Config.SHOW_STACKTRACE) {

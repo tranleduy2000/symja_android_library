@@ -15,7 +15,6 @@ import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -31,7 +30,6 @@ import edu.jas.structure.ElemFactory;
 import edu.jas.structure.GcdRingElem;
 
 /**
- *
  * (I)nterface for a mathematical (Expr)ession<br />
  *
  * <code>IExpr</code> is the main interface for the Symja object type hierarchy:
@@ -1131,6 +1129,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isList();
 
+    boolean isList(Predicate<IExpr> pred);
+
     /**
      * Test if this expression is a list of lists
      *
@@ -1568,6 +1568,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is the function <code>Power[&lt;arg1&gt;, &lt;arg2&gt;]</code>
      */
     boolean isPower();
+
     /**
      * Test if this expression is the function <code>Power[&lt;arg1&gt;, &lt;arg2&gt;]</code>
      *
@@ -1972,6 +1973,16 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * for derived number classes.
      */
     IExpr minus(final IExpr that);
+
+    /**
+     * If a value is present (i.e. this unequals F.NIL), apply the provided mapping function to it, and if the result is
+     * non-NIL, return the result. Otherwise return <code>F.NIL</code>
+     *
+     * @param mapper a mapping function to apply to the value, if present
+     * @return an IExpr describing the result of applying a mapping function to the value of this object, if a value is
+     * present, otherwise return <code>F.NIL</code>.
+     */
+    IExpr map(Function<? super IExpr, ? extends IExpr> mapper);
 
     IExpr mod(final IExpr that);
 

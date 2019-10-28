@@ -11,6 +11,7 @@ import com.gx.common.util.concurrent.TimeLimiter;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.BreakException;
 import org.matheclipse.core.eval.exception.ConditionException;
@@ -43,7 +44,6 @@ import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.parser.client.SyntaxError;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -1997,26 +1997,26 @@ public final class Programming {
 			}
 			final StringBuilder buf = new StringBuilder();
 			final OutputFormFactory out = OutputFormFactory.get();
+			final boolean[] convert = new boolean[] { true };
 			ast.forEach(new Consumer<IExpr>() {
-                @Override
-                public void accept(IExpr x) {
-                    IExpr temp = engine.evaluate(x);
-                    if (temp instanceof IStringX) {
-                        buf.append(temp.toString());
-                    } else {
-                        try {
-                            out.convert(buf, temp);
-                        } catch (IOException e) {
-                            stream.println(e.getMessage());
-                            if (Config.DEBUG) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
+				@Override
+				public void accept(IExpr x) {
+					IExpr temp = engine.evaluate(x);
+					if (temp instanceof IStringX) {
+						buf.append(temp.toString());
+					} else {
+						if (convert[0] && !out.convert(buf, temp)) {
+							convert[0] = true;
+						}
+					}
 
 
+				}
+			});
+			if (!convert[0] ) {
+				stream.println("ERROR-IN-OUTPUTFORM");
+				return F.Null;
                 }
-            });
 			stream.println(buf.toString());
 			return F.Null;
 		}
@@ -2385,11 +2385,13 @@ public final class Programming {
 					return F.$Aborted;
 				} catch (final RecursionLimitExceeded re) {
 					throw re;
-				} catch (final RuntimeException re) {
+				} catch (final ASTElementLimitExceeded re) {
+					throw re;
+				} catch (final RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
-						re.printStackTrace();
+						rex.printStackTrace();
 					}
-					fEngine.printMessage("TimeConstrained: " + re.getMessage());
+					fEngine.printMessage("TimeConstrained: " + rex.getMessage());
 				} catch (final Exception e) {
 					fEngine.printMessage("TimeConstrained: " + e.getMessage());
 				} catch (final OutOfMemoryError e) {
@@ -2460,15 +2462,21 @@ public final class Programming {
 					return ast.arg3();
 				}
 				return F.$Aborted;
+			} catch (RuntimeException rex) {
+				// Appengine example: com.google.apphosting.api.DeadlineExceededException
+				if (ast.isAST3()) {
+					// e.printStackTrace();
+					return ast.arg3();
+				}
+				if (Config.DEBUG) {
+					rex.printStackTrace();
+				}
+				return F.Null;
 			} catch (Exception e) {
 				if (ast.isAST3()) {
 					// e.printStackTrace();
 					return ast.arg3();
 				}
-				// Throwable re = e.getCause();
-				// if (re instanceof RecursionLimitExceeded) {
-				// throw (RecursionLimitExceeded) re;
-				// }
 				if (Config.DEBUG) {
 					e.printStackTrace();
 				}

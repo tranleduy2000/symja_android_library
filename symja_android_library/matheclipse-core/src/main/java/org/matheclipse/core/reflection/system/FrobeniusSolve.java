@@ -5,6 +5,7 @@ import com.duy.lambda.ObjIntConsumer;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.frobenius.FrobeniusSolver;
@@ -92,6 +93,8 @@ public class FrobeniusSolve extends AbstractEvaluator {
 				}
 
 				return result;
+			} catch (LimitException le) {
+				throw le;
 			} catch (RuntimeException e) {
 				if (Config.SHOW_STACKTRACE) {
 					e.printStackTrace();

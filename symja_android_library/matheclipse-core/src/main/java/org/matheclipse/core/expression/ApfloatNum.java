@@ -63,7 +63,7 @@ public class ApfloatNum extends INumImpl implements INum {
 		return new ApfloatNum(n.divide(d));
 	}
 
-	public static ApfloatNum valueOf(final String value, int precision) {
+	public static ApfloatNum valueOf(final String value, long precision) {
 		return new ApfloatNum(value, precision);
 	}
 
@@ -157,7 +157,7 @@ public class ApfloatNum extends INumImpl implements INum {
 
 	@Override
 	public INum multiply(final INum val) {
-		return valueOf(fApfloat.multiply(((ApfloatNum) val).fApfloat));
+		return valueOf(fApfloat.multiply(val.apfloatValue(fApfloat.precision())));
 	}
 
 	@Override
@@ -417,9 +417,10 @@ public class ApfloatNum extends INumImpl implements INum {
 
 	@Override
 	public ISignedNumber roundClosest(ISignedNumber multiple) {
-		final long precision = precision();
-		Apfloat factor = multiple.apfloatNumValue(precision).fApfloat;
-		return F.num(ApfloatMath.round(fApfloat.divide(factor), 1, RoundingMode.HALF_EVEN).multiply(factor));
+		throw new ArithmeticException("Apfloat: Round closest not implemented");
+		// final long precision = precision();
+		// Apfloat factor = multiple.apfloatNumValue(precision).fApfloat;
+		// return F.num(ApfloatMath.round(fApfloat.divide(factor), precision, RoundingMode.HALF_EVEN).multiply(factor));
 	}
 
 	/** {@inheritDoc} */

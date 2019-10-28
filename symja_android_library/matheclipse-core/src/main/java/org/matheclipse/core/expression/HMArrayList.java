@@ -23,7 +23,9 @@ import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -61,7 +63,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/**
 	 * Constructs a new instance of list with capacity <code>10</code>.
 	 */
-	public HMArrayList() {
+	/* package protected */ HMArrayList() {
 		this(10);
 	}
 
@@ -72,7 +74,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @param collection
 	 *            the collection of elements to add.
 	 */
-	public HMArrayList(Collection<? extends IExpr> collection) {
+	/* package protected */ HMArrayList(Collection<? extends IExpr> collection) {
 		firstIndex = hashValue = 0;
 		Object[] objects = collection.toArray();
 		int size = objects.length;
@@ -91,7 +93,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @param arguments
 	 *            the argument expressions
 	 */
-	public HMArrayList(IExpr headExpr, IExpr... arguments) {
+	/* package protected */ HMArrayList(IExpr headExpr, IExpr... arguments) {
 		firstIndex = hashValue = 0;
 		lastIndex = arguments.length + 1;
 		switch (lastIndex) {
@@ -595,9 +597,9 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 			}
 		if (obj instanceof AbstractAST) {
-			if (obj instanceof AST0) {
-				return obj.equals(this);
-			}
+			// if (obj instanceof AST0) {
+			// return obj.equals(this);
+			// }
 			IExpr head = array[firstIndex];
 			if (head != ((AbstractAST) obj).head() && head instanceof ISymbol) {
 				// compared with ISymbol object identity
@@ -935,6 +937,9 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	private static IExpr[] newElementArray(int size) {
+		if (Config.MAX_AST_SIZE < size) {
+			throw new ASTElementLimitExceeded(size);
+		}
 		return new IExpr[size];
 	}
 

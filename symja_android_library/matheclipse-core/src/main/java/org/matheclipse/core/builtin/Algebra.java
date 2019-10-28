@@ -18,14 +18,13 @@ import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.JASConversionException;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.OptionArgs;
-import org.matheclipse.core.expression.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.generic.ObjIntPredicate;
@@ -50,6 +49,7 @@ import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
 import org.matheclipse.core.polynomials.ExprMonomial;
 import org.matheclipse.core.polynomials.ExprPolynomial;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.polynomials.IPartialFractionGenerator;
 import org.matheclipse.core.polynomials.PartialFractionGenerator;
 import org.matheclipse.core.polynomials.PolynomialHomogenization;
@@ -116,35 +116,36 @@ public class Algebra {
 	private static class Initializer {
 
 		private static void init() {
-		F.Apart.setEvaluator(new Apart());
-		F.Cancel.setEvaluator(new Cancel());
-		F.Collect.setEvaluator(new Collect());
-		F.Denominator.setEvaluator(new Denominator());
-		F.Distribute.setEvaluator(new Distribute());
-		F.Expand.setEvaluator(new Expand());
-		F.ExpandAll.setEvaluator(new ExpandAll());
-		F.Factor.setEvaluator(new Factor());
-		F.FactorSquareFree.setEvaluator(new FactorSquareFree());
-		F.FactorSquareFreeList.setEvaluator(new FactorSquareFreeList());
-		F.FactorTerms.setEvaluator(new FactorTerms());
-		F.FullSimplify.setEvaluator(new FullSimplify());
-		F.Numerator.setEvaluator(new Numerator());
+			F.Apart.setEvaluator(new Apart());
+			F.Cancel.setEvaluator(new Cancel());
+			F.Collect.setEvaluator(new Collect());
+			F.Denominator.setEvaluator(new Denominator());
+			F.Distribute.setEvaluator(new Distribute());
+			F.Expand.setEvaluator(new Expand());
+			F.ExpandAll.setEvaluator(new ExpandAll());
+			F.Factor.setEvaluator(new Factor());
+			F.FactorSquareFree.setEvaluator(new FactorSquareFree());
+			F.FactorSquareFreeList.setEvaluator(new FactorSquareFreeList());
+			F.FactorTerms.setEvaluator(new FactorTerms());
+			F.FullSimplify.setEvaluator(new FullSimplify());
+			F.FunctionRange.setEvaluator(new FunctionRange());
+			F.Numerator.setEvaluator(new Numerator());
 
-		F.PolynomialExtendedGCD.setEvaluator(new PolynomialExtendedGCD());
-		F.PolynomialGCD.setEvaluator(new PolynomialGCD());
-		F.PolynomialLCM.setEvaluator(new PolynomialLCM());
-		F.PolynomialQ.setEvaluator(new PolynomialQ());
-		F.PolynomialQuotient.setEvaluator(new PolynomialQuotient());
-		F.PolynomialQuotientRemainder.setEvaluator(new PolynomialQuotientRemainder());
-		F.PolynomialRemainder.setEvaluator(new PolynomialRemainder());
+			F.PolynomialExtendedGCD.setEvaluator(new PolynomialExtendedGCD());
+			F.PolynomialGCD.setEvaluator(new PolynomialGCD());
+			F.PolynomialLCM.setEvaluator(new PolynomialLCM());
+			F.PolynomialQ.setEvaluator(new PolynomialQ());
+			F.PolynomialQuotient.setEvaluator(new PolynomialQuotient());
+			F.PolynomialQuotientRemainder.setEvaluator(new PolynomialQuotientRemainder());
+			F.PolynomialRemainder.setEvaluator(new PolynomialRemainder());
 
-		F.PowerExpand.setEvaluator(new PowerExpand());
-		F.Root.setEvaluator(new Root());
-		F.Simplify.setEvaluator(new Simplify());
-		F.Together.setEvaluator(new Together());
-		F.ToRadicals.setEvaluator(new ToRadicals());
-		F.Variables.setEvaluator(new Variables());
-	}
+			F.PowerExpand.setEvaluator(new PowerExpand());
+			F.Root.setEvaluator(new Root());
+			F.Simplify.setEvaluator(new Simplify());
+			F.Together.setEvaluator(new Together());
+			F.ToRadicals.setEvaluator(new ToRadicals());
+			F.Variables.setEvaluator(new Variables());
+		}
 	}
 
 	protected static class InternalFindCommonFactorPlus {
@@ -402,27 +403,31 @@ public class Algebra {
 		 * @param powerAST
 		 *            a power expression (a^b)
 		 * @param trig
-		 *            TODO
+		 *            if <code>true</code> get the "trigonometric form" of the given function. Example: Csc[x] gives
+		 *            Sin[x].
+		 * @param splitPowerPlusExponents
+		 *            split <code>Power()</code> expressions with <code>Plus()</code> exponents like
+		 *            <code>a^(-x+y)</code> into numerator <code>a^y</code> and denominator <code>a^x</code>
 		 * @return the numerator and denominator expression
 		 */
-		public static IExpr[] fractionalPartsPower(final IAST powerAST, boolean trig) {
+		public static IExpr[] fractionalPartsPower(final IAST powerAST, boolean trig, boolean splitPowerPlusExponents) {
 			IExpr[] parts = new IExpr[2];
 			parts[0] = F.C1;
 
-			IExpr arg1 = powerAST.arg1();
-			IExpr exponent = powerAST.arg2();
+			IExpr base = powerAST.base();
+			IExpr exponent = powerAST.exponent();
 			if (exponent.isReal()) {
 				ISignedNumber sn = (ISignedNumber) exponent;
 				if (sn.isMinusOne()) {
-					parts[1] = arg1;
+					parts[1] = base;
 					return parts;
 				} else if (sn.isNegative()) {
-					parts[1] = F.Power(arg1, sn.negate());
+					parts[1] = F.Power(base, sn.negate());
 					return parts;
 				} else {
-					if (sn.isInteger() && arg1.isAST()) {
+					if (sn.isInteger() && base.isAST()) {
 						// positive integer
-						IAST function = (IAST) arg1;
+						IAST function = (IAST) base;
 						// if (function.isTimes()) {
 						// IExpr[] partsArg1 = fractionalPartsTimesPower(function, true, true, trig,
 						// true);
@@ -443,10 +448,26 @@ public class Algebra {
 						}
 					}
 				}
+			} else if (splitPowerPlusExponents && exponent.isPlus()) {
+				// base ^ (a+b+c...)
+				IAST plusAST = (IAST) exponent;
+				IAST[] result = plusAST.filterNIL(new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						IExpr positiveExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(x);
+						if (positiveExpr.isPresent()) {
+							return positiveExpr;
+						}
+						return F.NIL;
+					}
+				});
+				parts[1] = base.power(result[0].oneIdentity0());
+				parts[0] = base.power(result[1].oneIdentity0());
+				return parts;
 			}
-			IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(exponent);
-			if (negExpr.isPresent()) {
-				parts[1] = F.Power(arg1, negExpr);
+			IExpr positiveExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(exponent);
+			if (positiveExpr.isPresent()) {
+				parts[1] = F.Power(base, positiveExpr);
 				return parts;
 			}
 			return null;
@@ -1139,32 +1160,40 @@ public class Algebra {
 	 * </code>
 	 * </pre>
 	 */
-	private static class Denominator extends AbstractEvaluator {
+	private static class Denominator extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			boolean trig = false;
-			if (ast.isAST2()) {
-				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-				IExpr option = options.getOption(F.Trig);
+			boolean numericMode = engine.isNumericMode();
+			try {
+				engine.setNumericMode(false);
+				boolean trig = false;
+				if (ast.isAST2()) {
+					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine, true);
+					if (options.isInvalidPosition()) {
+						return IOFunctions.printMessage(F.Denominator, "nonopt",
+								F.List(ast.arg2(), F.ZZ(options.getInvalidPosition() - 1), ast), engine);
+					}
+					IExpr option = options.getOption(F.Trig);
 
-				if (option.isTrue()) {
-					trig = true;
-				} else if (!option.isPresent()) {
-					throw new WrongArgumentType(ast, ast.arg2(), 2, "Option expected!");
+					if (option.isTrue()) {
+						trig = true;
+					}
 				}
-			}
 
-			IExpr expr = ast.arg1();
-			if (expr.isRational()) {
-				return ((IRational) expr).denominator();
+				IExpr expr = engine.evaluate(ast.arg1());
+				if (expr.isRational()) {
+					return ((IRational) expr).denominator();
+				}
+				IExpr[] parts = fractionalParts(expr, trig);
+				if (parts == null) {
+					return F.C1;
+				}
+				return parts[1];
+			} finally {
+				engine.setNumericMode(numericMode);
 			}
-			IExpr[] parts = fractionalParts(expr, trig);
-			if (parts == null) {
-				return F.C1;
-			}
-			return parts[1];
 		}
 
 		public int[] expectedArgSize() {
@@ -1412,7 +1441,7 @@ public class Algebra {
 				} else if (ast.isTimes()) {
 					// (a+b)*(c+d)...
 
-					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, evalParts, true);
+					IExpr[] temp = fractionalPartsTimesPower(ast, false, false, false, evalParts, true, true);
 					IExpr tempExpr;
 					if (temp == null) {
 						return expandTimes(ast);
@@ -2526,6 +2555,113 @@ public class Algebra {
         }
 	}
 
+	private final static class FunctionRange extends AbstractCoreFunctionEvaluator {
+
+		private final static class FunctionRangeRealsVisitor extends VisitorExpr {
+			final EvalEngine engine;
+
+			public FunctionRangeRealsVisitor(EvalEngine engine) {
+				super();
+				this.engine = engine;
+			}
+
+			/** {@inheritDoc} */
+			@Override
+			public IExpr visit3(IExpr head, IExpr arg1, IExpr arg2) {
+				boolean evaled = false;
+				IExpr x1 = arg1;
+				IExpr result = arg1.accept(this);
+				if (result.isPresent()) {
+					evaled = true;
+					x1 = result;
+				}
+				IExpr x2 = arg2;
+				result = arg2.accept(this);
+				if (result.isPresent()) {
+					evaled = true;
+					x2 = result;
+				}
+				if (head.equals(Power)) {
+					if (x1.isInterval1()) {
+						IAST interval = (IAST) x1;
+						IExpr l = interval.lower();
+						IExpr u = interval.upper();
+						if (x2.isMinusOne()) {
+							if (F.GreaterEqual.ofQ(engine, l, F.C1)) {
+								// [>= 1, u]
+								return F.Interval(F.Power(u, x2), F.Power(l, x2));
+							}
+						}
+						if (l.isNegativeResult() && u.isPositiveResult()) {
+							if (x2.isPositiveResult()) {
+								return F.Interval(F.C0, F.Power(u, x2));
+							}
+							if (x2.isEvenResult()) {
+								return F.Interval(F.C0, F.Power(u, x2));
+							} else if (x2.isFraction() && ((IFraction) x2).denominator().isEven()) {
+								return F.Interval(F.C0, F.Power(u, x2));
+							}
+						}
+					}
+				}
+				if (evaled) {
+					return F.binaryAST2(head, x1, x2);
+				}
+				return F.NIL;
+			}
+
+		}
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr function = ast.arg1();
+			IExpr xExpr = ast.arg2();
+			IExpr yExpr = ast.arg3();
+			IBuiltInSymbol domain = F.Reals;
+			if (xExpr.isSymbol() && yExpr.isSymbol()) {
+				ISymbol x = (ISymbol) xExpr;
+				ISymbol y = (ISymbol) yExpr;
+				IExpr f = function.replaceAll(F.Rule(x, F.Interval(F.CNInfinity, F.CInfinity))).orElse(function);
+				IExpr result = engine.evaluate(f);
+				if (result.isInterval1()) {
+					return convertInterval(result, y);
+				} else if (domain.equals(F.Reals)) {
+					IExpr temp = result;
+					while (temp.isPresent()) {
+						temp = temp.accept(new FunctionRangeRealsVisitor(engine));
+						if (temp.isPresent()) {
+							result = engine.evaluate(temp);
+							temp = result;
+						}
+					}
+					if (result.isInterval1()) {
+						return convertInterval(result, y);
+					}
+				}
+			}
+			return F.NIL;
+		}
+
+		private IExpr convertInterval(IExpr result, ISymbol y) {
+			IAST list = (IAST) result.first();
+			if (list.arg1().isRealResult()) {
+				if (list.arg2().isRealResult()) {
+					return F.LessEqual(list.arg1(), y, list.arg2());
+				} else if (list.arg2().isInfinity()) {
+					return F.GreaterEqual(y, list.arg1());
+				}
+			} else if (list.arg2().isRealResult()) {
+				if (list.arg1().isNegativeInfinity()) {
+					return F.LessEqual(y, list.arg2());
+				}
+			}
+			return F.NIL;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
+		}
+
+	}
 	/**
 	 * <h2>Numerator</h2>
 	 *
@@ -2551,24 +2687,29 @@ public class Algebra {
 	 * </code>
 	 * </pre>
 	 */
-	private static class Numerator extends AbstractEvaluator {
+	private static class Numerator extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			boolean numericMode = engine.isNumericMode();
+			try {
+				engine.setNumericMode(false);
 			boolean trig = false;
 			if (ast.isAST2()) {
-				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
+					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine, true);
+					if (options.isInvalidPosition()) {
+						return IOFunctions.printMessage(F.Numerator, "nonopt",
+								F.List(ast.arg2(), F.ZZ(options.getInvalidPosition() - 1), ast), engine);
+					}
 				IExpr option = options.getOption(F.Trig);
 
 				if (option.isTrue()) {
 					trig = true;
-				} else if (!option.isPresent()) {
-					throw new WrongArgumentType(ast, ast.arg2(), 2, "Option expected!");
 				}
 			}
 
-			IExpr arg = ast.arg1();
+				IExpr arg = engine.evaluate(ast.arg1());
 			if (arg.isRational()) {
 				return ((IRational) arg).numerator();
 			}
@@ -2577,6 +2718,9 @@ public class Algebra {
 				return arg;
 			}
 			return parts[0];
+			} finally {
+				engine.setNumericMode(numericMode);
+			}
 		}
 
 		public int[] expectedArgSize() {
@@ -3241,6 +3385,8 @@ public class Algebra {
 					result[0] = divRem[0].getExpr();
 					result[1] = divRem[1].getExpr();
 					return result;
+				} catch (LimitException le) {
+					throw le;
 				} catch (RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
 						rex.printStackTrace();
@@ -5604,18 +5750,23 @@ public class Algebra {
 	 * @param splitFractionalNumbers
 	 *            split a fractional number into numerator and denominator
 	 * @param trig
-	 *            try to find a trigonometric numerator/denominator form (Example: Csc[x] gives 1 / Sin[x])
+	 *            try to find a trigonometric numerator/denominator form (Example: <code>Csc[x]</code> gives
+	 *            <code>1 / Sin[x]</code>)
 	 * @param evalParts
 	 *            evaluate the determined numerator and denominator parts
 	 * @param negateNumerDenom
 	 *            negate numerator and denominator, if they are both negative
+	 * @param splitPowerPlusExponents
+	 *            split <code>Power()</code> expressions with <code>Plus()</code> exponents like <code>a^(-x+y)</code>
+	 *            into numerator <code>a^y</code> and denominator <code>a^x</code>
 	 * @return the numerator and denominator expression and an optional fractional number (maybe <code>null</code>), if
 	 *         splitNumeratorOne is <code>true</code>.
 	 */
 	public static IExpr[] fractionalPartsTimesPower(final IAST timesPower, boolean splitNumeratorOne,
-			boolean splitFractionalNumbers, boolean trig, boolean evalParts, boolean negateNumerDenom) {
+			boolean splitFractionalNumbers, boolean trig, boolean evalParts, boolean negateNumerDenom,
+			boolean splitPowerPlusExponents) {
 		if (timesPower.isPower()) {
-			IExpr[] parts = Apart.fractionalPartsPower(timesPower, trig);
+			IExpr[] parts = Apart.fractionalPartsPower(timesPower, trig, splitPowerPlusExponents);
 			if (parts != null) {
 				return parts;
 			}
@@ -5652,7 +5803,7 @@ public class Algebra {
 						}
 					}
 				} else if (arg.isPower()) {
-					IExpr[] parts = Apart.fractionalPartsPower((IAST) arg, trig);
+					IExpr[] parts = Apart.fractionalPartsPower((IAST) arg, trig, splitPowerPlusExponents);
 					if (parts != null) {
 						if (!parts[0].isOne()) {
 							numerator.append(parts[0]);
@@ -5734,9 +5885,9 @@ public class Algebra {
 		if (arg.isAST()) {
 			IAST ast = (IAST) arg;
 			if (arg.isTimes()) {
-				parts = fractionalPartsTimesPower(ast, false, true, trig, true, true);
+				parts = fractionalPartsTimesPower(ast, false, true, trig, true, true, true);
 			} else if (arg.isPower()) {
-				parts = Apart.fractionalPartsPower(ast, trig);
+				parts = Apart.fractionalPartsPower(ast, trig, true);
 			} else {
 
 				IExpr numerForm = Numerator.getTrigForm(ast, trig);

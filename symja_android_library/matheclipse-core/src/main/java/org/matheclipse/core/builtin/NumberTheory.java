@@ -158,37 +158,42 @@ public final class NumberTheory {
 
 			try {
 			IExpr arg1 = ast.arg1();
+				int n = arg1.toIntDefault(Integer.MIN_VALUE);
+				if (n < 0) {
+					if (arg1.isNumber()) {
+						return IOFunctions.printMessage(F.BellB, "intnm", F.List(ast, F.C1), engine);
+					}
+				}
 				if (ast.isAST2()) {
 					IExpr z = ast.arg2();
-					if (arg1.isZero()) {
+					if (n == 0) {
 						return F.C1;
 					}
-					if (arg1.isOne()) {
+					if (n == 1) {
 						return z;
-					}
-					if (z.isZero() && arg1.isPositive() && arg1.isIntegerResult()) {
-						return F.C0;
 					}
 					if (z.isOne()) {
 						return F.BellB(arg1);
 					}
+					if (n > 1) {
+						if (z.isZero() && n > 0) {
+							return F.C0;
 				}
-			int n = arg1.toIntDefault(Integer.MIN_VALUE);
-			if (n >= 0) {
-					if (ast.isAST2()) {
-						IExpr z = ast.arg2();
 						if (!z.isOne()) {
 					// bell polynomials: Sum(StirlingS2(n, k)* z^k, {k, 0, n})
 					return bellBPolynomial(n, z);
 				}
 					}
 
+				} else {
 				// bell numbers start here
-				if (arg1.isZero()) {
+					if (n == 0) {
 					return F.C1;
 				}
+					if (n > 0) {
 					IInteger bellB = bellNumber(n);
 					return bellB;
+				}
 				}
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
@@ -2029,7 +2034,7 @@ public final class NumberTheory {
 	 * 280571172992510140037611932413038677189525
 	 * </pre>
 	 */
-	private static class Fibonacci extends AbstractTrigArg1 {
+	private static class Fibonacci extends AbstractFunctionEvaluator {
 
 		/**
 		 * <p>
@@ -2039,16 +2044,81 @@ public final class NumberTheory {
 		 * sequence.</a>
 		 */
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
 			if (arg1.isInteger()) {
 				int n = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
 				if (n > Integer.MIN_VALUE) {
+					if (ast.isAST2()) {
+						return fibonacciPolynomialIterative(n, ast.arg2(), engine);
+					}
 					return fibonacci(n);
 				}
+			} else if (arg1.isNumeric()) {
+				INumber n = ((INumber) arg1).evaluatePrecision(engine);
+				if (ast.isAST2() && ast.arg2().isNumeric()) {
+					INumber x = ((INumber) ast.arg2()).evaluatePrecision(engine);
+					return
+					// [$ ((x + Sqrt(4 + x^2))^n/2^n - (2^n*Cos(n*Pi))/(x + Sqrt(4 + x^2))^n)/Sqrt(4 + x^2) $]
+					F.Times(F.Power(F.Plus(F.C4, F.Sqr(x)), F.CN1D2),
+							F.Plus(F.Times(F.Power(F.Power(F.C2, n), F.CN1),
+									F.Power(F.Plus(x, F.Sqrt(F.Plus(F.C4, F.Sqr(x)))), n)),
+									F.Times(F.CN1, F.Power(F.C2, n),
+											F.Power(F.Power(F.Plus(x, F.Sqrt(F.Plus(F.C4, F.Sqr(x)))), n), F.CN1),
+											F.Cos(F.Times(n, F.Pi))))); // $$;
+				}
+				return
+				// [$ ( GoldenRatio^n - Cos(Pi*n) * GoldenRatio^(-n) ) / Sqrt(5) $]
+				F.Times(F.C1DSqrt5, F.Plus(F.Power(F.GoldenRatio, n),
+						F.Times(F.CN1, F.Power(F.GoldenRatio, F.Negate(n)), F.Cos(F.Times(F.Pi, n))))); // $$;
 			}
 			return F.NIL;
 		}
 
+		/**
+		 * Create Fibonacci polynomial with iteration.
+		 *
+		 * @param n
+		 *            an integer <code>n >= 0</code>
+		 * @param x
+		 *            the variable expression of the polynomial
+		 * @return
+		 */
+		public IExpr fibonacciPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+			int iArg = n;
+			if (n < 0) {
+				n *= (-1);
+			}
+
+			IExpr previousFibonacci = F.C0;
+			IExpr fibonacci = F.C1;
+			if (n == 0) {
+				return previousFibonacci;
+			}
+			if (n == 1) {
+				return fibonacci;
+			}
+
+			for (int i = 1; i < n; i++) {
+				IExpr temp = fibonacci;
+				if (fibonacci.isPlus()) {
+					fibonacci = ((IAST) fibonacci).mapThread(F.Times(x, null), 2);
+				} else {
+					fibonacci = F.Times(x, fibonacci);
+				}
+				fibonacci = F.Expand.of(engine, F.Plus(fibonacci, previousFibonacci));
+				previousFibonacci = temp;
+			}
+			if (iArg < 0 && ((iArg & 0x00000001) == 0x00000000)) {
+				return F.Negate(fibonacci);
+			}
+
+			return fibonacci;
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
@@ -2428,23 +2498,95 @@ public final class NumberTheory {
 	 * </p>
 	 * See: <a href= "https://en.wikipedia.org/wiki/Lucas_number">Wikipedia: Lucas number</a>
 	 */
-	private static class LucasL extends AbstractTrigArg1 {
+	private static class LucasL extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
 			if (arg1.isInteger()) {
-				int i = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
-				if (i > Integer.MIN_VALUE) {
-					if (i < 0) {
-						i *= (-1);
+				int n = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
+				if (n > Integer.MIN_VALUE) {
+					if (ast.isAST2()) {
+						return lucasLPolynomialIterative(n, ast.arg2(), engine);
+					}
+					int iArg = n;
+					if (n < 0) {
+						n *= (-1);
 					}
 					// LucasL(n) = Fibonacci(n-1) + Fibonacci(n+1)
-					return fibonacci(i - 1).add(fibonacci(i + 1));
+					IExpr lucalsL= fibonacci(n - 1).add(fibonacci(n + 1));
+					if (iArg < 0 && ((iArg & 0x00000001) == 0x00000001)) {
+						return F.Negate(lucalsL);
+					}
+
+					return lucalsL;
 				}
+			} else if (arg1.isNumeric()) {
+				INumber n = ((INumber) arg1).evaluatePrecision(engine);
+				if (ast.isAST2() && ast.arg2().isNumeric()) {
+					INumber x = ((INumber) ast.arg2()).evaluatePrecision(engine);
+					return
+					// [$ (x/2 + Sqrt(1 + x^2/4))^n + Cos(n*Pi)/(x/2 + Sqrt(1 + x^2/4))^n $]
+					F.Plus(F.Power(F.Plus(F.Times(F.C1D2, x), F.Sqrt(F.Plus(F.C1, F.Times(F.C1D4, F.Sqr(x))))), n),
+							F.Times(F.Power(
+									F.Power(F.Plus(F.Times(F.C1D2, x), F.Sqrt(F.Plus(F.C1, F.Times(F.C1D4, F.Sqr(x))))),
+											n),
+									F.CN1), F.Cos(F.Times(n, F.Pi)))); // $$;
+					}
+				return
+				// [$ GoldenRatio^n + Cos(Pi*n) * GoldenRatio^(-n) $]
+				F.Plus(F.Power(F.GoldenRatio, n),
+						F.Times(F.Cos(F.Times(F.Pi, n)), F.Power(F.GoldenRatio, F.Negate(n)))); // $$;
+
 			}
 			return F.NIL;
 		}
 
+		/**
+		 * Create LucasL polynomial with iteration. Performs much better than recursion.
+		 *
+		 * @param n
+		 *            an integer <code>n >= 0</code>
+		 * @param x
+		 *            the variable expression of the polynomial
+		 * @return
+		 */
+		private static IExpr lucasLPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+			int iArg = n;
+			if (n < 0) {
+				n *= (-1);
+			}
+			IExpr previousLucasL = F.C2;
+			IExpr lucalsL = x;
+			if (n == 0) {
+				return previousLucasL;
+			}
+			if (n == 1) {
+				if (iArg < 0) {
+					return F.Negate(lucalsL);
+				}
+				return lucalsL;
+			}
+
+			for (int i = 1; i < n; i++) {
+				IExpr temp = lucalsL;
+				if (lucalsL.isPlus()) {
+					lucalsL = ((IAST) lucalsL).mapThread(F.Times(x, null), 2);
+				} else {
+					lucalsL = F.Times(x, lucalsL);
+				}
+				lucalsL = F.Expand.of(engine, F.Plus(lucalsL, previousLucasL));
+				previousLucasL = temp;
+			}
+			if (iArg < 0 && ((iArg & 0x00000001) == 0x00000001)) {
+				return F.Negate(lucalsL);
+			}
+			return lucalsL;
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
@@ -3000,9 +3142,7 @@ public final class NumberTheory {
 					if (result != null) {
 						return result;
 					}
-				} catch (ArithmeticException e) {
-					// e.printStackTrace();
-				} catch (MathException e) {
+				} catch (RuntimeException rex) {
 					// e.printStackTrace();
 				} catch (ExecutionException e) {
 					// e.printStackTrace();
@@ -3098,7 +3238,7 @@ public final class NumberTheory {
 					}
 				} catch (ArithmeticException e) {
 					// e.printStackTrace();
-				} catch (MathException e) {
+				} catch (RuntimeException rex) {
 					// e.printStackTrace();
 				} catch (ExecutionException e) {
 					// e.printStackTrace();
@@ -3654,10 +3794,10 @@ public final class NumberTheory {
 				return super.visitAST(ast);
 			}
 
-			@Override
-			public IExpr visit(IComplex element) {
-				return element;
-			}
+			// @Override
+			// public IExpr visit(IComplex element) {
+			// return element;
+			// }
 
 			@Override
 			public IExpr visit(IComplexNum element) {
@@ -3669,12 +3809,12 @@ public final class NumberTheory {
 				return F.fraction(element.getRealPart(), epsilon);
 			}
 
-			private IRational getRational(ISignedNumber signedNumber) {
-				if (signedNumber.isRational()) {
-					return (IRational) signedNumber;
-				}
-				return F.fraction(signedNumber.doubleValue(), epsilon);
-			}
+			// private IRational getRational(ISignedNumber signedNumber) {
+			// if (signedNumber.isRational()) {
+			// return (IRational) signedNumber;
+			// }
+			// return F.fraction(signedNumber.doubleValue(), epsilon);
+			// }
 		}
 
 		@Override
@@ -4260,6 +4400,9 @@ public final class NumberTheory {
 	 * @return
 	 */
 	public static IInteger risingFactorial(int n, int k) {
+		if (k == 0) {
+			return F.C1;
+		}
 		IInteger result = AbstractIntegerSym.valueOf(n);
 		for (int i = n + 1; i < n + k; i++) {
 			result = result.multiply(i);

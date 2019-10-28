@@ -220,7 +220,7 @@ public class IntegerFunctions {
 			}
 
 			if (arg1.isPlus()) {
-				IASTAppendable[] splittedPlus = ((IAST) arg1).filter(new CeilingPlusFunction());
+				IASTAppendable[] splittedPlus = ((IAST) arg1).filterNIL(new CeilingPlusFunction());
 				if (splittedPlus[0].size() > 1) {
 					if (splittedPlus[1].size() > 1) {
 						splittedPlus[0].append(F.Ceiling(splittedPlus[1].oneIdentity0()));
@@ -516,7 +516,7 @@ public class IntegerFunctions {
 				return arg1;
 			}
 			if (arg1.isPlus()) {
-				IASTAppendable[] splittedPlus = ((IAST) arg1).filter(new FloorPlusFunction());
+				IASTAppendable[] splittedPlus = ((IAST) arg1).filterNIL(new FloorPlusFunction());
 				if (splittedPlus[0].size() > 1) {
 					if (splittedPlus[1].size() > 1) {
 						splittedPlus[0].append(F.Floor(splittedPlus[1].oneIdentity0()));
@@ -1164,12 +1164,12 @@ public class IntegerFunctions {
 				if (ast.isAST2()) {
 					// Round(z, a)
 					ISignedNumber multiple = ast.arg2().evalReal();
-					if (multiple!=null) {
+					if (multiple != null) {
 						if (multiple.isZero()) {
 							return F.Indeterminate;
 						}
-				ISignedNumber signedNumber = arg1.evalReal();
-				if (signedNumber != null) {
+						ISignedNumber signedNumber = arg1.evalReal();
+						if (signedNumber != null) {
 							return signedNumber.roundClosest(multiple);
 						}
 						if (arg1.isComplexNumeric()) {
@@ -1224,7 +1224,7 @@ public class IntegerFunctions {
 				}
 
 				if (arg1.isPlus()) {
-					IASTAppendable[] result = ((IAST) arg1).filter(new RoundPlusFunction());
+					IASTAppendable[] result = ((IAST) arg1).filterNIL(new RoundPlusFunction());
 					if (result[0].size() > 1) {
 						if (result[1].size() > 1) {
 							result[0].append(F.Round(result[1]));

@@ -1,10 +1,12 @@
 package org.matheclipse.core.eval;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.mathml.MathMLFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.text.NumberFormat;
 
@@ -92,7 +94,7 @@ public class MathMLUtilities {
 	 * @param inputExpression
 	 * @param out
 	 */
-	synchronized public void toMathML(final String inputExpression, final Writer out) {
+	synchronized public boolean toMathML(final String inputExpression, final Writer out) {
 		IExpr parsedExpression = null;
 		// ASTNode node;
 		if (inputExpression != null) {
@@ -101,12 +103,13 @@ public class MathMLUtilities {
 				parsedExpression = parser.parse(inputExpression);
 				// node = fEvalEngine.parseNode(inputExpression);
 				// parsedExpression = AST2Expr.CONST.convert(node, fEvalEngine);
-			} catch (final Throwable e) {
-				return;
-				// parsedExpression == null ==> fError occured
+			} catch (final RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
 			}
 		}
-		toMathML(parsedExpression, out);
+		}
+		return toMathML(parsedExpression, out);
 	}
 
 	/**
@@ -115,16 +118,16 @@ public class MathMLUtilities {
 	 * @param objectExpression
 	 * @param out
 	 */
-	synchronized public void toMathML(final IExpr objectExpression, final Writer out) {
-		toMathML(objectExpression, out, false);
+	synchronized public boolean toMathML(final IExpr objectExpression, final Writer out) {
+		return toMathML(objectExpression, out, false);
 	}
 
-	synchronized public void toMathML(final IExpr objectExpression, final Writer out, boolean useXmlns) {
+	synchronized public boolean toMathML(final IExpr objectExpression, final Writer out, boolean useXmlns) {
 		final StringBuilder buf = new StringBuilder();
 
 		if (objectExpression != null) {
-			fMathMLFactory.convert(buf, objectExpression, Integer.MIN_VALUE, false);
 			try {
+				if (fMathMLFactory.convert(buf, objectExpression, Integer.MIN_VALUE, false)) {
 				if (fMSIE) {
 					out.write("<m:math>");
 					out.write(buf.toString());
@@ -148,14 +151,21 @@ public class MathMLUtilities {
 					// }
 					out.write("</math>");
 				}
-			} catch (final Throwable e) {
-				e.printStackTrace();
-				// parsedExpression == null ==> fError occured
+					return true;
+				}
+			} catch (final IOException ioe) {
+				//
+			} catch (final RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
 			}
 		}
+			return false;
+		}
+		return true;
 	}
 
-	synchronized public void toJava(final String inputExpression, final Writer out, boolean strictJava) {
+	synchronized private void toJava(final String inputExpression, final Writer out, boolean strictJava) {
 		IExpr parsedExpression = null;
 		// ASTNode node;
 		if (inputExpression != null) {
@@ -165,9 +175,12 @@ public class MathMLUtilities {
 				// node = fEvalEngine.parseNode(inputExpression);
 				// parsedExpression = AST2Expr.CONST.convert(node, fEvalEngine);
 				out.write(parsedExpression.internalJavaString(false, -1, false, true, false));
-			} catch (final Throwable e) {
-				return;
-				// parsedExpression == null ==> fError occured
+			} catch (final IOException ioe) {
+				//
+			} catch (final RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
 			}
 		}
 	}

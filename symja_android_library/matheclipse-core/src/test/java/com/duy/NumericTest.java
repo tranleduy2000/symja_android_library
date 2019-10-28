@@ -66,4 +66,11 @@ public class NumericTest extends TestCase {
                 "{Cos(1,4,1),Cos(2,4,2),Cos(3,4,4)}");
     }
 
+    public void testRound() {
+        ExprEvaluator exprEvaluator = new ExprEvaluator();
+        exprEvaluator.eval("TiRound[x_, y_] := Round[x, 10^(-y)]");
+        assertEquals(exprEvaluator.eval("N[TiRound(Rationalize(2.1675),3.0)]").toString(),
+                "2.168");
+    }
+
 }

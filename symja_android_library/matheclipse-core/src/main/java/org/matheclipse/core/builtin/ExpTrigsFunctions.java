@@ -19,7 +19,8 @@ import org.matheclipse.core.eval.interfaces.AbstractTrigArg1Rewrite;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.eval.interfaces.IRewrite;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
-import org.matheclipse.core.expression.ComplexUtils;
+import org.matheclipse.core.expression.ApcomplexNum;
+import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.interfaces.IAST;
@@ -150,28 +151,28 @@ public class ExpTrigsFunctions {
 					IExpr x = arg1.first();
 					IExpr y = arg1.second();
 					if (arg2.isAST(F.List, 3)) {
-						// 'AngleVector[{x_, y_}, {r_, phi_}]': '{x + r * Cos[phi], y + r * Sin[phi]}'
+						// AngleVector({x_, y_}, {r_, phi_}) := {x + r * Cos(phi), y + r * Sin(phi)}
 						IExpr r = arg2.first();
 						phi = arg2.second();
 						return F.List(F.Plus(x, F.Times(r, F.Cos(phi))), F.Plus(y, F.Times(r, F.Sin(phi))));
 					} else {
 						phi = arg2;
 					}
-					// 'AngleVector[{x_, y_}, phi_]': '{x + Cos[phi], y + Sin[phi]}'
+					// AngleVector({x_, y_}, phi_) := {x + Cos(phi), y + Sin(phi)}
 					return F.List(F.Plus(x, F.Cos(phi)), F.Plus(y, F.Sin(phi)));
 				}
 				return F.NIL;
 			}
 
 			if (arg1.isAST(F.List, 3)) {
-				// 'AngleVector[{r_, phi_}]': '{r * Cos[phi], r * Sin[phi]}'
+				// AngleVector({r_, phi_}) := {r * Cos(phi), r * Sin(phi)}
 				IExpr r = ((IAST) arg1).arg1();
 				phi = ((IAST) arg1).arg2();
 				return F.List(F.Times(r, F.Cos(phi)), F.Times(r, F.Sin(phi)));
 			} else {
 				phi = arg1;
 			}
-			// 'AngleVector[phi_]': '{Cos[phi], Sin[phi]}'
+			// AngleVector(phi_) := {Cos(phi), Sin(phi)}
 			return F.List(F.Cos(phi), F.Sin(phi));
 		}
 
@@ -949,8 +950,19 @@ public class ExpTrigsFunctions {
 		}
 
 		@Override
-		public IExpr e1DblComArg(final IComplexNum c) {
-			return ComplexUtils.atan(c);
+		public IExpr e1DblComArg(final IComplexNum val) {
+			if (val instanceof ApcomplexNum) {
+				return F.complexNum(ApcomplexMath.atan(((ApcomplexNum) val).apcomplexValue()));
+			}
+			ComplexNum z = (ComplexNum) val;
+			if (z.isNaN()) {
+				return F.Indeterminate;
+			}
+
+			IComplexNum temp = ComplexNum.I.add(z).divide(ComplexNum.I.subtract(z));
+			IComplexNum logValue = log(temp.complexNumValue());
+			return ComplexNum.I.multiply(logValue).divide(ComplexNum.valueOf(2.0, 0.0))
+					.complexNumValue();
 		}
 
 		@Override
@@ -1086,10 +1098,10 @@ public class ExpTrigsFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			if (ast.arg1().isReal()) {
-
-				if (ast.arg1().isInteger()) {
-					int i = ((IInteger) ast.arg1()).toIntDefault(Integer.MIN_VALUE);
+			final IExpr arg1 = ast.arg1();
+			if (arg1.isReal()) {
+				if (arg1.isInteger()) {
+					int i = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
 					if (i > 0) {
 						// Pi/i - Pi/2
 						final IExpr start = engine.evaluate(F.Plus(F.Times(F.QQ(1, i), F.Pi), F.Times(F.CN1D2, F.Pi)));
@@ -1195,6 +1207,9 @@ public class ExpTrigsFunctions {
 					}
 				}
 			}
+			if (arg1.isInterval1()) {
+				return evalInterval(arg1);
+			}
 			IExpr imPart = AbstractFunctionEvaluator.getComplexExpr(arg1, F.CNI);
 			if (imPart.isPresent()) {
 				return F.Cosh(imPart);
@@ -1262,6 +1277,21 @@ public class ExpTrigsFunctions {
 		@Override
 		public IAST getRuleAST() {
 			return RULES;
+		}
+
+		private static IExpr evalInterval(final IExpr arg1) {
+			IExpr l = arg1.lower();
+			IExpr u = arg1.upper();
+			if (l.isNegativeInfinity()) {
+				if (u.isInfinity() || u.isRealResult()) {
+					return F.Interval(F.List(F.CN1, F.C1));
+				}
+			} else if (u.isInfinity()) {
+				if (l.isRealResult()) {
+					return F.Interval(F.List(F.CN1, F.C1));
+				}
+			}
+			return F.NIL;
 		}
 
 		@Override
@@ -1613,6 +1643,20 @@ public class ExpTrigsFunctions {
 			return F.NIL;
 		}
 
+		// private static IExpr evalInterval(final IExpr arg1) {
+		// IExpr l = arg1.lower();
+		// IExpr u = arg1.upper();
+		// if (l.isReal()|| l.isNegativeInfinity()) {
+		// l = F.Cosh.of(l);
+		// if (l.isReal() || l.isNegativeInfinity()) {
+		// if (u.isReal() || u.isInfinity()) {
+		// u = F.Cosh.of(u);
+		// return F.Interval(F.List(l, u));
+		// }
+		// }
+		// }
+		// return F.NIL;
+		// }
 		@Override
 		public IAST getRuleAST() {
 			return RULES;
@@ -1901,9 +1945,10 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.arg1().isNumber() || ast.arg1().isNumericFunction()) {
+			final IExpr arg1 = ast.arg1();
+			if (arg1.isNumber() || arg1.isNumericFunction()) {
 				// 1/2 * (1-Cos(x))
-				return F.Times(F.C1D2, F.Subtract(F.C1, F.Cos(ast.arg1())));
+				return F.Times(F.C1D2, F.Subtract(F.C1, F.Cos(arg1)));
 				// return F.Power(F.Sin(F.C1D2.times(ast.arg1())), F.C2);
 			}
 			return F.NIL;
@@ -1924,8 +1969,9 @@ public class ExpTrigsFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			if (ast.arg1().isNumber() || ast.arg1().isNumericFunction()) {
-			return F.Times(F.C2, F.ArcSin(F.Sqrt(ast.arg1())));
+			final IExpr arg1 = ast.arg1();
+			if (arg1.isNumber() || arg1.isNumericFunction()) {
+				return F.Times(F.C2, F.ArcSin(F.Sqrt(arg1)));
 		}
 			return F.NIL;
 		}
@@ -1965,7 +2011,7 @@ public class ExpTrigsFunctions {
 
 		@Override
 		public IExpr e1DblComArg(final IComplexNum arg1) {
-			return ComplexUtils.log(arg1);
+			return log(arg1);
 		}
 
 		@Override
@@ -2018,6 +2064,22 @@ public class ExpTrigsFunctions {
 			if (arg1.isNegativeResult()) {
 				return F.Plus(F.Log(F.Negate(arg1)), F.Times(CI, F.Pi));
 			}
+			if (arg1.isInterval1()) {
+				return evalInterval(arg1);
+			}
+			return F.NIL;
+		}
+
+		private static IExpr evalInterval(final IExpr arg1) {
+			IExpr l = arg1.lower();
+			IExpr u = arg1.upper();
+			l = F.Log.of(l);
+			if (l.isRealResult() || l.isNegativeInfinity()) {
+				u = F.Log.of(u);
+				if (u.isRealResult() || u.isInfinity()) {
+					return F.Interval(F.List(l, u));
+				}
+			}
 			return F.NIL;
 		}
 
@@ -2044,18 +2106,18 @@ public class ExpTrigsFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg1 = ast.arg1();
+			if (arg1.isNumber()) {
 			if (arg1.isZero()) {
 				return F.C1D2;
+			}
+				// 1 / (1 + Exp(-arg1))
+				return F.Power(F.Plus(F.C1, F.Power(F.E, F.Times(F.CN1, arg1))), F.CN1);
 			}
 			if (arg1.isInfinity()) {
 				return F.C1;
 			}
 			if (arg1.isNegativeInfinity()) {
 				return F.C0;
-			}
-			if (arg1.isNumber()) {
-				// 1 / (1 + Exp(-arg1))
-				return F.Power(F.Plus(F.C1, F.Power(F.E, F.Times(F.CN1, arg1))), F.CN1);
 			}
 			return F.NIL;
 		}
@@ -2438,6 +2500,9 @@ public class ExpTrigsFunctions {
 					}
 				}
 			}
+			if (arg1.isInterval1()) {
+				return evalInterval(arg1);
+			}
 			IExpr imPart = AbstractFunctionEvaluator.getComplexExpr(arg1, F.CNI);
 			if (imPart.isPresent()) {
 				return F.Times(F.CI, F.Sinh(imPart));
@@ -2512,52 +2577,61 @@ public class ExpTrigsFunctions {
 		private static IExpr evalInterval(final IExpr arg1) {
 			IExpr l = arg1.lower();
 			IExpr u = arg1.upper();
-			if (l.isReal() && u.isReal()) {
-				double ld = l.evalDouble();
-				double ud = u.evalDouble();
-				double diff = Math.abs(ld - ud);
-				if (diff > 2 * Math.PI) {
-					return F.Interval(F.CN1, F.C1);
-				}
-				double ldSin = Math.sin(ld);
-				double udSin = Math.sin(ud);
-				if (diff < Math.PI / 2) {
-					if (ldSin < udSin) {
-						return F.Interval(F.Sin(l), F.Sin(u));
-					} else {
-						return F.Interval(F.Sin(u), F.Sin(l));
+			if (l.isNegativeInfinity()) {
+				if (u.isInfinity() || u.isRealResult()) {
+					return F.Interval(F.List(F.CN1, F.C1));
 					}
-				} else if (diff <= Math.PI) {
-					if (ldSin <= udSin) {
-						if (ldSin <= 0) {
-							return F.Interval(F.CN1, F.Sin(u));
-						} else {
-							return F.Interval(F.Sin(l), F.C1);
+			} else if (u.isInfinity()) {
+				if (l.isRealResult()) {
+					return F.Interval(F.List(F.CN1, F.C1));
 						}
-					} else {
-						if (udSin <= 0) {
-							return F.Interval(F.CN1, F.Sin(l));
-						} else {
-							return F.Interval(F.Sin(u), F.C1);
 						}
-					}
-				} else {
-					// diff > Math.PI
+			// if (l.isReal() && u.isReal()) {
+			// double ld = l.evalDouble();
+			// double ud = u.evalDouble();
+			// double diff = Math.abs(ld - ud);
+			// if (diff > 2 * Math.PI) {
+			// return F.Interval(F.CN1, F.C1);
+			// }
+			// double ldSin = Math.sin(ld);
+			// double udSin = Math.sin(ud);
+			// if (diff < Math.PI / 2) {
+			// if (ldSin < udSin) {
+			// return F.Interval(F.Sin(l), F.Sin(u));
+			// } else {
+			// return F.Interval(F.Sin(u), F.Sin(l));
+			// }
+			// } else if (diff <= Math.PI) {
 					// if (ldSin <= udSin) {
-					// if (ldSin > 0) {
-					// if (udSin > 0) {
+			// if (ldSin <= 0) {
 					// return F.Interval(F.CN1, F.Sin(u));
-					// }
+			// } else {
+			// return F.Interval(F.Sin(l), F.C1);
 					// }
 					// } else {
-					// if (ldSin > 0) {
-					// if (udSin > 0) {
+			// if (udSin <= 0) {
 					// return F.Interval(F.CN1, F.Sin(l));
+			// } else {
+			// return F.Interval(F.Sin(u), F.C1);
 					// }
 					// }
+			// } else {
+			// // diff > Math.PI
+			// // if (ldSin <= udSin) {
+			// // if (ldSin > 0) {
+			// // if (udSin > 0) {
+			// // return F.Interval(F.CN1, F.Sin(u));
+			// // }
+			// // }
+			// // } else {
+			// // if (ldSin > 0) {
+			// // if (udSin > 0) {
+			// // return F.Interval(F.CN1, F.Sin(l));
+			// // }
+			// // }
+			// // }
 					// }
-				}
-			}
+			// }
 			return F.NIL;
 		}
 
@@ -2760,6 +2834,26 @@ public class ExpTrigsFunctions {
 					} else if (k.isIntegerResult()) {
 						// (-1)^k * Sinh( arg1 - list.arg2() )
 						return F.Times(F.Power(F.CN1, k), F.Sinh(F.Subtract(arg1, list.arg2())));
+					}
+				}
+			}
+			if (arg1.isInterval1()) {
+				return evalInterval(arg1);
+			}
+			return F.NIL;
+		}
+
+		private static IExpr evalInterval(final IExpr arg1) {
+			IExpr l = arg1.lower();
+			IExpr u = arg1.upper();
+			if (l.isReal() || l.isNegativeInfinity()) {
+				l = F.Sinh.of(l);
+				if (l.isReal() || l.isNegativeInfinity()) {
+					if (u.isReal() || u.isInfinity()) {
+						u = F.Sinh.of(u);
+						if (u.isReal() || u.isInfinity()) {
+							return F.Interval(F.List(l, u));
+						}
 					}
 				}
 			}
@@ -3064,6 +3158,16 @@ public class ExpTrigsFunctions {
 		return F.NIL;
 	}
 
+	private static IComplexNum log(final IComplexNum val) {
+		if (val instanceof ApcomplexNum) {
+			return ApcomplexNum.valueOf(ApcomplexMath.log(((ApcomplexNum) val).apcomplexValue()));
+		}
+		ComplexNum z = (ComplexNum) val;
+		if (z.isNaN()) {
+			return ComplexNum.NaN;
+		}
+		return ComplexNum.valueOf(Math.log(z.dabs()), Math.atan2(z.imDoubleValue(), z.reDoubleValue()));
+	}
 	/**
 	 * Try simplifying <code>ArcSin(Sin(z))</code>
 	 *
@@ -3168,7 +3272,6 @@ public class ExpTrigsFunctions {
 		return F.NIL;
 	}
 
-	// private final static ExpTrigsFunctions CONST = new ExpTrigsFunctions();
 
 	public static void initialize() {
 		Initializer.init();
@@ -3186,7 +3289,6 @@ public class ExpTrigsFunctions {
 	 * @return
 	 */
 	private static IRational integerPartFolded2(IRational r) {
-		// -2 * IntegerPart( IntegerPart(r) / 2 )
 		return r.integerPart().multiply(F.C1D2).integerPart().multiply(F.CN2);
 	}
 }

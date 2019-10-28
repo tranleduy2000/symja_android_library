@@ -1040,7 +1040,7 @@ public class StatisticsFunctions {
 		 * @return
 		 */
 		private static IAST dropNonReals(final EvalEngine engine, IAST vector) {
-			IAST[] filter = vector.filter(new Function<IExpr, IExpr>() {
+			IAST[] filter = vector.filterNIL(new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
 					if (x.isReal()) {

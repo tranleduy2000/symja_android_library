@@ -198,6 +198,7 @@ public class IOFunctions {
 			"int", "Integer expected.", //
 			"intp", "Positive integer expected.", //
 			"intnn", "Non-negative integer expected.", //
+			"intnm", "Non-negative machine-sized integer expected at position `2` in `1`.", //
 			"intpm", "Positive integer (less equal 2147483647) expected at position `2` in `1`.", //
 			"iterb", "Iterator does not have appropriate bounds.", //
 			"ivar", "`1` is not a valid variable.", //
@@ -205,6 +206,7 @@ public class IOFunctions {
 			"locked", "Symbol `1` is locked.", //
 			"matsq", "Argument `1` is not a non-empty square matrix.", //
 			"noopen", "Cannot open `1`.", //
+			"nonopt", "Options expected (instead of `1`) beyond position `2` in `3`. An option must be a rule or a list of rules.",//
 			"nord", "Invalid comparison with `1` attempted.", //
 			"normal", "Nonatomic expression expected.", //
 			"notunicode",
@@ -291,6 +293,16 @@ public class IOFunctions {
 			}
 			engine.setMessageShortcut(messageShortcut);
 			engine.printMessage(symbol.toString() + ": " + message);
+		}
+		return F.NIL;
+	}
+
+	public static IAST printMessage(ISymbol symbol, Exception ex, EvalEngine engine) {
+		String message = ex.getMessage();
+		if (message != null) {
+			engine.printMessage(symbol.toString() + ": " + message);
+		} else {
+			engine.printMessage(symbol.toString() + ": " + ex.getClass().toString());
 		}
 		return F.NIL;
 	}

@@ -22,7 +22,7 @@ import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.ExprField;
-import org.matheclipse.core.expression.ExprRingFactory;
+import org.matheclipse.core.polynomials.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
@@ -1597,6 +1597,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public boolean isList(Predicate<IExpr> pred) {
+        return false;
+    }
+
     /**
      * Test if this expression is a list of lists
      *
@@ -2829,6 +2834,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public IExpr minus(final IExpr that) {
         return subtract(that);
+    }
+
+    @Override
+    public IExpr map(Function<? super IExpr, ? extends IExpr> mapper) {
+        return mapper.apply(this);
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.matheclipse.parser.client.math.MathException;
  * 
  * 
  */
-public class FlowControlException extends MathException {
+public abstract class FlowControlException extends MathException {
 	/**
 	 * 
 	 */

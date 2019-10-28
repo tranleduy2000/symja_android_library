@@ -27,7 +27,8 @@ public class Interval extends AbstractEvaluator {
 				ISignedNumber min = (ISignedNumber) list.arg1();
 				ISignedNumber max = (ISignedNumber) list.arg2();
 				if (min.greaterThan(max).isTrue()) {
-					throw new WrongArgumentType(ast, ast.arg1(), 1, "Min > Mac in interval");
+					return F.Interval(F.List(max,min));
+//					throw new WrongArgumentType(ast, ast.arg1(), 1, "Min > Mac in interval");
 				}
 			} catch (ClassCastException cca) {
 				// do nothing

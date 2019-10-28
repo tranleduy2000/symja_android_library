@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
+import org.matheclipse.core.interfaces.INumber;
 
 /**
  * Base class for functions with 1 argument (i.e. Sin, Cos...) with Attributes <i>Listable</i> and
@@ -30,17 +31,18 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 	public IExpr numericEval(final IAST ast, EvalEngine engine) {
 		IExpr arg1 = ast.arg1();
 		try {
-		if (arg1 instanceof INum) {
-			if (arg1 instanceof ApfloatNum) {
-					return e1ApfloatArg(((INum) arg1).apfloatValue(((INum) arg1).precision()));
+			if (arg1 instanceof INum) {
+				INumber x = ((INumber) arg1).evaluatePrecision(engine);
+				if (x instanceof ApfloatNum) {
+					return e1ApfloatArg(((INum) x).apfloatValue(((INum) x).precision()));
+				}
+				return e1DblArg(((Num) arg1).doubleValue());
+			} else if (arg1 instanceof IComplexNum) {
+				if (arg1 instanceof ApcomplexNum) {
+					return e1ApcomplexArg(((ApcomplexNum) arg1).apcomplexValue());
+				}
+				return e1ComplexArg(((ComplexNum) arg1).complexValue());
 			}
-			return e1DblArg(((Num) arg1).doubleValue());
-		} else if (arg1 instanceof IComplexNum) {
-			if (arg1 instanceof ApcomplexNum) {
-				return e1ApcomplexArg(((ApcomplexNum) arg1).apcomplexValue());
-			}
-			return e1ComplexArg(((ComplexNum) arg1).complexValue());
-		}
 		} catch (RuntimeException rex) {
 			EvalEngine.get().printMessage(ast.topHead().toString() + ": " + rex.getMessage());
 			return F.NIL;
