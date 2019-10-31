@@ -1,8 +1,17 @@
 package org.matheclipse.core.reflection.system;
 
-import com.duy.lambda.BiFunction;
-import com.duy.lambda.Predicate;
-import com.gx.common.cache.CacheBuilder;
+import static org.matheclipse.core.expression.F.Divide;
+import static org.matheclipse.core.expression.F.Integrate;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Times;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Predicate;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
@@ -22,17 +31,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.RulesData;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-
-import static org.matheclipse.core.expression.F.Divide;
-import static org.matheclipse.core.expression.F.Integrate;
-import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * <pre>
@@ -154,12 +153,10 @@ public class Integrate extends AbstractFunctionEvaluator {
 			ast = org.matheclipse.core.integrate.rubi.UtilityFunctions29.RULES;
 			ast = org.matheclipse.core.integrate.rubi.UtilityFunctions30.RULES;
 			ast = org.matheclipse.core.integrate.rubi.UtilityFunctions31.RULES;
-			
 			// org.matheclipse.core.integrate.rubi.UtilityFunctions.init();
 		}
 
 		private static void getRuleASTRubi45() {
-
 			IAST init;
 			init = org.matheclipse.core.integrate.rubi.IntRules0.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules1.RULES;
@@ -371,7 +368,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules207.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules208.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules209.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules210.RULES;
+			init = org.matheclipse.core.integrate.rubi.IntRules210.RULES;  
 			init = org.matheclipse.core.integrate.rubi.IntRules211.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules212.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules213.RULES;
@@ -381,7 +378,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules217.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules218.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules219.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules220.RULES;
+			init = org.matheclipse.core.integrate.rubi.IntRules220.RULES;  
 			init = org.matheclipse.core.integrate.rubi.IntRules221.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules222.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules223.RULES;
@@ -391,7 +388,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules227.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules228.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules229.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules230.RULES;
+			init = org.matheclipse.core.integrate.rubi.IntRules230.RULES;  
 			init = org.matheclipse.core.integrate.rubi.IntRules231.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules232.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules233.RULES;
@@ -401,7 +398,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules237.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules238.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules239.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules240.RULES;
+			init = org.matheclipse.core.integrate.rubi.IntRules240.RULES;  
 			init = org.matheclipse.core.integrate.rubi.IntRules241.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules242.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules243.RULES;
@@ -411,7 +408,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules247.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules248.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules249.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules250.RULES;
+			init = org.matheclipse.core.integrate.rubi.IntRules250.RULES;  
 			init = org.matheclipse.core.integrate.rubi.IntRules251.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules252.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules253.RULES;
@@ -421,7 +418,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules257.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules258.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules259.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules260.RULES;
+			init = org.matheclipse.core.integrate.rubi.IntRules260.RULES; 
 			init = org.matheclipse.core.integrate.rubi.IntRules261.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules262.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules263.RULES;
@@ -430,8 +427,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 			init = org.matheclipse.core.integrate.rubi.IntRules266.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules267.RULES;
 			init = org.matheclipse.core.integrate.rubi.IntRules268.RULES;
-			init = org.matheclipse.core.integrate.rubi.IntRules269.RULES;
-		}
+			init = org.matheclipse.core.integrate.rubi.IntRules269.RULES; 
+}
 	}
 
 	public static RulesData INTEGRATE_RULES_DATA;
@@ -450,7 +447,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
+	public IExpr evaluate(final IAST holdallAST, EvalEngine engine) {
 		try {
 			await();
 		} catch (InterruptedException e) {
@@ -476,12 +473,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			if (holdallAST.size() > 3) {
 				// reduce arguments by folding Integrate[fxy, x, y] to
 				// Integrate[Integrate[fxy, y], x] ...
-				return holdallAST.foldRight(new BiFunction<IExpr, IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x, IExpr y) {
-						return engine.evaluate(F.Integrate(x, y));
-					}
-				}, arg1, 2);
+				return holdallAST.foldRight((x, y) -> engine.evaluate(F.Integrate(x, y)), arg1, 2);
 			}
 
 			IExpr arg2 = engine.evaluateNull(holdallAST.arg2());
@@ -553,12 +545,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 				}
 
 				if (arg1.isTimes()) {
-					IAST[] temp = ((IAST) arg1).filter(new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr arg) {
-							return arg.isFree(x);
-						}
-					});
+					IAST[] temp = ((IAST) arg1).filter(arg -> arg.isFree(x));
 					IExpr free = temp[0].oneIdentity1();
 					if (!free.isOne()) {
 						IExpr rest = temp[1].oneIdentity1();
@@ -608,7 +595,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * line, calculate the definite integral <code>F(b)-F(a)</code>.
 	 * </p>
 	 * <a href="https://en.wikipedia.org/wiki/Integral">Wikipedia - Integral</a>
-	 *
+	 * 
 	 * @param function
 	 *            a function of <code>x</code>
 	 * @param xValueList
@@ -645,6 +632,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 		}
 		return F.Subtract(Fb, Fa);
 	}
+
 	private static IExpr callRestIntegrate(IAST arg1, final IExpr x, final EvalEngine engine) {
 		IExpr fxExpanded = F.expand(arg1, false, false, false);
 		if (fxExpanded.isAST()) {
@@ -697,7 +685,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 				}
 			}
 		}
-		if (arg1.isTrigFunction()||arg1.isHyperbolicFunction()) {
+		if (arg1.isTrigFunction() || arg1.isHyperbolicFunction()) {
 			// https://github.com/RuleBasedIntegration/Rubi/issues/12
 			IExpr temp = engine.evaluate(F.TrigToExp(arg1));
 			return engine.evaluate(F.Integrate(temp, x));
@@ -721,7 +709,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 	private static IExpr mapIntegrate(IAST ast, final IExpr x) {
 		return ast.mapThread(F.Integrate(null, x), 1);
 	}
-
 
 	/**
 	 * See <a href="http://en.wikipedia.org/wiki/Integration_by_parts">Wikipedia- Integration by parts</a>
