@@ -13,7 +13,7 @@ public class SVGGraphicsTestCase extends AbstractTestCase {
 
 		checkSVGGraphics("Show(Graphics(Point({0, 0})))",
 				"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"-1.666667 -1.666667 353.333333 353.333333\" width=\"350px\" height=\"350px\">\n" +
-				"<circle cx=\"175.0\" cy=\"175.0\" r=\"2.16667\" \n" +
+				"<circle cx=\"0.0\" cy=\"0.0\" r=\"2.16667\" \n" +
 				"      style=\"stroke: none; stroke-width: 0.000000px; fill: rgb(0.0%, 0.0%, 100.0%); fill-opacity: 1\" />\n" +
 				"\n" +
 				"</svg>");
