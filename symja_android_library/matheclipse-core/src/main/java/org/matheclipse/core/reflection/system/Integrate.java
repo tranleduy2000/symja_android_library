@@ -1,17 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
-import static org.matheclipse.core.expression.F.Divide;
-import static org.matheclipse.core.expression.F.Integrate;
-import static org.matheclipse.core.expression.F.List;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Predicate;
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.Predicate;
+import com.gx.common.cache.CacheBuilder;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
@@ -31,7 +22,17 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.RulesData;
 
-import com.google.common.cache.CacheBuilder;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+
+import static org.matheclipse.core.expression.F.Divide;
+import static org.matheclipse.core.expression.F.Integrate;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Times;
 
 /**
  * <pre>
@@ -447,7 +448,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST holdallAST, EvalEngine engine) {
+	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
 		try {
 			await();
 		} catch (InterruptedException e) {
@@ -473,7 +474,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 			if (holdallAST.size() > 3) {
 				// reduce arguments by folding Integrate[fxy, x, y] to
 				// Integrate[Integrate[fxy, y], x] ...
-				return holdallAST.foldRight((x, y) -> engine.evaluate(F.Integrate(x, y)), arg1, 2);
+				return holdallAST.foldRight(new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x, IExpr y) {
+						return engine.evaluate(F.Integrate(x, y));
+					}
+				}, arg1, 2);
 			}
 
 			IExpr arg2 = engine.evaluateNull(holdallAST.arg2());
@@ -545,7 +551,12 @@ public class Integrate extends AbstractFunctionEvaluator {
 				}
 
 				if (arg1.isTimes()) {
-					IAST[] temp = ((IAST) arg1).filter(arg -> arg.isFree(x));
+					IAST[] temp = ((IAST) arg1).filter(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr arg) {
+							return arg.isFree(x);
+						}
+					});
 					IExpr free = temp[0].oneIdentity1();
 					if (!free.isOne()) {
 						IExpr rest = temp[1].oneIdentity1();
