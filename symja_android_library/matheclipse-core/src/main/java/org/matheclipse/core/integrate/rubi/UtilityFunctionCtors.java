@@ -20,7 +20,7 @@ import static org.matheclipse.core.expression.F.senary;
 
 /**
  * UtilityFunction constructors from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- * <p>
+ *
  * TODO a lot of functions are only placeholders at the moment.
  *
  */
@@ -212,7 +212,7 @@ public class UtilityFunctionCtors {
      */
     public static IAST Int(final IExpr a0, final IExpr a1) {
         // Integrate.setAttributes(ISymbol.CONSOLE_OUTPUT);
-        return F.binaryAST2(Integrate, a0, a1);
+		return F.Integrate(a0, a1);
     }
 
     public static IAST IntBinomialQ(final IExpr... a) {
@@ -1230,7 +1230,7 @@ public class UtilityFunctionCtors {
     }
 
     // public static IAST NonzeroQ(final IExpr a0) {
-    // return F.unaryAST1()(F.$rubi("NonzeroQ"), a0);
+	// return F.unaryAST1(F.$rubi("NonzeroQ"), a0);
     // }
 
     public static IAST NormalizeHyperbolic(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
@@ -1286,7 +1286,7 @@ public class UtilityFunctionCtors {
     }
 
     // public static IAST NotFalseQ(final IExpr a0) {
-    // return F.unaryAST1()(F.$rubi("NotFalseQ"), a0);
+	// return F.unaryAST1(F.$rubi("NotFalseQ"), a0);
     // }
 
     public static IAST NotIntegrableQ(final IExpr a0, final IExpr a1) {
@@ -1314,7 +1314,7 @@ public class UtilityFunctionCtors {
     }
 
     // public static IAST OneQ(final IExpr a0) {
-    // return F.unaryAST1()(F.$rubi("OneQ"), a0);
+	// return F.unaryAST1(F.$rubi("OneQ"), a0);
     // }
     //
     // public static IAST OneQ(final IExpr... a) {
@@ -1546,7 +1546,7 @@ public class UtilityFunctionCtors {
     }
 
     // public static IAST RealNumericQ(final IExpr a0) {
-    // return F.unaryAST1()(F.$rubi("RealNumericQ"), a0);
+	// return F.unaryAST1(F.$rubi("RealNumericQ"), a0);
     // }
 
     public static IAST RealQ(final IExpr a0) {
@@ -1944,7 +1944,8 @@ public class UtilityFunctionCtors {
      * </pre>
      *
      * @param astTimes
-     * @param engine   TODO
+	 * @param engine
+	 *            TODO
      * @return
      */
     public static IExpr evalRubiDistTimes(IAST astTimes, EvalEngine engine) {
@@ -1973,7 +1974,7 @@ public class UtilityFunctionCtors {
      *     0,
      *     Dist[u+w,v,x]]
      * </pre>
-     * <p>
+	 *
      * Rule 2:
      *
      * <pre>
@@ -1984,7 +1985,8 @@ public class UtilityFunctionCtors {
      * </pre>
      *
      * @param astPlus
-     * @param engine  TODO
+	 * @param engine
+	 *            TODO
      * @return
      */
     public static IExpr evalRubiDistPlus(IAST astPlus, EvalEngine engine) {
