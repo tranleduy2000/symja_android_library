@@ -5810,6 +5810,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFactor() {
+		check("Factor(1+x^2, Extension->I)", //
+				"(-I+x)*(I+x)");
 		check("Factor(x^(-6)+1)", //
 				"((1+x^2)*(1-x^2+x^4))/x^6");
 		System.out.println( );
@@ -14558,6 +14560,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// https://en.wikipedia.org/wiki/Gaussian_integer#Gaussian_primes
 		check("PrimeQ(-3*I, GaussianIntegers->True)", //
 				"True");
+		check("PrimeQ(-3*I, GaussianIntegers->False)", //
+				"False");
 		check("PrimeQ(3*I, GaussianIntegers->True)", //
 				"True");
 		check("PrimeQ(-3, GaussianIntegers->True)", //

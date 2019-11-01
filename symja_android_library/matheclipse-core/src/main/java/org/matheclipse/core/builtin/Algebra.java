@@ -2022,7 +2022,10 @@ public class Algebra {
 			try {
 
 				if (ast.isAST2()) {
-					return factorWithOption(ast, expr, varList, false, engine);
+					IExpr temp = factorWithOption(ast, expr, varList, false, engine);
+					if (temp.isPresent()) {
+						return temp;
+				}
 				}
 				return factorExpr(ast, expr, eVar, false, engine);
 
@@ -2187,21 +2190,23 @@ public class Algebra {
 		 * @throws JASConversionException
 		 */
 		public static IExpr factorWithOption(final IAST ast, IExpr expr, List<IExpr> varList, boolean factorSquareFree,
-				final EvalEngine engine) throws JASConversionException {
+											 final EvalEngine engine) throws JASConversionException {
 			final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
 			IExpr option = options.getOption(F.Modulus);
 			if (option.isInteger() && !option.isZero()) {
 				return factorModulus(expr, varList, factorSquareFree, option);
 			}
 			if (!factorSquareFree) {
-			option = options.getOption(F.GaussianIntegers);
-			if (option.isTrue()) {
+				option = options.getOption(F.Extension);
+				if (option.isImaginaryUnit()) {
 					return factorComplex(expr, varList, F.Times, engine);
-			}
-			option = options.getOption(F.Extension);
-			if (option.isImaginaryUnit()) {
-					return factorComplex(expr, varList, F.Times, engine);
-			}
+				}
+				option = options.getOption(F.GaussianIntegers);
+				if (option.isPresent()) {
+					if (option.isTrue()) {
+						return factorComplex(expr, varList, F.Times, engine);
+					}
+				}
 			}
 			return F.NIL; // no evaluation
 		}
@@ -2336,7 +2341,7 @@ public class Algebra {
 				if (entry.getKey().isONE() && entry.getValue().equals(1L)) {
 					continue;
 				}
-				result.append(F.List(jas.integerPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
+				result.append(F.List(jas.integerPoly2Expr(entry.getKey()), F.ZZ(entry.getValue())));
 			}
 			return result;
 		}
@@ -5686,7 +5691,7 @@ public class Algebra {
 		for (SortedMap.Entry<GenPolynomial<ModLong>, Long> entry : map.entrySet()) {
 			GenPolynomial<ModLong> singleFactor = entry.getKey();
 			Long val = entry.getValue();
-			result.append(F.Power(jas.modLongPoly2Expr(singleFactor), F.integer(val)));
+			result.append(F.Power(jas.modLongPoly2Expr(singleFactor), F.ZZ(val)));
 		}
 		return result;
 	}
@@ -5711,7 +5716,7 @@ public class Algebra {
 			if (entry.getValue() == 1L) {
 				result.append(jas.integerPoly2Expr(entry.getKey()));
 			} else {
-				result.append(F.Power(jas.integerPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
+				result.append(F.Power(jas.integerPoly2Expr(entry.getKey()), F.ZZ(entry.getValue())));
 			}
 		}
 		return result;
