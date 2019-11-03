@@ -3,7 +3,6 @@ package org.matheclipse.core.patternmatching;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
@@ -24,7 +23,7 @@ public class Tester implements Predicate<IExpr> {
 	 * The constructor
 	 */
 	protected Tester(EvalEngine engine) {
-		this.rules = new RulesData(Context.SYSTEM);
+		this.rules = new RulesData();
 		this.engine = engine;
 	}
 
