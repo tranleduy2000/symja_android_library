@@ -1,14 +1,5 @@
 package org.matheclipse.core.rubi;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -22,6 +13,15 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Convert the Rubi files from <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Indefinite Integration Reduction
@@ -686,9 +686,9 @@ public class ConvertRubi {
 		File file = new File("./Rubi/RubiRules4.16.0_FullLHS.ser");
 		byte[] byteArray = WL.serialize(listOfRules);
 		try {
-			com.google.common.io.Files.write(byteArray, file);
+			com.gx.common.io.Files.write(byteArray, file);
 
-			byteArray = com.google.common.io.Files.toByteArray(file);
+			byteArray = com.gx.common.io.Files.toByteArray(file);
 			IExpr result = WL.deserialize(byteArray);
 			System.out.println(result.toString());
 		} catch (IOException e) {

@@ -8,8 +8,6 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.eval.util.Assumptions;
-import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
@@ -197,28 +195,28 @@ public class SeriesFunctions {
                     if (result.isPresent()) {
                         result = F.evalQuiet(result);
 						if (result.isNumericFunction() || result.isInfinity() || result.isNegativeInfinity()) {
-                            if (result.isZero()) {
-								IExpr temp = F.evalQuiet(F.N(F.Greater(F.Subtract(expression, limitValue), F.C0)));
-                                if (temp != null) {
-                                    IAssumptions assumptions = Assumptions.getInstance(temp);
-                                    if (assumptions != null) {
-                                        int direction = data.getDirection();
-                                        if (assumptions.isNegative(data.getSymbol())) {
-                                            if (direction == DIRECTION_TWO_SIDED || direction == DIRECTION_FROM_BELOW) {
-                                                data.setDirection(DIRECTION_FROM_BELOW);
-                                            } else {
-                                                return F.NIL;
-                                            }
-                                        } else if (assumptions.isNonNegative(data.getSymbol())) {
-                                            if (direction == DIRECTION_TWO_SIDED || direction == DIRECTION_FROM_ABOVE) {
-                                                data.setDirection(DIRECTION_FROM_ABOVE);
-                                            } else {
-                                                return F.NIL;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+							// if (result.isZero()) {
+							// IExpr temp = F.evalQuiet(F.N(F.Greater(F.Subtract(expression, limitValue), F.C0)));
+							// if (temp != null) {
+							// IAssumptions assumptions = Assumptions.getInstance(temp);
+							// if (assumptions != null) {
+							// int direction = data.getDirection();
+							// if (assumptions.isNegative(data.getSymbol())) {
+							// if (direction == DIRECTION_TWO_SIDED || direction == DIRECTION_FROM_BELOW) {
+							// // data.setDirection(DIRECTION_FROM_BELOW);
+							// } else {
+							// return F.NIL;
+							// }
+							// } else if (assumptions.isNonNegative(data.getSymbol())) {
+							// if (direction == DIRECTION_TWO_SIDED || direction == DIRECTION_FROM_ABOVE) {
+							// // data.setDirection(DIRECTION_FROM_ABOVE);
+							// } else {
+							// return F.NIL;
+							// }
+							// }
+							// }
+							// }
+							// }
                             return result;
                         }
                     }
@@ -450,10 +448,10 @@ public class SeriesFunctions {
                     long oddDegree = poly.degree() % 2;
                     if (oddDegree == 1) {
                         // odd degree
-                        return data.limit(F.Times(coeff, limit));
+						return evalLimitQuiet(F.Times(coeff, limit), data);
                     }
                     // even degree
-                    return data.limit(F.Times(coeff, F.CInfinity));
+					return evalLimitQuiet(F.Times(coeff, F.CInfinity), data);
                 } catch (RuntimeException e) {
 					if (Config.SHOW_STACKTRACE) {
                         e.printStackTrace();
@@ -472,11 +470,17 @@ public class SeriesFunctions {
                 return F.C1;
             }
 			if (exponent.isFree(data.getSymbol())) {
-				IExpr temp = evalLimitQuiet(base, data);
+				final IExpr temp = evalLimitQuiet(base, data);
+				if (temp.isPresent()) {
 				if (temp.isZero()&&!exponent.isNumericFunction()) {
 					// ConditionalExpression(0, exponent > 0)
 					return F.ConditionalExpression(F.C0,F.Greater(exponent, F.C0));
                                                                      }
+					if (!temp.isZero() && temp.isFree(data.getSymbol())) {
+						// ConditionalExpression(0, exponent > 0)
+						return F.Power(temp, exponent);
+					}
+				}
 				if (base.isTimes()) {
 					IAST isFreeResult = ((IAST) base).partitionTimes(new Predicate<IExpr>() {
                                                                          @Override
@@ -508,15 +512,17 @@ public class SeriesFunctions {
                                 if (n.isEven()) {
                                     return F.CInfinity;
                                 }
-                                if (data.getDirection() == DIRECTION_FROM_BELOW) {
+								if (data.getDirection() == DIRECTION_TWO_SIDED) {
+									return F.Indeterminate;
+								} else if (data.getDirection() == DIRECTION_FROM_BELOW) {
                                     return F.CNInfinity;
-                                } else {
-                                    data.setDirection(DIRECTION_FROM_ABOVE);
+								} else if (data.getDirection() == DIRECTION_FROM_ABOVE) {
                                     return F.CInfinity;
                                 }
 							} else if (exponent.isFraction()) {
-                                if (data.getDirection() != DIRECTION_FROM_BELOW) {
-                                    data.setDirection(DIRECTION_FROM_ABOVE);
+								if (data.getDirection() == DIRECTION_TWO_SIDED) {
+									return F.Indeterminate;
+								} else if (data.getDirection() == DIRECTION_FROM_ABOVE) {
                                     return F.CInfinity;
                                 }
                             }

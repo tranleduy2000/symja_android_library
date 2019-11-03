@@ -9088,7 +9088,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Limit(Sin(x),x->-Infinity)", //
 				"Interval({-1,1})");
 		check("Limit(Sin(1/x),x->0)", //
-				"Interval({-1,1})");
+				"Indeterminate");
 		check("Max(Interval({2,4}))", //
 				"4");
 		check("Min(Interval({2,4}))", //
@@ -10088,6 +10088,31 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// }
 
 	public void testLimit() {
+		check("Limit(x^(-2/3),x->0 , Direction->-1)", //
+				"Infinity");
+		check("Limit(x^(-2/3),x->0 , Direction->1)", //
+				"Limit(1/x^(2/3),x->0,Direction->1)");
+		check("Limit(x^(-2/3),x->0)", //
+				"Indeterminate");
+
+		check("Limit(x^(-16/7),x->0 , Direction->-1)", //
+				"Infinity");
+		check("Limit(x^(-16/7),x->0 , Direction->1)", //
+				"Limit(1/x^(16/7),x->0,Direction->1)");
+		check("Limit(x^(-16/7),x->0)", //
+				"Indeterminate");
+
+		check("Limit(x^(-37/4),x->0 , Direction->-1)", //
+				"Infinity");
+		check("Limit(x^(-37/4),x->0 , Direction->1)", //
+				"Limit(1/x^(37/4),x->0,Direction->1)");
+		check("Limit(x^(-37/4),x->0)", //
+				"Indeterminate");
+
+		check("Limit((x^2-1)/(x-1)^2, x->1)", //
+				"Indeterminate");
+		check("Limit((3*x^2-6)^(-1/3), x->-Infinity)", //
+				"0");
 		check("Limit(Cosh(x) , x->3)", //
 				"Cosh(3)");
 		check("Limit(x^3-4*x^2+6, x->-Infinity)", //
@@ -10101,10 +10126,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Limit((x^2-3*x+2)/(x^3+2*x-1), x->Infinity)", //
 				"0");
 		check("Limit(Sqrt(3*x-2), x->-Infinity)", //
-				"Limit(Sqrt(-2+3*x),x->-Infinity)");
-		// TODO return Infinity
-		// check("Limit((3*x^2-6)^(-1/3), x->-Infinity)", //
-		// "Infinity");
+				"Sqrt(-Infinity)");
 
 		check("Limit((x-1)^2/(x^2-1), x->1)", //
 				"0");
@@ -10114,9 +10136,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"4");
 		check("Limit((x^3-1)/(x^2-1), x->1)", //
 				"3/2");
-		// TODO
-		// check("Limit((x^2-1)/(x-1)^2, x->1)", //
-		// "Indeterminate");
 		// github #120
 		check("Limit( x*Log(x) , x->0)", //
 				"0");
@@ -10221,9 +10240,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"ComplexInfinity");
 		// check("Limit((4 - x), x -> 4)", "0");
 		check("Limit(1/(4 - x), x -> 4)", //
-				"Infinity");
+				"Indeterminate");
 		check("Limit(1/(x - 4), x -> 4)", //
-				"Infinity");
+				"Indeterminate");
 
 		check("Infinity-1", //
 				"Infinity");
@@ -10263,9 +10282,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Limit(c*(x^(-10)), x->Infinity)", //
 				"0");
 
-		// TOOO distinguish between upper and lower limit convergence
-		check("Limit(1/(x - 4), x -> 4)", //
-				"Infinity");
 
 	}
 

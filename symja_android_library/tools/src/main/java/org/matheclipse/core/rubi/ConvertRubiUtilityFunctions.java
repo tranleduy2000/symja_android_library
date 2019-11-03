@@ -1,5 +1,19 @@
 package org.matheclipse.core.rubi;
 
+import com.duy.lambda.Consumer;
+
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.convert.AST2Expr;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.WL;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.Parser;
+import org.matheclipse.parser.client.ast.ASTNode;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,19 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.convert.AST2Expr;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.WL;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.Parser;
-import org.matheclipse.parser.client.ast.ASTNode;
 
 /**
  * Convert the Rubi UtilityFunctions from <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Indefinite Integration
@@ -78,15 +79,20 @@ public class ConvertRubiUtilityFunctions {
 		}
 	}
 
-	public static void convert(ASTNode node, StringBuffer buffer, boolean last, Set<String> functionSet,
-			IASTAppendable listOfRules) {
+	public static void convert(ASTNode node, final StringBuffer buffer, final boolean last, final Set<String> functionSet,
+							   final IASTAppendable listOfRules) {
 		try {
 			// convert ASTNode to an IExpr node
 			IExpr expr = new AST2Expr(false, EvalEngine.get()).convert(node);
 
 			if (expr.isAST(F.CompoundExpression)) {
 				IAST ast = (IAST) expr;
-				ast.forEach(x -> convertExpr(x, buffer, last, functionSet, listOfRules));
+				ast.forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						convertExpr(x, buffer, last, functionSet, listOfRules);
+					}
+				});
 			} else {
 				convertExpr(expr, buffer, last, functionSet, listOfRules);
 			}
@@ -270,9 +276,9 @@ public class ConvertRubiUtilityFunctions {
 		File file = new File("./Rubi/IntegrationUtilityFunctions.ser");
 		byte[] byteArray = WL.serialize(listOfRules);
 		try {
-			com.google.common.io.Files.write(byteArray, file);
+			com.gx.common.io.Files.write(byteArray, file);
 
-			byteArray = com.google.common.io.Files.toByteArray(file);
+			byteArray = com.gx.common.io.Files.toByteArray(file);
 			IExpr result = WL.deserialize(byteArray);
 			System.out.println(result.toString());
 		} catch (IOException e) {
