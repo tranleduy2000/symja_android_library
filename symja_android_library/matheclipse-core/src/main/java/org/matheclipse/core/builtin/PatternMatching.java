@@ -12,14 +12,12 @@ import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.eval.util.Lambda;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.Context;
-import org.matheclipse.core.expression.ContextPath;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -496,37 +494,37 @@ public final class PatternMatching {
 	 */
 	private final static class Get extends AbstractFunctionEvaluator {
 
-		private static int addContextToPath(ContextPath contextPath, final List<ASTNode> node, int i,
-				final EvalEngine engine, ISymbol endSymbol) {
-			ContextPath path = engine.getContextPath();
-			try {
-				engine.setContextPath(contextPath);
-				AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
-				while (i < node.size()) {
-					IExpr temp = ast2Expr.convert(node.get(i++));
-					if (temp.isAST()) {
-						IExpr head = temp.head();
-						IAST ast = (IAST) temp;
-						if (head.equals(endSymbol) && ast.isAST0()) {
-							continue;
-						} else if (head.equals(F.Begin) && ast.size() >= 2) {
-							try {
-								contextPath.add(engine.getContextPath().getContext(ast.arg1().toString()));
-								i = addContextToPath(contextPath, node, i, engine, F.End);
-							} finally {
-								contextPath.remove(contextPath.size() - 1);
-							}
-							continue;
-						}
-					}
-					engine.evaluate(temp);
-				}
-				// TODO add error message
-			} finally {
-				engine.setContextPath(path);
-			}
-			return i;
-		}
+		// private static int addContextToPath(ContextPath contextPath, final List<ASTNode> node, int i,
+		// final EvalEngine engine, ISymbol endSymbol) {
+		// ContextPath path = engine.getContextPath();
+		// try {
+		// engine.setContextPath(contextPath);
+		// AST2Expr ast2Expr = new AST2Expr(engine.isRelaxedSyntax(), engine);
+		// while (i < node.size()) {
+		// IExpr temp = ast2Expr.convert(node.get(i++));
+		// if (temp.isAST()) {
+		// IExpr head = temp.head();
+		// IAST ast = (IAST) temp;
+		// if (head.equals(endSymbol) && ast.isAST0()) {
+		// continue;
+		// } else if (head.equals(F.Begin) && ast.size() >= 2) {
+		// try {
+		// contextPath.add(engine.getContextPath().getContext(ast.arg1().toString()));
+		// i = addContextToPath(contextPath, node, i, engine, F.End);
+		// } finally {
+		// contextPath.remove(contextPath.size() - 1);
+		// }
+		// continue;
+		// }
+		// }
+		// engine.evaluate(temp);
+		// }
+		// // TODO add error message
+		// } finally {
+		// engine.setContextPath(path);
+		// }
+		// return i;
+		// }
 
 		/**
 		 * Load a package from the given reader
@@ -646,7 +644,7 @@ public final class PatternMatching {
 			if (Config.isFileSystemEnabled(engine)) {
 
 				if (!(ast.arg1() instanceof IStringX)) {
-					throw new WrongNumberOfArguments(ast, 1, ast.argSize());
+					return IOFunctions.printMessage(F.Get, "string", F.List(), engine);
 				}
 				IStringX arg1 = (IStringX) ast.arg1();
 				File file = new File(arg1.toString());
@@ -1042,24 +1040,32 @@ public final class PatternMatching {
 			if (ast.head().equals(F.Pattern)) {
 				if (ast.size() == 3) {
 					if (ast.arg1().isSymbol()) {
-						if (ast.arg2().isBlank()) {
-							IPatternObject blank = (IPatternObject) ast.arg2();
-							return F.$p((ISymbol) ast.arg1(), blank.getHeadTest());
+						final ISymbol symbol = (ISymbol) ast.arg1();
+						final IExpr arg2 = ast.arg2();
+						if (arg2.isBlank()) {
+							IPatternObject blank = (IPatternObject) arg2;
+							return F.$p(symbol, blank.getHeadTest());
 						}
-						if (ast.arg2().isAST(F.Blank, 1)) {
-							return F.$p((ISymbol) ast.arg1());
+						if (arg2.size() == 1) {
+							if (arg2.isAST(F.Blank, 1)) {
+								return F.$p(symbol);
 						}
-						if (ast.arg2().isAST(F.BlankSequence, 1)) {
-							return F.$ps((ISymbol) ast.arg1(), null, false, false);
+							if (arg2.isAST(F.BlankSequence, 1)) {
+								return F.$ps(symbol, null, false, false);
 						}
-						if (ast.arg2().isAST(F.BlankNullSequence, 1)) {
-							return F.$ps((ISymbol) ast.arg1(), null, false, true);
+							if (arg2.isAST(F.BlankNullSequence, 1)) {
+								return F.$ps(symbol, null, false, true);
 						}
-						if (ast.arg2().isAST(F.BlankSequence, 2)) {
-							return F.$ps((ISymbol) ast.arg1(), ast.arg2().first(), false, false);
+						} else if (arg2.size() == 2) {
+							if (arg2.isAST(F.Blank, 2)) {
+								return F.$p(symbol, arg2.first());
 						}
-						if (ast.arg2().isAST(F.BlankNullSequence, 2)) {
-							return F.$ps((ISymbol) ast.arg1(), ast.arg2().first(), false, true);
+							if (arg2.isAST(F.BlankSequence, 2)) {
+								return F.$ps(symbol, arg2.first(), false, false);
+						}
+							if (arg2.isAST(F.BlankNullSequence, 2)) {
+								return F.$ps(symbol, arg2.first(), false, true);
+							}
 						}
 					}
 				}
@@ -1084,10 +1090,12 @@ public final class PatternMatching {
 			if (Config.isFileSystemEnabled(engine)) {
 
 				final int argSize = ast.argSize();
-				IStringX fileName = Validate.checkStringType(ast, argSize);
-				FileWriter writer;
+				if (!(ast.last() instanceof IStringX)) {
+					return IOFunctions.printMessage(F.Put, "string", F.List(), engine);
+				}
+				IStringX fileName = (IStringX) ast.last();
+				FileWriter writer = null;
 				try {
-					writer = new FileWriter(fileName.toString());
 					final StringBuilder buf = new StringBuilder();
 					for (int i = 1; i < argSize; i++) {
 						IExpr temp = engine.evaluate(ast.get(i));
@@ -1099,10 +1107,19 @@ public final class PatternMatching {
 							buf.append('\n');
 						}
 					}
+					writer = new FileWriter(fileName.toString());
 					writer.write(buf.toString());
-					writer.close();
 				} catch (IOException e) {
 					return engine.printMessage("Put: file " + fileName.toString() + " I/O exception !");
+				} finally {
+					if (writer != null) {
+						try {
+					writer.close();
+				} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 				}
 				return F.Null;
 			}
