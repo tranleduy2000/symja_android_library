@@ -2980,6 +2980,10 @@ public class F {
      * Represents <code>List(1)</code>
      */
     public static IAST CListC1;
+	/**
+	 * Represents <code>List(-1)</code>
+	 */
+	public static IAST CListCN1;
     /**
      * Represents <code>List(1,1)</code>
      */
@@ -3199,9 +3203,10 @@ public class F {
             List.setEvaluator(ICoreFunctionEvaluator.ARGS_EVALUATOR);
 
             CEmptyList = headAST0(List);
-            CListC0 = unaryAST1(List, C0);
-            CListC1 = unaryAST1(List, C1);
-            CListC2 = unaryAST1(List, C2);
+			CListC0 = new B1.List(C0);
+			CListC1 = new B1.List(C1);
+			CListC2 = new B1.List(C2);
+			CListCN1 = new B1.List(CN1);
 
 			CListC1C1 = new B2.List(C1, C1);
 			CListC1C2 = new B2.List(C1, C2);
@@ -3216,11 +3221,11 @@ public class F {
             CNIInfinity = unaryAST1(DirectedInfinity, CNI);
             CComplexInfinity = headAST0(DirectedInfinity);
 
-			CNPi = binaryAST2(Times, CN1, Pi);
-			CN2Pi = binaryAST2(Times, CN2, Pi);
-			C2Pi = binaryAST2(Times, C2, Pi);
-            CNPiHalf = binaryAST2(Times, CN1D2, Pi);
-            CPiHalf = binaryAST2(Times, C1D2, Pi);
+			CNPi = new B2.Times(CN1, Pi);
+			CN2Pi = new B2.Times(CN2, Pi);
+			C2Pi = new B2.Times(C2, Pi);
+			CNPiHalf = new B2.Times(CN1D2, Pi);
+			CPiHalf = new B2.Times(C1D2, Pi);
 
 			CSqrt2 = new B2.Power(C2, C1D2);
 			CSqrt3 = new B2.Power(C3, C1D2);
