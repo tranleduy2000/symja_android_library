@@ -3761,7 +3761,7 @@ public class MainTestCase extends AbstractTestCase {
 	}
 
 	public void testIssue99() {
-		check("Limit(1/x,x->0)", "Indeterminate");
+		check("Limit(1/x,x->0)", "Infinity");
 		check("Limit(x^(-3),x->0, Direction->-1)", "Infinity");
 		check("Limit(x^(-3),x->0, Direction->1)", "-Infinity");
 		check("Limit(x^(-4),x->0, Direction->-1)", "Infinity");

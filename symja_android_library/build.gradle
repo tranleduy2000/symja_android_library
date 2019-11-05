@@ -26,7 +26,7 @@ android {
         multiDexEnabled true
         versionCode 20
         versionName "1.1.9"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     testOptions {
@@ -87,7 +87,6 @@ repositories {
 }
 dependencies {
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.jsoup:jsoup:1.11.2'
+    testImplementation 'org.jsoup:jsoup:1.12.1'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
-    // implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
 }

@@ -254,8 +254,10 @@ public class BasicTeXTestCase extends TestCase {
 	}
 	public void testTeX027() {
 		check(new ASTRealMatrix(new double[][] { { 1.0, 2.0, 3.0 }, { 3.3, 4.4, 5.5 } }, false), //
-				"\\left(\n" + "\\begin{array}{ccc}\n" + "1.0 & 2.0 & 3.0 \\\\\n" + "3.3 & 4.4 & 5.5 \n"
-						+ "\\end{array}\n" + "\\right) ");
+				"\\begin{pmatrix}\n" + //
+				" 1.0 & 2.0 & 3.0 \\\\\n" + //
+				" 3.3 & 4.4 & 5.5 \\\\\n" + //
+				"\\end{pmatrix}");
 	}
 
 	public void testTeX028() {
@@ -269,6 +271,57 @@ public class BasicTeXTestCase extends TestCase {
 		check("Inequality(a,Less,0,LessEqual,b, Equal,c, Unequal,d)", //
 				"a < 0\\leq b == c\\neq d");
 
+	}
+	public void testTeX30() {
+		check("Quantity(3,\"m\")", //
+				"\\text{Quantity}(3,\\textnormal{m})");
+	}
+	public void testTeX31() {
+		check("a&&b||c", //
+				"a \\land b \\lor c");
+	}
+
+	public void testTeX32() {
+		check("{{a,b,c},{a,c,b},{c,a,b}}", //
+				"\\{\\{a,b,c\\},\\{a,c,b\\},\\{c,a,b\\}\\}");
+	}
+	public void testTeX033() {
+		IExpr expr = EvalEngine.get().evaluate("2.7*6");
+		check(expr, //
+				"16.2");
+	}
+	public void testTeX034() {
+		IExpr expr = EvalEngine.get().evaluate("ComplexInfinity");
+		check(expr, //
+				"ComplexInfinity");
+	}
+
+	public void testTeX035() {
+		IExpr expr = EvalEngine.get().evaluate("a[[1]]");
+		check(expr, //
+				"a[[1]]");
+		expr = EvalEngine.get().evaluate("test[[1,2,3]]");
+		check(expr, //
+				"\\text{test}[[1,2,3]]");
+	}
+
+	public void testTeX036() {
+		try {
+		IExpr expr = new EvalEngine(true).evaluate("HoldForm(f(x,y))");
+		check(expr, //
+				"f(x,y)");
+		expr = new EvalEngine(true).evaluate("Defer(f(x,y))");
+		check(expr, //
+				"f(x,y)");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void testTeX037() {
+		IExpr expr = EvalEngine.get().evaluate("f(#,#3,##)");
+		check(expr, //
+				"f(\\text{$\\#$1},\\text{$\\#$3},\\text{$\\#\\#$1})");
 	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
@@ -290,8 +343,8 @@ public class BasicTeXTestCase extends TestCase {
 	protected void setUp() {
 		try {
 			// F.initSymbols();
-			EvalEngine engine = new EvalEngine();
-			texUtil = new TeXUtilities(engine, true);
+			EvalEngine engine = new EvalEngine(true);
+			texUtil = new TeXUtilities(engine, true, 5, 7);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

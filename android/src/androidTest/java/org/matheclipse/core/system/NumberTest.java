@@ -2,6 +2,7 @@ package org.matheclipse.core.system;
 
 import junit.framework.TestCase;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.AbstractFractionSym;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.F;
@@ -9,7 +10,6 @@ import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -55,9 +55,13 @@ public class NumberTest extends TestCase {
 			OutputFormFactory factory = OutputFormFactory.get(true, false, 5,7);
 
 			IExpr expr = F.num("12345.123456789");
-			factory.convert(buf, expr);
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (!factory.convert(buf, expr)) {
+				fail();
+			}
+		} catch (RuntimeException rex) {
+			if (Config.SHOW_STACKTRACE) {
+				rex.printStackTrace();
+			}
 		}
 		assertEquals(buf.toString(), "12345.12");
 	}

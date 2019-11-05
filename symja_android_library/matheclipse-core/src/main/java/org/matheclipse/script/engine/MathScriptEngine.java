@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.concurrent.CountDownLatch;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.ScriptContext;
@@ -87,28 +86,27 @@ public class MathScriptEngine extends AbstractScriptEngine {
             if (Boolean.TRUE.equals(stepwise)) {
                 result[0] = fUtility.evalTrace(script, null, F.List());
             } else {
-                boolean isAndroid = System.getenv().containsKey("ANDROID_ASSETS");
                 final Throwable[] error = new Throwable[1];
-                if (isAndroid) {
-                    final CountDownLatch countDownLatch = new CountDownLatch(1);
-                    Thread thread = new Thread(null, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                result[0] = fUtility.evaluate(script);
-                            } catch (Throwable e) {
-                                error[0] = e;
-                            }
-                            countDownLatch.countDown();
+                ThreadGroup group = new ThreadGroup("CalculateThread");
+                Thread thread = new Thread(group, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            result[0] = fUtility.evaluate(script);
+                        } catch (Throwable e) {
+                            error[0] = e;
                         }
-                    }, toString(), 8 * 1024 * 1024);
-                    thread.start();
-                    countDownLatch.await();
-                    if (error[0] != null) {
-                        throw error[0];
                     }
-                } else {
-                    result[0] = fUtility.evaluate(script);
+                }, toString(), 2 * 1024 * 1024);
+                thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                if (error[0] != null) {
+                    throw error[0];
                 }
             }
             final Object returnType = context.getAttribute("RETURN_OBJECT");
@@ -147,7 +145,7 @@ public class MathScriptEngine extends AbstractScriptEngine {
                 }
                 return e1.getMessage();
             }
-        }  catch (final SyntaxError e) {
+        } catch (final SyntaxError e) {
             if (Config.DEBUG) {
                 e.printStackTrace();
             }
@@ -228,9 +226,9 @@ public class MathScriptEngine extends AbstractScriptEngine {
         }
         final StringWriter buf = new StringWriter();
         if (fDecimalFormat != null) {
-			// DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-			// DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
-			OutputFormFactory.get(relaxedSyntax, false, 5, 7).convert(buf, result);
+            // DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
+            // DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
+            OutputFormFactory.get(relaxedSyntax, false, 5, 7).convert(buf, result);
         } else {
             OutputFormFactory.get(relaxedSyntax).convert(buf, result);
         }

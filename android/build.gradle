@@ -5,20 +5,18 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.example.androidtest"
+        applicationId "com.duy.symja.example"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
+        versionCode 16
         versionName "1.0.0"
         multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         debug {
             minifyEnabled false
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         release {
@@ -28,15 +26,6 @@ android {
         }
 
     }
-    flavorDimensions "mode"
-    productFlavors {
-        lite {
-            dimension "mode"
-        }
-        full {
-            dimension "mode"
-        }
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
@@ -45,12 +34,14 @@ android {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.jsoup:jsoup:1.12.1'
 
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.3'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':symja_android_library')
-    testImplementation 'org.jsoup:jsoup:1.11.2'
+
+    implementation project(':symja_android_library-lite-release')
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
 }
