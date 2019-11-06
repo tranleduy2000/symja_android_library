@@ -11,6 +11,7 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.data.GraphExpr;
 import org.matheclipse.core.form.output.DoubleFormFactory;
 import org.matheclipse.core.form.output.JavaDoubleFormFactory;
 import org.matheclipse.core.form.output.JavaScriptFormFactory;
@@ -406,6 +407,9 @@ public final class OutputFunctions {
 				if (arg1.isAST(F.JSFormData, 3)) {
 					String manipulateStr = ((IAST) arg1).arg1().toString();
 					return F.$str(manipulateStr, IStringX.APPLICATION_JAVASCRIPT);
+				}
+				if (arg1 instanceof GraphExpr) {
+					return F.$str(GraphFunctions.graphToJSForm((GraphExpr) arg1), IStringX.APPLICATION_JAVASCRIPT);
 				}
 				return F.$str(toJavaScript(arg1), IStringX.APPLICATION_JAVASCRIPT);
 			} catch (Exception rex) {
