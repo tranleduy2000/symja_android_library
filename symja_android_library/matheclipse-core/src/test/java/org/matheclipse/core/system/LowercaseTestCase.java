@@ -15988,10 +15988,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testReplaceAll() {
-		check("{x,y,z}/.x -> 1", "{1,y,z}");
-		check("{x(x),y}/.x -> 1", "{1[1],y}");
-		check("{{x,y}}/.x:>Sequence[2,3]", "{{2,3,y}}");
-		check("{{x,y},y}/.{_,_} -> {1,1}", "{1,1}");
+		check("{x,y,z}/.x -> 1", //
+				"{1,y,z}");
+		check("{x(x),y}/.x -> 1", //
+				"{1[1],y}");
+		check("{{x,y}}/.x:>Sequence[2,3]", //
+				"{{2,3,y}}");
+		check("{{x,y},y}/.{_,_} -> {1,1}", //
+				"{1,1}");
 		check("{x,Sin(x),x^2,x*y,x+y,g(y,x),h(x,y,z)} /. f_Power :> (f /. x->10)", //
 				"{x,Sin(x),100,x*y,x+y,g(y,x),h(x,y,z)}");
 		check("{x,Sin(x),x^2,x*y,x+y,g(y,x),h(x,y,z)} /. Sin(x_) -> Sin(10)", //
@@ -16483,6 +16487,22 @@ public class LowercaseTestCase extends AbstractTestCase {
 	 * </pre>
 	 */
 	public void testResultant() {
+		check("Resultant(0, x^3+2*x, x)", //
+				"0");
+		check("Resultant(f(x), 0, x)", //
+				"0");
+		check("Resultant(1,a+x^2+c,x)", //
+				"1");
+		check("Resultant(a+x^2+c, 1, x)", //
+				"1");
+		check("Resultant(0, x^3+2*x, x)", //
+				"0");
+		check("Resultant(f(x), 0, x)", //
+				"0");
+		check("Resultant(1,a+x^2+c,x)", //
+				"1");
+		check("Resultant(a+x^2+c, 1, x)", //
+				"1");
 		// check("Resultant((x - a) (x - b), (x - c) (x - d) (x - e), x)",//
 		// "(a*b+(-(-a^2*b-a*b^2+a*b*c+a*b*d+a*b*e-c*d*e)*(-a-b-(-a^2*b-a*b^2+a*b*c+a*b*d+a*b*e-c*d*e)/(a^\n" +
 		// "2+a*b+b^2-a*c-b*c-a*d-b*d+c*d-a*e-b*e+c*e+d*e)))/(a^2+a*b+b^2-a*c-b*c-a*d-b*d+c*d-a*e-b*e+c*e+d*e))*(a^\n" +
@@ -16506,53 +16526,77 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testReturn() {
-		check("f(x_) := (If(x < 0, Return(0)); x)", "");
-		check("f(-1)", "0");
+		check("f(x_) := (If(x < 0, Return(0)); x)", //
+				"");
+		check("f(-1)", //
+				"0");
 
-		check("Do(If(i > 3, Return()); Print(i), {i, 10})", "");
+		check("Do(If(i > 3, Return()); Print(i), {i, 10})", //
+				"");
 
-		check("g(x_) := (Do(If(x < 0, Return(0)), {i, {2, 1, 0, -1}}); x)", "");
-		check("g(-1)", "-1");
+		check("g(x_) := (Do(If(x < 0, Return(0)), {i, {2, 1, 0, -1}}); x)", //
+				"");
+		check("g(-1)", //
+				"-1");
 
-		check("h(x_) := (If(x < 0, Return()); x)", "");
-		check("h(1)", "1");
+		check("h(x_) := (If(x < 0, Return()); x)", //
+				"");
+		check("h(1)", //
+				"1");
 		check("h(-1) // FullForm", "Null");
 
-		check("f(x_) := Return(x)", "");
+		check("f(x_) := Return(x)", //
+				"");
 		check("g(y_) := Module({}, z = f(y); 2)", //
 				"");
 		check("g(1)", //
 				"2");
 
-		check("$a(x_):=Return(1); $b(x_):=Module({},$c=$a(y);2); $b(1)", "2");
-		check("$f(x_) := (If(x > 5, Return(a)); x + 3); $f(6)", "a");
-		check("$g(x_) := (Do( If(x > 5, Return(a)), {3}); x); $g(6)", "6");
-		check("$h(x_) := Catch(Do(If(x > 5, Throw(a)), {3}); x); $h(6)", "a");
+		check("$a(x_):=Return(1); $b(x_):=Module({},$c=$a(y);2); $b(1)", //
+				"2");
+		check("$f(x_) := (If(x > 5, Return(a)); x + 3); $f(6)", //
+				"a");
+		check("$g(x_) := (Do( If(x > 5, Return(a)), {3}); x); $g(6)", //
+				"6");
+		check("$h(x_) := Catch(Do(If(x > 5, Throw(a)), {3}); x); $h(6)", //
+				"a");
 	}
 
 	public void testReverse() {
-		check("Reverse({1, 2, 3})", "{3,2,1}");
-		check("Reverse(x(a,b,c))", "x(c,b,a)");
+		check("Reverse({1, 2, 3})", //
+				"{3,2,1}");
+		check("Reverse(x(a,b,c))", //
+				"x(c,b,a)");
 		// check("Reverse({{1, 2}, {3, 4}}, 1)", "");
 	}
 
 	public void testRiffle() {
-		check("Riffle({1, 2, 3, 4, 5, 6, 7, 8, 9}, x)", "{1,x,2,x,3,x,4,x,5,x,6,x,7,x,8,x,9}");
-		check("Riffle({1, 2, 3, 4, 5, 6, 7, 8, 9}, {x, y})", "{1,x,2,y,3,x,4,y,5,x,6,y,7,x,8,y,9}");
-		check("Riffle({1}, x)", "{1}");
-		check("Riffle({a, b, c, d}, {x, y, z, w})", "{a,x,b,y,c,z,d,w}");
+		check("Riffle({1, 2, 3, 4, 5, 6, 7, 8, 9}, x)", //
+				"{1,x,2,x,3,x,4,x,5,x,6,x,7,x,8,x,9}");
+		check("Riffle({1, 2, 3, 4, 5, 6, 7, 8, 9}, {x, y})", //
+				"{1,x,2,y,3,x,4,y,5,x,6,y,7,x,8,y,9}");
+		check("Riffle({1}, x)", //
+				"{1}");
+		check("Riffle({a, b, c, d}, {x, y, z, w})", //
+				"{a,x,b,y,c,z,d,w}");
 	}
 
 	public void testRogersTanimotoDissimilarity() {
-		check("RogersTanimotoDissimilarity({1, 0, 1, 1, 0}, {1, 1, 0, 1, 1})", "3/4");
-		check("RogersTanimotoDissimilarity({True, False, True}, {True, True, False})", "4/5");
-		check("RogersTanimotoDissimilarity({1, 1, 1, 1}, {1, 1, 1, 1})", "0");
-		check("RogersTanimotoDissimilarity({0, 0, 0, 0}, {1, 1, 1, 1})", "1");
+		check("RogersTanimotoDissimilarity({1, 0, 1, 1, 0}, {1, 1, 0, 1, 1})", //
+				"3/4");
+		check("RogersTanimotoDissimilarity({True, False, True}, {True, True, False})", //
+				"4/5");
+		check("RogersTanimotoDissimilarity({1, 1, 1, 1}, {1, 1, 1, 1})", //
+				"0");
+		check("RogersTanimotoDissimilarity({0, 0, 0, 0}, {1, 1, 1, 1})", //
+				"1");
 	}
 
 	public void testRoot() {
-		check("Root((#^2 - 3*# - 1)&, 2)", "3/2+Sqrt(13)/2");
-		check("Root((-3*#-1)&, 1)", "-1/3");
+		check("Root((#^2 - 3*# - 1)&, 2)", //
+				"3/2+Sqrt(13)/2");
+		check("Root((-3*#-1)&, 1)", //
+				"-1/3");
 	}
 
 	public void testRoots() {
@@ -16863,7 +16907,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testSatisfiabilityInstances() {
-		check("SatisfiabilityInstances((a || b || c) && (! a || ! b || ! c), {a, b, c},All)",
+		check("SatisfiabilityInstances((a || b || c) && (! a || ! b || ! c), {a, b, c},All)", //
 				"{{True,True,False},{True,False,True},{True,False,False},{False,True,True},{False,True,False},{False,False,True}}");
 		check("SatisfiabilityInstances(a&&!(b||!c), {b,a,c}, All )", //
 				"{{False,True,True}}");
