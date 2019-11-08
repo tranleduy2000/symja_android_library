@@ -3180,14 +3180,25 @@ public class Algebra {
 				List<IExpr> varList = eVar.getVarList().copyTo();
 				JASConvert<BigInteger> jas = new JASConvert<BigInteger>(varList, BigInteger.ZERO);
 				GenPolynomial<BigInteger> poly = jas.expr2JAS(expr, false);
+				GenPolynomial<BigInteger> gcd;
+				boolean evaled = false;
 				GenPolynomial<BigInteger> temp;
 				GreatestCommonDivisorAbstract<BigInteger> factory = GCDFactory.getImplementation(BigInteger.ZERO);
 				for (int i = 2; i < ast.size(); i++) {
 					expr = F.evalExpandAll(ast.get(i), engine);
 					temp = jas.expr2JAS(expr, false);
+					if (!evaled) {
+						gcd = factory.gcd(poly, temp);
+						if (!gcd.isONE()) {
+							evaled = true;
+						}
+					}
 					poly = factory.lcm(poly, temp);
 				}
+				if (evaled) {
 				return jas.integerPoly2Expr(poly.monic());
+				}
+				return ast.setAtCopy(0, F.Times);
 			} catch (JASConversionException e) {
 				if (Config.DEBUG) {
 					e.printStackTrace();
@@ -3373,10 +3384,12 @@ public class Algebra {
 				GenPolynomial<BigRational> poly1 = jas.expr2JAS(arg1, false);
 				GenPolynomial<BigRational> poly2 = jas.expr2JAS(arg2, false);
 				GenPolynomial<BigRational>[] divRem = poly1.quotientRemainder(poly2);
-				IExpr[] result = new IExpr[2];
-				result[0] = jas.rationalPoly2Expr(divRem[0], false);
-				result[1] = jas.rationalPoly2Expr(divRem[1], false);
-				return result;
+				// IExpr[] result = new IExpr[2];
+				// result[0] = jas.rationalPoly2Expr(divRem[0], false);
+				// result[1] = jas.rationalPoly2Expr(divRem[1], false);
+				// return result;
+				return new IExpr[] { jas.rationalPoly2Expr(divRem[0], false), //
+						jas.rationalPoly2Expr(divRem[1], false) };
 			} catch (JASConversionException e1) {
 				try {
 					ExprPolynomialRing ring = new ExprPolynomialRing(F.List(variable));
@@ -3386,10 +3399,11 @@ public class Algebra {
 					if (divRem == null) {
 						return null;
 					}
-					IExpr[] result = new IExpr[2];
-					result[0] = divRem[0].getExpr();
-					result[1] = divRem[1].getExpr();
-					return result;
+					// IExpr[] result = new IExpr[2];
+					// result[0] = divRem[0].getExpr();
+					// result[1] = divRem[1].getExpr();
+					return new IExpr[] { divRem[0].getExpr(), //
+							divRem[1].getExpr() };
 				} catch (LimitException le) {
 					throw le;
 				} catch (RuntimeException rex) {
@@ -4055,6 +4069,24 @@ public class Algebra {
 					true));
 		}
 
+		private static class SimplifiedResult {
+			IExpr result;
+			long minCounter;
+
+			public SimplifiedResult(IExpr result, long minCounter) {
+				this.result = result;
+				this.minCounter = minCounter;
+			}
+
+			public boolean checkExpr(IExpr expr, long counter) {
+				if (counter < this.minCounter) {
+					this.minCounter = counter;
+					this.result = expr;
+					return true;
+				}
+				return false;
+			}
+		}
 		private static class IsBasicExpressionVisitor extends AbstractVisitorBoolean {
 			public IsBasicExpressionVisitor() {
 				super();
@@ -4156,6 +4188,7 @@ public class Algebra {
 				if (expr.isAST()) {
 					// try ExpandAll, Together, Apart, Factor to reduce the expression
 					long minCounter = fComplexityFunction.apply(expr);
+					SimplifiedResult sResult = new SimplifiedResult(expr, minCounter);
 					IExpr temp;
 					long count;
 					long expandAllCounter = 0;
@@ -4299,43 +4332,58 @@ public class Algebra {
 					}
 
 					try {
+						IExpr together = expr;
 						if (minCounter < Config.MAX_SIMPLIFY_TOGETHER_LEAFCOUNT) {
-						temp = F.eval(F.Together(expr));
-						count = fComplexityFunction.apply(temp);
+							together = F.eval(F.Together(expr));
+							count = fComplexityFunction.apply(together);
 						if (count < minCounter) {
 							minCounter = count;
-							result = temp;
+								result = together;
+							}
 						}
 						if (fFullSimplify) {
-							if (temp.isTimes()) {
-								IExpr[] parts = Algebra.getNumeratorDenominator((IAST) temp, EvalEngine.get());
-								if (!parts[1].isOne()) {
-									try {
-										final IExpr numerator = parts[0];
+							if (together.isTimes()) {
+								IExpr[] parts = Algebra.getNumeratorDenominator((IAST) together, EvalEngine.get());
+								IExpr numerator = parts[0];
 										IExpr denominator = parts[1];
-										if (denominator.isPlus() && !numerator.isPlusTimesPower()) {
-											IExpr test = ((IAST) denominator).map(new Function<IExpr, IExpr>() {
-                                                @Override
-                                                public IExpr apply(IExpr x) {
-                                                    return F.Divide(x, numerator);
-                                                }
-                                            }, 1);
-											temp = F.eval(F.Divide(F.C1, test));
-											count = fComplexityFunction.apply(temp);
+								if (!numerator.isOne() && //
+										!denominator.isOne()) {
+									VariablesSet variables = new VariablesSet(together);
+									List<IExpr> vars = variables.getArrayList();
+									boolean evaled = false;
+									for (int i = 0; i < vars.size(); i++) {
+										temp = EvalEngine.get().evaluate(
+												F.PolynomialQuotientRemainder(numerator, denominator, vars.get(i)));
+										if (temp.isAST(F.List, 3) && //
+												temp.second().isZero()) {
+											IExpr arg1 = temp.first();
+											count = fComplexityFunction.apply(arg1);
 											if (count < minCounter) {
 												minCounter = count;
-												result = temp;
+												result = arg1;
+												evaled = true;
+												break;
 											}
 										}
-									} catch (JASConversionException e) {
-										if (Config.DEBUG) {
-											e.printStackTrace();
+									}
+									if (!evaled) {
+										for (int i = 0; i < vars.size(); i++) {
+											temp = EvalEngine.get().evaluate(
+													F.PolynomialQuotientRemainder(denominator, numerator, vars.get(i)));
+											if (temp.isAST(F.List, 3) && //
+													temp.second().isZero()) {
+												IExpr arg1 = temp.first().reciprocal();
+												count = fComplexityFunction.apply(arg1);
+												if (count < minCounter) {
+													minCounter = count;
+													result = arg1;
+													break;
+											}
 										}
-											// return expr;
+										}
 									}
 								}
 							}
-						}
 						}
 					} catch (WrongArgumentType wat) {
 						//
@@ -4976,7 +5024,21 @@ public class Algebra {
 				if (cTerms.last().isNegative()) {
 					c = c.negate();
 				}
-				return F.Times.of(engine, c, F.Distribute(F.Divide(e, c)));
+				IExpr gcd;
+				if (!c.isFree(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isNumeric();
+					}
+				}, false)) {
+					gcd = engine.evaluate(F.Rationalize(c));
+					gcd = engine.evalN(gcd);
+				} else {
+					gcd = engine.evaluate(c);
+				}
+				if (gcd.isFree(F.GCD)) {
+					return F.Times(gcd, F.Distribute.of(engine, F.Divide(e, gcd)));
+			}
 			}
 			return p;
 		}
@@ -5642,7 +5704,7 @@ public class Algebra {
 				// hack: factoring -I and I out of an expression should give no new factorized expression
 				return expr;
 			}
-			result.append(F.Power(jas.complexPoly2Expr(entry.getKey()), F.integer(entry.getValue())));
+			result.append(F.Power(jas.complexPoly2Expr(entry.getKey()), F.ZZ(entry.getValue())));
 		}
 		return result;
 	}

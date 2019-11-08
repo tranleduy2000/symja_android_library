@@ -2834,7 +2834,21 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericArgument() {
-		return isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG);
+		if (isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG)) {
+			return forAll(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isNumericFunction() || //
+							(x.isList() && ((IAST) x).forAll(new Predicate<IExpr>() {
+								@Override
+								public boolean test(IExpr y) {
+									return y.isNumericFunction();
+								}
+							}));
+				}
+			});
+	}
+		return false;
 	}
 	/** {@inheritDoc} */
 	@Override
