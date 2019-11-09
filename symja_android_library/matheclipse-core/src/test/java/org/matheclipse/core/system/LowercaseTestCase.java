@@ -11349,6 +11349,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMemberQ() {
+		check("MemberQ({Sin, Cos, Tan, Cot, Sec, Csc}, If(AtomQ(Cos),Cos,Head(Cos)))", //
+				"True");
 		check("MemberQ(x,x)", //
 				"False");
 		check("MemberQ({{x^2, y^2}}, x^_)", //
@@ -16487,14 +16489,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	 * </pre>
 	 */
 	public void testResultant() {
-		check("Resultant(0, x^3+2*x, x)", //
-				"0");
-		check("Resultant(f(x), 0, x)", //
-				"0");
-		check("Resultant(1,a+x^2+c,x)", //
-				"1");
-		check("Resultant(a+x^2+c, 1, x)", //
-				"1");
 		check("Resultant(0, x^3+2*x, x)", //
 				"0");
 		check("Resultant(f(x), 0, x)", //
