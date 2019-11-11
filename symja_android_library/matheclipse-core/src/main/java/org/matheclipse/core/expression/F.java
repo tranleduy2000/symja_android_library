@@ -119,7 +119,7 @@ public class F {
 	 * <p>
 	 * In computing, memoization or memoisation is an optimization technique used primarily to speed up computer
 	 * programs by storing the results of expensive function calls and returning the cached result when the same inputs
-	 * occur again. This cache is especially useed for recursive integer functions to remember the results of the
+	 * occur again. This cache is especially used for recursive integer functions to remember the results of the
 	 * recursive call.
 	 * </p>
 	 *
@@ -127,6 +127,20 @@ public class F {
 	 */
 	public static Cache<IAST, IExpr> REMEMBER_INTEGER_CACHE = CacheBuilder.newBuilder().maximumSize(500).build();
 
+	/**
+	 * <p>
+	 * In computing, memoization or memoisation is an optimization technique used primarily to speed up computer
+	 * programs by storing the results of expensive function calls and returning the cached result when the same inputs
+	 * occur again.
+	 * </p>
+	 * <p>
+	 * This cache is especially used for expensive functions like <code>FullSimplify, Factor,...</code> to remember the
+	 * results of the function call. It often also stores the <code>F.NIL</code> result to indicate that a new
+	 * evaluation of a function is unnecessary.
+	 * </p>
+	 *
+	 * See: <a href="https://en.wikipedia.org/wiki/Memoization">Wikipedia - Memoization</a>
+	 */
 	public static Cache<IAST, IExpr> REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(500).build();
 
 	/**
@@ -1811,11 +1825,14 @@ public class F {
 	/** NullSpace(matrix) - returns a list of vectors that span the nullspace of the `matrix`. */
     public final static IBuiltInSymbol NullSpace = F.initFinalSymbol("NullSpace", ID.NullSpace);
     /***/
+	public final static IBuiltInSymbol Number = F.initFinalSymbol("Number", ID.Number);
+
+	/***/
     public final static IBuiltInSymbol NumberFieldRootsOfUnity = F.initFinalSymbol("NumberFieldRootsOfUnity", ID.NumberFieldRootsOfUnity);
 
     /** NumberQ(expr) - returns `True` if `expr` is an explicit number, and `False` otherwise.*/
     public final static IBuiltInSymbol NumberQ = F.initFinalSymbol("NumberQ", ID.NumberQ);
-	/** Numerator(expr) - gives the numerator in `expr`. */
+	/** Numerator(expr) - gives the numerator in `expr`. Numerator collects expressions with non negative exponents. */
     public final static IBuiltInSymbol Numerator = F.initFinalSymbol("Numerator", ID.Numerator);
     /***/
     public final static IBuiltInSymbol NumericFunction = F.initFinalSymbol("NumericFunction", ID.NumericFunction);
@@ -3008,6 +3025,25 @@ public class F {
      * Represents <code>Infinity</code> (i.e. <code>Infinity-&gt;DirectedInfinity(1)</code>)
      */
     public static IAST CInfinity;
+	/**
+	 * Represents <code>Return(False)</code>
+	 */
+	public static IAST CReturnFalse;
+
+	/**
+	 * Represents <code>Return(True)</code>
+	 */
+	public static IAST CReturnTrue;
+
+	/**
+	 * Represents <code>Throw(False)</code>
+	 */
+	public static IAST CThrowFalse;
+
+	/**
+	 * Represents <code>Throw(True)</code>
+	 */
+	public static IAST CThrowTrue;
     /**
      * Alias for CInfinity. Represents <code>Infinity</code> (i.e. <code>Infinity-&gt;DirectedInfinity(1)</code>)
      */
@@ -3213,6 +3249,10 @@ public class F {
 			CListC2C1 = new B2.List(C2, C1);
 			CListC2C2 = new B2.List(C2, C2);
 
+			CReturnFalse = new B1.Return(False);
+			CReturnTrue = new B1.Return(True);
+			CThrowFalse = new B1.Throw(False);
+			CThrowTrue = new B1.Throw(True);
             CInfinity = unaryAST1(DirectedInfinity, C1);
             oo = CInfinity;
             CNInfinity = unaryAST1(DirectedInfinity, CN1);
@@ -4010,19 +4050,19 @@ public class F {
     }
 
     public static IExpr and(IExpr a, Integer i) {
-        return And(a, integer(i.longValue()));
+		return And(a, ZZ(i.longValue()));
     }
 
     public static IExpr and(IExpr a, java.math.BigInteger i) {
-        return And(a, integer(i));
+		return And(a, ZZ(i));
     }
 
     public static IExpr and(Integer i, IExpr b) {
-        return And(integer(i.longValue()), b);
+		return And(ZZ(i.longValue()), b);
     }
 
     public static IExpr and(java.math.BigInteger i, IExpr b) {
-        return And(integer(i), b);
+		return And(ZZ(i), b);
     }
 
     public static IASTAppendable And() {
@@ -4752,11 +4792,11 @@ public class F {
 
     public static int compareTo(IExpr a, Integer i) throws UnsupportedOperationException {
         if (a instanceof ISignedNumber) {
-            return a.compareTo(integer(i.longValue()));
+			return a.compareTo(ZZ(i.longValue()));
         }
         IExpr temp = eval(a);
         if (temp instanceof ISignedNumber) {
-            return temp.compareTo(integer(i.longValue()));
+			return temp.compareTo(ZZ(i.longValue()));
         }
         throw new UnsupportedOperationException(
                 "compareTo() - first argument could not be converted into a signed number.");
@@ -4764,11 +4804,11 @@ public class F {
 
     public static int compareTo(IExpr a, java.math.BigInteger i) throws UnsupportedOperationException {
         if (a instanceof ISignedNumber) {
-            return a.compareTo(integer(i));
+			return a.compareTo(ZZ(i));
         }
         IExpr temp = eval(a);
         if (temp instanceof ISignedNumber) {
-            return temp.compareTo(integer(i));
+			return temp.compareTo(ZZ(i));
         }
         throw new UnsupportedOperationException(
                 "compareTo() - first argument could not be converted into a signed number.");
@@ -4788,11 +4828,11 @@ public class F {
 
     public static int compareTo(java.math.BigInteger i, IExpr b) throws UnsupportedOperationException {
         if (b instanceof ISignedNumber) {
-            return integer(i).compareTo(b);
+			return ZZ(i).compareTo(b);
         }
         IExpr temp = eval(b);
         if (temp instanceof ISignedNumber) {
-            return integer(i).compareTo(temp);
+			return ZZ(i).compareTo(temp);
         }
         throw new UnsupportedOperationException(
                 "compareTo() - second argument could not be converted into a signed number.");
@@ -5215,19 +5255,19 @@ public class F {
     }
 
     public static IExpr div(IExpr a, Integer i) {
-        return Times(a, Power(integer(i.longValue()), CN1));
+		return Times(a, Power(ZZ(i.longValue()), CN1));
     }
 
     public static IExpr div(IExpr a, java.math.BigInteger i) {
-        return Times(a, Power(integer(i), CN1));
+		return Times(a, Power(ZZ(i), CN1));
     }
 
     public static IExpr div(Integer i, IExpr b) {
-        return Times(integer(i.longValue()), Power(b, CN1));
+		return Times(ZZ(i.longValue()), Power(b, CN1));
     }
 
     public static IExpr div(java.math.BigInteger i, IExpr b) {
-        return Times(integer(i), Power(b, CN1));
+		return Times(ZZ(i), Power(b, CN1));
     }
 
     /**
@@ -5240,7 +5280,7 @@ public class F {
      * @return
      */
     public static IAST Divide(final IExpr arg1, final IExpr arg2) {
-		return new AST2(Times, arg1, new B2.Power(arg2, CN1));
+		return new B2.Times(arg1, new B2.Power(arg2, CN1));
     }
 
     public static IAST Divisible(final IExpr a0, final IExpr a1) {
@@ -6237,6 +6277,7 @@ public class F {
      *
      * @param integerValue
      * @return
+	 * @deprecated use ZZ()
      */
     public static IInteger integer(final BigInteger integerValue) {
         return AbstractIntegerSym.valueOf(integerValue);
@@ -6247,6 +6288,7 @@ public class F {
      *
      * @param integerValue
      * @return
+	 * @deprecated use ZZ()
      */
     public static IInteger integer(final long integerValue) {
         return AbstractIntegerSym.valueOf(integerValue);
@@ -6260,6 +6302,7 @@ public class F {
 	 * @param radix
 	 *            the radix to be used while parsing
      * @return Object
+	 * @deprecated use ZZ()
      */
     public static IInteger integer(final String integerString, final int radix) {
         return AbstractIntegerSym.valueOf(integerString, radix);
@@ -6831,7 +6874,7 @@ public class F {
     public static IAST List(final long... numbers) {
         IInteger a[] = new IInteger[numbers.length];
         for (int i = 0; i < numbers.length; i++) {
-            a[i] = integer(numbers[i]);
+			a[i] = ZZ(numbers[i]);
         }
         return function(List, a);
     }
@@ -7058,19 +7101,19 @@ public class F {
 		return new AST2(Minimize, a0, a1);
 	}
     public static IExpr minus(IExpr a, Integer i) {
-        return Plus(a, Times(integer(i.longValue()), CN1));
+		return Plus(F.ZZ(i.longValue() * (-1)), a);
     }
 
     public static IExpr minus(IExpr a, java.math.BigInteger i) {
-        return Plus(a, Times(integer(i), CN1));
+		return Plus(ZZ(i.negate()), a);
     }
 
     public static IExpr minus(Integer i, IExpr b) {
-        return Plus(integer(i.longValue()), Times(b, CN1));
+		return Plus(ZZ(i.longValue()), new B2.Times(CN1, b));
     }
 
     public static IExpr minus(java.math.BigInteger i, IExpr b) {
-        return Plus(integer(i), Times(b, CN1));
+		return Plus(ZZ(i), new B2.Times(CN1, b));
     }
 
     public static IAST Missing(final IExpr a0) {
@@ -7106,19 +7149,19 @@ public class F {
     }
 
     public static IExpr mod(IExpr a, Integer i) {
-        return Mod(a, integer(i.longValue()));
+		return Mod(a, ZZ(i.longValue()));
     }
 
     public static IExpr mod(IExpr a, java.math.BigInteger i) {
-        return Mod(a, integer(i));
+		return Mod(a, ZZ(i));
     }
 
     public static IExpr mod(Integer i, IExpr b) {
-        return Mod(integer(i.longValue()), b);
+		return Mod(ZZ(i.longValue()), b);
     }
 
     public static IExpr mod(java.math.BigInteger i, IExpr b) {
-        return Mod(integer(i), b);
+		return Mod(ZZ(i), b);
     }
 
     public static IExpr Mod(final IExpr a0, final IExpr a1) {
@@ -7134,19 +7177,19 @@ public class F {
     }
 
     public static IExpr multiply(IExpr a, Integer i) {
-        return Times(a, integer(i.longValue()));
+		return new B2.Times(ZZ(i.longValue()), a);
     }
 
     public static IExpr multiply(IExpr a, java.math.BigInteger i) {
-        return Times(a, integer(i));
+		return new B2.Times(ZZ(i), a);
     }
 
     public static IExpr multiply(Integer i, IExpr b) {
-        return Times(integer(i.longValue()), b);
+		return new B2.Times(ZZ(i.longValue()), b);
     }
 
     public static IExpr multiply(java.math.BigInteger i, IExpr b) {
-        return Times(integer(i), b);
+		return Times(ZZ(i), b);
     }
 
     public static IAST Multinomial(final IExpr... a) {
@@ -7501,7 +7544,7 @@ public class F {
     }
 
     public static IExpr plus(IExpr a, java.math.BigInteger i) {
-        return Plus(a, integer(i));
+		return Plus(a, ZZ(i));
     }
 
     public static IExpr plus(Integer i, IExpr b) {
@@ -7509,7 +7552,7 @@ public class F {
     }
 
     public static IExpr plus(java.math.BigInteger i, IExpr b) {
-        return Plus(integer(i), b);
+		return Plus(ZZ(i), b);
     }
 
     /**
@@ -7618,6 +7661,9 @@ public class F {
     }
 
     public static IExpr Power(final IExpr a0, final long exp) {
+		if (exp == 1L) {
+			return a0;
+		}
         if (a0.isNumber()) {
             if (exp > 0L) {
                 return a0.power(exp);
@@ -7633,7 +7679,7 @@ public class F {
                 return C1;
             }
         }
-		return new B2.Power(a0, integer(exp));
+		return new B2.Power(a0, ZZ(exp));
     }
 
     public static IAST PowerExpand(final IExpr a0) {
@@ -8075,6 +8121,12 @@ public class F {
     }
 
     public static IAST Return(final IExpr a) {
+		if (a.isFalse()) {
+			return CReturnFalse;
+		}
+		if (a.isTrue()) {
+			return CReturnTrue;
+		}
         return new AST1(Return, a);
     }
 
@@ -8221,11 +8273,11 @@ public class F {
     }
 
     public static IAST Slot(final int i) {
-        return new AST1(Slot, integer(i));
+		return new AST1(Slot, ZZ(i));
     }
 
     public static IAST SlotSequence(final int i) {
-        return new AST1(SlotSequence, integer(i));
+		return new AST1(SlotSequence, ZZ(i));
     }
 
     public static IAST Solve(final IExpr a0, final IExpr a1) {
@@ -8467,7 +8519,7 @@ public class F {
         // clone.append(binaryAST2(Times, CN1, arg2));
         // return clone;
         // }
-        return new AST2(Plus, arg1, new AST2(Times, CN1, arg2));
+		return new B2.Plus(arg1, new B2.Times(CN1, arg2));
     }
 
     public static IAST Sum(final IExpr a0, final IExpr a1) {
@@ -8574,6 +8626,12 @@ public class F {
     }
 
     public static IAST Throw(final IExpr a) {
+		if (a.isFalse()) {
+			return CThrowFalse;
+		}
+		if (a.isTrue()) {
+			return CThrowTrue;
+		}
         return new AST1(Throw, a);
     }
 
