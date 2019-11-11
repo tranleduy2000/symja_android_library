@@ -323,6 +323,10 @@ public class FunctionExpand extends AbstractEvaluator {
 	}
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
+		if (result != null) {
+			return result;
+		}
 		IExpr arg1 = ast.arg1();
 		IExpr assumptionExpr = F.NIL;
 		if (ast.size() > 2) {
@@ -346,12 +350,14 @@ public class FunctionExpand extends AbstractEvaluator {
 				if (assumptions != null) {
 					try {
 						engine.setAssumptions(assumptions);
-						return MATCHER.replaceAll(arg1, new Function<IAST, IExpr>() {
+						IExpr temp = MATCHER.replaceAll(arg1, new Function<IAST, IExpr>() {
 							@Override
 							public IExpr apply(IAST ast1) {
 								return beforeRules(ast1);
 							}
 						}).orElse(arg1);
+						F.REMEMBER_AST_CACHE.put(ast, temp);
+						return temp;
 					} finally {
 						engine.setAssumptions(oldAssumptions);
 					}
@@ -359,12 +365,14 @@ public class FunctionExpand extends AbstractEvaluator {
 			}
 
 		}
-		return MATCHER.replaceAll(arg1, new Function<IAST, IExpr>() {
+		IExpr temp = MATCHER.replaceAll(arg1, new Function<IAST, IExpr>() {
 			@Override
 			public IExpr apply(IAST ast1) {
 				return beforeRules(ast1);
 			}
 		}).orElse(arg1);
+		F.REMEMBER_AST_CACHE.put(ast, temp);
+		return temp;
 	}
 
 	public int[] expectedArgSize() {
