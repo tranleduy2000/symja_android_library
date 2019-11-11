@@ -9,6 +9,7 @@ import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -33,7 +34,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.List;
         }
 
@@ -51,7 +52,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.And;
         }
 
@@ -70,7 +71,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Condition;
         }
 
@@ -89,7 +90,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Equal;
         }
 
@@ -108,7 +109,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.FreeQ;
         }
 
@@ -127,7 +128,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Greater;
         }
 
@@ -146,7 +147,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.GreaterEqual;
         }
 
@@ -165,7 +166,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Integrate;
         }
 
@@ -184,7 +185,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Less;
         }
 
@@ -203,7 +204,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.LessEqual;
         }
 
@@ -222,7 +223,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Or;
         }
 
@@ -241,7 +242,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Plus;
         }
 
@@ -271,7 +272,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.PolynomialQ;
         }
 
@@ -290,7 +291,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Power;
         }
 
@@ -320,7 +321,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.Times;
         }
 
@@ -350,7 +351,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
 
         @Override
-        public final IExpr head() {
+		public final IBuiltInSymbol head() {
             return F.With;
         }
 
@@ -379,9 +380,12 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
     /**
      * Create a function with two arguments (i.e. <code>head[arg1, arg2]</code> ).
      *
-	 * @param head the head of the function
-	 * @param arg1 the first argument of the function
-	 * @param arg2 the second argument of the function
+	 * @param head
+	 *            the head of the function
+	 * @param arg1
+	 *            the first argument of the function
+	 * @param arg2
+	 *            the second argument of the function
      */
     B2(IExpr arg1, IExpr arg2) {
         this.arg1 = arg1;
@@ -389,9 +393,10 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
     }
 
     /**
-	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code> function (i.e. get(1)
-	 * ). <br />
-	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns <code>x</code>.
+	 * Get the first argument (i.e. the second element of the underlying list structure) of the <code>AST</code>
+	 * function (i.e. get(1) ). <br />
+	 * <b>Example:</b> for the AST representing the expression <code>Sin(x)</code>, <code>arg1()</code> returns
+	 * <code>x</code>.
      *
      * @return the first argument of the function represented by this <code>AST</code>.
      * @see IExpr#head()
@@ -505,15 +510,12 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
         }
         if (obj instanceof AbstractAST) {
             final IAST list = (IAST) obj;
-            if (head() != ((AbstractAST) list).head() && head() instanceof ISymbol) {
+			IBuiltInSymbol head = head();
+			if (head != ((AbstractAST) list).head()) {
                 // compared with ISymbol object identity
                 return false;
             }
-            if (list.size() != SIZE) {
-                return false;
-            }
-            return arg1.equals(list.arg1()) && arg2.equals(list.arg2())
-                    && (head() instanceof ISymbol || head().equals(list.head()));
+			return list.size() == SIZE && arg1.equals(list.arg1()) && arg2.equals(list.arg2());
         }
         return false;
     }
@@ -737,7 +739,7 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
     }
 
     @Override
-    public abstract IExpr head();
+	public abstract IBuiltInSymbol head();
 
     @Override
     public int hashCode() {
@@ -868,10 +870,13 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
     /**
      * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
      *
-	 * @param location the index at which to put the specified object.
-	 * @param object   the object to add.
+	 * @param location
+	 *            the index at which to put the specified object.
+	 * @param object
+	 *            the object to add.
      * @return the previous element at the index.
-	 * @throws IndexOutOfBoundsException when {@code location < 0 || >= size()}
+	 * @throws IndexOutOfBoundsException
+	 *             when {@code location < 0 || >= size()}
      */
     @Override
     public IExpr set(int location, IExpr object) {
