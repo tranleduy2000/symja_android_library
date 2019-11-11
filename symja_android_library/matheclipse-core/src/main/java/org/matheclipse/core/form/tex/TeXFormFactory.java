@@ -1458,9 +1458,13 @@ public class TeXFormFactory {
 
 	protected String convertDoubleToFormattedString(double dValue) {
 		if (fSignificantFigures > 0) {
+			try {
 			StringBuilder buf = new StringBuilder();
-			DoubleToMMA.doubleToMMA(buf, dValue, fExponentFigures, fSignificantFigures);
+				DoubleToMMA.doubleToMMA((Appendable) buf, dValue, fExponentFigures, fSignificantFigures, true);
 			return buf.toString();
+			} catch (IOException ioex) {
+				ioex.printStackTrace();
+			}
 		}
 		return Double.toString(dValue);
 	}
