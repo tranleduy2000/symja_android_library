@@ -9,6 +9,7 @@ import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -33,7 +34,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.Cos;
 		}
 
@@ -52,7 +53,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.IntegerQ;
 		}
 
@@ -71,7 +72,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.List;
 		} 
 
@@ -90,7 +91,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.Log;
 		}
 
@@ -109,7 +110,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.Not;
 		} 
 
@@ -118,6 +119,24 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 	}
 
+	public static class Return extends B1 {
+		public Return() {
+			super();
+		}
+
+		Return(IExpr arg1) {
+			super(arg1);
+		}
+
+		@Override
+		public final IBuiltInSymbol head() {
+			return F.Return;
+		}
+
+		public IASTMutable copy() {
+			return new Return(arg1);
+		}
+	}
 	public static class Sin extends B1 {
 		public Sin() {
 			super();
@@ -128,7 +147,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.Sin;
 		}
 
@@ -147,12 +166,30 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 
 		@Override
-		public final IExpr head() {
+		public final IBuiltInSymbol head() {
 			return F.Tan;
 		}
 
 		public IASTMutable copy() {
 			return new Tan(arg1);
+		}
+	}
+	public static class Throw extends B1 {
+		public Throw() {
+			super();
+		}
+
+		Throw(IExpr arg1) {
+			super(arg1);
+		}
+
+		@Override
+		public final IBuiltInSymbol head() {
+			return F.Throw;
+		}
+
+		public IASTMutable copy() {
+			return new Throw(arg1);
 		}
 	}
 	/**
@@ -299,14 +336,12 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 		if (obj instanceof AbstractAST) {
 			final IAST list = (IAST) obj;
-			if (head() != ((AbstractAST) list).head() && head() instanceof ISymbol) {
-				// compared with ISymbol object identity
+			IBuiltInSymbol head = head();
+			if (head != ((AbstractAST) list).head()) {
+				// compared with IBuiltInSymbol object identity
 				return false;
 			}
-			if (list.size() != SIZE) {
-				return false;
-			}
-			return arg1.equals(list.arg1()) && (head() instanceof ISymbol || head().equals(list.head()));
+			return list.size() == SIZE && arg1.equals(list.arg1());
 		}
 		return false;
 	}
@@ -475,7 +510,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 	}
 
 	@Override
-	public abstract IExpr head();
+	public abstract IBuiltInSymbol head();
 
 	@Override
 	public int hashCode() {
