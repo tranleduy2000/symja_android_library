@@ -2,6 +2,7 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lang.DDouble;
 
+import org.apache.commons.lang3.StringUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
@@ -325,12 +326,12 @@ public class ManipulateFunction {
 							break;
 						}
 					}
-					js = js.replace("`1`", slider.toString());
-					js = js.replace("`2`", variable.toString());
+				js = StringUtils.replace(js, "`1`", slider.toString());
+				js = StringUtils.replace(js, "`2`", variable.toString());
 				}
 			} else {
-				js = js.replace("`1`", "");
-				js = js.replace("`2`", "");
+			js = StringUtils.replace(js, "`1`", "");
+			js = StringUtils.replace(js, "`2`", "");
 			}
 			return js;
 		}
@@ -655,7 +656,7 @@ public class ManipulateFunction {
 				slider.append("', label: '");
 				slider.append(sliderSymbol);
 				slider.append("' }\n");
-				js = js.replace("`1`", slider.toString());
+			js = StringUtils.replace(js, "`1`", slider.toString());
 
 				StringBuilder variable = new StringBuilder();
 				variable.append("var ");
@@ -664,9 +665,9 @@ public class ManipulateFunction {
 				variable.append(" = getVariable(id, '");
 				variable.append(sliderSymbol);
 				variable.append("');\n");
-				js = js.replace("`2`", variable.toString());
 
-				js = js.replace("`3`", "");
+			js = StringUtils.replace(js, "`2`", variable.toString());
+			js = StringUtils.replace(js, "`3`", "");
 
 				TeXUtilities texUtil = new TeXUtilities(engine, true);
 				StringBuilder graphicControl = new StringBuilder();
@@ -1188,10 +1189,10 @@ public class ManipulateFunction {
 						break;
 					}
 				}
-				js = js.replace("`1`", slider.toString());
+				js = StringUtils.replace(js, "`1`", slider.toString());
 			}
 		} else {
-			js = js.replace("`1`", "");
+			js = StringUtils.replace(js, "`1`", "");
 		}
 		return js;
 	}
@@ -1217,52 +1218,53 @@ public class ManipulateFunction {
 			int[] dimension = pointList.isMatrix();
 			if (dimension != null) {
 				if (dimension[1] == 2) {
+					// plot a list of 2D points
 					StringBuilder function = new StringBuilder();
 
 					boundingbox = new double[] { Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE,
 							Double.MAX_VALUE };
 					if (ast.arg1().isAST(F.ListLinePlot) && pointList.size() > 2) {
-						IAST lastList = (IAST) pointList.arg1();
-						xBoundingBox(engine, boundingbox, lastList.arg1());
-						yBoundingBox(engine, boundingbox, lastList.arg2());
+						IAST lastPoint = (IAST) pointList.arg1();
+						xBoundingBox(engine, boundingbox, lastPoint.arg1());
+						yBoundingBox(engine, boundingbox, lastPoint.arg2());
 						for (int i = 2; i < pointList.size(); i++) {
 							function.append("board.create('line',");
-							IAST rowList = (IAST) pointList.get(i);
-							xBoundingBox(engine, boundingbox, rowList.arg1());
-							yBoundingBox(engine, boundingbox, rowList.arg2());
+							IAST point = (IAST) pointList.get(i);
+							xBoundingBox(engine, boundingbox, point.arg1());
+							yBoundingBox(engine, boundingbox, point.arg2());
 							function.append("[[");
 							function.append("function() {return ");
-							toJS.convert(function, lastList.arg1());
+							toJS.convert(function, lastPoint.arg1());
 							function.append(";}");
 							function.append(",");
 							function.append("function() {return ");
-							toJS.convert(function, lastList.arg2());
+							toJS.convert(function, lastPoint.arg2());
 							function.append(";}");
 							function.append("],");
 							function.append("[");
 							function.append("function() {return ");
-							toJS.convert(function, rowList.arg1());
+							toJS.convert(function, point.arg1());
 							function.append(";}");
 							function.append(",");
 							function.append("function() {return ");
-							toJS.convert(function, rowList.arg2());
+							toJS.convert(function, point.arg2());
 							function.append(";}");
 							function.append("]]");
 							function.append(", {straightFirst:false, straightLast:false, strokeWidth:2});\n");
-							lastList = rowList;
+							lastPoint = point;
 						}
 					} else {
 						for (int i = 1; i < pointList.size(); i++) {
-							IAST rowList = (IAST) pointList.get(i);
-							xBoundingBox(engine, boundingbox, rowList.arg1());
-							yBoundingBox(engine, boundingbox, rowList.arg2());
+							IAST point = (IAST) pointList.get(i);
+							xBoundingBox(engine, boundingbox, point.arg1());
+							yBoundingBox(engine, boundingbox, point.arg2());
 							function.append("board.create('point', [");
 							function.append("function() {return ");
-							toJS.convert(function, rowList.arg1());
+							toJS.convert(function, point.arg1());
 							function.append(";}");
 							function.append(",");
 							function.append("function() {return ");
-							toJS.convert(function, rowList.arg2());
+							toJS.convert(function, point.arg2());
 							function.append(";}");
 							function.append("], ");
 							function.append(" {name:'', face:'o', size: 2 } );\n");
@@ -1273,13 +1275,29 @@ public class ManipulateFunction {
 				}
 				return F.NIL;
 			} else {
+				// plot a list of points for X-values 1,2,3,...
 				StringBuilder function = new StringBuilder();
 				boundingbox = new double[] { 0.0, Double.MIN_VALUE, pointList.size(), Double.MAX_VALUE };
 				if (ast.arg1().isAST(F.ListLinePlot)) {
 					IExpr lastPoint = pointList.arg1();
+					int start = Integer.MAX_VALUE;
+					for (int i = 1; i < pointList.size(); i++) {
+						if (isNonReal(lastPoint)) {
+							continue;
+						}
+						lastPoint = pointList.get(i);
+						start = i + 1;
+						break;
+					}
+					if (start < Integer.MAX_VALUE) {
 					yBoundingBox(engine, boundingbox, lastPoint);
-					for (int i = 2; i < pointList.size(); i++) {
+						for (int i = start; i < pointList.size(); i++) {
 						IExpr currentPoint = pointList.get(i);
+							if (isNonReal(currentPoint)) {
+								lastPoint = F.NIL;
+								continue;
+							}
+							if (lastPoint.isPresent()) {
 						yBoundingBox(engine, boundingbox, currentPoint);
 						function.append("board.create('line',");
 						function.append("[[");
@@ -1297,7 +1315,9 @@ public class ManipulateFunction {
 						function.append(";}");
 						function.append("]]");
 						function.append(", {straightFirst:false, straightLast:false, strokeWidth:2});\n");
+							}
 						lastPoint = currentPoint;
+					}
 					}
 				} else {
 					for (int i = 1; i < pointList.size(); i++) {
@@ -1319,6 +1339,9 @@ public class ManipulateFunction {
 		return F.NIL;
 	}
 
+	private static boolean isNonReal(IExpr lastPoint) {
+		return lastPoint == F.None || lastPoint.isAST(F.Missing);
+	}
 	/**
 	 * Create JSXGraph bounding box and sliders.
 	 *

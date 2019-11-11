@@ -11349,6 +11349,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testMemberQ() {
+		check("MemberQ({Sin, Cos, Tan, Cot, Sec, Csc}, If(AtomQ(Cos),Cos,Head(Cos)))", //
+				"True");
 		check("MemberQ(x,x)", //
 				"False");
 		check("MemberQ({{x^2, y^2}}, x^_)", //
@@ -13958,6 +13960,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialExtendedGCD() {
+		check("PolynomialExtendedGCD(2*x^2+3,3*x,f(x,y))", //
+				"{1,{0,1/(3*x)}}");
 		check("PolynomialExtendedGCD(a[x],b[x],x)", //
 				"{b(x),{0,1}}");
 		check("PolynomialExtendedGCD(a[x],b,x)", //
@@ -14163,6 +14167,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialQuotientRemainder() {
+		check("PolynomialQuotientRemainder(2*x^2+3,3*x,f(x,y))", //
+				"{(3+2*x^2)/(3*x),0}");
 		check("PolynomialQuotientRemainder(x^2 + 7*x + 6, x^2-5*x-6, x)", //
 				"{1,12+12*x}");
 		check("PolynomialQuotientRemainder[a,b,x]", //
@@ -16487,14 +16493,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	 * </pre>
 	 */
 	public void testResultant() {
-		check("Resultant(0, x^3+2*x, x)", //
-				"0");
-		check("Resultant(f(x), 0, x)", //
-				"0");
-		check("Resultant(1,a+x^2+c,x)", //
-				"1");
-		check("Resultant(a+x^2+c, 1, x)", //
-				"1");
 		check("Resultant(0, x^3+2*x, x)", //
 				"0");
 		check("Resultant(f(x), 0, x)", //
@@ -19972,8 +19970,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Together[(2 + 2*x)/(2*Sqrt[2])]", //
 				"(1+x)/Sqrt(2)");
 
-//		check("Together(-(5*c*f+5*b*g+2*c*f*m+b*g*m+2*c*f*n+3*b*g*n+30*c*g*x+10*c*g*m*x+15*c*g*n*x)^5/(3125*c^4*g^4*(6+2*m+3*n)^4))", //
-//				"");
+		// check("Together(-(5*c*f+5*b*g+2*c*f*m+b*g*m+2*c*f*n+3*b*g*n+30*c*g*x+10*c*g*m*x+15*c*g*n*x)^5/(3125*c^4*g^4*(6+2*m+3*n)^4))",
+		// //
+		// "");
 		check("Together(1/2+a)", //
 				"1/2*(1+2*a)");
 		check("Together[(x+2*Sqrt(x)+1)/(1+Sqrt(x))]", //
