@@ -2529,6 +2529,8 @@ public class F {
     public final static IBuiltInSymbol Tr = F.initFinalSymbol("Tr", ID.Tr);
 	/** Trace(expr) - return the evaluation steps which are used to get the result. */
     public final static IBuiltInSymbol Trace = F.initFinalSymbol("Trace", ID.Trace);
+	/***/
+	public final static IBuiltInSymbol TraceForm = F.initFinalSymbol("TraceForm", ID.TraceForm);
     /***/
     public final static IBuiltInSymbol TraditionalForm = F.initFinalSymbol("TraditionalForm", ID.TraditionalForm);
 	/** Transpose(m) - transposes rows and columns in the matrix `m`. */
