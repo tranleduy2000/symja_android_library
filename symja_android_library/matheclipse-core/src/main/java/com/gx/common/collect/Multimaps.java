@@ -25,8 +25,8 @@ import com.gx.common.base.Predicates;
 import com.gx.common.base.Supplier;
 import com.gx.common.collect.Maps.EntryTransformer;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
-import com.gx.j2objc.annotations.Weak;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

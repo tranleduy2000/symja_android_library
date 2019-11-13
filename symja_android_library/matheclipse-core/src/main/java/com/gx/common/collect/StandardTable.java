@@ -24,7 +24,7 @@ import com.gx.common.collect.Maps.IteratorBasedAbstractMap;
 import com.gx.common.collect.Maps.ViewCachingAbstractMap;
 import com.gx.common.collect.Sets.ImprovedAbstractSet;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

@@ -18,7 +18,7 @@ import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.Objects;
 import com.gx.common.base.Predicate;
 import com.gx.common.base.Predicates;
-import com.gx.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.Weak;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

@@ -21,8 +21,8 @@ import com.gx.common.collect.MapMaker.Dummy;
 import com.gx.common.primitives.Ints;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 import com.gx.errorprone.annotations.concurrent.GuardedBy;
-import com.gx.j2objc.annotations.Weak;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

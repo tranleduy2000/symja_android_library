@@ -17,7 +17,7 @@ package com.gx.common.collect;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.Predicate;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

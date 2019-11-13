@@ -21,7 +21,7 @@ import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
 import com.gx.errorprone.annotations.concurrent.LazyInit;
-import com.gx.j2objc.annotations.RetainedWith;
+import com.google.j2objc.annotations.RetainedWith;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

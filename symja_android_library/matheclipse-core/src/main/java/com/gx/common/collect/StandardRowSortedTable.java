@@ -18,7 +18,7 @@ package com.gx.common.collect;
 
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.Supplier;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.WeakOuter;
 
 import java.util.Comparator;
 import java.util.Map;

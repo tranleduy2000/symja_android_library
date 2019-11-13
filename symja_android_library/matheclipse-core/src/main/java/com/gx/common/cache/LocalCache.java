@@ -41,8 +41,8 @@ import com.gx.common.util.concurrent.SettableFuture;
 import com.gx.common.util.concurrent.UncheckedExecutionException;
 import com.gx.common.util.concurrent.Uninterruptibles;
 import com.gx.errorprone.annotations.concurrent.GuardedBy;
-import com.gx.j2objc.annotations.Weak;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

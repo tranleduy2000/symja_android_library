@@ -22,7 +22,7 @@ import com.gx.common.annotations.VisibleForTesting;
 import com.gx.common.math.IntMath;
 import com.gx.common.primitives.Ints;
 import com.gx.errorprone.annotations.CanIgnoreReturnValue;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

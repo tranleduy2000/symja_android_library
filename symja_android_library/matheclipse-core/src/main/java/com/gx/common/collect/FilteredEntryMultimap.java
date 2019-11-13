@@ -20,7 +20,7 @@ import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.MoreObjects;
 import com.gx.common.base.Predicate;
 import com.gx.common.collect.Maps.ViewCachingAbstractMap;
-import com.gx.j2objc.annotations.WeakOuter;
+import com.google.j2objc.annotations.WeakOuter;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

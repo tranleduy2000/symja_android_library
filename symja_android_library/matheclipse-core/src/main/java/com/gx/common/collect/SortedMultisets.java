@@ -19,7 +19,7 @@ package com.gx.common.collect;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.collect.Multiset.Entry;
-import com.gx.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.Weak;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

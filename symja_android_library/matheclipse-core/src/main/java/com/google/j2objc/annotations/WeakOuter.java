@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.gx.j2objc.annotations;
+package com.google.j2objc.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
