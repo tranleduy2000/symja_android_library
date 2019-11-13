@@ -16,8 +16,8 @@
  */
 package org.apache.commons.lang3;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import org.apache.commons.lang3.mutable.MutableObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,8 +27,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.mutable.MutableObject;
 
 /**
  * <p>Operates on classes without using reflection.</p>
@@ -482,69 +480,6 @@ public class ClassUtils {
 
     // Superclasses/Superinterfaces
     // ----------------------------------------------------------------------
-    /**
-     * <p>Gets a {@code List} of superclasses for the given class.</p>
-     *
-     * @param cls  the class to look up, may be {@code null}
-     * @return the {@code List} of superclasses in order going up from this one
-     *  {@code null} if null input
-     */
-    public static List<Class<?>> getAllSuperclasses(final Class<?> cls) {
-        if (cls == null) {
-            return null;
-        }
-        final List<Class<?>> classes = new ArrayList<>();
-        Class<?> superclass = cls.getSuperclass();
-        while (superclass != null) {
-            classes.add(superclass);
-            superclass = superclass.getSuperclass();
-        }
-        return classes;
-    }
-
-    /**
-     * <p>Gets a {@code List} of all interfaces implemented by the given
-     * class and its superclasses.</p>
-     *
-     * <p>The order is determined by looking through each interface in turn as
-     * declared in the source file and following its hierarchy up. Then each
-     * superclass is considered in the same way. Later duplicates are ignored,
-     * so the order is maintained.</p>
-     *
-     * @param cls  the class to look up, may be {@code null}
-     * @return the {@code List} of interfaces in order,
-     *  {@code null} if null input
-     */
-    public static List<Class<?>> getAllInterfaces(final Class<?> cls) {
-        if (cls == null) {
-            return null;
-        }
-
-        final LinkedHashSet<Class<?>> interfacesFound = new LinkedHashSet<>();
-        getAllInterfaces(cls, interfacesFound);
-
-        return new ArrayList<>(interfacesFound);
-    }
-
-    /**
-     * Get the interfaces for the specified class.
-     *
-     * @param cls  the class to look up, may be {@code null}
-     * @param interfacesFound the {@code Set} of interfaces for the class
-     */
-    private static void getAllInterfaces(Class<?> cls, final HashSet<Class<?>> interfacesFound) {
-        while (cls != null) {
-            final Class<?>[] interfaces = cls.getInterfaces();
-
-            for (final Class<?> i : interfaces) {
-                if (interfacesFound.add(i)) {
-                    getAllInterfaces(i, interfacesFound);
-                }
-            }
-
-            cls = cls.getSuperclass();
-         }
-     }
 
     // Convert list
     // ----------------------------------------------------------------------
@@ -1038,9 +973,10 @@ public class ClassUtils {
      * @return the class represented by {@code className} using the current thread's context class loader
      * @throws ClassNotFoundException if the class is not found
      */
-    public static Class<?> getClass(final String className) throws ClassNotFoundException {
-        return getClass(className, true);
-    }
+    // Android changed: remove relection
+//    public static Class<?> getClass(final String className) throws ClassNotFoundException {
+//        return getClass(className, true);
+//    }
 
     /**
      * Returns the class represented by {@code className} using the
@@ -1053,66 +989,15 @@ public class ClassUtils {
      * @return the class represented by {@code className} using the current thread's context class loader
      * @throws ClassNotFoundException if the class is not found
      */
-    public static Class<?> getClass(final String className, final boolean initialize) throws ClassNotFoundException {
-        final ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
-        final ClassLoader loader = contextCL == null ? ClassUtils.class.getClassLoader() : contextCL;
-        return getClass(loader, className, initialize);
-    }
+    // Android changed: remove relection
+//    public static Class<?> getClass(final String className, final boolean initialize) throws ClassNotFoundException {
+//        final ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
+//        final ClassLoader loader = contextCL == null ? ClassUtils.class.getClassLoader() : contextCL;
+//        return getClass(loader, className, initialize);
+//    }
 
     // Public method
     // ----------------------------------------------------------------------
-    /**
-     * <p>Returns the desired Method much like {@code Class.getMethod}, however
-     * it ensures that the returned Method is from a public class or interface and not
-     * from an anonymous inner class. This means that the Method is invokable and
-     * doesn't fall foul of Java bug
-     * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4071957">4071957</a>).</p>
-     *
-     *  <pre>
-     *  <code>Set set = Collections.unmodifiableSet(...);
-     *  Method method = ClassUtils.getPublicMethod(set.getClass(), "isEmpty",  new Class[0]);
-     *  Object result = method.invoke(set, new Object[]);</code>
-     *  </pre>
-     *
-     * @param cls  the class to check, not null
-     * @param methodName  the name of the method
-     * @param parameterTypes  the list of parameters
-     * @return the method
-     * @throws NullPointerException if the class is null
-     * @throws SecurityException if a security violation occurred
-     * @throws NoSuchMethodException if the method is not found in the given class
-     *  or if the method doesn't conform with the requirements
-     */
-    public static Method getPublicMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes)
-            throws NoSuchMethodException {
-
-        final Method declaredMethod = cls.getMethod(methodName, parameterTypes);
-        if (Modifier.isPublic(declaredMethod.getDeclaringClass().getModifiers())) {
-            return declaredMethod;
-        }
-
-        final List<Class<?>> candidateClasses = new ArrayList<>();
-        candidateClasses.addAll(getAllInterfaces(cls));
-        candidateClasses.addAll(getAllSuperclasses(cls));
-
-        for (final Class<?> candidateClass : candidateClasses) {
-            if (!Modifier.isPublic(candidateClass.getModifiers())) {
-                continue;
-            }
-            Method candidateMethod;
-            try {
-                candidateMethod = candidateClass.getMethod(methodName, parameterTypes);
-            } catch (final NoSuchMethodException ex) {
-                continue;
-            }
-            if (Modifier.isPublic(candidateMethod.getDeclaringClass().getModifiers())) {
-                return candidateMethod;
-            }
-        }
-
-        throw new NoSuchMethodException("Can't find a public method for " +
-                methodName + " " + ArrayUtils.toString(parameterTypes));
-    }
 
     // ----------------------------------------------------------------------
     /**

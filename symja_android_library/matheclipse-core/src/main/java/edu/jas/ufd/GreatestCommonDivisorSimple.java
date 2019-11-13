@@ -228,7 +228,8 @@ public class GreatestCommonDivisorSimple<C extends GcdRingElem<C>> extends Great
         while (!r.isZERO()) {
             x = PolyUtil.recursivePseudoRemainder(q, r);
             if (logger.isDebugEnabled()) {
-                logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
+                // android: remove log
+//                logger.info("recursivePseudoRemainder.bits = " + x.bitLength());
             }
             q = r;
             if (field) {

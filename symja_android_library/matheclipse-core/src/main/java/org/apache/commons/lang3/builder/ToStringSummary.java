@@ -24,10 +24,10 @@ import java.lang.annotation.Target;
 
 /**
  * Use this annotation on the fields to get the summary instead of the detailed
- * information when using {@link ReflectionToStringBuilder}.
+ * information when using {link ReflectionToStringBuilder}.
  *
  * <p>
- * Notice that not all {@link ToStringStyle} implementations support the
+ * Notice that not all {link ToStringStyle} implementations support the
  * appendSummary method.
  * </p>
  *

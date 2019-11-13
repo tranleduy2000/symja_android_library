@@ -24,10 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -146,68 +142,6 @@ public class ArrayUtils {
 
     // Basic methods handling multi-dimensional arrays
     //-----------------------------------------------------------------------
-    /**
-     * <p>Outputs an array as a String, treating {@code null} as an empty array.
-     *
-     * <p>Multi-dimensional arrays are handled correctly, including
-     * multi-dimensional primitive arrays.
-     *
-     * <p>The format is that of Java source code, for example <code>{a,b}</code>.
-     *
-     * @param array  the array to get a toString for, may be {@code null}
-     * @return a String representation of the array, '{}' if null array input
-     */
-    public static String toString(final Object array) {
-        return toString(array, "{}");
-    }
-
-    /**
-     * <p>Outputs an array as a String handling {@code null}s.
-     *
-     * <p>Multi-dimensional arrays are handled correctly, including
-     * multi-dimensional primitive arrays.
-     *
-     * <p>The format is that of Java source code, for example <code>{a,b}</code>.
-     *
-     * @param array  the array to get a toString for, may be {@code null}
-     * @param stringIfNull  the String to return if the array is {@code null}
-     * @return a String representation of the array
-     */
-    public static String toString(final Object array, final String stringIfNull) {
-        if (array == null) {
-            return stringIfNull;
-        }
-        return new ToStringBuilder(array, ToStringStyle.SIMPLE_STYLE).append(array).toString();
-    }
-
-    /**
-     * <p>Get a hash code for an array handling multi-dimensional arrays correctly.
-     *
-     * <p>Multi-dimensional primitive arrays are also handled correctly by this method.
-     *
-     * @param array  the array to get a hash code for, {@code null} returns zero
-     * @return a hash code for the array
-     */
-    public static int hashCode(final Object array) {
-        return new HashCodeBuilder().append(array).toHashCode();
-    }
-
-    /**
-     * <p>Compares two arrays, using equals(), handling multi-dimensional arrays
-     * correctly.
-     *
-     * <p>Multi-dimensional primitive arrays are also handled correctly by this method.
-     *
-     * @param array1  the left hand array to compare, may be {@code null}
-     * @param array2  the right hand array to compare, may be {@code null}
-     * @return {@code true} if the arrays are equal
-     * @deprecated this method has been replaced by {@code java.util.Objects.deepEquals(Object, Object)} and will be
-     * removed from future releases.
-     */
-    @Deprecated
-    public static boolean isEquals(final Object array1, final Object array2) {
-        return new EqualsBuilder().append(array1, array2).isEquals();
-    }
 
     // To map
     //-----------------------------------------------------------------------
@@ -4742,29 +4676,30 @@ public class ArrayUtils {
      * @return an array of the corresponding primitive type, or the original array
      * @since 3.5
      */
-    public static Object toPrimitive(final Object array) {
-        if (array == null) {
-            return null;
-        }
-        final Class<?> ct = array.getClass().getComponentType();
-        final Class<?> pt = ClassUtils.wrapperToPrimitive(ct);
-        if(Integer.TYPE.equals(pt)) {
-            return toPrimitive((Integer[]) array);
-        }
-        if(Long.TYPE.equals(pt)) {
-            return toPrimitive((Long[]) array);
-        }
-        if(Short.TYPE.equals(pt)) {
-            return toPrimitive((Short[]) array);
-        }
-        if(Double.TYPE.equals(pt)) {
-            return toPrimitive((Double[]) array);
-        }
-        if(Float.TYPE.equals(pt)) {
-            return toPrimitive((Float[]) array);
-        }
-        return array;
-    }
+    // Android changed: remove relection
+//    public static Object toPrimitive(final Object array) {
+//        if (array == null) {
+//            return null;
+//        }
+//        final Class<?> ct = array.getClass().getComponentType();
+//        final Class<?> pt = ClassUtils.wrapperToPrimitive(ct);
+//        if(Integer.TYPE.equals(pt)) {
+//            return toPrimitive((Integer[]) array);
+//        }
+//        if(Long.TYPE.equals(pt)) {
+//            return toPrimitive((Long[]) array);
+//        }
+//        if(Short.TYPE.equals(pt)) {
+//            return toPrimitive((Short[]) array);
+//        }
+//        if(Double.TYPE.equals(pt)) {
+//            return toPrimitive((Double[]) array);
+//        }
+//        if(Float.TYPE.equals(pt)) {
+//            return toPrimitive((Float[]) array);
+//        }
+//        return array;
+//    }
 
     // Boolean array converters
     // ----------------------------------------------------------------------

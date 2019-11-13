@@ -22,7 +22,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.polynomials.ExprPolynomialRing;
 import org.matheclipse.core.visit.IVisitor;
@@ -791,13 +790,14 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public final void putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
-        if (fRulesData == null) {
-            fRulesData = new RulesData();
-        }
-        fRulesData.insertMatcher(pmEvaluator);
-    }
+    // Android changed: remove reflection
+//    @Override
+//    public final void putDownRule(final PatternMatcherAndInvoker pmEvaluator) {
+//        if (fRulesData == null) {
+//            fRulesData = new RulesData();
+//        }
+//        fRulesData.insertMatcher(pmEvaluator);
+//    }
 
     /**
      * {@inheritDoc}

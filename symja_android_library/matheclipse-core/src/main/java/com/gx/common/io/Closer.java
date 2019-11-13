@@ -25,7 +25,6 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
@@ -269,19 +268,20 @@ public final class Closer implements Closeable {
     static final class SuppressingSuppressor implements Suppressor {
 
         static final SuppressingSuppressor INSTANCE = new SuppressingSuppressor();
-        static final Method addSuppressed = getAddSuppressed();
+//        static final Method addSuppressed = getAddSuppressed();
 
         static boolean isAvailable() {
-            return addSuppressed != null;
+//            return addSuppressed != null;
+            return false;
         }
 
-        private static Method getAddSuppressed() {
-            try {
-                return Throwable.class.getMethod("addSuppressed", Throwable.class);
-            } catch (Throwable e) {
-                return null;
-            }
-        }
+//        private static Method getAddSuppressed() {
+//            try {
+//                return Throwable.class.getMethod("addSuppressed", Throwable.class);
+//            } catch (Throwable e) {
+//                return null;
+//            }
+//        }
 
         @Override
         public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
@@ -290,7 +290,7 @@ public final class Closer implements Closeable {
                 return;
             }
             try {
-                addSuppressed.invoke(thrown, suppressed);
+//                addSuppressed.invoke(thrown, suppressed);
             } catch (Throwable e) {
                 // if, somehow, IllegalAccessException or another exception is thrown, fall back to logging
                 LoggingSuppressor.INSTANCE.suppress(closeable, thrown, suppressed);

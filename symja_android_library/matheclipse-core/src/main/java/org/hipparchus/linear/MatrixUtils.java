@@ -36,7 +36,6 @@ import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
@@ -721,7 +720,7 @@ public class MatrixUtils {
      * @param vector real vector to serialize
      * @param oos    stream where the real vector should be written
      * @throws IOException if object cannot be written to stream
-     * @see #deserializeRealVector(Object, String, ObjectInputStream)
+     * see #deserializeRealVector(Object, String, ObjectInputStream)
      */
     public static void serializeRealVector(final RealVector vector,
                                            final ObjectOutputStream oos)
@@ -752,35 +751,36 @@ public class MatrixUtils {
      * @throws IOException            if object cannot be read from the stream
      * @see #serializeRealVector(RealVector, ObjectOutputStream)
      */
-    public static void deserializeRealVector(final Object instance,
-                                             final String fieldName,
-                                             final ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
-        try {
-
-            // read the vector data
-            final int n = ois.readInt();
-            final double[] data = new double[n];
-            for (int i = 0; i < n; ++i) {
-                data[i] = ois.readDouble();
-            }
-
-            // create the instance
-            final RealVector vector = new ArrayRealVector(data, false);
-
-            // set up the field
-            final java.lang.reflect.Field f =
-                    instance.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            f.set(instance, vector);
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            IOException ioe = new IOException();
-            ioe.initCause(e);
-            throw ioe;
-        }
-
-    }
+    // Android changed: remove reflection
+//    public static void deserializeRealVector(final Object instance,
+//                                             final String fieldName,
+//                                             final ObjectInputStream ois)
+//            throws ClassNotFoundException, IOException {
+//        try {
+//
+//            // read the vector data
+//            final int n = ois.readInt();
+//            final double[] data = new double[n];
+//            for (int i = 0; i < n; ++i) {
+//                data[i] = ois.readDouble();
+//            }
+//
+//            // create the instance
+//            final RealVector vector = new ArrayRealVector(data, false);
+//
+//            // set up the field
+//            final Field f =
+//                    instance.getClass().getDeclaredField(fieldName);
+//            f.setAccessible(true);
+//            f.set(instance, vector);
+//
+//        } catch (NoSuchFieldException | IllegalAccessException e) {
+//            IOException ioe = new IOException();
+//            ioe.initCause(e);
+//            throw ioe;
+//        }
+//
+//    }
 
     /**
      * Serialize a {@link RealMatrix}.
@@ -821,7 +821,7 @@ public class MatrixUtils {
      * @param matrix real matrix to serialize
      * @param oos    stream where the real matrix should be written
      * @throws IOException if object cannot be written to stream
-     * @see #deserializeRealMatrix(Object, String, ObjectInputStream)
+     * see #deserializeRealMatrix(Object, String, ObjectInputStream)
      */
     public static void serializeRealMatrix(final RealMatrix matrix,
                                            final ObjectOutputStream oos)
@@ -856,38 +856,39 @@ public class MatrixUtils {
      * @throws IOException            if object cannot be read from the stream
      * @see #serializeRealMatrix(RealMatrix, ObjectOutputStream)
      */
-    public static void deserializeRealMatrix(final Object instance,
-                                             final String fieldName,
-                                             final ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
-        try {
-
-            // read the matrix data
-            final int n = ois.readInt();
-            final int m = ois.readInt();
-            final double[][] data = new double[n][m];
-            for (int i = 0; i < n; ++i) {
-                final double[] dataI = data[i];
-                for (int j = 0; j < m; ++j) {
-                    dataI[j] = ois.readDouble();
-                }
-            }
-
-            // create the instance
-            final RealMatrix matrix = new Array2DRowRealMatrix(data, false);
-
-            // set up the field
-            final java.lang.reflect.Field f =
-                    instance.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            f.set(instance, matrix);
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            IOException ioe = new IOException();
-            ioe.initCause(e);
-            throw ioe;
-        }
-    }
+    // Android changed: remove reflection
+//    public static void deserializeRealMatrix(final Object instance,
+//                                             final String fieldName,
+//                                             final ObjectInputStream ois)
+//            throws ClassNotFoundException, IOException {
+//        try {
+//
+//            // read the matrix data
+//            final int n = ois.readInt();
+//            final int m = ois.readInt();
+//            final double[][] data = new double[n][m];
+//            for (int i = 0; i < n; ++i) {
+//                final double[] dataI = data[i];
+//                for (int j = 0; j < m; ++j) {
+//                    dataI[j] = ois.readDouble();
+//                }
+//            }
+//
+//            // create the instance
+//            final RealMatrix matrix = new Array2DRowRealMatrix(data, false);
+//
+//            // set up the field
+//            final Field f =
+//                    instance.getClass().getDeclaredField(fieldName);
+//            f.setAccessible(true);
+//            f.set(instance, matrix);
+//
+//        } catch (NoSuchFieldException | IllegalAccessException e) {
+//            IOException ioe = new IOException();
+//            ioe.initCause(e);
+//            throw ioe;
+//        }
+//    }
 
     /**
      * Solve  a  system of composed of a Lower Triangular Matrix

@@ -9,7 +9,6 @@ import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.core.patternmatching.PatternMatcherAndInvoker;
 import org.matheclipse.core.patternmatching.RulesData;
 
 import java.io.IOException;
@@ -461,7 +460,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @param pmEvaluator
      * @return
      */
-    public void putDownRule(final PatternMatcherAndInvoker pmEvaluator);
+    // Android changed: remove reflection
+//    public void putDownRule(final PatternMatcherAndInvoker pmEvaluator);
 
     /**
      * Associate a new &quot;down value&quot; rule with default priority to this symbol.

@@ -23,14 +23,10 @@ package org.hipparchus.optim.linear;
 
 import org.hipparchus.analysis.MultivariateFunction;
 import org.hipparchus.linear.ArrayRealVector;
-import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealVector;
 import org.hipparchus.optim.OptimizationData;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 /**
  * An objective function for a linear optimization problem.
@@ -45,8 +41,8 @@ import java.io.Serializable;
  */
 public class LinearObjectiveFunction
         implements MultivariateFunction,
-        OptimizationData,
-        Serializable {
+        OptimizationData/*, 	// Android changed: remove reflection
+        Serializable*/ {
     /**
      * Serializable version identifier.
      */
@@ -146,11 +142,12 @@ public class LinearObjectiveFunction
      * @param oos stream where object should be written
      * @throws IOException if object cannot be written to stream
      */
-    private void writeObject(ObjectOutputStream oos)
-            throws IOException {
-        oos.defaultWriteObject();
-        MatrixUtils.serializeRealVector(coefficients, oos);
-    }
+    // Android changed: remove reflection
+//    private void writeObject(ObjectOutputStream oos)
+//            throws IOException {
+//        oos.defaultWriteObject();
+//        MatrixUtils.serializeRealVector(coefficients, oos);
+//    }
 
     /**
      * Deserialize the instance.
@@ -159,9 +156,10 @@ public class LinearObjectiveFunction
      * @throws ClassNotFoundException if a class in the stream cannot be found
      * @throws IOException            if object cannot be read from the stream
      */
-    private void readObject(ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-        MatrixUtils.deserializeRealVector(this, "coefficients", ois);
-    }
+    // Android changed: remove reflection
+//    private void readObject(ObjectInputStream ois)
+//            throws ClassNotFoundException, IOException {
+//        ois.defaultReadObject();
+//        MatrixUtils.deserializeRealVector(this, "coefficients", ois);
+//    }
 }

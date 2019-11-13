@@ -24,16 +24,12 @@ package org.hipparchus.optim.linear;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.linear.Array2DRowRealMatrix;
-import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealVector;
 import org.hipparchus.optim.PointValuePair;
 import org.hipparchus.optim.nonlinear.scalar.GoalType;
 import org.hipparchus.util.Precision;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,7 +61,8 @@ import java.util.TreeSet;
  * RHS: Right hand side</br>
  * </p>
  */
-class SimplexTableau implements Serializable {
+// Android changed: remove reflection
+class SimplexTableau /*implements Serializable*/ {
 
     /**
      * Column label for negative vars.
@@ -777,11 +774,12 @@ class SimplexTableau implements Serializable {
      * @param oos stream where object should be written
      * @throws IOException if object cannot be written to stream
      */
-    private void writeObject(ObjectOutputStream oos)
-            throws IOException {
-        oos.defaultWriteObject();
-        MatrixUtils.serializeRealMatrix(tableau, oos);
-    }
+    // Android changed: remove reflection
+//    private void writeObject(ObjectOutputStream oos)
+//            throws IOException {
+//        oos.defaultWriteObject();
+//        MatrixUtils.serializeRealMatrix(tableau, oos);
+//    }
 
     /**
      * Deserialize the instance.
@@ -790,9 +788,10 @@ class SimplexTableau implements Serializable {
      * @throws ClassNotFoundException if a class in the stream cannot be found
      * @throws IOException            if object cannot be read from the stream
      */
-    private void readObject(ObjectInputStream ois)
-            throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-        MatrixUtils.deserializeRealMatrix(this, "tableau", ois);
-    }
+    // Android changed: remove reflection
+//    private void readObject(ObjectInputStream ois)
+//            throws ClassNotFoundException, IOException {
+//        ois.defaultReadObject();
+//        MatrixUtils.deserializeRealMatrix(this, "tableau", ois);
+//    }
 }

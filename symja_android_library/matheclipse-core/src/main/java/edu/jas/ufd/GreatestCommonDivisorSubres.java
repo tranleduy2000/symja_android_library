@@ -345,7 +345,8 @@ public class GreatestCommonDivisorSubres<C extends GcdRingElem<C>> extends Great
             //System.out.println("rgcd delta = " + delta);
             x = PolyUtil.recursiveDensePseudoRemainder(q, r);
             if (logger.isDebugEnabled()) {
-                logger.info("recursiveDensePseudoRemainder.bits = " + x.bitLength());
+                // android: remove log
+//                logger.info("recursiveDensePseudoRemainder.bits = " + x.bitLength());
             }
             q = r;
             if (!x.isZERO()) {

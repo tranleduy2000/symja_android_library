@@ -9,8 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -2514,31 +2512,32 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
      * @return number of bits in the representation of this polynomial,
      * including sign bits.
      */
-    public long bitLength() {
-        if (blen < 0L) {
-            long n = 0L;
-            for (Monomial<C> m : this) {
-                n += m.e.bitLength();
-                //n += m.c.bitLength(); // TODO add bitLength to Element
-                try { // hack
-                    Method method = m.c.getClass().getMethod("bitLength", (Class<?>[]) null);
-                    n += (Long) method.invoke(m.c, (Object[]) null);
-                } catch (NoSuchMethodException e) {
-                    logger.error("Exception, class: " + m.c.getClass());
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    logger.error("Exception, class: " + m.c.getClass());
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    logger.error("Exception, class: " + m.c.getClass());
-                    throw new RuntimeException(e);
-                }
-            }
-            blen = n;
-            //System.out.println("bitLength(poly) = " + blen);
-        }
-        return blen;
-    }
+    // android: remove log
+//    public long bitLength() {
+//        if (blen < 0L) {
+//            long n = 0L;
+//            for (Monomial<C> m : this) {
+//                n += m.e.bitLength();
+//                //n += m.c.bitLength(); // TODO add bitLength to Element
+//                try { // hack
+//                    Method method = m.c.getClass().getMethod("bitLength", (Class<?>[]) null);
+//                    n += (Long) method.invoke(m.c, (Object[]) null);
+//                } catch (NoSuchMethodException e) {
+//                    logger.error("Exception, class: " + m.c.getClass());
+//                    throw new RuntimeException(e);
+//                } catch (IllegalAccessException e) {
+//                    logger.error("Exception, class: " + m.c.getClass());
+//                    throw new RuntimeException(e);
+//                } catch (InvocationTargetException e) {
+//                    logger.error("Exception, class: " + m.c.getClass());
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//            blen = n;
+//            //System.out.println("bitLength(poly) = " + blen);
+//        }
+//        return blen;
+//    }
 
     //private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     //    out.defaultWriteObject();

@@ -14,16 +14,15 @@
 
 package com.gx.common.util.concurrent;
 
+import com.duy.concurrent.Executor;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.Function;
 import com.gx.errorprone.annotations.ForOverride;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import com.duy.concurrent.Executor;
 
 import static com.gx.common.base.Preconditions.checkNotNull;
 import static com.gx.common.util.concurrent.Futures.getDone;
@@ -105,11 +104,13 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
         T transformResult;
         try {
             transformResult = doTransform(localFunction, sourceResult);
-        } catch (UndeclaredThrowableException e) {
+        }
+        // Android changed: remove reflection
+        /* catch (UndeclaredThrowableException e) {
             // Set the cause of the exception as this future's exception.
             setException(e.getCause());
             return;
-        } catch (Throwable t) {
+        }*/ catch (Throwable t) {
             // This exception is irrelevant in this thread, but useful for the client.
             setException(t);
             return;
