@@ -31,8 +31,10 @@ public class CompatibleTest extends TestCase {
                 "java.util.concurrent.ExecutorService",
 
                 "java.util.Scanner",
+                "javax.xml.",
 
                 " Double.hashCode",
+                "(Double.hashCode",
         };
 
         File sourceDir = new File("../symja_android_library/matheclipse-core/src/main/java");

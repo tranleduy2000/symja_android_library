@@ -18,7 +18,6 @@ package org.apache.commons.text.translate;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.security.InvalidParameterException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class LookupTranslator extends CharSequenceTranslator {
      */
     public LookupTranslator(final Map<CharSequence, CharSequence> lookupMap) {
         if (lookupMap == null) {
-            throw new InvalidParameterException("lookupMap cannot be null");
+            throw new RuntimeException("lookupMap cannot be null");
         }
         this.lookupMap = new HashMap<>();
         this.prefixSet = new BitSet();

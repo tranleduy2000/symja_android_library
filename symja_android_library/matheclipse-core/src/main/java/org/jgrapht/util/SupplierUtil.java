@@ -17,12 +17,13 @@
  */
 package org.jgrapht.util;
 
+import com.duy.lambda.Supplier;
+
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.Serializable;
-import java.util.UUID;
-import com.duy.lambda.Supplier;
+import java.util.Random;
 
 /**
  * Helper class for suppliers.
@@ -216,7 +217,7 @@ public class SupplierUtil {
 
         @Override
         public String get() {
-            return UUID.randomUUID().toString();
+            return String.valueOf(new Random().nextDouble());
         }
     }
 
