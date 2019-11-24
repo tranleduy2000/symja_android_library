@@ -285,7 +285,7 @@ public class Solve extends AbstractFunctionEvaluator {
 								} else {
 									sym = (ISymbol) expr;
 									if (fEquationType == LINEAR) {
-										IAST cloned = arg.removeAtCopy(i);
+										IAST cloned = arg.splice(i);
 										fMatrixRow.set(j, F.Plus(fMatrixRow.get(j), cloned));
 									}
 								}
@@ -466,6 +466,15 @@ public class Solve extends AbstractFunctionEvaluator {
 					return fEngine.evaluate(F.Subtract(ast.base(), inverseFunction));
 				}
 
+			} else if (ast.isTimes() && ast.size() == 3 && ast.first().isNumericFunction() && ast.second().isAST1()) {
+				IAST timesArg2 = (IAST) ast.second();
+				IASTAppendable inverseFunction = InverseFunction.getUnaryInverseFunction(timesArg2);
+				if (inverseFunction.isPresent()) {
+					fEngine.printMessage("Solve: using of inverse functions may omit some solutions.");
+					// rewrite fNumer
+					inverseFunction.append(F.Divide(arg1, ast.first()));
+					return fEngine.evaluate(F.Subtract(timesArg2.arg1(), inverseFunction));
+				}
 			}
 			return F.NIL;
 		}
@@ -481,7 +490,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		 */
 		private IExpr rewriteInverseFunction(IAST plusAST, int position) {
 			IAST ast = (IAST) plusAST.get(position);
-			IExpr plus = plusAST.removeAtCopy(position).oneIdentity0();
+			IExpr plus = plusAST.splice(position).oneIdentity0();
 			if (ast.isAbs()) {
 				if (plus.isNegative() || plus.isZero()) {
 					if (plus.isFree(Predicates.in(fListOfVariables), true)) {
@@ -497,7 +506,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		}
 
 		/**
-		 * Try to rewrite a <code>Plus(...,f(x), ...)</code> function which contains an invertable function argument
+		 * Try to rewrite a <code>Plus(...,f(x), ...)</code> function which contains an invertible function argument
 		 * <code>f(x)</code>.
 		 */
 		private IExpr rewritePlusWithInverseFunctions(IAST plusAST) {
@@ -519,14 +528,23 @@ public class Solve extends AbstractFunctionEvaluator {
 					} else if (function.isPower()) {
 						// function is Power(x, fraction)
 						return rewritePowerFractions(plusAST, i, F.C1, function.base(), function.exponent());
-					} else if (function.isTimes() && function.size() == 3 && function.arg2().isPower()
-							&& function.arg1().isNumber()) {
+					} else if (function.isTimes() && function.size() == 3 && function.arg1().isNumericFunction()) {
+						if (function.arg2().isPower()) {
 						// function is num*Power(x, fraction)
 						IAST power = (IAST) function.arg2();
 						IExpr temp = rewritePowerFractions(plusAST, i, (INumber) function.arg1(), power.base(),
 								power.exponent());
 						if (temp.isPresent()) {
 							return fEngine.evaluate(temp);
+						}
+						} else if (function.arg2().isAST1()) {
+							IAST inverseTimesFunction = InverseFunction.getUnaryInverseFunction((IAST) function.arg2());
+							if (inverseTimesFunction.isPresent()) {
+								IExpr temp = rewriteInverseFunction(plusAST, i);
+								if (temp.isPresent()) {
+									return temp;
+								}
+							}
 						}
 					}
 				}
@@ -550,7 +568,7 @@ public class Solve extends AbstractFunctionEvaluator {
 						if (exponent.isFraction() || (exponent.isReal() && !exponent.isNumIntValue())) {
 							ISignedNumber arg2 = (ISignedNumber) exponent;
 				if (arg2.isPositive()) {
-					IExpr plus = plusAST.removeAtCopy(i).oneIdentity0();
+					IExpr plus = plusAST.splice(i).oneIdentity0();
 							if (plus.isPositiveResult()) {
 								// no solution possible
 								return NO_EQUATION_SOLUTION;
@@ -569,7 +587,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		}
 
 		/**
-		 * Try to rewrite a <code>Times(...,f(x), ...)</code> expression which may contain an invertable function
+		 * Try to rewrite a <code>Times(...,f(x), ...)</code> expression which may contain an invertible function
 		 * argument <code>f(x)</code> as subexpression.
 		 */
 		private IExpr rewriteTimesWithInverseFunctions(IAST times) {
@@ -1080,7 +1098,7 @@ public class Solve extends AbstractFunctionEvaluator {
 			IAST[] reduced = Eliminate.eliminateOneVariable(F.List(F.Equal(firstEquation, F.C0)), firstVariable,
 					engine);
 			if (reduced != null) {
-				variables = variables.removeAtCopy(1);
+				variables = variables.splice(1);
 				termsEqualZeroList = termsEqualZeroList.removeAtCopy(1);
 				// oneVariableRule = ( firstVariable -> reducedExpression )
 				IAST oneVariableRule = reduced[1];
