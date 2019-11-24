@@ -2,6 +2,7 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
 
+import org.apache.commons.lang3.StringUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -19,6 +20,7 @@ import org.matheclipse.core.trie.SuggestTree;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +111,7 @@ public class IOFunctions {
 	}
 
 	private static IExpr inputString(final IAST ast, EvalEngine engine) {
-		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
 		try {
 			if (ast.isAST1()) {
 				engine.getOutPrintStream().print(ast.arg1().toString());
@@ -184,6 +186,7 @@ public class IOFunctions {
 			"base", "Requested base `1` in `2` should be between 2 and `3`.", //
 			"boxfmt", "`1` is not a box formatting type.", //
 			"color", "`1` is not a valid color or gray-level specification.", //
+			"compat", "`1` and `2` are incompatible units", //
 			"cxt", "`1` is not a valid context name.", //
 			"divz", "The argument `1` should be nonzero.", //
 			"digit", "Digit at position `1` in `2` is too large to be used in base `3`.", //
@@ -275,7 +278,17 @@ public class IOFunctions {
 				engine);
 		}
 
-	public static IAST printMessage(ISymbol symbol, String messageShortcut, final IAST ast, EvalEngine engine) {
+	/**
+	 *
+	 * @param symbol
+	 * @param messageShortcut
+	 *            the message shortcut defined in <code>MESSAGES</code> array
+	 * @param listOfArgs
+	 *            a list of arguments which should be inserted into the message shortcuts placeholder
+	 * @param engine
+	 * @return always <code>F.NIL</code>
+	 */
+	public static IAST printMessage(ISymbol symbol, String messageShortcut, final IAST listOfArgs, EvalEngine engine) {
 		IExpr temp = symbol.evalMessage(messageShortcut);
 		String message = null;
 		if (temp.isPresent()) {
@@ -288,8 +301,8 @@ public class IOFunctions {
 		}
 
 		if (message != null) {
-			for (int i = 1; i < ast.size(); i++) {
-				message = message.replace("`" + (i) + "`", ast.get(i).toString());
+			for (int i = 1; i < listOfArgs.size(); i++) {
+				message = StringUtils.replace(message, "`" + (i) + "`", listOfArgs.get(i).toString());
 			}
 			engine.setMessageShortcut(messageShortcut);
 			engine.printMessage(symbol.toString() + ": " + message);
@@ -309,7 +322,7 @@ public class IOFunctions {
 
 	private static String rawMessage(final IAST ast, String message) {
 				for (int i = 2; i < ast.size(); i++) {
-			message = message.replace("`" + (i - 1) + "`", ast.get(i).toString());
+			message = StringUtils.replace(message, "`" + (i - 1) + "`", ast.get(i).toString());
 				}
 		return message;
 	}
