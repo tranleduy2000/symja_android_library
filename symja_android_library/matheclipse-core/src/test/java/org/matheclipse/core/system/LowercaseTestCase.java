@@ -5845,7 +5845,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// https://www.research.ed.ac.uk/portal/files/413486/Solving_Symbolic_Equations_%20with_PRESS.pdf
 		System.out.print('.');
 		check("Factor(4^(2*x+1)*5^(x-2)-6^(1-x))", //
-				"(2^(2-x)*(-75/2+2^(5*x)*3^x*5^x))/(25*3^x)");
+				"(2^(1-x)*(-75+2^(1+5*x)*3^x*5^x))/(25*3^x)");
 
 		System.out.print('.');
 		check("Factor(E^x+E^(2*x))", //
@@ -9450,11 +9450,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 						"\n" + //
 						"\n" + //
 						"var expressions = [ '1+x',\n" + //
-						"'1+x^{2}',\n" + //
-						"'\\\\\\\\left( 1+x\\\\\\\\right) \\\\\\\\,\\\\\\\\left( 1 - x+x^{2}\\\\\\\\right) ',\n" + //
-						"'1+x^{4}',\n" + //
-						"'\\\\\\\\left( 1+x\\\\\\\\right) \\\\\\\\,\\\\\\\\left( 1 - x+x^{2} - x^{3}+x^{4}\\\\\\\\right) ' ];\n"
-						+ //
+				"'1+{x}^{2}',\n" + //
+				"'\\\\\\\\left( 1+x\\\\\\\\right) \\\\\\\\,\\\\\\\\left( 1 - x+{x}^{2}\\\\\\\\right) ',\n" + //
+				"'1+{x}^{4}',\n" + //
+				"'\\\\\\\\left( 1+x\\\\\\\\right) \\\\\\\\,\\\\\\\\left( 1 - x+{x}^{2} - {x}^{3}+{x}^{4}\\\\\\\\right) ' ];\n" + //
 						"\n" + //
 						"  var data = '\\\\\\\\[' + expressions[n-1] + '\\\\\\\\]';\n" + //
 						"\n" + //
@@ -12559,7 +12558,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// check("125*2^(3-2*z)", //
 		// "");
 		checkNumeric("NSolve({2==x-0.091y, y==0.054-0.0171*z, x==Exp(z)+1}, {x,y,z})", //
-				"{z->0.004894386769035651,y->0.053916305986249774,x->2.004906383844749}");
+				"{z->0.0048943867690357384,y->0.053916305986249774,x->2.004906383844749}");
 		// check("Eliminate({sin(x)-11==y, x+y==-9}, {y,x})",
 		// "x+Sin(x)==2");
 		// checkNumeric("FindRoot(x+Sin(x)==2, {x,0})", //
@@ -19669,11 +19668,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("TeXForm(2+I*3)", //
 				"2 + 3\\,i ");
 		check("TeXForm(a+b^2)", //
-				"a+b^{2}");
+				"a+{b}^{2}");
 		check("TeXForm(Expand((x+y)^3))", //
-				"x^{3} + 3\\,x^{2}\\,y + 3\\,x\\,y^{2}+y^{3}");
+				"{x}^{3} + 3\\,{x}^{2}\\,y + 3\\,x\\,{y}^{2}+{y}^{3}");
 		check("TeXForm(3*a+b^2)", //
-				"3\\,a+b^{2}");
+				"3\\,a+{b}^{2}");
 		check("TeXForm(x/Sqrt(5))", //
 				"\\frac{x}{\\sqrt{5}}");
 		check("TeXForm(x^(1/3))", //
@@ -19695,12 +19694,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"\\sum_{n = 1}^{m} {f(n)}");
 		check("TeXForm(Product(f(n), {n, 1, m}))", //
 				"\\prod_{n = 1}^{m} {f(n)}");
-		check("TeXForm(Subscript(a,b))", "a_b");
-		check("TeXForm(Superscript(a,b))", "a^b");
+		check("TeXForm(Subscript(a,b))", //
+				"{a}_{b}");
+		check("TeXForm(Superscript(a,b))", //
+				"{a}^{b}");
 		check("TeXForm(Subscript(x,2*k+1))", //
-				"x_{1 + 2\\,k}");
+				"{x}_{1 + 2\\,k}");
 		check("TeXForm(Subsuperscript(a,b,c))", //
-				"a_b^c");
+				"{a}_{b}^{c}");
 		check("TeXForm(HarmonicNumber(n))", //
 				"H_n");
 		check("TeXForm(HarmonicNumber(m,n))", //
