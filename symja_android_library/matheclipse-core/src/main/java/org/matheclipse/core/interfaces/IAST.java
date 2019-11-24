@@ -1224,6 +1224,27 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTMutable setAtCopy(int i, IExpr expr);
 
     /**
+     * Copy of a sub <code>AST</code> from <code>start</code> (inclusive) to <code>end</code> (exclusive). The
+     * <code>slice()</code> method selects the elements starting at the given <code>start</code> argument, and ends at,
+     * but does not include, the given <code>end</code> argument.
+     *
+     * @param start An integer that specifies where to start the selection (the first argument has an index of
+     *              <code>1</code>, the head of the AST is at index <code>0</code>).
+     * @param end   An integer that specifies where to end the selection.
+     * @return a copy of sub <code>AST</code> from <code>start</code> (inclusive) to <code>end</code> (exclusive).
+     */
+    IASTAppendable slice(int start, int end);
+
+    /**
+     * The <code>splice()</code> method adds/removes items to/from an AST copy, and returns the copy.
+     *
+     * @param index   An integer that specifies at what position to add/remove items.
+     * @param howMany The number of items to be removed. If set to 0, no items will be removed
+     * @param items   Optional. The new item(s) to be added to the AST copy
+     * @return an IAST with removed element at the given position.
+     */
+    public IAST splice(int index, int howMany, IExpr... items);
+    /**
      * Returns an array containing all elements contained in this {@code List}.
      *
      * @return an array of the elements from this {@code List}.
