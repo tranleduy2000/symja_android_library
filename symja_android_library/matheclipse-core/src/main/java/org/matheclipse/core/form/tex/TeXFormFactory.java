@@ -660,13 +660,15 @@ public class TeXFormFactory {
 			}
 
 			precedenceOpen(buf, precedence);
-			fFactory.convertSubExpr(buf, arg1, fPrecedence);
-			if (fOperator.compareTo("") != 0) {
-				buf.append(fOperator);
-			}
 
 			// http://en.wikibooks.org/wiki/LaTeX/Mathematics#Powers_and_indices
 			// For powers with more than one digit, surround the power with {}.
+			buf.append('{');
+			fFactory.convertInternal(buf, arg1, fPrecedence);
+			buf.append('}');
+			if (fOperator.compareTo("") != 0) {
+				buf.append(fOperator);
+			}
 			buf.append('{');
 			fFactory.convertInternal(buf, arg2, 0);
 			buf.append('}');
@@ -755,9 +757,15 @@ public class TeXFormFactory {
 			IExpr arg1 = f.arg1();
 			IExpr arg2 = f.arg2();
 
-			fFactory.convertSubExpr(buf, arg1, 0);
+			// http://en.wikibooks.org/wiki/LaTeX/Mathematics#Powers_and_indices
+			// For powers with more than one digit, surround the power with {}.
+			buf.append('{');
+			fFactory.convertInternal(buf, arg1, precedence);
+			buf.append('}');
 			buf.append("_");
-			fFactory.convertSubExpr(buf, arg2, 0);
+			buf.append('{');
+			fFactory.convertInternal(buf, arg2, precedence);
+			buf.append('}');
 			return true;
 		}
 	}
@@ -773,11 +781,19 @@ public class TeXFormFactory {
 			IExpr arg2 = f.arg2();
 			IExpr arg3 = f.arg3();
 
+			// http://en.wikibooks.org/wiki/LaTeX/Mathematics#Powers_and_indices
+			// For powers with more than one digit, surround the power with {}.
+			buf.append('{');
 			fFactory.convertInternal(buf, arg1, Integer.MAX_VALUE);
+			buf.append('}');
 			buf.append("_");
+			buf.append('{');
 			fFactory.convertInternal(buf, arg2, Integer.MAX_VALUE);
+			buf.append('}');
 			buf.append("^");
+			buf.append('{');
 			fFactory.convertInternal(buf, arg3, Integer.MAX_VALUE);
+			buf.append('}');
 			return true;
 		}
 	}
@@ -851,9 +867,15 @@ public class TeXFormFactory {
 			IExpr arg1 = f.arg1();
 			IExpr arg2 = f.arg2();
 
-			fFactory.convertSubExpr(buf, arg1, 0);
+			// http://en.wikibooks.org/wiki/LaTeX/Mathematics#Powers_and_indices
+			// For powers with more than one digit, surround the power with {}.
+			buf.append('{');
+			fFactory.convertInternal(buf, arg1, 0);
+			buf.append('}');
 			buf.append("^");
-			fFactory.convertSubExpr(buf, arg2, 0);
+			buf.append('{');
+			fFactory.convertInternal(buf, arg2, 0);
+			buf.append('}');
 			return true;
 		}
 	}
