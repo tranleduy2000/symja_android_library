@@ -2288,5 +2288,9 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		CONVERTERS.put(F.UndirectedEdge, new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("UndirectedEdge").getPrecedence(), "&lt;-&gt;"));
 		CONVERTERS.put(F.Unequal,
 				new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("Unequal").getPrecedence(), "!="));
+		CONVERTERS.put(F.CenterDot,
+				new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("CenterDot").getPrecedence(), "&#183;"));
+		CONVERTERS.put(F.CircleDot,
+				new MMLOperator(ASTNodeFactory.MMA_STYLE_FACTORY.get("CircleDot").getPrecedence(), "&#8857;"));
 	}
 }

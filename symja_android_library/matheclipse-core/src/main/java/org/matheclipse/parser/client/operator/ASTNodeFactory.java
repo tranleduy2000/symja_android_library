@@ -176,8 +176,8 @@ public class ASTNodeFactory implements INodeParserFactory {
 			"Dot", "Not", "PreMinus", "SameQ", "RuleDelayed", "GreaterEqual", "Condition", "Colon", "//", "DivideBy",
 			"Or", "Span", "Equal", "StringJoin", "Unequal", "Decrement", "SubtractFrom", "PrePlus", "RepeatedNull",
 			"UnsameQ", "Rule", "UpSetDelayed", "PreIncrement", "Function", "Greater", "PreDecrement", "Subtract",
-			"SetDelayed", "Alternatives", "AddTo", "Repeated", "ReplaceAll", "TagSet", "TwoWayRule", "TwoWayRule", "DirectedEdge",
-			"UndirectedEdge" };
+			"SetDelayed", "Alternatives", "AddTo", "Repeated", "ReplaceAll", "TagSet", "TwoWayRule", "TwoWayRule",
+			"DirectedEdge", "UndirectedEdge", "CenterDot", "CircleDot" };
 
 	static final String[] OPERATOR_STRINGS = { "::", "<<", "?", "//@", "*=", "+", "^=", ";", "@", "/@", "=.", "@@",
 			"@@@", "//.", "<", "&&", "/", "=", "++", "!!", "<=", "**", "!", "*", "^", ".", "!", "-", "===", ":>", ">=",
@@ -186,7 +186,9 @@ public class ASTNodeFactory implements INodeParserFactory {
 			"<->", // TwoWayRule
 			"\uF120", // TwoWayRule
 			"\uF3D5", // DirectedEdge
-			"\uF3D4"// UndirectedEdge
+			"\uF3D4", // UndirectedEdge
+			"\u00B7", // CenterDot
+			"\u2299" // CircleDot
 	};
 
 	public static final ApplyOperator APPLY_HEAD_OPERATOR = new ApplyOperator("@", "Apply", APPLY_HEAD_PRECEDENCE,
@@ -324,8 +326,11 @@ public class ASTNodeFactory implements INodeParserFactory {
 					new InfixOperator("<->", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE),
 					new InfixOperator("\uF120", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE),
 					new InfixOperator("\uF3D5", "DirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE),
-					new InfixOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE)};
+					new InfixOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE),
+					new InfixOperator("\u00B7", "CenterDot", 410, InfixOperator.NONE), //
+					new InfixOperator("\u2299", "CircleDot", 520, InfixOperator.NONE) //
 
+			};
 			StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
 			fOperatorMap = new HashMap<String, Operator>();
 			fOperatorTokenStartSet = new HashMap<String, ArrayList<Operator>>();
