@@ -946,9 +946,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		boolean[] isNumeric = new boolean[] { false };
 		try {
 			IAST variables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
-			if (variables == null) {
-				return F.NIL;
-			}
+			if (variables.isPresent()) {
 			ISymbol domain = F.Complexes;
 			if (ast.isAST3()) {
 				if (!ast.arg3().isSymbol()) {
@@ -990,6 +988,7 @@ public class Solve extends AbstractFunctionEvaluator {
 			IASTMutable termsEqualZeroList = lists[0];
 			IExpr result = solveRecursive(termsEqualZeroList, lists[1], numericFlag, variables, engine);
 			return checkDomain(result, domain);
+			}
 		} catch (LimitException le) {
 			throw le;
 		} catch (RuntimeException rex) {

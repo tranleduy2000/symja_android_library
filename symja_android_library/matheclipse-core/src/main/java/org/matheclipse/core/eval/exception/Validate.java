@@ -2,6 +2,7 @@ package org.matheclipse.core.eval.exception;
 
 import com.duy.lambda.IntFunction;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.IntegerSym;

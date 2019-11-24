@@ -335,14 +335,17 @@ public class PolynomialFunctions {
 				eVar.appendToList(symbolList);
 				varList = eVar.getArrayList();
 			} else {
-				symbolList = Validate.checkSymbolOrSymbolList(ast, 2);
+				symbolList = Validate.checkSymbolOrSymbolList(ast, 2, engine);
+				if (!symbolList.isPresent()) {
+					return F.NIL;
+				}
 				varList = new ArrayList<IExpr>(symbolList.argSize());
 				symbolList.forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr x) {
-                        varList.add(x);
-                    }
-                });
+					@Override
+					public void accept(IExpr x) {
+						varList.add(x);
+					}
+				});
 			}
 			TermOrder termOrder = TermOrderByName.Lexicographic;
 			try {
@@ -703,7 +706,8 @@ public class PolynomialFunctions {
 			}
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine);
 			try {
-				ExprPolynomialRing ring = new ExprPolynomialRing(F.List(arg2));
+				IAST univariateVariables = F.List(arg2);
+				ExprPolynomialRing ring = new ExprPolynomialRing(univariateVariables);
 				ExprPolynomial poly = ring.create(expr);
 
 				long n = poly.degree();
@@ -728,7 +732,7 @@ public class PolynomialFunctions {
 					}
 				}
 				IExpr fN = poly.leadingBaseCoefficient();// coefficient(n);
-				ExprPolynomial polyDiff = poly.derivative();
+				ExprPolynomial polyDiff = poly.derivativeUnivariate();
 				// see:
 				// http://en.wikipedia.org/wiki/Discriminant#Discriminant_of_a_polynomial
 				return F.Divide(F.Times(F.Power(F.CN1, (n * (n - 1) / 2)),
@@ -947,7 +951,7 @@ public class PolynomialFunctions {
 			if (arg1.isZero()||arg2.isZero()) {
 				return F.C0;
 			}
-			IExpr arg3 = Validate.checkSymbolType(ast, 3);
+			IExpr arg3 = Validate.checkSymbolType(ast, 3, engine);
 			ISymbol x = (ISymbol) arg3;
 			IExpr a = F.evalExpandAll(arg1, engine);
 			IExpr b = F.evalExpandAll(arg2, engine);
@@ -2026,7 +2030,10 @@ public class PolynomialFunctions {
 				eVar.appendToList(symbolList);
 				varList = eVar.getArrayList();
 			} else {
-				symbolList = Validate.checkSymbolOrSymbolList(ast, 2);
+				symbolList = Validate.checkSymbolOrSymbolList(ast, 2, engine);
+				if (!symbolList.isPresent()) {
+					return F.NIL;
+				}
 				varList = new ArrayList<IExpr>(symbolList.argSize());
 				symbolList.forEach(new Consumer<IExpr>() {
 					@Override

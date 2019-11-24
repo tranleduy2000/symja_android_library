@@ -23,7 +23,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
@@ -2148,7 +2147,10 @@ public final class BooleanFunctions {
 				return F.True;
 			}
 			try {
-			Validate.checkRange(ast, 4, Integer.MAX_VALUE);
+				// Validate.checkRange(ast, 4, Integer.MAX_VALUE);
+				if (ast.size() < 4) {
+					return F.NIL;
+				}
 
 			if (ast.size() == 4) {
 				for (IBuiltInSymbol sym : COMPARATOR_SYMBOLS) {

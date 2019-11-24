@@ -13,6 +13,7 @@ import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.FlowControlException;
 import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.NoEvalException;
 import org.matheclipse.core.eval.exception.Validate;
@@ -45,7 +46,6 @@ import org.matheclipse.core.reflection.system.Product;
 import org.matheclipse.core.reflection.system.Sum;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.core.visit.VisitorRemoveLevelSpecification;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -541,7 +541,7 @@ public final class ListFunctions {
 				}
 			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			IAST arg1AST = Validate.checkASTType(arg1, engine);
+			IAST arg1AST = Validate.checkASTType(ast, arg1, engine);
 			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
@@ -625,13 +625,13 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			ISymbol sym = Validate.checkSymbolType(ast, 1, engine);
-			if (sym == null) {
+			IExpr sym = Validate.checkSymbolType(ast, 1, engine);
+			if (!sym.isPresent()) {
 				return F.NIL;
 			}
 			IExpr arg2 = engine.evaluate(ast.arg2());
 			Function<IExpr, IExpr> function = new AppendToFunction(arg2);
-			IExpr[] results = sym.reassignSymbolValue(function, F.AppendTo, engine);
+			IExpr[] results = ((ISymbol)sym).reassignSymbolValue(function, F.AppendTo, engine);
 			if (results != null) {
 				return results[1];
 			}
@@ -1056,9 +1056,9 @@ public final class ListFunctions {
 		 *
 		 */
 		@SuppressWarnings("serial")
-		private static class StopException extends MathException {
+		private static class StopException extends FlowControlException {
 			public StopException() {
-				super("Stop Cases() evaluation");
+				super();
 			}
 		}
 
@@ -1708,7 +1708,7 @@ public final class ListFunctions {
 						if (indx == 0) {
 							return list.setAtCopy(0, F.Sequence);
 						}
-						return list.removeAtCopy(indx);
+						return list.splice(indx);
 					} catch (final RuntimeException rex) {
 					if (Config.DEBUG) {
 							rex.printStackTrace();
@@ -1785,7 +1785,7 @@ public final class ListFunctions {
 				if (position == 0) {
 					return list.setAtCopy(0, F.Sequence);
 				}
-				return list.removeAtCopy(position);
+				return list.splice(position);
 			}
 			IExpr temp = list.get(position);
 			if (temp.isAST()) {
@@ -2694,7 +2694,7 @@ public final class ListFunctions {
 			}
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			IAST arg1AST = Validate.checkASTType(arg1, engine);
+			IAST arg1AST = Validate.checkASTType(ast, arg1, engine);
 			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
@@ -3173,7 +3173,7 @@ public final class ListFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST() && ((IAST) arg1).size() > 1) {
-				return ((IAST) arg1).removeAtCopy(((IAST) arg1).argSize());
+				return ((IAST) arg1).splice(((IAST) arg1).argSize());
 			}
 			engine.printMessage("Most: Nonatomic expression expected");
 			return F.NIL;
@@ -3785,7 +3785,7 @@ public final class ListFunctions {
 				}
 			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			IAST arg1AST = Validate.checkASTType(arg1, engine);
+			IAST arg1AST = Validate.checkASTType(ast, arg1, engine);
 			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
@@ -3896,13 +3896,13 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			ISymbol sym = Validate.checkSymbolType(ast, 1, engine);
-			if (sym == null) {
+			IExpr sym = Validate.checkSymbolType(ast, 1, engine);
+			if (!sym.isPresent()) {
 				return F.NIL;
 			}
 			IExpr arg2 = engine.evaluate(ast.arg2());
 			Function<IExpr, IExpr> function = new PrependToFunction(arg2);
-			IExpr[] results = sym.reassignSymbolValue(function, F.PrependTo, engine);
+			IExpr[] results = ((ISymbol)sym).reassignSymbolValue(function, F.PrependTo, engine);
 			if (results != null) {
 				return results[1];
 			}
