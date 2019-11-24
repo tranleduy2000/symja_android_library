@@ -2396,6 +2396,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCoefficient() {
+		check("Coefficient(7*y^w, y, w)", //
+				"7");
+		check("Coefficient(7*y^(3*w), y, 3*w)", //
+				"7");
+		check("Coefficient(c*x^(-2)+a+b*x,x,-2)", //
+				"c");
 		// TODO
 		// check("Coefficient(2*x*y+5*x^3,x^3,0)", //
 		// "0");
@@ -2443,7 +2449,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Coefficient(SeriesData(x, 0, {1, 1, 0, 1, 1, 0, 1, 1}, 0, 9, 1), x, 4)", //
 				"1");
 		check("Coefficient(x^2*y^2 + 3*x + 4*y+y^w, y, 0)", //
-				"3*x+y^w");
+				"3*x");
 		check("Coefficient(x^2*y^2 + 3*x + 4*y+3/(y^4), x, 0)", //
 				"3/y^4+4*y");
 		check("Coefficient(x^2*y^2 + 3*x + 4*y+Sin(y), x, 0)", //
@@ -2601,6 +2607,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testCoefficientList() {
+		check("CoefficientList(7*y^w, y )", //
+				"{7*y^w}");
 		check("CoefficientList(2*x*y+5*x^3,2*x)", //
 				"{5*x^3+2*x*y}");
 		check("CoefficientList((2*x)^7*y+5*x^3,x^3)", //
@@ -5637,6 +5645,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testExponent() {
+		check("Exponent(1 + x^(-2) + a*x^(-42), x, List)", //
+				"{-42,-2,0}");
+		check("Exponent(c*x^(-2)+a+b*x,x,-2)", //
+				"-2[-2,0,1]");
+		check("Exponent(7*y^w, y, List)", //
+				"{w}");
 		check("Exponent((2*x )^7*y+5*x^3,x^3)", //
 				"7/3");
 		check("Exponent(2*x *y+5*x^3,x^3)", //
@@ -6510,6 +6524,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFibonacci() {
+		// Android changed:
 		check("Fibonacci(0.2114411444411100011, 5)", //
 				"1.598551917369153727*10^-1");
 		check("Fibonacci(5.8)", //
@@ -20829,6 +20844,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testUpperCaseQ() {
+		// print message: UpperCaseQ: String expected at position 1 in UpperCaseQ(abc).
+		check("UpperCaseQ(abc)", //
+				"UpperCaseQ(abc)");
 		check("UpperCaseQ(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\")", //
 				"True");
 		check("UpperCaseQ(\"ABCDEFGHIJKLMNopqRSTUVWXYZ\")", //
