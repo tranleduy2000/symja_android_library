@@ -972,13 +972,32 @@ public class ManipulateFunction {
 		}
 		double plotRangeYMax = Double.MIN_VALUE;
 		double plotRangeYMin = Double.MAX_VALUE;
+		double plotRangeXMax = Double.MIN_VALUE;
+		double plotRangeXMin = Double.MAX_VALUE;
+		if (plotRangeX.isAST(F.List, 4)) {
+			try {
+				plotRangeXMin = engine.evalDouble(plotRangeX.arg2());
+				plotRangeXMax = engine.evalDouble(plotRangeX.arg3());
+			} catch (RuntimeException rex) {
+			}
+		}
 		IExpr plotRangeY = options.getOption(F.PlotRange);
 		// IAST optionPlotRange = F.NIL;
 		if (plotRangeY.isPresent()) {
 			if (plotRangeY.isAST(F.List, 3)) {
 				try {
+					if (plotRangeY.first().isAST(F.List, 3) && //
+							plotRangeY.second().isAST(F.List, 3)) {
+						IAST list = (IAST) plotRangeY.first();
+						plotRangeXMin = engine.evalDouble(list.first());
+						plotRangeXMax = engine.evalDouble(list.second());
+						list = (IAST) plotRangeY.second();
+						plotRangeYMin = engine.evalDouble(list.first());
+						plotRangeYMax = engine.evalDouble(list.second());
+					} else {
 					plotRangeYMin = engine.evalDouble(plotRangeY.first());
 					plotRangeYMax = engine.evalDouble(plotRangeY.second());
+					}
 				} catch (RuntimeException rex) {
 				}
 				// optionPlotRange = F.List(F.Full, F.List(plotRange.first(), plotRange.second()));
@@ -1013,15 +1032,15 @@ public class ManipulateFunction {
 
 		ISymbol plotSymbolX = (ISymbol) plotRangeX.arg1();
 
-		double plotRangeXMax = Double.MIN_VALUE;
-		double plotRangeXMin = Double.MAX_VALUE;
-		if (plotRangeX.isAST(F.List, 4)) {
-			try {
-				plotRangeXMin = engine.evalDouble(plotRangeX.arg2());
-				plotRangeXMax = engine.evalDouble(plotRangeX.arg3());
-			} catch (RuntimeException rex) {
-			}
-		}
+		// double plotRangeXMax = Double.MIN_VALUE;
+		// double plotRangeXMin = Double.MAX_VALUE;
+		// if (plotRangeX.isAST(F.List, 4)) {
+		// try {
+		// plotRangeXMin = engine.evalDouble(plotRangeX.arg2());
+		// plotRangeXMax = engine.evalDouble(plotRangeX.arg3());
+		// } catch (RuntimeException rex) {
+		// }
+		// }
 		if (plotID == ID.ParametricPlot && //
 				plotRangeYMax != Double.MIN_VALUE && //
 				plotRangeYMin != Double.MAX_VALUE) {
