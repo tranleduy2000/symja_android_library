@@ -1,4 +1,4 @@
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.longexponent;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -11,8 +11,7 @@ import java.util.Random;
 import edu.jas.structure.RingFactory;
 
 /**
- * Singleton ring factory class. Defines tests for field and query of
- * characteristic.
+ * Singleton ring factory class.
  * 
  */
 public class ExprRingFactory implements RingFactory<IExpr> {

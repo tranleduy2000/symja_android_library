@@ -23,7 +23,7 @@ import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.RulesData;
-import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;

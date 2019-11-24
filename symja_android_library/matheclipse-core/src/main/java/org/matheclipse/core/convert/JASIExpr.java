@@ -5,7 +5,7 @@ import com.duy.lambda.Predicate;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.ASTSeriesData;
-import org.matheclipse.core.polynomials.ExprRingFactory;
+import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -13,7 +13,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.polynomials.ExpVectorLong;
+import org.matheclipse.core.polynomials.longexponent.ExpVectorLong;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -174,9 +174,9 @@ public class JASIExpr {
 		}
 	}
 
-	public GenPolynomial<IExpr> expr2IExprJAS(final org.matheclipse.core.polynomials.ExprPolynomial exprPoly) {
+	public GenPolynomial<IExpr> expr2IExprJAS(final org.matheclipse.core.polynomials.longexponent.ExprPolynomial exprPoly) {
 		GenPolynomial<IExpr> result = new GenPolynomial<IExpr>(fPolyFactory);// fPolyFactory.getZERO();
-		SortedMap<org.matheclipse.core.polynomials.ExpVectorLong, IExpr> monoms = exprPoly.getMap();
+		SortedMap<org.matheclipse.core.polynomials.longexponent.ExpVectorLong, IExpr> monoms = exprPoly.getMap();
 		for (Entry<ExpVectorLong, IExpr> entry : monoms.entrySet()) {
 			long[] arr = entry.getKey().getVal();
 			result.doPutToMap(ExpVector.create(arr), monoms.get(entry.getKey()));

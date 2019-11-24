@@ -1,4 +1,4 @@
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.longexponent;
 
 import com.duy.util.ThreadLocalRandom;
 
@@ -10,8 +10,10 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
 import java.io.Reader;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,92 @@ import edu.jas.util.LongIterable;
 
 public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
+	/**
+	 * Comparator for polynomials.
+	 */
+	private static class ExprPolynomialComparator implements Serializable, Comparator<ExprPolynomial> {
+
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = -2427163728878196089L;
+
+		public final ExprTermOrder tord;
+
+		public final boolean reverse;
+
+		/**
+		 * Constructor.
+		 *
+		 * @param t
+		 *            TermOrder.
+		 * @param reverse
+		 *            flag if reverse ordering is requested.
+		 */
+		public  ExprPolynomialComparator(ExprTermOrder t, boolean reverse) {
+			tord = t;
+			this.reverse = reverse;
+		}
+
+		/**
+		 * Compare polynomials.
+		 *
+		 * @param p1
+		 *            first polynomial.
+		 * @param p2
+		 *            second polynomial.
+		 * @return 0 if ( p1 == p2 ), -1 if ( p1 < p2 ) and +1 if ( p1 > p2 ).
+		 */
+		@Override
+		public int compare(ExprPolynomial p1, ExprPolynomial p2) {
+			// check if p1.tord = p2.tord = tord ?
+			int s = p1.compareTo(p2);
+			if (reverse) {
+				return -s;
+			}
+			return s;
+		}
+
+		/**
+		 * Equals test of comparator.
+		 *
+		 * @param o
+		 *            other object.
+		 * @return true if this = o, else false.
+		 */
+		@Override
+		public boolean equals(Object o) {
+			ExprPolynomialComparator pc = null;
+			try {
+				pc = (ExprPolynomialComparator) o;
+			} catch (ClassCastException ignored) {
+				return false;
+			}
+			if (pc == null) {
+				return false;
+			}
+			return tord.equals(pc.tord);
+		}
+
+		/**
+		 * Hash code for this PolynomialComparator.
+		 *
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			return tord.hashCode();
+		}
+
+		/**
+		 * toString.
+		 */
+		@Override
+		public String toString() {
+			return "PolynomialComparator(" + tord + ")";
+		}
+
+	}
 	/**
 	 *
 	 */
@@ -268,7 +356,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @return
 	 */
 	public ExprPolynomial create(final IExpr exprPoly) throws ArithmeticException, ClassCastException {
-		return create(exprPoly, false, true);
+		return create(exprPoly, false, true, false);
 	}
 
 	/**
@@ -279,11 +367,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @param coefficient
 	 *            set to <code>true</code> if called by the <code>Coefficient()</code> function
 	 * @param checkNegativeExponents
-	 *            if <code>true</code> don't allow negative exponents
+	 *            if <code>true</code> don't allow negative exponents and throw an ArithmeticException
+	 * @param coefficientListMode
+	 *            if in coefficient list mode don't collect negative <code>Power()</code> exponents
 	 * @return
 	 */
-	public ExprPolynomial create(final IExpr exprPoly, boolean coefficient, boolean checkNegativeExponents)
-			throws ArithmeticException, ClassCastException {
+	public ExprPolynomial create(final IExpr exprPoly, boolean coefficient, boolean checkNegativeExponents,
+			boolean coefficientListMode) throws ArithmeticException, ClassCastException {
 		int ix = ExpVectorLong.indexVar(exprPoly, getVars());
 		if (ix >= 0) {
 			ExpVectorLong e = new ExpVectorLong(vars.argSize(), ix, 1L);
@@ -295,19 +385,19 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 			ExprPolynomial p = getZero();
 			if (ast.isPlus()) {
 				IExpr expr = ast.arg1();
-				result = create(expr, coefficient, checkNegativeExponents);
+				result = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 				for (int i = 2; i < ast.size(); i++) {
 					expr = ast.get(i);
-					p = create(expr, coefficient, checkNegativeExponents);
+					p = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 					result = result.sum(p);
 				}
 				return result;
 			} else if (ast.isTimes()) {
 				IExpr expr = ast.arg1();
-				result = create(expr, coefficient, checkNegativeExponents);
+				result = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 				for (int i = 2; i < ast.size(); i++) {
 					expr = ast.get(i);
-					p = create(expr, coefficient, checkNegativeExponents);
+					p = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 					result = result.multiply(p);
 				}
 				return result;
@@ -326,10 +416,11 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 						throw new ArithmeticException(
 								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
 					}
-					if (exponent < 0) {
+					if (exponent < 0 && coefficientListMode) {
 						return new ExprPolynomial(this, ast);
-						// ExpVectorLong e = new ExpVectorLong(vars.argSize(), ix, 0);
-						// return getOne().multiply(e);
+					}
+					if (exponent == Integer.MIN_VALUE) {
+						return new ExprPolynomial(this, ast);
 					}
 					ExpVectorLong e = new ExpVectorLong(vars.argSize(), ix, exponent);
 					return getOne().multiply(e);
@@ -1282,7 +1373,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *
 	 * @return polynomial comparator.
 	 */
-	public ExprPolynomialComparator getComparator() {
+	public  Comparator getComparator() {
 		return new ExprPolynomialComparator(tord, false);
 	}
 
@@ -1293,7 +1384,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *            for reverse comparator.
 	 * @return polynomial comparator.
 	 */
-	public ExprPolynomialComparator getComparator(boolean rev) {
+	public  Comparator getComparator(boolean rev) {
 		return new ExprPolynomialComparator(tord, rev);
 	}
 

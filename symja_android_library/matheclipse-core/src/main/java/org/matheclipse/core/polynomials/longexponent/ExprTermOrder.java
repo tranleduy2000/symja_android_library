@@ -2,7 +2,7 @@
  * $Id: ExprTermOrder.java 5391 2016-01-04 13:46:50Z kredel $
  */
 
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.longexponent;
 
 
 import org.apache.log4j.Logger;

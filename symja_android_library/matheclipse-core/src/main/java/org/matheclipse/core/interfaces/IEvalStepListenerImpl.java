@@ -1,7 +1,7 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.polynomials.ExprPolynomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
 
 /**
  * Created by Duy on 2/20/2018.
