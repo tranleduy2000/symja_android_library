@@ -473,4 +473,9 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         throw new IndexOutOfBoundsException("Index: " + Integer.valueOf(start) + ", Size: " + size());
     }
 
+    @Override
+    public IAST splice(int index) {
+        return removeAtCopy(index);
+    }
+
 }

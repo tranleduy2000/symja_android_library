@@ -1236,6 +1236,15 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTAppendable slice(int start, int end);
 
     /**
+     * The <code>splice()</code> method removes the item from an AST copy, and returns the copy.
+     *
+     * @param index
+     *            An integer that specifies at what position to add/remove items.
+     * @return an IAST with removed element at the given position.
+     */
+    IAST splice(int index);
+
+    /**
      * The <code>splice()</code> method adds/removes items to/from an AST copy, and returns the copy.
      *
      * @param index   An integer that specifies at what position to add/remove items.
