@@ -314,7 +314,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         if (fValue != null) {
             IExpr temp = assignedValue();
-            if (temp != null && temp != this && temp.isNumericFunction()) {
+			if (temp != null && temp.isNumericFunction() && temp != this) {
                 return true;
             }
         }

@@ -2853,7 +2853,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericFunction() {
-		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute()) {
+		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
 			// check if all arguments are &quot;numeric&quot;
 			return forAll(new Predicate<IExpr>() {
 				@Override
