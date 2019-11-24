@@ -1,11 +1,10 @@
 package org.matheclipse.core.eval.exception;
 
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  */
-public class WrongNumberOfArguments extends MathException {
+public class WrongNumberOfArguments extends ValidateException {
 	/**
 	 * 
 	 */
@@ -20,8 +19,8 @@ public class WrongNumberOfArguments extends MathException {
 	int fTextNumber;
 
 	/**
-	 * Expected number of arguments: {@code allowed} but got {@code current}
-	 * arguments:<br/> {@code expr}.
+	 * Expected number of arguments: {@code allowed} but got {@code current} arguments:<br/>
+	 * {@code expr}.
 	 * 
 	 * @param expr
 	 * @param allowed
@@ -35,8 +34,8 @@ public class WrongNumberOfArguments extends MathException {
 	}
 
 	/**
-	 * Expected number of arguments: {@code allowed} but got {@code current}
-	 * arguments:<br/> {@code expr}.
+	 * Expected number of arguments: {@code allowed} but got {@code current} arguments:<br/>
+	 * {@code expr}.
 	 * 
 	 * @param expr
 	 * @param allowed

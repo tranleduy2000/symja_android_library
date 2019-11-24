@@ -23,7 +23,6 @@ import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractMatrix1Expr;
@@ -639,9 +638,9 @@ public final class LinearAlgebra {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            if (ast.size() != 3) {
-                throw new WrongNumberOfArguments(ast, 2, ast.argSize());
-            }
+			// if (ast.size() != 3) {
+			// throw new WrongNumberOfArguments(ast, 2, ast.argSize());
+			// }
             IExpr u = ast.arg1();
             IExpr v = ast.arg2();
 
@@ -660,6 +659,10 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     /**
@@ -684,9 +687,9 @@ public final class LinearAlgebra {
 
         @Override
         public IExpr evaluate(final IAST functionList, EvalEngine engine) {
-            if (functionList.size() != 3) {
-                throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
-            }
+			// if (functionList.size() != 3) {
+			// throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
+			// }
             IExpr arg1 = functionList.arg1();
             IExpr arg2 = functionList.arg2();
 
@@ -705,6 +708,10 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     /**
@@ -791,9 +798,9 @@ public final class LinearAlgebra {
 
         @Override
         public IExpr evaluate(final IAST functionList, EvalEngine engine) {
-            if (functionList.size() != 3) {
-                throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
-            }
+			// if (functionList.size() != 3) {
+			// throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
+			// }
             IExpr arg1 = functionList.arg1();
             IExpr arg2 = functionList.arg2();
 
@@ -822,6 +829,10 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     /**
@@ -919,9 +930,9 @@ public final class LinearAlgebra {
 
         @Override
         public IExpr evaluate(final IAST functionList, EvalEngine engine) {
-            if (functionList.size() != 3) {
-                throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
-            }
+			// if (functionList.size() != 3) {
+			// throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
+			// }
             IExpr arg1 = functionList.arg1();
             IExpr arg2 = functionList.arg2();
 
@@ -940,6 +951,10 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     /**
@@ -2795,9 +2810,9 @@ public final class LinearAlgebra {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            if (ast.size() != 3) {
-                throw new WrongNumberOfArguments(ast, 2, ast.argSize());
-            }
+			// if (ast.size() != 3) {
+			// throw new WrongNumberOfArguments(ast, 2, ast.argSize());
+			// }
             IExpr arg1 = ast.arg1();
             IExpr arg2 = ast.arg2();
 
@@ -2827,6 +2842,10 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
         @Override
         public void setUp(ISymbol newSymbol) {
 
@@ -3846,9 +3865,9 @@ public final class LinearAlgebra {
 
         @Override
         public IExpr evaluate(final IAST functionList, EvalEngine engine) {
-            if (functionList.size() != 3) {
-                throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
-            }
+			// if (functionList.size() != 3) {
+			// throw new WrongNumberOfArguments(functionList, 2, functionList.argSize());
+			// }
             IExpr arg1 = functionList.arg1();
             IExpr arg2 = functionList.arg2();
 
@@ -3879,6 +3898,10 @@ public final class LinearAlgebra {
             return F.NIL;
         }
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
     }
 
     private static class ToeplitzMatrix extends AbstractFunctionEvaluator {

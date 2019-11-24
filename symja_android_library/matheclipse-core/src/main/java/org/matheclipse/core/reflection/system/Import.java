@@ -9,7 +9,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.WL;
@@ -41,7 +40,7 @@ public class Import extends AbstractEvaluator {
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (Config.isFileSystemEnabled(engine)) {
 			if (!(ast.arg1() instanceof IStringX)) {
-				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
+				return F.NIL;
 			}
 
             IStringX arg1 = (IStringX) ast.arg1();
@@ -49,7 +48,7 @@ public class Import extends AbstractEvaluator {
             String fileName = arg1.toString();
             if (ast.size() > 2) {
                 if (!(ast.arg2() instanceof IStringX)) {
-                    throw new WrongNumberOfArguments(ast, 2, ast.argSize());
+					return F.NIL;
                 }
                 format = Extension.importExtension(((IStringX) ast.arg2()).toString());
             }

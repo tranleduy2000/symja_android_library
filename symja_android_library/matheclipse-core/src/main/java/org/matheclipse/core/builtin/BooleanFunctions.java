@@ -24,7 +24,7 @@ import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -2231,7 +2231,7 @@ public final class BooleanFunctions {
 				return res;
 
 				// return inequality(ast, engine);
-			} catch (WrongNumberOfArguments woa) {
+			} catch (ValidateException woa) {
 				return engine.printMessage(woa.getMessage());
 			}
 		}
