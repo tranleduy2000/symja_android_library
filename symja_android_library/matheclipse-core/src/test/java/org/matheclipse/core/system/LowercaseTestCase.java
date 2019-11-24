@@ -5866,7 +5866,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// example from paper
 		System.out.print('.');
 		check("Factor(3*Tan(3*x)-Tan(x)+2)", //
-				"3*(2/3-Tan(x)/3+Tan(3*x))");
+				"2-Tan(x)+3*Tan(3*x)");
 		System.out.print('.');
 		check("TrigToExp(3*Tan(3*x)-Tan(x)+2)", //
 				"2+(-I*(E^(-I*x)-E^(I*x)))/(E^(-I*x)+E^(I*x))+(I*3*(E^(-I*3*x)-E^(I*3*x)))/(E^(-\n"
@@ -5879,7 +5879,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// example from paper
 		System.out.print('.');
 		check("Factor(3*Sech(x)^2+4*Tanh(x)+1)", //
-				"4*(1/4+3/4*Sech(x)^2+Tanh(x))");
+				"1+3*Sech(x)^2+4*Tanh(x)");
 		System.out.print('.');
 		check("TrigToExp(3*Sech(x)^2+4*Tanh(x)+1)", //
 				"1+12/(E^(-x)+E^x)^2+4*(-1/(E^x*(E^(-x)+E^x))+E^x/(E^(-x)+E^x))");
@@ -5902,7 +5902,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// example from paper
 		System.out.print('.');
 		check("Factor(Cosh(x)-3*Sinh(y))", //
-				"-3*(-Cosh(x)/3+Sinh(y))");
+				"Cosh(x)-3*Sinh(y)");
 
 		// 1/(E^x*2) + E^x/2 + 3/(E^y*2) - (3*E^y)/2
 		System.out.print('.');
@@ -5918,7 +5918,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// example from paper
 		System.out.print('.');
 		check("Factor(2*Sinh(x)+6*Cosh(y)-5)", //
-				"2*(-5/2+3*Cosh(y)+Sinh(x))");
+				"-5+6*Cosh(y)+2*Sinh(x)");
 		System.out.print('.');
 		check("TrigToExp(2*Sinh(x)+6*Cosh(y)-5)", //
 				"-5+2*(-1/(2*E^x)+E^x/2)+6*(1/(2*E^y)+E^y/2)");
@@ -7634,13 +7634,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 	public void testFunctionRange() {
 		// TODO
-		// check("FunctionRange(x/(1 + x^2), x, y)", //
-		// "");
-		check("FunctionRange(x^2-1, x, y)", //
-				"y>=-1");
-		// TODO
 		// check("FunctionRange(Sqrt(x^2 - 1)/x, x, y)", //
 		// "");
+		check("FunctionRange(x/(1 + x^2), x, y)", //
+				"-1/2<=y<=1/2");
+		check("FunctionRange(x^2-1, x, y)", //
+				"y>=-1");
 
 		check("FunctionRange(1/(1 + x^2), x, y)", //
 				"0<=y<=1");
@@ -10121,6 +10120,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// }
 
 	public void testLimit() {
+		check("Limit(Sqrt(x^2 - 1)/x, x->-Infinity)", //
+				"-1");
+		check("Limit(x/Sqrt(x^2 - 1), x->-Infinity)", //
+				"-1");
 		// gitlab #107
 		check("Limit(x^2-1/x-2, x->0)", //
 				"Indeterminate");
@@ -11525,6 +11528,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{Min(a,b),Min(a,b,c),Min(b,c)}");
 	}
 	public void testMinimize() {
+		// check("Minimize(Sin(x),x)", //
+		// "");
 		check("Minimize(x^4+7*x^3-2*x^2 + 42, x)", //
 				"{42+7*(-21/8-Sqrt(505)/8)^3-2*(21/8+Sqrt(505)/8)^2+(21/8+Sqrt(505)/8)^4,{x->-21/\n"
 						+ "8-Sqrt(505)/8}}");
@@ -15896,6 +15901,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"Abs(x)");
 		check("Refine(Sqrt(x^2), x>=0)", //
 				"x");
+		check("Refine(Power((-x)^(1/2), 2), Element(x, Reals))", //
+				"-x");
 
 		check("Refine((x^3)^(1/3), x >= 0)", //
 				"x");

@@ -2600,7 +2600,7 @@ public class PolynomialFunctions {
 					}
 				} else {
 					polyRat = jas.expr2JAS(temp, numericSolutions);
-					IAST factorComplex = Algebra.factorComplex(temp,polyRat, jas, F.List);
+					IAST factorComplex = Algebra.factorRational(polyRat, jas, F.List);
 					for (int k = 1; k < factorComplex.size(); k++) {
 						temp = F.evalExpand(factorComplex.get(k));
 						quarticResultList = QuarticSolver.solve(temp, variables.arg1());
