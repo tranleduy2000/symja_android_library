@@ -6590,10 +6590,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindInstance() {
-		check("FindInstance((a || b || c) && (! a || ! b || ! c) && True, {a, b, c}, 2)",
-				"{{a->False,b->True,c->True},{a->False,b->True,c->False}}");
+		check("FindInstance(-1+4*Sin(x)==0,x)", //
+				"{{x->ArcSin(1/4)}}");
 		check("FindInstance(2*Sin(x)==1/2,x)", //
 				"{{x->ArcSin(1/4)}}");
+		check("FindInstance((a || b || c) && (! a || ! b || ! c) && True, {a, b, c}, 2)",
+				"{{a->False,b->True,c->True},{a->False,b->True,c->False}}");
 
 		check("FindInstance({x^2==4,x+y^2==6}, {x,y})", //
 				"{{x->-2,y->-2*Sqrt(2)}}");
@@ -6603,12 +6605,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{{a->False,b->True,c->False,d->False}}");
 
 		check("FindInstance(Sin((-3+x^2)/x) ==2,{x})", //
-				"FindInstance(Sin((-3+x^2)/x)==2,{x})");
+				"{{x->1/2*(ArcSin(2)+Sqrt(12+ArcSin(2)^2))}}");
 		// check("FindInstance(Abs((-3+x^2)/x) ==2,{x})", "{{x->-3}}");
 		check("FindInstance({x^2-11==y, x+y==-9}, {x,y})", "{{x->-2,y->-7}}");
 
-		check("FindInstance(2*Sin(x)==1/2,x)", //
-				"{{x->ArcSin(1/4)}}");
 		check("FindInstance(3+2*Cos(x)==1/2,x)", //
 				"{{x->ArcCos(-5/4)}}");
 		check("FindInstance(Sin(x)==0,x)", "{{x->0}}");
