@@ -5,7 +5,8 @@
 package org.matheclipse.core.polynomials.longexponent;
 
 
-import org.apache.log4j.Logger;
+
+import org.matheclipse.core.basic.Config;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -18,14 +19,7 @@ import edu.jas.kern.Scripting;
 /**
  * Term order class for ordered polynomials. Implements the most used term orders: graded, lexicographical, weight aray
  * and block orders. For the definitions see for example the articles
- * <a href="http://doi.acm.org/10.1145/43882.43887">Kredel, "Admissible term orderings used in computer algebra
- * systems"</a> and <a href="http://doi.acm.org/10.1145/70936.70941">Sit, "Some comments on term-ordering in
- * Gr&ouml;bner basis computations"</a>. <b>Note: </b> the naming is not quite easy to understand: in case of doubt use
- * the term orders with "I" in the name, like IGRLEX (the default) or INVLEX. Not all algorithms may work with all term
- * orders since not all are well-founded, so watch your step. This class does not implement orders by linear forms over
- * Q[t]. Objects of this class are immutable.
- * 
- * @author Heinz Kredel
+ *
  */
 
 public final class ExprTermOrder implements Serializable {
@@ -36,10 +30,7 @@ public final class ExprTermOrder implements Serializable {
 	private static final long serialVersionUID = 360644493672021694L;
 
 
-	private static final Logger logger = Logger.getLogger(ExprTermOrder.class);
-
-
-    private final boolean debug = logger.isDebugEnabled();
+	private final boolean debug = Config.DEBUG;
 
 
     // ExprTermOrder index values

@@ -193,8 +193,7 @@ public class SymbolicPolynomialRing implements RingFactory<SymbolicPolynomial> {
 
 		/**
 		 * IExpr iterator.
-		 * 
-		 * @author Heinz Kredel
+		 *
 		 */
 		class IExprIterator implements Iterator<IExpr> {
 

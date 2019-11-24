@@ -35,6 +35,104 @@ import edu.jas.util.LongIterable;
  */
 
 public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
+	/**
+	 * Polynomial monomial iterator.
+	 *
+	 */
+	private static class GenPolynomialMonomialIterator implements Iterator<ExprPolynomial> {
+
+		/**
+		 * data structure.
+		 */
+		final ExprPolynomialRing ring;
+
+		final Iterator<List<IExpr>> iter;
+
+		ExprPolynomial current;
+
+		/**
+		 * Polynomial iterator constructor.
+		 */
+		@SuppressWarnings("unchecked")
+		public GenPolynomialMonomialIterator(ExprPolynomialRing fac) {
+			ring = fac;
+			LongIterable li = new LongIterable();
+			li.setNonNegativeIterator();
+			List<Iterable<Long>> tlist = new ArrayList<Iterable<Long>>(ring.nvar);
+			for (int i = 0; i < ring.nvar; i++) {
+				tlist.add(li);
+			}
+			CartesianProductInfinite<Long> ei = new CartesianProductInfinite<Long>(tlist);
+			// Iterator<List<Long>> eviter = ei.iterator();
+
+			ExprRingFactory cf = ring.coFac;
+			Iterable<IExpr> coeffiter;
+			if (cf instanceof Iterable && !cf.isFinite()) {
+				Iterable<IExpr> cfi = (Iterable<IExpr>) cf;
+				coeffiter = cfi;
+			} else {
+				throw new IllegalArgumentException("only for infinite iterable coefficients implemented");
+			}
+
+			// Cantor iterator for exponents and coeffcients
+			List<Iterable> eci = new ArrayList<Iterable>(2); // no type parameter
+			eci.add(ei);
+			eci.add(coeffiter);
+			CartesianProductInfinite ecp = new CartesianProductInfinite(eci);
+			iter = ecp.iterator();
+
+			List<IExpr> ec = iter.next();
+			List<Long> ecl = (List<Long>) ec.get(0);
+			IExpr c = ec.get(1); // zero
+			ExpVectorLong e = ExpVectorLong.create(ecl);
+			// System.out.println("exp = " + e);
+			// System.out.println("coeffs = " + c);
+			current = new ExprPolynomial(ring, c, e);
+		}
+
+		/**
+		 * Test for availability of a next element.
+		 *
+		 * @return true if the iteration has more elements, else false.
+		 */
+		@Override
+		public boolean hasNext() {
+			return true;
+		}
+
+		/**
+		 * Get next polynomial.
+		 *
+		 * @return next polynomial.
+		 */
+		@Override
+		@SuppressWarnings("unchecked")
+		public synchronized ExprPolynomial next() {
+			ExprPolynomial res = current;
+
+			List<IExpr> ec = iter.next();
+			IExpr c = ec.get(1);
+			while (c.isZERO()) { // zero already done in first next
+				ec = iter.next();
+				c = ec.get(1);
+			}
+			List<Long> ecl = (List<Long>) ec.get(0);
+			ExpVectorLong e = ExpVectorLong.create(ecl);
+			// System.out.println("exp = " + e);
+			// System.out.println("coeffs = " + c);
+			current = new ExprPolynomial(ring, c, e);
+
+			return res;
+		}
+
+		/**
+		 * Remove an element if allowed.
+		 */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("cannnot remove elements");
+		}
+	}
 
 	/**
 	 * Comparator for polynomials.
@@ -1563,14 +1661,12 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		return getOne();
 	}
 
-}
 
 /**
  * Polynomial iterator.
  *
- * @author Heinz Kredel
  */
-class GenPolynomialIterator implements Iterator<ExprPolynomial> {
+	private static class GenPolynomialIterator implements Iterator<ExprPolynomial> {
 
 	/**
 	 * data structure.
@@ -1692,103 +1788,4 @@ class GenPolynomialIterator implements Iterator<ExprPolynomial> {
 		throw new UnsupportedOperationException("cannnot remove elements");
 	}
 }
-
-/**
- * Polynomial monomial iterator.
- *
- * @author Heinz Kredel
- */
-class GenPolynomialMonomialIterator implements Iterator<ExprPolynomial> {
-
-	/**
-	 * data structure.
-	 */
-	final ExprPolynomialRing ring;
-
-	final Iterator<List<IExpr>> iter;
-
-	ExprPolynomial current;
-
-	/**
-	 * Polynomial iterator constructor.
-	 */
-	@SuppressWarnings("unchecked")
-	public GenPolynomialMonomialIterator(ExprPolynomialRing fac) {
-		ring = fac;
-		LongIterable li = new LongIterable();
-		li.setNonNegativeIterator();
-		List<Iterable<Long>> tlist = new ArrayList<Iterable<Long>>(ring.nvar);
-		for (int i = 0; i < ring.nvar; i++) {
-			tlist.add(li);
-		}
-		CartesianProductInfinite<Long> ei = new CartesianProductInfinite<Long>(tlist);
-		// Iterator<List<Long>> eviter = ei.iterator();
-
-		ExprRingFactory cf = ring.coFac;
-		Iterable<IExpr> coeffiter;
-		if (cf instanceof Iterable && !cf.isFinite()) {
-			Iterable<IExpr> cfi = (Iterable<IExpr>) cf;
-			coeffiter = cfi;
-		} else {
-			throw new IllegalArgumentException("only for infinite iterable coefficients implemented");
-		}
-
-		// Cantor iterator for exponents and coeffcients
-		List<Iterable> eci = new ArrayList<Iterable>(2); // no type parameter
-		eci.add(ei);
-		eci.add(coeffiter);
-		CartesianProductInfinite ecp = new CartesianProductInfinite(eci);
-		iter = ecp.iterator();
-
-		List<IExpr> ec = iter.next();
-		List<Long> ecl = (List<Long>) ec.get(0);
-		IExpr c = ec.get(1); // zero
-		ExpVectorLong e = ExpVectorLong.create(ecl);
-		// System.out.println("exp = " + e);
-		// System.out.println("coeffs = " + c);
-		current = new ExprPolynomial(ring, c, e);
-	}
-
-	/**
-	 * Test for availability of a next element.
-	 *
-	 * @return true if the iteration has more elements, else false.
-	 */
-	@Override
-	public boolean hasNext() {
-		return true;
-	}
-
-	/**
-	 * Get next polynomial.
-	 *
-	 * @return next polynomial.
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public synchronized ExprPolynomial next() {
-		ExprPolynomial res = current;
-
-		List<IExpr> ec = iter.next();
-		IExpr c = ec.get(1);
-		while (c.isZERO()) { // zero already done in first next
-			ec = iter.next();
-			c = ec.get(1);
-		}
-		List<Long> ecl = (List<Long>) ec.get(0);
-		ExpVectorLong e = ExpVectorLong.create(ecl);
-		// System.out.println("exp = " + e);
-		// System.out.println("coeffs = " + c);
-		current = new ExprPolynomial(ring, c, e);
-
-		return res;
-	}
-
-	/**
-	 * Remove an element if allowed.
-	 */
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException("cannnot remove elements");
-	}
 }
