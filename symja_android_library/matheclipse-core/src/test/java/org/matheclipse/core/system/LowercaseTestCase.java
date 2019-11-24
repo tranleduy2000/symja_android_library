@@ -1756,6 +1756,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBooleanMinimize() {
+		check("BooleanMinimize(Or(z,a, z))",//
+				"a||z");
 		check("BooleanMinimize((a&&b&&!c)||(a&&!b&&c)||(a&&!c&&d)||(!a&&b&&c)||(b&&c&&!d)||(b&&!c&&d)||(!b&&c&&d))", //
 				"a&&b&&!c||a&&!b&&d||a&&c&&!d||!a&&b&&d||!a&&c&&d||b&&c&&!d");
 
@@ -12962,6 +12964,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testOr() {
+		check("Or(z, z)", //
+				"z||z");
+		check("Or(a, z, z)", //
+				"a||z||z");
 		check("Attributes(Or)", //
 				"{Flat,HoldAll,OneIdentity,Protected}");
 		check("Or(p, p, p) /. Or(a_, b_) :> {a, b}", //
@@ -12975,14 +12981,20 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("False || True", //
 				"True");
-		check("a || False || b", "a||b");
+		check("a || False || b", //
+				"a||b");
 		// Android changed: accept non-zero number as true value
-		check("Or( )", "False");
+		check("Or( )", //
+				"False");
 		// Android changed: accept non-zero number as true value
-		check("Or(2+2)", "True");
-		check("FullForm( Or(x, Or(y, z)) )", "Or(x, y, z)");
-		check("Or(x, False, z)", "x||z");
-		check("Or(x, True, z)", "True");
+		check("Or(2+2)", //
+				"True");
+		check("FullForm( Or(x, Or(y, z)) )", //
+				"Or(x, y, z)");
+		check("Or(x, False, z)", //
+				"x||z");
+		check("Or(x, True, z)", //
+				"True");
 	}
 
 	public void testOrder() {
@@ -13742,8 +13754,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"0.398942");
 		checkNumeric("N(PDF(BinomialDistribution(40, 0.5), 1))", //
 				"3.637978807091713E-11");
+		//Swift changed: Use Config.DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		checkNumeric("N(PDF(HypergeometricDistribution(20,50,100), 10))", //
 				"0.19687121770654947");
+		//Swift changed: Use Config.DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		checkNumeric("N(PDF(PoissonDistribution(10), 15))", //
 				"0.03471806963068415");
 	}

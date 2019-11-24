@@ -930,7 +930,11 @@ public final class BooleanFunctions {
 						vars.append(temp);
 					}
 				}
+				if (rest.size() == 1) {
+					vars = F.Or();
+				} else {
 				formula = lf.expr2BooleanFunction(rest);
+			}
 			}
 			formula = QuineMcCluskeyAlgorithm.compute(formula);
 			// System.out.println(formula.toString());
@@ -1839,7 +1843,7 @@ public final class BooleanFunctions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.FLAT);
+			// don't assign ISymbol.FLAT
 		}
 
 		/**
