@@ -21,7 +21,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
@@ -80,15 +79,11 @@ public class ExprParserFactory implements IParserFactory {
 			if (fOperatorString.equals("@")) {
 				return F.unaryAST1(lhs, rhs);
 			}
-			IASTAppendable fn = F.ast(F.Apply);
-			fn.append(lhs);
-			fn.append(rhs);
 			if (fOperatorString.equals("@@")) {
-				return fn;
+				return F.Apply(lhs,rhs);
 			}
 			// case "@@@"
-			fn.append(F.List(F.C1));
-			return fn;
+			return F.ApplyListC1(lhs,rhs);
 		}
 
 	}

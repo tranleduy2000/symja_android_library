@@ -4107,10 +4107,27 @@ public class F {
         return new AST2(AppendTo, a0, a1);
     }
 
-    public static IAST Apply(final IExpr a0, final IExpr a1) {
+	/**
+	 * Operator <code>@@</code>
+	 *
+	 * @param a0
+	 * @param a1
+	 * @return
+	 */
+	public static IASTMutable Apply(final IExpr a0, final IExpr a1) {
         return new AST2(Apply, a0, a1);
     }
 
+	/**
+	 * Operator <code>@@@</code>
+	 *
+	 * @param a0
+	 * @param a1
+	 * @return
+	 */
+	public static IASTMutable ApplyListC1(final IExpr a0, final IExpr a1) {
+		return new AST3(Apply, a0, a1, CListC1);
+	}
 	public static IAST Array(final IExpr a0, final IExpr a1) {
 		return new AST2(Array, a0, a1);
 	}
