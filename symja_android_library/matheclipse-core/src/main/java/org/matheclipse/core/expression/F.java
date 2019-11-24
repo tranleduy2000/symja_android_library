@@ -509,6 +509,8 @@ public class F {
     public final static IBuiltInSymbol Catenate = F.initFinalSymbol("Catenate", ID.Catenate);
 	/** Ceiling(expr) - gives the first integer greater than or equal `expr`. */
     public final static IBuiltInSymbol Ceiling = F.initFinalSymbol("Ceiling", ID.Ceiling);
+	/***/
+	public final static IBuiltInSymbol CenterDot = F.initFinalSymbol("CenterDot", ID.CenterDot);
 	/** CentralMoment(list, r) - gives the the `r`th central moment (i.e. the `r`th moment about the mean) of `list`. */
     public final static IBuiltInSymbol CentralMoment = F.initFinalSymbol("CentralMoment", ID.CentralMoment);
     /***/
@@ -551,6 +553,8 @@ public class F {
      * value `0`.
      */
     public final static IBuiltInSymbol Chop = F.initFinalSymbol("Chop", ID.Chop);
+	/***/
+	public final static IBuiltInSymbol CircleDot = F.initFinalSymbol("CircleDot", ID.CircleDot);
 	/** CirclePoints(i) - gives the `i` points on the unit circle for a positive integer `i`. */
     public final static IBuiltInSymbol CirclePoints = F.initFinalSymbol("CirclePoints", ID.CirclePoints);
 	/** Clear(symbol1, symbol2,...) - clears all values of the given symbols. */
