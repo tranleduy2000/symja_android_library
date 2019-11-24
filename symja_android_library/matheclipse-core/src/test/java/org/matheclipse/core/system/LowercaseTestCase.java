@@ -9350,8 +9350,9 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// TODO use ExprParser#getReal() if apfloat problems are fixed
 		// check("ArcSin(1.3038404810405297)",
 		// "1.5707963267948966+I*(-7.610396837318266e-1)");
+		// Android changed
 		checkNumeric("ArcSin(1.3038404810405297)", //
-				"1.5707963267948966+I*(-7.6103968373182658*10^-1)");
+				"1.5707963267948966+I*(-7.610396837318266*10^-1)");
 		checkNumeric("InverseHaversine(1.7)", //
 				"3.141592653589793+I*(-1.5220793674636532)");
 	}
@@ -13756,10 +13757,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"3.637978807091713E-11");
 		//Swift changed: Use Config.DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		checkNumeric("N(PDF(HypergeometricDistribution(20,50,100), 10))", //
-				"0.19687121770654947");
+				"0.19687121770654945");
 		//Swift changed: Use Config.DOUBLE_TOLERANCE to compare double in order to avoid infinity loop
 		checkNumeric("N(PDF(PoissonDistribution(10), 15))", //
-				"0.03471806963068415");
+				"0.03471806963068414");
 	}
 
 	public void testPermutations() {
