@@ -290,6 +290,15 @@ public abstract class B2 extends AbstractAST implements Cloneable, Externalizabl
             super(arg1, arg2);
         }
 
+		@Override
+		public IExpr base() {
+			return arg1;
+		}
+
+		@Override
+		public IExpr exponent() {
+			return arg2;
+		}
         @Override
 		public final IBuiltInSymbol head() {
             return F.Power;
