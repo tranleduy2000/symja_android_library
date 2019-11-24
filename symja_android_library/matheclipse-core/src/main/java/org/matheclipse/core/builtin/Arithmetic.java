@@ -3466,10 +3466,12 @@ public final class Arithmetic {
 					if (base.exponent().isReal() && exponent.isReal()) {
 						IExpr temp = base.exponent().times(exponent);
                         if (temp.isOne()) {
+							// (a ^ b )^exponent => a ^ (b * exponent) && b*exponent==1
 							if (base.base().isNonNegativeResult()) {
 								return base.base();
                             }
-							if (base.base().isRealResult()) {
+							if (base.base().isRealResult() && //
+									base.exponent().isEvenResult()) {
 								return F.Abs(base.base());
                             }
                         }
@@ -5251,7 +5253,7 @@ public final class Arithmetic {
 								} else {
 									// creates an IASTAppendable
 
-                                astTimes = astTimes.removeAtClone(j);
+									astTimes = astTimes.splice(j);
 
 									isIASTAppendable = true;
 								}
