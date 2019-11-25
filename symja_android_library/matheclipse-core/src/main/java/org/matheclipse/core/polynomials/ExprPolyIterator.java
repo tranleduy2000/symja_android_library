@@ -1,6 +1,8 @@
 package org.matheclipse.core.polynomials;
 
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.polynomials.longexponent.ExpVectorLong;
+import org.matheclipse.core.polynomials.longexponent.ExprMonomial;
 
 import java.util.Iterator;
 import java.util.Map;

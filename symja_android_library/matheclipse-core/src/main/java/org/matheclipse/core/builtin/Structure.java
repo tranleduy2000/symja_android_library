@@ -11,7 +11,6 @@ import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Lambda;
@@ -36,7 +35,6 @@ import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.IndexedLevel;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -446,8 +444,8 @@ public class Structure {
 	 * {{{1, 2}, {4}}, {{3}, {5, 6}}}
 	 * </pre>
 	 * <p>
-	 * Level 4 specified in {{2}, {1}, {3}, {4}} exceeds the levels, 3, which can be flattened together in {{{1, 2}, {3}}, {{4}, {5,
-	 * 6}}}.
+	 * Level 4 specified in {{2}, {1}, {3}, {4}} exceeds the levels, 3, which can be flattened together in {{{1, 2},
+	 * {3}}, {{4}, {5, 6}}}.
 	 * </p>
 	 * 
 	 * <pre>
@@ -630,7 +628,8 @@ public class Structure {
 							symbolSlots = F.List(arg1);
 						}
 						if (symbolSlots.size() > ast.size()) {
-							throw new WrongNumberOfArguments(ast, symbolSlots.argSize(), ast.argSize());
+							// To many parameters in `1` to be filled from `2`.
+							return IOFunctions.printMessage(F.Function, "fpct", F.List(symbolSlots, function), engine);
 						}
 						java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
 						final int moduleCounter = engine.incModuleCounter();
@@ -953,7 +952,7 @@ public class Structure {
 					}, 1, heads);
 				}
 				return arg2.accept(level).orElse(arg2);
-			} catch (final MathException e) {
+			} catch (final RuntimeException e) {
 				return engine.printMessage("Map: " + e.getMessage());
 			}
 		}

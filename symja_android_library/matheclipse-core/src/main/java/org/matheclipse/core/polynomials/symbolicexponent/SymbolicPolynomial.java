@@ -1,13 +1,11 @@
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.symbolicexponent;
 
 import com.duy.lambda.Function;
 
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.Collections;
@@ -18,7 +16,6 @@ import java.util.TreeMap;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
-import edu.jas.structure.Element;
 import edu.jas.structure.RingElem;
 import edu.jas.structure.RingElemImpl;
 
@@ -29,9 +26,60 @@ import edu.jas.structure.RingElemImpl;
  * long entries (this will eventually be changed in the future). C can also be a non integral domain, e.g. a ModInteger,
  * i.e. it may contain zero divisors, since multiply() does now check for zeros. <b>Note:</b> multiply() now checks for
  * wrong method dispatch for GenSolvablePolynomial.
- *
+ * 
  */
-public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements RingElem<ExprPolynomial>, Iterable<ExprMonomial> {
+public class SymbolicPolynomial extends RingElemImpl<SymbolicPolynomial> implements RingElem<SymbolicPolynomial>, Iterable<SymbolicMonomial> {
+
+	/**
+	 * Iterator over monomials of a polynomial. Adaptor for val.entrySet().iterator().
+	 * 
+	 */
+	public class SymbolicPolyIterator implements Iterator<SymbolicMonomial> {
+
+		/**
+		 * Internal iterator over polynomial map.
+		 */
+		protected final Iterator<Map.Entry<ExpVectorSymbolic, IExpr>> ms;
+
+		/**
+		 * Constructor of polynomial iterator.
+		 * 
+		 * @param m
+		 *            SortetMap of a polynomial.
+		 */
+		public SymbolicPolyIterator(SortedMap<ExpVectorSymbolic, IExpr> m) {
+			ms = m.entrySet().iterator();
+		}
+
+		/**
+		 * Test for availability of a next monomial.
+		 * 
+		 * @return true if the iteration has more monomials, else false.
+		 */
+		@Override
+		public boolean hasNext() {
+			return ms.hasNext();
+		}
+
+		/**
+		 * Get next monomial element.
+		 * 
+		 * @return next monomial.
+		 */
+		@Override
+		public SymbolicMonomial next() {
+			return new SymbolicMonomial(ms.next());
+		}
+
+		/**
+		 * Remove the last monomial returned from underlying set if allowed.
+		 */
+		@Override
+		public void remove() {
+			ms.remove();
+		}
+
+	}
 
 	/**
 	 * 
@@ -41,13 +89,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	/**
 	 * The factory for the polynomial ring.
 	 */
-	public final ExprPolynomialRing ring;
+	public final SymbolicPolynomialRing ring;
 
 	/**
 	 * The data structure for polynomials.
 	 */
-	protected final SortedMap<ExpVectorLong, IExpr> val; // do not change to
-															// TreeMap
+	protected final SortedMap<ExpVectorSymbolic, IExpr> val; // do not change to
+																// TreeMap
 
 	private final boolean debug = Config.DEBUG;
 
@@ -61,7 +109,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param t
 	 *            TreeMap with correct ordering.
 	 */
-	private ExprPolynomial(ExprPolynomialRing r, TreeMap<ExpVectorLong, IExpr> t) {
+	private SymbolicPolynomial(SymbolicPolynomialRing r, TreeMap<ExpVectorSymbolic, IExpr> t) {
 		ring = r;
 		val = t;
 	}
@@ -72,8 +120,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param r
 	 *            polynomial ring factory.
 	 */
-	public ExprPolynomial(ExprPolynomialRing r) {
-		this(r, new TreeMap<ExpVectorLong, IExpr>(r.tord.getDescendComparator()));
+	public SymbolicPolynomial(SymbolicPolynomialRing r) {
+		this(r, new TreeMap<ExpVectorSymbolic, IExpr>(r.tord.getDescendComparator()));
 	}
 
 	/**
@@ -86,7 +134,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param e
 	 *            exponent.
 	 */
-	public ExprPolynomial(ExprPolynomialRing r, IExpr c, ExpVectorLong e) {
+	public SymbolicPolynomial(SymbolicPolynomialRing r, IExpr c, ExpVectorSymbolic e) {
 		this(r);
 		if (!c.isZERO()) {
 			val.put(e, c);
@@ -101,7 +149,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param c
 	 *            coefficient.
 	 */
-	public ExprPolynomial(ExprPolynomialRing r, IExpr c) {
+	public SymbolicPolynomial(SymbolicPolynomialRing r, IExpr c) {
 		this(r, c, r.evzero);
 	}
 
@@ -113,7 +161,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param e
 	 *            exponent.
 	 */
-	public ExprPolynomial(ExprPolynomialRing r, ExpVectorLong e) {
+	public SymbolicPolynomial(SymbolicPolynomialRing r, ExpVectorSymbolic e) {
 		this(r, r.coFac.getONE(), e);
 	}
 
@@ -125,7 +173,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param v
 	 *            the SortedMap of some other polynomial.
 	 */
-	protected ExprPolynomial(ExprPolynomialRing r, SortedMap<ExpVectorLong, IExpr> v) {
+	protected SymbolicPolynomial(SymbolicPolynomialRing r, SortedMap<ExpVectorSymbolic, IExpr> v) {
 		this(r);
 		if (v.size() > 0) {
 			// ExprPolynomialRing.creations++;
@@ -140,7 +188,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @see edu.jas.structure.Element#factory()
 	 */
 	@Override
-	public ExprPolynomialRing factory() {
+	public SymbolicPolynomialRing factory() {
 		return ring;
 	}
 
@@ -150,8 +198,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return copy of this.
 	 */
 	@Override
-	public ExprPolynomial copy() {
-		return new ExprPolynomial(ring, this.val);
+	public SymbolicPolynomial copy() {
+		return new SymbolicPolynomial(ring, this.val);
 	}
 
 	/**
@@ -168,9 +216,9 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return val as unmodifiable SortedMap.
 	 */
-	public SortedMap<ExpVectorLong, IExpr> getMap() {
+	public SortedMap<ExpVectorSymbolic, IExpr> getMap() {
 		// return val;
-		return Collections.<ExpVectorLong, IExpr>unmodifiableSortedMap(val);
+		return Collections.<ExpVectorSymbolic, IExpr>unmodifiableSortedMap(val);
 	}
 
 	/**
@@ -183,7 +231,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param e
 	 *            exponent.
 	 */
-	public void doPutToMap(ExpVectorLong e, IExpr c) {
+	public void doPutToMap(ExpVectorSymbolic e, IExpr c) {
 		if (debug) {
 			IExpr a = val.get(e);
 			if (a != null) {
@@ -205,7 +253,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param c
 	 *            expected coefficient, null for ignore.
 	 */
-	public void doRemoveFromMap(ExpVectorLong e, IExpr c) {
+	public void doRemoveFromMap(ExpVectorSymbolic e, IExpr c) {
 		IExpr b = val.remove(e);
 		if (debug) {
 			if (c == null) { // ignore b
@@ -225,9 +273,9 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param vals
 	 *            sorted map of exponents and coefficients.
 	 */
-	public void doPutToMap(SortedMap<ExpVectorLong, IExpr> vals) {
-		for (Map.Entry<ExpVectorLong, IExpr> me : vals.entrySet()) {
-			ExpVectorLong e = me.getKey();
+	public void doPutToMap(SortedMap<ExpVectorSymbolic, IExpr> vals) {
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : vals.entrySet()) {
+			ExpVectorSymbolic e = me.getKey();
 			if (debug) {
 				IExpr a = val.get(e);
 				if (a != null) {
@@ -259,7 +307,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		s.append("[ ");
 		boolean first = true;
-		for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
 			if (first) {
 				first = false;
 			} else {
@@ -288,7 +336,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			} else {
 				// s.append( "( " );
 				boolean first = true;
-				for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
+				for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
 					IExpr c = m.getValue();
 					if (first) {
 						first = false;
@@ -300,7 +348,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 							s.append(" + ");
 						}
 					}
-					ExpVectorLong e = m.getKey();
+					ExpVectorSymbolic e = m.getKey();
 					if (!c.isOne() || e.isZERO()) {
 						String cs = c.toString();
 						// if (c instanceof GenPolynomial || c instanceof
@@ -328,7 +376,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				s.append("0");
 			} else {
 				boolean first = true;
-				for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
+				for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
 					IExpr c = m.getValue();
 					if (first) {
 						first = false;
@@ -340,7 +388,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 							s.append(" + ");
 						}
 					}
-					ExpVectorLong e = m.getKey();
+					ExpVectorSymbolic e = m.getKey();
 					if (!c.isOne() || e.isZERO()) {
 						s.append(c.toString());
 						s.append(" ");
@@ -373,7 +421,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		// v = ExprPolynomialRing.newVars("x", ring.nvar);
 		// }
 		boolean first = true;
-		for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
 			IExpr c = m.getValue();
 			if (first) {
 				first = false;
@@ -385,7 +433,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 					s.append(" + ");
 				}
 			}
-			ExpVectorLong e = m.getKey();
+			ExpVectorSymbolic e = m.getKey();
 			String cs = c.toScript();
 			boolean parenthesis = (cs.indexOf("-") >= 0 || cs.indexOf("+") >= 0);
 			if (!c.isOne() || e.isZERO()) {
@@ -431,7 +479,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public boolean isZERO() {
@@ -503,11 +551,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (val.size() <= 1) {
 			return true;
 		}
-		long deg = -1;
-		for (ExpVectorLong e : val.keySet()) {
-			if (deg < 0) {
+		IExpr deg = F.CN1;
+		for (ExpVectorSymbolic e : val.keySet()) {
+			if (deg.isNegative()) {
 				deg = e.totalDeg();
-			} else if (deg != e.totalDeg()) {
+			} else if (!deg.equals(e.totalDeg())) {
 				return false;
 			}
 		}
@@ -524,10 +572,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (B == null) {
 			return false;
 		}
-		if (!(B instanceof ExprPolynomial)) {
+		if (!(B instanceof SymbolicPolynomial)) {
 			return false;
 		}
-		ExprPolynomial a = (ExprPolynomial) B;
+		SymbolicPolynomial a = (SymbolicPolynomial) B;
 		return this.compareTo(a) == 0;
 	}
 
@@ -552,21 +600,21 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return sign(this-b).
 	 */
 	@Override
-	public int compareTo(ExprPolynomial b) {
+	public int compareTo(SymbolicPolynomial b) {
 		if (b == null) {
 			return 1;
 		}
-		SortedMap<ExpVectorLong, IExpr> av = this.val;
-		SortedMap<ExpVectorLong, IExpr> bv = b.val;
-		Iterator<Map.Entry<ExpVectorLong, IExpr>> ai = av.entrySet().iterator();
-		Iterator<Map.Entry<ExpVectorLong, IExpr>> bi = bv.entrySet().iterator();
+		SortedMap<ExpVectorSymbolic, IExpr> av = this.val;
+		SortedMap<ExpVectorSymbolic, IExpr> bv = b.val;
+		Iterator<Map.Entry<ExpVectorSymbolic, IExpr>> ai = av.entrySet().iterator();
+		Iterator<Map.Entry<ExpVectorSymbolic, IExpr>> bi = bv.entrySet().iterator();
 		int s = 0;
 		int c = 0;
 		while (ai.hasNext() && bi.hasNext()) {
-			Map.Entry<ExpVectorLong, IExpr> aie = ai.next();
-			Map.Entry<ExpVectorLong, IExpr> bie = bi.next();
-			ExpVectorLong ae = aie.getKey();
-			ExpVectorLong be = bie.getKey();
+			Map.Entry<ExpVectorSymbolic, IExpr> aie = ai.next();
+			Map.Entry<ExpVectorSymbolic, IExpr> bie = bi.next();
+			ExpVectorSymbolic ae = aie.getKey();
+			ExpVectorSymbolic be = bie.getKey();
 			s = ae.compareTo(be);
 			if (s != 0) {
 				// System.out.println("s = " + s + ", " + ring.toScript(ae) + ",
@@ -606,7 +654,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (this.isZERO()) {
 			return 0;
 		}
-		ExpVectorLong t = val.firstKey();
+		ExpVectorSymbolic t = val.firstKey();
 		IExpr c = val.get(t);
 		return c.signum();
 	}
@@ -625,10 +673,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return first map entry.
 	 */
-	public Map.Entry<ExpVectorLong, IExpr> leadingMonomial() {
+	public Map.Entry<ExpVectorSymbolic, IExpr> leadingMonomial() {
 		if (val.size() == 0)
 			return null;
-		Iterator<Map.Entry<ExpVectorLong, IExpr>> ai = val.entrySet().iterator();
+		Iterator<Map.Entry<ExpVectorSymbolic, IExpr>> ai = val.entrySet().iterator();
 		return ai.next();
 	}
 
@@ -637,7 +685,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return first exponent.
 	 */
-	public ExpVectorLong leadingExpVectorLong() {
+	public ExpVectorSymbolic leadingExpVectorLong() {
 		if (val.size() == 0) {
 			return null; // ring.evzero? needs many changes
 		}
@@ -649,7 +697,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return last exponent.
 	 */
-	public ExpVectorLong trailingExpVectorLong() {
+	public ExpVectorSymbolic trailingExpVectorLong() {
 		if (val.size() == 0) {
 			return ring.evzero; // or null ?;
 		}
@@ -690,7 +738,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent.
 	 * @return coefficient for given exponent.
 	 */
-	public IExpr coefficient(ExpVectorLong e) {
+	public IExpr coefficient(ExpVectorSymbolic e) {
 		IExpr c = val.get(e);
 		if (c == null) {
 			c = ring.coFac.getZERO();
@@ -703,15 +751,15 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return this - leading monomial.
 	 */
-	public ExprPolynomial reductum() {
+	public SymbolicPolynomial reductum() {
 		if (val.size() <= 1) {
 			return ring.getZero();
 		}
-		Iterator<ExpVectorLong> ai = val.keySet().iterator();
-		ExpVectorLong lt = ai.next();
+		Iterator<ExpVectorSymbolic> ai = val.keySet().iterator();
+		ExpVectorSymbolic lt = ai.next();
 		lt = ai.next(); // size > 1
-		SortedMap<ExpVectorLong, IExpr> red = val.tailMap(lt);
-		ExprPolynomial r = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> red = val.tailMap(lt);
+		SymbolicPolynomial r = ring.getZero().copy();
 		r.doPutToMap(red); // new GenPolynomial(ring, red);
 		return r;
 	}
@@ -721,9 +769,9 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return maximal degree in the variable i.
 	 */
-	public long degree(int i) {
+	public IExpr degree(int i) {
 		if (val.size() == 0) {
-			return 0; // 0 or -1 ?;
+			return F.C0; // 0 or -1 ?;
 		}
 		int j;
 		if (i >= 0) {
@@ -731,10 +779,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		} else { // python like -1 means main variable
 			j = ring.nvar + i;
 		}
-		long deg = 0;
-		for (ExpVectorLong e : val.keySet()) {
-			long d = e.getVal(j);
-			if (d > deg) {
+		IExpr deg = F.C0;
+		for (ExpVectorSymbolic e : val.keySet()) {
+			IExpr d = e.getVal(j);
+			if (F.Greater.ofQ(d, deg)) {
 				deg = d;
 			}
 		}
@@ -746,14 +794,14 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return maximal degree in any variables.
 	 */
-	public long degree() {
+	public IExpr degree() {
 		if (val.size() == 0) {
-			return 0; // 0 or -1 ?;
+			return F.C0; // 0 or -1 ?;
 		}
-		long deg = 0;
-		for (ExpVectorLong e : val.keySet()) {
-			long d = e.maxDeg();
-			if (d > deg) {
+		IExpr deg = F.C0;
+		for (ExpVectorSymbolic e : val.keySet()) {
+			IExpr d = e.maxDeg();
+			if (F.Greater.ofQ(d, deg)) {
 				deg = d;
 			}
 		}
@@ -765,14 +813,14 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return total degree in any variables.
 	 */
-	public long totalDegree() {
+	public IExpr totalDegree() {
 		if (val.size() == 0) {
-			return 0; // 0 or -1 ?;
+			return F.C0; // 0 or -1 ?;
 		}
-		long deg = 0;
-		for (ExpVectorLong e : val.keySet()) {
-			long d = e.totalDeg();
-			if (d > deg) {
+		IExpr deg = F.C0;
+		for (ExpVectorSymbolic e : val.keySet()) {
+			IExpr d = e.totalDeg();
+			if (F.Greater.ofQ(d, deg)) {
 				deg = d;
 			}
 		}
@@ -784,18 +832,18 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return weight degree in all variables.
 	 */
-	public long weightDegree() {
-		long[][] w = ring.tord.getWeight();
+	public IExpr weightDegree() {
+		IExpr[][] w = ring.tord.getWeight();
 		if (w == null || w.length == 0) {
 			return totalDegree(); // assume weight 1
 		}
 		if (val.isEmpty()) {
-			return -1L; // 0 or -1 ?;
+			return F.CN1; // 0 or -1 ?;
 		}
-		long deg = 0;
-		for (ExpVectorLong e : val.keySet()) {
-			long d = e.weightDeg(w);
-			if (d > deg) {
+		IExpr deg = F.C0;
+		for (ExpVectorSymbolic e : val.keySet()) {
+			IExpr d = e.weightDeg(w);
+			if (F.Greater.ofQ(d, deg)) {
 				deg = d;
 			}
 		}
@@ -807,22 +855,22 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return polynomial with terms of maximal weight degree.
 	 */
-	public ExprPolynomial leadingWeightPolynomial() {
+	public SymbolicPolynomial leadingWeightPolynomial() {
 		if (val.isEmpty()) {
 			return ring.getZero();
 		}
-		long[][] w = ring.tord.getWeight();
-		long maxw;
+		IExpr[][] w = ring.tord.getWeight();
+		IExpr maxw;
 		if (w == null || w.length == 0) {
 			maxw = totalDegree(); // assume weights = 1
 		} else {
 			maxw = weightDegree();
 		}
-		ExprPolynomial wp = new ExprPolynomial(ring);
-		for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
-			ExpVectorLong e = m.getKey();
-			long d = e.weightDeg(w);
-			if (d >= maxw) {
+		SymbolicPolynomial wp = new SymbolicPolynomial(ring);
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
+			ExpVectorSymbolic e = m.getKey();
+			IExpr d = e.weightDeg(w);
+			if (F.GreaterEqual.ofQ(d, maxw)) {
 				wp.val.put(e, m.getValue());
 			}
 		}
@@ -838,15 +886,15 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (val.size() <= 1) {
 			return true;
 		}
-		long[][] w = ring.tord.getWeight();
+		IExpr[][] w = ring.tord.getWeight();
 		if (w == null || w.length == 0) {
 			return isHomogeneous(); // assume weights = 1
 		}
-		long deg = -1;
-		for (ExpVectorLong e : val.keySet()) {
-			if (deg < 0) {
+		IExpr deg = F.CN1;
+		for (ExpVectorSymbolic e : val.keySet()) {
+			if (deg.isNegativeResult()) {
 				deg = e.weightDeg(w);
-			} else if (deg != e.weightDeg(w)) {
+			} else if (!deg.equals(e.weightDeg(w))) {
 				return false;
 			}
 		}
@@ -858,12 +906,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return maximal degree vector of all variables.
 	 */
-	public ExpVectorLong degreeVector() {
-		ExpVectorLong deg = ring.evzero;
+	public ExpVectorSymbolic degreeVector() {
+		ExpVectorSymbolic deg = ring.evzero;
 		if (val.size() == 0) {
 			return deg;
 		}
-		for (ExpVectorLong e : val.keySet()) {
+		for (ExpVectorSymbolic e : val.keySet()) {
 			deg = deg.lcm(e);
 		}
 		return deg;
@@ -908,7 +956,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	// public <T extends GenPolynomial> T sum(T /*GenPolynomial*/ S) {
 	@Override
-	public ExprPolynomial sum(ExprPolynomial S) {
+	public SymbolicPolynomial sum(SymbolicPolynomial S) {
 		if (S == null) {
 			return this;
 		}
@@ -919,11 +967,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return S;
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.copy(); // new GenPolynomial(ring, val);
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong e = me.getKey();
+		SymbolicPolynomial n = this.copy(); // new GenPolynomial(ring, val);
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic e = me.getKey();
 			IExpr y = me.getValue(); // sv.get(e); // assert y != null
 			IExpr x = nv.get(e);
 			if (x != null) {
@@ -949,15 +997,15 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent.
 	 * @return this + a x<sup>e</sup>.
 	 */
-	public ExprPolynomial sum(IExpr a, ExpVectorLong e) {
+	public SymbolicPolynomial sum(IExpr a, ExpVectorSymbolic e) {
 		if (a == null) {
 			return this;
 		}
 		if (a.isZERO()) {
 			return this;
 		}
-		ExprPolynomial n = this.copy(); // new GenPolynomial(ring, val);
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
+		SymbolicPolynomial n = this.copy(); // new GenPolynomial(ring, val);
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
 		// if ( nv.size() == 0 ) { nv.put(e,a); return n; }
 		IExpr x = nv.get(e);
 		if (x != null) {
@@ -980,7 +1028,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            coefficient.
 	 * @return this + a x<sup>0</sup>.
 	 */
-	public ExprPolynomial sum(IExpr a) {
+	public SymbolicPolynomial sum(IExpr a) {
 		return sum(a, ring.evzero);
 	}
 
@@ -990,7 +1038,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param S
 	 *            GenPolynomial.
 	 */
-	public void doAddTo(ExprPolynomial S) {
+	public void doAddTo(SymbolicPolynomial S) {
 		if (S == null || S.isZERO()) {
 			return;
 		}
@@ -999,10 +1047,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return;
 		}
 		assert (ring.nvar == S.ring.nvar);
-		SortedMap<ExpVectorLong, IExpr> nv = this.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong e = me.getKey();
+		SortedMap<ExpVectorSymbolic, IExpr> nv = this.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic e = me.getKey();
 			IExpr y = me.getValue(); // sv.get(e); // assert y != null
 			IExpr x = nv.get(e);
 			if (x != null) {
@@ -1027,11 +1075,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @param e
 	 *            exponent.
 	 */
-	public void doAddTo(IExpr a, ExpVectorLong e) {
+	public void doAddTo(IExpr a, ExpVectorSymbolic e) {
 		if (a == null || a.isZERO()) {
 			return;
 		}
-		SortedMap<ExpVectorLong, IExpr> nv = this.val;
+		SortedMap<ExpVectorSymbolic, IExpr> nv = this.val;
 		IExpr x = nv.get(e);
 		if (x != null) {
 			x = x.add(a);
@@ -1064,7 +1112,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return this-S.
 	 */
 	@Override
-	public ExprPolynomial subtract(ExprPolynomial S) {
+	public SymbolicPolynomial subtract(SymbolicPolynomial S) {
 		if (S == null) {
 			return this;
 		}
@@ -1075,11 +1123,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return S.negate();
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.copy(); // new GenPolynomial(ring, val);
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong e = me.getKey();
+		SymbolicPolynomial n = this.copy(); // new GenPolynomial(ring, val);
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic e = me.getKey();
 			IExpr y = me.getValue(); // sv.get(e); // assert y != null
 			IExpr x = nv.get(e);
 			if (x != null) {
@@ -1105,12 +1153,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent.
 	 * @return this - a x<sup>e</sup>.
 	 */
-	public ExprPolynomial subtract(IExpr a, ExpVectorLong e) {
+	public SymbolicPolynomial subtract(IExpr a, ExpVectorSymbolic e) {
 		if (a == null || a.isZERO()) {
 			return this;
 		}
-		ExprPolynomial n = this.copy();
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
+		SymbolicPolynomial n = this.copy();
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
 		IExpr x = nv.get(e);
 		if (x != null) {
 			x = x.subtract(a);
@@ -1132,7 +1180,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            coefficient.
 	 * @return this + a x<sup>0</sup>.
 	 */
-	public ExprPolynomial subtract(IExpr a) {
+	public SymbolicPolynomial subtract(IExpr a) {
 		return subtract(a, ring.evzero);
 	}
 
@@ -1145,7 +1193,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return this - a S.
 	 */
-	public ExprPolynomial subtractMultiple(IExpr a, ExprPolynomial S) {
+	public SymbolicPolynomial subtractMultiple(IExpr a, SymbolicPolynomial S) {
 		if (a == null || a.isZERO()) {
 			return this;
 		}
@@ -1156,11 +1204,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return S.multiply(a.negate());
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.copy();
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong f = me.getKey();
+		SymbolicPolynomial n = this.copy();
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic f = me.getKey();
 			IExpr y = me.getValue(); // assert y != null
 			y = a.multiply(y);
 			IExpr x = nv.get(f);
@@ -1189,7 +1237,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return this - a x<sup>e</sup> S.
 	 */
-	public ExprPolynomial subtractMultiple(IExpr a, ExpVectorLong e, ExprPolynomial S) {
+	public SymbolicPolynomial subtractMultiple(IExpr a, ExpVectorSymbolic e, SymbolicPolynomial S) {
 		if (a == null || a.isZERO()) {
 			return this;
 		}
@@ -1200,11 +1248,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return S.multiply(a.negate(), e);
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.copy();
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong f = me.getKey();
+		SymbolicPolynomial n = this.copy();
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic f = me.getKey();
 			f = e.sum(f);
 			IExpr y = me.getValue(); // assert y != null
 			y = a.multiply(y);
@@ -1234,7 +1282,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return this * b - a S.
 	 */
-	public ExprPolynomial scaleSubtractMultiple(IExpr b, IExpr a, ExprPolynomial S) {
+	public SymbolicPolynomial scaleSubtractMultiple(IExpr b, IExpr a, SymbolicPolynomial S) {
 		if (a == null || S == null) {
 			return this.multiply(b);
 		}
@@ -1248,11 +1296,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return subtractMultiple(a, S);
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.multiply(b);
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong f = me.getKey();
+		SymbolicPolynomial n = this.multiply(b);
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic f = me.getKey();
 			// f = e.sum(f);
 			IExpr y = me.getValue(); // assert y != null
 			y = a.multiply(y); // now y can be zero
@@ -1284,7 +1332,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return this * b - a x<sup>e</sup> S.
 	 */
-	public ExprPolynomial scaleSubtractMultiple(IExpr b, IExpr a, ExpVectorLong e, ExprPolynomial S) {
+	public SymbolicPolynomial scaleSubtractMultiple(IExpr b, IExpr a, ExpVectorSymbolic e, SymbolicPolynomial S) {
 		if (a == null || S == null) {
 			return this.multiply(b);
 		}
@@ -1298,11 +1346,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return subtractMultiple(a, e, S);
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.multiply(b);
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong f = me.getKey();
+		SymbolicPolynomial n = this.multiply(b);
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic f = me.getKey();
 			f = e.sum(f);
 			IExpr y = me.getValue(); // assert y != null
 			y = a.multiply(y); // now y can be zero
@@ -1336,7 +1384,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return this * a x<sup>g</sup> - a x<sup>e</sup> S.
 	 */
-	public ExprPolynomial scaleSubtractMultiple(IExpr b, ExpVectorLong g, IExpr a, ExpVectorLong e, ExprPolynomial S) {
+	public SymbolicPolynomial scaleSubtractMultiple(IExpr b, ExpVectorSymbolic g, IExpr a, ExpVectorSymbolic e,
+			SymbolicPolynomial S) {
 		if (a == null || S == null) {
 			return this.multiply(b, g);
 		}
@@ -1350,11 +1399,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return subtractMultiple(a, e, S);
 		}
 		assert (ring.nvar == S.ring.nvar);
-		ExprPolynomial n = this.multiply(b, g);
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		SortedMap<ExpVectorLong, IExpr> sv = S.val;
-		for (Map.Entry<ExpVectorLong, IExpr> me : sv.entrySet()) {
-			ExpVectorLong f = me.getKey();
+		SymbolicPolynomial n = this.multiply(b, g);
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		SortedMap<ExpVectorSymbolic, IExpr> sv = S.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> me : sv.entrySet()) {
+			ExpVectorSymbolic f = me.getKey();
 			f = e.sum(f);
 			IExpr y = me.getValue(); // assert y != null
 			y = a.multiply(y); // y can be zero now
@@ -1379,11 +1428,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return -this.
 	 */
 	@Override
-	public ExprPolynomial negate() {
-		ExprPolynomial n = ring.getZero().copy();
+	public SymbolicPolynomial negate() {
+		SymbolicPolynomial n = ring.getZero().copy();
 		// new GenPolynomial(ring, ring.getZERO().val);
-		SortedMap<ExpVectorLong, IExpr> v = n.val;
-		for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
+		SortedMap<ExpVectorSymbolic, IExpr> v = n.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
 			IExpr x = m.getValue(); // != null, 0
 			v.put(m.getKey(), x.negate());
 			// or m.setValue( x.negate() ) if this cloned
@@ -1397,13 +1446,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return
 	 */
-	public ExprPolynomial multiplyByMinimumNegativeExponents() {
-		long[] result = new long[numberOfVariables()];
+	public SymbolicPolynomial multiplyByMinimumNegativeExponents() {
+		IExpr[] result = new IExpr[numberOfVariables()];
 		boolean negativeExponents = false;
-		for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
-			long[] k = m.getKey().getVal();
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
+			IExpr[] k = m.getKey().getVal();
 			for (int i = 0; i < k.length; i++) {
-				if (k[i] < 0 && k[i] < result[i]) {
+				if (k[i].isNegativeResult() && F.Less.ofQ(k[i], result[i])) {
 					result[i] = k[i];
 					negativeExponents = true;
 				}
@@ -1411,11 +1460,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		if (negativeExponents) {
 			for (int i = 0; i < result.length; i++) {
-				if (result[i] < 0) {
-					result[i] *= (-1);
+				if (result[i].isNegativeResult()) {
+					result[i] = result[i].negate();
 				}
 			}
-			return multiply(new ExpVectorLong(result));
+			return multiply(new ExpVectorSymbolic(result));
 		}
 		return this;
 	}
@@ -1426,7 +1475,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return abs(this).
 	 */
 	@Override
-	public ExprPolynomial abs() {
+	public SymbolicPolynomial abs() {
 		if (leadingBaseCoefficient().signum() < 0) {
 			return this.negate();
 		}
@@ -1441,7 +1490,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return this*S.
 	 */
 	@Override
-	public ExprPolynomial multiply(ExprPolynomial S) {
+	public SymbolicPolynomial multiply(SymbolicPolynomial S) {
 		if (S == null) {
 			return ring.getZero();
 		}
@@ -1461,17 +1510,17 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		// GenSolvablePolynomial<C> Sp = (GenSolvablePolynomial<C>) S;
 		// return T.multiply(Sp);
 		// }
-		ExprPolynomial p = ring.getZero().copy();
-		SortedMap<ExpVectorLong, IExpr> pv = p.val;
-		for (Map.Entry<ExpVectorLong, IExpr> m1 : val.entrySet()) {
+		SymbolicPolynomial p = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> pv = p.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m1 : val.entrySet()) {
 			IExpr c1 = m1.getValue();
-			ExpVectorLong e1 = m1.getKey();
-			for (Map.Entry<ExpVectorLong, IExpr> m2 : S.val.entrySet()) {
+			ExpVectorSymbolic e1 = m1.getKey();
+			for (Map.Entry<ExpVectorSymbolic, IExpr> m2 : S.val.entrySet()) {
 				IExpr c2 = m2.getValue();
-				ExpVectorLong e2 = m2.getKey();
+				ExpVectorSymbolic e2 = m2.getKey();
 				IExpr c = c1.multiply(c2); // check non zero if not domain
 				if (!c.isZERO()) {
-					ExpVectorLong e = e1.sum(e2);
+					ExpVectorSymbolic e = e1.sum(e2);
 					IExpr c0 = pv.get(e);
 					if (c0 == null) {
 						pv.put(e, c);
@@ -1496,7 +1545,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            coefficient.
 	 * @return this*s.
 	 */
-	public ExprPolynomial multiply(IExpr s) {
+	public SymbolicPolynomial multiply(IExpr s) {
 		if (s == null) {
 			return ring.getZero();
 		}
@@ -1513,11 +1562,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		// GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
 		// return T.multiply(s);
 		// }
-		ExprPolynomial p = ring.getZero().copy();
-		SortedMap<ExpVectorLong, IExpr> pv = p.val;
-		for (Map.Entry<ExpVectorLong, IExpr> m1 : val.entrySet()) {
+		SymbolicPolynomial p = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> pv = p.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m1 : val.entrySet()) {
 			IExpr c1 = m1.getValue();
-			ExpVectorLong e1 = m1.getKey();
+			ExpVectorSymbolic e1 = m1.getKey();
 			IExpr c = c1.multiply(s); // check non zero if not domain
 			if (!c.isZERO()) {
 				pv.put(e1, c); // or m1.setValue( c )
@@ -1532,7 +1581,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return monic(this).
 	 */
-	public ExprPolynomial monic() {
+	public SymbolicPolynomial monic() {
 		if (this.isZERO()) {
 			return this;
 		}
@@ -1554,7 +1603,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent.
 	 * @return this * s x<sup>e</sup>.
 	 */
-	public ExprPolynomial multiply(IExpr s, ExpVectorLong e) {
+	public SymbolicPolynomial multiply(IExpr s, ExpVectorSymbolic e) {
 		if (s == null) {
 			return ring.getZero();
 		}
@@ -1571,14 +1620,14 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		// GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
 		// return T.multiply(s, e);
 		// }
-		ExprPolynomial p = ring.getZero().copy();
-		SortedMap<ExpVectorLong, IExpr> pv = p.val;
-		for (Map.Entry<ExpVectorLong, IExpr> m1 : val.entrySet()) {
+		SymbolicPolynomial p = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> pv = p.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m1 : val.entrySet()) {
 			IExpr c1 = m1.getValue();
-			ExpVectorLong e1 = m1.getKey();
+			ExpVectorSymbolic e1 = m1.getKey();
 			IExpr c = c1.multiply(s); // check non zero if not domain
 			if (!c.isZERO()) {
-				ExpVectorLong e2 = e1.sum(e);
+				ExpVectorSymbolic e2 = e1.sum(e);
 				pv.put(e2, c);
 			}
 		}
@@ -1592,7 +1641,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent (!= null).
 	 * @return this * x<sup>e</sup>.
 	 */
-	public ExprPolynomial multiply(ExpVectorLong e) {
+	public SymbolicPolynomial multiply(ExpVectorSymbolic e) {
 		// assert e != null. This is never allowed.
 		if (this.isZERO()) {
 			return this;
@@ -1604,12 +1653,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		// GenSolvablePolynomial<C> T = (GenSolvablePolynomial<C>) this;
 		// return T.multiply(e);
 		// }
-		ExprPolynomial p = ring.getZero().copy();
-		SortedMap<ExpVectorLong, IExpr> pv = p.val;
-		for (Map.Entry<ExpVectorLong, IExpr> m1 : val.entrySet()) {
+		SymbolicPolynomial p = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> pv = p.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m1 : val.entrySet()) {
 			IExpr c1 = m1.getValue();
-			ExpVectorLong e1 = m1.getKey();
-			ExpVectorLong e2 = e1.sum(e);
+			ExpVectorSymbolic e1 = m1.getKey();
+			ExpVectorSymbolic e2 = e1.sum(e);
 			pv.put(e2, c1);
 		}
 		return p;
@@ -1622,7 +1671,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            'monomial'.
 	 * @return this * m.
 	 */
-	public ExprPolynomial multiply(Map.Entry<ExpVectorLong, IExpr> m) {
+	public SymbolicPolynomial multiply(Map.Entry<ExpVectorSymbolic, IExpr> m) {
 		if (m == null) {
 			return ring.getZero();
 		}
@@ -1636,7 +1685,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            coefficient.
 	 * @return this/s.
 	 */
-	public ExprPolynomial divide(IExpr s) {
+	public SymbolicPolynomial divide(IExpr s) {
 		if (s == null || s.isZERO()) {
 			throw new ArithmeticException("division by zero");
 		}
@@ -1645,10 +1694,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		// C t = s.inverse();
 		// return multiply(t);
-		ExprPolynomial p = ring.getZero().copy();
-		SortedMap<ExpVectorLong, IExpr> pv = p.val;
-		for (Map.Entry<ExpVectorLong, IExpr> m : val.entrySet()) {
-			ExpVectorLong e = m.getKey();
+		SymbolicPolynomial p = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> pv = p.val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> m : val.entrySet()) {
+			ExpVectorSymbolic e = m.getKey();
 			IExpr c1 = m.getValue();
 			IExpr c = c1.divide(s);
 			if (debug) {
@@ -1677,7 +1726,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial,edu.jas.poly.GenPolynomial)
 	 */
 	@Override
-	public ExprPolynomial[] quotientRemainder(ExprPolynomial S) {
+	public SymbolicPolynomial[] quotientRemainder(SymbolicPolynomial S) {
 		if (S == null || S.isZERO()) {
 			throw new ArithmeticException("division by zero");
 		}
@@ -1687,15 +1736,15 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		IExpr ci = c.inverse();
 		assert (ring.nvar == S.ring.nvar);
-		ExpVectorLong e = S.leadingExpVectorLong();
-		ExprPolynomial h;
-		ExprPolynomial q = ring.getZero().copy();
-		ExprPolynomial r = this.copy();
+		ExpVectorSymbolic e = S.leadingExpVectorLong();
+		SymbolicPolynomial h;
+		SymbolicPolynomial q = ring.getZero().copy();
+		SymbolicPolynomial r = this.copy();
 		while (!r.isZERO()) {
-			ExpVectorLong f = r.leadingExpVectorLong();
+			ExpVectorSymbolic f = r.leadingExpVectorLong();
 			if (f.multipleOf(e)) {
 				IExpr a = r.leadingBaseCoefficient();
-				ExpVectorLong g = f.subtract(e);
+				ExpVectorSymbolic g = f.subtract(e);
 				a = a.multiplyDistributed(ci);
 				if (a.isZERO()) {
 					return null;
@@ -1713,10 +1762,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 				break;
 			}
 		}
-		ExprPolynomial[] ret = new ExprPolynomial[2];
-		ret[0] = q;
-		ret[1] = r;
-		return ret;
+		return new SymbolicPolynomial[] { q, r };
 	}
 
 	/**
@@ -1731,7 +1777,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @deprecated use quotientRemainder()
 	 */
 	@Deprecated
-	private ExprPolynomial[] divideAndRemainder(ExprPolynomial S) {
+	private SymbolicPolynomial[] divideAndRemainder(SymbolicPolynomial S) {
 		return quotientRemainder(S);
 	}
 
@@ -1745,7 +1791,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial,edu.jas.poly.GenPolynomial)
 	 */
 	@Override
-	public ExprPolynomial divide(ExprPolynomial S) {
+	public SymbolicPolynomial divide(SymbolicPolynomial S) {
 		// if (this instanceof GenSolvablePolynomial || S instanceof
 		// GenSolvablePolynomial) {
 		// // throw new RuntimeException("wrong method dispatch in JRE ");
@@ -1768,7 +1814,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @see edu.jas.poly.PolyUtil#baseSparsePseudoRemainder(edu.jas.poly.GenPolynomial,edu.jas.poly.GenPolynomial)
 	 */
 	@Override
-	public ExprPolynomial remainder(ExprPolynomial S) {
+	public SymbolicPolynomial remainder(SymbolicPolynomial S) {
 		// if (this instanceof GenSolvablePolynomial || S instanceof
 		// GenSolvablePolynomial) {
 		// // throw new RuntimeException("wrong method dispatch in JRE ");
@@ -1787,11 +1833,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		IExpr ci = c.inverse();
 		assert (ring.nvar == S.ring.nvar);
-		ExpVectorLong e = S.leadingExpVectorLong();
-		ExprPolynomial h;
-		ExprPolynomial r = this.copy();
+		ExpVectorSymbolic e = S.leadingExpVectorLong();
+		SymbolicPolynomial h;
+		SymbolicPolynomial r = this.copy();
 		while (!r.isZERO()) {
-			ExpVectorLong f = r.leadingExpVectorLong();
+			ExpVectorSymbolic f = r.leadingExpVectorLong();
 			if (f.multipleOf(e)) {
 				IExpr a = r.leadingBaseCoefficient();
 				f = f.subtract(e);
@@ -1814,7 +1860,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return gcd(this,S).
 	 */
 	@Override
-	public ExprPolynomial gcd(ExprPolynomial S) {
+	public SymbolicPolynomial gcd(SymbolicPolynomial S) {
 		if (S == null || S.isZERO()) {
 			return this;
 		}
@@ -1824,9 +1870,9 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (ring.nvar != 1) {
 			throw new IllegalArgumentException("not univariate polynomials" + ring);
 		}
-		ExprPolynomial x;
-		ExprPolynomial q = this;
-		ExprPolynomial r = S;
+		SymbolicPolynomial x;
+		SymbolicPolynomial q = this;
+		SymbolicPolynomial r = S;
 		while (!r.isZERO()) {
 			x = q.remainder(r);
 			q = r;
@@ -1844,8 +1890,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *         possible.
 	 */
 	@Override
-	public ExprPolynomial[] egcd(ExprPolynomial S) {
-		ExprPolynomial[] ret = new ExprPolynomial[3];
+	public SymbolicPolynomial[] egcd(SymbolicPolynomial S) {
+		SymbolicPolynomial[] ret = new SymbolicPolynomial[3];
 		ret[0] = null;
 		ret[1] = null;
 		ret[2] = null;
@@ -1868,24 +1914,24 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			IExpr t = this.leadingBaseCoefficient();
 			IExpr s = S.leadingBaseCoefficient();
 			if (t.isInteger() && s.isInteger()) {
-			IExpr[] gg = t.egcd(s);
-			// System.out.println("coeff gcd = " + Arrays.toString(gg));
-			ExprPolynomial z = this.ring.getZero();
-			ret[0] = z.sum(gg[0]);
-			ret[1] = z.sum(gg[1]);
-			ret[2] = z.sum(gg[2]);
-			return ret;
+				IExpr[] gg = t.egcd(s);
+				// System.out.println("coeff gcd = " + Arrays.toString(gg));
+				SymbolicPolynomial z = this.ring.getZero();
+				ret[0] = z.sum(gg[0]);
+				ret[1] = z.sum(gg[1]);
+				ret[2] = z.sum(gg[2]);
+				return ret;
+			}
 		}
-		}
-		ExprPolynomial[] qr;
-		ExprPolynomial q = this;
-		ExprPolynomial r = S;
-		ExprPolynomial c1 = ring.getOne().copy();
-		ExprPolynomial d1 = ring.getZero().copy();
-		ExprPolynomial c2 = ring.getZero().copy();
-		ExprPolynomial d2 = ring.getOne().copy();
-		ExprPolynomial x1;
-		ExprPolynomial x2;
+		SymbolicPolynomial[] qr;
+		SymbolicPolynomial q = this;
+		SymbolicPolynomial r = S;
+		SymbolicPolynomial c1 = ring.getOne().copy();
+		SymbolicPolynomial d1 = ring.getZero().copy();
+		SymbolicPolynomial c2 = ring.getZero().copy();
+		SymbolicPolynomial d2 = ring.getOne().copy();
+		SymbolicPolynomial x1;
+		SymbolicPolynomial x2;
 		while (!r.isZERO()) {
 			qr = q.quotientRemainder(r);
 			if (qr == null) {
@@ -1923,8 +1969,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return [ gcd(this,S), a ] with a*this + b*S = gcd(this,S).
 	 */
-	public ExprPolynomial[] hegcd(ExprPolynomial S) {
-		ExprPolynomial[] ret = new ExprPolynomial[2];
+	public SymbolicPolynomial[] hegcd(SymbolicPolynomial S) {
+		SymbolicPolynomial[] ret = new SymbolicPolynomial[2];
 		ret[0] = null;
 		ret[1] = null;
 		if (S == null || S.isZERO()) {
@@ -1939,12 +1985,12 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		if (ring.nvar != 1) {
 			throw new IllegalArgumentException(this.getClass().getName() + " not univariate polynomials" + ring);
 		}
-		ExprPolynomial[] qr;
-		ExprPolynomial q = this;
-		ExprPolynomial r = S;
-		ExprPolynomial c1 = ring.getOne().copy();
-		ExprPolynomial d1 = ring.getZero().copy();
-		ExprPolynomial x1;
+		SymbolicPolynomial[] qr;
+		SymbolicPolynomial q = this;
+		SymbolicPolynomial r = S;
+		SymbolicPolynomial c1 = ring.getOne().copy();
+		SymbolicPolynomial d1 = ring.getZero().copy();
+		SymbolicPolynomial x1;
 		while (!r.isZERO()) {
 			qr = q.quotientRemainder(r);
 			q = qr[0];
@@ -1971,7 +2017,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * GenPolynomial inverse. Required by RingElem. Throws not invertible exception.
 	 */
 	@Override
-	public ExprPolynomial inverse() {
+	public SymbolicPolynomial inverse() {
 		if (isUnit()) { // only possible if ldbcf is unit
 			IExpr c = leadingBaseCoefficient().inverse();
 			return ring.getOne().multiply(c);
@@ -1986,16 +2032,16 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            GenPolynomial.
 	 * @return a with with a*this = 1 mod m.
 	 */
-	public ExprPolynomial modInverse(ExprPolynomial m) {
+	public SymbolicPolynomial modInverse(SymbolicPolynomial m) {
 		if (this.isZERO()) {
 			throw new NotInvertibleException("zero is not invertible");
 		}
-		ExprPolynomial[] hegcd = this.hegcd(m);
-		ExprPolynomial a = hegcd[0];
+		SymbolicPolynomial[] hegcd = this.hegcd(m);
+		SymbolicPolynomial a = hegcd[0];
 		if (!a.isUnit()) { // gcd != 1
-			throw new AlgebraicNotInvertibleException("element not invertible, gcd != 1", m, a, m.divide(a));
+			throw new SymbolicAlgebraicNotInvertibleException("element not invertible, gcd != 1", m, a, m.divide(a));
 		}
-		ExprPolynomial b = hegcd[1];
+		SymbolicPolynomial b = hegcd[1];
 		if (b.isZERO()) { // when m divides this, e.g. m.isUnit()
 			throw new NotInvertibleException("element not invertible, divisible by modul");
 		}
@@ -2013,21 +2059,21 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent for x_j.
 	 * @return extended polynomial.
 	 */
-	public ExprPolynomial extend(ExprPolynomialRing pfac, int j, long k) {
+	public SymbolicPolynomial extend(SymbolicPolynomialRing pfac, int j, IExpr k) {
 		if (ring.equals(pfac)) { // nothing to do
 			return this;
 		}
-		ExprPolynomial Cp = pfac.getZero().copy();
+		SymbolicPolynomial Cp = pfac.getZero().copy();
 		if (this.isZERO()) {
 			return Cp;
 		}
 		int i = pfac.nvar - ring.nvar;
-		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
-		Map<ExpVectorLong, IExpr> A = val;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
+		Map<ExpVectorSymbolic, IExpr> C = Cp.val; // getMap();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
 			IExpr a = y.getValue();
-			ExpVectorLong f = e.extend(i, j, k);
+			ExpVectorSymbolic f = e.extend(i, j, k);
 			C.put(f, a);
 		}
 		return Cp;
@@ -2045,21 +2091,21 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            exponent for x_j.
 	 * @return extended polynomial.
 	 */
-	public ExprPolynomial extendLower(ExprPolynomialRing pfac, int j, long k) {
+	public SymbolicPolynomial extendLower(SymbolicPolynomialRing pfac, int j, IExpr k) {
 		if (ring.equals(pfac)) { // nothing to do
 			return this;
 		}
-		ExprPolynomial Cp = pfac.getZero().copy();
+		SymbolicPolynomial Cp = pfac.getZero().copy();
 		if (this.isZERO()) {
 			return Cp;
 		}
 		int i = pfac.nvar - ring.nvar;
-		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
-		Map<ExpVectorLong, IExpr> A = val;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
+		Map<ExpVectorSymbolic, IExpr> C = Cp.val; // getMap();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
 			IExpr a = y.getValue();
-			ExpVectorLong f = e.extendLower(i, j, k);
+			ExpVectorSymbolic f = e.extendLower(i, j, k);
 			C.put(f, a);
 		}
 		return Cp;
@@ -2072,22 +2118,23 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            contracted polynomial ring factory (by i variables).
 	 * @return Map of exponents and contracted polynomials. <b>Note:</b> could return SortedMap
 	 */
-	public Map<ExpVectorLong, ExprPolynomial> contract(ExprPolynomialRing pfac) {
-		ExprPolynomial zero = pfac.getZero(); // not pfac.coFac;
-		ExprTermOrder t = ExprTermOrderByName.INVLEX;// new
-															// ExprTermOrder(ExprTermOrder.INVLEX);
-		Map<ExpVectorLong, ExprPolynomial> B = new TreeMap<ExpVectorLong, ExprPolynomial>(t.getAscendComparator());
+	public Map<ExpVectorSymbolic, SymbolicPolynomial> contract(SymbolicPolynomialRing pfac) {
+		SymbolicPolynomial zero = pfac.getZero(); // not pfac.coFac;
+		SymbolicTermOrder t = SymbolicTermOrderByName.INVLEX;// new
+																// ExprTermOrder(ExprTermOrder.INVLEX);
+		Map<ExpVectorSymbolic, SymbolicPolynomial> B = new TreeMap<ExpVectorSymbolic, SymbolicPolynomial>(
+				t.getAscendComparator());
 		if (this.isZERO()) {
 			return B;
 		}
 		int i = ring.nvar - pfac.nvar;
-		Map<ExpVectorLong, IExpr> A = val;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
 			IExpr a = y.getValue();
-			ExpVectorLong f = e.contract(0, i);
-			ExpVectorLong g = e.contract(i, e.length() - i);
-			ExprPolynomial p = B.get(f);
+			ExpVectorSymbolic f = e.contract(0, i);
+			ExpVectorSymbolic g = e.contract(i, e.length() - i);
+			SymbolicPolynomial p = B.get(f);
 			if (p == null) {
 				p = zero;
 			}
@@ -2105,10 +2152,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            contracted polynomial ring factory (by i variables).
 	 * @return contracted coefficient polynomial.
 	 */
-	public ExprPolynomial contractCoeff(ExprPolynomialRing pfac) {
-		Map<ExpVectorLong, ExprPolynomial> ms = contract(pfac);
-		ExprPolynomial c = pfac.getZero();
-		for (Map.Entry<ExpVectorLong, ExprPolynomial> m : ms.entrySet()) {
+	public SymbolicPolynomial contractCoeff(SymbolicPolynomialRing pfac) {
+		Map<ExpVectorSymbolic, SymbolicPolynomial> ms = contract(pfac);
+		SymbolicPolynomial c = pfac.getZero();
+		for (Map.Entry<ExpVectorSymbolic, SymbolicPolynomial> m : ms.entrySet()) {
 			if (m.getKey().isZERO()) {
 				c = m.getValue();
 			} else {
@@ -2128,7 +2175,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            index of the variable of this polynomial in pfac.
 	 * @return extended multivariate polynomial.
 	 */
-	public ExprPolynomial extendUnivariate(ExprPolynomialRing pfac, int i) {
+	public SymbolicPolynomial extendUnivariate(SymbolicPolynomialRing pfac, int i) {
 		if (i < 0 || pfac.nvar < i) {
 			throw new IllegalArgumentException("index " + i + "out of range " + pfac.nvar);
 		}
@@ -2139,17 +2186,17 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			return pfac.getOne();
 		}
 		int j = pfac.nvar - 1 - i;
-		ExprPolynomial Cp = pfac.getZero().copy();
+		SymbolicPolynomial Cp = pfac.getZero().copy();
 		if (this.isZERO()) {
 			return Cp;
 		}
-		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
-		Map<ExpVectorLong, IExpr> A = val;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
-			long n = e.getVal(0);
+		Map<ExpVectorSymbolic, IExpr> C = Cp.val; // getMap();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
+			IExpr n = e.getVal(0);
 			IExpr a = y.getValue();
-			ExpVectorLong f = new ExpVectorLong(pfac.nvar, j, n);
+			ExpVectorSymbolic f = new ExpVectorSymbolic(pfac.nvar, j, n);
 			C.put(f, a); // assert not contained
 		}
 		return Cp;
@@ -2162,23 +2209,23 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            extended polynomial ring factory (by 1 variable).
 	 * @return homogeneous polynomial.
 	 */
-	public ExprPolynomial homogenize(ExprPolynomialRing pfac) {
+	public SymbolicPolynomial homogenize(SymbolicPolynomialRing pfac) {
 		if (ring.equals(pfac)) { // not implemented
 			throw new UnsupportedOperationException("case with same ring not implemented");
 		}
-		ExprPolynomial Cp = pfac.getZero().copy();
+		SymbolicPolynomial Cp = pfac.getZero().copy();
 		if (this.isZERO()) {
 			return Cp;
 		}
-		long deg = totalDegree();
+		IExpr deg = totalDegree();
 		// int i = pfac.nvar - ring.nvar;
-		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
-		Map<ExpVectorLong, IExpr> A = val;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
+		Map<ExpVectorSymbolic, IExpr> C = Cp.val; // getMap();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
 			IExpr a = y.getValue();
-			long d = deg - e.totalDeg();
-			ExpVectorLong f = e.extend(1, 0, d);
+			IExpr d = F.Subtract.of(deg, e.totalDeg());
+			ExpVectorSymbolic f = e.extend(1, 0, d);
 			C.put(f, a);
 		}
 		return Cp;
@@ -2191,20 +2238,20 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            contracted polynomial ring factory (by 1 variable).
 	 * @return in homogeneous polynomial.
 	 */
-	public ExprPolynomial deHomogenize(ExprPolynomialRing pfac) {
+	public SymbolicPolynomial deHomogenize(SymbolicPolynomialRing pfac) {
 		if (ring.equals(pfac)) { // not implemented
 			throw new UnsupportedOperationException("case with same ring not implemented");
 		}
-		ExprPolynomial Cp = pfac.getZero().copy();
+		SymbolicPolynomial Cp = pfac.getZero().copy();
 		if (this.isZERO()) {
 			return Cp;
 		}
-		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
-		Map<ExpVectorLong, IExpr> A = val;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
+		Map<ExpVectorSymbolic, IExpr> C = Cp.val; // getMap();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
 			IExpr a = y.getValue();
-			ExpVectorLong f = e.contract(1, pfac.nvar);
+			ExpVectorSymbolic f = e.contract(1, pfac.nvar);
 			C.put(f, a);
 		}
 		return Cp;
@@ -2215,8 +2262,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return polynomial with reversed variables.
 	 */
-	public ExprPolynomial reverse(ExprPolynomialRing oring) {
-		ExprPolynomial Cp = oring.getZero().copy();
+	public SymbolicPolynomial reverse(SymbolicPolynomialRing oring) {
+		SymbolicPolynomial Cp = oring.getZero().copy();
 		if (this.isZERO()) {
 			return Cp;
 		}
@@ -2225,11 +2272,11 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 			k = oring.tord.getSplit();
 		}
 
-		Map<ExpVectorLong, IExpr> C = Cp.val; // getMap();
-		Map<ExpVectorLong, IExpr> A = val;
-		ExpVectorLong f;
-		for (Map.Entry<ExpVectorLong, IExpr> y : A.entrySet()) {
-			ExpVectorLong e = y.getKey();
+		Map<ExpVectorSymbolic, IExpr> C = Cp.val; // getMap();
+		Map<ExpVectorSymbolic, IExpr> A = val;
+		ExpVectorSymbolic f;
+		for (Map.Entry<ExpVectorSymbolic, IExpr> y : A.entrySet()) {
+			ExpVectorSymbolic e = y.getKey();
 			if (k >= 0) {
 				f = e.reverse(k);
 			} else {
@@ -2255,7 +2302,7 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return val.keySet().iterator().
 	 */
-	public Iterator<ExpVectorLong> exponentIterator() {
+	public Iterator<ExpVectorSymbolic> exponentIterator() {
 		return val.keySet().iterator();
 	}
 
@@ -2265,8 +2312,8 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * @return a PolyIterator.
 	 */
 	@Override
-	public Iterator<ExprMonomial> iterator() {
-		return new ExprPolyIterator(val);
+	public Iterator<SymbolicMonomial> iterator() {
+		return new SymbolicPolyIterator(val);
 	}
 
 	/**
@@ -2276,10 +2323,10 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 *            evaluation functor.
 	 * @return new polynomial with coefficients f(this(e)).
 	 */
-	public ExprPolynomial map(final Function<IExpr, IExpr> f) {
-		ExprPolynomial n = ring.getZero().copy();
-		SortedMap<ExpVectorLong, IExpr> nv = n.val;
-		for (ExprMonomial m : this) {
+	public SymbolicPolynomial map(final Function<IExpr, IExpr> f) {
+		SymbolicPolynomial n = ring.getZero().copy();
+		SortedMap<ExpVectorSymbolic, IExpr> nv = n.val;
+		for (SymbolicMonomial m : this) {
 			// logger.info("m = " + m);
 			IExpr c = f.apply(m.c);
 			if (c != null && !c.isZERO()) {
@@ -2296,13 +2343,13 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	public IAST coefficientRules() {
 		IASTAppendable result = F.ListAlloc(val.size());
-		for (Map.Entry<ExpVectorLong, IExpr> monomial : val.entrySet()) {
+		for (Map.Entry<ExpVectorSymbolic, IExpr> monomial : val.entrySet()) {
 			IExpr coeff = monomial.getValue();
-			ExpVectorLong exp = monomial.getKey();
+			ExpVectorSymbolic exp = monomial.getKey();
 			int len = exp.length();
 			IASTAppendable ruleList = F.ListAlloc(len);
 			for (int i = 0; i < len; i++) {
-				ruleList.append(F.integer(exp.getVal(len - i - 1)));
+				ruleList.append(exp.getVal(len - i - 1));
 			}
 			result.append(F.Rule(ruleList, coeff));
 		}
@@ -2316,9 +2363,9 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 */
 	public IAST monomialList() {
 		IASTAppendable result = F.ListAlloc(val.size());
-		for (Map.Entry<ExpVectorLong, IExpr> monomial : val.entrySet()) {
+		for (Map.Entry<ExpVectorSymbolic, IExpr> monomial : val.entrySet()) {
 			// IExpr coeff = monomial.getValue();
-			ExpVectorLong exp = monomial.getKey();
+			ExpVectorSymbolic exp = monomial.getKey();
 			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
 			monomTimes.append(val.get(exp));
 			appendToExpr(monomTimes, exp, ring.vars);
@@ -2327,14 +2374,14 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		return result;
 	}
 
-	private void appendToExpr(IASTAppendable times, ExpVectorLong expArray, IAST variables) {
-		long[] arr = expArray.getVal();
-		ExpVectorLong leer = ring.evzero;
+	private void appendToExpr(IASTAppendable times, ExpVectorSymbolic expArray, IAST variables) {
+		IExpr[] arr = expArray.getVal();
+		ExpVectorSymbolic leer = ring.evzero;
 		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] != 0L) {
+			if (!arr[i].isZero()) {
 				int ix = leer.varIndex(i);
 				if (ix >= 0) {
-					if (arr[i] == 1L) {
+					if (arr[i].isOne()) {
 						times.append(variables.get(ix + 1));
 					} else {
 						times.append(F.Power(variables.get(ix + 1), arr[i]));
@@ -2350,78 +2397,74 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 	 * 
 	 * @return the coefficients of a univariate polynomial up to n degree
 	 */
-	public IAST coefficientList() {
-
-		final int argsSize = ring.getVars().size() - 1;
-		if (argsSize == 1) {
-		long exp;
-		if (ring.tord.getEvord() == ExprTermOrder.IGRLEX || ring.tord.getEvord() == ExprTermOrder.REVILEX) {
-			long lastDegree = degree();
-			IExpr[] exprs = new IExpr[(int) lastDegree + 1];
-			for (int i = 0; i < exprs.length; i++) {
-				exprs[i] = F.C0;
-			}
-			for (ExpVectorLong expArray : val.keySet()) {
-				exp = expArray.getVal(0);
-				exprs[(int) exp] = val.get(expArray);
-			}
-				return F.function(F.List, exprs);
-		} else {
-			long lastDegree = 0L;
-			IASTAppendable result = F.ListAlloc(val.size());
-			for (ExpVectorLong expArray : val.keySet()) {
-				exp = expArray.getVal(0);
-				while (lastDegree < exp) {
-					result.append(F.C0);
-					lastDegree++;
-				}
-				if (lastDegree == exp) {
-					result.append(val.get(expArray));
-					lastDegree++;
-				}
-			}
-			return result;
-		}
-		} else if (argsSize > 1) {
-			long exp;
-			int[] arr = new int[argsSize];
-			for (int j = 0; j < argsSize; j++) {
-				arr[j] = (int) degree(j) + 1;
-			}
-			IASTMutable constantArray = F.C0.constantArray(F.List, 0, arr);
-
-			for (ExpVectorLong expArray : val.keySet()) {
-				int[] positions = new int[argsSize];
-				for (int i = 0; i < expArray.length(); i++) {
-					exp = expArray.getVal(i);
-					positions[expArray.varIndex(i)] = (int) exp + 1;
-				}
-				constantArray.setPart(val.get(expArray), positions);
-			}
-			return constantArray;
-		}
-		return F.NIL;
-	}
+	// public IAST coefficientList() {
+	// final int argsSize = ring.getVars().size() - 1;
+	// if (argsSize == 1) {
+	// IExpr exp;
+	// if (ring.tord.getEvord() == ExpVectorTermOrder.IGRLEX || ring.tord.getEvord() == ExpVectorTermOrder.REVILEX) {
+	// IExpr lastDegree = degree();
+	// IExpr[] exprs = new IExpr[(int) lastDegree + 1];
+	// for (int i = 0; i < exprs.length; i++) {
+	// exprs[i] = F.C0;
+	// }
+	// for (ExpVectorExpr expArray : val.keySet()) {
+	// exp = expArray.getVal(0);
+	// exprs[(int) exp] = val.get(expArray);
+	// }
+	// return F.function(F.List, exprs);
+	// } else {
+	// long lastDegree = 0L;
+	// IASTAppendable result = F.ListAlloc(val.size());
+	// for (ExpVectorExpr expArray : val.keySet()) {
+	// exp = expArray.getVal(0);
+	// while (lastDegree < exp) {
+	// result.append(F.C0);
+	// lastDegree++;
+	// }
+	// if (lastDegree == exp) {
+	// result.append(val.get(expArray));
+	// lastDegree++;
+	// }
+	// }
+	// return result;
+	// }
+	// } else if (argsSize > 1) {
+	// IExpr exp;
+	// int[] arr = new int[argsSize];
+	// for (int j = 0; j < argsSize; j++) {
+	// arr[j] = (int) degree(j) + 1;
+	// }
+	// IASTMutable constantArray = F.C0.constantArray(F.List, 0, arr);
+	// for (ExpVectorLong expArray : val.keySet()) {
+	// int[] positions = new int[argsSize];
+	// for (int i = 0; i < expArray.length(); i++) {
+	// exp = expArray.getVal(i);
+	// positions[expArray.varIndex(i)] = (int) exp + 1;
+	// }
+	// constantArray.setPart(val.get(expArray), positions);
+	// }
+	// return constantArray;
+	// }
+	// return F.NIL;
+	// }
 
 	/**
 	 * Derivative of a polynomial. This method assumes that the polynomial is univariate. Throws WrongNumberOfArguments
 	 * if the polynomial is not univariate.
 	 * 
-	 * @return the derivative polynomia if the polynomial isn't univariate
+	 * @return the derivative polynomial if the polynomial is univariate
 	 */
-	public ExprPolynomial derivative() {
-		Validate.checkSize(ring.getVars(), 2);
-
-		ExprPolynomial result = new ExprPolynomial(ring);
-		long exp;
+	public SymbolicPolynomial derivativeUnivariate() {
+		SymbolicPolynomial result = new SymbolicPolynomial(ring);
+		IExpr exp;
 		IExpr coefficient;
-		ExpVectorLong copy;
-		for (ExpVectorLong expArray : val.keySet()) {
+		ExpVectorSymbolic copy;
+		for (ExpVectorSymbolic expArray : val.keySet()) {
 			exp = expArray.getVal(0);
-			if (exp != 0) {
+			if (!exp.isZero()) {
 				copy = expArray.copy();
-				copy.val[0] = exp - 1;
-				coefficient = val.get(expArray).times(F.integer(exp));
+				copy.val[0] = exp.dec();
+				coefficient = val.get(expArray).times(exp);
 				result.doAddTo(coefficient, copy);
 			}
 		}
@@ -2441,27 +2484,27 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 
 		IASTAppendable result = F.PlusAlloc(length());
 		IAST vars = ring.vars;
-		for (ExprMonomial monomial : this) {
+		for (SymbolicMonomial monomial : this) {
 			IExpr coeff = monomial.coefficient();
-			ExpVectorLong exp = monomial.exponent();
+			ExpVectorSymbolic exp = monomial.exponent();
 			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
 			if (!coeff.isOne()) {
 				monomTimes.append(coeff);
 			}
-			long lExp;
+			IExpr lExp;
 			int ix;
 			IExpr variable;
 			for (int i = 0; i < exp.length(); i++) {
 				lExp = exp.getVal(i);
-				if (lExp != 0L) {
+				if (!lExp.isZero()) {
 					// if (getVar) {
 					ix = exp.varIndex(i);
 					variable = vars.get(ix + 1);
 					// }
-					if (lExp == 1L) {
+					if (lExp.isOne()) {
 						monomTimes.append(variable);
 					} else {
-						monomTimes.append(F.Power(variable, F.integer(lExp)));
+						monomTimes.append(F.Power(variable, lExp));
 					}
 				}
 			}
@@ -2469,4 +2512,5 @@ public class ExprPolynomial extends RingElemImpl<ExprPolynomial> implements Ring
 		}
 		return result.oneIdentity0();
 	}
+
 }

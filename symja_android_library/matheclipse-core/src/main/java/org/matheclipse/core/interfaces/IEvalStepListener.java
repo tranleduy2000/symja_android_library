@@ -1,6 +1,6 @@
 package org.matheclipse.core.interfaces;
 
-import org.matheclipse.core.polynomials.ExprPolynomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
 
 /**
  * A listener which could listen to the <code>EvalEngine#evalLoop()</code>

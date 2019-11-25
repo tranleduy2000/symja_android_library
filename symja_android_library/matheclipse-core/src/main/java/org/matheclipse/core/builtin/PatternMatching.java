@@ -364,7 +364,9 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			ISymbol symbol = Validate.checkSymbolType(ast, 1);
+			IExpr arg1 = Validate.checkSymbolType(ast, 1, engine);
+			if (arg1.isPresent()) {
+				ISymbol symbol = (ISymbol) arg1;
 
 			if (ast.size() > 2) {
 				int pos = ast.arg2().toIntDefault();
@@ -373,6 +375,7 @@ public final class PatternMatching {
 				}
 			} else {
 				return symbol.getDefaultValue();
+			}
 			}
 			return F.NIL;
 		}
@@ -440,7 +443,9 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			ISymbol symbol = Validate.checkSymbolType(ast, 1);
+			IExpr arg1 = Validate.checkSymbolType(ast, 1, engine);
+			if (arg1.isPresent()) {
+				ISymbol symbol = (ISymbol) arg1;
 
 			PrintStream stream;
 			stream = engine.getOutPrintStream();
@@ -456,6 +461,7 @@ public final class PatternMatching {
 				}
 			}
 
+			}
 			return F.Null;
 		}
 

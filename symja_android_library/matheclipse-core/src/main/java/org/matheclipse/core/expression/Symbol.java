@@ -23,7 +23,7 @@ import org.matheclipse.core.interfaces.ISymbolImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.RulesData;
-import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -314,7 +314,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         }
         if (fValue != null) {
             IExpr temp = assignedValue();
-            if (temp != null && temp != this && temp.isNumericFunction()) {
+			if (temp != null && temp.isNumericFunction() && temp != this) {
                 return true;
             }
         }

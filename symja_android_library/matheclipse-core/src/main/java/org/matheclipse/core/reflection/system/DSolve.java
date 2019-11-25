@@ -8,14 +8,14 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.polynomials.ExprRingFactory;
+import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
-import org.matheclipse.core.polynomials.ExprPolynomial;
-import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
 
 /**
  * <pre>
@@ -171,7 +171,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 					return F.NIL;
 				}
 				try {
-					ExprPolynomial poly = ring.create(eq.oneIdentity0(), false, true);
+					ExprPolynomial poly = ring.create(eq.oneIdentity0(), false, true, false);
 					if (order == 1 && poly.degree() <= 1) {
 						IAST coeffs = poly.coefficientList();
 						IExpr q = coeffs.arg1(); // degree 0

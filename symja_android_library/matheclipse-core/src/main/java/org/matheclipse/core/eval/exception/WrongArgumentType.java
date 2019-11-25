@@ -2,11 +2,10 @@ package org.matheclipse.core.eval.exception;
 
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 /**
  */
-public class WrongArgumentType extends MathException {
+public class WrongArgumentType extends ValidateException {
 	/**
 	 * 
 	 */
@@ -21,8 +20,7 @@ public class WrongArgumentType extends MathException {
 	String fMessage;
 
 	/**
-	 * The function {@code expr} has wrong argument {@code arg} at position:
-	 * {@code position}
+	 * The function {@code expr} has wrong argument {@code arg} at position: {@code position}
 	 * 
 	 * @param expr
 	 * @param arg
@@ -37,8 +35,7 @@ public class WrongArgumentType extends MathException {
 	}
 
 	/**
-	 * The function {@code expr} has wrong argument {@code arg} at position:
-	 * {@code position}: {@code message}
+	 * The function {@code expr} has wrong argument {@code arg} at position: {@code position}: {@code message}
 	 * 
 	 * @param expr
 	 * @param arg

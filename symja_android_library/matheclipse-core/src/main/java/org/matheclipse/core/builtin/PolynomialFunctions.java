@@ -37,14 +37,17 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
-import org.matheclipse.core.polynomials.ExpVectorLong;
-import org.matheclipse.core.polynomials.ExprMonomial;
-import org.matheclipse.core.polynomials.ExprPolynomial;
-import org.matheclipse.core.polynomials.ExprPolynomialRing;
-import org.matheclipse.core.polynomials.ExprRingFactory;
-import org.matheclipse.core.polynomials.ExprTermOrder;
 import org.matheclipse.core.polynomials.PolynomialsUtils;
 import org.matheclipse.core.polynomials.QuarticSolver;
+import org.matheclipse.core.polynomials.longexponent.ExpVectorLong;
+import org.matheclipse.core.polynomials.longexponent.ExprMonomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
+import org.matheclipse.core.polynomials.longexponent.ExprTermOrder;
+import org.matheclipse.core.polynomials.symbolicexponent.ExpVectorSymbolic;
+import org.matheclipse.core.polynomials.symbolicexponent.SymbolicPolynomial;
+import org.matheclipse.core.polynomials.symbolicexponent.SymbolicPolynomialRing;
 import org.matheclipse.core.reflection.system.rules.LegendrePRules;
 import org.matheclipse.core.reflection.system.rules.LegendreQRules;
 
@@ -164,7 +167,7 @@ public class PolynomialFunctions {
 			// list of variable expressions extracted from the second argument
 			IASTAppendable listOfVariables = null;
 			// array of corresponding exponents for the list of variables
-			long[] exponents = null;
+			IExpr[] exponents = null;
 
 			// if (arg2.isTimes()) {
 			// // Times(x, y^a,...)
@@ -195,28 +198,29 @@ public class PolynomialFunctions {
 			// } else {
 				listOfVariables = F.ListAlloc();
 				listOfVariables.append(arg2);
-				exponents = new long[1];
-				exponents[0] = 1;
+			exponents = new IExpr[1];
+			exponents[0] = F.C1;
 			// }
 
 			try {
-				long n = 1;
+				IExpr n = F.C1;
 				if (ast.isAST3()) {
 					if (ast.arg3().isNegativeInfinity()) {
 						return F.C0;
 					}
-					n = Validate.checkLongType(ast.arg3());
+					// n = Validate.checkLongType(ast.arg3());
+					n = ast.arg3();
 					for (int i = 0; i < exponents.length; i++) {
-						exponents[i] *= n;
+						exponents[i] = exponents[i].times(n);
 					}
 				}
-				ExpVectorLong expArr = new ExpVectorLong(exponents);
+				ExpVectorSymbolic expArr = new ExpVectorSymbolic(exponents);
 				IExpr expr = F.evalExpandAll(ast.arg1(), engine).normal();
 				IAST subst = Algebra.substituteVariablesInPolynomial(expr, listOfVariables, "§Coefficient");
 				expr = subst.arg1();
 				listOfVariables = (IASTAppendable) subst.arg2();
-				ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, listOfVariables);
-				ExprPolynomial poly = ring.create(expr, true, false);
+				SymbolicPolynomialRing ring = new SymbolicPolynomialRing(ExprRingFactory.CONST, listOfVariables);
+				SymbolicPolynomial poly = ring.create(expr, true, false, false);
 				IExpr temp= poly.coefficient(expArr);
 				F.REMEMBER_AST_CACHE.put(ast, temp);
 				return temp;
@@ -335,14 +339,17 @@ public class PolynomialFunctions {
 				eVar.appendToList(symbolList);
 				varList = eVar.getArrayList();
 			} else {
-				symbolList = Validate.checkSymbolOrSymbolList(ast, 2);
+				symbolList = Validate.checkSymbolOrSymbolList(ast, 2, engine);
+				if (!symbolList.isPresent()) {
+					return F.NIL;
+				}
 				varList = new ArrayList<IExpr>(symbolList.argSize());
 				symbolList.forEach(new Consumer<IExpr>() {
-                    @Override
-                    public void accept(IExpr x) {
-                        varList.add(x);
-                    }
-                });
+					@Override
+					public void accept(IExpr x) {
+						varList.add(x);
+					}
+				});
 			}
 			TermOrder termOrder = TermOrderByName.Lexicographic;
 			try {
@@ -703,7 +710,8 @@ public class PolynomialFunctions {
 			}
 			IExpr expr = F.evalExpandAll(ast.arg1(), engine);
 			try {
-				ExprPolynomialRing ring = new ExprPolynomialRing(F.List(arg2));
+				IAST univariateVariables = F.List(arg2);
+				ExprPolynomialRing ring = new ExprPolynomialRing(univariateVariables);
 				ExprPolynomial poly = ring.create(expr);
 
 				long n = poly.degree();
@@ -728,7 +736,7 @@ public class PolynomialFunctions {
 					}
 				}
 				IExpr fN = poly.leadingBaseCoefficient();// coefficient(n);
-				ExprPolynomial polyDiff = poly.derivative();
+				ExprPolynomial polyDiff = poly.derivativeUnivariate();
 				// see:
 				// http://en.wikipedia.org/wiki/Discriminant#Discriminant_of_a_polynomial
 				return F.Divide(F.Times(F.Power(F.CN1, (n * (n - 1) / 2)),
@@ -778,12 +786,12 @@ public class PolynomialFunctions {
 			if (form.isList()) {
 				return ((IAST) form).mapThread(ast, 2);
 			}
-			ISymbol sym = F.Max;
+			IExpr sym = F.Max;
 			if (ast.isAST3()) {
 				final IExpr arg3 = engine.evaluate(ast.arg3());
-				if (arg3.isSymbol()) {
-					sym = (ISymbol) arg3;
-				}
+				// if (arg3.isSymbol()) {
+				sym = arg3;
+				// }
 			}
 			Set<IExpr> collector = new TreeSet<IExpr>();
 
@@ -947,7 +955,7 @@ public class PolynomialFunctions {
 			if (arg1.isZero()||arg2.isZero()) {
 				return F.C0;
 			}
-			IExpr arg3 = Validate.checkSymbolType(ast, 3);
+			IExpr arg3 = Validate.checkSymbolType(ast, 3, engine);
 			ISymbol x = (ISymbol) arg3;
 			IExpr a = F.evalExpandAll(arg1, engine);
 			IExpr b = F.evalExpandAll(arg2, engine);
@@ -2026,7 +2034,10 @@ public class PolynomialFunctions {
 				eVar.appendToList(symbolList);
 				varList = eVar.getArrayList();
 			} else {
-				symbolList = Validate.checkSymbolOrSymbolList(ast, 2);
+				symbolList = Validate.checkSymbolOrSymbolList(ast, 2, engine);
+				if (!symbolList.isPresent()) {
+					return F.NIL;
+				}
 				varList = new ArrayList<IExpr>(symbolList.argSize());
 				symbolList.forEach(new Consumer<IExpr>() {
 					@Override
@@ -2194,7 +2205,7 @@ public class PolynomialFunctions {
 	public static IAST coefficientList(IExpr expr, IAST coefficientList) {
 		try {
 			ExprPolynomialRing ring = new ExprPolynomialRing(coefficientList);
-			ExprPolynomial poly = ring.create(expr,true,false);
+			ExprPolynomial poly = ring.create(expr, true, false, true);
 			if (poly.isZero()) {
 				return F.List();
 			}
@@ -2205,7 +2216,6 @@ public class PolynomialFunctions {
 			if (Config.SHOW_STACKTRACE) {
 				ex.printStackTrace();
 			}
-			// throw new WrongArgumentType(ast, expr, 1, "Polynomial expected!");
 		}
 		return F.NIL;
 	}
@@ -2327,7 +2337,7 @@ public class PolynomialFunctions {
 		try {
 			// try to generate a common expression polynomial
 			ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, varList);
-			ExprPolynomial ePoly = ring.create(expr, false, false);
+			ExprPolynomial ePoly = ring.create(expr, false, false, false);
 			ePoly = ePoly.multiplyByMinimumNegativeExponents();
 			if (ePoly.degree(0) >= Integer.MAX_VALUE) {
 				return F.NIL;
@@ -2372,7 +2382,7 @@ public class PolynomialFunctions {
 		try {
 			// try to generate a common expression polynomial
 			ExprPolynomialRing ring = new ExprPolynomialRing(ExprRingFactory.CONST, varList);
-			ExprPolynomial ePoly = ring.create(expr, false, false);
+			ExprPolynomial ePoly = ring.create(expr, false, false, false);
 			ePoly = ePoly.multiplyByMinimumNegativeExponents();
 			result = rootsOfQuadraticPolynomial(ePoly);
 			if (result.isPresent() && expr.isNumericMode()) {
@@ -2600,7 +2610,7 @@ public class PolynomialFunctions {
 					}
 				} else {
 					polyRat = jas.expr2JAS(temp, numericSolutions);
-					IAST factorComplex = Algebra.factorComplex(temp,polyRat, jas, F.List);
+					IAST factorComplex = Algebra.factorRational(polyRat, jas, F.List);
 					for (int k = 1; k < factorComplex.size(); k++) {
 						temp = F.evalExpand(factorComplex.get(k));
 						quarticResultList = QuarticSolver.solve(temp, variables.arg1());

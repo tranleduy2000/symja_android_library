@@ -22,8 +22,8 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.polynomials.ExprPolynomial;
-import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
 import org.matheclipse.core.reflection.system.rules.LimitRules;
 import org.matheclipse.core.reflection.system.rules.SeriesCoefficientRules;
 
@@ -70,7 +70,7 @@ public class SeriesFunctions {
      */
     private final static class Limit extends AbstractFunctionEvaluator implements LimitRules {
 
-        static class LimitData implements Cloneable {
+		static class LimitData {
             final ISymbol symbol;
 
             final IExpr limitValue;
@@ -86,10 +86,6 @@ public class SeriesFunctions {
                 this.direction = direction;
             }
 
-            @Override
-            protected LimitData clone() throws CloneNotSupportedException {
-                return (LimitData) super.clone();
-            }
 
             public int getDirection() {
                 return direction;
@@ -129,9 +125,9 @@ public class SeriesFunctions {
              * @return a new <code>F.Limit( arg1, ... )</code> expression
              */
             public IAST limit(IExpr arg1) {
-                // if (direction == DIRECTION_FROM_LARGER_VALUES) {
-                // return F.Limit(arg1, rule, F.Rule(F.Direction, F.CN1));
-                // }
+				if (direction == DIRECTION_FROM_ABOVE) {
+					return F.Limit(arg1, rule, F.Rule(F.Direction, F.CN1));
+				}
 
                 if (direction == DIRECTION_FROM_BELOW) {
                     return F.Limit(arg1, rule, F.Rule(F.Direction, F.C1));
@@ -404,7 +400,7 @@ public class SeriesFunctions {
          *            the limit data definition
          * @return <code>F.NIL</code> if no limit found
          */
-        private static IExpr numeratorDenominatorLimit(final IExpr numerator, final IExpr denominator, LimitData data) {
+		private static IExpr numeratorDenominatorLimit(IExpr numerator, IExpr denominator, LimitData data) {
             IExpr numValue;
             IExpr denValue;
 			IExpr limitValue = data.getLimitValue();
@@ -416,18 +412,74 @@ public class SeriesFunctions {
                 return data.mapLimit((IAST) numerator);
             }
             if (!denominator.isNumber() || denominator.isZero()) {
+				IExpr result = F.NIL;
                 ISymbol x = data.getSymbol();
 				denValue = engine.evalModuleDummySymbol(denominator, x, limitValue, true);
-                if (denValue.equals(F.Indeterminate)) {
+				if (denValue.isIndeterminate()) {
                     return F.NIL;
-				} else if (denValue.isZero() || denValue.isDirectedInfinity() || denValue.isComplexInfinity()
-						|| denValue.isIndeterminate()) {
+				} else if (denValue.isZero()) {
 					numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
-					if (numValue.isZero() || numValue.isDirectedInfinity() || numValue.isComplexInfinity()
-							|| numValue.isIndeterminate()) {
+					if (numValue.isZero()) {
+						return lHospitalesRule(numerator, denominator, data);
+					}
+					return F.NIL;
+				} else if (denValue.isInfinity()) {
+					numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
+					if (numValue.isInfinity()) {
+						return lHospitalesRule(numerator, denominator, data);
+					} else if (numValue.isNegativeInfinity()) {
+						numerator = engine.evaluate(numerator.negate());
+						numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
+						if (numValue.isInfinity()) {
+							result = lHospitalesRule(numerator, denominator, data);
+							if (result.isPresent()) {
+								return result.negate();
+							}
+						}
+					}
+					return F.NIL;
+				} else if (denValue.isNegativeInfinity()) {
+					denominator = engine.evaluate(denominator.negate());
+					denValue = engine.evalModuleDummySymbol(denominator, x, limitValue, true);
+					if (denValue.isInfinity()) {
+						numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
+						if (numValue.isInfinity()) {
+							result = lHospitalesRule(numerator, denominator, data);
+							if (result.isPresent()) {
+								// negate because denominator.negate()
+								return result.negate();
+							}
+						} else if (numValue.isNegativeInfinity()) {
+							numerator = engine.evaluate(numerator.negate());
+							numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
+							if (numValue.isInfinity()) {
+								// tried both cases numerator.negate() and denominator.negate()
                         return lHospitalesRule(numerator, denominator, data);
                     }
+						}
                     return F.NIL;
+					}
+					// numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
+					// if (numValue.isInfinity()) {
+					// return lHospitalesRule(numerator, denominator, data);
+					// } else if (numValue.isNegativeInfinity()) {
+					// numValue = engine.evalModuleDummySymbol(numerator.negate(), x, limitValue, true);
+					// if (numValue.isInfinity()) {
+					// result = lHospitalesRule(numerator, denominator, data);
+					// if (result.isPresent()) {
+					// return result.negate();
+					// }
+					// }
+					// }
+					return F.NIL;
+					// } else if (denValue.isZero() || denValue.isDirectedInfinity() || denValue.isComplexInfinity()
+					// || denValue.isIndeterminate()) {
+					// numValue = engine.evalModuleDummySymbol(numerator, x, limitValue, true);
+					// if (numValue.isZero() || numValue.isDirectedInfinity() || numValue.isComplexInfinity()
+					// || numValue.isIndeterminate()) {
+					// return lHospitalesRule(numerator, denominator, data);
+					// }
+					// return F.NIL;
                 }
             }
 
@@ -598,6 +650,7 @@ public class SeriesFunctions {
         }
 
 		private static IExpr timesLimit(final IAST timesAST, final LimitData data) {
+			EvalEngine engine = EvalEngine.get();
 			IAST isFreeResult = timesAST.partitionTimes(new Predicate<IExpr>() {
                 @Override
                 public boolean test(IExpr x) {
@@ -616,11 +669,30 @@ public class SeriesFunctions {
                     }
                 });
 				if (timesPolyFiltered[0].size() > 1 && timesPolyFiltered[1].size() > 1) {
-					parts = new IExpr[] { timesPolyFiltered[1].oneIdentity1(),
-							F.Power(timesPolyFiltered[0].oneIdentity1(), F.CN1) };
+					IExpr first = engine.evaluate(data.limit(timesPolyFiltered[0].oneIdentity1()));
+					IExpr second = engine.evaluate(data.limit(timesPolyFiltered[1].oneIdentity1()));
+					if (first.isReal() || second.isReal()) {
+						IExpr temp = engine.evaluate(F.Times(first, second));
+						if (!temp.isIndeterminate()) {
+							return temp;
+						}
+						if (data.getLimitValue().isZero()) {
+							// Try reciprocal of symbol and approach to +/- Infinity
+							IExpr newTimes = timesAST.replaceAll(F.Rule(data.symbol, F.Power(data.symbol, F.CN1)));
+							if (newTimes.isPresent()) {
+								IAST infinityExpr = (data.direction == DIRECTION_FROM_BELOW) ? F.CNInfinity
+										: F.CInfinity;
+								LimitData copy = new LimitData(data.symbol, infinityExpr,
+										F.Rule(data.symbol, infinityExpr), data.direction);
+								temp = engine.evaluate(copy.limit(newTimes));
+								if (!temp.isIndeterminate()) {
+									return temp;
+								}
+							}
 				}
 			}
-            if (parts != null) {
+				}
+			} else {
 
                 IExpr numerator = parts[0];
                 IExpr denominator = parts[1];
@@ -639,7 +711,7 @@ public class SeriesFunctions {
                     }
                 }
 
-				IExpr plusResult = Algebra.partsApart(parts, symbol, EvalEngine.get());
+				IExpr plusResult = Algebra.partsApart(parts, symbol, engine);
 				// Algebra.partialFractionDecompositionRational(new PartialFractionGenerator(), parts,symbol);
                 if (plusResult.isPlus()) {
                     return data.mapLimit((IAST) plusResult);

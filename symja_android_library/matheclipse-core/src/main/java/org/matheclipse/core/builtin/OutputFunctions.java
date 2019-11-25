@@ -267,6 +267,7 @@ public final class OutputFunctions {
 					variables = eVar.getVarList();
 				}
 
+				if (variables.isPresent()) {
 				if (variables.size() >= 2) {
 					ISymbol sym = (ISymbol) variables.arg1();
 					if (poly.isPlus( )) {
@@ -275,6 +276,7 @@ public final class OutputFunctions {
 					}
 				}
 
+				}
 			}
 			return arg1;
 		}

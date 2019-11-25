@@ -461,4 +461,21 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return ast;
     }
 
+    @Override
+    public IASTAppendable slice(int start, int end) {
+        if (0 < start && start <= size() && start < end && end <= size()) {
+            IASTAppendable ast = F.ast(head(), end - start, false);
+            for (int i = start; i < end; i++) {
+                ast.append(get(i));
+            }
+            return ast;
+        }
+        throw new IndexOutOfBoundsException("Index: " + Integer.valueOf(start) + ", Size: " + size());
+    }
+
+    @Override
+    public IAST splice(int index) {
+        return removeAtCopy(index);
+    }
+
 }

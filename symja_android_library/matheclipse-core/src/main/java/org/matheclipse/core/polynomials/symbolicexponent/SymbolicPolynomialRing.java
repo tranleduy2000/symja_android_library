@@ -1,6 +1,18 @@
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.symbolicexponent;
 
-import com.duy.util.ThreadLocalRandom;
+import java.io.Reader;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Predicates;
@@ -8,16 +20,9 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-
-import java.io.Reader;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import org.matheclipse.core.polynomials.longexponent.ExpVectorLong;
+import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
+import org.matheclipse.core.polynomials.longexponent.ExprTermOrder;
 
 import edu.jas.kern.PrettyPrint;
 import edu.jas.kern.Scripting;
@@ -29,13 +34,268 @@ import edu.jas.util.LongIterable;
 /**
  * GenPolynomialRing generic polynomial factory implementing ExprRingFactory; Factory for n-variate ordered polynomials
  * over C. Almost immutable object, except variable names.
- *
+ * 
  */
 
-public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
+public class SymbolicPolynomialRing implements RingFactory<SymbolicPolynomial> {
 
 	/**
-	 *
+	 * Comparator for polynomials.
+	 */
+	private static class SymbolicPolynomialComparator implements Serializable, Comparator<SymbolicPolynomial> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2427163728878196089L;
+
+		public final SymbolicTermOrder tord;
+
+		public final boolean reverse;
+
+		/**
+		 * Constructor.
+		 * 
+		 * @param t
+		 *            TermOrder.
+		 * @param reverse
+		 *            flag if reverse ordering is requested.
+		 */
+		public SymbolicPolynomialComparator(SymbolicTermOrder t, boolean reverse) {
+			tord = t;
+			this.reverse = reverse;
+		}
+
+		/**
+		 * Compare polynomials.
+		 * 
+		 * @param p1
+		 *            first polynomial.
+		 * @param p2
+		 *            second polynomial.
+		 * @return 0 if ( p1 == p2 ), -1 if ( p1 < p2 ) and +1 if ( p1 > p2 ).
+		 */
+		@Override
+		public int compare(SymbolicPolynomial p1, SymbolicPolynomial p2) {
+			// check if p1.tord = p2.tord = tord ?
+			int s = p1.compareTo(p2);
+			if (reverse) {
+				return -s;
+			}
+			return s;
+		}
+
+		/**
+		 * Equals test of comparator.
+		 * 
+		 * @param o
+		 *            other object.
+		 * @return true if this = o, else false.
+		 */
+		@Override
+		public boolean equals(Object o) {
+			SymbolicPolynomialComparator pc = null;
+			try {
+				pc = (SymbolicPolynomialComparator) o;
+			} catch (ClassCastException ignored) {
+				return false;
+			}
+			if (pc == null) {
+				return false;
+			}
+			return tord.equals(pc.tord);
+		}
+
+		/**
+		 * Hash code for this PolynomialComparator.
+		 * 
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			return tord.hashCode();
+		}
+
+		/**
+		 * toString.
+		 */
+		@Override
+		public String toString() {
+			return "PolynomialComparator(" + tord + ")";
+		}
+
+	}
+
+	/**
+	 * Iterable for IExpr.
+	 * 
+	 */
+	private static class IExprIterable implements Iterable<IExpr> {
+
+		private boolean nonNegative = true;
+
+		private IExpr upperBound = F.CInfinity;
+
+		/**
+		 * Constructor.
+		 */
+		public IExprIterable() {
+		}
+
+		/**
+		 * Constructor.
+		 */
+		public IExprIterable(IExpr ub) {
+			upperBound = ub;
+		}
+
+		/**
+		 * Set the upper bound for the iterator.
+		 * 
+		 * @param ub
+		 *            an upper bound for the iterator elements.
+		 */
+		public void setUpperBound(IExpr ub) {
+			upperBound = ub;
+		}
+
+		/**
+		 * Get the upper bound for the iterator.
+		 * 
+		 * @return the upper bound for the iterator elements.
+		 */
+		public IExpr getUpperBound() {
+			return upperBound;
+		}
+
+		/**
+		 * Set the iteration algorithm to all elements.
+		 */
+		public void setAllIterator() {
+			nonNegative = false;
+		}
+
+		/**
+		 * Set the iteration algorithm to non-negative elements.
+		 */
+		public void setNonNegativeIterator() {
+			nonNegative = true;
+		}
+
+		/**
+		 * Get an iterator over Long.
+		 * 
+		 * @return an iterator.
+		 */
+		public Iterator<IExpr> iterator() {
+			return new IExprIterator(nonNegative, upperBound);
+		}
+
+		/**
+		 * IExpr iterator.
+		 *
+		 */
+		class IExprIterator implements Iterator<IExpr> {
+
+			/**
+			 * data structure.
+			 */
+			IExpr current;
+
+			boolean empty;
+
+			final boolean nonNegative;
+
+			protected IExpr upperBound;
+
+			/**
+			 * Set the upper bound for the iterator.
+			 * 
+			 * @param ub
+			 *            an upper bound for the iterator elements.
+			 */
+			public void setUpperBound(IExpr ub) {
+				upperBound = ub;
+			}
+
+			/**
+			 * Get the upper bound for the iterator.
+			 * 
+			 * @return the upper bound for the iterator elements.
+			 */
+			public IExpr getUpperBound() {
+				return upperBound;
+			}
+
+			/**
+			 * Long iterator constructor.
+			 */
+			public IExprIterator() {
+				this(false, F.CInfinity);
+			}
+
+			/**
+			 * Long iterator constructor.
+			 * 
+			 * @param nn
+			 *            true for an iterator over non-negative longs, false for all elements iterator.
+			 * @param ub
+			 *            an upper bound for the entries.
+			 */
+			public IExprIterator(boolean nn, IExpr ub) {
+				current = F.C0;
+				// System.out.println("current = " + current);
+				empty = false;
+				nonNegative = nn;
+				upperBound = ub;
+				// System.out.println("upperBound = " + upperBound);
+			}
+
+			/**
+			 * Test for availability of a next long.
+			 * 
+			 * @return true if the iteration has more Longs, else false.
+			 */
+			public synchronized boolean hasNext() {
+				return !empty;
+			}
+
+			/**
+			 * Get next Long.
+			 * 
+			 * @return next Long.
+			 */
+			public synchronized IExpr next() {
+				if (empty) {
+					throw new NoSuchElementException("invalid call of next()");
+				}
+				IExpr res = current; // Long.valueOf(current);
+				if (nonNegative) {
+					current = current.inc();
+				} else if (current.isPositiveResult()) {
+					current = current.negate();
+				} else {
+					current = current.negate();
+					current = current.inc();
+				}
+				if (F.Greater.ofQ(current, upperBound)) {
+					empty = true;
+				}
+				return res;
+			}
+
+			/**
+			 * Remove a tuple if allowed.
+			 */
+			public void remove() {
+				throw new UnsupportedOperationException("cannnot remove elements");
+			}
+
+		}
+	}
+
+	/**
+	 * 
 	 */
 	private static final long serialVersionUID = -6136386786501333693L;
 
@@ -52,7 +312,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * The term order.
 	 */
-	public final ExprTermOrder tord;
+	public final SymbolicTermOrder tord;
 
 	/**
 	 * True for partially reversed variables.
@@ -72,17 +332,17 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * The constant polynomial 0 for this ring.
 	 */
-	public final ExprPolynomial ZERO;
+	public final SymbolicPolynomial ZERO;
 
 	/**
 	 * The constant polynomial 1 for this ring.
 	 */
-	public final ExprPolynomial ONE;
+	public final SymbolicPolynomial ONE;
 
 	/**
 	 * The constant exponent vector 0 for this ring.
 	 */
-	public final ExpVectorLong evzero;
+	public final ExpVectorSymbolic evzero;
 
 	/**
 	 * A default random sequence generator.
@@ -94,69 +354,67 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 */
 	protected int isField = -1; // initially unknown
 
-
 	final boolean numericFunction;
-
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param listOfVariables
 	 *            names for the variables.
 	 */
-	public ExprPolynomialRing(IAST listOfVariables) {
-		this(ExprRingFactory.CONST, listOfVariables, listOfVariables.argSize(), ExprTermOrderByName.Lexicographic);
+	public SymbolicPolynomialRing(IAST listOfVariables) {
+		this(ExprRingFactory.CONST, listOfVariables, listOfVariables.argSize(), SymbolicTermOrderByName.Lexicographic);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param listOfVariables
 	 *            names for the variables.
 	 * @param t
 	 *            a term order.
 	 */
-	public ExprPolynomialRing(IAST listOfVariables, ExprTermOrder t) {
+	public SymbolicPolynomialRing(IAST listOfVariables, SymbolicTermOrder t) {
 		this(ExprRingFactory.CONST, listOfVariables, listOfVariables.argSize(), t);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param symbol
 	 *            name of a variable.
 	 */
-	public ExprPolynomialRing(ISymbol symbol) {
-		this(ExprRingFactory.CONST, F.List(symbol), 1, ExprTermOrderByName.Lexicographic);
+	public SymbolicPolynomialRing(ISymbol symbol) {
+		this(ExprRingFactory.CONST, F.List(symbol), 1, SymbolicTermOrderByName.Lexicographic);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param symbol
 	 *            name of a variable.
 	 * @param t
 	 *            a term order.
 	 */
-	public ExprPolynomialRing(ISymbol symbol, ExprTermOrder t) {
+	public SymbolicPolynomialRing(ISymbol symbol, SymbolicTermOrder t) {
 		this(ExprRingFactory.CONST, F.List(symbol), 1, t);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param cf
 	 *            factory for coefficients of type C.
 	 * @param listOfVariables
 	 *            names for the variables.
 	 */
-	public ExprPolynomialRing(ExprRingFactory cf, IAST listOfVariables ) {
-		this(cf, listOfVariables, listOfVariables.argSize(), ExprTermOrderByName.Lexicographic);
+	public SymbolicPolynomialRing(ExprRingFactory cf, IAST listOfVariables) {
+		this(cf, listOfVariables, listOfVariables.argSize(), SymbolicTermOrderByName.Lexicographic);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param cf
 	 *            factory for coefficients of type C.
 	 * @param listOfVariables
@@ -164,13 +422,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @param t
 	 *            a term order.
 	 */
-	public ExprPolynomialRing(ExprRingFactory cf, IAST listOfVariables, ExprTermOrder t) {
+	public SymbolicPolynomialRing(ExprRingFactory cf, IAST listOfVariables, SymbolicTermOrder t) {
 		this(cf, listOfVariables, listOfVariables.argSize(), t);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param cf
 	 *            factory for coefficients of type C.
 	 * @param listOfVariables
@@ -180,13 +438,13 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @param t
 	 *            a term order.
 	 */
-	private ExprPolynomialRing(ExprRingFactory cf, IAST listOfVariables, int n, ExprTermOrder t) {
+	private SymbolicPolynomialRing(ExprRingFactory cf, IAST listOfVariables, int n, SymbolicTermOrder t) {
 		this(cf, listOfVariables, n, t, false);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object.
-	 *
+	 * 
 	 * @param cf
 	 *            factory for coefficients of type C.
 	 * @param v
@@ -196,8 +454,8 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @param t
 	 *            a term order.
 	 */
-	public ExprPolynomialRing(ExprRingFactory cf, IAST listOfVariables, int n, ExprTermOrder t,
-							  boolean numericFunction) {
+	public SymbolicPolynomialRing(ExprRingFactory cf, IAST listOfVariables, int n, SymbolicTermOrder t,
+			boolean numericFunction) {
 		coFac = cf;
 		nvar = n;
 		tord = t;
@@ -208,11 +466,11 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		vars = listOfVariables.copyAppendable();// Arrays.copyOf(v, v.length); // >
 		// Java-5
 		// }
-		ZERO = new ExprPolynomial(this);
+		ZERO = new SymbolicPolynomial(this);
 		IExpr coeff = coFac.getONE();
-		evzero = new ExpVectorLong(nvar);
+		evzero = new ExpVectorSymbolic(nvar);
 		this.numericFunction = numericFunction;
-		ONE = new ExprPolynomial(this, coeff, evzero);
+		ONE = new SymbolicPolynomial(this, coeff, evzero);
 		// if (vars == null) {
 		// if (PrettyPrint.isTrue()) {
 		// vars = newVars("x", nvar);
@@ -228,86 +486,88 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * The constructor creates a polynomial factory object with the the same term order, number of variables and
 	 * variable names as the given polynomial factory, only the coefficient factories differ.
-	 *
+	 * 
 	 * @param cf
 	 *            factory for coefficients of type C.
 	 * @param o
 	 *            other polynomial ring.
 	 */
-	public ExprPolynomialRing(ExprRingFactory cf, ExprPolynomialRing o) {
+	public SymbolicPolynomialRing(ExprRingFactory cf, SymbolicPolynomialRing o) {
 		this(cf, o.vars, o.nvar, o.tord);
 	}
 
 	/**
 	 * The constructor creates a polynomial factory object with the the same coefficient factory, number of variables
 	 * and variable names as the given polynomial factory, only the term order differs.
-	 *
+	 * 
 	 * @param to
 	 *            term order.
 	 * @param o
 	 *            other polynomial ring.
 	 */
-	public ExprPolynomialRing(ExprPolynomialRing o, ExprTermOrder to) {
+	public SymbolicPolynomialRing(SymbolicPolynomialRing o, SymbolicTermOrder to) {
 		this(o.coFac, o.vars, o.nvar, to);
 	}
 
 	/**
 	 * Copy this factory.
-	 *
+	 * 
 	 * @return a clone of this.
 	 */
-	public ExprPolynomialRing copy() {
-		return new ExprPolynomialRing(coFac, this);
+	public SymbolicPolynomialRing copy() {
+		return new SymbolicPolynomialRing(coFac, this);
 	}
 
 	/**
 	 * Create a <code>Polynomial</code> from the given <code>exprPoly</code>.
-	 *
+	 * 
 	 * @param exprPoly
 	 *            the polynomial expression
 	 * @return
 	 */
-	public ExprPolynomial create(final IExpr exprPoly) throws ArithmeticException, ClassCastException {
-		return create(exprPoly, false, true);
+	public SymbolicPolynomial create(final IExpr exprPoly) throws ArithmeticException, ClassCastException {
+		return create(exprPoly, false, true, false);
 	}
 
 	/**
 	 * Create a <code>Polynomial</code> from the given <code>exprPoly</code>.
-	 *
+	 * 
 	 * @param exprPoly
 	 *            the polynomial expression
 	 * @param coefficient
 	 *            set to <code>true</code> if called by the <code>Coefficient()</code> function
 	 * @param checkNegativeExponents
-	 *            if <code>true</code> don't allow negative exponents
+	 *            if <code>true</code> don't allow negative exponents and throw an ArithmeticException
+	 * @param coefficientListMode
+	 *            if in coefficient list mode don't collect negative <code>Power()</code> exponents
 	 * @return
 	 */
-	public ExprPolynomial create(final IExpr exprPoly, boolean coefficient, boolean checkNegativeExponents)
-			throws ArithmeticException, ClassCastException {
+	public SymbolicPolynomial create(final IExpr exprPoly, boolean coefficient, boolean checkNegativeExponents,
+			boolean coefficientListMode) throws ArithmeticException, ClassCastException {
 		int ix = ExpVectorLong.indexVar(exprPoly, getVars());
 		if (ix >= 0) {
-			ExpVectorLong e = new ExpVectorLong(vars.argSize(), ix, 1L);
+			ExpVectorSymbolic e = new ExpVectorSymbolic(vars.argSize(), ix, F.C1);
 			return getOne().multiply(e);
 		}
 		if (exprPoly instanceof IAST) {
 			final IAST ast = (IAST) exprPoly;
-			ExprPolynomial result = getZero();
-			ExprPolynomial p = getZero();
+			SymbolicPolynomial result = getZero();
+			SymbolicPolynomial p = getZero();
 			if (ast.isPlus()) {
 				IExpr expr = ast.arg1();
-				result = create(expr, coefficient, checkNegativeExponents);
+				result = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 				for (int i = 2; i < ast.size(); i++) {
 					expr = ast.get(i);
-					p = create(expr, coefficient, checkNegativeExponents);
+					p = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 					result = result.sum(p);
 				}
 				return result;
 			} else if (ast.isTimes()) {
 				IExpr expr = ast.arg1();
-				result = create(expr, coefficient, checkNegativeExponents);
+				result = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 				for (int i = 2; i < ast.size(); i++) {
 					expr = ast.get(i);
-					p = create(expr, coefficient, checkNegativeExponents);
+					p = create(expr, coefficient, checkNegativeExponents, coefficientListMode);
 					result = result.multiply(p);
 				}
 				return result;
@@ -315,51 +575,52 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				final IExpr base = ast.base();
 				ix = ExpVectorLong.indexVar(base, getVars());
 				if (ix >= 0) {
-					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
+					IExpr exponent = ast.exponent(); // .toIntDefault(Integer.MIN_VALUE);
 					// int exponent = -1;
 					// try {
 					// exponent = Validate.checkPowerExponent(ast);
 					// } catch (WrongArgumentType e) {
 					// //
 					// }
-					if (checkNegativeExponents && exponent < 0) {
+					if (checkNegativeExponents && exponent.isNegative()) {
 						throw new ArithmeticException(
 								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
 					}
-					if (exponent < 0) {
-						return new ExprPolynomial(this, ast);
-						// ExpVectorLong e = new ExpVectorLong(vars.argSize(), ix, 0);
-						// return getOne().multiply(e);
+					if (exponent.isNegative() && coefficientListMode) {
+						return new SymbolicPolynomial(this, ast);
 					}
-					ExpVectorLong e = new ExpVectorLong(vars.argSize(), ix, exponent);
+					// if (exponent == Integer.MIN_VALUE) {
+					// return new ExpVectorPolynomial(this, ast);
+					// }
+					ExpVectorSymbolic e = new ExpVectorSymbolic(vars.argSize(), ix, exponent);
 					return getOne().multiply(e);
 				}
 			}
 			if (coefficient) {
-				return new ExprPolynomial(this, ast);
+				return new SymbolicPolynomial(this, ast);
 			}
 			if (numericFunction) {
 				if (ast.isNumericFunction()) {
-					return new ExprPolynomial(this, ast);
+					return new SymbolicPolynomial(this, ast);
 				}
 			}
 		} else if (exprPoly instanceof ISymbol) {
 			if (coefficient) {
-				return new ExprPolynomial(this, exprPoly);
+				return new SymbolicPolynomial(this, exprPoly);
 			}
 			if (numericFunction) {
 				if (exprPoly.isNumericFunction()) {
-					return new ExprPolynomial(this, exprPoly);
+					return new SymbolicPolynomial(this, exprPoly);
 				}
 				throw new ClassCastException(exprPoly.toString());
 			} else {
-				return new ExprPolynomial(this, exprPoly);
+				return new SymbolicPolynomial(this, exprPoly);
 			}
 		} else if (exprPoly.isNumber()) {
-			return new ExprPolynomial(this, exprPoly);
+			return new SymbolicPolynomial(this, exprPoly);
 		}
 		if (exprPoly.isFree(Predicates.in(vars), true)) {
-			return new ExprPolynomial(this, exprPoly);
+			return new SymbolicPolynomial(this, exprPoly);
 		}
 		throw new ClassCastException(exprPoly.toString());
 	}
@@ -367,7 +628,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	/**
 	 * Create the coefficients of the (univariate) polynomial in <code>coefficientMap</code> and append non-polynomial
 	 * terms to <code>restList</code>
-	 *
+	 * 
 	 * @param exprPoly
 	 *            the polynomial expression
 	 * @param x
@@ -380,7 +641,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @throws ArithmeticException
 	 */
 	public static Map<IExpr, IExpr> create(final IExpr exprPoly, IExpr x, Map<IExpr, IExpr> coefficientMap,
-										   IASTAppendable restList) throws ArithmeticException {
+			IASTAppendable restList) throws ArithmeticException {
 		if (exprPoly instanceof IAST) {
 			final IAST ast = (IAST) exprPoly;
 			if (ast.isPlus()) {
@@ -421,41 +682,41 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	private static Map<IExpr, IExpr> createTimesSub(final IAST ast, IExpr x, Map<IExpr, IExpr> coefficientMap,
 			IASTAppendable restList) {
-				IExpr mainExponent = F.nilPtr();
-				IExpr expr;
-				IASTAppendable times = F.TimesAlloc(ast.size());
-				for (int i = 1; i < ast.size(); i++) {
-					expr = ast.get(i);
+		IExpr mainExponent = F.NIL;
+		IExpr expr;
+		IASTAppendable times = F.TimesAlloc(ast.size());
+		for (int i = 1; i < ast.size(); i++) {
+			expr = ast.get(i);
 
-					if (expr.isFree(x, true)) {
-						times.append(expr);
+			if (expr.isFree(x, true)) {
+				times.append(expr);
 				continue;
-					} else if (expr.equals(x)) {
-						final IExpr exponent = F.C1;
+			} else if (expr.equals(x)) {
+				final IExpr exponent = F.C1;
 				if (!mainExponent.isPresent()) {
-							mainExponent = exponent;
+					mainExponent = exponent;
 					continue;
-						}
-					} else if (expr.isPower()) {
-						final IExpr exponent = expr.exponent();
-						if (exponent.isFree(x)) {
+				}
+			} else if (expr.isPower()) {
+				final IExpr exponent = expr.exponent();
+				if (exponent.isFree(x)) {
 					if (expr.base().equals(x)) {
 						if (!mainExponent.isPresent()) {
-									mainExponent = exponent;
+							mainExponent = exponent;
 							continue;
-								}
-							}
 						}
-			}
-				restList.append(ast);
-				return coefficientMap;
 					}
-				return addCoefficient(coefficientMap, mainExponent, times.oneIdentity1());
+				}
+			}
+			restList.append(ast);
+			return coefficientMap;
+		}
+		return addCoefficient(coefficientMap, mainExponent, times.oneIdentity1());
 	}
 
 	public static Map<IExpr, IExpr> createTimes(final IAST ast, IExpr x, Map<IExpr, IExpr> coefficientMap,
 			IASTAppendable restList) {
-		IExpr mainExponent = F.nilPtr();
+		IExpr mainExponent = F.NIL;
 		IExpr expr;
 		IASTAppendable times = F.TimesAlloc(ast.size());
 		for (int i = 1; i < ast.size(); i++) {
@@ -477,11 +738,10 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 						if (exponent.isInteger() && !mainExponent.isPresent()) {
 							mainExponent = exponent;
 							continue;
-					}
+						}
 					}
 				}
 			}
-
 			restList.append(expr);
 		}
 		return addCoefficient(coefficientMap, mainExponent, times.oneIdentity1());
@@ -489,7 +749,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Add a coefficient to the coefficient map.
-	 *
+	 * 
 	 * @param coefficientMap
 	 * @param exponent
 	 * @param coefficient
@@ -497,28 +757,28 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 * @return
 	 */
 	private static Map<IExpr, IExpr> addCoefficient(Map<IExpr, IExpr> coefficientMap, final IExpr exponent,
-													IExpr coefficient) {
+			IExpr coefficient) {
 		if (exponent.isPresent()) {
-		IExpr oldCoefficient = coefficientMap.get(exponent);
-		if (oldCoefficient != null) {
-			if (oldCoefficient.isTimes()) {
-				((IASTAppendable) oldCoefficient).append(coefficient);
+			IExpr oldCoefficient = coefficientMap.get(exponent);
+			if (oldCoefficient != null) {
+				if (oldCoefficient.isTimes()) {
+					((IASTAppendable) oldCoefficient).append(coefficient);
+				} else {
+					IASTAppendable times = F.TimesAlloc(4);
+					times.append(oldCoefficient);
+					times.append(coefficient);
+					coefficientMap.put(exponent, times);
+				}
 			} else {
-				IASTAppendable times = F.TimesAlloc(4);
-				times.append(oldCoefficient);
-				times.append(coefficient);
-				coefficientMap.put(exponent, times);
+				coefficientMap.put(exponent, coefficient);
 			}
-		} else {
-			coefficientMap.put(exponent, coefficient);
-		}
 		}
 		return coefficientMap;
 	}
 
 	/**
 	 * Create a <code>Polynomial</code> from the given <code>exprPoly</code>.
-	 *
+	 * 
 	 * @param expression
 	 *            the expression which should be checked if it's a polynomial
 	 * @param coefficient
@@ -531,7 +791,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Create a <code>Polynomial</code> from the given <code>exprPoly</code>.
-	 *
+	 * 
 	 * @param expression
 	 *            the expression which should be checked if it's a polynomial
 	 * @param coefficient
@@ -550,8 +810,8 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				IExpr expr = variable.exponent().reciprocal();
 				if (!expr.isZero()) {
 					if (expr.isInteger()) {
-				return true;
-			}
+						return true;
+					}
 					return false;
 				}
 			}
@@ -593,8 +853,8 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 						IExpr expr = variable.exponent().reciprocal().times(ast.exponent());
 						if (!expr.isZero()) {
 							if (expr.isInteger()) {
-						return true;
-					}
+								return true;
+							}
 							return false;
 						}
 					}
@@ -629,10 +889,9 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		return false;
 	}
 
-
 	/**
 	 * Get the String representation.
-	 *
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	// @SuppressWarnings("cast")
@@ -707,7 +966,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a scripting compatible string representation.
-	 *
+	 * 
 	 * @return script compatible representation for this Element.
 	 * @see edu.jas.structure.Element#toScript()
 	 */
@@ -715,12 +974,12 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	public String toScript() {
 		StringBuilder s = new StringBuilder();
 		switch (Scripting.getLang()) {
-			case Ruby:
-				s.append("PolyRing.new(");
-				break;
-			case Python:
-			default:
-				s.append("PolyRing(");
+		case Ruby:
+			s.append("PolyRing.new(");
+			break;
+		case Python:
+		default:
+			s.append("PolyRing(");
 		}
 		// if (coFac instanceof RingElem) {
 		// s.append(coFac.toScriptFactory());
@@ -742,7 +1001,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a scripting compatible string representation of an ExpVectorLong of this ring.
-	 *
+	 * 
 	 * @param e
 	 *            exponent vector
 	 * @return script compatible representation for the ExpVectorLong.
@@ -756,7 +1015,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Comparison with any other object.
-	 *
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -764,10 +1023,10 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		if (other == null) {
 			return false;
 		}
-		if (!(other instanceof ExprPolynomialRing)) {
+		if (!(other instanceof SymbolicPolynomialRing)) {
 			return false;
 		}
-		ExprPolynomialRing oring = (ExprPolynomialRing) other;
+		SymbolicPolynomialRing oring = (SymbolicPolynomialRing) other;
 		if (nvar != oring.nvar) {
 			return false;
 		}
@@ -786,7 +1045,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Hash code for this polynomial ring.
-	 *
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -800,7 +1059,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get the number of polynomial creations.
-	 *
+	 * 
 	 * @return creations.
 	 */
 	// public int getCreations() {
@@ -809,7 +1068,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get the variable names.
-	 *
+	 * 
 	 * @return vars.
 	 */
 	public IAST getVars() {
@@ -818,7 +1077,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Set the variable names.
-	 *
+	 * 
 	 * @return old vars.
 	 */
 	public IAST setVars(IAST v) {
@@ -833,7 +1092,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a String representation of the variable names.
-	 *
+	 * 
 	 * @return names seperated by commas.
 	 */
 	public String varsToString() {
@@ -846,7 +1105,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get the zero element from the coefficients.
-	 *
+	 * 
 	 * @return 0 as C.
 	 */
 	public IExpr getZEROCoefficient() {
@@ -855,7 +1114,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get the one element from the coefficients.
-	 *
+	 * 
 	 * @return 1 as C.
 	 */
 	public IExpr getONECoefficient() {
@@ -864,25 +1123,25 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get the zero element.
-	 *
+	 * 
 	 * @return 0 as GenPolynomial.
 	 */
-	public ExprPolynomial getZero() {
+	public SymbolicPolynomial getZero() {
 		return ZERO;
 	}
 
 	/**
 	 * Get the one element.
-	 *
+	 * 
 	 * @return 1 as GenPolynomial.
 	 */
-	public ExprPolynomial getOne() {
+	public SymbolicPolynomial getOne() {
 		return ONE;
 	}
 
 	/**
 	 * Query if this ring is commutative.
-	 *
+	 * 
 	 * @return true if this ring is commutative, else false.
 	 */
 	@Override
@@ -892,7 +1151,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Query if this ring is associative.
-	 *
+	 * 
 	 * @return true if this ring is associative, else false.
 	 */
 	@Override
@@ -902,7 +1161,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Query if this ring is a field.
-	 *
+	 * 
 	 * @return false.
 	 */
 	@Override
@@ -923,7 +1182,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Characteristic of this ring.
-	 *
+	 * 
 	 * @return characteristic of this ring.
 	 */
 	@Override
@@ -933,102 +1192,102 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a (constant) GenPolynomial&lt;C&gt; element from a coefficient value.
-	 *
+	 * 
 	 * @param a
 	 *            coefficient.
 	 * @return a GenPolynomial&lt;C&gt;.
 	 */
-	public ExprPolynomial valueOf(IExpr a) {
-		return new ExprPolynomial(this, a);
+	public SymbolicPolynomial valueOf(IExpr a) {
+		return new SymbolicPolynomial(this, a);
 	}
 
 	/**
 	 * Get a GenPolynomial&lt;C&gt; element from an exponent vector.
-	 *
+	 * 
 	 * @param e
 	 *            exponent vector.
 	 * @return a GenPolynomial&lt;C&gt;.
 	 */
-	public ExprPolynomial valueOf(ExpVectorLong e) {
-		return new ExprPolynomial(this, coFac.getONE(), e);
+	public SymbolicPolynomial valueOf(ExpVectorSymbolic e) {
+		return new SymbolicPolynomial(this, coFac.getONE(), e);
 	}
 
 	/**
 	 * Get a GenPolynomial&lt;C&gt; element from a coeffcient and an exponent vector.
-	 *
+	 * 
 	 * @param a
 	 *            coefficient.
 	 * @param e
 	 *            exponent vector.
 	 * @return a GenPolynomial&lt;C&gt;.
 	 */
-	public ExprPolynomial valueOf(IExpr a, ExpVectorLong e) {
-		return new ExprPolynomial(this, a, e);
+	public SymbolicPolynomial valueOf(IExpr a, ExpVectorSymbolic e) {
+		return new SymbolicPolynomial(this, a, e);
 	}
 
 	/**
 	 * Get a (constant) GenPolynomial&lt;C&gt; element from a long value.
-	 *
+	 * 
 	 * @param a
 	 *            long.
 	 * @return a GenPolynomial&lt;C&gt;.
 	 */
 	@Override
-	public ExprPolynomial fromInteger(long a) {
-		return new ExprPolynomial(this, coFac.fromInteger(a), evzero);
+	public SymbolicPolynomial fromInteger(long a) {
+		return new SymbolicPolynomial(this, coFac.fromInteger(a), evzero);
 	}
 
 	/**
 	 * Get a (constant) GenPolynomial&lt;C&gt; element from a BigInteger value.
-	 *
+	 * 
 	 * @param a
 	 *            BigInteger.
 	 * @return a GenPolynomial&lt;C&gt;.
 	 */
 	@Override
-	public ExprPolynomial fromInteger(BigInteger a) {
-		return new ExprPolynomial(this, coFac.fromInteger(a), evzero);
+	public SymbolicPolynomial fromInteger(BigInteger a) {
+		return new SymbolicPolynomial(this, coFac.fromInteger(a), evzero);
 	}
 
 	/**
 	 * Copy polynomial c.
-	 *
+	 * 
 	 * @param c
 	 * @return a copy of c.
 	 */
 	@Override
-	public ExprPolynomial copy(ExprPolynomial c) {
+	public SymbolicPolynomial copy(SymbolicPolynomial c) {
 		// System.out.println("GP copy = " + this);
-		return new ExprPolynomial(this, c.val);
+		return new SymbolicPolynomial(this, c.val);
 	}
 
 	/**
 	 * Generate univariate polynomial in a given variable.
-	 *
+	 * 
 	 * @param i
 	 *            the index of the variable.
 	 * @return X_i as univariate polynomial.
 	 */
-	public ExprPolynomial univariate(int i) {
-		return univariate(0, i, 1L);
+	public SymbolicPolynomial univariate(int i) {
+		return univariate(0, i, F.C1);
 	}
 
 	/**
 	 * Generate univariate polynomial in a given variable with given exponent.
-	 *
+	 * 
 	 * @param i
 	 *            the index of the variable.
 	 * @param e
 	 *            the exponent of the variable.
 	 * @return X_i^e as univariate polynomial.
 	 */
-	public ExprPolynomial univariate(int i, long e) {
+	public SymbolicPolynomial univariate(int i, IExpr e) {
 		return univariate(0, i, e);
 	}
 
 	/**
 	 * Generate univariate polynomial in a given variable with given exponent.
-	 *
+	 * 
 	 * @param modv
 	 *            number of module variables.
 	 * @param i
@@ -1037,14 +1296,14 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	 *            the exponent of the variable.
 	 * @return X_i^e as univariate polynomial.
 	 */
-	public ExprPolynomial univariate(int modv, int i, long e) {
-		ExprPolynomial p = getZero();
+	public SymbolicPolynomial univariate(int modv, int i, IExpr e) {
+		SymbolicPolynomial p = getZero();
 		int r = nvar - modv;
 		if (0 <= i && i < r) {
 			IExpr one = coFac.getONE();
-			ExpVectorLong f = new ExpVectorLong(r, i, e);
+			ExpVectorSymbolic f = new ExpVectorSymbolic(r, i, e);
 			if (modv > 0) {
-				f = f.extend(modv, 0, 0l);
+				f = f.extend(modv, 0, F.C0);
 			}
 			p = p.sum(one, f);
 		}
@@ -1053,12 +1312,12 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get the generating elements excluding the generators for the coefficient ring.
-	 *
+	 * 
 	 * @return a list of generating elements for this ring.
 	 */
-	public List<ExprPolynomial> getGenerators() {
-		List<? extends ExprPolynomial> univs = univariateList();
-		List<ExprPolynomial> gens = new ArrayList<ExprPolynomial>(univs.size() + 1);
+	public List<SymbolicPolynomial> getGenerators() {
+		List<? extends SymbolicPolynomial> univs = univariateList();
+		List<SymbolicPolynomial> gens = new ArrayList<SymbolicPolynomial>(univs.size() + 1);
 		gens.add(getOne());
 		gens.addAll(univs);
 		return gens;
@@ -1066,15 +1325,15 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a list of the generating elements.
-	 *
+	 * 
 	 * @return list of generators for the algebraic structure.
 	 * @see edu.jas.structure.ElemFactory#generators()
 	 */
 	@Override
-	public List<ExprPolynomial> generators() {
+	public List<SymbolicPolynomial> generators() {
 		List<? extends IExpr> cogens = coFac.generators();
-		List<? extends ExprPolynomial> univs = univariateList();
-		List<ExprPolynomial> gens = new ArrayList<ExprPolynomial>(univs.size() + cogens.size());
+		List<? extends SymbolicPolynomial> univs = univariateList();
+		List<SymbolicPolynomial> gens = new ArrayList<SymbolicPolynomial>(univs.size() + cogens.size());
 		for (IExpr c : cogens) {
 			gens.add(getOne().multiply(c));
 		}
@@ -1084,15 +1343,15 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a list of the generating elements excluding the module variables.
-	 *
+	 * 
 	 * @param modv
 	 *            number of module variables
 	 * @return list of generators for the polynomial ring.
 	 */
-	public List<ExprPolynomial> generators(int modv) {
+	public List<SymbolicPolynomial> generators(int modv) {
 		List<? extends IExpr> cogens = coFac.generators();
-		List<? extends ExprPolynomial> univs = univariateList(modv);
-		List<ExprPolynomial> gens = new ArrayList<ExprPolynomial>(univs.size() + cogens.size());
+		List<? extends SymbolicPolynomial> univs = univariateList(modv);
+		List<SymbolicPolynomial> gens = new ArrayList<SymbolicPolynomial>(univs.size() + cogens.size());
 		for (IExpr c : cogens) {
 			gens.add(getOne().multiply(c));
 		}
@@ -1102,7 +1361,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Is this structure finite or infinite.
-	 *
+	 * 
 	 * @return true if this structure is finite, else false.
 	 * @see edu.jas.structure.ElemFactory#isFinite()
 	 */
@@ -1113,38 +1372,38 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Generate list of univariate polynomials in all variables.
-	 *
+	 * 
 	 * @return List(X_1,...,X_n) a list of univariate polynomials.
 	 */
-	public List<? extends ExprPolynomial> univariateList() {
-		return univariateList(0, 1L);
+	public List<? extends SymbolicPolynomial> univariateList() {
+		return univariateList(0, F.C1);
 	}
 
 	/**
 	 * Generate list of univariate polynomials in all variables.
-	 *
+	 * 
 	 * @param modv
 	 *            number of module variables.
 	 * @return List(X_1,...,X_n) a list of univariate polynomials.
 	 */
-	public List<? extends ExprPolynomial> univariateList(int modv) {
-		return univariateList(modv, 1L);
+	public List<? extends SymbolicPolynomial> univariateList(int modv) {
+		return univariateList(modv, F.C1);
 	}
 
 	/**
 	 * Generate list of univariate polynomials in all variables with given exponent.
-	 *
+	 * 
 	 * @param modv
 	 *            number of module variables.
 	 * @param e
 	 *            the exponent of the variables.
 	 * @return List(X_1^e,...,X_n^e) a list of univariate polynomials.
 	 */
-	public List<? extends ExprPolynomial> univariateList(int modv, long e) {
-		List<ExprPolynomial> pols = new ArrayList<ExprPolynomial>(nvar);
+	public List<? extends SymbolicPolynomial> univariateList(int modv, IExpr e) {
+		List<SymbolicPolynomial> pols = new ArrayList<SymbolicPolynomial>(nvar);
 		int nm = nvar - modv;
 		for (int i = 0; i < nm; i++) {
-			ExprPolynomial p = univariate(modv, nm - 1 - i, e);
+			SymbolicPolynomial p = univariate(modv, nm - 1 - i, e);
 			pols.add(p);
 		}
 		return pols;
@@ -1152,7 +1411,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Extend variables. Used e.g. in module embedding. Extend number of variables by i.
-	 *
+	 * 
 	 * @param i
 	 *            number of variables to extend.
 	 * @return extended polynomial ring factory.
@@ -1165,12 +1424,12 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Extend variables. Used e.g. in module embedding. Extend number of variables by length(vn).
-	 *
+	 * 
 	 * @param vn
 	 *            names for extended variables.
 	 * @return extended polynomial ring factory.
 	 */
-	public ExprPolynomialRing extend(IAST vn) {
+	public SymbolicPolynomialRing extend(IAST vn) {
 		if (vn == null || vars == null) {
 			throw new IllegalArgumentException("vn and vars may not be null");
 		}
@@ -1183,14 +1442,14 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		// for (int k = 0; k < vn.length; k++) {
 		// v[vars.length + k] = vn[k];
 		// }
-		ExprTermOrder to = tord.extend(nvar, i);
-		ExprPolynomialRing pfac = new ExprPolynomialRing(coFac, v, nvar + i, to);
+		SymbolicTermOrder to = tord.extend(nvar, i);
+		SymbolicPolynomialRing pfac = new SymbolicPolynomialRing(coFac, v, nvar + i, to);
 		return pfac;
 	}
 
 	/**
 	 * Contract variables. Used e.g. in module embedding. Contract number of variables by i.
-	 *
+	 * 
 	 * @param i
 	 *            number of variables to remove.
 	 * @return contracted polynomial ring factory.
@@ -1210,11 +1469,11 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Distributive representation as polynomial with all main variables.
-	 *
+	 * 
 	 * @return distributive polynomial ring factory.
 	 */
 	@SuppressWarnings("cast")
-	public ExprPolynomialRing distribute() {
+	public SymbolicPolynomialRing distribute() {
 		// if (!(coFac instanceof GenPolynomialRing)) {
 		return this;
 		// }
@@ -1233,7 +1492,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Reverse variables. Used e.g. in opposite rings.
-	 *
+	 * 
 	 * @return polynomial ring factory with reversed variables.
 	 */
 	// public GenPolynomialRing reverse() {
@@ -1242,7 +1501,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Reverse variables. Used e.g. in opposite rings.
-	 *
+	 * 
 	 * @param partial
 	 *            true for partialy reversed term orders.
 	 * @return polynomial ring factory with reversed variables.
@@ -1279,27 +1538,27 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get PolynomialComparator.
-	 *
+	 * 
 	 * @return polynomial comparator.
 	 */
-	public ExprPolynomialComparator getComparator() {
-		return new ExprPolynomialComparator(tord, false);
+	public Comparator getComparator() {
+		return new SymbolicPolynomialComparator(tord, false);
 	}
 
 	/**
 	 * Get PolynomialComparator.
-	 *
+	 * 
 	 * @param rev
 	 *            for reverse comparator.
 	 * @return polynomial comparator.
 	 */
-	public ExprPolynomialComparator getComparator(boolean rev) {
-		return new ExprPolynomialComparator(tord, rev);
+	public Comparator getComparator(boolean rev) {
+		return new SymbolicPolynomialComparator(tord, rev);
 	}
 
 	/**
 	 * New variable names. Generate new names for variables,
-	 *
+	 * 
 	 * @param prefix
 	 *            name prefix.
 	 * @param n
@@ -1329,7 +1588,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * New variable names. Generate new names for variables,
-	 *
+	 * 
 	 * @param prefix
 	 *            name prefix.
 	 * @return new variable names.
@@ -1340,7 +1599,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * New variable names. Generate new names for variables,
-	 *
+	 * 
 	 * @param n
 	 *            number of variables.
 	 * @return new variable names.
@@ -1351,7 +1610,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * New variable names. Generate new names for variables,
-	 *
+	 * 
 	 * @return new variable names.
 	 */
 	// public IAST newVars() {
@@ -1360,7 +1619,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Add variable names.
-	 *
+	 * 
 	 * @param vars
 	 *            variable names to be recorded.
 	 */
@@ -1377,7 +1636,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Permute variable names.
-	 *
+	 * 
 	 * @param vars
 	 *            variable names.
 	 * @param P
@@ -1398,7 +1657,7 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Permutation of polynomial ring variables.
-	 *
+	 * 
 	 * @param P
 	 *            permutation.
 	 * @return P(this).
@@ -1425,10 +1684,10 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 
 	/**
 	 * Get a GenPolynomial iterator.
-	 *
+	 * 
 	 * @return an iterator over all polynomials.
 	 */
-	public Iterator<ExprPolynomial> iterator() {
+	public Iterator<SymbolicPolynomial> iterator() {
 		if (coFac.isFinite()) {
 			return new GenPolynomialIterator(this);
 		}
@@ -1439,265 +1698,263 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	}
 
 	@Override
-	public ExprPolynomial getZERO() {
+	public SymbolicPolynomial getZERO() {
 		return getZero();
 	}
 
 	@Override
-	public ExprPolynomial random(int n) {
+	public SymbolicPolynomial random(int n) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ExprPolynomial random(int n, Random random) {
+	public SymbolicPolynomial random(int n, Random random) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ExprPolynomial parse(String s) {
+	public SymbolicPolynomial parse(String s) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ExprPolynomial parse(Reader r) {
+	public SymbolicPolynomial parse(Reader r) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ExprPolynomial getONE() {
+	public SymbolicPolynomial getONE() {
 		return getOne();
 	}
 
-}
-
-/**
- * Polynomial iterator.
- *
- * @author Heinz Kredel
- */
-class GenPolynomialIterator implements Iterator<ExprPolynomial> {
-
 	/**
-	 * data structure.
+	 * Polynomial iterator.
+	 * 
 	 */
-	final ExprPolynomialRing ring;
+	private static class GenPolynomialIterator implements Iterator<SymbolicPolynomial> {
 
-	final Iterator<List<Long>> eviter;
+		/**
+		 * data structure.
+		 */
+		final SymbolicPolynomialRing ring;
 
-	final List<ExpVectorLong> powers;
+		final Iterator<List<IExpr>> eviter;
 
-	final List<Iterable<IExpr>> coeffiter;
+		final List<ExpVectorSymbolic> powers;
 
-	Iterator<List<IExpr>> itercoeff;
+		final List<Iterable<IExpr>> coeffiter;
 
-	ExprPolynomial current;
+		Iterator<List<IExpr>> itercoeff;
 
-	/**
-	 * Polynomial iterator constructor.
-	 */
-	@SuppressWarnings("unchecked")
-	public GenPolynomialIterator(ExprPolynomialRing fac) {
-		ring = fac;
-		LongIterable li = new LongIterable();
-		li.setNonNegativeIterator();
-		List<Iterable<Long>> tlist = new ArrayList<Iterable<Long>>(ring.nvar);
-		for (int i = 0; i < ring.nvar; i++) {
-			tlist.add(li);
-		}
-		CartesianProductInfinite<Long> ei = new CartesianProductInfinite<Long>(tlist);
-		eviter = ei.iterator();
-		ExprRingFactory cf = ring.coFac;
-		coeffiter = new ArrayList<Iterable<IExpr>>();
-		if (cf instanceof Iterable && cf.isFinite()) {
-			Iterable<IExpr> cfi = (Iterable<IExpr>) cf;
-			coeffiter.add(cfi);
-		} else {
-			throw new IllegalArgumentException("only for finite iterable coefficients implemented");
-		}
-		CartesianProduct<IExpr> tuples = new CartesianProduct<IExpr>(coeffiter);
-		itercoeff = tuples.iterator();
-		powers = new ArrayList<ExpVectorLong>();
-		ExpVectorLong e = ExpVectorLong.create(eviter.next());
-		powers.add(e);
-		// System.out.println("new e = " + e);
-		// System.out.println("powers = " + powers);
-		List<IExpr> c = itercoeff.next();
-		// System.out.println("coeffs = " + c);
-		current = new ExprPolynomial(ring, c.get(0), e);
-	}
+		SymbolicPolynomial current;
 
-	/**
-	 * Test for availability of a next element.
-	 *
-	 * @return true if the iteration has more elements, else false.
-	 */
-	@Override
-	public boolean hasNext() {
-		return true;
-	}
-
-	/**
-	 * Get next polynomial.
-	 *
-	 * @return next polynomial.
-	 */
-	@Override
-	public synchronized ExprPolynomial next() {
-		ExprPolynomial res = current;
-		if (!itercoeff.hasNext()) {
-			ExpVectorLong e = ExpVectorLong.create(eviter.next());
-			powers.add(0, e); // add new ev at beginning
-			// System.out.println("new e = " + e);
-			// System.out.println("powers = " + powers);
-			if (coeffiter.size() == 1) { // shorten frist iterator by one
-				// element
-				coeffiter.add(coeffiter.get(0));
-				Iterable<IExpr> it = coeffiter.get(0);
-				List<IExpr> elms = new ArrayList<IExpr>();
-				for (IExpr elm : it) {
-					elms.add(elm);
-				}
-				elms.remove(0);
-				coeffiter.set(0, elms);
+		/**
+		 * Polynomial iterator constructor.
+		 */
+		@SuppressWarnings("unchecked")
+		public GenPolynomialIterator(SymbolicPolynomialRing fac) {
+			ring = fac;
+			IExprIterable li = new IExprIterable();
+			li.setNonNegativeIterator();
+			List<Iterable<IExpr>> tlist = new ArrayList<Iterable<IExpr>>(ring.nvar);
+			for (int i = 0; i < ring.nvar; i++) {
+				tlist.add(li);
+			}
+			CartesianProductInfinite<IExpr> ei = new CartesianProductInfinite<IExpr>(tlist);
+			eviter = ei.iterator();
+			ExprRingFactory cf = ring.coFac;
+			coeffiter = new ArrayList<Iterable<IExpr>>();
+			if (cf instanceof Iterable && cf.isFinite()) {
+				Iterable<IExpr> cfi = (Iterable<IExpr>) cf;
+				coeffiter.add(cfi);
 			} else {
-				coeffiter.add(coeffiter.get(1));
+				throw new IllegalArgumentException("only for finite iterable coefficients implemented");
 			}
 			CartesianProduct<IExpr> tuples = new CartesianProduct<IExpr>(coeffiter);
 			itercoeff = tuples.iterator();
+			powers = new ArrayList<ExpVectorSymbolic>();
+			ExpVectorSymbolic e = ExpVectorSymbolic.create(eviter.next());
+			powers.add(e);
+			// System.out.println("new e = " + e);
+			// System.out.println("powers = " + powers);
+			List<IExpr> c = itercoeff.next();
+			// System.out.println("coeffs = " + c);
+			current = new SymbolicPolynomial(ring, c.get(0), e);
 		}
-		List<IExpr> coeffs = itercoeff.next();
-		// while ( coeffs.get(0).isZERO() ) {
-		// System.out.println(" skip zero ");
-		// coeffs = itercoeff.next(); // skip tuples with zero in first
-		// component
-		// }
-		// System.out.println("coeffs = " + coeffs);
-		ExprPolynomial pol = ring.getZero().copy();
-		int i = 0;
-		for (ExpVectorLong f : powers) {
-			IExpr c = coeffs.get(i++);
-			if (c.isZERO()) {
-				continue;
+
+		/**
+		 * Test for availability of a next element.
+		 * 
+		 * @return true if the iteration has more elements, else false.
+		 */
+		@Override
+		public boolean hasNext() {
+			return true;
+		}
+
+		/**
+		 * Get next polynomial.
+		 * 
+		 * @return next polynomial.
+		 */
+		@Override
+		public synchronized SymbolicPolynomial next() {
+			SymbolicPolynomial res = current;
+			if (!itercoeff.hasNext()) {
+				ExpVectorSymbolic e = ExpVectorSymbolic.create(eviter.next());
+				powers.add(0, e); // add new ev at beginning
+				// System.out.println("new e = " + e);
+				// System.out.println("powers = " + powers);
+				if (coeffiter.size() == 1) { // shorten frist iterator by one
+												// element
+					coeffiter.add(coeffiter.get(0));
+					Iterable<IExpr> it = coeffiter.get(0);
+					List<IExpr> elms = new ArrayList<IExpr>();
+					for (IExpr elm : it) {
+						elms.add(elm);
+					}
+					elms.remove(0);
+					coeffiter.set(0, elms);
+				} else {
+					coeffiter.add(coeffiter.get(1));
+				}
+				CartesianProduct<IExpr> tuples = new CartesianProduct<IExpr>(coeffiter);
+				itercoeff = tuples.iterator();
 			}
-			if (pol.val.get(f) != null) {
-				System.out.println("error f in pol = " + f + ", " + pol.getMap().get(f));
-				throw new RuntimeException("error in iterator");
+			List<IExpr> coeffs = itercoeff.next();
+			// while ( coeffs.get(0).isZERO() ) {
+			// System.out.println(" skip zero ");
+			// coeffs = itercoeff.next(); // skip tuples with zero in first
+			// component
+			// }
+			// System.out.println("coeffs = " + coeffs);
+			SymbolicPolynomial pol = ring.getZero().copy();
+			int i = 0;
+			for (ExpVectorSymbolic f : powers) {
+				IExpr c = coeffs.get(i++);
+				if (c.isZERO()) {
+					continue;
+				}
+				if (pol.val.get(f) != null) {
+					System.out.println("error f in pol = " + f + ", " + pol.getMap().get(f));
+					throw new RuntimeException("error in iterator");
+				}
+				pol.doPutToMap(f, c);
 			}
-			pol.doPutToMap(f, c);
-		}
-		current = pol;
-		return res;
-	}
-
-	/**
-	 * Remove an element if allowed.
-	 */
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException("cannnot remove elements");
-	}
-}
-
-/**
- * Polynomial monomial iterator.
- *
- * @author Heinz Kredel
- */
-class GenPolynomialMonomialIterator implements Iterator<ExprPolynomial> {
-
-	/**
-	 * data structure.
-	 */
-	final ExprPolynomialRing ring;
-
-	final Iterator<List<IExpr>> iter;
-
-	ExprPolynomial current;
-
-	/**
-	 * Polynomial iterator constructor.
-	 */
-	@SuppressWarnings("unchecked")
-	public GenPolynomialMonomialIterator(ExprPolynomialRing fac) {
-		ring = fac;
-		LongIterable li = new LongIterable();
-		li.setNonNegativeIterator();
-		List<Iterable<Long>> tlist = new ArrayList<Iterable<Long>>(ring.nvar);
-		for (int i = 0; i < ring.nvar; i++) {
-			tlist.add(li);
-		}
-		CartesianProductInfinite<Long> ei = new CartesianProductInfinite<Long>(tlist);
-		// Iterator<List<Long>> eviter = ei.iterator();
-
-		ExprRingFactory cf = ring.coFac;
-		Iterable<IExpr> coeffiter;
-		if (cf instanceof Iterable && !cf.isFinite()) {
-			Iterable<IExpr> cfi = (Iterable<IExpr>) cf;
-			coeffiter = cfi;
-		} else {
-			throw new IllegalArgumentException("only for infinite iterable coefficients implemented");
+			current = pol;
+			return res;
 		}
 
-		// Cantor iterator for exponents and coeffcients
-		List<Iterable> eci = new ArrayList<Iterable>(2); // no type parameter
-		eci.add(ei);
-		eci.add(coeffiter);
-		CartesianProductInfinite ecp = new CartesianProductInfinite(eci);
-		iter = ecp.iterator();
-
-		List<IExpr> ec = iter.next();
-		List<Long> ecl = (List<Long>) ec.get(0);
-		IExpr c = ec.get(1); // zero
-		ExpVectorLong e = ExpVectorLong.create(ecl);
-		// System.out.println("exp = " + e);
-		// System.out.println("coeffs = " + c);
-		current = new ExprPolynomial(ring, c, e);
-	}
-
-	/**
-	 * Test for availability of a next element.
-	 *
-	 * @return true if the iteration has more elements, else false.
-	 */
-	@Override
-	public boolean hasNext() {
-		return true;
-	}
-
-	/**
-	 * Get next polynomial.
-	 *
-	 * @return next polynomial.
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public synchronized ExprPolynomial next() {
-		ExprPolynomial res = current;
-
-		List<IExpr> ec = iter.next();
-		IExpr c = ec.get(1);
-		while (c.isZERO()) { // zero already done in first next
-			ec = iter.next();
-			c = ec.get(1);
+		/**
+		 * Remove an element if allowed.
+		 */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("cannnot remove elements");
 		}
-		List<Long> ecl = (List<Long>) ec.get(0);
-		ExpVectorLong e = ExpVectorLong.create(ecl);
-		// System.out.println("exp = " + e);
-		// System.out.println("coeffs = " + c);
-		current = new ExprPolynomial(ring, c, e);
-
-		return res;
 	}
 
 	/**
-	 * Remove an element if allowed.
+	 * Polynomial monomial iterator.
+	 * 
 	 */
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException("cannnot remove elements");
+	private static class GenPolynomialMonomialIterator implements Iterator<SymbolicPolynomial> {
+
+		/**
+		 * data structure.
+		 */
+		final SymbolicPolynomialRing ring;
+
+		final Iterator<List<IExpr>> iter;
+
+		SymbolicPolynomial current;
+
+		/**
+		 * Polynomial iterator constructor.
+		 */
+		@SuppressWarnings("unchecked")
+		public GenPolynomialMonomialIterator(SymbolicPolynomialRing fac) {
+			ring = fac;
+			LongIterable li = new LongIterable();
+			li.setNonNegativeIterator();
+			List<Iterable<Long>> tlist = new ArrayList<Iterable<Long>>(ring.nvar);
+			for (int i = 0; i < ring.nvar; i++) {
+				tlist.add(li);
+			}
+			CartesianProductInfinite<Long> ei = new CartesianProductInfinite<Long>(tlist);
+			// Iterator<List<Long>> eviter = ei.iterator();
+
+			ExprRingFactory cf = ring.coFac;
+			Iterable<IExpr> coeffiter;
+			if (cf instanceof Iterable && !cf.isFinite()) {
+				Iterable<IExpr> cfi = (Iterable<IExpr>) cf;
+				coeffiter = cfi;
+			} else {
+				throw new IllegalArgumentException("only for infinite iterable coefficients implemented");
+			}
+
+			// Cantor iterator for exponents and coeffcients
+			List<Iterable> eci = new ArrayList<Iterable>(2); // no type parameter
+			eci.add(ei);
+			eci.add(coeffiter);
+			CartesianProductInfinite ecp = new CartesianProductInfinite(eci);
+			iter = ecp.iterator();
+
+			List<IExpr> ec = iter.next();
+			List<IExpr> ecl = (List<IExpr>) ec.get(0);
+			IExpr c = ec.get(1); // zero
+			ExpVectorSymbolic e = ExpVectorSymbolic.create(ecl);
+			// System.out.println("exp = " + e);
+			// System.out.println("coeffs = " + c);
+			current = new SymbolicPolynomial(ring, c, e);
+		}
+
+		/**
+		 * Test for availability of a next element.
+		 * 
+		 * @return true if the iteration has more elements, else false.
+		 */
+		@Override
+		public boolean hasNext() {
+			return true;
+		}
+
+		/**
+		 * Get next polynomial.
+		 * 
+		 * @return next polynomial.
+		 */
+		@Override
+		@SuppressWarnings("unchecked")
+		public synchronized SymbolicPolynomial next() {
+			SymbolicPolynomial res = current;
+
+			List<IExpr> ec = iter.next();
+			IExpr c = ec.get(1);
+			while (c.isZERO()) { // zero already done in first next
+				ec = iter.next();
+				c = ec.get(1);
+			}
+			List<IExpr> ecl = (List<IExpr>) ec.get(0);
+			ExpVectorSymbolic e = ExpVectorSymbolic.create(ecl);
+			// System.out.println("exp = " + e);
+			// System.out.println("coeffs = " + c);
+			current = new SymbolicPolynomial(ring, c, e);
+
+			return res;
+		}
+
+		/**
+		 * Remove an element if allowed.
+		 */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("cannnot remove elements");
+		}
 	}
+
 }

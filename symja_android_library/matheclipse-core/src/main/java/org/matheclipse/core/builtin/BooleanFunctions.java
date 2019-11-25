@@ -23,8 +23,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -930,7 +929,11 @@ public final class BooleanFunctions {
 						vars.append(temp);
 					}
 				}
+				if (rest.size() == 1) {
+					vars = F.Or();
+				} else {
 				formula = lf.expr2BooleanFunction(rest);
+			}
 			}
 			formula = QuineMcCluskeyAlgorithm.compute(formula);
 			// System.out.println(formula.toString());
@@ -1839,7 +1842,7 @@ public final class BooleanFunctions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.FLAT);
+			// don't assign ISymbol.FLAT
 		}
 
 		/**
@@ -2144,7 +2147,10 @@ public final class BooleanFunctions {
 				return F.True;
 			}
 			try {
-			Validate.checkRange(ast, 4, Integer.MAX_VALUE);
+				// Validate.checkRange(ast, 4, Integer.MAX_VALUE);
+				if (ast.size() < 4) {
+					return F.NIL;
+				}
 
 			if (ast.size() == 4) {
 				for (IBuiltInSymbol sym : COMPARATOR_SYMBOLS) {
@@ -2227,7 +2233,7 @@ public final class BooleanFunctions {
 				return res;
 
 				// return inequality(ast, engine);
-			} catch (WrongNumberOfArguments woa) {
+			} catch (ValidateException woa) {
 				return engine.printMessage(woa.getMessage());
 			}
 		}

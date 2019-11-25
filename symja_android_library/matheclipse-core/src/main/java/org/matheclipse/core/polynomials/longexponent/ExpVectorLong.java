@@ -1,4 +1,4 @@
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.longexponent;
 
 import com.duy.lambda.ObjIntConsumer;
 
@@ -578,8 +578,17 @@ public final class ExpVectorLong {
 			return false;
 		}
 		ExpVectorLong b = (ExpVectorLong) B;
-		int t = this.invLexCompareTo(b);
-		return (0 == t);
+		long[] u = val;
+		long[] v = b.val;
+		if (u.length != v.length) {
+			return false;
+		}
+		for (int i = 0; i < u.length; i++) {
+			if (u[i] != v[i]) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

@@ -53,8 +53,8 @@ import org.matheclipse.core.interfaces.IUnaryIndexFunction;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcherEvalEngine;
-import org.matheclipse.core.polynomials.ExprPolynomial;
-import org.matheclipse.core.polynomials.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
+import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -2853,7 +2853,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericFunction() {
-		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute()) {
+		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
 			// check if all arguments are &quot;numeric&quot;
 			return forAll(new Predicate<IExpr>() {
 				@Override
@@ -3912,6 +3912,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	public final IASTAppendable removeAtClone(int position) {
 		IASTAppendable ast = copyAppendable();
 		ast.remove(position);
+		return ast;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public IAST splice(int index, int howMany, IExpr... items) {
+		IASTAppendable ast = copyAppendable();
+		if (howMany > 0) {
+			ast.removeRange(index, index + howMany);
+		}
+		for (int i = 0; i < items.length; i++) {
+			ast.append(index++, items[i]);
+		}
 		return ast;
 	}
 

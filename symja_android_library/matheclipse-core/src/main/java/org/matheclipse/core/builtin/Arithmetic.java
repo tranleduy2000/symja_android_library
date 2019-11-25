@@ -2169,8 +2169,17 @@ public final class Arithmetic {
 					IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
 					numericPrecision = Validate.checkIntType(arg2);
                 }
+				IExpr arg1 = ast.arg1();
+				if (arg1.isNumericFunction()) {
+					engine.setNumericMode(true, numericPrecision);
+					return engine.evalWithoutNumericReset(arg1);
+				}
+
+				// first try symbolic evaluation, then numeric evaluation
+				engine.setNumericPrecision(numericPrecision);
+				IExpr temp = engine.evaluate(arg1);
                 engine.setNumericMode(true, numericPrecision);
-                return engine.evalWithoutNumericReset(ast.arg1());
+				return engine.evalWithoutNumericReset(temp);
             } finally {
                 engine.setNumericMode(numericMode);
                 engine.setNumericPrecision(oldPrecision);
@@ -3466,10 +3475,12 @@ public final class Arithmetic {
 					if (base.exponent().isReal() && exponent.isReal()) {
 						IExpr temp = base.exponent().times(exponent);
                         if (temp.isOne()) {
+							// (a ^ b )^exponent => a ^ (b * exponent) && b*exponent==1
 							if (base.base().isNonNegativeResult()) {
 								return base.base();
                             }
-							if (base.base().isRealResult()) {
+							if (base.base().isRealResult() && //
+									base.exponent().isEvenResult()) {
 								return F.Abs(base.base());
                             }
                         }
@@ -3850,20 +3861,20 @@ public final class Arithmetic {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			final int size = ast.size();
-			if (size == 3) {
-				return binaryOperator(ast, ast.arg1(), ast.arg2());
-			}
 			if (ast.head() == F.Power) {
-            if (size == 1) {
+				switch (size) {
+				case 0:
+					break;
+				case 1:
                 return F.C1;
-            }
-				if (size == 2) {
+				case 2:
                 return ast.arg1();
+				case 3:
+					return binaryOperator(ast, ast.arg1(), ast.arg2());
+				default:
+					// Power(a,b,c,d) ==> Power(a, b, Power(c, d)))
+					return ast.splice(size - 2, 2, F.Power(ast.get(size - 2), ast.get(size - 1)));
             }
-				// size > 3
-					IASTAppendable temp = ast.removeAtClone(size - 1);
-					temp.set(temp.size() - 1, F.Power(ast.get(size - 2), ast.get(size - 1)));
-					return temp;
 				}
 			return F.NIL;
         }
@@ -5251,7 +5262,7 @@ public final class Arithmetic {
 								} else {
 									// creates an IASTAppendable
 
-                                astTimes = astTimes.removeAtClone(j);
+									astTimes = astTimes.splice(j);
 
 									isIASTAppendable = true;
 								}

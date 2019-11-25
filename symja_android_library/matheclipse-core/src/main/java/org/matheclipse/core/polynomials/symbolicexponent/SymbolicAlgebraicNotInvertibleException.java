@@ -2,7 +2,7 @@
  * $Id: AlgebraicNotInvertibleException.java 3472 2011-01-07 17:19:22Z kredel $
  */
 
-package org.matheclipse.core.polynomials;
+package org.matheclipse.core.polynomials.symbolicexponent;
 
 
 import edu.jas.structure.NotInvertibleException;
@@ -13,38 +13,38 @@ import edu.jas.structure.NotInvertibleException;
  * Runtime Exception to be thrown for not invertible algebraic numbers.
  * Container for the non-trivial factors found by the inversion algorithm.
  * <b>Note: </b> cannot be generic because of Throwable.
- * @author Heinz Kredel
+ *
  */
-public class AlgebraicNotInvertibleException extends NotInvertibleException {
+public class SymbolicAlgebraicNotInvertibleException extends NotInvertibleException {
 
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 4734826103269124125L;
 
-	public final ExprPolynomial f; // = f1 * f2
+	public final SymbolicPolynomial f; // = f1 * f2
 
-    public final ExprPolynomial f1;
+    public final SymbolicPolynomial f1;
 
-    public final ExprPolynomial f2;
+    public final SymbolicPolynomial f2;
 
 
-    public AlgebraicNotInvertibleException() {
+    public SymbolicAlgebraicNotInvertibleException() {
         this(null,null,null);
     }
 
 
-    public AlgebraicNotInvertibleException(String c) {
+    public SymbolicAlgebraicNotInvertibleException(String c) {
         this(c,null,null,null);
     }
 
 
-    public AlgebraicNotInvertibleException(String c, Throwable t) {
+    public SymbolicAlgebraicNotInvertibleException(String c, Throwable t) {
         this(c,t,null,null,null);
     }
 
 
-    public AlgebraicNotInvertibleException(Throwable t) {
+    public SymbolicAlgebraicNotInvertibleException(Throwable t) {
         this(t,null,null,null);
     }
 
@@ -55,7 +55,7 @@ public class AlgebraicNotInvertibleException extends NotInvertibleException {
      * @param f1 polynomial.
      * @param f2 polynomial.
      */
-    public AlgebraicNotInvertibleException(ExprPolynomial f, ExprPolynomial f1, ExprPolynomial f2) {
+    public SymbolicAlgebraicNotInvertibleException(SymbolicPolynomial f, SymbolicPolynomial f1, SymbolicPolynomial f2) {
         super("AlgebraicNotInvertibleException");
         this.f = f;
         this.f1 = f1;
@@ -69,7 +69,7 @@ public class AlgebraicNotInvertibleException extends NotInvertibleException {
      * @param f1 polynomial.
      * @param f2 polynomial.
      */
-    public AlgebraicNotInvertibleException(String c, ExprPolynomial f, ExprPolynomial f1, ExprPolynomial f2) {
+    public SymbolicAlgebraicNotInvertibleException(String c, SymbolicPolynomial f, SymbolicPolynomial f1, SymbolicPolynomial f2) {
         super(c);
         this.f = f;
         this.f1 = f1;
@@ -83,7 +83,7 @@ public class AlgebraicNotInvertibleException extends NotInvertibleException {
      * @param f1 polynomial.
      * @param f2 polynomial.
      */
-    public AlgebraicNotInvertibleException(String c, Throwable t, ExprPolynomial f, ExprPolynomial f1, ExprPolynomial f2) {
+    public SymbolicAlgebraicNotInvertibleException(String c, Throwable t, SymbolicPolynomial f, SymbolicPolynomial f1, SymbolicPolynomial f2) {
         super(c,t);
         this.f = f;
         this.f1 = f1;
@@ -97,7 +97,7 @@ public class AlgebraicNotInvertibleException extends NotInvertibleException {
      * @param f1 polynomial.
      * @param f2 polynomial.
      */
-    public AlgebraicNotInvertibleException(Throwable t, ExprPolynomial f, ExprPolynomial f1, ExprPolynomial f2) {
+    public SymbolicAlgebraicNotInvertibleException(Throwable t, SymbolicPolynomial f, SymbolicPolynomial f1, SymbolicPolynomial f2) {
         super("AlgebraicNotInvertibleException",t);
         this.f = f;
         this.f1 = f1;

@@ -21,7 +21,6 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
@@ -80,15 +79,11 @@ public class ExprParserFactory implements IParserFactory {
 			if (fOperatorString.equals("@")) {
 				return F.unaryAST1(lhs, rhs);
 			}
-			IASTAppendable fn = F.ast(F.Apply);
-			fn.append(lhs);
-			fn.append(rhs);
 			if (fOperatorString.equals("@@")) {
-				return fn;
+				return F.Apply(lhs,rhs);
 			}
 			// case "@@@"
-			fn.append(F.List(F.C1));
-			return fn;
+			return F.ApplyListC1(lhs,rhs);
 		}
 
 	}
@@ -223,7 +218,8 @@ public class ExprParserFactory implements IParserFactory {
 			"GreaterEqual", "Condition", "Colon", "//", "DivideBy", "Or", "Span", "Equal", "StringJoin", "Unequal",
 			"Decrement", "SubtractFrom", "PrePlus", "RepeatedNull", "UnsameQ", "Rule", "UpSetDelayed", "PreIncrement",
 			"Function", "Greater", "PreDecrement", "Subtract", "SetDelayed", "Alternatives", "AddTo", "Repeated",
-			"ReplaceAll", "TagSet", "TwoWayRule", "TwoWayRule", "DirectedEdge", "UndirectedEdge" };
+			"ReplaceAll", "TagSet", "TwoWayRule", "TwoWayRule", "DirectedEdge", "UndirectedEdge", "CenterDot",
+			"CircleDot" };
 
 	static final String[] OPERATOR_STRINGS = { "::", "<<", "?", "??", "?", "//@", "*=", "+", "^=", ";", "@", "/@", "=.",
 			"@@", "@@@", "//.", "<", "&&", "/", "=", "++", "!!", "<=", "**", "!", "*", "^", ".", "!", "-", "===", ":>",
@@ -232,7 +228,9 @@ public class ExprParserFactory implements IParserFactory {
 			"<->", // TwoWayRule
 			"\uF120", // TwoWayRule
 			"\uF3D5", // DirectedEdge
-			"\uF3D4"// UndirectedEdge
+			"\uF3D4", // UndirectedEdge
+			"\u00B7", // CenterDot
+			"\u2299" // CircleDot
 	};
 
 	private static Operator[] OPERATORS;
@@ -382,7 +380,10 @@ public class ExprParserFactory implements IParserFactory {
 					new InfixExprOperator("<->", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE), //
 					new InfixExprOperator("\uF120", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE), //
 					new InfixExprOperator("\uF3D5", "DirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE), //
-					new InfixExprOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE) };
+					new InfixExprOperator("\uF3D4", "UndirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE), //
+					new InfixExprOperator("\u00B7", "CenterDot", 410, InfixExprOperator.NONE), //
+					new InfixExprOperator("\u2299", "CircleDot", 520, InfixExprOperator.NONE) //
+			};
 
 		StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
 			fOperatorMap = Tries.forStrings();

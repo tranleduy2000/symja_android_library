@@ -2,7 +2,6 @@ package org.matheclipse.core.img;
 
 import com.duy.awt.Color;
 
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -13,7 +12,7 @@ import ch.ethz.idsc.tensor.io.ImageFormat;
 /**
  * mappings between {@link IAST}, {@link Color}, and 0xAA:RR:GG:BB integer
  * 
- * <p> 
+ * <p>
  * functions are used in {@link ImageFormat}
  */
 public enum ColorFormat {
@@ -59,7 +58,9 @@ public enum ColorFormat {
 	 *             if either color value is outside the allowed range [0, ..., 255]
 	 */
 	public static Color toColor(IAST vector) {
-		Validate.checkSize(vector, 5);
+		if (vector.size() != 5) {
+			throw new IllegalArgumentException("ColorFormat#toColor() exppects 4 arguments");
+		}
 
 		return new Color( //
 				((IInteger) vector.arg1()).toInt(), //
