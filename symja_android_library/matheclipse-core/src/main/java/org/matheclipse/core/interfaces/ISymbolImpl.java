@@ -2,6 +2,7 @@ package org.matheclipse.core.interfaces;
 
 import com.duy.lambda.DoubleFunction;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -88,7 +89,7 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
 
     @Override
     public boolean isProtected() {
-        return ((getAttributes() & PROTECTED) == PROTECTED);
+        return ((getAttributes() & PROTECTED) == PROTECTED) && !Config.DISABLE_PROTECTED_ATTR;
 
     }
 

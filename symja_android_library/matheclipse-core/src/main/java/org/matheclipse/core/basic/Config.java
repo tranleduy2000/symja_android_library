@@ -168,6 +168,9 @@ public class Config {
 	 *
 	 */
 	public static boolean UNPROTECT_ALLOWED = true;
+
+	public static boolean DISABLE_PROTECTED_ATTR = false;
+
 	/**
 	 * See <a href="http://en.wikipedia.org/wiki/Machine_epsilon">Wikipedia: Machine epsilon</a>
 	 */

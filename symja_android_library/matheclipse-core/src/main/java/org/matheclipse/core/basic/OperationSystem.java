@@ -20,7 +20,7 @@ public class OperationSystem {
      * AppDelegate.swift
      * Before calculating, this field should set to true
      */
-    private static boolean isMemoryWarning = false;
+    private static boolean memoryWarning = false;
 
     /**
      * Maximum number of bytes the heap can expand to. Negative values mean default JVM value
@@ -47,8 +47,8 @@ public class OperationSystem {
         OperationSystem.maxMemoryUsageFactor = memoryUsageFactor;
     }
 
-    public static void setIsMemoryWarning(boolean isMemoryWarning) {
-        OperationSystem.isMemoryWarning = isMemoryWarning;
+    public static void setMemoryWarning(boolean memoryWarning) {
+        OperationSystem.memoryWarning = memoryWarning;
     }
 
     public static void checkMemory() {
@@ -83,7 +83,9 @@ public class OperationSystem {
             if (maxMemory > 0 && maxMemory < Long.MAX_VALUE && usedMemory > 0) {
                 float usageFactor = (float) usedMemory / maxMemory;
                 if (usageFactor < 1.0f && usageFactor > maxMemoryUsageFactor) {
-                    System.err.println("usedMemory = " + usedMemory + "; maxMemory = " + maxMemory);
+                    if (debug) {
+                        System.err.println("usedMemory = " + usedMemory + "; maxMemory = " + maxMemory);
+                    }
                     throw new OutOfMemoryError("Out of memory");
                 }
             }
@@ -92,12 +94,15 @@ public class OperationSystem {
                 return;
             }
             Runtime runtime = Runtime.getRuntime();
-            long usedMemory = runtime.totalMemory() - runtime.freeMemory() + additionalMemoryInBytes;
+            long usedMemory = runtime.totalMemory() + additionalMemoryInBytes;
             if (debug) {
                 printMemoryUsage(maxMemory, usedMemory);
             }
-            if (usedMemory > maxMemory) {
-                System.err.println("usedMemory = " + usedMemory + "; maxMemory = " + maxMemory);
+            if (usedMemory > maxMemory || memoryWarning) {
+                if (debug) {
+                    System.err.println("usedMemory = " + usedMemory + "; maxMemory = " + maxMemory);
+                }
+                memoryWarning = false;
                 throw new OutOfMemoryError("Out of memory");
             }
         }
