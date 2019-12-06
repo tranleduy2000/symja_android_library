@@ -272,35 +272,35 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			}
 		} else {
 			patternMap = getPatternMap();
-		patternMap.initPattern();
+			patternMap.initPattern();
 			if (matchExpr(fLhsPatternExpr, leftHandSide, engine, new StackMatcher(engine))) {
 
-			if (RulesData.showSteps) {
-				if (fLhsPatternExpr.head().equals(F.Integrate)) {
+				if (RulesData.showSteps) {
+					if (fLhsPatternExpr.head().equals(F.Integrate)) {
 						IExpr rhs = fRightHandSide.orElse(F.Null);
-					System.out.println("\nCOMPLEX: " + fLhsPatternExpr.toString() + " := " + rhs.toString());
-					System.out.println("\n>>>>> " + toString());
+						System.out.println("\nCOMPLEX: " + fLhsPatternExpr.toString() + " := " + rhs.toString());
+						System.out.println("\n>>>>> " + toString());
+					}
 				}
-			}
 
 				if (fReturnResult.isPresent()) {
 					return fReturnResult;
 				}
-			IExpr result = patternMap.substituteSymbols(fRightHandSide);
-			try {
-				// System.out.println(result.toString());
-				if (evaluate) {
+				IExpr result = patternMap.substituteSymbols(fRightHandSide);
+				try {
+					// System.out.println(result.toString());
+					if (evaluate) {
 						result = engine.evaluate(result);
-				}
-					return result;
-			} catch (final ConditionException e) {
-					if (Config.SHOW_STACKTRACE) {
-				logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
 					}
-				return F.NIL;
-			} catch (final ReturnException e) {
+					return result;
+				} catch (final ConditionException e) {
+					if (Config.SHOW_STACKTRACE) {
+						logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
+					}
+					return F.NIL;
+				} catch (final ReturnException e) {
 					return e.getValue();
-			}
+				}
 
 			}
 		}

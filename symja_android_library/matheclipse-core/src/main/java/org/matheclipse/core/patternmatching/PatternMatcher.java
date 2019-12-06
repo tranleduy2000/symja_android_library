@@ -2,7 +2,10 @@ package org.matheclipse.core.patternmatching;
 
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Predicate;
+import com.duy.ref.ObjectRef;
+import com.google.j2objc.annotations.AutoreleasePool;
 
+import org.matheclipse.combinatoric.IStepVisitor;
 import org.matheclipse.combinatoric.MultisetPartitionsIterator;
 import org.matheclipse.combinatoric.NumberPartitionsIterator;
 import org.matheclipse.core.basic.Config;
@@ -715,14 +718,26 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
                         // same size ==> use OneIdentity in pattern
                         // matching
 								|| (lhsPatternAST.size() == lhsEvalSize && !sym.hasFlatAttribute()));
-                MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPatternAST.argSize());
-                return !iter.execute();
+                // objc-changed
+				// MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPatternAST.argSize());
+				// return !iter.execute();
+				ObjectRef<Boolean> resultRef = new ObjectRef<>();
+				invokeMultisetPartitionsIteratorExecute(visitor, lhsPatternAST, resultRef);
+				return !resultRef.get();
             }
 
             return matchASTSequence(lhsPatternAST, lhsEvalAST, 0, engine, stackMatcher);
         }
         return false;
     }
+
+    // objc-changed
+	@AutoreleasePool
+	private void invokeMultisetPartitionsIteratorExecute(IStepVisitor visitor, IAST lhsPatternAST, ObjectRef<Boolean> resultRef) {
+		MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPatternAST.argSize());
+		resultRef.set(iter.execute());
+		return;
+	}
 
 	private boolean matchBlankSequence(final IPatternSequence patternSequence, final IAST lhsPatternAST,
 			final int position, final IAST lhsEvalAST, EvalEngine engine, StackMatcher stackMatcher) {
@@ -1263,8 +1278,13 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 
 			FlatOrderlessStepVisitor visitor = new FlatOrderlessStepVisitor(sym, lhsPatternFinal, lhsEvalFinal,
 					stackMatcher, fPatternMap, sym.hasFlatAttribute());
-			MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPattern.argSize());
-            return !iter.execute();
+
+			// objc-changed: auto release pool
+			// MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPattern.argSize());
+			// return !iter.execute();
+			ObjectRef<Boolean> resultRef = new ObjectRef<>();
+			invokeMultisetPartitionsIteratorExecute(visitor, lhsPattern, resultRef);
+			return !resultRef.get();
 		} else {
 			// IExpr temp = fPatternMap.substituteASTPatternOrSymbols(lhsPattern, false);
 			// if (temp.isAST(lhsPattern.head())) {
@@ -1297,11 +1317,22 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
             }
 
 			FlatStepVisitor visitor = new FlatStepVisitor(sym, lhsPatternAST, lhsEvalAST, stackMatcher, fPatternMap);
-			NumberPartitionsIterator iter = new NumberPartitionsIterator(visitor, lhsEvalAST.argSize(),
-					lhsPatternAST.argSize());
-            return !iter.execute();
-        }
-    }
+			// j2objc changed: auto release pool
+			ObjectRef<Boolean> resultRef = new ObjectRef<>();
+			numberPartitionsIteratorExecuteImpl(visitor, lhsEvalAST,
+					lhsPatternAST, resultRef);
+			return resultRef.get();
+		}
+	}
+
+	// j2objc changed: auto release pool
+	@AutoreleasePool
+	private void numberPartitionsIteratorExecuteImpl(FlatStepVisitor visitor, IAST lhsEvalAST, IAST lhsPatternAST, ObjectRef<Boolean> resultRef) {
+		NumberPartitionsIterator iter = new NumberPartitionsIterator(visitor, lhsEvalAST.argSize(),
+				lhsPatternAST.argSize());
+		resultRef.set(!iter.execute());
+		return;
+	}
 
 	/**
 	 * Remove parts which are "free of patterns" in <code>lhsPattern</code> and <code>lhsEval</code>.

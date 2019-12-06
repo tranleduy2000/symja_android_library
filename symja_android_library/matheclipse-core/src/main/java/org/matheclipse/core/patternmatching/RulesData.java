@@ -393,7 +393,8 @@ public final class RulesData implements Serializable {
 		boolean evalRHSMode = engine.isEvalRHSMode();
 		try {
 			engine.setEvalRHSMode(true);
-			IPatternMatcher pmEvaluator;
+			// obj-c changed: autoreleasepool
+			// IPatternMatcher pmEvaluator;
 			if (fPatternDownRules != null) {
 				IExpr result;
 				int patternHash = 0;
@@ -408,33 +409,35 @@ public final class RulesData implements Serializable {
 					// }
 					// }
 					if (patternEvaluator.isPatternHashAllowed(patternHash)) {
-					pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
-					if (showSteps) {
-						if (isShowSteps(pmEvaluator)) {
+						// obj-c changed: autoreleasepool
+						IPatternMatcher pmEvaluator;
+						pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
+						if (showSteps) {
+							if (isShowSteps(pmEvaluator)) {
 								IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
 								System.out.println(
 										" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
+							}
 						}
-					}
 						// if (pmEvaluator.getLHSPriority() == 6656) {
 						// System.out.println("Debug from this line");
 						// }
-					if (Config.SHOW_STACKTRACE) {
-						if (isShowPriority(pmEvaluator)) {
-							System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
+						if (Config.SHOW_STACKTRACE) {
+							if (isShowPriority(pmEvaluator)) {
+								System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
+							}
+							// if (pmEvaluator.getLHSPriority() == 432) {
+							// System.out.println(pmEvaluator.toString());
+							// System.out.println(expr);
+							// System.out.println("Debug from this line");
+							// }
 						}
-						// if (pmEvaluator.getLHSPriority() == 432) {
-						// System.out.println(pmEvaluator.toString());
-						// System.out.println(expr);
-						// System.out.println("Debug from this line");
-						// }
-					}
 						// System.out.println(pmEvaluator.toString());
 						// System.out.println(">>"+expr);
 
 
-					result = pmEvaluator.eval(expr, engine);
-					if (result.isPresent()) {
+						result = pmEvaluator.eval(expr, engine);
+						if (result.isPresent()) {
 							// if (patternEvaluator.fLhsPatternExpr.isAST(F.Integrate)) {
 							// System.out.println(((IPatternMatcher) patternEvaluator).toString());
 							// // if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 6686) {
@@ -442,31 +445,31 @@ public final class RulesData implements Serializable {
 							// patternEvaluator).getLHSPriority());
 							// // }
 							// }
-						if (Config.SHOW_STACKTRACE) {
-							if (isShowPriority(pmEvaluator)) {
-								System.out.println("matched: " + pmEvaluator.getLHSPriority()+": "+pmEvaluator.toString());
-							}
-						}
-						if (showSteps) {
-							if (isShowSteps(pmEvaluator)) {
-								IExpr rhs = pmEvaluator.getRHS();
-								if (!rhs.isPresent()) {
-									rhs = F.Null;
+							if (Config.SHOW_STACKTRACE) {
+								if (isShowPriority(pmEvaluator)) {
+									System.out.println("matched: " + pmEvaluator.getLHSPriority() + ": " + pmEvaluator.toString());
 								}
-								System.out.println(
-										"\nCOMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
-								System.out.println(" >>> " + expr.toString() + "  >>>>  " + result.toString());
 							}
-						}
-						return result;
+							if (showSteps) {
+								if (isShowSteps(pmEvaluator)) {
+									IExpr rhs = pmEvaluator.getRHS();
+									if (!rhs.isPresent()) {
+										rhs = F.Null;
+									}
+									System.out.println(
+											"\nCOMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
+									System.out.println(" >>> " + expr.toString() + "  >>>>  " + result.toString());
+								}
+							}
+							return result;
 						}
 						if (Config.SHOW_STACKTRACE) {
 							if (isShowPriority(pmEvaluator)) {
-								System.out.print("not matched: " + pmEvaluator.getLHSPriority()+" ");
+								System.out.print("not matched: " + pmEvaluator.getLHSPriority() + " ");
 							}
 						}
+					}
 				}
-			}
 			}
 		} catch (CloneNotSupportedException cnse) {
 			cnse.printStackTrace();

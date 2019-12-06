@@ -1,5 +1,8 @@
 package org.matheclipse.combinatoric;
 
+import com.duy.ref.ObjectRef;
+import com.google.j2objc.annotations.AutoreleasePool;
+
 /**
  * Partition a set and visit all steps of the algorithm with an <code>IStepVisitor</code>
  * 
@@ -7,7 +10,8 @@ package org.matheclipse.combinatoric;
  */
 public class NumberPartitionsIterator {
 	private final int[][] result;
-	private RosenNumberPartitionIterator rosen;
+	// objc-changed
+	private final RosenNumberPartitionIterator rosen;
 	private IStepVisitor handler;
 
 	/**
@@ -32,7 +36,13 @@ public class NumberPartitionsIterator {
 	}
 
 	public boolean execute() {
+		ObjectRef<Boolean> resultRef = new ObjectRef<>();
+		executeImpl(resultRef);
+		return resultRef.get();
+	}
 
+	@AutoreleasePool
+	private void executeImpl(ObjectRef<Boolean> resultRef) {
 		while (rosen.hasNext()) {
 			int counter = 0;
 			final int[] currentRosen = rosen.next();
@@ -52,11 +62,12 @@ public class NumberPartitionsIterator {
 				// }
 			}
 			if (!handler.visit(result)) {
-				return false;
+				resultRef.set(false);
+				return;
 			}
 		}
-		return true;
-
+		resultRef.set(true);
+		return;
 	}
 
 }

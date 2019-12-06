@@ -1,5 +1,8 @@
 package org.matheclipse.combinatoric;
 
+import com.duy.ref.ObjectRef;
+import com.google.j2objc.annotations.AutoreleasePool;
+
 /**
  * Partition an ordered multi-set and visit all steps of the algorithm with a <code>IStepVisitor</code>
  * 
@@ -10,7 +13,8 @@ public class MultisetPartitionsIterator {
 	private final int n;
 	private final int[] multiset;
 	private final int[][] result;
-	private RosenNumberPartitionIterator rosen;
+	// objc-changed
+	private final RosenNumberPartitionIterator rosen;
 	private final IStepVisitor handler;
 
 	/**
@@ -47,6 +51,13 @@ public class MultisetPartitionsIterator {
 	}
 
 	private boolean recursiveMultisetCombination(int[] multiset, final int[] currentRosen, int i) {
+		ObjectRef<Boolean> result = new ObjectRef<>();
+		recursiveMultisetCombinationImpl(multiset, currentRosen, i, result);
+		return result.get();
+	}
+
+	@AutoreleasePool
+	private void recursiveMultisetCombinationImpl(int[] multiset, int[] currentRosen, int i, ObjectRef<Boolean> resultRef) {
 		if (i < currentRosen.length) {
 			final MultisetCombinationIterator iter = new MultisetCombinationIterator(multiset, currentRosen[i]);
 			while (iter.hasNext()) {
@@ -54,11 +65,14 @@ public class MultisetPartitionsIterator {
 				result[i] = currentSubset;
 				int[] wc = ArrayUtils.deleteSubset(multiset, currentSubset);
 				if (recursiveMultisetCombination(wc, currentRosen, i + 1)) {
-					return true;
+					resultRef.set(true);
+					return;
 				}
 			}
-			return false;
+			resultRef.set(false);
+			return;
 		}
-		return !handler.visit(result);
+		resultRef.set(!handler.visit(result));
+		return;
 	}
 }
