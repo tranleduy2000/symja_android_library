@@ -66,7 +66,7 @@ public final class BigRational extends RingElemImpl<BigRational>
      * @param n math.BigInteger.
      * @param d math.BigInteger.
      */
-    protected BigRational(BigInteger n, BigInteger d) {
+    public BigRational(BigInteger n, BigInteger d) {
         // assert gcd(n,d) == 1
         num = n;
         den = d;

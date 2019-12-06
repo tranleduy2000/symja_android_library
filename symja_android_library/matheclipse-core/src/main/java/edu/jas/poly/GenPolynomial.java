@@ -18,6 +18,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import edu.jas.arith.BigInteger;
+import edu.jas.arith.BigRational;
 import edu.jas.kern.PreemptingException;
 import edu.jas.kern.PrettyPrint;
 import edu.jas.structure.NotInvertibleException;
@@ -668,7 +670,13 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
             for (Map.Entry<ExpVector, C> m2 : S.val.entrySet()) {
                 C c2 = m2.getValue();
                 ExpVector e2 = m2.getKey();
-                C c = c1.multiply(c2); // check non zero if not domain
+                // objc-changed: fast-fix ClassCastException
+                C c; // check non zero if not domain
+                if (c1 instanceof BigRational && c2 instanceof BigInteger) {
+                    c = c1.multiply((C) new BigRational((BigInteger) c2, BigInteger.ONE));
+                } else {
+                    c = c1.multiply(c2);
+                }
                 if (!c.isZERO()) {
                     ExpVector e = e1.sum(e2);
                     C c0 = pv.get(e);
