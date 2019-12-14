@@ -7,11 +7,11 @@ import java.math.BigInteger;
 public class NumberUtilTest extends TestCase {
 
     public void testApproximatelyDigitCount() {
-        assertEquals(NumberUtil.approximatelyDigitCount(new BigInteger("102")), 3);
-        assertEquals(NumberUtil.approximatelyDigitCount(new BigInteger("-102")), 3);
-        assertEquals(NumberUtil.approximatelyDigitCount(new BigInteger("-121302")), 6);
-        assertEquals(NumberUtil.approximatelyDigitCount(new BigInteger("121302")), 6);
-        assertEquals(NumberUtil.approximatelyDigitCount(new BigInteger("1")), 1);
+        assertEquals(NumberUtil.calculateApproximatelyDigitCount(new BigInteger("102")), 3);
+        assertEquals(NumberUtil.calculateApproximatelyDigitCount(new BigInteger("-102")), 3);
+        assertEquals(NumberUtil.calculateApproximatelyDigitCount(new BigInteger("-121302")), 6);
+        assertEquals(NumberUtil.calculateApproximatelyDigitCount(new BigInteger("121302")), 6);
+        assertEquals(NumberUtil.calculateApproximatelyDigitCount(new BigInteger("1")), 1);
     }
 
     public void test2() {
@@ -22,7 +22,20 @@ public class NumberUtilTest extends TestCase {
         System.out.println("String size = " + s.length() * 2 + " bytes");
         BigInteger number = new BigInteger(s.toString());
         System.out.println("bitCount = " + number.bitCount());
-        System.out.println("approximatelyDigitCount = " + NumberUtil.approximatelyDigitCount(number));
-        System.out.println("actual size = 41544 (mag.length * 4 + 4 * 5)");
+        System.out.println("bitLength = " + number.bitLength() + " ; " + number.bitLength() / 8);
+        System.out.println("approximatelyDigitCount = " + NumberUtil.calculateApproximatelyDigitCount(number));
+        System.out.println("calculateApproximatelySizeOf = " + NumberUtil.calculateApproximatelySizeOf(number) + " bytes");
+        System.out.println("actual size = 41544 bytes (mag.length * 4 + 4 * 5)");
+    }
+
+    public void test3() {
+        BigInteger number = new BigInteger("9").pow(333);
+        System.out.println("approximatelyDigitCount = " + NumberUtil.calculateApproximatelyDigitCount(number));
+    }
+
+    public void test() {
+        BigInteger nine = new BigInteger("9");
+        BigInteger integer = nine.pow(9).pow(9).pow(9).pow(9);
+        System.out.println();
     }
 }

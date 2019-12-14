@@ -23,4 +23,8 @@ public abstract class LimitException extends MathException {
 	public LimitException() {
 		super();
 	}
+
+	public LimitException(String message) {
+		super(message);
+	}
 }

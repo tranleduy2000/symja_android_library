@@ -27,18 +27,18 @@ import java.math.RoundingMode;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.matheclipse.core.expression.NumberUtil.approximatelyDigitCount;
+import static org.matheclipse.core.expression.NumberUtil.calculateApproximatelySizeOf;
 
 /**
  * IInteger implementation which delegates most of the methods to the BigInteger methods.
- * 
+ *
  * @see AbstractIntegerSym
  * @see IntegerSym
  */
 public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6389228668633533063L;
 
@@ -93,7 +93,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
 	 * do not use directly, needed for serialization/deserialization
-	 * 
+	 *
 	 */
 	public BigIntegerSym() {
 		fBigIntValue = null;
@@ -252,7 +252,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
 	 * Return the divisors of this integer number.
-	 * 
+	 *
 	 * <pre>
 	 * divisors(24) ==> {1,2,3,4,6,8,12,24}
 	 * </pre>
@@ -334,7 +334,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
 	 * Get the highest exponent of <code>base</code> that divides <code>this</code>
-	 * 
+	 *
 	 * @return the exponent
 	 */
 	@Override
@@ -356,7 +356,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
 	 * Returns the greatest common divisor of this large integer and the one specified.
-	 * 
+	 *
 	 */
 	@Override
 	public IInteger gcd(final IInteger that) {
@@ -575,7 +575,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -612,17 +612,17 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IInteger multiply(final IInteger that) {
 		// Swift changed: check out of memory
-		// suppose that result is length of this number, two bytes per digit
-		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 2);
+		OperationSystem.checkMemory(calculateApproximatelySizeOf(fBigIntValue) + calculateApproximatelySizeOf(that));
+		OperationSystem.checkMultiplicationOperation(fBigIntValue.bitLength(), that.bitLength());
 		if (that instanceof IntegerSym) {
 			switch (((IntegerSym) that).fIntValue) {
-			case 0:
-				return F.C0;
-			case 1:
-				return this;
-			case -1:
-				return negate();
-			default:
+				case 0:
+					return F.C0;
+				case 1:
+					return this;
+				case -1:
+					return negate();
+				default:
 			}
 		}
 		return valueOf(fBigIntValue.multiply(that.toBigNumerator()));
@@ -635,16 +635,16 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	@Override
 	public IInteger multiply(int value) {
 		// Swift changed: check out of memory
-		// suppose that result is length of this number, two bytes per digit
-		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 2);
-		switch (value) {
-		case 0:
-			return F.C0;
-		case 1:
-			return this;
-		case -1:
-			return negate();
-		default:
+		OperationSystem.checkMemory(calculateApproximatelySizeOf(fBigIntValue));
+        OperationSystem.checkMultiplicationOperation(fBigIntValue.bitLength(), 4 * 8);
+        switch (value) {
+			case 0:
+				return F.C0;
+			case 1:
+				return this;
+			case -1:
+				return negate();
+			default:
 		}
 		return valueOf(fBigIntValue.multiply(BigInteger.valueOf(value)));
 	}
@@ -653,8 +653,10 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	public IRational multiply(IRational parm1) {
 		// Swift changed: check out of memory
 		// suppose that result is length of this number, two bytes per digit
-		OperationSystem.checkMemory(approximatelyDigitCount(fBigIntValue) * 2);
-		if (parm1.isZero()) {
+		OperationSystem.checkMemory(
+		        calculateApproximatelySizeOf(fBigIntValue) + calculateApproximatelySizeOf(parm1.toBigNumerator()));
+        OperationSystem.checkMultiplicationOperation(fBigIntValue.bitLength(), parm1.toBigNumerator().bitLength());
+        if (parm1.isZero()) {
 			return F.C0;
 		}
 		if (parm1.isOne()) {
@@ -683,7 +685,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
 	 * Returns the nth-root of this integer.
-	 * 
+	 *
 	 * @return <code>k<code> such as <code>k^n <= this < (k + 1)^n</code>
 	 * @throws IllegalArgumentException
 	 *             if {@code this < 0}
@@ -720,7 +722,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 			return result;
 		}
 	}
-	
+
 	@Override
 	public final INumber numericNumber() {
 		return F.num(this);
@@ -804,7 +806,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	/**
 	 * Returns the integer square root of this integer.
-	 * 
+	 *
 	 * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative or it's
 	 *         impossible to find a square root return <code>F.Sqrt(this)</code>.
 	 */

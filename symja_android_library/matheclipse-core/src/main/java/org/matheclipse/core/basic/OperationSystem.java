@@ -1,27 +1,28 @@
 package org.matheclipse.core.basic;
 
+import org.matheclipse.core.eval.exception.MemoryLimitExceeded;
+
 @SuppressWarnings("unused")
 public class OperationSystem {
 
     public static boolean debug = false;
 
+    public static int toomCook3Threshold = Integer.MAX_VALUE;
+
     /**
      * Is running on JVM or not
      */
     private static boolean jvm = true;
-
     /**
      * Maximum memory can use by this process
      */
     private static float maxMemoryUsageFactor = 0.9f;
-
     /**
      * This field should be set to true if the application receive memory warning, typically in
      * AppDelegate.swift
      * Before calculating, this field should set to true
      */
     private static boolean memoryWarning = false;
-
     /**
      * Maximum number of bytes the heap can expand to. Negative values mean default JVM value
      */
@@ -67,7 +68,7 @@ public class OperationSystem {
      * @param additionalMemoryInBytes approximately memory will be allocate after perform some operations.
      *                                Unit of bytes
      */
-    public static void checkMemory(int additionalMemoryInBytes) {
+    public static void checkMemory(long additionalMemoryInBytes) {
         if (isJvm()) {
             Runtime runtime = Runtime.getRuntime();
             if (maxMemory <= 0) {
@@ -125,5 +126,16 @@ public class OperationSystem {
 
     private static String toMegabytes(long bytes) {
         return (bytes / 1024 / 1024) + " MB";
+    }
+
+    public static void checkMultiplicationOperation(int magLength1, long magLength2) {
+        if (debug) {
+            System.out.println("magLength1 = " + magLength1);
+            System.out.println("magLength2 = " + magLength2);
+        }
+        if (magLength1 > toomCook3Threshold && magLength2 > toomCook3Threshold) {
+            throw new MemoryLimitExceeded("toomCook3Threshold " + toomCook3Threshold + " limit exceeded. " +
+                    "magLength1 = " + magLength1 + "; magLength2 = " + magLength2);
+        }
     }
 }
