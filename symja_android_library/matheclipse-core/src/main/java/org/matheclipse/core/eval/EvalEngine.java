@@ -565,11 +565,11 @@ public class EvalEngine implements Serializable {
 				// the HoldFirst attribute isn't set here
 				try {
 					if (!x.isAST(F.Unevaluated)) {
-					selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
+						selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
 						evalArg(rlist, ast, x, 1, isNumericFunction);
-					if (astSize == 2 && rlist[0].isPresent()) {
-						return rlist[0];
-					}
+						if (astSize == 2 && rlist[0].isPresent()) {
+							return rlist[0];
+						}
 					}
 				} finally {
 					if ((ISymbol.NHOLDFIRST & attr) == ISymbol.NHOLDFIRST) {
@@ -599,27 +599,9 @@ public class EvalEngine implements Serializable {
 					try {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
 						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
-                            @Override
-                            public void accept(IExpr arg, int i) {
-                                if (!arg.isAST(F.Unevaluated)) {
-                                    EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
-                                }
-                            }
-                        });
-					} finally {
-						if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
-							fNumericMode = numericMode;
-						}
-					}
-				} else {
-				// the HoldRest attribute is set here
-				numericMode = fNumericMode;
-				try {
-					selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
 							@Override
 							public void accept(IExpr arg, int i) {
-								if (arg.isAST(F.Evaluate)) {
+								if (!arg.isAST(F.Unevaluated)) {
 									EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
 								}
 							}
@@ -629,8 +611,27 @@ public class EvalEngine implements Serializable {
 							fNumericMode = numericMode;
 						}
 					}
+				} else {
+					// the HoldRest attribute is set here
+					numericMode = fNumericMode;
+					try {
+						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
+						ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
+							@Override
+							public void accept(IExpr arg, int i) {
+								if (arg.isAST(F.Evaluate)) {
+									EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
+								}
+							}
+						});
+						// EvalEngineUtils.forEachEvaluateArg(ast, astSize, this);
+					} finally {
+						if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
+							fNumericMode = numericMode;
+						}
+					}
 				}
-				}
+			}
 			if (!isNumericArgument && ast.isNumericArgument()) {
 				// one of the arguments is a numeric value
 				if (!rlist[0].isPresent()) {
@@ -850,12 +851,12 @@ public class EvalEngine implements Serializable {
 
 			if ((ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION) {
 				if (!((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL)) {
-					if (tempAST.exists(new Predicate<IExpr>() {
+					if (tempAST.exists(/*new Predicate<IExpr>() {
 						@Override
 						public boolean test(IExpr x) {
 							return x.isIndeterminate();
 						}
-					})) {
+					}*/EvalEngineUtils.indeterminatePredicate)) {
 						return F.Indeterminate;
 					}
 				}
@@ -1365,12 +1366,14 @@ public class EvalEngine implements Serializable {
 		// }
 		// }
 		final IAST ast;
-		if (argsAST.exists(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isAST(F.Unevaluated, 2);
-			}
-		})) {
+		// objc-changed: avoid using too much memory.
+		// new Predicate<IExpr>() {
+		//        @Override
+		//        public boolean test(IExpr x) {
+		//            return x.isAST(F.Unevaluated, 2);
+		//        }
+		//    }
+		if (argsAST.exists(EvalEngineUtils.unevaluatedPredicate)) {
 			ast = argsAST.map(new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {

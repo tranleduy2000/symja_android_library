@@ -1256,12 +1256,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 
 		final ISymbol symbol = topHead();
-		IExpr temp = engine.evalAttributes(symbol, this).orElseGet(new Supplier<IExpr>() {
-			@Override
-			public IExpr get() {
-				return engine.evalRules(symbol, AbstractAST.this);
-			}
-		});
+		// objc-changed:
+		// IExpr temp = engine.evalAttributes(symbol, this).orElseGet(new Supplier<IExpr>() {
+		//			@Override
+		//			public IExpr get() {
+		//				return engine.evalRules(symbol, AbstractAST.this);
+		//			}
+		//		});
+		IExpr temp = engine.evalAttributes(symbol, this);
+		if (!temp.isPresent()) {
+			temp = engine.evalRules(symbol, AbstractAST.this);
+		}
 		if (Config.SHOW_CONSOLE) {
 			if (temp.isPresent() && (topHead().getAttributes() & ISymbol.CONSOLE_OUTPUT) == ISymbol.CONSOLE_OUTPUT) {
 				System.out.println(toString());

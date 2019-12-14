@@ -102,7 +102,6 @@ public class OperationSystem {
                 if (debug) {
                     System.err.println("usedMemory = " + usedMemory + "; maxMemory = " + maxMemory);
                 }
-                memoryWarning = false;
                 throw new OutOfMemoryError("Out of memory");
             }
         }
