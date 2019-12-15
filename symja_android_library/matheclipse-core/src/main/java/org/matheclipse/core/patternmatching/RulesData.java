@@ -411,7 +411,7 @@ public final class RulesData implements Serializable {
 					if (patternEvaluator.isPatternHashAllowed(patternHash)) {
 						// obj-c changed: autoreleasepool
 						IPatternMatcher pmEvaluator;
-						pmEvaluator = (IPatternMatcher) patternEvaluator/*.clone()*/;
+						pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
 						if (showSteps) {
 							if (isShowSteps(pmEvaluator)) {
 								IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
@@ -471,9 +471,9 @@ public final class RulesData implements Serializable {
 					}
 				}
 			}
-		}/* catch (CloneNotSupportedException cnse) {
+		} catch (CloneNotSupportedException cnse) {
 			cnse.printStackTrace();
-		} */finally {
+		} finally {
 			engine.setEvalRHSMode(evalRHSMode);
 		}
 		return F.NIL;
@@ -501,7 +501,7 @@ public final class RulesData implements Serializable {
 			}
 		}
 
-//		try {
+		try {
 			IPatternMatcher pmEvaluator;
 			if ((fSimplePatternUpRules != null) && (expression.isAST())) {
 				final int hash = ((IAST) expression).topHead().hashCode();
@@ -512,7 +512,7 @@ public final class RulesData implements Serializable {
 						if (list != null) {
 							IExpr result;
 							for (int i = 0; i < list.length; i++) {
-								pmEvaluator = (IPatternMatcher) list[i]/*.clone()*/;
+								pmEvaluator = (IPatternMatcher) list[i].clone();
 								result = pmEvaluator.eval(expression, engine);
 								if (result.isPresent()) {
 									return result;
@@ -523,9 +523,9 @@ public final class RulesData implements Serializable {
 				}
 			}
 
-//		} catch (CloneNotSupportedException cnse) {
-//			cnse.printStackTrace();
-//		}
+		} catch (CloneNotSupportedException cnse) {
+			cnse.printStackTrace();
+		}
 		return F.NIL;
 	}
 
