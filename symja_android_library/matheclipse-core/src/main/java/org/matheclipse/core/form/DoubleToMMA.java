@@ -27,7 +27,8 @@ public class DoubleToMMA {
 	 */
 	public static void doubleToMMA(Appendable buf, double value, int exponent, int significantFigures,
 			boolean texScientificNotation) throws IOException {
-		String s = String.format(Locale.US, "%16.16E", value);
+		// avoid bug in Swift
+		String s = String.format(Locale.US, "%16.16E", value).toUpperCase(Locale.US);
 		int start = s.indexOf('E');
 		String expStr = s.substring(start + 1);
 		// on Android you may receive a '+' sign: 1.2345123456789000E+04
@@ -41,7 +42,7 @@ public class DoubleToMMA {
 			int hashSize;
 			if (exp > 0) {
 				hashSize = significantFigures - exp - 1;
-				if (hashSize < 0) {
+				if (hashSize <= 0) {
 					hashSize = 1;
 				}
 				if (hashSize >= HASH_STR.length()) {
@@ -54,7 +55,7 @@ public class DoubleToMMA {
 						usSymbols);
 			} else {
 				hashSize = -exp + significantFigures - 2;
-				if (hashSize < 0) {
+				if (hashSize <= 0) {
 					hashSize = 1;
 				}
 				if (hashSize >= HASH_STR.length()) {
