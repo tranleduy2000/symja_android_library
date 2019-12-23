@@ -27,6 +27,8 @@
 ///////////////////////////////////////////////////////////////////////////
 package org.logicng.transformations.qmc;
 
+import com.google.j2objc.annotations.AutoreleasePool;
+
 import org.logicng.cardinalityconstraints.CCIncrementalData;
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Tristate;
@@ -157,7 +159,7 @@ public class QuineMcCluskeyAlgorithm {
      */
     static SortedMap<Integer, LinkedHashSet<Term>> combineInTermClasses(final SortedMap<Integer, LinkedHashSet<Term>> termsInClasses) {
         final SortedMap<Integer, LinkedHashSet<Term>> newTermsInClasses = new TreeMap<>();
-        for (int i = 0; i < termsInClasses.lastKey(); i++) {
+        for (@AutoreleasePool int i = 0; i < termsInClasses.lastKey(); i++) {
             final LinkedHashSet<Term> thisClass = termsInClasses.get(i);
             final LinkedHashSet<Term> otherClass = termsInClasses.get(i + 1);
             if (thisClass != null && otherClass != null) {

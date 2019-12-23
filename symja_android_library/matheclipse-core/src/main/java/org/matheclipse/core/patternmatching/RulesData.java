@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 import com.duy.util.CollectionWrapper;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.eval.util.OpenIntToSet;
@@ -409,6 +410,8 @@ public final class RulesData implements Serializable {
 					// }
 					// }
 					if (patternEvaluator.isPatternHashAllowed(patternHash)) {
+						OperationSystem.checkMemory();
+						OperationSystem.checkInterrupt();
 						// obj-c changed: autoreleasepool
 						IPatternMatcher pmEvaluator;
 						pmEvaluator = (IPatternMatcher) patternEvaluator.clone();

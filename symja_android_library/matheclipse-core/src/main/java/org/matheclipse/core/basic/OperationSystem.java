@@ -28,6 +28,11 @@ public class OperationSystem {
      */
     private static long maxMemory = -1;
 
+    /**
+     * Set <code>true</code> to cancel all calculation tasks
+     */
+    private static boolean abortSystem = false;
+
     static {
         setJvm(true);
     }
@@ -48,12 +53,26 @@ public class OperationSystem {
         OperationSystem.maxMemoryUsageFactor = memoryUsageFactor;
     }
 
+    public static boolean isMemoryWarning() {
+        return memoryWarning;
+    }
+
     public static void setMemoryWarning(boolean memoryWarning) {
         OperationSystem.memoryWarning = memoryWarning;
     }
 
     public static void checkMemory() {
         checkMemory(0);
+    }
+
+    public static void checkInterrupt() {
+        if (abortSystem) {
+            throw new RuntimeException("System is interrupted");
+        }
+    }
+
+    public static void setInterrupt(boolean interrupt) {
+        OperationSystem.abortSystem = interrupt;
     }
 
     public static long getMaxMemory() {

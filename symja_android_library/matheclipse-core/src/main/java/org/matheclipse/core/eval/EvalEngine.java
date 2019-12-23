@@ -9,6 +9,7 @@ import com.gx.common.cache.Cache;
 
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.Programming;
@@ -520,6 +521,7 @@ public class EvalEngine implements Serializable {
 	 *            if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
 	 */
 	private void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) {
+		OperationSystem.checkInterrupt();
 		IExpr temp = evalLoop(arg);
 		if (temp.isPresent()) {
 			if (!result0[0].isPresent()) {
@@ -546,6 +548,7 @@ public class EvalEngine implements Serializable {
 	 * @return
 	 */
 	public IASTMutable evalArgs(final IAST ast, final int attr) {
+		OperationSystem.checkInterrupt();
 		final int astSize = ast.size();
 		if (astSize > 1) {
 			boolean numericMode = fNumericMode;
@@ -652,6 +655,7 @@ public class EvalEngine implements Serializable {
 	 * @return
 	 */
 	private IExpr evalASTArg1(final IAST ast) {
+		OperationSystem.checkInterrupt();
 		// special case ast.isAST1()
 		// head == ast[0] --- arg1 == ast[1]
 		IExpr result = ast.head().evaluateHead(ast, this);
@@ -725,6 +729,7 @@ public class EvalEngine implements Serializable {
 	 * @return <code>F.NIL</code> if no evaluation happened
 	 */
 	private IExpr evalASTBuiltinFunction(final ISymbol symbol, final IAST ast) {
+		OperationSystem.checkInterrupt();
 		final int attr = symbol.getAttributes();
 		if (fEvalLHSMode) {
 			if ((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL) {
@@ -797,6 +802,7 @@ public class EvalEngine implements Serializable {
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
 	public IExpr evalAttributes(@Nonnull ISymbol symbol, @Nonnull IAST ast) {
+		OperationSystem.checkInterrupt();
 		IASTMutable tempAST = (IASTMutable) ast;
 		final int astSize = tempAST.size();
 		if (astSize == 2) {
@@ -874,6 +880,7 @@ public class EvalEngine implements Serializable {
 	}
 
 	public IExpr evalBlock(final IExpr expr, final IAST localVariablesList) {
+		OperationSystem.checkInterrupt();
 		ISymbol[] symbolList = new ISymbol[localVariablesList.size()];
 		IExpr[] blockVariables = new IExpr[localVariablesList.size()];
 		RulesData[] blockVariablesRulesData = new RulesData[localVariablesList.size()];
@@ -919,7 +926,7 @@ public class EvalEngine implements Serializable {
 	 *            if <code>true</code> evaluate in quiet mode and suppress evaluation messages
 	 */
 	public IExpr evalModuleDummySymbol(IExpr expr, ISymbol symbol, IExpr localValue, boolean quiet) {
-
+		OperationSystem.checkInterrupt();
 		boolean quietMode = isQuietMode();
 		setQuietMode(quiet);
 		java.util.IdentityHashMap<ISymbol, ISymbol> blockVariables = new IdentityHashMap<ISymbol, ISymbol>();
@@ -1009,6 +1016,7 @@ public class EvalEngine implements Serializable {
 	 * @return <code>F.NIL</code> if no evaluation was possible
 	 */
 	public IAST evalFlatOrderlessAttributesRecursive(final IAST ast) {
+		OperationSystem.checkInterrupt();
 		if (ast.isEvalFlagOn(IAST.IS_FLAT_ORDERLESS_EVALED)) {
 			return F.NIL;
 		}
@@ -1140,6 +1148,7 @@ public class EvalEngine implements Serializable {
 	 * @see EvalEngine#evalWithoutNumericReset(IExpr)
 	 */
 	public IExpr evalLoop(@Nonnull final IExpr expr) {
+		OperationSystem.checkInterrupt();
 		if ((fRecursionLimit > 0) && (fRecursionCounter > fRecursionLimit)) {
 			if (Config.DEBUG) {
 				System.out.println(expr.toString());
@@ -1408,6 +1417,7 @@ public class EvalEngine implements Serializable {
 
 	private IASTMutable evalSetAttributeArg(IAST ast, int i, IAST argI, IASTMutable resultList, boolean noEvaluation,
 			int level) {
+		OperationSystem.checkInterrupt();
 		IExpr expr = evalSetAttributesRecursive(argI, noEvaluation, true, level + 1);
 		if (expr != argI && expr.isPresent()) {
 			if (resultList.isPresent()) {
@@ -1470,6 +1480,7 @@ public class EvalEngine implements Serializable {
 		return evalHoldPattern(ast, noEvaluation, false);
 	}
 	private IExpr evalSetAttributesRecursive(IAST ast, boolean noEvaluation, boolean evalNumericFunction, int level) {
+		OperationSystem.checkInterrupt();
 		// final ISymbol symbol = ast.topHead();
 		IExpr head = ast.head();
 		if (!head.isPattern()) {
@@ -1568,6 +1579,7 @@ public class EvalEngine implements Serializable {
 	 * @return <code>ast</code> if no evaluation was possible
 	 */
 	private IExpr evalSetOrderless(IAST ast, final int attr, boolean noEvaluation, int level) {
+		OperationSystem.checkInterrupt();
 		if ((ISymbol.ORDERLESS & attr) == ISymbol.ORDERLESS) {
 			EvalAttributes.sortWithFlags((IASTMutable) ast);
 			if (level > 0 && !noEvaluation && ast.isFreeOfPatterns()) {
