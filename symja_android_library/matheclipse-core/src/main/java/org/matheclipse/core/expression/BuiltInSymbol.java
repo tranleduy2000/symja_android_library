@@ -234,6 +234,22 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		return this == F.Pi;
 	}
 
+	@Override
+	final public boolean isNegative() {
+		if (isRealConstant()) {
+			return ((ISignedNumberConstant) fEvaluator).isNegative();
+		}
+		return false;
+	}
+
+	@Override
+	final public boolean isPositive() {
+		if (isRealConstant()) {
+			return ((ISignedNumberConstant) fEvaluator).isPositive();
+		}
+		return false;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	final public boolean isRealConstant() {

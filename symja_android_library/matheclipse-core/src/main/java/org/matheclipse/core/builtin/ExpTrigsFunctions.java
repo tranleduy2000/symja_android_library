@@ -1208,8 +1208,8 @@ public class ExpTrigsFunctions {
 					}
 				}
 			}
-			if (arg1.isInterval1()) {
-				return evalInterval(arg1);
+			if (arg1.isInterval()) {
+				return IntervalSym.cos((IAST) arg1);
 			}
 			IExpr imPart = AbstractFunctionEvaluator.getComplexExpr(arg1, F.CNI);
 			if (imPart.isPresent()) {
@@ -1280,20 +1280,6 @@ public class ExpTrigsFunctions {
 			return RULES;
 		}
 
-		private static IExpr evalInterval(final IExpr arg1) {
-			IExpr l = arg1.lower();
-			IExpr u = arg1.upper();
-			if (l.isNegativeInfinity()) {
-				if (u.isInfinity() || u.isRealResult()) {
-					return F.Interval(F.List(F.CN1, F.C1));
-				}
-			} else if (u.isInfinity()) {
-				if (l.isRealResult()) {
-					return F.Interval(F.List(F.CN1, F.C1));
-				}
-			}
-			return F.NIL;
-		}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -1644,20 +1630,6 @@ public class ExpTrigsFunctions {
 			return F.NIL;
 		}
 
-		// private static IExpr evalInterval(final IExpr arg1) {
-		// IExpr l = arg1.lower();
-		// IExpr u = arg1.upper();
-		// if (l.isReal()|| l.isNegativeInfinity()) {
-		// l = F.Cosh.of(l);
-		// if (l.isReal() || l.isNegativeInfinity()) {
-		// if (u.isReal() || u.isInfinity()) {
-		// u = F.Cosh.of(u);
-		// return F.Interval(F.List(l, u));
-		// }
-		// }
-		// }
-		// return F.NIL;
-		// }
 		@Override
 		public IAST getRuleAST() {
 			return RULES;
@@ -2488,8 +2460,8 @@ public class ExpTrigsFunctions {
 					}
 				}
 			}
-			if (arg1.isInterval1()) {
-				return evalInterval(arg1);
+			if (arg1.isInterval()) {
+				return IntervalSym.sin((IAST) arg1);
 			}
 			IExpr imPart = AbstractFunctionEvaluator.getComplexExpr(arg1, F.CNI);
 			if (imPart.isPresent()) {
@@ -2552,74 +2524,7 @@ public class ExpTrigsFunctions {
 			// if (imPart.isPresent()) {
 			// return F.Times(F.CI, F.Sinh(imPart));
 			// }
-			return F.NIL;
-		}
 
-		/**
-		 * TODO: wrong results
-		 *
-		 * @param arg1
-		 *            is assumed to be an interval
-		 * @return
-		 */
-		private static IExpr evalInterval(final IExpr arg1) {
-			IExpr l = arg1.lower();
-			IExpr u = arg1.upper();
-			if (l.isNegativeInfinity()) {
-				if (u.isInfinity() || u.isRealResult()) {
-					return F.Interval(F.List(F.CN1, F.C1));
-					}
-			} else if (u.isInfinity()) {
-				if (l.isRealResult()) {
-					return F.Interval(F.List(F.CN1, F.C1));
-						}
-						}
-			// if (l.isReal() && u.isReal()) {
-			// double ld = l.evalDouble();
-			// double ud = u.evalDouble();
-			// double diff = Math.abs(ld - ud);
-			// if (diff > 2 * Math.PI) {
-			// return F.Interval(F.CN1, F.C1);
-			// }
-			// double ldSin = Math.sin(ld);
-			// double udSin = Math.sin(ud);
-			// if (diff < Math.PI / 2) {
-			// if (ldSin < udSin) {
-			// return F.Interval(F.Sin(l), F.Sin(u));
-			// } else {
-			// return F.Interval(F.Sin(u), F.Sin(l));
-			// }
-			// } else if (diff <= Math.PI) {
-					// if (ldSin <= udSin) {
-			// if (ldSin <= 0) {
-					// return F.Interval(F.CN1, F.Sin(u));
-			// } else {
-			// return F.Interval(F.Sin(l), F.C1);
-					// }
-					// } else {
-			// if (udSin <= 0) {
-					// return F.Interval(F.CN1, F.Sin(l));
-			// } else {
-			// return F.Interval(F.Sin(u), F.C1);
-					// }
-					// }
-			// } else {
-			// // diff > Math.PI
-			// // if (ldSin <= udSin) {
-			// // if (ldSin > 0) {
-			// // if (udSin > 0) {
-			// // return F.Interval(F.CN1, F.Sin(u));
-			// // }
-			// // }
-			// // } else {
-			// // if (ldSin > 0) {
-			// // if (udSin > 0) {
-			// // return F.Interval(F.CN1, F.Sin(l));
-			// // }
-			// // }
-			// // }
-					// }
-			// }
 			return F.NIL;
 		}
 

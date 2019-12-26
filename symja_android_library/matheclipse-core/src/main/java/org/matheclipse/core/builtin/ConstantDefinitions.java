@@ -7,7 +7,7 @@ import org.apfloat.Aprational;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractSymbolEvaluator;
-import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
+import org.matheclipse.core.eval.interfaces.ISignedNumberConstantAbstractSymbolEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -219,7 +219,7 @@ public class ConstantDefinitions {
 	 * 8*Catalan+Pi^2
 	 * </pre>
 	 */
-	private static class Catalan extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class Catalan extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double CATALAN = 0.91596559417721901505460351493238411077414937428167;
 
 		@Override
@@ -315,7 +315,7 @@ public class ConstantDefinitions {
 	 * 0.017453292519943295
 	 * </pre>
 	 */
-	private static class Degree extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class Degree extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double DEGREE = 0.017453292519943295769236907684886127134428718885417;
 
 		/**
@@ -369,7 +369,7 @@ public class ConstantDefinitions {
 	 * 2.718281828459045
 	 * </pre>
 	 */
-	private static class E extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class E extends ISignedNumberConstantAbstractSymbolEvaluator {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -398,7 +398,7 @@ public class ConstantDefinitions {
 	 *
 	 * See <a href="http://en.wikipedia.org/wiki/Euler–Mascheroni_constant">Euler– Mascheroni constant</a>
 	 */
-	private static class EulerGamma extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class EulerGamma extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double EULER_GAMMA = 0.57721566490153286060651209008240243104215933593992;
 
 		@Override
@@ -436,7 +436,7 @@ public class ConstantDefinitions {
 	 * constant</a></li>
 	 * </ul>
 	 */
-	private static class Glaisher extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class Glaisher extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double GLAISHER = 1.2824271291006226368753425688697917277676889273250;
 
 		@Override
@@ -456,7 +456,7 @@ public class ConstantDefinitions {
 
 	}
 
-	private static class GoldenAngle extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class GoldenAngle extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double GOLDEN_ANGLE =  2.3999632297286533222315555066336138531249990110581;
 		@Override
 		public IExpr evaluate(final ISymbol symbol) {
@@ -512,7 +512,7 @@ public class ConstantDefinitions {
 	 * 1.618033988749895
 	 * </pre>
 	 */
-	private static class GoldenRatio extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class GoldenRatio extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double GOLDEN_RATIO = 1.6180339887498948482045868343656381177203091798058;
 
 		@Override
@@ -670,7 +670,7 @@ public class ConstantDefinitions {
 	 * 2.6854520010653062
 	 * </pre>
 	 */
-	private static class Khinchin extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class Khinchin extends ISignedNumberConstantAbstractSymbolEvaluator {
 		final static public double KHINCHIN = 2.6854520010653064453097148354817956938203822939945;
 
 		@Override
@@ -707,7 +707,7 @@ public class ConstantDefinitions {
 	 * 3.141592653589793
 	 * </pre>
 	 */
-	private static class Pi extends AbstractSymbolEvaluator implements ISignedNumberConstant {
+	private static class Pi extends ISignedNumberConstantAbstractSymbolEvaluator {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {

@@ -100,6 +100,62 @@ public class IntervalSym {
 		return F.List(arg1, arg1);
 	}
 
+	public static IExpr cos(final IAST ast) {
+		IAST interval = normalize(ast);
+		if (interval.isPresent()) {
+			try {
+				IASTMutable result = interval.copy();
+				for (int i = 1; i < interval.size(); i++) {
+					IAST list = (IAST) interval.get(i);
+					IExpr min = list.arg1();
+					IExpr max = list.arg2();
+					EvalEngine engine = EvalEngine.get();
+					IAST difference = F.Subtract(max, min);
+					if (engine.evalTrue(F.GreaterEqual(difference, F.C2Pi))) {
+						// >= 2 * Pi
+						result.set(i, F.List(F.CN1, F.C1));
+						continue;
+					}
+					// slope from 1st derivative
+					double dMin = engine.evalDouble(F.Sin(min).negate());
+					double dMax = engine.evalDouble(F.Sin(max).negate());
+					if (engine.evalTrue(F.LessEqual(difference, F.Pi))) {
+						if (dMin >= 0) {
+							if (dMax >= 0) {
+								result.set(i, F.List(F.Cos(min), F.Cos(max)));
+							} else {
+								result.set(i, F.List(F.Min(F.Cos(min), F.Cos(max)), F.C1));
+							}
+						} else {
+							if (dMax < 0) {
+								result.set(i, F.List(F.Cos(max), F.Cos(min)));
+							} else {
+								result.set(i, F.List(F.CN1, F.Max(F.Cos(min), F.Cos(max))));
+							}
+						}
+					} else { // difference between {Pi, 2*Pi}
+						if (dMin >= 0) {
+							if (dMax > 0) {
+								result.set(i, F.List(F.CN1, F.C1));
+							} else {
+								result.set(i, F.List(F.Min(F.Cos(min), F.Cos(max)), F.C1));
+							}
+						} else {
+							if (dMax < 0) {
+								result.set(i, F.List(F.CN1, F.C1));
+							} else {
+								result.set(i, F.List(F.CN1, F.Max(F.Cos(min), F.Cos(max))));
+							}
+						}
+					}
+				}
+				return result;
+			} catch (RuntimeException rex) {
+				//
+			}
+		}
+		return F.NIL;
+	}
 	public static IExpr log(final IAST ast) {
 		IAST interval = normalize(ast);
 		if (interval.isPresent()) {
@@ -121,6 +177,62 @@ public class IntervalSym {
 		return F.NIL;
 	}
 
+	public static IExpr sin(final IAST ast) {
+		IAST interval = normalize(ast);
+		if (interval.isPresent()) {
+			try {
+				IASTMutable result = interval.copy();
+				for (int i = 1; i < interval.size(); i++) {
+					IAST list = (IAST) interval.get(i);
+					IExpr min = list.arg1();
+					IExpr max = list.arg2();
+					EvalEngine engine = EvalEngine.get();
+					IAST difference = F.Subtract(max, min);
+					if (engine.evalTrue(F.GreaterEqual(difference, F.C2Pi))) {
+						// >= 2 * Pi
+						result.set(i, F.List(F.CN1, F.C1));
+						continue;
+					}
+					// slope from 1st derivative
+					double dMin = engine.evalDouble(F.Cos(min));
+					double dMax = engine.evalDouble(F.Cos(max));
+					if (engine.evalTrue(F.LessEqual(difference, F.Pi))) {
+						if (dMin >= 0) {
+							if (dMax >= 0) {
+								result.set(i, F.List(F.Sin(min), F.Sin(max)));
+							} else {
+								result.set(i, F.List(F.Min(F.Sin(min), F.Sin(max)), F.C1));
+							}
+						} else {
+							if (dMax < 0) {
+								result.set(i, F.List(F.Sin(max), F.Sin(min)));
+							} else {
+								result.set(i, F.List(F.CN1, F.Max(F.Sin(min), F.Sin(max))));
+							}
+						}
+					} else {// difference between {Pi, 2*Pi}
+						if (dMin >= 0) {
+							if (dMax > 0) {
+								result.set(i, F.List(F.CN1, F.C1));
+							} else {
+								result.set(i, F.List(F.Min(F.Sin(min), F.Sin(max)), F.C1));
+							}
+						} else {
+							if (dMax < 0) {
+								result.set(i, F.List(F.CN1, F.C1));
+							} else {
+								result.set(i, F.List(F.CN1, F.Max(F.Sin(min), F.Sin(max))));
+							}
+						}
+					}
+				}
+				return result;
+			} catch (RuntimeException rex) {
+				//
+			}
+		}
+		return F.NIL;
+	}
 	public static IExpr plus(final IAST ast1, final IAST ast2) {
 		IAST interval1 = normalize(ast1);
 		IAST interval2 = normalize(ast2);
