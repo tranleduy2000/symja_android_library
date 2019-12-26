@@ -54,7 +54,6 @@ import org.matheclipse.core.reflection.system.rules.LegendreQRules;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
