@@ -1105,7 +1105,8 @@ public class ManipulateFunction {
 						function.append(",");
 					}
 				}
-				function.append(",[1,0], ");
+				// origin of polar plot
+				function.append(",[0,0], ");
 
 				toJS.convert(function, plotRangeX.arg2());
 				function.append(", ");
@@ -1148,6 +1149,20 @@ public class ManipulateFunction {
 			}
 			if (!F.isFuzzyEquals(Double.MAX_VALUE, plotRangeYMin, 1e-10)) {
 				boundingbox[3] = plotRangeYMin;
+			}
+			if (plotID == ID.PolarPlot) {
+				if (-plotRangeXMax < boundingbox[0]) {
+					boundingbox[0] = -plotRangeXMax;
+				}
+				if (plotRangeXMax > boundingbox[1]) {
+					boundingbox[1] = plotRangeXMax;
+				}
+				if (boundingbox[2] < plotRangeXMax) {
+					boundingbox[2] = plotRangeXMax;
+				}
+				if (-plotRangeXMax < boundingbox[3]) {
+					boundingbox[3] = -plotRangeXMax;
+				}
 			}
 			return jsxgraphBoundingBox(ast, boundingbox, function.toString(), toJS);
 
