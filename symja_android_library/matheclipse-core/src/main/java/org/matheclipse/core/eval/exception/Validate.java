@@ -371,12 +371,16 @@ public final class Validate {
 			for (int i = 1; i < listOfSymbols.size(); i++) {
 				if (!Validate.checkSymbolType(listOfSymbols, i, engine).isPresent()) {
 					return F.NIL;
-			}
+				}
 			}
 			return listOfSymbols;
 		} else {
-			return F.List(Validate.checkSymbolType(ast, position, engine));
+			IExpr temp = Validate.checkSymbolType(ast, position, engine);
+			if (temp.isPresent()) {
+				return F.List(temp);
+			}
 		}
+		return F.NIL;
 	}
 
 	/**

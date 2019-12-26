@@ -6,7 +6,7 @@ import com.duy.lambda.Predicate;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.StringX;
@@ -14,6 +14,7 @@ import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
@@ -45,6 +46,7 @@ public final class StringFunctions {
 			F.ToExpression.setEvaluator(new ToExpression());
 			F.ToString.setEvaluator(new ToString());
 			F.ToUnicode.setEvaluator(new ToUnicode());
+			F.UpperCaseQ.setEvaluator(new UpperCaseQ());
 		}
 	}
 
@@ -177,11 +179,12 @@ public final class StringFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (!(ast.arg1() instanceof IStringX)) {
-				throw new WrongArgumentType(ast, ast.arg1(), 1);
+			IExpr arg1 = Validate.checkStringType(ast, 1, engine);
+			if (arg1.isPresent()) {
+				return F.bool(test(arg1));
 			}
 
-			return F.bool(test(ast.arg1()));
+			return F.NIL;
 		}
 
 		@Override
@@ -617,6 +620,57 @@ public final class StringFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * UpperCaseQ(str)
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * is <code>True</code> if the given <code>str</code> is a string which only contains upper case characters.
+	 * </p>
+	 * </blockquote>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * &gt;&gt; UpperCaseQ("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	 * True
+	 *
+	 * &gt;&gt; UpperCaseQ("ABCDEFGHIJKLMNopqRSTUVWXYZ")
+	 * False
+	 * </pre>
+	 */
+	private final static class UpperCaseQ extends AbstractCoreFunctionEvaluator
+			implements Predicate<IExpr>, IPredicate {
+
+		/** {@inheritDoc} */
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = engine.evaluate(ast.arg1());
+			IExpr temp = Validate.checkStringType(ast, 1, engine);
+			if (temp.isPresent()) {
+				return F.bool(test(arg1));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public boolean test(final IExpr obj) {
+			final String str = obj.toString();
+			char ch;
+			for (int i = 0; i < str.length(); i++) {
+				ch = str.charAt(i);
+				if (!(Character.isUpperCase(ch))) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+	}
 	public static String inputForm(final IExpr expression, boolean relaxedSyntax) {
 		try {
 			StringBuilder buf = new StringBuilder();
