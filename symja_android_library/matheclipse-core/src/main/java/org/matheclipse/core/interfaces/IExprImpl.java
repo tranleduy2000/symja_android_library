@@ -2812,6 +2812,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return null;
     }
 
+    @Override
+    public IExpr[] linearPower(IExpr variable) {
+        return null;
+    }
+
     /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>lower</code> value. If this is a
      * <code>ISignedNumber</code> expression return <code>this</code>.

@@ -1960,6 +1960,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr[] linear(IExpr variable);
 
     /**
+     * If this is an expression of the form <code>a + b * x^n</code> with <code>n</code> integer, return the addend at
+     * index <code>0</code> and the multiplicant at index <code>0</code> and the exponent <code>n</code> at index
+     * <code>2</code>.
+     *
+     * @param variable
+     *            the variable <code>x</code> in the formula
+     *
+     * @return <code>null</code> if this is not an expression of the form <code>a+b*x^n</code>
+     */
+    IExpr[] linearPower(IExpr variable);
+
+    /**
      * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>lower</code> value. If this is a
      * <code>ISignedNumber</code> expression return <code>this</code>.
      *

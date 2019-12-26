@@ -2299,17 +2299,18 @@ public final class Arithmetic {
                     continue;
                 }
                 condition = engine.evaluateNull(condition);
+				if (condition.isPresent()) {
+					evaluated = true;
                 if (condition.isTrue()) {
-                    evaluated = true;
                     if (noBoolean) {
                         result = appendPiecewise(result, row.arg1(), F.True, matrixSize);
                         return createPiecewise(piecewiseAST, result);
                     }
                     return row.arg1();
                 } else if (condition.isFalse()) {
-                    evaluated = true;
                     continue;
-                } else {
+					}
+				}
 					IExpr rowArg1 = engine.evaluateNull(row.arg1());
 					if (rowArg1.isPresent()) {
 						evaluated = true;
@@ -2321,13 +2322,12 @@ public final class Arithmetic {
                     noBoolean = true;
                     continue;
                 }
-            }
             if (!noBoolean) {
                 return defaultValue;
             } else {
                 if (evaluated) {
                     piecewiseAST = createPiecewise(piecewiseAST, F.List());
-                    piecewiseAST.append(defaultValue);
+					piecewiseAST.append(engine.evaluate(defaultValue));
                     return piecewiseAST;
                 }
             }

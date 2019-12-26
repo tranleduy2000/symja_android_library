@@ -68,4 +68,9 @@ public abstract class INumberImpl extends IExprImpl implements INumber {
     public IExpr[] linear(IExpr variable) {
         return new IExpr[]{this, F.C0};
     }
+
+    @Override
+    public IExpr[] linearPower(IExpr variable) {
+        return new IExpr[] { this, F.C0, F.C1 };
+    }
 }

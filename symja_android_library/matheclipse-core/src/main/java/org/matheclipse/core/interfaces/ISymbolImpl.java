@@ -98,6 +98,13 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
         return false;
     }
 
+    public IExpr[] linearPower(IExpr variable) {
+        if (this.equals(variable)) {
+            return new IExpr[] { F.C0, F.C1, F.C1 };
+        }
+        return new IExpr[] { this, F.C0, F.C1 };
+    }
+
     @Override
     public boolean isConstantAttribute() {
         return (getAttributes() & CONSTANT) == CONSTANT;

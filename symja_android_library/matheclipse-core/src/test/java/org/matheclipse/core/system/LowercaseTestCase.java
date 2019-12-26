@@ -7794,8 +7794,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"Piecewise({{-2*(-1+2*x)^3,1/4<x&&x<=1/2},{2*(1+2*x)^3,-1/2<=x&&x<-1/4},{1-24*x^2\n"
 						+ "-48*x^3,-1/4<=x&&x<0},{1-24*x^2+48*x^3,0<=x<=1/4}},0)");
 		check("FunctionExpand(TukeyWindow(x))", //
-				"Piecewise({{1,-1/3-2*x<=0&&-1/3+2*x<=0},{1/2*(1+Cos(3*Pi*(1/6+x))),x>=-1/2&&-1/3\n"
-						+ "-2*x>0},{1/2*(1+Cos(3*Pi*(-1/6+x))),-1/3+2*x>0&&x<=1/2}},0)");
+				"Piecewise({{1,x>=-1/6&&x<=1/6},{1/2*(1+Cos(3*Pi*(1/6+x))),x>=-1/2&&x<-1/6},{1/2*(\n" //
+						+ "1+Cos(3*Pi*(-1/6+x))),x>1/6&&x<=1/2}},0)");
 		check("FunctionExpand(Log(10*E))", //
 				"1+Log(10)");
 		check("FunctionExpand(PolyGamma(-2, 1))", //
@@ -8865,6 +8865,24 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testIntegrate() {
+		check("Refine(Integrate(Abs(E+Pi*x^(-8)),x), Element(x,Reals))", //
+				"-Pi/(7*x^7)+E*x");
+		check("Refine(Integrate(Abs(Pi+42*x^6),x), Element(x,Reals))", //
+				"Pi*x+6*x^7");
+		check("Refine(Integrate(Abs(E+Pi*x^(-1)),x), Element(x,Reals))", //
+				"Piecewise({{E*x+Pi*Log(x),x<=-Pi/E},{-E*x+2*Pi*(-2+I*Pi+Log(Pi))-Pi*Log(x),-Pi/E<x&&x<=\n" +
+				"0}},E*x+Pi*Log(x))");
+		check("Refine(Integrate(Abs(E+2*x^(-1)),x), Element(x,Reals))", //
+				"Piecewise({{E*x+2*Log(x),x<=-2/E},{-E*x+4*(-2+I*2+Log(2))-2*Log(x),-2/E<x&&x<=0}},E*x+\n" +
+				"2*Log(x))");
+
+
+		check("Refine(Integrate(Abs(E+2*x),x), Element(x,Reals))", //
+				"Piecewise({{-E*x-x^2,x<=-E/2}},E^2/Pi+E*x+x^2)");
+		check("Refine(Integrate(Abs(E+Pi*x),x), Element(x,Reals))", //
+				"Piecewise({{-E*x-1/2*Pi*x^2,x<=-E/Pi}},E^2/Pi+E*x+1/2*Pi*x^2)");
+		check("Refine(Integrate(Abs(a+b*x),x), Element(x,Reals))", //
+				"Integrate(Abs(a+b*x),x)");
 		check("Refine(Integrate(Abs(x),x), Element(x,Reals))", //
 				"Piecewise({{-x^2/2,x<=0}},x^2/2)");
 		check("Refine(Integrate(Abs(x^3),x), Element(x,Reals))", //
@@ -8875,7 +8893,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"x^5/5");
 
 		check("Refine(Integrate(Abs(x^(-1)),x), Element(x,Reals))", //
-				"Piecewise({{-Log(x)},x<=0},Log(x))");
+				"Piecewise({{-Log(x),x<=0}},Log(x))");
 		check("Refine(Integrate(Abs(x^(-5)),x), Element(x,Reals))", //
 				"Piecewise({{1/(4*x^4),x<=0}},-1/(4*x^4))");
 		check("Refine(Integrate(Abs(x^(-7)),x), Element(x,Reals))", //
@@ -13895,6 +13913,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPiecewise() {
+		check("Piecewise({{-Log(x),x<=(0+(-1)*0)*1/1}},Log(x))", //
+				"Piecewise({{-Log(x),x<=0}},Log(x))");
 		check("Piecewise({{x^2, x < 0}, {x, x > 0}}) /. x->3", //
 				"3");
 		check("Piecewise({{(a^0*Log(a)^n)/n!,n>=0}},0)", //
