@@ -9128,7 +9128,54 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testInterval() {
-		// https://en.wikipedia.org/wiki/Interval_arithmetic
+		check("ArcCot(Interval({-1, Infinity}))", //
+				"Interval({-Pi/2,-Pi/4},{0,Pi/2})");
+		check("ArcCot(Interval({1-Sqrt(2), 1+Sqrt(2)}))", //
+				"Interval({-Pi/2,-3/8*Pi},{Pi/8,Pi/2})");
+		check("ArcCot(Interval({1, Infinity}))", //
+				"Interval({0,Pi/4})");
+		check("ArcCot(Interval({-Pi,-1}))", //
+				"Interval({-Pi/4,-ArcCot(Pi)})");
+
+		check("ArcTan(Interval({-1, 1-Sqrt(2)}))", //
+				"Interval({-Pi/4,-Pi/8})");
+
+		check("ArcSin(Interval({-1/2,1/2}))", //
+				"Interval({-Pi/6,Pi/6})");
+		check("ArcSin(Interval({-1,1}))", //
+				"Interval({-Pi/2,Pi/2})");
+
+		check("Cot(Interval({3*Pi/4,6*Pi/5}))", //
+				"Interval({-Infinity,-1},{Sqrt(1+2/Sqrt(5)),Infinity})");
+		check("Cot(Interval({Pi/4,3*Pi/4}))", //
+				"Interval({-1,1})");
+		check("Cot(Interval({-Pi/4,2*Pi/3}))", //
+				"Interval({-Infinity,-1},{-1/Sqrt(3),Infinity})");
+		check("Cot(Interval({4,7}))", //
+				"Interval({-Infinity,Cot(4)},{Cot(7),Infinity})");
+		check("Cot(Interval({4,8}))", //
+				"Interval({-Infinity,Infinity})");
+		check("Cot(Interval({2,3}))", //
+				"Interval({Cot(3),Cot(2)})");
+		check("Cot(Interval({Pi/4,5*Pi/4}))", //
+				"Interval({-Infinity,Infinity})");
+		check("Cot(Interval({Pi/4,5*Pi/2}))", //
+				"Interval({-Infinity,Infinity})");
+
+		check("Tan(Interval({Pi/4,3*Pi/5}))", //
+				"Interval({-Infinity,-Sqrt(5+2*Sqrt(5))},{1,Infinity})");
+		check("Tan(Interval({-Pi/4,2*Pi/3}))", //
+				"Interval({-Infinity,-Sqrt(3)},{-1,Infinity})");
+		check("Tan(Interval({4,7}))", //
+				"Interval({-Infinity,Tan(7)},{Tan(4),Infinity})");
+		check("Tan(Interval({4,8}))", //
+				"Interval({-Infinity,Infinity})");
+		check("Tan(Interval({2,3}))", //
+				"Interval({Tan(2),Tan(3)})");
+		check("Tan(Interval({Pi/4,5*Pi/4}))", //
+				"Interval({-Infinity,Infinity})");
+		check("Tan(Interval({Pi/4,5*Pi/2}))", //
+				"Interval({-Infinity,Infinity})");
 		check("Cos(Interval({0, Pi}))", //
 				"Interval({-1,1})");
 		check("Cos(Interval({0, 2*Pi}))", //
@@ -9151,6 +9198,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Cos(Interval({4, 7}))", //
 				"Interval({Cos(4),1})");
 
+		// https://en.wikipedia.org/wiki/Interval_arithmetic
 		check("Sin(Interval({0, Pi}))", //
 				"Interval({0,1})");
 		check("Sin(Interval({0, 2*Pi}))", //
@@ -9199,8 +9247,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("(0)^Interval({2,4},{-42,43})", "Indeterminate");
 
-		check("(0)^Interval({2,4},{-42,43})",
-				"Indeterminate");
+		check("(0)^Interval({2,4},{-42,43})", "Indeterminate");
+
 
 		check("(0)^Interval({2,4},{42,43})", "Interval({0,0})");
 
