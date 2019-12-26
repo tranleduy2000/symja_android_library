@@ -5,6 +5,7 @@ import com.duy.lambda.IntFunction;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -87,6 +88,15 @@ public interface IASTAppendable extends IASTMutable {
 	 *             if an object cannot be added to this {@code List}.
 	 */
 	public boolean appendAll(Collection<? extends IExpr> collection);
+
+	/**
+	 * Adds the mappings in the specified map as <code>Rule(...)</code> to the end of this {@code List}. The objects are
+	 * added in the order in which they are returned from the map's iterator.
+	 *
+	 * @param map
+	 * @return
+	 */
+	public boolean appendAll(Map<? extends IExpr, ? extends IExpr> map);
 
 	/**
 	 * Appends all elements from offset <code>startPosition</code> to <code>endPosition</code> in the specified AST to

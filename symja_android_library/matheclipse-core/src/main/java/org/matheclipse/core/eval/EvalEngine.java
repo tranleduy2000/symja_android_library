@@ -13,6 +13,7 @@ import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.Programming;
+import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
@@ -1155,12 +1156,13 @@ public class EvalEngine implements Serializable {
 			}
 			RecursionLimitExceeded.throwIt(fRecursionLimit, expr);
 		}
+		IExpr result = expr;
 		try {
-			IExpr result, temp;
+			IExpr temp;
 			fRecursionCounter++;
 			if (fTraceMode) {
 				fTraceStack.setUp(expr, fRecursionCounter);
-				temp = expr.evaluate(this);
+				temp = result.evaluate(this);
 				if (temp.isPresent()) {
 					if (fStopRequested) {
 						throw TimeoutException.TIMED_OUT;
@@ -1185,7 +1187,7 @@ public class EvalEngine implements Serializable {
 					}
 				}
 			} else {
-				temp = expr.evaluate(this);
+				temp = result.evaluate(this);
 				if (temp.isPresent()) {
 					if (fStopRequested) {
 						throw TimeoutException.TIMED_OUT;
@@ -1227,6 +1229,12 @@ public class EvalEngine implements Serializable {
 			}
 
 			return F.NIL;
+		} catch (UnsupportedOperationException uoe) {
+			if (Config.SHOW_STACKTRACE) {
+				uoe.printStackTrace();
+			}
+			printMessage("Evaluation aborted:" + result.toString());
+			throw AbortException.ABORTED;
 		} finally {
 			if (fTraceMode) {
 				fTraceStack.tearDown(fRecursionCounter);
@@ -1905,6 +1913,17 @@ public class EvalEngine implements Serializable {
 		return ++fModuleCounter;
 	}
 
+	/**
+	 * <p>
+	 * Reset the module counter to <code>0</code>. Used only in JUnit tests.
+	 * </p>
+	 * <b> Don't reset for reusable EvalEngine's.</b>
+	 *
+	 * @return the module counter
+	 */
+	public void resetModuleCounter() {
+		fModuleCounter = 0;
+	}
 	/**
 	 * Increment the recursion counter by 1 and return the result.
 	 *
