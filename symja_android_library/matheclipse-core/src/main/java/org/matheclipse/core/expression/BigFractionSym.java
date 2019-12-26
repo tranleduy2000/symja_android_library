@@ -2,6 +2,8 @@ package org.matheclipse.core.expression;
 
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.basic.OperationSystem;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
@@ -30,6 +32,14 @@ public class BigFractionSym extends AbstractFractionSym {
 	BigFraction fFraction;
 
 	BigFractionSym(BigFraction fraction) {
+		BigInteger temp = fraction.getNumerator();
+		if (Config.MAX_BIT_COUNT < temp.bitCount()) {
+			throw new ASTElementLimitExceeded(temp.bitCount());
+		}
+		temp = fraction.getDenominator();
+		if (Config.MAX_BIT_COUNT < temp.bitCount()) {
+			throw new ASTElementLimitExceeded(temp.bitCount());
+		}
 		fFraction = fraction;
 	}
 
@@ -37,12 +47,23 @@ public class BigFractionSym extends AbstractFractionSym {
 	 * <p>
 	 * Construct a rational from two BigIntegers.
 	 * </p>
-	 * <b>Note:</b> the constructor is package private and does not normalize. Use the static constructor valueOf instead.
+	 * <b>Note:</b> the constructor is package private and does not normalize. Use the static constructor valueOf
+	 * instead.
 	 * 
-	 * @param nom   Numerator
-	 * @param denom Denominator
+	 * @param nom
+	 *            Numerator
+	 * @param denom
+	 *            Denominator
 	 */
 	BigFractionSym(BigInteger nom, BigInteger denom) {
+		BigInteger temp = nom;
+		if (Config.MAX_BIT_COUNT < temp.bitCount()) {
+			throw new ASTElementLimitExceeded(temp.bitCount());
+		}
+		temp = denom;
+		if (Config.MAX_BIT_COUNT < temp.bitCount()) {
+			throw new ASTElementLimitExceeded(temp.bitCount());
+		}
 		fFraction = new BigFraction(nom, denom);
 	}
 
@@ -54,7 +75,8 @@ public class BigFractionSym extends AbstractFractionSym {
 	/**
 	 * Return a new rational representing <code>this + other</code>.
 	 * 
-	 * @param other Rational to add.
+	 * @param other
+	 *            Rational to add.
 	 * @return Sum of <code>this</code> and <code>other</code>.
 	 */
 	@Override
@@ -155,10 +177,12 @@ public class BigFractionSym extends AbstractFractionSym {
 		// double precision complex number
 		double nr = toBigNumerator().doubleValue();
 		double dr = toBigDenominator().doubleValue();
-		// Avoid Android framework's bug
-		if (F.isEqual(nr, dr)) {
-			nr = new BigDecimal(toBigNumerator()).doubleValue();
-			dr = new BigDecimal(toBigDenominator()).doubleValue();
+		if (OperationSystem.isJvm()) {
+			// Avoid Android framework's bug
+			if (F.isEqual(nr, dr)) {
+				nr = new BigDecimal(toBigNumerator()).doubleValue();
+				dr = new BigDecimal(toBigDenominator()).doubleValue();
+			}
 		}
 		return ComplexNum.valueOf(nr / dr);
 	}
@@ -178,7 +202,8 @@ public class BigFractionSym extends AbstractFractionSym {
 	/**
 	 * Return a new rational representing <code>this / other</code>.
 	 * 
-	 * @param other Rational to divide.
+	 * @param other
+	 *            Rational to divide.
 	 * @return Quotient of <code>this</code> and <code>other</code>.
 	 */
 	@Override
@@ -317,10 +342,11 @@ public class BigFractionSym extends AbstractFractionSym {
 	}
 
 	/**
-	 * Compute the gcd of two rationals (this and other). The gcd is the rational number, such that dividing this and other with the gcd
-	 * will yield two co-prime integers.
+	 * Compute the gcd of two rationals (this and other). The gcd is the rational number, such that dividing this and
+	 * other with the gcd will yield two co-prime integers.
 	 * 
-	 * @param other the second rational argument.
+	 * @param other
+	 *            the second rational argument.
 	 * @return the gcd of this and other.
 	 */
 	public IFraction gcd(IFraction other) {
@@ -362,7 +388,8 @@ public class BigFractionSym extends AbstractFractionSym {
 	/**
 	 * Return a new rational representing <code>this / other</code>.
 	 * 
-	 * @param other Rational to divide.
+	 * @param other
+	 *            Rational to divide.
 	 * @return Quotient of <code>this</code> and <code>other</code>.
 	 */
 	public IFraction idiv(IFraction other) {
@@ -465,7 +492,8 @@ public class BigFractionSym extends AbstractFractionSym {
 	/**
 	 * Return a new rational representing <code>this * other</code>.
 	 * 
-	 * @param other big integer to multiply.
+	 * @param other
+	 *            big integer to multiply.
 	 * @return Product of <code>this</code> and <code>other</code>.
 	 */
 	public IFraction mul(BigInteger other) {
