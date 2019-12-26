@@ -33,6 +33,8 @@ import org.matheclipse.core.visit.VisitorExpr;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.matheclipse.core.expression.F.Power;
+
 public class MinMaxFunctions {
 	/**
 	 * 
@@ -124,7 +126,7 @@ public class MinMaxFunctions {
 					evaled = true;
 					x2 = result;
 				}
-				if (head.equals(F.Power)) {
+				if (head.equals(Power)) {
 					if (x1.isInterval1()) {
 						IAST interval = (IAST) x1;
 						IExpr l = interval.lower();
@@ -132,17 +134,17 @@ public class MinMaxFunctions {
 						if (x2.isMinusOne()) {
 							if (F.GreaterEqual.ofQ(engine, l, F.C1)) {
 								// [>= 1, u]
-								return F.Interval(F.Power(u, x2), F.Power(l, x2));
+								return F.Interval(Power(u, x2), Power(l, x2));
 							}
 						}
 						if (l.isNegativeResult() && u.isPositiveResult()) {
 							if (x2.isPositiveResult()) {
-								return F.Interval(F.C0, F.Power(u, x2));
+								return F.Interval(F.C0, Power(u, x2));
 							}
 							if (x2.isEvenResult()) {
-								return F.Interval(F.C0, F.Power(u, x2));
+								return F.Interval(F.C0, Power(u, x2));
 							} else if (x2.isFraction() && ((IFraction) x2).denominator().isEven()) {
-								return F.Interval(F.C0, F.Power(u, x2));
+								return F.Interval(F.C0, Power(u, x2));
 							}
 						}
 					}
@@ -215,15 +217,17 @@ public class MinMaxFunctions {
 
 		private IExpr convertMinMaxList(IAST list, ISymbol y) {
 			if (list.arg1().isRealResult()) {
-				if (list.arg2().isRealResult()) {
-					return F.LessEqual(list.arg1(), y, list.arg2());
-				} else if (list.arg2().isInfinity()) {
+				if (list.arg2().isInfinity()) {
 					return F.GreaterEqual(y, list.arg1());
+				} else if (list.arg2().isRealResult()) {
+					return F.LessEqual(list.arg1(), y, list.arg2());
 				}
 			} else if (list.arg2().isRealResult()) {
 				if (list.arg1().isNegativeInfinity()) {
+					if (!list.arg2().isInfinity()) {
 					return F.LessEqual(y, list.arg2());
 				}
+			}
 			}
 			return F.NIL;
 		}

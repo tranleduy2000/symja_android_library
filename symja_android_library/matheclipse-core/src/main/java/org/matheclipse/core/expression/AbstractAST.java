@@ -2825,12 +2825,24 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNegativeResult() {
+		if (isDirectedInfinity()) {
+			if (isNegativeInfinity()) {
+				return true;
+			}
+			return false;
+		}
 		return AbstractAssumptions.isNegativeResult(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNonNegativeResult() {
+		if (isDirectedInfinity()) {
+			if (isInfinity()) {
+				return true;
+			}
+			return false;
+		}
 		return AbstractAssumptions.isNonNegativeResult(this);
 	}
 
@@ -3004,6 +3016,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isPositiveResult() {
+		if (isDirectedInfinity()) {
+			if (isInfinity()) {
+				return true;
+			}
+			return false;
+		}
 		return AbstractAssumptions.isPositiveResult(this);
 	}
 
@@ -3133,9 +3151,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			}
 			return true;
 		}
-		// if (isInfinity()||isNegativeInfinity()) {
-		// return true;
-		// }
+		if (isInfinity() || isNegativeInfinity()) {
+			return true;
+		}
 		return false;
 	}
 
