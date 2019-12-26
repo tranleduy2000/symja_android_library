@@ -25,6 +25,7 @@ import org.matheclipse.core.patternmatching.RulesData;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.Integrate;
@@ -92,8 +93,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 		@Override
 		public void run() {
 			// long start = System.currentTimeMillis();
-			if (!INTEGRATE_RULES_READ) {
-				INTEGRATE_RULES_READ = true;
+			if (!INTEGRATE_RULES_READ.get()) {
+				INTEGRATE_RULES_READ.set(true);
 				final EvalEngine engine = EvalEngine.get();
 				ContextPath path = engine.getContextPath();
 				try {
@@ -121,6 +122,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			}
 		}
 
+		@SuppressWarnings("UnusedAssignment")
 		private static void getUtilityFunctionsRuleASTRubi45() {
 			IAST ast = org.matheclipse.core.integrate.rubi.UtilityFunctions0.RULES;
 			ast = org.matheclipse.core.integrate.rubi.UtilityFunctions1.RULES;
@@ -165,6 +167,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			// org.matheclipse.core.integrate.rubi.UtilityFunctions.init();
 		}
 
+		@SuppressWarnings("UnusedAssignment")
 		private static void getRuleASTRubi45() {
 			IAST init;
 			init = org.matheclipse.core.integrate.rubi.IntRules0.RULES;
@@ -526,16 +529,20 @@ public class Integrate extends AbstractFunctionEvaluator {
 
 	public final static Set<IExpr> DEBUG_EXPR = new HashSet<IExpr>(64);
 
-	public static volatile boolean INTEGRATE_RULES_READ = false;
+	public static final AtomicBoolean INTEGRATE_RULES_READ = new AtomicBoolean(false);
 
 	public Integrate() {
 	}
 
 	@Override
 	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
+		// Android changed: perform reading integrate rules
+		new IntegrateInitializer().run();
+
 		try {
+			// wait for initializer runs completely, no matter how many threads call evaluate() method
 			await();
-		} catch (InterruptedException e) {
+		} catch (InterruptedException ignored) {
 		}
 		boolean evaled = false;
 		IExpr result;
@@ -985,17 +992,18 @@ public class Integrate extends AbstractFunctionEvaluator {
 		newSymbol.setAttributes(ISymbol.HOLDALL);
 		super.setUp(newSymbol);
 
-		if (Config.THREAD_FACTORY != null) {
-			INIT_THREAD = Config.THREAD_FACTORY.newThread(new IntegrateInitializer());
-		} else {
-			INIT_THREAD = new Thread(new IntegrateInitializer());
-		}
-
-		if (Config.JAS_NO_THREADS) {
-			INIT_THREAD.run();
-		} else {
-			INIT_THREAD.start();
-		}
+		// Android changed: call static initializer in evaluate() method.
+//		if (Config.THREAD_FACTORY != null) {
+//			INIT_THREAD = Config.THREAD_FACTORY.newThread(new IntegrateInitializer());
+//		} else {
+//			INIT_THREAD = new Thread(new IntegrateInitializer());
+//		}
+//
+//		if (Config.JAS_NO_THREADS) {
+//			INIT_THREAD.run();
+//		} else {
+//			INIT_THREAD.start();
+//		}
 
 		F.ISet(F.$s("§simplifyflag"), F.False);
 
