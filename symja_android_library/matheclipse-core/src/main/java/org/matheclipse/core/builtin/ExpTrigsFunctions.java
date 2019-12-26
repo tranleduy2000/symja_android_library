@@ -1772,6 +1772,9 @@ public class ExpTrigsFunctions {
 			// return Times(CNI, Coth(imPart));
 			// }
 
+			if (arg1.isInterval()) {
+				return IntervalSym.cot((IAST) arg1);
+			}
 			return F.NIL;
 		}
 
@@ -2874,6 +2877,9 @@ public class ExpTrigsFunctions {
 						return F.CComplexInfinity;
 					}
 				}
+			}
+			if (arg1.isInterval()) {
+				return IntervalSym.tan((IAST) arg1);
 			}
 			// IExpr imPart = AbstractFunctionEvaluator.getPureImaginaryPart(arg1);
 			// if (imPart.isPresent()) {
