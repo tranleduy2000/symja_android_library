@@ -1151,13 +1151,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("BaseForm(2882400255, 16)", //
 				"Subscript(abcdefff,16)");
 		check("37^^abcdefff", //
-				"Syntax error in line: 1 - Base 37^^... is invalid. Only bases between 1 and 36 are allowed\n" +
-				"37^^abcdefff\n" +
-				"  ^");
+				"Syntax error in line: 1 - Base 37^^... is invalid. Only bases between 1 and 36 are allowed\n"
+						+ "37^^abcdefff\n" + "  ^");
 		check("16^^6z12xy", //
-				"Syntax error in line: 1 - Number format error: 6z12xy\n" +
-				"16^^6z12xy\n" +
-				"         ^");
+				"Syntax error in line: 1 - Number format error: 6z12xy\n" + "16^^6z12xy\n" + "         ^");
 	}
 	public void testBegin() {
 		check("Begin(\"mytest`\")", //
@@ -6821,6 +6818,14 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"FindVertexCover({2->1,1->3,3->6,6->1,4->6,1->5,5->4})");
 
 	}
+	public void testFindShortestPath() {
+		check("FindShortestPath(Graph({1 -> 2, 2 -> 4, 1 -> 3,  3 -> 2, 3 -> 4},{EdgeWeight->{3.0,1.0,1.0,1.0,3.0}}),1,4)", //
+				"{1,3,2,4}");
+
+		check("FindShortestPath({1 -> 2, 2 -> 3, 3 -> 1,  3 -> 4, 4 -> 5, 3 -> 5},1,4)", //
+				"{1,2,3,4}");
+	}
+
 	public void testFindShortestTour() {
 		check("FindShortestTour({GeoPosition[{41, 20}], GeoPosition[{5, 20}], GeoPosition[{49, 32}], " //
 				+ "GeoPosition[{53, 28}], GeoPosition[{47, 29}]})", //
@@ -6844,10 +6849,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("FindSpanningTree(g)", //
 				"Graph({1,2,3,4,6,5,7,8},{1->2,1->3,1->4,2->6,5->3,5->7,5->8})");
-	}
-	public void testFindShortestPath() {
-		check("FindShortestPath({1 -> 2, 2 -> 3, 3 -> 1,  3 -> 4, 4 -> 5, 3 -> 5},1,4)", //
-				"{1,2,3,4}");
 	}
 
 	public void testHamiltonianGraphQ() {

@@ -88,6 +88,7 @@ The Pegasus method should converge faster than the Illinois method, another Regu
 The Pegasus method assumes that the function is continuous, but not necessarily smooth. 
 
 ### Examples 
+
 ```
 >> FindRoot(Exp(x)==Pi^3,{x,-1,10}, Method->Bisection)
 {x->3.434189647436142}

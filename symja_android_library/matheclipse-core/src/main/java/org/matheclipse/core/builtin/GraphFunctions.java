@@ -305,6 +305,19 @@ public class GraphFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>GraphPeriphery(graph)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * compute the <code>graph</code> periphery. The periphery of a <code>graph</code> is the set of vertices of graph
+	 * eccentricity equal to the graph diameter.
+	 * </p>
+	 * </blockquote>
+	 */
 	private static class GraphPeriphery extends AbstractEvaluator {
 
 		@Override
@@ -562,6 +575,29 @@ public class GraphFunctions {
 							}
 							return F.List(sum, shortestTourList);
 						}
+						// } else {
+						// GraphExpr<ExprEdge> gex = createGraph(ast.arg1());
+						// if (gex == null) {
+						// return F.NIL;
+						// }
+						//
+						// Graph<IExpr, ExprEdge> g = gex.toData();
+						//
+						// GraphPath<IExpr, ExprEdge> tour = new HeldKarpTSP<IExpr, ExprEdge>()
+						// .getTour(g);
+						//
+						// // calculate the shortest tour from the sum of distances and
+						// // create list of vertices for the shortest tour
+						// List<IExpr> tourPositions = tour.getVertexList();
+						// IASTAppendable shortestTourList = F.ListAlloc(tourPositions.size());
+						// IExpr lastPosition = tourPositions.get(tourPositions.size() - 1);
+						// shortestTourList.append(lastPosition);
+						// for (int i = tourPositions.size() - 2; i >= 0; i--) {
+						// IExpr position = tourPositions.get(i);
+						// shortestTourList.append(position);
+						// lastPosition = position;
+						// }
+						// return F.List(F.num(tour.getWeight()), shortestTourList);
 					}
 				}
 			} catch (RuntimeException rex) {
@@ -846,6 +882,33 @@ public class GraphFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>HamiltonianGraphQ(graph)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>True</code> if <code>graph</code> is an hamiltonian graph, and <code>False</code> otherwise.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Hamiltonian_path">Wikipedia - Hamiltonian path</a></li>
+	 * <li><a href="https://en.wikipedia.org/wiki/Hamiltonian_path_problem">Wikipedia - Hamiltonian path
+	 * problem</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; HamiltonianGraphQ(Graph({1 -&gt; 2, 2 -&gt; 3, 3 -&gt; 4, 4 -&gt; 1}))
+	 * True
+	 * </code>
+	 * </pre>
+	 */
 	private static class HamiltonianGraphQ extends AbstractEvaluator {
 
 		@Override
@@ -947,6 +1010,33 @@ public class GraphFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code> FindHamiltonianCycle(graph)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * find an hamiltonian cycle in the <code>graph</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Hamiltonian_path">Wikipedia - Hamiltonian path</a></li>
+	 * <li><a href="https://en.wikipedia.org/wiki/Hamiltonian_path_problem">Wikipedia - Hamiltonian path
+	 * problem</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; FindHamiltonianCycle( {1 -&gt; 2, 2 -&gt; 3, 3 -&gt; 4, 4 -&gt; 1} )
+	 * {1-&gt;2,2-&gt;3,3-&gt;4,4-&gt;1}
+	 * </code>
+	 * </pre>
+	 */
 	private static class FindHamiltonianCycle extends AbstractEvaluator {
 
 		@Override
