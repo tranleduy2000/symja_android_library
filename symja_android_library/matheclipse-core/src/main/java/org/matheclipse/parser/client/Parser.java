@@ -501,25 +501,9 @@ public class Parser extends Scanner {
 
 		getNextToken();
 
-		if (fRelaxedSyntax) {
-			if (fToken == TT_PRECEDENCE_CLOSE) {
-				getNextToken();
-				if (fToken == TT_PRECEDENCE_OPEN) {
-					return function;
-				}
-				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
-				}
-				return function;
-			}
-		} else {
-			if (fToken == TT_ARGUMENTS_CLOSE) {
-				getNextToken();
-				if (fToken == TT_ARGUMENTS_OPEN) {
-					return getFunctionArguments(function);
-				}
-				return function;
-			}
+		FunctionNode fun = functionNodeClosed(function);
+		if (fun != null) {
+			return fun;
 		}
 		fRecursionDepth++;
 		try {
@@ -527,6 +511,26 @@ public class Parser extends Scanner {
 		} finally {
 			fRecursionDepth--;
 		}
+		fun = functionNodeClosed(function);
+		if (fun != null) {
+			return fun;
+		}
+		if (fRelaxedSyntax) {
+			throwSyntaxError("')' expected.");
+		} else {
+			throwSyntaxError("']' expected.");
+		}
+		return null;
+
+	}
+
+	/**
+	 * Test if the current token is closing parenthesis.
+	 *
+	 * @param function
+	 * @return <code>null</code> if function wasn't closed
+	 */
+	private FunctionNode functionNodeClosed(final FunctionNode function) {
 		if (fRelaxedSyntax) {
 			if (fToken == TT_PRECEDENCE_CLOSE) {
 				getNextToken();
@@ -548,11 +552,6 @@ public class Parser extends Scanner {
 			}
 		}
 
-		if (fRelaxedSyntax) {
-			throwSyntaxError("')' expected.");
-		} else {
-			throwSyntaxError("']' expected.");
-		}
 		return null;
 
 	}
