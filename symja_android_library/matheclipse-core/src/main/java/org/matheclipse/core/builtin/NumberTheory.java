@@ -41,7 +41,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.numbertheory.GaussianInteger;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.core.visit.VisitorExpr;
-import org.matheclipse.parser.client.math.MathException;
 
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -4123,36 +4122,39 @@ public final class NumberTheory {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			try {
-			IExpr nArg1 = ast.arg1();
-			IExpr kArg2 = ast.arg2();
-			if (nArg1.isNegative() || kArg2.isNegative()) {
-				return F.NIL;
-			}
-			if (nArg1.isZero() && kArg2.isZero()) {
-				return F.C1;
-			}
-			if (nArg1.isInteger() && kArg2.isInteger()) {
-				IInteger ki = (IInteger) kArg2;
-				if (ki.greaterThan(nArg1).isTrue()) {
-					return C0;
+				IExpr nArg1 = ast.arg1();
+				IExpr kArg2 = ast.arg2();
+				if (nArg1.isNegative() || kArg2.isNegative()) {
+					return F.NIL;
 				}
-				if (ki.isZero()) {
-					return C0;
+				if (nArg1.isZero() && kArg2.isZero()) {
+					return F.C1;
 				}
-				if (ki.isOne()) {
-					// {n,1}==1
-					return C1;
-				}
-				if (ki.equals(C2)) {
-					// {n,2}==2^(n-1)-1
-					return Subtract(Power(C2, Subtract(nArg1, C1)), C1);
-				}
+				if (nArg1.isInteger() && kArg2.isInteger()) {
+					IInteger ki = (IInteger) kArg2;
+					if (ki.greaterThan(nArg1).isTrue()) {
+						return C0;
+					}
+					if (ki.equals(nArg1)) {
+						return C1;
+					}
+					if (ki.isZero()) {
+						return C0;
+					}
+					if (ki.isOne()) {
+						// {n,1}==1
+						return C1;
+					}
+					if (ki.equals(C2)) {
+						// {n,2}==2^(n-1)-1
+						return Subtract(Power(C2, Subtract(nArg1, C1)), C1);
+					}
 
-				int k = ki.toIntDefault(0);
-				if (k != 0) {
-					return stirlingS2((IInteger) nArg1, ki, k);
+					int k = ki.toIntDefault(0);
+					if (k != 0) {
+						return stirlingS2((IInteger) nArg1, ki, k);
+					}
 				}
-			}
 
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {

@@ -14413,6 +14413,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPower() {
+		// check("3^3^3^3^3^3^3", //
+		// "Maximum AST size 3175 exceeded");
 		check("Power((-x)^(1/2), 2)", //
 				"-x");
 		check("Power((-x)^(1/3), 3)", //
