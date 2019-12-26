@@ -181,6 +181,90 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	/**
+	 * <p>
+	 * Return <code>true</code> if the number of negative terms of the <code>ast</code> expression
+	 * <code>countWeight</code> is greater than the half of the number of the arguments of <code>ast</code>.
+	 * </p>
+	 * I.e. <code>int halfSize = ast.size() / 2; return countWeight > halfSize;</code>
+	 *
+	 *
+	 * @param ast
+	 * @param checkTimesPlus
+	 *            check <code>Times(...)</code> and <code>Plus(...)</code> expressions
+	 * @return
+	 */
+	public static boolean isNegativeWeighted(final IAST ast, boolean checkTimesPlus) {
+		int countWeight = countNegativeWeight(ast, checkTimesPlus);
+		int halfSize = ast.size() / 2;
+		return countWeight > halfSize;
+	}
+
+	/**
+	 * <p>
+	 * Return the number of negative terms of the <code>ast</code> expression.
+	 * </p>
+	 *
+	 * @param ast
+	 * @param checkTimesPlus
+	 *            check <code>Times(...)</code> and <code>Plus(...)</code> expressions
+	 * @return
+	 */
+	public static int countNegativeWeight(final IAST ast, boolean checkTimesPlus) {
+		int count = 1;
+		for (int i = 1; i < ast.size(); i++) {
+			if (isNegativeWeighted(ast.get(i), checkTimesPlus)) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * <p>
+	 * Return <code>true</code> if the <code>expression</code> is considered having <i>negative weight</i>
+	 * </p>
+	 *
+	 * @param expression
+	 * @param checkTimesPlus
+	 *            check <code>Times(...)</code> and <code>Plus(...)</code> expressions
+	 * @return
+	 */
+	public static boolean isNegativeWeighted(final IExpr expression, boolean checkTimesPlus) {
+		if (expression.isNumber()) {
+			return ((INumber) expression).complexSign() < 0;
+		} else if (expression.isAST()) {
+			if (checkTimesPlus && expression.isTimes()) {
+				IExpr arg1 = expression.first();
+				// see github #110: checking for arg1.isNegative() will trigger infinite recursion!
+				if (arg1.isNumber()) {
+					if (((INumber) arg1).complexSign() < 0) {
+						return true;
+					}
+				} else if (arg1.isNegativeInfinity()) {
+					return true;
+				}
+			} else if (checkTimesPlus && expression.isPlus()) {
+				IAST plusAST = ((IAST) expression);
+				IExpr arg1 = plusAST.arg1();
+				if (arg1.isNumber()) {
+					if (((INumber) arg1).complexSign() < 0) {
+						return true;
+					}
+				} else if (arg1.isNegativeInfinity()) {
+					return true;
+				} else if (arg1.isTimes() && isNegativeWeighted(arg1, checkTimesPlus)) {
+					return true;
+				}
+			} else if (expression.isDirectedInfinity() && expression.isAST1()) {
+				IExpr arg1 = expression.first();
+				if (arg1.isMinusOne() || arg1.isNegativeImaginaryUnit()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Try to split a periodic part from the expression: <code>expr == part.arg1() + part.arg2() * period</code>
@@ -203,7 +287,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 			if (ast.isTimes()) {
 				for (int i = 1; i < ast.size(); i++) {
 					if (ast.get(i).equals(period)) {
-						result.set(2, ast.removeAtCopy(i).oneIdentity1());
+						result.set(2, ast.splice(i).oneIdentity1());
 						return result;
 					}
 				}
@@ -213,7 +297,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 				for (int i = 1; i < ast.size(); i++) {
 					IAST temp = getPeriodicParts(ast.get(i), period);
 					if (temp.isPresent() && temp.arg1().isZero()) {
-						result.set(1, ast.removeAtCopy(i).oneIdentity0());
+						result.set(1, ast.splice(i).oneIdentity0());
 						result.set(2, temp.arg2());
 						return result;
 					}
@@ -257,8 +341,8 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 	/**
-	 * This assumes plusAST to be a Plus() expression. The multiple of Pi returned is a IRational number or assumed to
-	 * be an expression with Integer result.
+	 * This method assumes plusAST to be a Plus() expression. The multiple of Pi returned is a IRational number or
+	 * assumed to be an expression with Integer result.
 	 *
 	 * @param plusAST
 	 * @param engine
@@ -319,7 +403,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 	public static IExpr peelOfTimes(final IAST astTimes, final IExpr period) {
 		for (int i = 1; i < astTimes.size(); i++) {
 			if (astTimes.get(i).equals(period)) {
-				return astTimes.removeAtCopy(i).oneIdentity1();
+				return astTimes.splice(i).oneIdentity1();
 			}
 		}
 		return F.NIL;
@@ -576,6 +660,18 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 		return F.NIL;
 	}
 
+	// Swift changed: remove reflection
+//	/**
+//	 * Create a rule which invokes the method name in this class instance.
+//	 *
+//	 * @param symbol
+//	 * @param patternString
+//	 * @param methodName
+//	 */
+//	public void createRuleFromMethod(ISymbol symbol, String patternString, String methodName) {
+//		PatternMatcherAndInvoker pm = new PatternMatcherAndInvoker(patternString, this, methodName);
+//		symbol.putDownRule(pm);
+//	}
 	/** {@inheritDoc} */
 	@Override
 	abstract public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine);

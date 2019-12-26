@@ -4864,40 +4864,19 @@ public final class Arithmetic {
         public Times() {
         }
 
-        // private void addTrigRules(ISymbol head1, ISymbol head2, ISymbol
-        // resultHead) {
-        // IAST sinX_ = F.unaryAST1(head1, x_);
-        // IAST cotX_ = F.unaryAST1(head2, x_);
-        // IAST sinX = F.unaryAST1(head1, x);
-        // IAST cotX = F.unaryAST1(head2, x);
-        // IAST resultX = F.unaryAST1(resultHead, x);
-        // ORDERLESS_MATCHER.defineHashRule(sinX_, cotX_, resultX);
-        // ORDERLESS_MATCHER.defineHashRule(sinX_, F.Power(cotX_, $p(n,
-        // IntegerQ)),
-        // F.Times(F.Power(cotX, F.Subtract(n, F.C1)), resultX), F.Positive(n));
-        // ORDERLESS_MATCHER.defineHashRule(F.Power(sinX_, $p(m, IntegerQ)),
-        // cotX_,
-        // F.Times(F.Power(sinX, F.Subtract(m, F.C1)), resultX), F.Positive(m));
-        // ORDERLESS_MATCHER.defineHashRule(F.Power(sinX_, $p(m, IntegerQ)),
-        // F.Power(cotX_, $p(n, IntegerQ)),
-        // F.If(F.Greater(m, n), F.Times(F.Power(sinX, F.Subtract(m, n)),
-        // F.Power(resultX, n)),
-        // F.Times(F.Power(cotX, F.Subtract(n, m)), F.Power(resultX, m))),
-        // F.And(F.Positive(m), F.Positive(n)));
-        // }
 
         /**
-		 * Distribute a leading integer factor over the integer powers if available.
-		 * <code>12*2^x*3^y   ==>   2^(2+x)*3^(1+y)</code>.
+		 * Distribute a leading integer factor.
          *
-		 * @param ast
-		 *            the already evaluated expression
+		 * @param noEvalExpression
+		 *            return this expression if no evaluation step was done
 		 * @param originalExpr
-		 *            the original expression which is used, if <code>!ast.isPresent()</code>
-         * @return the evaluated object or <code>ast</code>, if the distribution of an integer factor isn't possible
+		 *            the original expression which is used, if <code>!noEvalExpression.isPresent()</code>
+		 * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an integer factor isn't
+		 *         possible
          */
-        private IExpr distributeLeadingFactor(IExpr ast, IAST originalExpr) {
-            IExpr expr = ast;
+		private static IExpr distributeLeadingFactor(IExpr noEvalExpression, IAST originalExpr) {
+			IExpr expr = noEvalExpression;
             if (!expr.isPresent()) {
                 expr = originalExpr;
             }
@@ -4905,7 +4884,39 @@ public final class Arithmetic {
                 IAST times = (IAST) expr;
                 IInteger leadingFactor = (IInteger) times.arg1();
 
-                if (!leadingFactor.isMinusOne()) {
+				if (leadingFactor.isMinusOne()) {
+					return distributeLeadingFactorCN1(noEvalExpression, times);
+				} else {
+					return distributeLeadingFactorModulus(noEvalExpression, times, leadingFactor);
+				}
+
+			}
+			return noEvalExpression;
+		}
+
+		/**
+		 * <p>
+		 * Distribute a leading integer factor over the integer powers if available.
+		 * </p>
+		 * Example: <code>12*2^x*3^y</code> distribute leading factor <code>12 == 2*2*3</code> to the Power expressions
+		 * <code>2^(2+x)*3^(1+y)</code>
+		 *
+		 * @param noEvalExpression
+		 *            return this expression if no evaluation step was done
+		 * @param times
+		 *            the <code>Times(...)</code> AST
+		 * @param leadingFactor
+		 *            the first factor in <code>Times(...)</code>
+		 * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an integer factor isn't
+		 *         possible
+		 */
+		private static IExpr distributeLeadingFactorModulus(IExpr noEvalExpression, IAST times,
+				IInteger leadingFactor) {
+			boolean negative = false;
+			if (leadingFactor.isNegative()) {
+				leadingFactor = leadingFactor.negate();
+				negative = true;
+			}
                     IASTAppendable result = F.NIL;
                     for (int i = 2; i < times.size(); i++) {
                         IExpr temp = times.get(i);
@@ -4927,19 +4938,56 @@ public final class Arithmetic {
                                     if (!result.isPresent()) {
                                         result = times.copyAppendable();
                                     }
-									result.set(i, F.Power(temp.base(), F.Plus(F.integer(count), temp.exponent())));
+							result.set(i, F.Power(temp.base(), F.Plus(F.ZZ(count), temp.exponent())));
                                 }
                             }
                         }
                     }
                     if (result.isPresent()) {
+				if (negative) {
+					leadingFactor = leadingFactor.negate();
+				}
                         result.set(1, leadingFactor);
+				if (leadingFactor.isMinusOne()) {
+					return distributeLeadingFactorCN1(result, result);
+				}
+				return result;
+			}
+			return noEvalExpression;
+		}
+
+		/**
+		 * <p>
+		 * Distribute a leading factor <code>-1</code> to <code>Plus(...)</code> terms of the <code>times</code>
+		 * expression if possible.
+		 * </p>
+		 * <b>Example:</b> <code>-a*(2-x)</code> distribute leading factor <code>-1</code> to the <code>Plus(...)</code>
+		 * expression <code>(2-x)</code> returns <code>a*(-2+x)</code>
+		 *
+		 * @param noEvalExpr
+		 *            return this expression if no evaluation step was done
+		 * @param times
+		 *            the <code>Times(...)</code> AST
+		 * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an integer factor isn't
+		 *         possible
+		 */
+		private static IExpr distributeLeadingFactorCN1(IExpr noEvalExpr, IAST times) {
+			IASTAppendable result = F.NIL;
+			for (int i = 2; i < times.size(); i++) {
+				IExpr temp = times.get(i);
+				if (temp.isPlus()) {
+					IAST plus = (IAST) temp;
+					if (AbstractFunctionEvaluator.isNegativeWeighted(plus, true)) {
+						temp = EvalEngine.get().evaluate(plus.mapThread(F.binaryAST2(Times, CN1, F.Null), 2));
+						result = times.copyAppendable();
+						result.set(i, temp);
+						result.remove(1);
                         return result;
                     }
                 }
 
             }
-            return ast;
+			return noEvalExpr;
         }
 
         @Override
