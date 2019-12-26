@@ -189,12 +189,12 @@ public final class ListFunctions {
 		}
 	}
 
-	public static class ArrayIterator extends IIteratorImpl<IExpr> implements IIterator<IExpr> {
-		int fCurrent;
+	private static class ArrayIterator extends IIteratorImpl<IExpr> implements IIterator<IExpr> {
+		private int fCurrent;
 
-		final int fFrom;
+		private final int fFrom;
 
-		final int fTo;
+		private final int fTo;
 
 		public ArrayIterator(final int to) {
 			this(1, to);
@@ -223,7 +223,7 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr next() {
-			return F.integer(fCurrent++);
+			return F.ZZ(fCurrent++);
 		}
 
 		@Override
@@ -765,49 +765,6 @@ public final class ListFunctions {
 			}
 		}
 
-		private static class ArrayIterator extends IIteratorImpl<IExpr> implements IIterator<IExpr> {
-			int fCurrent;
-
-			final int fFrom;
-
-			final int fTo;
-
-			public ArrayIterator(final int to) {
-				this(1, to);
-			}
-
-			public ArrayIterator(final int from, final int length) {
-				fFrom = from;
-				fCurrent = from;
-				fTo = from + length - 1;
-			}
-
-			@Override
-			public boolean setUp() {
-				return true;
-			}
-
-			@Override
-			public void tearDown() {
-				fCurrent = fFrom;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return fCurrent <= fTo;
-			}
-
-			@Override
-			public IExpr next() {
-				return F.integer(fCurrent++);
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-
-		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
