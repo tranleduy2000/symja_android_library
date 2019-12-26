@@ -1,5 +1,6 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
@@ -860,13 +861,26 @@ public class PredicateQ {
 			if (expr.isNumber()) {
 				return expr.isZero();
 			}
-			IExpr temp = arg1.evalNumber();
-			if (temp != null) {
-				if (temp.isZero()) {
-					return true;
-				}
-			}
 			if (expr.isAST()) {
+				IExpr temp = ((IAST) expr).replace( //
+						new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr x) {
+								return x.isNumericFunction();
+							}
+						}, //
+						new Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr x) {
+								return x.evalNumber();
+							}
+						});
+				if (temp != null) {
+					temp = engine.evaluate(temp);
+					if (temp.isZero()) {
+						return true;
+					}
+				}
 				if (expr.isPlus()) {
 					IExpr[] commonFactors = InternalFindCommonFactorPlus.findCommonFactors((IAST) expr, true);
 					if (commonFactors != null) {
@@ -877,17 +891,15 @@ public class PredicateQ {
 						temp = temp.evalNumber();
 						if (temp != null) {
 							if (temp.isZero()) {
-					return true;
-				}
+								return true;
+							}
 						}
 					}
 				}
-				// } else {
 				return isZeroTogether(expr, engine);
-				// }
 			}
-					return false;
-				}
+			return false;
+		}
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
