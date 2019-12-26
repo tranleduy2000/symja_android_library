@@ -10173,6 +10173,25 @@ public class LowercaseTestCase extends AbstractTestCase {
 	// }
 
 	public void testLimit() {
+		check("Limit(E^(-x),x->Infinity )", //
+				"0");
+
+		check("Limit(Gamma(1/t)*Cos(Sin(1/t)),t->0)", //
+				"Limit(Cos(Sin(1/t))*Gamma(1/t),t->0)");
+		check("Limit(Gamma(1/t),t->Infinity)", //
+				"Infinity");
+		check("Limit(Gamma(1/t),t->-Infinity)", //
+				"-Infinity");
+		check("Limit(Gamma(z,t),t->Infinity)", //
+				"0");
+		check("Limit(Gamma(z,t),t->0)", //
+				"Gamma(z)");
+		check("limit((1 - cos(x))/x^2, x->0)", //
+				"1/2");
+		check("limit((1 + 1/n)^n, n->infinity)", //
+				"E");
+		check("Limit((sin(x) - x)/x^3,x->0)", //
+				"-1/6");
 		check("Limit(Sqrt(x^2 - 1)/x, x->-Infinity)", //
 				"-1");
 		check("Limit(x/Sqrt(x^2 - 1), x->-Infinity)", //
@@ -10304,7 +10323,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Limit(Log(x^y), x->0)", //
 				"DirectedInfinity(-y)");
 		check("Limit(Log(y*x, b), x->1)", //
-				"Limit(1/Log(x*y),x->1)*Log(b)");
+				"Log(b)/Log(y)");
 		check("Limit(Log(y*x), x->0)", //
 				"-Infinity");
 		check("Limit(Log(x), x->Infinity)", //
@@ -14395,6 +14414,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPossibleZeroQ() {
+		check("PossibleZeroQ(x*E^(I*Pi/4)  - x*(-1)^(1/4))", //
+				"True");
 		check("PossibleZeroQ(-Cos(x)/(1-Cos(x))+Sin(x)^2/(1-Cos(x))^2-1/(1-Cos(x)))", //
 				"True");
 		check("PossibleZeroQ(2^(2*I) - 2^(-2*I) - 2*I*Sin(Log(4)))", //

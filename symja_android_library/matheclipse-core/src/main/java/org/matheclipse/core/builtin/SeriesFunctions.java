@@ -70,6 +70,12 @@ public class SeriesFunctions {
      */
     private final static class Limit extends AbstractFunctionEvaluator implements LimitRules {
 
+		/**
+		 * Representing the data for the current limit.
+		 *
+		 * @author khart
+		 *
+		 */
 		static class LimitData {
             final ISymbol symbol;
 
@@ -79,6 +85,9 @@ public class SeriesFunctions {
 
             int direction;
 
+			public LimitData(ISymbol symbol, IExpr limitValue, IAST rule) {
+				this(symbol, limitValue, rule, DIRECTION_TWO_SIDED);
+			}
             public LimitData(ISymbol symbol, IExpr limitValue, IAST rule, int direction) {
                 this.symbol = symbol;
                 this.limitValue = limitValue;
@@ -87,6 +96,11 @@ public class SeriesFunctions {
             }
 
 
+			/**
+			 * Get the optional direction value. Default is DIRECTION_TWO_SIDED = 0.
+			 *
+			 * @return
+			 */
             public int getDirection() {
                 return direction;
             }
@@ -113,26 +127,31 @@ public class SeriesFunctions {
                 return symbol;
             }
 
+			/**
+			 * Set the optional direction value. Default is DIRECTION_TWO_SIDED = 0.
+			 *
+			 * @param direction
+			 */
             public void setDirection(int direction) {
                 this.direction = direction;
             }
 
             /**
-             * Create a new <code>F.Limit( arg1, ... )</code> expression from his <code>LimitData</code> object
+			 * Create a new <code>F.Limit( arg1, ... )</code> expression from this <code>LimitData</code> object
              *
              * @param arg1
              *            the first argument of the Limit expression
              * @return a new <code>F.Limit( arg1, ... )</code> expression
              */
-            public IAST limit(IExpr arg1) {
-				if (direction == DIRECTION_FROM_ABOVE) {
-					return F.Limit(arg1, rule, F.Rule(F.Direction, F.CN1));
-				}
-
-                if (direction == DIRECTION_FROM_BELOW) {
-                    return F.Limit(arg1, rule, F.Rule(F.Direction, F.C1));
-                }
-                return F.Limit(arg1, rule);
+			public IExpr limit(IExpr arg1) {
+				return evalLimitQuiet(arg1, this);
+				// if (direction == DIRECTION_FROM_ABOVE) {
+				// return F.Limit(arg1, rule, F.Rule(F.Direction, F.CN1));
+				// }
+				// if (direction == DIRECTION_FROM_BELOW) {
+				// return F.Limit(arg1, rule, F.Rule(F.Direction, F.C1));
+				// }
+				// return F.Limit(arg1, rule);
             }
 
             /**
@@ -141,8 +160,24 @@ public class SeriesFunctions {
              * @param ast
              * @return
              */
-            public IExpr mapLimit(final IAST ast) {
-                return ast.mapThread(limit(null), 1);
+			public IAST mapLimit(final IAST ast) {
+				// return ast.mapThread(limit(null), 1);
+				IASTMutable result = ast.copy();
+				boolean isIndeterminate = false;
+				boolean isLimit = false;
+				for (int i = 1; i < ast.size(); i++) {
+					IExpr temp = evalLimitQuiet(ast.get(i), this);
+					if (!temp.isFree(F.Limit)) {
+						isLimit = true;
+					} else if (temp.isIndeterminate()) {
+						isIndeterminate = true;
+					}
+					result.set(i, temp);
+				}
+				if (isLimit && isIndeterminate) {
+					return F.NIL;
+				}
+				return result;
             }
         }
 
@@ -150,8 +185,10 @@ public class SeriesFunctions {
             EvalEngine engine = EvalEngine.get();
             boolean quiet = engine.isQuietMode();
             try {
-                engine.setQuietMode(true);
-                return evalLimit(expr, data, true);
+				// engine.setQuietMode(true);
+				// return evalLimit(expr, data, true);
+				IExpr direction = data.getDirection() == DIRECTION_TWO_SIDED ? F.Reals : F.ZZ(data.getDirection());
+				return engine.evaluate(F.Limit(expr, data.getRule(), F.Rule(F.Direction, direction)));
             } finally {
                 engine.setQuietMode(quiet);
             }
@@ -159,17 +196,16 @@ public class SeriesFunctions {
         }
 
         /**
+		 * EValuate the limit for the given limit data.
          *
          * @param expr
          * @param data
          *            the limits data definition
-         * @param evalExpr
          * @return
          */
-        private static IExpr evalLimit(final IExpr expr, LimitData data, boolean evalExpr) {
+		private static IExpr evalLimit(final IExpr expr, LimitData data) {
             IExpr expression = expr;
 			final IExpr limitValue = data.getLimitValue();
-            if (evalExpr) {
                 IExpr result = F.evalQuiet(expression);
                 if (result.isNumericFunction()) {
                     return result;
@@ -187,37 +223,19 @@ public class SeriesFunctions {
                 }
 
 				if (limitValue.isNumericFunction()) {
-                    result = expression.replaceAll(data.getRule());
-                    if (result.isPresent()) {
-                        result = F.evalQuiet(result);
-						if (result.isNumericFunction() || result.isInfinity() || result.isNegativeInfinity()) {
-							// if (result.isZero()) {
-							// IExpr temp = F.evalQuiet(F.N(F.Greater(F.Subtract(expression, limitValue), F.C0)));
-							// if (temp != null) {
-							// IAssumptions assumptions = Assumptions.getInstance(temp);
-							// if (assumptions != null) {
-							// int direction = data.getDirection();
-							// if (assumptions.isNegative(data.getSymbol())) {
-							// if (direction == DIRECTION_TWO_SIDED || direction == DIRECTION_FROM_BELOW) {
-							// // data.setDirection(DIRECTION_FROM_BELOW);
-							// } else {
-							// return F.NIL;
-							// }
-							// } else if (assumptions.isNonNegative(data.getSymbol())) {
-							// if (direction == DIRECTION_TWO_SIDED || direction == DIRECTION_FROM_ABOVE) {
-							// // data.setDirection(DIRECTION_FROM_ABOVE);
-							// } else {
-							// return F.NIL;
-							// }
-							// }
-							// }
-							// }
-							// }
-                            return result;
+					IExpr temp = evalReplaceAll(expression, data);
+					if (temp.isPresent()) {
+						return temp;
                         }
+				} else if ((limitValue.isInfinity() || //
+						limitValue.isNegativeInfinity()) && //
+						expression.isAST() && //
+						expression.size() > 1) {
+					IExpr temp = limitInfinityZero((IAST) expression, data, (IAST) limitValue);
+					if (temp.isPresent()) {
+						return temp;
                     }
                 }
-            }
 
             if (expression.isAST()) {
 				if (!limitValue.isNumericFunction() && limitValue.isFree(F.DirectedInfinity)
@@ -243,6 +261,57 @@ public class SeriesFunctions {
             return F.NIL;
         }
 
+		private static IExpr evalReplaceAll(IExpr expression, LimitData data) {
+			IExpr result = expression.replaceAll(data.getRule());
+			if (result.isPresent()) {
+				result = F.evalQuiet(result);
+				if (result.isNumericFunction() || result.isInfinity() || result.isNegativeInfinity()) {
+					return result;
+				}
+			}
+			return F.NIL;
+		}
+
+		/**
+		 * <p>
+		 * Solve for example:<br />
+		 * <code>Limit(Gamma(1/t),t->Infinity) ==> Infinity</code> <br />
+		 * <code>Limit(Gamma(1/t),t->-Infinity)  ==> -Infinity</code>
+		 * </p>
+		 *
+		 * @param ast
+		 * @param data
+		 * @param limitValue
+		 *            <code>Infinity</code> or <code>-Infinity</code>
+		 * @return
+		 */
+		private static IExpr limitInfinityZero(IAST ast, LimitData data, final IAST limitValue) {
+			int direction = limitValue.isNegativeInfinity() ? DIRECTION_FROM_BELOW : DIRECTION_FROM_ABOVE;
+			int dataDirection = data.getDirection();
+			if (dataDirection == DIRECTION_TWO_SIDED || dataDirection == direction) {
+				int variableArgPosition = -1;
+				for (int i = 1; i < ast.size(); i++) {
+					if (!ast.get(i).isFree(data.getSymbol())) {
+						if (variableArgPosition == -1) {
+							variableArgPosition = i;
+						} else {
+							// more than 1 argument contains the symbol
+							return F.NIL;
+						}
+					}
+				}
+				if (variableArgPosition > 0) {
+					IExpr arg1 = evalLimitQuiet(ast.get(variableArgPosition), data);
+					if (arg1.isZero()) {
+
+						LimitData tempData = new LimitData(data.getSymbol(), F.C0, F.Rule(data.getSymbol(), F.C0),
+								direction);
+						return evalLimitQuiet(ast.setAtCopy(variableArgPosition, data.getSymbol()), tempData);
+					}
+				}
+			}
+			return F.NIL;
+		}
         /**
          * Try L'hospitales rule. See <a href="http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule"> Wikipedia
          * L'Hôpital's rule</a>
@@ -270,7 +339,7 @@ public class SeriesFunctions {
 							IInteger exp = frac.denominator(); // == 2
 							IExpr expr = engine.evalQuiet(F.Times(F.D(F.Power(numerator, exp), x),
 									F.Power(F.D(denominator.base(), x), F.CN1)));
-							expr = evalLimit(expr, data, true);
+							expr = evalLimit(expr, data);
 							if (expr.isNumber()) {
 								// Sqrt( expr )
 								return F.Power(expr, frac);
@@ -279,7 +348,7 @@ public class SeriesFunctions {
 					}
 				}
 				IExpr expr = engine.evalQuiet(F.Times(F.D(numerator, x), F.Power(F.D(denominator, x), F.CN1)));
-                    return evalLimit(expr, data, false);
+				return evalLimit(expr, data);
                 } catch (RecursionLimitExceeded rle) {
                     engine.setRecursionLimit(recursionLimit);
                 } finally {
@@ -518,9 +587,15 @@ public class SeriesFunctions {
             // IAST rule = data.getRule();
             IExpr base = powerAST.arg1();
 			IExpr exponent = powerAST.arg2();
-			if (exponent.equals(data.getSymbol()) && data.getLimitValue().isZero()) {
+			if (exponent.equals(data.getSymbol()) && data.getLimitValue().isZero() && !base.isZero()) {
                 return F.C1;
             }
+			if (base.isRealResult() && !base.isZero()) {
+				IExpr temp = evalReplaceAll(powerAST, data);
+				if (temp.isPresent()) {
+					return temp;
+				}
+			}
 			if (exponent.isFree(data.getSymbol())) {
 				final IExpr temp = evalLimitQuiet(base, data);
 				if (temp.isPresent()) {
@@ -805,7 +880,8 @@ public class SeriesFunctions {
                             direction = DIRECTION_FROM_BELOW;
                         } else if (option.isMinusOne()) {
                             direction = DIRECTION_FROM_ABOVE;
-                        } else if (option.equals(F.Automatic)) {
+						} else if (option.equals(F.Automatic) || //
+								option.equals(F.Reals)) {
                             direction = DIRECTION_TWO_SIDED;
                         } else {
 							throw new WrongArgumentType(ast, arg2, 2, "Limit: direction option expected!");
@@ -829,7 +905,7 @@ public class SeriesFunctions {
                             "Limit: limit value contains variable symbol for rule definition!");
                 }
                 LimitData data = new LimitData(symbol, limit, rule, direction);
-				return evalLimit(arg1, data, true);
+				return evalLimit(arg1, data);
             } finally {
                 engine.setNumericMode(numericMode);
             }
@@ -1400,7 +1476,7 @@ public class SeriesFunctions {
                             // TODO support other cases than 0
                             return F.NIL;
                         }
-                        x0 = F.integer(lowerLimit);
+				x0 = F.ZZ(lowerLimit);
                 }
 
                 final int degree = n.toIntDefault(Integer.MIN_VALUE);
