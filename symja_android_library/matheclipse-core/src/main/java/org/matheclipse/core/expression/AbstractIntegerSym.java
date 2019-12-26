@@ -168,7 +168,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	 *             if the specified character sequence does not contain a parsable large integer.
 	 */
 	public static IInteger valueOf(final String integerString, final int radix) {
-		if (integerString.length() >= 1) {
+		if (integerString.length() >= 1 && radix == 10) {
 			char ch = integerString.charAt(0);
 			if (ch == '-') {
 				if (integerString.length() == 2) {

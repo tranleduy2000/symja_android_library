@@ -7,9 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
-import org.matheclipse.core.trie.SuggestTree;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.interfaces.IAST;
@@ -19,6 +17,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.trie.SuggestTree;
 import org.matheclipse.core.trie.Tries;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.ast.FloatNode;
@@ -68,8 +67,8 @@ public class AST2Expr {
 			"AlgebraicNumber", "Alternatives", "Apart", "AppellF1", "Append", "AppendTo", "Apply", "ArcCos", "ArcCosh",
 			"ArcCot", "ArcCoth", "ArcCsc", "ArcCsch", "ArcSec", "ArcSech", "ArithmeticGeometricMean", "ArcSin",
 			"ArcSinh", "ArcTan", "ArcTanh", "Arg", "ArgMax", "ArgMin", "Array", "ArrayDepth", "ArrayPad",
-			"ArrayReshape", "Arrays", "ArrayQ", "Assumptions", "AtomQ", "Attributes", "BartlettWindow", "Begin",
-			"BeginPackage", "BellB", "BellY", "BernoulliB", "BernoulliDistribution", "BesselI", "BesselJ",
+			"ArrayReshape", "Arrays", "ArrayQ", "Assumptions", "AtomQ", "Attributes", "BartlettWindow", "BaseForm",
+			"Begin", "BeginPackage", "BellB", "BellY", "BernoulliB", "BernoulliDistribution", "BesselI", "BesselJ",
 			"BesselJZero", "BesselK", "BesselY", "BesselYZero", "Beta", "BetaDistribution", "BetaRegularized",
 			"BinarySerialize", "BinaryDeserialize", "BinCounts", "Binomial", "BinomialDistribution", "BitLength",
 			"BlackmanHarrisWindow", "BlackmanNuttallWindow", "BlackmanWindow", "Blank", "BlankSequence",
@@ -175,12 +174,12 @@ public class AST2Expr {
 			"TensorDimensions", "TensorProduct", "TensorRank", "TensorSymmetry", "TextCell", "TextString", "TeXForm",
 			"Thread", "Through", "Throw", "TimeConstrained", "Times", "TimesBy", "TimeValue", "Timing",
 			"ToCharacterCode", "ToExpression", "ToeplitzMatrix", "Together", "ToPolarCoordinates", "ToRadicals",
-			"ToString", "Total", "ToUnicode", "Tr", "Trace", "TraditionalForm", "Transpose", "TreeForm", "TrigExpand",
-			"TrigReduce", "TrigToExp", "TrueQ", "TukeyWindow", "Tuples", "TwoWayRule", "Undefined", "Underoverscript",
-			"UndirectedEdge", "Unequal", "Unevaluated", "UniformDistribution", "Union", "Unique", "UnitaryMatrixQ",
-			"UnitConvert", "Unitize", "UnitStep", "UnitVector", "Unprotect", "UnsameQ", "Unset", "UpperCaseQ",
-			"UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ", "VandermondeMatrix", "Variables", "Variance",
-			"VectorAngle", "VectorQ", "VertexEccentricity", "VertexList", "VertexQ", "WeibullDistribution",
+			"ToString", "Total", "ToUnicode", "Tr", "Trace", "TraceForm", "TraditionalForm", "Transpose", "TreeForm",
+			"TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "TukeyWindow", "Tuples", "TwoWayRule", "Undefined",
+			"Underoverscript", "UndirectedEdge", "Unequal", "Unevaluated", "UniformDistribution", "Union", "Unique",
+			"UnitaryMatrixQ", "UnitConvert", "Unitize", "UnitStep", "UnitVector", "Unprotect", "UnsameQ", "Unset",
+			"UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ", "VandermondeMatrix", "Variables",
+			"Variance", "VectorAngle", "VectorQ", "VertexEccentricity", "VertexList", "VertexQ", "WeibullDistribution",
 			"WeierstrassHalfPeriods", "WeierstrassInvariants", "WeierstrassP", "WeierstrassPPrime",
 			"WeightedAdjacencyMatrix", "Which", "While", "With", "WriteString", "Xor", "YuleDissimilarity",
 			"ZeroSymmetric", "Zeta" };
@@ -375,7 +374,7 @@ public class AST2Expr {
 				case ID.N:
 					if (ast.isAST2() && ast.arg2().isInteger()) {
 						try {
-							int precision = Validate.checkIntType(ast.arg2());
+							int precision = ast.arg2().toIntDefault();
 							if (EvalEngine.isApfloat(precision)) {
 								fPrecision = precision;
 								ast.set(1, convertNode(functionNode.get(1)));

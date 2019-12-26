@@ -358,9 +358,14 @@ public class BasicTeXTestCase extends TestCase {
     }
 	public void testTeX039() {
 		// gitlab #108
-		IExpr expr = EvalEngine.get().evaluate("SuperScript(2,10)");
+		IExpr expr = EvalEngine.get().evaluate("Superscript(2,10)");
 		check(expr, //
 				"{2}^{10}");
+	}
+	public void testTeX040() {
+		IExpr expr = EvalEngine.get().evaluate("Subscript(\"zzz\",36)");
+		check(expr, //
+				"{\\textnormal{zzz}}_{36}");
 	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();

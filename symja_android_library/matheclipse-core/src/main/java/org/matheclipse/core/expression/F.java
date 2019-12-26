@@ -374,6 +374,8 @@ public class F {
     public final static IBuiltInSymbol Background = F.initFinalSymbol("Background", ID.Background);
     /***/
     public final static IBuiltInSymbol BartlettWindow = F.initFinalSymbol("BartlettWindow", ID.BartlettWindow);
+	/***/
+	public final static IBuiltInSymbol BaseForm = F.initFinalSymbol("BaseForm", ID.BaseForm);
 	/** Begin("<context-name>") - start a new context definition */
     public final static IBuiltInSymbol Begin = F.initFinalSymbol("Begin", ID.Begin);
 	/** BeginPackage("<context-name>") - start a new package definition */
@@ -8443,6 +8445,9 @@ public class F {
         return new AST1(Subfactorial, a0);
     }
 
+	public static IAST Subscript(final IExpr a0, final IExpr a1) {
+		return new AST2(Subscript, a0, a1);
+	}
     /**
      * Substitute all (sub-) expressions <code>x</code> with <code>y</code>. If no substitution matches, the method
      * returns the given <code>expr</code>.
@@ -8578,6 +8583,9 @@ public class F {
         return intIterator(F.Plus, function, iMin, iMax, iStep);
     }
 
+	public static IAST Superscript(final IExpr a0, final IExpr a1) {
+		return new AST2(Superscript, a0, a1);
+	}
     public static IASTAppendable SurfaceGraphics() {
 
         return ast(SurfaceGraphics);
@@ -8910,6 +8918,18 @@ public class F {
         return AbstractIntegerSym.valueOf(integerValue);
     }
 
+	/**
+	 * Create a large integer number.
+	 *
+	 * @param integerString
+	 *            the integer number represented as a String
+	 * @param radix
+	 *            the radix to be used while parsing
+	 * @return Object
+	 */
+	public static IInteger ZZ(final String integerString, final int radix) {
+		return AbstractIntegerSym.valueOf(integerString, radix);
+	}
 	/**
 	 * The operator form <code>op(f)[expr]</code> is transformed to <code>op(expr, f)</code>
 	 *
