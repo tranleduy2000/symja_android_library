@@ -1970,6 +1970,8 @@ public class F {
 	/** PoissonDistribution(m) - returns a Poisson distribution. */
     public final static IBuiltInSymbol PoissonDistribution = F.initFinalSymbol("PoissonDistribution",
             ID.PoissonDistribution);
+	/***/
+	public final static IBuiltInSymbol PolarPlot = F.initFinalSymbol("PolarPlot", ID.PolarPlot);
     /***/
     public final static IBuiltInSymbol PolyGamma = F.initFinalSymbol("PolyGamma", ID.PolyGamma);
     /***/
@@ -4778,9 +4780,6 @@ public class F {
         return new AST2(ClearAttributes, a0, a1);
     }
 
-    public static IAST CNInfinity() {
-        return new AST2(Times, CN1, Infinity);
-    }
 
     public static IAST Coefficient(final IExpr a0, final IExpr a1) {
         return new AST2(Coefficient, a0, a1);

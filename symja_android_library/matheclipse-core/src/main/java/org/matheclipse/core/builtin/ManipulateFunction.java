@@ -68,7 +68,7 @@ public class ManipulateFunction {
 					IAST plot = (IAST) ast.arg1();
 					return mathcellSliderWithListPlot(ast, plot, engine);
 				} else if (ast.arg1().isAST(F.Plot) || //
-						ast.arg1().isAST(F.ParametricPlot)) {
+						ast.arg1().isAST(F.ParametricPlot) || ast.arg1().isAST(F.PolarPlot)) {
 					IAST plot = (IAST) ast.arg1();
 					if (plot.size() >= 3 && plot.arg2().isList()) {
 						IAST plotRangeX = (IAST) plot.arg2();
@@ -170,6 +170,9 @@ public class ManipulateFunction {
 						optionPlotRange = F.List(F.Full, F.List(plotRange.negate(), plotRange));
 					} else if (plotID == ID.ListPlot || plotID == ID.ListLinePlot) {
 						optionPlotRange = F.List(F.Full, F.List(F.C0, plotRange));
+					} else if (plotID == ID.PolarPlot) {
+						optionPlotRange = F.List(F.List(plotRange.negate(), plotRange), //
+								F.List(plotRange.negate(), plotRange));
 					} else if (plotID == ID.ParametricPlot) {
 						optionPlotRange = F.List(F.List(plotRange.negate(), plotRange), //
 								F.List(plotRange.negate(), plotRange));
@@ -251,7 +254,8 @@ public class ManipulateFunction {
 			}
 			graphicControl.append("];\n");
 		} else {
-			if (plotID == ID.ParametricPlot) {
+			if (plotID == ID.ParametricPlot || //
+					plotID == ID.PolarPlot) {
 				graphicControl.append("var data = [ parametric( ");
 				toJS.convert(graphicControl, plotSymbolX);
 				graphicControl.append(" => [");
@@ -1009,7 +1013,8 @@ public class ManipulateFunction {
 					} catch (RuntimeException rex) {
 					}
 					// optionPlotRange = F.List(F.Full, F.List(plotRange.negate(), plotRange));
-				} else if (plotID == ID.ParametricPlot) {
+				} else if (plotID == ID.ParametricPlot || //
+						plotID == ID.PolarPlot) {
 					try {
 						plotRangeYMin = engine.evalDouble(plotRangeY.negate());
 						plotRangeYMax = engine.evalDouble(plotRangeY);
@@ -1041,7 +1046,8 @@ public class ManipulateFunction {
 		// } catch (RuntimeException rex) {
 		// }
 		// }
-		if (plotID == ID.ParametricPlot && //
+		if ((plotID == ID.ParametricPlot || //
+				plotID == ID.PolarPlot) && //
 				plotRangeYMax != Double.MIN_VALUE && //
 				plotRangeYMin != Double.MAX_VALUE) {
 			try {
@@ -1054,11 +1060,12 @@ public class ManipulateFunction {
 		StringBuilder function = new StringBuilder();
 
 		// boundingbox = new double[] { 0.0, Double.MIN_VALUE, listOfFunctions.size(), Double.MAX_VALUE };
-		if (plotID == ID.ParametricPlot) {
+		if (plotID == ID.ParametricPlot || //
+				plotID == ID.PolarPlot) {
 		IAST listOfFunctions = (IAST) arg1;
 			int[] dim = arg1.isMatrix();
 			if (dim == null) {
-				if (listOfFunctions.size() != 3) {
+				if (plotID == ID.ParametricPlot && listOfFunctions.size() != 3) {
 					return F.NIL;
 				}
 			} else {
@@ -1084,6 +1091,30 @@ public class ManipulateFunction {
 		}
 			}
 
+			if (plotID == ID.PolarPlot) {
+				function.append("board.create('curve', [");
+				for (int i = 1; i < listOfFunctions.size(); i++) {
+					function.append("function(");
+					toJS.convert(function, plotSymbolX);
+					function.append("){return z");
+					function.append(i);
+					function.append("(");
+					toJS.convert(function, plotSymbolX);
+					function.append(");}");
+					if (i < listOfFunctions.size() - 1) {
+						function.append(",");
+					}
+				}
+				function.append(",[1,0], ");
+
+				toJS.convert(function, plotRangeX.arg2());
+				function.append(", ");
+				toJS.convert(function, plotRangeX.arg3());
+
+
+				function.append("]");
+				function.append(", {curveType:'polar'} );\n");
+			} else {
 			function.append("board.create('curve',[");
 			// graphicControl.append(OutputFunctions.toJSXGraph(plotSymbolX));
 			// graphicControl.append(" => [");
@@ -1103,6 +1134,7 @@ public class ManipulateFunction {
 			jsxgraphRangeArgs(function, plotRangeX, -1, toJS);
 			function.append("]");
 			function.append(", { } );\n");
+			}
 			if (!F.isFuzzyEquals(Double.MAX_VALUE, plotRangeXMin, 1e-10)
 					&& F.isFuzzyEquals(Double.MAX_VALUE, boundingbox[0], 1e-10)) {
 				boundingbox[0] = plotRangeXMin;

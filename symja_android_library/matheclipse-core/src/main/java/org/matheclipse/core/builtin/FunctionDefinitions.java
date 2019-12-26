@@ -1,7 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import org.matheclipse.core.expression.F;
-
 import static org.matheclipse.core.expression.F.Compile;
 import static org.matheclipse.core.expression.F.ComplexExpand;
 import static org.matheclipse.core.expression.F.CreateDirectory;
@@ -15,6 +13,7 @@ import static org.matheclipse.core.expression.F.ExpToTrig;
 import static org.matheclipse.core.expression.F.Export;
 import static org.matheclipse.core.expression.F.FindInstance;
 import static org.matheclipse.core.expression.F.FindRoot;
+import static org.matheclipse.core.expression.F.Fourier;
 import static org.matheclipse.core.expression.F.FrobeniusSolve;
 import static org.matheclipse.core.expression.F.FunctionExpand;
 import static org.matheclipse.core.expression.F.HeavisideTheta;
@@ -43,6 +42,7 @@ import static org.matheclipse.core.expression.F.Outer;
 import static org.matheclipse.core.expression.F.ParametricPlot;
 import static org.matheclipse.core.expression.F.Plot;
 import static org.matheclipse.core.expression.F.Plot3D;
+import static org.matheclipse.core.expression.F.PolarPlot;
 import static org.matheclipse.core.expression.F.Product;
 import static org.matheclipse.core.expression.F.Share;
 import static org.matheclipse.core.expression.F.Solve;
@@ -74,7 +74,7 @@ public final class FunctionDefinitions {
 			ExpToTrig.setEvaluator(new org.matheclipse.core.reflection.system.ExpToTrig());
 			FindInstance.setEvaluator(new org.matheclipse.core.reflection.system.FindInstance());
 			FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
-			F.Fourier.setEvaluator(new org.matheclipse.core.reflection.system.Fourier());
+			Fourier.setEvaluator(new org.matheclipse.core.reflection.system.Fourier());
 			FrobeniusSolve.setEvaluator(new org.matheclipse.core.reflection.system.FrobeniusSolve());
 			FunctionExpand.setEvaluator(new org.matheclipse.core.reflection.system.FunctionExpand());
 			HeavisideTheta.setEvaluator(new org.matheclipse.core.reflection.system.HeavisideTheta());
@@ -103,6 +103,7 @@ public final class FunctionDefinitions {
 			ParametricPlot.setEvaluator(new org.matheclipse.core.reflection.system.ParametricPlot());
 			Plot.setEvaluator(new org.matheclipse.core.reflection.system.Plot());
 			Plot3D.setEvaluator(new org.matheclipse.core.reflection.system.Plot3D());
+			PolarPlot.setEvaluator(new org.matheclipse.core.reflection.system.PolarPlot());
 			Product.setEvaluator(new org.matheclipse.core.reflection.system.Product());
 
 			Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());
