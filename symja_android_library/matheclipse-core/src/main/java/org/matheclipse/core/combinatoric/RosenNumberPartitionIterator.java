@@ -1,6 +1,6 @@
-package org.matheclipse.combinatoric;
+package org.matheclipse.core.combinatoric;
 
-import org.matheclipse.combinatoric.util.ReadOnlyIterator;
+import org.matheclipse.core.combinatoric.util.ReadOnlyIterator;
 
 /**
  * <p>

@@ -9,7 +9,7 @@
  *
  * Created Sep 4, 2009
  */
-package org.matheclipse.combinatoric.util;
+package org.matheclipse.core.combinatoric.util;
 
 import java.util.Iterator;
 

@@ -2,8 +2,8 @@ package org.matheclipse.core.patternmatching;
 
 import com.duy.annotations.Nonnull;
 
-import org.matheclipse.combinatoric.AbstractListStepVisitor;
-import org.matheclipse.combinatoric.NumberPartitionsIterator;
+import org.matheclipse.core.combinatoric.AbstractListStepVisitor;
+import org.matheclipse.core.combinatoric.NumberPartitionsIterator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;

@@ -1,4 +1,4 @@
-package org.matheclipse.combinatoric;
+package org.matheclipse.core.combinatoric;
 
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -64,7 +64,7 @@ public abstract class AbstractMultisetStepVisitor<T extends IExpr> extends Abstr
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.matheclipse.combinatoric.IStepVisitor#visit(int[][])
+	 * @see IStepVisitor#visit(int[][])
 	 */
 	// public boolean visit(int[][] result) {
 	// // print the result to console

@@ -3,8 +3,8 @@ package org.matheclipse.core.numbertheory;
 import com.gx.common.math.BigIntegerMath;
 import com.gx.common.math.LongMath;
 
-import org.matheclipse.combinatoric.KSubsets;
-import org.matheclipse.combinatoric.KSubsets.KSubsetsList;
+import org.matheclipse.core.combinatoric.KSubsets;
+import org.matheclipse.core.combinatoric.KSubsets.KSubsetsList;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.expression.AbstractIntegerSym;

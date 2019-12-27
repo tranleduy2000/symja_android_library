@@ -1,4 +1,4 @@
-package org.matheclipse.combinatoric;
+package org.matheclipse.core.combinatoric;
 
 import com.duy.ref.ObjectRef;
 import com.google.j2objc.annotations.AutoreleasePool;

@@ -5,9 +5,9 @@ import com.duy.lambda.Predicate;
 import com.duy.ref.ObjectRef;
 import com.google.j2objc.annotations.AutoreleasePool;
 
-import org.matheclipse.combinatoric.IStepVisitor;
-import org.matheclipse.combinatoric.MultisetPartitionsIterator;
-import org.matheclipse.combinatoric.NumberPartitionsIterator;
+import org.matheclipse.core.combinatoric.IStepVisitor;
+import org.matheclipse.core.combinatoric.MultisetPartitionsIterator;
+import org.matheclipse.core.combinatoric.NumberPartitionsIterator;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ConditionException;
