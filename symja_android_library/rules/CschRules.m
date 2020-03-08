@@ -19,8 +19,8 @@
  Csch(ArcCoth(x_)):=Sqrt(x-1)*Sqrt(x+1),
  Csch(ArcSech(x_)):=x/(Sqrt((1 - x)/(1 + x))*(1 + x)),
  Csch(ArcCsch(x_)):=x,
- Csch(Log(x_)):=2/(x-1/x),
-
+ Csch(Log(x_)):=2*x/(-1+x^2),
+ 
  Csch(Infinity)=0,
  Csch(ComplexInfinity)=Indeterminate 
 }
