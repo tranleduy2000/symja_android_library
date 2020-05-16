@@ -23,6 +23,8 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
@@ -31,6 +33,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
+import org.matheclipse.core.expression.IntervalSym;
 import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.generic.Comparators;
 import org.matheclipse.core.interfaces.IAST;
@@ -74,45 +77,46 @@ public final class BooleanFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.AllTrue.setEvaluator(new AllTrue());
-		F.And.setEvaluator(new And());
-		F.AnyTrue.setEvaluator(new AnyTrue());
-		F.Boole.setEvaluator(new Boole());
-		F.BooleanConvert.setEvaluator(new BooleanConvert());
-		F.BooleanMinimize.setEvaluator(new BooleanMinimize());
-		F.BooleanTable.setEvaluator(new BooleanTable());
-		F.BooleanVariables.setEvaluator(new BooleanVariables());
-		F.Equal.setEvaluator(CONST_EQUAL);
-		F.Equivalent.setEvaluator(new Equivalent());
-		F.Exists.setEvaluator(new Exists());
-		F.ForAll.setEvaluator(new ForAll());
-		F.Greater.setEvaluator(CONST_GREATER);
-		F.GreaterEqual.setEvaluator(new GreaterEqual());
-		F.Implies.setEvaluator(new Implies());
-		F.Inequality.setEvaluator(new Inequality());
-		F.Less.setEvaluator(CONST_LESS);
-		F.LessEqual.setEvaluator(new LessEqual());
-		F.Max.setEvaluator(new Max());
-		F.Min.setEvaluator(new Min());
-		F.Nand.setEvaluator(new Nand());
-		F.Negative.setEvaluator(new Negative());
-		F.NoneTrue.setEvaluator(new NoneTrue());
-		F.NonNegative.setEvaluator(new NonNegative());
-		F.NonPositive.setEvaluator(new NonPositive());
-		F.Nor.setEvaluator(new Nor());
-		F.Not.setEvaluator(new Not());
-		F.Or.setEvaluator(new Or());
-		F.Positive.setEvaluator(new Positive());
-		F.SameQ.setEvaluator(new SameQ());
-		F.SatisfiabilityCount.setEvaluator(new SatisfiabilityCount());
-		F.SatisfiabilityInstances.setEvaluator(new SatisfiabilityInstances());
-		F.SatisfiableQ.setEvaluator(new SatisfiableQ());
-		F.TautologyQ.setEvaluator(new TautologyQ());
-		F.TrueQ.setEvaluator(new TrueQ());
-		F.Unequal.setEvaluator(new Unequal());
-		F.UnsameQ.setEvaluator(new UnsameQ());
-		F.Xor.setEvaluator(new Xor());
-	}
+			F.AllTrue.setEvaluator(new AllTrue());
+			F.And.setEvaluator(new And());
+			F.AnyTrue.setEvaluator(new AnyTrue());
+			F.Boole.setEvaluator(new Boole());
+			F.BooleanConvert.setEvaluator(new BooleanConvert());
+			F.BooleanMinimize.setEvaluator(new BooleanMinimize());
+			F.BooleanTable.setEvaluator(new BooleanTable());
+			F.BooleanVariables.setEvaluator(new BooleanVariables());
+			F.Equal.setEvaluator(CONST_EQUAL);
+			F.Equivalent.setEvaluator(new Equivalent());
+			F.Exists.setEvaluator(new Exists());
+			F.ForAll.setEvaluator(new ForAll());
+			F.Greater.setEvaluator(CONST_GREATER);
+			F.GreaterEqual.setEvaluator(new GreaterEqual());
+			F.Implies.setEvaluator(new Implies());
+			F.Inequality.setEvaluator(new Inequality());
+			F.Less.setEvaluator(CONST_LESS);
+			F.LessEqual.setEvaluator(new LessEqual());
+			F.Max.setEvaluator(new Max());
+			F.Min.setEvaluator(new Min());
+			F.MinMax.setEvaluator(new MinMax());
+			F.Nand.setEvaluator(new Nand());
+			F.Negative.setEvaluator(new Negative());
+			F.NoneTrue.setEvaluator(new NoneTrue());
+			F.NonNegative.setEvaluator(new NonNegative());
+			F.NonPositive.setEvaluator(new NonPositive());
+			F.Nor.setEvaluator(new Nor());
+			F.Not.setEvaluator(new Not());
+			F.Or.setEvaluator(new Or());
+			F.Positive.setEvaluator(new Positive());
+			F.SameQ.setEvaluator(new SameQ());
+			F.SatisfiabilityCount.setEvaluator(new SatisfiabilityCount());
+			F.SatisfiabilityInstances.setEvaluator(new SatisfiabilityInstances());
+			F.SatisfiableQ.setEvaluator(new SatisfiableQ());
+			F.TautologyQ.setEvaluator(new TautologyQ());
+			F.TrueQ.setEvaluator(new TrueQ());
+			F.Unequal.setEvaluator(new Unequal());
+			F.UnsameQ.setEvaluator(new UnsameQ());
+			F.Xor.setEvaluator(new Xor());
+		}
 	}
 
 	final private static class LogicFormula {
@@ -146,18 +150,17 @@ public final class BooleanFunctions {
 			this.factory = factory;
 		}
 
-		public Variable[] ast2Variable(final IAST listOfSymbols) throws ClassCastException {
+		public Variable[] ast2Variable(final IAST listOfSymbols) {
 			if (listOfSymbols instanceof IAST) {
 				Variable[] result = new Variable[listOfSymbols.argSize()];
 				for (int i = 1; i < listOfSymbols.size(); i++) {
 					IExpr temp = listOfSymbols.get(i);
 					if (temp instanceof ISymbol) {
 						ISymbol symbol = (ISymbol) temp;
-						if (symbol.isFalse()) {
-							throw new ClassCastException(F.False.toString());
-						}
-						if (symbol.isTrue()) {
-							throw new ClassCastException(F.True.toString());
+						if (symbol.isFalse() || symbol.isTrue()) {
+							// `1` is not a valid variable.
+							String str = IOFunctions.getMessage("ivar", F.List(symbol), EvalEngine.get());
+							throw new ArgumentTypeException(str);
 						}
 						Variable v = symbol2variableMap.get(symbol);
 						if (v == null) {
@@ -169,15 +172,19 @@ public final class BooleanFunctions {
 							result[i - 1] = v;
 						}
 					} else {
-						throw new ClassCastException(temp.toString());
+						// `1` is not a valid variable.
+						String str = IOFunctions.getMessage("ivar", F.List(temp), EvalEngine.get());
+						throw new ArgumentTypeException(str);
 					}
 				}
 				return result;
 			}
-			throw new ClassCastException(listOfSymbols.toString());
+			// `1` is not a valid variable.
+			String str = IOFunctions.getMessage("ivar", F.List(listOfSymbols), EvalEngine.get());
+			throw new ArgumentTypeException(str);
 		}
 
-		public IExpr booleanFunction2Expr(final Formula formula) throws ClassCastException {
+		public IExpr booleanFunction2Expr(final Formula formula) {
 			if (formula instanceof org.logicng.formulas.And) {
 				org.logicng.formulas.And a = (org.logicng.formulas.And) formula;
 				IExpr[] result = new IExpr[a.numberOfOperands()];
@@ -211,7 +218,10 @@ public final class BooleanFunctions {
 				}
 				return F.Not(mapToSymbol(a.variable()));
 			}
-			throw new ClassCastException(formula.toString());
+			// illegal arguments: \"`1`\" in `2`
+			String str = IOFunctions.getMessage("argillegal",
+					F.List(F.stringx(formula.toString()), F.stringx("LogicFormula")), EvalEngine.get());
+			throw new ArgumentTypeException(str);
 		}
 
 		private ISymbol mapToSymbol(Variable v) {
@@ -248,7 +258,7 @@ public final class BooleanFunctions {
 			return factory.or(factory.and(arg1, factory.not(arg2)), factory.and(factory.not(arg1), arg2));
 		}
 
-		public Formula expr2BooleanFunction(final IExpr logicExpr) throws ClassCastException {
+		public Formula expr2BooleanFunction(final IExpr logicExpr) {
 			if (logicExpr instanceof IAST) {
 				final IAST ast = (IAST) logicExpr;
 				int functionID = ast.headID();
@@ -346,6 +356,11 @@ public final class BooleanFunctions {
 				if (symbol.isTrue()) {
 					return factory.verum();
 				}
+				if (!symbol.isVariable() || symbol.isProtected()) {
+					// `1` is not a valid variable.
+					String message = IOFunctions.getMessage("ivar", F.List(symbol), EvalEngine.get());
+					throw new ArgumentTypeException(message);
+				}
 				Variable v = symbol2variableMap.get(symbol);
 				if (v == null) {
 					final Variable value = factory.variable(symbol.getSymbolName());
@@ -355,19 +370,24 @@ public final class BooleanFunctions {
 				}
 				return v;
 			}
-			throw new ClassCastException(logicExpr.toString());
+			// illegal arguments: \"`1`\" in `2`
+			String str = IOFunctions.getMessage("argillegal", F.List(logicExpr, F.stringx("LogicFormula")),
+					EvalEngine.get());
+			throw new ArgumentTypeException(str);
 		}
 
 		public FormulaFactory getFactory() {
 			return factory;
 		}
 
-		public Collection<Variable> list2LiteralCollection(final IAST list) throws ClassCastException {
+		private Collection<Variable> list2LiteralCollection(final IAST list) {
 			Collection<Variable> arr = new ArrayList<Variable>(list.argSize());
 			for (int i = 1; i < list.size(); i++) {
 				IExpr temp = list.get(i);
 				if (!temp.isSymbol()) {
-					throw new ClassCastException(temp.toString());
+					// illegal arguments: \"`1`\" in `2`
+					String str = IOFunctions.getMessage("argillegal", F.List(temp, list), EvalEngine.get());
+					throw new ArgumentTypeException(str);
 				}
 
 				ISymbol symbol = (ISymbol) temp;
@@ -849,10 +869,9 @@ public final class BooleanFunctions {
 					return lf.booleanFunction2Expr(formula.transform(transformation));
 				}
 
-			} catch (ClassCastException cce) {
-				if (Config.DEBUG) {
-					cce.printStackTrace();
-				}
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			}
 			return F.NIL;
 		}
@@ -910,6 +929,7 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			try {
 			FormulaFactory factory = new FormulaFactory();
 			LogicFormula lf = new LogicFormula(factory);
 
@@ -929,7 +949,7 @@ public final class BooleanFunctions {
 						vars.append(temp);
 					}
 				}
-				if (rest.size() == 1) {
+					if (rest.isEmpty()) {
 					vars = F.Or();
 				} else {
 				formula = lf.expr2BooleanFunction(rest);
@@ -952,6 +972,13 @@ public final class BooleanFunctions {
 			// TODO CNF form after minimizing blows up the formula.
 			// FormulaTransformation transformation = BooleanConvert.transformation(ast, engine);
 			// return lf.booleanFunction2Expr(formula.transform(transformation));
+			} catch (final ValidateException ve) {
+				// int number validation
+				engine.printMessage(ast.topHead(), ve);
+			} catch (RuntimeException rex) {
+
+			}
+			return ast.arg1();
 		}
 
 		public int[] expectedArgSize() {
@@ -999,6 +1026,11 @@ public final class BooleanFunctions {
 				}
 				IExpr sym = variables.get(position);
 				if (sym.isSymbol()) {
+					if (sym.isBuiltInSymbol() || !sym.isVariable()) {
+						// Cannot assign to raw object `1`.
+						throw new ArgumentTypeException(
+								IOFunctions.getMessage("setraw", F.List(sym), EvalEngine.get()));
+					}
 					ISymbol symbol = (ISymbol) sym;
 					IExpr value = symbol.assignedValue();
 					try {
@@ -1025,7 +1057,7 @@ public final class BooleanFunctions {
 			if (ast.isAST2()) {
 				variables = ast.arg2().orNewList();
 				} else {
-				variables = BooleanVariables.booleanVariables(ast.arg2());
+				variables = BooleanVariables.booleanVariables(ast.arg1());
 			}
 
 			BooleanTableParameter btp = new BooleanTableParameter(variables, engine);
@@ -2221,7 +2253,7 @@ public final class BooleanFunctions {
 						lastOp = op;
 					}
 				}
-				if (res.size() == 1) {
+				if (res.isEmpty()) {
 			return F.True;
 		}
 				if (res.size() == 4) {
@@ -2474,13 +2506,8 @@ public final class BooleanFunctions {
 				return F.CNInfinity;
 			}
 
-			if (ast.arg1().isInterval1()) {
-				IAST list = (IAST) ast.arg1().first();
-				try {
-					return list.arg2();
-				} catch (ClassCastException cca) {
-					// do nothing
-				}
+			if (ast.arg1().isInterval()) {
+				return IntervalSym.max((IAST) ast.arg1());
 			}
 
 			IAST resultList = EvalAttributes.flattenDeep(F.List, ast);
@@ -2512,6 +2539,9 @@ public final class BooleanFunctions {
 			}
 			if (!evaled) {
 				evaled = flattenedList;
+			}
+			if (list.isEmpty()) {
+				return F.CNInfinity;
 			}
 			IExpr max1;
 			IExpr max2;
@@ -2618,13 +2648,8 @@ public final class BooleanFunctions {
 				return F.CInfinity;
 			}
 
-			if (ast.arg1().isInterval1()) {
-				IAST list = (IAST) ast.arg1().first();
-				try {
-					return list.arg1();
-				} catch (ClassCastException cca) {
-					// do nothing
-				}
+			if (ast.arg1().isInterval()) {
+				return IntervalSym.min((IAST) ast.arg1());
 			}
 
 			IAST resultList = EvalAttributes.flattenDeep(F.List, ast);
@@ -2657,6 +2682,9 @@ public final class BooleanFunctions {
 				evaled = flattenedList;
 			}
 
+			if (list.isEmpty()) {
+				return F.CInfinity;
+			}
 			IExpr min1;
 			IExpr min2;
 			min1 = list.arg1();
@@ -2708,6 +2736,44 @@ public final class BooleanFunctions {
 		}
 	}
 
+	private static class MinMax extends AbstractFunctionEvaluator {
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+			if (ast.isAST1()) {
+				if (arg1.isList() || arg1.isAssociation()) {
+					return F.List(F.Min(arg1), F.Max(arg1));
+				}
+			} else if (ast.isAST2()) {
+				IExpr arg2 = ast.arg2();
+				if (arg1.isList() || arg1.isAssociation()) {
+					if (arg2.isList()) {
+						if (arg2.size() == 3 && //
+								arg2.first().isNumericFunction() && //
+								arg2.second().isNumericFunction()) {
+							return F.List(F.Subtract(F.Min(arg1), arg2.first()), F.Plus(F.Max(arg1), arg2.second()));
+						}
+					} else if (arg2.isNumericFunction()) {
+						return F.List(F.Subtract(F.Min(arg1), arg2), F.Plus(F.Max(arg1), arg2));
+					} else if (arg2.isAST(F.Scaled, 2) && //
+							arg2.first().isNumericFunction()) {
+						IExpr delta = engine.evaluate(F.Times(arg2.first(), F.Subtract(F.Max(arg1), F.Min(arg1))));
+						return F.List(F.Subtract(F.Min(arg1), delta), F.Plus(F.Max(arg1), delta));
+					}
+				}
+			}
+
+			return F.NIL;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+	}
 	/**
 	 * <pre>
 	 * Nand(arg1, arg2, ...)'
@@ -2810,8 +2876,8 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			    IExpr arg1 = ast.arg1();
-			    if (arg1.isReal()) {
-			    	return F.bool(arg1.isNegative());
+			if (arg1.isNegativeResult()) {
+				return F.True;
 			    }
 			    if (arg1.isNumber()) {
 			    	return F.False;
@@ -2964,8 +3030,8 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = ast.arg1();
-			if (arg1.isReal()) {
-				return F.bool(!arg1.isNegative());
+			if (arg1.isNonNegativeResult()) {
+				return F.True;
 			}
 			if (arg1.isNumber()) {
 				return F.False;
@@ -3017,15 +3083,15 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = ast.arg1();
-			if (arg1.isReal()) {
-				return F.bool(!arg1.isPositive());
+			if (arg1.isNegativeResult() || arg1.isZero()) {
+				return F.True;
 			}
 			if (arg1.isNumber()) {
 				return F.False;
 			}
 			ISignedNumber signedNumber = arg1.evalReal();
 			if (signedNumber != null) {
-				return F.bool(!signedNumber.isPositive());
+				return F.bool(signedNumber.isNegative() || signedNumber.isZero());
 			}
 			return F.NIL;
 		}
@@ -3336,8 +3402,8 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = ast.arg1();
-			if (arg1.isNumber()) {
-				return F.bool(arg1.isPositive());
+			if (arg1.isPositiveResult()) {
+				return F.True;
 			}
 			if (arg1.isNumber()) {
 				return F.False;
@@ -3469,13 +3535,11 @@ public final class BooleanFunctions {
 					userDefinedVariables = vSet.getVarList();
 				}
 				return logicNGSatisfiabilityCount(arg1, userDefinedVariables);
-			} catch (ClassCastException cce) {
-				if (Config.DEBUG) {
-					cce.printStackTrace();
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 				}
 			}
-			return F.NIL;
-		}
 
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_3;
@@ -3498,7 +3562,7 @@ public final class BooleanFunctions {
 			miniSat.add(formula);
 			Variable[] vars = lf.ast2Variable(variables);
 			List<Assignment> assignments = miniSat.enumerateAllModels(vars);
-			return F.integer(assignments.size());
+			return F.ZZ(assignments.size());
 		}
 	}
 
@@ -3541,11 +3605,20 @@ public final class BooleanFunctions {
 			IAST userDefinedVariables;
 			IExpr arg1 = ast.arg1();
 			try {
+				VariablesSet vSet = new VariablesSet(arg1);
+				IAST variablesInFormula = vSet.getVarList();
 				// currently only SAT is available
 				String method = "SAT";
 				int maxChoices = 1;
 				if (ast.size() > 2) {
 					userDefinedVariables = ast.arg2().orNewList();
+					IExpr complement = F.Complement.of(engine, userDefinedVariables, variablesInFormula);
+					if (complement.size() > 1 && complement.isList()) {
+						IASTAppendable or = F.Or();
+						or.append(arg1);
+						arg1 = or;
+						or.appendArgs((IAST) complement);
+					}
 					if (ast.size() > 3) {
 						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine);
 						// "BDD" (binary decision diagram), "SAT", "TREE" ?
@@ -3556,24 +3629,22 @@ public final class BooleanFunctions {
 					}
 
 					IExpr argN = ast.last();
+					if (!argN.isRule()) {
 					if (argN.equals(F.All)) {
 						maxChoices = Integer.MAX_VALUE;
-					} else if (argN.isReal()) {
-						ISignedNumber sn = (ISignedNumber) argN;
-						maxChoices = sn.toIntDefault(0);
+						} else if (argN.isNumber()) {
+							maxChoices = Validate.checkPositiveIntType(ast, ast.argSize());
+						}
 					}
 				} else {
-					VariablesSet vSet = new VariablesSet(arg1);
-					userDefinedVariables = vSet.getVarList();
+					userDefinedVariables = variablesInFormula;
 				}
 				return satisfiabilityInstances(arg1, userDefinedVariables, maxChoices);
-			} catch (ClassCastException cce) {
-				if (Config.DEBUG) {
-					cce.printStackTrace();
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ast.topHead(), ve);
 				}
 			}
-			return F.NIL;
-		}
 
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_3;
@@ -3633,13 +3704,11 @@ public final class BooleanFunctions {
 					return logicNGSatisfiableQ(arg1);
 				}
 				return bruteForceSatisfiableQ(arg1, userDefinedVariables, 1) ? F.True : F.False;
-			} catch (ClassCastException cce) {
-				if (Config.DEBUG) {
-					cce.printStackTrace();
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 				}
 			}
-			return F.NIL;
-		}
 
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_3;
@@ -3680,6 +3749,10 @@ public final class BooleanFunctions {
 			}
 			IExpr sym = variables.get(position);
 			if (sym.isSymbol()) {
+				if (sym.isBuiltInSymbol() || !sym.isVariable()) {
+					// Cannot assign to raw object `1`.
+					throw new ArgumentTypeException(IOFunctions.getMessage("setraw", F.List(sym), EvalEngine.get()));
+				}
 				ISymbol symbol = (ISymbol) sym;
 				IExpr value = symbol.assignedValue();
 				try {
@@ -3746,13 +3819,11 @@ public final class BooleanFunctions {
 				}
 
 				return bruteForceTautologyQ(arg1, userDefinedVariables, 1) ? F.True : F.False;
-			} catch (ClassCastException cce) {
-				if (Config.DEBUG) {
-					cce.printStackTrace();
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 				}
 			}
-			return F.NIL;
-		}
 
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_2;
@@ -3790,6 +3861,10 @@ public final class BooleanFunctions {
 			}
 			IExpr sym = variables.get(position);
 			if (sym.isSymbol()) {
+				if (sym.isBuiltInSymbol() || !sym.isVariable()) {
+					// Cannot assign to raw object `1`.
+					throw new ArgumentTypeException(IOFunctions.getMessage("setraw", F.List(sym), EvalEngine.get()));
+				}
 				ISymbol symbol = (ISymbol) sym;
 				IExpr value = symbol.assignedValue();
 				try {
@@ -4064,7 +4139,7 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.size() == 1) {
+			if (ast.isEmpty()) {
 				return F.False;
 			}
 			if (ast.size() == 2) {
