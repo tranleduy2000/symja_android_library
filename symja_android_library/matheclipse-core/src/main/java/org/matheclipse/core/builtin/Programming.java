@@ -5,6 +5,7 @@ import com.duy.concurrent.ExecutorService;
 import com.duy.concurrent.Executors;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
+import com.duy.lambda.ObjIntConsumer;
 import com.gx.common.util.concurrent.SimpleTimeLimiter;
 import com.gx.common.util.concurrent.TimeLimiter;
 
@@ -22,6 +23,7 @@ import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
@@ -34,6 +36,7 @@ import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IIterator;
@@ -642,14 +645,16 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			try {
 					final java.util.List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
-				ast.forEach(2, ast.size(), new Consumer<IExpr>() {
+				ast.forEach(2, ast.size(), new ObjIntConsumer<IExpr>() {
 					@Override
-					public void accept(IExpr x) {
-						iterList.add(Iterator.create((IAST) x, engine));
+					public void accept(IExpr x, int i) {
+						iterList.add(Iterator.create((IAST) x, i, engine));
 					}
 				});
 				final DoIterator generator = new DoIterator(iterList, engine);
 				return generator.doIt(ast.arg1());
+			} catch (final ValidateException ve) {
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} catch (final NoEvalException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
@@ -717,11 +722,12 @@ public final class Programming {
 
 			boolean numericMode = engine.isNumericMode();
 			try {
-				// use EvalEngine's iterationLimit only for evaluation control
-				// final int iterationLimit = engine.getIterationLimit();
-				// int iterationCounter = 1;
 
 				IExpr f = ast.arg1();
+				if (f.isAtom() && !f.isSymbol()) {
+					// Nonatomic expression expected at position `1` in `2`.
+					return IOFunctions.printMessage(ast.topHead(), "normal", F.List(F.C1, ast), engine);
+				}
 				IExpr current = ast.arg2();
 				int iterations = Integer.MAX_VALUE;
 				if (ast.isAST3()) {
@@ -731,11 +737,12 @@ public final class Programming {
 					} else if (arg3.isNegativeInfinity()) {
 						iterations = Integer.MIN_VALUE;
 					} else {
-						iterations = Validate.checkIntType(arg3, Integer.MIN_VALUE);
+						iterations = Validate.checkNonNegativeIntType(ast, 3);
 					}
 				}
 				if (iterations < 0) {
-					return engine.printMessage("FixedPoint: Non-negative integer expected.");
+					// Non-negative machine-sized integer expected at position `2` in `1`.
+					return IOFunctions.printMessage(ast.topHead(), "intnm", F.List(ast, F.ZZ(3)), EvalEngine.get());
 				}
 				if (iterations > 0) {
 					IExpr last;
@@ -752,6 +759,8 @@ public final class Programming {
 				}
 				return current;
 
+			} catch (final ValidateException ve) {
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} finally {
 				engine.setNumericMode(numericMode);
 			}
@@ -761,10 +770,10 @@ public final class Programming {
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_2_3;
 		}
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL);
-		}
+		// @Override
+		// public void setUp(final ISymbol newSymbol) {
+		// newSymbol.setAttributes(ISymbol.HOLDALL);
+		// }
 
 	}
 
@@ -840,11 +849,12 @@ public final class Programming {
 
 			boolean numericMode = engine.isNumericMode();
 			try {
-				// use EvalEngine's iterationLimit only for evaluation control
-				// final int iterationLimit = engine.getIterationLimit();
-				// int iterationCounter = 1;
 
 				IExpr f = ast.arg1();
+				if (f.isNumber()) {
+					// Nonatomic expression expected at position `1` in `2`.
+					return IOFunctions.printMessage(ast.topHead(), "normal", F.List(F.C1, ast), engine);
+				}
 				IASTAppendable list = F.ListAlloc(32);
 				IExpr current = ast.arg2();
 				list.append(current);
@@ -855,7 +865,7 @@ public final class Programming {
 					} else if (ast.arg3().isNegativeInfinity()) {
 						iterations = Integer.MIN_VALUE;
 					} else {
-						iterations = Validate.checkIntType(ast, 3, Integer.MIN_VALUE);
+						iterations = Validate.checkNonNegativeIntType(ast, 3);
 					}
 				}
 				if (iterations < 0) {
@@ -875,6 +885,8 @@ public final class Programming {
 				}
 				return list;
 
+			} catch (final ValidateException ve) {
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} finally {
 				engine.setNumericMode(numericMode);
 			}
@@ -883,10 +895,6 @@ public final class Programming {
 
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_2_3;
-		}
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 
 	}
@@ -1299,13 +1307,6 @@ public final class Programming {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			return evaluateNestList(ast, F.ListAlloc(), engine);
-		}
-
-		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_3_3;
-		}
-		public static IExpr evaluateNestList(final IAST ast, final IASTAppendable resultList, EvalEngine engine) {
 			IExpr arg3 = engine.evaluate(ast.arg3());
 			if (arg3.isInteger()) {
 				int n = arg3.toIntDefault(Integer.MIN_VALUE);
@@ -1313,26 +1314,33 @@ public final class Programming {
 					// Positive integer (less equal 2147483647) expected at position `2` in `1`.
 					return IOFunctions.printMessage(F.Nest, "intpm", F.List(ast, F.C3), engine);
 					}
-				final IExpr arg1 = ast.arg1();
-				nestList(ast.arg2(), n, new Function<IExpr, IExpr>() {
+				final IExpr arg1 = engine.evaluate(ast.arg1());
+				IExpr arg2 = engine.evaluate(ast.arg2());
+				return nestList(arg2, n, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.unaryAST1(arg1, x);
 					}
-				}, resultList, engine);
-				return resultList;
+				}, F.List, engine);
 			}
 			return F.NIL;
 		}
 
-		public static void nestList(final IExpr expr, final int n, final Function<IExpr, IExpr> fn,
-				final IASTAppendable resultList, EvalEngine engine) {
+		public static IAST nestList(final IExpr expr, final int n, final Function<IExpr, IExpr> fn,
+				final IExpr resultHead, EvalEngine engine) {
+			IASTAppendable resultList = F.ast(resultHead, n + 1, false);
 			IExpr temp = expr;
 			resultList.append(temp);
 			for (int i = 0; i < n; i++) {
-				temp = engine.evaluate(fn.apply(temp));
+				// temp = engine.evaluate(fn.apply(temp));
+				temp = fn.apply(temp);
 				resultList.append(temp);
 			}
+			return resultList;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_3_3;
 		}
 
 		@Override
@@ -1964,19 +1972,23 @@ public final class Programming {
 						try {
 								if (rightHandSide.isList()) {
 									IExpr res = Programming.assignPart(temp, part, 2, (IAST) rightHandSide, 1, engine);
+								if (res.isPresent()) {
 								// symbol.putDownRule(IPatternMatcher.SET, true, symbol, res, false);
 								symbol.assign(res);
+								}
 									return rightHandSide;
 								} else {
 									IExpr res = Programming.assignPart(temp, part, 2, rightHandSide, engine);
+								if (res.isPresent()) {
 								// symbol.putDownRule(IPatternMatcher.SET, true, symbol, res, false);
 								symbol.assign(res);
+								}
 									return rightHandSide;
 								}
 						} catch (RuntimeException npe) {
-							engine.printMessage("Set: wrong argument for Part[] function: " + part.toString()
-									+ " selects no part expression.");
-							return rightHandSide;
+							engine.printMessage("Set: " + npe.getMessage());
+							return F.NIL;
+							// return rightHandSide;
 						}
 					}
 				}
@@ -2523,7 +2535,7 @@ public final class Programming {
 
 			final long begin = System.currentTimeMillis();
 			final IExpr result = engine.evaluate(ast.arg1());
-				return List(Divide(F.num(System.currentTimeMillis() - begin), F.integer(1000L)), F.HoldForm(result));
+				return List(Divide(F.num(System.currentTimeMillis() - begin), F.ZZ(1000L)), F.HoldForm(result));
 			}
 			return F.NIL;
 		}
@@ -3205,21 +3217,50 @@ public final class Programming {
 			}
 			return result;
 		}
+		if (arg1.isAssociation()) {
+			IExpr result = F.NIL;
+			if (arg2.isAST(F.Key, 2)) {
+				result = ((IAssociation) arg1).getValue(arg2.first());
+			} else if (arg2.isString()) {
+				result = ((IAssociation) arg1).getValue(arg2);
+			}
+
+			if (result.isPresent()) {
+				if (p1 < ast.size()) {
+					if (result.isAST()) {
+						return part((IAST) result, ast, p1, engine);
+					} else {
+						// Part specification `1` is longer than depth of object.
+						return IOFunctions.printMessage(F.Part, "partd", F.List(result), engine);
+					}
+				}
+				return result;
+			}
+		}
 		// The expression `1` cannot be used as a part specification.
 		return IOFunctions.printMessage(F.Part, "pkspec1", F.List(arg2), engine);
 	}
 
-	private static IExpr spanPart(final IAST ast, int pos, IAST arg1, final IExpr arg2, int start, int last, int step,
-			int p1, EvalEngine engine) {
+	private static IExpr spanPart(final IAST ast, int pos, final IAST arg1, final IExpr arg2, int start, int last,
+			int step, int p1, EvalEngine engine) {
 		IASTAppendable result = arg1.copyHead();
 
+		final int size = arg1.size();
 		if (step < 0 && start >= last) {
 			for (int i = start; i >= last; i += step) {
 				if (p1 >= ast.size()) {
-					result.append(arg1.get(i));
+					IExpr temp = getIndex(arg1, i, engine);
+					if (temp.isPresent()) {
+						result.append(temp);
 					continue;
 				}
+					return F.NIL;
+				}
 				if (arg1.get(i).isAST()) {
+					if (i >= size) {
+						// Cannot take positions `1` through `2` in `3`.
+						return IOFunctions.printMessage(F.Part, "take", F.List(F.ZZ(start), F.ZZ(last), arg1), engine);
+					}
 					IExpr temp = part((IAST) arg1.get(i), ast, p1, engine);
 					if (temp.isPresent()) {
 						result.append(temp);
@@ -3232,11 +3273,19 @@ public final class Programming {
 		} else if (step > 0 && (last != 1 || start <= last)) {
 			for (int i = start; i <= last; i += step) {
 				if (p1 >= ast.size()) {
-					result.append(arg1.get(i));
+					IExpr temp = getIndex(arg1, i, engine);
+					if (temp.isPresent()) {
+						result.append(temp);
 					continue;
+				}
+					return F.NIL;
 				}
 				if (arg1.get(i).isAST()) {
 
+					if (i >= size) {
+						// Cannot take positions `1` through `2` in `3`.
+						return IOFunctions.printMessage(F.Part, "take", F.List(F.ZZ(start), F.ZZ(last), arg1), engine);
+					}
 					IExpr temp = part((IAST) arg1.get(i), ast, p1, engine);
 					if (temp.isPresent()) {
 						result.append(temp);
@@ -3255,8 +3304,13 @@ public final class Programming {
 
 	private static IExpr assignPart(final IExpr assignedExpr, final IAST part, int partPosition, IExpr value,
 			EvalEngine engine) {
-		if (!assignedExpr.isAST() || partPosition >= part.size()) {
+		if (partPosition >= part.size()) {
+			// stop recursion
 			return value;
+		}
+		if (!assignedExpr.isAST()) {
+			// Part specification `1` is longer than depth of object.
+			return IOFunctions.printMessage(F.Part, "partd", F.List(part), engine);
 		}
 		IAST assignedAST = (IAST) assignedExpr;
 		final IExpr arg2 = engine.evaluate(part.get(partPosition));
@@ -3282,18 +3336,20 @@ public final class Programming {
 							engine);
 				}
 			} else {
-				throw new WrongArgumentType(part, arg2, partPosition,
-						"Wrong argument for Part[] function: " + arg2.toString() + " selects no part expression.");
+				// Part `1` of `2` does not exist.
+				return IOFunctions.printMessage(F.Part, "partw", F.List(F.ZZ(partPosition), arg2), engine);
 			}
 			return result;
 		} else if (arg2.isReal()) {
-			int indx = Validate.checkIntType(arg2, Integer.MIN_VALUE);
+			int indx = Validate.throwIntType(arg2, Integer.MIN_VALUE, engine);
 			if (indx < 0) {
 				indx = part.size() + indx;
 			}
 			if ((indx < 0) || (indx >= part.size())) {
-				throw new WrappedException(new IndexOutOfBoundsException(
-						"Part[] index " + indx + " of " + part.toString() + " is out of bounds."));
+				// Part `1` of `2` does not exist.
+				return IOFunctions.printMessage(F.Part, "partw", F.List(F.ZZ(indx), part), engine);
+				// throw new WrappedException(new IndexOutOfBoundsException(
+				// "Part[] index " + indx + " of " + part.toString() + " is out of bounds."));
 			}
 			IASTAppendable result = F.NIL;
 			IExpr temp = assignPart(assignedAST.get(indx), part, partPositionPlus1, value, engine);
@@ -3314,7 +3370,7 @@ public final class Programming {
 				if (listArg.isInteger()) {
 					IExpr ires = null;
 
-					final int indx = Validate.checkIntType(listArg, Integer.MIN_VALUE);
+					final int indx = Validate.throwIntType(listArg, Integer.MIN_VALUE, engine);
 					ires = assignPartValue(assignedAST, indx, value);
 					if (ires == null) {
 						return F.NIL;
@@ -3324,8 +3380,9 @@ public final class Programming {
 							temp = assignPart(ires, part, partPositionPlus1, value, engine);
 							result.append(temp);
 						} else {
-							throw new WrongArgumentType(part, assignedAST, partPosition,
-									"Wrong argument for Part[] function. Function or list expected.");
+							// Part `1` of `2` does not exist.
+							return IOFunctions.printMessage(F.Part, "partw", F.List(F.ZZ(partPosition), assignedAST),
+									engine);
 						}
 					} else {
 						result.append(ires);
@@ -3334,8 +3391,8 @@ public final class Programming {
 			}
 			return result;
 		}
-		throw new WrongArgumentType(part, assignedAST, partPosition,
-				"Wrong argument for Part[] function: " + arg2.toString() + " selects no part expression.");
+		// Part `1` of `2` does not exist.
+		return IOFunctions.printMessage(F.Part, "partw", F.List(arg2, assignedAST), engine);
 	}
 
 	private static IExpr assignPart(final IExpr assignedExpr, final IAST part, int partPosition, IAST rhs, int rhsPos,
@@ -3388,8 +3445,8 @@ public final class Programming {
 					}
 				}
 			} else {
-				throw new WrongArgumentType(part, arg2, partPosition,
-						"Wrong argument for Part[] function: " + arg2.toString() + " selects no part expression.");
+				// Part `1` of `2` does not exist.
+				return IOFunctions.printMessage(F.Part, "partw", F.List(arg2, assignedAST), engine);
 			}
 			return result;
 		} else if (arg2.isReal()) {
@@ -3400,8 +3457,8 @@ public final class Programming {
 				if (ires.isAST()) {
 					return assignPart(ires, part, partPositionPlus1, rhs, rhsPos++, engine);
 				} else {
-					throw new WrongArgumentType(part, assignedAST, partPosition,
-							"Wrong argument for Part[] function. Function or list expected.");
+					// Part `1` of `2` does not exist.
+					return IOFunctions.printMessage(F.Part, "partw", F.List(F.ZZ(partPosition), assignedAST), engine);
 				}
 			}
 			return ires;
@@ -3415,7 +3472,7 @@ public final class Programming {
 				if (listArg.isInteger()) {
 					IExpr ires = null;
 
-					final int indx = Validate.checkIntType(listArg, Integer.MIN_VALUE);
+					final int indx = Validate.throwIntType(listArg, Integer.MIN_VALUE, engine);
 					ires = assignPartValue(assignedAST, indx, list);
 					if (ires == null) {
 						return F.NIL;
@@ -3425,8 +3482,9 @@ public final class Programming {
 							temp = assignPart(ires, part, partPositionPlus1, rhs, rhsPos++, engine);
 							result.append(temp);
 						} else {
-							throw new WrongArgumentType(part, assignedAST, partPosition,
-									"Wrong argument for Part[] function. Function or list expected.");
+							// Part `1` of `2` does not exist.
+							return IOFunctions.printMessage(F.Part, "partw", F.List(F.ZZ(partPosition), assignedAST),
+									engine);
 						}
 					} else {
 						result.append(ires);
@@ -3435,8 +3493,8 @@ public final class Programming {
 			}
 			return result;
 		}
-		throw new WrongArgumentType(part, assignedAST, partPosition,
-				"Wrong argument for Part[] function: " + arg2.toString() + " selects no part expression.");
+		// Part `1` of `2` does not exist.
+		return IOFunctions.printMessage(F.Part, "partw", F.List(arg2, assignedAST), engine);
 	}
 
 	/**

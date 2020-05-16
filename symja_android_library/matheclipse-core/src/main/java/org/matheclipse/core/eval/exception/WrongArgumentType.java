@@ -2,6 +2,7 @@ package org.matheclipse.core.eval.exception;
 
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  */
@@ -66,4 +67,8 @@ public class WrongArgumentType extends ValidateException {
 		}
 	}
 
+	@Override
+	public String getMessage(ISymbol symbol) {
+		return getMessage();
+	}
 }

@@ -1,5 +1,7 @@
 package org.matheclipse.core.expression;
 
+import com.gx.common.math.DoubleMath;
+
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatRuntimeException;
@@ -21,6 +23,7 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import static org.matheclipse.core.expression.F.num;
 
@@ -93,26 +96,54 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 	 *            a double complex numeric value
 	 * @return
 	 */
-	protected static ComplexNum newInstance(final Complex value) {
+	private static ComplexNum newInstance(final Complex value) {
 		ComplexNum d = new ComplexNum(0.0, 0.0);
 		d.fComplex = value;
 		return d;
 	}
 
 	public static ComplexNum valueOf(final Complex c) {
+		double real = c.getReal();
+		double imaginary = c.getImaginary();
+		if (real == 0.0d || real == -0.0d) {
+			if (imaginary == 0.0d || imaginary == -0.0d) {
+				return ZERO;
+			}
+			return newInstance(new Complex(0.0d, imaginary));
+		}
+		if (imaginary == 0.0d || imaginary == -0.0d) {
+			return newInstance(new Complex(real, 0.0d));
+		}
 		return newInstance(c);
 	}
 
 	public static ComplexNum valueOf(final double real) {
+		if (real == 0.0d || real == -0.0d) {
+			return ZERO;
+		}
 		return newInstance(new Complex(real, 0.0));
 	}
 
 	public static ComplexNum valueOf(final double real, final double imaginary) {
+		if (real == 0.0d || real == -0.0d) {
+			if (imaginary == 0.0d || imaginary == -0.0d) {
+				// Complex.ZERO constructor
+				return newInstance(new Complex(0.0d, 0.0d));
+			}
+			return newInstance(new Complex(0.0d, imaginary));
+		}
+		if (imaginary == 0.0d || imaginary == -0.0d) {
+			return newInstance(new Complex(real, 0.0d));
+		}
 		return newInstance(new Complex(real, imaginary));
 	}
 
 	public static ComplexNum valueOf(final INum d) {
-		return newInstance(new Complex(d.getRealPart(), 0.0));
+		double real = d.getRealPart();
+		if (real == 0.0d || real == -0.0d) {
+			return ZERO;
+		}
+		return newInstance(new Complex(real, 0.0));
 	}
 
 	Complex fComplex;
@@ -123,7 +154,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return visitor.visit(this);
 	}
 
@@ -308,7 +339,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public IExpr complexArg() {
-		return num(Math.atan2(imDoubleValue(), reDoubleValue()));
+		return num(fComplex.getArgument());
 	}
 
 	@Override
@@ -403,6 +434,11 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 		return fComplex.getReal();
 	}
 
+	@Override
+	public INumber round() throws ArithmeticException {
+		return F.complex(F.ZZ(DoubleMath.roundToBigInteger(fComplex.getReal(), RoundingMode.HALF_EVEN)), //
+				F.ZZ(DoubleMath.roundToBigInteger(fComplex.getImaginary(), RoundingMode.HALF_EVEN)));
+	}
 	@Override
 	public double getRealPart() {
 		double temp = fComplex.getReal();

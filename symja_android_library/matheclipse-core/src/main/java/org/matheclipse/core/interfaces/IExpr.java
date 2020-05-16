@@ -127,7 +127,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     /**
      * Accept a visitor with return type T
      */
-    <T> T accept(IVisitor<T> visitor);
+    IExpr accept(IVisitor visitor);
 
     /**
      * Accept a visitor with return type <code>boolean</code>
@@ -463,9 +463,10 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * If this expression unequals <code>F.NIL</code>, invoke the specified consumer with the <code>this</code> object,
      * otherwise do nothing.
      *
-     * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
+     * @param consumer
+     *            block to be executed if this expression unequals <code>F.NIL</code>
      */
-    void ifPresent(Consumer<? super IExpr> consumer);
+    IExpr ifPresent(Function<? super IExpr, IExpr> function);
 
     /**
      * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
@@ -580,6 +581,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is the function <code>ArcTanh[&lt;arg&gt;]</code>
      */
     boolean isArcTanh();
+
+    /**
+     * Test if this AST is an association <code>&lt;|a-&gt;b, c-&gt;d|&gt;</code>(i.e. type <code>AssociationAST</code>)
+     *
+     * @return
+     */
+    boolean isAssociation();
 
     /**
      * Test if this expression is an AST list, which contains a <b>header element</b> (i.e. the function name) at index
@@ -801,6 +809,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isNumericFunction()
      */
     boolean isConstantAttribute();
+
+    /**
+     * Test if this expression is a continuous distribution AST (i.e. NormalDistribution(),
+     * ExponentialDistribution(),...)
+     *
+     * @return
+     */
+    boolean isContinuousDistribution();
 
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
@@ -1162,6 +1178,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isVector()
      */
     boolean isListOfRules();
+
+    /**
+     * Test if this expression is a list of rules (head Rule or RuleDelayed)
+     *
+     * @param ignoreEmptyList
+     *            if <code>true</code>, ignore elements which equals an empty list <code>{ }</code>
+     * @return
+     * @see #isList()
+     * @see #isMatrix(boolean)
+     * @see #isVector()
+     */
+    boolean isListOfRules(boolean ignoreEmptyList);
 
     /**
      * Test if this expression is the function <code>Log[&lt;arg&gt;]</code>
@@ -1526,6 +1554,16 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>true</code> if this expression is a polynomial; <code>false</code>otherwise
      */
     boolean isPolynomial(IAST variables);
+
+    /**
+     * <p>
+     * Test if this expression has a polynomial structiure, i.e. no built-in function as head
+     * </p>
+     *
+     * @return <code>true</code> if this expression has a polynomial structure; <code>false</code>otherwise
+     *
+     */
+    boolean isPolynomialStruct();
 
     /**
      * <p>
@@ -2339,6 +2377,20 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>null</code> if this object can not be converted into a <code>double[]</code> vector
      */
     double[] toDoubleVector();
+
+    /**
+     * Convert this object into a <code>Complex[]</code> vector.
+     *
+     * @return <code>null</code> if this object can not be converted into a <code>Complex[]</code> vector
+     */
+    Complex[] toComplexVector();
+
+    /**
+     * Convert this object into a <code>int[]</code> vector.
+     *
+     * @return
+     */
+    int[] toIntVector();
 
     /**
      * Converts this number to an <code>int</code> value; unlike {link #intValue} this method returns

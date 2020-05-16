@@ -1,6 +1,7 @@
 package org.matheclipse.core.interfaces;
 
 import org.matheclipse.core.eval.exception.NoEvalException;
+import org.matheclipse.core.expression.F;
 
 /**
  * Created by Duy on 2/20/2018.
@@ -98,6 +99,25 @@ public abstract class IIteratorImpl<E> implements IIterator<E> {
      * @return
      */
     public boolean isValidVariable() {
+        return false;
+    }
+
+    @Override
+    public boolean isInvalidNumeric() {
+        if (!isSetIterator()) {
+            IExpr step = getStep();
+            if (step != null) {
+                if (step.isNonNegativeResult()) {
+                    if (F.Negative.ofQ(F.Subtract(getUpperLimit(), getLowerLimit()))) {
+                        return true;
+                    }
+                } else if (step.isNegativeResult()) {
+                    if (F.Negative.ofQ(F.Subtract(getLowerLimit(), getUpperLimit()))) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 

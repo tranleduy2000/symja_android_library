@@ -1,9 +1,11 @@
 package org.matheclipse.core.reflection.system;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.ListFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -115,11 +117,34 @@ public class Product extends ListFunctions.Table implements ProductRules {
 			return ((IAST) arg1).mapThread(prod, 1);
 		}
 
-		IExpr temp = evaluateTableThrow(ast, Times(), Times(), engine);
+		if (ast.size() > 2) {
+			IAST list;
+			if (ast.last().isList()) {
+				list = (IAST) ast.last();
+			} else {
+				list = F.List(ast.last());
+			}
+			if (list.isAST1()) {
+				// indefinite product case
+				IExpr variable = list.arg1();
+				if (ast.arg1().isFree(variable) && variable.isVariable()) {
+					return indefiniteProduct(ast, variable);
+				}
+			}
+		}
+		IExpr temp = F.NIL;
+		try {
+			temp = evaluateTableThrow(ast, Times(), Times(), engine);
 		if (temp.isPresent()) {
 			return temp;
 		}
 
+		} catch (final ValidateException ve) {
+			if (Config.SHOW_STACKTRACE) {
+				ve.printStackTrace();
+			}
+			return EvalEngine.get().printMessage(ve.getMessage(F.Product));
+		}
 		// arg1 = evalBlockExpandWithoutReap(arg1,
 		// determineIteratorVariables(ast));
 
@@ -128,7 +153,12 @@ public class Product extends ListFunctions.Table implements ProductRules {
 			boolean flag = true;
 			// Prod( i^a, {i,from,to},... )
 			for (int i = 2; i < ast.size(); i++) {
-				IIterator<IExpr> iterator = Iterator.create((IAST) ast.get(i), engine);
+				IIterator<IExpr> iterator;
+				if (ast.get(i).isList()) {
+					iterator = Iterator.create((IAST) ast.get(i), i, engine);
+				} else {
+					iterator = Iterator.create(F.List(ast.get(i)), i, engine);
+				}
 				if (iterator.isValidVariable() && exponent.isFree(iterator.getVariable())) {
 					continue;
 				}
@@ -143,11 +173,12 @@ public class Product extends ListFunctions.Table implements ProductRules {
 		}
 		IExpr argN = ast.last();
 		if (ast.size() >= 3 && argN.isList()) {
+			try {
 			if (arg1.isZero()) {
 				// Product(0, {k, n, m})
 				return F.C0;
 			}
-			IIterator<IExpr> iterator = Iterator.create((IAST) argN, engine);
+				IIterator<IExpr> iterator = Iterator.create((IAST) argN, ast.argSize(), engine);
 			if (iterator.isValidVariable() && iterator.getUpperLimit().isInfinity()) {
 				if (arg1.isOne()) {
 					// Product(1, {k, a, Infinity})
@@ -217,13 +248,17 @@ public class Product extends ListFunctions.Table implements ProductRules {
 
 				}
 			}
-			try {
 				temp = F.NIL;
 			IAST resultList = Times();
-				temp = evaluateLast(ast.arg1(), iterator, resultList, F.NIL);
+				temp = evaluateLast(ast.arg1(), iterator, resultList, F.C1);
 			if (!temp.isPresent() || temp.equals(resultList)) {
 				return F.NIL;
 			}
+			} catch (final ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				return EvalEngine.get().printMessage(ve.getMessage(F.Product));
 			} catch (RecursionLimitExceeded rle) {
 				return engine.printMessage("Product: Recursionlimit exceeded");
 			}
@@ -240,6 +275,24 @@ public class Product extends ListFunctions.Table implements ProductRules {
 		return F.NIL;
 	}
 
+	/**
+	 * Create a new Product() by removing last iterator or return result of indefinite sum case for Product(a, x)
+	 *
+	 * @param ast
+	 * @param variable
+	 *            the iterator variable
+	 * @return
+	 */
+	private static IExpr indefiniteProduct(final IAST ast, IExpr variable) {
+		IExpr result = F.Power(ast.arg1(), F.Plus(F.CN1, variable));
+		int argSize = ast.argSize();
+		if (argSize == 2) {
+			return result;
+		}
+		IASTAppendable newSum = ast.removeAtClone(argSize);
+		newSum.set(1, result);
+		return newSum;
+	}
 	public int[] expectedArgSize() {
 		return IOFunctions.ARGS_2_INFINITY;
 	}

@@ -21,6 +21,7 @@ import org.matheclipse.core.visit.IVisitorLong;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 /**
  * <code>IComplexNum</code> implementation which wraps a <code>org.apache.commons.math3.complex.Apcomplex</code> value
@@ -496,7 +497,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return visitor.visit(this);
 	}
 
@@ -535,13 +536,20 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return F.num(getRealPart());
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public INumber round() {
+		Apfloat re = ApfloatMath.round(fApcomplex.real(), 1, RoundingMode.HALF_EVEN);
+		Apfloat im = ApfloatMath.round(fApcomplex.imag(), 1, RoundingMode.HALF_EVEN);
+		return F.complex(F.ZZ(ApfloatMath.floor(re).toBigInteger()), F.ZZ(ApfloatMath.floor(im).toBigInteger()));
+	}
 	public IExpr sqrt() {
 		return valueOf(ApcomplexMath.sqrt(fApcomplex));
 	}
 	@Override
 	public INumber ceilFraction() throws ArithmeticException {
-		return F.complex(F.integer(ApfloatMath.ceil(fApcomplex.real()).toBigInteger()),
-				F.integer(ApfloatMath.ceil(fApcomplex.imag()).toBigInteger()));
+		return F.complex(F.ZZ(ApfloatMath.ceil(fApcomplex.real()).toBigInteger()),
+				F.ZZ(ApfloatMath.ceil(fApcomplex.imag()).toBigInteger()));
 	}
 
 	/** {@inheritDoc} */
@@ -551,8 +559,8 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	}
 	@Override
 	public INumber floorFraction() throws ArithmeticException {
-		return F.complex(F.integer(ApfloatMath.floor(fApcomplex.real()).toBigInteger()),
-				F.integer(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
+		return F.complex(F.ZZ(ApfloatMath.floor(fApcomplex.real()).toBigInteger()),
+				F.ZZ(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
 	}
 
 	

@@ -6,6 +6,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TeXUtilities;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.io.StringWriter;
@@ -98,13 +99,22 @@ public class BasicTeXTestCase extends TestCase {
 	}
 
 	public void testTeX012b() {
-		check("TableForm({1,2,3,4,5,6})", "\\begin{array}{c}\n" + " 1 \\\\\n" + " 2 \\\\\n" + " 3 \\\\\n" + " 4 \\\\\n"
-				+ " 5 \\\\\n" + " 6 \\end{array}");
+		check("TableForm({1,2,3,4,5,6})", //
+				"\\begin{array}{c}\n" + //
+						" 1 \\\\\n" + //
+						" 2 \\\\\n" + //
+						" 3 \\\\\n" + //
+						" 4 \\\\\n" + //
+						" 5 \\\\\n" + //
+						" 6 \n" + "\\end{array}");
 	}
 
 	public void testTeX012c() {
-		check("TableForm({{1,2,3},{4,5,6}})",
-				"\\begin{array}{ccc}\n" + " 1 & 2 & 3 \\\\\n" + " 4 & 5 & 6 \\\\\n" + "\\end{array}");
+		check("TableForm({{1,2,3},{4,5,6}})", //
+				"\\begin{array}{ccc}\n" + //
+						" 1 & 2 & 3 \\\\\n" + //
+						" 4 & 5 & 6 \\\\\n" + //
+						"\\end{array}");
 	}
 
 	public void testTeX013() {
@@ -366,6 +376,45 @@ public class BasicTeXTestCase extends TestCase {
 		IExpr expr = EvalEngine.get().evaluate("Subscript(\"zzz\",36)");
 		check(expr, //
 				"{\\textnormal{zzz}}_{36}");
+	}
+	public void testTeX041() {
+		IExpr expr = EvalEngine.get().evaluate("Interval({-3.21625*10^-16,5.66554*10^-16})");
+		check(expr, //
+				"Interval(\\{-3.21625*10^{-16},5.66554*10^{-16}\\})");
+	}
+
+	public void testTeX042() {
+		IExpr expr = EvalEngine.get().evaluate("Cot(Interval({3*Pi/4,6*Pi/5}))");
+		check(expr, //
+				"Interval(\\{-\\infty,-1\\},\\{\\sqrt{\\left( 1+\\frac{2}{\\sqrt{5}}\\right) },\\infty\\})");
+	}
+
+	public void testTeX043() {
+		IExpr expr = EvalEngine.get().evaluate("<|a -> x, b -> y, c -> z|>");
+		check(expr, //
+				"\\langle|a\\to x,b\\to y,c\\to z|\\rangle");
+	}
+
+	public void testTeX044() {
+		IExpr expr = EvalEngine.get().evaluate("{{{a->b},{c:>d}},{4,5,6}}");
+		((IAST) expr).setEvalFlags(IAST.OUTPUT_MULTILINE);
+		check(expr, //
+				"\\begin{array}{c}\n" + //
+						" \\{\\{a\\to b\\},\\{c:\\to d\\}\\} \\\\\n" + //
+						" \\{4,5,6\\} \n" + //
+						"\\end{array}");
+	}
+
+	public void testTeX045() {
+		IExpr expr = EvalEngine.get().evaluate("Derivative(2)[10/x^4]");
+		check(expr, //
+				"\\left( \\frac{10}{{x}^{4}}\\right) ''");
+	}
+
+	public void testTeX046() {
+		IExpr expr = EvalEngine.get().evaluate("Derivative(a)[10/x^4]");
+		check(expr, //
+				"\\left( \\frac{10}{{x}^{4}}\\right) ^{(a)}");
 	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();

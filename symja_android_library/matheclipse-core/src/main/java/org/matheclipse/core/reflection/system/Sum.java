@@ -2,11 +2,13 @@ package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.ListFunctions;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -152,20 +154,38 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			IAST sum = ast.setAtCopy(1, null);
 			return ((IAST) arg1).mapThread(sum, 1);
 		}
-		IExpr temp;
-		temp = evaluateTableThrow(ast, Plus(), Plus(), engine);
-		if (temp.isPresent()) {
-			return temp;
+		if (ast.size() > 2) {
+			IAST list;
+			if (ast.last().isList()) {
+				list = (IAST) ast.last();
+			} else {
+				list = F.List(ast.last());
+			}
+			if (list.isAST1()) {
+				// indefinite sum case
+				IExpr variable = list.arg1();
+				if (ast.arg1().isFree(variable) && variable.isVariable()) {
+					return indefiniteSum(ast, variable);
+				}
 		}
 
 		VariablesSet variablesSet = determineIteratorExprVariables(ast);
 		IAST varList = variablesSet.getVarList();
+			IIterator<IExpr> iterator = null;
 		IExpr argN = ast.last();
-		IIterator<IExpr> iterator = null;
+			try {
+				IExpr temp = evaluateTableThrow(ast, Plus(), Plus(), engine);
+				if (temp.isPresent()) {
+					return temp;
+				}
 
 		if (argN.isList()) {
 			argN = evalBlockWithoutReap(argN, varList);
-			iterator = Iterator.create((IAST) argN, engine);
+					if (argN.isList()) {
+						iterator = Iterator.create((IAST) argN, ast.argSize(), engine);
+					} else {
+						iterator = Iterator.create(F.List(argN), ast.argSize(), engine);
+					}
 			// if (iterator.isSetIterator() || iterator.isNumericFunction()) {
 			// IAST resultList = Plus();
 			// temp = evaluateLast(ast.arg1(), iterator, resultList, C0);
@@ -180,12 +200,19 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			// }
 			// }
 			// }
+				}
+			} catch (final ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				// see level specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 		}
 
 		// arg1 = evalBlockExpandWithoutReap(ast.arg1(), varList);
 		if (arg1.isTimes()) {
 			if (variablesSet.size() > 0) {
-				temp = collectConstantFactors(ast, (IAST) arg1, variablesSet);
+					IExpr temp = collectConstantFactors(ast, (IAST) arg1, variablesSet);
 				if (temp.isPresent()) {
 					return temp;
 				}
@@ -210,7 +237,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 
 			if (iterator.isValidVariable() && iterator.isNumericFunction()) {
 				IAST resultList = Plus();
-				temp = evaluateLast(ast.arg1(), iterator, resultList, F.C0);
+					IExpr temp = evaluateLast(ast.arg1(), iterator, resultList, F.C0);
 				if (!temp.isPresent() || temp.equals(resultList)) {
 					return F.NIL;
 				}
@@ -225,6 +252,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 
 			if (iterator.isValidVariable() && !iterator.isNumericFunction()) {
 				if (iterator.getStep().isOne()) {
+						IExpr temp;
 					if (iterator.getUpperLimit().isDirectedInfinity()) {
 						temp = definiteSumInfinity(arg1, iterator, (IAST) argN, engine);
 					} else {
@@ -243,7 +271,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			}
 
 		} else if (argN.isSymbol()) {
-			temp = indefiniteSum(arg1, (ISymbol) argN);
+				IExpr temp = indefiniteSum(arg1, (ISymbol) argN);
 			if (temp.isPresent()) {
 				if (ast.isAST2()) {
 					return temp;
@@ -255,9 +283,28 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			}
 		}
 
+		}
 		return F.NIL;
 	}
 
+	/**
+	 * Create a new Sum() by removing last iterator or return result of indefinite sum case for Sum(a, x)
+	 *
+	 * @param ast
+	 * @param variable
+	 *            the iterator variable
+	 * @return
+	 */
+	private static IExpr indefiniteSum(final IAST ast, IExpr variable) {
+		IExpr result = F.Times(ast.arg1(), variable);
+		int argSize = ast.argSize();
+		if (argSize == 2) {
+			return result;
+		}
+		IASTAppendable newSum = ast.removeAtClone(argSize);
+		newSum.set(1, result);
+		return newSum;
+	}
 	public int[] expectedArgSize() {
 		return IOFunctions.ARGS_2_INFINITY;
 	}

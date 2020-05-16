@@ -130,7 +130,18 @@ public class TensorFunctions {
 			if (ast.arg1().isList() && ast.arg2().isList()) {
 				IAST list = (IAST) ast.arg1();
 				IAST dims = (IAST) ast.arg2();
-				int[] dimension = Validate.checkListOfInts(dims, 1, Integer.MAX_VALUE);
+				if (dims.size() == 1) {
+					if (list.isEmpty()) {
+						return F.C0;
+					}
+					if (list.size() > 1) {
+						return list.arg1();
+					}
+				}
+				int[] dimension = Validate.checkListOfInts(ast, dims, 1, Integer.MAX_VALUE, engine);
+				if (dimension == null) {
+					return F.NIL;
+				}
 				IExpr padding = F.C0;
 				if (ast.size() == 4) {
 					padding = ast.arg3();
@@ -172,6 +183,7 @@ public class TensorFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			if (ast.isAST2()) {
 			if (ast.arg1().isAST() && ast.arg2().isAST()) {
 				IAST kernel = (IAST) ast.arg1();
 				IAST tensor = (IAST) ast.arg2();
@@ -179,14 +191,16 @@ public class TensorFunctions {
 				int kernelSize = kernel.size();
 				int tensorSize = tensor.size();
 				if (kernelSize <= tensorSize) {
-					return ListCorrelate.listCorrelate(ListFunctions.reverse(kernel), kernelSize, tensor, tensorSize);
+						return ListCorrelate.listCorrelate(ListFunctions.reverse(kernel), kernelSize, tensor,
+								tensorSize);
+					}
 				}
 			}
 			return F.NIL;
 		}
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_1_2;
+			return IOFunctions.ARGS_2_2;
 		}
 	}
 
@@ -217,6 +231,7 @@ public class TensorFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			if (ast.isAST2()) {
 			if (ast.arg1().isAST() && ast.arg2().isAST()) {
 				IAST kernel = (IAST) ast.arg1();
 				IAST tensor = (IAST) ast.arg2();
@@ -226,12 +241,13 @@ public class TensorFunctions {
 					return listCorrelate(kernel, kernelSize, tensor, tensorSize);
 				}
 			}
+			}
 			return F.NIL;
 		}
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_1_2;
+			return IOFunctions.ARGS_2_2;
 		}
 
 		public static IExpr listCorrelate(final IAST kernel, int kernelSize, final IAST tensor, int tensorSize) {

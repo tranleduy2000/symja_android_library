@@ -1,6 +1,6 @@
 package org.matheclipse.core.form.mathml;
 
-import junit.framework.TestCase;
+import java.io.StringWriter;
 
 import org.apfloat.Apcomplex;
 import org.matheclipse.core.eval.EvalEngine;
@@ -8,7 +8,7 @@ import org.matheclipse.core.eval.MathMLUtilities;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.io.StringWriter;
+import junit.framework.TestCase;
 
 /**
  * Tests MathML presentation function
@@ -25,43 +25,48 @@ public class MathMLPresentationTestCase extends TestCase {
 	 * Test mathml function
 	 */
 	public void testMathMLPresentation() {
-		check("TableForm({a,b,c,d})",
+		check("TableForm({a,b,c,d})", //
 				"<mtable columnalign=\"center\"><mtr><mtd columnalign=\"center\"><mi>a</mi></mtd></mtr><mtr><mtd columnalign=\"center\"><mi>b</mi></mtd></mtr><mtr><mtd columnalign=\"center\"><mi>c</mi></mtd></mtr><mtr><mtd columnalign=\"center\"><mi>d</mi></mtd></mtr></mtable>");
 
-		check("TableForm({{a,b},{c,d}})",
+		check("TableForm({{a,b},{c,d}})", //
 				"<mtable columnalign=\"center\"><mtr><mtd columnalign=\"center\"><mi>a</mi></mtd><mtd columnalign=\"center\"><mi>b</mi></mtd></mtr><mtr><mtd columnalign=\"center\"><mi>c</mi></mtd><mtd columnalign=\"center\"><mi>d</mi></mtd></mtr></mtable>");
+
 		// check("-a-b*I",
 		// "<mrow><mo>-</mo><mrow><mrow><mrow><mi>&#x2148;</mi></mrow></mrow><mo>&#0183;</mo><mi>b</mi></mrow><mrow><mo>-</mo><mi>a</mi></mrow></mrow>");
 		IExpr expr = EvalEngine.get().evaluate("-1/2-3/4*I");
-		check(expr,
+		check(expr, //
 				"<mrow><mrow><mo>-</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><mrow><mo>-</mo><mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow><mo>&#0183;</mo><mi>&#x2148;</mi></mrow></mrow>");
 		expr = EvalEngine.get().evaluate("1/2+3/4*I");
 		check(expr,
 				"<mrow><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><mrow><mo>+</mo><mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow><mo>&#0183;</mo><mi>&#x2148;</mi></mrow></mrow>");
 
-		check("-1/2-3/4*I",
+		check("-1/2-3/4*I", //
 				"<mrow><mfrac><mrow><mrow><mo>(</mo><mn>-3</mn><mo>)</mo></mrow><mo>&#0183;</mo><mrow><mi>&#x2148;</mi></mrow></mrow><mn>4</mn></mfrac><mo>-</mo><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></mrow>");
-		check("1/2+3/4*I",
+		check("1/2+3/4*I", //
 				"<mrow><mfrac><mrow><mn>3</mn><mo>&#0183;</mo><mrow><mi>&#x2148;</mi></mrow></mrow><mn>4</mn></mfrac><mo>+</mo><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></mrow>");
 
 		check("\"hello\nworld\"",
 				"<mtext>hello</mtext><mspace linebreak='newline' /><mtext>world</mtext><mspace linebreak='newline' />");
 		check("\"hello\nthis is & and < to > \\\" world\"",
 				"<mtext>hello</mtext><mspace linebreak='newline' /><mtext>this&nbsp;is&nbsp;&amp;&nbsp;and&nbsp;&lt;&nbsp;to&nbsp;&gt;&nbsp;&quot;&nbsp;world</mtext><mspace linebreak='newline' />");
+
 		check("x /.y", "<mrow><mi>x</mi><mo>/.</mo><mi>y</mi></mrow>");
 		check("f(x_,y_):={x,y}/;x>y", //
 				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mtext>x_</mtext><mo>,</mo><mtext>y_</mtext></mrow><mo>)</mo></mrow></mrow><mo>:=</mo><mrow><mrow><mo>{</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>}</mo></mrow><mo>/;</mo><mrow><mi>x</mi><mo>&gt;</mo><mi>y</mi></mrow></mrow></mrow>");
 
-		check("f(x)&",
+		check("f(x)&", //
 				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>&amp;</mo></mrow>");
-		check("f(x, #)&[y]",
+		check("f(x, #)&[y]", //
 				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>,</mo><mi>#1</mi></mrow><mo>)</mo></mrow></mrow><mo>&amp;</mo></mrow><mo>[</mo><mi>y</mi><mo>]</mo>");
 
-		check("f(x)[y][z]",
+		check("f(x)[y][z]", //
 				"<mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>[</mo><mi>y</mi><mo>]</mo><mo>[</mo><mi>z</mi><mo>]</mo>");
-		check("f'(x)", "<mrow><mi>f</mi><mo>'</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>");
-		check(F.Slot1, "<mi>#1</mi>");
-		check(F.SlotSequence(2), "<mi>##2</mi>");
+		check("f'(x)", //
+				"<mrow><msup><mi>f</mi><mo>&#8242;</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>");
+		check(F.Slot1, //
+				"<mi>#1</mi>");
+		check(F.SlotSequence(2), //
+				"<mi>##2</mi>");
 		Apcomplex c = new Apcomplex("(-0.5,-4.0)");
 		check(F.complexNum(c), //
 				"<mrow><mrow><mn>-5</mn><mo>&#0183;</mo><msup><mn>10</mn><mn>-1</mn></msup></mrow><mo>-</mo><mn>4</mn><mo>&#0183;</mo><mi>&#x2148;</mi></mrow>");
@@ -88,12 +93,9 @@ public class MathMLPresentationTestCase extends TestCase {
 
 		check("Sqrt(-4*I)",
 				"<msqrt><mrow><mrow><mo>(</mo><mn>-4</mn><mo>)</mo></mrow><mo>&#0183;</mo><mrow><mi>&#x2148;</mi></mrow></mrow></msqrt>");
-		check("DirectedInfinity()",
-				"<mi>ComplexInfinity</mi>");
-		check("DirectedInfinity(-1)",
-				"<mrow><mo>-</mo><mi>&#x221E;</mi></mrow>");
-		check("DirectedInfinity(I)",
-				"<mrow><mrow><mi>&#x2148;</mi></mrow><mo>&#0183;</mo><mi>Infinity</mi></mrow>");
+		check("DirectedInfinity()", "<mi>ComplexInfinity</mi>");
+		check("DirectedInfinity(-1)", "<mrow><mo>-</mo><mi>&#x221E;</mi></mrow>");
+		check("DirectedInfinity(I)", "<mrow><mrow><mi>&#x2148;</mi></mrow><mo>&#0183;</mo><mi>Infinity</mi></mrow>");
 		check("DirectedInfinity(-I)",
 				"<mrow><mrow><mrow><mo>-</mo><mi>&#x2148;</mi></mrow></mrow><mo>&#0183;</mo><mi>Infinity</mi></mrow>");
 		check("Integrate(f(x), x)",
@@ -175,17 +177,24 @@ public class MathMLPresentationTestCase extends TestCase {
 	}
 
 	public void testMathML001() {
-		check("-0.0", "<mn>0.0</mn>");
-		check("0.0", "<mn>0.0</mn>");
-		check("Catalan", "<mi>C</mi>");
-		check("Pi", "<mi>&#x03C0;</mi>");
-		check("Infinity", "<mi>&#x221E;</mi>");
-		check("-Infinity", "<mrow><mo>-</mo><mi>&#x221E;</mi></mrow>");
+		check("-0.0", //
+				"<mn>0.0</mn>");
+		check("0.0", //
+				"<mn>0.0</mn>");
+		check("Catalan", //
+				"<mi>C</mi>");
+		check("Pi", //
+				"<mi>&#x03C0;</mi>");
+		check("Infinity", //
+				"<mi>&#x221E;</mi>");
+		check("-Infinity", //
+				"<mrow><mo>-</mo><mi>&#x221E;</mi></mrow>");
 	}
 
 	public void testMathML002() {
 		IExpr expr = EvalEngine.get().evaluate("-1/2*Sqrt(1/2)*Sqrt(5+Sqrt(5))");
-		check(expr, "<mfrac><mrow><mo>-</mo><msqrt><mrow><msqrt><mn>5</mn></msqrt><mo>+</mo><mn>5</mn></mrow></msqrt></mrow><mrow><mn>2</mn><mo>&#0183;</mo><msqrt><mn>2</mn></msqrt></mrow></mfrac>");
+		check(expr,
+				"<mfrac><mrow><mo>-</mo><msqrt><mrow><msqrt><mn>5</mn></msqrt><mo>+</mo><mn>5</mn></mrow></msqrt></mrow><mrow><mn>2</mn><mo>&#0183;</mo><msqrt><mn>2</mn></msqrt></mrow></mfrac>");
 
 		// (-1/3+I)*a
 		expr = EvalEngine.get().evaluate("a*((- 1/3 )+x)");
@@ -235,7 +244,7 @@ public class MathMLPresentationTestCase extends TestCase {
 
 	public void testMathML003() {
 		check("a/(b*c*Log[F]*((-b*Log[F])/e)^m)", //
-				"<mfrac><mi>a</mi><mrow><mi>b</mi><mo>&#0183;</mo><mi>c</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow><mo>&#0183;</mo><msup><mfrac><mrow><mo>-</mo><mi>b</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow></mrow><mi>e</mi></mfrac><mi>m</mi></msup></mrow></mfrac>");
+				"<mfrac><mi>a</mi><mrow><mi>b</mi><mo>&#0183;</mo><mi>c</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow><mo>&#0183;</mo><msup><mrow><mo>(</mo><mfrac><mrow><mo>-</mo><mi>b</mi><mo>&#0183;</mo><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>F</mi><mo>)</mo></mrow></mrow><mi>e</mi></mfrac><mo>)</mo></mrow><mi>m</mi></msup></mrow></mfrac>");
 	}
 
 	public void testC1() {
@@ -243,6 +252,13 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(expr, //
 				"<msub><mi>c</mi><mn>1</mn></msub>");
 	}
+
+	public void testAssociation() {
+		IExpr expr = EvalEngine.get().evaluate("<|a -> x, b -> y, c -> z|>");
+		check(expr, //
+				"<mrow><mo>&lt;|</mo><mrow><mrow><mi>a</mi><mo>-&gt;</mo><mi>x</mi></mrow><mo>,</mo><mrow><mi>b</mi><mo>-&gt;</mo><mi>y</mi></mrow><mo>,</mo><mrow><mi>c</mi><mo>-&gt;</mo><mi>z</mi></mrow></mrow><mo>|&gt;</mo></mrow>");
+	}
+
 	public void testCeiling() {
 		IExpr expr = EvalEngine.get().evaluate("Ceiling(f(x))");
 		check(expr, //
@@ -260,6 +276,7 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(expr, //
 				"<mn>2.71828182845904523536028747135</mn>");
 	}
+
 	public void testNot() {
 		IExpr expr = EvalEngine.get().evaluate("!f(x)");
 		check(expr, //
@@ -289,11 +306,24 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(expr, //
 				"<mrow><mo>&#x230A;</mo><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>&#x230B;</mo></mrow>");
 	}
-	public void testDerivatve001() {
+
+	public void testDerivative001() {
 		IExpr expr = EvalEngine.get().evaluate("1/f''(x)");
 		check(expr,
-				"<mfrac><mn>1</mn><mrow><mi>f</mi><mo>''</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></mfrac>");
+				"<mfrac><mn>1</mn><mrow><msup><mi>f</mi><mo>&#8242;&#8242;</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></mfrac>");
 
+	}
+
+	public void testDerivative002() {
+		IExpr expr = EvalEngine.get().evaluate("Derivative(2)[10/x^4]");
+		check(expr, //
+				"<mrow><msup><mrow><mo>(</mo><mfrac><mn>10</mn><msup><mi>x</mi><mn>4</mn></msup></mfrac><mo>)</mo></mrow><mo>&#8242;&#8242;</mo></msup></mrow>");
+	}
+
+	public void testDerivative003() {
+		IExpr expr = EvalEngine.get().evaluate("Derivative(a)[10/x^4]");
+		check(expr, //
+				"<mrow><msup><mrow><mo>(</mo><mfrac><mn>10</mn><msup><mi>x</mi><mn>4</mn></msup></mfrac><mo>)</mo></mrow><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></msup></mrow>");
 	}
 
 	public void testElement() {
@@ -310,16 +340,17 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(expr, //
 				"<mrow><mi>a</mi><mo>&#8712;</mo><mi>&#8477;</mi></mrow>");
 	}
+
 	public void testSeries001() {
 		IExpr expr = EvalEngine.get().evaluate("Series(f(x),{x,a,3})");
 		check(expr,
-				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mo>+</mo><mrow><mrow><mi>f</mi><mo>'</mo><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></mrow><mo>&#0183;</mo><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>+</mo><mfrac><mrow><mrow><mi>f</mi><mo>''</mo><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></mrow><mo>&#0183;</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup></mrow><mn>2</mn></mfrac><mo>+</mo><mfrac><mrow><mrow><msup><mi>f</mi><mrow><mo>(</mo><mn>3</mn><mo>)</mo></mrow></msup><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></mrow><mo>&#0183;</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>3</mn></msup></mrow><mn>6</mn></mfrac><mo>+</mo><msup><mrow><mi>O</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mn>4</mn></msup></mrow>");
+				"<mrow><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mo>+</mo><mrow><mrow><msup><mi>f</mi><mo>&#8242;</mo></msup><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></mrow><mo>&#0183;</mo><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>+</mo><mfrac><mrow><mrow><msup><mi>f</mi><mo>&#8242;&#8242;</mo></msup><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></mrow><mo>&#0183;</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup></mrow><mn>2</mn></mfrac><mo>+</mo><mfrac><mrow><mrow><msup><mi>f</mi><mrow><mo>(</mo><mn>3</mn><mo>)</mo></mrow></msup><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow></mrow><mo>&#0183;</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>3</mn></msup></mrow><mn>6</mn></mfrac><mo>+</mo><msup><mrow><mi>O</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mn>4</mn></msup></mrow>");
 	}
 
 	public void testSeries002() {
 		IExpr expr = EvalEngine.get().evaluate("Series(Log(x),{x,a,3})");
 		check(expr,
-				"<mrow><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>a</mi><mo>)</mo></mrow><mo>+</mo><mfrac><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mi>a</mi></mfrac><mo>+</mo><mfrac><mrow><mo>-</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup></mrow><mrow><mn>2</mn><mo>&#0183;</mo><msup><mi>a</mi><mn>2</mn></msup></mrow></mfrac><mo>+</mo><mfrac><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>3</mn></msup><mrow><mn>3</mn><mo>&#0183;</mo><msup><mi>a</mi><mn>3</mn></msup></mrow></mfrac><mo>+</mo><msup><mrow><mi>O</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mn>4</mn></msup></mrow>");
+				"<mrow><mrow><mi>log</mi><mo>&#x2061;</mo><mo>(</mo><mi>a</mi><mo>)</mo></mrow><mo>+</mo><mfrac><mrow><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow></mrow><mi>a</mi></mfrac><mo>+</mo><mfrac><mrow><mo>-</mo><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup></mrow><mrow><mn>2</mn><mo>&#0183;</mo><msup><mi>a</mi><mn>2</mn></msup></mrow></mfrac><mo>+</mo><mfrac><msup><mrow><mrow><mo>(</mo><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow><mo>)</mo></mrow></mrow><mn>3</mn></msup><mrow><mn>3</mn><mo>&#0183;</mo><msup><mi>a</mi><mn>3</mn></msup></mrow></mfrac><mo>+</mo><msup><mrow><mi>O</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mi>x</mi><mrow><mo>-</mo><mi>a</mi></mrow></mrow></mrow><mo>)</mo></mrow></mrow><mn>4</mn></msup></mrow>");
 	}
 
 	public void testEdge() {
@@ -333,21 +364,27 @@ public class MathMLPresentationTestCase extends TestCase {
 		check("Graph({1,2,3},{1->2,2->3})", //
 				"<mrow><mi>Graph</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mrow><mo>{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>}</mo></mrow><mo>,</mo><mrow><mo>{</mo><mrow><mrow><mn>1</mn><mo>-&gt;</mo><mn>2</mn></mrow><mo>,</mo><mrow><mn>2</mn><mo>-&gt;</mo><mn>3</mn></mrow></mrow><mo>}</mo></mrow></mrow><mo>)</mo></mrow></mrow>");
 	}
+
 	public void testInequality() {
 		IExpr expr = EvalEngine.get().evaluate("Inequality(c,Less,0,Less,a)");
 		check(expr, "<mrow><mi>c</mi><mo>&lt;</mo><mn>0</mn><mo>&lt;</mo><mi>a</mi></mrow>");
 
 		expr = EvalEngine.get().evaluate("Inequality(a,Less,0,LessEqual,b, Equal,c, Unequal,d)");
-		check(expr, "<mrow><mi>a</mi><mo>&lt;</mo><mn>0</mn><mo>&lt;=</mo><mi>b</mi><mo>==</mo><mi>c</mi><mo>!=</mo><mi>d</mi></mrow>");
+		check(expr,
+				"<mrow><mi>a</mi><mo>&lt;</mo><mn>0</mn><mo>&lt;=</mo><mi>b</mi><mo>==</mo><mi>c</mi><mo>!=</mo><mi>d</mi></mrow>");
 	}
+
 	public void testCenterDot() {
 		IExpr expr = EvalEngine.get().evaluate("CenterDot(x+z, f(a))");
-		check(expr, "<mrow><mrow><mrow><mo>(</mo><mi>z</mi><mo>+</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>&#183;</mo><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>a</mi></mrow><mo>)</mo></mrow></mrow></mrow>");
+		check(expr,
+				"<mrow><mrow><mrow><mo>(</mo><mi>z</mi><mo>+</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>&#183;</mo><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>a</mi></mrow><mo>)</mo></mrow></mrow></mrow>");
 
 		expr = EvalEngine.get().evaluate("CircleDot(x+z, f(a))");
-		check(expr, "<mrow><mrow><mrow><mo>(</mo><mi>z</mi><mo>+</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>&#8857;</mo><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>a</mi></mrow><mo>)</mo></mrow></mrow></mrow>");
+		check(expr,
+				"<mrow><mrow><mrow><mo>(</mo><mi>z</mi><mo>+</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>&#8857;</mo><mrow><mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>a</mi></mrow><mo>)</mo></mrow></mrow></mrow>");
 
 	}
+
 	public void testSubscript() {
 		IExpr expr = EvalEngine.get().evaluate("Subscript(\"zzz\",36)");
 		check(expr, //
@@ -359,6 +396,19 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(expr, //
 				"<msup><mi>xx</mi><mi>yy</mi></msup>");
 	}
+
+	public void testInterval001() {
+		IExpr expr = EvalEngine.get().evaluate("Interval({-3.21625*10^-16,5.66554*10^-16})");
+		check(expr, //
+				"<mrow><mi>Interval</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mo>{</mo><mn>-3.2162499999999998E-16</mn><mo>,</mo><mn>5.66554E-16</mn><mo>}</mo></mrow><mo>)</mo></mrow></mrow>");
+	}
+
+	public void testInterval002() {
+		IExpr expr = EvalEngine.get().evaluate("Cot(Interval({3*Pi/4,6*Pi/5}))");
+		check(expr, //
+				"<mrow><mi>Interval</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mo>{</mo><mrow><mo>-</mo><mi>&#x221E;</mi></mrow><mo>,</mo><mn>-1</mn><mo>}</mo></mrow><mo>,</mo><mrow><mo>{</mo><msqrt><mrow><mfrac><mn>2</mn><msqrt><mn>5</mn></msqrt></mfrac><mo>+</mo><mn>1</mn></mrow></msqrt><mo>,</mo><mi>&#x221E;</mi><mo>}</mo></mrow><mo>)</mo></mrow></mrow>");
+	}
+
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();
 		mathUtil.toMathML(strEval, stw);
@@ -382,6 +432,7 @@ public class MathMLPresentationTestCase extends TestCase {
 		check(expr,
 				"<mrow><mi>Missing</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mtext>test1</mtext><mo>,</mo><mtext>test2</mtext></mrow><mo>)</mo></mrow></mrow>");
 	}
+
 	/**
 	 * The JUnit setup method
 	 */

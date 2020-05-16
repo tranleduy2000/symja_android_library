@@ -14,11 +14,12 @@ import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.exception.AbortException;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.TimeoutException;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.expression.ASTRealMatrix;
@@ -32,6 +33,7 @@ import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvalStepListener;
 import org.matheclipse.core.interfaces.IEvaluator;
@@ -546,7 +548,7 @@ public class EvalEngine implements Serializable {
 	 *
 	 * @param ast
 	 * @param attr
-	 * @return
+	 * @return <code>F.NIL</code> is no evaluation was possible
 	 */
 	public IASTMutable evalArgs(final IAST ast, final int attr) {
 		OperationSystem.checkInterrupt();
@@ -566,7 +568,7 @@ public class EvalEngine implements Serializable {
 			rlist[0] = F.NIL;
 			IExpr x = ast.arg1();
 			if ((ISymbol.HOLDFIRST & attr) == ISymbol.NOATTRIBUTE) {
-				// the HoldFirst attribute isn't set here
+				// the HoldFirst attribute is disabled
 				try {
 					if (!x.isAST(F.Unevaluated)) {
 						selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
@@ -598,7 +600,7 @@ public class EvalEngine implements Serializable {
 			}
 			if (astSize > 2) {
 				if ((ISymbol.HOLDREST & attr) == ISymbol.NOATTRIBUTE) {
-					// the HoldRest attribute isn't set here
+					// the HoldRest attribute is disabled
 					numericMode = fNumericMode;
 					try {
 						selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
@@ -628,7 +630,6 @@ public class EvalEngine implements Serializable {
 								}
 							}
 						});
-						// EvalEngineUtils.forEachEvaluateArg(ast, astSize, this);
 					} finally {
 						if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
 							fNumericMode = numericMode;
@@ -690,6 +691,7 @@ public class EvalEngine implements Serializable {
 
 		if ((ISymbol.LISTABLE & attr) == ISymbol.LISTABLE) {
 			if (symbol.isBuiltInSymbol()) {
+				try {
 			if (arg1.isRealVector() && ((IAST) arg1).size() > 1) {
 					final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
 					if (module instanceof DoubleUnaryOperator) {
@@ -703,9 +705,16 @@ public class EvalEngine implements Serializable {
 						return ASTRealMatrix.map((IAST) arg1, oper);
 					}
 				}
+				} catch (RuntimeException rex) {
+					// org.matheclipse.core.eval.exception.ComplexResultException
+					// may be thrown in applAsDouble()
+				}
 			if (arg1.isList()) {
 				// thread over the list
 				return EvalAttributes.threadList(ast, F.List, ast.head(), ((IAST) arg1).argSize());
+				} else if (arg1.isAssociation()) {
+					// thread over the association
+					return ((IAssociation) arg1).mapThread(ast, 1);
 			}
 		}
 		}
@@ -716,7 +725,7 @@ public class EvalEngine implements Serializable {
 			}
 		}
 
-		if (!(arg1 instanceof IPatternObject)) {
+		if (!(arg1 instanceof IPatternObject) && arg1.isPresent()) {
 			ISymbol lhsSymbol = arg1.isSymbol() ? (ISymbol) arg1 : arg1.topHead();
 			return lhsSymbol.evalUpRule(this, ast);
 		}
@@ -758,6 +767,7 @@ public class EvalEngine implements Serializable {
 		if (symbol.isBuiltInSymbol()) {
 			final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
 			if (module instanceof IFunctionEvaluator) {
+				try {
 				// evaluate a built-in function.
 				final IFunctionEvaluator functionEvaluator = (IFunctionEvaluator) module;
 				int[] expected;
@@ -775,6 +785,12 @@ public class EvalEngine implements Serializable {
 						functionEvaluator.evaluate(ast, this);
 				if (result.isPresent()) {
 					return result;
+					}
+				} catch (ValidateException ve) {
+					if (Config.SHOW_STACKTRACE) {
+						ve.printStackTrace();
+					}
+					return printMessage(ast.topHead(), ve);
 				}
 				if (((ISymbol.DELAYED_RULE_EVALUATION & attr) == ISymbol.DELAYED_RULE_EVALUATION)) {
 					return symbol.evalDownRule(this, ast);
@@ -853,6 +869,15 @@ public class EvalEngine implements Serializable {
 				resultList = threadASTListArgs(tempAST);
 				if (resultList.isPresent()) {
 					return evalArgs(resultList, ISymbol.NOATTRIBUTE).orElse(resultList);
+				}
+				int indx = tempAST.indexOf(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isAssociation();
+					}
+				});
+				if (indx > 0) {
+					return ((IAssociation) tempAST.get(indx)).mapThread(tempAST, indx);
 				}
 			}
 
@@ -959,7 +984,6 @@ public class EvalEngine implements Serializable {
 	 * @param expr
 	 * @return
 	 * @see #evaluate(IExpr)
-	 * @throws WrongArgumentType
 	 */
 	final public double evalDouble(final IExpr expr) {
 		if (expr.isReal()) {
@@ -971,9 +995,16 @@ public class EvalEngine implements Serializable {
 				return ((ISignedNumber) result).doubleValue();
 			}
 		}
-		throw new WrongArgumentType(expr, "Conversion into a double numeric value is not possible!");
+		throw new ArgumentTypeException("conversion into a double numeric value is not possible!");
 	}
 
+	/**
+	 * Evaluates <code>expr</code> numerically and return the result a Java <code>org.hipparchus.complex.Complex</code>
+	 * value.
+	 *
+	 * @param expr
+	 * @return
+	 */
 	final public Complex evalComplex(final IExpr expr) {
 		if (expr.isReal()) {
 			return new Complex(((ISignedNumber) expr).doubleValue());
@@ -990,7 +1021,7 @@ public class EvalEngine implements Serializable {
 				return new Complex(((INumber) result).reDoubleValue(), ((INumber) result).imDoubleValue());
 			}
 		}
-		throw new WrongArgumentType(expr, "Conversion into a double numeric value is not possible!");
+		throw new ArgumentTypeException("conversion into a double numeric value is not possible!");
 	}
 	/**
 	 * Evaluate arguments with the head <code>F.Evaluate</code>, i.e. <code>f(a, ... , Evaluate(x), ...)</code>
@@ -1230,10 +1261,10 @@ public class EvalEngine implements Serializable {
 
 			return F.NIL;
 		} catch (UnsupportedOperationException uoe) {
-			if (Config.SHOW_STACKTRACE) {
-				uoe.printStackTrace();
+			if (Config.FUZZ_TESTING) {
+				throw new NullPointerException();
 			}
-			printMessage("Evaluation aborted:" + result.toString());
+			printMessage("Evaluation aborted: " + result.toString());
 			throw AbortException.ABORTED;
 		} finally {
 			if (fTraceMode) {
@@ -1282,6 +1313,45 @@ public class EvalEngine implements Serializable {
 		return evaluate(F.N(expr));
 	}
 
+	final public IAST evalArgsOrderlessN(IAST ast1) {
+		IASTMutable copy = F.NIL;
+		// EvalEngine engine = EvalEngine.get();
+		// long precision = engine.getNumericPrecision();
+		// for (int i = 1; i < ast1.size(); i++) {
+		// IExpr temp = ast1.get(i);
+		// if (temp instanceof ApfloatNum) {
+		// if (((ApfloatNum) temp).precision() > precision) {
+		// precision = ((ApfloatNum) temp).precision();
+		// }
+		// } else if (temp instanceof ApcomplexNum) {
+		// if (((ApcomplexNum) temp).precision() > precision) {
+		// precision = ((ApcomplexNum) temp).precision();
+		// }
+		// } else if (temp.isAST(F.Interval)) {
+		// long p = IntervalSym.precision((IAST) temp);
+		// if (p > precision) {
+		// precision = p;
+		// }
+		// }
+		// }
+		// engine.setNumericPrecision(precision);
+		for (int i = 1; i < ast1.size(); i++) {
+			IExpr temp = ast1.get(i);
+			if (!temp.isNumeric() && temp.isNumericFunction()) {
+				temp = evalLoop(F.N(temp));
+				if (temp.isPresent()) {
+					if (!copy.isPresent()) {
+						copy = ast1.copy();
+					}
+					copy.set(i, evalN(temp));
+				}
+			}
+		}
+		if (copy.isPresent()) {
+			EvalAttributes.sort(copy);
+		}
+		return copy;
+	}
 	/**
 	 * <p>
 	 * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric
@@ -1777,6 +1847,10 @@ public class EvalEngine implements Serializable {
 	 * @return
 	 */
 	public IAST flattenSequences(final IAST ast) {
+		if (ast.isEvalFlagOn(IAST.SEQUENCE_FLATTENED)) {
+			return F.NIL;
+		}
+		final int attr = ast.topHead().getAttributes();
 		final IASTAppendable[] seqResult = new IASTAppendable[] { F.NIL };
 
 		ast.forEach(new ObjIntConsumer<IExpr>() {
@@ -1789,17 +1863,26 @@ public class EvalEngine implements Serializable {
 						seqResult[0].appendArgs(ast, i);
 					}
 					seqResult[0].appendArgs(seq);
+					return;
 				} else if (x.equals(F.Nothing)) {
-					if (!seqResult[0].isPresent()) {
-						seqResult[0] = F.ast(ast.head(), ast.size() - 1, false);
-						seqResult[0].appendArgs(ast, i);
+					if ((ISymbol.HOLDALL & attr) == ISymbol.NOATTRIBUTE) {
+						if (!seqResult[0].isPresent()) {
+							seqResult[0] = F.ast(ast.head(), ast.size() - 1, false);
+							seqResult[0].appendArgs(ast, i);
+						}
+						return;
 					}
-				} else if (seqResult[0].isPresent()) {
+				}
+				if (seqResult[0].isPresent()) {
 					seqResult[0].append(x);
 				}
 			}
 		});
+		if (seqResult[0].isPresent()) {
 		return seqResult[0];
+	}
+		ast.addEvalFlags(IAST.SEQUENCE_FLATTENED);
+		return F.NIL;
 	}
 
 	/**
@@ -2089,8 +2172,6 @@ public class EvalEngine implements Serializable {
 	 */
 	final public IExpr parse(String expression) {
 		return parse(expression, Config.EXPLICIT_TIMES_OPERATOR);
-		// final ExprParser parser = new ExprParser(this, fRelaxedSyntax);
-		// return parser.parse(expression);
 	}
 
 	/**
@@ -2127,6 +2208,25 @@ public class EvalEngine implements Serializable {
 		}
 		if (fThrowError) {
 			throw new IllegalArgument(str);
+		}
+		return F.NIL;
+	}
+	/**
+	 * Print a message to the <code>Out</code> stream, if the engine is not in &quot;quiet mode&quot;.
+	 *
+	 * @param rex
+	 *            the RuntimeException which should be printed
+	 */
+	public IAST printMessage(ISymbol symbol, RuntimeException rex) {
+		if (!isQuietMode()) {
+			PrintStream stream = getErrorPrintStream();
+			if (stream == null) {
+				stream = System.err;
+			}
+			stream.println(symbol + ": " + rex.getMessage());
+		}
+		if (fThrowError) {
+			throw new IllegalArgument(rex.getMessage());
 		}
 		return F.NIL;
 	}
@@ -2387,7 +2487,8 @@ public class EvalEngine implements Serializable {
 						listLength[0] = ((IAST) x).argSize();
 					} else {
 						if (listLength[0] != ((IAST) x).argSize()) {
-							EvalEngine.this.printMessage("Lists of unequal lengths cannot be combined: " + ast.toString());
+							// Objects of unequal length in `1` cannot be combined.
+							IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
 							// ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
 							return true;
 						}
@@ -2399,7 +2500,7 @@ public class EvalEngine implements Serializable {
 						return F.NIL;
 					}
 		if (listLength[0] != -1) {
-			IASTAppendable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength[0]);
+			IASTMutable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength[0]);
 			result.addEvalFlags(IAST.IS_LISTABLE_THREADED);
 			return result;
 		}

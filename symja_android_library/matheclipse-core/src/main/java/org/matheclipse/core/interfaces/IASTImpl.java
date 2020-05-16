@@ -128,6 +128,11 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
         return arg2();
     }
 
+    @Override
+    public int[] toIntVector() {
+        return null;
+    }
+
     /**
      * Tests whether this {@code Collection} contains all objects contained in the specified {@code Collection}. This
      * implementation iterates over the specified {@code Collection}. If one element returned by the iterator is not
@@ -150,6 +155,11 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
             }
         }
         return true;
+    }
+
+    @Override
+    public IASTMutable copyAST() {
+        return copy();
     }
 
     /**

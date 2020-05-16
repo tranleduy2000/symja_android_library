@@ -191,6 +191,13 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	}
 
 	@Override
+	public IAST getItems(int[] items, int length) {
+		if (length == 0) {
+			return this;
+		}
+		throw new IndexOutOfBoundsException("Index: " + items[0]);
+	}
+	@Override
 	public int hashCode() {
         return DObjects.hash(arg1, unit);
 	}

@@ -235,6 +235,9 @@ public class ApfloatNum extends INumImpl implements INum {
 	public Apfloat apfloatValue(long precision) {
 		return fApfloat;
 	}
+	public Apfloat apfloatValue() {
+		return fApfloat;
+	}
 
 	@Override
 	public boolean equals(final Object arg0) {
@@ -412,7 +415,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	@Override
 	public IInteger round() {
 		Apfloat f = ApfloatMath.round(fApfloat, 1, RoundingMode.HALF_EVEN);
-		return F.integer(ApfloatMath.floor(f).toBigInteger());
+		return F.ZZ(ApfloatMath.floor(f).toBigInteger());
 	}
 
 	@Override
@@ -518,7 +521,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return visitor.visit(this);
 	}
 
@@ -558,6 +561,9 @@ public class ApfloatNum extends INumImpl implements INum {
 		return this;
 	}
 
+	public ApfloatNum apfloatNumValue() {
+		return this;
+	}
 	@Override
 	public INum numValue() {
 		return Num.valueOf(doubleValue());

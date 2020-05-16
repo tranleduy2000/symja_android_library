@@ -599,16 +599,14 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return ID.UNKNOWN;
     }
 
-    /**
-     * If this expression unequals <code>F.NIL</code>, invoke the specified consumer with the <code>this</code> object,
-     * otherwise do nothing.
-     *
-     * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
-     * @see java.util.Optional#ifPresent(com.duy.lambda.Consumer)
-     */
-    public void ifPresent(Consumer<? super IExpr> consumer) {
-        consumer.accept(this);
+    @Override
+    public IExpr ifPresent(Function<? super IExpr, IExpr> function) {
+        if (this.isPresent()) {
+            return function.apply(this);
+        }
+        return F.NIL;
     }
+
 
     /**
      * If a value is present, performs the given <code>consumer</code> with the value, otherwise performs the given
@@ -779,6 +777,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isArcTanh() {
+        return false;
+    }
+
+    @Override
+    public boolean isAssociation() {
         return false;
     }
 
@@ -1084,6 +1087,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isConstantAttribute() {
+        return false;
+    }
+
+    @Override
+    public boolean isContinuousDistribution() {
         return false;
     }
 
@@ -1635,6 +1643,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      */
     @Override
     public boolean isListOfRules() {
+        return isListOfRules(false);
+    }
+
+    @Override
+    public boolean isListOfRules(boolean ignoreEmptyList) {
         return false;
     }
 
@@ -2171,6 +2184,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isPolynomial(IAST variables) {
         return isNumber();
+    }
+
+    @Override
+    public boolean isPolynomialStruct() {
+        return isExactNumber();
     }
 
     /**
@@ -3383,6 +3401,16 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return <code>null</code> if this object can not be converted into a <code>double[]</code> vector
      */
     public double[] toDoubleVector() {
+        return null;
+    }
+
+    @Override
+    public Complex[] toComplexVector() {
+        return null;
+    }
+
+    @Override
+    public int[] toIntVector() {
         return null;
     }
 

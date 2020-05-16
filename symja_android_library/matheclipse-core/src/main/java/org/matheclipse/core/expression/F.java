@@ -18,6 +18,7 @@ import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.builtin.Arithmetic;
+import org.matheclipse.core.builtin.AssociationFunctions;
 import org.matheclipse.core.builtin.AssumptionFunctions;
 import org.matheclipse.core.builtin.AttributeFunctions;
 import org.matheclipse.core.builtin.BesselFunctions;
@@ -72,6 +73,7 @@ import org.matheclipse.core.generic.Functors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -239,15 +241,18 @@ public class F {
     public final static IBuiltInSymbol $Version = F.initFinalSymbol("$Version", ID.$Version);
 	/** Abort() - aborts an evaluation completely and returns `$Aborted`. */
     public final static IBuiltInSymbol Abort = F.initFinalSymbol("Abort", ID.Abort);
-    /** Abs(expr) - returns the absolute value of the real or complex number `expr`.*/
+	/** Abs(expr) - returns the absolute value of the real or complex number `expr`. */
     public final static IBuiltInSymbol Abs = F.initFinalSymbol("Abs", ID.Abs);
-    /** AbsArg(expr) - returns a list of 2 values of the complex number `Abs(expr), Arg(expr)`.*/
+	/** AbsArg(expr) - returns a list of 2 values of the complex number `Abs(expr), Arg(expr)`. */
     public final static IBuiltInSymbol AbsArg = F.initFinalSymbol("AbsArg", ID.AbsArg);
+	/***/
+	public final static IBuiltInSymbol AbsoluteCorrelation = F.initFinalSymbol("AbsoluteCorrelation",
+			ID.AbsoluteCorrelation);
 	/** Accumulate(list) - accumulate the values of `list` returning a new list. */
     public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
 	/** AddTo(x, dx) - is equivalent to `x = x + dx`. */
     public final static IBuiltInSymbol AddTo = F.initFinalSymbol("AddTo", ID.AddTo);
-    /** AdjacencyMatrix(graph) - convert the `graph` into a adjacency matrix.*/
+	/** AdjacencyMatrix(graph) - convert the `graph` into a adjacency matrix. */
     public final static IBuiltInSymbol AdjacencyMatrix = F.initFinalSymbol("AdjacencyMatrix", ID.AdjacencyMatrix);
 	/***/
 	public final static IBuiltInSymbol AiryAi = F.initFinalSymbol("AiryAi", ID.AiryAi);
@@ -284,11 +289,13 @@ public class F {
     public final static IBuiltInSymbol AnnuityDue = F.initFinalSymbol("AnnuityDue", ID.AnnuityDue);
     /***/
     public final static IBuiltInSymbol AntiSymmetric = F.initFinalSymbol("AntiSymmetric", ID.AntiSymmetric);
-     /** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix.*/
-    public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ", ID.AntihermitianMatrixQ);
+	/** AntihermitianMatrixQ(m) - returns `True` if `m` is a anti hermitian matrix. */
+	public final static IBuiltInSymbol AntihermitianMatrixQ = F.initFinalSymbol("AntihermitianMatrixQ",
+			ID.AntihermitianMatrixQ);
 
-    /** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix.*/
-    public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ", ID.AntisymmetricMatrixQ);
+	/** AntisymmetricMatrixQ(m) - returns `True` if `m` is a anti symmetric matrix. */
+	public final static IBuiltInSymbol AntisymmetricMatrixQ = F.initFinalSymbol("AntisymmetricMatrixQ",
+			ID.AntisymmetricMatrixQ);
 
 	/**
 	 * AnyTrue({expr1, expr2, ...}, test) - returns `True` if any application of `test` to `expr1, expr2, ...` evaluates
@@ -331,12 +338,12 @@ public class F {
     public final static IBuiltInSymbol ArcTanh = F.initFinalSymbol("ArcTanh", ID.ArcTanh);
 	/** Arg(expr) - returns the argument of the complex number `expr`. */
     public final static IBuiltInSymbol Arg = F.initFinalSymbol("Arg", ID.Arg);
-    /***/
+	/** ArgMax(function, variable) - returns a maximizer point for a univariate `function`. */
 	public final static IBuiltInSymbol ArgMax = F.initFinalSymbol("ArgMax", ID.ArgMax);
 
-    /***/
+	/** ArgMin(function, variable) - returns a minimizer point for a univariate `function`. */
 	public final static IBuiltInSymbol ArgMin = F.initFinalSymbol("ArgMin", ID.ArgMin);
-	/** ArithmeticGeometricMean(a, b) - returns the arithmetic geometric mean of `a` and `b`. */
+	/** ArithmeticGeometricMean({a, b, c,...}) - returns the arithmetic geometric mean of `{a, b, c,...}`. */
 	public final static IBuiltInSymbol ArithmeticGeometricMean = F.initFinalSymbol("ArithmeticGeometricMean",
 			ID.ArithmeticGeometricMean);
 	/** Array(f, n) - returns the `n`-element list `{f(1), ..., f(n)}`. */
@@ -345,7 +352,7 @@ public class F {
     public final static IBuiltInSymbol ArrayDepth = F.initFinalSymbol("ArrayDepth", ID.ArrayDepth);
 	/** ArrayPad(list, n) - adds `n` times `0` on the left and right of the `list`. */
     public final static IBuiltInSymbol ArrayPad = F.initFinalSymbol("ArrayPad", ID.ArrayPad);
-	/** 'ArrayQ(expr) - tests whether expr is a full array. */
+	/** ArrayQ(expr) - tests whether expr is a full array. */
     public final static IBuiltInSymbol ArrayQ = F.initFinalSymbol("ArrayQ", ID.ArrayQ);
     /**
      * ArrayReshape(list-of-values, list-of-dimension) - returns the `list-of-values` elements reshaped as nested list
@@ -354,6 +361,11 @@ public class F {
     public final static IBuiltInSymbol ArrayReshape = F.initFinalSymbol("ArrayReshape", ID.ArrayReshape);
     /***/
     public final static IBuiltInSymbol Arrays = F.initFinalSymbol("Arrays", ID.Arrays);
+	/** Association(list-of-rules) - create a `key->value` association map from the `list-of-rules`. */
+	public final static IBuiltInSymbol Association = F.initFinalSymbol("Association", ID.Association);
+
+	/** AssociationQ(expr) - returns `True` if `expr` is an association, and `False` otherwise. */
+	public final static IBuiltInSymbol AssociationQ = F.initFinalSymbol("AssociationQ", ID.AssociationQ);
     /***/
     public final static IBuiltInSymbol Assumptions = F.initFinalSymbol("Assumptions", ID.Assumptions);
     /**
@@ -374,8 +386,14 @@ public class F {
     /***/
     public final static IBuiltInSymbol Background = F.initFinalSymbol("Background", ID.Background);
     /***/
-    public final static IBuiltInSymbol BartlettWindow = F.initFinalSymbol("BartlettWindow", ID.BartlettWindow);
+	public final static IBuiltInSymbol BarChart = F.initFinalSymbol("BarChart", ID.BarChart);
 	/***/
+	public final static IBuiltInSymbol BarOrigin = F.initFinalSymbol("BarOrigin", ID.BarOrigin);
+
+	/***/
+	public final static IBuiltInSymbol BartlettWindow = F.initFinalSymbol("BartlettWindow", ID.BartlettWindow);
+
+	/** BaseForm(integer, radix) - prints the `integer` number in base `radix` form. */
 	public final static IBuiltInSymbol BaseForm = F.initFinalSymbol("BaseForm", ID.BaseForm);
 	/** Begin("<context-name>") - start a new context definition */
     public final static IBuiltInSymbol Begin = F.initFinalSymbol("Begin", ID.Begin);
@@ -393,20 +411,20 @@ public class F {
 	/** BernoulliDistribution(p) - returns the Bernoulli distribution. */
     public final static IBuiltInSymbol BernoulliDistribution = F.initFinalSymbol("BernoulliDistribution",
             ID.BernoulliDistribution);
-    /***/
+	/** BesselI(n, z) - modified Bessel function of the first kind. */
     public final static IBuiltInSymbol BesselI = F.initFinalSymbol("BesselI", ID.BesselI);
 	/** BesselJ(n, z) - Bessel function of the first kind. */
     public final static IBuiltInSymbol BesselJ = F.initFinalSymbol("BesselJ", ID.BesselJ);
-    /***/
+	/** BesselJZero(n, z) - is the `k`th zero of the `BesselJ(n,z)` function. */
     public final static IBuiltInSymbol BesselJZero = F.initFinalSymbol("BesselJZero", ID.BesselJZero);
-    /***/
+	/** BesselK(n, z) - modified Bessel function of the second kind. */
     public final static IBuiltInSymbol BesselK = F.initFinalSymbol("BesselK", ID.BesselK);
-    /***/
+	/** BesselY(n, z) - Bessel function of the second kind. */
     public final static IBuiltInSymbol BesselY = F.initFinalSymbol("BesselY", ID.BesselY);
     /***/
     public final static IBuiltInSymbol BesselYZero = F.initFinalSymbol("BesselYZero", ID.BesselYZero);
 
-    /** Beta(a, b) - is the beta function of the numbers `a`,`b`.*/
+	/** Beta(a, b) - is the beta function of the numbers `a`,`b`. */
     public final static IBuiltInSymbol Beta = F.initFinalSymbol("Beta", ID.Beta);
     /***/
     public final static IBuiltInSymbol BetaDistribution = F.initFinalSymbol("BetaDistribution", ID.BetaDistribution);
@@ -468,6 +486,11 @@ public class F {
     public final static IBuiltInSymbol BooleanVariables = F.initFinalSymbol("BooleanVariables", ID.BooleanVariables);
 	/** Booleans - is the set of boolean values. */
     public final static IBuiltInSymbol Booleans = F.initFinalSymbol("Booleans", ID.Booleans);
+	/***/
+	public final static IBuiltInSymbol Bottom = F.initFinalSymbol("Bottom", ID.Bottom);
+
+	/***/
+	public final static IBuiltInSymbol BoxWhiskerChart = F.initFinalSymbol("BoxWhiskerChart", ID.BoxWhiskerChart);
 	/** BrayCurtisDistance(u, v) - returns the Bray Curtis distance between `u` and `v`. */
     public final static IBuiltInSymbol BrayCurtisDistance = F.initFinalSymbol("BrayCurtisDistance",
             ID.BrayCurtisDistance);
@@ -573,9 +596,9 @@ public class F {
     public final static IBuiltInSymbol Clip = F.initFinalSymbol("Clip", ID.Clip);
 	/** Coefficient(polynomial, variable, exponent) - get the coefficient of `variable^exponent` in `polynomial`. */
     public final static IBuiltInSymbol Coefficient = F.initFinalSymbol("Coefficient", ID.Coefficient);
-	/** CoefficientList(polynomial, variable) - get the coefficient list of a univariate `polynomial`. */
+	/** CoefficientList(polynomial, variable) - get the coefficient list of a `polynomial`. */
     public final static IBuiltInSymbol CoefficientList = F.initFinalSymbol("CoefficientList", ID.CoefficientList);
-    /***/
+	/** CoefficientRules(polynomial, list-of-variables) - get the list of coefficient rules of a `polynomial`. */
     public final static IBuiltInSymbol CoefficientRules = F.initFinalSymbol("CoefficientRules", ID.CoefficientRules);
 	/** Collect(expr, variable) - collect subexpressions in `expr` which belong to the same `variable`. */
     public final static IBuiltInSymbol Collect = F.initFinalSymbol("Collect", ID.Collect);
@@ -690,6 +713,14 @@ public class F {
     public final static IBuiltInSymbol Coth = F.initFinalSymbol("Coth", ID.Coth);
 	/** Count(list, pattern) - returns the number of times `pattern` appears in `list`. */
     public final static IBuiltInSymbol Count = F.initFinalSymbol("Count", ID.Count);
+	/***/
+	public final static IBuiltInSymbol CountDistinct = F.initFinalSymbol("CountDistinct", ID.CountDistinct);
+
+	/**
+	 * Counts({elem1, elem2, elem3, ...}) - count the number of each distinct element in the list `{elem1, elem2, elem3,
+	 * ...}` and return the result as an association `<|elem1->counter1, ...|>`.
+	 */
+	public final static IBuiltInSymbol Counts = F.initFinalSymbol("Counts", ID.Counts);
 	/** Covariance(a, b) - computes the covariance between the equal-sized vectors `a` and `b`. */
     public final static IBuiltInSymbol Covariance = F.initFinalSymbol("Covariance", ID.Covariance);
     /***/
@@ -713,6 +744,8 @@ public class F {
      * variable `var`.
      */
     public final static IBuiltInSymbol DSolve = F.initFinalSymbol("DSolve", ID.DSolve);
+	/***/
+	public final static IBuiltInSymbol Dataset = F.initFinalSymbol("Dataset", ID.Dataset);
 	/** Decrement(x) - decrements `x` by `1`, returning the original value of `x`. */
     public final static IBuiltInSymbol Decrement = F.initFinalSymbol("Decrement", ID.Decrement);
 	/**
@@ -743,6 +776,11 @@ public class F {
 	 * Denominator(expr) - gives the denominator in `expr`. Denominator collects expressions with negative exponents.
 	 */
     public final static IBuiltInSymbol Denominator = F.initFinalSymbol("Denominator", ID.Denominator);
+	/***/
+	public final static IBuiltInSymbol DensityHistogram = F.initFinalSymbol("DensityHistogram", ID.DensityHistogram);
+
+	/***/
+	public final static IBuiltInSymbol DensityPlot = F.initFinalSymbol("DensityPlot", ID.DensityPlot);
 	/** Depth(expr) - gives the depth of `expr`. */
     public final static IBuiltInSymbol Depth = F.initFinalSymbol("Depth", ID.Depth);
 	/** Derivative(n)[f] - represents the `n`-th derivative of the function `f`. */
@@ -771,6 +809,8 @@ public class F {
     public final static IBuiltInSymbol DiceDissimilarity = F.initFinalSymbol("DiceDissimilarity", ID.DiceDissimilarity);
     /***/
     public final static IBuiltInSymbol Differences = F.initFinalSymbol("Differences", ID.Differences);
+	/** DigitCount(n) - returns a list of the number of integer digits for `n` for `radix` 10. */
+	public final static IBuiltInSymbol DigitCount = F.initFinalSymbol("DigitCount", ID.DigitCount);
 	/** DigitQ(str) - returns `True` if `str` is a string which contains only digits. */
     public final static IBuiltInSymbol DigitQ = F.initFinalSymbol("DigitQ", ID.DigitQ);
 	/** Dimensions(expr) - returns a list of the dimensions of the expression `expr`. */
@@ -821,6 +861,8 @@ public class F {
     public final static IBuiltInSymbol DivisorSigma = F.initFinalSymbol("DivisorSigma", ID.DivisorSigma);
 	/** Divisors(n) - returns all integers that divide the integer `n`. */
     public final static IBuiltInSymbol Divisors = F.initFinalSymbol("Divisors", ID.Divisors);
+	/** DivisorSum */
+	public final static IBuiltInSymbol DivisorSum = F.initFinalSymbol("DivisorSum", ID.DivisorSum);
 	/** Do(expr, {max}) - evaluates `expr` `max` times. */
     public final static IBuiltInSymbol Do = F.initFinalSymbol("Do", ID.Do);
 	/** Dot(x, y) or x . y - `x . y` computes the vector dot product or matrix product `x . y`. */
@@ -1098,19 +1140,26 @@ public class F {
      * integers `{a1, ... ,aN}` and the non-negative integer `M`.
      */
     public final static IBuiltInSymbol FrobeniusSolve = F.initFinalSymbol("FrobeniusSolve", ID.FrobeniusSolve);
-    /***/
+	/**
+	 * FromCharacterCode({ch1, ch2, ...}) - converts the `ch1, ch2,...` character codes into a string of corresponding
+	 * characters.
+	 */
     public final static IBuiltInSymbol FromCharacterCode = F.initFinalSymbol("FromCharacterCode", ID.FromCharacterCode);
-    /** FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2, ...}`.*/
+	/**
+	 * FromContinuedFraction({n1, n2, ...}) - return the number which represents the continued fraction list `{n1, n2,
+	 * ...}`.
+	 */
     public final static IBuiltInSymbol FromContinuedFraction = F.initFinalSymbol("FromContinuedFraction", ID.FromContinuedFraction);
 
-    /** FromDigits(list) - creates an expression from the list of digits for radix `10`.*/
+	/** FromDigits(list) - creates an expression from the list of digits for radix `10`. */
     public final static IBuiltInSymbol FromDigits = F.initFinalSymbol("FromDigits", ID.FromDigits);
-    /** FromPolarCoordinates({r, t}) - return the cartesian coordinates for the polar coordinates `{r, t}`.*/
-    public final static IBuiltInSymbol FromPolarCoordinates = F.initFinalSymbol("FromPolarCoordinates", ID.FromPolarCoordinates);
+	/** FromPolarCoordinates({r, t}) - return the cartesian coordinates for the polar coordinates `{r, t}`. */
+	public final static IBuiltInSymbol FromPolarCoordinates = F.initFinalSymbol("FromPolarCoordinates",
+			ID.FromPolarCoordinates);
 
     /***/
     public final static IBuiltInSymbol Full = F.initFinalSymbol("Full", ID.Full);
-    /** FullForm(expression) - shows the internal representation of the given `expression`.*/
+	/** FullForm(expression) - shows the internal representation of the given `expression`. */
     public final static IBuiltInSymbol FullForm = F.initFinalSymbol("FullForm", ID.FullForm);
     /**
      * FullSimplify(expr) - works like `Simplify` but additionally tries some `FunctionExpand` rule transformations to
@@ -1119,7 +1168,10 @@ public class F {
     public final static IBuiltInSymbol FullSimplify = F.initFinalSymbol("FullSimplify", ID.FullSimplify);
     /***/
     public final static IBuiltInSymbol Function = F.initFinalSymbol("Function", ID.Function);
-	/** FunctionExpand(f) - expands the special function `f`. */
+	/**
+	 * FunctionExpand(expression) - expands the special function `expression`. `FunctionExpand` expands simple nested
+	 * radicals.
+	 */
     public final static IBuiltInSymbol FunctionExpand = F.initFinalSymbol("FunctionExpand", ID.FunctionExpand);
     /***/
     public final static IBuiltInSymbol FunctionRange = F.initFinalSymbol("FunctionRange", ID.FunctionRange);
@@ -1141,11 +1193,14 @@ public class F {
 	public final static IBuiltInSymbol GaussianMatrix = F.initFinalSymbol("GaussianMatrix", ID.GaussianMatrix);
     /***/
     public final static IBuiltInSymbol GaussianWindow = F.initFinalSymbol("GaussianWindow", ID.GaussianWindow);
-    /***/
+	/** GegenbauerC(n, a, x) - returns the GegenbauerC polynomial. */
     public final static IBuiltInSymbol GegenbauerC = F.initFinalSymbol("GegenbauerC", ID.GegenbauerC);
     /***/
     public final static IBuiltInSymbol General = F.initFinalSymbol("General", ID.General);
-    /** GeoDistance({latitude1,longitude1}, {latitude2,longitude2}) - returns the geodesic distance between `{latitude1,longitude1}` and `{latitude2,longitude2}`.*/
+	/**
+	 * GeoDistance({latitude1,longitude1}, {latitude2,longitude2}) - returns the geodesic distance between
+	 * `{latitude1,longitude1}` and `{latitude2,longitude2}`.
+	 */
     public final static IBuiltInSymbol GeoDistance = F.initFinalSymbol("GeoDistance", ID.GeoDistance);
 
     /***/
@@ -1154,9 +1209,11 @@ public class F {
     /***/
     public final static IBuiltInSymbol GeodesyData = F.initFinalSymbol("GeodesyData", ID.GeodesyData);
 
-    /** GeometricDistribution(p) - returns a geometric distribution.*/
-    public final static IBuiltInSymbol GeometricDistribution = F.initFinalSymbol("GeometricDistribution", ID.GeometricDistribution);
-    /***/
+	/** GeometricDistribution(p) - returns a geometric distribution. */
+	public final static IBuiltInSymbol GeometricDistribution = F.initFinalSymbol("GeometricDistribution",
+			ID.GeometricDistribution);
+
+	/** GeometricMean({a, b, c,...}) - returns the geometric mean of `{a, b, c,...}`. */
     public final static IBuiltInSymbol GeometricMean = F.initFinalSymbol("GeometricMean", ID.GeometricMean);
 	/** Get("path-to-package-file-name") - load the package defined in `path-to-package-file-name`. */
     public final static IBuiltInSymbol Get = F.initFinalSymbol("Get", ID.Get);
@@ -1172,34 +1229,47 @@ public class F {
 	/** Graph({edge1,...,edgeN}) - create a graph from the given edges `edge1,...,edgeN`. */
     public final static IBuiltInSymbol Graph = F.initFinalSymbol("Graph", ID.Graph);
 
-    /** GraphCenter(graph) - compute the `graph` center. The center of a `graph` is the set of vertices of graph eccentricity equal to the `graph` radius.*/
+	/**
+	 * GraphCenter(graph) - compute the `graph` center. The center of a `graph` is the set of vertices of graph
+	 * eccentricity equal to the `graph` radius.
+	 */
 	public final static IBuiltInSymbol GraphCenter = F.initFinalSymbol("GraphCenter", ID.GraphCenter);
     /***/
     public final static IBuiltInSymbol GraphData = F.initFinalSymbol("GraphData", ID.GraphData);
-    /** GraphDiameter(graph) - return the diameter of the `graph`.*/
+	/** GraphDiameter(graph) - return the diameter of the `graph`. */
 	public final static IBuiltInSymbol GraphDiameter = F.initFinalSymbol("GraphDiameter", ID.GraphDiameter);
 
-    /** GraphPeriphery(graph) - compute the `graph` periphery. The periphery of a `graph` is the set of vertices of graph eccentricity equal to the graph diameter.  */
+	/**
+	 * GraphPeriphery(graph) - compute the `graph` periphery. The periphery of a `graph` is the set of vertices of graph
+	 * eccentricity equal to the graph diameter.
+	 */
 	public final static IBuiltInSymbol GraphPeriphery = F.initFinalSymbol("GraphPeriphery", ID.GraphPeriphery);
 
-    /** GraphQ(expr) - test if `expr` is a graph object.*/
+	/** GraphQ(expr) - test if `expr` is a graph object. */
     public final static IBuiltInSymbol GraphQ = F.initFinalSymbol("GraphQ", ID.GraphQ);
-    /** GraphRadius(graph) - return the radius of the `graph`.*/
+	/** GraphRadius(graph) - return the radius of the `graph`. */
 	public final static IBuiltInSymbol GraphRadius = F.initFinalSymbol("GraphRadius", ID.GraphRadius);
     /***/
     public final static IBuiltInSymbol Graphics = F.initFinalSymbol("Graphics", ID.Graphics);
     /***/
     public final static IBuiltInSymbol Graphics3D = F.initFinalSymbol("Graphics3D", ID.Graphics3D);
-    /** Greater(x, y) - yields `True` if `x` is known to be greater than `y`.*/
+	/** Greater(x, y) - yields `True` if `x` is known to be greater than `y`. */
     public final static IBuiltInSymbol Greater = F.initFinalSymbol("Greater", ID.Greater);
-    /** GreaterEqual(x, y) - yields `True` if `x` is known to be greater than or equal to `y`.*/
+	/** GreaterEqual(x, y) - yields `True` if `x` is known to be greater than or equal to `y`. */
     public final static IBuiltInSymbol GreaterEqual = F.initFinalSymbol("GreaterEqual", ID.GreaterEqual);
-    /** GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and `variable-list`.*/
+	/**
+	 * GroebnerBasis({polynomial-list},{variable-list}) - returns a Gröbner basis for the `polynomial-list` and
+	 * `variable-list`.
+	 */
     public final static IBuiltInSymbol GroebnerBasis = F.initFinalSymbol("GroebnerBasis", ID.GroebnerBasis);
-    /** GumbelDistribution(a, b) - returns a Gumbel distribution.*/
-    public final static IBuiltInSymbol GumbelDistribution = F.initFinalSymbol("GumbelDistribution", ID.GumbelDistribution);
+	/***/
+	public final static IBuiltInSymbol GroupBy = F.initFinalSymbol("GroupBy", ID.GroupBy);
 
-    /** HamiltonianGraphQ(graph) - returns `True` if `graph` is an hamiltonian graph, and `False` otherwise.*/
+	/** GumbelDistribution(a, b) - returns a Gumbel distribution. */
+	public final static IBuiltInSymbol GumbelDistribution = F.initFinalSymbol("GumbelDistribution",
+			ID.GumbelDistribution);
+
+	/** HamiltonianGraphQ(graph) - returns `True` if `graph` is an hamiltonian graph, and `False` otherwise. */
     public final static IBuiltInSymbol HamiltonianGraphQ = F.initFinalSymbol("HamiltonianGraphQ", ID.HamiltonianGraphQ);
     /***/
     public final static IBuiltInSymbol HammingWindow = F.initFinalSymbol("HammingWindow", ID.HammingWindow);
@@ -1210,7 +1280,7 @@ public class F {
 	public final static IBuiltInSymbol HankelH2 = F.initFinalSymbol("HankelH2", ID.HankelH2);
     /***/
     public final static IBuiltInSymbol HannWindow = F.initFinalSymbol("HannWindow", ID.HannWindow);
-	/***/
+	/** HarmonicMean({a, b, c,...}) - returns the harmonic mean of `{a, b, c,...}`. */
 	public final static IBuiltInSymbol HarmonicMean = F.initFinalSymbol("HarmonicMean", ID.HarmonicMean);
 	/** HarmonicNumber(n) - returns the `n`th harmonic number. */
     public final static IBuiltInSymbol HarmonicNumber = F.initFinalSymbol("HarmonicNumber", ID.HarmonicNumber);
@@ -1228,6 +1298,8 @@ public class F {
     public final static IBuiltInSymbol HermitianMatrixQ = F.initFinalSymbol("HermitianMatrixQ", ID.HermitianMatrixQ);
 	/** HilbertMatrix(n) - gives the hilbert matrix with `n` rows and columns. */
     public final static IBuiltInSymbol HilbertMatrix = F.initFinalSymbol("HilbertMatrix", ID.HilbertMatrix);
+	/***/
+	public final static IBuiltInSymbol Histogram = F.initFinalSymbol("Histogram", ID.Histogram);
 	/** Hold(expr) - `Hold` doesn't evaluate `expr`. */
     public final static IBuiltInSymbol Hold = F.initFinalSymbol("Hold", ID.Hold);
 	/** HoldAll - is an attribute specifying that all arguments of a function should be left unevaluated. */
@@ -1238,7 +1310,7 @@ public class F {
     public final static IBuiltInSymbol HoldComplete = F.initFinalSymbol("HoldComplete", ID.HoldComplete);
 	/** HoldFirst - is an attribute specifying that the first argument of a function should be left unevaluated. */
     public final static IBuiltInSymbol HoldFirst = F.initFinalSymbol("HoldFirst", ID.HoldFirst);
-	/** HoldForm(expr) - `HoldForm` doesn't evaluate `expr` and didn't appear in the output */
+	/** HoldForm(expr) - `HoldForm` doesn't evaluate `expr` and didn't appear in the output. */
     public final static IBuiltInSymbol HoldForm = F.initFinalSymbol("HoldForm", ID.HoldForm);
 	/** HoldPattern(expr) - `HoldPattern` doesn't evaluate `expr` for pattern-matching. */
     public final static IBuiltInSymbol HoldPattern = F.initFinalSymbol("HoldPattern", ID.HoldPattern);
@@ -1250,7 +1322,7 @@ public class F {
     public final static IBuiltInSymbol Horner = F.initFinalSymbol("Horner", ID.Horner);
 	/** HornerForm(polynomial) - Generate the horner scheme for a univariate `polynomial`. */
     public final static IBuiltInSymbol HornerForm = F.initFinalSymbol("HornerForm", ID.HornerForm);
-    /***/
+	/** HurwitzZeta(s, a) - returns the Hurwitz zeta function. */
     public final static IBuiltInSymbol HurwitzZeta = F.initFinalSymbol("HurwitzZeta", ID.HurwitzZeta);
 	/** Hypergeometric0F1(b, z) - return the `Hypergeometric0F1` function */
     public final static IBuiltInSymbol Hypergeometric0F1 = F.initFinalSymbol("Hypergeometric0F1", ID.Hypergeometric0F1);
@@ -1264,7 +1336,7 @@ public class F {
 	/** HypergeometricDistribution(n, s, t) - returns a hypergeometric distribution. */
     public final static IBuiltInSymbol HypergeometricDistribution = F.initFinalSymbol("HypergeometricDistribution",
             ID.HypergeometricDistribution);
-    /***/
+	/** HypergeometricPFQ({a,...}, {b,...}, c) - return the `HypergeometricPFQ` function */
     public final static IBuiltInSymbol HypergeometricPFQ = F.initFinalSymbol("HypergeometricPFQ", ID.HypergeometricPFQ);
     /***/
     public final static IBuiltInSymbol HypergeometricPFQRegularized = F.initFinalSymbol("HypergeometricPFQRegularized",
@@ -1399,7 +1471,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol InverseWeierstrassP = F.initFinalSymbol("InverseWeierstrassP", ID.InverseWeierstrassP);
 
-    /** JSForm(expr) - returns the JavaScript form of the `expr`.  */
+	/** JSForm(expr) - returns the JavaScript form of the `expr`. */
     public final static IBuiltInSymbol JSForm = F.initFinalSymbol("JSForm", ID.JSForm);
 
 	/***/
@@ -1412,8 +1484,19 @@ public class F {
 	 */
     public final static IBuiltInSymbol JaccardDissimilarity = F.initFinalSymbol("JaccardDissimilarity", ID.JaccardDissimilarity);
 
+	/** JacobiAmplitude(x, m) - returns the amplitude `am(x, m)` for Jacobian elliptic function. */
+	public final static IBuiltInSymbol JacobiAmplitude = F.initFinalSymbol("JacobiAmplitude", ID.JacobiAmplitude);
+
+	/** JacobiCN(x, m) - returns the Jacobian elliptic function `cn(x, m)`. */
+	public final static IBuiltInSymbol JacobiCN = F.initFinalSymbol("JacobiCN", ID.JacobiCN);
+
+	/** JacobiDN(x, m) - returns the Jacobian elliptic function `dn(x, m)`. */
+	public final static IBuiltInSymbol JacobiDN = F.initFinalSymbol("JacobiDN", ID.JacobiDN);
+
 	/** JacobiMatrix(matrix, var) - creates a Jacobian matrix. */
     public final static IBuiltInSymbol JacobiMatrix = F.initFinalSymbol("JacobiMatrix", ID.JacobiMatrix);
+	/** JacobiSN(x, m) - returns the Jacobian elliptic function `sn(x, m)`. */
+	public final static IBuiltInSymbol JacobiSN = F.initFinalSymbol("JacobiSN", ID.JacobiSN);
 	/** JacobiSymbol(m, n) - calculates the Jacobi symbol. */
     public final static IBuiltInSymbol JacobiSymbol = F.initFinalSymbol("JacobiSymbol", ID.JacobiSymbol);
     /***/
@@ -1429,8 +1512,21 @@ public class F {
             ID.KOrderlessPartitions);
     /***/
     public final static IBuiltInSymbol KPartitions = F.initFinalSymbol("KPartitions", ID.KPartitions);
+	/***/
+	public final static IBuiltInSymbol Key = F.initFinalSymbol("Key", ID.Key);
+
+	/***/
+	public final static IBuiltInSymbol KeyExistsQ = F.initFinalSymbol("KeyExistsQ", ID.KeyExistsQ);
+
+	/** KeySort(<|key1->value1, ...|>) - sort the `<|key1->value1, ...|>` entries by the `key` values. */
+	public final static IBuiltInSymbol KeySort = F.initFinalSymbol("KeySort", ID.KeySort);
+
+	/** Keys(association) - return a list of keys of the `association`. */
+	public final static IBuiltInSymbol Keys = F.initFinalSymbol("Keys", ID.Keys);
 	/** Khinchin - Khinchin's constant */
     public final static IBuiltInSymbol Khinchin = F.initFinalSymbol("Khinchin", ID.Khinchin);
+	/***/
+	public final static IBuiltInSymbol KleinInvariantJ = F.initFinalSymbol("KleinInvariantJ", ID.KleinInvariantJ);
     /***/
     public final static IBuiltInSymbol KnownUnitQ = F.initFinalSymbol("KnownUnitQ", ID.KnownUnitQ);
 
@@ -1463,6 +1559,8 @@ public class F {
     public final static IBuiltInSymbol LeafCount = F.initFinalSymbol("LeafCount", ID.LeafCount);
 	/** LeastSquares(matrix, right) - solves the linear least-squares problem 'matrix . x = right'. */
     public final static IBuiltInSymbol LeastSquares = F.initFinalSymbol("LeastSquares", ID.LeastSquares);
+	/***/
+	public final static IBuiltInSymbol Left = F.initFinalSymbol("Left", ID.Left);
 	/** LegendreP(n, x) - returns the Legendre polynomial `P_n(x)`. */
     public final static IBuiltInSymbol LegendreP = F.initFinalSymbol("LegendreP", ID.LegendreP);
 	/** LegendreQ(n, x) - returns the Legendre functions of the second kind `Q_n(x)`. */
@@ -1484,7 +1582,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Lexicographic = F.initFinalSymbol("Lexicographic", ID.Lexicographic);
 
-    /** Limit(expr, x->x0) - gives the limit of `expr` as `x` approaches `x0`*/
+	/** Limit(expr, x->x0) - gives the limit of `expr` as `x` approaches `x0` */
     public final static IBuiltInSymbol Limit = F.initFinalSymbol("Limit", ID.Limit);
     /***/
     public final static IBuiltInSymbol Line = F.initFinalSymbol("Line", ID.Line);
@@ -1517,12 +1615,12 @@ public class F {
 
 	/** ListLinePlot( { list-of-points } ) - generate a JavaScript list line plot control for the `list-of-points`. */
 	public final static IBuiltInSymbol ListLinePlot = F.initFinalSymbol("ListLinePlot", ID.ListLinePlot);
-    /** ListPlot( { list-of-points } ) - generate a JavaScript list plot control for the `list-of-points`.*/
+	/** ListPlot( { list-of-points } ) - generate a JavaScript list plot control for the `list-of-points`. */
     public final static IBuiltInSymbol ListPlot = F.initFinalSymbol("ListPlot", ID.ListPlot);
 
-    /** ListPlot3D( { list-of-points } ) - generate a JavaScript list plot 3D control for the `list-of-points`.*/
+	/** ListPlot3D( { list-of-points } ) - generate a JavaScript list plot 3D control for the `list-of-points`. */
     public final static IBuiltInSymbol ListPlot3D = F.initFinalSymbol("ListPlot3D", ID.ListPlot3D);
-    /** ListQ(expr) - tests whether `expr` is a `List`.*/
+	/** ListQ(expr) - tests whether `expr` is a `List`. */
     public final static IBuiltInSymbol ListQ = F.initFinalSymbol("ListQ", ID.ListQ);
     /**
      * Listable - is an attribute specifying that a function should be automatically applied to each element of a list.
@@ -1554,6 +1652,11 @@ public class F {
     public final static IBuiltInSymbol LogisticSigmoid = F.initFinalSymbol("LogisticSigmoid", ID.LogisticSigmoid);
     /***/
     public final static IBuiltInSymbol LongForm = F.initFinalSymbol("LongForm", ID.LongForm);
+	/**
+	 * Lookup(association, key) - return the value in the `association` which is associated with the `key`. If no value
+	 * is available return `Missing("KeyAbsent",key)`.
+	 */
+	public final static IBuiltInSymbol Lookup = F.initFinalSymbol("Lookup", ID.Lookup);
     /***/
     public final static IBuiltInSymbol LowerCaseQ = F.initFinalSymbol("LowerCaseQ", ID.LowerCaseQ);
 	/** LowerTriangularize(matrix) - create a lower triangular matrix from the given `matrix`. */
@@ -1599,7 +1702,7 @@ public class F {
      */
     public final static IBuiltInSymbol MatchingDissimilarity = F.initFinalSymbol("MatchingDissimilarity",
             ID.MatchingDissimilarity);
-	/** MathMLForm(expr) - returns the MathMLForm form of the evaluated `expr`. */
+	/** MathMLForm(expr) - returns the MathML form of the evaluated `expr`. */
     public final static IBuiltInSymbol MathMLForm = F.initFinalSymbol("MathMLForm", ID.MathMLForm);
     /***/
     public final static IBuiltInSymbol MatrixExp = F.initFinalSymbol("MatrixExp", ID.MatrixExp);
@@ -1611,6 +1714,8 @@ public class F {
      */
     public final static IBuiltInSymbol MatrixMinimalPolynomial = F.initFinalSymbol("MatrixMinimalPolynomial",
             ID.MatrixMinimalPolynomial);
+	/***/
+	public final static IBuiltInSymbol MatrixPlot = F.initFinalSymbol("MatrixPlot", ID.MatrixPlot);
 	/** MatrixPower(matrix, n) - computes the `n`th power of a `matrix` */
     public final static IBuiltInSymbol MatrixPower = F.initFinalSymbol("MatrixPower", ID.MatrixPower);
 	/** MatrixQ(m) - returns `True` if `m` is a list of equal-length lists. */
@@ -1645,7 +1750,7 @@ public class F {
 	/** MersennePrimeExponent(n) - returns the `n`th mersenne prime exponent. `2^n - 1` must be a prime number. */
     public final static IBuiltInSymbol MersennePrimeExponent = F.initFinalSymbol("MersennePrimeExponent", ID.MersennePrimeExponent);
     /**
-     * MersennePrimeExponentQ(n) - returns `True` if `2^n - 1` is a prime number. Currently `0 <= n <= 45` can be
+	 * MersennePrimeExponentQ(n) - returns `True` if `2^n - 1` is a prime number. Currently `0 <= n <= 47` can be
      * computed in reasonable time.
      */
     public final static IBuiltInSymbol MersennePrimeExponentQ = F.initFinalSymbol("MersennePrimeExponentQ",
@@ -1670,6 +1775,8 @@ public class F {
     public final static IBuiltInSymbol Min = F.initFinalSymbol("Min", ID.Min);
 	/** MinFilter(list, r) - filter which evaluates the `Min` of `list` for the radius `r`. */
     public final static IBuiltInSymbol MinFilter = F.initFinalSymbol("MinFilter", ID.MinFilter);
+	/***/
+	public final static IBuiltInSymbol MinMax = F.initFinalSymbol("MinMax", ID.MinMax);
     /***/
     public final static IBuiltInSymbol MinimalPolynomial = F.initFinalSymbol("MinimalPolynomial", ID.MinimalPolynomial);
 	/** Minimize(unary-function, variable) - returns the minimum of the unary function for the given `variable`. */
@@ -1708,6 +1815,11 @@ public class F {
             ID.MultiplicativeOrder);
 	/** N(expr) - gives the numerical value of `expr`. */
     public final static IBuiltInSymbol N = F.initFinalSymbol("N", ID.N);
+	/**
+	 * ND(function, x, value) - returns a numerical approximation of the partial derivative of the `function` for the
+	 * variable `x` and the given `value`.
+	 */
+	public final static IBuiltInSymbol ND = F.initFinalSymbol("ND", ID.ND);
     /***/
     public final static IBuiltInSymbol NDSolve = F.initFinalSymbol("NDSolve", ID.NDSolve);
     /***/
@@ -1827,7 +1939,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Nothing = F.initFinalSymbol("Nothing", ID.Nothing);
 
-    /** Null - is the implicit result of expressions that do not yield a result.*/
+	/** Null - is the implicit result of expressions that do not yield a result. */
     public final static IBuiltInSymbol Null = F.initFinalSymbol("Null", ID.Null);
 	/** NullSpace(matrix) - returns a list of vectors that span the nullspace of the `matrix`. */
     public final static IBuiltInSymbol NullSpace = F.initFinalSymbol("NullSpace", ID.NullSpace);
@@ -1837,8 +1949,10 @@ public class F {
 	/***/
     public final static IBuiltInSymbol NumberFieldRootsOfUnity = F.initFinalSymbol("NumberFieldRootsOfUnity", ID.NumberFieldRootsOfUnity);
 
-    /** NumberQ(expr) - returns `True` if `expr` is an explicit number, and `False` otherwise.*/
+	/** NumberQ(expr) - returns `True` if `expr` is an explicit number, and `False` otherwise. */
     public final static IBuiltInSymbol NumberQ = F.initFinalSymbol("NumberQ", ID.NumberQ);
+	/***/
+	public final static IBuiltInSymbol NumberString = F.initFinalSymbol("NumberString", ID.NumberString);
 	/** Numerator(expr) - gives the numerator in `expr`. Numerator collects expressions with non negative exponents. */
     public final static IBuiltInSymbol Numerator = F.initFinalSymbol("Numerator", ID.Numerator);
     /***/
@@ -1888,7 +2002,7 @@ public class F {
      * Orderless - is an attribute indicating that the leaves in an expression `f(a, b, c)` can be placed in any order.
      */
     public final static IBuiltInSymbol Orderless = F.initFinalSymbol("Orderless", ID.Orderless);
-    /***/
+	/** OrthogonalMatrixQ(matrix) - returns `True`, if `matrix` is an orthogonal matrix. `False` otherwise. */
     public final static IBuiltInSymbol OrthogonalMatrixQ = F.initFinalSymbol("OrthogonalMatrixQ", ID.OrthogonalMatrixQ);
 	/** Orthogonalize(matrix) - returns a basis for the orthogonalized set of vectors defined by `matrix`. */
     public final static IBuiltInSymbol Orthogonalize = F.initFinalSymbol("Orthogonalize", ID.Orthogonalize);
@@ -1911,7 +2025,10 @@ public class F {
     public final static IBuiltInSymbol PadLeft = F.initFinalSymbol("PadLeft", ID.PadLeft);
 	/** PadRight(list, n) - pads `list` to length `n` by adding `0` on the right. */
     public final static IBuiltInSymbol PadRight = F.initFinalSymbol("PadRight", ID.PadRight);
-    /** ParametricPlot({function1, function2}, {t, tMin, tMax}) - generate a JavaScript control for the parametric expressions `function1`, `function1` in the `t` range `{t, tMin, tMax}`.*/
+	/**
+	 * ParametricPlot({function1, function2}, {t, tMin, tMax}) - generate a JavaScript control for the parametric
+	 * expressions `function1`, `function2` in the `t` range `{t, tMin, tMax}`.
+	 */
     public final static IBuiltInSymbol ParametricPlot = F.initFinalSymbol("ParametricPlot", ID.ParametricPlot);
 	/** Part(expr, i) - returns part `i` of `expr`. */
     public final static IBuiltInSymbol Part = F.initFinalSymbol("Part", ID.Part);
@@ -1948,8 +2065,12 @@ public class F {
     public final static IBuiltInSymbol Permutations = F.initFinalSymbol("Permutations", ID.Permutations);
 	/** Pi - is the constant `Pi`. */
     public final static IBuiltInSymbol Pi = F.initFinalSymbol("Pi", ID.Pi);
+	/***/
+	public final static IBuiltInSymbol PieChart = F.initFinalSymbol("PieChart", ID.PieChart);
 	/** Piecewise({{expr1, cond1}, ...}) - represents a piecewise function. */
     public final static IBuiltInSymbol Piecewise = F.initFinalSymbol("Piecewise", ID.Piecewise);
+	/***/
+	public final static IBuiltInSymbol PiecewiseExpand = F.initFinalSymbol("PiecewiseExpand", ID.PiecewiseExpand);
 	/**
 	 * Plot(function, {x, xMin, xMax}, PlotRange->{yMin,yMax}) - generate a JavaScript control for the expression
 	 * `function` in the `x` range `{x, xMin, xMax}` and `{yMin, yMax}` in the `y` range.
@@ -1971,9 +2092,15 @@ public class F {
 	/** PoissonDistribution(m) - returns a Poisson distribution. */
     public final static IBuiltInSymbol PoissonDistribution = F.initFinalSymbol("PoissonDistribution",
             ID.PoissonDistribution);
-	/***/
+	/**
+	 * PolarPlot(function, {t, tMin, tMax}) - generate a JavaScript control for the polar plot expressions `function` in
+	 * the `t` range `{t, tMin, tMax}`.
+	 */
 	public final static IBuiltInSymbol PolarPlot = F.initFinalSymbol("PolarPlot", ID.PolarPlot);
-    /***/
+	/**
+	 * PolyGamma(value) - return the digamma function of the `value`. The digamma function is defined as the logarithmic
+	 * derivative of the gamma function.
+	 */
     public final static IBuiltInSymbol PolyGamma = F.initFinalSymbol("PolyGamma", ID.PolyGamma);
     /***/
     public final static IBuiltInSymbol PolyLog = F.initFinalSymbol("PolyLog", ID.PolyLog);
@@ -2020,7 +2147,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Postefix = F.initFinalSymbol("Postefix", ID.Postefix);
 
-    /** Power(a, b) - represents `a` raised to the power of `b`.*/
+	/** Power(a, b) - represents `a` raised to the power of `b`. */
     public final static IBuiltInSymbol Power = F.initFinalSymbol("Power", ID.Power);
 	/** PowerExpand(expr) - expands out powers of the form `(x^y)^z` and `(x*y)^z` in `expr`. */
     public final static IBuiltInSymbol PowerExpand = F.initFinalSymbol("PowerExpand", ID.PowerExpand);
@@ -2037,7 +2164,7 @@ public class F {
     /***/
     public final static IBuiltInSymbol Prefix = F.initFinalSymbol("Prefix", ID.Prefix);
 
-    /** Prepend(expr, item) - returns `expr` with `item` prepended to its leaves.*/
+	/** Prepend(expr, item) - returns `expr` with `item` prepended to its leaves. */
     public final static IBuiltInSymbol Prepend = F.initFinalSymbol("Prepend", ID.Prepend);
 	/** PrependTo(s, item) - prepend `item` to value of `s` and sets `s` to the result. */
     public final static IBuiltInSymbol PrependTo = F.initFinalSymbol("PrependTo", ID.PrependTo);
@@ -2098,6 +2225,8 @@ public class F {
     public final static IBuiltInSymbol QuantityMagnitude = F.initFinalSymbol("QuantityMagnitude", ID.QuantityMagnitude);
     /***/
     public final static IBuiltInSymbol QuantityQ = F.initFinalSymbol("QuantityQ", ID.QuantityQ);
+	/** Quartiles(arg) - returns a list of the `1/4`, `1/2` and `3/4` quantile of `arg`. */
+	public final static IBuiltInSymbol Quartiles = F.initFinalSymbol("Quartiles", ID.Quartiles);
 	/** Quiet(expr) - evaluates `expr` in "quiet" mode (i.e. no warning messages are shown during evaluation). */
     public final static IBuiltInSymbol Quiet = F.initFinalSymbol("Quiet", ID.Quiet);
     /***/
@@ -2106,6 +2235,8 @@ public class F {
     public final static IBuiltInSymbol Quotient = F.initFinalSymbol("Quotient", ID.Quotient);
 	/** QuotientRemainder(m, n) - computes a list of the quotient and remainder from division of `m` and `n`. */
     public final static IBuiltInSymbol QuotientRemainder = F.initFinalSymbol("QuotientRemainder", ID.QuotientRemainder);
+	/***/
+	public final static IBuiltInSymbol Ramp = F.initFinalSymbol("Ramp", ID.Ramp);
 	/** RandomChoice({arg1, arg2, arg3,...}) - chooses a random `arg` from the list. */
     public final static IBuiltInSymbol RandomChoice = F.initFinalSymbol("RandomChoice", ID.RandomChoice);
 	/** RandomInteger(n) - create a random integer number between `0` and `n`. */
@@ -2191,6 +2322,8 @@ public class F {
     public final static IBuiltInSymbol Reverse = F.initFinalSymbol("Reverse", ID.Reverse);
 	/** Riffle(list1, list2) - insert elements of `list2` between the elements of `list1`. */
     public final static IBuiltInSymbol Riffle = F.initFinalSymbol("Riffle", ID.Riffle);
+	/***/
+	public final static IBuiltInSymbol Right = F.initFinalSymbol("Right", ID.Right);
     /**
      * RogersTanimotoDissimilarity(u, v) - returns the Rogers-Tanimoto dissimilarity between the two boolean 1-D lists
      * `u` and `v`, which is defined as `R / (c_tt + c_ff + R)` where n is `len(u)`, `c_ij` is the number of occurrences
@@ -2256,6 +2389,8 @@ public class F {
      * of boolean `False` and `True` values for the `list-of-variables`.
      */
     public final static IBuiltInSymbol SatisfiableQ = F.initFinalSymbol("SatisfiableQ", ID.SatisfiableQ);
+	/***/
+	public final static IBuiltInSymbol Scaled = F.initFinalSymbol("Scaled", ID.Scaled);
 	/** Scan(f, expr) - applies `f` to each element of `expr` and returns 'Null'. */
     public final static IBuiltInSymbol Scan = F.initFinalSymbol("Scan", ID.Scan);
 	/** Sec(z) - returns the secant of `z`. */
@@ -2266,6 +2401,18 @@ public class F {
     public final static IBuiltInSymbol Second = F.initFinalSymbol("Second", ID.Second);
 	/** Select({e1, e2, ...}, f) - returns a list of the elements `ei` for which `f(ei)` returns `True`. */
     public final static IBuiltInSymbol Select = F.initFinalSymbol("Select", ID.Select);
+	/**
+	 * SemanticImport("path-to-filename") - if the file system is enabled, import the data from CSV files and do a
+	 * semantic interpretation of the columns.
+	 */
+	public final static IBuiltInSymbol SemanticImport = F.initFinalSymbol("SemanticImport", ID.SemanticImport);
+
+	/**
+	 * SemanticImportString("string-content") - import the data from a content string in CSV format and do a semantic
+	 * interpretation of the columns.
+	 */
+	public final static IBuiltInSymbol SemanticImportString = F.initFinalSymbol("SemanticImportString",
+			ID.SemanticImportString);
     /***/
     public final static IBuiltInSymbol Sequence = F.initFinalSymbol("Sequence", ID.Sequence);
 	/***/
@@ -2338,10 +2485,10 @@ public class F {
     public final static IBuiltInSymbol Sow = F.initFinalSymbol("Sow", ID.Sow);
 	/** Span - is the head of span ranges like `1;;3`. */
     public final static IBuiltInSymbol Span = F.initFinalSymbol("Span", ID.Span);
-	/***/
+	/** SphericalBesselJ(n, z) - spherical Bessel function `J(n, x)`. */
 	public final static IBuiltInSymbol SphericalBesselJ = F.initFinalSymbol("SphericalBesselJ", ID.SphericalBesselJ);
 
-	/***/
+	/** SphericalBesselY(n, z) - spherical Bessel function `Y(n, x)`. */
 	public final static IBuiltInSymbol SphericalBesselY = F.initFinalSymbol("SphericalBesselY", ID.SphericalBesselY);
 
 	/***/
@@ -2358,7 +2505,9 @@ public class F {
     public final static IBuiltInSymbol SplitBy = F.initFinalSymbol("SplitBy", ID.SplitBy);
 	/** Sqrt(expr) - returns the square root of `expr`. */
     public final static IBuiltInSymbol Sqrt = F.initFinalSymbol("Sqrt", ID.Sqrt);
-	/** SquareFreeQ(n) - returns `True` if `n` a square free integer number or a square free univariate polynomial. */
+	/**
+	 * SquareFreeQ(n) - returns `True` if `n` is a square free integer number or a square free univariate polynomial.
+	 */
     public final static IBuiltInSymbol SquareFreeQ = F.initFinalSymbol("SquareFreeQ", ID.SquareFreeQ);
 	/** SquareMatrixQ(m) - returns `True` if `m` is a square matrix. */
     public final static IBuiltInSymbol SquareMatrixQ = F.initFinalSymbol("SquareMatrixQ", ID.SquareMatrixQ);
@@ -2387,18 +2536,41 @@ public class F {
     public final static IBuiltInSymbol Strict = F.initFinalSymbol("Strict", ID.Strict);
     /***/
     public final static IBuiltInSymbol String = F.initFinalSymbol("String", ID.String);
+	/**
+	 * StringCases(str, {"p1", "p2",...}) - return a list of matches for `"p1", "p2",...` list of strings in the string
+	 * `str`.
+	 */
+	public final static IBuiltInSymbol StringCases = F.initFinalSymbol("StringCases", ID.StringCases);
+
+	/**
+	 * StringContainsQ(str1, str2) - return a list of matches for `"p1", "p2",...` list of strings in the string `str`.
+	 */
+	public final static IBuiltInSymbol StringContainsQ = F.initFinalSymbol("StringContainsQ", ID.StringContainsQ);
     /***/
     public final static IBuiltInSymbol StringDrop = F.initFinalSymbol("StringDrop", ID.StringDrop);
+	/***/
+	public final static IBuiltInSymbol StringExpression = F.initFinalSymbol("StringExpression", ID.StringExpression);
 	/** StringJoin(str1, str2, ... strN) - concatenate the strings `str1, str2, ... strN` into one string. */
     public final static IBuiltInSymbol StringJoin = F.initFinalSymbol("StringJoin", ID.StringJoin);
-    /***/
+	/** StringLength(str) - return the length of the string `str`. */
     public final static IBuiltInSymbol StringLength = F.initFinalSymbol("StringLength", ID.StringLength);
-	/** StringQ(x) - is `True` if `x` is a string, or `False` otherwise. */
+	/**
+	 * StringMatchQ(str, RegularExpression(pattern-string)) - check if the regular expression `pattern-string` matches
+	 * the string `str`.
+	 */
+	public final static IBuiltInSymbol StringMatchQ = F.initFinalSymbol("StringMatchQ", ID.StringMatchQ);
+
+	/** StringPart(str, pos) - return the character at position `pos` from the `str` string expression. */
+	public final static IBuiltInSymbol StringPart = F.initFinalSymbol("StringPart", ID.StringPart);
+
+	/** StringQ(x) - is `True` if `x` is a string object, or `False` otherwise. */
     public final static IBuiltInSymbol StringQ = F.initFinalSymbol("StringQ", ID.StringQ);
-    /***/
+	/** StringReplace(str, fromStr -> toStr) - replaces the `fromStr` with the `toStr` in the `str` string. */
     public final static IBuiltInSymbol StringReplace = F.initFinalSymbol("StringReplace", ID.StringReplace);
     /***/
     public final static IBuiltInSymbol StringRiffle = F.initFinalSymbol("StringRiffle", ID.StringRiffle);
+	/** StringSplit(str) - split the string `str` by whitespaces into a list of strings. */
+	public final static IBuiltInSymbol StringSplit = F.initFinalSymbol("StringSplit", ID.StringSplit);
     /***/
     public final static IBuiltInSymbol StringTake = F.initFinalSymbol("StringTake", ID.StringTake);
 	/** StruveH(n, z) - returns the Struve function `H_n(z)`. */
@@ -2456,7 +2628,7 @@ public class F {
     /** SystemDialogInput("FileOpen") - if the file system is enabled, open a file chooser dialog box. */
     public final static IBuiltInSymbol SystemDialogInput = F.initFinalSymbol("SystemDialogInput", ID.SystemDialogInput);
 
-    /** Table(expr, {i, n}) - evaluates `expr` with `i` ranging from `1` to `n`, returning a list of the results.*/
+	/** Table(expr, {i, n}) - evaluates `expr` with `i` ranging from `1` to `n`, returning a list of the results. */
     public final static IBuiltInSymbol Table = F.initFinalSymbol("Table", ID.Table);
     /***/
     public final static IBuiltInSymbol TableForm = F.initFinalSymbol("TableForm", ID.TableForm);
@@ -2466,6 +2638,11 @@ public class F {
     public final static IBuiltInSymbol TagSetDelayed = F.initFinalSymbol("TagSetDelayed", ID.TagSetDelayed);
 	/** Take(expr, n) - returns `expr` with all but the first `n` leaves removed. */
     public final static IBuiltInSymbol Take = F.initFinalSymbol("Take", ID.Take);
+	/***/
+	public final static IBuiltInSymbol TakeLargest = F.initFinalSymbol("TakeLargest", ID.TakeLargest);
+
+	/***/
+	public final static IBuiltInSymbol TakeLargestBy = F.initFinalSymbol("TakeLargestBy", ID.TakeLargestBy);
     /***/
     public final static IBuiltInSymbol Tally = F.initFinalSymbol("Tally", ID.Tally);
 	/** Tan(expr) - returns the tangent of `expr` (measured in radians). */
@@ -2513,7 +2690,7 @@ public class F {
      * evaluation result of `x`.
      */
     public final static IBuiltInSymbol Timing = F.initFinalSymbol("Timing", ID.Timing);
-	/** ToCharacterCode(string) - converts `string` into a list of corresponding integer numbers. */
+	/** ToCharacterCode(string) - converts `string` into a list of corresponding integer character codes. */
     public final static IBuiltInSymbol ToCharacterCode = F.initFinalSymbol("ToCharacterCode", ID.ToCharacterCode);
 	/** ToExpression("string", form) - converts the `string` given in `form` into an expression. */
     public final static IBuiltInSymbol ToExpression = F.initFinalSymbol("ToExpression", ID.ToExpression);
@@ -2532,6 +2709,8 @@ public class F {
     public final static IBuiltInSymbol Together = F.initFinalSymbol("Together", ID.Together);
     /***/
     public final static IBuiltInSymbol TooLarge = F.initFinalSymbol("TooLarge", ID.TooLarge);
+	/***/
+	public final static IBuiltInSymbol Top = F.initFinalSymbol("Top", ID.Top);
 	/** Total(list) - adds all values in `list`. */
     public final static IBuiltInSymbol Total = F.initFinalSymbol("Total", ID.Total);
 	/** Tr(matrix) - computes the trace of the `matrix`. */
@@ -2619,6 +2798,8 @@ public class F {
             ID.UpperTriangularize);
 	/** ValueQ(expr) - returns `True` if and only if `expr` is defined. */
     public final static IBuiltInSymbol ValueQ = F.initFinalSymbol("ValueQ", ID.ValueQ);
+	/** Values(association) - return a list of values of the `association`. */
+	public final static IBuiltInSymbol Values = F.initFinalSymbol("Values", ID.Values);
 	/** VandermondeMatrix(n) - gives the Vandermonde matrix with `n` rows and columns. */
     public final static IBuiltInSymbol VandermondeMatrix = F.initFinalSymbol("VandermondeMatrix", ID.VandermondeMatrix);
     /***/
@@ -2643,13 +2824,14 @@ public class F {
 	/** VertexList(graph) - convert the `graph` into a list of vertices. */
     public final static IBuiltInSymbol VertexList = F.initFinalSymbol("VertexList", ID.VertexList);
 
-    /** VertexQ(graph, vertex) - test if `vertex` is a vertex in the `graph` object.*/
+	/** VertexQ(graph, vertex) - test if `vertex` is a vertex in the `graph` object. */
     public final static IBuiltInSymbol VertexQ = F.initFinalSymbol("VertexQ", ID.VertexQ);
     /***/
     public final static IBuiltInSymbol ViewPoint = F.initFinalSymbol("ViewPoint", ID.ViewPoint);
 
-    /** WeibullDistribution(a, b) - returns a Weibull distribution.*/
-    public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution", ID.WeibullDistribution);
+	/** WeibullDistribution(a, b) - returns a Weibull distribution. */
+	public final static IBuiltInSymbol WeibullDistribution = F.initFinalSymbol("WeibullDistribution",
+			ID.WeibullDistribution);
 
     /***/
     public final static IBuiltInSymbol WeierstrassHalfPeriods = F.initFinalSymbol("WeierstrassHalfPeriods", ID.WeierstrassHalfPeriods);
@@ -2675,6 +2857,8 @@ public class F {
     public final static IBuiltInSymbol While = F.initFinalSymbol("While", ID.While);
     /***/
     public final static IBuiltInSymbol White = F.initFinalSymbol("White", ID.White);
+	/***/
+	public final static IBuiltInSymbol Whitespace = F.initFinalSymbol("Whitespace", ID.Whitespace);
 	/**
 	 * With({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by replacing the
 	 * local variables in `expr`.
@@ -2690,7 +2874,7 @@ public class F {
     public final static IBuiltInSymbol Xor = F.initFinalSymbol("Xor", ID.Xor);
 	/**
 	 * YuleDissimilarity(u, v) - returns the Yule dissimilarity between the two boolean 1-D lists `u` and `v`, which is
-	 * defined as R / (c_tt * c_ff + R / 2) where n is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and
+	 * defined as `R / (c_tt * c_ff + R / 2)` where `n` is `len(u)`, `c_ij` is the number of occurrences of `u(k)=i` and
 	 * `v(k)=j` for `k<n`, and `R = 2 * c_tf * c_ft`.
 	 */
     public final static IBuiltInSymbol YuleDissimilarity = F.initFinalSymbol("YuleDissimilarity", ID.YuleDissimilarity);
@@ -2927,12 +3111,12 @@ public class F {
 	/**
 	 * Complex imaginary unit. The parsed symbol &quot;I&quot; is converted on input to this constant.
 	 */
-	public final static IComplex CI = ComplexSym.valueOf(BigInteger.ZERO, BigInteger.ONE);
+	public final static IComplex CI = ComplexSym.valueOf(0, 1, 1, 1);
 
 	/**
 	 * Complex negative imaginary unit.
 	 */
-	public final static IComplex CNI = ComplexSym.valueOf(BigInteger.ZERO, BigInteger.valueOf(-1L));
+	public final static IComplex CNI = ComplexSym.valueOf(0, 1, -1, 1);
 
 	/**
 	 * Constant fraction &quot;1/2&quot;
@@ -3158,6 +3342,10 @@ public class F {
      */
     public static IAST Slot2;
 	/**
+	 * Represents <code>#3</code>
+	 */
+	public static IAST Slot3;
+	/**
 	 * Constant integer &quot;-1&quot;
 	 */
 	public final static IInteger CN1 = AbstractIntegerSym.valueOf(-1);
@@ -3294,6 +3482,7 @@ public class F {
 
             Slot1 = unaryAST1(Slot, C1);
             Slot2 = unaryAST1(Slot, C2);
+			Slot3 = unaryAST1(Slot, C3);
 
             GLOBAL_IDS = new IExpr[]{CN1, CN2, CN3, CN4, CN5, CN6, CN7, CN8, CN9, CN10, C0, C1, C2, C3, C4, C5, C6,
                     C7, C8, C9, C10, CI, CNI, C1D2, CN1D2, C1D3, CN1D3, C1D4, CN1D4, CD0, CD1, CInfinity, CNInfinity,
@@ -3463,6 +3652,7 @@ public class F {
 			MinMaxFunctions.initialize();
 			GraphFunctions.initialize();
 			GraphDataFunctions.initialize();
+			AssociationFunctions.initialize();
 			GeodesyFunctions.initialize();
 			ManipulateFunction.initialize();
             ImageFunctions.initialize();
@@ -4056,6 +4246,9 @@ public class F {
         return new AST1(Abs, a0);
     }
 
+	public static IAST AbsoluteCorrelation(final IExpr a0, final IExpr a1) {
+		return new AST2(AbsoluteCorrelation, a0, a1);
+	}
     public static IAST Alternatives(final IExpr... a) {
         return function(Alternatives, a);
     }
@@ -4084,6 +4277,13 @@ public class F {
         return function(And, a);
     }
 
+	public static IAST And(final IExpr a0, final IExpr a1) {
+		return new B2.And(a0, a1);
+	}
+
+	public static IAST And(final IExpr a0, final IExpr a1, final IExpr a3) {
+		return new AST3(F.And, a0, a1, a3);
+	}
     public static IAST AngleVector(final IExpr a0) {
         return new AST1(AngleVector, a0);
     }
@@ -4092,9 +4292,6 @@ public class F {
         return new AST1(AntiSymmetric, a0);
     }
 
-    public static IAST And(final IExpr a0, final IExpr a1) {
-		return new B2.And(a0, a1);
-    }
 
     public static IAST Apart(final IExpr a0) {
         return new AST1(Apart, a0);
@@ -4282,6 +4479,12 @@ public class F {
         return new AST2(ArithmeticGeometricMean, a0, a1);
     }
 
+	public static IAssociation assoc(final IAST listOfRules) {
+		if (listOfRules.isAST1() && listOfRules.arg1().isListOfRules(true)) {
+			return new ASTAssociation((IAST) listOfRules.arg1());
+		}
+		return new ASTAssociation(listOfRules);
+	}
     /**
      * Creates a new AST from the given <code>ast</code> and <code>head</code>. if <code>include</code> is set to
      * <code>true </code> all arguments from index first to last-1 are copied in the new list if <code>include</code> is
@@ -4291,20 +4494,23 @@ public class F {
     public static IAST ast(final IAST f, final IExpr head, final boolean include, final int first, final int last) {
         AST ast = null;
         if (include) {
-            ast = AST.newInstance(last - first, head);
+			ast = AST.newInstance(last - first, head, false);
             // range include
-            for (int i = first; i < last; i++) {
-                ast.append(f.get(i));
-            }
+			ast.appendAll(f, first, last);
+			// for (int i = first; i < last; i++) {
+			// ast.append(f.get(i));
+			// }
         } else {
-            ast = AST.newInstance(f.size() - last + first - 1, head);
+			ast = AST.newInstance(f.size() - last + first - 1, head, false);
             // range exclude
-            for (int i = 1; i < first; i++) {
-                ast.append(f.get(i));
-            }
-            for (int j = last; j < f.size(); j++) {
-                ast.append(f.get(j));
-            }
+			ast.appendAll(f, 1, first);
+			// for (int i = 1; i < first; i++) {
+			// ast.append(f.get(i));
+			// }
+			ast.appendAll(f, last, f.size());
+			// for (int j = last; j < f.size(); j++) {
+			// ast.append(f.get(j));
+			// }
         }
         return ast;
     }
@@ -4334,13 +4540,7 @@ public class F {
      * @return
      */
     public static IASTAppendable ast(final IExpr head, final int initialCapacity, final boolean initNull) {
-        final AST ast = AST.newInstance(initialCapacity, head);
-        if (initNull) {
-            for (int i = 0; i < initialCapacity; i++) {
-                ast.append(null);
-            }
-        }
-        return ast;
+		return AST.newInstance(initialCapacity, head, initNull);
     }
 
     /**
@@ -4464,6 +4664,9 @@ public class F {
         return new AST1(F.BernoulliB, a0);
     }
 
+	public static IAST BernoulliB(final IExpr a0, final IExpr a1) {
+		return new AST2(F.BernoulliB, a0, a1);
+	}
     public static IAST BernoulliDistribution(final IExpr a0) {
         return new AST1(F.BernoulliDistribution, a0);
     }
@@ -4841,11 +5044,11 @@ public class F {
 
     public static int compareTo(Integer i, IExpr b) throws UnsupportedOperationException {
         if (b instanceof ISignedNumber) {
-            return integer(i.longValue()).compareTo(b);
+			return ZZ(i.longValue()).compareTo(b);
         }
         IExpr temp = eval(b);
         if (temp instanceof ISignedNumber) {
-            return integer(i.longValue()).compareTo(temp);
+			return ZZ(i.longValue()).compareTo(temp);
         }
         throw new UnsupportedOperationException(
                 "compareTo() - second argument could not be converted into a signed number.");
@@ -5443,21 +5646,23 @@ public class F {
      * @return the evaluated expression
      * @see EvalEngine#evaluate(IExpr)
      */
-    public static IExpr evalExpand(IExpr a) {
-        IExpr result = EvalEngine.get().evaluate(a);
+	public static IExpr evalExpand(IExpr result) {
+		EvalEngine engine = EvalEngine.get();
         if (result.isAST()) {
             IAST ast = (IAST) result;
             if (ast.isPlus()) {
-                for (int i = 1; i < ast.size(); i++) {
-                    IExpr temp = ast.get(i);
-                    if (temp.isTimes() || temp.isPower() || temp.isPlus()) {
-                        return EvalEngine.get().evaluate(Expand(result));
+				if (ast.exists(new Predicate<IExpr>() {
+                    @Override
+                    public boolean test(IExpr x) {
+                        return x.isPlusTimesPower();
                     }
+                })) {
+					return engine.evaluate(Expand(result));
                 }
                 return ast;
             }
             if (ast.isTimes() || ast.isPower()) {
-                return EvalEngine.get().evaluate(Expand(result));
+				return engine.evaluate(Expand(result));
             }
         }
         return result;
@@ -6645,10 +6850,32 @@ public class F {
 	public static IAST JSFormData(final String a0, final String format) {
 		return new AST2(JSFormData, F.$str(a0), F.$str(format));
 	}
+	public static IAST JacobiAmplitude(final IExpr a0, final IExpr a1) {
+		return new AST2(JacobiAmplitude, a0, a1);
+	}
+
+	public static IAST JacobiCN(final IExpr a0, final IExpr a1) {
+		return new AST2(JacobiCN, a0, a1);
+	}
+
+	public static IAST JacobiDN(final IExpr a0, final IExpr a1) {
+		return new AST2(JacobiDN, a0, a1);
+	}
+
+	public static IAST JacobiSN(final IExpr a0, final IExpr a1) {
+		return new AST2(JacobiSN, a0, a1);
+	}
     public static IAST Join(final IExpr a0, final IExpr a1) {
         return new AST2(Join, a0, a1);
     }
 
+	public static IAST Key(final IExpr a0) {
+		return new AST1(Key, a0);
+	}
+
+	public static IAST KleinInvariantJ(final IExpr a0) {
+		return new AST1(KleinInvariantJ, a0);
+	}
     public static IAST KroneckerDelta(final IExpr a0) {
         return new AST1(KroneckerDelta, a0);
     }
@@ -6742,7 +6969,7 @@ public class F {
     }
 
 	public static IAST Line(final IExpr a0) {
-		return new AST1(Line, a0);
+		return new B1.Line(a0);
 	}
     public static IAST LinearModelFit(final IExpr a0) {
         return new AST1(LinearModelFit, a0);
@@ -7264,13 +7491,20 @@ public class F {
         if (x.isNegativeInfinity()) {
             return CInfinity;
         }
-        return new AST2(Times, CN1, x);
+		return new B2.Times(CN1, x);
     }
 
     public static IAST Negative(final IExpr a0) {
         return new AST1(Negative, a0);
     }
 
+	public static IAST Nest(final IExpr a0, final IExpr a1, final int n) {
+		return Nest(a0, a1, ZZ(n));
+	}
+
+	public static IAST Nest(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Nest, a0, a1, a2);
+	}
     /**
      * Create a new abstract syntax tree (AST).
      *
@@ -7282,7 +7516,7 @@ public class F {
      * @return
      */
     public static IAST newInstance(final int intialArgumentsCapacity, final IExpr head) {
-        return AST.newInstance(intialArgumentsCapacity, head);
+        return AST.newInstance(intialArgumentsCapacity, head, false);
     }
 
     public static INilPointer nilPtr() {
@@ -7491,21 +7725,6 @@ public class F {
         return new AST1(Options, a0);
     }
 
-    public static IExpr or(IExpr a, Integer i) {
-        return $(Or, a, integer(i.longValue()));
-    }
-
-    public static IExpr or(IExpr a, java.math.BigInteger i) {
-        return Or(a, integer(i));
-    }
-
-    public static IExpr or(Integer i, IExpr b) {
-        return $(Or, integer(i.longValue()), b);
-    }
-
-    public static IExpr or(java.math.BigInteger i, IExpr b) {
-        return Or(integer(i), b);
-    }
 
     public static IASTAppendable Or() {
         return ast(Or);
@@ -7515,6 +7734,9 @@ public class F {
 		return new B2.Or(a0, a1);
     }
 
+	public static IAST Or(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(F.Or, a0, a1, a2);
+	}
     public static IAST Or(final IExpr... a) {
         return function(Or, a);
     }
@@ -7531,8 +7753,19 @@ public class F {
         return ast(Part);
     }
 
+	public static IAST Part(final IExpr a0, final IExpr a1) {
+		return new B2.Part(a0, a1);
+	}
+
+	public static IAST Part(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Part, a0, a1, a2);
+	}
     public static IASTAppendable Part(final IExpr... a) {
-        IASTAppendable part = F.ast(Part, a.length + 1, false);
+		return Part(0, a);
+	}
+
+	public static IASTAppendable Part(final int extraSize, final IExpr... a) {
+		IASTAppendable part = F.ast(Part, a.length + extraSize + 1, false);
         for (int i = 0; i < a.length; i++) {
             part.append(a[i]);
         }
@@ -7567,6 +7800,9 @@ public class F {
         return new AST1(Piecewise, a0);
     }
 
+	public static IAST PiecewiseExpand(final IExpr a0) {
+		return new AST1(PiecewiseExpand, a0);
+	}
     public static IAST Piecewise(final IExpr a0, final IExpr a1) {
         return new AST2(Piecewise, a0, a1);
     }
@@ -7579,7 +7815,7 @@ public class F {
 		return new AST2(Plot3D, a0, a1);
 	}
     public static IExpr plus(IExpr a, Integer i) {
-        return Plus(a, integer(i.longValue()));
+		return Plus(a, ZZ(i.longValue()));
     }
 
     public static IExpr plus(IExpr a, java.math.BigInteger i) {
@@ -7587,7 +7823,7 @@ public class F {
     }
 
     public static IExpr plus(Integer i, IExpr b) {
-        return Plus(integer(i.longValue()), b);
+		return Plus(ZZ(i.longValue()), b);
     }
 
     public static IExpr plus(java.math.BigInteger i, IExpr b) {
@@ -7633,6 +7869,9 @@ public class F {
         return new B2.Plus(a1, a2);
     }
 
+	public static IAST Plus(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Plus, a0, a1, a2);
+	}
     public static IAST Plus(final long num, final IExpr... a) {
         IASTAppendable ast = ast(Plus, a.length + 1, false);
         ast.append(ZZ(num));
@@ -7645,7 +7884,7 @@ public class F {
     }
 
 	public static IAST Point(final IAST list) {
-		return new AST1(Point, list);
+		return new B1.Point(list);
 	}
     public static IAST PolyGamma(final IExpr a0) {
         return new AST1(PolyGamma, a0);
@@ -7881,6 +8120,9 @@ public class F {
         return new AST2(Quotient, a0, a1);
     }
 
+	public static IAST Quotient(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Quotient, a0, a1, a2);
+	}
 	public static IAST RandomReal(final IExpr a0) {
 		return new AST1(RandomReal, a0);
 	}
@@ -8391,6 +8633,16 @@ public class F {
         return new AST2(Surd, a0, a1);
     }
 
+	/**
+	 * Create a Symja string expression with mime type TEXT_PLAIN.
+	 *
+	 * @param c
+	 * @return
+	 * @see IStringX#TEXT_PLAIN
+	 */
+	final static public IStringX stringx(final char c) {
+		return StringX.valueOf(c);
+	}
     /**
 	 * Create a Symja string expression with mime type TEXT_PLAIN.
      *
@@ -8718,12 +8970,15 @@ public class F {
         return new B2.Times(a1, a2);
     }
 
+	public static IASTMutable Times(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Times, a0, a1, a2);
+	}
     private static IASTMutable binaryASTOrderless(Predicate<IExpr> t, ISymbol symbol, final IExpr a1, final IExpr a2) {
         final boolean test1 = t.test(a1);
         final boolean test2 = t.test(a2);
         if (test1 || test2) {
             int size = test1 ? a1.size() : 1;
-            size += test1 ? a2.size() : 1;
+			size += test2 ? a2.size() : 1;
             IASTAppendable result = ast(symbol, size, false);
             if (test1) {
                 result.appendArgs((IAST) a1);

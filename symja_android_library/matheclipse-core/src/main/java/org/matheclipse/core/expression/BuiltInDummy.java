@@ -71,7 +71,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return visitor.visit(this);
 	}
 

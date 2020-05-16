@@ -10,13 +10,16 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
+import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.FlowControlException;
 import org.matheclipse.core.eval.exception.IllegalArgument;
 import org.matheclipse.core.eval.exception.NoEvalException;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -34,6 +37,7 @@ import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
@@ -48,6 +52,7 @@ import org.matheclipse.core.visit.VisitorLevelSpecification;
 import org.matheclipse.core.visit.VisitorRemoveLevelSpecification;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +65,43 @@ import java.util.TreeSet;
 import static org.matheclipse.core.expression.F.List;
 
 public final class ListFunctions {
+	/**
+	 * See <a href="https://stackoverflow.com/a/4859279/24819">Get the indices of an array after sorting?</a>
+	 *
+	 */
+	private final static class ArrayIndexComparator implements Comparator<Integer> {
+		protected final IAST ast;
+		protected EvalEngine engine;
+
+		public ArrayIndexComparator(IAST ast, EvalEngine engine) {
+			this.ast = ast;
+			this.engine = engine;
+		}
+
+		public Integer[] createIndexArray() {
+			int size = ast.size();
+			Integer[] indexes = new Integer[size - 1];
+			for (int i = 1; i < size; i++) {
+				indexes[i - 1] = i;
+			}
+			return indexes;
+		}
+
+		@Override
+		public int compare(Integer index1, Integer index2) {
+			IExpr arg1 = ast.get(index1);
+			IExpr arg2 = ast.get(index2);
+			if (arg1.isNumericFunction() && arg2.isNumericFunction()) {
+				if (engine.evalTrue(F.Greater(arg1, arg2))) {
+					return -1;
+				}
+				if (engine.evalTrue(F.Less(arg1, arg2))) {
+					return 1;
+				}
+			}
+			return (-1) * arg1.compareTo(arg2);
+		}
+	}
 	private interface IVariablesFunction {
 		public IExpr evaluate(final ISymbol[] variables, final IExpr[] index);
 	}
@@ -252,7 +294,7 @@ public final class ListFunctions {
 		private ISymbol[] fCurrentVariable;
 		public TableGenerator(final List<? extends IIterator<IExpr>> iterList, final IAST prototypeList,
 				final IVariablesFunction function) {
-			this(iterList, prototypeList, function, (IExpr) null);
+			this(iterList, prototypeList, function, F.NIL);
 		}
 
 		public TableGenerator(final List<? extends IIterator<IExpr>> iterList, final IAST prototypeList,
@@ -278,7 +320,7 @@ public final class ListFunctions {
 								fCurrentIndex[index] = iter.next();
 								fCurrentVariable[index] = iter.getVariable();
 								IExpr temp = table();
-								if (temp == null) {
+								if (temp == null || !temp.isPresent()) {
 									temp = fDefaultValue;
 								}
 								if (temp.isNumber()) {
@@ -291,7 +333,10 @@ public final class ListFunctions {
 									return createGenericTable(iter, index, iter.allocHint(), temp, null);
 								}
 							}
+							if (iter.isInvalidNumeric()) {
 							return fDefaultValue;
+						}
+							return F.NIL;
 						}
 						return createGenericTable(iter, index, iter.allocHint(), null, null);
 					} finally {
@@ -317,7 +362,7 @@ public final class ListFunctions {
 								fCurrentIndex[index] = iter.next();
 								fCurrentVariable[index] = iter.getVariable();
 								IExpr temp = table();
-								if (temp == null) {
+								if (temp == null || !temp.isPresent()) {
 									temp = fDefaultValue;
 								}
 								if (temp.isNumber()) {
@@ -397,7 +442,7 @@ public final class ListFunctions {
 		private IExpr createGenericTable(final IIterator<IExpr> iter, final int index, final int allocationHint,
 										 IExpr arg1, IExpr arg2) {
 			final IASTAppendable result = fPrototypeList
-					.copyHead(fPrototypeList.size() + (allocationHint > 0 ? allocationHint : 0));
+					.copyHead(fPrototypeList.size() + (allocationHint > 0 ? allocationHint + 8 : 8));
 			result.appendArgs(fPrototypeList);
 			if (arg1 != null) {
 				result.append(arg1);
@@ -409,7 +454,7 @@ public final class ListFunctions {
 				fCurrentIndex[index] = iter.next();
 				fCurrentVariable[index] = iter.getVariable();
 				IExpr temp = table();
-				if (temp == null) {
+				if (temp == null || !temp.isPresent()) {
 					result.append(fDefaultValue);
 				} else {
 					result.append(temp);
@@ -422,22 +467,12 @@ public final class ListFunctions {
 	private static class PositionConverter implements IPositionConverter<IExpr> {
 		@Override
 		public IExpr toObject(final int i) {
-			if (i < 3) {
-				switch (i) {
-					case 0:
-						return F.C0;
-					case 1:
-						return F.C1;
-					case 2:
-						return F.C2;
-				}
-			}
 			return F.ZZ(i);
 		}
 
 		@Override
 		public int toInt(final IExpr position) {
-			int val = position.toIntDefault(Integer.MIN_VALUE);
+			int val = position.toIntDefault();
 			if (val<0) {
 			return -1;
 		}
@@ -541,7 +576,7 @@ public final class ListFunctions {
 				}
 			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			IAST arg1AST = Validate.checkASTType(ast, arg1, engine);
+			IAST arg1AST = Validate.checkASTType(ast, arg1, 1, engine);
 			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
@@ -616,7 +651,7 @@ public final class ListFunctions {
 			@Override
 			public IExpr apply(final IExpr symbolValue) {
 				if (!symbolValue.isAST()) {
-					return null;
+					return F.NIL;
 				}
 				return ((IAST) symbolValue).appendClone(value);
 			}
@@ -780,12 +815,12 @@ public final class ListFunctions {
 					final List<ArrayIterator> iterList = new ArrayList<ArrayIterator>();
 					if (ast.size() >= 4) {
 						if (ast.arg2().isInteger() && ast.arg3().isInteger()) {
-							indx1 = Validate.checkIntType(ast, 3);
+							indx1 = Validate.checkIntType(ast, 3, Integer.MIN_VALUE + 1);
 							indx2 = Validate.checkIntType(ast, 2);
 							iterList.add(new ArrayIterator(indx1, indx2));
 						} else if (ast.arg2().isList() && ast.arg3().isInteger()) {
 							final IAST dimIter = (IAST) ast.arg2(); // dimensions
-							indx1 = Validate.checkIntType(ast, 3);
+							indx1 = Validate.checkIntType(ast, 3, Integer.MIN_VALUE + 1);
 							for (int i = 1; i < dimIter.size(); i++) {
 								indx2 = Validate.checkIntType(dimIter, i);
 								iterList.add(new ArrayIterator(indx1, indx2));
@@ -823,6 +858,9 @@ public final class ListFunctions {
 					}
 
 				}
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
 			} catch (final ArithmeticException e) {
@@ -1103,6 +1141,7 @@ public final class ListFunctions {
 				}
 			}
 
+			try {
 			if (ast.size() >= 3 && ast.size() <= 5) {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST()) {
@@ -1143,6 +1182,13 @@ public final class ListFunctions {
 			}
 			return F.List();
 		}
+			} catch (final ValidateException ve) {
+				// see level specification and int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+				// } catch (final RuntimeException rex) {
+				// // ArgumentTypeException from VisitorLevelSpecification level specification checks
+				// return engine.printMessage("Cases: " + rex.getMessage());
+			}
 			return F.NIL;
 		}
 
@@ -1227,11 +1273,15 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IAST list = Validate.checkListType(ast, 1);
+			IAST list = Validate.checkListType(ast, 1, engine);
+			if (list.isPresent()) {
 
 			int n = -1;
 			if (ast.isAST2()) {
-				n = Validate.checkIntType(ast.arg2());
+					n = Validate.checkIntType(F.Commonest, ast.arg2(), 0, engine);
+					if (n == Integer.MIN_VALUE) {
+						return F.NIL;
+					}
 			}
 
 			IASTAppendable tallyResult = Tally.tally1Arg(list);
@@ -1274,6 +1324,8 @@ public final class ListFunctions {
 				}
 			}
 			return F.List();
+		}
+			return F.NIL;
 		}
 
 		@Override
@@ -1494,10 +1546,6 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			return evaluateArray(ast, List());
-		}
-
-		public static IExpr evaluateArray(final IAST ast, IAST resultList) {
 			try {
 				if ((ast.size() >= 3) && (ast.size() <= 5)) {
 					int indx1, indx2;
@@ -1512,6 +1560,9 @@ public final class ListFunctions {
 						for (int i = 1; i < dimensions.size(); i++) {
 							indx1 = Validate.checkIntType(dimensions, i);
 							dim[i - 1] = indx1;
+						}
+						if (dim.length == 0) {
+							return F.CEmptyList;
 						}
 						return constantExpr.constantArray(F.List, 0, dim);
 					} else if (ast.size() >= 4) {
@@ -1531,6 +1582,7 @@ public final class ListFunctions {
 					}
 
 					if (iterList.size() > 0) {
+						IAST resultList = F.List();
 						if (ast.size() == 5) {
 							resultList = F.ast(ast.arg4());
 						}
@@ -1540,6 +1592,9 @@ public final class ListFunctions {
 					}
 
 				}
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
 			} catch (final ArithmeticException e) {
@@ -1548,6 +1603,10 @@ public final class ListFunctions {
 			return F.NIL;
 		}
 
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.HOLDALL);
@@ -1616,6 +1675,7 @@ public final class ListFunctions {
 
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 
+			try {
 			final VisitorLevelSpecification level;
 			CountFunctor mf = new CountFunctor(engine.evalPatternMatcher(ast.arg2()));
 			if (ast.isAST3()) {
@@ -1625,7 +1685,11 @@ public final class ListFunctions {
 				level = new VisitorLevelSpecification(mf, 1);
 			}
 			arg1.accept(level);
-			return F.integer(mf.getCounter());
+				return F.ZZ(mf.getCounter());
+			} catch (final ValidateException ve) {
+				// see level specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
 		}
 
 		@Override
@@ -1634,6 +1698,29 @@ public final class ListFunctions {
 		}
 	}
 
+	private final static class CountDistinct extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			final IExpr arg1 = engine.evaluate(ast.arg1());
+			if (arg1.isAST()) {
+				final Set<IExpr> map = new HashSet<IExpr>();
+				((IAST) arg1).forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						map.add(x);
+					}
+				});
+				return F.ZZ(map.size());
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+	}
 	/**
 	 * Delete(list,n) - delete the n-th argument from the list. Negative n counts from the end.
 	 *
@@ -1665,6 +1752,8 @@ public final class ListFunctions {
 							return list.setAtCopy(0, F.Sequence);
 						}
 						return list.splice(indx);
+					} catch (final ValidateException ve) {
+						return engine.printMessage(ve.getMessage(F.Delete));
 					} catch (final RuntimeException rex) {
 					if (Config.DEBUG) {
 							rex.printStackTrace();
@@ -1706,7 +1795,10 @@ public final class ListFunctions {
 		private IAST deleteListOfPositions(final IAST list, final IAST listOfIntPositions, EvalEngine engine) {
 			int[] indx;
 			try {
-				indx = Validate.checkListOfInts(listOfIntPositions, Integer.MIN_VALUE, Integer.MAX_VALUE);
+				indx = Validate.checkListOfInts(list, listOfIntPositions, Integer.MIN_VALUE, Integer.MAX_VALUE, engine);
+				if (indx == null) {
+					return F.NIL;
+				}
 				return deletePartRecursive(list, indx, 0);
 			} catch (final RuntimeException rex) {
 				if (Config.DEBUG) {
@@ -1812,12 +1904,16 @@ public final class ListFunctions {
 				if (ast.isAST3() || ast.size() == 5) {
 					final IExpr arg3 = engine.evaluate(ast.arg3());
 					int maximumRemoveOperations = -1;
-					if (ast.size() == 5) {
-						maximumRemoveOperations = Validate.checkIntType(ast, 4);
-					}
 					IASTAppendable arg1RemoveClone = ((IAST) arg1).copyAppendable();
 
 					try {
+						if (ast.size() == 5) {
+							if (ast.arg4().isInfinity()) {
+								maximumRemoveOperations = Integer.MAX_VALUE;
+							} else {
+								maximumRemoveOperations = Validate.checkIntType(ast, 4);
+							}
+						}
 						DeleteCasesPatternMatcherFunctor cpmf = new DeleteCasesPatternMatcherFunctor(matcher);
 						VisitorRemoveLevelSpecification level = new VisitorRemoveLevelSpecification(cpmf, arg3,
 								maximumRemoveOperations, false, engine);
@@ -1828,6 +1924,9 @@ public final class ListFunctions {
 						return arg1RemoveClone;
 					} catch (VisitorRemoveLevelSpecification.StopException se) {
 						// reached maximum number of results
+					} catch (final ValidateException ve) {
+						// see level specification
+						return engine.printMessage(ve.getMessage(ast.topHead()));
 					}
 					return arg1RemoveClone;
 				} else {
@@ -1988,13 +2087,18 @@ public final class ListFunctions {
 						return resultList;
 					}
 				}
-			} catch (final IllegalArgument e) {
-				engine.printMessage(e.getMessage());
-				return F.NIL;
-			} catch (final Exception e) {
+			} catch (ValidateException ve) {
+				return engine.printMessage(ast.topHead(), ve);
+			} catch (final IndexOutOfBoundsException ibe) {
 				if (Config.SHOW_STACKTRACE) {
-					e.printStackTrace();
+					ibe.printStackTrace();
 				}
+				return engine.printMessage(ast.topHead(), ibe);
+			} catch (final NullPointerException npe) {
+				if (Config.SHOW_STACKTRACE) {
+					npe.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), npe);
 			}
 			return F.NIL;
 		}
@@ -2027,7 +2131,7 @@ public final class ListFunctions {
 			if (step < 0) {
 				end--;
 				if (j < end || end <= 0) {
-					throw new IllegalArgument("Cannot drop positions " + j + " through " + end + " in " + list);
+					throw new ArgumentTypeException("cannot drop positions " + j + " through " + end + " in " + list);
 					// return F.NIL;
 				}
 				for (int i = j; i >= end; i += step) {
@@ -2036,7 +2140,8 @@ public final class ListFunctions {
 				}
 			} else {
 				if (j == 0) {
-					throw new IllegalArgument("Cannot drop positions " + j + " through " + (end - 1) + " in " + list);
+					throw new ArgumentTypeException(
+							"cannot drop positions " + j + " through " + (end - 1) + " in " + list);
 				}
 				for (int i = j; i < end; i += step) {
 					list.remove(j);
@@ -2049,7 +2154,7 @@ public final class ListFunctions {
 						final IASTAppendable tempList = ((IAST) list.get(j2)).copyAppendable();
 						list.set(j2, drop(tempList, newLevel, sequenceSpecifications));
 					} else {
-						throw new IllegalArgument("Cannot execute drop for argument: " + list.get(j2).toString());
+						throw new ArgumentTypeException("Cannot execute drop for argument: " + list.get(j2).toString());
 					}
 				}
 			}
@@ -2093,7 +2198,13 @@ public final class ListFunctions {
 	private final static class Extract extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
 			if (ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
 
@@ -2110,7 +2221,7 @@ public final class ListFunctions {
 							return F.NIL;
 						}
 					}
-					if (indx <= list.size()) {
+					if (indx < list.size()) {
 						return list.get(indx);
 					}
 				} else if (ast.arg2().isList()) {
@@ -2135,19 +2246,12 @@ public final class ListFunctions {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_3;
+			return IOFunctions.ARGS_1_3;
 		}
 		private static IExpr extract(final IAST list, final IAST position) {
-			final PositionConverter converter = new PositionConverter();
-			if ((position.size() > 1) && (position.arg1().isReal())) {
-				return extract(list, position, converter, 1);
-			} else {
-				// construct an array
-				// final IAST resultList = List();
-				// NestedFinding.position(list, resultList, pos, 1);
-				// return resultList;
-			}
-			return F.NIL;
+			IASTAppendable part = F.Part(position.argSize(), list);
+			part.appendAll(position, 1, position.size());
+			return part;
 		}
 
 		@Override
@@ -2161,22 +2265,31 @@ public final class ListFunctions {
 		 *
 		 * @param list
 		 * @param positions
-		 * @param positionConverter
-		 *            the <code>positionConverter</code> creates an <code>int</code> value from the given position
-		 *            objects in <code>positions</code>.
 		 * @param headOffset
 		 */
-		private static IExpr extract(final IAST list, final IAST positions,
-									 final IPositionConverter<? super IExpr> positionConverter, int headOffset) {
+		private static IExpr extract(final IAST list, final IAST positions, int headOffset) {
 			int p = 0;
 			IAST temp = list;
+			if (!temp.isPresent()) {
+				return F.NIL;
+			}
 			int posSize = positions.argSize();
 			IExpr expr = list;
 			for (int i = headOffset; i <= posSize; i++) {
-				p = positionConverter.toInt(positions.get(i));
-				if (!temp.isPresent() || temp.size() <= p || p < 0) {
+				p = positions.get(i).toIntDefault(); // positionConverter.toInt(positions.get(i));
+				if (p >= 0) {
+					if (temp.size() <= p) {
 					return F.NIL;
 				}
+					expr = temp.get(p);
+					if (expr.isAST()) {
+						temp = (IAST) expr;
+					} else {
+						if (i < positions.size()) {
+							temp = F.NIL;
+						}
+					}
+				} else if (positions.get(i).isAST(F.Key, 2)) {
 				expr = temp.get(p);
 				if (expr.isAST()) {
 					temp = (IAST) expr;
@@ -2185,6 +2298,7 @@ public final class ListFunctions {
 						temp = F.NIL;
 					}
 				}
+			}
 			}
 			return expr;
 		}
@@ -2313,10 +2427,17 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
 			if (ast.size() == 3) {
 				return evaluateNestList3(ast, engine);
 			} else if (ast.size() == 4) {
 				return evaluateNestList4(ast, engine);
+			}
+			} catch (RuntimeException rex) {
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), rex);
 			}
 			return F.NIL;
 		}
@@ -2326,7 +2447,7 @@ public final class ListFunctions {
 			if (temp.isAST()) {
 				IAST list = (IAST) temp;
 				final IExpr arg1 = engine.evaluate(ast.arg1());
-				if (list.size() == 1 || list.size() == 2) {
+				if (list.isEmpty() || list.size() == 2) {
 					return list;
 				}
 				final IASTAppendable resultList = F.ast(list.head(), list.size(), false);
@@ -2349,7 +2470,7 @@ public final class ListFunctions {
 					final IAST list = (IAST) temp;
 				final IExpr arg1 = engine.evaluate(ast.arg1());
 					IExpr arg2 = engine.evaluate(ast.arg2());
-				if (list.size() == 1) {
+				if (list.isEmpty()) {
 					return F.unaryAST1(list.head(), arg2);
 						}
 				final IASTAppendable resultList = F.ast(list.head(), list.size(), false);
@@ -2610,7 +2731,7 @@ public final class ListFunctions {
 		 * @return
 		 */
 		public static IAST intersection(IAST ast1, IAST ast2, final IASTAppendable result) {
-			if (ast1.size() == 1 || ast2.size() == 1) {
+			if (ast1.isEmpty() || ast2.isEmpty()) {
 				return F.CEmptyList;
 			}
 			Set<IExpr> set1 = new HashSet<IExpr>(ast1.size() + ast2.size() / 10);
@@ -2650,7 +2771,7 @@ public final class ListFunctions {
 			}
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			IAST arg1AST = Validate.checkASTType(ast, arg1, engine);
+			IAST arg1AST = Validate.checkASTType(ast, arg1, 1, engine);
 			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
@@ -2658,7 +2779,11 @@ public final class ListFunctions {
 			IExpr arg3 = engine.evaluate(ast.arg3());
 			if (arg3.isInteger()) {
 				try {
-					int i = Validate.checkIntType(arg3, Integer.MIN_VALUE);
+					int i = Validate.checkIntType(F.Insert, arg3, Integer.MIN_VALUE, engine);
+					if (i == Integer.MIN_VALUE) {
+						return F.NIL;
+
+					}
 					if (i < 0) {
 						i = 1 + arg1AST.size() + i;
 					}
@@ -2884,7 +3009,7 @@ public final class ListFunctions {
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST()) {
-				return F.integer(((IAST) arg1).argSize());
+				return F.ZZ(((IAST) arg1).argSize());
 			}
 			return F.C0;
 		}
@@ -3001,6 +3126,7 @@ public final class ListFunctions {
 
 			int lastIndex = ast.argSize();
 			boolean heads = false;
+			try {
 			final OptionArgs options = new OptionArgs(ast.topHead(), ast, lastIndex, engine);
 			IExpr option = options.getOption(F.Heads);
 			if (option.isPresent()) {
@@ -3016,26 +3142,30 @@ public final class ListFunctions {
 
 			if (!ast.arg1().isAtom()) {
 				final IAST arg1 = (IAST) ast.arg1();
-				final IASTAppendable resultList;
+					final IASTAppendable resultList;
 				if (lastIndex != 3) {
 					resultList = F.ListAlloc(8);
 				} else {
 					resultList = F.ast(ast.get(lastIndex));
 				}
 
-				final VisitorLevelSpecification level = new VisitorLevelSpecification(new Function<IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x) {
-						resultList.append(x);
-						return F.NIL;
-					}
-				}, ast.arg2(), heads, engine);
+					final VisitorLevelSpecification level = new VisitorLevelSpecification(new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							resultList.append(x);
+							return F.NIL;
+						}
+					}, ast.arg2(), heads, engine);
 				// Functors.collect(resultList.args()), ast.arg2(), heads);
 				arg1.accept(level);
 
 				return resultList;
 			}
 			return F.List();
+			} catch (final ValidateException ve) {
+				// see level specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
 		}
 
 		@Override
@@ -3080,8 +3210,9 @@ public final class ListFunctions {
 				// throws MathException if Level isn't defined correctly
 				new VisitorLevelSpecification(null, arg1, false, engine);
 				return F.True;
-			} catch (RuntimeException rex) {
-				// thrown in VisitorLevelSpecification ctor
+			} catch (final RuntimeException rex) {
+				// ArgumentTypeException from VisitorLevelSpecification level specification checks
+				// return engine.printMessage("LevelQ: " + rex.getMessage());
 			}
 			return F.False;
 		}
@@ -3263,9 +3394,10 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			try {
 			if (ast.isAST1()) {
 				if (ast.arg1().isListOfLists()) {
-					final IAST list = (IAST) ast.arg1();
+						final IAST list = (IAST) ast.arg1();
 					int maxSize = -1;
 					for (int i = 1; i < list.size(); i++) {
 						IAST subList = (IAST) list.get(i);
@@ -3276,12 +3408,12 @@ public final class ListFunctions {
 					if (maxSize > 0) {
 						IASTAppendable result = F.ListAlloc(list.size());
 						final int mSize = maxSize - 1;
-						return result.appendArgs(list.size(), new IntFunction<IExpr>() {
-							@Override
-							public IExpr apply(int i) {
-								return padLeftAtom(list.getAST(i), mSize, F.C0);
-							}
-						});
+							return result.appendArgs(list.size(), new IntFunction<IExpr>() {
+								@Override
+								public IExpr apply(int i) {
+									return padLeftAtom(list.getAST(i), mSize, F.C0);
+								}
+							});
 						// for (int i = 1; i < list.size(); i++) {
 						// result.append(padLeftAtom(list.getAST(i), maxSize - 1, F.C0));
 						// }
@@ -3304,6 +3436,10 @@ public final class ListFunctions {
 					return padLeftAtom(arg1, n, F.C0);
 				}
 			}
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
 			return F.NIL;
 		}
 
@@ -3315,7 +3451,7 @@ public final class ListFunctions {
 		public static IExpr padLeftAtom(IAST ast, int n, final IExpr atom) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
-				IASTAppendable result = ast.copyHead();
+				IASTAppendable result = ast.copyHead(length + ast.argSize());
 				result.appendArgs(0, length, new IntFunction<IExpr>() {
 					@Override
 					public IExpr apply(int i) {
@@ -3337,7 +3473,7 @@ public final class ListFunctions {
 		public static IAST padLeftAST(IAST ast, int n, IAST arg2) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
-				IASTAppendable result = ast.copyHead();
+				IASTAppendable result = ast.copyHead(length + ast.argSize());
 				if (arg2.size() < 2) {
 					return ast;
 				}
@@ -3412,9 +3548,10 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			try {
 			if (ast.isAST1()) {
 				if (ast.arg1().isListOfLists()) {
-					final IAST list = (IAST) ast.arg1();
+						final IAST list = (IAST) ast.arg1();
 					int maxSize = -1;
 					for (int i = 1; i < list.size(); i++) {
 						IAST subList = (IAST) list.get(i);
@@ -3425,12 +3562,12 @@ public final class ListFunctions {
 					if (maxSize > 0) {
 						IASTAppendable result = F.ListAlloc(list.size());
 						final int mSize = maxSize;
-						return result.appendArgs(list.size(), new IntFunction<IExpr>() {
-							@Override
-							public IExpr apply(int i) {
-								return padRightAtom(list.getAST(i), mSize - 1, F.C0);
-							}
-						});
+							return result.appendArgs(list.size(), new IntFunction<IExpr>() {
+								@Override
+								public IExpr apply(int i) {
+									return padRightAtom(list.getAST(i), mSize - 1, F.C0);
+								}
+							});
 						// for (int i = 1; i < list.size(); i++) {
 						// result.append(padRightAtom(list.getAST(i), maxSize - 1, F.C0));
 						// }
@@ -3454,6 +3591,10 @@ public final class ListFunctions {
 					return padRightAtom(arg1, n, F.C0);
 				}
 			}
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
 			return F.NIL;
 		}
 
@@ -3465,7 +3606,7 @@ public final class ListFunctions {
 		public static IExpr padRightAtom(IAST ast, int n, final IExpr atom) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
-				IASTAppendable result = ast.copyHead();
+				IASTAppendable result = ast.copyHead(length + ast.argSize());
 				result.appendArgs(ast);
 				return result.appendArgs(0, length, new IntFunction<IExpr>() {
 					@Override
@@ -3483,7 +3624,7 @@ public final class ListFunctions {
 		public static IAST padRightAST(IAST ast, int n, IAST arg2) {
 			int length = n - ast.size() + 1;
 			if (length > 0) {
-				IASTAppendable result = ast.copyHead();
+				IASTAppendable result = ast.copyHead(length + ast.argSize());
 				result.appendArgs(ast);
 				if (arg2.size() < 2) {
 					return ast;
@@ -3580,7 +3721,11 @@ public final class ListFunctions {
 				if (ast.get(i).isAST()) {
 					// clone = (INestedList<IExpr>) prototypeList.clone();
 					clone = prototypeList.copyAppendable();
+					if (ast.isAssociation()) {
+						clone.append(((IAssociation) ast).getKey(i));
+					} else {
 					clone.append(positionConverter.toObject(i));
+					}
 					position((IAST) ast.get(i), clone, resultCollection, Integer.MAX_VALUE, level, matcher,
 							positionConverter, headOffset);
 					if (level.getCurrentDepth() < minDepth) {
@@ -3590,8 +3735,11 @@ public final class ListFunctions {
 				if (matcher.test(ast.get(i))) {
 					if (level.isInRange()) {
 						clone = prototypeList.copyAppendable();
-						IExpr IExpr = positionConverter.toObject(i);
-						clone.append(IExpr);
+						if (ast.isAssociation()) {
+							clone.append(((IAssociation) ast).getKey(i));
+						} else {
+							clone.append(positionConverter.toObject(i));
+						}
 						if (maxResults >= resultCollection.size()) {
 						resultCollection.append(clone);
 						} else {
@@ -3671,9 +3819,14 @@ public final class ListFunctions {
 						}
 						return F.NIL;
 					}
+					try {
 					final IExpr arg3 = engine.evaluate(ast.arg3());
 					final LevelSpec level = new LevelSpecification(arg3, true);
 					return position((IAST) arg1, arg2, level, maxResults, engine);
+					} catch (final ValidateException ve) {
+						// see level specification
+						return engine.printMessage(ve.getMessage(ast.topHead()));
+					}
 				}
 			}
 			return F.NIL;
@@ -3741,7 +3894,7 @@ public final class ListFunctions {
 				}
 			}
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			IAST arg1AST = Validate.checkASTType(ast, arg1, engine);
+			IAST arg1AST = Validate.checkASTType(ast, arg1, 1, engine);
 			if (!arg1AST.isPresent()) {
 				return F.NIL;
 			}
@@ -3922,6 +4075,9 @@ public final class ListFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.arg1().isAST(F.List, 1)) {
+				return ast.arg1();
+			}
 			if (ast.isAST1() && ast.arg1().isReal()) {
 				int size = ast.arg1().toIntDefault(Integer.MIN_VALUE);
 				if (size != Integer.MIN_VALUE) {
@@ -3931,6 +4087,15 @@ public final class ListFunctions {
 				engine.printMessage("Range: argument " + ast.arg1()
 						+ " is greater than Javas Integer.MAX_VALUE or no integer number.");
 				return F.NIL;
+			}
+			if (ast.isAST3()) {
+				if (ast.arg3().isZero()) {
+					// Infinite expression `1` encountered.
+					return IOFunctions.printMessage(ast.topHead(), "infy", F.List(F.Divide(ast.arg2(), F.C0)), engine);
+				}
+				if (ast.arg3().isDirectedInfinity()) {
+					return ast.arg1();
+				}
 			}
 			return evaluateTable(ast, List(), engine);
 		}
@@ -3977,9 +4142,13 @@ public final class ListFunctions {
 					iterList = new ArrayList<IIterator<IExpr>>();
 					iterList.add(Iterator.create(ast, null, engine));
 
-					final TableGenerator generator = new TableGenerator(iterList, resultList, new UnaryRangeFunction());
+					final TableGenerator generator = new TableGenerator(iterList, resultList, new UnaryRangeFunction(),
+							F.CEmptyList);
 					return generator.table();
 				}
+			} catch (NoEvalException nev) {
+				// Range specification in `1` does not have appropriate bounds.
+				return IOFunctions.printMessage(ast.topHead(), "range", F.List(ast), engine);
 			} catch (final ArithmeticException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
@@ -3988,8 +4157,12 @@ public final class ListFunctions {
 		}
 
 		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL);
+			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
 	}
 
@@ -4016,12 +4189,12 @@ public final class ListFunctions {
 	private final static class Replace extends AbstractEvaluator {
 
 		private static final class ReplaceFunction implements Function<IExpr, IExpr> {
-			private final IAST ast;
+			// private final IAST ast;
 			private final EvalEngine engine;
 			private IExpr rules;
 
-			public ReplaceFunction(final IAST ast, final IExpr rules, final EvalEngine engine) {
-				this.ast = ast;
+			public ReplaceFunction(final IExpr rules, final EvalEngine engine) {
+				// this.ast = ast;
 				this.rules = rules;
 				this.engine = engine;
 			}
@@ -4045,9 +4218,8 @@ public final class ListFunctions {
 								return temp;
 							}
 						} else {
-							WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
-									"Rule expression (x->y) expected: ");
-							throw wat;
+							throw new ArgumentTypeException(
+									"rule expressions (x->y) expected instead of " + element.toString());
 						}
 
 					}
@@ -4055,11 +4227,8 @@ public final class ListFunctions {
 				}
 				if (rules.isRuleAST()) {
 					return replaceRule(input, (IAST) rules, engine);
-				} else {
-					WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-					engine.printMessage("Replace: " + wat.getMessage());
 				}
-				return F.NIL;
+				throw new ArgumentTypeException("rule expressions (x->y) expected instead of " + rules.toString());
 			}
 
 			public void setRule(IExpr rules) {
@@ -4085,9 +4254,8 @@ public final class ListFunctions {
 								break;
 							}
 						} else {
-							WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
-									"Rule expression (x->y) expected: ");
-							throw wat;
+							throw new ArgumentTypeException(
+									"rule expressions (x->y) expected instead of " + element.toString());
 						}
 					}
 					result.append(temp.orElse(arg1));
@@ -4103,9 +4271,8 @@ public final class ListFunctions {
 							return temp;
 						}
 					} else {
-						WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
-								"Rule expression (x->y) expected: ");
-						throw wat;
+						throw new ArgumentTypeException(
+								"rule expressions (x->y) expected instead of " + element.toString());
 					}
 
 				}
@@ -4113,18 +4280,15 @@ public final class ListFunctions {
 			}
 			if (rules.isRuleAST()) {
 				return replaceRule(arg1, (IAST) rules, engine);
-			} else {
-				WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-				engine.printMessage("Replace: " + wat.getMessage());
 			}
-			return F.NIL;
+			throw new ArgumentTypeException("rule expressions (x->y) expected instead of " + rules.toString());
 		}
 
 		private static IExpr replaceExprWithLevelSpecification(final IAST ast, IExpr arg1, IExpr rules,
 				IExpr exprLevelSpecification, EvalEngine engine) {
 			// use replaceFunction#setRule() method to set the current rules which
-			// are initialized with null
-			ReplaceFunction replaceFunction = new ReplaceFunction(ast, null, engine);
+			// are initialized with an empty list { }
+			ReplaceFunction replaceFunction = new ReplaceFunction(F.CEmptyList, engine);
 			VisitorLevelSpecification level = new VisitorLevelSpecification(replaceFunction, exprLevelSpecification,
 					false, engine);
 
@@ -4143,9 +4307,8 @@ public final class ListFunctions {
 								break;
 							}
 						} else {
-							WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
-									"Rule expression (x->y) expected: ");
-							throw wat;
+							throw new ArgumentTypeException(
+									"rule expressions (x->y) expected instead of " + element.toString());
 						}
 					}
 					result.append(temp.orElse(arg1));
@@ -4184,7 +4347,6 @@ public final class ListFunctions {
 			if (ast.size() < 3 || ast.size() > 4) {
 				return F.NIL;
 			}
-			try {
 				IExpr arg1 = ast.arg1();
 				IExpr rules = engine.evaluate(ast.arg2());
 				if (ast.isAST3()) {
@@ -4192,10 +4354,6 @@ public final class ListFunctions {
 					return replaceExprWithLevelSpecification(ast, arg1, rules, ast.arg3(), engine);
 				}
 				return replaceExpr(ast, arg1, rules, engine);
-			} catch (WrongArgumentType wat) {
-				engine.printMessage("Replace: " + wat.getMessage());
-			}
-			return F.NIL;
 		}
 
 		public int[] expectedArgSize() {
@@ -4258,36 +4416,27 @@ public final class ListFunctions {
 				}
 			}
 			if (ast.size() == 3) {
-			try {
 				IExpr arg1 = ast.arg1();
 					IExpr arg2 = ast.arg2();
-				if (arg2.isListOfRules()) {
+				if (arg2.isListOfRules(false)) {
 					return arg1.replaceAll((IAST) arg2).orElse(arg1);
 				} else if (arg2.isListOfLists()) {
 					IAST list = (IAST) arg2;
 					IASTAppendable result = F.ListAlloc(list.size());
 					for (IExpr subList : list) {
-						if (subList.isListOfRules()) {
+						if (subList.isListOfRules(false)) {
 							result.append(F.subst(arg1, (IAST) subList));
 						} else {
-							WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
-									"List of rule expressions (x->y) expected: ");
-								return engine.printMessage(wat.getMessage());
+							throw new ArgumentTypeException(
+									"rule expressions (x->y) expected instead of " + subList.toString());
 						}
 					}
 					return result;
 				} else if (arg2.isRuleAST()) {
 					return F.subst(arg1, (IAST) arg2);
 				} else {
-					WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-						return engine.printMessage(wat.getMessage());
+					throw new ArgumentTypeException("rule expressions (x->y) expected instead of " + arg2.toString());
 				}
-			} catch (WrongArgumentType wat) {
-				if (Config.SHOW_STACKTRACE) {
-					wat.printStackTrace();
-				}
-					return engine.printMessage(wat.getMessage());
-			}
 		}
 			return F.NIL;
 		}
@@ -4335,16 +4484,14 @@ public final class ListFunctions {
 				int maxNumberOfResults, final EvalEngine engine) {
 			if (rules.isList()) {
 				IAST rulesList = (IAST) rules;
-				IExpr temp = F.NIL;
 				for (IExpr element : rulesList) {
 					if (element.isRuleAST()) {
 						IAST rule = (IAST) element;
 						Function<IExpr, IExpr> function = Functors.listRules(rule, result, engine);
-						temp = function.apply(arg1);
+						function.apply(arg1);
 					} else {
-						WrongArgumentType wat = new WrongArgumentType(ast, ast, -1,
-								"Rule expression (x->y) expected: ");
-						throw wat;
+						throw new ArgumentTypeException(
+								"rule expressions (x->y) expected instead of " + element.toString());
 					}
 				}
 
@@ -4357,8 +4504,7 @@ public final class ListFunctions {
 					return temp;
 				}
 			} else {
-				WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-				return engine.printMessage("ReplaceList: " + wat.getMessage());
+				throw new ArgumentTypeException("rule expressions (x->y) expected instead of " + rules.toString());
 			}
 			return result;
 		}
@@ -4487,7 +4633,6 @@ public final class ListFunctions {
 					return F.NIL;
 				}
 			}
-			try {
 				if (ast.isAST3()) {
 					if (ast.arg3().isList()) {
 						IExpr result = ast.arg1();
@@ -4518,9 +4663,6 @@ public final class ListFunctions {
 					return ast.arg1().replacePart((IAST) ast.arg2()).orElse(ast.arg1());
 				}
 				return result;
-			} catch (WrongArgumentType wat) {
-				return engine.printMessage(wat.getMessage());
-			}
 		}
 
 		@Override
@@ -4594,7 +4736,6 @@ public final class ListFunctions {
 					return F.NIL;
 			}
 			}
-			try {
 				IExpr arg2 = ast.arg2();
 				if (arg2.isListOfLists()) {
 					IAST list = (IAST) arg2;
@@ -4610,11 +4751,7 @@ public final class ListFunctions {
 				if (arg2.isAST()) {
 					return ast.arg1().replaceRepeated((IAST) arg2);
 				} else {
-					WrongArgumentType wat = new WrongArgumentType(ast, ast, -1, "Rule expression (x->y) expected: ");
-					return engine.printMessage("ReplaceRepeated: " + wat.getMessage());
-				}
-			} catch (WrongArgumentType wat) {
-				return engine.printMessage("ReplaceRepeated: " + wat.getMessage());
+				throw new ArgumentTypeException("rule expressions (x->y) expected instead of " + arg2.toString());
 			}
 		}
 
@@ -4831,19 +4968,26 @@ public final class ListFunctions {
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST()) {
-				final IASTAppendable result = F.ast(arg1.head());
+				final int argSize = arg1.argSize();
+				if (argSize == 0) {
+					return arg1;
+				}
+				IAST list = (IAST) arg1;
 				if (ast.isAST1()) {
-					// ASTRange range = ((IAST) arg1).args();
-					((IAST) arg1).rotateLeft(result, 1);
+					final IASTAppendable result = F.ast(list.head(), list.size() + 1, false);
+					list.rotateLeft(result, 1);
 					// Rotating.rotateLeft((IAST) list.arg1(), result, 2, 1);
 					return result;
 				} else {
 					IExpr arg2 = engine.evaluate(ast.arg2());
 					if (arg2.isInteger()) {
-						int n = Validate.checkIntType(arg2);
-
-						// ASTRange range = ((IAST) arg1).args();
-						((IAST) arg1).rotateLeft(result, n);
+						int n = Validate.checkIntType(F.RotateLeft, arg2, 0, engine);
+						if (n == Integer.MIN_VALUE) {
+							return F.NIL;
+						}
+						n = n % argSize;
+						final IASTAppendable result = F.ast(list.head(), list.size() + n, false);
+						list.rotateLeft(result, n);
 						return result;
 					}
 				}
@@ -4898,6 +5042,10 @@ public final class ListFunctions {
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST()) {
+				final int argSize = arg1.argSize();
+				if (argSize == 0) {
+					return arg1;
+				}
 				final IASTAppendable result = F.ast(arg1.head());
 				if (ast.isAST1()) {
 					// ASTRange range = ((IAST) arg1).args();
@@ -4907,7 +5055,11 @@ public final class ListFunctions {
 				} else {
 					IExpr arg2 = engine.evaluate(ast.arg2());
 					if (arg2.isInteger()) {
-						int n = Validate.checkIntType(arg2);
+						int n = Validate.checkIntType(F.RotateRight, arg2, 0, engine);
+						if (n == Integer.MIN_VALUE) {
+							return F.NIL;
+						}
+						n = n % argSize;
 						// ASTRange range = ((IAST) arg1).args();
 						((IAST) arg1).rotateRight(result, n);
 						return result;
@@ -4971,28 +5123,34 @@ public final class ListFunctions {
 			}
 
 			}
+			try {
 			int size = ast.size();
 			if (ast.arg1().isAST()) {
 				IAST list = (IAST) ast.arg1();
-				final IExpr predicateHead = ast.arg2();
-				int allocSize = list.size() > 4 ? list.size() / 4 : 4;
+					final IExpr predicateHead = ast.arg2();
+					// int allocSize = list.size() > 4 ? list.size() / 4 : 4;
 				if (size == 3) {
-					return list.filter(list.copyHead(allocSize), new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							return engine.evalTrue(F.unaryAST1(predicateHead, x));
-						}
-					});
+						return list.select(new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr x) {
+								return engine.evalTrue(F.unaryAST1(predicateHead, x));
+							}
+						});
 				} else if ((size == 4) && ast.arg3().isInteger()) {
 					final int resultLimit = Validate.checkIntType(ast, 3);
-					return list.filter(list.copyHead(allocSize), new Predicate<IExpr>() {
-								@Override
-								public boolean test(IExpr x) {
-									return engine.evalTrue(F.unaryAST1(predicateHead, x));
+						if (resultLimit == 0) {
+							return F.CEmptyList;
 								}
-							},
-							resultLimit);
+						return list.select(new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr x) {
+								return engine.evalTrue(F.unaryAST1(predicateHead, x));
+							}
+						}, resultLimit);
 				}
+				}
+			} catch (final ValidateException ve) {
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			}
 			return F.NIL;
 		}
@@ -5369,9 +5527,9 @@ public final class ListFunctions {
 					final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
 					for (int i = 2; i < ast.size(); i++) {
 						if (ast.get(i).isList()) {
-							iterList.add(Iterator.create((IAST) ast.get(i), engine));
+							iterList.add(Iterator.create((IAST) ast.get(i), i, engine));
 						} else {
-							iterList.add(Iterator.create(F.List(ast.get(i)), engine));
+							iterList.add(Iterator.create(F.List(ast.get(i)), i, engine));
 						}
 					}
 
@@ -5379,6 +5537,13 @@ public final class ListFunctions {
 							new TableFunction(engine, ast.arg1()), defaultValue);
 					return generator.table();
 				}
+			} catch (final ArrayIndexOutOfBoundsException e) {
+				if (Config.SHOW_STACKTRACE) {
+					e.printStackTrace();
+				}
+			} catch (final ValidateException ve) {
+				// see iterator specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} catch (final NoEvalException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
@@ -5393,9 +5558,9 @@ public final class ListFunctions {
 					final List<IIterator<IExpr>> iterList = new ArrayList<IIterator<IExpr>>();
 					for (int i = 2; i < ast.size(); i++) {
 						if (ast.get(i).isList()) {
-							iterList.add(Iterator.create((IAST) ast.get(i), engine));
+							iterList.add(Iterator.create((IAST) ast.get(i), i, engine));
 						} else {
-							iterList.add(Iterator.create(F.List(ast.get(i)), engine));
+							iterList.add(Iterator.create(F.List(ast.get(i)), i, engine));
 						}
 					}
 
@@ -5403,6 +5568,9 @@ public final class ListFunctions {
 							new TableFunction(engine, ast.arg1()), defaultValue);
 					return generator.tableThrow();
 				}
+			} catch (final ValidateException ve) {
+				// see iterator specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
 			} catch (final NoEvalException e) {
 			} catch (final ClassCastException e) {
 				// the iterators are generated only from IASTs
@@ -5531,14 +5699,15 @@ public final class ListFunctions {
 		private static IASTAppendable createResultList(java.util.Map<IExpr, Integer> map) {
 			IASTAppendable result = F.ListAlloc(map.size());
 			for (java.util.Map.Entry<IExpr, Integer> entry : map.entrySet()) {
-				result.append(F.List(entry.getKey(), F.integer(entry.getValue())));
+				result.append(F.List(entry.getKey(), F.ZZ(entry.getValue())));
 			}
 			return result;
 		}
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IAST list = Validate.checkListType(ast, 1);
+			IAST list = Validate.checkListType(ast, 1, engine);
+			if (list.isPresent()) {
 
 			int size = ast.size();
 
@@ -5549,6 +5718,7 @@ public final class ListFunctions {
 				return tally2Args(list, biPredicate);
 			}
 
+			}
 			return F.NIL;
 		}
 
@@ -5703,11 +5873,11 @@ public final class ListFunctions {
 				} else {
 					return engine.printMessage("Take: Nonatomic expression expected at position 1");
 				}
-			} catch (final IllegalArgument e) {
-				return engine.printMessage("Take: " + e.getMessage());
-			} catch (final Exception e) {
+			} catch (final ValidateException ve) {
+				return engine.printMessage(ast.topHead(), ve);
+			} catch (final RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
-					e.printStackTrace();
+					rex.printStackTrace();
 				}
 			}
 
@@ -5739,17 +5909,19 @@ public final class ListFunctions {
 			int step = sequ.getStep();
 			if (step < 0) {
 				end--;
-				if (start < end || end <= 0) {
-					throw new IllegalArgument(
-							"Cannot execute take positions " + start + " through " + end + " in " + list);
-					// return F.NIL;
+				if (start < end || end <= 0 || start >= list.size()) {
+					// Cannot take positions `1` through `2` in `3`.
+					String str = IOFunctions.getMessage("take", F.List(F.ZZ(start), F.ZZ(end), list), EvalEngine.get());
+					throw new ArgumentTypeException(str);
 				}
+				// negative step used here
 				for (int i = start; i >= end; i += step) {
 					if (sequenceSpecifications.length > newLevel) {
 						if (list.get(i).isAST()) {
 							resultList.append(take((IAST) list.get(i), newLevel, sequenceSpecifications));
 						} else {
-							throw new IllegalArgument("Cannot execute take for argument: " + list.get(i).toString());
+							throw new ArgumentTypeException(
+									"cannot execute take for argument: " + list.get(i).toString());
 						}
 					} else {
 						resultList.append(list.get(i));
@@ -5759,12 +5931,20 @@ public final class ListFunctions {
 				if (start == 0) {
 					return resultList;
 				}
+				if (end > list.size()) {
+					// Cannot take positions `1` through `2` in `3`.
+					String str = IOFunctions.getMessage("take", F.List(F.ZZ(start), F.ZZ(end - 1), list),
+							EvalEngine.get());
+					throw new ArgumentTypeException(str);
+				}
 				for (int i = start; i < end; i += step) {
 					if (sequenceSpecifications.length > newLevel) {
 						if (list.get(i).isAST()) {
 							resultList.append(take((IAST) list.get(i), newLevel, sequenceSpecifications));
 						} else {
-							throw new IllegalArgument("Cannot execute take for argument: " + list.get(i).toString());
+							// List expected at position `1` in `2`.
+							String str = IOFunctions.getMessage("list", F.List(F.ZZ(i), list), EvalEngine.get());
+							throw new ArgumentTypeException(str);
 						}
 					} else {
 						resultList.append(list.get(i));
@@ -5850,13 +6030,14 @@ public final class ListFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			try {
 			VisitorLevelSpecification level = null;
-			Function<IExpr, IExpr> tf = new Function<IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x) {
-					return x.isAST() ? ((IAST) x).setAtCopy(0, F.Plus) : x;
-				}
-			};
+				Function<IExpr, IExpr> tf = new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return x.isAST() ? ((IAST) x).setAtCopy(0, F.Plus) : x;
+					}
+				};
 
 			if (ast.isAST2()) {
 				level = new TotalLevelSpecification(tf, ast.arg2(), false, engine);
@@ -5868,13 +6049,16 @@ public final class ListFunctions {
 			if (ast.arg1().isAST()) {
 				// increment level because we select only subexpressions
 				level.incCurrentLevel();
-				IExpr temp = ast.arg1().accept(level);
+					IExpr temp = ((IAST) ast.arg1()).copyAST().accept(level);
 				if (temp.isPresent()) {
 					boolean te = engine.isThrowError();
 					try {
 						engine.setThrowError(true);
 						return engine.evaluate(temp);
 					} catch (RuntimeException rex) {
+							if (Config.SHOW_STACKTRACE) {
+								rex.printStackTrace();
+							}
 						return F.NIL;
 					} finally {
 						engine.setThrowError(te);
@@ -5882,6 +6066,13 @@ public final class ListFunctions {
 				}
 			}
 
+			} catch (final ValidateException ve) {
+				// see level specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+				// } catch (final RuntimeException rex) {
+				// // ArgumentTypeException from VisitorLevelSpecification level specification checks
+				// return engine.printMessage("Total: " + rex.getMessage());
+			}
 			return F.NIL;
 		}
 
@@ -6025,6 +6216,23 @@ public final class ListFunctions {
 		return resultCollection;
 	}
 
+	/**
+	 * Exclude <code>Indeterminate, Missing(), None, Null</code> and other symbolic expressions from list.
+	 *
+	 * @param list
+	 * @return
+	 */
+	private static IAST cleanList(IAST list) {
+		return list.select(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return !(x.equals(F.Indeterminate) || //
+						x.equals(F.Null) || //
+						x.equals(F.None) || //
+						x.isAST(F.Missing));
+			}
+		});
+	}
 	/**
 	 * Reverse the elements in the given <code>list</code>.
 	 *

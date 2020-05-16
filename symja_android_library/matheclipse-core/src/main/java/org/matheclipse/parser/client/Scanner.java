@@ -27,6 +27,15 @@ public abstract class Scanner {
 	 */
 	final static protected int TT_EOF = 0;
 
+	/**
+	 * Token type: opening bracket for associations
+	 */
+	final static protected int TT_ASSOCIATION_OPEN = 10;
+
+	/**
+	 * Token type: closing bracket for associations
+	 */
+	final static protected int TT_ASSOCIATION_CLOSE = 11;
 
 	/**
 	 * Token type: opening bracket for function arguments
@@ -68,6 +77,10 @@ public abstract class Scanner {
 	 */
 	final static protected int TT_PARTCLOSE = 19;
 
+	/**
+	 * Token type: operator ';;'
+	 */
+	final static protected int TT_SPAN = 30;
 	/**
 	 * Token type: operator found in input string
 	 */
@@ -535,6 +548,24 @@ public abstract class Scanner {
 	}
 
 	/**
+	 * Parse a Java <code>int</code> value.
+	 *
+	 * @return
+	 * @throws SyntaxError
+	 *             if the number couldn't be parsed as Java <code>int</code> value.
+	 */
+	protected long getJavaLong() throws SyntaxError {
+		final String number = getIntegerString();
+		long longValue = 0;
+		try {
+			longValue = Long.parseLong(number, 10);
+		} catch (final NumberFormatException e) {
+			throwSyntaxError("Number format error (not an int type): " + number, number.length());
+		}
+		getNextToken();
+		return longValue;
+	}
+	/**
 	 * Parse a Java <code>string</code> from the digits <code>0,1,2,3,4,5,6,7,8,9</code>.
 	 *
 	 * @return
@@ -549,21 +580,39 @@ public abstract class Scanner {
 		return new String(fInputString, startPosition, (--endPosition) - startPosition);
 	}
 
-	private void getNextChar() {
+	/**
+	 *
+	 * @return <code>true</code> if a '\' (backslash) + new-line are detected
+	 */
+	private boolean getNextChar() {
 		fCurrentChar = fInputString[fCurrentPosition++];
 		if (fCurrentChar == '\\') {
 			// search next non-whitespace character
-			while (isValidPosition()) {
-				fCurrentChar = fInputString[fCurrentPosition++];
-				if (!Character.isWhitespace(fCurrentChar) && fCurrentChar != '\\') {
-					return;
-				}
-				if (fCurrentChar == '\n') {
+			if (isValidPosition()) {
+				char ch = fInputString[fCurrentPosition++];
+				if (ch == '\n') { // linux line break
 					fRowCounter++;
 					fCurrentColumnStartPosition = fCurrentPosition;
+					if (isValidPosition()) {
+				fCurrentChar = fInputString[fCurrentPosition++];
+						return true;
+				}
+				} else if (ch == '\r') { // windows line break
+					if (isValidPosition()) {
+						ch = fInputString[fCurrentPosition++];
+						if (ch == '\n') {
+					fRowCounter++;
+					fCurrentColumnStartPosition = fCurrentPosition;
+							if (isValidPosition()) {
+								fCurrentChar = fInputString[fCurrentPosition++];
+								return true;
+							}
 				}
 			}
 		}
+	}
+		}
+		return false;
 	}
 
 	/**
@@ -602,6 +651,12 @@ public abstract class Scanner {
 
 					return;
 				}
+				if (fCurrentChar == '.') {
+					if (Character.isDigit(charAtPosition())) {
+						fToken = TT_DIGIT;
+						return;
+					}
+				}
 				if (fCurrentChar == '(') {
 					if (isValidPosition()) {
 						if (charAtPosition() == '*') {
@@ -616,6 +671,7 @@ public abstract class Scanner {
 				case '(':
 					fToken = TT_PRECEDENCE_OPEN;
 
+					skipWhitespace();
 					break;
 				case ')':
 					fToken = TT_PRECEDENCE_CLOSE;
@@ -624,6 +680,7 @@ public abstract class Scanner {
 				case '{':
 					fToken = TT_LIST_OPEN;
 
+					skipWhitespace();
 					break;
 				case '}':
 					fToken = TT_LIST_CLOSE;
@@ -643,6 +700,51 @@ public abstract class Scanner {
 				case ']':
 					fToken = TT_ARGUMENTS_CLOSE;
 					break;
+				case '<':
+					if (isValidPosition()) {
+						if (charAtPosition() == '|') {
+							fCurrentPosition++;
+							fToken = TT_ASSOCIATION_OPEN;
+							skipWhitespace();
+							break;
+						}
+					}
+					if (isOperatorCharacters()) {
+						fOperList = getOperator();
+						fToken = TT_OPERATOR;
+						return;
+					}
+
+					break;
+				case ';':
+					if (isValidPosition()) {
+						if (charAtPosition() == ';') {
+							fCurrentPosition++;
+							fToken = TT_SPAN;
+							break;
+						}
+					}
+					if (isOperatorCharacters()) {
+						fOperList = getOperator();
+						fToken = TT_OPERATOR;
+						return;
+					}
+
+					break;
+				case '|':
+					if (isValidPosition()) {
+						if (charAtPosition() == '>') {
+							fCurrentPosition++;
+							fToken = TT_ASSOCIATION_CLOSE;
+							break;
+						}
+					}
+					if (isOperatorCharacters()) {
+						fOperList = getOperator();
+						fToken = TT_OPERATOR;
+						return;
+					}
+					break;
 				case ',':
 					fToken = TT_COMMA;
 
@@ -660,17 +762,21 @@ public abstract class Scanner {
 							}
 							}
 							fToken = TT_BLANK_BLANK;
-							break;
 						} else if (charAtPosition() == '.') {
 							fCurrentPosition++;
 							fToken = TT_BLANK_OPTIONAL;
-							break;
 						} else if (charAtPosition() == ':') {
 							fCurrentPosition++;
+							if (isValidPosition()) {
+								if (charAtPosition() == '>') {
+									fCurrentPosition--;
+								} else {
 							fToken = TT_BLANK_COLON;
+								}
+							}
+						}
 							break;
 						}
-					}
 
 					break;
 				case '"':
@@ -701,23 +807,23 @@ public abstract class Scanner {
 						fToken = TT_OPERATOR;
 						return;
 					}
-					if (fCurrentChar == '.') {
-						if (isValidPosition()) {
-							if (Character.isDigit(fCurrentChar)) {
-								// don't increment fCurrentPosition (see
-								// getNumberString())
-								fToken = TT_DIGIT; // floating-point number
-								break;
-							}
-						}
-						break;
-					} else {
+					// if (fCurrentChar == '.') {
+					// if (isValidPosition()) {
+					// if (Character.isDigit(fCurrentChar)) {
+					// // don't increment fCurrentPosition (see
+					// // getNumberString())
+					// fToken = TT_DIGIT; // floating-point number
+					// break;
+					// }
+					// }
+					// break;
+					// } else {
 					if (Characters.CharacterNamesMap.containsKey(String.valueOf(fCurrentChar))) {
 						fToken = TT_IDENTIFIER;
 						return;
 					}
 					throwSyntaxError("unexpected character: '" + fCurrentChar + "'");
-				}
+					// }
 				}
 
 				if (fToken == TT_EOF) {
@@ -798,6 +904,7 @@ public abstract class Scanner {
 			}
 		}
 
+		boolean backslash = false;
 		if (numFormat == 10) {
 			while (Character.isDigit(fCurrentChar) || (fCurrentChar == '.')) {
 				if (fCurrentChar == '.') {
@@ -808,7 +915,19 @@ public abstract class Scanner {
 						dFlag = true;
 					}
 				}
-					getChar();
+				if (isValidPosition()) {
+					if (getNextChar()) {
+						backslash = true;
+						if (Character.isDigit(fCurrentChar) || (fCurrentChar == '.')) {
+							continue;
+						}
+						throwSyntaxError("error in number - unknown character after back-slash.");
+					}
+					continue;
+				}
+				fCurrentPosition = fInputString.length + 1;
+				fCurrentChar = ' ';
+				fToken = TT_EOF;
 			}
 			if (dFlag) {
 				numFormat = -1;
@@ -818,8 +937,12 @@ public abstract class Scanner {
 				char nextChar = fInputString[fCurrentPosition];
 				if (nextChar == '^') {
 					try {
-						numFormat = Integer.parseInt(
-								new String(fInputString, startPosition, fCurrentPosition - startPosition - 1));
+						String numberStr = new String(fInputString, startPosition,
+								fCurrentPosition - startPosition - 1);
+						if (backslash) {
+							numberStr = sanitizeBackslash(numberStr);
+						}
+						numFormat = Integer.parseInt(numberStr);
 						if (numFormat <= 0 || numFormat > 36) {
 							throwSyntaxError("Base " + numFormat + "^^... is invalid. Only bases between 1 and 36 are allowed");
 						}
@@ -895,11 +1018,27 @@ public abstract class Scanner {
 		}
 
 		int endPosition = fCurrentPosition--;
-		result[0] = new String(fInputString, startPosition, (--endPosition) - startPosition);
+		String numberStr = new String(fInputString, startPosition, (--endPosition) - startPosition);
+		if (backslash) {
+			numberStr = sanitizeBackslash(numberStr);
+		}
+		result[0] = numberStr;
 		result[1] = Integer.valueOf(numFormat);
 		return result;
 	}
 
+	private String sanitizeBackslash(String numberStr) {
+		StringBuilder buf = new StringBuilder(numberStr.length() - 2);
+		for (int i = 0; i < numberStr.length(); i++) {
+			char ch = numberStr.charAt(i);
+			if (ch == '\\' || ch == '\r' || ch == '\n') {
+				continue;
+			}
+			buf.append(ch);
+		}
+		numberStr = buf.toString();
+		return numberStr;
+	}
 	/**
 	 * Get a list of operators for the operator string determined with TT_OPERATOR token detection.
 	 *
@@ -959,7 +1098,7 @@ public abstract class Scanner {
 						}
 						throwSyntaxError("string - unknown character after back-slash.");
 					default:
-						throwSyntaxError("string - unknown character after back-slash.");
+						// throwSyntaxError("string - unknown character after back-slash.");
 					}
 				} else {
 					throwSyntaxError("string - unknown character after back-slash.");
@@ -1019,7 +1158,7 @@ public abstract class Scanner {
 	 * @return <code>true</code> if the current position in the parsed input string is less than the input strings
 	 *         length.
 	 */
-	private boolean isValidPosition() {
+	protected boolean isValidPosition() {
 		return fInputString.length > fCurrentPosition;
 	}
 
@@ -1241,5 +1380,37 @@ public abstract class Scanner {
 	protected void throwSyntaxError(final String error, final int errorLength) throws SyntaxError {
 		throw new SyntaxError(fCurrentPosition - errorLength, fRowCounter,
 				fCurrentPosition - fCurrentColumnStartPosition, getErrorLine(), error, errorLength);
+	}
+	/**
+	 * Shows the current line for debugging purposes.
+	 */
+	public String toString() {
+		if (fInputString == null || //
+				fCurrentPosition < 0) {
+			return "<undefined scanner>";
+		}
+		// read until end-of-line
+		try {
+			int eol = fCurrentPosition;
+			while (fInputString.length > eol) {
+				char ch = fInputString[eol++];
+				if (ch == '\n') {
+					eol--;
+					break;
+				}
+			}
+			String line = new String(fInputString, fCurrentColumnStartPosition, eol - fCurrentColumnStartPosition);
+			final StringBuilder buf = new StringBuilder(line.length() + 256);
+			buf.append(line + "\n");
+			int indx = fCurrentPosition - fCurrentColumnStartPosition;
+			for (int i = 0; i < indx; i++) {
+				buf.append(' ');
+			}
+			buf.append("^\n");
+			return buf.toString();
+		} catch (IndexOutOfBoundsException ioob) {
+			// thrown by new String(...)
+		}
+		return "<end-of-line>";
 	}
 }

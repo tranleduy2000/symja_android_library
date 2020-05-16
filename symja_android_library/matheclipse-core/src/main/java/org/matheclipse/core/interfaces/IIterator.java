@@ -1,5 +1,7 @@
 package org.matheclipse.core.interfaces;
 
+import org.matheclipse.core.expression.F;
+
 import java.util.Iterator;
 
 /**
@@ -75,6 +77,8 @@ public interface IIterator<E> extends Iterator<E> {
      * @return
      */
     boolean isValidVariable();
+
+    boolean isInvalidNumeric();
 
     /**
      * Tear down this iterator.

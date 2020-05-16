@@ -142,15 +142,18 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	// Swift changed: type is incompatible
 	public static IInteger valueOf(final int newnum) {
+		if (newnum == Integer.MIN_VALUE) {
+			return new BigIntegerSym(newnum);
+		}
 		return (newnum >= low && newnum <= high) ? cache[newnum + (-low)] : new IntegerSym(newnum);
 	}
 
 	public static IInteger valueOf(final long newnum) {
-		if (Integer.MIN_VALUE <= newnum && newnum <= Integer.MAX_VALUE) {
+		if (Integer.MIN_VALUE < newnum && newnum <= Integer.MAX_VALUE) {
 			return valueOf((int) newnum);
 		}
 		BigIntegerSym z = new BigIntegerSym(newnum);
-//		z.fBigIntValue = BigInteger.valueOf(newnum);
+		// z.fBigIntValue = BigInteger.valueOf(newnum);
 		return z;
 	}
 
@@ -236,7 +239,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return visitor.visit(this);
 	}
 

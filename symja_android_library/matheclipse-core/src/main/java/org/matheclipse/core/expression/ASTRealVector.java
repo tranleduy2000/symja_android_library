@@ -4,6 +4,7 @@ import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
+import org.hipparchus.complex.Complex;
 import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealVector;
 import org.matheclipse.core.basic.Config;
@@ -12,6 +13,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -303,8 +305,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	 */
 	@Override
 	public IAST clone() {
-		return Convert.vector2List(vector);
-		// return new ASTRealVector(vector.copy(), false);
+		return Convert.vector2List(vector, false);
 	}
 
 	/** {@inheritDoc} */
@@ -329,7 +330,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 
 	@Override
 	public IASTAppendable copyAppendable() {
-		return Convert.vector2List(vector);
+		return Convert.vector2List(vector, false);
 	}
 	
 	@Override
@@ -391,6 +392,14 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return F.num(val);
 	}
 
+	@Override
+	public IAST getItems(int[] items, int length) {
+		double[] v = new double[length];
+		for (int i = 0; i < length; i++) {
+			v[i] = vector.getEntry(items[i] - 1);
+		}
+		return new ASTRealVector(v, false);
+	}
 	public double getEntry(int location) {
 		return vector.getEntry(location - 1);
 	}
@@ -540,6 +549,17 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 				"Index: " + Integer.valueOf(location) + ", Size: " + (vector.getDimension() + 1));
 	}
 
+	@Override
+	public IASTMutable setAtCopy(int i, IExpr expr) {
+		if (expr instanceof Num) {
+			IASTMutable ast = copy();
+			ast.set(i, expr);
+			return ast;
+		}
+		IASTAppendable ast = copyAppendable();
+		ast.set(i, expr);
+		return ast;
+	}
 	public void setEntry(int location, double value) {
 		hashValue = 0;
 		vector.setEntry(location - 1, value);
@@ -578,6 +598,16 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return vector.toArray();
 	}
 
+	@Override
+	public Complex[] toComplexVector() {
+		double[] array = vector.toArray();
+		final int size = array.length;
+		Complex[] result = new Complex[size];
+		for (int i = 0; i < size; i++) {
+			result[i] = Complex.valueOf(array[i]);
+		}
+		return result;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public RealVector toRealVector() {

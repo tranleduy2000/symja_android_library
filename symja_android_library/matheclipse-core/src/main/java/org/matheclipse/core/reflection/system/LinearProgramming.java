@@ -1,6 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
 import org.hipparchus.exception.MathIllegalStateException;
+import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.optim.PointValuePair;
 import org.hipparchus.optim.linear.LinearConstraint;
 import org.hipparchus.optim.linear.LinearConstraintSet;
@@ -91,6 +92,7 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 		try {
 			if (ast.arg1().isList() && ast.arg2().isList() && ast.arg3().isList()) {
 				double[] arg1D =   ast.arg1().toDoubleVector();
+				if (arg1D != null) {
 				LinearObjectiveFunction f = new LinearObjectiveFunction(arg1D, 0);
 				Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
 
@@ -102,10 +104,16 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 				double[] arg2D;
 				double[] arg3D;
 				for (int i = 1; i < arg2.size(); i++) {
-					arg2D = Expr2Object.toDoubleVector((IAST) arg2.get(i));
 					if (arg2.get(i).isList()) {
+							arg2D = arg2.get(i).toDoubleVector( );
+							if (arg2D==null) {
+								return F.NIL;
+							}
 						if (arg3.get(i).isList()) {
-							arg3D = Expr2Object.toDoubleVector((IAST) arg3.get(i));
+								arg3D =   arg3.get(i).toDoubleVector();
+								if (arg3D==null) {
+									return F.NIL;
+								}
 							if (arg3D.length >= 2) {
 								double val = arg3D[1];
 								if (val == 0.0) {
@@ -123,11 +131,11 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 							if (sn != null) {
 								constraints.add(new LinearConstraint(arg2D, Relationship.GEQ, sn.doubleValue()));
 							} else {
-								throw new WrongArgumentType(arg3, arg3.get(i), i, "Numeric vector or number expected!");
+									return engine.printMessage( "LinearProgramming: numeric vector or number expected!");
 							}
 						}
 					} else {
-						throw new WrongArgumentType(ast, ast.get(i), i, "Numeric vector expected!");
+							return engine.printMessage( "LinearProgramming: numeric vector expected!");
 					}
 				}
 				SimplexSolver solver = new SimplexSolver();
@@ -137,10 +145,12 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 				double[] values = solution.getPointRef();
 				return F.List(values);
 			}
-		} catch (MathIllegalStateException oe) {
-			throw new WrappedException(oe);
+			}
+		} catch (MathRuntimeException mre) {
+			// throw new WrappedException(oe);
+			return engine.printMessage(ast.topHead(), mre);
 			// if (Config.SHOW_STACKTRACE) {
-			// oe.printStackTrace();
+			// mre.printStackTrace();
 			// }
 		}
 

@@ -254,65 +254,7 @@ public class PolynomialFunctions {
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_2_2;
 		}
-		// private static long univariateCoefficientList(IExpr polynomial, final ISymbol variable, List<IExpr>
-		// resultList)
-		// throws JASConversionException {
-		// try {
-		// ExprPolynomialRing ring = new ExprPolynomialRing(F.List(variable));
-		// ExprPolynomial poly = ring.create(polynomial);
-		// IAST list = poly.coefficientList();
-		// int degree = list.size() - 2;
-		// if (degree >= Short.MAX_VALUE) {
-		// return degree;
-		// }
-		// for (int i = 0; i <= degree; i++) {
-		// IExpr temp = list.get(i + 1);
-		// resultList.add(temp);
-		// }
-		// return degree;
-		// } catch (RuntimeException ex) {
-		// throw new WrongArgumentType(polynomial, "Polynomial expected!");
-		// }
-		// }
 
-		/**
-		 * 
-		 * @param polynomial
-		 * @param variable
-		 * @param resultList
-		 *            the coefficient list of the given univariate polynomial in increasing order
-		 * @param resultListDiff
-		 *            the coefficient list of the derivative of the given univariate polynomial
-		 * @return the degree of the univariate polynomial; if <code>degree >= Short.MAX_VALUE</code>, the result list
-		 *         will be empty.
-		 */
-		// private static long univariateCoefficientList(IExpr polynomial, ISymbol variable, List<IExpr> resultList,
-		// List<IExpr> resultListDiff) throws JASConversionException {
-		// try {
-		// ExprPolynomialRing ring = new ExprPolynomialRing(F.List(variable));
-		// ExprPolynomial poly = ring.create(polynomial);
-		// IAST polyExpr = poly.coefficientList();
-		//
-
-		// int degree = polyExpr.size() - 2;
-		// if (degree >= Short.MAX_VALUE) {
-		// return degree;
-		// }
-		// for (int i = 0; i <= degree; i++) {
-		// IExpr temp = polyExpr.get(i + 1);
-		// resultList.add(temp);
-		// }
-		// IAST polyDiff = poly.derivative().coefficientList();
-		// int degreeDiff = polyDiff.size() - 2;
-		// for (int i = 0; i <= degreeDiff; i++) {
-		// IExpr temp = polyDiff.get(i + 1);
-		// resultListDiff.add(temp);
-		// }
-		// return degree;
-		// } catch (RuntimeException ex) {
-		// throw new WrongArgumentType(polynomial, "Polynomial expected!");
-		// }
-		// }
 	}
 
 	/**
@@ -334,7 +276,7 @@ public class PolynomialFunctions {
 				varList = eVar.getArrayList();
 				symbolList = eVar.getVarList();
 			} else {
-				symbolList = Validate.checkSymbolOrSymbolList(ast, 2, engine);
+				symbolList = Validate.checkIsVariableOrVariableList(ast, 2, engine);
 				if (!symbolList.isPresent()) {
 					return F.NIL;
 				}
@@ -748,7 +690,8 @@ public class PolynomialFunctions {
 				return F.Divide(F.Times(F.Power(F.CN1, (n * (n - 1) / 2)),
 						F.Resultant(poly.getExpr(), polyDiff.getExpr(), arg2)), fN);
 			} catch (RuntimeException ex) {
-				throw new WrongArgumentType(ast, expr, 1, "Polynomial expected!");
+				return engine.printMessage(
+						ast.topHead() + ": polynomial expected at position 1 instead of " + ast.arg1().toString());
 			}
 		}
 
@@ -972,15 +915,18 @@ public class PolynomialFunctions {
 					ring.create(a);
 				} catch (RuntimeException ex) {
 					// Polynomial expected at position `1` in `2`.
-					return IOFunctions.printMessage(F.Resultant, "polynomial", F.List(ast.get(1), F.C1), engine);
+					return IOFunctions.printMessage(ast.topHead(), "polynomial", F.List(ast.get(1), F.C1), engine);
 				}
 				try {
 					// check if b is a polynomial otherwise check ArithmeticException, ClassCastException
 					ring.create(b);
 				} catch (RuntimeException ex) {
-					return IOFunctions.printMessage(F.Resultant, "polynomial", F.List(ast.get(2), F.C2), engine);
+					return IOFunctions.printMessage(ast.topHead(), "polynomial", F.List(ast.get(2), F.C2), engine);
 				}
-				return F.Together(resultant(a, b, x, engine));
+				IExpr resultant = resultant(a, b, x, engine);
+				if (resultant.isPresent()) {
+					return F.Together(resultant);
+				}
 			}
 			return F.NIL;
 		}
@@ -990,23 +936,35 @@ public class PolynomialFunctions {
 			return IOFunctions.ARGS_3_3;
 		}
 		private IExpr resultant(IExpr a, IExpr b, ISymbol x, EvalEngine engine) {
-			IExpr aExp = F.Exponent.of(engine, a, x);
-			IExpr bExp = F.Exponent.of(engine, b, x);
+			IExpr aExp = F.Exponent.ofNIL(engine, a, x);
+			IExpr bExp = F.Exponent.ofNIL(engine, b, x);
+			if (aExp.isPresent() && bExp.isPresent()) {
 			if (b.isFree(x)) {
 				return F.Power(b, aExp);
 			}
 			IExpr abExp = aExp.times(bExp);
 			if (F.Less.ofQ(engine, aExp, bExp)) {
-				return F.Times(F.Power(F.CN1, abExp), resultant(b, a, x, engine));
+					IExpr resultant = resultant(b, a, x, engine);
+					if (!resultant.isPresent()) {
+						return F.NIL;
+					}
+					return F.Times(F.Power(F.CN1, abExp), resultant);
 			}
 
-			IExpr r = F.PolynomialRemainder.of(engine, a, b, x);
+				IExpr r = F.PolynomialRemainder.ofNIL(engine, a, b, x);
+				if (r.isPresent()) {
 			IExpr rExp = r;
 			if (!r.isZero()) {
-				rExp = F.Exponent.of(engine, r, x);
+						rExp = F.Exponent.ofNIL(engine, r, x);
+						if (!rExp.isPresent()) {
+							return F.NIL;
+						}
 			}
 			return F.Times(F.Power(F.CN1, abExp), F.Power(F.Coefficient(b, x, bExp), F.Subtract(aExp, rExp)),
 					resultant(b, r, x, engine));
+		}
+			}
+			return F.NIL;
 		}
 
 		private IExpr jasResultant(IExpr a, IExpr b, ISymbol x, EvalEngine engine) {
@@ -1169,7 +1127,13 @@ public class PolynomialFunctions {
 				}
 				variables = eVar.getVarList();
 			} else {
-				variables = ast.arg2().orNewList();
+				variables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+				if (!variables.isPresent()) {
+					return F.NIL;
+				}
+			}
+			if (variables.size() <= 1) {
+				return F.NIL;
 			}
 			IExpr temp = roots(ast.arg1(), variables, engine);
 			if (!temp.isList()) {
@@ -1432,7 +1396,8 @@ public class PolynomialFunctions {
 					arg1 = engine.evaluate(F.Subtract(equalAST.arg1(), equalAST.arg2()));
 				}
 			} else {
-				throw new WrongArgumentType(ast, ast.arg1(), 1, "Equal() expression expected!");
+				return engine.printMessage(ast.topHead() + ": Equal() expression expected at position 1 instead of "
+						+ ast.arg1().toString());
 			}
 			VariablesSet eVar = null;
 			if (ast.arg2().isList()) {
@@ -1443,7 +1408,9 @@ public class PolynomialFunctions {
 			}
 			if (!eVar.isSize(1)) {
 				// factorization only possible for univariate polynomials
-				throw new WrongArgumentType(ast, ast.arg2(), 2, "Only one variable expected");
+				return engine.printMessage(ast.topHead()
+						+ ": factorization only possible for univariate polynomials at position 2 instead of "
+						+ ast.arg2().toString());
 			}
 			IAST variables = eVar.getVarList();
 			IExpr variable = variables.arg1();
@@ -1645,8 +1612,12 @@ public class PolynomialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
 			int[] dim = ast.arg1().isMatrix();
-			if (ast.isAST1() && dim != null) {
+				if (dim != null) {
+					if (dim[0] == 0 && dim[1] == 0) {
+						return F.C0;
+					}
 				IAST matrixArg1 = (IAST) ast.arg1();
 
 				if (dim[0] == 1) {
@@ -1657,6 +1628,7 @@ public class PolynomialFunctions {
 						IAST row = (IAST) matrixArg1.arg1();
 						return row.apply(F.Times);
 					}
+				}
 				}
 				return F.NIL;
 			}
@@ -1847,7 +1819,7 @@ public class PolynomialFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
-			if (degree > Integer.MIN_VALUE) {
+			if (degree >= 0) {
 				return PolynomialsUtils.createHermitePolynomial(degree, ast.arg2());
 			}
 			return F.NIL;
@@ -1952,7 +1924,7 @@ public class PolynomialFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
-			if (degree > Integer.MIN_VALUE) {
+			if (degree >= 0) {
 				return PolynomialsUtils.createLegendrePolynomial(degree, ast.arg2());
 			}
 			return F.NIL;
@@ -2049,7 +2021,7 @@ public class PolynomialFunctions {
 				varList = eVar.getArrayList();
 				symbolList = eVar.getVarList();
 			} else {
-				symbolList = Validate.checkSymbolOrSymbolList(ast, 2, engine);
+				symbolList = Validate.checkIsVariableOrVariableList(ast, 2, engine);
 				if (!symbolList.isPresent()) {
 					return F.NIL;
 				}
@@ -2203,10 +2175,6 @@ public class PolynomialFunctions {
 		try {
 			ExprPolynomialRing ring = new ExprPolynomialRing(F.List(variable));
 			ExprPolynomial poly = ring.create(polynomial);
-			// PolynomialOld poly = new PolynomialOld(polynomial, (ISymbol) variable);
-			// if (!poly.isPolynomial()) {
-			// throw new WrongArgumentType(polynomial, "Polynomial expected!");
-			// }
 
 			IAST list = poly.coefficientList();
 			int degree = list.size() - 2;
@@ -2221,13 +2189,14 @@ public class PolynomialFunctions {
 			}
 			return result;
 		} catch (RuntimeException ex) {
-			throw new WrongArgumentType(polynomial, "Polynomial expected!");
+			// Polynomial expected!
+			return null;
 		}
 	}
 
-	public static IAST coefficientList(IExpr expr, IAST coefficientList) {
+	public static IAST coefficientList(IExpr expr, IAST listOfVariables) {
 		try {
-			ExprPolynomialRing ring = new ExprPolynomialRing(coefficientList);
+			ExprPolynomialRing ring = new ExprPolynomialRing(listOfVariables);
 			ExprPolynomial poly = ring.create(expr, true, false, true);
 			if (poly.isZero()) {
 				return F.List();
@@ -2235,10 +2204,18 @@ public class PolynomialFunctions {
 			return poly.coefficientList();
 		} catch (LimitException le) {
 			throw le;
+		} catch (ClassCastException ex) {
+			// org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing.create()
+			if (Config.SHOW_STACKTRACE) {
+				ex.printStackTrace();
+			}
 		} catch (RuntimeException ex) {
 			if (Config.SHOW_STACKTRACE) {
 				ex.printStackTrace();
 			}
+		}
+		if (listOfVariables.argSize() > 0) {
+			return F.Nest(F.List, expr, listOfVariables.argSize());
 		}
 		return F.NIL;
 	}
@@ -2249,8 +2226,8 @@ public class PolynomialFunctions {
 		}
 		IExpr expr = evalExpandAll(arg1, engine);
 
-		ISymbol sym = (ISymbol) variables.arg1();
-		double[] coefficients = Expr2Object.toPolynomial(expr, sym);
+		IExpr variable = variables.arg1();
+		double[] coefficients = Expr2Object.toPolynomial(expr, variable);
 
 		if (coefficients != null) {
 			LaguerreSolver solver = new LaguerreSolver(Config.DEFAULT_ROOTS_CHOP_DELTA);

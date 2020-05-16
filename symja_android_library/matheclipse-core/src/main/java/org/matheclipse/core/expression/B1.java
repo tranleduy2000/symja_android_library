@@ -62,6 +62,25 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 	}
 	
+	public static class Line extends B1 {
+		public Line() {
+			super();
+		}
+
+		Line(IExpr arg1) {
+			super(arg1);
+		}
+
+		@Override
+		public final IBuiltInSymbol head() {
+			return F.Line;
+		}
+
+		public IASTMutable copy() {
+			return new Line(arg1);
+		}
+	}
+
 	public static class List extends B1 {
 		public List() {
 			super();
@@ -116,6 +135,25 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 
 		public IASTMutable copy() {
 			return new Not(arg1);
+		}
+	}
+
+	public static class Point extends B1 {
+		public Point() {
+			super();
+		}
+
+		Point(IExpr arg1) {
+			super(arg1);
+		}
+
+		@Override
+		public final IBuiltInSymbol head() {
+			return F.Point;
+		}
+
+		public IASTMutable copy() {
+			return new Point(arg1);
 		}
 	}
 
@@ -214,7 +252,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 	 * @param arg2
 	 *            the second argument of the function
 	 */
-	B1(IExpr arg1) {
+	public B1(IExpr arg1) {
 		this.arg1 = arg1;
 	}
 
@@ -336,7 +374,7 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 		}
 		if (obj instanceof AbstractAST) {
 			final IAST list = (IAST) obj;
-			IBuiltInSymbol head = head();
+			ISymbol head = head();
 			if (head != ((AbstractAST) list).head()) {
 				// compared with IBuiltInSymbol object identity
 				return false;
@@ -510,7 +548,20 @@ public abstract class B1 extends AbstractAST implements Cloneable, Externalizabl
 	}
 
 	@Override
-	public abstract IBuiltInSymbol head();
+	public IAST getItems(int[] items, int length) {
+		if (length == 0) {
+			return this;
+		}
+		AST result = new AST(length, true);
+		result.set(0, head());
+		for (int i = 0; i < length; i++) {
+			result.set(i + 1, get(items[i]));
+		}
+		return result;
+	}
+
+	@Override
+	public abstract ISymbol head();
 
 	@Override
 	public int hashCode() {

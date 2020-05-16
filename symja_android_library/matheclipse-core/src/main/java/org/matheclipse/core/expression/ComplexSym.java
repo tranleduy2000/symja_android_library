@@ -41,9 +41,11 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	 */
 	private static final long serialVersionUID = 1489050560741527824L;
 
-	private final static ComplexSym ZERO = ComplexSym.valueOf(F.C0);
-	private final static ComplexSym MINUS_ONE = ComplexSym.valueOf(F.CN1);
-	private final static ComplexSym ONE = ComplexSym.valueOf(F.C1);
+	private final static ComplexSym ZERO = ComplexSym.valueOf(0, 1, 0, 1);
+	private final static ComplexSym MINUS_ONE = ComplexSym.valueOf(-1, 1, 0, 1);
+	private final static ComplexSym ONE = ComplexSym.valueOf(1, 1, 0, 1);
+	private final static ComplexSym POSITIVE_I = ComplexSym.valueOf(0, 1, 1, 1);
+	private final static ComplexSym NEGATIVE_I = ComplexSym.valueOf(0, 1, -1, 1);
 
 	public static ComplexSym valueOf(final BigFraction real, final BigFraction imaginary) {
 		final ComplexSym c = new ComplexSym();
@@ -115,6 +117,12 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr abs() {
+		if (fReal.isZero()) {
+			return fImaginary.abs();
+		}
+		if (fImaginary.isZero()) {
+			return fReal.abs();
+		}
 		return F.Sqrt(fReal.multiply(fReal).add(fImaginary.multiply(fImaginary)));
 	}
 
@@ -161,7 +169,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
 	/** {@inheritDoc} */
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return visitor.visit(this);
 	}
 
@@ -603,6 +611,33 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	 * @return
 	 */
 	private IComplex powPositive(final long n) {
+		if (fReal.isZero()) {
+			long modN = n % 4;
+			if (fImaginary.isOne()) {
+				if (modN == 0) {
+					return ONE;
+				}
+				if (modN == 1) {
+					return this;
+				}
+				if (modN == 2) {
+					return MINUS_ONE;
+				}
+				return NEGATIVE_I;
+			}
+			if (fImaginary.isMinusOne()) {
+				if (modN == 0) {
+					return ONE;
+				}
+				if (modN == 1) {
+					return NEGATIVE_I;
+				}
+				if (modN == 2) {
+					return MINUS_ONE;
+				}
+				return POSITIVE_I;
+			}
+		}
 		long exp = n;
 		long b2pow = 0;
 		while ((exp & 1) == 0L) {
@@ -652,6 +687,10 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return fReal;
 	}
 
+	@Override
+	public INumber round() {
+		return valueOf((IRational) fReal.round(), (IRational) fImaginary.round());
+	}
 	@Override
 	public IExpr times(final IExpr that) {
 		if (that instanceof ComplexSym) {

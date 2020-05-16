@@ -61,7 +61,7 @@ public class ExprID extends IExprImpl implements IExpr {
 	}
 
 	@Override
-	public <T> T accept(IVisitor<T> visitor) {
+	public IExpr accept(IVisitor visitor) {
 		return null;
 	}
 

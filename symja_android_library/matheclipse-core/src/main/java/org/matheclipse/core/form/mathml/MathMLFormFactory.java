@@ -7,6 +7,7 @@ import org.matheclipse.core.builtin.Algebra;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.util.Iterator;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
@@ -16,8 +17,10 @@ import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
+import org.matheclipse.core.expression.IntervalSym;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -846,7 +849,8 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			}
 			fFactory.tagStart(buf, "mrow");
 			if (f.get(i).isList()) {
-				IIterator<IExpr> iterator = Iterator.create((IAST) f.get(i), EvalEngine.get());
+				try {
+					IIterator<IExpr> iterator = Iterator.create((IAST) f.get(i), i, EvalEngine.get());
 				if (iterator.isValidVariable() && iterator.getStep().isOne()) {
 					fFactory.tagStart(buf, "munderover");
 					fFactory.tag(buf, "mo", mathSymbol);
@@ -863,6 +867,9 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 					}
 					fFactory.tagEnd(buf, "mrow");
 					return true;
+				}
+				} catch (final ArgumentTypeException e) {
+					return false;
 				}
 			} else if (f.get(i).isSymbol()) {
 				ISymbol symbol = (ISymbol) f.get(i);
@@ -929,6 +936,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			}
 			final IExpr numerator = parts[0];
 			final IExpr denominator = parts[1];
+			precedenceOpen(buf, precedence);
 			if (!denominator.isOne()) {
 				// found a fraction expression
 				if (caller == MathMLFormFactory.PLUS_CALL) {
@@ -937,12 +945,12 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 				fFactory.tagStart(buf, "mfrac");
 				// insert numerator in buffer:
 				if (numerator.isTimes()) {
-					convertTimesOperator(buf, (IAST) numerator, precedence, MathMLFormFactory.NO_PLUS_CALL);
+					convertTimesOperator(buf, (IAST) numerator, Integer.MIN_VALUE, MathMLFormFactory.NO_PLUS_CALL);
 				} else {
-					fFactory.convertInternal(buf, numerator, fPrecedence, false);
+					fFactory.convertInternal(buf, numerator, Integer.MIN_VALUE, false);
 				}
 				if (denominator.isTimes()) {
-					convertTimesOperator(buf, (IAST) denominator, precedence, MathMLFormFactory.NO_PLUS_CALL);
+					convertTimesOperator(buf, (IAST) denominator, Integer.MIN_VALUE, MathMLFormFactory.NO_PLUS_CALL);
 				} else {
 					fFactory.convertInternal(buf, denominator, Integer.MIN_VALUE, false);
 				}
@@ -956,6 +964,7 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 				}
 			}
 
+			precedenceClose(buf, precedence);
 			return true;
 		}
 
@@ -1263,40 +1272,42 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 			if (derivStruct != null) {
 				IAST a1Head = derivStruct[0];
 				IAST headAST = derivStruct[1];
-				if (a1Head.isAST1() && a1Head.arg1().isInteger() && headAST.isAST1()
-						&& (headAST.arg1().isSymbol() || headAST.arg1().isAST()) && derivStruct[2] != null) {
+				if (a1Head.isAST1() && headAST.isAST1() && (headAST.arg1().isSymbol() || headAST.arg1().isAST())) {
 					try {
-						int n = ((IInteger) a1Head.arg1()).toInt();
+						int n = a1Head.arg1().toIntDefault();
 						if (n == 1 || n == 2) {
 							tagStart(buf, "mrow");
+							tagStart(buf, "msup");
 							IExpr symbolOrAST = headAST.arg1();
-							convertInternal(buf, symbolOrAST, Integer.MIN_VALUE, false);
+							convertInternal(buf, symbolOrAST, Integer.MAX_VALUE, false);
 							if (n == 1) {
-								tag(buf, "mo", "'");
+								tag(buf, "mo", "&#8242;");
 							} else if (n == 2) {
-								tag(buf, "mo", "''");
+								tag(buf, "mo", "&#8242;&#8242;");
 							}
+							tagEnd(buf, "msup");
+							if (derivStruct[2] != null) {
 							convertArgs(buf, symbolOrAST, list);
+							}
 							tagEnd(buf, "mrow");
 							return;
 						}
-						if (n > 2) {
 							tagStart(buf, "mrow");
 							IExpr symbolOrAST = headAST.arg1();
 							tagStart(buf, "msup");
-							convertInternal(buf, symbolOrAST, Integer.MIN_VALUE, false);
+						convertInternal(buf, symbolOrAST, Integer.MAX_VALUE, false);
 							tagStart(buf, "mrow");
 							tag(buf, "mo", "(");
-							tagStart(buf, "mn");
-							buf.append(Integer.toString(n));
-							tagEnd(buf, "mn");
+						// supscript "(n)"
+						convertInternal(buf, a1Head.arg1(), Integer.MIN_VALUE, false);
 							tag(buf, "mo", ")");
 							tagEnd(buf, "mrow");
 							tagEnd(buf, "msup");
+						if (derivStruct[2] != null) {
 							convertArgs(buf, symbolOrAST, list);
+						}
 							tagEnd(buf, "mrow");
 							return;
-						}
 					} catch (ArithmeticException ae) {
 
 					}
@@ -1328,6 +1339,13 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		}
 		if (list.isList() || list instanceof ASTRealVector || list instanceof ASTRealMatrix) {
 			convertList(buf, list);
+			return;
+		}
+		if (list.isInterval() && convertInterval(buf, list)) {
+			return;
+		}
+		if (list.isAssociation()) {
+			convertAssociation(buf, (IAssociation) list);
 			return;
 		}
 		int functionID = ((ISymbol) list.head()).ordinal();
@@ -1867,7 +1885,80 @@ public class MathMLFormFactory extends AbstractMathMLFormFactory {
 		}
 		tag(buf, "mo", "}");
 		tagEnd(buf, "mrow");
+	}
 
+	public void convertAssociation(final StringBuilder buf, final IAssociation association) {
+		IAST list = association.normal();
+		tagStart(buf, "mrow");
+		tag(buf, "mo", "&lt;|");
+		if (list.size() > 1) {
+			tagStart(buf, "mrow");
+			convertInternal(buf, list.arg1(), 0, false);
+			for (int i = 2; i < list.size(); i++) {
+				tag(buf, "mo", ",");
+				convertInternal(buf, list.get(i), 0, false);
+			}
+			tagEnd(buf, "mrow");
+		}
+		tag(buf, "mo", "|&gt;");
+		tagEnd(buf, "mrow");
+	}
+
+	public boolean convertInterval(final StringBuilder buf, final IAST f) {
+		if (f.size() > 1 && f.first().isASTSizeGE(F.List, 2)) {
+			IAST interval = IntervalSym.normalize(f);
+
+			tagStart(buf, "mrow");
+			tagStart(buf, "mi");
+			buf.append("Interval");
+			tagEnd(buf, "mi");
+			// &af; &#x2061;
+			tag(buf, "mo", "&#x2061;");
+			tagStart(buf, "mrow");
+			if (fRelaxedSyntax) {
+				tag(buf, "mo", "(");
+			} else {
+				tag(buf, "mo", "[");
+			}
+
+			for (int i = 1; i < interval.size(); i++) {
+				tagStart(buf, "mrow");
+				tag(buf, "mo", "{");
+
+				IAST subList = (IAST) interval.get(i);
+				IExpr min = subList.arg1();
+				IExpr max = subList.arg2();
+				if (min instanceof INum) {
+					tagStart(buf, "mn");
+					buf.append(convertDoubleToFormattedString(min.evalDouble()));
+					tagEnd(buf, "mn");
+				} else {
+					convertInternal(buf, min, 0, false);
+				}
+				tag(buf, "mo", ",");
+				if (max instanceof INum) {
+					tagStart(buf, "mn");
+					buf.append(convertDoubleToFormattedString(max.evalDouble()));
+					tagEnd(buf, "mn");
+				} else {
+					convertInternal(buf, max, 0, false);
+				}
+				tag(buf, "mo", "}");
+				tagEnd(buf, "mrow");
+				if (i < interval.size() - 1) {
+					tag(buf, "mo", ",");
+				}
+			}
+			if (fRelaxedSyntax) {
+				tag(buf, "mo", ")");
+			} else {
+				tag(buf, "mo", "]");
+			}
+			tagEnd(buf, "mrow");
+			tagEnd(buf, "mrow");
+			return true;
+		}
+		return false;
 	}
 
 	public boolean convertNumber(final StringBuilder buf, final IExpr o, final int precedence, boolean caller) {

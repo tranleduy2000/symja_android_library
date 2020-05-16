@@ -14,60 +14,8 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.math.RoundingMode;
 
 public class Expr2Object {
-	/**
-	 * 
-	 * @param ast
-	 * @return
-	 * @throws WrongArgumentType
-	 * @deprecated use {@link IExpr#toDoubleVector()}
-	 */
-	@Deprecated
-	public static double[] toDoubleVector(IAST ast) throws WrongArgumentType {
-		double[] result = new double[ast.argSize()];
-		ISignedNumber signedNumber;
-		for (int i = 1; i < ast.size(); i++) {
-			signedNumber = ast.get(i).evalReal();
-			if (signedNumber != null) {
-				result[i - 1] = signedNumber.doubleValue();
-			} else {
-				throw new WrongArgumentType(ast, ast.get(i), i,
-						"Conversion into a vector of double values not possible!");
-			}
-		}
-		return result;
-	}
 
-	/**
-	 * 
-	 * @param ast
-	 * @return <code>null</code> if ast is no matrix
-	 * @throws WrongArgumentType
-	 * @deprecated use {@link IExpr#toDoubleMatrix()}
-	 */
-	@Deprecated
-	public static double[][] toDoubleMatrix(IAST ast) throws WrongArgumentType {
-		int[] dim = ast.isMatrix();
-		if (dim == null) {
-			return null;
-		}
-		double[][] result = new double[dim[0]][dim[1]];
-		ISignedNumber signedNumber;
-		for (int i = 1; i <= dim[0]; i++) {
-			IAST row = (IAST) ast.get(i);
-			for (int j = 1; j <= dim[1]; j++) {
-				signedNumber = row.get(j).evalReal();
-				if (signedNumber != null) {
-					result[i - 1][j - 1] = signedNumber.doubleValue();
-				} else {
-					throw new WrongArgumentType(ast, ast.get(i), i,
-							"Conversion into a matrix of double values not possible!");
-				}
-			}
-		}
-		return result;
-	}
-
-	public static double[] toPolynomial(IExpr expr, ISymbol sym) {
+	public static double[] toPolynomial(IExpr expr, IExpr sym) {
 		OpenIntToDoubleHashMap map = toPolynomialMap(expr, sym);
 		if (map == null) {
 			return null;
@@ -109,11 +57,11 @@ public class Expr2Object {
 	/**
 	 * 
 	 * @param expr
-	 * @param sym
+	 * @param variable
 	 * @return <code>null</code> if the expression couldn't be converted to a
 	 *         polynomial.
 	 */
-	public static OpenIntToDoubleHashMap toPolynomialMap(IExpr expr, ISymbol sym) {
+	public static OpenIntToDoubleHashMap toPolynomialMap(IExpr expr, IExpr variable) {
 		try {
 			OpenIntToDoubleHashMap map = new OpenIntToDoubleHashMap();
 			if (expr.isPlus()) {
@@ -126,11 +74,11 @@ public class Expr2Object {
 						for (int j = 1; j < times.size(); j++) {
 							if (times.get(j).isPower()) {
 								IAST power = (IAST) times.get(j);
-								if (power.arg1().equals(sym)) {
+								if (power.base().equals(variable)) {
 									if (exp != (-1)) {
 										return null;
 									}
-									IExpr res = F.evaln(power.arg2());
+									IExpr res = F.evaln(power.exponent());
 									if (!(res instanceof INum)) {
 										return null;
 									}
@@ -141,7 +89,7 @@ public class Expr2Object {
 									continue;
 								}
 							} else if (times.get(j).isSymbol()) {
-								if (times.get(j).equals(sym)) {
+								if (times.get(j).equals(variable)) {
 									if (exp != (-1)) {
 										return null;
 									}
@@ -166,7 +114,7 @@ public class Expr2Object {
 						continue;
 					} else if (plus.get(i).isPower()) {
 						IAST power = (IAST) plus.get(i);
-						if (power.arg1().equals(sym)) {
+						if (power.arg1().equals(variable)) {
 							IExpr res = F.evaln(power.arg2());
 							if (!(res instanceof INum)) {
 								return null;
@@ -180,7 +128,7 @@ public class Expr2Object {
 						}
 						return null;
 					} else if (plus.get(i).isSymbol()) {
-						if (plus.equalsAt(i, sym)) {
+						if (plus.equalsAt(i, variable)) {
 							addCoefficient(map, 1.0, 1);
 							continue;
 						}

@@ -116,6 +116,15 @@ public class AST extends HMArrayList implements Externalizable {
 			return fDelegate.get(fFirstIndex + location - 1);
 		}
 
+		@Override
+		public IAST getItems(int[] items, int length) {
+			AST result = new AST(length, true);
+			result.set(0, head());
+			for (int i = 0; i < length; i++) {
+				result.set(i + 1, get(items[i]));
+			}
+			return result;
+		}
 		public int size() {
 			return fDelegate.size() - fFirstIndex + 1;
 		}
@@ -188,14 +197,22 @@ public class AST extends HMArrayList implements Externalizable {
 
 	/**
 	 * 
-	 * @param intialCapacity
+	 * @param initialCapacity
 	 *            the initial capacity (i.e. number of arguments without the header element) of the list.
 	 * @param head
+	 *            the header expression of the function. If the ast represents a function like
+	 *            <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
+	 * @param initNull
+	 *            initialize all elements with <code>null</code>.
 	 * @return
 	 */
-	public static AST newInstance(final int intialCapacity, final IExpr head) {
-		AST ast = new AST(intialCapacity + 1, false);
+	public static AST newInstance(final int initialCapacity, final IExpr head, boolean initNull) {
+		AST ast = new AST(initialCapacity, initNull);
+		if (initNull) {
+			ast.set(0, head);
+		} else {
 		ast.append(head);
+		}
 		return ast;
 	}
 
@@ -387,6 +404,15 @@ public class AST extends HMArrayList implements Externalizable {
 		return ast;
 	}
 
+	@Override
+	public IAST getItems(int[] items, int length) {
+		AST result = new AST(length, true);
+		result.set(0,head());
+		for (int i = 0; i < length; i++) {
+			result.set(i + 1, get(items[i]));
+		}
+		return result;
+	}
 	@Override
 	public IASTMutable copy() {
 		switch (size()) {

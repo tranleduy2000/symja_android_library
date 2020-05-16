@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.concurrent.Callable;
+import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 import com.gx.common.math.BigIntegerMath;
@@ -12,8 +13,11 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.JASConvert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.JASConversionException;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
@@ -194,10 +198,13 @@ public final class NumberTheory {
 					return bellB;
 				}
 				}
+			} catch (MathRuntimeException mre) {
+				return engine.printMessage(ast.topHead(), mre);
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
+				return engine.printMessage(ast.topHead(), rex);
 			}
 			return F.NIL;
 		}
@@ -237,10 +244,57 @@ public final class NumberTheory {
 
 			if (ast.isAST1()) {
 				try {
-					int bn = ast.arg1().toIntDefault(Integer.MIN_VALUE);
-					if (bn !=Integer.MIN_VALUE) {
+					int bn = ast.arg1().toIntDefault();
+					if (bn >= 0) {
 						return bernoulliNumber(bn);
 				}
+					IExpr temp = engine.evaluate(F.Subtract(ast.arg1(), F.C3));
+					if (temp.isIntegerResult() && temp.isPositiveResult() && temp.isEvenResult()) {
+						// http://fungrim.org/entry/a98234/
+						return F.C0;
+					}
+
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+				}
+				return F.NIL;
+			}
+			if (ast.isAST2()) {
+				try {
+					final IExpr n = ast.arg1();
+					final IExpr x = ast.arg2();
+					int xInt = x.toIntDefault();
+					if (xInt != Integer.MIN_VALUE) {
+						if (xInt == 0) {
+							// http://fungrim.org/entry/a1d2d7/
+							return F.BernoulliB(ast.arg1());
+						}
+						if (xInt == 1 && n.isIntegerResult()) {
+							// http://fungrim.org/entry/829185/
+							return F.Times(F.Power(F.CN1, n), F.BernoulliB(n));
+						}
+
+						return F.NIL;
+					}
+					if (n.isInteger() && n.isNonNegativeResult()) {
+						if (x.isNumEqualRational(F.C1D2)) {
+							// http://fungrim.org/entry/03ee0b/
+							return F.Times(F.Subtract(F.Power(F.C2, F.Subtract(F.C1, n)), F.C1), F.BernoulliB(n));
+						}
+						int bn = n.toIntDefault();
+						if (bn >= 0) {
+							// http://fungrim.org/entry/555e10/
+							return F.sum(new Function<IExpr, IExpr>() {
+											 @Override
+											 public IExpr apply(IExpr k) {
+												 return F.Times(F.Binomial(n, k), F.BernoulliB(F.Subtract(n, k)), F.Power(x, k));
+											 }
+										 },
+									0, bn);
+						}
+					}
 				} catch (RuntimeException rex) {
 					if (Config.SHOW_STACKTRACE) {
 						rex.printStackTrace();
@@ -354,7 +408,7 @@ public final class NumberTheory {
 					IAST temp;
 					IExpr nTemp = n;
 					for (int i = 1; i <= kInt; i++) {
-						temp = F.Divide(nTemp, F.integer(i));
+						temp = F.Divide(nTemp, F.ZZ(i));
 						result.append(temp);
 						nTemp = F.eval(F.Subtract(nTemp, F.C1));
 					}
@@ -579,13 +633,21 @@ public final class NumberTheory {
 		 * @return the result
 		 */
 		public static long chineseRemainders(final long[] primes, final long[] remainders) {
-			if (primes.length != remainders.length)
-				throw new IllegalArgumentException();
+			if (primes.length != remainders.length) {
+				// The arguments to `1` must be two lists of integers of identical length, with the second list only
+				// containing positive integers.
+				String message = IOFunctions.getMessage("pilist", F.List(F.ChineseRemainder), EvalEngine.get());
+				throw new ArgumentTypeException(message);
+			}
 
 			long modulus = primes[0];
 			for (int i = 1; i < primes.length; ++i) {
-				if (primes[i] <= 0)
-					throw new RuntimeException("Negative CRT input: " + primes[i]);
+				if (primes[i] <= 0) {
+					// The arguments to `1` must be two lists of integers of identical length, with the second list only
+					// containing positive integers.
+					String message = IOFunctions.getMessage("pilist", F.List(F.ChineseRemainder), EvalEngine.get());
+					throw new ArgumentTypeException(message);
+				}
 				modulus = multiplyExact(primes[i], modulus);
 			}
 
@@ -610,12 +672,20 @@ public final class NumberTheory {
 		 * @return the result
 		 */
 		private static BigInteger chineseRemainders(final BigInteger[] primes, final BigInteger[] remainders) {
-			if (primes.length != remainders.length)
-				throw new IllegalArgumentException();
+			if (primes.length != remainders.length) {
+				// The arguments to `1` must be two lists of integers of identical length, with the second list only
+				// containing positive integers.
+				String message = IOFunctions.getMessage("pilist", F.List(F.ChineseRemainder), EvalEngine.get());
+				throw new ArgumentTypeException(message);
+			}
 			BigInteger m = primes[0];
 			for (int i = 1; i < primes.length; i++) {
-				if (primes[i].signum() <= 0)
-					throw new RuntimeException("Negative CRT input: " + primes[i]);
+				if (primes[i].signum() <= 0) {
+					// The arguments to `1` must be two lists of integers of identical length, with the second list only
+					// containing positive integers.
+					String message = IOFunctions.getMessage("pilist", F.List(F.ChineseRemainder), EvalEngine.get());
+					throw new ArgumentTypeException(message);
+				}
 				m = primes[i].multiply(m);
 			}
 
@@ -644,35 +714,44 @@ public final class NumberTheory {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.arg1().isList() && ast.arg2().isList()) {
 				try {
-					long[] a = Validate.checkListOfLongs(ast.arg1(), Long.MIN_VALUE);
-					long[] n = Validate.checkListOfLongs(ast.arg2(), Long.MIN_VALUE);
+					long[] a = Validate.checkListOfLongs(ast, ast.arg1(), Long.MIN_VALUE, true, engine);
+					long[] n = Validate.checkListOfLongs(ast, ast.arg2(), Long.MIN_VALUE, true, engine);
+					if (a == null || n == null) {
+						// try with BigIntegers
+						BigInteger[] aBig = Validate.checkListOfBigIntegers(ast, ast.arg1(), false, engine);
+						if (aBig == null) {
+							return F.NIL;
+						}
+						BigInteger[] nBig = Validate.checkListOfBigIntegers(ast, ast.arg2(), false, engine);
+						if (nBig == null) {
+							return F.NIL;
+						}
+						if (aBig.length != nBig.length) {
+						return F.NIL;
+					}
+					try {
+							return F.ZZ(chineseRemainders(nBig, aBig));
+					} catch (ArithmeticException ae) {
+						if (Config.SHOW_STACKTRACE) {
+							ae.printStackTrace();
+						}
+					}
+					return F.NIL;
+					}
 					if (a.length != n.length) {
 						return F.NIL;
 					}
-					try {
-						return F.integer(chineseRemainders(n, a));
-					} catch (ArithmeticException ae) {
-						if (Config.SHOW_STACKTRACE) {
-							ae.printStackTrace();
-						}
-					}
-					return F.NIL;
-				} catch (WrongArgumentType wat) {
-					// try with BigIntegers
-					BigInteger[] aBig = Validate.checkListOfBigIntegers(ast.arg1(), false);
-					BigInteger[] nBig = Validate.checkListOfBigIntegers(ast.arg2(), false);
-					if (aBig.length != nBig.length) {
+					if (a.length == 0) {
 						return F.NIL;
 					}
-					try {
-						return F.integer(chineseRemainders(nBig, aBig));
+					return F.ZZ(chineseRemainders(n, a));
+				} catch (ValidateException ve) {
+					return engine.printMessage(ast.topHead(), ve);
 					} catch (ArithmeticException ae) {
 						if (Config.SHOW_STACKTRACE) {
 							ae.printStackTrace();
 						}
 					}
-					return F.NIL;
-				}
 			}
 			return F.NIL;
 		}
@@ -713,6 +792,14 @@ public final class NumberTheory {
 
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
+				if (list.exists(new Predicate<IExpr>() {
+					@Override
+					public boolean test(IExpr x) {
+						return x.isList();
+					}
+				})) {
+					return F.NIL;
+				}
 				if (list.size() > 1) {
 					int size = list.argSize();
 					IASTAppendable resultList = F.ListAlloc(list.size());
@@ -802,7 +889,7 @@ public final class NumberTheory {
 			IInteger q = F.C1;
 			IInteger a = F.ZZ(BigIntegerMath.sqrt(d.toBigNumerator(), RoundingMode.FLOOR));
 			IInteger last = a;
-			IASTAppendable result = F.ListAlloc();
+			IASTAppendable result = F.ListAlloc(10);
 
 			do {
 				p = last.multiply(q).subtract(p);
@@ -883,14 +970,14 @@ public final class NumberTheory {
 
 		private static IAST realToContinuedFraction(INum value, int iterationLimit, EvalEngine engine) {
 			final double doubleValue = value.getRealPart();
-			IASTAppendable continuedFractionList = F.ListAlloc(10);
-			int ip = (int) doubleValue;
 			if (value.isNumIntValue()) {
-				continuedFractionList.append(F.ZZ((int) Math.rint(doubleValue)));
-				return continuedFractionList;
+				return F.List(F.ZZ((int) Math.rint(doubleValue)));
 			}
 
-			int aNow = ip;
+			// int ip = (int) doubleValue;
+			IASTAppendable continuedFractionList = F
+					.ListAlloc(iterationLimit > 0 && iterationLimit < 1000 ? iterationLimit + 10 : 10);
+			int aNow = (int) doubleValue;
 			double tNow = doubleValue - aNow;
 			double tNext;
 			int aNext;
@@ -1551,6 +1638,17 @@ public final class NumberTheory {
 		}
 	}
 
+	// public static void main(String[] args) {
+	// BigInteger[] gcdArgs = new BigInteger[] { BigInteger.valueOf(550), BigInteger.valueOf(420),
+	// BigInteger.valueOf(3515) };
+	// BigInteger[] bezoutCoefficients = new BigInteger[3];
+	// BigInteger gcd = ExtendedGCD.extendedGCD(gcdArgs, bezoutCoefficients);
+	// System.out.println("GCD: " + gcd.toString());
+	// System.out.println("Bezout Coefficients: ");
+	// for (int i = 0; i < bezoutCoefficients.length; i++) {
+	// System.out.print(" " + bezoutCoefficients[i].toString());
+	// }
+	// }
 	/**
 	 * <pre>
 	 * ExtendedGCD(n1, n2, ...)
@@ -1609,6 +1707,7 @@ public final class NumberTheory {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg;
+			BigInteger[] gcdArgs = new BigInteger[ast.argSize()];
 			for (int i = 1; i < ast.size(); i++) {
 				arg = ast.get(i);
 				if (!arg.isInteger()) {
@@ -1617,27 +1716,27 @@ public final class NumberTheory {
 				if (!((IInteger) arg).isPositive()) {
 					return F.NIL;
 				}
+				gcdArgs[i - 1] = ((IInteger) ast.get(i)).toBigNumerator();
 			}
 			// all arguments are positive integers now
 
 			try {
 
-				// BigInteger factor = BigInteger.ONE;
-				final BigInteger[] subBezouts = new BigInteger[ast.argSize()];
-				BigInteger gcd = extendedGCD(ast, subBezouts);
+				final BigInteger[] bezoutCoefficients = new BigInteger[ast.argSize()];
+				BigInteger gcd = extendedGCD(gcdArgs, bezoutCoefficients);
 				// convert the Bezout numbers to sublists
-				IASTAppendable subList = F.ListAlloc(subBezouts.length);
-				subList.appendArgs(0, subBezouts.length, new IntFunction<IExpr>() {
+				IASTAppendable subList = F.ListAlloc(bezoutCoefficients.length);
+				subList.appendArgs(0, bezoutCoefficients.length, new IntFunction<IExpr>() {
 					@Override
 					public IExpr apply(int i) {
-						return F.integer(subBezouts[i]);
+						return F.ZZ(bezoutCoefficients[i]);
 					}
 				});
 				// for (int i = 0; i < subBezouts.length; i++) {
 				// subList.append(F.integer(subBezouts[i]));
 				// }
 				// create the output list
-				return F.List(F.integer(gcd), subList);
+				return F.List(F.ZZ(gcd), subList);
 			} catch (ArithmeticException ae) {
 				if (Config.SHOW_STACKTRACE) {
 					ae.printStackTrace();
@@ -1650,23 +1749,32 @@ public final class NumberTheory {
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_2_INFINITY;
 		}
-		public static BigInteger extendedGCD(final IAST ast, BigInteger[] subBezouts) {
+		/**
+		 * Calculate the extended GCD
+		 *
+		 * @param gcdArgs
+		 *            an array of positive BigInteger numbers
+		 * @param bezoutsCoefficients
+		 *            returns the Bezout Coefficients
+		 * @return
+		 */
+		public static BigInteger extendedGCD(final BigInteger[] gcdArgs, BigInteger[] bezoutsCoefficients) {
 			BigInteger factor;
-			BigInteger gcd = ((IInteger) ast.arg1()).toBigNumerator();
-			Object[] stepResult = extendedGCD(((IInteger) ast.arg2()).toBigNumerator(), gcd);
+			BigInteger gcd = gcdArgs[0];
+			Object[] stepResult = extendedGCD(gcdArgs[1], gcd);
 
 			gcd = (BigInteger) stepResult[0];
-			subBezouts[0] = ((BigInteger[]) stepResult[1])[0];
-			subBezouts[1] = ((BigInteger[]) stepResult[1])[1];
+			bezoutsCoefficients[0] = ((BigInteger[]) stepResult[1])[0];
+			bezoutsCoefficients[1] = ((BigInteger[]) stepResult[1])[1];
 
-			for (int i = 3; i < ast.size(); i++) {
-				stepResult = extendedGCD(((IInteger) ast.get(i)).toBigNumerator(), gcd);
+			for (int i = 2; i < gcdArgs.length; i++) {
+				stepResult = extendedGCD(gcdArgs[i], gcd);
 				gcd = (BigInteger) stepResult[0];
 				factor = ((BigInteger[]) stepResult[1])[0];
-				for (int j = 0; j < i - 1; j++) {
-					subBezouts[j] = subBezouts[j].multiply(factor);
+				for (int j = 0; j < i; j++) {
+					bezoutsCoefficients[j] = bezoutsCoefficients[j].multiply(factor);
 				}
-				subBezouts[i - 1] = ((BigInteger[]) stepResult[1])[1];
+				bezoutsCoefficients[i] = ((BigInteger[]) stepResult[1])[1];
 			}
 			return gcd;
 		}
@@ -2159,9 +2267,12 @@ public final class NumberTheory {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			BigInteger[] array = Validate.checkListOfBigIntegers(ast.arg1(), true);
+			BigInteger[] array = Validate.checkListOfBigIntegers(ast, ast.arg1(), true, engine);
+			if (array != null && array.length > 0) {
 			BigInteger result = org.matheclipse.core.frobenius.FrobeniusNumber.frobeniusNumber(array);
 			return F.ZZ(result);
+		}
+			return F.NIL;
 		}
 
 		@Override
@@ -2204,18 +2315,16 @@ public final class NumberTheory {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (!ast.arg1().isList()) {
-				throw new WrongNumberOfArguments(ast, 1, ast.argSize());
-			}
+			if (ast.arg1().isList()) {
 			IAST list = (IAST) ast.arg1();
 			if (list.size() > 1) {
 				int size = list.argSize();
-				if (list.forAll(new Predicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x) {
-                        return x.isReal();
-                    }
-                })) {
+					if (list.forAll(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							return x.isReal();
+						}
+					})) {
 					IExpr result = list.get(size--);
 					for (int i = size; i >= 1; i--) {
 						result = list.get(i).plus(result.power(-1));
@@ -2227,6 +2336,7 @@ public final class NumberTheory {
 					result = F.Plus(list.get(i), F.Power(result, F.CN1));
 				}
 				return result;
+			}
 			}
 			return F.NIL;
 		}
@@ -2655,7 +2765,7 @@ public final class NumberTheory {
 	 * <blockquote>
 	 * <p>
 	 * returns the <code>n</code>th mersenne prime exponent. <code>2^n - 1</code> must be a prime number. Currently
-	 * <code>0 &lt;= n &lt;= 45</code> can be computed, otherwise the function returns unevaluated.
+	 * <code>0 &lt;= n &lt;= 47</code> can be computed, otherwise the function returns unevaluated.
 	 * </p>
 	 * </blockquote>
 	 * <p>
@@ -2702,7 +2812,7 @@ public final class NumberTheory {
 	 * 
 	 * <blockquote>
 	 * <p>
-	 * returns <code>True</code> if <code>2^n - 1</code> is a prime number. Currently <code>0 &lt;= n &lt;= 45</code>
+	 * returns <code>True</code> if <code>2^n - 1</code> is a prime number. Currently <code>0 &lt;= n &lt;= 47</code>
 	 * can be computed in reasonable time.
 	 * </p>
 	 * </blockquote>
@@ -2947,7 +3057,7 @@ public final class NumberTheory {
 				try {
 					IInteger k = ast.getInt(1);
 					IInteger n = ast.getInt(2);
-					if (n.isNegative()) {
+					if (!n.isPositive()) {
 						return F.NIL;
 					}
 
@@ -3017,7 +3127,7 @@ public final class NumberTheory {
 					// Non-negative integer expected.
 					return IOFunctions.printMessage(F.NextPrime, "intnn", F.List(), engine);
 				}
-				return F.integer(primeBase.nextProbablePrime());
+				return F.ZZ(primeBase.nextProbablePrime());
 			} else if (ast.isAST2() && ast.arg1().isInteger() && ast.arg2().isInteger()) {
 
 				BigInteger primeBase = ((IInteger) ast.arg1()).toBigNumerator();
@@ -3034,7 +3144,7 @@ public final class NumberTheory {
 				for (int i = 0; i < n; i++) {
 					temp = temp.nextProbablePrime();
 				}
-				return F.integer(temp);
+				return F.ZZ(temp);
 
 			}
 			return F.NIL;
@@ -3120,7 +3230,8 @@ public final class NumberTheory {
 			if (arg1.isZero()) {
 				return F.C1;
 			}
-			if (arg1.isInteger() && arg1.isPositive()) {
+			if (arg1.isInteger()) {
+				if (arg1.isPositive()) {
 				if (arg1.isOne()) {
 					return F.C1;
 				}
@@ -3147,6 +3258,9 @@ public final class NumberTheory {
 					// e.printStackTrace();
 				}
 				return F.NIL;
+			}
+				// http://fungrim.org/entry/cd3013/
+				return F.C0;
 			}
 			if (arg1.isInfinity()) {
 				return F.CInfinity;
@@ -3210,7 +3324,8 @@ public final class NumberTheory {
 			if (arg1.isZero()) {
 				return F.C1;
 			}
-			if (arg1.isInteger() && arg1.isPositive()) {
+			if (arg1.isInteger()) {
+				if (arg1.isPositive()) {
 				if (arg1.isOne()) {
 					return F.C1;
 				}
@@ -3243,6 +3358,8 @@ public final class NumberTheory {
 					// e.printStackTrace();
 				}
 				return F.NIL;
+			}
+				return F.C0;
 			}
 			if (arg1.isInfinity()) {
 				return F.CInfinity;
@@ -3431,7 +3548,7 @@ public final class NumberTheory {
 					return F.NIL;
 				}
 				try {
-					return F.integer(Primality.prime(nthPrime));
+					return F.ZZ(Primality.prime(nthPrime));
 				} catch (RuntimeException ae) {
 					if (Config.SHOW_STACKTRACE) {
 						ae.printStackTrace();
@@ -3490,7 +3607,7 @@ public final class NumberTheory {
 						}
 						result++;
 					}
-					return F.integer(result);
+					return F.ZZ(result);
 				}
 			}
 
@@ -3634,7 +3751,24 @@ public final class NumberTheory {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
+			// TODO
 			IExpr arg1 = ast.arg1();
+			if (arg1.isInteger()) {
+				try {
+					IInteger ii = (IInteger) arg1;
+					if (ii.isEven() && !ii.equals(F.C2) && !ii.equals(F.C4)) {
+						if (ii.quotient(F.C2).isEven()) {
+							return F.NIL;
+						}
+					}
+				} catch (LimitException le) {
+					throw le;
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
+				}
+			}
 			return F.NIL;
 		}
 
@@ -3687,9 +3821,13 @@ public final class NumberTheory {
 								return roots[i];
 							}
 						});
+							}
+				} catch (LimitException le) {
+					throw le;
+				} catch (RuntimeException rex) {
+					if (Config.SHOW_STACKTRACE) {
+						rex.printStackTrace();
 					}
-				} catch (ArithmeticException e) {
-					// integer to large?
 				}
 			}
 			return F.NIL;
@@ -3891,8 +4029,8 @@ public final class NumberTheory {
 				}
 			}
 			if (!eVar.isSize(1)) {
-				throw new WrongArgumentType(ast, ast.arg1(), 1,
-						"SquareFreeQ only implemented for univariate polynomials");
+				return engine
+						.printMessage(ast.topHead() + ": only implemented for univariate polynomials at position 1");
 			}
 			try {
 				IExpr expr = F.evalExpandAll(ast.arg1(), engine);
@@ -4042,7 +4180,7 @@ public final class NumberTheory {
 				IInteger k;
 				IASTAppendable temp = F.PlusAlloc(counter >= 0 ? counter : 0);
 				for (int i = 0; i < counter; i++) {
-					k = F.integer(i);
+					k = F.ZZ(i);
 					if ((i & 1) == 1) { // isOdd(i) ?
 						factorPlusMinus1 = F.CN1;
 					} else {
@@ -4156,10 +4294,13 @@ public final class NumberTheory {
 					}
 				}
 
+			} catch (MathRuntimeException mre) {
+				return engine.printMessage(ast.topHead(), mre);
 			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
+				return engine.printMessage(ast.topHead(), rex);
 			}
 			return F.NIL;
 		}
@@ -4531,10 +4672,11 @@ public final class NumberTheory {
 			return F.C1;
 		} else if (n == 1) {
 			return F.CN1D2;
-		} else if (n % 2 != 0) {
-			return F.C0;
 		} else if (n < 0) {
 			throw new ArithmeticException("BernoulliB(n): n is not a positive int number");
+		} else if (n % 2 != 0) {
+			// http://fungrim.org/entry/a98234/
+			return F.C0;
 		}
 		IFraction[] bernoulli = new IFraction[n + 1];
 		bernoulli[0] = AbstractFractionSym.ONE;
@@ -4678,17 +4820,17 @@ public final class NumberTheory {
 	 * @return {@code S2(nArg1,kArg2)} or throw <code>ArithmeticException</code> if <code>n</code> cannot be converted
 	 *         into a positive int number
 	 */
-	public static IInteger stirlingS2(IInteger n, IInteger k, int ki) {
-		try {
+	public static IInteger stirlingS2(IInteger n, IInteger k, int ki) throws MathRuntimeException {
+		// try {
 			int ni = n.toIntDefault(0);
 			if (ni != 0 && ni <= 25) {// S(26,9) = 11201516780955125625 is larger than Long.MAX_VALUE
 				return F.ZZ(CombinatoricsUtils.stirlingS2(ni, ki));
 			}
-		} catch (MathRuntimeException mre) {
-			if (Config.DEBUG) {
-				mre.printStackTrace();
-			}
-		}
+		// } catch (MathRuntimeException mre) {
+		// if (Config.DEBUG) {
+		// mre.printStackTrace();
+		// }
+		// }
 		IInteger sum = F.C0;
 		int nInt = n.toIntDefault(-1);
 		if (nInt < 0) {

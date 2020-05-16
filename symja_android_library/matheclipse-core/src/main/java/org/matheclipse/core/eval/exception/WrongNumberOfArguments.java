@@ -1,6 +1,7 @@
 package org.matheclipse.core.eval.exception;
 
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  */
@@ -61,4 +62,8 @@ public class WrongNumberOfArguments extends ValidateException {
 		return "Wrong text number: " + fAllowed + " but got " + fCurrent + " arguments:\n" + fExpr.toString();
 	}
 
+	@Override
+	public String getMessage(ISymbol symbol) {
+		return getMessage();
+	}
 }

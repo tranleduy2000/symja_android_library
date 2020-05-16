@@ -1,8 +1,11 @@
 package org.matheclipse.core.eval.util;
 
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.QuantityFunctions;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.NoEvalException;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
@@ -137,7 +140,7 @@ public class Iterator {
 				try {
 					double d = sub.evalDouble();
 					return !(d < 0.0);
-				} catch (WrongArgumentType wt) {
+				} catch (ValidateException ve) {
 					// return false;
 				}
 					return false;
@@ -227,7 +230,11 @@ public class Iterator {
 				}
 			}
 			if (maxCounterOrList.isList()) {
+				if (maxCounterOrListIndex < maxCounterOrList.size()) {
 				count = maxCounterOrList.getAt(maxCounterOrListIndex++);
+				} else {
+					return false;
+				}
 			} else {
 				count = lowerLimit;
 			}
@@ -887,9 +894,9 @@ public class Iterator {
 			this.lowerLimit = lowerLimit;
 			this.upperLimit = upperLimit;
 			this.step = step;
-			this.originalLowerLimit = F.integer(lowerLimit);
-			this.originalUpperLimit = F.integer(upperLimit);
-			this.originalStep = F.integer(step);
+			this.originalLowerLimit = F.ZZ(lowerLimit);
+			this.originalUpperLimit = F.ZZ(upperLimit);
+			this.originalStep = F.ZZ(step);
 		}
 
 		public IntIterator(final int lowerLimit, final int upperLimit, final int step) {
@@ -967,7 +974,7 @@ public class Iterator {
 		 */
 		@Override
 		public IExpr next() {
-			final IExpr temp = F.integer(count);
+			final IExpr temp = F.ZZ(count);
 			if (variable != null) {
 				variable.assign(temp);
 			}
@@ -1027,7 +1034,7 @@ public class Iterator {
 	 *            the evaluation engine
 	 * @return the iterator
 	 */
-	public static IIterator<IExpr> create(final IAST list, final EvalEngine engine) {
+	public static IIterator<IExpr> create(final IAST list, int position, final EvalEngine engine) {
 
 		EvalEngine evalEngine = engine;
 		IExpr lowerLimit;
@@ -1071,7 +1078,10 @@ public class Iterator {
 				} else if (upperLimit.isReal()) {
 					return new ISignedNumberIterator(variable, F.C1, (ISignedNumber) upperLimit, F.C1);
 				}
-				break;
+				if (!list.arg1().isVariable()) {
+					throw new ArgumentTypeException(
+							IOFunctions.getMessage("vloc", F.List(list.arg1()), EvalEngine.get()));
+				}
 
 			case 3:
 				lowerLimit = F.C1;
@@ -1079,7 +1089,13 @@ public class Iterator {
 				step = F.C1;
 
 				if (list.arg1() instanceof ISymbol) {
-					variable = (ISymbol) list.arg1();
+					ISymbol sym = (ISymbol) list.arg1();
+					if (!sym.isVariable() || sym.isProtected()) {
+						// Cannot assign to raw object `1`.
+						throw new ArgumentTypeException(
+								IOFunctions.getMessage("setraw", F.List(sym), EvalEngine.get()));
+					}
+					variable = sym;
 				} else {
 					variable = null;
 				}
@@ -1112,7 +1128,13 @@ public class Iterator {
 				step = F.C1;
 
 				if (list.arg1().isSymbol()) {
-					variable = (ISymbol) list.arg1();
+					ISymbol sym = (ISymbol) list.arg1();
+					if (!sym.isVariable() || sym.isProtected()) {
+						// Cannot assign to raw object `1`.
+						throw new ArgumentTypeException(
+								IOFunctions.getMessage("setraw", F.List(sym), EvalEngine.get()));
+					}
+					variable = sym;
 				} else {
 					variable = null;
 				}
@@ -1148,7 +1170,13 @@ public class Iterator {
 				upperLimit = evalEngine.evalWithoutNumericReset(list.arg3());
 				step = evalEngine.evalWithoutNumericReset(list.arg4());
 				if (list.arg1() instanceof ISymbol) {
-					variable = (ISymbol) list.arg1();
+					ISymbol sym = (ISymbol) list.arg1();
+					if (!sym.isVariable() || sym.isProtected()) {
+						// Cannot assign to raw object `1`.
+						throw new ArgumentTypeException(
+								IOFunctions.getMessage("setraw", F.List(sym), EvalEngine.get()));
+					}
+					variable = sym;
 				} else {
 					variable = null;
 				}
@@ -1182,15 +1210,21 @@ public class Iterator {
 
 				break;
 			default:
-				lowerLimit = null;
-				upperLimit = null;
-				step = null;
-				variable = null;
+				// Argument `1` at position `2` does not have the correct form for an iterator.
+				String str = IOFunctions.getMessage("itform", F.List(list, F.ZZ(position)), EvalEngine.get());
+				throw new ArgumentTypeException(str);
+
+				// lowerLimit = null;
+				// upperLimit = null;
+				// step = null;
+				// variable = null;
 			}
 
 			return new ExprIterator(variable, evalEngine, lowerLimit, upperLimit, step, fNumericMode);
 		} catch (RuntimeException rex) {
-			throw new ClassCastException();
+			// Argument `1` at position `2` does not have the correct form for an iterator.
+			String str = IOFunctions.getMessage("itform", F.List(list, F.ZZ(position)), EvalEngine.get());
+			throw new ArgumentTypeException(str);
 		} finally {
 			evalEngine.setNumericMode(localNumericMode);
 		}
@@ -1215,6 +1249,10 @@ public class Iterator {
 		ISymbol variable;
 		boolean fNumericMode;
 
+		if (symbol != null && (!symbol.isVariable() || symbol.isProtected())) {
+			// Cannot assign to raw object `1`.
+			throw new ArgumentTypeException(IOFunctions.getMessage("setraw", F.List(symbol), EvalEngine.get()));
+		}
 		boolean localNumericMode = evalEngine.isNumericMode();
 		try {
 			if (list.hasNumericArgument()) {

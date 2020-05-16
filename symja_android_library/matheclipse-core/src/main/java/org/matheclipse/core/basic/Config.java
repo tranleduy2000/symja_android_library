@@ -112,6 +112,12 @@ public class Config {
 	public static boolean SHOW_STACKTRACE = false;
 
 	/**
+	 * Set to true if in fuzz testing mode
+	 *
+	 */
+	public final static boolean FUZZ_TESTING = true;
+
+	/**
 	 * Show the console output, if an expression has a head symbol with attribute <code>ISymbol.CONSOLE_OUTPUT</code>.
 	 * 
 	 */
