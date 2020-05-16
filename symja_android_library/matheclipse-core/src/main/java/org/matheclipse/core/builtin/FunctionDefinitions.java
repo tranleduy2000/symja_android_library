@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import org.matheclipse.core.expression.F;
+
 import static org.matheclipse.core.expression.F.Compile;
 import static org.matheclipse.core.expression.F.ComplexExpand;
 import static org.matheclipse.core.expression.F.CreateDirectory;
@@ -31,6 +33,7 @@ import static org.matheclipse.core.expression.F.LinearProgramming;
 import static org.matheclipse.core.expression.F.ListLinePlot;
 import static org.matheclipse.core.expression.F.ListPlot;
 import static org.matheclipse.core.expression.F.ListPlot3D;
+import static org.matheclipse.core.expression.F.ND;
 import static org.matheclipse.core.expression.F.NDSolve;
 import static org.matheclipse.core.expression.F.NFourierTransform;
 import static org.matheclipse.core.expression.F.NIntegrate;
@@ -64,6 +67,7 @@ public final class FunctionDefinitions {
 			ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
 			Compile.setEvaluator(new org.matheclipse.core.reflection.system.Compile());
 			CreateDirectory.setEvaluator(new org.matheclipse.core.reflection.system.CreateDirectory());
+			//Dataset.setEvaluator(new org.matheclipse.core.reflection.system.Dataset());
 			D.setEvaluator(new org.matheclipse.core.reflection.system.D());
 			Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
 			DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
@@ -71,10 +75,11 @@ public final class FunctionDefinitions {
 			ElementData.setEvaluator(new org.matheclipse.core.data.ElementData());
 			Eliminate.setEvaluator(new org.matheclipse.core.reflection.system.Eliminate());
 			Export.setEvaluator(new org.matheclipse.core.reflection.system.Export());
+			//ExportString.setEvaluator(new org.matheclipse.core.reflection.system.ExportString());
 			ExpToTrig.setEvaluator(new org.matheclipse.core.reflection.system.ExpToTrig());
 			FindInstance.setEvaluator(new org.matheclipse.core.reflection.system.FindInstance());
 			FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
-			Fourier.setEvaluator(new org.matheclipse.core.reflection.system.Fourier());
+			F.Fourier.setEvaluator(new org.matheclipse.core.reflection.system.Fourier());
 			FrobeniusSolve.setEvaluator(new org.matheclipse.core.reflection.system.FrobeniusSolve());
 			FunctionExpand.setEvaluator(new org.matheclipse.core.reflection.system.FunctionExpand());
 			HeavisideTheta.setEvaluator(new org.matheclipse.core.reflection.system.HeavisideTheta());
@@ -92,6 +97,7 @@ public final class FunctionDefinitions {
 			ListLinePlot.setEvaluator(new org.matheclipse.core.reflection.system.ListLinePlot());
 			ListPlot.setEvaluator(new org.matheclipse.core.reflection.system.ListPlot());
 			ListPlot3D.setEvaluator(new org.matheclipse.core.reflection.system.ListPlot3D());
+			ND.setEvaluator(new org.matheclipse.core.reflection.system.ND());
 			NDSolve.setEvaluator(new org.matheclipse.core.reflection.system.NDSolve());
 			NFourierTransform.setEvaluator(new org.matheclipse.core.reflection.system.NFourierTransform());
 			NIntegrate.setEvaluator(new org.matheclipse.core.reflection.system.NIntegrate());
@@ -106,6 +112,9 @@ public final class FunctionDefinitions {
 			PolarPlot.setEvaluator(new org.matheclipse.core.reflection.system.PolarPlot());
 			Product.setEvaluator(new org.matheclipse.core.reflection.system.Product());
 
+			//Ramp.setEvaluator(new org.matheclipse.core.reflection.system.Ramp());
+			//SemanticImport.setEvaluator(new org.matheclipse.core.reflection.system.SemanticImport());
+			//SemanticImportString.setEvaluator(new org.matheclipse.core.reflection.system.SemanticImportString());
 			Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());
 			Solve.setEvaluator(new org.matheclipse.core.reflection.system.Solve());
 			Sum.setEvaluator(new org.matheclipse.core.reflection.system.Sum());
