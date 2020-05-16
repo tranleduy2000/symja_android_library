@@ -12,6 +12,7 @@ import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
+import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -19,6 +20,7 @@ import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.form.DoubleToMMA;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -148,6 +150,14 @@ public class OutputFormFactory {
 
 	private void convertDouble(final Appendable buf, final double doubleValue, final INum d, final int precedence,
 			boolean caller) throws IOException {
+		if (d instanceof ApfloatNum) {
+			final boolean isNegative = d.isNegative();
+			if (!isNegative && caller == PLUS_CALL) {
+				append(buf, "+");
+			}
+			convertDoubleString(buf, convertApfloat(d.apfloatValue(d.precision())), precedence, isNegative);
+			return;
+		}
 		if (F.isZero(doubleValue, Config.MACHINE_EPSILON)) {
 			convertDoubleString(buf, convertDoubleToFormattedString(0.0), precedence, false);
 			return;
@@ -158,8 +168,6 @@ public class OutputFormFactory {
 		}
 		if (d instanceof Num) {
 			convertDoubleString(buf, convertDoubleToFormattedString(doubleValue), precedence, isNegative);
-		} else {
-			convertDoubleString(buf, convertApfloat(d.apfloatValue(d.precision())), precedence, isNegative);
 		}
 	}
 
@@ -928,7 +936,20 @@ public class OutputFormFactory {
 	private void convert(final Appendable buf, final IExpr o, final int precedence, boolean isASTHead)
 			throws IOException {
 		if (o instanceof IAST) {
+			// if (o instanceof ASTDataset) {
+			// 	// TODO improve output
+			// 	buf.append(o.toString());
+			// 	return;
+			// }
+			if (o.isAssociation()) {
+				convertAssociation(buf, (IAssociation) o);
+				return;
+			}
 			final IAST list = (IAST) o;
+			if (!list.isPresent()) {
+				append(buf, "NIL");
+				return;
+			}
 			IExpr header = list.head();
 			if (!header.isSymbol()) {
 				// print expressions like: f(#1, y)& [x]
@@ -959,11 +980,20 @@ public class OutputFormFactory {
 				}
 
 				convert(buf, header, Integer.MIN_VALUE, true);
-				convertFunctionArgs(buf, list);
+				// avoid fast StackOverflow
+				// convertFunctionArgs(buf, list);
+				append(buf, "[");
+				for (int i = 1; i < list.size(); i++) {
+					convert(buf, list.get(i), Integer.MIN_VALUE, false);
+					if (i < list.argSize()) {
+						append(buf, ",");
+					}
+				}
+				append(buf, "]");
 				return;
 			}
-			if (list.head().isSymbol()) {
-				ISymbol head = (ISymbol) list.head();
+			if (header.isSymbol()) {
+				ISymbol head = (ISymbol) header;
 				int functionID = head.ordinal();
 				if (functionID > ID.UNKNOWN) {
 					switch (functionID) {
@@ -1123,6 +1153,20 @@ public class OutputFormFactory {
 		convertString(buf, o.toString());
 	}
 
+	private void convertAssociation(final Appendable buf, final IAssociation association) throws IOException {
+		IAST list = association.normal();
+		append(buf, "<|");
+		final int listSize = list.size();
+		if (listSize > 1) {
+			convert(buf, list.arg1(), Integer.MIN_VALUE, false);
+		}
+		for (int i = 2; i < listSize; i++) {
+			append(buf, ",");
+			convert(buf, list.get(i), Integer.MIN_VALUE, false);
+		}
+		append(buf, "|>");
+		return;
+	}
 	private boolean convertInequality(final Appendable buf, final IAST inequality, final int precedence)
 			throws IOException {
 		int operPrecedence = ASTNodeFactory.EQUAL_PRECEDENCE;
@@ -1133,7 +1177,7 @@ public class OutputFormFactory {
 		final int listSize = inequality.size();
 		int i = 1;
 		while (i < listSize) {
-			convert(tempBuffer, inequality.get(i++));
+			convert(tempBuffer, inequality.get(i++), Integer.MIN_VALUE, false);
 			if (i == listSize) {
 				if (operPrecedence < precedence) {
 					append(tempBuffer, ")");
@@ -1488,16 +1532,16 @@ public class OutputFormFactory {
 		return call;
 	}
 
-	public void convertFunctionArgs(final Appendable buf, final IAST list) throws IOException {
-		append(buf, "[");
-		for (int i = 1; i < list.size(); i++) {
-			convert(buf, list.get(i), Integer.MIN_VALUE, false);
-			if (i < list.argSize()) {
-				append(buf, ",");
-			}
-		}
-		append(buf, "]");
-	}
+	// public void convertFunctionArgs(final Appendable buf, final IAST list) throws IOException {
+	// append(buf, "[");
+	// for (int i = 1; i < list.size(); i++) {
+	// convert(buf, list.get(i), Integer.MIN_VALUE, false);
+	// if (i < list.argSize()) {
+	// append(buf, ",");
+	// }
+	// }
+	// append(buf, "]");
+	// }
 
 	/**
 	 * Write a function into the given <code>Appendable</code>.
@@ -1515,10 +1559,8 @@ public class OutputFormFactory {
 	public void convertArgs(final Appendable buf, IExpr head, final IAST function) throws IOException {
 		if (head.isAST()) {
 			append(buf, "[");
-		} else if (fRelaxedSyntax) {
-			append(buf, "(");
 		} else {
-			append(buf, "[");
+			append(buf, fRelaxedSyntax ? "(" : "[");
 		}
 		final int functionSize = function.size();
 		if (functionSize > 1) {
@@ -1530,10 +1572,8 @@ public class OutputFormFactory {
 		}
 		if (head.isAST()) {
 			append(buf, "]");
-		} else if (fRelaxedSyntax) {
-			append(buf, ")");
 		} else {
-			append(buf, "]");
+			append(buf, fRelaxedSyntax ? ")" : "]");
 		}
 	}
 
