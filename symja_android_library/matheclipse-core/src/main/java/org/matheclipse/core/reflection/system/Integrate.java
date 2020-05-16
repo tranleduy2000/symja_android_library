@@ -983,7 +983,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 					}
 				} else {
 					newCache = true;
-					engine.REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(50).build();
+					engine.REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(100).build();
 				}
 				try {
 					engine.setQuietMode(true);

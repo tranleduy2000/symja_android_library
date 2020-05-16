@@ -827,7 +827,7 @@ public class BigFraction
     @Override
     public double doubleValue() {
         double result = numerator.doubleValue() / denominator.doubleValue();
-        if (Double.isNaN(result)) {
+        if (Double.isNaN(result) || Double.isInfinite(result)) {
             // Numerator and/or denominator must be out of range:
             // Calculate how far to shift them to put them in range.
             int shift = FastMath.max(numerator.bitLength(),
@@ -850,7 +850,7 @@ public class BigFraction
     @Override
     public float floatValue() {
         float result = numerator.floatValue() / denominator.floatValue();
-        if (Double.isNaN(result)) {
+        if (Double.isNaN(result) || Double.isInfinite(result)) {
             // Numerator and/or denominator must be out of range:
             // Calculate how far to shift them to put them in range.
             int shift = FastMath.max(numerator.bitLength(),

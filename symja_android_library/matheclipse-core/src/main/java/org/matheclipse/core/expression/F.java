@@ -6,6 +6,7 @@ import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
+import com.duy.lang.DDouble;
 import com.gx.common.cache.Cache;
 import com.gx.common.cache.CacheBuilder;
 
@@ -7345,6 +7346,10 @@ public class F {
         }
         double n = value.toBigNumerator().doubleValue();
         double d = value.toBigDenominator().doubleValue();
+        // case: 1.02^181 return Infinity
+        if (!DDouble.isFinite(n) || !DDouble.isFinite(d) || !DDouble.isFinite(n / d)) {
+            return num(value.doubleValue());
+        }
         // Android changed: avoid Android's framework bug
         if (F.isEqual(n, d)) {
             n = new BigDecimal(value.toBigNumerator()).doubleValue();

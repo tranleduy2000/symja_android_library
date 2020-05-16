@@ -17,12 +17,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 29
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 29
         multiDexEnabled true
         versionCode 20
         versionName "1.1.9"
@@ -43,16 +43,16 @@ android {
             debuggable true
         }
     }
-
-    flavorDimensions "mode"
-    productFlavors {
-        lite {
-            dimension "mode"
-        }
-        full {
-            dimension "mode"
-        }
-    }
+//
+//    flavorDimensions "mode"
+//    productFlavors {
+//        lite {
+//            dimension "mode"
+//        }
+//        full {
+//            dimension "mode"
+//        }
+//    }
 
     sourceSets {
         main {
@@ -60,9 +60,9 @@ android {
             resources.srcDirs = ['src/main/resources']
             java.srcDirs += 'matheclipse-core/src/main/java/'
         }
-        full {
-            assets.srcDirs += 'matheclipse-core/src/main/resources/'
-        }
+//        full {
+//            assets.srcDirs += 'matheclipse-core/src/main/resources/'
+//        }
         test {
             java.srcDirs += "matheclipse-core/src/test/java/"
             java.srcDirs += "tools/src/main/java/"
