@@ -8,6 +8,7 @@ import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.reflection.system.Share;
@@ -28,6 +29,21 @@ public class SerializableTest extends TestCase {
 		F.await();
 	}
 
+	public void testAssociation() {
+		IAssociation assoc = F.assoc(F.List(F.Rule(F.a, F.b)));
+		equalsCopy(assoc);
+	}
+
+	public void testDataset() {
+//		Table table = Table.read().csv("Products,Sales,Market_Share\n" + //
+//				"a,5500,3\n" + //
+//				"b,12200,4\n" + //
+//				"c,60000,33\n", "");
+//
+//		ASTDataset ds = ASTDataset.newInstance(table);
+//		equalsStringCopy(ds);
+
+	}
 	public void testNum() {
 		equalsCopy(F.num(0.5));
 		equalsCopy(F.num(Integer.MAX_VALUE));
@@ -41,10 +57,10 @@ public class SerializableTest extends TestCase {
 	}
 
 	public void testInteger() {
-		equalsCopy(F.integer(Integer.MAX_VALUE));
-		equalsCopy(F.integer(Integer.MIN_VALUE));
-		equalsCopy(F.integer((Integer.MAX_VALUE) * 2L));
-		equalsCopy(F.integer((Integer.MIN_VALUE) * 2L));
+		equalsCopy(F.ZZ(Integer.MAX_VALUE));
+		equalsCopy(F.ZZ(Integer.MIN_VALUE));
+		equalsCopy(F.ZZ((Integer.MAX_VALUE) * 2L));
+		equalsCopy(F.ZZ((Integer.MIN_VALUE) * 2L));
 	}
 
 	public void testFraction() {

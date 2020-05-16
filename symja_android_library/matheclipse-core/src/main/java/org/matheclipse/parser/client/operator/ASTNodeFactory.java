@@ -60,9 +60,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 		@Override
 		public ASTNode createFunction(final INodeParserFactory factory, final ASTNode lhs, final ASTNode rhs) {
 			if (fOperatorString.equals("@")) {
-				FunctionNode fn = factory.createAST(lhs);
-				fn.add(rhs);
-				return fn;
+				return factory.unaryAST(lhs, rhs);
 			}
 			FunctionNode fn = factory.createFunction(factory.createSymbol("Apply"), lhs, rhs);
 			if (fOperatorString.equals("@@")) {
@@ -176,13 +174,14 @@ public class ASTNodeFactory implements INodeParserFactory {
 			"Dot", "Not", "PreMinus", "SameQ", "RuleDelayed", "GreaterEqual", "Condition", "Colon", "//", "DivideBy",
 			"Or", "Span", "Equal", "StringJoin", "Unequal", "Decrement", "SubtractFrom", "PrePlus", "RepeatedNull",
 			"UnsameQ", "Rule", "UpSetDelayed", "PreIncrement", "Function", "Greater", "PreDecrement", "Subtract",
-			"SetDelayed", "Alternatives", "AddTo", "Repeated", "ReplaceAll", "TagSet", "TwoWayRule", "TwoWayRule",
-			"DirectedEdge", "UndirectedEdge", "CenterDot", "CircleDot" };
+			"SetDelayed", "Alternatives", "AddTo", "Repeated", "ReplaceAll", "TagSet", "Composition",
+			"StringExpression", "TwoWayRule", "TwoWayRule", "DirectedEdge", "UndirectedEdge", "CenterDot",
+			"CircleDot" };
 
 	static final String[] OPERATOR_STRINGS = { "::", "<<", "?", "//@", "*=", "+", "^=", ";", "@", "/@", "=.", "@@",
 			"@@@", "//.", "<", "&&", "/", "=", "++", "!!", "<=", "**", "!", "*", "^", ".", "!", "-", "===", ":>", ">=",
 			"/;", ":", "//", "/=", "||", ";;", "==", "<>", "!=", "--", "-=", "+", "...", "=!=", "->", "^:=", "++", "&",
-			">", "--", "-", ":=", "|", "+=", "..", "/.", "/:", //
+			">", "--", "-", ":=", "|", "+=", "..", "/.", "/:", "@*", "~~", //
 			"<->", // TwoWayRule
 			"\uF120", // TwoWayRule
 			"\uF3D5", // DirectedEdge
@@ -322,7 +321,10 @@ public class ASTNodeFactory implements INodeParserFactory {
 					new InfixOperator("|", "Alternatives", 160, InfixOperator.NONE),
 					new InfixOperator("+=", "AddTo", 100, InfixOperator.RIGHT_ASSOCIATIVE),
 					new PostfixOperator("..", "Repeated", 170),
-					new InfixOperator("/.", "ReplaceAll", 110, InfixOperator.LEFT_ASSOCIATIVE), TAG_SET_OPERATOR,
+					new InfixOperator("/.", "ReplaceAll", 110, InfixOperator.LEFT_ASSOCIATIVE), //
+					TAG_SET_OPERATOR, //
+					new InfixOperator("@*", "Composition", 625, InfixOperator.NONE),
+					new InfixOperator("~~", "StringExpression", 135, InfixOperator.NONE),
 					new InfixOperator("<->", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE),
 					new InfixOperator("\uF120", "TwoWayRule", 125, InfixOperator.RIGHT_ASSOCIATIVE),
 					new InfixOperator("\uF3D5", "DirectedEdge", 120, InfixOperator.RIGHT_ASSOCIATIVE),
@@ -475,6 +477,10 @@ public class ASTNodeFactory implements INodeParserFactory {
 	}
 
 	@Override
+	public FunctionNode unaryAST(final ASTNode head, final ASTNode arg0) {
+		return new FunctionNode(head, arg0);
+	}
+	@Override
 	public IntegerNode createInteger(final String integerString, final int numberFormat) {
 		return new IntegerNode(integerString, numberFormat);
 	}
@@ -523,7 +529,9 @@ public class ASTNodeFactory implements INodeParserFactory {
 	public SymbolNode createSymbol(final String symbolName, final String context) {
 		String name = symbolName;
 		if (fIgnoreCase) {
+			if (name.length() > 1) {
 			name = symbolName.toLowerCase();
+		}
 		}
 		if (Config.RUBI_CONVERT_SYMBOLS) {
 			name = toRubiString(name);

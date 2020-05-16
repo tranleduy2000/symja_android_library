@@ -24,8 +24,7 @@ public interface INodeParserFactory extends IParserFactory {
 	/**
 	 * Creates a new function with head <code>head</code> and 0 arguments.
 	 * 
-	 * @param head
-	 *            the head of the function
+	 * @param head the head of the function
 	 * @return
 	 */
 	public FunctionNode createFunction(SymbolNode head);
@@ -33,10 +32,8 @@ public interface INodeParserFactory extends IParserFactory {
 	/**
 	 * Creates a new function with head <code>head</code> and 1 argument.
 	 * 
-	 * @param head
-	 *            the head of the function
-	 * @param arg
-	 *            the argument of the function
+	 * @param head the head of the function
+	 * @param arg  the argument of the function
 	 * @return
 	 */
 	public FunctionNode createFunction(SymbolNode head, ASTNode arg);
@@ -44,26 +41,19 @@ public interface INodeParserFactory extends IParserFactory {
 	/**
 	 * Creates a new function with head <code>head</code> and 2 arguments.
 	 * 
-	 * @param head
-	 *            the head of the function
-	 * @param arg1
-	 *            the first argument of the function
-	 * @param arg2
-	 *            the second argument of the function
+	 * @param head the head of the function
+	 * @param arg1 the first argument of the function
+	 * @param arg2 the second argument of the function
 	 * @return
 	 */
 	public FunctionNode createFunction(SymbolNode head, ASTNode arg1, ASTNode arg2);
 
 	/**
 	 *
-	 * @param head
-	 *            the head of the function
-	 * @param arg1
-	 *            the first argument of the function
-	 * @param arg2
-	 *            the second argument of the function
-	 * @param arg3
-	 *            the third argument of the function
+	 * @param head the head of the function
+	 * @param arg1 the first argument of the function
+	 * @param arg2 the second argument of the function
+	 * @param arg3 the third argument of the function
 	 * @return
 	 */
 	public FunctionNode createFunction(SymbolNode head, ASTNode arg1, ASTNode arg2, ASTNode arg3);
@@ -71,12 +61,19 @@ public interface INodeParserFactory extends IParserFactory {
 	/**
 	 * Creates a new function with no arguments from the given header expression .
 	 * 
-	 * @param headExpr
-	 *            the head of the function
+	 * @param headExpr the head of the function
 	 * @return
 	 */
 	public FunctionNode createAST(ASTNode headExpr);
 
+	/**
+	 * Creates a new function with head <code>head</code> and 1 argument.
+	 *
+	 * @param head the head of the function
+	 * @param arg  the argument of the function
+	 * @return
+	 */
+	public FunctionNode unaryAST(final ASTNode head, final ASTNode arg0);
 	/**
 	 * Create an double node from the given double value string
 	 * 
@@ -89,10 +86,8 @@ public interface INodeParserFactory extends IParserFactory {
 	/**
 	 * Create an integer node from the given string
 	 * 
-	 * @param integerString
-	 *            the integer number represented as a String
-	 * @param numberFormat
-	 *            the format of the number (usually 10)
+	 * @param integerString the integer number represented as a String
+	 * @param numberFormat  the format of the number (usually 10)
 	 * @return IInteger
 	 */
 	public IntegerNode createInteger(String integerString, int numberFormat);

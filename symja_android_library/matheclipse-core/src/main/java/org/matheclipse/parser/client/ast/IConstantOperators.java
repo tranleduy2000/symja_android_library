@@ -24,6 +24,10 @@ public interface IConstantOperators {
 	
 	public final static String Inequality = "Inequality";
 	/**
+	 * Head for lists (i.e. &lt;|a->,b,...|&gt; )
+	 */
+	public final static String Association = "Association";
+	/**
 	 * Head for lists (i.e. {a,b,c,...} )
 	 */
 	public final static String List = "List";

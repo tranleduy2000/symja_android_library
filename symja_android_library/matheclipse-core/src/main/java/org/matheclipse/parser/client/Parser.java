@@ -68,12 +68,11 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
-	 * idea, how to parse the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
+	 * the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param relaxedSyntax
-	 *            if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
 	 */
 	public Parser(final boolean relaxedSyntax) {
 		this(ASTNodeFactory.MMA_STYLE_FACTORY, relaxedSyntax);
@@ -84,14 +83,12 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
-	 * idea, how to parse the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
+	 * the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param relaxedSyntax
-	 *            if <code>true</code>, use '('...')' as brackets for function arguments
-	 * @param packageMode
-	 *            parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
+	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param packageMode   parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
 	 */
 	public Parser(final boolean relaxedSyntax, boolean packageMode) {
 		this(ASTNodeFactory.MMA_STYLE_FACTORY, relaxedSyntax, packageMode);
@@ -102,14 +99,12 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
-	 * idea, how to parse the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
+	 * the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param factory
-	 *            a parser factory
-	 * @param relaxedSyntax
-	 *            if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param factory       a parser factory
+	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
 	 */
 	public Parser(INodeParserFactory factory, final boolean relaxedSyntax) {
 		this(factory, relaxedSyntax, false);
@@ -120,16 +115,13 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
-	 * idea, how to parse the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
+	 * the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param factory
-	 *            a parser factory
-	 * @param relaxedSyntax
-	 *            if <code>true</code>, use '('...')' as brackets for function arguments
-	 * @param packageMode
-	 *            parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
+	 * @param factory       a parser factory
+	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param packageMode   parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
 	 */
 	public Parser(INodeParserFactory factory, final boolean relaxedSyntax, boolean packageMode) {
 		super(packageMode, Config.EXPLICIT_TIMES_OPERATOR);
@@ -211,7 +203,16 @@ public class Parser extends Scanner {
 	private ASTNode getFactor(final int min_precedence) throws SyntaxError {
 		ASTNode temp = null;
 
-		if (fToken == TT_PRECEDENCE_OPEN) {
+		switch (fToken) {
+		case TT_IDENTIFIER:
+			final SymbolNode symbol = getSymbol();
+			if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
+				temp = getBlankPatterns(symbol);
+			} else {
+				temp = symbol;
+			}
+			return parseArguments(temp);
+		case TT_PRECEDENCE_OPEN:
 			fRecursionDepth++;
 			try {
 				getNextToken();
@@ -238,24 +239,21 @@ public class Parser extends Scanner {
 			}
 			return temp;
 
-		} else if (fToken == TT_LIST_OPEN) {
-			return getList();
-		} else if (fToken == TT_IDENTIFIER) {
-			final SymbolNode symbol = getSymbol();
-			if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
-				temp = getBlankPatterns(symbol);
-			} else {
-				temp = symbol;
-			}
-			return parseArguments(temp);
-		} else if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
+		case TT_LIST_OPEN:
+			return parseArguments(getList());
+		case TT_BLANK:
+		case TT_BLANK_BLANK:
+		case TT_BLANK_BLANK_BLANK:
+		case TT_BLANK_OPTIONAL:
+		case TT_BLANK_COLON:
 			return getBlanks(temp);
-		} else if (fToken == TT_DIGIT) {
+		case TT_DIGIT:
 			return getNumber(false);
 
-		} else if (fToken == TT_STRING) {
-			return getString();
-		} else if (fToken == TT_PERCENT) {
+		case TT_STRING:
+			ASTNode str = getString();
+			return parseArguments(str);
+		case TT_PERCENT:
 
 			final FunctionNode out = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Out));
 
@@ -274,7 +272,7 @@ public class Parser extends Scanner {
 
 			out.add(fFactory.createInteger(-countPercent));
 			return parseArguments(out);
-		} else if (fToken == TT_SLOT) {
+		case TT_SLOT:
 
 			getNextToken();
 			final FunctionNode slot = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Slot));
@@ -284,7 +282,7 @@ public class Parser extends Scanner {
 				slot.add(fFactory.createInteger(1));
 			}
 			return parseArguments(slot);
-		} else if (fToken == TT_SLOTSEQUENCE) {
+		case TT_SLOTSEQUENCE:
 
 			getNextToken();
 			final FunctionNode slotSequencce = fFactory
@@ -295,8 +293,44 @@ public class Parser extends Scanner {
 				slotSequencce.add(fFactory.createInteger(1));
 			}
 			return parseArguments(slotSequencce);
+		case TT_ASSOCIATION_OPEN:
+			final FunctionNode function = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.List));
+			fRecursionDepth++;
+			try {
+				getNextToken();
+				do {
+					function.add(parseExpression());
+					if (fToken != TT_COMMA) {
+						break;
+					}
+
+					getNextToken();
+				} while (true);
+
+				if (fToken != TT_ASSOCIATION_CLOSE) {
+					throwSyntaxError("\'|>\' expected.");
+				}
+				final FunctionNode assoc = fFactory
+						.createFunction(fFactory.createSymbol(IConstantOperators.Association));
+				assoc.add(function);
+				temp = assoc;
+				getNextToken();
+				if (fToken == TT_PRECEDENCE_OPEN) {
+					if (!fExplicitTimes) {
+						Operator oper = fFactory.get("Times");
+						if (Config.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
+							return getTimes(temp);
+						}
+					}
 		}
-		switch (fToken) {
+				if (fToken == TT_ARGUMENTS_OPEN) {
+					return getFunctionArguments(temp);
+				}
+
+			} finally {
+				fRecursionDepth--;
+			}
+			return temp;
 
 		case TT_PRECEDENCE_CLOSE:
 			throwSyntaxError("Too much closing ) in factor.");
@@ -306,6 +340,9 @@ public class Parser extends Scanner {
 			break;
 		case TT_ARGUMENTS_CLOSE:
 			throwSyntaxError("Too much closing ] in factor.");
+			break;
+		case TT_ASSOCIATION_CLOSE:
+			throwSyntaxError("Too much closing |> in factor.");
 			break;
 		}
 
@@ -457,20 +494,16 @@ public class Parser extends Scanner {
 			getNextToken();
 			ASTNode defaultValue = parseExpression();
 
-			final FunctionNode function = fFactory.createAST(fFactory.createSymbol("Optional"));
-			function.add(fFactory.createPattern(symbol, null, false));
-			function.add(defaultValue);
-			temp = function;
+			temp = fFactory.createFunction(fFactory.createSymbol("Optional"),//
+					fFactory.createPattern(symbol, null, false),//
+					defaultValue);
 
 		}
 
 		if (fToken == TT_OPERATOR && fOperatorString.equals(":")) {
 			getNextToken();
 			ASTNode defaultValue = parseExpression();
-			final FunctionNode function = fFactory.createAST(fFactory.createSymbol("Optional"));
-			function.add(temp);
-			function.add(defaultValue);
-			temp = function;
+			temp = fFactory.createFunction(fFactory.createSymbol("Optional"), temp, defaultValue);
 			}
 
 
@@ -478,8 +511,7 @@ public class Parser extends Scanner {
 	}
 
 	/**
-	 * The current token is <code>TT_IDENTIFIER</code> and it is not followed by a <code>_</code> &quot;pattern
-	 * character&quot;.
+	 * The current token is <code>TT_IDENTIFIER</code> and it is not followed by a <code>_</code> &quot;pattern character&quot;.
 	 *
 	 * @return
 	 */
@@ -792,8 +824,7 @@ public class Parser extends Scanner {
 	/**
 	 * Parse the given <code>expression</code> String into an ASTNode.
 	 * 
-	 * @param expression
-	 *            a formula string which should be parsed.
+	 * @param expression a formula string which should be parsed.
 	 * @return the parsed ASTNode representation of the given formula string
 	 * @throws SyntaxError
 	 */
@@ -851,15 +882,62 @@ public class Parser extends Scanner {
 	}
 
 	private ASTNode parseExpression() {
-		return parseExpression(parsePrimary(0), 0);
+		if (fToken == TT_SPAN) {
+			FunctionNode span = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Span));
+			span.add(fFactory.createInteger(1));
+			getNextToken();
+			if (fToken == TT_SPAN) {
+				span.add(fFactory.createSymbol(IConstantOperators.All));
+				getNextToken();
+				if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
+						|| fToken == TT_PRECEDENCE_CLOSE) {
+					return span;
+				}
+			} else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
+					|| fToken == TT_PRECEDENCE_CLOSE) {
+				span.add(fFactory.createSymbol(IConstantOperators.All));
+				return span;
+			}
+			span.add(parseExpression(parsePrimary(0), 0));
+			return span;
+		}
+		ASTNode temp = parseExpression(parsePrimary(0), 0);
+
+		if (fToken == TT_SPAN) {
+			FunctionNode span = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Span));
+			span.add(temp);
+			getNextToken();
+			if (fToken == TT_SPAN) {
+				span.add(fFactory.createSymbol(IConstantOperators.All));
+				getNextToken();
+				if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
+						|| fToken == TT_PRECEDENCE_CLOSE) {
+					return span;
+				}
+			} else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
+					|| fToken == TT_PRECEDENCE_CLOSE) {
+				span.add(fFactory.createSymbol(IConstantOperators.All));
+				return span;
+			}
+			span.add(parseExpression(parsePrimary(0), 0));
+			if (fToken == TT_SPAN) {
+				getNextToken();
+				if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
+						|| fToken == TT_PRECEDENCE_CLOSE) {
+					return span;
+				}
+				span.add(parseExpression(parsePrimary(0), 0));
+			}
+			return span;
+		}
+		return temp;
 	}
 
 	/**
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
-	 * idea, how to parse the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
+	 * the operators depending on their precedence.
 	 * 
-	 * @param lhs
-	 *            the already parsed left-hand-side of the operator
+	 * @param lhs            the already parsed left-hand-side of the operator
 	 * @param min_precedence
 	 * @return
 	 */
@@ -980,8 +1058,7 @@ public class Parser extends Scanner {
 	/**
 	 * Rewrite a chain of different comparator operators to an <code>Inequality(...)</code> expression.
 	 *
-	 * @param ast
-	 *            the ast which should be rewritten
+	 * @param ast           the ast which should be rewritten
 	 * @param infixOperator
 	 * @return
 	 */
@@ -1082,8 +1159,7 @@ public class Parser extends Scanner {
 			getNextToken();
 		}
 		FunctionNode head = fFactory.createFunction(DERIVATIVE, new IntegerNode(derivativeCounter));
-		FunctionNode deriv = fFactory.createAST(head);
-		deriv.add(expr);
+		FunctionNode deriv = fFactory.unaryAST(head, expr);
 		expr = parseArguments(deriv);
 		return expr;
 	}
@@ -1127,21 +1203,6 @@ public class Parser extends Scanner {
 
 	private ASTNode parsePrimary(final int min_precedence) {
 		if (fToken == TT_OPERATOR) {
-			if (";;".equals(fOperatorString)) {
-				FunctionNode function = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Span));
-				function.add(fFactory.createInteger(1));
-				getNextToken();
-				if (fToken == TT_COMMA || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_PRECEDENCE_CLOSE) {
-					function.add(fFactory.createSymbol(IConstantOperators.All));
-					return function;
-				}
-				function.add(parsePrimary(0));
-				if (fToken == TT_OPERATOR && ";;".equals(fOperatorString)) {
-					function.add(fFactory.createSymbol(IConstantOperators.All));
-					getNextToken();
-				}
-				return function;
-			}
 			if (".".equals(fOperatorString)) {
 				fCurrentChar = '.';
 				return getNumber(false);
