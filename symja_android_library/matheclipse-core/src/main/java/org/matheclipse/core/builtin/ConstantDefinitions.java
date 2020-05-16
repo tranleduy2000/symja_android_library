@@ -30,6 +30,7 @@ public class ConstantDefinitions {
 	private static int HOUR = Calendar.getInstance().get(Calendar.HOUR);
 	private static int MINUTE = Calendar.getInstance().get(Calendar.MINUTE);
 	private static int SECOND = Calendar.getInstance().get(Calendar.SECOND);
+	final static public double EULER_GAMMA = 0.57721566490153286060651209008240243104215933593992;
 	/**
 	 *
 	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
@@ -140,8 +141,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public IExpr evaluate(final ISymbol symbol) {
-			return F.List(F.integer(YEAR), F.integer(MONTH), F.integer(DAY), F.integer(HOUR), F.integer(MINUTE),
-					F.integer(SECOND));
+			return F.List(F.ZZ(YEAR), F.ZZ(MONTH), F.ZZ(DAY), F.ZZ(HOUR), F.ZZ(MINUTE), F.ZZ(SECOND));
 		}
 
 	}
@@ -172,7 +172,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public IExpr evaluate(final ISymbol symbol) {
-			return F.integer(Config.MACHINE_PRECISION);
+			return F.ZZ(Config.MACHINE_PRECISION);
 		}
 
 	}
@@ -224,7 +224,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -323,7 +323,7 @@ public class ConstantDefinitions {
 		 */
 		@Override
 		public IExpr evaluate(final ISymbol symbol) {
-			return Times(F.Pi, Power(F.integer(180), F.CN1));
+			return Times(F.Pi, Power(F.ZZ(180), F.CN1));
 		}
 
 		@Override
@@ -345,7 +345,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 	}
 
@@ -441,7 +441,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -467,7 +467,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -524,7 +524,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -575,7 +575,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -675,7 +675,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -711,7 +711,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override

@@ -13,10 +13,14 @@ import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.hipparchus.fraction.BigFraction;
+import org.hipparchus.linear.Array2DRowRealMatrix;
+import org.hipparchus.linear.ArrayRealVector;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.functions.GammaJS;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.PlusOp;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractArg12;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
@@ -30,6 +34,8 @@ import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
+import org.matheclipse.core.expression.ASTRealMatrix;
+import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
@@ -65,6 +71,8 @@ import org.matheclipse.core.reflection.system.rules.AbsRules;
 import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
+import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.math.MathException;
 
 import ch.ethz.idsc.tensor.qty.IQuantity;
 
@@ -100,7 +108,6 @@ import static org.matheclipse.core.expression.F.Sin;
 import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Subtract;
 import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.integer;
 import static org.matheclipse.core.expression.F.num;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.x_;
@@ -169,6 +176,7 @@ public final class Arithmetic {
             F.LCM.setEvaluator(new LCM());
             F.N.setEvaluator(new N());
             F.Piecewise.setEvaluator(new Piecewise());
+			F.PiecewiseExpand.setEvaluator(new PiecewiseExpand());
             F.Pochhammer.setEvaluator(new Pochhammer());
             F.Precision.setEvaluator(new Precision());
             F.PreDecrement.setEvaluator(new PreDecrement());
@@ -321,6 +329,9 @@ public final class Arithmetic {
 					}
 				}
 			}
+			if (arg1.isInterval()) {
+				return IntervalSym.abs((IAST) arg1);
+			}
             return F.NIL;
         }
 
@@ -408,6 +419,7 @@ public final class Arithmetic {
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr leftHandSide = ast.arg1();
 			final IExpr head = leftHandSide.head();
+			try {
 			if (head.isBuiltInSymbol() && leftHandSide.isAST()) {
 				IEvaluator eval = ((IBuiltInSymbol) head).getEvaluator();
 				if (eval instanceof ISetEvaluator) {
@@ -432,6 +444,12 @@ public final class Arithmetic {
             }
             return F.NIL;
         }
+			} catch (ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), ve);
+			}
 			// `1` is not a variable with a value, so its value cannot be changed.
 			return IOFunctions.printMessage(getFunctionSymbol(), "rvalue", F.List(leftHandSide), engine);
 		}
@@ -1055,7 +1073,7 @@ public final class Arithmetic {
             if (arg1.isNumber()) {
                 return ((INumber) arg1).conjugate();
             }
-            if (arg1.isRealResult()) {
+			if (arg1.isRealResult() || arg1.isRealVector() || arg1.isRealMatrix()) {
                 return arg1;
             }
             if (arg1.isDirectedInfinity()) {
@@ -1144,6 +1162,9 @@ public final class Arithmetic {
 					return F.Subtract(arg1, F.Times(F.C2, F.CI, im));
 				}
 			}
+			if (arg1.isInterval()) {
+				return IntervalSym.mapSymbol(F.Conjugate, (IAST) arg1);
+			}
             return F.NIL;
         }
 
@@ -1196,12 +1217,19 @@ public final class Arithmetic {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
             IExpr symbol = ast.arg1();
+			try {
             if (symbol.isSymbol() && ((ISymbol) symbol).hasAssignedSymbolValue()) {
                 IExpr[] results = ((ISymbol) symbol).reassignSymbolValue(getAST(), getFunctionSymbol(), engine);
                 if (results != null) {
                     return getResult(results[0], results[1]);
                 }
             }
+			} catch (ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), ve);
+			}
             return F.NIL;
         }
 
@@ -1538,11 +1566,47 @@ public final class Arithmetic {
             return num(gamma);
         }
 
+		@Override
+		public IExpr e2DblComArg(final IComplexNum d0, final IComplexNum d1) {
+			if (d0.isZero() && d1.isZero()) {
+				return F.CInfinity;
+			}
+			return F.complexNum(GammaJS.gamma(d0.evalComplex(), d1.evalComplex()));
+		}
         public IExpr e2DblArg(final INum d0, final INum d1) {
-            return F.num(de.lab4inf.math.functions.IncompleteGamma.incGammaP(d0.doubleValue(), d1.doubleValue()));
+			if (d0.isZero() && d1.isZero()) {
+				return F.CInfinity;
+			}
+			if (d0.isZero() || d0.isNegative() || d1.isNegative()) {
+				return F.complexNum(GammaJS.gamma(d0.evalComplex(), d1.evalComplex()));
+			}
+			double c = GammaJS.gamma(d0.doubleValue(), d1.doubleValue());
+			// if (F.isZero(c.getImaginary())) {
+			// return F.num(c.getReal());
+			// }
+			return F.num(c);
+			// return F.num(de.lab4inf.math.functions.IncompleteGamma.incGammaP(d0.doubleValue(), d1.doubleValue()));
         }
 
         public IExpr e2ObjArg(final IExpr o0, final IExpr z) {
+			if (z.isZero()) {
+				if (o0.isZero()) {
+					return F.CInfinity;
+				}
+				if (o0.isNegativeResult()) {
+					return F.CComplexInfinity;
+				}
+				if (o0.isPositiveResult()) {
+					return F.Gamma(o0);
+				}
+				IExpr re = o0.re();
+				if (re.isNegative()) {
+					return F.CComplexInfinity;
+				}
+				if (re.isPositive()) {
+					return F.Gamma(o0);
+				}
+			}
             int n = o0.toIntDefault(Integer.MIN_VALUE);
 			if (n > 0&&z.isNumericFunction()) {
                 //
@@ -1559,10 +1623,17 @@ public final class Arithmetic {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			try {
             if (ast.size() != 3) {
                 return unaryOperator(ast.arg1());
             }
 			return binaryOperator(ast, ast.arg1(), ast.arg2());
+			} catch (ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), ve);
+			}
         }
 
 		@Override
@@ -1722,8 +1793,9 @@ public final class Arithmetic {
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
             IExpr arg1 = ast.arg1();
+			try {
             if (ast.isAST2()) {
-				final IExpr arg2 = ast.arg2();
+					final IExpr arg2 = ast.arg2();
                 if (arg2.isOne()) {
                     return F.HarmonicNumber(arg1);
                 } else {
@@ -1751,7 +1823,7 @@ public final class Arithmetic {
 						return result.appendArgs(n + 1, new IntFunction<IExpr>() {
                             @Override
                             public IExpr apply(int i) {
-                                return Power(integer(i), Negate(arg2));
+                                return Power(F.ZZ(i), Negate(arg2));
                             }
                         });
                     }
@@ -1782,6 +1854,10 @@ public final class Arithmetic {
                 return F.CComplexInfinity;
             }
 
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
             return F.NIL;
         }
 
@@ -1872,6 +1948,15 @@ public final class Arithmetic {
             if (arg1.isRealResult()) {
                 return F.C0;
             }
+			if (arg1.isRealVector()) {
+				// 0.0 - vector
+				return new ASTRealVector(new ArrayRealVector(arg1.size() - 1, 0.0), false);
+			}
+			if (arg1.isRealMatrix()) {
+				ASTRealMatrix matrix = (ASTRealMatrix) arg1;
+				return new ASTRealMatrix(
+						new Array2DRowRealMatrix(matrix.getRowDimension(), matrix.getColumnDimension()), false);
+			}
             IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
             if (negExpr.isPresent()) {
                 return Negate(Im(negExpr));
@@ -1885,14 +1970,8 @@ public final class Arithmetic {
                     }
                 });
 				if (position > 0) {
-					return F.Times(timesAST.get(position), F.Im(timesAST.removeAtClone(position)));
+					return F.Times(timesAST.get(position), F.Im(timesAST.splice(position)));
 					}
-				// for (int i = 1; i < timesAST.size(); i++) {
-				// IExpr temp = timesAST.get(i);
-				// if (temp.isRealResult()) {
-				// return F.Times(temp, F.Im(timesAST.removeAtClone(i)));
-				// }
-				// }
 				IExpr first = timesAST.arg1();
 				if (first.isNumber()) {
 					IExpr rest = timesAST.rest().oneIdentity1();
@@ -1924,6 +2003,15 @@ public final class Arithmetic {
                     }
                 }
             }
+			if (arg1.isInterval()) {
+				if (arg1.size() == 2) {
+					IAST list = (IAST) arg1.first();
+					if (list.first().isRealResult() && list.second().isRealResult()) {
+						return F.C0;
+					}
+				}
+				return IntervalSym.mapSymbol(F.Im, (IAST) arg1);
+			}
             return F.NIL;
         }
 
@@ -2165,7 +2253,7 @@ public final class Arithmetic {
             final boolean numericMode = engine.isNumericMode();
 			final long oldPrecision = engine.getNumericPrecision();
             try {
-				long numericPrecision = Config.MACHINE_PRECISION;
+				long numericPrecision = engine.getNumericPrecision();// Config.MACHINE_PRECISION;
                 if (ast.isAST2()) {
 					IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
 					numericPrecision = arg2.toIntDefault();// Validate.checkIntType(arg2);
@@ -2270,6 +2358,9 @@ public final class Arithmetic {
             }
             IAST matrix = (IAST) arg1;
             IExpr defaultValue = F.C0;
+			if (ast.isAST1()) {
+				return ast.appendClone(F.C0);
+			}
             if (ast.isAST2()) {
                 defaultValue = ast.arg2();
             }
@@ -2291,8 +2382,10 @@ public final class Arithmetic {
                         return F.NIL;
                     }
                     if (noBoolean) {
-                        result = appendPiecewise(result, row.arg1(), F.True, matrixSize);
-                        return createPiecewise(piecewiseAST, result);
+						// result = appendPiecewise(result, row.arg1(), F.True, matrixSize);
+						piecewiseAST = createPiecewise(piecewiseAST, result);
+						piecewiseAST.append(row.arg1());
+						return piecewiseAST;
                     }
                     return row.arg1();
                 } else if (condition.isFalse()) {
@@ -2364,6 +2457,67 @@ public final class Arithmetic {
         }
     }
 
+	private final static class PiecewiseExpand extends AbstractFunctionEvaluator {
+		static class PiecewiseExpandVisitor extends VisitorExpr {
+			private final EvalEngine fEngine;
+
+			public PiecewiseExpandVisitor(EvalEngine engine) {
+				super();
+				fEngine = engine;
+			}
+
+			@Override
+			public IExpr visit(IASTMutable ast) {
+				if (ast.isAST(F.If, 3)) {
+					IExpr a1 = ast.arg1();
+					IExpr a2 = ast.arg2();
+					return F.Piecewise(F.List(F.List(a2, a1), F.C0));
+				}
+				if (ast.isAST(F.If, 4)) {
+					IExpr a1 = ast.arg1();
+					IExpr a2 = ast.arg2();
+					IExpr a3 = ast.arg3();
+					return F.Piecewise(F.List(F.List(a2, a1), a3));
+				}
+				if (ast.isAST(F.Ramp, 2)) {
+					IExpr x = ast.arg1();
+					return F.Piecewise(F.List(F.List(x, F.GreaterEqual(x, F.C0)), F.C0));
+				}
+				if (ast.isAST(F.UnitStep) && ast.size() > 1) {
+					// Piecewise[{{1, x >= 0 && y >= 0 && z >= 0}}, 0]
+					final int size = ast.size();
+					IASTAppendable andAST = F.ast(F.And, size, false);
+					for (int i = 1; i < size; i++) {
+						andAST.append(F.GreaterEqual(ast.get(i), F.C0));
+					}
+					return F.Piecewise(F.List(F.List(F.C1, andAST), F.C0));
+				}
+
+				return visitAST(ast);
+			}
+		}
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				PiecewiseExpandVisitor visitor = new PiecewiseExpandVisitor(engine);
+				IExpr arg1 = ast.arg1();
+				if (arg1.isAST()) {
+					IExpr temp = arg1.accept(visitor);
+					if (temp.isPresent()) {
+						return temp;
+					}
+				}
+				return arg1;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_3;
+		}
+	}
     /**
      * <pre>
      * Plus(a, b, ...)
@@ -2550,13 +2704,20 @@ public final class Arithmetic {
          * @return the evaluated object or <code>null</code>, if evaluation isn't possible
          */
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+        public IExpr evaluate(IAST ast, EvalEngine engine) {
 			if (ast.isEvalFlagOn(IAST.BUILT_IN_EVALED)) {
 				return F.NIL;
 			}
 			final int size = ast.size();
             if (size > 2) {
-                final PlusOp plusOp = new PlusOp(size);
+				if (ast.isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG)) {
+					IAST temp = engine.evalArgsOrderlessN(ast);
+					if (temp.isPresent()) {
+						ast = temp;
+					}
+				}
+
+				final PlusOp plusOp = new PlusOp(size);
 				IExpr temp = ast.findFirst(new Function<IExpr, IExpr>() {
                     @Override
                     public IExpr apply(IExpr x) {
@@ -2690,10 +2851,7 @@ public final class Arithmetic {
 			int ni = n.toIntDefault(Integer.MIN_VALUE);
 			if (a.isRational() && ni > Integer.MIN_VALUE) {
                 BigFraction bf = ((IRational) a).toBigFraction();
-				BigFraction ph = pochhammer(bf, ni);
-                if (ph != null) {
-                    return F.fraction(ph);
-                }
+				return pochhammer(bf, ni);
             }
             if (a.isInteger() && a.isPositive()) {
                 IExpr temp = EvalEngine.get().evaluate(F.Plus(((IInteger) a).subtract(F.C1), n));
@@ -2738,24 +2896,27 @@ public final class Arithmetic {
 		 *            The number of product terms in the evaluation.
          * @return Gamma(that+n)/Gamma(that) = that*(that+1)*...*(that+n-1).
          */
-		public static BigFraction pochhammer(BigFraction that, final int n) {
+		public static IExpr pochhammer(BigFraction that, final int n) {
 			if (n < 0) {
                 BigFraction res = BigFraction.ONE;
 				for (int i = (-1); i >= n; i--) {
                     res = res.multiply(that.add(i));
                 }
-                return res.reciprocal();
+				if (res.equals(BigFraction.ZERO)) {
+					return F.CComplexInfinity;
+				}
+				return F.fraction(res.reciprocal());
 			} else if (n == 0) {
-                return BigFraction.ONE;
+				return F.C1;
             } else {
 				if (that.equals(BigFraction.ZERO)) {
-					return BigFraction.ZERO;
+					return F.C0;
 				}
 				BigFraction res = that;
 				for (int i = 1; i < n; i++) {
                     res = res.multiply(that.add(i));
                 }
-                return res;
+				return F.fraction(res);
             }
         }
 
@@ -2916,8 +3077,12 @@ public final class Arithmetic {
 						// return powerInterval(base, ii);
 					}
 				} else if (base.isQuantity()) {
+					try {
 					IQuantity q = (IQuantity) base;
 					return q.power(exponent);
+					} catch (MathException mex) {
+						return F.NIL;
+					}
 				} else if (base instanceof ASTSeriesData) {
 					int exp = exponent.toIntDefault(Integer.MIN_VALUE);
 					if (exp != Integer.MIN_VALUE) {
@@ -3331,37 +3496,33 @@ public final class Arithmetic {
 					// return temp;
 					// }
 					// }
-                ISignedNumber is1 = (ISignedNumber) exponent;
+					ISignedNumber realExponent = (ISignedNumber) exponent;
                 if (base.isInfinity()) {
-                    if (is1.isNegative()) {
+						if (realExponent.isNegative()) {
                         return F.C0;
                     } else {
                         return F.CInfinity;
                     }
-                } else if (base.isPower() && is1.isNumIntValue() && is1.isPositive()) {
+					} else if (base.isPower() && realExponent.isNumIntValue() && realExponent.isPositive()) {
                     final IExpr baseExponent = base.exponent();
                     if (baseExponent.isNumIntValue() && baseExponent.isPositive()) {
                         // (x*n)^m => x ^(n*m)
-                        return Power(base.base(), is1.times(baseExponent));
+							return Power(base.base(), realExponent.times(baseExponent));
                     }
                 } else if (base.isNegativeInfinity()) {
-                    if (exponent.isInteger()) {
-                        IInteger ii = (IInteger) exponent;
-                        if (ii.isNegative()) {
+						if (realExponent.isNegative()) {
                             return F.C0;
-                        } else {
+						}
+						if (realExponent.isInteger()) {
+							IInteger ii = (IInteger) realExponent;
                             if (ii.isOdd()) {
                                 return F.CNInfinity;
                             } else {
                                 return F.CInfinity;
                             }
-                        }
                     } else {
-                        int exp = exponent.toIntDefault(Integer.MIN_VALUE);
+							int exp = realExponent.toIntDefault(Integer.MIN_VALUE);
                         if (exp != Integer.MIN_VALUE) {
-                            if (exp < 0) {
-                                return F.C0;
-                            } else {
                                 if ((exp & 0x1) == 0x1) {
                                     return F.CNInfinity;
                                 } else {
@@ -3370,7 +3531,6 @@ public final class Arithmetic {
                             }
                         }
                     }
-                }
                 if (exponent.isMinusOne() || exponent.isInteger()) {
                     if (base.isNumber()) {
                         if (exponent.isMinusOne()) {
@@ -3420,6 +3580,20 @@ public final class Arithmetic {
                 // extract I for sqrt
                 return F.Times(F.CI, F.Power(F.Negate(base), exponent));
             }
+			}
+			if (base.isDirectedInfinity() && !exponent.isReal()) {
+				// check negative/positive assumptions about exponent
+				if (base.isInfinity()) {
+					if (exponent.isNegativeResult()) {
+						return F.C0;
+					}
+					if (exponent.isPositiveResult()) {
+						return F.CInfinity;
+					}
+				}
+				if (base.isNegativeInfinity() && exponent.isNegativeResult()) {
+					return F.C0;
+				}
 			}
 
             if (base.isE() && (exponent.isPlusTimesPower())) {
@@ -4152,7 +4326,7 @@ public final class Arithmetic {
             if (expr.isNumber()) {
                 return ((INumber) expr).re();
             }
-            if (expr.isRealResult()) {
+			if (expr.isRealResult() || expr.isRealVector() || expr.isRealMatrix()) {
                 return expr;
             }
 
@@ -4161,34 +4335,24 @@ public final class Arithmetic {
                 return Negate(Re(negExpr));
             }
             if (expr.isTimes()) {
-				IAST timesAST = (IAST) expr;
-				int position = timesAST.indexOf(new Predicate<IExpr>() {
+                IAST timesAST = (IAST) expr;
+                int position = timesAST.indexOf(new Predicate<IExpr>() {
                     @Override
                     public boolean test(IExpr x) {
                         return x.isRealResult();
                     }
                 });
-				if (position > 0) {
-					return F.Times(timesAST.get(position), F.Re(timesAST.removeAtClone(position)));
-					}
-				// for (int i = 1; i < timesAST.size(); i++) {
-				// IExpr temp = timesAST.get(i);
-				// if (temp.isRealResult()) {
-				// return F.Times(temp, F.Re(timesAST.removeAtClone(i)));
-				// }
-				// }
-				IExpr first = timesAST.arg1();
-				if (first.isNumber()) {
-					IExpr rest = timesAST.rest().oneIdentity1();
-                if (first.isReal()) {
-                    return F.Times(first, F.Re(expr.rest()));
+                if (position > 0) {
+                    return F.Times(timesAST.get(position), F.Re(timesAST.splice(position)));
                 }
-					// if (first.isImaginaryUnit()) {
-					// // Re(I*temp) -> -Im(temp)
-					// return F.Times(F.CN1, F.Im(expr.rest()));
-					// }
+                IExpr first = timesAST.arg1();
+                if (first.isNumber()) {
+                    IExpr rest = timesAST.rest().oneIdentity1();
+                    if (first.isReal()) {
+                        return F.Times(first, F.Re(expr.rest()));
+                    }
 
-					return F.Subtract(F.Times(first.re(), F.Re(rest)), F.Times(first.im(), F.Im(rest)));
+                    return F.Subtract(F.Times(first.re(), F.Re(rest)), F.Times(first.im(), F.Im(rest)));
                 }
             }
             if (expr.isPlus()) {
@@ -4363,6 +4527,19 @@ public final class Arithmetic {
 					// (x + I*y)/Sqrt(x^2 + y^2)
 					return F.Times(F.Plus(x, F.Times(F.CI, y)), F.Power(F.Plus(F.Sqr(x), F.Sqr(y)), F.CN1D2));
 				}
+			}
+			if (arg1.isInterval()) {
+				if (arg1.size() == 2) {
+					IAST list = (IAST) arg1.first();
+					if (list.first().isNegativeResult() && list.second().isNegativeResult()) {
+						return F.CN1;
+					} else if (list.first().isPositiveResult() && list.second().isPositiveResult()) {
+						return F.C1;
+					} else if (list.first().isZero() && list.second().isZero()) {
+						return F.C0;
+					}
+				}
+				return IntervalSym.mapSymbol(F.Sign, (IAST) arg1);
 			}
 			return result;
 		}
@@ -5278,7 +5455,7 @@ public final class Arithmetic {
         }
 
         @Override
-        public IExpr evaluate(final IAST ast1, EvalEngine engine) {
+		public IExpr evaluate(IAST ast1, EvalEngine engine) {
 			int size = ast1.size();
             if (size == 1) {
                 return F.C1;
@@ -5296,6 +5473,12 @@ public final class Arithmetic {
                     return temp.oneIdentity1();
                 }
             }
+			if (ast1.isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG)) {
+				IAST temp = engine.evalArgsOrderlessN(ast1);
+				if (temp.isPresent()) {
+					ast1 = temp;
+				}
+			}
             if (size == 3) {
 				// if ((ast1.arg1().isNumeric() || ast1.arg1().isOne() || ast1.arg1().isMinusOne())
 				if ((ast1.arg1().isOne() || ast1.arg1().isMinusOne()) && ast1.arg2().isPlus()) {
@@ -5967,20 +6150,9 @@ public final class Arithmetic {
 	 * @return
 	 */
 	public static org.hipparchus.complex.Complex lanczosApproxGamma(org.hipparchus.complex.Complex z) {
-		// if (z.abs() <= 1.0) {
-		// de.lab4inf.math.sets.ComplexNumber cc = new de.lab4inf.math.sets.ComplexNumber(z.getReal(),
-		// z.getImaginary());
-		// de.lab4inf.math.Complex gResult = de.lab4inf.math.functions.Gamma.gamma(cc);
-		// return new org.hipparchus.complex.Complex(gResult.real(), gResult.imag());
-		// }
-
-
-		// if (F.isZero(z.getImaginary())) {
-		// return new org.hipparchus.complex.Complex(org.hipparchus.special.Gamma.gamma(z.getReal()));
-		// }
 		if (z.getReal() < 0.5) {
 			// Pi / ( Sin(Pi * z) * Gamma(1 - z) )
-			return lanczosApproxGamma(z.negate().add(1.0)).multiply(z.multiply(Math.PI).sin()).pow(-1.0)
+			return lanczosApproxGamma(z.negate().add(1.0)).multiply(z.multiply(Math.PI).sin()).reciprocal()
 					.multiply(Math.PI);
 		} else {
 			z = z.subtract(1.0);

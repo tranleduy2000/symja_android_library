@@ -200,7 +200,11 @@ public class Config {
 	 * Replace <code>double</code> values in root algorithms by 0 if they are below this tolerance.
 	 */
 	public static double DEFAULT_ROOTS_CHOP_DELTA = 1.0e-5;
-
+	/**
+	 * Tolerance used in special function algorithms ported from
+	 * <a href="https://github.com/paulmasson/math">math.js</a> and in the JavaScript based plot functions.
+	 */
+	public static double SPECIAL_FUNCTIONS_TOLERANCE = 1.0e-10;
 	/**
 	 * Define the recursion limit for <code>Integrate#integrateByParts()</code> method.
 	 */
