@@ -21,9 +21,19 @@ import java.util.Map;
  * 
  */
 public class JavaScriptFormFactory extends DoubleFormFactory {
+	/**
+	 * Generate pure JavaScript output
+	 */
 	public final static int USE_PURE_JS = 1;
+	/**
+	 * Generate JavaScript output for usage with the JavaScript libraries:
+	 * <ul>
+	 * <li><a href="https://github.com/paulmasson/mathcell">github.com/paulmasson/math</a></li>
+	 * <li><a href="https://github.com/paulmasson/mathcell">github.com/paulmasson/mathcell</a></li>
+	 * </ul>
+	 */
 	public final static int USE_MATHCELL = 2;
-	public final static int USE_JSXGRAPH = 3;
+	// public final static int USE_JSXGRAPH = 3;
 	/**
 	 * If <code>true</code> the <code>Piecewise()</code> function was used in an expression, which need to do inline
 	 * operators with the JavaScript ternary operator. If <code>false</code> the converter will use
@@ -60,15 +70,18 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		FUNCTIONS_STR_MATHCELL.put(F.BesselY, "besselY");
 		FUNCTIONS_STR_MATHCELL.put(F.BesselI, "besselI");
 		FUNCTIONS_STR_MATHCELL.put(F.BesselK, "besselK");
+		FUNCTIONS_STR_MATHCELL.put(F.StruveH, "struveH");
+		FUNCTIONS_STR_MATHCELL.put(F.StruveL, "struveL");
+
+		FUNCTIONS_STR_MATHCELL.put(F.BesselJZero, "besselJZero ");
+		FUNCTIONS_STR_MATHCELL.put(F.BesselYZero, "besselYZero ");
 
 		// TODO see math.js - https://github.com/paulmasson/math
-		// FUNCTIONS_STR_MATHCELL.put(F.BesselJZero, "besselJZero ");
-		// FUNCTIONS_STR_MATHCELL.put(F.BesselYZero, "besselYZero ");
 		// FUNCTIONS_STR_MATHCELL.put(F.Hankel1, "hankel1");
 		// FUNCTIONS_STR_MATHCELL.put(F.Hankel2, "hankel2");
 
-		// FUNCTIONS_STR_MATHCELL.put(F.AiryAi, "airyAi");
-		// FUNCTIONS_STR_MATHCELL.put(F.AiryBi, "airyBi");
+		FUNCTIONS_STR_MATHCELL.put(F.AiryAi, "airyAi");
+		FUNCTIONS_STR_MATHCELL.put(F.AiryBi, "airyBi");
 
 		FUNCTIONS_STR_MATHCELL.put(F.EllipticF, "ellipticF");
 		FUNCTIONS_STR_MATHCELL.put(F.EllipticK, "ellipticK");
@@ -76,7 +89,12 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		FUNCTIONS_STR_MATHCELL.put(F.EllipticPi, "ellipticPi");
 		FUNCTIONS_STR_MATHCELL.put(F.EllipticTheta, "jacobiTheta");
 
+		FUNCTIONS_STR_MATHCELL.put(F.JacobiAmplitude, "am");
+		FUNCTIONS_STR_MATHCELL.put(F.JacobiCN, "cn");
+		FUNCTIONS_STR_MATHCELL.put(F.JacobiDN, "dn");
+		FUNCTIONS_STR_MATHCELL.put(F.JacobiSN, "sn");
 		FUNCTIONS_STR_MATHCELL.put(F.JacobiZeta, "jacobiZeta");
+		FUNCTIONS_STR_MATHCELL.put(F.KleinInvariantJ, "kleinJ");
 		FUNCTIONS_STR_MATHCELL.put(F.Factorial, "factorial");
 		FUNCTIONS_STR_MATHCELL.put(F.Factorial2, "factorial2");
 		FUNCTIONS_STR_MATHCELL.put(F.Binomial, "binomial");
@@ -85,12 +103,15 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		FUNCTIONS_STR_MATHCELL.put(F.Beta, "beta");
 		FUNCTIONS_STR_MATHCELL.put(F.Erf, "erf");
 		FUNCTIONS_STR_MATHCELL.put(F.Erfc, "erfc");
+		FUNCTIONS_STR_MATHCELL.put(F.FresnelC, "fresnelC");
+		FUNCTIONS_STR_MATHCELL.put(F.FresnelS, "fresnelS");
 
 		FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric0F1, "hypergeometric0F1");
 		FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric1F1, "hypergeometric1F1");
 		// FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric2??, "hypergeometric2F0");
 		FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric2F1, "hypergeometric2F1");
 
+		FUNCTIONS_STR_MATHCELL.put(F.HypergeometricPFQ, "hypergeometricPFQ");
 		FUNCTIONS_STR_MATHCELL.put(F.Exp, "exp");
 		FUNCTIONS_STR_MATHCELL.put(F.Im, "im");
 		FUNCTIONS_STR_MATHCELL.put(F.Log, "log");
@@ -136,6 +157,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		FUNCTIONS_STR_MATHCELL.put(F.ArcCsch, "arccsch");
 
 		FUNCTIONS_STR_MATHCELL.put(F.Sinc, "sinc");
+		FUNCTIONS_STR_MATHCELL.put(F.HurwitzZeta, "hurwitzZeta");
 		FUNCTIONS_STR_MATHCELL.put(F.Zeta, "zeta");
 		// FUNCTIONS_STR_MATHCELL.put(F.DirichletEta, "dirichletEta");
 		FUNCTIONS_STR_MATHCELL.put(F.BernoulliB, "bernoulli");
@@ -318,7 +340,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 			if (javascriptFlavor == USE_MATHCELL && function.headID() < 0) {
 				// avoid generating JavaScript eval(head) here
 				buf.append("(window[");
-				convert(buf, head);
+				convertInternal(buf, head);
 				buf.append("](");
 				convertArgs(buf, head, function);
 				buf.append("))");
@@ -329,7 +351,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 			// interpret List() as javascript array
 			buf.append("[");
 			for (int i = 1; i < function.size(); i++) {
-				convert(buf, function.get(i));
+				convertInternal(buf, function.get(i));
 				if (i < function.size() - 1) {
 					buf.append(",");
 				}
@@ -347,10 +369,10 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 							buf.append("mul(");
 						}
 					}
-					convert(buf, function.arg1());
+					convertInternal(buf, function.arg1());
 					buf.append(",");
 					for (int i = 2; i < function.size(); i++) {
-						convert(buf, function.get(i));
+						convertInternal(buf, function.get(i));
 						buf.append(")");
 						if (i < function.size() - 1) {
 							buf.append(",");
@@ -363,13 +385,13 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				IExpr exponent = function.exponent();
 				if (exponent.isMinusOne()) {
 					buf.append("(1.0/");
-					convert(buf, base);
+					convertInternal(buf, base);
 					buf.append(")");
 					return;
 				}
 				if (exponent.isNumEqualRational(F.C1D2)) {
 					buf.append("sqrt(");
-					convert(buf, base);
+					convertInternal(buf, base);
 					buf.append(")");
 					return;
 				}
@@ -386,16 +408,16 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				if (function.isAST1()) {
 					IExpr arg1 = function.first();
 					buf.append("log(");
-					convert(buf, arg1);
+					convertInternal(buf, arg1);
 					buf.append(", Math.E)");
 					return;
 				} else if (function.isAST2()) {
 					IExpr arg1 = function.first();
 					IExpr arg2 = function.second();
 					buf.append("log(");
-					convert(buf, arg1);
+					convertInternal(buf, arg1);
 					buf.append(", ");
-					convert(buf, arg2);
+					convertInternal(buf, arg2);
 					buf.append(")");
 					return;
 				}
@@ -413,19 +435,19 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				IExpr exponent = function.exponent();
 				if (exponent.isMinusOne()) {
 					buf.append("(1.0/");
-					convert(buf, base);
+					convertInternal(buf, base);
 					buf.append(")");
 					return;
 				}
 				if (exponent.isNumEqualRational(F.C1D2)) {
 					buf.append("Math.sqrt(");
-					convert(buf, base);
+					convertInternal(buf, base);
 					buf.append(")");
 					return;
 				}
 				if (exponent.isNumEqualRational(F.C1D3)) {
 					buf.append("Math.cbrt(");
-					convert(buf, base);
+					convertInternal(buf, base);
 					buf.append(")");
 					return;
 				}
@@ -447,12 +469,12 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				return;
 			} else if (function.head() == F.Cot && function.size() == 2) {
 				buf.append("(1/Math.tan(");
-				convert(buf, function.arg1());
+				convertInternal(buf, function.arg1());
 				buf.append("))");
 				return;
 			} else if (function.head() == F.ArcCot && function.size() == 2) {
 				buf.append("((Math.PI/2.0)-Math.atan(");
-				convert(buf, function.arg1());
+				convertInternal(buf, function.arg1());
 				buf.append("))");
 				return;
 			}
@@ -461,12 +483,12 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		if (function.head() == F.If && function.size() >= 3 && function.size() <= 4) {
 			// use the ternary operator
 			buf.append("((");
-			convert(buf, function.arg1());
+			convertInternal(buf, function.arg1());
 			buf.append(") ? (");
-			convert(buf, function.arg2());
+			convertInternal(buf, function.arg2());
 			buf.append(") : ( ");
 			if (function.size() == 4) {
-				convert(buf, function.arg3());
+				convertInternal(buf, function.arg3());
 			} else {
 				buf.append("Number.NaN");
 			}
@@ -482,7 +504,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 			throw new MathException("Cannot convert to JavaScript. Function head: " + function.head());
 		}
 
-		convert(buf, head);
+		convertInternal(buf, head);
 		convertArgs(buf, head, function);
 	}
 
@@ -491,67 +513,85 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		IExpr arg2 = function.arg2();
 		// use the ternary operator
 		buf.append("((");
-		convert(buf, arg2);
+		convertInternal(buf, arg2);
 		buf.append(") ? (");
-		convert(buf, arg1);
+		convertInternal(buf, arg1);
 		buf.append(") : ( Number.NaN ))");
 	}
 
-	private boolean convertPiecewise(final IAST function, final StringBuilder buf) {
-		int[] dim = function.arg1().isMatrix();
-		if (dim != null && dim[1] == 2) {
+	private boolean convertPiecewise(final IAST function, final StringBuilder buffer) {
+		if (function.arg1().isList() && function.arg1().size() >= 2 && //
+				function.arg1().first().isList()) {
 			IAST list = (IAST) function.arg1();
+			StringBuilder piecewiseBuffer = new StringBuilder();
 			if (INLINE_PIECEWISE) {
 				// use the ternary operator
 				int size = list.size();
-				buf.append("(");
+				piecewiseBuffer.append("(");
+				int countOpen = 0;
+				IExpr last = F.C0;
 				for (int i = 1; i < size; i++) {
-					IAST row = (IAST) list.get(i);
+					IExpr arg = list.get(i);
+					if (arg.isAST(F.List, 3)) {
+						IAST row = (IAST) arg;
 					if (i > 1) {
-						buf.append("(");
+							piecewiseBuffer.append("(");
+							countOpen++;
 					}
-					buf.append("(");
-					convert(buf, row.second());
-					buf.append(") ? ");
-					convert(buf, row.first());
-					buf.append(" : ");
-				}
-				buf.append("( ");
-				if (function.isAST2()) {
-					convert(buf, function.second());
+						piecewiseBuffer.append("(");
+						convertInternal(piecewiseBuffer, row.second());
+						piecewiseBuffer.append(") ? ");
+						convertInternal(piecewiseBuffer, row.first());
+						piecewiseBuffer.append(" : ");
+					} else {
+						if (i == size - 1) {
+							last = arg;
 				} else {
-					buf.append(" Number.NaN ");
+							return false;
+						}
 				}
-				buf.append(" )");
-				for (int i = 2; i < size; i++) {
-					buf.append(" )");
 				}
-				buf.append(")");
+				piecewiseBuffer.append("( ");
+				convertInternal(piecewiseBuffer, last);
+				piecewiseBuffer.append(" )");
+				for (int i = 0; i < countOpen; i++) {
+					piecewiseBuffer.append(" )");
+				}
+				piecewiseBuffer.append(")");
+				buffer.append(piecewiseBuffer);
 				return true;
 			} else {
 				// use if... statements
-				for (int i = 1; i < list.size(); i++) {
-					IAST row = (IAST) list.get(i);
+				IExpr last = F.C0;
+				final int size = list.size();
+				for (int i = 1; i < size; i++) {
+					IExpr arg = list.get(i);
+					if (arg.isAST(F.List, 3)) {
+						IAST row = (IAST) arg;
 					if (i == 1) {
-						buf.append("if (");
-						convert(buf, row.second());
-						buf.append(") {");
+							piecewiseBuffer.append("if (");
+							convertInternal(piecewiseBuffer, row.second());
+							piecewiseBuffer.append(") {");
+						} else {
+							piecewiseBuffer.append(" else if (");
+							convertInternal(piecewiseBuffer, row.second());
+							piecewiseBuffer.append(") {");
+						}
+						piecewiseBuffer.append(" return ");
+						convertInternal(piecewiseBuffer, row.first());
+						piecewiseBuffer.append("}");
 					} else {
-						buf.append(" else if (");
-						convert(buf, row.second());
-						buf.append(") {");
-					}
-					buf.append(" return ");
-					convert(buf, row.first());
-					buf.append("}");
-				}
-				buf.append(" else {");
-				if (function.isAST2()) {
-					convert(buf, function.second());
+						if (i == size - 1) {
+							last = arg;
 				} else {
-					buf.append(" return Number.NaN; ");
+							return false;
+						}
 				}
-				buf.append("}");
+				}
+				piecewiseBuffer.append(" else { return ");
+				convertInternal(piecewiseBuffer, last);
+				piecewiseBuffer.append("}");
+				buffer.append(piecewiseBuffer);
 				return true;
 			}
 		}
@@ -584,18 +624,18 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				// }
 			}
 			return null;
-		} else if (javascriptFlavor == USE_JSXGRAPH) {
-			if (head.isSymbolID(ID.Plus, ID.Times, ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater,
-					ID.GreaterEqual, ID.And, ID.Or, ID.Not)) {
-				return OutputFormFactory.getOperator(head);
-				// String str = head.toString();
-				// if (fRelaxedSyntax) {
-				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
-				// } else {
-				// operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+			// } else if (javascriptFlavor == USE_JSXGRAPH) {
+			// if (head.isSymbolID(ID.Plus, ID.Times, ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater,
+			// ID.GreaterEqual, ID.And, ID.Or, ID.Not)) {
+			// return OutputFormFactory.getOperator(head);
+			// // String str = head.toString();
+			// // if (fRelaxedSyntax) {
+			// // operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
+			// // } else {
+			// // operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
+			// // }
 				// }
-			}
-			return null;
+			// return null;
 		}
 		return super.getOperator(head);
 	}

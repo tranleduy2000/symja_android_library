@@ -461,7 +461,7 @@ public abstract class DoubleFormFactory {
 	}
 
 	public void convertHead(final StringBuilder buf, final IExpr obj) {
-		convert(buf, obj);
+		convertInternal(buf, obj);
 	}
 
 	private void convertPlusOperator(final StringBuilder buf, final IAST plusAST, final InfixOperator oper,
@@ -494,12 +494,12 @@ public abstract class DoubleFormFactory {
 		} else {
 			if (plusArg.isNegativeSigned()) {
 				// special case negative number or -Infinity...
-				convert(buf, plusArg);
+				convertInternal(buf, plusArg);
 			} else {
 				if (caller == PLUS_CALL) {
 					append(buf, "+");
 				}
-				convert(buf, plusArg, ASTNodeFactory.PLUS_PRECEDENCE, false);
+				convertInternal(buf, plusArg, ASTNodeFactory.PLUS_PRECEDENCE, false);
 			}
 
 		}
@@ -541,7 +541,7 @@ public abstract class DoubleFormFactory {
 					if (i < size) {
 						append(buf, operatorStr);
 					}
-					convert(buf, arg1, ASTNodeFactory.TIMES_PRECEDENCE, false);
+					convertInternal(buf, arg1, ASTNodeFactory.TIMES_PRECEDENCE, false);
 				}
 
 				IExpr timesArg;
@@ -554,19 +554,19 @@ public abstract class DoubleFormFactory {
 						showOperator = true;
 					}
 
-					convert(buf, timesArg, ASTNodeFactory.TIMES_PRECEDENCE, false);
+					convertInternal(buf, timesArg, ASTNodeFactory.TIMES_PRECEDENCE, false);
 
 				}
 			} else {
 				if (plusArg.isNumber() && (((INumber) plusArg).complexSign() < 0)) {
 					// special case negative number:
-					convert(buf, plusArg);
+					convertInternal(buf, plusArg);
 				} else {
 					if (i < size) {
 						append(buf, operatorStr);
 					}
 
-					convert(buf, plusArg, ASTNodeFactory.PLUS_PRECEDENCE, false);
+					convertInternal(buf, plusArg, ASTNodeFactory.PLUS_PRECEDENCE, false);
 
 				}
 			}
@@ -604,7 +604,7 @@ public abstract class DoubleFormFactory {
 			} else {
 				if (numerator.isTimes() && numerator.isAST2() && numerator.first().isMinusOne()) {
 					append(buf, "-");
-					convert(buf, numerator.second(), ASTNodeFactory.TIMES_PRECEDENCE, false);
+					convertInternal(buf, numerator.second(), ASTNodeFactory.TIMES_PRECEDENCE, false);
 				} else {
 					if (caller == PLUS_CALL) {
 						append(buf, "+");
@@ -614,7 +614,7 @@ public abstract class DoubleFormFactory {
 						convertTimesOperator(buf, (IAST) numerator, oper, ASTNodeFactory.DIVIDE_PRECEDENCE,
 								NO_PLUS_CALL);
 					} else {
-						convert(buf, numerator, ASTNodeFactory.DIVIDE_PRECEDENCE, false);
+						convertInternal(buf, numerator, ASTNodeFactory.DIVIDE_PRECEDENCE, false);
 					}
 				}
 			}
@@ -623,7 +623,7 @@ public abstract class DoubleFormFactory {
 			if (denominator.isTimes()) {
 				convertTimesOperator(buf, (IAST) denominator, oper, ASTNodeFactory.DIVIDE_PRECEDENCE, NO_PLUS_CALL);
 			} else {
-				convert(buf, denominator, ASTNodeFactory.DIVIDE_PRECEDENCE, false);
+				convertInternal(buf, denominator, ASTNodeFactory.DIVIDE_PRECEDENCE, false);
 			}
 			if (currPrecedence < precedence) {
 				append(buf, ")");
@@ -656,7 +656,7 @@ public abstract class DoubleFormFactory {
 				if (caller == PLUS_CALL) {
 					append(buf, "+");
 				}
-				convert(buf, arg1, oper.getPrecedence(), false);
+				convertInternal(buf, arg1, oper.getPrecedence(), false);
 			}
 		}
 		for (int i = 2; i < timesAST.size(); i++) {
@@ -665,7 +665,7 @@ public abstract class DoubleFormFactory {
 			} else {
 				showOperator = true;
 			}
-			convert(buf, timesAST.get(i), oper.getPrecedence(), false);
+			convertInternal(buf, timesAST.get(i), oper.getPrecedence(), false);
 		}
 		if (currPrecedence < precedence) {
 			append(buf, ")");
@@ -683,7 +683,7 @@ public abstract class DoubleFormFactory {
 	// }
 	// append(buf, "1/");
 	// if (exp.isMinusOne()) {
-	// convert(buf, list.arg1(), ASTNodeFactory.DIVIDE_PRECEDENCE, false);
+	// convertInternal(buf, list.arg1(), ASTNodeFactory.DIVIDE_PRECEDENCE, false);
 	// if (ASTNodeFactory.DIVIDE_PRECEDENCE < precedence) {
 	// append(buf, ")");
 	// }
@@ -713,7 +713,7 @@ public abstract class DoubleFormFactory {
 				} else {
 					append(buf, "[");
 				}
-				convert(buf, list.arg1(), 0, false);
+				convertInternal(buf, list.arg1(), 0, false);
 				if (fRelaxedSyntax) {
 					append(buf, ")");
 				} else {
@@ -727,7 +727,7 @@ public abstract class DoubleFormFactory {
 				}
 				append(buf, "1/");
 				if (exp.isMinusOne()) {
-					convert(buf, list.arg1(), ASTNodeFactory.DIVIDE_PRECEDENCE, false);
+					convertInternal(buf, list.arg1(), ASTNodeFactory.DIVIDE_PRECEDENCE, false);
 					if (ASTNodeFactory.DIVIDE_PRECEDENCE < precedence) {
 						append(buf, ")");
 					}
@@ -742,10 +742,10 @@ public abstract class DoubleFormFactory {
 				return;
 			}
 		}
-		convertInfixOperator(buf, list, oper, precedence);
+		convertInfixOperator(F.Power, buf, list, oper, precedence);
 	}
 
-	public void convertInfixOperator(final StringBuilder buf, final IAST list, final InfixOperator oper,
+	public void convertInfixOperator(ISymbol head, final StringBuilder buf, final IAST list, final InfixOperator oper,
 			final int precedence) {
 
 		if (list.isAST2()) {
@@ -762,7 +762,7 @@ public abstract class DoubleFormFactory {
 					}
 				}
 			}
-			convert(buf, list.arg1(), oper.getPrecedence(), false);
+			convertInternal(buf, list.arg1(), oper.getPrecedence(), false);
 			if (oper.getGrouping() == InfixOperator.RIGHT_ASSOCIATIVE && list.arg1().head().equals(list.head())) {
 				append(buf, ")");
 			} else {
@@ -779,7 +779,7 @@ public abstract class DoubleFormFactory {
 			if (oper.getGrouping() == InfixOperator.LEFT_ASSOCIATIVE && list.arg2().head().equals(list.head())) {
 				append(buf, "(");
 			}
-			convert(buf, list.arg2(), oper.getPrecedence(), false);
+			convertInternal(buf, list.arg2(), oper.getPrecedence(), false);
 			if (oper.getGrouping() == InfixOperator.LEFT_ASSOCIATIVE && list.arg2().head().equals(list.head())) {
 				append(buf, ")");
 			}
@@ -793,13 +793,28 @@ public abstract class DoubleFormFactory {
 		if (oper.getPrecedence() < precedence) {
 			append(buf, "(");
 		}
+		if (list.size() > 3 && //
+				(head.equals(F.Equal) || head.equals(F.Unequal) || head.equals(F.Greater) || head.equals(F.GreaterEqual)
+						|| head.equals(F.Less) || head.equals(F.LessEqual))) {
+			convertInternal(buf, list.arg1(), oper.getPrecedence(), false);
+			for (int i = 2; i < list.size(); i++) {
+				append(buf, oper.getOperatorString());
+				convertInternal(buf, list.get(i), oper.getPrecedence(), false);
+
+				if (i < list.size() - 1) {
+					buf.append(" && ");
+					convertInternal(buf, list.get(i), oper.getPrecedence(), false);
+				}
+			}
+		} else {
 		if (list.size() > 1) {
-			convert(buf, list.arg1(), oper.getPrecedence(), false);
+				convertInternal(buf, list.arg1(), oper.getPrecedence(), false);
 		}
 
 		for (int i = 2; i < list.size(); i++) {
 			append(buf, oper.getOperatorString());
-			convert(buf, list.get(i), oper.getPrecedence(), false);
+				convertInternal(buf, list.get(i), oper.getPrecedence(), false);
+			}
 		}
 		if (oper.getPrecedence() < precedence) {
 			append(buf, ")");
@@ -812,7 +827,7 @@ public abstract class DoubleFormFactory {
 			append(buf, "(");
 		}
 		append(buf, oper.getOperatorString());
-		convert(buf, list.arg1(), oper.getPrecedence(), false);
+		convertInternal(buf, list.arg1(), oper.getPrecedence(), false);
 		if (oper.getPrecedence() <= precedence) {
 			append(buf, ")");
 		}
@@ -823,7 +838,7 @@ public abstract class DoubleFormFactory {
 		if (oper.getPrecedence() <= precedence) {
 			append(buf, "(");
 		}
-		convert(buf, list.arg1(), oper.getPrecedence(), false);
+		convertInternal(buf, list.arg1(), oper.getPrecedence(), false);
 		append(buf, oper.getOperatorString());
 		if (oper.getPrecedence() <= precedence) {
 			append(buf, ")");
@@ -833,12 +848,17 @@ public abstract class DoubleFormFactory {
 	public String toString(final IExpr o) {
 		reset();
 		StringBuilder buf = new StringBuilder();
-			convert(buf, o, Integer.MIN_VALUE, false);
+		convertInternal(buf, o, Integer.MIN_VALUE, false);
 		return buf.toString();
 	}
 
 	public void convert(final StringBuilder buf, final IExpr o) {
-		convert(buf, o, Integer.MIN_VALUE, false);
+		IExpr expr = EvalEngine.get().evaluate(F.PiecewiseExpand(o));
+		convertInternal(buf, expr, Integer.MIN_VALUE, false);
+	}
+
+	protected void convertInternal(final StringBuilder buf, final IExpr o) {
+		convertInternal(buf, o, Integer.MIN_VALUE, false);
 	}
 
 	private void convertNumber(final StringBuilder buf, final INumber o, final int precedence, boolean caller) {
@@ -864,7 +884,7 @@ public abstract class DoubleFormFactory {
 		}
 	}
 
-	private void convert(final StringBuilder buf, final IExpr o, final int precedence, boolean isASTHead) {
+	private void convertInternal(final StringBuilder buf, final IExpr o, final int precedence, boolean isASTHead) {
 		if (o instanceof IAST) {
 			final IAST list = (IAST) o;
 			// IExpr header = list.head();
@@ -881,7 +901,7 @@ public abstract class DoubleFormFactory {
 			// int n = ((IInteger) a1Head.arg1()).toInt();
 			// if (n == 1 || n == 2) {
 			// IExpr symbolOrAST = headAST.arg1();
-			// convert(buf, symbolOrAST);
+			// convertInternal(buf, symbolOrAST);
 			// if (n == 1) {
 			// append(buf, "'");
 			// } else if (n == 2) {
@@ -896,7 +916,7 @@ public abstract class DoubleFormFactory {
 			// }
 			// }
 			//
-			// convert(buf, header, Integer.MIN_VALUE, true);
+			// convertInternal(buf, header, Integer.MIN_VALUE, true);
 			// convertFunctionArgs(buf, list);
 			// return;
 			// }
@@ -916,7 +936,7 @@ public abstract class DoubleFormFactory {
 					}
 				}
 
-				int functionID = head.ordinal();
+				// int functionID = head.ordinal();
 				// if (functionID > ID.UNKNOWN) {
 				// switch (functionID) {
 				// case ID.Quantity:
@@ -959,7 +979,7 @@ public abstract class DoubleFormFactory {
 				// case ID.Defer:
 				// case ID.HoldForm:
 				// if (list.isAST1()) {
-				// convert(buf, list.arg1());
+				// convertInternal(buf, list.arg1());
 				// return;
 				// }
 				// break;
@@ -994,9 +1014,9 @@ public abstract class DoubleFormFactory {
 				// break;
 				// case ID.Optional:
 				// if (list.isAST2() && (list.arg1().isBlank() || list.arg1().isPattern())) {
-				// convert(buf, list.arg1());
+				// convertInternal(buf, list.arg1());
 				// buf.append(":");
-				// convert(buf, list.arg2());
+				// convertInternal(buf, list.arg2());
 				// return;
 				// }
 				// break;
@@ -1058,18 +1078,18 @@ public abstract class DoubleFormFactory {
 				return true;
 			} else if (list.isAST(F.Apply)) {
 				if (list.size() == 3) {
-					convertInfixOperator(buf, list, ASTNodeFactory.APPLY_OPERATOR, precedence);
+					convertInfixOperator(head, buf, list, ASTNodeFactory.APPLY_OPERATOR, precedence);
 					return true;
 				}
 				if (list.size() == 4 && list.arg2().equals(F.List(F.C1))) {
-					convertInfixOperator(buf, list, ASTNodeFactory.APPLY_LEVEL_OPERATOR, precedence);
+					convertInfixOperator(head, buf, list, ASTNodeFactory.APPLY_LEVEL_OPERATOR, precedence);
 					return true;
 				}
 				return false;
 			} else if (list.size() != 3 && infixOperator.getGrouping() != InfixOperator.NONE) {
 				return false;
 			}
-			convertInfixOperator(buf, list, (InfixOperator) operator, precedence);
+			convertInfixOperator(head, buf, list, (InfixOperator) operator, precedence);
 			return true;
 		}
 		if ((operator instanceof PostfixOperator) && (list.isAST1())) {
@@ -1157,7 +1177,7 @@ public abstract class DoubleFormFactory {
 		append(buf, "{");
 		final int listSize = list.size();
 		if (listSize > 1) {
-			convert(buf, list.arg1());
+			convertInternal(buf, list.arg1());
 		}
 		for (int i = 2; i < listSize; i++) {
 			append(buf, ",");
@@ -1166,7 +1186,7 @@ public abstract class DoubleFormFactory {
 				append(buf, ' ');
 
 			}
-			convert(buf, list.get(i));
+			convertInternal(buf, list.get(i));
 		}
 		append(buf, "}");
 	}
@@ -1193,13 +1213,13 @@ public abstract class DoubleFormFactory {
 		if (parentheses) {
 			append(buf, "(");
 		}
-		convert(buf, arg1);
+		convertInternal(buf, arg1);
 		if (parentheses) {
 			append(buf, ")");
 		}
 		append(buf, "[[");
 		for (int i = 2; i < list.size(); i++) {
-			convert(buf, list.get(i));
+			convertInternal(buf, list.get(i));
 			if (i < list.argSize()) {
 				append(buf, ",");
 			}
@@ -1335,7 +1355,7 @@ public abstract class DoubleFormFactory {
 	public void convertFunctionArgs(final StringBuilder buf, final IAST list) {
 		append(buf, "[");
 		for (int i = 1; i < list.size(); i++) {
-			convert(buf, list.get(i));
+			convertInternal(buf, list.get(i));
 			if (i < list.argSize()) {
 				append(buf, ",");
 			}
@@ -1373,7 +1393,7 @@ public abstract class DoubleFormFactory {
 				return;
 			}
 		}
-		convert(buf, head);
+		convertInternal(buf, head);
 		convertArgs(buf, head, function);
 	}
 
@@ -1387,11 +1407,11 @@ public abstract class DoubleFormFactory {
 		}
 		final int functionSize = function.size();
 		if (functionSize > 1) {
-			convert(buf, function.arg1());
+			convertInternal(buf, function.arg1());
 		}
 		for (int i = 2; i < functionSize; i++) {
 			append(buf, ",");
-			convert(buf, function.get(i));
+			convertInternal(buf, function.get(i));
 		}
 		if (head.isAST()) {
 			append(buf, "]");
