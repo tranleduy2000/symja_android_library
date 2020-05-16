@@ -24,7 +24,7 @@ public class OperationSystem {
      */
     private static boolean memoryWarning = false;
     /**
-     * Maximum number of bytes the heap can expand to. Negative values mean default JVM value
+     * Maximum number of bytes the heap can expand to. Negative values means default JVM value
      */
     private static long maxMemory = -1;
 

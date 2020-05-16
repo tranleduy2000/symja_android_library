@@ -1,6 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.BiFunction;
+import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 import com.gx.common.cache.CacheBuilder;
 
@@ -18,6 +19,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -550,7 +552,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 		boolean numericMode = engine.isNumericMode();
 		try {
 			engine.setNumericMode(false);
-			if (holdallAST.size() < 3) {
+			if (holdallAST.size() < 3 || holdallAST.isEvalFlagOn(IAST.BUILT_IN_EVALED)) {
 				return F.NIL;
 			}
 			final IExpr a1 = NumberTheory.rationalize(holdallAST.arg1()).orElse(holdallAST.arg1());
@@ -637,6 +639,9 @@ public class Integrate extends AbstractFunctionEvaluator {
 					return F.NIL;
 				}
 
+				if (fx.isAST(F.Piecewise) && fx.size() >= 2 && fx.arg1().isList()) {
+					return integratePiecewise(fx, ast);
+				}
 				result = integrateAbs(arg1, x);
 				if (result.isPresent()) {
 					if (result == F.Undefined) {
@@ -647,7 +652,22 @@ public class Integrate extends AbstractFunctionEvaluator {
 
 				result = integrateByRubiRules(fx, x, ast, engine);
 				if (result.isPresent()) {
-					return result;
+					IExpr temp = result.replaceAll(new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr f) {
+							if (f.isAST(UtilityFunctionCtors.Unintegrable, 3)) {
+								IAST integrate = F.Integrate(f.first(), f.second());
+								integrate.addEvalFlags(IAST.BUILT_IN_EVALED);
+								return integrate;
+							} else if (f.isAST(F.$rubi("CannotIntegrate"), 3)) {
+								IAST integrate = F.Integrate(f.first(), f.second());
+								integrate.addEvalFlags(IAST.BUILT_IN_EVALED);
+								return integrate;
+							}
+							return F.NIL;
+						}
+					});
+					return temp.orElse(result);
 				}
 				if (arg1.isTimes()) {
 					IAST[] temp = ((IAST) arg1).filter(new Predicate<IExpr>() {
@@ -699,6 +719,29 @@ public class Integrate extends AbstractFunctionEvaluator {
 		}
 	}
 
+	private static IExpr integratePiecewise(final IAST piecewiseFunction, final IAST integrateFunction) {
+		int[] dim = piecewiseFunction.arg1().isMatrix(false);
+		if (dim != null && dim[0] > 0 && dim[1] == 2) {
+			IAST list = (IAST) piecewiseFunction.arg1();
+			if (list.size() > 1) {
+				IASTAppendable pwResult = F.ListAlloc(list.size());
+				for (int i = 1; i < list.size(); i++) {
+					IASTMutable integrate = ((IAST) integrateFunction).copy();
+					integrate.set(1, list.get(i).first());
+					pwResult.append(F.List(integrate, list.get(i).second()));
+				}
+				IASTMutable piecewise = ((IAST) piecewiseFunction).copy();
+				piecewise.set(1, pwResult);
+				if (piecewiseFunction.size() > 2) {
+					IASTMutable integrate = ((IAST) integrateFunction).copy();
+					integrate.set(1, piecewiseFunction.second());
+					piecewise.set(2, integrate);
+				}
+				return piecewise;
+			}
+		}
+		return F.NIL;
+	}
 	/**
 	 * Integrate forms of <code>Abs()</code> or <code>Abs()^n</code> with <code>n^n</code> integer.
 	 *
@@ -772,27 +815,27 @@ public class Integrate extends AbstractFunctionEvaluator {
 					IExpr l0 = lin[0];
 					IExpr l1 = lin[1];
 					constant = F.Divide(F.Negate(l0), l1);
-			IInteger exp = (IInteger) power.exponent();
+					IInteger exp = (IInteger) power.exponent();
 					IExpr expP1 = exp.inc();
-			if (exp.isNegative()) {
-				if (exp.isMinusOne()) {
+					if (exp.isNegative()) {
+						if (exp.isMinusOne()) {
 							// Abs(l0 + l1 * x) ^ (-1)
-					return F.Piecewise( //
+							return F.Piecewise( //
 									F.List(F.List(F.Negate(F.Log(x)), F.LessEqual(x, constant))), //
-							F.Log(x));
-				}
-				if (exp.isEven()) {
+									F.Log(x));
+						}
+						if (exp.isEven()) {
 							return F.Times(expP1.inverse().negate(), F.Power(x, expP1));
-				}
-				return F.Piecewise( //
+						}
+						return F.Piecewise( //
 								F.List(F.List(F.Times(expP1.inverse().negate(), F.Power(x, expP1)),
-								F.LessEqual(x, constant))), //
+										F.LessEqual(x, constant))), //
 								F.Times(expP1.inverse(), F.Power(x, expP1)));
-			}
-			if (exp.isEven()) {
+					}
+					if (exp.isEven()) {
 						return F.Divide(F.Power(x, expP1), expP1);
-			}
-			return F.Piecewise( //
+					}
+					return F.Piecewise( //
 							F.List(F.List(F.Divide(F.Power(x, expP1), expP1.negate()), F.LessEqual(x, constant))), //
 							F.Divide(F.Power(x, expP1), expP1));
 				}
@@ -1131,7 +1174,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 		F.ISet(F.$s("§$calculusfunctions"), F.List(F.D, F.Sum, F.Product, F.Integrate, F.$rubi("Unintegrable"),
 				F.$rubi("CannotIntegrate"), F.$rubi("Dif"), F.$rubi("Subst")));
 		F.ISet(F.$s("§$stopfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern, F.If, F.Integrate,
-				F.$rubi("Unintegrable"), F.$rubi("CannotIntegrate")));
+				UtilityFunctionCtors.Unintegrable, F.$rubi("CannotIntegrate")));
 		F.ISet(F.$s("§$heldfunctions"), F.List(F.Hold, F.HoldForm, F.Defer, F.Pattern));
 
 		F.ISet(UtilityFunctionCtors.IntegerPowerQ, //
