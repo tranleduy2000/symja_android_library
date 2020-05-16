@@ -270,24 +270,46 @@ public class FunctionExpand extends AbstractEvaluator {
 			final IExpr arg1 = plus.arg1();
 			final IExpr arg2 = plus.arg2();
 			if (arg1.isRational()) {
-				return nestedSquareRoots((IRational) arg1, arg2);
+				return sqrtDenest((IRational) arg1, arg2);
 			}
 		}
 		return F.NIL;
 	}
 
 	/**
+	 * <p>
+	 * Denests <code>Sqrt()</code> in an expression that contain other square roots if possible, otherwise returns
+	 * <code>F.NIL</code>.
+	 * </p>
 	 *
+	 * <pre>
+	 * Example: sqrt(5 + 2*Sqrt(6))
+	 *
+	 *   >> sqrtDenest(5, 2*Sqrt(6))
+	 *   sqrt(2) + sqrt(3)
+	 * </pre>
+	 * <p>
 	 * See: <a href="// https://en.wikipedia.org/wiki/Nested_radical#Two_nested_square_roots">Wikipedia - Nested radical
 	 * - Two nested square roots</a>
+	 * </p>
+	 *
+	 * Github #166. References for possible improvements of this method:
+	 *
+	 * <pre>
+	 *
+	 * .. [1] http://researcher.watson.ibm.com/researcher/files/us-fagin/symb85.pdf
+	 * .. [2] D. J. Jeffrey and A. D. Rich, 'Symplifying Square Roots of Square Roots
+	 *        by Denesting' (available at http://www.cybertester.com/data/denest.pdf)
+	 * </pre>
 	 *
 	 * @param arg1
 	 * @param arg2
-	 * @return
+	 * @return <code>F.NIL</code> if no change could be applied
 	 */
-	private static IExpr nestedSquareRoots(IRational arg1, IExpr arg2) {
+	private static IExpr sqrtDenest(IRational arg1, IExpr arg2) {
 		if (arg1.isNegative()) {
-			return nestedSquareRoots(arg1.negate(), arg2.negate()).map(new Function<IExpr, IExpr>() {
+			return sqrtDenest(arg1.negate(), arg2.negate()).//
+					map(new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
 					return F.Times(F.CI, x);
