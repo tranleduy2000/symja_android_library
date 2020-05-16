@@ -1,53 +1,63 @@
 package org.matheclipse.core.builtin.functions;
 
+import java.util.Arrays;
+
 import org.hipparchus.complex.Complex;
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.F;
+import static org.matheclipse.core.builtin.functions.EllipticIntegralsJS.*;
 
 /**
- * 
+ *
  * Ported from JavaScript file <a href=
  * "https://github.com/paulmasson/math/blob/master/src/functions/elliptic-functions.js">elliptic-functions.js</a>
  */
 public class EllipticFunctionsJS {
+	public static double trunc(double value) {
+		return value < 0 ? Math.ceil(value) : Math.floor(value);
+	}
+
 	public static Complex jacobiTheta(int n, double x, double q) {
-		return jacobiTheta(n, x, q, 1e-10);
+		return jacobiTheta(n, x, q, Config.SPECIAL_FUNCTIONS_TOLERANCE);
 	}
 
 	public static Complex jacobiTheta(int n, double x, double q, double tolerance) {
 		if (Math.abs(q) >= 1) {
-			throw new ArithmeticException("Unsupported elliptic nome");
+			throw new ArgumentTypeException("unsupported elliptic nome");
 		}
 
 		if (n < 1 || n > 4) {
-			throw new ArithmeticException("Undefined Jacobi theta index");
+			throw new ArgumentTypeException("undefined Jacobi theta index");
 		}
+
 		if (F.isZero(q)) {
 			switch (n) {
-			case 1:
-			case 2:
-				return Complex.ZERO;
-			case 3:
-			case 4:
-				return Complex.ONE;
+				case 1:
+				case 2:
+					return Complex.ZERO;
+				case 3:
+				case 4:
+					return Complex.ONE;
 			}
 		}
 		// dlmf.nist.gov/20.2 to reduce overflow
 		if (Math.abs(x) > Math.PI) {
 
-			double p = Math.round(x / Math.PI);
+			double p = trunc(x / Math.PI);
 			x = x - p * Math.PI;
 
 			switch (n) {
 
-			case 1:
-			case 2:
+				case 1:
+				case 2:
 
-				return new Complex(Math.pow(-1, p)).multiply(jacobiTheta(n, x, q));
+					return new Complex(Math.pow(-1, p)).multiply(jacobiTheta(n, x, q));
 
-			case 3:
-			case 4:
+				case 3:
+				case 4:
 
-				return jacobiTheta(n, x, q);
+					return jacobiTheta(n, x, q);
 
 			}
 
@@ -55,97 +65,98 @@ public class EllipticFunctionsJS {
 
 		switch (n) {
 
-		case 1:
-			if (q < 0) {
-				return jacobiTheta(n, new Complex(x), new Complex(q));
-			}
+			case 1:
+				if (q < 0) {
+					return jacobiTheta(n, new Complex(x), new Complex(q));
+				}
 
-			double s = 0;
-			double p = 1;
-			int i = 0;
+				double s = 0;
+				double p = 1;
+				int i = 0;
 
-			while (Math.abs(p) > tolerance) {
-				p = Math.pow(-1, i) * Math.pow(q, (i * i + i)) * Math.sin((2 * i + 1) * x);
-				s += p;
-				i++;
-			}
-			return new Complex(2 * Math.pow(q, 0.25) * s);
-		case 2:
-			if (q < 0) {
-				return jacobiTheta(n, new Complex(x), new Complex(q));
-			}
+				while (Math.abs(p) > tolerance) {
+					p = Math.pow(-1, i) * Math.pow(q, (i * i + i)) * Math.sin((2 * i + 1) * x);
+					s += p;
+					i++;
+				}
+				return new Complex(2 * Math.pow(q, 0.25) * s);
+			case 2:
+				if (q < 0) {
+					return jacobiTheta(n, new Complex(x), new Complex(q));
+				}
 
-			s = 0;
-			p = 1;
-			i = 0;
+				s = 0;
+				p = 1;
+				i = 0;
 
-			while (Math.abs(p) > tolerance) {
-				p = Math.pow(q, (i * i + i)) * Math.cos((2 * i + 1) * x);
-				s += p;
-				i++;
-			}
-			return new Complex(2 * Math.pow(q, 0.25) * s);
-		case 3:
-			s = 0;
-			p = 1;
-			i = 1;
-			while (Math.abs(p) > tolerance) {
-				p = Math.pow(q, (i * i)) * Math.cos(2 * i * x);
-				s += p;
-				i++;
-			}
-			return new Complex(1 + 2 * s);
-		case 4:
+				while (Math.abs(p) > tolerance) {
+					p = Math.pow(q, (i * i + i)) * Math.cos((2 * i + 1) * x);
+					s += p;
+					i++;
+				}
+				return new Complex(2 * Math.pow(q, 0.25) * s);
+			case 3:
+				s = 0;
+				p = 1;
+				i = 1;
+				while (Math.abs(p) > tolerance) {
+					p = Math.pow(q, (i * i)) * Math.cos(2 * i * x);
+					s += p;
+					i++;
+				}
+				return new Complex(1 + 2 * s);
+			case 4:
 
-			s = 0;
-			p = 1;
-			i = 1;
+				s = 0;
+				p = 1;
+				i = 1;
 
-			while (Math.abs(p) > tolerance) {
-				p = Math.pow(-q, (i * i)) * Math.cos(2 * i * x);
-				s += p;
-				i++;
-			}
+				while (Math.abs(p) > tolerance) {
+					p = Math.pow(-q, (i * i)) * Math.cos(2 * i * x);
+					s += p;
+					i++;
+				}
 
-			return new Complex(1 + 2 * s);
+				return new Complex(1 + 2 * s);
 
 		}
-		throw new ArithmeticException("Undefined Jacobi theta index");
+		throw new ArgumentTypeException("undefined Jacobi theta index");
 	}
 
 	public static Complex jacobiTheta(int n, Complex x, Complex q) {
-		return jacobiTheta(n, x, q, 1e-10);
+		return jacobiTheta(n, x, q, Config.SPECIAL_FUNCTIONS_TOLERANCE);
 	}
 
 	public static Complex jacobiTheta(int n, Complex x, Complex q, double tolerance) {
 
 		if (q.abs() >= 1) {
-			throw new ArithmeticException("Unsupported elliptic nome");
+			throw new ArgumentTypeException("unsupported elliptic nome");
 		}
 
 		if (n < 1 || n > 4) {
-			throw new ArithmeticException("Undefined Jacobi theta index");
+			throw new ArgumentTypeException("undefined Jacobi theta index");
 		}
 
 		if (F.isZero(q)) {
 			switch (n) {
-			case 1:
-			case 2:
-				return Complex.ZERO;
-			case 3:
-			case 4:
-				return Complex.ONE;
+				case 1:
+				case 2:
+					return Complex.ZERO;
+				case 3:
+				case 4:
+					return Complex.ONE;
 			}
 		}
+
 		Complex piTau = q.log().divide(Complex.I);
 
 		// dlmf.nist.gov/20.2 to reduce overflow
 		if (Math.abs(x.getImaginary()) > Math.abs(piTau.getImaginary()) || Math.abs(x.getReal()) > Math.PI) {
 
-			long pt = Math.round(x.getImaginary() / piTau.getImaginary());
+			double pt = trunc(x.getImaginary() / piTau.getImaginary());
 			x = x.subtract(piTau.multiply(pt));
 
-			long p = Math.round(x.getReal() / Math.PI);
+			double p = trunc(x.getReal() / Math.PI);
 			x = x.subtract(p * Math.PI);
 
 			Complex qFactor = q.pow(-pt * pt);
@@ -153,19 +164,19 @@ public class EllipticFunctionsJS {
 
 			// factors can become huge, so chop spurious parts first
 			switch (n) {
-			case 1:
-				return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance))
-						.multiply(Math.pow((-1), (p + pt)));
+				case 1:
+					return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance))
+							.multiply(Math.pow((-1), (p + pt)));
 
-			case 2:
-				return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance))
-						.multiply(Math.pow((-1), p));
+				case 2:
+					return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance))
+							.multiply(Math.pow((-1), p));
 
-			case 3:
-				return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance));
-			case 4:
-				return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance))
-						.multiply(Math.pow((-1), pt));
+				case 3:
+					return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance));
+				case 4:
+					return qFactor.multiply(eFactor).multiply(F.chopComplex(jacobiTheta(n, x, q), tolerance))
+							.multiply(Math.pow((-1), pt));
 			}
 
 		}
@@ -174,40 +185,40 @@ public class EllipticFunctionsJS {
 		int i = 0;
 		switch (n) {
 
-		case 1:
-			while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
-				p = q.pow(i * i + i).multiply(x.multiply(2 * i + 1).sin()).multiply(Math.pow(-1, i));
-				s = s.add(p);
-				i++;
-			}
+			case 1:
+				while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
+					p = q.pow(i * i + i).multiply(x.multiply(2 * i + 1).sin()).multiply(Math.pow(-1, i));
+					s = s.add(p);
+					i++;
+				}
 
-			return q.pow(0.25).multiply(s).multiply(2);
-		case 2:
-			while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
-				p = q.pow(i * i + i).multiply(x.multiply(2 * i + 1).cos());
-				s = s.add(p);
-				i++;
-			}
-			return q.pow(0.25).multiply(s).multiply(2);
-		case 3:
-			i = 1;
-			while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
-				p = q.pow(i * i).multiply(x.multiply(2 * i).cos());
-				s = s.add(p);
-				i++;
-			}
-			return s.multiply(2.0).add(1.0);
-		case 4:
-			i = 1;
-			while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
-				p = q.negate().pow(i * i).multiply(x.multiply(2 * i).cos());
-				s = s.add(p);
-				i++;
-			}
-			return s.multiply(2.0).add(1.0);
+				return q.pow(0.25).multiply(s).multiply(2);
+			case 2:
+				while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
+					p = q.pow(i * i + i).multiply(x.multiply(2 * i + 1).cos());
+					s = s.add(p);
+					i++;
+				}
+				return q.pow(0.25).multiply(s).multiply(2);
+			case 3:
+				i = 1;
+				while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
+					p = q.pow(i * i).multiply(x.multiply(2 * i).cos());
+					s = s.add(p);
+					i++;
+				}
+				return s.multiply(2.0).add(1.0);
+			case 4:
+				i = 1;
+				while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
+					p = q.negate().pow(i * i).multiply(x.multiply(2 * i).cos());
+					s = s.add(p);
+					i++;
+				}
+				return s.multiply(2.0).add(1.0);
 		}
 
-		throw new ArithmeticException("Undefined Jacobi theta index");
+		throw new ArgumentTypeException("undefined Jacobi theta index");
 	}
 
 	public static Complex ellipticNome(Complex m) {
@@ -227,13 +238,22 @@ public class EllipticFunctionsJS {
 
 	}
 
-	public static Complex sn(Complex x, Complex m) {
+	/**
+	 * JacobiSN function for complex values.
+	 *
+	 * @param x
+	 * @param m
+	 * @return
+	 */
+	public static Complex jacobiSN(Complex x, Complex m) {
 
 		Complex q = ellipticNome(m);
 
 		// if ( m > 1 || isComplex(x) || isComplex(m) ) {
 
-		Complex t = x.divide(jacobiTheta(3, Complex.ZERO, q).pow(2));
+		Complex a2 = jacobiTheta(3, Complex.ZERO, q);
+		a2 = a2.multiply(a2);
+		Complex t = x.divide(a2);
 
 		return jacobiTheta(3, Complex.ZERO, q).divide(jacobiTheta(2, Complex.ZERO, q))
 				.multiply(jacobiTheta(1, t, q).divide(jacobiTheta(4, t, q)));
@@ -241,12 +261,30 @@ public class EllipticFunctionsJS {
 		// }
 	}
 
-	public static Complex sn(double x, double m) {
+	/**
+	 * JacobiSN function for real values.
+	 *
+	 * @param x
+	 * @param m
+	 * @return
+	 */
+	public static Complex jacobiSN(double x, double m) {
 		if (m > 1) {
-			return sn(new Complex(x), new Complex(m));
+			return jacobiSN(new Complex(x), new Complex(m));
 		}
+
+		// dlmf.nist.gov/22.5#ii
+		if (m == 0) {
+			return new Complex(Math.sin(x));
+		}
+		if (m == 1) {
+			return new Complex(Math.tanh(x));
+		}
+
 		Complex q = ellipticNome(new Complex(m));
-		Complex t = new Complex(x).divide(jacobiTheta(3, Complex.ZERO, q).pow(2));
+		Complex a2 = jacobiTheta(3, Complex.ZERO, q);
+		a2 = a2.multiply(a2);
+		Complex t = new Complex(x).divide(a2);
 
 		if (m < 0) {
 			return jacobiTheta(3, Complex.ZERO, q).divide(jacobiTheta(4, t, q))
@@ -257,23 +295,50 @@ public class EllipticFunctionsJS {
 
 	}
 
-	public static Complex cn(Complex x, Complex m) {
+	/**
+	 * JacobiCN function for real values.
+	 *
+	 * @param x
+	 * @param m
+	 * @return
+	 */
+	public static Complex jacobiCN(Complex x, Complex m) {
 		Complex q = ellipticNome(m);
 		// if ( m > 1 || isComplex(x) || isComplex(m) ) {
-		Complex t = x.divide(jacobiTheta(3, Complex.ZERO, q).pow(2));
+		Complex a2 = jacobiTheta(3, Complex.ZERO, q);
+		a2 = a2.multiply(a2);
+		Complex t = x.divide(a2);
 
 		return jacobiTheta(4, Complex.ZERO, q).divide(jacobiTheta(2, Complex.ZERO, q))
 				.multiply(jacobiTheta(2, t, q).divide(jacobiTheta(4, t, q)));
 		// }
 	}
 
-	public static Complex cn(double x, double m) {
+	/**
+	 * JacobiCN function for real values.
+	 *
+	 * @param x
+	 * @param m
+	 * @return
+	 */
+	public static Complex jacobiCN(double x, double m) {
 		if (m > 1) {
-			return cn(new Complex(x), new Complex(m));
+			return jacobiCN(new Complex(x), new Complex(m));
 		}
-		Complex q = ellipticNome(new Complex(m));
 
-		Complex t = new Complex(x).divide(jacobiTheta(3, Complex.ZERO, q).pow(2));
+		// dlmf.nist.gov/22.5#ii
+		if (m == 0) {
+			return new Complex(Math.cos(x));
+		}
+		if (m == 1) {
+			// sech(x)
+			return new Complex(1.0D / Math.cosh(x));
+		}
+
+		Complex q = ellipticNome(new Complex(m));
+		Complex a2 = jacobiTheta(3, Complex.ZERO, q);
+		a2 = a2.multiply(a2);
+		Complex t = new Complex(x).divide(a2);
 
 		if (m < 0) {
 			return jacobiTheta(4, Complex.ZERO, q).divide(jacobiTheta(4, t, q))
@@ -283,13 +348,22 @@ public class EllipticFunctionsJS {
 				.multiply(jacobiTheta(2, t, q).divide(jacobiTheta(4, t, q)));
 	}
 
-	public static Complex dn(Complex x, Complex m) {
+	/**
+	 * JacobiDN function for complex values.
+	 *
+	 * @param x
+	 * @param m
+	 * @return
+	 */
+	public static Complex jacobiDN(Complex x, Complex m) {
 
 		Complex q = ellipticNome(m);
 
 		// if ( m > 1 || isComplex(x) || isComplex(m) ) {
 
-		Complex t = x.divide(jacobiTheta(3, Complex.ZERO, q).pow(2));
+		Complex a2 = jacobiTheta(3, Complex.ZERO, q);
+		a2 = a2.multiply(a2);
+		Complex t = x.divide(a2);
 
 		return jacobiTheta(4, Complex.ZERO, q).divide(jacobiTheta(3, Complex.ZERO, q))
 				.multiply(jacobiTheta(3, t, q).divide(jacobiTheta(4, t, q)));
@@ -297,20 +371,38 @@ public class EllipticFunctionsJS {
 		// }
 	}
 
-	public static Complex dn(double x, double m) {
+	/**
+	 * JacobiDN function for real values.
+	 *
+	 * @param x
+	 * @param m
+	 * @return
+	 */
+	public static Complex jacobiDN(double x, double m) {
 		if (m > 1) {
-			return dn(new Complex(x), new Complex(m));
+			return jacobiDN(new Complex(x), new Complex(m));
 		}
-		Complex q = ellipticNome(new Complex(m));
 
-		Complex t = new Complex(x).divide(jacobiTheta(3, Complex.ZERO, q).pow(2));
+		// dlmf.nist.gov/22.5#ii
+		if (m == 0) {
+			return Complex.ONE;
+		}
+		if (m == 1) {
+			// sech(x)
+			return new Complex(1.0D / Math.cosh(x));
+		}
+
+		Complex q = ellipticNome(new Complex(m));
+		Complex a2 = jacobiTheta(3, Complex.ZERO, q);
+		a2 = a2.multiply(a2);
+		Complex t = new Complex(x).divide(a2);
 
 		return jacobiTheta(4, Complex.ZERO, q).divide(jacobiTheta(3, Complex.ZERO, q))
 				.multiply(jacobiTheta(3, t, q).divide(jacobiTheta(4, t, q)));
 
 	}
 
-	public static Complex am(Complex x, Complex m) {
+	public static Complex jacobiAmplitude(Complex x, Complex m) {
 
 		// if ( m > 1 || isComplex(x) || isComplex(m) ) {
 
@@ -327,30 +419,30 @@ public class EllipticFunctionsJS {
 
 				// bitwise test for odd integer
 				if ((p & 1) == 1) {
-					return sn(x, m).asin().negate().add(n * Math.PI);
+					return jacobiSN(x, m).asin().negate().add(n * Math.PI);
 				}
 
 			}
 
-			return sn(x, m).asin().add(n * Math.PI);
+			return jacobiSN(x, m).asin().add(n * Math.PI);
 
 		}
 
-		return sn(x, m).asin();
+		return jacobiSN(x, m).asin();
 
 		// }
 	}
 
-	public static Complex am(double x, double m) {
+	public static Complex jacobiAmplitude(double x, double m) {
 		if (m > 1) {
-			return am(new Complex(x), new Complex(m));
+			return jacobiAmplitude(new Complex(x), new Complex(m));
 		}
 
 		Complex K = EllipticIntegralsJS.ellipticK(m);
 		long n = Math.round(x / 2.0 / K.getReal()); // ??? .getReal() inserted
 		x = x - 2 * n * K.getReal();// ??? .getReal() inserted
 
-		return sn(x, m).asin().add(n * Math.PI);
+		return jacobiSN(x, m).asin().add(n * Math.PI);
 
 	}
 
@@ -375,12 +467,32 @@ public class EllipticFunctionsJS {
 
 		Complex[] sol = weierstrassRoots(g2, g3);
 		Complex e1 = sol[0];
-		// Complex e2 = sol[1];
+		Complex e2 = sol[1];
 		Complex e3 = sol[2];
-		Complex w1 = inverseWeierstrassP(e1, g2, g3);
-		Complex w3 = inverseWeierstrassP(e3, g2, g3);
+		Complex lambda = e1.subtract(e3).sqrt();
+		Complex m = e2.subtract(e3).divide(e1.subtract(e3));
+
+		Complex w1 = ellipticK(m).divide(lambda);
+		Complex w3 = Complex.I.multiply(ellipticK(Complex.ONE.subtract(m))).divide(lambda);
 
 		return new Complex[] { w1, w3 };
+
+		// Complex e1 = sol[0];
+		// Complex e2 = sol[1];
+		// Complex e3 = sol[2];
+		// Complex w1 = inverseWeierstrassP(e1, g2, g3);
+		// Complex w2 = inverseWeierstrassP(e2, g2, g3);
+		// Complex w3 = inverseWeierstrassP(e3, g2, g3);
+		//
+		// Complex[] w = new Complex[] { w1, w2, w3 };
+		// Arrays.sort(w, (a, b) -> (int) Math.signum((a.abs() - b.abs())));
+		// // w.sort( (a,b) => abs(a) - abs(b) );
+		// Complex smallest = w[0];
+		// Complex[] v = new Complex[] { w[1], w[2], //
+		// w[1].subtract(smallest), w[2].subtract(smallest) };
+		// // w.sort( (a,b) => abs(a) - abs(b) );
+		// Arrays.sort(v, (a, b) -> (int) Math.signum((a.abs() - b.abs())));
+		// return new Complex[] { smallest, v[0] };
 
 	}
 
@@ -412,12 +524,19 @@ public class EllipticFunctionsJS {
 		Complex a = jacobiTheta(2, Complex.ZERO, q);
 		Complex b = jacobiTheta(3, Complex.ZERO, q);
 
-		Complex g2 = w1.multiply(2).pow(-4).multiply(a.pow(8).add(a.pow(4).multiply(b.pow(4)).negate()).add(b.pow(8)))
+		Complex aPow4 = a.multiply(a);
+		aPow4 = aPow4.multiply(aPow4);
+		Complex aPow8 = aPow4.multiply(aPow4);
+
+		Complex bPow4 = b.multiply(b);
+		bPow4 = bPow4.multiply(bPow4);
+		Complex bPow8 = bPow4.multiply(bPow4);
+
+		Complex g2 = w1.multiply(2).pow(-4).multiply(aPow8.add(aPow4.multiply(bPow4).negate()).add(bPow8))
 				.multiply(4.0 / 3.0 * Math.pow(Math.PI, 4));
 
-		Complex g3 = w1.multiply(2).pow(-6).multiply(8.0 / 27.0 * Math.pow(Math.PI, 6))
-				.multiply(a.pow(12).add(a.pow(8).multiply(b.pow(4)).multiply(-1.5))
-						.add(a.pow(4).multiply(b.pow(8)).multiply(-1.5)).add(b.pow(12)));
+		Complex g3 = w1.multiply(2.0).pow(-6.0).multiply(8.0 / 27.0 * Math.pow(Math.PI, 6.0)).multiply(a.pow(12)
+				.add(aPow8.multiply(bPow4).multiply(-1.5)).add(aPow4.multiply(bPow8).multiply(-1.5)).add(b.pow(12)));
 
 		if (conjugate) {
 			g2 = g2.conjugate();
@@ -440,7 +559,9 @@ public class EllipticFunctionsJS {
 
 		Complex m = e2.subtract(e3).divide(e1.subtract(e3));
 
-		return e3.add(e1.subtract(e3).multiply(sn(x.multiply(e1.subtract(e3).sqrt()), m).pow(-2)));
+		Complex pow = jacobiSN(x.multiply(e1.subtract(e3).sqrt()), m).reciprocal();
+		pow = pow.multiply(pow);
+		return e3.add(e1.subtract(e3).multiply(pow));
 
 	}
 
@@ -459,8 +580,8 @@ public class EllipticFunctionsJS {
 
 		Complex argument = x.multiply(e1.subtract(e3).sqrt());
 
-		return e1.subtract(e3).pow(1.5).multiply(cn(argument, m)).multiply(dn(argument, m))
-				.multiply(sn(argument, m).pow(-3)).multiply(-2);
+		return e1.subtract(e3).pow(1.5).multiply(jacobiCN(argument, m)).multiply(jacobiDN(argument, m))
+				.multiply(jacobiSN(argument, m).pow(-3)).multiply(-2);
 
 	}
 
