@@ -1994,6 +1994,8 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 		// "1+n/2");
 		// check("rubi`SmartSimplify[1+n/2]", //
 		// "1/2*(2+n)");
+		// check("(1 + x/a)^(n/2)/(x^2*(1 - x/a)^(n/2)) // FullForm", //
+		// "Times[Power[x, -2], Power[Plus[1, Times[Power[a, -1], x]], Times[Rational[1,2], n]], Power[Plus[1, Times[-1, Power[a, -1], x]], Times[Rational[-1,2], n]]]");
 		check(//
 				"Integrate[(1 + x/a)^(n/2)/(x^2*(1 - x/a)^(n/2)), x]", //
 				"(-4*(1 - x/a)^(1 - n/2)*(1 + x/a)^((-2 + n)/2)*Hypergeometric2F1[2, 1 - n/2, 2 - n/2, (a - x)/(a + x)])/(a*(2 - n))", //
@@ -9087,9 +9089,6 @@ public class AlgebraicFunctions extends AbstractRubiTestCase {
 		check(//
 				"Integrate[1/Sqrt[3 + 9*x^2 + 2*x^4], x]", //
 				"(Sqrt[(6 + (9 - Sqrt[57])*x^2)/(6 + (9 + Sqrt[57])*x^2)]*(6 + (9 + Sqrt[57])*x^2)*EllipticF[ArcTan[Sqrt[(9 + Sqrt[57])/6]*x], (-19 + 3*Sqrt[57])/4])/(Sqrt[6*(9 + Sqrt[57])]*Sqrt[3 + 9*x^2 + 2*x^4])", //
-				"((6+(9+Sqrt(57))*x^2)*Sqrt((6+(9-Sqrt(57))*x^2)/(6+(9+Sqrt(57))*x^2))*EllipticF(ArcTan(\n"
-						+ "1/6*Sqrt(6*(9+Sqrt(57)))*x),1/4*(-19+3*Sqrt(57))))/(Sqrt(6*(9+Sqrt(57)))*Sqrt(3+\n"
-						+ "9*x^2+2*x^4))", //
 				1099);
 	}
 
