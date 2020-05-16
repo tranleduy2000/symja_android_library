@@ -404,11 +404,29 @@ public class EvalAttributes {
 	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
 	 */
 	public static final void sort(final IASTMutable ast, Comparator<IExpr> comparator) {
+		if (ast.isAssociation()) {
+			throw new UnsupportedOperationException("Sort(list, comparator) not implemented for associations.");
+		}
+		if (ast.size() > 2) {
 		final IExpr[] a = ast.toArray();
 		int end = a.length;
+			if (Config.FUZZ_TESTING) {
+				try {
+					Arrays.sort(a, 1, ast.size(), comparator);
+					for (int j = 1; j < end; j++) {
+						ast.set(j, a[j]);
+					}
+				} catch (java.lang.IllegalArgumentException iae) {
+					// java.util.TimSort.mergeHi(TimSort.java:899) - Comparison method violates its general contract!
+					System.err.println(ast.toString());
+					throw iae;
+				}
+			} else {
 		Arrays.sort(a, 1, ast.size(), comparator);
 		for (int j = 1; j < end; j++) {
 			ast.set(j, a[j]);
+		}
+	}
 		}
 	}
 
@@ -443,7 +461,8 @@ public class EvalAttributes {
 	/**
 	 * Sort an AST with 3 arguments using function <code>Order</code>.
 	 * 
-	 * @param ast an ast with 3 arguments
+	 * @param ast
+	 *            an ast with 3 arguments
 	 * @return
 	 */
 	private static boolean sort3Args(final IASTMutable ast, final boolean setFlag) {
@@ -494,10 +513,13 @@ public class EvalAttributes {
 	 *            the length of the list
 	 * @return the resulting ast with the <code>argHead</code> threaded into each ast argument.
 	 */
-	public static IASTAppendable threadList(final IAST ast, final IExpr listHead, final IExpr argHead,
+	public static IASTMutable threadList(final IAST ast, final IExpr listHead, final IExpr argHead,
 			final int listLength) {
 
-		final IASTAppendable result = F.ast(listHead, listLength, true);
+		if (listLength == 0) {
+			return F.headAST0(listHead);
+		}
+		IASTMutable result = F.NIL;
 		final int listSize = ast.size();
 		for (int j = 1; j < listLength + 1; j++) {
 			final IASTAppendable subResult = F.ast(argHead, listSize - 1, true);
@@ -510,7 +532,22 @@ public class EvalAttributes {
 					subResult.set(i, ast.get(i));
 				}
 			}
+			if (!result.isPresent()) {
+				switch (listLength) {
+				case 1:
+					result = F.unaryAST1(listHead, F.Slot1);
+					break;
+				case 2:
+					result = F.binaryAST2(listHead, F.Slot1, F.Slot2);
+					break;
+				case 3:
+					result = F.ternaryAST3(listHead, F.Slot1, F.Slot2, F.Slot3);
+					break;
+				default:
+					result = F.ast(listHead, listLength, true);
+				}
 
+			}
 			result.set(j, subResult);
 		}
 
