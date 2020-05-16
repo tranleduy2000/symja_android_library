@@ -7,6 +7,7 @@ import com.duy.lambda.ObjIntConsumer;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
@@ -186,7 +187,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 	 * @param engine
 	 * @return
 	 */
-	private IExpr getDerivativeArg1(IExpr x, final IExpr a1, final IExpr head, EvalEngine engine) {
+	private static IExpr getDerivativeArg1(IExpr x, final IExpr a1, final IExpr head, EvalEngine engine) {
 		if (head.isSymbol()) {
 			ISymbol header = (ISymbol) head;
 			IAST fDerivParam = Derivative.createDerivative(1, header, a1);
@@ -207,7 +208,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 	 * @param head
 	 * @return
 	 */
-	private IExpr getDerivativeArgN(final IExpr x, final IAST ast, final IExpr head) {
+	private static IExpr getDerivativeArgN(final IExpr x, final IAST ast, final IExpr head) {
 		final IAST[] deriv = ast.isDerivative();
 		int size = ast.size();
 		if (deriv != null) {
@@ -215,7 +216,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			ast.forEach(size, new ObjIntConsumer<IExpr>() {
 				@Override
 				public void accept(IExpr expr, int i) {
-					plus.append(F.Times(F.D(expr, x), D.this.addDerivative(i, deriv[0], deriv[1].arg1(), ast)));
+					plus.append(F.Times(F.D(expr, x), addDerivative(i, deriv[0], deriv[1].arg1(), ast)));
 				}
 			});
 			return plus;
@@ -225,7 +226,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			ast.forEach(size, new ObjIntConsumer<IExpr>() {
 				@Override
 				public void accept(IExpr expr, int i) {
-					plus.append(F.Times(F.D(expr, x), D.this.createDerivative(i, head, ast)));
+					plus.append(F.Times(F.D(expr, x), createDerivative(i, head, ast)));
 				}
 			});
 			return plus;
@@ -242,7 +243,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 	 * @param args
 	 * @return
 	 */
-	private IAST createDerivative(final int pos, final IExpr header, final IAST args) {
+	private static IAST createDerivative(final int pos, final IExpr header, final IAST args) {
 		final int size = args.size();
 		IASTAppendable derivativeHead1 = F.ast(F.Derivative, size, false);
 		for (int i = 1; i < size; i++) {
@@ -250,20 +251,13 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 		}
 		IASTAppendable derivativeHead2 = F.ast(derivativeHead1);
 		derivativeHead2.append(header);
-		final IASTAppendable derivativeAST = F.ast(derivativeHead2, size, false);
-		args.forEach(new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr x) {
-				derivativeAST.append(x);
-			}
-		});
-		// for (int i = 1; i < size; i++) {
-		// derivativeAST.append(args.get(i));
-		// }
+		IASTAppendable derivativeAST = F.ast(derivativeHead2, size, false);
+		derivativeAST.appendArgs(args);
+		// args.forEach(x -> derivativeAST.append(x));
 		return derivativeAST;
 	}
 
-	private IAST addDerivative(final int pos, IAST deriveHead, final IExpr header, final IAST args) {
+	private static IAST addDerivative(final int pos, IAST deriveHead, final IExpr header, final IAST args) {
 		IASTMutable derivativeHead1 = deriveHead.copyAppendable();
 		for (int i = 1; i < derivativeHead1.size(); i++) {
 			if (i == pos) {
@@ -291,18 +285,19 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			return F.NIL;
 		}
 
+		try {
 		final IExpr fx = ast.arg1();
 		if (fx.isIndeterminate()) {
 			return F.Indeterminate;
 		}
 		if (ast.size() > 3) {
 			// reduce arguments by folding D[fxy, x, y] to D[ D[fxy, x], y] ...
-			return ast.foldLeft(new BiFunction<IExpr, IExpr, IExpr>() {
-				@Override
-				public IExpr apply(IExpr x, IExpr y) {
-					return engine.evaluate(F.D(x, y));
-				}
-			}, fx, 2);
+				return ast.foldLeft(new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x, IExpr y) {
+						return engine.evaluate(F.D(x, y));
+					}
+				}, fx, 2);
 		}
 
 		if (fx.isList()) {
@@ -316,23 +311,23 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			// D[fx_, {...}]
 			IAST xList = (IAST) x;
 			if (xList.isAST1() && xList.arg1().isListOfLists()) {
-				final IAST subList = (IAST) xList.arg1();
+					final IAST subList = (IAST) xList.arg1();
 				IASTAppendable result = F.ListAlloc(subList.size());
-				result.appendArgs(subList.size(), new IntFunction<IExpr>() {
-					@Override
-					public IExpr apply(int i) {
-						return F.D(fx, F.List(subList.get(i)));
-					}
-				});
+					result.appendArgs(subList.size(), new IntFunction<IExpr>() {
+						@Override
+						public IExpr apply(int i) {
+							return F.D(fx, F.List(subList.get(i)));
+						}
+					});
 				return result;
 			} else if (xList.isAST1() && xList.arg1().isList()) {
 				IAST subList = (IAST) xList.arg1();
-				return subList.mapLeft(F.ListAlloc(), new BiFunction<IExpr, IExpr, IExpr>() {
-                    @Override
-                    public IExpr apply(IExpr a, IExpr b) {
-                        return engine.evaluate(F.D(a, b));
-                    }
-                }, fx);
+					return subList.mapLeft(F.ListAlloc(), new BiFunction<IExpr, IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr a, IExpr b) {
+							return engine.evaluate(F.D(a, b));
+						}
+					}, fx);
 			} else if (xList.isAST2() && xList.arg2().isInteger()) {
 				if (ast.isEvalFlagOn(IAST.IS_DERIVATIVE_EVALED)) {
 					return F.NIL;
@@ -356,6 +351,9 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 		}
 
 		if (!(x.isList())) {
+				if (fx.isAST(F.Piecewise) && fx.size() >= 2 && fx.first().isList()) {
+					return dPiecewise(fx, ast, engine);
+				}
 			if (fx instanceof ASTSeriesData) {
 				ASTSeriesData series = ((ASTSeriesData) fx);
 				if (series.getX().equals(x)) {
@@ -460,7 +458,37 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			}
 
 		}
+		} catch (final ValidateException ve) {
+			// int number validation
+			return engine.printMessage(ve.getMessage(ast.topHead()));
+		}
+		return F.NIL;
+	}
 
+	private static IExpr dPiecewise(final IExpr piecewiseFunction, final IAST ast, EvalEngine engine) {
+		int[] dim = piecewiseFunction.first().isMatrix(false);
+		if (dim != null && dim[0] > 0 && dim[1] == 2) {
+			IAST list = (IAST) piecewiseFunction.first();
+			if (list.size() > 1) {
+				IASTAppendable pwResult = F.ListAlloc(list.size());
+				for (int i = 1; i < list.size(); i++) {
+					IASTMutable diff = ((IAST) ast).copy();
+					diff.set(1, list.get(i).first());
+					pwResult.append(F.List(diff, list.get(i).second()));
+				}
+				if (piecewiseFunction.size() > 2) {
+					IASTMutable diff = ((IAST) ast).copy();
+					diff.set(1, piecewiseFunction.second());
+					pwResult.append(F.List(engine.evaluate(diff), F.True));
+				}
+				IASTMutable piecewise = ((IAST) piecewiseFunction).copy();
+				piecewise.set(1, pwResult);
+				if (piecewise.size() > 2) {
+					piecewise.set(2, F.Indeterminate);
+				}
+				return piecewise;
+			}
+		}
 		return F.NIL;
 	}
 
