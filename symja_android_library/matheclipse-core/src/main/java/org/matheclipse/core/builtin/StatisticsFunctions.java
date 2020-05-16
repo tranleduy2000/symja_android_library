@@ -75,6 +75,7 @@ public class StatisticsFunctions {
 	private static class Initializer {
 
 		private static void init() {
+			F.AbsoluteCorrelation.setEvaluator(new AbsoluteCorrelation());
 			F.ArithmeticGeometricMean.setEvaluator(new ArithmeticGeometricMean());
 			F.CDF.setEvaluator(new CDF());
 			F.PDF.setEvaluator(new PDF());
@@ -111,6 +112,7 @@ public class StatisticsFunctions {
 			F.PoissonDistribution.setEvaluator(new PoissonDistribution());
 			F.Probability.setEvaluator(new Probability());
 			F.Quantile.setEvaluator(new Quantile());
+			F.Quartiles.setEvaluator(new Quartiles());
 			F.RandomVariate.setEvaluator(new RandomVariate());
 			F.Rescale.setEvaluator(new Rescale());
 			F.Skewness.setEvaluator(new Skewness());
@@ -186,6 +188,26 @@ public class StatisticsFunctions {
 		// default IExpr inverseCDF(IAST dist, IExpr x) {
 		// return F.NIL;
 		// }
+	}
+
+	private final static class AbsoluteCorrelation extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr a = ast.arg1();
+			IExpr b = ast.arg2();
+			int dim1 = a.isVector();
+			int dim2 = b.isVector();
+			if (dim1 >= 0 && dim1 == dim2) {
+				return F.Divide(F.Dot(a, F.Conjugate(b)), F.Length(a));
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_2;
+		}
 	}
 
 	private static class InverseCDF extends AbstractFunctionEvaluator {

@@ -16820,31 +16820,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("Ramp(Pi-E)", //
 				"-E+Pi");
 	}
-	public void testQuotientRemainder() {
-		check("QuotientRemainder(13, 0)", //
-				"QuotientRemainder(13,0)");
-		check("QuotientRemainder(-17, 7)", //
-				"{-3,4}");
-		check("QuotientRemainder(15, -5)", //
-				"{-3,0}");
-		check("QuotientRemainder(17, 5)", //
-				"{3,2}");
-		check("QuotientRemainder(-17, -4)", //
-				"{4,-1}");
-		check("QuotientRemainder(-14, 7)", //
-				"{-2,0}");
-		check("QuotientRemainder(19, -4)", //
-				"{-5,-1}");
-	}
-
-	public void testRamp() {
-		check("Ramp(-1)", //
-				"0");
-		check("Ramp(3.7)", //
-				"3.7");
-		check("Ramp(Pi-E)", //
-				"-E+Pi");
-	}
 	public void testRandom() {
 		// message: RandomPrime: Positive integer value expected.
 		check("RandomPrime(-11)", //

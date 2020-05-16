@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -49,70 +50,74 @@ public class AST2Expr {
 			"$OutputSizeLimit", "$PrePrint", "$PreRead", "$RecursionLimit", "$UserName", "$Version" };
 
 	public final static String[] SYMBOL_STRINGS = { "All", "Algebraics", "Automatic", "Axes", "AxesOrigin", "AxesStyle",
-			"Background", "Booleans", "CharacterEncoding", "ComplexInfinity", "Catalan", "Complexes",
-			"ComplexityFunction", "Constant", "Degree", "DegreeLexicographic", "DegreeReverseLexicographic", "Disputed",
-			"EliminationOrder", "EulerGamma", "Expression", "Extension", "False", "Flat", "Float", "Full",
-			"GaussianIntegers", "General", "Glaisher", "GoldenAngle", "GoldenRatio", "Heads", "HoldAll", "HoldComplete",
-			"HoldAllComplete", "HoldFirst", "HoldRest", "Indeterminate", "Infinity", "Integer", "Integers", "Khinchin",
-			"Lexicographic", "Listable", "LongForm", "MaxIterations", "MaxPoints", "Method", "Modulus", "MonomialOrder",
-			"NegativeDegreeLexicographic", "NegativeDegreeReverseLexicographic", "NegativeLexicographic", "NHoldAll",
-			"NHoldFirst", "NHoldRest", "None", "Nothing", "Nonexistent", "NotApplicable", "NotAvailable", "Null",
-			"Number", "NumericFunction", "OneIdentity", "Orderless", "Pi", "PrecisionGoal", "Primes", "Protected",
-			"Rationals", "ReadProtected", "Real", "Reals", "SameTest", "Second", "SequenceHold", "Slot", "SlotSequence",
-			"Strict", "String", "Symbol", "TooLarge", "Trig", "True", "Variable", "White", "Unknown", "ViewPoint" };
+			"Background", "BarOrigin", "Booleans", "Bottom", "CharacterEncoding", "ComplexInfinity", "Catalan",
+			"Complexes", "ComplexityFunction", "Constant", "Degree", "DegreeLexicographic",
+			"DegreeReverseLexicographic", "Disputed", "EliminationOrder", "EulerGamma", "Expression", "Extension",
+			"False", "Flat", "Float", "Full", "GaussianIntegers", "General", "Glaisher", "GoldenAngle", "GoldenRatio",
+			"Heads", "HoldAll", "HoldComplete", "HoldAllComplete", "HoldFirst", "HoldRest", "Indeterminate", "Infinity",
+			"Integer", "Integers", "Khinchin", "Left", "Lexicographic", "Listable", "LongForm", "MaxIterations",
+			"MaxPoints", "Method", "Modulus", "MonomialOrder", "NegativeDegreeLexicographic",
+			"NegativeDegreeReverseLexicographic", "NegativeLexicographic", "NHoldAll", "NHoldFirst", "NHoldRest",
+			"None", "Nothing", "Nonexistent", "NotApplicable", "NotAvailable", "Null", "Number", "NumberString",
+			"NumericFunction", "OneIdentity", "Orderless", "Pi", "PrecisionGoal", "Primes", "Protected", "Rationals",
+			"ReadProtected", "Real", "Reals", "Right", "SameTest", "Second", "SequenceHold", "Slot", "SlotSequence",
+			"Strict", "String", "Symbol", "TooLarge", "Top", "Trig", "True", "Variable", "White", "Whitespace",
+			"Unknown", "ViewPoint" };
 
-	public final static String[] FUNCTION_STRINGS = { "Abort", "Abs", "AbsArg", "Accumulate", "AddTo",
-			"AdjacencyMatrix", "AiryAi", "AiryAiPrime", "AiryBi", "AiryBiPrime", "AllTrue", "And", "AngleVector",
-			"AnyTrue", "AntihermitianMatrixQ", "AntiSymmetric", "AntisymmetricMatrixQ", "Annuity", "AnnuityDue",
-			"AlgebraicNumber", "Alternatives", "Apart", "AppellF1", "Append", "AppendTo", "Apply", "ArcCos", "ArcCosh",
-			"ArcCot", "ArcCoth", "ArcCsc", "ArcCsch", "ArcSec", "ArcSech", "ArithmeticGeometricMean", "ArcSin",
-			"ArcSinh", "ArcTan", "ArcTanh", "Arg", "ArgMax", "ArgMin", "Array", "ArrayDepth", "ArrayPad",
-			"ArrayReshape", "Arrays", "ArrayQ", "Assumptions", "AtomQ", "Attributes", "BartlettWindow", "BaseForm",
-			"Begin", "BeginPackage", "BellB", "BellY", "BernoulliB", "BernoulliDistribution", "BesselI", "BesselJ",
-			"BesselJZero", "BesselK", "BesselY", "BesselYZero", "Beta", "BetaDistribution", "BetaRegularized",
-			"BinarySerialize", "BinaryDeserialize", "BinCounts", "Binomial", "BinomialDistribution", "BitLength",
-			"BlackmanHarrisWindow", "BlackmanNuttallWindow", "BlackmanWindow", "Blank", "BlankSequence",
-			"BlankNullSequence", "Block", "Boole", "BooleanQ", "BooleanConvert", "BooleanMinimize", "BooleanTable",
-			"BooleanVariables", "BrayCurtisDistance", "Break", "Button", "ByteArray", "ByteArrayQ", "ByteCount",
-			"CanberraDistance", "Cancel", "CancelButton", "CarmichaelLambda", "CartesianProduct", "Cases",
-			"CatalanNumber", "Catch", "Catenate", "CDF", "Ceiling", "CenterDot", "CentralMoment", "CForm",
-			"CharacteristicPolynomial", "ChebyshevT", "ChebyshevU", "Check", "ChessboardDistance", "ChineseRemainder",
-			"ChiSquareDistribution", "CholeskyDecomposition", "Chop", "CircleDot", "CirclePoints", "Clear", "ClearAll",
-			"ClearAttributes", "Clip", "Coefficient", "CoefficientList", "CoefficientRules", "Colon", "Column",
-			"Collect", "Commonest", "CompatibleUnitQ", "Complement", "Compile", "CompiledFunction", "Complex",
-			"ComplexExpand", "ComposeList", "ComposeSeries", "Composition", "CompoundExpression", "Condition",
-			"ConditionalExpression", "ConnectedGraphQ", "Conjugate", "ConjugateTranspose", "ConstantArray",
-			"ContainsAll", "ContainsAny", "ContainsNone", "ContainsExactly", "ContainsOnly", "Context", "Continue",
-			"ContinuedFraction", "Convergents", "ConvexHullMesh", "CoprimeQ", "Correlation", "Cos", "Cosh",
-			"CosineDistance", "CosIntegral", "CoshIntegral", "Cot", "Coth", "Count", "Covariance", "CreateDirectory",
-			"Cross", "Csc", "Csch", "CubeRoot", "Curl", "Cyclotomic", "Decrement", "Default", "DefaultButton", "Defer",
-			"Definition", "Delete", "DeleteCases", "DeleteDuplicates", "Denominator", "Depth", "Derivative",
-			"DesignMatrix", "Det", "Diagonal", "DiagonalMatrix", "DialogInput", "DialogNotebook", "DialogReturn",
-			"DiceDissimilarity", "Differences", "DigitQ", "Dimensions", "DiracDelta", "DirichletEta", "DiscreteDelta",
-			"DiscreteUniformDistribution", "DirectedEdge", "DirectedInfinity", "Direction", "DirichletWindow",
-			"Discriminant", "DisjointQ", "Distribute", "Distributed", "Div", "Divide", "DivideBy", "Divisible",
-			"Divisors", "DivisorSigma", "Do", "Dot", "Drop", "Dynamic", "DSolve", "EasterSunday", "EdgeCount",
-			"EdgeList", "EdgeQ", "EdgeWeight", "EffectiveInterest", "Eigenvalues", "Eigenvectors", "Element",
-			"ElementData", "Eliminate", "EllipticE", "EllipticF", "EllipticK", "EllipticPi", "EllipticTheta", "End",
-			"EndPackage", "Equal", "Equivalent", "Erf", "Erfc", "Erfi", "ErlangDistribution", "EuclideanDistance",
-			"EulerE", "EulerianGraphQ", "EulerPhi", "Evaluate", "EvenQ", "ExactNumberQ", "Except", "Exists", "Exp",
-			"Expand", "ExpandAll", "Expectation", "ExponentialDistribution", "ExpIntegralE", "ExpIntegralEi",
-			"Exponent", "Export", "ExportString", "ExpToTrig", "ExtendedGCD", "Extract", "Factor", "Factorial",
-			"Factorial2", "FactorInteger", "FactorSquareFree", "FactorSquareFreeList", "FactorTerms", "Flatten",
-			"FlattenAt", "FlatTopWindow", "Fibonacci", "FindEulerianCycle", "FindFit", "FindEdgeCover",
-			"FindIndependentEdgeSet", "FindIndependentVertexSet", "FindHamiltonianCycle", "FindInstance", "FindRoot",
-			"FindShortestPath", "FindShortestTour", "FindSpanningTree", "FindVertexCover", "First", "Fit", "FiveNum",
-			"FixedPoint", "FixedPointList", "Floor", "Fold", "FoldList", "For", "ForAll", "Fourier", "FourierMatrix",
+	public final static String[] FUNCTION_STRINGS = { "Abort", "Abs", "AbsArg", "AbsoluteCorrelation", "Accumulate",
+			"AddTo", "AdjacencyMatrix", "AiryAi", "AiryAiPrime", "AiryBi", "AiryBiPrime", "AllTrue", "And",
+			"AngleVector", "AnyTrue", "AntihermitianMatrixQ", "AntiSymmetric", "AntisymmetricMatrixQ", "Annuity",
+			"AnnuityDue", "AlgebraicNumber", "Alternatives", "Apart", "AppellF1", "Append", "AppendTo", "Apply",
+			"ArcCos", "ArcCosh", "ArcCot", "ArcCoth", "ArcCsc", "ArcCsch", "ArcSec", "ArcSech",
+			"ArithmeticGeometricMean", "ArcSin", "ArcSinh", "ArcTan", "ArcTanh", "Arg", "ArgMax", "ArgMin", "Array",
+			"ArrayDepth", "ArrayPad", "ArrayReshape", "Arrays", "ArrayQ", "Association", "AssociationQ", "Assumptions",
+			"AtomQ", "Attributes", "BarChart", "BartlettWindow", "BaseForm", "Begin", "BeginPackage", "BellB", "BellY",
+			"BernoulliB", "BernoulliDistribution", "BesselI", "BesselJ", "BesselJZero", "BesselK", "BesselY",
+			"BesselYZero", "Beta", "BetaDistribution", "BetaRegularized", "BinarySerialize", "BinaryDeserialize",
+			"BinCounts", "Binomial", "BinomialDistribution", "BitLength", "BlackmanHarrisWindow",
+			"BlackmanNuttallWindow", "BlackmanWindow", "Blank", "BlankSequence", "BlankNullSequence", "Block", "Boole",
+			"BooleanQ", "BooleanConvert", "BooleanMinimize", "BooleanTable", "BooleanVariables", "BoxWhiskerChart",
+			"BrayCurtisDistance", "Break", "Button", "ByteArray", "ByteArrayQ", "ByteCount", "CanberraDistance",
+			"Cancel", "CancelButton", "CarmichaelLambda", "CartesianProduct", "Cases", "CatalanNumber", "Catch",
+			"Catenate", "CDF", "Ceiling", "CenterDot", "CentralMoment", "CForm", "CharacteristicPolynomial",
+			"ChebyshevT", "ChebyshevU", "Check", "ChessboardDistance", "ChineseRemainder", "ChiSquareDistribution",
+			"CholeskyDecomposition", "Chop", "CircleDot", "CirclePoints", "Clear", "ClearAll", "ClearAttributes",
+			"Clip", "Coefficient", "CoefficientList", "CoefficientRules", "Colon", "Column", "Collect", "Commonest",
+			"CompatibleUnitQ", "Complement", "Compile", "CompiledFunction", "Complex", "ComplexExpand", "ComposeList",
+			"ComposeSeries", "Composition", "CompoundExpression", "Condition", "ConditionalExpression",
+			"ConnectedGraphQ", "Conjugate", "ConjugateTranspose", "ConstantArray", "ContainsAll", "ContainsAny",
+			"ContainsNone", "ContainsExactly", "ContainsOnly", "Context", "Continue", "ContinuedFraction",
+			"Convergents", "ConvexHullMesh", "CoprimeQ", "Correlation", "Cos", "Cosh", "CosineDistance", "CosIntegral",
+			"CoshIntegral", "Cot", "Coth", "Count", "CountDistinct", "Counts", "Covariance", "CreateDirectory", "Cross",
+			"Csc", "Csch", "CubeRoot", "Curl", "Cyclotomic", "Dataset", "Decrement", "Default", "DefaultButton",
+			"Defer", "Definition", "Delete", "DeleteCases", "DeleteDuplicates", "Denominator", "DensityHistogram",
+			"DensityPlot", "Depth", "Derivative", "DesignMatrix", "Det", "Diagonal", "DiagonalMatrix", "DialogInput",
+			"DialogNotebook", "DialogReturn", "DiceDissimilarity", "Differences", "DigitCount", "DigitQ", "Dimensions",
+			"DiracDelta", "DirichletEta", "DiscreteDelta", "DiscreteUniformDistribution", "DirectedEdge",
+			"DirectedInfinity", "Direction", "DirichletWindow", "Discriminant", "DisjointQ", "Distribute",
+			"Distributed", "Div", "Divide", "DivideBy", "Divisible", "Divisors", "DivisorSum", "DivisorSigma", "Do",
+			"Dot", "Drop", "Dynamic", "DSolve", "EasterSunday", "EdgeCount", "EdgeList", "EdgeQ", "EdgeWeight",
+			"EffectiveInterest", "Eigenvalues", "Eigenvectors", "Element", "ElementData", "Eliminate", "EllipticE",
+			"EllipticF", "EllipticK", "EllipticPi", "EllipticTheta", "End", "EndPackage", "Equal", "Equivalent", "Erf",
+			"Erfc", "Erfi", "ErlangDistribution", "EuclideanDistance", "EulerE", "EulerianGraphQ", "EulerPhi",
+			"Evaluate", "EvenQ", "ExactNumberQ", "Except", "Exists", "Exp", "Expand", "ExpandAll", "Expectation",
+			"ExponentialDistribution", "ExpIntegralE", "ExpIntegralEi", "Exponent", "Export", "ExportString",
+			"ExpToTrig", "ExtendedGCD", "Extract", "Factor", "Factorial", "Factorial2", "FactorInteger",
+			"FactorSquareFree", "FactorSquareFreeList", "FactorTerms", "Flatten", "FlattenAt", "FlatTopWindow",
+			"Fibonacci", "FindEulerianCycle", "FindFit", "FindEdgeCover", "FindIndependentEdgeSet",
+			"FindIndependentVertexSet", "FindHamiltonianCycle", "FindInstance", "FindRoot", "FindShortestPath",
+			"FindShortestTour", "FindSpanningTree", "FindVertexCover", "First", "Fit", "FiveNum", "FixedPoint",
+			"FixedPointList", "Floor", "Fold", "FoldList", "For", "ForAll", "Fourier", "FourierMatrix",
 			"FRatioDistribution", "FractionalPart", "FrechetDistribution", "FreeQ", "FresnelC", "FresnelS",
 			"FrobeniusNumber", "FrobeniusSolve", "FromCharacterCode", "FromContinuedFraction", "FromDigits",
 			"FromPolarCoordinates", "FullForm", "FullSimplify", "Function", "FunctionExpand", "FunctionRange", "Gamma",
 			"GammaDistribution", "GammaRegularized", "Gather", "GatherBy", "GaussianMatrix", "GaussianWindow", "GCD",
 			"GegenbauerC", "GeodesyData", "GeoDistance", "GeometricDistribution", "GeometricMean", "GeoPosition", "Get",
 			"Grad", "Graph", "GraphCenter", "GraphData", "GraphDiameter", "Graphics", "Graphics3D", "GraphPeriphery",
-			"GraphQ", "GraphRadius", "Greater", "GreaterEqual", "GroebnerBasis", "GumbelDistribution",
+			"GraphQ", "GraphRadius", "Greater", "GreaterEqual", "GroebnerBasis", "GroupBy", "GumbelDistribution",
 			"HamiltonianGraphQ", "HammingWindow", "HankelH1", "HankelH2", "HannWindow", "Haversine", "HarmonicMean",
-			"HarmonicNumber", "Head", "HeavisideTheta", "HermiteH", "HermitianMatrixQ", "HilbertMatrix", "Hold",
-			"HoldForm", "HoldPattern", "Horner", "HornerForm", "HurwitzZeta", "HypergeometricDistribution",
+			"HarmonicNumber", "Head", "HeavisideTheta", "HermiteH", "HermitianMatrixQ", "HilbertMatrix", "Histogram",
+			"Hold", "HoldForm", "HoldPattern", "Horner", "HornerForm", "HurwitzZeta", "HypergeometricDistribution",
 			"HypergeometricPFQ", "HypergeometricU", "Hypergeometric0F1", "Hypergeometric1F1",
 			"Hypergeometric1F1Regularized", "Hypergeometric2F1", "HypergeometricPFQRegularized", "Identity",
 			"IdentityMatrix", "If", "Im", "Implies", "Import", "Increment", "Inequality", "InexactNumberQ", "Infix",
@@ -121,22 +126,23 @@ public class AST2Expr {
 			"Integrate", "Interpolation", "InterpolatingFunction", "InterpolatingPolynomial", "IntersectingQ",
 			"Interrupt", "Intersection", "Inverse", "InverseFourier", "InverseBetaRegularized", "InverseCDF",
 			"InverseErf", "InverseErfc", "InverseFunction", "InverseGammaRegularized", "InverseHaversine",
-			"InverseLaplaceTransform", "InverseSeries", "InverseWeierstrassP", "JaccardDissimilarity", "JacobiMatrix",
-			"JacobiSymbol", "JacobiZeta", "JavaForm", "JSForm", "JSFormData", "Join", "KnownUnitQ",
-			"KolmogorovSmirnovTest", "KOrderlessPartitions", "KPartitions", "KroneckerDelta", "Kurtosis", "Last", "LCM",
-			"LeafCount", "LaguerreL", "LaplaceTransform", "LeastSquares", "LegendreP", "LegendreQ", "Length", "Less",
-			"LessEqual", "LetterQ", "Level", "LevelQ", "Limit", "Line", "LinearModelFit", "LinearProgramming",
-			"LinearRecurrence", "LinearSolve", "LiouvilleLambda", "List", "ListConvolve", "ListCorrelate",
-			"ListLinePlot", "ListPlot", "ListPlot3D", "ListQ", "Literal", "Log", "Log2", "Log10", "LogGamma",
-			"LogNormalDistribution", "LogicalExpand", "LogisticSigmoid", "LogIntegral", "LowerCaseQ",
-			"LowerTriangularize", "LucasL", "LUDecomposition", "MachineNumberQ", "MangoldtLambda", "ManhattanDistance",
-			"Manipulate", "MantissaExponent", "Map", "MapAt", "MapAll", "MapIndexed", "MapThread",
+			"InverseLaplaceTransform", "InverseSeries", "InverseWeierstrassP", "JaccardDissimilarity",
+			"JacobiAmplitude", "JacobiMatrix", "JacobiSymbol", "JacobiCN", "JacobiDN", "JacobiSN", "JacobiZeta",
+			"JavaForm", "JSForm", "JSFormData", "Join", "Key", "KeyExistsQ", "Keys", "KeySort", "KleinInvariantJ",
+			"KnownUnitQ", "KolmogorovSmirnovTest", "KOrderlessPartitions", "KPartitions", "KroneckerDelta", "Kurtosis",
+			"Last", "LCM", "LeafCount", "LaguerreL", "LaplaceTransform", "LeastSquares", "LegendreP", "LegendreQ",
+			"Length", "Less", "LessEqual", "LetterQ", "Level", "LevelQ", "Limit", "Line", "LinearModelFit",
+			"LinearProgramming", "LinearRecurrence", "LinearSolve", "LiouvilleLambda", "List", "ListConvolve",
+			"ListCorrelate", "ListLinePlot", "ListPlot", "ListPlot3D", "ListQ", "Literal", "Log", "Log2", "Log10",
+			"LogGamma", "LogNormalDistribution", "LogicalExpand", "LogisticSigmoid", "LogIntegral", "Lookup",
+			"LowerCaseQ", "LowerTriangularize", "LucasL", "LUDecomposition", "MachineNumberQ", "MangoldtLambda",
+			"ManhattanDistance", "Manipulate", "MantissaExponent", "Map", "MapAt", "MapAll", "MapIndexed", "MapThread",
 			"MatchingDissimilarity", "MatchQ", "MathMLForm", "MatrixExp", "MatrixForm", "MatrixMinimalPolynomial",
-			"MatrixPower", "MatrixQ", "MatrixRank", "Max", "MaxFilter", "Maximize", "Mean", "MeanFilter",
+			"MatrixPlot", "MatrixPower", "MatrixQ", "MatrixRank", "Max", "MaxFilter", "Maximize", "Mean", "MeanFilter",
 			"MeanDeviation", "Median", "MedianFilter", "MeijerG", "MemberQ", "MeshRange", "MessageName", "Message",
 			"Messages", "MersennePrimeExponent", "MersennePrimeExponentQ", "Min", "MinFilter", "MinimalPolynomial",
-			"Minimize", "Minus", "Missing", "MissingQ", "Mod", "Module", "MoebiusMu", "MonomialList", "Most",
-			"Multinomial", "MultiplicativeOrder", "NakagamiDistribution", "Names", "Nand", "NDSolve", "Nearest",
+			"Minimize", "MinMax", "Minus", "Missing", "MissingQ", "Mod", "Module", "MoebiusMu", "MonomialList", "Most",
+			"Multinomial", "MultiplicativeOrder", "NakagamiDistribution", "Names", "Nand", "ND", "NDSolve", "Nearest",
 			"Negative", "Nest", "NestList", "NestWhile", "NestWhileList", "NextPrime", "NFourierTransform",
 			"NIntegrate", "NMaximize", "NMinimize", "NonCommutativeMultiply", "NonNegative", "NonPositive", "NoneTrue",
 			"Nor", "Normal", "Normalize", "Norm", "NormalDistribution", "Not", "NotElement", "NotListQ", "NRoots",
@@ -145,44 +151,46 @@ public class AST2Expr {
 			"OrderedQ", "Orthogonalize", "OrthogonalMatrixQ", "Out", "Outer", "OutputForm", "OutputStream", "Package",
 			"PadLeft", "PadRight", "ParametricPlot", "Part", "Partition", "PartitionsP", "PartitionsQ", "PatternOrder",
 			"ParzenWindow", "PearsonChiSquareTest", "PerfectNumber", "PerfectNumberQ", "Pattern", "PatternTest", "PDF",
-			"Permutations", "Piecewise", "Plot", "PlotRange", "Plot3D", "Plus", "Pochhammer", "PolarPlot", "Point",
-			"PoissonDistribution", "PolyGamma", "Polygon", "PolyLog", "PolynomialExtendedGCD", "PolynomialGCD",
-			"PolynomialLCM", "PolynomialQ", "PolynomialQuotient", "PolynomialQuotientRemainder", "PolynomialRemainder",
-			"Position", "Positive", "PossibleZeroQ", "Postefix", "Power", "PowerExpand", "PowerMod", "Precision",
-			"PreDecrement", "Prefix", "PreIncrement", "Prepend", "PrependTo", "Prime", "PrimeOmega", "PrimePi",
-			"PrimePowerQ", "PrimeQ", "PrimitiveRoot", "PrimitiveRootList", "Print", "Probability", "Product",
-			"ProductLog", "Projection", "Protect", "PseudoInverse", "Put", "QRDecomposition", "Quantile", "Quantity",
-			"QuantityDistribution", "QuantityMagnitude", "QuantityQ", "Quiet", "Quit", "Quotient", "QuotientRemainder",
+			"Permutations", "PieChart", "Piecewise", "PiecewiseExpand", "Plot", "PlotRange", "Plot3D", "Plus",
+			"Pochhammer", "PolarPlot", "Point", "PoissonDistribution", "PolyGamma", "Polygon", "PolyLog",
+			"PolynomialExtendedGCD", "PolynomialGCD", "PolynomialLCM", "PolynomialQ", "PolynomialQuotient",
+			"PolynomialQuotientRemainder", "PolynomialRemainder", "Position", "Positive", "PossibleZeroQ", "Postefix",
+			"Power", "PowerExpand", "PowerMod", "Precision", "PreDecrement", "Prefix", "PreIncrement", "Prepend",
+			"PrependTo", "Prime", "PrimeOmega", "PrimePi", "PrimePowerQ", "PrimeQ", "PrimitiveRoot",
+			"PrimitiveRootList", "Print", "Probability", "Product", "ProductLog", "Projection", "Protect",
+			"PseudoInverse", "Put", "QRDecomposition", "Quantile", "Quantity", "QuantityDistribution",
+			"QuantityMagnitude", "QuantityQ", "Quartiles", "Quiet", "Quit", "Quotient", "QuotientRemainder", "Ramp",
 			"RandomChoice", "RandomInteger", "RandomPrime", "RandomReal", "RandomSample", "RandomVariate", "Range",
 			"Rational", "Rationalize", "Re", "RealNumberQ", "Reap", "Rectangle", "Reduce", "Refine",
 			"RegularExpression", "Remove", "Repeated", "RepeatedNull", "Replace", "ReplaceAll", "ReplaceList",
 			"ReplacePart", "ReplaceRepeated", "Rescale", "Rest", "Resultant", "Return", "Reverse", "Riffle",
 			"RogersTanimotoDissimilarity", "RootIntervals", "Root", "RootOf", "Roots", "RotateLeft", "RotateRight",
 			"RotationMatrix", "Round", "Row", "RowReduce", "Rule", "RuleDelayed", "RussellRaoDissimilarity", "Surd",
-			"SameQ", "SatisfiabilityCount", "SatisfiabilityInstances", "SatisfiableQ", "Scan", "Sec", "Sech", "Select",
-			"Sequence", "Series", "SeriesCoefficient", "SeriesData", "Set", "SetAttributes", "SetDelayed", "Share",
-			"Show", "Sign", "SignCmp", "Simplify", "Sin", "Sinc", "SingularValueDecomposition", "Sinh", "SinIntegral",
-			"SinhIntegral", "Skewness", "SokalSneathDissimilarity", "Solve", "Sort", "SortBy", "Sow", "Span",
-			"SphericalBesselJ", "SphericalBesselY", "SphericalHankelH1", "SphericalHankelH2", "Split", "SplitBy",
-			"Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "SquareMatrixQ", "StandardDeviation", "StandardForm",
-			"Standardize", "StieltjesGamma", "StirlingS1", "StirlingS2", "StringDrop", "StringJoin", "StringLength",
-			"StringRiffle", "StringTake", "StringQ", "StringReplace", "StruveH", "StruveL", "StudentTDistribution",
-			"Subdivide", "Subfactorial", "Subscript", "Subsuperscript", "SubsetQ", "Subsets", "Subtract",
-			"SubtractFrom", "Sum", "Superscript", "SurfaceGraphics", "SurvivalFunction", "Switch", "SyntaxLength",
-			"SymbolName", "SymbolQ", "Symmetric", "SymmetricMatrixQ", "SyntaxQ", "SystemDialogInput", "Table",
-			"TableForm", "TagSet", "TagSetDelayed", "Take", "Tally", "Tan", "Tanh", "TautologyQ", "Taylor",
-			"TensorDimensions", "TensorProduct", "TensorRank", "TensorSymmetry", "TextCell", "TextString", "TeXForm",
-			"Thread", "Through", "Throw", "TimeConstrained", "Times", "TimesBy", "TimeValue", "Timing",
-			"ToCharacterCode", "ToExpression", "ToeplitzMatrix", "Together", "ToPolarCoordinates", "ToRadicals",
-			"ToString", "Total", "ToUnicode", "Tr", "Trace", "TraceForm", "TraditionalForm", "Transpose", "TreeForm",
-			"TrigExpand", "TrigReduce", "TrigToExp", "TrueQ", "TukeyWindow", "Tuples", "TwoWayRule", "Undefined",
-			"Underoverscript", "UndirectedEdge", "Unequal", "Unevaluated", "UniformDistribution", "Union", "Unique",
-			"UnitaryMatrixQ", "UnitConvert", "Unitize", "UnitStep", "UnitVector", "Unprotect", "UnsameQ", "Unset",
-			"UpperCaseQ", "UpperTriangularize", "UpSet", "UpSetDelayed", "ValueQ", "VandermondeMatrix", "Variables",
-			"Variance", "VectorAngle", "VectorQ", "VertexEccentricity", "VertexList", "VertexQ", "WeibullDistribution",
-			"WeierstrassHalfPeriods", "WeierstrassInvariants", "WeierstrassP", "WeierstrassPPrime",
-			"WeightedAdjacencyMatrix", "Which", "While", "With", "WriteString", "Xor", "YuleDissimilarity",
-			"ZeroSymmetric", "Zeta" };
+			"SameQ", "SatisfiabilityCount", "SatisfiabilityInstances", "SatisfiableQ", "Scaled", "Scan", "Sec", "Sech",
+			"Select", "SemanticImport", "SemanticImportString", "Sequence", "Series", "SeriesCoefficient", "SeriesData",
+			"Set", "SetAttributes", "SetDelayed", "Share", "Show", "Sign", "SignCmp", "Simplify", "Sin", "Sinc",
+			"SingularValueDecomposition", "Sinh", "SinIntegral", "SinhIntegral", "Skewness", "SokalSneathDissimilarity",
+			"Solve", "Sort", "SortBy", "Sow", "Span", "SphericalBesselJ", "SphericalBesselY", "SphericalHankelH1",
+			"SphericalHankelH2", "Split", "SplitBy", "Sqrt", "SquaredEuclideanDistance", "SquareFreeQ", "SquareMatrixQ",
+			"StandardDeviation", "StandardForm", "Standardize", "StieltjesGamma", "StirlingS1", "StirlingS2",
+			"StringCases", "StringContainsQ", "StringDrop", "StringExpression", "StringJoin", "StringLength",
+			"StringMatchQ", "StringPart", "StringRiffle", "StringSplit", "StringTake", "StringQ", "StringReplace",
+			"StruveH", "StruveL", "StudentTDistribution", "Subdivide", "Subfactorial", "Subscript", "Subsuperscript",
+			"SubsetQ", "Subsets", "Subtract", "SubtractFrom", "Sum", "Superscript", "SurfaceGraphics",
+			"SurvivalFunction", "Switch", "SyntaxLength", "SymbolName", "SymbolQ", "Symmetric", "SymmetricMatrixQ",
+			"SyntaxQ", "SystemDialogInput", "Table", "TableForm", "TagSet", "TagSetDelayed", "Take", "TakeLargest",
+			"TakeLargestBy", "Tally", "Tan", "Tanh", "TautologyQ", "Taylor", "TensorDimensions", "TensorProduct",
+			"TensorRank", "TensorSymmetry", "TextCell", "TextString", "TeXForm", "Thread", "Through", "Throw",
+			"TimeConstrained", "Times", "TimesBy", "TimeValue", "Timing", "ToCharacterCode", "ToExpression",
+			"ToeplitzMatrix", "Together", "ToPolarCoordinates", "ToRadicals", "ToString", "Total", "ToUnicode", "Tr",
+			"Trace", "TraceForm", "TraditionalForm", "Transpose", "TreeForm", "TrigExpand", "TrigReduce", "TrigToExp",
+			"TrueQ", "TukeyWindow", "Tuples", "TwoWayRule", "Undefined", "Underoverscript", "UndirectedEdge", "Unequal",
+			"Unevaluated", "UniformDistribution", "Union", "Unique", "UnitaryMatrixQ", "UnitConvert", "Unitize",
+			"UnitStep", "UnitVector", "Unprotect", "UnsameQ", "Unset", "UpperCaseQ", "UpperTriangularize", "UpSet",
+			"UpSetDelayed", "ValueQ", "Values", "VandermondeMatrix", "Variables", "Variance", "VectorAngle", "VectorQ",
+			"VertexEccentricity", "VertexList", "VertexQ", "WeibullDistribution", "WeierstrassHalfPeriods",
+			"WeierstrassInvariants", "WeierstrassP", "WeierstrassPPrime", "WeightedAdjacencyMatrix", "Which", "While",
+			"With", "WriteString", "Xor", "YuleDissimilarity", "ZeroSymmetric", "Zeta" };
 
 	public static Map<String, Integer> RUBI_STATISTICS_MAP;
 
@@ -369,8 +377,22 @@ public class AST2Expr {
 
 			int functionID = ast.headID();
 			if (functionID > ID.UNKNOWN) {
+				try {
 				IExpr expr;
 				switch (functionID) {
+					case ID.Association:
+						if (ast.isAST1() && ast.arg1().isList()) {
+							IExpr arg1 = ast.arg1();
+							if (arg1.isListOfRules(true)) {
+								return F.assoc((IAST) arg1);
+							} else if (arg1.isAST(F.List, 2)) {
+								arg1 = arg1.first();
+								if (arg1.isListOfRules(true)) {
+									return F.assoc((IAST) arg1);
+								}
+							}
+						}
+						break;
 				case ID.N:
 					if (ast.isAST2() && ast.arg2().isInteger()) {
 						try {
@@ -380,7 +402,7 @@ public class AST2Expr {
 								ast.set(1, convertNode(functionNode.get(1)));
 							}
 							return ast;
-						} catch (WrongArgumentType wat) {
+							} catch (ValidateException ve) {
 
 						}
 					}
@@ -439,6 +461,11 @@ public class AST2Expr {
 					}
 					break;
 				}
+				} catch (ValidateException ve) {
+					if (Config.SHOW_STACKTRACE) {
+						ve.printStackTrace();
+					}
+				}
 			}
 			return ast;
 		}
@@ -476,9 +503,9 @@ public class AST2Expr {
 			final IntegerNode integerNode = (IntegerNode) node;
 			final String iStr = integerNode.getString();
 			if (iStr != null) {
-				return F.integer(iStr, integerNode.getNumberFormat());
+				return F.ZZ(iStr, integerNode.getNumberFormat());
 			}
-			return F.integer(integerNode.getIntValue());
+			return F.ZZ(integerNode.getIntValue());
 		}
 		if (node instanceof FractionNode) {
 			FractionNode fr = (FractionNode) node;
