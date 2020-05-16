@@ -42,5 +42,6 @@ Other options include `MaxIterations` and `MaxPoints`
 ```
 
 ### Related terms 
-[D](D.md), [Integrate](Integrate.md) 
+[D](D.md), [DSolve](DSolve.md), [Integrate](Integrate.md), [Limit](Limit.md), [ND](ND.md)
+
 		
