@@ -1,7 +1,5 @@
 package org.apfloat;
 
-import com.duy.util.MapWrapper;
-
 import org.apfloat.spi.Util;
 
 import java.math.RoundingMode;
@@ -48,7 +46,7 @@ public class ApfloatMath
      */
 
     public static Apfloat pow(Apfloat x, long n)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         if (n == 0)
         {
@@ -107,7 +105,7 @@ public class ApfloatMath
      */
 
     public static Apfloat sqrt(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         return root(x, 2);
     }
@@ -121,7 +119,7 @@ public class ApfloatMath
      */
 
     public static Apfloat cbrt(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return root(x, 3);
     }
@@ -138,7 +136,7 @@ public class ApfloatMath
      */
 
     public static Apfloat root(Apfloat x, long n)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         if (n == 0)
         {
@@ -188,7 +186,7 @@ public class ApfloatMath
      */
 
     public static Apfloat inverseRoot(Apfloat x, long n)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         return inverseRoot(x, n, x.precision());
     }
@@ -207,7 +205,7 @@ public class ApfloatMath
      */
 
     public static Apfloat inverseRoot(Apfloat x, long n, long targetPrecision)
-        throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
+            throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
     {
         return inverseRoot(x, n, targetPrecision, null);
     }
@@ -227,7 +225,7 @@ public class ApfloatMath
      */
 
     public static Apfloat inverseRoot(Apfloat x, long n, long targetPrecision, Apfloat initialGuess)
-        throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
+            throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
     {
         return inverseRoot(x, n, targetPrecision, initialGuess, initialGuess == null ? 0 : initialGuess.precision());
     }
@@ -252,7 +250,7 @@ public class ApfloatMath
      */
 
     public static Apfloat inverseRoot(Apfloat x, long n, long targetPrecision, Apfloat initialGuess, long initialPrecision)
-        throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
+            throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
     {
         if (x.signum() == 0)
         {
@@ -291,7 +289,7 @@ public class ApfloatMath
         }
 
         long precision,
-             doublePrecision = ApfloatHelper.getDoublePrecision(x.radix());
+                doublePrecision = ApfloatHelper.getDoublePrecision(x.radix());
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix()),
                 divisor = new Apfloat(n, Apfloat.INFINITE, x.radix()),
                 result;
@@ -300,7 +298,7 @@ public class ApfloatMath
         {
             // Calculate initial guess from x
             long scaleQuot = x.scale() / n,
-                 scaleRem = x.scale() - scaleQuot * n;
+                    scaleRem = x.scale() - scaleQuot * n;
 
             result = x.precision(doublePrecision);
             result = scale(result, -result.scale());    // Allow scales in exess of doubles'
@@ -379,7 +377,7 @@ public class ApfloatMath
      */
 
     public static Apint floor(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return x.floor();
     }
@@ -394,7 +392,7 @@ public class ApfloatMath
      */
 
     public static Apint ceil(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return x.ceil();
     }
@@ -408,7 +406,7 @@ public class ApfloatMath
      */
 
     public static Apint truncate(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return x.truncate();
     }
@@ -424,7 +422,7 @@ public class ApfloatMath
      */
 
     public static Apfloat frac(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return x.frac();
     }
@@ -445,7 +443,7 @@ public class ApfloatMath
      */
 
     public static Apfloat round(Apfloat x, long precision, RoundingMode roundingMode)
-        throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
+            throws IllegalArgumentException, ArithmeticException, ApfloatRuntimeException
     {
         return RoundingHelper.round(x, precision, roundingMode);
     }
@@ -462,7 +460,7 @@ public class ApfloatMath
 
     @Deprecated
     public static Apfloat negate(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return x.negate();
     }
@@ -476,7 +474,7 @@ public class ApfloatMath
      */
 
     public static Apfloat abs(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (x.signum() >= 0)
         {
@@ -500,7 +498,7 @@ public class ApfloatMath
      */
 
     public static Apfloat copySign(Apfloat x, Apfloat y)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (y.signum() == 0)
         {
@@ -526,7 +524,7 @@ public class ApfloatMath
      */
 
     public static Apfloat scale(Apfloat x, long scale)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (scale == 0 || x.signum() == 0)
         {
@@ -571,7 +569,7 @@ public class ApfloatMath
      */
 
     public static Apfloat[] modf(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         Apfloat[] result = new Apfloat[2];
 
@@ -598,7 +596,7 @@ public class ApfloatMath
      */
 
     public static Apfloat fmod(Apfloat x, Apfloat y)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (y.signum() == 0)
         {
@@ -671,7 +669,7 @@ public class ApfloatMath
      */
 
     public static Apfloat multiplyAdd(Apfloat a, Apfloat b, Apfloat c, Apfloat d)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return multiplyAddOrSubtract(a, b, c, d, false);
     }
@@ -691,13 +689,13 @@ public class ApfloatMath
      */
 
     public static Apfloat multiplySubtract(Apfloat a, Apfloat b, Apfloat c, Apfloat d)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return multiplyAddOrSubtract(a, b, c, d, true);
     }
 
     private static Apfloat multiplyAddOrSubtract(Apfloat a, Apfloat b, Apfloat c, Apfloat d, boolean subtract)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         long[] precisions;
         Apfloat ab, cd;
@@ -739,31 +737,15 @@ public class ApfloatMath
      */
 
     public static Apfloat agm(Apfloat a, Apfloat b)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (a.signum() == 0 || b.signum() == 0)         // Would not converge quadratically
         {
             return Apfloat.ZERO;
         }
 
-        if (abs(a).equals(abs(b)))                      // Would not converge quadratically
-        {
-            return a.signum() == b.signum() ? a.precision(Math.min(a.precision(), b.precision())) : Apfloat.ZERO;
-        }
-
-        if (a.signum() != b.signum())
-        {
-            throw new ArithmeticException("Non-real result");
-        }
-
-        boolean negate = a.signum() < 0;                // Thanks to Marko Gaspersic for finding several bugs in issue #12
-        if (negate)
-        {
-            a = a.negate();
-            b = b.negate();
-        }
         long workingPrecision = Math.min(a.precision(), b.precision()),
-             targetPrecision = workingPrecision;
+                targetPrecision = Math.max(a.precision(), b.precision());
 
         if (workingPrecision == Apfloat.INFINITE)
         {
@@ -776,7 +758,7 @@ public class ApfloatMath
         b = ApfloatHelper.ensurePrecision(b, workingPrecision);
 
         long precision = 0,
-             halfWorkingPrecision = (workingPrecision + 1) / 2;
+                halfWorkingPrecision = (workingPrecision + 1) / 2;
         final long CONVERGING = 1000;           // Arbitrarily chosen value...
         Apfloat two = new Apfloat(2, Apfloat.INFINITE, a.radix());
 
@@ -808,8 +790,7 @@ public class ApfloatMath
             precision *= 2;
         }
 
-        Apfloat result = a.add(b).divide(two).precision(targetPrecision);
-        return (negate ? result.negate() : result);
+        return a.add(b).divide(two).precision(targetPrecision);
     }
 
     /**
@@ -824,7 +805,7 @@ public class ApfloatMath
      */
 
     public static Apfloat pi(long precision)
-        throws IllegalArgumentException, NumberFormatException, ApfloatRuntimeException
+            throws IllegalArgumentException, ApfloatRuntimeException
     {
         ApfloatContext ctx = ApfloatContext.getContext();
         int radix = ctx.getDefaultRadix();
@@ -845,7 +826,7 @@ public class ApfloatMath
      */
 
     public static Apfloat pi(long precision, int radix)
-        throws IllegalArgumentException, NumberFormatException, ApfloatRuntimeException
+            throws IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision <= 0)
         {
@@ -857,7 +838,7 @@ public class ApfloatMath
         }
 
         // Get synchronization lock - getting the lock is also synchronized
-        Integer radixKey = getRadixKey(ApfloatMath.radixPiKeys, radix);
+        Integer radixKey = getRadixPiKey(new Integer(radix));   // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
 
         Apfloat pi;
 
@@ -881,6 +862,17 @@ public class ApfloatMath
         return pi;
     }
 
+    // Get shared radix key for synchronizing getting and calculating the pi related constants
+    private static Integer getRadixPiKey(Integer radix)
+    {
+        Integer radixKey = ApfloatMath.radixPiKeys.putIfAbsent(radix, radix);
+        if (radixKey == null)
+        {
+            radixKey = radix;
+        }
+
+        return radixKey;
+    }
 
     /**
      * Simple JavaBean to hold one apfloat. This class can
@@ -915,7 +907,7 @@ public class ApfloatMath
     private static class PiCalculator
     {
         public PiCalculator(int radix)
-            throws ApfloatRuntimeException
+                throws ApfloatRuntimeException
         {
             this.A = new Apfloat(13591409, Apfloat.INFINITE, radix);
             this.B = new Apfloat(545140134, Apfloat.INFINITE, radix);
@@ -928,7 +920,7 @@ public class ApfloatMath
         }
 
         private Apfloat a(long n)
-            throws ApfloatRuntimeException
+                throws ApfloatRuntimeException
         {
             Apfloat s = new Apfloat(n, Apfloat.INFINITE, this.radix),
                     v = this.A.add(this.B.multiply(s));
@@ -939,7 +931,7 @@ public class ApfloatMath
         }
 
         private Apfloat p(long n)
-            throws ApfloatRuntimeException
+                throws ApfloatRuntimeException
         {
             Apfloat v;
 
@@ -959,7 +951,7 @@ public class ApfloatMath
         }
 
         private Apfloat q(long n)
-            throws ApfloatRuntimeException
+                throws ApfloatRuntimeException
         {
             Apfloat v;
 
@@ -978,7 +970,7 @@ public class ApfloatMath
         }
 
         public void r(long n1, long n2, ApfloatHolder T, ApfloatHolder Q, ApfloatHolder P)
-            throws ApfloatRuntimeException
+                throws ApfloatRuntimeException
         {
             assert (n1 != n2);
             long length = n2 - n1;
@@ -995,8 +987,8 @@ public class ApfloatMath
             {
                 long nMiddle = (n1 + n2) / 2;
                 ApfloatHolder LT = new ApfloatHolder(),
-                              LQ = new ApfloatHolder(),
-                              LP = new ApfloatHolder();
+                        LQ = new ApfloatHolder(),
+                        LP = new ApfloatHolder();
 
                 r(n1, nMiddle, LT, LQ, LP);
                 r(nMiddle, n2, T, Q, P);
@@ -1021,7 +1013,7 @@ public class ApfloatMath
     // Uses the Chudnovskys' binary splitting algorithm.
     // Uses previously calculated terms (if such exist) to improve the precision of the calculation.
     private static Apfloat calculatePi(long precision, Integer radixKey)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         int radix = radixKey;
         PiCalculator piCalculator = ApfloatMath.radixPiCalculator.get(radixKey);
@@ -1037,14 +1029,14 @@ public class ApfloatMath
                 inverseRoot;
 
         ApfloatHolder RT = new ApfloatHolder(),
-                      RQ = new ApfloatHolder(),
-                      RP = new ApfloatHolder();
+                RQ = new ApfloatHolder(),
+                RP = new ApfloatHolder();
 
         // Perform the calculation of T, Q and P to infinite precision
         // to make possible to use them later for further calculations
 
         long neededTerms = (long) ((double) precision * Math.log((double) radix) / 32.65445004177),
-             workingPrecision = ApfloatHelper.extendPrecision(precision);   // To avoid cumulative round-off errors
+                workingPrecision = ApfloatHelper.extendPrecision(precision);   // To avoid cumulative round-off errors
 
         Long terms = ApfloatMath.radixPiTerms.get(radixKey);
         LT = ApfloatMath.radixPiT.get(radixKey);
@@ -1069,7 +1061,7 @@ public class ApfloatMath
             }
 
             // Improve the inverse root value from the current precision
-            inverseRoot = inverseRoot(new Apfloat(1823176476672000L, workingPrecision, radix), 2, workingPrecision, inverseRoot);
+            inverseRoot = inverseRoot(new Apfloat(640320, workingPrecision, radix), 2, workingPrecision, inverseRoot);
         }
         else
         {
@@ -1079,10 +1071,10 @@ public class ApfloatMath
             LQ = RQ.getApfloat();
             LP = RP.getApfloat();
 
-            inverseRoot = inverseRoot(new Apfloat(1823176476672000L, workingPrecision, radix), 2);
+            inverseRoot = inverseRoot(new Apfloat(640320, workingPrecision, radix), 2);
         }
 
-        Apfloat pi = inverseRoot(inverseRoot.multiply(LT), 1).multiply(LQ);
+        Apfloat pi = inverseRoot(inverseRoot.multiply(LT), 1).multiply(new Apfloat(53360, Apfloat.INFINITE, radix)).multiply(LQ);
 
         // Limit precisions to actual after extended working precisions
         inverseRoot = inverseRoot.precision(precision);
@@ -1109,11 +1101,11 @@ public class ApfloatMath
      *
      * @return Natural logarithm of <code>x</code>.
      *
-     * @exception java.lang.ArithmeticException If <code>x &lt;= 0</code>.
+     * @exception java.lang.ArithmeticException If <code>x <= 0</code>.
      */
 
     public static Apfloat log(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         return log(x, true);
     }
@@ -1129,13 +1121,13 @@ public class ApfloatMath
      *
      * @return Base-<code>b</code> logarithm of <code>x</code>.
      *
-     * @exception java.lang.ArithmeticException If <code>x &lt;= 0</code> or <code>b &lt;= 0</code>.
+     * @exception java.lang.ArithmeticException If <code>x <= 0</code> or <code>b <= 0</code>.
      *
      * @since 1.6
      */
 
     public static Apfloat log(Apfloat x, Apfloat b)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         long targetPrecision = Math.min(x.precision(), b.precision());
 
@@ -1150,7 +1142,7 @@ public class ApfloatMath
     }
 
     private static Apfloat log(Apfloat x, boolean multiplyByPi)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         if (x.signum() <= 0)
         {
@@ -1167,12 +1159,6 @@ public class ApfloatMath
         long targetPrecision = x.precision();
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix());
         long finalPrecision = Util.ifFinite(targetPrecision, targetPrecision - one.equalDigits(x));     // If the argument is close to 1, the result is less accurate
-        if (x.scale() > 1)
-        {
-            double logScale = Math.log((double) x.scale() - 1) / Math.log((double) x.radix());
-            logScale += Math.ulp(logScale);
-            finalPrecision = Util.ifFinite(finalPrecision, finalPrecision + (long) logScale);           // If the argument is very big, the result is more accurate
-        }
 
         long originalScale = x.scale();
 
@@ -1195,7 +1181,7 @@ public class ApfloatMath
     // Raw logarithm, regardless of x
     // Doesn't work for big x, but is faster if used alone for small numbers
     private static Apfloat rawLog(Apfloat x, boolean multiplyByPi)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         assert (x.signum() > 0);                                        // Must be real logarithm
 
@@ -1211,7 +1197,7 @@ public class ApfloatMath
         final int EXTRA_PRECISION = 25;
 
         long workingPrecision = ApfloatHelper.extendPrecision(targetPrecision),
-             n = targetPrecision / 2 + EXTRA_PRECISION;                 // Very rough estimate
+                n = targetPrecision / 2 + EXTRA_PRECISION;                 // Very rough estimate
 
         x = ApfloatHelper.extendPrecision(x, EXTRA_PRECISION);
 
@@ -1233,6 +1219,17 @@ public class ApfloatMath
         return log.precision(targetPrecision);
     }
 
+    // Get shared radix key for synchronizing getting and calculating the logarithm related constants
+    private static Integer getRadixLogKey(Integer radix)
+    {
+        Integer radixKey = ApfloatMath.radixLogKeys.putIfAbsent(radix, radix);
+        if (radixKey == null)
+        {
+            radixKey = radix;
+        }
+
+        return radixKey;
+    }
 
     /**
      * Gets or calculates logarithm of a radix to required precision.
@@ -1247,16 +1244,16 @@ public class ApfloatMath
      */
 
     public static Apfloat logRadix(long precision, int radix)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return logRadix(precision, radix, true);
     }
 
     private static Apfloat logRadix(long precision, int radix, boolean multiplyByPi)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         // Get synchronization lock - getting the lock is also synchronized
-        Integer radixKey = getRadixKey(ApfloatMath.radixLogKeys, radix);
+        Integer radixKey = getRadixLogKey(new Integer(radix));      // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
 
         Apfloat logRadix;
 
@@ -1305,7 +1302,7 @@ public class ApfloatMath
      */
 
     public static Apfloat exp(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         int radix = x.radix();
 
@@ -1315,24 +1312,11 @@ public class ApfloatMath
         }
 
         long targetPrecision = x.precision(),
-             precision,
-             doublePrecision = ApfloatHelper.getDoublePrecision(radix);
+                precision,
+                doublePrecision = ApfloatHelper.getDoublePrecision(radix);
 
         // If the argument is close to 0, the result is more accurate
-        if (x.scale() < 1)
-        {
-            targetPrecision = Util.ifFinite(targetPrecision, targetPrecision + 1 - x.scale());
-        }
-        // If the argument is very big, the result is less accurate
-        long finalPrecision = targetPrecision;
-        if (x.scale() > 1)
-        {
-            if (x.scale() - 1 >= targetPrecision)
-            {
-                throw new LossOfPrecisionException("Complete loss of accurate digits");
-            }
-            finalPrecision = Util.ifFinite(targetPrecision, targetPrecision - (x.scale() - 1));
-        }
+        targetPrecision = Util.ifFinite(targetPrecision, targetPrecision + Math.max(1 - x.scale(), 0));
 
         if (targetPrecision == Apfloat.INFINITE)
         {
@@ -1442,7 +1426,7 @@ public class ApfloatMath
             }
         }
 
-        return result.precision(finalPrecision);
+        return result.precision(targetPrecision);
     }
 
     /**
@@ -1460,7 +1444,7 @@ public class ApfloatMath
      */
 
     public static Apfloat pow(Apfloat x, Apfloat y)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         long targetPrecision = Math.min(x.precision(), y.precision());
 
@@ -1495,11 +1479,11 @@ public class ApfloatMath
      *
      * @return Inverse hyperbolic cosine of <code>x</code>.
      *
-     * @exception java.lang.ArithmeticException If <code>x &lt; 1</code>.
+     * @exception java.lang.ArithmeticException If <code>x < 1</code>.
      */
 
     public static Apfloat acosh(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix());
 
@@ -1515,7 +1499,7 @@ public class ApfloatMath
      */
 
     public static Apfloat asinh(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix());
 
@@ -1536,11 +1520,11 @@ public class ApfloatMath
      *
      * @return Inverse hyperbolic tangent of <code>x</code>.
      *
-     * @exception java.lang.ArithmeticException If <code>abs(x) &gt;= 1</code>.
+     * @exception java.lang.ArithmeticException If <code>abs(x) >= 1</code>.
      */
 
     public static Apfloat atanh(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix()),
                 two = new Apfloat(2, Apfloat.INFINITE, x.radix());
@@ -1557,7 +1541,7 @@ public class ApfloatMath
      */
 
     public static Apfloat cosh(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         Apfloat y = exp(x),
                 one = new Apfloat(1, Apfloat.INFINITE, x.radix()),
@@ -1575,7 +1559,7 @@ public class ApfloatMath
      */
 
     public static Apfloat sinh(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         Apfloat y = exp(x),
                 one = new Apfloat(1, Apfloat.INFINITE, x.radix()),
@@ -1593,27 +1577,14 @@ public class ApfloatMath
      */
 
     public static Apfloat tanh(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
-        return tanh(x, x.signum() > 0);
-    }
-
-    static Apfloat tanhFixedPrecision(Apfloat x)
-        throws ApfloatRuntimeException
-    {
-        return tanh(x, x.signum() < 0);
-    }
-
-    private static Apfloat tanh(Apfloat x, boolean negate)
-        throws ApfloatRuntimeException
-    {
-        x = (negate ? x.negate() : x);
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix()),
                 two = new Apfloat(2, Apfloat.INFINITE, x.radix()),
-                y = exp(two.multiply(x));
+                y = exp(two.multiply(abs(x)));
 
         y = y.subtract(one).divide(y.add(one));
-        return (negate ? y.negate() : y);
+        return (x.signum() < 0 ? y.negate() : y);
     }
 
     /**
@@ -1623,11 +1594,11 @@ public class ApfloatMath
      *
      * @return Inverse cosine of <code>x</code>.
      *
-     * @exception java.lang.ArithmeticException If <code>abs(x) &gt; 1</code>.
+     * @exception java.lang.ArithmeticException If <code>abs(x) > 1</code>.
      */
 
     public static Apfloat acos(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix());
         Apcomplex i = new Apcomplex(Apfloat.ZERO, one);
@@ -1642,11 +1613,11 @@ public class ApfloatMath
      *
      * @return Inverse sine of <code>x</code>.
      *
-     * @exception java.lang.ArithmeticException If <code>abs(x) &gt; 1</code>.
+     * @exception java.lang.ArithmeticException If <code>abs(x) > 1</code>.
      */
 
     public static Apfloat asin(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix());
         Apcomplex i = new Apcomplex(Apfloat.ZERO, one);
@@ -1663,7 +1634,7 @@ public class ApfloatMath
      */
 
     public static Apfloat atan(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         Apfloat one = new Apfloat(1, Apfloat.INFINITE, x.radix()),
                 two = new Apfloat(2, Apfloat.INFINITE, x.radix());
@@ -1675,57 +1646,52 @@ public class ApfloatMath
     /**
      * Converts cartesian coordinates to polar coordinates. Calculated using complex functions.<p>
      *
-     * Computes the phase angle by computing an arc tangent of <code>y/x</code> in the range of -&pi; &lt; angle &lt;= &pi;.
+     * Computes the phase angle by computing an arc tangent of <code>x/y</code> in the range of -&pi; < angle <= &pi;.
      *
-     * @param y The argument.
      * @param x The argument.
+     * @param y The argument.
      *
-     * @return The angle of the point <code>(x, y)</code> in the plane.
+     * @return The angle of the point <code>(y, x)</code> in the plane.
      *
-     * @exception java.lang.ArithmeticException If <code>y</code> and <code>x</code> are both zero.
+     * @exception java.lang.ArithmeticException If <code>x</code> and <code>y</code> are both zero.
      */
 
-    public static Apfloat atan2(Apfloat y, Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+    public static Apfloat atan2(Apfloat x, Apfloat y)
+            throws ArithmeticException, ApfloatRuntimeException
     {
-        if (x.signum() == 0)
-        {
         if (y.signum() == 0)
         {
+            if (x.signum() == 0)
+            {
                 throw new ArithmeticException("Angle of (0, 0)");
             }
 
-            Apfloat pi = pi(y.precision(), y.radix()),
-                    two = new Apfloat(2, Apfloat.INFINITE, y.radix());
+            Apfloat pi = pi(x.precision(), x.radix()),
+                    two = new Apfloat(2, Apfloat.INFINITE, x.radix());
 
-            return new Apfloat(y.signum(), Apfloat.INFINITE, y.radix()).multiply(pi).divide(two);
+            return new Apfloat(x.signum(), Apfloat.INFINITE, x.radix()).multiply(pi).divide(two);
         }
-        else if (y.signum() == 0)
+        else if (x.signum() == 0)
         {
-            if (x.signum() > 0)
+            if (y.signum() > 0)
             {
                 return Apfloat.ZERO;
             }
 
-            return pi(x.precision(), x.radix());
+            return pi(y.precision(), y.radix());
         }
-        else if (Math.min(y.precision(), x.precision()) == Apfloat.INFINITE)
+        else if (Math.min(x.precision(), y.precision()) == Apfloat.INFINITE)
         {
             throw new InfiniteExpansionException("Cannot calculate atan2 to infinite precision");
         }
-        else if (x.signum() > 0 && y.scale() < x.scale())
-        {
-            // The log formula below is inaccurate if y is small in magnitude compared to x
-            return atan(y.divide(x));
-        }
         else
         {
-            long maxScale = Math.max(y.scale(), x.scale());
+            long maxScale = Math.max(x.scale(), y.scale());
 
-            y = scale(y, -maxScale);    // Now neither y nor x is zero
-            x = scale(x, -maxScale);
+            x = scale(x, -maxScale);    // Now neither x nor y is zero
+            y = scale(y, -maxScale);
 
-            return ApcomplexMath.log(new Apcomplex(x, y)).imag();
+            return ApcomplexMath.log(new Apcomplex(y, x)).imag();
         }
     }
 
@@ -1738,7 +1704,7 @@ public class ApfloatMath
      */
 
     public static Apfloat cos(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return ApcomplexMath.exp(new Apcomplex(Apfloat.ZERO, x)).real();
     }
@@ -1752,7 +1718,7 @@ public class ApfloatMath
      */
 
     public static Apfloat sin(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return ApcomplexMath.exp(new Apcomplex(Apfloat.ZERO, x)).imag();
     }
@@ -1768,7 +1734,7 @@ public class ApfloatMath
      */
 
     public static Apfloat tan(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         Apcomplex w = ApcomplexMath.exp(new Apcomplex(Apfloat.ZERO, x));
 
@@ -1792,7 +1758,7 @@ public class ApfloatMath
      */
 
     public static Apfloat w(Apfloat x)
-        throws ArithmeticException, ApfloatRuntimeException
+            throws ArithmeticException, ApfloatRuntimeException
     {
         return LambertWHelper.w(x);
     }
@@ -1808,9 +1774,9 @@ public class ApfloatMath
      */
 
     public static Apfloat toDegrees(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
-        return x.signum() == 0 ? x : x.multiply(new Apfloat(180, Apfloat.INFINITE, x.radix())).divide(pi(x.precision(), x.radix()));    // Thanks to Marko Gaspersic for finding the bug in issue #11
+        return x.multiply(new Apfloat(180, Apfloat.INFINITE, x.radix())).divide(pi(x.precision(), x.radix()));
     }
 
     /**
@@ -1824,9 +1790,9 @@ public class ApfloatMath
      */
 
     public static Apfloat toRadians(Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
-        return x.signum() == 0 ? x : x.divide(new Apfloat(180, Apfloat.INFINITE, x.radix())).multiply(pi(x.precision(), x.radix()));    // Thanks to Marko Gaspersic for finding the bug in issue #11
+        return x.divide(new Apfloat(180, Apfloat.INFINITE, x.radix())).multiply(pi(x.precision(), x.radix()));
     }
 
     /**
@@ -1846,7 +1812,7 @@ public class ApfloatMath
      */
 
     public static Apfloat product(Apfloat... x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (x.length == 0)
         {
@@ -1869,7 +1835,7 @@ public class ApfloatMath
 
         // Add sqrt length digits for round-off errors
         long extraPrec = (long) Math.sqrt((double) x.length),
-             destPrec = ApfloatHelper.extendPrecision(maxPrec, extraPrec);
+                destPrec = ApfloatHelper.extendPrecision(maxPrec, extraPrec);
         for (int i = 0; i < x.length; i++)
         {
             tmp[i] = x[i].precision(destPrec);
@@ -1882,19 +1848,20 @@ public class ApfloatMath
             public int compare(Apfloat x, Apfloat y)
             {
                 long xSize = x.size(),
-                     ySize = y.size();
+                        ySize = y.size();
                 return (xSize < ySize ? -1 : (xSize > ySize ? 1 : 0));
             }
         });
 
         // Perform the multiplications in parallel
-        ParallelHelper.ProductKernel<Apfloat> kernel = new ParallelHelper.ProductKernel<Apfloat>() {
-            @Override
-            public void run(Queue<Apfloat> h) {
-                Apfloat a = h.remove();
-                Apfloat b = h.remove();
+        ParallelHelper.ProductKernel<Apfloat> kernel = new ParallelHelper.ProductKernel<Apfloat>()
+        {
+            public void run(Queue<Apfloat> heap)
+            {
+                Apfloat a = heap.remove();
+                Apfloat b = heap.remove();
                 Apfloat c = a.multiply(b);
-                h.add(c);
+                heap.add(c);
             }
         };
         ParallelHelper.parallelProduct(x, heap, kernel);
@@ -1919,7 +1886,7 @@ public class ApfloatMath
      */
 
     public static Apfloat sum(Apfloat... x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         if (x.length == 0)
         {
@@ -1928,18 +1895,18 @@ public class ApfloatMath
 
         // Determine working precision
         long maxScale = -Apfloat.INFINITE,
-             maxPrec = Apfloat.INFINITE;
+                maxPrec = Apfloat.INFINITE;
         for (int i = 0; i < x.length; i++)
         {
             long oldScale = maxScale,
-                 oldPrec = maxPrec,
-                 newScale = x[i].scale(),
-                 newPrec = x[i].precision();
+                    oldPrec = maxPrec,
+                    newScale = x[i].scale(),
+                    newPrec = x[i].precision();
             maxScale = Math.max(oldScale, newScale);
             long oldScaleDiff = (maxScale - oldScale < 0 ? Apfloat.INFINITE : maxScale - oldScale),
-                 newScaleDiff = (maxScale - newScale < 0 ? Apfloat.INFINITE : maxScale - newScale);
+                    newScaleDiff = (maxScale - newScale < 0 ? Apfloat.INFINITE : maxScale - newScale);
             maxPrec = Math.min(Util.ifFinite(oldPrec, oldPrec + oldScaleDiff),
-                               Util.ifFinite(newPrec, newPrec + newScaleDiff));
+                    Util.ifFinite(newPrec, newPrec + newScaleDiff));
         }
 
         // Do not use x.clone() as the array might be of some subclass type, resulting in ArrayStoreException later
@@ -1948,8 +1915,8 @@ public class ApfloatMath
         for (int i = 0; i < x.length; i++)
         {
             long scale = x[i].scale(),
-                 scaleDiff = (maxScale - scale < 0 ? Apfloat.INFINITE : maxScale - scale),
-                 destPrec = (maxPrec - scaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - scaleDiff));
+                    scaleDiff = (maxScale - scale < 0 ? Apfloat.INFINITE : maxScale - scale),
+                    destPrec = (maxPrec - scaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - scaleDiff));
             if (destPrec > 0)
             {
                 tmp[i] = x[i].precision(destPrec);
@@ -1967,7 +1934,7 @@ public class ApfloatMath
             public int compare(Apfloat x, Apfloat y)
             {
                 long xScale = x.scale(),
-                     yScale = y.scale();
+                        yScale = y.scale();
                 return (xScale < yScale ? -1 : (xScale > yScale ? 1 : 0));
             }
         };
@@ -1985,10 +1952,10 @@ public class ApfloatMath
             long maxSize = (long) (ctx.getMemoryThreshold() * 5.0 / Math.log((double) ctx.getDefaultRadix()));
 
             // Create a queue of small numbers where the parallel algorithm can add and remove elements
-            final Queue<Apfloat> queue = new ConcurrentLinkedQueue<>();
+            final Queue<Apfloat> queue = new ConcurrentLinkedQueue<Apfloat>();
 
             // The large numbers go to the list where they will be added using a single thread algorithm
-            list = new ArrayList<>();
+            list = new ArrayList<Apfloat>();
 
             // Put all the numbers to either the parallel queue or single thread list
             for (Apfloat a : x)
@@ -1996,13 +1963,15 @@ public class ApfloatMath
                 (a.size() <= maxSize ? queue : list).add(a);
             }
 
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
                     // Add numbers as long as there are any left in the queue
                     Apfloat s = Apfloat.ZERO,
                             a;
-                    while ((a = queue.poll()) != null) {
+                    while ((a = queue.poll()) != null)
+                    {
                         s = s.add(a);
                     }
                     // Finally, put the sub-sum back in the queue
@@ -2055,135 +2024,6 @@ public class ApfloatMath
     public static Apfloat gamma(Apfloat x)
     {
         return ApcomplexMath.gamma(x).real();
-    }
-
-    /**
-     * Generates a random number. Uses the default radix.
-     * Returned values are chosen pseudorandomly with (approximately)
-     * uniform distribution from the range <code>0 &le; x &lt; 1</code>.
-     * The generated random numbers may have leading zeros and may thus not
-     * always have exactly the requested number of significant digits.
-     * The precision of the numbers is the requested number of digits minus
-     * the number of leading zeros. Trailing zeros do not affect the precision.
-     *
-     * @param digits Maximum number of digits in the number.
-     *
-     * @return A random number, uniformly distributed between <code>0 &le; x &lt; 1</code>.
-     *
-     * @exception java.lang.NumberFormatException If the default radix is not valid.
-     * @exception java.lang.IllegalArgumentException In case the number of specified digits is invalid.
-     *
-     * @since 1.9.0
-     */
-
-    public static Apfloat random(long digits)
-    {
-        ApfloatContext ctx = ApfloatContext.getContext();
-        int radix = ctx.getDefaultRadix();
-
-        return random(digits, radix);
-    }
-
-    /**
-     * Generates a random number.
-     * Returned values are chosen pseudorandomly with (approximately)
-     * uniform distribution from the range <code>0 &le; x &lt; 1</code>.
-     * The generated random numbers may have leading zeros and may thus not
-     * always have exactly the requested number of significant digits.
-     * The precision of the numbers is the requested number of digits minus
-     * the number of leading zeros. Trailing zeros do not affect the precision.
-     *
-     * @param digits Maximum number of digits in the number.
-     * @param radix The radix in which the number should be generated.
-     *
-     * @return A random number, uniformly distributed between <code>0 &le; x &lt; 1</code>, in base <code>radix</code>.
-     *
-     * @exception java.lang.NumberFormatException If the radix is not valid.
-     * @exception java.lang.IllegalArgumentException In case the number of specified digits is invalid.
-     *
-     * @since 1.9.0
-     */
-
-    public static Apfloat random(long digits, int radix)
-    {
-        Apfloat random = ApintMath.random(digits, radix);
-        if (random.signum() != 0)
-        {
-            random = random.precision(random.scale());
-        }
-        return scale(random, -digits);
-    }
-
-    /**
-     * Generates a random, Gaussian ("normally") distributed
-     * number value with mean 0 and standard deviation 1.
-     * Uses the default radix.
-     *
-     * @param digits Maximum number of digits in the number.
-     *
-     * @return A random number, Gaussian ("normally") distributed with mean 0 and standard deviation 1.
-     *
-     * @exception java.lang.NumberFormatException If the default radix is not valid.
-     * @exception java.lang.IllegalArgumentException In case the number of specified digits is invalid.
-     *
-     * @since 1.9.0
-     */
-
-    public static Apfloat randomGaussian(long digits)
-    {
-        ApfloatContext ctx = ApfloatContext.getContext();
-        int radix = ctx.getDefaultRadix();
-
-        return randomGaussian(digits, radix);
-    }
-
-    /**
-     * Generates a random, Gaussian ("normally") distributed
-     * number value with mean 0 and standard deviation 1.
-     * Uses the default radix.
-     *
-     * @param digits Maximum number of digits in the number.
-     * @param radix The radix in which the number should be generated.
-     *
-     * @return A random number, Gaussian ("normally") distributed with mean 0 and standard deviation 1.
-     *
-     * @exception java.lang.NumberFormatException If the radix is not valid.
-     * @exception java.lang.IllegalArgumentException In case the number of specified digits is invalid.
-     *
-     * @since 1.9.0
-     */
-
-    public static Apfloat randomGaussian(long digits, int radix)
-    {
-        // Get synchronization lock - getting the lock is also synchronized
-        Integer radixKey = getRadixKey(ApfloatMath.radixGaussianKeys, radix);
-
-        synchronized (radixKey)
-        {
-            Apfloat nextGaussian = ApfloatMath.nextGaussian.remove(radixKey);
-            Long nextGaussianPrecision = ApfloatMath.nextGaussianPrecision.remove(radixKey);
-            if (nextGaussian != null && nextGaussianPrecision == digits)
-            {
-                return nextGaussian;
-            }
-            else
-            {
-                Apint one = new Apint(1, radix),
-                      two = new Apint(2, radix);
-                Apfloat v1, v2, s;
-                do
-                {
-                    v1 = two.multiply(random(digits, radix)).subtract(one).precision(digits);
-                    v2 = two.multiply(random(digits, radix)).subtract(one).precision(digits);
-                    s = multiplyAdd(v1, v1, v2, v2);
-                } while (s.compareTo(one) >= 1 || s.signum() == 0);
-                Apfloat multiplier = sqrt(two.negate().multiply(log(s)).divide(s));
-                nextGaussian = v2.multiply(multiplier);
-                ApfloatMath.nextGaussian.put(radixKey, nextGaussian);
-                ApfloatMath.nextGaussianPrecision.put(radixKey, digits);
-                return v1.multiply(multiplier);
-            }
-        }
     }
 
     /**
@@ -2283,28 +2123,16 @@ public class ApfloatMath
         }
         return x.add(scale(new Apfloat(direction, 1, x.radix()), scale));
     }
+
     // Extend the precision on last iteration
     private static Apfloat lastIterationExtendPrecision(int iterations, int precisingIteration, Apfloat x)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         return (iterations == 0 && precisingIteration != 0 ? ApfloatHelper.extendPrecision(x) : x);
     }
 
-    // Get shared radix key for synchronizing getting and calculating something per radix
-    private static Integer getRadixKey(Map<Integer, Integer> radixKeys, int radix)
-    {
-        @SuppressWarnings("deprecation")
-        Integer value = new Integer(radix); // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
-        Integer radixKey = new MapWrapper<>(radixKeys).putIfAbsent(value, value);
-        if (radixKey == null)
-        {
-            radixKey = value;
-        }
-
-        return radixKey;
-    }
     static Apfloat factorial(long n, long precision)
-        throws ArithmeticException, NumberFormatException, ApfloatRuntimeException
+            throws ArithmeticException, NumberFormatException, ApfloatRuntimeException
     {
         ApfloatContext ctx = ApfloatContext.getContext();
         int radix = ctx.getDefaultRadix();
@@ -2313,7 +2141,7 @@ public class ApfloatMath
     }
 
     static Apfloat factorial(long n, long precision, int radix)
-        throws ArithmeticException, NumberFormatException, ApfloatRuntimeException
+            throws ArithmeticException, NumberFormatException, ApfloatRuntimeException
     {
         if (n < 0)
         {
@@ -2341,7 +2169,7 @@ public class ApfloatMath
         for (int i = 62 - Long.numberOfLeadingZeros(n); i >= 0; i--)
         {
             long m = n >>> i,
-                 k = m >>> 1;
+                    k = m >>> 1;
             exponentOfTwo += k;
             oddProduct = oddProduct.multiply(oddProduct(k + 1, m, precision, radix));
             factorialProduct = factorialProduct.multiply(oddProduct);
@@ -2351,7 +2179,7 @@ public class ApfloatMath
     }
 
     private static Apfloat oddProduct(long n, long m, long precision, int radix)
-        throws ApfloatRuntimeException
+            throws ApfloatRuntimeException
     {
         n = n | 1;       // Round n up to the next odd number
         m = (m - 1) | 1; // Round m down to the next odd number
@@ -2381,35 +2209,27 @@ public class ApfloatMath
         ApfloatMath.radixPiInverseRoot = SHUTDOWN_MAP;
         ApfloatMath.radixLog = SHUTDOWN_MAP;
         ApfloatMath.radixLogPi = SHUTDOWN_MAP;
-        ApfloatMath.nextGaussian = SHUTDOWN_MAP;
     }
 
     // Map that always throws ApfloatRuntimeException, to be used after clean-up has been initiated
-    private static final Map<Integer, Apfloat> SHUTDOWN_MAP = new ShutdownMap<>();
+    private static final Map<Integer, Apfloat> SHUTDOWN_MAP = new ShutdownMap<Integer, Apfloat>();
 
     // Synchronization keys for pi calculation
-    private static ConcurrentMap<Integer, Integer> radixPiKeys = new ConcurrentHashMap<>();
+    private static ConcurrentMap<Integer, Integer> radixPiKeys = new ConcurrentHashMap<Integer, Integer>();
 
     // Shared cached values related to pi for different radixes
-    private static Map<Integer, Apfloat> radixPi = new ConcurrentSoftHashMap<>();
-    private static Map<Integer, PiCalculator> radixPiCalculator = new Hashtable<>();
-    private static Map<Integer, Apfloat> radixPiT = new ConcurrentSoftHashMap<>();
-    private static Map<Integer, Apfloat> radixPiQ = new ConcurrentSoftHashMap<>();
-    private static Map<Integer, Apfloat> radixPiP = new ConcurrentSoftHashMap<>();
-    private static Map<Integer, Apfloat> radixPiInverseRoot = new ConcurrentSoftHashMap<>();
-    private static Map<Integer, Long> radixPiTerms = new Hashtable<>();
+    private static Map<Integer, Apfloat> radixPi = new ConcurrentSoftHashMap<Integer, Apfloat>();
+    private static Map<Integer, PiCalculator> radixPiCalculator = new Hashtable<Integer, PiCalculator>();
+    private static Map<Integer, Apfloat> radixPiT = new ConcurrentSoftHashMap<Integer, Apfloat>();
+    private static Map<Integer, Apfloat> radixPiQ = new ConcurrentSoftHashMap<Integer, Apfloat>();
+    private static Map<Integer, Apfloat> radixPiP = new ConcurrentSoftHashMap<Integer, Apfloat>();
+    private static Map<Integer, Apfloat> radixPiInverseRoot = new ConcurrentSoftHashMap<Integer, Apfloat>();
+    private static Map<Integer, Long> radixPiTerms = new Hashtable<Integer, Long>();
 
     // Synchronization keys for logarithm calculation
-    private static ConcurrentMap<Integer, Integer> radixLogKeys = new ConcurrentHashMap<>();
+    private static ConcurrentMap<Integer, Integer> radixLogKeys = new ConcurrentHashMap<Integer, Integer>();
 
     // Shared cached values related to logarithm for different radixes
-    private static Map<Integer, Apfloat> radixLog = new ConcurrentHashMap<>();
-    private static Map<Integer, Apfloat> radixLogPi = new ConcurrentHashMap<>();
-
-    // Synchronization keys for random Gaussian calculation
-    private static ConcurrentMap<Integer, Integer> radixGaussianKeys = new ConcurrentHashMap<>();
-
-    // Used by randomGaussian
-    private static Map<Integer, Apfloat> nextGaussian = new ConcurrentHashMap<>();
-    private static Map<Integer, Long> nextGaussianPrecision = new ConcurrentHashMap<>();
+    private static Map<Integer, Apfloat> radixLog = new ConcurrentHashMap<Integer, Apfloat>();
+    private static Map<Integer, Apfloat> radixLogPi = new ConcurrentHashMap<Integer, Apfloat>();
 }

@@ -4371,6 +4371,9 @@ public final class Arithmetic {
 					return rePowerComplex(base, exponent.re(), exponent.im());
                 }
             }
+			if (expr.isInterval()) {
+				return IntervalSym.mapSymbol(F.Re, (IAST) expr);
+			}
             return F.NIL;
         }
 
