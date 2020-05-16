@@ -5,8 +5,10 @@ import com.duy.lambda.Consumer;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.eval.exception.MemoryLimitExceeded;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.ObjIntPredicate;
+import org.matheclipse.core.visit.IVisitor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +43,15 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
 
     @Override
     public abstract IAST clone() throws CloneNotSupportedException;
+
+    @Override
+    public IExpr acceptChecked(IVisitor visitor) {
+        try {
+            return accept(visitor);
+        } catch (StackOverflowError soe) {
+            throw new MemoryLimitExceeded("StackOverflowError in visitor");
+        }
+    }
 
     @Override
     public int argSize() {

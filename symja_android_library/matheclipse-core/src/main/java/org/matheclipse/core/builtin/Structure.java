@@ -11,6 +11,7 @@ import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.Lambda;
@@ -21,6 +22,7 @@ import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
@@ -232,8 +234,8 @@ public class Structure {
 					level = new VisitorLevelSpecification(af, 0);
 				}
 
-				if (!expr.isAtom()) {
-					return expr.accept(level).orElse(expr);
+				if (expr.isAST()) {
+					return ((IAST) expr).acceptChecked(level).orElse(expr);
 				} else {
 					// arg2 is an Atom to which the head f couldn't be applied
 					if (evaledAST.size() >= 3) {
@@ -243,8 +245,9 @@ public class Structure {
 						return expr;
 					}
 				}
-			} catch (final RuntimeException e) {
-				return engine.printMessage("Apply: " + e.getMessage());
+			} catch (final ValidateException ve) {
+				// see level specification
+				return engine.printMessage(ve.getMessage(F.Apply));
 
 			}
 			return F.NIL;
@@ -319,7 +322,7 @@ public class Structure {
 			if (!(arg1.isAST())) {
 				return F.C1;
 			}
-			return F.integer(depth((IAST) ast.arg1(), 1));
+			return F.ZZ(depth((IAST) arg1, 1));
 		}
 
 		public int[] expectedArgSize() {
@@ -490,6 +493,7 @@ public class Structure {
 			IExpr arg1 = engine.evaluate(ast.arg1());
 			if (arg1.isAST()) {
 				IAST arg1AST = (IAST) arg1;
+				try {
 				if (ast.isAST1()) {
 					IAST resultList = EvalAttributes.flattenDeep(arg1AST.topHead(), (IAST) arg1);
 					if (resultList.isPresent()) {
@@ -501,7 +505,7 @@ public class Structure {
 
 					int level = Validate.checkIntLevelType(arg2);
 					if (level > 0) {
-						IASTAppendable resultList = F.ast(arg1AST.topHead());
+							IASTAppendable resultList = F.ast(arg1AST.topHead(), arg1AST.size(), false);
 						if (EvalAttributes.flatten(arg1AST.topHead(), (IAST) arg1, resultList, 0, level)) {
 							return resultList;
 						}
@@ -518,6 +522,10 @@ public class Structure {
 						}
 					}
 					return arg1;
+				}
+				} catch (final ValidateException ve) {
+					// see level specification
+					return engine.printMessage(ve.getMessage(ast.topHead()));
 				}
 			}
 			return F.NIL;
@@ -848,7 +856,7 @@ public class Structure {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			return F.integer(engine.evaluate(ast.arg1()).leafCount());
+			return F.ZZ(engine.evaluate(ast.arg1()).leafCount());
 		}
 
 		public int[] expectedArgSize() {
@@ -952,8 +960,11 @@ public class Structure {
 					}, 1, heads);
 				}
 				return arg2.accept(level).orElse(arg2);
-			} catch (final RuntimeException e) {
-				return engine.printMessage("Map: " + e.getMessage());
+			} catch (final ValidateException ve) {
+				// see level specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+				// } catch (final RuntimeException e) {
+				// return engine.printMessage("Map: " + e.getMessage());
 			}
 		}
 
@@ -1094,8 +1105,9 @@ public class Structure {
 				if (arg2.isAST()) {
 					return level.visitAST(((IAST) arg2), new int[0]).orElse(arg2);
 				}
-			} catch (final RuntimeException e) {
-				return engine.printMessage("MapIndexed: " + e.getMessage());
+			} catch (final RuntimeException rex) {
+				// ArgumentTypeException from IndexedLevel level specification checks
+				return engine.printMessage("MapIndexed: " + rex.getMessage());
 			}
 			return F.NIL;
 		}
@@ -1194,7 +1206,7 @@ public class Structure {
 					return lst;
 				}
 				int size = lst.first().size() - 1;
-				IASTAppendable list;
+				IAST list;
 				if (level == recursionLevel + 1) {
 					list = EvalAttributes.threadList(lst, F.List, constant, size);
 					if (resultList != null) {
@@ -1335,7 +1347,11 @@ public class Structure {
 	private final static class OrderedQ extends AbstractFunctionEvaluator implements Predicate<IAST> {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			return F.bool(test(((IAST) ast.arg1())));
+			IAST arg1AST = Validate.checkASTType(ast, ast.arg1(), 1, engine);
+			if (arg1AST.isPresent()) {
+				return F.bool(test(arg1AST));
+			}
+			return F.NIL;
 		}
 
 		public int[] expectedArgSize() {
@@ -1643,6 +1659,9 @@ public class Structure {
 					}
 				}
 				return F.Null;
+				} catch (final ValidateException ve) {
+					// see level specification
+					return engine.printMessage(ve.getMessage(ast.topHead()));
 			} catch (final ReturnException e) {
 				return e.getValue();
 				// don't catch Throw[] here !
@@ -1690,8 +1709,13 @@ public class Structure {
 
 			if (ast.arg1().isAST()) {
 				IAST arg1 = (IAST) ast.arg1();
-				if (ast.isAST1() && arg1.isEvalFlagOn(IAST.IS_SORTED)) {
+				if (ast.isAST1()) {
+					if (arg1.isEvalFlagOn(IAST.IS_SORTED)) {
 					return arg1;
+				}
+					if (arg1.isAssociation()) {
+						return ((IAssociation) arg1).sort();
+					}
 				}
 				final IASTMutable shallowCopy = ((IAST) ast.arg1()).copy();
 				if (shallowCopy.size() <= 2) {
@@ -1705,7 +1729,10 @@ public class Structure {
 						EvalAttributes.sort(shallowCopy, new Predicates.IsBinaryFalse(ast.arg2()));
 					}
 					return shallowCopy;
-				} catch (Exception ex) {
+				} catch (RuntimeException rex) {
+					// if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+					// }
 
 				}
 			}
@@ -1933,7 +1960,7 @@ public class Structure {
 			}
 			final IAST list = (IAST) ast.arg1();
 			if (list.size() > 1) {
-				return threadList(list, head, list.head());
+				return threadList(list, head, list.head()).orElse(list);
 			}
 			return F.NIL;
 		}
@@ -1954,15 +1981,17 @@ public class Structure {
 		 */
 		public static IAST threadList(final IAST list, IExpr head, IExpr mapHead) {
 
-			int listLength = 0;
+			int listLength = -1;
 
 			for (int i = 1; i < list.size(); i++) {
 				if ((list.get(i).isAST()) && (((IAST) list.get(i)).head().equals(head))) {
-					if (listLength == 0) {
+					if (listLength == -1) {
 						listLength = ((IAST) list.get(i)).argSize();
 					} else {
 						if (listLength != ((IAST) list.get(i)).argSize()) {
-							listLength = 0;
+							// Objects of unequal length in `1` cannot be combined.
+							IOFunctions.printMessage(F.Thread, "tdlen", F.List(list), EvalEngine.get());
+							listLength = -1;
 							return F.NIL;
 							// for loop
 						}
@@ -1970,6 +1999,9 @@ public class Structure {
 				}
 			}
 
+			if (listLength == -1) {
+				return list;
+			}
 			return EvalAttributes.threadList(list, head, mapHead, listLength);
 
 		}

@@ -268,8 +268,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Differentiation of a power series.
      *
-	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Differentiation_and_integration">Wikipedia: Power series -
-	 * Differentiation and integration</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Differentiation_and_integration">Wikipedia: Power series
+	 * - Differentiation and integration</a>
      *
      * @param x
      * @return
@@ -334,9 +334,9 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /** {@inheritDoc} */
     @Override
     public IExpr evaluate(EvalEngine engine) {
-//		if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
-//			return F.NIL;
-//		}
+		// if ((getEvalFlags() & IAST.DEFER_AST) == IAST.DEFER_AST) {
+		// return F.NIL;
+		// }
         return F.NIL;
     }
 
@@ -1131,8 +1131,8 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
     /**
      * Multiply two power series.
      *
-	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Multiplication_and_division">Wikipedia: Power series - Multiplication and
-	 * Division</a>
+	 * See <a href="https://en.wikipedia.org/wiki/Power_series#Multiplication_and_division">Wikipedia: Power series -
+	 * Multiplication and Division</a>
      *
      * @param b
      * @return

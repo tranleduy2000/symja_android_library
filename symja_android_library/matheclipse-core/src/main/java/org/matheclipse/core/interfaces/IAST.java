@@ -9,6 +9,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.generic.ObjIntPredicate;
+import org.matheclipse.core.visit.IVisitor;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
  * <p>
  * (I)nterface for the (A)bstract (S)yntax (T)ree of a given function.
  * </p>
@@ -28,14 +28,14 @@ import java.util.Set;
  * implicit in the tree structure, and a syntactic construct such as a <code>Sin(x)</code> expression will be denoted by
  * an AST with 2 nodes. One node for the header <code>Sin</code> and one node for the argument <code>x</code>.
  * </p>
- *
+ * <p>
  * Internally an AST is represented as a list which contains
  * <ul>
  * <li>the operator of a function (i.e. the &quot;header&quot;-symbol: Sin, Cos, Inverse, Plus, Times,...) at index
  * <code>0</code> and</li>
  * <li>the <code>n</code> arguments of a function in the index <code>1 to n</code></li>
  * </ul>
- *
+ * <p>
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>,
  * <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
@@ -138,6 +138,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     int OUTPUT_MULTILINE = 0x00100000;
 
+
+    IExpr acceptChecked(IVisitor visitor);
 
     /**
      * Add an evaluation flag to the existing ones.
@@ -348,6 +350,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
 
     /**
      * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not cloned).
+     *
      * @return a clone of this <code>IAST</code> instance.
      * @deprecated use {@link #copyAppendable()} or {@link #copy()}
      */
@@ -395,6 +398,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     @Override
     IASTMutable copy();
+
     /**
      * Return a copy of the pure <code>IAST</code> instance (the elements themselves are not copied). Additionally to
      * the <code>copy()</code> method, this method tries to transform <code>AssociatioinAST</code> objects to
@@ -581,8 +585,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * Select all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and append
      * the arguments which satisfy the predicate.
      *
-     * @param predicate
-     *            the predicate which filters each argument in this <code>AST</code>
+     * @param predicate the predicate which filters each argument in this <code>AST</code>
      * @return the selected ast
      */
     public IAST select(Predicate<? super IExpr> predicate);
@@ -591,10 +594,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * Select all elements by applying the <code>predicate</code> to each argument in this <code>AST</code> and append
      * up to <code>maxMatches</code> arguments which satisfy the predicate.
      *
-     * @param predicate
-     *            the predicate which filters each argument in this <code>AST</code>
-     * @param maxMatches
-     *            the maximum number of matches
+     * @param predicate  the predicate which filters each argument in this <code>AST</code>
+     * @param maxMatches the maximum number of matches
      * @return the selected ast
      */
     public IAST select(Predicate<? super IExpr> predicate, int maxMatches);
@@ -759,11 +760,9 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     /**
      * Returns the element at the specified location in this {@code IAST}.
      *
-     * @param location
-     *            the index of the element to return.
+     * @param location the index of the element to return.
      * @return the element at the specified location.
-     * @throws IndexOutOfBoundsException
-     *             if {@code location < 0 || >= size()}
+     * @throws IndexOutOfBoundsException if {@code location < 0 || >= size()}
      */
     public IExpr get(IInteger location);
 
@@ -772,11 +771,9 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * Returns <code>length</code> number of elements specified in the <code>items</code> position array in this
      * {@code IAST}.
      *
-     * @param items
-     *            ascending ordered array of positions which should be selected from this {@code IAST}.
-     * @param length
-     *            the end position (exclusive) to which the <code>items</code> array is filled with valid element
-     *            positions
+     * @param items  ascending ordered array of positions which should be selected from this {@code IAST}.
+     * @param length the end position (exclusive) to which the <code>items</code> array is filled with valid element
+     *               positions
      * @return
      */
     public IAST getItems(int[] items, int length);
@@ -1101,12 +1098,11 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
 
     /**
      * Maps the elements of this IAST with the unary <code>function)</code>.
-     *
+     * <p>
      * <br />
      *
-     * @param function
-     *            an IAST there the argument at the given position is replaced by the currently mapped argument of this
-     *            IAST.
+     * @param function an IAST there the argument at the given position is replaced by the currently mapped argument of this
+     *                 IAST.
      * @return
      */
     public IASTMutable mapThread(Function<IExpr, IExpr> function);
@@ -1227,8 +1223,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     /**
      * Removes all the elements from this list which satisfies the given predicate and return the result as a new List
      *
-     * @param predicate
-     *            the predicate which filters each element in the range
+     * @param predicate the predicate which filters each element in the range
      * @return the resulting ASTs in the 0-th and 1-st element of the array
      */
     IAST removeIf(Predicate<? super IExpr> predicate);
@@ -1304,8 +1299,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     /**
      * The <code>splice()</code> method removes the item from an AST copy, and returns the copy.
      *
-     * @param index
-     *            An integer that specifies at what position to add/remove items.
+     * @param index An integer that specifies at what position to add/remove items.
      * @return an IAST with removed element at the given position.
      */
     IAST splice(int index);
@@ -1319,6 +1313,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return an IAST with removed element at the given position.
      */
     public IAST splice(int index, int howMany, IExpr... items);
+
     /**
      * Returns an array containing all elements contained in this {@code List}.
      *

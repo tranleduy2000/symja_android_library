@@ -11,12 +11,14 @@ import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.builtin.PolynomialFunctions;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.convert.CreamConvert;
+import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.NoEvalException;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.SolveUtils;
@@ -953,23 +955,34 @@ public class Solve extends AbstractFunctionEvaluator {
 	public static IExpr of(final IAST ast, boolean numeric, EvalEngine engine) {
 		boolean[] isNumeric = new boolean[] { false };
 		try {
-			IAST variables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
-			if (variables.isPresent()) {
+			if (ast.arg1().isAST(F.List, 1)) {
+				return F.List(F.CEmptyList);
+			}
+			IAST userDefinedVariables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+			if (userDefinedVariables.isPresent()) {
+				IAST equationVariables = VariablesSet.getVariables(ast.arg1());
+				if (userDefinedVariables.isEmpty()) {
+					userDefinedVariables = equationVariables;
+				}
 			ISymbol domain = F.Complexes;
 			if (ast.isAST3()) {
 				if (!ast.arg3().isSymbol()) {
-					throw new WrongArgumentType(ast, ast.arg3(), 3, "Domain definition expected!");
+						return engine.printMessage(ast.topHead()
+								+ ": domain definition expected at position 3 instead of " + ast.arg3().toString());
 				}
 				domain = (ISymbol) ast.arg3();
 				if (domain.equals(F.Booleans)) {
-					return BooleanFunctions.solveInstances(ast.arg1(), variables, Integer.MAX_VALUE);
+						return BooleanFunctions.solveInstances(ast.arg1(), userDefinedVariables, Integer.MAX_VALUE);
 				}
 				if (domain.equals(F.Integers)) {
+						if (!userDefinedVariables.isEmpty()) {
 					IAST equationsAndInequations = Validate.checkEquationsAndInequations(ast, 1);
 					try {
 						// call cream solver
+								// ChocoConvert converter = new ChocoConvert();
 						CreamConvert converter = new CreamConvert();
-						IAST resultList = converter.integerSolve(equationsAndInequations, variables);
+								IAST resultList = converter.integerSolve(equationsAndInequations, equationVariables,
+										userDefinedVariables, engine);
 						EvalAttributes.sort((IASTMutable) resultList);
 						return resultList;
 					} catch (LimitException le) {
@@ -980,9 +993,12 @@ public class Solve extends AbstractFunctionEvaluator {
 						}
 						return engine.printMessage("Solve: " + "Integer solution not found: " + rex.getMessage());
 					}
+						}
+						return F.NIL;
 				}
 				if (!domain.equals(F.Reals) && !domain.equals(F.Complexes)) {
-					throw new WrongArgumentType(ast, ast.arg3(), 3, "Domain definition expected!");
+						return engine.printMessage(ast.topHead()
+								+ ": domain definition expected at position 3 instead of " + domain.toString());
 				}
 			}
 			IAST termsList = Validate.checkEquationsAndInequations(ast, 1);
@@ -994,11 +1010,13 @@ public class Solve extends AbstractFunctionEvaluator {
 			}
 
 			IASTMutable termsEqualZeroList = lists[0];
-			IExpr result = solveRecursive(termsEqualZeroList, lists[1], numericFlag, variables, engine);
+				IExpr result = solveRecursive(termsEqualZeroList, lists[1], numericFlag, userDefinedVariables, engine);
 			return checkDomain(result, domain);
 			}
 		} catch (LimitException le) {
 			throw le;
+		} catch (ValidateException ve) {
+			return engine.printMessage(F.Solve, ve);
 		} catch (RuntimeException rex) {
 			if (Config.SHOW_STACKTRACE) {
 				rex.printStackTrace();
