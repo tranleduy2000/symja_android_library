@@ -2,6 +2,10 @@ package org.matheclipse.core.polynomials;
 
 import com.duy.lambda.Function;
 
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -14,18 +18,14 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 /**
  * Forward and backward substitutions of expressions for polynomials. See
  * <a href="https://www.research.ed.ac.uk/portal/files/413486/Solving_Symbolic_Equations_%20with_PRESS.pdf">3.5
  * Homogenization</a>
  * 
  */
+public class PolynomialHomogenizationNew {
 
-public class PolynomialHomogenization {
 	/**
 	 * Variables (ISymbols) which are substituted from the original polynomial (backward substitution).
 	 */
@@ -55,13 +55,13 @@ public class PolynomialHomogenization {
 	 * @param engine
 	 *            the evaluation engine
 	 */
-	public PolynomialHomogenization(IAST listOfVariables, EvalEngine engine) {
+	public PolynomialHomogenizationNew(IAST listOfVariables, EvalEngine engine) {
 		this.engine = engine;
 	}
 
 	/**
 	 * Lazy initialization for map <code>symbol -> list-of-least-common-multiple-factors</code>.
-	 *
+	 * 
 	 * @return
 	 */
 	private Map<ISymbol, IASTAppendable> getSymbol2IntegerAST() {
@@ -73,7 +73,7 @@ public class PolynomialHomogenization {
 
 	/**
 	 * Lazy initialization for map <code>symbol -> least-common-multiple-factors</code>.
-	 *
+	 * 
 	 * @return
 	 */
 	private Map<ISymbol, IInteger> getSymbol2LCM() {
@@ -85,7 +85,7 @@ public class PolynomialHomogenization {
 
 	/**
 	 * Determine the <code>least-common-multiple-factor </code> associated with a symbol.
-	 *
+	 * 
 	 * @param x
 	 * @return
 	 */
@@ -103,7 +103,7 @@ public class PolynomialHomogenization {
 	/**
 	 * Forward substitution - transforming the expression into a polynomial expression by introducing &quot;substitution
 	 * variables&quot;. After transforming the polynomial expression may be solvable by a polynomial factorization.
-	 *
+	 * 
 	 * @param expression
 	 * @return the polynomial expression
 	 */
@@ -131,7 +131,7 @@ public class PolynomialHomogenization {
 	 * Forward substitution - transforming the numerator and denominator expression into polynomial expressions by
 	 * introducing &quot;substitution variables&quot;. After transforming the polynomial expression may be solvable by a
 	 * polynomial factorization.
-	 *
+	 * 
 	 * @param numerator
 	 * @param denominator
 	 * @return polynomial numerator at index '0'; and polynomial denominator at index '1'
@@ -167,7 +167,7 @@ public class PolynomialHomogenization {
 			if (ast.isPlus() || ast.isTimes()) {
 				for (int i = 1; i < ast.size(); i++) {
 					determineLCM(ast.get(i));
-		}
+				}
 				return;
 			} else if (ast.isPower()) {
 				IExpr exp = ast.exponent();
@@ -176,9 +176,6 @@ public class PolynomialHomogenization {
 
 					IInteger lcm = F.C1;
 					IRational rat = ((ISignedNumber) exp).rationalFactor();
-					if (rat == null) {
-						return;
-					}
 					if (!rat.isInteger()) {
 						IInteger denominator = rat.denominator();
 						if (denominator.isNegative()) {
@@ -189,7 +186,11 @@ public class PolynomialHomogenization {
 					// if (base.isTimes()) {
 					//
 					// }
-					replaceExpressionLCM(base, lcm);
+					if (base.isAST()) {
+						determineLCM(base);
+					} else {
+						replaceExpressionLCM(base, lcm);
+					}
 					return;
 				}
 				if (exp.isTimes()) {
@@ -247,7 +248,7 @@ public class PolynomialHomogenization {
 	/**
 	 * Forward substitution - transforming the expression into a polynomial expression by introducing &quot;substitution
 	 * variables&quot;. After transforming the polynomial expression may be solvable by a polynomial factorization.
-	 *
+	 * 
 	 * @param expression
 	 * @return
 	 * @throws ArithmeticException
@@ -270,7 +271,7 @@ public class PolynomialHomogenization {
 				if (power.isPresent()) {
 					return power;
 				}
-				final IExpr b = ast.base();
+				IExpr b = replaceForwardRecursive(ast.base());
 				IExpr exp = ast.exponent();
 				if (exp.isReal()) {
 					IExpr base = replacePower(b, (ISignedNumber) exp);
@@ -279,6 +280,7 @@ public class PolynomialHomogenization {
 					}
 				}
 				IExpr base = b;
+
 				if (exp.isTimes()) {
 					return replaceTimes(ast, base, exp);
 				} else if (exp.isPlus()) {// && base.isExactNumber()) {
@@ -291,10 +293,10 @@ public class PolynomialHomogenization {
 					}
 				}
 
-						return ast;
-					}
-			return replaceExpression(expression);
+				return F.Power(base, exp);
 			}
+			return replaceExpression(expression);
+		}
 		if (expression.isSymbol()) {
 			return replaceExpression(expression).orElse(expression);
 		}
@@ -342,7 +344,7 @@ public class PolynomialHomogenization {
 			}
 			final int moduleCounter = engine.incModuleCounter();
 			final String varAppend = "$" + moduleCounter;
-			newSymbol = F.Dummy("jas" + varAppend);// , engine);
+			newSymbol = F.Dummy("hg" + varAppend);// , engine);
 			substitutedVariables.put(newSymbol, exprPoly);
 			substitutedExpr.put(exprPoly, newSymbol);
 
@@ -350,35 +352,37 @@ public class PolynomialHomogenization {
 				IASTAppendable list = F.ast(F.LCM);
 				list.append(lcm);
 				getSymbol2IntegerAST().put(newSymbol, list);
-	}
+			}
+
 			return newSymbol;
 		}
 		return exprPoly;
 	}
+
 	private IExpr replaceExpression(final IExpr exprPoly) {
 		ISymbol symbol = substitutedExpr.get(exprPoly);
 		if (symbol != null) {
 			IInteger lcm = getLCM(symbol);
 			if (lcm.isOne()) {
-			return symbol;
-		}
+				return symbol;
+			}
 			return F.Power(symbol, lcm);
 		}
 		return F.NIL;
-			}
+	}
+
 	private IExpr replacePower(final IExpr exprPoly, ISignedNumber exp) {
 		ISymbol symbol = substitutedExpr.get(exprPoly);
 		if (symbol != null) {
 			IInteger lcm = getLCM(symbol);
 			if (lcm.isOne()) {
 				lcm = F.C1;
-		}
+			}
 			if (lcm.isOne() && exp.isInteger()) {
 				return F.Power(symbol, exp);
 			}
 
 			IRational rat = exp.rationalFactor();
-			if (rat != null) {
 			IInteger intExp = rat.multiply(lcm).numerator();
 			int exponent = intExp.toIntDefault(Integer.MIN_VALUE);
 			if (exponent != Integer.MIN_VALUE) {
@@ -388,7 +392,6 @@ public class PolynomialHomogenization {
 				return F.Power(symbol, exponent);
 			}
 
-			}
 			return F.Power(symbol, F.Times(lcm, exp));
 		}
 		return F.NIL;
@@ -397,7 +400,7 @@ public class PolynomialHomogenization {
 	/**
 	 * Backward substitution - transforming the expression back by replacing the introduce &quot;substitution
 	 * variables&quot;.
-	 *
+	 * 
 	 * @param expression
 	 * @return
 	 * @see #replaceForward(IExpr)
@@ -409,7 +412,7 @@ public class PolynomialHomogenization {
 				if (x.isSymbol()) {
 					IExpr t = substitutedVariables.get(x);
 					if (t != null) {
-						IInteger denominatorLCM = PolynomialHomogenization.this.getLCM(x);
+						IInteger denominatorLCM = PolynomialHomogenizationNew.this.getLCM(x);
 						if (denominatorLCM.isOne()) {
 							return t;
 						}
@@ -421,6 +424,7 @@ public class PolynomialHomogenization {
 		});
 		return engine.evaluate(temp);
 	}
+
 	/**
 	 * Variables (ISymbols) which are substituted from the original polynomial (backward substitution) returned in a
 	 * <code>IdentityHashMap</code>.
@@ -436,4 +440,5 @@ public class PolynomialHomogenization {
 	public int size() {
 		return substitutedVariables.size();
 	}
+
 }

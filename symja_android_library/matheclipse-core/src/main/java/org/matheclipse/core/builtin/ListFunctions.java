@@ -149,12 +149,14 @@ public final class ListFunctions {
 			F.ComposeList.setEvaluator(new ComposeList());
 			F.ConstantArray.setEvaluator(new ConstantArray());
 			F.Count.setEvaluator(new Count());
+			F.CountDistinct.setEvaluator(new CountDistinct());
 			F.Delete.setEvaluator(new Delete());
 			F.DeleteDuplicates.setEvaluator(new DeleteDuplicates());
 			F.DeleteCases.setEvaluator(new DeleteCases());
 			F.Drop.setEvaluator(new Drop());
 			F.Extract.setEvaluator(new Extract());
 			F.First.setEvaluator(new First());
+			//F.GroupBy.setEvaluator(new GroupBy());
 			F.Fold.setEvaluator(new Fold());
 			F.FoldList.setEvaluator(new FoldList());
 			F.Gather.setEvaluator(new Gather());
@@ -190,6 +192,8 @@ public final class ListFunctions {
 			F.Subdivide.setEvaluator(new Subdivide());
 			F.Table.setEvaluator(new Table());
 			F.Take.setEvaluator(new Take());
+			F.TakeLargest.setEvaluator(new TakeLargest());
+			F.TakeLargestBy.setEvaluator(new TakeLargestBy());
 			F.Tally.setEvaluator(new Tally());
 			F.Total.setEvaluator(new Total());
 			F.Union.setEvaluator(new Union());
@@ -2649,6 +2653,42 @@ public final class ListFunctions {
 					}
 				}
 				return result;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
+
+	private final static class GroupBy extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
+			if (ast.isAST2()) {
+				try {
+					// if (ast.arg1().isDataSet()) {
+					// 	List<String> listOfStrings = Convert.toStringList(ast.arg2());
+					// 	if (listOfStrings != null) {
+					// 		ASTDataset dataset = (ASTDataset) ast.arg1();
+					// 		return dataset.groupBy(listOfStrings);
+					// 	}
+					// }
+				} catch (RuntimeException rex) {
+					return engine.printMessage(ast.topHead(), rex);
+				}
 			}
 			return F.NIL;
 		}
@@ -5960,6 +6000,97 @@ public final class ListFunctions {
 		}
 	}
 
+	private final static class TakeLargest extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
+			if (ast.isAST2()) {
+				try {
+					if (ast.arg1().isAST()) {
+						IAST list = (IAST) ast.arg1();
+						list = cleanList(list);
+						int n = ast.arg2().toIntDefault();
+						if (n > 0 && n <= list.size()) {
+							ArrayIndexComparator largestComparator = new ArrayIndexComparator(list, engine);
+							Integer[] indexes = largestComparator.createIndexArray();
+							Arrays.sort(indexes, largestComparator);
+							int[] largestIndexes = new int[n];
+							for (int i = 0; i < n; i++) {
+								largestIndexes[i] = indexes[i];
+							}
+							return list.getItems(largestIndexes, largestIndexes.length);
+
+						}
+					}
+				} catch (RuntimeException rex) {
+					return engine.printMessage(ast.topHead(), rex);
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_2;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
+
+	private final static class TakeLargestBy extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+			if (ast.isAST2()) {
+				ast = F.operatorFormAppend(ast);
+				if (!ast.isPresent()) {
+					return F.NIL;
+				}
+			}
+			if (ast.isAST3()) {
+				try {
+					if (ast.arg1().isAST()) {
+						IAST cleanedList = cleanList((IAST) ast.arg1());
+						int n = ast.arg3().toIntDefault();
+						if (n > 0 && n <= cleanedList.size()) {
+							IAST list = cleanedList.mapThread(F.unary(ast.arg2(), F.Slot1), 1);
+							ArrayIndexComparator largestComparator = new ArrayIndexComparator(list, engine);
+							Integer[] indexes = largestComparator.createIndexArray();
+							Arrays.sort(indexes, largestComparator);
+							int[] largestIndexes = new int[n];
+							for (int i = 0; i < n; i++) {
+								largestIndexes[i] = indexes[i];
+							}
+							return cleanedList.getItems(largestIndexes, largestIndexes.length);
+
+						}
+					}
+				} catch (RuntimeException rex) {
+					return engine.printMessage(ast.topHead(), rex);
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+
+	}
 	/**
 	 * <pre>
 	 * Total(list)
