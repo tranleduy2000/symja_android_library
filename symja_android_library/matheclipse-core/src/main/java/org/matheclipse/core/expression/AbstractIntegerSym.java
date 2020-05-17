@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.NumberTheory;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -646,6 +647,9 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		if (that instanceof IInteger) {
 			return gcd((IInteger) that);
 		}
+		if (that instanceof IFraction) {
+			((IFraction) that).gcd(F.fraction(toBigNumerator(), BigInteger.ONE));
+		}
 		return F.C1;
 	}
 
@@ -928,9 +932,14 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	@Override
 	public IInteger[] primitiveRootList() throws ArithmeticException {
 		IInteger phi = eulerPhi();
-		int size = phi.eulerPhi().toInt();
+		int size = phi.eulerPhi().toIntDefault();
 		if (size <= 0) {
 			return null;
+		}
+		if (isEven() && !equals(F.C2) && !equals(F.C4)) {
+			if (quotient(F.C2).isEven()) {
+				return new IInteger[0];
+			}
 		}
 
 		IAST ast = phi.factorInteger();
@@ -944,6 +953,9 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		IInteger n = this;
 		IInteger m = F.C1;
 
+		if (Config.MAX_AST_SIZE < size) {
+			throw new ASTElementLimitExceeded(size);
+		}
 		IInteger resultArray[] = new IInteger[size];
 		boolean b;
 		while (m.compareTo(n) < 0) {
