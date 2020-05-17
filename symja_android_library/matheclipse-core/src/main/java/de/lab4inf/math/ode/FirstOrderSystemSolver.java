@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.ode;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.lapack.LinearAlgebra;
 
@@ -82,7 +84,7 @@ public class FirstOrderSystemSolver extends RKFSolver implements FirstOrderOdeSy
         double e = eps / 10;
 
         if (eps < EPS_MIN) {
-            String msg = String.format("epsilon:%.2g less than esp_min=%.2g",
+            String msg = String.format(Locale.US, "epsilon:%.2g less than esp_min=%.2g",
                     eps, EPS_MIN);
             logger.warn(msg);
             e = max(eps, EPS_MIN);
@@ -172,7 +174,7 @@ public class FirstOrderSystemSolver extends RKFSolver implements FirstOrderOdeSy
             }
         } while (LinearAlgebra.maxdiff(ya, yb) > eps && h > H_MIN);
         if (h < H_MIN) {
-            String msg = String.format("RK Sys no convergence h=%g", h);
+            String msg = String.format(Locale.US, "RK Sys no convergence h=%g", h);
             logger.warn(msg);
             throw new ArithmeticException(msg);
         }
@@ -245,10 +247,10 @@ public class FirstOrderSystemSolver extends RKFSolver implements FirstOrderOdeSy
             // calculate the next step width
             q = qNext(h, err, eps);
             h = min(q * h, H_MAX);
-            //logger.warn(String.format("x:%.4f q:%.2f h:%.3g err:%.3g", xj, q,h, err));
+            //logger.warn(String.format(Locale.US, "x:%.4f q:%.2f h:%.3g err:%.3g", xj, q,h, err));
 
             if (h < H_MIN && (xj + h < x1)) {
-                String msg = String.format("RKF Sys no convergence! step width %g", h);
+                String msg = String.format(Locale.US, "RKF Sys no convergence! step width %g", h);
                 logger.info(msg);
                 //h = H_MIN;
                 throw new ArithmeticException(msg);

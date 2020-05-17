@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.statistic;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
@@ -299,7 +301,7 @@ public final class ProbabilityDistribution extends L4MObject {
      */
     private static void checkProbabilty(final double p) {
         if (Double.isNaN(p) || p < 0 || p > 1) {
-            throw new IllegalArgumentException(String.format("not a probability: %f", p));
+            throw new IllegalArgumentException(String.format(Locale.US, "not a probability: %f", p));
         }
     }
 
@@ -311,7 +313,7 @@ public final class ProbabilityDistribution extends L4MObject {
      */
     private static void checkUnit(final double x) {
         if (Double.isNaN(x) || x < 0 || x > 1) {
-            throw new IllegalArgumentException(String.format("not within [0,1]: %f", x));
+            throw new IllegalArgumentException(String.format(Locale.US, "not within [0,1]: %f", x));
         }
     }
 
@@ -577,7 +579,7 @@ public final class ProbabilityDistribution extends L4MObject {
      */
     public static double pdfGamma(final double k, final double t, final double x) {
         if (x < 0 || k < 0 || t < 0) {
-            throw new IllegalArgumentException(String.format("g(%f,%f,%f)", k, t, x));
+            throw new IllegalArgumentException(String.format(Locale.US, "g(%f,%f,%f)", k, t, x));
         }
         final double z = x / t;
         if (x == 0) {
@@ -701,7 +703,7 @@ public final class ProbabilityDistribution extends L4MObject {
         } while (!hasReachedAccuracy(y, x, PRECISION) && ++n < MAX_ITE);
         if (n >= MAX_ITE) {
             final double p = -err.f(0);
-            final String msg = String.format("quantile(%f)=%f no convergence", p, x);
+            final String msg = String.format(Locale.US, "quantile(%f)=%f no convergence", p, x);
             getLogger().warn(msg);
         }
         return y;

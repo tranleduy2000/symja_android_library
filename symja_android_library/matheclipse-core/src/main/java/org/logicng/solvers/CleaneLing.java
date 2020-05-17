@@ -54,6 +54,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -415,7 +416,7 @@ public final class CleaneLing extends SATSolver {
 
     @Override
     public String toString() {
-        return String.format("CleaneLing{result=%s, idx2name=%s}", this.result, this.idx2name);
+        return String.format(Locale.US, "CleaneLing{result=%s, idx2name=%s}", this.result, this.idx2name);
     }
 
     private Literal getLiteralFromIntLiteral(final int lit) {

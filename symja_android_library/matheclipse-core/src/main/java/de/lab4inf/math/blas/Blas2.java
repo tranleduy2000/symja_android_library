@@ -20,6 +20,7 @@
 */
 package de.lab4inf.math.blas;
 
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import static de.lab4inf.math.blas.Blas1.ddot;
@@ -345,20 +346,20 @@ public final class Blas2 extends BasicBlas {
         final int ny = y.length;
         if (transpose) {
             if (na * incX != nx) {
-                final String msg = String.format("no AT(%d,%d) * x(%d) inc: %d", na, ma, nx, incX);
+                final String msg = String.format(Locale.US, "no AT(%d,%d) * x(%d) inc: %d", na, ma, nx, incX);
                 throw new IllegalArgumentException(msg);
             }
             if (ma * incY != ny) {
-                final String msg = String.format("no AT(%d,%d) + y(%d) inc: %d", na, ma, ny, incY);
+                final String msg = String.format(Locale.US, "no AT(%d,%d) + y(%d) inc: %d", na, ma, ny, incY);
                 throw new IllegalArgumentException(msg);
             }
         } else {
             if (ma * incX != nx) {
-                final String msg = String.format("no A(%d,%d) * x(%d) inc:%d", na, ma, nx, incX);
+                final String msg = String.format(Locale.US, "no A(%d,%d) * x(%d) inc:%d", na, ma, nx, incX);
                 throw new IllegalArgumentException(msg);
             }
             if (na * incY != ny) {
-                final String msg = String.format("no A(%d,%d) + y(%d) inc:%d", na, ma, ny, incY);
+                final String msg = String.format(Locale.US, "no A(%d,%d) + y(%d) inc:%d", na, ma, ny, incY);
                 throw new IllegalArgumentException(msg);
             }
         }

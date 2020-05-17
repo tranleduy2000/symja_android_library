@@ -22,6 +22,7 @@
 package de.lab4inf.math.sets;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MObject;
 
@@ -288,7 +289,7 @@ public final class Vector2D extends L4MObject implements Cloneable,
      */
     @Override
     public String toString() {
-        return String.format("<%+f|%+f>", x, y);
+        return String.format(Locale.US, "<%+f|%+f>", x, y);
     }
 }
  

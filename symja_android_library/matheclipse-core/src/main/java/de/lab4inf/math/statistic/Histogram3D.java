@@ -22,6 +22,7 @@
 package de.lab4inf.math.statistic;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Collects a three dimensional distribution as a histogram and fills
@@ -624,7 +625,7 @@ public class Histogram3D extends DataCollector3D {
      * @return a XY projected two dimensional histogram
      */
     public Histogram2D getXYProjection() {
-        String xyName = String.format("%s-XY", getName());
+        String xyName = String.format(Locale.US, "%s-XY", getName());
         double x, y;
         Histogram2D xyp = new Histogram2D(xyName, numXBins, getLowerX(),
                 getUpperX(), numYBins, getLowerY(), getUpperY());
@@ -648,7 +649,7 @@ public class Histogram3D extends DataCollector3D {
      * @return a XZ projected two dimensional histogram
      */
     public Histogram2D getXZProjection() {
-        String xzName = String.format("%s-XZ", getName());
+        String xzName = String.format(Locale.US, "%s-XZ", getName());
         double x, z;
         Histogram2D xzp = new Histogram2D(xzName, numXBins, getLowerX(),
                 getUpperX(), numZBins, getLowerZ(), getUpperZ());
@@ -672,7 +673,7 @@ public class Histogram3D extends DataCollector3D {
      * @return a YZ projected two dimensional histogram
      */
     public Histogram2D getYZProjection() {
-        String yzName = String.format("%s-YZ", getName());
+        String yzName = String.format(Locale.US, "%s-YZ", getName());
         double y, z;
         Histogram2D yzp = new Histogram2D(yzName, numYBins, getLowerY(),
                 getUpperY(), numZBins, getLowerZ(), getUpperZ());

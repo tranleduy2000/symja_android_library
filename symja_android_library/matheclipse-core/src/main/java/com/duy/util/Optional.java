@@ -29,6 +29,7 @@ import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -324,7 +325,7 @@ public final class Optional<T> {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return DObjects.hashCode(value);
     }
 
     /**
@@ -341,7 +342,7 @@ public final class Optional<T> {
     @Override
     public String toString() {
         return value != null
-            ? String.format("Optional[%s]", value)
+            ? String.format(Locale.US, "Optional[%s]", value)
             : "Optional.empty";
     }
 }

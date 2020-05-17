@@ -7,6 +7,7 @@ import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MemoryOverflowErrorTest extends TestCase {
 
@@ -37,6 +38,6 @@ public class MemoryOverflowErrorTest extends TestCase {
     }
 
     private String toMegabytes(long bytes) {
-        return String.format("%d MB", bytes / 1024 / 1024);
+        return String.format(Locale.US, "%d MB", bytes / 1024 / 1024);
     }
 }

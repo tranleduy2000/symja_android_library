@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.Letters;
 import de.lab4inf.math.gof.Visitor;
@@ -138,7 +140,7 @@ public class IncompleteGamma extends L4MFunction {
     private static double regGammaP(final double a, final double x, final double eps, final int max) {
         double ret = 0;
         if ((a <= 0.0) || (x < 0.0)) {
-            throw new IllegalArgumentException(String.format("P(%f,%f)", a, x));
+            throw new IllegalArgumentException(String.format(Locale.US, "P(%f,%f)", a, x));
         }
         if (a >= 1 && x > a) {
             ret = 1.0 - regGammaQ(a, x, eps, max);
@@ -174,7 +176,7 @@ public class IncompleteGamma extends L4MFunction {
         double ret = 0;
 
         if ((a <= 0.0) || (x < 0.0)) {
-            throw new IllegalArgumentException(String.format("Q(%f,%f)", a, x));
+            throw new IllegalArgumentException(String.format(Locale.US, "Q(%f,%f)", a, x));
         }
         if (x < a || a < 1.0) {
             ret = 1.0 - regGammaP(a, x, epsilon, maxIterations);

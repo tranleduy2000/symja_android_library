@@ -14,6 +14,7 @@
 
 package com.gx.common.base;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.GwtIncompatible;
@@ -683,7 +684,7 @@ public final class Predicates {
             // Pattern uses Object.hashCode, so we have to reach
             // inside to build a hashCode consistent with equals.
 
-            return Objects.hashCode(pattern.pattern(), pattern.flags());
+            return DObjects.hashCode(pattern.pattern(), pattern.flags());
         }
 
         @Override

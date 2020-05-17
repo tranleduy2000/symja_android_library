@@ -44,6 +44,8 @@
 
 package org.logicng.solvers.datastructures;
 
+import java.util.Locale;
+
 /**
  * A watcher for clauses for MiniSAT-style solvers.
  *
@@ -95,6 +97,6 @@ public final class MSWatcher {
 
     @Override
     public String toString() {
-        return String.format("MSWatcher{clause=%s, blocker=%d}", this.clause, this.blocker);
+        return String.format(Locale.US, "MSWatcher{clause=%s, blocker=%d}", this.clause, this.blocker);
     }
 }

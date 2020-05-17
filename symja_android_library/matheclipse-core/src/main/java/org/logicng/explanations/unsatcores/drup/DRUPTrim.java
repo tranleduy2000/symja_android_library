@@ -54,6 +54,7 @@ import org.logicng.collections.LNGVector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -358,7 +359,7 @@ public final class DRUPTrim {
                 if (clauseNr >= currentFile.size() && fileSwitchFlag && !currentFile.empty())
                     break;
                 if (Math.abs(lit) > this.nVars)
-                    throw new IllegalStateException(String.format("Illegal literal %d due to max var %d", lit, this.nVars));
+                    throw new IllegalStateException(String.format(Locale.US, "Illegal literal %d due to max var %d", lit, this.nVars));
                 int hash = getHash(marks, ++mark, buffer);
                 if (del) {
                     if (this.delete) {

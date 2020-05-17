@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 
@@ -324,7 +326,7 @@ public class Bessel extends L4MFunction implements Differentiable {
      */
     @Override
     public String toString() {
-        return String.format("j%s", toLowerScript(n));
+        return String.format(Locale.US, "j%s", toLowerScript(n));
     }
 
     /**

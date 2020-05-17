@@ -18,6 +18,8 @@ import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.errorprone.annotations.concurrent.LazyInit;
 
+import java.util.Locale;
+
 import static com.gx.common.base.Preconditions.checkArgument;
 import static com.gx.common.math.DoubleUtils.isFinite;
 import static java.lang.Double.NaN;
@@ -208,7 +210,7 @@ public abstract class LinearTransformation {
 
         @Override
         public String toString() {
-            return String.format("y = %g * x + %g", slope, yIntercept);
+            return String.format(Locale.US, "y = %g * x + %g", slope, yIntercept);
         }
 
         private LinearTransformation createInverse() {
@@ -265,7 +267,7 @@ public abstract class LinearTransformation {
 
         @Override
         public String toString() {
-            return String.format("x = %g", x);
+            return String.format(Locale.US, "x = %g", x);
         }
 
         private LinearTransformation createInverse() {

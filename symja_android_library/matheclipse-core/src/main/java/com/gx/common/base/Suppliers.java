@@ -14,6 +14,7 @@
 
 package com.gx.common.base;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.VisibleForTesting;
 
@@ -173,7 +174,7 @@ public final class Suppliers {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(function, supplier);
+            return DObjects.hashCode(function, supplier);
         }
 
         @Override
@@ -334,7 +335,7 @@ public final class Suppliers {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(instance);
+            return DObjects.hashCode(instance);
         }
 
         @Override

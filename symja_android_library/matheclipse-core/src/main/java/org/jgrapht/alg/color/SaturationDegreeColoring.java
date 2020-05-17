@@ -17,6 +17,7 @@
  */
 package org.jgrapht.alg.color;
 
+import com.duy.lang.DInteger;
 import com.duy.util.DObjects;
 
 import org.jgrapht.Graph;
@@ -188,7 +189,7 @@ public class SaturationDegreeColoring<V, E>
             } else if (sat1 < sat2) {
                 return 1;
             } else {
-                return -1 * Integer.compare(degree.get(o1), degree.get(o2));
+                return -1 * DInteger.compare(degree.get(o1), degree.get(o2));
             }
         }
     }

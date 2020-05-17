@@ -23,6 +23,7 @@ package de.lab4inf.math.sets;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MLogger;
 import de.lab4inf.math.Operand;
@@ -561,7 +562,7 @@ public class RationalNumber extends Number implements Rational {
     public RationalNumber multiply(final double x) {
         final long y = Math.round(Math.floor(x));
         if (Math.abs(x - y) > Accuracy.DEPS) {
-            logger.warning(String.format("scaling by none integer %f", x));
+            logger.warning(String.format(Locale.US, "scaling by none integer %f", x));
         }
         return multiply(y);
     }
@@ -652,7 +653,7 @@ public class RationalNumber extends Number implements Rational {
             delta = diff(t, y);
             y = t;
             // y.setEps(Math.abs(delta));
-            // logger.info(String.format("%s eps:%.2e", y,delta));
+            // logger.info(String.format(Locale.US, "%s eps:%.2e", y,delta));
         } while (Math.abs(delta) > deps);
         y.setEps(deps);
         return y;
@@ -677,7 +678,7 @@ public class RationalNumber extends Number implements Rational {
             xk = xk.multiply(this);
             y = sum;
             // y.setEps(Math.abs(delta));
-            // logger.info(String.format("%s eps:%.2e", y,delta));
+            // logger.info(String.format(Locale.US, "%s eps:%.2e", y,delta));
         } while (Math.abs(delta) > eps);
         y.setEps(eps);
         return y;
@@ -712,7 +713,7 @@ public class RationalNumber extends Number implements Rational {
             xk = xk.multiply(xsq);
             y = sum;
             // y.setEps(Math.abs(delta));
-            // logger.info(String.format("%s eps:%.2e", y,delta));
+            // logger.info(String.format(Locale.US, "%s eps:%.2e", y,delta));
         } while (Math.abs(delta) > eps);
         y.setEps(eps);
         return y;
@@ -748,7 +749,7 @@ public class RationalNumber extends Number implements Rational {
 
             y = sum;
             // y.setEps(Math.abs(delta));
-            // logger.info(String.format("%s eps:%.2e", y,delta));
+            // logger.info(String.format(Locale.US, "%s eps:%.2e", y,delta));
         } while (Math.abs(delta) > eps);
         y.setEps(eps);
         return y;
@@ -871,9 +872,9 @@ public class RationalNumber extends Number implements Rational {
     public String toString(final boolean full) {
         final int digets = -(int) Math.log10(eps);
         if (full) {
-            return String.format("[%s / %s]=%s", numerator, divider, toString(digets));
+            return String.format(Locale.US, "[%s / %s]=%s", numerator, divider, toString(digets));
         }
-        return String.format("%s", toString(digets));
+        return String.format(Locale.US, "%s", toString(digets));
     }
 
     /*

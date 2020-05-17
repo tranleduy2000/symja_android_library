@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.roots;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
 import de.lab4inf.math.RootFinder;
@@ -138,9 +140,9 @@ public abstract class AbstractRootFinder extends L4MObject implements RootFinder
             setEpsilon(guess[2]);
         }
         final double x = findroot(f, guess);
-        // logger.info(String.format("found approximate root: %+f ",x));
+        // logger.info(String.format(Locale.US, "found approximate root: %+f ",x));
         if (Math.abs(f.f(x)) > Accuracy.FEPS) {
-            final String msg = String.format("found fake pole %.2e at %.5g", f.f(x), x);
+            final String msg = String.format(Locale.US, "found fake pole %.2e at %.5g", f.f(x), x);
             logger.info(msg);
             throw new ArithmeticException(msg);
         }

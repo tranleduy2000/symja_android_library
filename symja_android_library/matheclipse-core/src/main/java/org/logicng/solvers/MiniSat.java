@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -584,7 +585,7 @@ public final class MiniSat extends SATSolver {
 
     @Override
     public String toString() {
-        return String.format("MiniSat{result=%s, incremental=%s}", this.result, this.incremental);
+        return String.format(Locale.US, "MiniSat{result=%s, incremental=%s}", this.result, this.incremental);
     }
 
     private Literal getLiteralFromIntLiteral(final int lit) {

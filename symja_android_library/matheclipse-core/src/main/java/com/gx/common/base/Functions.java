@@ -14,6 +14,7 @@
 
 package com.gx.common.base;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.GwtCompatible;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
@@ -252,7 +253,7 @@ public final class Functions {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(map, defaultValue);
+            return DObjects.hashCode(map, defaultValue);
         }
 
         @Override

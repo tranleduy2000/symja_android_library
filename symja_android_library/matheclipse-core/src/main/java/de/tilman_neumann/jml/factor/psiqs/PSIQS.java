@@ -14,6 +14,7 @@
 package de.tilman_neumann.jml.factor.psiqs;
 
 import java.math.BigInteger;
+import java.util.Locale;
 
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver;
 import de.tilman_neumann.jml.factor.siqs.data.BaseArrays;
@@ -49,7 +50,7 @@ public class PSIQS extends PSIQSBase {
 
 	@Override
 	public String getName() {
-		String maxQRestExponentStr = "maxQRestExponent=" + String.format("%.3f", maxQRestExponent);
+		String maxQRestExponentStr = "maxQRestExponent=" + String.format(Locale.US, "%.3f", maxQRestExponent);
 		return "PSIQS(Cmult=" + Cmult + ", Mmult=" + Mmult + ", qCount=" + apg.getQCount() + ", " + maxQRestExponentStr + ", " + powerFinder.getName() + ", " + solverController.getName() + ", " + numberOfThreads + " threads)";
 	}
 

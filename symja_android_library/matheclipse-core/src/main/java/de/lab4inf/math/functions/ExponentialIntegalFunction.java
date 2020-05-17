@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import static de.lab4inf.math.Constants.EULER;
 import static de.lab4inf.math.util.Accuracy.hasConverged;
 import static java.lang.Math.exp;
@@ -58,7 +60,7 @@ public class ExponentialIntegalFunction extends L4MFunction {
      */
     public static double ei(final double x) {
         if (x <= 0) {
-            throw new IllegalArgumentException(String.format("x=%.2f <=0", x));
+            throw new IllegalArgumentException(String.format(Locale.US, "x=%.2f <=0", x));
         }
         if (x > TURN) {
             return -e1Asym(-x);

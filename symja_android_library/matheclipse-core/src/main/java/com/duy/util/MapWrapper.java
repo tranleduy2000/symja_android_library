@@ -37,6 +37,28 @@ public class MapWrapper<K, V> {
         return curValue;
     }
 
+    public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        DObjects.requireNonNull(remappingFunction);
+        V oldValue = get(key);
+
+        V newValue = remappingFunction.apply(key, oldValue);
+        if (newValue == null) {
+            // delete mapping
+            if (oldValue != null || containsKey(key)) {
+                // something to remove
+                remove(key);
+                return null;
+            } else {
+                // nothing to do. Leave things as they were.
+                return null;
+            }
+        } else {
+            // add or replace old mapping
+            put(key, newValue);
+            return newValue;
+        }
+    }
+
     public void forEach(BiConsumer<K, V> action) {
         DObjects.requireNonNull(action);
         for (Map.Entry<K, V> entry : entrySet()) {

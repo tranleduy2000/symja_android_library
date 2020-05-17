@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.text;
 
+import com.duy.util.DObjects;
+
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParsePosition;
@@ -289,8 +291,8 @@ public class ExtendedMessageFormat extends MessageFormat {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = HASH_SEED * result + Objects.hashCode(registry);
-        result = HASH_SEED * result + Objects.hashCode(toPattern);
+        result = HASH_SEED * result + DObjects.hashCode(registry);
+        result = HASH_SEED * result + DObjects.hashCode(toPattern);
         return result;
     }
 

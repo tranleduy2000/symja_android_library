@@ -16,6 +16,7 @@
 
 package com.gx.common.collect;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.GwtIncompatible;
@@ -2167,7 +2168,7 @@ public final class Maps {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(
+            return DObjects.hashCode(
                     entriesOnlyOnLeft(), entriesOnlyOnRight(), entriesInCommon(), entriesDiffering());
         }
 
@@ -2228,7 +2229,7 @@ public final class Maps {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(left, right);
+            return DObjects.hashCode(left, right);
         }
 
         @Override

@@ -30,6 +30,7 @@ package org.logicng.util;
 
 import com.duy.util.DObjects;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -92,6 +93,6 @@ public class Pair<A, B> {
 
     @Override
     public String toString() {
-        return String.format("<%s, %s>", a, b);
+        return String.format(Locale.US, "<%s, %s>", a, b);
     }
 }

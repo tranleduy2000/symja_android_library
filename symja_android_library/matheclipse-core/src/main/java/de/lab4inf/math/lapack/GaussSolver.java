@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.lapack;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Numeric;
 
 import static de.lab4inf.math.lapack.LinearAlgebra.copy;
@@ -1371,7 +1373,7 @@ public class GaussSolver extends LASolver {
             residualCorrection(a, ma, b, x, p);
             double corrected = LinearAlgebra.norm1(residual(a, b, x));
             getLogger().warn(
-                    String.format("Global Residual Error %e changed to %e ratio=%f", resErr, corrected, corrected
+                    String.format(Locale.US, "Global Residual Error %e changed to %e ratio=%f", resErr, corrected, corrected
                             / resErr));
         }
         return x;

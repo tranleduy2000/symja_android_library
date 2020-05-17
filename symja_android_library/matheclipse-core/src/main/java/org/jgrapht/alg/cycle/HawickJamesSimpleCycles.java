@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphTests;
 import org.jgrapht.Graphs;
@@ -157,7 +159,7 @@ public class HawickJamesSimpleCycles<V, E>
                 continue;
             }
 
-            if (Objects.equals(w, start)) {
+            if (DObjects.equals(w, start)) {
                 if (o == Operation.ENUMERATE) {
                     List<V> cycle = new ArrayList<>(stack.size());
 
@@ -230,7 +232,7 @@ public class HawickJamesSimpleCycles<V, E>
         Iterator<Integer> iterator = list.iterator();
         while (iterator.hasNext()) {
             Integer w = iterator.next();
-            if (Objects.equals(w, u)) {
+            if (DObjects.equals(w, u)) {
                 nOccurrences++;
                 iterator.remove();
             }

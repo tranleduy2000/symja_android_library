@@ -13,6 +13,7 @@
  */
 package de.tilman_neumann.jml.factor.base.congruence;
 
+import java.util.Locale;
 import java.util.Map;
 
 import de.tilman_neumann.util.Multiset;
@@ -86,16 +87,16 @@ public class CongruenceCollectorReport {
 			}
 		}
 		float smoothPercentage = (nonIntSmoothBigFactorCount*100.0F) / totalSmoothBigFactorCount;
-		return String.format("%.2f", smoothPercentage) + "% of smooths' big factors and " + String.format("%.2f", partialPercentage) + "% of partials' big factors are > 31 bit";
+		return String.format(Locale.US, "%.2f", smoothPercentage) + "% of smooths' big factors and " + String.format(Locale.US, "%.2f", partialPercentage) + "% of partials' big factors are > 31 bit";
 	}
 	
 	public String getPartialQSignCounts() {
 		float partialWithPositiveQPercentage = partialWithPositiveQCount*100.0F / partialCount;
-		return partialWithPositiveQCount + " partials (" + String.format("%.2f", partialWithPositiveQPercentage) + "%) had positive Q, " + (partialCount-partialWithPositiveQCount) + " partials (" + String.format("%.2f", 100-partialWithPositiveQPercentage) + "%) had negative Q";
+		return partialWithPositiveQCount + " partials (" + String.format(Locale.US, "%.2f", partialWithPositiveQPercentage) + "%) had positive Q, " + (partialCount-partialWithPositiveQCount) + " partials (" + String.format(Locale.US, "%.2f", 100-partialWithPositiveQPercentage) + "%) had negative Q";
 	}
 	
 	public String getSmoothQSignCounts() {
 		float smoothWithPositiveQPercentage = smoothWithPositiveQCount*100.0F / smoothCount;
-		return smoothWithPositiveQCount + " smooths (" + String.format("%.2f", smoothWithPositiveQPercentage) + "%) had positive Q, " + (smoothCount-smoothWithPositiveQCount) + " smooths (" + String.format("%.2f", 100-smoothWithPositiveQPercentage) + "%) had negative Q";
+		return smoothWithPositiveQCount + " smooths (" + String.format(Locale.US, "%.2f", smoothWithPositiveQPercentage) + "%) had positive Q, " + (smoothCount-smoothWithPositiveQCount) + " smooths (" + String.format(Locale.US, "%.2f", 100-smoothWithPositiveQPercentage) + "%) had negative Q";
 	}
 }

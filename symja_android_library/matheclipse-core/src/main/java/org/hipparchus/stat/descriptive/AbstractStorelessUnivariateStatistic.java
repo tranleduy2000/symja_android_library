@@ -27,6 +27,8 @@ import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
 
+import java.util.Locale;
+
 /**
  * Abstract base class for implementations of the
  * {@link StorelessUnivariateStatistic} interface.
@@ -128,7 +130,7 @@ public abstract class AbstractStorelessUnivariateStatistic
 
     @Override
     public String toString() {
-        return String.format("%s: result=%f, N=%d",
+        return String.format(Locale.US, "%s: result=%f, N=%d",
                 getClass().getSimpleName(),
                 getResult(),
                 getN());

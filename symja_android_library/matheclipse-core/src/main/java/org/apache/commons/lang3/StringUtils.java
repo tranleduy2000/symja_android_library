@@ -7861,7 +7861,7 @@ public class StringUtils {
         final int minAbbrevWidthOffset = abbrevMarkerLength + abbrevMarkerLength + 1;
 
         if (maxWidth < minAbbrevWidth) {
-            throw new IllegalArgumentException(String.format("Minimum abbreviation width is %d", minAbbrevWidth));
+            throw new IllegalArgumentException(String.format(Locale.US, "Minimum abbreviation width is %d", minAbbrevWidth));
         }
         if (str.length() <= maxWidth) {
             return str;
@@ -7876,7 +7876,7 @@ public class StringUtils {
             return str.substring(0, maxWidth - abbrevMarkerLength) + abbrevMarker;
         }
         if (maxWidth < minAbbrevWidthOffset) {
-            throw new IllegalArgumentException(String.format("Minimum abbreviation width with offset is %d", minAbbrevWidthOffset));
+            throw new IllegalArgumentException(String.format(Locale.US, "Minimum abbreviation width with offset is %d", minAbbrevWidthOffset));
         }
         if (offset + maxWidth - abbrevMarkerLength < str.length()) {
             return abbrevMarker + abbreviate(str.substring(offset), abbrevMarker, maxWidth - abbrevMarkerLength);

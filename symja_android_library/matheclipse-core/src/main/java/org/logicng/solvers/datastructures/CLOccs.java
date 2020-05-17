@@ -53,6 +53,7 @@ package org.logicng.solvers.datastructures;
 import org.logicng.collections.LNGVector;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Full occurrence lists for dense mode of the SAT solver (used during simplifications).
@@ -122,6 +123,6 @@ public final class CLOccs implements Iterable<CLClause> {
 
     @Override
     public String toString() {
-        return String.format("CLOccs{count=%d, clauses=%s}", this.count, this.clauses);
+        return String.format(Locale.US, "CLOccs{count=%d, clauses=%s}", this.count, this.clauses);
     }
 }

@@ -1,5 +1,7 @@
 package org.matheclipse.core.expression;
 
+import com.duy.lang.DMath;
+
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.matheclipse.core.builtin.IOFunctions;
@@ -172,8 +174,8 @@ public class IntervalSym {
 						F.num(values[1]));
 			}
 			double value = ((ISignedNumber) arg).doubleValue();
-			return F.List(F.num(Math.nextDown(value)), //
-					F.num(Math.nextUp(value)));
+			return F.List(F.num(DMath.nextDown(value)), //
+					F.num(DMath.nextUp(value)));
 		}
 		return F.List(arg, arg);
 	}

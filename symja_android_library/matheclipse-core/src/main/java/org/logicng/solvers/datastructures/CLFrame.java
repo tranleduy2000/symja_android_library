@@ -50,6 +50,8 @@
 
 package org.logicng.solvers.datastructures;
 
+import java.util.Locale;
+
 /**
  * A decision frame for the SAT solver.  Each decision opens up a new frame.
  *
@@ -130,6 +132,6 @@ public final class CLFrame {
 
     @Override
     public String toString() {
-        return String.format("CLFrame{decision=%d, level=%d, trail=%d, mark=%s}", this.decision, this.level, this.trail, this.mark);
+        return String.format(Locale.US, "CLFrame{decision=%d, level=%d, trail=%d, mark=%s}", this.decision, this.level, this.trail, this.mark);
     }
 }

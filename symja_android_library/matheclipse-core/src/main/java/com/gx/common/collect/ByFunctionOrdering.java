@@ -16,6 +16,7 @@
 
 package com.gx.common.collect;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.Function;
 import com.gx.common.base.Objects;
@@ -60,7 +61,7 @@ final class ByFunctionOrdering<F, T> extends Ordering<F> implements Serializable
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(function, ordering);
+        return DObjects.hashCode(function, ordering);
     }
 
     @Override

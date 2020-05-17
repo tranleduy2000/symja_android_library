@@ -14,6 +14,7 @@
 
 package com.gx.common.io;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.base.Ascii;
@@ -951,7 +952,7 @@ public abstract class BaseEncoding {
 
         @Override
         public int hashCode() {
-            return alphabet.hashCode() ^ Objects.hashCode(paddingChar);
+            return alphabet.hashCode() ^ DObjects.hashCode(paddingChar);
         }
     }
 

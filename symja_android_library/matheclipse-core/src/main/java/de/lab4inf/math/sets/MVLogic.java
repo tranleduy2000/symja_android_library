@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.sets;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Operand;
 
 /**
@@ -179,7 +181,7 @@ public abstract class MVLogic {
      */
     @Override
     public String toString() {
-        return String.format("%d/%d", n, order);
+        return String.format(Locale.US, "%d/%d", n, order);
     }
 
     /**
@@ -296,7 +298,7 @@ public abstract class MVLogic {
          */
         @Override
         public String toString() {
-            return String.format("Goedel:%s", super.toString());
+            return String.format(Locale.US, "Goedel:%s", super.toString());
         }
     }
 
@@ -342,7 +344,7 @@ public abstract class MVLogic {
          */
         @Override
         public String toString() {
-            return String.format("Luca:%s", super.toString());
+            return String.format(Locale.US, "Luca:%s", super.toString());
         }
     }
 }

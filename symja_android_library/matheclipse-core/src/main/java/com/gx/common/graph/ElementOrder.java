@@ -16,6 +16,7 @@
 
 package com.gx.common.graph;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.base.MoreObjects;
 import com.gx.common.base.MoreObjects.ToStringHelper;
@@ -124,7 +125,7 @@ public final class ElementOrder<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, comparator);
+        return DObjects.hashCode(type, comparator);
     }
 
     @Override

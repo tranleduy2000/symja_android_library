@@ -14,6 +14,7 @@
 
 package com.gx.common.math;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.base.MoreObjects;
@@ -289,7 +290,7 @@ public final class PairedStats implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(xStats, yStats, sumOfProductsOfDeltas);
+        return DObjects.hashCode(xStats, yStats, sumOfProductsOfDeltas);
     }
 
     @Override

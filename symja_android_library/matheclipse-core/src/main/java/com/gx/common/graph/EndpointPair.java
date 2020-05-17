@@ -16,6 +16,7 @@
 
 package com.gx.common.graph;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.base.Objects;
 import com.gx.common.collect.Iterators;
@@ -146,7 +147,7 @@ public abstract class EndpointPair<N> implements Iterable<N> {
     public abstract boolean equals(@NullableDecl Object obj);
 
     /**
-     * The hashcode of an ordered {@link EndpointPair} is equal to {@code Objects.hashCode(source(),
+     * The hashcode of an ordered {@link EndpointPair} is equal to {@code DObjects.hashCode(source(),
      * target())}. The hashcode of an unordered {@link EndpointPair} is equal to {@code
      * nodeU().hashCode() + nodeV().hashCode()}.
      */
@@ -192,7 +193,7 @@ public abstract class EndpointPair<N> implements Iterable<N> {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(source(), target());
+            return DObjects.hashCode(source(), target());
         }
 
         @Override

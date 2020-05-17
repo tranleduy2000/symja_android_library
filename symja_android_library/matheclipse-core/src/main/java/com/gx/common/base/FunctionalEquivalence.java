@@ -14,6 +14,7 @@
 
 package com.gx.common.base;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtCompatible;
 
@@ -67,7 +68,7 @@ final class FunctionalEquivalence<F, T> extends Equivalence<F> implements Serial
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(function, resultEquivalence);
+        return DObjects.hashCode(function, resultEquivalence);
     }
 
     @Override

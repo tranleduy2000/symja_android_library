@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.lapack;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Complex;
 import de.lab4inf.math.Numeric;
 import de.lab4inf.math.util.Accuracy;
@@ -138,7 +140,7 @@ public abstract class AbstractIterativeSolver extends LASolver {
                     t = p[k];
                     p[k] = p[j];
                     p[j] = t;
-                    //getLogger().error(String.format("%d <-> %d",p[k],p[j]));
+                    //getLogger().error(String.format(Locale.US, "%d <-> %d",p[k],p[j]));
                 }
             }
             if (aMax == 0 && j < n - 2) {
@@ -173,7 +175,7 @@ public abstract class AbstractIterativeSolver extends LASolver {
                     t = p[k];
                     p[k] = p[j];
                     p[j] = t;
-                    getLogger().error(String.format("%d <-> %d", p[k], p[j]));
+                    getLogger().error(String.format(Locale.US, "%d <-> %d", p[k], p[j]));
                 }
             }
             if (aMax.isZero() && j < n - 2) {

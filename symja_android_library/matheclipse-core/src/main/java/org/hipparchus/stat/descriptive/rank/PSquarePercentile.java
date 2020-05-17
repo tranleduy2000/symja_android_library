@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A {@link StorelessUnivariateStatistic} estimating percentiles using the
@@ -290,11 +291,11 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
     public synchronized String toString() {
 
         if (markers == null) {
-            return String.format("obs=%s pValue=%s",
+            return String.format(Locale.US, "obs=%s pValue=%s",
                     DECIMAL_FORMAT.format(lastObservation),
                     DECIMAL_FORMAT.format(pValue));
         } else {
-            return String.format("obs=%s markers=%s",
+            return String.format(Locale.US, "obs=%s markers=%s",
                     DECIMAL_FORMAT.format(lastObservation), markers.toString());
         }
     }
@@ -511,7 +512,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          */
         @Override
         public String toString() {
-            return String.format("m1=[%s],m2=[%s],m3=[%s],m4=[%s],m5=[%s]",
+            return String.format(Locale.US, "m1=[%s],m2=[%s],m3=[%s],m4=[%s],m5=[%s]",
                     markerArray[1].toString(), markerArray[2].toString(),
                     markerArray[3].toString(), markerArray[4].toString(),
                     markerArray[5].toString());

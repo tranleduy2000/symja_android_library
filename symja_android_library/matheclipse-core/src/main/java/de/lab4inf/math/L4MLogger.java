@@ -24,6 +24,7 @@ package de.lab4inf.math;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.IllegalFormatConversionException;
+import java.util.Locale;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -161,7 +162,7 @@ public class L4MLogger extends Logger {
                 cname = frame.getClassName();
                 // We've found the relevant frame.
                 classmethod[0] = cname;
-                classmethod[1] = String.format("%d", frame.getLineNumber());
+                classmethod[1] = String.format(Locale.US, "%d", frame.getLineNumber());
                 break;
             }
             ix--;
@@ -394,17 +395,17 @@ public class L4MLogger extends Logger {
             String threadInfo = Thread.currentThread().getName();
             Throwable thrown = record.getThrown();
             String clazz = className(record.getSourceClassName());
-            String where = String.format("[%s] (%s.java:%s)", threadInfo, clazz,
+            String where = String.format(Locale.US, "[%s] (%s.java:%s)", threadInfo, clazz,
                     record.getSourceMethodName());
-            where = String.format("%s", where);
+            where = String.format(Locale.US, "%s", where);
             if (thrown == null) {
-                msg = String.format("%-7s %s - %s %n", record.getLevel(),
+                msg = String.format(Locale.US, "%-7s %s - %s %n", record.getLevel(),
                         where, record.getMessage());
             } else {
                 StackTraceElement stack = thrown.getStackTrace()[0];
                 String errorClazz = stack.getClassName();
                 int errorLine = stack.getLineNumber();
-                msg = String.format("%-7s %s %s %s:%d %s%n",
+                msg = String.format(Locale.US, "%-7s %s %s %s:%d %s%n",
                         record.getLevel(), where, record.getMessage(),
                         errorClazz, errorLine, thrown.getMessage());
             }

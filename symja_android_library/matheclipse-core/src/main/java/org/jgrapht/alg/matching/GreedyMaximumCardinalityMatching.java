@@ -17,6 +17,7 @@
  */
 package org.jgrapht.alg.matching;
 
+import com.duy.lang.DInteger;
 import com.duy.util.ListWrapper;
 
 import org.jgrapht.Graph;
@@ -120,7 +121,7 @@ public class GreedyMaximumCardinalityMatching<V, E>
                     graph.degreeOf(graph.getEdgeSource(e1)) + graph.degreeOf(graph.getEdgeTarget(e1));
             int degreeE2 =
                     graph.degreeOf(graph.getEdgeSource(e2)) + graph.degreeOf(graph.getEdgeTarget(e2));
-            return Integer.compare(degreeE1, degreeE2);
+            return DInteger.compare(degreeE1, degreeE2);
         }
     }
 }

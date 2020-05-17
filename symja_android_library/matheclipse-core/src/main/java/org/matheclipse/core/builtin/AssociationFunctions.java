@@ -1,6 +1,8 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.BiFunction;
 import com.duy.lambda.Function;
+import com.duy.util.MapWrapper;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -19,7 +21,6 @@ import org.matheclipse.core.interfaces.ISymbol;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 public class AssociationFunctions {
 	private final static class MutableInt {
@@ -142,7 +143,7 @@ public class AssociationFunctions {
 					HashMap<IExpr, MutableInt> map = new HashMap<IExpr, MutableInt>();
 					for (int i = 1; i < list.size(); i++) {
 						IExpr key = list.get(i);
-						map.compute(key, new BiFunction<IExpr, MutableInt, MutableInt>() {
+						new MapWrapper<>(map).compute(key, new BiFunction<IExpr, MutableInt, MutableInt>() {
                             @Override
                             public MutableInt apply(IExpr k, MutableInt v) {
                                 return (v == null) ? new MutableInt(1) : v.increment();
@@ -150,7 +151,7 @@ public class AssociationFunctions {
                         });
 					}
 					IAssociation assoc = new ASTAssociation(map.size(), false);
-					for (Map.Entry<IExpr, AssociationFunctions.MutableInt> elem : map.entrySet()) {
+					for (Map.Entry<IExpr, MutableInt> elem : map.entrySet()) {
 						assoc.appendRule(F.Rule(elem.getKey(), F.ZZ(elem.getValue().value())));
 					}
 					return assoc;

@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.ode;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 
 import static de.lab4inf.math.util.Accuracy.hasReachedAccuracy;
@@ -53,7 +55,7 @@ public class RKNSolver extends AbstractOdeSolver implements SecondOrderOdeSolver
                         final double x1, final Function f, final double eps) {
         double y, e = eps / 10;
         if (eps < EPS_MIN) {
-            String msg = String.format("epsilon:%.2g less than esp_min=%.2g",
+            String msg = String.format(Locale.US, "epsilon:%.2g less than esp_min=%.2g",
                     eps, EPS_MIN);
             logger.warn(msg);
             e = max(eps, EPS_MIN);
@@ -132,7 +134,7 @@ public class RKNSolver extends AbstractOdeSolver implements SecondOrderOdeSolver
             }
         } while (!hasReachedAccuracy(yb, ya, eps) && h > H_MIN);
         if (h < H_MIN) {
-            String msg = String.format("RKN no convergence width h=%f", h);
+            String msg = String.format(Locale.US, "RKN no convergence width h=%f", h);
             logger.info(msg);
             throw new ArithmeticException(msg);
         }

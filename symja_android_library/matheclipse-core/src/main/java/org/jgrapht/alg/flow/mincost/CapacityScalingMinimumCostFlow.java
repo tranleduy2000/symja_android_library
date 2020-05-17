@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -410,7 +411,7 @@ public class CapacityScalingMinimumCostFlow<V, E>
      */
     private Pair<List<Node>, Set<Node>> scale(int delta) {
         if (DEBUG) {
-            System.out.println(String.format("Current delta = %d", delta));
+            System.out.println(String.format(Locale.US, "Current delta = %d", delta));
         }
 
         // saturate all non-saturated arcs with negative edge costs in the delta-residual network
@@ -516,10 +517,10 @@ public class CapacityScalingMinimumCostFlow<V, E>
                     node.potential += distance;
                 }
                 if (DEBUG) {
-                    System.out.println(String.format("Distance = %.1f", distance));
+                    System.out.println(String.format(Locale.US, "Distance = %.1f", distance));
                     for (Node node : nodes) {
                         System.out.println(
-                                String.format("Id = %d, potential = %.1f", node.id, node.potential));
+                                String.format(Locale.US, "Id = %d, potential = %.1f", node.id, node.potential));
                     }
                 }
                 return;
@@ -756,7 +757,7 @@ public class CapacityScalingMinimumCostFlow<V, E>
          */
         @Override
         public String toString() {
-            return String.format("Id = %d, excess = %d, potential = %.1f", id, excess, potential);
+            return String.format(Locale.US, "Id = %d, excess = %d, potential = %.1f", id, excess, potential);
         }
     }
 

@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 
@@ -537,7 +538,7 @@ public class PushRelabelMFImpl<V, E>
 
         @Override
         public String toString() {
-            return prototype.toString() + String.format(" { HGT: %d } ", height);
+            return prototype.toString() + String.format(Locale.US, " { HGT: %d } ", height);
         }
     }
 }

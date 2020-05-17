@@ -16,7 +16,10 @@
  */
 package org.apache.commons.lang3.builder;
 
+import com.duy.lang.DCharacter;
+import com.duy.lang.DInteger;
 import com.duy.lang.DLong;
+import com.duy.lang.DShort;
 
 import java.util.Comparator;
 
@@ -262,7 +265,7 @@ public class CompareToBuilder implements Builder<Integer> {
         if (comparison != 0) {
             return this;
         }
-        comparison = Integer.compare(lhs, rhs);
+        comparison = DInteger.compare(lhs, rhs);
         return this;
     }
 
@@ -278,7 +281,7 @@ public class CompareToBuilder implements Builder<Integer> {
         if (comparison != 0) {
             return this;
         }
-        comparison = Short.compare(lhs, rhs);
+        comparison = DShort.compare(lhs, rhs);
         return this;
     }
 
@@ -294,7 +297,7 @@ public class CompareToBuilder implements Builder<Integer> {
         if (comparison != 0) {
             return this;
         }
-        comparison = Character.compare(lhs, rhs);
+        comparison = DCharacter.compare(lhs, rhs);
         return this;
     }
 

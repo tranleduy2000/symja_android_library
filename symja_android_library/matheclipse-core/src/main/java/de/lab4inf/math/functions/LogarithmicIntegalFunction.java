@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import static de.lab4inf.math.Constants.EULER;
 import static de.lab4inf.math.util.Accuracy.hasConverged;
 import static de.lab4inf.math.util.Accuracy.hasReachedAccuracy;
@@ -52,7 +54,7 @@ public class LogarithmicIntegalFunction extends L4MFunction {
 
     public static double li(final double x) {
         if (x <= 1) {
-            throw new IllegalArgumentException(String.format("x=%.2f < 1", x));
+            throw new IllegalArgumentException(String.format(Locale.US, "x=%.2f < 1", x));
         }
         if (x < TURN) {
             return liRamanujan(x);

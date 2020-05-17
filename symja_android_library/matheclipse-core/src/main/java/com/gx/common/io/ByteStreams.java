@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.Locale;
 
 import static com.gx.common.base.Preconditions.checkArgument;
 import static com.gx.common.base.Preconditions.checkNotNull;
@@ -283,7 +284,7 @@ public final class ByteStreams {
         // When called at high frequency, boxing size generates too much garbage,
         // so avoid doing that if we can.
         if (size < 0) {
-            throw new IllegalArgumentException(String.format("Invalid size: %s", size));
+            throw new IllegalArgumentException(String.format(Locale.US, "Invalid size: %s", size));
         }
         return newDataOutput(new ByteArrayOutputStream(size));
     }

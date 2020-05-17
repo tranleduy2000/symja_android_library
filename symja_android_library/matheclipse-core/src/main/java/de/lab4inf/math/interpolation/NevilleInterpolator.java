@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.interpolation;
 
+import java.util.Locale;
+
 import static de.lab4inf.math.lapack.LinearAlgebra.copy;
 import static java.lang.Math.abs;
 
@@ -99,7 +101,7 @@ public class NevilleInterpolator extends Interpolator {
                 w = c[i] - d[i - 1];
                 dx = xi - xm;
                 if (dx == 0) {
-                    String msg = String.format("x[%d] == x[%d+%d]", i, i, m);
+                    String msg = String.format(Locale.US, "x[%d] == x[%d+%d]", i, i, m);
                     throw new IllegalArgumentException(msg);
                 }
                 dx = w / dx;
@@ -113,7 +115,7 @@ public class NevilleInterpolator extends Interpolator {
             }
             y += dy;
         }
-        // logger.info(String.format("p(%+.2f)=%f err:%+.6g",x,y,dy));
+        // logger.info(String.format(Locale.US, "p(%+.2f)=%f err:%+.6g",x,y,dy));
         return y;
     }
 }

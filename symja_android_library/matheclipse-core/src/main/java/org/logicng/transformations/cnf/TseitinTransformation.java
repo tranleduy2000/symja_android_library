@@ -38,6 +38,7 @@ import org.logicng.predicates.CNFPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.logicng.formulas.cache.TransformationCacheEntry.TSEITIN;
 import static org.logicng.formulas.cache.TransformationCacheEntry.TSEITIN_VARIABLE;
@@ -158,6 +159,6 @@ public final class TseitinTransformation implements FormulaTransformation {
 
     @Override
     public String toString() {
-        return String.format("TseitinTransformation{boundary=%d}", boundaryForFactorization);
+        return String.format(Locale.US, "TseitinTransformation{boundary=%d}", boundaryForFactorization);
     }
 }

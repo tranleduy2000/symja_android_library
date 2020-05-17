@@ -23,6 +23,7 @@ package de.lab4inf.math.statistic;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MObject;
 
@@ -60,7 +61,7 @@ public class DataCollectorND extends L4MObject implements Serializable {
      * @param n dimension of the distribution.
      */
     public DataCollectorND(final int n) {
-        this(String.format("statistic-%dD", n), n);
+        this(String.format(Locale.US, "statistic-%dD", n), n);
     }
 
     /**

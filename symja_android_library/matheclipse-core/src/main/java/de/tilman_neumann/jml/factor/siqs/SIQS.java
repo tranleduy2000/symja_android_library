@@ -16,6 +16,7 @@ package de.tilman_neumann.jml.factor.siqs;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.tilman_neumann.jml.factor.FactorAlgorithmBase;
 import de.tilman_neumann.jml.factor.FactorException;
@@ -122,7 +123,7 @@ public class SIQS extends FactorAlgorithmBase {
 
 	@Override
 	public String getName() {
-		String maxQRestExponentStr = "maxQRestExponent=" + String.format("%.3f", maxQRestExponent);
+		String maxQRestExponentStr = "maxQRestExponent=" + String.format(Locale.US, "%.3f", maxQRestExponent);
 		return "SIQS(Cmult=" + Cmult + ", Mmult=" + Mmult + ", qCount=" + apg.getQCount() + ", " + maxQRestExponentStr + ", " + powerFinder.getName() + ", " + polyGenerator.getName() + ", " + sieve.getName() + ", " + auxFactorizer.getName() + ", " + solverController.getName() + ")";
 	}
 	

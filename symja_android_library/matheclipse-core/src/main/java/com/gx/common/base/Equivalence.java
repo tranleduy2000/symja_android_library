@@ -14,6 +14,7 @@
 
 package com.gx.common.base;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.errorprone.annotations.ForOverride;
 
@@ -325,7 +326,7 @@ public abstract class Equivalence<T> {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(equivalence, target);
+            return DObjects.hashCode(equivalence, target);
         }
 
         @Override

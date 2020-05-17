@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.roots;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 
 import static java.lang.Math.max;
@@ -47,7 +49,7 @@ public class SecantRootFinder extends AbstractRootFinder {
     private static void checkBracket(final double a, final double x,
                                      final double b) {
         if (x < min(a, b) || x > max(a, b)) {
-            String msg = String.format("secant %f leaves [%f,%f]", x, a, b);
+            String msg = String.format(Locale.US, "secant %f leaves [%f,%f]", x, a, b);
             throw new IllegalArgumentException(msg);
         }
     }

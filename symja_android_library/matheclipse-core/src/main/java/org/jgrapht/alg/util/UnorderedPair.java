@@ -64,8 +64,8 @@ public class UnorderedPair<A, B>
 
         @SuppressWarnings("unchecked") UnorderedPair<A, B> other = (UnorderedPair<A, B>) o;
 
-        return (Objects.equals(first, other.first) && DObjects.equals(second, other.second))
-                || (Objects.equals(first, other.second) && DObjects.equals(second, other.first));
+        return (DObjects.equals(first, other.first) && DObjects.equals(second, other.second))
+                || (DObjects.equals(first, other.second) && DObjects.equals(second, other.first));
     }
 
     @Override

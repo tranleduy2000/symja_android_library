@@ -22,6 +22,7 @@
 package de.lab4inf.math.util;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import static de.lab4inf.math.util.BinomialCoefficient.binomial;
 
@@ -59,7 +60,7 @@ public final class StirlingNumbers {
      * @return the unique key
      */
     private static Object pk(final String s, final int n, final int k) {
-        return String.format("%s(%d,%d)", s, n, k);
+        return String.format(Locale.US, "%s(%d,%d)", s, n, k);
     }
 
     /**

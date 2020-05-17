@@ -58,6 +58,7 @@ import org.logicng.util.Pair;
 
 import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.TreeMap;
 
 import static org.logicng.datastructures.Tristate.FALSE;
@@ -335,7 +336,7 @@ public final class IncWBO extends WBO {
                 int coreCost = computeCostCore(solver.conflict());
                 lbCost += coreCost;
                 if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format("c LB : %d CS : %d W : %d", lbCost, solver.conflict().size(), coreCost));
+                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", lbCost, solver.conflict().size(), coreCost));
                 if (!foundLowerBound(lbCost, null))
                     return MaxSATResult.UNDEF;
                 this.relaxCore(solver.conflict(), coreCost);
@@ -420,7 +421,7 @@ public final class IncWBO extends WBO {
                 int coreCost = computeCostCore(solver.conflict());
                 lbCost += coreCost;
                 if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format("c LB : %d CS : %d W : %d", lbCost, solver.conflict().size(), coreCost));
+                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", lbCost, solver.conflict().size(), coreCost));
                 if (lbCost == ubCost) {
                     if (verbosity != Verbosity.NONE)
                         this.output.println("c LB = UB");

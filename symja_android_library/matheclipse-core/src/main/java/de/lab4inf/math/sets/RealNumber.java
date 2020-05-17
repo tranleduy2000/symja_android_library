@@ -24,6 +24,7 @@ package de.lab4inf.math.sets;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Locale;
 
 import de.lab4inf.math.Operand;
 import de.lab4inf.math.Real;
@@ -270,7 +271,7 @@ public class RealNumber extends Number implements Real {
      */
     @Override
     public String toString() {
-        return String.format("%g", value);
+        return String.format(Locale.US, "%g", value);
     }
 
     /*
@@ -519,7 +520,7 @@ public class RealNumber extends Number implements Real {
      */
     @Override
     public Real sqrt() {
-        // if(value<0) throw new IllegalArgumentException(String.format("%f is less zero",value));
+        // if(value<0) throw new IllegalArgumentException(String.format(Locale.US, "%f is less zero",value));
         // return new RealNumber(Math.sqrt(value));
         RealNumber delta, t, y = this;
         final RealNumber two = new RealNumber(2);

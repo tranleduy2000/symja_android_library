@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.ode;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 
 import static java.lang.Math.abs;
@@ -116,10 +118,10 @@ public class RKFSolver extends AbstractOdeSolver implements FirstOrderOdeSolver 
     public double solve(final double x0, final double y0, final double x1,
                         final Function f, final double eps) {
         // logger.info(
-        // String.format("selecting solver %s with precision %g", m, eps));
+        // String.format(Locale.US, "selecting solver %s with precision %g", m, eps));
         double y, e = eps / 10;
         if (e < EPS_MIN) {
-            String msg = String.format("epsilon:%.2g less than esp_min=%.2g",
+            String msg = String.format(Locale.US, "epsilon:%.2g less than esp_min=%.2g",
                     eps, EPS_MIN);
             logger.warn(msg);
             e = max(eps, EPS_MIN);
@@ -166,9 +168,9 @@ public class RKFSolver extends AbstractOdeSolver implements FirstOrderOdeSolver 
             // calculate the next step width
             q = qNext(h, dw, eps);
             h = min(q * h, H_MAX);
-            //logger.warn(String.format("x=%.2f y=%.2f q=%.2f h=%.3g dw=%.3g", xj + h, wj, q, h, dw));
+            //logger.warn(String.format(Locale.US, "x=%.2f y=%.2f q=%.2f h=%.3g dw=%.3g", xj + h, wj, q, h, dw));
             if (h < H_MIN && (xj + h < x1)) {
-                String msg = String.format("RKF no convergence! step width %g", h);
+                String msg = String.format(Locale.US, "RKF no convergence! step width %g", h);
                 logger.error(msg);
                 //h = H_MIN;
                 throw new ArithmeticException(msg);

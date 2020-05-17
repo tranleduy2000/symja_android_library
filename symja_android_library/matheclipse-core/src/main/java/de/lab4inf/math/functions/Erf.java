@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.util.Accuracy;
 
 import static de.lab4inf.math.util.Accuracy.hasConverged;
@@ -114,13 +116,13 @@ public class Erf extends L4MFunction {
     private static Type type = Type.CODY;
 
     static {
-        getLogger().info(String.format("X_MIN  = %.3e", Erf.X_MIN));
-        getLogger().info(String.format("X_MAX  = %.3e", Erf.X_MAX));
-        getLogger().info(String.format("X_INF  = %.3e", Erf.X_INF));
-        getLogger().info(String.format("X_NEG  = %.3f", Erf.X_NEG));
-        getLogger().info(String.format("X_SMALL= %.3e", Erf.X_SMALL));
-        getLogger().info(String.format("X_HUGE = %.3e", Erf.X_HUGE));
-        getLogger().info(String.format("X_BIG  = %.3f", Erf.X_BIG));
+        getLogger().info(String.format(Locale.US, "X_MIN  = %.3e", Erf.X_MIN));
+        getLogger().info(String.format(Locale.US, "X_MAX  = %.3e", Erf.X_MAX));
+        getLogger().info(String.format(Locale.US, "X_INF  = %.3e", Erf.X_INF));
+        getLogger().info(String.format(Locale.US, "X_NEG  = %.3f", Erf.X_NEG));
+        getLogger().info(String.format(Locale.US, "X_SMALL= %.3e", Erf.X_SMALL));
+        getLogger().info(String.format(Locale.US, "X_HUGE = %.3e", Erf.X_HUGE));
+        getLogger().info(String.format(Locale.US, "X_BIG  = %.3f", Erf.X_BIG));
     }
     // ===========================================================================
 

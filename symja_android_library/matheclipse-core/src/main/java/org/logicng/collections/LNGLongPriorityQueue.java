@@ -50,6 +50,8 @@
 
 package org.logicng.collections;
 
+import java.util.Locale;
+
 /**
  * A simple priority queue implementation for elements with long priorities taken from CleaneLing.
  *
@@ -313,7 +315,7 @@ public final class LNGLongPriorityQueue {
     public String toString() {
         final StringBuilder sb = new StringBuilder("LNGLongPriorityQueue{");
         for (int i = 0; i < this.heap.size(); i++) {
-            sb.append(String.format("<elem=%d, pos=%d, prio=%d>", this.heap.get(i), this.pos.get(i), this.prior.get(i)));
+            sb.append(String.format(Locale.US, "<elem=%d, pos=%d, prio=%d>", this.heap.get(i), this.pos.get(i), this.prior.get(i)));
             if (i != this.heap.size() - 1)
                 sb.append(", ");
         }

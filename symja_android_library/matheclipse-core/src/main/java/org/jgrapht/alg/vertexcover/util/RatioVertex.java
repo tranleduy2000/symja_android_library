@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.vertexcover.util;
 
+import com.duy.lang.DInteger;
+
 import org.jgrapht.util.TypeUtil;
 
 import java.util.LinkedHashMap;
@@ -125,7 +127,7 @@ public class RatioVertex<V>
             return 0;
         int result = Double.compare(this.getRatio(), other.getRatio());
         if (result == 0) // If vertices have the same value, resolve tie by an ID comparison
-            return Integer.compare(this.ID, other.ID);
+            return DInteger.compare(this.ID, other.ID);
         else
             return result;
     }

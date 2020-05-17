@@ -152,7 +152,7 @@ public class SineIntegral extends AbstractSiCiIntegrals implements Differentiabl
             xn *= x2;
             n++;
         } while (abs(delta) > EPS && n < 13);
-        // logger.info(String.format("x:%.4f max %d*%d! = %d ",x , nn,nn,fac));
+        // logger.info(String.format(Locale.US, "x:%.4f max %d*%d! = %d ",x , nn,nn,fac));
         return sum;
     }
 

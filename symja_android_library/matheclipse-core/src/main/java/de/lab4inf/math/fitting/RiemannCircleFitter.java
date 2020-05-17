@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.fitting;
 
+import java.util.Locale;
+
 import de.lab4inf.math.lapack.EigenValueDecomposition;
 import de.lab4inf.math.lapack.JacobiEigenvalueDecomposition;
 import de.lab4inf.math.lapack.LinearAlgebra;
@@ -179,7 +181,7 @@ public class RiemannCircleFitter extends CircleFitter {
             final double[] wt = LinearAlgebra.mult(vt, eigenvalue);
             final double diff = LinearAlgebra.diff(vt, wt);
             if (diff > 1.E5 * Accuracy.DEPS) {
-                getLogger().error(String.format("eigenvalue/vector missmatch: %.2g", diff));
+                getLogger().error(String.format(Locale.US, "eigenvalue/vector missmatch: %.2g", diff));
                 // throw new IllegalStateException("wrong eigenvalue/vector: "+diff);
             }
         }

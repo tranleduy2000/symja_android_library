@@ -28,6 +28,7 @@ import com.duy.lambda.IntConsumer;
 import com.duy.lambda.Supplier;
 import com.duy.lang.IntegerWrapper;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 /**
@@ -244,7 +245,7 @@ public final class OptionalInt {
     @Override
     public String toString() {
         return isPresent
-                ? String.format("OptionalInt[%s]", value)
+                ? String.format(Locale.US, "OptionalInt[%s]", value)
                 : "OptionalInt.empty";
     }
 }

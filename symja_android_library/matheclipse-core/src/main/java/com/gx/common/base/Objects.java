@@ -66,7 +66,7 @@ public final class Objects extends ExtraObjectsMethodsForWeb {
      * <p>
      * <pre>{@code
      * public int hashCode() {
-     *   return Objects.hashCode(getX(), getY(), getZ());
+     *   return DObjects.hashCode(getX(), getY(), getZ());
      * }
      * }</pre>
      * <p>

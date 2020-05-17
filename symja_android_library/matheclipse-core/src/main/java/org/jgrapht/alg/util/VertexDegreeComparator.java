@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.util;
 
+import com.duy.lang.DInteger;
+
 import org.jgrapht.Graph;
 
 import java.util.Comparator;
@@ -87,7 +89,7 @@ public class VertexDegreeComparator<V, E>
      */
     @Override
     public int compare(V v1, V v2) {
-        int comparison = Integer.compare(graph.degreeOf(v1), graph.degreeOf(v2));
+        int comparison = DInteger.compare(graph.degreeOf(v1), graph.degreeOf(v2));
 
         if (order == Order.ASCENDING)
             return comparison;

@@ -50,6 +50,8 @@
 
 package org.logicng.solvers.datastructures;
 
+import java.util.Locale;
+
 /**
  * Watcher of for a clause.
  *
@@ -112,7 +114,7 @@ public final class CLWatch {
 
     @Override
     public String toString() {
-        return String.format("CLWatch{blit=%d, binary=%s, clause=%s}", this.blit, this.binary, this.clause);
+        return String.format(Locale.US, "CLWatch{blit=%d, binary=%s, clause=%s}", this.blit, this.binary, this.clause);
     }
 }
 

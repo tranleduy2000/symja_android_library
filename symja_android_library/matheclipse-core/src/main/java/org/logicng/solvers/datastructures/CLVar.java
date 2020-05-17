@@ -50,6 +50,8 @@
 
 package org.logicng.solvers.datastructures;
 
+import java.util.Locale;
+
 /**
  * A variable of the SAT solver for CleaneLing-style solvers.
  *
@@ -162,7 +164,7 @@ public final class CLVar {
 
     @Override
     public String toString() {
-        return String.format("CLVar{state=%s, level=%s, mark=%s, reason=%s}", this.state, this.level, this.mark, this.reason);
+        return String.format(Locale.US, "CLVar{state=%s, level=%s, mark=%s, reason=%s}", this.state, this.level, this.mark, this.reason);
     }
 
     /**

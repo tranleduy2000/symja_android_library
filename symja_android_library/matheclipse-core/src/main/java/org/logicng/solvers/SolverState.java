@@ -29,6 +29,7 @@
 package org.logicng.solvers;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * A wrapper class for the internal solver state.
@@ -73,6 +74,6 @@ public final class SolverState {
 
     @Override
     public String toString() {
-        return String.format("SolverState{id=%d, state=%s}", id, Arrays.toString(state));
+        return String.format(Locale.US, "SolverState{id=%d, state=%s}", id, Arrays.toString(state));
     }
 }

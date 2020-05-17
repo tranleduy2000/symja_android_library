@@ -22,6 +22,7 @@
 package de.lab4inf.math.util;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 import de.lab4inf.math.Function;
@@ -160,7 +161,7 @@ public final class Randomizer extends L4MObject {
     public static synchronized void seed(final long seed) {
         rndSeed = seed;
         rnd = new Random(rndSeed);
-        getLogger().info(String.format("random generator seed %d", rndSeed));
+        getLogger().info(String.format(Locale.US, "random generator seed %d", rndSeed));
     }
 
     /**

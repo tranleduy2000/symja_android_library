@@ -14,6 +14,7 @@
 
 package com.gx.common.math;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.base.MoreObjects;
@@ -529,7 +530,7 @@ public final class Stats implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(count, mean, sumOfSquaresOfDeltas, min, max);
+        return DObjects.hashCode(count, mean, sumOfSquaresOfDeltas, min, max);
     }
 
     @Override

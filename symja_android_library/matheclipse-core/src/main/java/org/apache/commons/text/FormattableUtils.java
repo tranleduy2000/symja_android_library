@@ -18,6 +18,7 @@ package org.apache.commons.text;
 
 import java.util.Formattable;
 import java.util.Formatter;
+import java.util.Locale;
 
 import static java.util.FormattableFlags.LEFT_JUSTIFY;
 
@@ -131,7 +132,7 @@ public class FormattableUtils {
             final int precision, final char padChar, final CharSequence ellipsis) {
         if (!(ellipsis == null || precision < 0 || ellipsis.length() <= precision)) {
             throw new IllegalArgumentException(
-                    String.format("Specified ellipsis '%s' exceeds precision of %s",
+                    String.format(Locale.US, "Specified ellipsis '%s' exceeds precision of %s",
                             ellipsis,
                             precision));
         }

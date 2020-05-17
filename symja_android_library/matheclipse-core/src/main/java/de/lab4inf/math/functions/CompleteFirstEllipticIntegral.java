@@ -74,7 +74,7 @@ public class CompleteFirstEllipticIntegral extends L4MFunction implements Differ
             return Double.POSITIVE_INFINITY;
         } else if (m < 0) {
             return cfeint(-m);
-            // throw new IllegalArgumentException(String.format("m=%f < 0", m));
+            // throw new IllegalArgumentException(String.format(Locale.US, "m=%f < 0", m));
         } else if (m > 0.5) {
             // using A&ST 17.3.29
             mm = Math.sqrt(1 - m);

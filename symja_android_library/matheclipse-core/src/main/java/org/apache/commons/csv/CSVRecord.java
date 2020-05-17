@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -99,7 +100,7 @@ public final class CSVRecord implements Serializable, Iterable<String> {
         }
         final Integer index = mapping.get(name);
         if (index == null) {
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", name,
+            throw new IllegalArgumentException(String.format(Locale.US, "Mapping for %s not found, expected one of %s", name,
                 mapping.keySet()));
         }
         try {

@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Letters;
 import de.lab4inf.math.util.PrimeNumbers;
 
@@ -52,7 +54,7 @@ public class PiFunction extends L4MFunction {
     @Override
     public double f(final double... x) {
         if (x.length != 1)
-            throw new IllegalArgumentException(String.format("%s function needs 1 argument", PI));
+            throw new IllegalArgumentException(String.format(Locale.US, "%s function needs 1 argument", PI));
         return pi(x[0]);
     }
 

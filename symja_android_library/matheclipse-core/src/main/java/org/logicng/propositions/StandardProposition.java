@@ -35,6 +35,7 @@ import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -134,6 +135,6 @@ public final class StandardProposition extends Proposition {
 
     @Override
     public String toString() {
-        return String.format("StandardProposition{formulas=%s, description=%s}", this.formulas, this.description);
+        return String.format(Locale.US, "StandardProposition{formulas=%s, description=%s}", this.formulas, this.description);
     }
 }

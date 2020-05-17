@@ -58,6 +58,7 @@ import org.logicng.solvers.maxsat.encodings.Encoder;
 import org.logicng.solvers.sat.MiniSatStyleSolver;
 
 import java.io.PrintStream;
+import java.util.Locale;
 
 import static org.logicng.solvers.maxsat.algorithms.MaxSATConfig.CardinalityEncoding;
 import static org.logicng.solvers.maxsat.algorithms.MaxSATConfig.Verbosity;
@@ -146,7 +147,7 @@ public final class LinearSU extends MaxSAT {
                     if (newCost > 0 && !foundUpperBound(ubCost, null))
                         return MaxSATResult.UNDEF;
                 } else if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format("c BMO-UB : %d (Function %d/%d)", newCost, posWeight + 1, orderWeights.size()));
+                    this.output.println(String.format(Locale.US, "c BMO-UB : %d (Function %d/%d)", newCost, posWeight + 1, orderWeights.size()));
                 if (newCost == 0 && currentWeight == minWeight)
                     return MaxSATResult.OPTIMUM;
                 else {

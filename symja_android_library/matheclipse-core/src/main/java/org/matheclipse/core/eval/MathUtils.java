@@ -459,7 +459,7 @@ public class MathUtils {
 	// result = stringFromOutputStream(_outputStream);
 	// } catch (Throwable t) {
 	// Log.e("MathUtils",
-	// String.format("evalCodeString(): UNSUPPORTED OPERATION!\n[\n%s\n]\n%s",
+	// String.format(Locale.US, "evalCodeString(): UNSUPPORTED OPERATION!\n[\n%s\n]\n%s",
 	// codeString, t.toString()), t);
 	// result = "UNSUPPORTED OPERATION!\n[\n" + codeString + "\n]\n" +
 	// t.toString();
@@ -467,7 +467,7 @@ public class MathUtils {
 	// _outputStream.close();
 	// } catch (Throwable t) {
 	// Log.e("MathUtils",
-	// String.format("evalCodeString(): UNSUPPORTED OPERATION!\n[\n%s\n]\n%s",
+	// String.format(Locale.US, "evalCodeString(): UNSUPPORTED OPERATION!\n[\n%s\n]\n%s",
 	// codeString, t.toString()), t);
 	// result = "UNSUPPORTED OPERATION!\n[\n" + codeString + "\n]\n" +
 	// t.toString();

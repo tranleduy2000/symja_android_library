@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.L4MObject;
 import de.lab4inf.math.util.Accuracy;
 
@@ -133,7 +135,7 @@ public final class CarlsonIntegral extends L4MObject {
      */
     public static double rd(final double x, final double y, final double z) {
         if (z == 0)
-            throw new IllegalArgumentException(String.format("rd(%f,%f,%f) zero argument", x, y, z));
+            throw new IllegalArgumentException(String.format(Locale.US, "rd(%f,%f,%f) zero argument", x, y, z));
 
         int n = 0;
         double a0 = (x + y + 3 * z) / 5;
@@ -158,7 +160,7 @@ public final class CarlsonIntegral extends L4MObject {
 
         } while (q > fn * abs(am) && n < NMAX);
         if (n >= NMAX) {
-            throw new IllegalArgumentException(String.format("rd(%f,%f,%f) no convergence", x, y, z));
+            throw new IllegalArgumentException(String.format(Locale.US, "rd(%f,%f,%f) no convergence", x, y, z));
         }
         rd = 1 / (fn * am * sqrt(am));
         am *= fn;
@@ -205,7 +207,7 @@ public final class CarlsonIntegral extends L4MObject {
 
         } while (q > fn * abs(am) && n < NMAX);
         if (n >= NMAX) {
-            throw new IllegalArgumentException(String.format("rc(%f,%f) no convergence", x, y));
+            throw new IllegalArgumentException(String.format(Locale.US, "rc(%f,%f) no convergence", x, y));
         }
         rc = 1 / sqrt(am);
         am *= fn;
@@ -278,7 +280,7 @@ public final class CarlsonIntegral extends L4MObject {
 
         } while (q > fn * abs(am) && n < NMAX);
         if (n >= NMAX) {
-            throw new IllegalArgumentException(String.format("rj(%f,%f,%f,%f) no convergence", x, y, z, p));
+            throw new IllegalArgumentException(String.format(Locale.US, "rj(%f,%f,%f,%f) no convergence", x, y, z, p));
         }
         rj = 1 / (fn * am * sqrt(am));
         am *= fn;
@@ -309,7 +311,7 @@ public final class CarlsonIntegral extends L4MObject {
             return rf(x, y);
         if (x <= 0) {
             if (y <= 0) {
-                throw new IllegalArgumentException(String.format("rf(0,0,%f)", z));
+                throw new IllegalArgumentException(String.format(Locale.US, "rf(0,0,%f)", z));
             }
             return rf(y, z, x);
         }
@@ -334,7 +336,7 @@ public final class CarlsonIntegral extends L4MObject {
 
         } while (q > fn * abs(am) && n < NMAX);
         if (n >= NMAX) {
-            throw new IllegalArgumentException(String.format("rf(%f,%f,%f) no convergence", x, y, z));
+            throw new IllegalArgumentException(String.format(Locale.US, "rf(%f,%f,%f) no convergence", x, y, z));
         }
         rf = 1 / sqrt(am);
         am *= fn;
@@ -360,7 +362,7 @@ public final class CarlsonIntegral extends L4MObject {
         }
 
         if (x <= 0 || y <= 0) {
-            throw new IllegalArgumentException(String.format("rf(%f,%f) negativ argument", x, y));
+            throw new IllegalArgumentException(String.format(Locale.US, "rf(%f,%f) negativ argument", x, y));
         }
         int n = 0;
         double rf, xm, ym, xn = sqrt(x), yn = sqrt(y), zm;
@@ -373,7 +375,7 @@ public final class CarlsonIntegral extends L4MObject {
             yn = ym;
         } while (zm > xm * DEPS && n < NMAX);
         if (n >= NMAX) {
-            throw new IllegalArgumentException(String.format("rf(%f,%f) no convergence", x, y));
+            throw new IllegalArgumentException(String.format(Locale.US, "rf(%f,%f) no convergence", x, y));
         }
         rf = Math.PI / (xm + ym);
         return rf;
@@ -388,7 +390,7 @@ public final class CarlsonIntegral extends L4MObject {
      */
     public static double rg(final double x, final double y) {
         if (x < 0 || y < 0) {
-            throw new IllegalArgumentException(String.format("rg(%f,%f) negativ argument", x, y));
+            throw new IllegalArgumentException(String.format(Locale.US, "rg(%f,%f) negativ argument", x, y));
         }
         int n = 0;
         double rf, rg, tn = 1, xm, ym, xn = sqrt(x), yn = sqrt(y), zm, s0, sm = 0;
@@ -405,7 +407,7 @@ public final class CarlsonIntegral extends L4MObject {
             yn = ym;
         } while (abs(zm) > xm * DEPS && n < NMAX);
         if (n >= NMAX) {
-            throw new IllegalArgumentException(String.format("rg(%f,%f) no convergence", x, y));
+            throw new IllegalArgumentException(String.format(Locale.US, "rg(%f,%f) no convergence", x, y));
         }
         rf = Math.PI / (2 * xm);
         rg = (s0 - sm) * rf / 8;
@@ -504,7 +506,7 @@ public final class CarlsonIntegral extends L4MObject {
      */
     public static double[] KandE(final double m) {
         if (m < 0 || 1 < m) {
-            throw new IllegalArgumentException(String.format("K/E(%f) wrong argument", m));
+            throw new IllegalArgumentException(String.format(Locale.US, "K/E(%f) wrong argument", m));
         }
         double x = 1 - m;
         int n = 0;
@@ -522,7 +524,7 @@ public final class CarlsonIntegral extends L4MObject {
             yn = ym;
         } while (abs(zm) > xm * DEPS && n < 2 * NMAX);
         if (n >= 2 * NMAX) {
-            String msg = String.format("K/E(%f) no convergence", m);
+            String msg = String.format(Locale.US, "K/E(%f) no convergence", m);
             getLogger().error(msg);
             // throw new IllegalArgumentException();
         }

@@ -22,6 +22,7 @@
 package de.lab4inf.math.statistic;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import de.lab4inf.math.util.Accuracy;
 
@@ -141,8 +142,8 @@ public class DataCollector2D implements Serializable {
      */
     public void setName(final String name) {
         this.name = name;
-        xCollector.setName(String.format("%s-x", name));
-        yCollector.setName(String.format("%s-y", name));
+        xCollector.setName(String.format(Locale.US, "%s-x", name));
+        yCollector.setName(String.format(Locale.US, "%s-y", name));
     }
 
     /*

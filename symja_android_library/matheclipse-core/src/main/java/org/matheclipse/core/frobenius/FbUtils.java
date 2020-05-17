@@ -54,7 +54,7 @@ public final class FbUtils {
 				if (o1[i] < o2[i]) {
 					return -1;
 				}
-				// c = Integer.compare(o1[i], o2[i]);
+				// c = DInteger.compare(o1[i], o2[i]);
 				// if (c != 0)
 				// return c;
 			}

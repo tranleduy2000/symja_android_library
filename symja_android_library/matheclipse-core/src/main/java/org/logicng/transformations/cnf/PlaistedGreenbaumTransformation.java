@@ -38,6 +38,7 @@ import org.logicng.predicates.CNFPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.logicng.formulas.cache.TransformationCacheEntry.PLAISTED_GREENBAUM_POS;
 import static org.logicng.formulas.cache.TransformationCacheEntry.PLAISTED_GREENBAUM_VARIABLE;
@@ -159,6 +160,6 @@ public final class PlaistedGreenbaumTransformation implements FormulaTransformat
 
     @Override
     public String toString() {
-        return String.format("PlaistedGreenbaumTransformation{boundary=%d}", this.boundaryForFactorization);
+        return String.format(Locale.US, "PlaistedGreenbaumTransformation{boundary=%d}", this.boundaryForFactorization);
     }
 }

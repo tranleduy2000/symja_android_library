@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.ode;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 
 import static java.lang.Math.abs;
@@ -41,10 +43,10 @@ public class PCSolver extends AbstractOdeSolver implements FirstOrderOdeSolver {
      */
     public double solve(double x0, double y0, double x1, Function f, double eps) {
         // logger.info(
-        // String.format("selecting solver %s with precision %g", m, eps));
+        // String.format(Locale.US, "selecting solver %s with precision %g", m, eps));
         double y, e = eps / 10;
         if (e < EPS_MIN) {
-            String msg = String.format("epsilon:%.2g less than esp_min=%.2g",
+            String msg = String.format(Locale.US, "epsilon:%.2g less than esp_min=%.2g",
                     eps, EPS_MIN);
             logger.warn(msg);
             e = max(eps, EPS_MIN);

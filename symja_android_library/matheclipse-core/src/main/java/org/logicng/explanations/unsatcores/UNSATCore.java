@@ -33,6 +33,7 @@ import com.duy.util.DObjects;
 import org.logicng.propositions.Proposition;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -93,6 +94,6 @@ final public class UNSATCore<T extends Proposition> {
 
     @Override
     public String toString() {
-        return String.format("UNSATCore{isMUS=%s, propositions=%s}", this.isMUS, this.propositions);
+        return String.format(Locale.US, "UNSATCore{isMUS=%s, propositions=%s}", this.isMUS, this.propositions);
     }
 }

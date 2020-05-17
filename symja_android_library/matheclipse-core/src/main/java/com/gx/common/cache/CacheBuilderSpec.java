@@ -14,6 +14,7 @@
 
 package com.gx.common.cache;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.GwtIncompatible;
 import com.gx.common.annotations.VisibleForTesting;
 import com.gx.common.base.MoreObjects;
@@ -276,7 +277,7 @@ public final class CacheBuilderSpec {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(
+        return DObjects.hashCode(
                 initialCapacity,
                 maximumSize,
                 maximumWeight,

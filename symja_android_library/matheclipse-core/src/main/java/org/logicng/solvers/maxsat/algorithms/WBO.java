@@ -57,6 +57,7 @@ import org.logicng.util.Pair;
 
 import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -454,7 +455,7 @@ public class WBO extends MaxSAT {
                 int coreCost = this.computeCostCore(this.solver.conflict());
                 lbCost += coreCost;
                 if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format("c LB : %d CS : %d W : %d", lbCost, this.solver.conflict().size(), coreCost));
+                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", lbCost, this.solver.conflict().size(), coreCost));
                 if (!foundLowerBound(lbCost, null))
                     return MaxSATResult.UNDEF;
                 this.relaxCore(this.solver.conflict(), coreCost, this.assumptions);
@@ -511,7 +512,7 @@ public class WBO extends MaxSAT {
                 int coreCost = this.computeCostCore(this.solver.conflict());
                 lbCost += coreCost;
                 if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format("c LB : %d CS : %d W : %d", lbCost, this.solver.conflict().size(), coreCost));
+                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", lbCost, this.solver.conflict().size(), coreCost));
                 if (lbCost == ubCost) {
                     if (verbosity != Verbosity.NONE)
                         this.output.println("c LB = UB");

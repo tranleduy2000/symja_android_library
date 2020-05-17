@@ -33,6 +33,8 @@ import com.duy.lang.DSystem;
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
+import java.util.Locale;
+
 /**
  * The configuration object for the CNF encoding.
  *
@@ -63,7 +65,7 @@ public final class CNFConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(String.format("CNFConfig{%n"));
+        final StringBuilder sb = new StringBuilder(String.format(Locale.US, "CNFConfig{%n"));
         sb.append("algorithm=").append(this.algorithm).append(DSystem.lineSeparator());
         sb.append("fallbackAlgorithmForAdvancedEncoding=").append(this.fallbackAlgorithmForAdvancedEncoding).append(DSystem.lineSeparator());
         sb.append("distributedBoundary=").append(this.distributionBoundary).append(DSystem.lineSeparator());

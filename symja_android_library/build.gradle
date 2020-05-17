@@ -78,6 +78,7 @@ android {
 
     lintOptions {
         abortOnError false
+        disable 'UseSparseArrays'
     }
 }
 

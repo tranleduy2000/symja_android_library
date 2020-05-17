@@ -17,6 +17,8 @@
  */
 package org.jgrapht.util;
 
+import com.duy.lang.DInteger;
+
 /**
  * The <code>ModifiableInteger</code> class wraps a value of the primitive type <code>int</code> in
  * an object, similarly to {@link Integer}. An object of type
@@ -124,7 +126,7 @@ public class ModifiableInteger
         int thisVal = this.value;
         int anotherVal = anotherInteger.value;
 
-        return Integer.compare(thisVal, anotherVal);
+        return DInteger.compare(thisVal, anotherVal);
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package com.gx.common.collect;
 
+import com.duy.util.DObjects;
 import com.gx.common.annotations.Beta;
 import com.gx.common.annotations.GwtCompatible;
 import com.gx.common.base.Function;
@@ -307,7 +308,7 @@ public final class Tables {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(getRowKey(), getColumnKey(), getValue());
+            return DObjects.hashCode(getRowKey(), getColumnKey(), getValue());
         }
 
         @Override
