@@ -26,12 +26,12 @@ public final class RandomFunctions {
 	private static class Initializer {
 
 		private static void init() {
-		F.RandomInteger.setEvaluator(new RandomInteger());
+			F.RandomInteger.setEvaluator(new RandomInteger());
 			F.RandomPrime.setEvaluator(new RandomPrime());
-		F.RandomChoice.setEvaluator(new RandomChoice());
-		F.RandomReal.setEvaluator(new RandomReal());
-		F.RandomSample.setEvaluator(new RandomSample());
-	}
+			F.RandomChoice.setEvaluator(new RandomChoice());
+			F.RandomReal.setEvaluator(new RandomReal());
+			F.RandomSample.setEvaluator(new RandomSample());
+		}
 	}
 
 	/**
