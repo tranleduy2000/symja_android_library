@@ -15001,6 +15001,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPartition() {
+		fail();
 		check("Partition(f(),1)", //
 				"f()");
 		check("Partition(f(x),1)", //
