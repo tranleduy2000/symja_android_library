@@ -1,7 +1,7 @@
 package org.matheclipse.core.system;
 
-import org.matheclipse.combinatoric.MultisetPartitionsIterator;
-import org.matheclipse.combinatoric.RosenNumberPartitionIterator;
+import org.matheclipse.core.combinatoric.MultisetPartitionsIterator;
+import org.matheclipse.core.combinatoric.RosenNumberPartitionIterator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.patternmatching.FlatOrderlessStepVisitor;
@@ -23,6 +23,14 @@ public class CombinatoricTestCase extends AbstractTestCase {
      */
     public void testCombinatoric() {
 
+//		check("KOrderlessPartitions(f(g),1)", //
+//				"{f(g)}");
+//		check("KOrderlessPartitions(f(),1)", //
+//				"KOrderlessPartitions(f(),1)");
+		check("KOrderlessPartitions(w+x+x+y+z,5)", //
+				"KOrderlessPartitions(w+2*x+y+z,5)");
+		check("KOrderlessPartitions(w+x+x+y+z,6)", //
+				"KOrderlessPartitions(w+2*x+y+z,6)");
 		check("KOrderlessPartitions(w+x+x+y+z,3)",//
                 "{{w,2*x,y+z},{w,2*x+y,z},{w+2*x,y,z},{w,2*x+z,y},{w+2*x,z,y},{w,y,2*x+z},{w+y,2*x,z},{w,y+z,\n"
                         + "2*x},{w+y,z,2*x},{w,z,2*x+y},{w+z,2*x,y},{w+z,y,2*x},{2*x,w,y+z},{2*x,w+y,z},{2*x,w+z,y},{\n"

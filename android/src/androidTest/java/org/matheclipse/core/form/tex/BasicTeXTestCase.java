@@ -6,6 +6,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TeXUtilities;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.io.StringWriter;
@@ -42,68 +43,90 @@ public class BasicTeXTestCase extends TestCase {
 	}
 
 	public void testTeX004() {
-		check("Sum(a,{x,1,z})", "\\sum_{x = 1}^{z} a");
-		check("Sum(a,{x,z})", "\\sum_{x = 1}^{z} a");
-		check("Sum(a,{x,1,n},{y,1,m})", "\\sum_{x = 1}^{n}\\sum_{y = 1}^{m} a");
-		check("Sum(f,i)", "\\sum_{i} f");
+		check("Sum(a,{x,1,z})", //
+				"\\sum_{x = 1}^{z} a");
+		check("Sum(a,{x,z})", //
+				"\\sum_{x = 1}^{z} a");
+		check("Sum(a,{x,1,n},{y,1,m})", //
+				"\\sum_{x = 1}^{n}\\sum_{y = 1}^{m} a");
+		check("Sum(f,i)", //
+				"\\sum_{i} f");
 	}
 
 	public void testTeX005() {
-		check("Product(a,{x,1,z})", "\\prod_{x = 1}^{z} a");
-		check("Product(f,i)", "\\prod_{i} f");
+		check("Product(a,{x,1,z})", //
+				"\\prod_{x = 1}^{z} a");
+		check("Product(f,i)", //
+				"\\prod_{i} f");
 	}
 
 	public void testTeX006() {
-		check("Integrate(f(x),y)", "\\int  f(x)\\,\\mathrm{d}y");
+		check("Integrate(f(x),y)", //
+				"\\int  f(x)\\,\\mathrm{d}y");
 	}
 
 	public void testTeX007() {
 		check("Integrate(f(x),{x,1,10})", //
 				"\\int_{1}^{10} f(x)\\,\\mathrm{d}x");
 		check("Integrate(E^(-x),{x,0,Infinity})", //
-				"\\int_{0}^{\\infty} e^{ - x}\\,\\mathrm{d}x");
+				"\\int_{0}^{\\infty} {e}^{ - x}\\,\\mathrm{d}x");
 	}
 
 	public void testTeX008() {
-		check("alpha + beta", "\\alpha+\\beta");
+		check("alpha + beta", //
+				"\\alpha+\\beta");
 	}
 
 	public void testTeX009() {
-		check("Limit(Sin(x),x->0)", "\\lim_{x\\to 0 }\\,{\\sin (x)}");
+		check("Limit(Sin(x),x->0)", //
+				"\\lim_{x\\to 0 }\\,{\\sin (x)}");
 	}
 
 	public void testTeX010() {
-		check("3+x*(4+x*(5+(33+x^2)*x^4))",
-				"3 + x\\,\\left( 4 + x\\,\\left( 5 + \\left( 33+x^{2}\\right) \\,x^{4}\\right) \\right) ");
+		check("3+x*(4+x*(5+(33+x^2)*x^4))", //
+				"3 + x\\,\\left( 4 + x\\,\\left( 5 + \\left( 33+{x}^{2}\\right) \\,{x}^{4}\\right) \\right) ");
 	}
 
 	public void testTeX011() {
-		check("x^(3/4*y)", "x^{\\frac{3\\,y}{4}}");
+		check("x^(3/4*y)", //
+				"{x}^{\\frac{3\\,y}{4}}");
 	}
 
 	public void testTeX012a() {
 		// check("{{{1,2,3},{4,5,6}}}", "\\begin{pmatrix} 1 & 2 & 3 \\\\\n" + " 4 & 5 & 6 \\\\\n" + "\\end{pmatrix}");
-		check("MatrixForm({{1,2,3},{4,5,6}})",
+		check("MatrixForm({{1,2,3},{4,5,6}})", //
 				"\\begin{pmatrix}\n 1 & 2 & 3 \\\\\n" + " 4 & 5 & 6 \\\\\n" + "\\end{pmatrix}");
 	}
 
 	public void testTeX012b() {
-		check("TableForm({1,2,3,4,5,6})", "\\begin{array}{c}\n" + " 1 \\\\\n" + " 2 \\\\\n" + " 3 \\\\\n" + " 4 \\\\\n"
-				+ " 5 \\\\\n" + " 6 \\end{array}");
+		check("TableForm({1,2,3,4,5,6})", //
+				"\\begin{array}{c}\n" + //
+						" 1 \\\\\n" + //
+						" 2 \\\\\n" + //
+						" 3 \\\\\n" + //
+						" 4 \\\\\n" + //
+						" 5 \\\\\n" + //
+						" 6 \n" + "\\end{array}");
 	}
 
 	public void testTeX012c() {
-		check("TableForm({{1,2,3},{4,5,6}})",
-				"\\begin{array}{ccc}\n" + " 1 & 2 & 3 \\\\\n" + " 4 & 5 & 6 \\\\\n" + "\\end{array}");
+		check("TableForm({{1,2,3},{4,5,6}})", //
+				"\\begin{array}{ccc}\n" + //
+						" 1 & 2 & 3 \\\\\n" + //
+						" 4 & 5 & 6 \\\\\n" + //
+						"\\end{array}");
 	}
 
 	public void testTeX013() {
-		check("a*b+c; a*b+c", "a\\,b+c;a\\,b+c");
+		check("a*b+c; a*b+c",//
+				"a\\,b+c;a\\,b+c");
 	}
 
 	public void testTeX014() {
-		check("Sin(x)^2", "{\\sin (x)}^{2}");
-		check("Sin(2*x)^2", "{\\sin (2\\,x)}^{2}");
+		check("Sin(x)^2", //
+				"{\\sin (x)}^{2}");
+		check("Sin(2*x)^2", //
+				"{\\sin (2\\,x)}^{2}");
 	}
 
 	public void testTeX015() {
@@ -177,35 +200,49 @@ public class BasicTeXTestCase extends TestCase {
 	
 	public void testTeX018() {
 		check("1/4*a^2*b^(-1)*f^(-1)", //
-				"\\frac{a^{2}}{4\\,b\\,f}");
+				"\\frac{{a}^{2}}{4\\,b\\,f}");
 	}
 	
 	public void testTeX019() {
-		check("n!", "n ! ");
-		check("n!!", "n !! ");
+		check("n!", //
+				"n ! ");
+		check("n!!", //
+				"n !! ");
 	}
 	
 	public void testTeX020() {
-		check("Hold(++x)", "\\text{Hold}(\\text{++}x)");
-		check("Hold(y^2/.x->3)", "\\text{Hold}(y^{2}\\text{/.}\\,x\\to 3)");
-		check("Hold(y^2//.x->3)", "\\text{Hold}(y^{2}\\text{//.}\\,x\\to 3)");
+		check("Hold(++x)",//
+				"\\text{Hold}(\\text{++}x)");
+		check("Hold(y^2/.x->3)", //
+				"\\text{Hold}({y}^{2}\\text{/.}\\,x\\to 3)");
+		check("Hold(y^2//.x->3)", //
+				"\\text{Hold}({y}^{2}\\text{//.}\\,x\\to 3)");
 		check("Hold(1 * 5 * x + 1 * 63)", //
 				"\\text{Hold}(5\\,x + 63)");
-		check("10*f(x)", "10\\,f(x)");
-		check("Hold((5*3)/2)", "\\text{Hold}(\\frac{3\\cdot 5}{2})");
+		check("10*f(x)", //
+				"10\\,f(x)");
+		check("Hold((5*3)/2)", //
+				"\\text{Hold}(\\frac{3\\cdot 5}{2})");
 		check("Integrate(8+5*x, {x, 5, 10})", //
 				"\\int_{5}^{10} 8 + 5\\,x\\,\\mathrm{d}x");
 	}
 	
 	public void testTeX021() {
-		check("\\[Alpha]", "\\alpha");
-		check("-Infinity", " - \\infty");
-		check("GoldenRatio", "\\phi");
-		check("Infinity", "\\infty");
+		check("\\[Alpha]", //
+				"\\alpha");
+		check("-Infinity",//
+				 " - \\infty");
+		check("GoldenRatio", //
+				"\\phi");
+		check("Infinity", //
+				"\\infty");
 		
-		check("EulerGamma", "\\gamma");
-		check("Pi", "\\pi");
-		check("E", "e");
+		check("EulerGamma", //
+				"\\gamma");
+		check("Pi",//
+				 "\\pi");
+		check("E", //
+				"e");
 		// check("Catalan", "");
 		// check("Degree", "");
 		//
@@ -226,7 +263,7 @@ public class BasicTeXTestCase extends TestCase {
 	public void testTeX023() {
 		// issue #117
 		check("5*3^(5*x)*Log(3)", //
-				"5\\cdot 3^{5\\,x}\\,\\log (3)");
+				"5\\cdot {3}^{5\\,x}\\,\\log (3)");
 	}
 	
 	public void testTeX024() {
@@ -243,9 +280,9 @@ public class BasicTeXTestCase extends TestCase {
 		assertEquals(stw.toString(), "0.3");
 	}
 	public void testTeX026() {
-		check("DirectedEdge(a,b)",
+		check("DirectedEdge(a,b)",//
 				"a\\to b");
-		check("UndirectedEdge(a,b)",
+		check("UndirectedEdge(a,b)",//
 				"a\\leftrightarrow b");
 		check("Graph({1,2,3},{1<->2,2<->3})", //
 				"\\text{Graph}(\\{1,2,3\\},\\{1\\leftrightarrow 2,2\\leftrightarrow 3\\})");
@@ -322,6 +359,62 @@ public class BasicTeXTestCase extends TestCase {
 		IExpr expr = EvalEngine.get().evaluate("f(#,#3,##)");
 		check(expr, //
 				"f(\\text{$\\#$1},\\text{$\\#$3},\\text{$\\#\\#$1})");
+	}
+	public void testTeX038() {
+		// gitlab #108
+		IExpr expr = EvalEngine.get().evaluate("Solve({Log10(x)==21.69},{x})");
+		check(expr, //
+				"\\{\\{x\\to 4.89779*10^{21}\\}\\}");
+    }
+	public void testTeX039() {
+		// gitlab #108
+		IExpr expr = EvalEngine.get().evaluate("Superscript(2,10)");
+		check(expr, //
+				"{2}^{10}");
+	}
+	public void testTeX040() {
+		IExpr expr = EvalEngine.get().evaluate("Subscript(\"zzz\",36)");
+		check(expr, //
+				"{\\textnormal{zzz}}_{36}");
+	}
+	public void testTeX041() {
+		IExpr expr = EvalEngine.get().evaluate("Interval({-3.21625*10^-16,5.66554*10^-16})");
+		check(expr, //
+				"Interval(\\{-3.21625*10^{-16},5.66554*10^{-16}\\})");
+	}
+
+	public void testTeX042() {
+		IExpr expr = EvalEngine.get().evaluate("Cot(Interval({3*Pi/4,6*Pi/5}))");
+		check(expr, //
+				"Interval(\\{-\\infty,-1\\},\\{\\sqrt{\\left( 1+\\frac{2}{\\sqrt{5}}\\right) },\\infty\\})");
+	}
+
+	public void testTeX043() {
+		IExpr expr = EvalEngine.get().evaluate("<|a -> x, b -> y, c -> z|>");
+		check(expr, //
+				"\\langle|a\\to x,b\\to y,c\\to z|\\rangle");
+	}
+
+	public void testTeX044() {
+		IExpr expr = EvalEngine.get().evaluate("{{{a->b},{c:>d}},{4,5,6}}");
+		((IAST) expr).setEvalFlags(IAST.OUTPUT_MULTILINE);
+		check(expr, //
+				"\\begin{array}{c}\n" + //
+						" \\{\\{a\\to b\\},\\{c:\\to d\\}\\} \\\\\n" + //
+						" \\{4,5,6\\} \n" + //
+						"\\end{array}");
+	}
+
+	public void testTeX045() {
+		IExpr expr = EvalEngine.get().evaluate("Derivative(2)[10/x^4]");
+		check(expr, //
+				"\\left( \\frac{10}{{x}^{4}}\\right) ''");
+	}
+
+	public void testTeX046() {
+		IExpr expr = EvalEngine.get().evaluate("Derivative(a)[10/x^4]");
+		check(expr, //
+				"\\left( \\frac{10}{{x}^{4}}\\right) ^{(a)}");
 	}
 	public void check(String strEval, String strResult) {
 		StringWriter stw = new StringWriter();

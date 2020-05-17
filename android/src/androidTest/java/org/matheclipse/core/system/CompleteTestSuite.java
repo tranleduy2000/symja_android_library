@@ -32,7 +32,6 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(SVGGraphicsTestCase.class);
 //		suite.addTestSuite(Graphics3DTestCase.class);
 //		suite.addTestSuite(SymjifyTestCase.class);
-		suite.addTestSuite(MainTestCase.class);
 		suite.addTestSuite(BasicPatternPropertiesTestCase.class);
 		suite.addTestSuite(CompareToTestCase.class);
 		suite.addTestSuite(PatternMatchingTestCase.class);
