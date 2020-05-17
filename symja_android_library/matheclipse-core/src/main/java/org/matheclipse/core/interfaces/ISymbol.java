@@ -541,7 +541,6 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
      * @param engine         the evaluation engine
      * @return an array with the currently assigned value of the symbol and the new calculated value of the symbol or
      * <code>null</code> if the reassignment isn't possible.
-     * @see WrongArgumentType
      */
     public IExpr[] reassignSymbolValue(Function<IExpr, IExpr> function, ISymbol functionSymbol, EvalEngine engine);
 

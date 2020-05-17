@@ -1789,7 +1789,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      *
      * @param size the size of an AST for which <code>Span[]</code> should be applied.
      * @return <code>null</code> if this is no <code>Span[...]</code> expression.
-     * @throws WrongArgumentType
      */
     int[] isSpan(int size);
 

@@ -2,7 +2,10 @@ package org.matheclipse.core.eval.interfaces;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
@@ -111,8 +114,12 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 	}
 
 	public IExpr binaryOperator(IAST ast, final IExpr o0, final IExpr o1) {
-		IExpr result = F.NIL;
-		if (o0.isNumeric() || o1.isNumeric()) {
+		IExpr result = e2ObjArg(o0, o1);
+		if (result.isPresent()) {
+			return result;
+		}
+
+		if (o0.isNumeric() && o1.isNumeric()) {
 		try {
 				EvalEngine engine = EvalEngine.get();
 				INumber arg1=  ((INumber) o0).evaluatePrecision(engine);
@@ -161,13 +168,12 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 			}
 		} catch (RuntimeException rex) {
 			// EvalEngine.get().printMessage(ast.topHead().toString() + ": " + rex.getMessage());
+				if (Config.SHOW_STACKTRACE) {
+					rex.printStackTrace();
+				}
 			return F.NIL;
 		}
 
-		}
-		result = e2ObjArg(o0, o1);
-		if (result.isPresent()) {
-			return result;
 		}
 
 		if (o0 instanceof IInteger) {
@@ -284,14 +290,26 @@ public abstract class AbstractArg12 extends AbstractFunctionEvaluator {
 
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		try {
 		if (ast.size() == 2 || ast.size() == 3) {
 		if (ast.size() != 3) {
 			return unaryOperator(ast.arg1());
 		}
 			return binaryOperator(ast, ast.arg1(), ast.arg2());
 	}
-		return engine.printMessage(ast.topHead() + ": " + ast.topHead()
-				+ " function requires 1 or 2 arguments, but number of args equals: " + ast.argSize());
+		} catch (ValidateException ve) {
+			if (Config.SHOW_STACKTRACE) {
+				ve.printStackTrace();
+			}
+			return engine.printMessage(ast.topHead(), ve);
+		}
+		return F.NIL;
+		// return engine.printMessage(ast.topHead() + ": " + ast.topHead()
+		// + " function requires 1 or 2 arguments, but number of args equals: " + ast.argSize());
 	}
 
+	@Override
+	public int[] expectedArgSize() {
+		return IOFunctions.ARGS_1_2;
+	}
 }

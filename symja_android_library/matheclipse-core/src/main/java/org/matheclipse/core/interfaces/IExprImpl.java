@@ -360,10 +360,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @return <code>null</code> if the conversion is not possible.
      */
     public Complex evalComplex() {
-        if (isNumber()) {
-            return ((INumber) this).complexNumValue().complexValue();
-        }
-        throw new WrongArgumentType(this, "Conversion into a complex numeric value is not possible!");
+        return EvalEngine.get().evalComplex(this);
     }
 
     /**
@@ -2551,7 +2548,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      *
      * @param size the size of an AST for which <code>Span[]</code> should be applied.
      * @return <code>null</code> if this is no <code>Span[...]</code> expression.
-     * @throws WrongArgumentType
      */
     @Override
     public int[] isSpan(int size) {

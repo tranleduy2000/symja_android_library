@@ -175,11 +175,6 @@ public class JASModInteger {
 				for (int i = 0; i < fVariables.size(); i++) {
 					if (fVariables.get(i).equals(base)) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-						// int exponent = -1;
-						// try {
-						// exponent = Validate.checkPowerExponent(ast);
-						// } catch (WrongArgumentType e) {
-						// }
 						if (exponent < 0) {
 							throw new ArithmeticException(
 									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
@@ -241,12 +236,6 @@ public class JASModInteger {
 				for (int i = 0; i < fVariables.size(); i++) {
 					if (fVariables.get(i).equals(base)) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-						// int exponent = -1;
-						// try {
-						// exponent = Validate.checkPowerExponent(ast);
-						// } catch (WrongArgumentType e) {
-						// //
-						// }
 						if (exponent < 0) {
 							throw new ArithmeticException(
 									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
@@ -303,7 +292,7 @@ public class JASModInteger {
 		for (Monomial<ModLong> monomial : poly) {
 			ModLong coeff = monomial.coefficient();
 			ExpVector exp = monomial.exponent();
-			IInteger coeffValue = F.integer(coeff.getVal());
+			IInteger coeffValue = F.ZZ(coeff.getVal());
 			IASTAppendable monomTimes = F.TimesAlloc(exp.length() + 1);
 			monomialToExpr(coeffValue, exp, monomTimes);
 			result.append(monomTimes.oneIdentity1());
@@ -325,7 +314,7 @@ public class JASModInteger {
 					if (lExp == 1L) {
 						monomTimes.append(fVariables.get(ix));
 					} else {
-						monomTimes.append(F.Power(fVariables.get(ix), F.integer(lExp)));
+						monomTimes.append(F.Power(fVariables.get(ix), F.ZZ(lExp)));
 					}
 				} else {
 					return false;

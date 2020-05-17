@@ -4578,8 +4578,6 @@ public final class ListFunctions {
 					return replaceExpr(ast, arg1, rules, result, maxNumberOfResults, engine);
 				} catch (ArithmeticException ae) {
 					return engine.printMessage("ReplaceList: " + ae.getMessage());
-				} catch (WrongArgumentType wat) {
-					return engine.printMessage("ReplaceList: " + wat.getMessage());
 				}
 			}
 			return F.NIL;

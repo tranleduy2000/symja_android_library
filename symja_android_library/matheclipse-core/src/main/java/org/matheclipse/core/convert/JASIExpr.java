@@ -137,7 +137,7 @@ public class JASIExpr {
 			for (int i = 0; i < exp.length(); i++) {
 				lExp = exp.getVal(i);
 				if (lExp != 0) {
-					monomTimes.append(F.Power(fVariables.get(i), F.integer(lExp)));
+					monomTimes.append(F.Power(fVariables.get(i), F.ZZ(lExp)));
 				}
 			}
 			if (monomTimes.isAST1()) {
@@ -215,12 +215,6 @@ public class JASIExpr {
 					int ix = leer.indexVar(base.toString(), fPolyFactory.getVars());
 					if (ix >= 0) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-						// int exponent = -1;
-						// try {
-						// exponent = Validate.checkPowerExponent(ast);
-						// } catch (WrongArgumentType e) {
-						// //
-						// }
 						if (exponent < 0) {
 							throw new ArithmeticException(
 									"JASConvert:expr2Poly - invalid exponent: " + ast.exponent().toString());
@@ -330,7 +324,7 @@ public class JASIExpr {
 					if (lExp == 1L) {
 						monomTimes.append(fVariables.get(ix));
 					} else {
-						monomTimes.append(F.Power(fVariables.get(ix), F.integer(lExp)));
+						monomTimes.append(F.Power(fVariables.get(ix), F.ZZ(lExp)));
 					}
 				} else {
 					return false;
@@ -384,7 +378,7 @@ public class JASIExpr {
 			for (int i = 0; i < exp.length(); i++) {
 				lExp = exp.getVal(i);
 				if (lExp != 0) {
-					monomTimes.append(F.Power(fVariables.get(i), F.integer(lExp)));
+					monomTimes.append(F.Power(fVariables.get(i), F.ZZ(lExp)));
 				}
 			}
 			if (monomTimes.isAST1()) {

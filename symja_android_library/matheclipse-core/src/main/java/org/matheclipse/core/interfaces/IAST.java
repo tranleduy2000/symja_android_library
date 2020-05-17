@@ -7,7 +7,6 @@ import com.duy.lambda.Function;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
-import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.visit.IVisitor;
 
@@ -783,7 +782,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @param index
      * @return
-     * @throws WrongArgumentType if the cast is not possible
      */
     IAST getAST(int index);
 
@@ -813,7 +811,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @param index
      * @return
-     * @throws WrongArgumentType if the cast is not possible
      */
     IInteger getInt(int index);
 
@@ -822,7 +819,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @param index
      * @return
-     * @throws WrongArgumentType
      */
     IAST getList(int index);
 
@@ -831,7 +827,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      *
      * @param index
      * @return
-     * @throws WrongArgumentType if the cast is not possible
      */
     INumber getNumber(int index);
 

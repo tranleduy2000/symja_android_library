@@ -575,13 +575,7 @@ public class SymbolicPolynomialRing implements RingFactory<SymbolicPolynomial> {
 				final IExpr base = ast.base();
 				ix = ExpVectorSymbolic.indexVar(base, getVars());
 				if (ix >= 0) {
-					IExpr exponent = ast.exponent(); // .toIntDefault(Integer.MIN_VALUE);
-					// int exponent = -1;
-					// try {
-					// exponent = Validate.checkPowerExponent(ast);
-					// } catch (WrongArgumentType e) {
-					// //
-					// }
+					IExpr exponent = ast.exponent();
 					if (checkNegativeExponents && //
 							(!exponent.isInteger()||exponent.isNegative())) {
 						throw new ArithmeticException(
@@ -590,9 +584,6 @@ public class SymbolicPolynomialRing implements RingFactory<SymbolicPolynomial> {
 					if (exponent.isNegative() && coefficientListMode) {
 						return new SymbolicPolynomial(this, ast);
 					}
-					// if (exponent == Integer.MIN_VALUE) {
-					// return new ExpVectorPolynomial(this, ast);
-					// }
 					ExpVectorSymbolic e = new ExpVectorSymbolic(vars.argSize(), ix, exponent);
 					return getOne().multiply(e);
 				}
@@ -839,12 +830,6 @@ public class SymbolicPolynomialRing implements RingFactory<SymbolicPolynomial> {
 					IExpr variable = vars.get(i);
 					if (variable.equals(base)) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-						// int exponent = -1;
-						// try {
-						// exponent = Validate.checkPowerExponent(ast);
-						// } catch (WrongArgumentType e) {
-						// return false;
-						// }
 						if (exponent < 0) {
 							return false;
 						}
