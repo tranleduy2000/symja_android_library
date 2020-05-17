@@ -1,5 +1,8 @@
 package org.matheclipse.core.eval.util;
 
+import org.matheclipse.core.builtin.IOFunctions;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -27,17 +30,15 @@ public class LevelSpecification extends LevelSpec {
 	 * Create a LevelSpecification from an IInteger or IAST list-object.<br>
 	 * <br>
 	 * 
-	 * If <code>expr</code> is a non-negative IInteger iValue set Level
-	 * {1,iValue};<br>
+	 * If <code>expr</code> is a non-negative IInteger iValue set Level {1,iValue};<br>
 	 * If <code>expr</code> is a negative IInteger iValue set Level {iValue, 0};<br>
-	 * If <code>expr</code> is a List {i0Value, i1Value} set Level {i0Value,
-	 * i1Value};<br>
+	 * If <code>expr</code> is a List {i0Value, i1Value} set Level {i0Value, i1Value};<br>
 	 * 
 	 * @param expr
 	 * @param includeHeads
-	 *          TODO
+	 *            TODO
 	 * @throws MathException
-	 *           if the expr is not a <i>level specification</i>
+	 *             if the expr is not a <i>level specification</i>
 	 * @see
 	 */
 	public LevelSpecification(final IExpr expr, boolean includeHeads) {
@@ -73,7 +74,9 @@ public class LevelSpecification extends LevelSpec {
 						fFromLevel = 0;
 						fToLevel = Integer.MAX_VALUE;
 						if (fToDepth < fFromDepth) {
-							throw new MathException("Invalid Level specification: " + expr.toString());
+							String str = IOFunctions.getMessage("level", F.List(expr), EvalEngine.get());
+							throw new ArgumentTypeException(str);
+							// throw new MathException("Invalid Level specification: " + expr.toString());
 						}
 					} else {
 						fToLevel = i.toBigNumerator().intValue();
@@ -81,7 +84,9 @@ public class LevelSpecification extends LevelSpec {
 						fFromDepth = Integer.MIN_VALUE;
 						fToDepth = -1;
 						if (fToLevel < fFromLevel) {
-							throw new MathException("Invalid Level specification: " + expr.toString());
+							String str = IOFunctions.getMessage("level", F.List(expr), EvalEngine.get());
+							throw new ArgumentTypeException(str);
+							// throw new MathException("Invalid Level specification: " + expr.toString());
 						}
 					}
 					return;
@@ -97,7 +102,9 @@ public class LevelSpecification extends LevelSpec {
 							fFromLevel = 0;
 							fToLevel = Integer.MAX_VALUE;
 						} else if (i0.isNegative()) {
-							throw new MathException("Invalid Level specification: " + expr.toString());
+							String str = IOFunctions.getMessage("level", F.List(expr), EvalEngine.get());
+							throw new ArgumentTypeException(str);
+							// throw new MathException("Invalid Level specification: " + expr.toString());
 						} else if (i1.isNegative()) {
 							fFromDepth = Integer.MIN_VALUE;
 							fToDepth = i1.toBigNumerator().intValue();
@@ -113,7 +120,9 @@ public class LevelSpecification extends LevelSpec {
 					} else if ((lst.arg1()  instanceof IInteger) && (lst.arg2() .isInfinity())) {
 						final IInteger i0 = (IInteger) lst.arg1() ;
 						if (i0.isNegative()) {
-							throw new MathException("Invalid Level specification: " + expr.toString());
+							String str = IOFunctions.getMessage("level", F.List(expr), EvalEngine.get());
+							throw new ArgumentTypeException(str);
+							// throw new MathException("Invalid Level specification: " + expr.toString());
 						} else {
 							fFromDepth = Integer.MIN_VALUE;
 							fToDepth = -1;
@@ -125,14 +134,16 @@ public class LevelSpecification extends LevelSpec {
 				}
 			}
 		}
-		if (expr.equals(F.CInfinity)) {
+		if (expr.isInfinity() ) {
 			fToLevel = Integer.MAX_VALUE;
 			fFromLevel = 1;
 			fFromDepth = Integer.MIN_VALUE;
 			fToDepth = -1;
 			return;
 		}
-		throw new MathException("Invalid Level specification: " + expr.toString());
+		String str = IOFunctions.getMessage("level", F.List(expr), EvalEngine.get());
+		throw new ArgumentTypeException(str);
+		// throw new MathException("Invalid Level specification: " + expr.toString());
 	}
 
 	/**

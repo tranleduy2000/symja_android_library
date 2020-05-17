@@ -156,7 +156,7 @@ public final class ListFunctions {
 			F.Drop.setEvaluator(new Drop());
 			F.Extract.setEvaluator(new Extract());
 			F.First.setEvaluator(new First());
-			//F.GroupBy.setEvaluator(new GroupBy());
+			F.GroupBy.setEvaluator(new GroupBy());
 			F.Fold.setEvaluator(new Fold());
 			F.FoldList.setEvaluator(new FoldList());
 			F.Gather.setEvaluator(new Gather());

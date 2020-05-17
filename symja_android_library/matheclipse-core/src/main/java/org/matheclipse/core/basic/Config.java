@@ -35,7 +35,8 @@ public class Config {
 	private static final int MAX_EXPR_CACHE_SIZE = 10000;
 
 	/**
-	 * Maximum number for the leaf count of an expression so that <code>Factor()</code> will try a factoring
+	 * Maximum number for the leaf count of an expression so that <code>Factor()</code> will try a factoring. Has to be
+	 * an int value greater 0.
 	 */
 	public static final int MAX_FACTOR_LEAFCOUNT = 600;
 
@@ -62,12 +63,12 @@ public class Config {
 	public static int MAX_OUTPUT_SIZE = Integer.MAX_VALUE;
 	/**
 	 * Maximum number of elements which could be allocated for an AST
-	 **/
+	 */
 	public static int MAX_AST_SIZE = Integer.MAX_VALUE;
 	/**
 	 * Maximum number of elements which could be allocated for a BigInteger number
-	 **/
-	public static int MAX_BIT_COUNT = Integer.MAX_VALUE;
+	 */
+	public static int MAX_BIT_LENGTH = Integer.MAX_VALUE;
 	static {
 		EXPR_CACHE = CacheBuilder.newBuilder().maximumSize(MAX_EXPR_CACHE_SIZE).weakKeys().weakValues().build();
 	}

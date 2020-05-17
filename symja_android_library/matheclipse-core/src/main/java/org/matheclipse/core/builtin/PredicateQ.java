@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
@@ -39,111 +40,112 @@ public class PredicateQ {
 	private static class Initializer {
 
 		private static void init() {
-		F.AntisymmetricMatrixQ.setEvaluator(new AntisymmetricMatrixQ());
-		F.AntihermitianMatrixQ.setEvaluator(new AntihermitianMatrixQ());
-		F.ArrayQ.setEvaluator(new ArrayQ());
-		F.AtomQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isAtom();
-			}
-		});
-		F.BooleanQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isTrue() || x.isFalse();
-			}
-		});
-		F.ByteArrayQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return WXFFunctions.isByteArray(x);
-			}
-		});
-		F.DigitQ.setEvaluator(new DigitQ());
-		F.EvenQ.setEvaluator(new EvenQ());
-		F.ExactNumberQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isExactNumber();
-			}
-		});
-		F.FreeQ.setEvaluator(new FreeQ());
-		F.HermitianMatrixQ.setEvaluator(new HermitianMatrixQ());
-		F.InexactNumberQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isInexactNumber();
-			}
-		});
-		F.IntegerQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isInteger();
-			}
-		});
-		F.ListQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isList();
-			}
-		});
-		F.MachineNumberQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isMachineNumber();
-			}
-		});
-		F.MatchQ.setEvaluator(new MatchQ());
-		F.MatrixQ.setEvaluator(new MatrixQ());
-		F.MemberQ.setEvaluator(new MemberQ());
-		F.MissingQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isAST(F.Missing, 2);
-			}
-		});
-		F.NotListQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return !x.isList();
-			}
-		});
-		F.NumberQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isNumber();
-			}
-		});
-		F.NumericQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isNumericFunction();
-			}
-		});
-		F.OddQ.setEvaluator(new OddQ());
-		F.PossibleZeroQ.setEvaluator(new PossibleZeroQ());
-		F.PrimeQ.setEvaluator(new PrimeQ());
-		F.QuantityQ.setEvaluator(new QuantityQ());
-		F.RealNumberQ.setEvaluator(new RealNumberQ());
-		F.SquareMatrixQ.setEvaluator(new SquareMatrixQ());
-		F.StringQ.setPredicateQ(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                return x.isString();
-            }
-        });
-		F.SymbolQ.setPredicateQ(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isSymbol();
-			}
-		});
-		F.SymmetricMatrixQ.setEvaluator(new SymmetricMatrixQ());
-		F.SyntaxQ.setEvaluator(new SyntaxQ());
-		F.ValueQ.setEvaluator(new ValueQ());
-		F.VectorQ.setEvaluator(new VectorQ());
-	}
+			F.AntisymmetricMatrixQ.setEvaluator(new AntisymmetricMatrixQ());
+			F.AntihermitianMatrixQ.setEvaluator(new AntihermitianMatrixQ());
+			F.ArrayQ.setEvaluator(new ArrayQ());
+			F.AtomQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isAtom();
+				}
+			});
+			F.BooleanQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isTrue() || x.isFalse();
+				}
+			});
+			F.ByteArrayQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return WXFFunctions.isByteArray(x);
+				}
+			});
+			F.DigitQ.setEvaluator(new DigitQ());
+			F.EvenQ.setEvaluator(new EvenQ());
+			F.ExactNumberQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isExactNumber();
+				}
+			});
+			F.FreeQ.setEvaluator(new FreeQ());
+			F.HermitianMatrixQ.setEvaluator(new HermitianMatrixQ());
+			F.InexactNumberQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isInexactNumber();
+				}
+			});
+			F.IntegerQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isInteger();
+				}
+			});
+			F.ListQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isList();
+				}
+			});
+			F.MachineNumberQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isMachineNumber();
+				}
+			});
+			F.MatchQ.setEvaluator(new MatchQ());
+			F.MatrixQ.setEvaluator(new MatrixQ());
+			F.MemberQ.setEvaluator(new MemberQ());
+			F.MissingQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isAST(F.Missing, 2);
+				}
+			});
+			F.NotListQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return !x.isList();
+				}
+			});
+			F.NumberQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isNumber();
+				}
+			});
+			F.NumericQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isNumericFunction();
+				}
+			});
+			F.OddQ.setEvaluator(new OddQ());
+			F.OrthogonalMatrixQ.setEvaluator(new OrthogonalMatrixQ());
+			F.PossibleZeroQ.setEvaluator(new PossibleZeroQ());
+			F.PrimeQ.setEvaluator(new PrimeQ());
+			F.QuantityQ.setEvaluator(new QuantityQ());
+			F.RealNumberQ.setEvaluator(new RealNumberQ());
+			F.SquareMatrixQ.setEvaluator(new SquareMatrixQ());
+			F.StringQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isString();
+				}
+			});
+			F.SymbolQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isSymbol();
+				}
+			});
+			F.SymmetricMatrixQ.setEvaluator(new SymmetricMatrixQ());
+			F.SyntaxQ.setEvaluator(new SyntaxQ());
+			F.ValueQ.setEvaluator(new ValueQ());
+			F.VectorQ.setEvaluator(new VectorQ());
+		}
 	}
 
 	/**
@@ -273,6 +275,9 @@ public class PredicateQ {
 			if (expr.isList()) {
 				IAST ast = (IAST) expr;
 				int size = ast.size();
+				if (size == 1) {
+					return depth;
+				}
 				IExpr arg1AST = ast.arg1();
 				boolean isList = arg1AST.isList();
 				int arg1Size = 0;
@@ -751,32 +756,37 @@ public class PredicateQ {
 				}
 			}
 
-			boolean heads = false;
-			int size = ast.size();
-			if (ast.size() > 3) {
-				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, size, engine);
-				if (options.isTrue(F.Heads)) {
-					heads = true;
+			try {
+				boolean heads = false;
+				int size = ast.size();
+				if (ast.size() > 3) {
+					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, size, engine);
+					if (options.isTrue(F.Heads)) {
+						heads = true;
+					}
+					int pos = options.getLastPosition();
+					if (pos != -1) {
+						size = pos;
+					}
 				}
-				int pos = options.getLastPosition();
-				if (pos != -1) {
-					size = pos;
-			}
-			}
-			if (size >= 3) {
-			final IExpr arg1 = engine.evaluate(ast.arg1());
-			if (arg1.isAST()) {
-					final IExpr arg2 = engine.evaluate(ast.arg2());
-					if (size == 3) {
-						return F.bool(arg1.isMember(arg2, heads, null));
-			}
-					Predicate<IExpr> predicate = memberPredicate(arg2);
-					IVisitorBoolean level = new VisitorBooleanLevelSpecification(predicate, ast.arg3(), heads, engine);
+				if (size >= 3) {
+					final IExpr arg1 = engine.evaluate(ast.arg1());
+					if (arg1.isAST()) {
+						final IExpr arg2 = engine.evaluate(ast.arg2());
+						if (size == 3) {
+							return F.bool(arg1.isMember(arg2, heads, null));
+						}
+						Predicate<IExpr> predicate = memberPredicate(arg2);
+						IVisitorBoolean level = new VisitorBooleanLevelSpecification(predicate, ast.arg3(), heads, engine);
 
-					return F.bool(arg1.accept(level));
+						return F.bool(arg1.accept(level));
+					}
+					return F.False;
 				}
-			return F.False;
-		}
+			} catch (final ValidateException ve) {
+				// see level specification
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
 			return F.NIL;
 		}
 
@@ -822,6 +832,27 @@ public class PredicateQ {
 		}
 
 		@Override
+		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, OptionArgs options) {
+			IExpr option = options.getOption(F.GaussianIntegers);
+			if (!option.isTrue()) {
+				return evalArg1Boole(arg1, engine);
+			}
+			IInteger[] reImParts = arg1.gaussianIntegers();
+			if (reImParts == null) {
+				return false;
+			}
+			if (reImParts[1].isZero()) {
+				return reImParts[0].isOdd();
+			}
+			if (reImParts[0].isZero()) {
+				return reImParts[1].isOdd();
+			}
+			if (reImParts[0].isOdd() && reImParts[1].isOdd()) {
+				return false;
+			}
+			return reImParts[0].isOdd() || reImParts[1].isOdd();
+		}
+		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
@@ -850,6 +881,58 @@ public class PredicateQ {
 			return expr.isQuantity();
 		}
 
+	}
+	private final static class OrthogonalMatrixQ extends AbstractCoreFunctionEvaluator implements IPredicate {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+
+			final IExpr arg1 = engine.evaluate(ast.arg1());
+			int[] dims = arg1.isMatrix();
+			if (dims == null ) {
+				// no square matrix
+				return F.False;
+			}
+			IExpr identityMatrix = F.NIL;
+			int[] identityMatrixDims = null;
+			if (dims[0] >= dims[1]) {
+				identityMatrix = F.Dot.of(engine, F.Transpose(arg1), arg1);
+				identityMatrixDims = identityMatrix.isMatrix();
+				if (identityMatrixDims == null || //
+						identityMatrixDims[0] != dims[1] || //
+						identityMatrixDims[1] != dims[1]) {
+					return F.False;
+				}
+			} else {
+				identityMatrix = F.Dot.of(engine, arg1, F.Transpose(arg1));
+				identityMatrixDims = identityMatrix.isMatrix();
+				if (identityMatrixDims == null || //
+						identityMatrixDims[0] != dims[0] || //
+						identityMatrixDims[1] != dims[0]) {
+					return F.False;
+				}
+			}
+			IAST matrix = (IAST) identityMatrix;
+			for (int i = 1; i <= identityMatrixDims[0]; i++) {
+				IAST row = (IAST) matrix.get(i);
+				for (int j = 1; j <= identityMatrixDims[1]; j++) {
+					if (i == j) {
+						if (!F.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, row.get(j)))) {
+							return F.False;
+						}
+					} else {
+						if (!F.PossibleZeroQ.ofQ(engine, row.get(j))) {
+							return F.False;
+						}
+					}
+				}
+			}
+			return F.True;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
 	}
 	/**
 	 * <pre>

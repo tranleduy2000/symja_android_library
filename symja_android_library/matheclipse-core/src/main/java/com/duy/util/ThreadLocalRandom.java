@@ -30,7 +30,7 @@ public class ThreadLocalRandom extends Random {
      * between 0 (inclusive) and the specified value (exclusive).
      *
      * @param n the bound on the random number to be returned.  Must be
-     *        positive.
+     *          positive.
      * @return the next value
      * @throws IllegalArgumentException if n is not positive
      */
@@ -48,11 +48,17 @@ public class ThreadLocalRandom extends Random {
      * @param bound the upper bound (exclusive)
      * @return the next value
      * @throws IllegalArgumentException if least greater than or equal
-     * to bound
+     *                                  to bound
      */
     public double nextDouble(double least, double bound) {
         if (least >= bound)
             throw new IllegalArgumentException();
         return nextDouble() * (bound - least) + least;
+    }
+
+    public int nextInt(int start, int end) {
+        int bounds = (end - start) + 1;
+        int value = nextInt(bounds);
+        return start + value;
     }
 }
