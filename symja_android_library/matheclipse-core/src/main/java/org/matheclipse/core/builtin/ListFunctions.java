@@ -1246,7 +1246,7 @@ public final class ListFunctions {
 				if (list.exists(new Predicate<IExpr>() {
 					@Override
 					public boolean test(IExpr x) {
-						if (!x.isList()) {
+						if (!(x.isList() || x.isAssociation())) {
 							return true;
 						}
 						size[0] += list.argSize();

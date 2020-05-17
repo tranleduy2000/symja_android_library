@@ -1794,42 +1794,42 @@ public final class Arithmetic {
 
             IExpr arg1 = ast.arg1();
 			try {
-            if (ast.isAST2()) {
-					final IExpr arg2 = ast.arg2();
-                if (arg2.isOne()) {
-                    return F.HarmonicNumber(arg1);
-                } else {
-                    // generalized harmonic number
-                    if (arg2.isInteger()) {
-                        if (arg1.isInfinity()) {
-                            if (arg2.isPositive() && ((IInteger) arg2).isEven()) {
-                                // Module({v=s/2},((2*Pi)^(2*v)*(-1)^(v+1)*BernoulliB(2*v))/(2*(2*v)!))
-                                IExpr v = Times(C1D2, arg2);
-                                return Times(Power(Times(C2, Pi), Times(C2, v)), Power(CN1, Plus(v, C1)),
-                                        BernoulliB(Times(C2, v)), Power(Times(C2, Factorial(Times(C2, v))), CN1));
+                if (ast.isAST2()) {
+                    final IExpr arg2 = ast.arg2();
+                    if (arg2.isOne()) {
+                        return F.HarmonicNumber(arg1);
+                    } else {
+                        // generalized harmonic number
+                        if (arg2.isInteger()) {
+                            if (arg1.isInfinity()) {
+                                if (arg2.isPositive() && ((IInteger) arg2).isEven()) {
+                                    // Module({v=s/2},((2*Pi)^(2*v)*(-1)^(v+1)*BernoulliB(2*v))/(2*(2*v)!))
+                                    IExpr v = Times(C1D2, arg2);
+                                    return Times(Power(Times(C2, Pi), Times(C2, v)), Power(CN1, Plus(v, C1)),
+                                            BernoulliB(Times(C2, v)), Power(Times(C2, Factorial(Times(C2, v))), CN1));
+                                }
+                                return F.NIL;
                             }
-                            return F.NIL;
                         }
-                    }
-                    if (arg1.isInteger()) {
-                        int n = Validate.checkIntType(ast, 1, Integer.MIN_VALUE);
-                        if (n < 0) {
-                            return F.NIL;
-                        }
-                        if (n == 0) {
-                            return C0;
-                        }
-                        IASTAppendable result = F.PlusAlloc(n);
-						return result.appendArgs(n + 1, new IntFunction<IExpr>() {
-                            @Override
-                            public IExpr apply(int i) {
-                                return Power(F.ZZ(i), Negate(arg2));
+                        if (arg1.isInteger()) {
+                            int n = Validate.checkIntType(ast, 1, Integer.MIN_VALUE);
+                            if (n < 0) {
+                                return F.NIL;
                             }
-                        });
+                            if (n == 0) {
+                                return C0;
+                            }
+                            IASTAppendable result = F.PlusAlloc(n);
+                            return result.appendArgs(n + 1, new IntFunction<IExpr>() {
+                                @Override
+                                public IExpr apply(int i) {
+                                    return Power(F.ZZ(i), Negate(arg2));
+                                }
+                            });
+                        }
+                        return F.NIL;
                     }
-                    return F.NIL;
                 }
-            }
             if (arg1.isInteger()) {
                 if (arg1.isNegative()) {
                     return F.CComplexInfinity;

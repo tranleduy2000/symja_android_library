@@ -3051,8 +3051,20 @@ public abstract class AbstractAST extends IASTMutableImpl {
 							}));
 				}
 			});
-	}
-		return false;
+				}
+		// TODO optimize this expression:
+		return isAST(F.Interval) && forAll(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return x.isNumericArgument() || //
+						(x.isList() && ((IAST) x).forAll(new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr y) {
+								return y.isNumericArgument();
+							}
+						}));
+			}
+		});
 	}
 	/** {@inheritDoc} */
 	@Override

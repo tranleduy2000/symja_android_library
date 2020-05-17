@@ -43,6 +43,12 @@ public class PredicateQ {
 			F.AntisymmetricMatrixQ.setEvaluator(new AntisymmetricMatrixQ());
 			F.AntihermitianMatrixQ.setEvaluator(new AntihermitianMatrixQ());
 			F.ArrayQ.setEvaluator(new ArrayQ());
+			F.AssociationQ.setPredicateQ(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isAssociation();
+				}
+			});
 			F.AtomQ.setPredicateQ(new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {

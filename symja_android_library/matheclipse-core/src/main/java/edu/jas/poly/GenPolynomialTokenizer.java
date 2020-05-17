@@ -582,6 +582,7 @@ public class GenPolynomialTokenizer {
                             try {
                                 r = (RingElem) fac.parse(tok.sval);
                             } catch (NumberFormatException re) {
+                                re.printStackTrace();
                                 throw new InvalidExpressionException("recursively unknown variable " + tok.sval);
                             }
                             if (debug)

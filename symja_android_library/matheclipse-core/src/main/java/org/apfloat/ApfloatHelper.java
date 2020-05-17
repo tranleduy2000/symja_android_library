@@ -1,36 +1,21 @@
-/*
- * Apfloat arbitrary precision arithmetic library
- * Copyright (C) 2002-2020  Mikko Tommila
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
 package org.apfloat;
-
-import java.math.BigInteger;
-import java.math.BigDecimal;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PushbackReader;
-import java.io.Writer;
-import java.io.IOException;
 
 import org.apfloat.spi.ApfloatBuilder;
 import org.apfloat.spi.ApfloatImpl;
 import org.apfloat.spi.Util;
-import static org.apfloat.spi.RadixConstants.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PushbackReader;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import static org.apfloat.spi.RadixConstants.DOUBLE_PRECISION;
+import static org.apfloat.spi.RadixConstants.FLOAT_PRECISION;
+import static org.apfloat.spi.RadixConstants.LONG_PRECISION;
 
 /**
  * Various utility methods related to apfloats.
@@ -46,7 +31,7 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(String value, boolean isInteger)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         long precision = (isInteger ? Apfloat.INFINITE : Apfloat.DEFAULT);
         int radix = getDefaultRadix();
@@ -54,14 +39,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(String value, long precision, boolean isInteger)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix, isInteger);
     }
 
     public static ApfloatImpl createApfloat(String value, long precision, int radix, boolean isInteger)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -71,28 +56,28 @@ class ApfloatHelper
     }
 
     private static ApfloatImpl implCreateApfloat(String value, long precision, int radix, boolean isInteger)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         ApfloatBuilder factory = getApfloatBuilder();
         return factory.createApfloat(value, precision, radix, isInteger);
     }
 
     public static ApfloatImpl createApfloat(long value)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return implCreateApfloat(value, Apfloat.INFINITE, radix);
     }
 
     public static ApfloatImpl createApfloat(long value, long precision)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(long value, long precision, int radix)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? Apfloat.INFINITE : precision);
         checkPrecision(precision);
@@ -100,14 +85,14 @@ class ApfloatHelper
     }
 
     private static ApfloatImpl implCreateApfloat(long value, long precision, int radix)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         ApfloatBuilder factory = getApfloatBuilder();
         return factory.createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(float value)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         int precision = getFloatPrecision(radix);
@@ -115,14 +100,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(float value, long precision)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(float value, long precision, int radix)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? getFloatPrecision(radix) : precision);
         checkPrecision(precision);
@@ -130,7 +115,7 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(double value)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         int precision = getDoublePrecision(radix);
@@ -138,14 +123,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(double value, long precision)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(double value, long precision, int radix)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? getDoublePrecision(radix) : precision);
         checkPrecision(precision);
@@ -153,28 +138,14 @@ class ApfloatHelper
     }
 
     private static ApfloatImpl implCreateApfloat(double value, long precision, int radix)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         ApfloatBuilder factory = getApfloatBuilder();
         return factory.createApfloat(value, precision, radix);
     }
 
-    public static ApfloatImpl createApfloat(PushbackReader in, boolean isInteger)
-            throws IOException, NumberFormatException, ApfloatRuntimeException
-    {
-        int radix = getDefaultRadix();
-        return implCreateApfloat(in, Apfloat.DEFAULT, radix, isInteger);
-    }
-
-    public static ApfloatImpl createApfloat(PushbackReader in, long precision, boolean isInteger)
-            throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
-    {
-        int radix = getDefaultRadix();
-        return createApfloat(in, precision, radix, isInteger);
-    }
-
     public static ApfloatImpl createApfloat(PushbackReader in, long precision, int radix, boolean isInteger)
-            throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IOException, IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -184,28 +155,28 @@ class ApfloatHelper
     }
 
     private static ApfloatImpl implCreateApfloat(PushbackReader in, long precision, int radix, boolean isInteger)
-            throws IOException, NumberFormatException, ApfloatRuntimeException
+        throws IOException, NumberFormatException, ApfloatRuntimeException
     {
         ApfloatBuilder factory = getApfloatBuilder();
         return factory.createApfloat(in, precision, radix, isInteger);
     }
 
     public static ApfloatImpl createApfloat(BigInteger value)
-            throws NumberFormatException, ApfloatRuntimeException
+        throws NumberFormatException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, Apfloat.INFINITE, radix);
     }
 
     public static ApfloatImpl createApfloat(BigInteger value, long precision)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(BigInteger value, long precision, int radix)
-            throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -226,13 +197,13 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(BigDecimal value)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return implCreateApfloat(value.toString(), Apfloat.DEFAULT, 10, false);
     }
 
     public static ApfloatImpl createApfloat(BigDecimal value, long precision)
-            throws IllegalArgumentException, ApfloatRuntimeException
+        throws IllegalArgumentException, ApfloatRuntimeException
     {
         return createApfloat(value.toString(), precision, 10, false);
     }
@@ -250,7 +221,7 @@ class ApfloatHelper
      */
 
     public static boolean readMatch(PushbackReader in, int c)
-            throws IOException
+        throws IOException
     {
         int i = in.read();
 
@@ -275,7 +246,7 @@ class ApfloatHelper
      */
 
     public static void extractWhitespace(PushbackReader in)
-            throws IOException
+        throws IOException
     {
         int c;
 
@@ -310,7 +281,7 @@ class ApfloatHelper
      */
 
     public static long[] getMatchingPrecisions(Apfloat x, Apfloat y)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         if (x.signum() == 0 || y.signum() == 0)
         {
@@ -318,16 +289,16 @@ class ApfloatHelper
         }
 
         long xPrec  = x.precision(),
-                yPrec  = y.precision(),
-                xScale = x.scale(),
-                yScale = y.scale(),
-                maxScale = Math.max(xScale, yScale),
-                xScaleDiff = (maxScale - xScale < 0 ? Apfloat.INFINITE : maxScale - xScale),
-                yScaleDiff = (maxScale - yScale < 0 ? Apfloat.INFINITE : maxScale - yScale),
-                maxPrec = Math.min(Util.ifFinite(xPrec, xPrec + xScaleDiff),
-                        Util.ifFinite(yPrec, yPrec + yScaleDiff)),
-                destXPrec = (maxPrec - xScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - xScaleDiff)),
-                destYPrec = (maxPrec - yScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - yScaleDiff));
+             yPrec  = y.precision(),
+             xScale = x.scale(),
+             yScale = y.scale(),
+             maxScale = Math.max(xScale, yScale),
+             xScaleDiff = (maxScale - xScale < 0 ? Apfloat.INFINITE : maxScale - xScale),
+             yScaleDiff = (maxScale - yScale < 0 ? Apfloat.INFINITE : maxScale - yScale),
+             maxPrec = Math.min(Util.ifFinite(xPrec, xPrec + xScaleDiff),
+                                Util.ifFinite(yPrec, yPrec + yScaleDiff)),
+             destXPrec = (maxPrec - xScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - xScaleDiff)),
+             destYPrec = (maxPrec - yScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - yScaleDiff));
 
         return new long[] { destXPrec, destYPrec };
     }
@@ -354,10 +325,10 @@ class ApfloatHelper
      */
 
     public static long[] getMatchingPrecisions(Apfloat a, Apfloat b, Apfloat c, Apfloat d)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         long abPrec  = (a.signum() == 0 || b.signum() == 0 ? 0 : Math.min(a.precision(), b.precision())),
-                cdPrec  = (c.signum() == 0 || d.signum() == 0 ? 0 : Math.min(c.precision(), d.precision()));
+             cdPrec  = (c.signum() == 0 || d.signum() == 0 ? 0 : Math.min(c.precision(), d.precision()));
 
         if (abPrec == 0 || cdPrec == 0)
         {
@@ -365,20 +336,20 @@ class ApfloatHelper
         }
 
         long abScale = a.scale() + b.scale(),
-                cdScale = c.scale() + d.scale(),
-                maxScale = Math.max(abScale, cdScale),
-                abScaleDiff = (maxScale - abScale < 0 ? Apfloat.INFINITE : maxScale - abScale),
-                cdScaleDiff = (maxScale - cdScale < 0 ? Apfloat.INFINITE : maxScale - cdScale),
-                maxPrec = Math.min(Util.ifFinite(abPrec, abPrec + abScaleDiff),
-                        Util.ifFinite(cdPrec, cdPrec + cdScaleDiff)),
-                destAbPrec = (maxPrec - abScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - abScaleDiff + 1)), // Add 1 since the scale may be 1 less
-                destCdPrec = (maxPrec - cdScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - cdScaleDiff + 1));
+             cdScale = c.scale() + d.scale(),
+             maxScale = Math.max(abScale, cdScale),
+             abScaleDiff = (maxScale - abScale < 0 ? Apfloat.INFINITE : maxScale - abScale),
+             cdScaleDiff = (maxScale - cdScale < 0 ? Apfloat.INFINITE : maxScale - cdScale),
+             maxPrec = Math.min(Util.ifFinite(abPrec, abPrec + abScaleDiff),
+                                Util.ifFinite(cdPrec, cdPrec + cdScaleDiff)),
+             destAbPrec = (maxPrec - abScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - abScaleDiff + 1)), // Add 1 since the scale may be 1 less
+             destCdPrec = (maxPrec - cdScaleDiff <= 0 ? 0 : Util.ifFinite(maxPrec, maxPrec - cdScaleDiff + 1));
 
         return new long[] { destAbPrec, destCdPrec, maxPrec };
     }
 
     public static void checkPrecision(long precision)
-            throws IllegalArgumentException
+        throws IllegalArgumentException
     {
         if (precision <= 0)
         {
@@ -387,7 +358,7 @@ class ApfloatHelper
     }
 
     public static void checkRadix(int radix)
-            throws NumberFormatException
+        throws NumberFormatException
     {
         if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
         {
@@ -396,7 +367,7 @@ class ApfloatHelper
     }
 
     private static void checkPowPrecision(long targetPrecision)
-            throws InfiniteExpansionException
+        throws InfiniteExpansionException
 
     {
         if (targetPrecision == Apfloat.INFINITE)
@@ -406,7 +377,7 @@ class ApfloatHelper
     }
 
     private static Apcomplex checkPowBasic(Apcomplex z, Apcomplex w, long targetPrecision)
-            throws ArithmeticException, ApfloatRuntimeException
+        throws ArithmeticException, ApfloatRuntimeException
     {
         if (w.real().signum() == 0 && w.imag().signum() == 0)
         {
@@ -426,7 +397,7 @@ class ApfloatHelper
     }
 
     public static Apcomplex checkPow(Apcomplex z, Apcomplex w, long targetPrecision)
-            throws ArithmeticException, ApfloatRuntimeException
+        throws ArithmeticException, ApfloatRuntimeException
     {
         Apcomplex result = checkPowBasic(z, w, targetPrecision);
         if (result != null)
@@ -440,7 +411,7 @@ class ApfloatHelper
     }
 
     public static Apfloat checkPow(Apfloat x, Apfloat y, long targetPrecision)
-            throws ArithmeticException, ApfloatRuntimeException
+        throws ArithmeticException, ApfloatRuntimeException
     {
         Apcomplex result = checkPowBasic(x, y, targetPrecision);
         if (result != null)
@@ -477,14 +448,14 @@ class ApfloatHelper
 
     // Returns x with precision at most as specified
     public static Apfloat limitPrecision(Apfloat x, long precision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return x.precision(Math.min(x.precision(), precision));
     }
 
     // Returns x with precision at least as specified
     public static Apfloat ensurePrecision(Apfloat x, long precision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return x.precision(Math.max(x.precision(), precision));
     }
@@ -503,91 +474,91 @@ class ApfloatHelper
 
     // Returns x with precision extended by Apfloat.EXTRA_PRECISION
     public static Apfloat extendPrecision(Apfloat x)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return x.precision(extendPrecision(x.precision()));
     }
 
     // Returns x with precision extended by specified amount
     public static Apfloat extendPrecision(Apfloat x, long extraPrecision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return x.precision(extendPrecision(x.precision(), extraPrecision));
     }
 
     // Returns z with precision as specified
     public static Apcomplex setPrecision(Apcomplex z, long precision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         if (z.real().signum() == 0)
         {
             return new Apcomplex(z.real(),
-                    z.imag().precision(precision));
+                                 z.imag().precision(precision));
         }
         else if (z.imag().signum() == 0)
         {
             return new Apcomplex(z.real().precision(precision),
-                    z.imag());
+                                 z.imag());
         }
 
         long precisionChange = precision - z.precision(),
-                realPrecision = z.real().precision(),
-                imagPrecision = z.imag().precision(),
-                newRealPrecision = Util.ifFinite(realPrecision, realPrecision + precisionChange),
-                newImagPrecision = Util.ifFinite(imagPrecision, imagPrecision + precisionChange);
+             realPrecision = z.real().precision(),
+             imagPrecision = z.imag().precision(),
+             newRealPrecision = Util.ifFinite(realPrecision, realPrecision + precisionChange),
+             newImagPrecision = Util.ifFinite(imagPrecision, imagPrecision + precisionChange);
 
         if (precisionChange < 0)
         {
             if (realPrecision + precisionChange <= 0)
             {
                 return new Apcomplex(Apfloat.ZERO,
-                        z.imag().precision(precision));
+                                     z.imag().precision(precision));
             }
             else if (imagPrecision + precisionChange <= 0)
             {
                 return new Apcomplex(z.real().precision(precision),
-                        Apfloat.ZERO);
+                                     Apfloat.ZERO);
             }
         }
 
         return new Apcomplex(z.real().precision(newRealPrecision),
-                z.imag().precision(newImagPrecision));
+                             z.imag().precision(newImagPrecision));
     }
 
     // Returns z with precision at most as specified
     public static Apcomplex limitPrecision(Apcomplex z, long precision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return new Apcomplex(z.real().precision(Math.min(z.real().precision(), precision)),
-                z.imag().precision(Math.min(z.imag().precision(), precision)));
+                             z.imag().precision(Math.min(z.imag().precision(), precision)));
     }
 
     // Returns z with precision at least as specified
     public static Apcomplex ensurePrecision(Apcomplex z, long precision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return new Apcomplex(z.real().precision(Math.max(z.real().precision(), precision)),
-                z.imag().precision(Math.max(z.imag().precision(), precision)));
+                             z.imag().precision(Math.max(z.imag().precision(), precision)));
     }
 
     // Returns z with precision extended by Apfloat.EXTRA_PRECISION
     public static Apcomplex extendPrecision(Apcomplex z)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return new Apcomplex(z.real().precision(extendPrecision(z.real().precision())),
-                z.imag().precision(extendPrecision(z.imag().precision())));
+                             z.imag().precision(extendPrecision(z.imag().precision())));
     }
 
     // Returns z with precision extended by specified precision
     public static Apcomplex extendPrecision(Apcomplex z, long extraPrecision)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return new Apcomplex(z.real().precision(extendPrecision(z.real().precision(), extraPrecision)),
-                z.imag().precision(extendPrecision(z.imag().precision(), extraPrecision)));
+                             z.imag().precision(extendPrecision(z.imag().precision(), extraPrecision)));
     }
 
     public static long size(Aprational x)
-            throws ApfloatRuntimeException
+        throws ApfloatRuntimeException
     {
         return Math.max(x.numerator().size(), x.denominator().size());
     }
@@ -615,7 +586,6 @@ class ApfloatHelper
         {
             a.writeTo(new Writer()
             {
-                @Override
                 public void write(int c)
                 {
                     c = Character.digit(c, 16);
@@ -632,7 +602,6 @@ class ApfloatHelper
                     this.hi = !this.hi;
                 }
 
-                @Override
                 public void write(char cbuf[], int off, int len)
                 {
                     for (int i = 0; i < len; i++)
@@ -641,12 +610,10 @@ class ApfloatHelper
                     }
                 }
 
-                @Override
                 public void close()
                 {
                 }
 
-                @Override
                 public void flush()
                 {
                 }
@@ -669,13 +636,12 @@ class ApfloatHelper
     // The BigInteger.toString() method has O(n^2) complexity,
     // therefore we convert to a byte array instead.
     public static PushbackReader toPushbackReader(BigInteger x)
-            throws IOException
+        throws IOException
     {
         byte[] bytes = x.abs().toByteArray();
         final int startB = (x.signum() < 0 ? '-' : -1);     // Start the stream with minus sign in case of negative number
         InputStream in = new ByteArrayInputStream(bytes)
         {
-            @Override
             public int read()
             {
                 int c;
@@ -700,7 +666,6 @@ class ApfloatHelper
                 return c;
             }
 
-            @Override
             public int read(byte[] b, int off, int len)
             {
                 int i = 0;
@@ -724,7 +689,7 @@ class ApfloatHelper
     }
 
     private static int getDefaultRadix()
-            throws NumberFormatException
+        throws NumberFormatException
     {
         ApfloatContext ctx = ApfloatContext.getContext();
         return ctx.getDefaultRadix();
