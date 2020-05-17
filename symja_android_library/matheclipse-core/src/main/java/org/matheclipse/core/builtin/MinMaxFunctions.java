@@ -16,6 +16,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Expr2LP;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -54,6 +55,31 @@ public class MinMaxFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>ArgMax(function, variable)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns a maximizer point for a univariate <code>function</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Arg_max">Wikipedia - Arg max</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; ArgMax(x*10-x^2, x)
+	 * 5
+	 * </code>
+	 * </pre>
+	 */
 	private static class ArgMax extends AbstractEvaluator {
 
 		@Override
@@ -77,6 +103,31 @@ public class MinMaxFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>ArgMin(function, variable)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns a minimizer point for a univariate <code>function</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Arg_max">Wikipedia - Arg max</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; ArgMin(x*10+x^2, x)
+	 * -5
+	 * </code>
+	 * </pre>
+	 */
 	private static class ArgMin extends AbstractEvaluator {
 
 		@Override
@@ -134,17 +185,17 @@ public class MinMaxFunctions {
 						if (x2.isMinusOne()) {
 							if (F.GreaterEqual.ofQ(engine, l, F.C1)) {
 								// [>= 1, u]
-								return F.Interval(Power(u, x2), Power(l, x2));
+								return F.Interval(F.Power(u, x2), F.Power(l, x2));
 							}
 						}
 						if (l.isNegativeResult() && u.isPositiveResult()) {
 							if (x2.isPositiveResult()) {
-								return F.Interval(F.C0, Power(u, x2));
+								return F.Interval(F.C0, F.Power(u, x2));
 							}
 							if (x2.isEvenResult()) {
-								return F.Interval(F.C0, Power(u, x2));
+								return F.Interval(F.C0, F.Power(u, x2));
 							} else if (x2.isFraction() && ((IFraction) x2).denominator().isEven()) {
-								return F.Interval(F.C0, Power(u, x2));
+								return F.Interval(F.C0, F.Power(u, x2));
 							}
 						}
 					}
@@ -237,6 +288,45 @@ public class MinMaxFunctions {
 		}
 
 	}
+	/**
+	 * <pre>
+	 * <code>Maximize(unary-function, variable)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the maximum of the unary function for the given <code>variable</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Derivative_test">Wikipedia - Derivative test</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; Maximize(-x^4-7*x^3+2*x^2 - 42,x)
+	 * {-42-7*(-21/8-Sqrt(505)/8)^3+2*(21/8+Sqrt(505)/8)^2-(21/8+Sqrt(505)/8)^4,{x-&gt;-21/8-Sqrt(505)/8}}
+	 * </code>
+	 * </pre>
+	 * <p>
+	 * Print a message if no maximum can be found
+	 * </p>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; Maximize(x^4+7*x^3-2*x^2 + 42, x)
+	 * {Infinity,{x-&gt;-Infinity}}
+	 * </code>
+	 * </pre>
+	 *
+	 * <h3>Related terms</h3>
+	 * <p>
+	 * <a href="Minimize.md">Minimize</a>
+	 * </p>
+	 */
 	private final static class Maximize extends AbstractFunctionEvaluator {
 
 		@Override
@@ -258,6 +348,36 @@ public class MinMaxFunctions {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * <code>Minimize(unary-function, variable)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns the minimum of the unary function for the given <code>variable</code>.
+	 * </p>
+	 * </blockquote>
+	 * <p>
+	 * See:
+	 * </p>
+	 * <ul>
+	 * <li><a href="https://en.wikipedia.org/wiki/Derivative_test">Wikipedia - Derivative test</a></li>
+	 * </ul>
+	 * <h3>Examples</h3>
+	 *
+	 * <pre>
+	 * <code>&gt;&gt; Minimize(x^4+7*x^3-2*x^2 + 42, x)
+	 * {42+7*(-21/8-Sqrt(505)/8)^3-2*(21/8+Sqrt(505)/8)^2+(21/8+Sqrt(505)/8)^4,{x-&gt;-21/8-Sqrt(505)/8}}
+	 * </code>
+	 * </pre>
+	 *
+	 * <h3>Related terms</h3>
+	 * <p>
+	 * <a href="Maximize.md">Maximize</a>
+	 * </p>
+	 */
 	private final static class Minimize extends AbstractFunctionEvaluator {
 
 		@Override
@@ -328,6 +448,7 @@ public class MinMaxFunctions {
 
 		@Override
 		public IExpr numericEval(final IAST ast, EvalEngine engine) {
+			try {
 			if (ast.arg1().isList() && ast.arg2().isList()) {
 				IAST list1 = (IAST) ast.arg1();
 				IAST list2 = (IAST) ast.arg2();
@@ -344,6 +465,12 @@ public class MinMaxFunctions {
 								new NonNegativeConstraint(true), PivotSelectionRule.BLAND);
 					}
 				}
+			}
+			} catch (ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), ve);
 			}
 			return F.NIL;
 		}
@@ -410,6 +537,7 @@ public class MinMaxFunctions {
 
 		@Override
 		public IExpr numericEval(final IAST ast, EvalEngine engine) {
+			try {
 			if (ast.arg1().isList() && ast.arg2().isList()) {
 				IAST list1 = (IAST) ast.arg1();
 				IAST list2 = (IAST) ast.arg2();
@@ -426,6 +554,12 @@ public class MinMaxFunctions {
 								new NonNegativeConstraint(true), PivotSelectionRule.BLAND);
 					}
 				}
+			}
+			} catch (ValidateException ve) {
+				if (Config.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), ve);
 			}
 			return F.NIL;
 		}
