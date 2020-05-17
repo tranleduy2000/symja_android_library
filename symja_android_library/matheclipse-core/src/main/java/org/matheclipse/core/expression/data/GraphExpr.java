@@ -26,6 +26,21 @@ public class GraphExpr<T> extends DataExpr<Graph<IExpr, T>> {
 	}
  
 	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj instanceof GraphExpr) {
+			return fData.equals(((GraphExpr) obj).fData);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return (fData == null) ? 283 : 283 + fData.hashCode();
+	}
+	@Override
 	public IExpr copy() {
 		return new GraphExpr<T>(fData);
 	}
