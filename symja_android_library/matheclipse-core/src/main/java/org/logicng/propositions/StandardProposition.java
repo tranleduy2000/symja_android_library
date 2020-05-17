@@ -28,6 +28,8 @@
 
 package org.logicng.propositions;
 
+import com.duy.util.DObjects;
+
 import org.logicng.collections.ImmutableFormulaList;
 import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
@@ -116,7 +118,7 @@ public final class StandardProposition extends Proposition {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.formulas, this.description);
+        return DObjects.hash(this.formulas, this.description);
     }
 
     @Override
@@ -125,7 +127,7 @@ public final class StandardProposition extends Proposition {
             return true;
         if (other instanceof StandardProposition) {
             final StandardProposition o = (StandardProposition) other;
-            return Objects.equals(this.formulas, o.formulas) && Objects.equals(this.description, o.description);
+            return DObjects.equals(this.formulas, o.formulas) && DObjects.equals(this.description, o.description);
         }
         return false;
     }

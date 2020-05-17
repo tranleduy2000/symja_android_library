@@ -28,6 +28,8 @@
 
 package org.logicng.bdds.datastructures;
 
+import com.duy.util.DObjects;
+
 import org.logicng.bdds.BDDFactory;
 import org.logicng.datastructures.Assignment;
 import org.logicng.formulas.Formula;
@@ -345,14 +347,14 @@ public final class BDD {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.index, this.factory);
+        return DObjects.hash(this.index, this.factory);
     }
 
     @Override
     public boolean equals(final Object other) {
         return this == other || other instanceof BDD
                 && this.index == ((BDD) other).index
-                && Objects.equals(this.factory, ((BDD) other).factory);
+                && DObjects.equals(this.factory, ((BDD) other).factory);
     }
 
     @Override

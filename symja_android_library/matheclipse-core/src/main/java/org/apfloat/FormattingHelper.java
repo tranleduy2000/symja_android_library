@@ -121,7 +121,7 @@ class FormattingHelper
                 String s;
                 if (this.locale == null)
                 {
-                    s = String.valueOf((char) c).toUpperCase();
+                    s = String.valueOf((char) c).toUpperCase(Locale.US);
                 }
                 else
                 {

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Locale;
 
 /**
  * Markdown processor class.
@@ -709,9 +710,9 @@ public class Processor
             // To make compiler happy: add != null checks
             if (isLinkRef && id != null && link != null)
             {
-                if (id.toLowerCase().equals("$profile$"))
+                if (id.toLowerCase(Locale.US).equals("$profile$"))
                 {
-                    this.emitter.useExtensions = this.useExtensions = link.toLowerCase().equals("extended");
+                    this.emitter.useExtensions = this.useExtensions = link.toLowerCase(Locale.US).equals("extended");
                     lastLinkRef = null;
                 }
                 else

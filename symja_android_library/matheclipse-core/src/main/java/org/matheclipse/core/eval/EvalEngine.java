@@ -201,6 +201,7 @@ public class EvalEngine implements Serializable {
      * @see org.matheclipse.core.reflection.Out
      */
     transient private boolean fOutListDisabled = true;
+
     /**
      *
      */
@@ -825,12 +826,7 @@ public class EvalEngine implements Serializable {
                 if (resultList.isPresent()) {
                     return evalArgs(resultList, ISymbol.NOATTRIBUTE).orElse(resultList);
                 }
-                int indx = tempAST.indexOf(new Predicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x) {
-                        return x.isAssociation();
-                    }
-                });
+                int indx = tempAST.indexOf(EvalEngineUtils.associationPredicate);
                 if (indx > 0) {
                     return ((IAssociation) tempAST.get(indx)).mapThread(tempAST, indx);
                 }
@@ -840,12 +836,6 @@ public class EvalEngine implements Serializable {
                 if (!((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL)) {
                     // Swift changed
                     if (tempAST.exists(EvalEngineUtils.indeterminatePredicate)) {
-						/*new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							return x.isIndeterminate();
-						}
-						}*/
                         return F.Indeterminate;
                     }
                 }
@@ -1401,12 +1391,6 @@ public class EvalEngine implements Serializable {
         // }
         final IAST ast;
         // objc-changed: avoid using too much memory.
-        // new Predicate<IExpr>() {
-        //        @Override
-        //        public boolean test(IExpr x) {
-        //            return x.isAST(F.Unevaluated, 2);
-        //        }
-        //    }
         if (argsAST.exists(EvalEngineUtils.unevaluatedPredicate)) {
             ast = argsAST.map(new Function<IExpr, IExpr>() {
                 @Override
@@ -1420,21 +1404,38 @@ public class EvalEngine implements Serializable {
         } else {
             ast = argsAST;
         }
-        final IExpr[] result = new IExpr[1];
-        result[0] = F.NIL;
-        if (ast.exists(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                if (!(x instanceof IPatternObject) && x.isPresent()) {
-                    result[0] = x.topHead().evalUpRule(EvalEngine.this, ast);
-                    if (result[0].isPresent()) {
-                        return true;
-                    }
+//        final IExpr[] result = new IExpr[1];
+//        result[0] = F.NIL;
+//        if (ast.exists(new Predicate<IExpr>() {
+//            @Override
+//            public boolean test(IExpr x) {
+//                if (!(x instanceof IPatternObject) && x.isPresent()) {
+//                    result[0] = x.topHead().evalUpRule(EvalEngine.this, ast);
+//                    if (result[0].isPresent()) {
+//                        return true;
+//                    }
+//                }
+//                return false;
+//            }
+//        })) {
+//            return result[0];
+//        }
+        // swift changed: memory issue
+        boolean exists = false;
+        IExpr result = F.NIL;
+        final int size = ast.size();
+        for (int i = 1; i < size; i++) {
+            IExpr x = ast.get(i);
+            if (!(x instanceof IPatternObject) && x.isPresent()) {
+                result = x.topHead().evalUpRule(this, ast);
+                if (result.isPresent()) {
+                    exists = true;
+                    break;
                 }
-                return false;
             }
-        })) {
-            return result[0];
+        }
+        if (exists) {
+            return result;
         }
 
         return evalASTBuiltinFunction(symbol, ast);
@@ -1785,32 +1786,60 @@ public class EvalEngine implements Serializable {
         }
         final int attr = ast.topHead().getAttributes();
         final IASTAppendable[] seqResult = new IASTAppendable[]{F.NIL};
-
-        ast.forEach(new ObjIntConsumer<IExpr>() {
-            @Override
-            public void accept(IExpr x, int i) {
-                if (x.isSequence()) {
-                    IAST seq = (IAST) x;
+        // swift changed: memory issue
+        // ast.forEach(new ObjIntConsumer<IExpr>() {
+        //     @Override
+        //     public void accept(IExpr x, int i) {
+        //         if (x.isSequence()) {
+        //             IAST seq = (IAST) x;
+        //             if (!seqResult[0].isPresent()) {
+        //                 seqResult[0] = F.ast(ast.head(), ast.size() + seq.size(), false);
+        //                 seqResult[0].appendArgs(ast, i);
+        //             }
+        //             seqResult[0].appendArgs(seq);
+        //             return;
+        //         } else if (x.equals(F.Nothing)) {
+        //             if ((ISymbol.HOLDALL & attr) == ISymbol.NOATTRIBUTE) {
+        //                 if (!seqResult[0].isPresent()) {
+        //                     seqResult[0] = F.ast(ast.head(), ast.size() - 1, false);
+        //                     seqResult[0].appendArgs(ast, i);
+        //                 }
+        //                 return;
+        //             }
+        //         }
+        //         if (seqResult[0].isPresent()) {
+        //             seqResult[0].append(x);
+        //         }
+        //     }
+        // });
+        // swift changed: memory issue
+        for (int i = 1; i < ast.size(); i++) {
+            IExpr x = ast.get(i);
+            boolean exit = false;
+            if (x.isSequence()) {
+                IAST seq = (IAST) x;
+                if (!seqResult[0].isPresent()) {
+                    seqResult[0] = F.ast(ast.head(), ast.size() + seq.size(), false);
+                    seqResult[0].appendArgs(ast, i);
+                }
+                seqResult[0].appendArgs(seq);
+                exit = true;
+            } else if (x.equals(F.Nothing)) {
+                if ((ISymbol.HOLDALL & attr) == ISymbol.NOATTRIBUTE) {
                     if (!seqResult[0].isPresent()) {
-                        seqResult[0] = F.ast(ast.head(), ast.size() + seq.size(), false);
+                        seqResult[0] = F.ast(ast.head(), ast.size() - 1, false);
                         seqResult[0].appendArgs(ast, i);
                     }
-                    seqResult[0].appendArgs(seq);
-                    return;
-                } else if (x.equals(F.Nothing)) {
-                    if ((ISymbol.HOLDALL & attr) == ISymbol.NOATTRIBUTE) {
-                        if (!seqResult[0].isPresent()) {
-                            seqResult[0] = F.ast(ast.head(), ast.size() - 1, false);
-                            seqResult[0].appendArgs(ast, i);
-                        }
-                        return;
-                    }
+                    exit = true;
                 }
+            }
+            if (!exit) {
                 if (seqResult[0].isPresent()) {
                     seqResult[0].append(x);
                 }
             }
-        });
+        }
+
         if (seqResult[0].isPresent()) {
             return seqResult[0];
         }
@@ -2405,26 +2434,49 @@ public class EvalEngine implements Serializable {
     public IASTMutable threadASTListArgs(final IASTMutable ast) {
 
         final int[] listLength = new int[]{-1};
-        if (ast.exists(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                if (x.isList()) {
-                    if (listLength[0] < 0) {
-                        listLength[0] = ((IAST) x).argSize();
-                    } else {
-                        if (listLength[0] != ((IAST) x).argSize()) {
-                            // Objects of unequal length in `1` cannot be combined.
-                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
-                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-                            return true;
-                        }
+//        if (ast.exists(new Predicate<IExpr>() {
+//            @Override
+//            public boolean test(IExpr x) {
+//                if (x.isList()) {
+//                    if (listLength[0] < 0) {
+//                        listLength[0] = ((IAST) x).argSize();
+//                    } else {
+//                        if (listLength[0] != ((IAST) x).argSize()) {
+//                            // Objects of unequal length in `1` cannot be combined.
+//                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
+//                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+//                            return true;
+//                        }
+//                    }
+//                }
+//                return false;
+//            }
+//        })) {
+//            return F.NIL;
+//        }
+        // swift changed: memory issue
+        boolean exists = false;
+        final int size = ast.size();
+        for (int i = 1; i < size; i++) {
+            IExpr x = ast.get(i);
+            if (x.isList()) {
+                if (listLength[0] < 0) {
+                    listLength[0] = ((IAST) x).argSize();
+                } else {
+                    if (listLength[0] != ((IAST) x).argSize()) {
+                        // Objects of unequal length in `1` cannot be combined.
+                        IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
+                        // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+                        exists = true;
+                        break;
                     }
                 }
-                return false;
             }
-        })) {
+        }
+        if (exists) {
             return F.NIL;
         }
+
         if (listLength[0] != -1) {
             IASTMutable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength[0]);
             result.addEvalFlags(IAST.IS_LISTABLE_THREADED);

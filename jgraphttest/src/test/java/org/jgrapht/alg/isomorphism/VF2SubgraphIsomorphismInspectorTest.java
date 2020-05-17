@@ -889,7 +889,7 @@ public class VF2SubgraphIsomorphismInspectorTest
         @Override
         public int compare(String o1, String o2)
         {
-            if (o1.toLowerCase().equals(o2.toLowerCase()))
+            if (o1.toLowerCase(Locale.US).equals(o2.toLowerCase(Locale.US)))
                 return 0;
             else
                 return 1;

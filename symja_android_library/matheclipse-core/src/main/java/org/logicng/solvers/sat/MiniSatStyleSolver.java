@@ -44,6 +44,8 @@
 
 package org.logicng.solvers.sat;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.collections.LNGBooleanVector;
 import org.logicng.collections.LNGIntVector;
 import org.logicng.collections.LNGVector;
@@ -677,28 +679,28 @@ public abstract class MiniSatStyleSolver {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("ok            ").append(ok).append(System.lineSeparator());
-        sb.append("qhead         ").append(qhead).append(System.lineSeparator());
-        sb.append("#clauses      ").append(clauses.size()).append(System.lineSeparator());
-        sb.append("#learnts      ").append(learnts.size()).append(System.lineSeparator());
-        sb.append("#watches      ").append(watches.size()).append(System.lineSeparator());
-        sb.append("#vars         ").append(vars.size()).append(System.lineSeparator());
-        sb.append("#orderheap    ").append(orderHeap.size()).append(System.lineSeparator());
-        sb.append("#trail        ").append(trail.size()).append(System.lineSeparator());
-        sb.append("#trailLim     ").append(trailLim.size()).append(System.lineSeparator());
+        sb.append("ok            ").append(ok).append(DSystem.lineSeparator());
+        sb.append("qhead         ").append(qhead).append(DSystem.lineSeparator());
+        sb.append("#clauses      ").append(clauses.size()).append(DSystem.lineSeparator());
+        sb.append("#learnts      ").append(learnts.size()).append(DSystem.lineSeparator());
+        sb.append("#watches      ").append(watches.size()).append(DSystem.lineSeparator());
+        sb.append("#vars         ").append(vars.size()).append(DSystem.lineSeparator());
+        sb.append("#orderheap    ").append(orderHeap.size()).append(DSystem.lineSeparator());
+        sb.append("#trail        ").append(trail.size()).append(DSystem.lineSeparator());
+        sb.append("#trailLim     ").append(trailLim.size()).append(DSystem.lineSeparator());
 
-        sb.append("model         ").append(model).append(System.lineSeparator());
-        sb.append("conflict      ").append(conflict).append(System.lineSeparator());
-        sb.append("assumptions   ").append(assumptions).append(System.lineSeparator());
-        sb.append("#seen         ").append(seen.size()).append(System.lineSeparator());
-        sb.append("#stack        ").append(analyzeStack.size()).append(System.lineSeparator());
-        sb.append("#toclear      ").append(analyzeToClear.size()).append(System.lineSeparator());
+        sb.append("model         ").append(model).append(DSystem.lineSeparator());
+        sb.append("conflict      ").append(conflict).append(DSystem.lineSeparator());
+        sb.append("assumptions   ").append(assumptions).append(DSystem.lineSeparator());
+        sb.append("#seen         ").append(seen.size()).append(DSystem.lineSeparator());
+        sb.append("#stack        ").append(analyzeStack.size()).append(DSystem.lineSeparator());
+        sb.append("#toclear      ").append(analyzeToClear.size()).append(DSystem.lineSeparator());
 
-        sb.append("claInc        ").append(claInc).append(System.lineSeparator());
-        sb.append("simpDBAssigns ").append(simpDBAssigns).append(System.lineSeparator());
-        sb.append("simpDBProps   ").append(simpDBProps).append(System.lineSeparator());
-        sb.append("#clause lits  ").append(clausesLiterals).append(System.lineSeparator());
-        sb.append("#learnts lits ").append(learntsLiterals).append(System.lineSeparator());
+        sb.append("claInc        ").append(claInc).append(DSystem.lineSeparator());
+        sb.append("simpDBAssigns ").append(simpDBAssigns).append(DSystem.lineSeparator());
+        sb.append("simpDBProps   ").append(simpDBProps).append(DSystem.lineSeparator());
+        sb.append("#clause lits  ").append(clausesLiterals).append(DSystem.lineSeparator());
+        sb.append("#learnts lits ").append(learntsLiterals).append(DSystem.lineSeparator());
         return sb.toString();
     }
 

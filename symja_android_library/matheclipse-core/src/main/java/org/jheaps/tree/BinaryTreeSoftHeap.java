@@ -17,6 +17,8 @@
  */
 package org.jheaps.tree;
 
+import com.duy.lang.DInteger;
+
 import org.jheaps.Heap;
 import org.jheaps.MergeableHeap;
 import org.jheaps.annotations.ConstantTime;
@@ -598,7 +600,7 @@ public class BinaryTreeSoftHeap<K> implements Heap<K>, MergeableHeap<K>, Seriali
             }
 
             if (rank1 <= rank2) {
-                switch (Integer.compare(rank1, resultRank)) {
+                switch (DInteger.compare(rank1, resultRank)) {
                     case 0:
                         // combine into result
                         resultTail.root = combine(cur1.root, resultTail.root);
@@ -647,7 +649,7 @@ public class BinaryTreeSoftHeap<K> implements Heap<K>, MergeableHeap<K>, Seriali
                 }
             } else {
                 // symmetric case rank2 < rank1
-                switch (Integer.compare(rank2, resultRank)) {
+                switch (DInteger.compare(rank2, resultRank)) {
                     case 0:
                         // combine into result
                         resultTail.root = combine(cur2.root, resultTail.root);

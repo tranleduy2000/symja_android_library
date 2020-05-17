@@ -28,6 +28,8 @@
 
 package org.logicng.explanations.unsatcores;
 
+import com.duy.util.DObjects;
+
 import org.logicng.propositions.Proposition;
 
 import java.util.List;
@@ -76,7 +78,7 @@ final public class UNSATCore<T extends Proposition> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.propositions, this.isMUS);
+        return DObjects.hash(this.propositions, this.isMUS);
     }
 
     @Override
@@ -86,7 +88,7 @@ final public class UNSATCore<T extends Proposition> {
         if (!(o instanceof UNSATCore))
             return false;
         UNSATCore unsatCore = (UNSATCore) o;
-        return this.isMUS == unsatCore.isMUS && Objects.equals(this.propositions, unsatCore.propositions);
+        return this.isMUS == unsatCore.isMUS && DObjects.equals(this.propositions, unsatCore.propositions);
     }
 
     @Override

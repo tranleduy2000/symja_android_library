@@ -35,6 +35,7 @@ import org.matheclipse.parser.client.ast.SymbolNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ASTNodeFactory implements INodeParserFactory {
@@ -530,14 +531,14 @@ public class ASTNodeFactory implements INodeParserFactory {
 		String name = symbolName;
 		if (fIgnoreCase) {
 			if (name.length() > 1) {
-			name = symbolName.toLowerCase();
+			name = symbolName.toLowerCase(Locale.US);
 		}
 		}
 		if (Config.RUBI_CONVERT_SYMBOLS) {
 			name = toRubiString(name);
 		}
 		// if (fIgnoreCase) {
-		// return new SymbolNode(symbolName.toLowerCase());
+		// return new SymbolNode(symbolName.toLowerCase(Locale.US));
 		// }
 		return new SymbolNode(name);
 	}
@@ -557,7 +558,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 			if (nodeStr.length() == 1) {
 				return nodeStr;
 			}
-			String lowercaseName = nodeStr.toLowerCase();
+			String lowercaseName = nodeStr.toLowerCase(Locale.US);
 			String temp = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(lowercaseName);
 			if (temp != null) {
 				if (!temp.equals(nodeStr)) {
@@ -576,7 +577,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 					}
 				}
 			} else {
-				if (!nodeStr.equals(nodeStr.toLowerCase())) {
+				if (!nodeStr.equals(nodeStr.toLowerCase(Locale.US))) {
 					temp = F.PREDEFINED_INTERNAL_FORM_STRINGS.get(nodeStr);
 					if (temp == null) {
 						if (lowercaseName.length() > 1) {

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3;
 
+import com.duy.util.DObjects;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
@@ -4621,7 +4623,7 @@ public class StringUtils {
         }
         final Object first = iterator.next();
         if (!iterator.hasNext()) {
-            return Objects.toString(first, EMPTY);
+            return DObjects.toString(first, EMPTY);
         }
 
         // two or more elements
@@ -4665,7 +4667,7 @@ public class StringUtils {
         }
         final Object first = iterator.next();
         if (!iterator.hasNext()) {
-            return Objects.toString(first, "");
+            return DObjects.toString(first, "");
         }
 
         // two or more elements
@@ -4835,7 +4837,7 @@ public class StringUtils {
 
         final Iterator<Object> iterator = Arrays.asList(objects).iterator();
         while (iterator.hasNext()) {
-            final String value = Objects.toString(iterator.next(), "");
+            final String value = DObjects.toString(iterator.next(), "");
             result.append(value);
 
             if (iterator.hasNext()) {
@@ -5596,8 +5598,8 @@ public class StringUtils {
          }
          String searchText = text;
          if (ignoreCase) {
-             searchText = text.toLowerCase();
-             searchString = searchString.toLowerCase();
+             searchText = text.toLowerCase(Locale.US);
+             searchString = searchString.toLowerCase(Locale.US);
          }
          int start = 0;
          int end = searchText.indexOf(searchString, start);
@@ -6704,7 +6706,7 @@ public class StringUtils {
         if (str == null) {
             return null;
         }
-        return str.toUpperCase();
+        return str.toUpperCase(Locale.US);
     }
 
     /**
@@ -6731,7 +6733,7 @@ public class StringUtils {
     }
 
     /**
-     * <p>Converts a String to lower case as per {@link String#toLowerCase()}.</p>
+     * <p>Converts a String to lower case as per {@link String#toLowerCase(Locale.US)}.</p>
      *
      * <p>A {@code null} input String returns {@code null}.</p>
      *
@@ -6741,7 +6743,7 @@ public class StringUtils {
      * StringUtils.lowerCase("aBc") = "abc"
      * </pre>
      *
-     * <p><strong>Note:</strong> As described in the documentation for {@link String#toLowerCase()},
+     * <p><strong>Note:</strong> As described in the documentation for {@link String#toLowerCase(Locale.US)},
      * the result of this method is affected by the current locale.
      * For platform-independent case transformations, the method {@link #lowerCase(String, Locale)}
      * should be used with a specific locale (e.g. {@link Locale#ENGLISH}).</p>
@@ -6753,7 +6755,7 @@ public class StringUtils {
         if (str == null) {
             return null;
         }
-        return str.toLowerCase();
+        return str.toLowerCase(Locale.US);
     }
 
     /**

@@ -28,6 +28,8 @@
 
 package org.logicng.datastructures;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
@@ -313,7 +315,7 @@ public class Assignment {
 
     @Override
     public int hashCode() {
-        return Objects.hash(new HashSet<>(this.pos), new HashSet<>(this.neg));
+        return DObjects.hash(new HashSet<>(this.pos), new HashSet<>(this.neg));
     }
 
     @Override
@@ -324,8 +326,8 @@ public class Assignment {
             return true;
         if (this.getClass() == other.getClass()) {
             final Assignment o = (Assignment) other;
-            return Objects.equals(new HashSet<>(this.pos), new HashSet<>(o.pos))
-                    && Objects.equals(new HashSet<>(this.neg), new HashSet<>(o.neg));
+            return DObjects.equals(new HashSet<>(this.pos), new HashSet<>(o.pos))
+                    && DObjects.equals(new HashSet<>(this.neg), new HashSet<>(o.neg));
         }
         return false;
     }

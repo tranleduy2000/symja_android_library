@@ -29,6 +29,7 @@ import org.matheclipse.parser.client.math.ArithmeticMathException;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -440,16 +441,16 @@ public class DoubleEvaluator {
 			if (SYMBOL_DOUBLE_MAP.get("pi") == null) {
 				// init tables for relaxed mode
 				for (String key : SYMBOL_DOUBLE_MAP.keySet()) {
-					SYMBOL_DOUBLE_MAP.put(key.toLowerCase(), SYMBOL_DOUBLE_MAP.get(key));
+					SYMBOL_DOUBLE_MAP.put(key.toLowerCase(Locale.US), SYMBOL_DOUBLE_MAP.get(key));
 				}
 				for (String key : SYMBOL_BOOLEAN_MAP.keySet()) {
-					SYMBOL_BOOLEAN_MAP.put(key.toLowerCase(), SYMBOL_BOOLEAN_MAP.get(key));
+					SYMBOL_BOOLEAN_MAP.put(key.toLowerCase(Locale.US), SYMBOL_BOOLEAN_MAP.get(key));
 				}
 				for (String key : FUNCTION_DOUBLE_MAP.keySet()) {
-					FUNCTION_DOUBLE_MAP.put(key.toLowerCase(), FUNCTION_DOUBLE_MAP.get(key));
+					FUNCTION_DOUBLE_MAP.put(key.toLowerCase(Locale.US), FUNCTION_DOUBLE_MAP.get(key));
 				}
 				for (String key : FUNCTION_BOOLEAN_MAP.keySet()) {
-					FUNCTION_BOOLEAN_MAP.put(key.toLowerCase(), FUNCTION_BOOLEAN_MAP.get(key));
+					FUNCTION_BOOLEAN_MAP.put(key.toLowerCase(Locale.US), FUNCTION_BOOLEAN_MAP.get(key));
 				}
 			}
 		}
@@ -884,7 +885,7 @@ public class DoubleEvaluator {
 	 */
 	public void defineVariable(String variableName, double value) {
 		if (fRelaxedSyntax) {
-			fVariableMap.put(variableName.toLowerCase(), new DoubleVariable(value));
+			fVariableMap.put(variableName.toLowerCase(Locale.US), new DoubleVariable(value));
 		} else {
 			fVariableMap.put(variableName, new DoubleVariable(value));
 		}
@@ -898,7 +899,7 @@ public class DoubleEvaluator {
 	 */
 	public void defineVariable(String variableName, IDoubleValue value) {
 		if (fRelaxedSyntax) {
-			fVariableMap.put(variableName.toLowerCase(), value);
+			fVariableMap.put(variableName.toLowerCase(Locale.US), value);
 		} else {
 			fVariableMap.put(variableName, value);
 		}
@@ -912,7 +913,7 @@ public class DoubleEvaluator {
 	 */
 	public void defineVariable(String variableName) {
 		if (fRelaxedSyntax) {
-			fVariableMap.put(variableName.toLowerCase(), new DoubleVariable(0.0));
+			fVariableMap.put(variableName.toLowerCase(Locale.US), new DoubleVariable(0.0));
 		} else {
 			fVariableMap.put(variableName, new DoubleVariable(0.0));
 		}
@@ -927,7 +928,7 @@ public class DoubleEvaluator {
 	 */
 	public IDoubleValue getVariable(String variableName) {
 		if (fRelaxedSyntax) {
-			return fVariableMap.get(variableName.toLowerCase());
+			return fVariableMap.get(variableName.toLowerCase(Locale.US));
 		} else {
 			return fVariableMap.get(variableName);
 		}
@@ -941,7 +942,7 @@ public class DoubleEvaluator {
 	 */
 	public void defineVariable(String variableName, BooleanVariable value) {
 		if (fRelaxedSyntax) {
-			fBooleanVariables.put(variableName.toLowerCase(), value);
+			fBooleanVariables.put(variableName.toLowerCase(Locale.US), value);
 		} else {
 			fBooleanVariables.put(variableName, value);
 		}

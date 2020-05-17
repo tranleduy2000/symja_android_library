@@ -28,6 +28,8 @@
 
 package org.logicng.solvers.sat;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -125,40 +127,40 @@ public final class CleaneLingConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CleaneLingConfig{").append(System.lineSeparator());
-        sb.append("blockedClauseElimination=").append(this.block).append(System.lineSeparator());
-        sb.append("blockedClauseEliminationWait=").append(this.blkwait).append(System.lineSeparator());
-        sb.append("blockedClauseEliminationRTC=").append(this.blkrtc).append(System.lineSeparator());
-        sb.append("boost=").append(this.boost).append(System.lineSeparator());
-        sb.append("bwClauseLim=").append(this.bwclslim).append(System.lineSeparator());
-        sb.append("bwOccurrenceLim=").append(this.bwocclim).append(System.lineSeparator());
-        sb.append("clauseBumping=").append(this.cbump).append(System.lineSeparator());
-        sb.append("distillation=").append(this.distill).append(System.lineSeparator());
-        sb.append("bvElim=").append(this.elim).append(System.lineSeparator());
-        sb.append("bvElimRTC=").append(this.elmrtc).append(System.lineSeparator());
-        sb.append("bvElimOccurrenceLim=").append(this.elmocclim).append(System.lineSeparator());
-        sb.append("bvElimPivotOccurrenceLimOneSided=").append(this.elmpocclim1).append(System.lineSeparator());
-        sb.append("bvElimPivotOccurrenceLimTwoSided=").append(this.elmpocclim2).append(System.lineSeparator());
-        sb.append("bvElimClauseLim=").append(this.elmclslim).append(System.lineSeparator());
-        sb.append("gluered=").append(this.gluered).append(System.lineSeparator());
-        sb.append("glueKeep=").append(this.gluekeep).append(System.lineSeparator());
-        sb.append("glueUpdate=").append(this.glueupdate).append(System.lineSeparator());
-        sb.append("iterationSimplificationDelay=").append(this.itsimpdel).append(System.lineSeparator());
-        sb.append("plain=").append(this.plain).append(System.lineSeparator());
-        sb.append("restart=").append(this.restart).append(System.lineSeparator());
-        sb.append("restartInterval=").append(this.restartint).append(System.lineSeparator());
-        sb.append("reductionInterval=").append(this.redinit).append(System.lineSeparator());
-        sb.append("reductionIntervalInc=").append(this.redinc).append(System.lineSeparator());
-        sb.append("reuseTrail=").append(this.reusetrail).append(System.lineSeparator());
-        sb.append("simpSteps=").append(this.simpint).append(System.lineSeparator());
-        sb.append("simpGeomIncrease=").append(this.simpgeom).append(System.lineSeparator());
-        sb.append("sizePenalty=").append(this.sizepen).append(System.lineSeparator());
-        sb.append("sizeMaxPenalty=").append(this.sizemaxpen).append(System.lineSeparator());
-        sb.append("searchInterval=").append(this.searchint).append(System.lineSeparator());
-        sb.append("searchFirst=").append(this.searchfirst).append(System.lineSeparator());
-        sb.append("scoreIncrementFactor=").append(this.scincfact).append(System.lineSeparator());
-        sb.append("stepsLim=").append(this.stepslim).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("CleaneLingConfig{").append(DSystem.lineSeparator());
+        sb.append("blockedClauseElimination=").append(this.block).append(DSystem.lineSeparator());
+        sb.append("blockedClauseEliminationWait=").append(this.blkwait).append(DSystem.lineSeparator());
+        sb.append("blockedClauseEliminationRTC=").append(this.blkrtc).append(DSystem.lineSeparator());
+        sb.append("boost=").append(this.boost).append(DSystem.lineSeparator());
+        sb.append("bwClauseLim=").append(this.bwclslim).append(DSystem.lineSeparator());
+        sb.append("bwOccurrenceLim=").append(this.bwocclim).append(DSystem.lineSeparator());
+        sb.append("clauseBumping=").append(this.cbump).append(DSystem.lineSeparator());
+        sb.append("distillation=").append(this.distill).append(DSystem.lineSeparator());
+        sb.append("bvElim=").append(this.elim).append(DSystem.lineSeparator());
+        sb.append("bvElimRTC=").append(this.elmrtc).append(DSystem.lineSeparator());
+        sb.append("bvElimOccurrenceLim=").append(this.elmocclim).append(DSystem.lineSeparator());
+        sb.append("bvElimPivotOccurrenceLimOneSided=").append(this.elmpocclim1).append(DSystem.lineSeparator());
+        sb.append("bvElimPivotOccurrenceLimTwoSided=").append(this.elmpocclim2).append(DSystem.lineSeparator());
+        sb.append("bvElimClauseLim=").append(this.elmclslim).append(DSystem.lineSeparator());
+        sb.append("gluered=").append(this.gluered).append(DSystem.lineSeparator());
+        sb.append("glueKeep=").append(this.gluekeep).append(DSystem.lineSeparator());
+        sb.append("glueUpdate=").append(this.glueupdate).append(DSystem.lineSeparator());
+        sb.append("iterationSimplificationDelay=").append(this.itsimpdel).append(DSystem.lineSeparator());
+        sb.append("plain=").append(this.plain).append(DSystem.lineSeparator());
+        sb.append("restart=").append(this.restart).append(DSystem.lineSeparator());
+        sb.append("restartInterval=").append(this.restartint).append(DSystem.lineSeparator());
+        sb.append("reductionInterval=").append(this.redinit).append(DSystem.lineSeparator());
+        sb.append("reductionIntervalInc=").append(this.redinc).append(DSystem.lineSeparator());
+        sb.append("reuseTrail=").append(this.reusetrail).append(DSystem.lineSeparator());
+        sb.append("simpSteps=").append(this.simpint).append(DSystem.lineSeparator());
+        sb.append("simpGeomIncrease=").append(this.simpgeom).append(DSystem.lineSeparator());
+        sb.append("sizePenalty=").append(this.sizepen).append(DSystem.lineSeparator());
+        sb.append("sizeMaxPenalty=").append(this.sizemaxpen).append(DSystem.lineSeparator());
+        sb.append("searchInterval=").append(this.searchint).append(DSystem.lineSeparator());
+        sb.append("searchFirst=").append(this.searchfirst).append(DSystem.lineSeparator());
+        sb.append("scoreIncrementFactor=").append(this.scincfact).append(DSystem.lineSeparator());
+        sb.append("stepsLim=").append(this.stepslim).append(DSystem.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         return sb.toString();
     }
 

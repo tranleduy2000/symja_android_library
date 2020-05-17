@@ -16,6 +16,9 @@
  */
 package org.apache.commons.lang3.text;
 
+import com.duy.lang.DSystem;
+
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -276,7 +279,7 @@ public class WordUtils {
             return null;
         }
         if (newLineStr == null) {
-            newLineStr = System.lineSeparator();
+            newLineStr = DSystem.lineSeparator();
         }
         if (wrapLength < 1) {
             wrapLength = 1;
@@ -479,7 +482,7 @@ public class WordUtils {
         if (StringUtils.isEmpty(str) || delimLen == 0) {
             return str;
         }
-        str = str.toLowerCase();
+        str = str.toLowerCase(Locale.US);
         return capitalize(str, delimiters);
     }
 

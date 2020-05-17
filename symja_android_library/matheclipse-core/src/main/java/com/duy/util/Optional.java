@@ -313,7 +313,7 @@ public final class Optional<T> {
         }
 
         Optional<?> other = (Optional<?>) obj;
-        return Objects.equals(value, other.value);
+        return DObjects.equals(value, other.value);
     }
 
     /**

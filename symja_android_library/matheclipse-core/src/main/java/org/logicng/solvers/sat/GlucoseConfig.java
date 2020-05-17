@@ -28,6 +28,8 @@
 
 package org.logicng.solvers.sat;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -77,21 +79,21 @@ public final class GlucoseConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("GlucoseConfig{").append(System.lineSeparator());
-        sb.append("lbLBDMinimizingClause=").append(this.lbLBDMinimizingClause).append(System.lineSeparator());
-        sb.append("lbLBDFrozenClause=").append(this.lbLBDFrozenClause).append(System.lineSeparator());
-        sb.append("lbSizeMinimizingClause=").append(this.lbSizeMinimizingClause).append(System.lineSeparator());
-        sb.append("firstReduceDB=").append(this.firstReduceDB).append(System.lineSeparator());
-        sb.append("specialIncReduceDB=").append(this.specialIncReduceDB).append(System.lineSeparator());
-        sb.append("incReduceDB=").append(this.incReduceDB).append(System.lineSeparator());
-        sb.append("factorK=").append(this.factorK).append(System.lineSeparator());
-        sb.append("factorR=").append(this.factorR).append(System.lineSeparator());
-        sb.append("sizeLBDQueue=").append(this.sizeLBDQueue).append(System.lineSeparator());
-        sb.append("sizeTrailQueue=").append(this.sizeTrailQueue).append(System.lineSeparator());
-        sb.append("reduceOnSize=").append(this.reduceOnSize).append(System.lineSeparator());
-        sb.append("reduceOnSizeSize=").append(this.reduceOnSizeSize).append(System.lineSeparator());
-        sb.append("maxVarDecay=").append(this.maxVarDecay).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("GlucoseConfig{").append(DSystem.lineSeparator());
+        sb.append("lbLBDMinimizingClause=").append(this.lbLBDMinimizingClause).append(DSystem.lineSeparator());
+        sb.append("lbLBDFrozenClause=").append(this.lbLBDFrozenClause).append(DSystem.lineSeparator());
+        sb.append("lbSizeMinimizingClause=").append(this.lbSizeMinimizingClause).append(DSystem.lineSeparator());
+        sb.append("firstReduceDB=").append(this.firstReduceDB).append(DSystem.lineSeparator());
+        sb.append("specialIncReduceDB=").append(this.specialIncReduceDB).append(DSystem.lineSeparator());
+        sb.append("incReduceDB=").append(this.incReduceDB).append(DSystem.lineSeparator());
+        sb.append("factorK=").append(this.factorK).append(DSystem.lineSeparator());
+        sb.append("factorR=").append(this.factorR).append(DSystem.lineSeparator());
+        sb.append("sizeLBDQueue=").append(this.sizeLBDQueue).append(DSystem.lineSeparator());
+        sb.append("sizeTrailQueue=").append(this.sizeTrailQueue).append(DSystem.lineSeparator());
+        sb.append("reduceOnSize=").append(this.reduceOnSize).append(DSystem.lineSeparator());
+        sb.append("reduceOnSizeSize=").append(this.reduceOnSizeSize).append(DSystem.lineSeparator());
+        sb.append("maxVarDecay=").append(this.maxVarDecay).append(DSystem.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         return sb.toString();
     }
 

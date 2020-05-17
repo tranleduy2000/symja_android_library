@@ -104,7 +104,7 @@ public class HeavyPathDecomposition<V, E>
      * @param root the root of the tree
      */
     public HeavyPathDecomposition(Graph<V, E> tree, V root) {
-        this(tree, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
+        this(tree, Collections.singleton(DObjects.requireNonNull(root, "root cannot be null")));
     }
 
     /**

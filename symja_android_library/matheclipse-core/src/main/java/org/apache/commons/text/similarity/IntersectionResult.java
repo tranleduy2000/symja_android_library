@@ -16,6 +16,8 @@
  */
 package org.apache.commons.text.similarity;
 
+import com.duy.util.DObjects;
+
 import java.util.Objects;
 
 /**
@@ -108,7 +110,7 @@ public class IntersectionResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(sizeA, sizeB, intersection);
+        return DObjects.hash(sizeA, sizeB, intersection);
     }
 
     @Override

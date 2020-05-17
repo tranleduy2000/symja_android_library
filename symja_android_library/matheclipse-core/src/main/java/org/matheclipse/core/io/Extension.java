@@ -1,5 +1,7 @@
 package org.matheclipse.core.io;
 
+import java.util.Locale;
+
 /**
  * File extensions format.
  * 
@@ -56,7 +58,7 @@ public enum Extension {
 		try {
 			int pos = filename.lastIndexOf('.');
 			if (pos >= 1) {
-				String ucExtension = filename.substring(pos + 1).toUpperCase();
+				String ucExtension = filename.substring(pos + 1).toUpperCase(Locale.US);
 				if (ucExtension.equals("DATA")) {
 					return DAT;
 				}
@@ -77,7 +79,7 @@ public enum Extension {
 	 */
 	public static Extension exportExtension(String extensionString) {
 		try {
-			String ucExtension = extensionString.toUpperCase();
+			String ucExtension = extensionString.toUpperCase(Locale.US);
 			if (ucExtension.equals("DATA")) {
 				return DAT;
 			}

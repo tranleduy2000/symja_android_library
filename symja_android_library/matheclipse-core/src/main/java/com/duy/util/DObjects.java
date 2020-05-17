@@ -88,7 +88,7 @@ public final class DObjects {
      *
      * <blockquote><pre>
      * &#064;Override public int hashCode() {
-     *     return Objects.hash(x, y, z);
+     *     return DObjects.hash(x, y, z);
      * }
      * </pre></blockquote>
      *

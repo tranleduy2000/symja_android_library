@@ -17,6 +17,8 @@
  */
 package org.jheaps.tree;
 
+import com.duy.lang.DInteger;
+
 import org.jheaps.AddressableHeap;
 import org.jheaps.MergeableAddressableHeap;
 import org.jheaps.annotations.ConstantTime;
@@ -747,7 +749,7 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
             }
 
             if (rank1 <= rank2) {
-                switch (Integer.compare(rank1, resultRank)) {
+                switch (DInteger.compare(rank1, resultRank)) {
                     case 0:
                         // combine into result
                         resultTail.root = combine(cur1.root, resultTail.root);
@@ -797,7 +799,7 @@ public class BinaryTreeSoftAddressableHeap<K, V> implements MergeableAddressable
                 }
             } else {
                 // symmetric case rank2 < rank1
-                switch (Integer.compare(rank2, resultRank)) {
+                switch (DInteger.compare(rank2, resultRank)) {
                     case 0:
                         // combine into result
                         resultTail.root = combine(cur2.root, resultTail.root);

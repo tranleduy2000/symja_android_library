@@ -16,6 +16,9 @@
  */
 package org.apache.commons.text;
 
+import com.duy.lang.DSystem;
+import com.duy.util.DObjects;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -279,7 +282,7 @@ public final class AlphabetConverter {
                 : originalToEncoded.entrySet()) {
             sb.append(codePointToString(entry.getKey()))
                     .append(ARROW)
-                    .append(entry.getValue()).append(System.lineSeparator());
+                    .append(entry.getValue()).append(DSystem.lineSeparator());
         }
 
         return sb.toString();
@@ -304,7 +307,7 @@ public final class AlphabetConverter {
 
     @Override
     public int hashCode() {
-        return Objects.hash(originalToEncoded,
+        return DObjects.hash(originalToEncoded,
                 encodedToOriginal,
                 encodedLetterLength);
     }

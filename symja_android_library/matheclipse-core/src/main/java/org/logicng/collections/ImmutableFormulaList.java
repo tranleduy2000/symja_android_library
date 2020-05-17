@@ -28,6 +28,8 @@
 
 package org.logicng.collections;
 
+import com.duy.util.DObjects;
+
 import org.logicng.datastructures.Substitution;
 import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
@@ -312,7 +314,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.operator, Arrays.hashCode(this.formulas));
+        return DObjects.hash(this.operator, Arrays.hashCode(this.formulas));
     }
 
     @Override

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.text.similarity;
 
+import com.duy.util.DObjects;
+
 import java.util.Objects;
 
 /**
@@ -107,14 +109,14 @@ public class LevenshteinResults {
             return false;
         }
         final LevenshteinResults result = (LevenshteinResults) o;
-        return Objects.equals(distance, result.distance) && Objects.equals(insertCount, result.insertCount)
-                && Objects.equals(deleteCount, result.deleteCount)
-                && Objects.equals(substituteCount, result.substituteCount);
+        return DObjects.equals(distance, result.distance) && DObjects.equals(insertCount, result.insertCount)
+                && DObjects.equals(deleteCount, result.deleteCount)
+                && DObjects.equals(substituteCount, result.substituteCount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(distance, insertCount, deleteCount, substituteCount);
+        return DObjects.hash(distance, insertCount, deleteCount, substituteCount);
     }
 
     @Override

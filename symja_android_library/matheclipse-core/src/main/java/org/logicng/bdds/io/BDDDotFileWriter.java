@@ -28,6 +28,8 @@
 
 package org.logicng.bdds.io;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.bdds.BDDFactory;
 import org.logicng.bdds.datastructures.BDD;
 
@@ -84,7 +86,7 @@ public final class BDDDotFileWriter {
             sb.append(String.format("  id_%d -> %s [style = dotted, color = red];%n", internalNode.nodenum(), getNodeString(internalNode.low())));
             sb.append(String.format("  id_%d -> %s [color = darkgreen];%n", internalNode.nodenum(), getNodeString(internalNode.high())));
         }
-        sb.append("}").append(System.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
         try {
             writer.append(sb);

@@ -618,7 +618,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				return OutputFormFactory.getOperator(head);
 				// String str = head.toString();
 				// if (fRelaxedSyntax) {
-				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
+				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase(Locale.US));
 				// } else {
 				// operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
 				// }
@@ -630,7 +630,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 			// return OutputFormFactory.getOperator(head);
 			// // String str = head.toString();
 			// // if (fRelaxedSyntax) {
-			// // operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
+			// // operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase(Locale.US));
 			// // } else {
 			// // operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
 			// // }

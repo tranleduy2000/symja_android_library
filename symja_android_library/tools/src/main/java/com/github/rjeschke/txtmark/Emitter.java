@@ -17,6 +17,7 @@ package com.github.rjeschke.txtmark;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Emitter class responsible for generating HTML output.
@@ -49,7 +50,7 @@ class Emitter
      */
     public void addLinkRef(final String key, final LinkRef linkRef)
     {
-        this.linkRefs.put(key.toLowerCase(), linkRef);
+        this.linkRefs.put(key.toLowerCase(Locale.US), linkRef);
     }
 
     /**
@@ -245,7 +246,7 @@ class Emitter
         pos = Utils.skipSpaces(in, pos);
         if (pos < start)
         {
-            final LinkRef lr = this.linkRefs.get(name.toLowerCase());
+            final LinkRef lr = this.linkRefs.get(name.toLowerCase(Locale.US));
             if (lr != null)
             {
                 isAbbrev = lr.isAbbrev;
@@ -315,7 +316,7 @@ class Emitter
                 return -1;
             }
             final String id = temp.length() > 0 ? temp.toString() : name;
-            final LinkRef lr = this.linkRefs.get(id.toLowerCase());
+            final LinkRef lr = this.linkRefs.get(id.toLowerCase(Locale.US));
             if (lr != null)
             {
                 link = lr.link;
@@ -324,7 +325,7 @@ class Emitter
         }
         else
         {
-            final LinkRef lr = this.linkRefs.get(name.toLowerCase());
+            final LinkRef lr = this.linkRefs.get(name.toLowerCase(Locale.US));
             if (lr != null)
             {
                 isAbbrev = lr.isAbbrev;

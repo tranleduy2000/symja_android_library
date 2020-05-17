@@ -10,6 +10,8 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 
+import java.util.Locale;
+
 public class Show3D2ThreeJS {
 
 	/**
@@ -87,7 +89,7 @@ public class Show3D2ThreeJS {
 		IExpr option = options.getOption(F.ViewPoint);
 		if (option.isPresent()) {
 			if (option.isSymbol()) {
-				String viewpoint = option.toString().toLowerCase();
+				String viewpoint = option.toString().toLowerCase(Locale.US);
 				if (viewpoint.equals("above")) {
 					viewpoints[0] = 0.0;
 					viewpoints[1] = 0.0;

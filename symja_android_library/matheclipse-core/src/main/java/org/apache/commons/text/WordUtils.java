@@ -16,11 +16,14 @@
  */
 package org.apache.commons.text;
 
+import com.duy.lang.DSystem;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -289,7 +292,7 @@ public class WordUtils {
             return null;
         }
         if (newLineStr == null) {
-            newLineStr = System.lineSeparator();
+            newLineStr = DSystem.lineSeparator();
         }
         if (wrapLength < 1) {
             wrapLength = 1;
@@ -522,7 +525,7 @@ public class WordUtils {
         if (StringUtils.isEmpty(str)) {
             return str;
         }
-        str = str.toLowerCase();
+        str = str.toLowerCase(Locale.US);
         return capitalize(str, delimiters);
     }
 

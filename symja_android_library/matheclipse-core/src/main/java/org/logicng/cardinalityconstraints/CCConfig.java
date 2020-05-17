@@ -28,6 +28,8 @@
 
 package org.logicng.cardinalityconstraints;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -68,17 +70,17 @@ public final class CCConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CCConfig{").append(System.lineSeparator());
-        sb.append("amoEncoder=").append(this.amoEncoder).append(System.lineSeparator());
-        sb.append("amkEncoder=").append(this.amkEncoder).append(System.lineSeparator());
-        sb.append("alkEncoder=").append(this.alkEncoder).append(System.lineSeparator());
-        sb.append("exkEncoder=").append(this.exkEncoder).append(System.lineSeparator());
-        sb.append("bimanderGroupSize=").append(this.bimanderGroupSize).append(System.lineSeparator());
-        sb.append("bimanderFixedGroupSize=").append(this.bimanderFixedGroupSize).append(System.lineSeparator());
-        sb.append("nestingGroupSize=").append(this.nestingGroupSize).append(System.lineSeparator());
-        sb.append("productRecursiveBound=").append(this.productRecursiveBound).append(System.lineSeparator());
-        sb.append("commanderGroupSize=").append(this.commanderGroupSize).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("CCConfig{").append(DSystem.lineSeparator());
+        sb.append("amoEncoder=").append(this.amoEncoder).append(DSystem.lineSeparator());
+        sb.append("amkEncoder=").append(this.amkEncoder).append(DSystem.lineSeparator());
+        sb.append("alkEncoder=").append(this.alkEncoder).append(DSystem.lineSeparator());
+        sb.append("exkEncoder=").append(this.exkEncoder).append(DSystem.lineSeparator());
+        sb.append("bimanderGroupSize=").append(this.bimanderGroupSize).append(DSystem.lineSeparator());
+        sb.append("bimanderFixedGroupSize=").append(this.bimanderFixedGroupSize).append(DSystem.lineSeparator());
+        sb.append("nestingGroupSize=").append(this.nestingGroupSize).append(DSystem.lineSeparator());
+        sb.append("productRecursiveBound=").append(this.productRecursiveBound).append(DSystem.lineSeparator());
+        sb.append("commanderGroupSize=").append(this.commanderGroupSize).append(DSystem.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         return sb.toString();
     }
     /**

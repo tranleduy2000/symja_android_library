@@ -28,6 +28,8 @@
 
 package org.logicng.pseudobooleans;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -58,12 +60,12 @@ public final class PBConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("PBConfig{").append(System.lineSeparator());
-        sb.append("pbEncoder=").append(this.pbEncoder).append(System.lineSeparator());
-        sb.append("binaryMergeUseGAC=").append(this.binaryMergeUseGAC).append(System.lineSeparator());
-        sb.append("binaryMergeNoSupportForSingleBit=").append(this.binaryMergeNoSupportForSingleBit).append(System.lineSeparator());
-        sb.append("binaryMergeUseWatchDog=").append(this.binaryMergeUseWatchDog).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("PBConfig{").append(DSystem.lineSeparator());
+        sb.append("pbEncoder=").append(this.pbEncoder).append(DSystem.lineSeparator());
+        sb.append("binaryMergeUseGAC=").append(this.binaryMergeUseGAC).append(DSystem.lineSeparator());
+        sb.append("binaryMergeNoSupportForSingleBit=").append(this.binaryMergeNoSupportForSingleBit).append(DSystem.lineSeparator());
+        sb.append("binaryMergeUseWatchDog=").append(this.binaryMergeUseWatchDog).append(DSystem.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         return sb.toString();
     }
 

@@ -18,6 +18,7 @@
 package org.jgrapht.alg.isomorphism;
 
 import com.duy.lambda.Function;
+import com.duy.util.DCollections;
 import com.duy.util.DObjects;
 import com.duy.util.MapWrapper;
 
@@ -285,7 +286,7 @@ public class AHURootedTreeIsomorphismInspector<V, E>
         GraphMapping<V, E> iterMapping = getMapping();
 
         if (iterMapping == null)
-            return Collections.emptyIterator();
+            return DCollections.emptyIterator();
         else
             return Collections.singletonList(iterMapping).iterator();
     }

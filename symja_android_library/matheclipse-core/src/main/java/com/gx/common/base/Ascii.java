@@ -551,13 +551,13 @@ public final class Ascii {
      * <p>
      * <ul>
      * <li>{@code string.toUpperCase().equals("UPPER CASE ASCII")}
-     * <li>{@code string.toLowerCase().equals("lower case ascii")}
+     * <li>{@code string.toLowerCase(Locale.US).equals("lower case ascii")}
      * </ul>
      * <p>
      * <p>due to case-folding of some non-ASCII characters (which does not occur in {@link
      * String#equalsIgnoreCase}). However in almost all cases that ASCII strings are used, the author
      * probably wanted the behavior provided by this method rather than the subtle and sometimes
-     * surprising behavior of {@code toUpperCase()} and {@code toLowerCase()}.
+     * surprising behavior of {@code toUpperCase()} and {@code toLowerCase(Locale.US)}.
      *
      * @since 16.0
      */

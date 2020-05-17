@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.cycle;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphTests;
@@ -501,7 +503,7 @@ public class HierholzerEulerianCycle<V, E>
             if (getClass() != obj.getClass())
                 return false;
             VertexNode other = TypeUtil.uncheckedCast(obj);
-            return Objects.equals(this.v, other.v);
+            return DObjects.equals(this.v, other.v);
         }
 
         @Override
@@ -566,7 +568,7 @@ public class HierholzerEulerianCycle<V, E>
             if (getClass() != obj.getClass())
                 return false;
             EdgeNode other = TypeUtil.uncheckedCast(obj);
-            return Objects.equals(this.e, other.e);
+            return DObjects.equals(this.e, other.e);
         }
 
         @Override

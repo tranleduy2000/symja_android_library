@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.tuple;
 
+import com.duy.util.DObjects;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -111,9 +113,9 @@ public abstract class Triple<L, M, R> implements Comparable<Triple<L, M, R>>, Se
         }
         if (obj instanceof Triple<?, ?, ?>) {
             final Triple<?, ?, ?> other = (Triple<?, ?, ?>) obj;
-            return Objects.equals(getLeft(), other.getLeft())
-                && Objects.equals(getMiddle(), other.getMiddle())
-                && Objects.equals(getRight(), other.getRight());
+            return DObjects.equals(getLeft(), other.getLeft())
+                && DObjects.equals(getMiddle(), other.getMiddle())
+                && DObjects.equals(getRight(), other.getRight());
         }
         return false;
     }

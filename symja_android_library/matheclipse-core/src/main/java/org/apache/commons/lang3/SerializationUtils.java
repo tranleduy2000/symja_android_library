@@ -81,17 +81,22 @@ public class SerializationUtils {
         final byte[] objectData = serialize(object);
         final ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
 
-        try (ClassLoaderAwareObjectInputStream in = new ClassLoaderAwareObjectInputStream(bais,
-                object.getClass().getClassLoader())) {
-            /*
-             * when we serialize and deserialize an object,
-             * it is reasonable to assume the deserialized object
-             * is of the same type as the original serialized object
-             */
-            @SuppressWarnings("unchecked") // see above
-            final T readObject = (T) in.readObject();
-            return readObject;
+        try {
+            ClassLoaderAwareObjectInputStream in = new ClassLoaderAwareObjectInputStream(bais,
+                    object.getClass().getClassLoader());
+            try {
+                /*
+                 * when we serialize and deserialize an object,
+                 * it is reasonable to assume the deserialized object
+                 * is of the same type as the original serialized object
+                 */
+                @SuppressWarnings("unchecked") // see above
+                final T readObject = (T) in.readObject();
+                return readObject;
 
+            } finally {
+                in.close();
+            }
         } catch (final ClassNotFoundException ex) {
             throw new SerializationException("ClassNotFoundException while reading cloned object data", ex);
         } catch (final IOException ex) {
@@ -134,8 +139,13 @@ public class SerializationUtils {
      */
     public static void serialize(final Serializable obj, final OutputStream outputStream) {
         Validate.isTrue(outputStream != null, "The OutputStream must not be null");
-        try (ObjectOutputStream out = new ObjectOutputStream(outputStream)){
-            out.writeObject(obj);
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(outputStream);
+            try {
+                out.writeObject(obj);
+            } finally {
+                out.close();
+            }
         } catch (final IOException ex) {
             throw new SerializationException(ex);
         }
@@ -189,10 +199,14 @@ public class SerializationUtils {
      */
     public static <T> T deserialize(final InputStream inputStream) {
         Validate.isTrue(inputStream != null, "The InputStream must not be null");
-        try (ObjectInputStream in = new ObjectInputStream(inputStream)) {
-            @SuppressWarnings("unchecked")
-            final T obj = (T) in.readObject();
-            return obj;
+        try {
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+            try {
+                @SuppressWarnings("unchecked") final T obj = (T) in.readObject();
+                return obj;
+            } finally {
+                in.close();
+            }
         } catch (final ClassNotFoundException | IOException ex) {
             throw new SerializationException(ex);
         }

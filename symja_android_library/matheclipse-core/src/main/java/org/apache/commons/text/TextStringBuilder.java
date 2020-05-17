@@ -16,6 +16,9 @@
  */
 package org.apache.commons.text;
 
+import com.duy.lang.DSystem;
+import com.duy.util.DObjects;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
@@ -502,7 +505,7 @@ public class TextStringBuilder implements CharSequence, Appendable, Serializable
      */
     public TextStringBuilder appendNewLine() {
         if (newLine == null) {
-            append(System.lineSeparator());
+            append(DSystem.lineSeparator());
             return this;
         }
         return append(newLine);
@@ -1301,7 +1304,7 @@ public class TextStringBuilder implements CharSequence, Appendable, Serializable
      */
     public TextStringBuilder appendWithSeparators(final Object[] array, final String separator) {
         if (array != null && array.length > 0) {
-            final String sep = Objects.toString(separator, "");
+            final String sep = DObjects.toString(separator, "");
             append(array[0]);
             for (int i = 1; i < array.length; i++) {
                 append(sep);
@@ -1323,7 +1326,7 @@ public class TextStringBuilder implements CharSequence, Appendable, Serializable
      */
     public TextStringBuilder appendWithSeparators(final Iterable<?> iterable, final String separator) {
         if (iterable != null) {
-            final String sep = Objects.toString(separator, "");
+            final String sep = DObjects.toString(separator, "");
             final Iterator<?> it = iterable.iterator();
             while (it.hasNext()) {
                 append(it.next());
@@ -1347,7 +1350,7 @@ public class TextStringBuilder implements CharSequence, Appendable, Serializable
      */
     public TextStringBuilder appendWithSeparators(final Iterator<?> it, final String separator) {
         if (it != null) {
-            final String sep = Objects.toString(separator, "");
+            final String sep = DObjects.toString(separator, "");
             while (it.hasNext()) {
                 append(it.next());
                 if (it.hasNext()) {

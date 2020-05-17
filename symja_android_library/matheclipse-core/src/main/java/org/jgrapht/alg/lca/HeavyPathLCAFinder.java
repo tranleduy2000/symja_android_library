@@ -84,7 +84,7 @@ public class HeavyPathLCAFinder<V, E>
      * @param root  the root of the graph
      */
     public HeavyPathLCAFinder(Graph<V, E> graph, V root) {
-        this(graph, Collections.singleton(Objects.requireNonNull(root, "root cannot be null")));
+        this(graph, Collections.singleton(DObjects.requireNonNull(root, "root cannot be null")));
     }
 
     /**

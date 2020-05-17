@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.concurrent;
 
+import com.duy.util.DObjects;
+
 import java.util.Objects;
 
 /**
@@ -110,7 +112,7 @@ public class ConstantInitializer<T> implements ConcurrentInitializer<T> {
         }
 
         final ConstantInitializer<?> c = (ConstantInitializer<?>) obj;
-        return Objects.equals(getObject(), c.getObject());
+        return DObjects.equals(getObject(), c.getObject());
     }
 
     /**

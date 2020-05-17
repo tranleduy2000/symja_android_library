@@ -6415,7 +6415,7 @@ public class F {
     public static IBuiltInSymbol initFinalSymbol(final String symbolName, int ordinal) {
 		String str;
         if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-            str = (symbolName.length() == 1) ? symbolName : symbolName.toLowerCase();
+            str = (symbolName.length() == 1) ? symbolName : symbolName.toLowerCase(Locale.US);
         } else {
             str = symbolName;
         }

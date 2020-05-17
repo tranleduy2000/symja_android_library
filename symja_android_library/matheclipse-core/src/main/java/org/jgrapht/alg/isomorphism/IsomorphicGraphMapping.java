@@ -203,14 +203,14 @@ public class IsomorphicGraphMapping<V, E>
         if (o == null || getClass() != o.getClass())
             return false;
         IsomorphicGraphMapping<?, ?> that = (IsomorphicGraphMapping<?, ?>) o;
-        return Objects.equals(forwardMapping, that.forwardMapping)
-                && Objects.equals(backwardMapping, that.backwardMapping) && graph1 == that.graph1
+        return DObjects.equals(forwardMapping, that.forwardMapping)
+                && DObjects.equals(backwardMapping, that.backwardMapping) && graph1 == that.graph1
                 && graph2 == that.graph2;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
+        return DObjects.hash(
                 forwardMapping, backwardMapping, System.identityHashCode(graph1),
                 System.identityHashCode(graph2));
     }

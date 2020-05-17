@@ -102,7 +102,7 @@ public final class Iterables {
 
     /**
      * Returns {@code true} if {@code iterable} contains any element {@code o} for which {@code
-     * Objects.equals(o, element)} would return {@code true}. Otherwise returns {@code false}, even in
+     * DObjects.equals(o, element)} would return {@code true}. Otherwise returns {@code false}, even in
      * cases where {@link Collection#contains} might throw {@link NullPointerException} or {@link
      * ClassCastException}.
      */

@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.isomorphism;
 
+import com.duy.util.DCollections;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMapping;
 import org.jgrapht.GraphTests;
@@ -105,7 +107,7 @@ public class AHUUnrootedTreeIsomorphismInspector<V, E>
         GraphMapping<V, E> iterMapping = getMapping();
 
         if (iterMapping == null)
-            return Collections.emptyIterator();
+            return DCollections.emptyIterator();
         else
             return Collections.singletonList(iterMapping).iterator();
     }

@@ -4,6 +4,8 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.ISignedNumber;
 
+import java.util.Locale;
+
 public class Dimensions2D {
 
 	public Color color;
@@ -91,7 +93,7 @@ public class Dimensions2D {
 	}
 
 	public void setColorRGB(String color) {
-		String c = color.toLowerCase();
+		String c = color.toLowerCase(Locale.US);
 		if (c.equals("white")) {
 			this.color = Color.WHITE;
 		} else if (c.equals("black")) {

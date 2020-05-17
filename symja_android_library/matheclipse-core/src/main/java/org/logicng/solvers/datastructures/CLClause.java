@@ -50,6 +50,8 @@
 
 package org.logicng.solvers.datastructures;
 
+import com.duy.lang.DLong;
+
 import org.logicng.collections.LNGIntVector;
 
 import java.util.Comparator;
@@ -72,7 +74,7 @@ public final class CLClause {
                 return -1;
             if (c1.glue > c2.glue)
                 return 1;
-            return Long.compare(c2.activity, c1.activity);
+            return DLong.compare(c2.activity, c1.activity);
         }
     };
     private final LNGIntVector lits;

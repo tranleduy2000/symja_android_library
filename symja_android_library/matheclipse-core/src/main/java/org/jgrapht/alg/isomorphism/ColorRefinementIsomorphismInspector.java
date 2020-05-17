@@ -18,6 +18,7 @@
 package org.jgrapht.alg.isomorphism;
 
 import com.duy.lang.IntegerWrapper;
+import com.duy.util.DObjects;
 import com.duy.util.ListWrapper;
 
 import org.jgrapht.Graph;
@@ -451,12 +452,12 @@ public class ColorRefinementIsomorphismInspector<V, E>
 
             @SuppressWarnings("unchecked") DistinctGraphObject<T, V, E> other =
                     (DistinctGraphObject<T, V, E>) o;
-            return Objects.equals(getObject(), other.getObject()) && getGraph() == other.getGraph();
+            return DObjects.equals(getObject(), other.getObject()) && getGraph() == other.getGraph();
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getObject(), System.identityHashCode(getGraph()));
+            return DObjects.hash(getObject(), System.identityHashCode(getGraph()));
         }
 
         public static <T, V, E> DistinctGraphObject<T, V, E> of(T object, Graph<V, E> graph) {

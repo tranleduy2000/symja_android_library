@@ -28,6 +28,9 @@
 
 package org.logicng.formulas;
 
+import com.duy.lang.DSystem;
+import com.duy.util.DObjects;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.printer.DefaultStringRepresentation;
@@ -1124,21 +1127,21 @@ public class FormulaFactory {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("Name:              ").append(this.name).append(System.lineSeparator());
-        sb.append("Positive Literals: ").append(this.posLiterals.size()).append(System.lineSeparator());
-        sb.append("Negative Literals: ").append(this.negLiterals.size()).append(System.lineSeparator());
-        sb.append("Negations:         ").append(this.nots.size()).append(System.lineSeparator());
-        sb.append("Implications:      ").append(this.implications.size()).append(System.lineSeparator());
-        sb.append("Equivalences:      ").append(this.equivalences.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (2):  ").append(this.ands2.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (3):  ").append(this.ands3.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (4):  ").append(this.ands4.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (>4): ").append(this.andsN.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (2):  ").append(this.ors2.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (3):  ").append(this.ors3.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (4):  ").append(this.ors4.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (>4): ").append(this.orsN.size()).append(System.lineSeparator());
-        sb.append("Pseudo Booleans:   ").append(this.pbConstraints.size()).append(System.lineSeparator());
+        sb.append("Name:              ").append(this.name).append(DSystem.lineSeparator());
+        sb.append("Positive Literals: ").append(this.posLiterals.size()).append(DSystem.lineSeparator());
+        sb.append("Negative Literals: ").append(this.negLiterals.size()).append(DSystem.lineSeparator());
+        sb.append("Negations:         ").append(this.nots.size()).append(DSystem.lineSeparator());
+        sb.append("Implications:      ").append(this.implications.size()).append(DSystem.lineSeparator());
+        sb.append("Equivalences:      ").append(this.equivalences.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (2):  ").append(this.ands2.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (3):  ").append(this.ands3.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (4):  ").append(this.ands4.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (>4): ").append(this.andsN.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (2):  ").append(this.ors2.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (3):  ").append(this.ors3.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (4):  ").append(this.ors4.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (>4): ").append(this.orsN.size()).append(DSystem.lineSeparator());
+        sb.append("Pseudo Booleans:   ").append(this.pbConstraints.size()).append(DSystem.lineSeparator());
         return sb.toString();
     }
 
@@ -1168,7 +1171,7 @@ public class FormulaFactory {
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.rhs, this.comparator, Arrays.hashCode(this.coefficients), Arrays.hashCode(this.literals));
+            return DObjects.hash(this.rhs, this.comparator, Arrays.hashCode(this.coefficients), Arrays.hashCode(this.literals));
         }
 
         @Override
@@ -1383,7 +1386,7 @@ public class FormulaFactory {
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.name, this.positiveLiterals, this.negativeLiterals, this.negations, this.implications, this.equivalences, this.conjunctions2,
+            return DObjects.hash(this.name, this.positiveLiterals, this.negativeLiterals, this.negations, this.implications, this.equivalences, this.conjunctions2,
                     this.conjunctions3, this.conjunctions4, this.conjunctionsN, this.disjunctions2, this.disjunctions3, this.disjunctions4, this.disjunctionsN,
                     this.pbcs, this.ccCounter, this.pbCounter, this.cnfCounter);
         }
@@ -1410,7 +1413,7 @@ public class FormulaFactory {
                     this.ccCounter == that.ccCounter &&
                     this.pbCounter == that.pbCounter &&
                     this.cnfCounter == that.cnfCounter &&
-                    Objects.equals(this.name, that.name);
+                    DObjects.equals(this.name, that.name);
         }
 
         @Override

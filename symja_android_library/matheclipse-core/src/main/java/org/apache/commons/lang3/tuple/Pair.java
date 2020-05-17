@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.tuple;
 
+import com.duy.util.DObjects;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -131,8 +133,8 @@ public abstract class Pair<L, R> implements Map.Entry<L, R>, Comparable<Pair<L, 
         }
         if (obj instanceof Map.Entry<?, ?>) {
             final Map.Entry<?, ?> other = (Map.Entry<?, ?>) obj;
-            return Objects.equals(getKey(), other.getKey())
-                    && Objects.equals(getValue(), other.getValue());
+            return DObjects.equals(getKey(), other.getKey())
+                    && DObjects.equals(getValue(), other.getValue());
         }
         return false;
     }

@@ -431,7 +431,7 @@ public class AhujaOrlinSharmaCyclicExchangeLocalAugmentation<V, E> {
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.head, this.tail, this.labels);
+            return DObjects.hash(this.head, this.tail, this.labels);
         }
 
         @Override
@@ -442,8 +442,8 @@ public class AhujaOrlinSharmaCyclicExchangeLocalAugmentation<V, E> {
                 return false;
 
             @SuppressWarnings("unchecked") PathSetKey<V> other = (PathSetKey<V>) o;
-            return Objects.equals(head, other.head) && Objects.equals(tail, other.tail)
-                    && Objects.equals(labels, other.labels);
+            return DObjects.equals(head, other.head) && DObjects.equals(tail, other.tail)
+                    && DObjects.equals(labels, other.labels);
         }
     }
 }

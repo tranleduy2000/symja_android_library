@@ -16,6 +16,7 @@
 package com.github.rjeschke.txtmark;
 
 import java.util.LinkedList;
+import java.util.Locale;
 
 /**
  * This class represents a text line.
@@ -531,7 +532,7 @@ class Line
             element = temp.toString();
             temp.setLength(0);
             Utils.getXMLTag(temp, element);
-            tag = temp.toString().toLowerCase();
+            tag = temp.toString().toLowerCase(Locale.US);
             if (!HTML.isHtmlBlockElement(tag))
             {
                 return false;
@@ -564,7 +565,7 @@ class Line
                         element = temp.toString();
                         temp.setLength(0);
                         Utils.getXMLTag(temp, element);
-                        tag = temp.toString().toLowerCase();
+                        tag = temp.toString().toLowerCase(Locale.US);
                         if (HTML.isHtmlBlockElement(tag) && !tag.equals("hr"))
                         {
                             if (element.charAt(1) == '/')

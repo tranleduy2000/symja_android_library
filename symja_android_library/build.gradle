@@ -75,6 +75,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
 //        targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 repositories {
@@ -86,7 +90,7 @@ repositories {
     }
 }
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     testImplementation 'org.jsoup:jsoup:1.12.1'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
 }

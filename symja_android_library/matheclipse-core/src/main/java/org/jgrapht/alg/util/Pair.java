@@ -17,6 +17,8 @@
  */
 package org.jgrapht.alg.util;
 
+import com.duy.util.DObjects;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -122,12 +124,12 @@ public class Pair<A, B>
             return false;
 
         @SuppressWarnings("unchecked") Pair<A, B> other = (Pair<A, B>) o;
-        return Objects.equals(first, other.first) && Objects.equals(second, other.second);
+        return DObjects.equals(first, other.first) && DObjects.equals(second, other.second);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, second);
+        return DObjects.hash(first, second);
     }
 
     /**

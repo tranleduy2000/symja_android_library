@@ -17,6 +17,8 @@
  */
 package org.jgrapht.graph;
 
+import com.duy.util.DObjects;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphType;
 
@@ -55,7 +57,7 @@ public class AsUnweightedGraph<V, E>
      * @throws NullPointerException if the graph is null
      */
     public AsUnweightedGraph(Graph<V, E> g) {
-        super(Objects.requireNonNull(g));
+        super(DObjects.requireNonNull(g));
     }
 
     @Override

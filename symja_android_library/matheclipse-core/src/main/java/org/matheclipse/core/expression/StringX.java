@@ -533,7 +533,7 @@ public class StringX extends IStringXImpl implements IStringX {
      * @return
      */
     public String toLowerCase() {
-        return fString.toLowerCase();
+        return fString.toLowerCase(Locale.US);
     }
 
     /**
@@ -553,7 +553,7 @@ public class StringX extends IStringXImpl implements IStringX {
      * @return
      */
     public String toUpperCase() {
-        return fString.toUpperCase();
+        return fString.toUpperCase(Locale.US);
     }
 
     /**

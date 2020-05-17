@@ -18,6 +18,7 @@
 package org.jgrapht.alg.isomorphism;
 
 import com.duy.lambda.Consumer;
+import com.duy.util.DCollections;
 import com.duy.util.DObjects;
 import com.duy.util.SetWrapper;
 
@@ -135,7 +136,7 @@ public class AHUForestIsomorphismInspector<V, E>
         GraphMapping<V, E> iterMapping = getMapping();
 
         if (iterMapping == null)
-            return Collections.emptyIterator();
+            return DCollections.emptyIterator();
         else
             return Collections.singletonList(iterMapping).iterator();
     }

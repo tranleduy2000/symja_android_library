@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.matheclipse.core.trie.SuggestTree.Node;
 
@@ -389,7 +390,7 @@ public class IOFunctions {
 			exact = false;
 		}
 		SuggestTree suggestTree = AST2Expr.getSuggestTree();
-		name = Config.PARSER_USE_LOWERCASE_SYMBOLS ? name.toLowerCase() : name;
+		name = Config.PARSER_USE_LOWERCASE_SYMBOLS ? name.toLowerCase(Locale.US) : name;
 		Node n = suggestTree.getAutocompleteSuggestions(name);
 		if (n != null) {
 			IASTAppendable list = F.ListAlloc(n.listLength());
@@ -413,7 +414,7 @@ public class IOFunctions {
 			return list;
 		}
 		SuggestTree suggestTree = AST2Expr.getSuggestTree();
-		namePrefix = Config.PARSER_USE_LOWERCASE_SYMBOLS ? namePrefix.toLowerCase() : namePrefix;
+		namePrefix = Config.PARSER_USE_LOWERCASE_SYMBOLS ? namePrefix.toLowerCase(Locale.US) : namePrefix;
 		Node n = suggestTree.getAutocompleteSuggestions(namePrefix);
 		if (n != null) {
 			for (int i = 0; i < n.listLength(); i++) {

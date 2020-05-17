@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.builder;
 
+import com.duy.lang.DLong;
+
 import java.util.Comparator;
 
 /**
@@ -244,7 +246,7 @@ public class CompareToBuilder implements Builder<Integer> {
         if (comparison != 0) {
             return this;
         }
-        comparison = Long.compare(lhs, rhs);
+        comparison = DLong.compare(lhs, rhs);
         return this;
     }
 

@@ -21,4 +21,10 @@ public class EvalEngineUtils {
         }
     };
 
+    public static final Predicate<? super IExpr> associationPredicate = new Predicate<IExpr>() {
+        @Override
+        public boolean test(IExpr x) {
+            return x.isAssociation();
+        }
+    };
 }

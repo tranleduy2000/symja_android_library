@@ -2,6 +2,7 @@ package ch.ethz.idsc.tensor.io;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Locale;
 
 public class Filename implements Serializable {
     private static final char DOT = '.';
@@ -16,7 +17,7 @@ public class Filename implements Serializable {
     }
 
     public Filename(String string) {
-        this.string = string.toUpperCase();
+        this.string = string.toUpperCase(Locale.US);
     }
 
     // strictly private

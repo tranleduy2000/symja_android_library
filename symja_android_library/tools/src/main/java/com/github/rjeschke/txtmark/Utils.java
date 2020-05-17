@@ -15,6 +15,8 @@
  */
 package com.github.rjeschke.txtmark;
 
+import java.util.Locale;
+
 /**
  * Utilities.
  *
@@ -678,7 +680,7 @@ class Utils
                 {
                     return -1;
                 }
-                final String tag = temp.toString().trim().toLowerCase();
+                final String tag = temp.toString().trim().toLowerCase(Locale.US);
                 if (HTML.isUnsafeHtmlElement(tag))
                 {
                     out.append("&lt;");
