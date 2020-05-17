@@ -28,6 +28,9 @@ public class MultisetPartitionsIterator {
 	public MultisetPartitionsIterator(IStepVisitor visitor, final int k) {
 		int[] mset = visitor.getMultisetArray();
 		this.n = mset.length;
+		if (k > n || k < 1) {
+			throw new IllegalArgumentException("MultisetPartitionsIterator: k " + k + " > " + n);
+		}
 		this.multiset = mset;
 		this.result = new int[k][];
 		this.rosen = new RosenNumberPartitionIterator(n, k);
@@ -51,11 +54,13 @@ public class MultisetPartitionsIterator {
 	}
 
 	private boolean recursiveMultisetCombination(int[] multiset, final int[] currentRosen, int i) {
+		// objc-changed AutoreleasePool
 		ObjectRef<Boolean> result = new ObjectRef<>();
 		recursiveMultisetCombinationImpl(multiset, currentRosen, i, result);
 		return result.get();
 	}
 
+	// objc-changed
 	@AutoreleasePool
 	private void recursiveMultisetCombinationImpl(int[] multiset, int[] currentRosen, int i, ObjectRef<Boolean> resultRef) {
 		if (i < currentRosen.length) {

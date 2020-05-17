@@ -2,6 +2,8 @@ package org.matheclipse.core.combinatoric;
 
 import org.matheclipse.core.combinatoric.util.ReadOnlyIterator;
 
+import java.util.Iterator;
+
 /**
  * <p>
  * An iterator that generates all partitions of <code>n</code> elements, into
@@ -31,7 +33,7 @@ import org.matheclipse.core.combinatoric.util.ReadOnlyIterator;
  * </p>
  *
  */
-public class RosenNumberPartitionIterator extends ReadOnlyIterator<int[]> {
+public class RosenNumberPartitionIterator implements Iterator<int[]> {
 
 	/**
 	 * Computes the number of unique combinations of <code>n</code> elements
@@ -73,6 +75,9 @@ public class RosenNumberPartitionIterator extends ReadOnlyIterator<int[]> {
 	public RosenNumberPartitionIterator(final int n, final int k) {
 		this.n = n - 1;
 		this.k = k - 1;
+		if (k > n || k < 1) {
+			throw new IllegalArgumentException("RosenNumberPartitionIterator: k " + k + " > " + n);
+		}
 		this.count = count(this.n, this.k);
 	}
 
