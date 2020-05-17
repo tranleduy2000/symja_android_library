@@ -479,6 +479,9 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 		}
 		if (exprPoly instanceof IAST) {
 			final IAST ast = (IAST) exprPoly;
+			if (ast.isDirectedInfinity()) {
+				throw new ClassCastException(exprPoly.toString());
+			}
 			ExprPolynomial result = getZero();
 			ExprPolynomial p = getZero();
 			if (ast.isPlus()) {
@@ -504,12 +507,6 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				ix = ExpVectorLong.indexVar(base, getVars());
 				if (ix >= 0) {
 					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-					// int exponent = -1;
-					// try {
-					// exponent = Validate.checkPowerExponent(ast);
-					// } catch (WrongArgumentType e) {
-					// //
-					// }
 					if (checkNegativeExponents && exponent < 0) {
 						throw new ArithmeticException(
 								"JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
@@ -533,6 +530,9 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 				}
 			}
 		} else if (exprPoly instanceof ISymbol) {
+			if (exprPoly.isIndeterminate()) {
+				throw new ClassCastException(exprPoly.toString());
+			}
 			if (coefficient) {
 				return new ExprPolynomial(this, exprPoly);
 			}
@@ -609,41 +609,43 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 	}
 
 	private static Map<IExpr, IExpr> createTimesSub(final IAST ast, IExpr x, Map<IExpr, IExpr> coefficientMap,
-			IASTAppendable restList) {
-				IExpr mainExponent = F.nilPtr();
-				IExpr expr;
-				IASTAppendable times = F.TimesAlloc(ast.size());
-				for (int i = 1; i < ast.size(); i++) {
-					expr = ast.get(i);
+													IASTAppendable restList) {
+		// swift changed
+		IExpr mainExponent = F.nilPtr();
+		IExpr expr;
+		IASTAppendable times = F.TimesAlloc(ast.size());
+		for (int i = 1; i < ast.size(); i++) {
+			expr = ast.get(i);
 
-					if (expr.isFree(x, true)) {
-						times.append(expr);
+			if (expr.isFree(x, true)) {
+				times.append(expr);
 				continue;
-					} else if (expr.equals(x)) {
-						final IExpr exponent = F.C1;
+			} else if (expr.equals(x)) {
+				final IExpr exponent = F.C1;
 				if (!mainExponent.isPresent()) {
-							mainExponent = exponent;
+					mainExponent = exponent;
 					continue;
-						}
-					} else if (expr.isPower()) {
-						final IExpr exponent = expr.exponent();
-						if (exponent.isFree(x)) {
+				}
+			} else if (expr.isPower()) {
+				final IExpr exponent = expr.exponent();
+				if (exponent.isFree(x)) {
 					if (expr.base().equals(x)) {
 						if (!mainExponent.isPresent()) {
-									mainExponent = exponent;
+							mainExponent = exponent;
 							continue;
-								}
-							}
 						}
-			}
-				restList.append(ast);
-				return coefficientMap;
 					}
-				return addCoefficient(coefficientMap, mainExponent, times.oneIdentity1());
+				}
+			}
+			restList.append(ast);
+			return coefficientMap;
+		}
+		return addCoefficient(coefficientMap, mainExponent, times.oneIdentity1());
 	}
 
 	public static Map<IExpr, IExpr> createTimes(final IAST ast, IExpr x, Map<IExpr, IExpr> coefficientMap,
 			IASTAppendable restList) {
+		// swift changed
 		IExpr mainExponent = F.nilPtr();
 		IExpr expr;
 		IASTAppendable times = F.TimesAlloc(ast.size());
@@ -767,12 +769,6 @@ public class ExprPolynomialRing implements RingFactory<ExprPolynomial> {
 					IExpr variable = vars.get(i);
 					if (variable.equals(base)) {
 						int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-						// int exponent = -1;
-						// try {
-						// exponent = Validate.checkPowerExponent(ast);
-						// } catch (WrongArgumentType e) {
-						// return false;
-						// }
 						if (exponent < 0) {
 							return false;
 						}
