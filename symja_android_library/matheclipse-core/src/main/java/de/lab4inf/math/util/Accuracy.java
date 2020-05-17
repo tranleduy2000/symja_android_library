@@ -23,6 +23,7 @@ package de.lab4inf.math.util;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Collection;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MObject;
 import de.lab4inf.math.Numeric;
@@ -30,7 +31,6 @@ import de.lab4inf.math.Numeric;
 import static java.lang.Math.abs;
 import static java.lang.Math.log10;
 import static java.lang.Math.pow;
-import static java.lang.String.format;
 
 /**
  * The computational accuracy for floating point
@@ -104,7 +104,7 @@ public final class Accuracy extends L4MObject {
         }
         QEPS = qeps.multiply(BigDecimal.TEN, mc);
         // if (DEBUG)
-        getLogger().info(format("feps:%8.2E  deps:%8.3G", FEPS, DEPS));
+        getLogger().info(String.format("feps:%8.2E  deps:%8.3G", FEPS, DEPS));
     }
 
     /**
@@ -410,7 +410,7 @@ public final class Accuracy extends L4MObject {
             return true;
         }
         if (n >= max) {
-            final String msg = format(NO_CONVERGENCE, n, xn);
+            final String msg = String.format(Locale.US, NO_CONVERGENCE, n, xn);
             if (DEBUG)
                 getLogger().warn(msg);
             throw new ArithmeticException(msg);
@@ -438,7 +438,7 @@ public final class Accuracy extends L4MObject {
             return true;
         }
         if (n >= max) {
-            final String msg = format(NO_CONVERGENCE, n, norm(xn));
+            final String msg = String.format(Locale.US, NO_CONVERGENCE, n, norm(xn));
             if (DEBUG)
                 getLogger().warn(msg);
             throw new ArithmeticException(msg);
@@ -467,7 +467,7 @@ public final class Accuracy extends L4MObject {
         }
         if (n >= max) {
             final double[] xx = asArray(xn);
-            final String msg = format(NO_CONVERGENCE, n, norm(xx));
+            final String msg = String.format(Locale.US, NO_CONVERGENCE, n, norm(xx));
             if (DEBUG)
                 getLogger().warn(msg);
             throw new ArithmeticException(msg);
@@ -499,7 +499,7 @@ public final class Accuracy extends L4MObject {
             return true;
         }
         if (n >= max) {
-            final String msg = format(NO_CONVERGENCE, n, xn);
+            final String msg = String.format(Locale.US, NO_CONVERGENCE, n, xn);
             if (DEBUG)
                 getLogger().warn(msg);
             throw new ArithmeticException(msg);
@@ -533,7 +533,7 @@ public final class Accuracy extends L4MObject {
             }
         }
         if (n >= max) {
-            final String msg = format(NO_CONVERGENCE, n, norm(xn));
+            final String msg = String.format(Locale.US, NO_CONVERGENCE, n, norm(xn));
             if (DEBUG)
                 getLogger().warn(msg);
             throw new ArithmeticException(msg);

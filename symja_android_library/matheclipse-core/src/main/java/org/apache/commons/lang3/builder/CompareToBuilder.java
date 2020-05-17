@@ -16,6 +16,7 @@
  */
 package org.apache.commons.lang3.builder;
 
+import com.duy.lang.DByte;
 import com.duy.lang.DCharacter;
 import com.duy.lang.DInteger;
 import com.duy.lang.DLong;
@@ -313,7 +314,7 @@ public class CompareToBuilder implements Builder<Integer> {
         if (comparison != 0) {
             return this;
         }
-        comparison = Byte.compare(lhs, rhs);
+        comparison = DByte.compare(lhs, rhs);
         return this;
     }
 

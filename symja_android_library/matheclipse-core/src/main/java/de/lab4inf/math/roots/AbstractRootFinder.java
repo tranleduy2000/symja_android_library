@@ -30,7 +30,6 @@ import de.lab4inf.math.util.Accuracy;
 
 import static de.lab4inf.math.util.Accuracy.hasReachedAccuracy;
 import static de.lab4inf.math.util.Accuracy.round;
-import static java.lang.String.format;
 
 /**
  * Abstract base class for a root finder.
@@ -67,18 +66,18 @@ public abstract class AbstractRootFinder extends L4MObject implements RootFinder
         boolean converged = false;
         String msg;
         if (Double.isInfinite(f) || Double.isNaN(f)) {
-            msg = format(NOT_A_NUMBER, xn, n);
+            msg = String.format(Locale.US, NOT_A_NUMBER, xn, n);
             getLogger().error(msg);
             throw new ArithmeticException(msg);
         }
         if (n >= MAX_ITERATIONS) {
-            msg = format(NO_CONVERGENCE, xn, f, n);
+            msg = String.format(Locale.US, NO_CONVERGENCE, xn, f, n);
             getLogger().error(msg);
             throw new ArithmeticException(msg);
         }
         converged = hasReachedAccuracy(xn, xo, eps);// || abs(f) < EPS;
         if (converged && getLogger().isInfoEnabled()) {
-            msg = format(ITERATIONS_FOR_ROOT, n, round(xn, eps));
+            msg = String.format(Locale.US, ITERATIONS_FOR_ROOT, n, round(xn, eps));
             getLogger().info(msg);
         }
         return converged;
@@ -95,7 +94,7 @@ public abstract class AbstractRootFinder extends L4MObject implements RootFinder
      */
     protected static void checkEnclosure(final double a, final double b, final double fa, final double fb) {
         if ((fa < 0 && fb < 0) || (fa > 0 && fb > 0)) {
-            throw new IllegalArgumentException(format(WRONG_RANGE, fa, a, b, fb));
+            throw new IllegalArgumentException(String.format(WRONG_RANGE, fa, a, b, fb));
         }
     }
 
@@ -132,7 +131,7 @@ public abstract class AbstractRootFinder extends L4MObject implements RootFinder
     @Override
     public double root(final Function f, final double... guess) {
         if (guess == null || !checkGuess(guess)) {
-            final String msg = format(WRONG_ARGS, getRootFinderName());
+            final String msg = String.format(Locale.US, WRONG_ARGS, getRootFinderName());
             getLogger().info(msg);
             throw new IllegalArgumentException(msg);
         }

@@ -20,11 +20,11 @@
 */
 package de.lab4inf.math.blas;
 
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import static de.lab4inf.math.blas.Blas2.dgemv;
 import static de.lab4inf.math.blas.Blas2.dgemvt;
-import static java.lang.String.format;
 
 /**
  * <h1> BLAS III </h1>
@@ -54,7 +54,7 @@ public final class Blas3 extends BasicBlas {
 
     static {
         final int nCached = NPROCESSORS * 2;
-        LOGGER.info(format("creating #%d parallizers", nCached));
+        LOGGER.info(String.format(Locale.US, "creating #%d parallizers", nCached));
         Parallizer3 worker;
         final Parallizer3[] workers = new Parallizer3[nCached];
         for (int i = 0; i < nCached; i++) {
@@ -315,12 +315,12 @@ public final class Blas3 extends BasicBlas {
             mb = nb;
         }
         if (la != lb) {
-            final String msg = format("no M(%d,%d) * M(%d,%d)", na, ma, nb, mb);
+            final String msg = String.format(Locale.US, "no M(%d,%d) * M(%d,%d)", na, ma, nb, mb);
             throw new IllegalArgumentException(msg);
         }
 
         if (na != nc || mb != mc) {
-            final String msg = format("no M(%d,%d) + M(%d,%d)", na, ma, nc, mc);
+            final String msg = String.format(Locale.US, "no M(%d,%d) + M(%d,%d)", na, ma, nc, mc);
             throw new IllegalArgumentException(msg);
         }
     }
@@ -347,13 +347,13 @@ public final class Blas3 extends BasicBlas {
         private double[] a, c;
 
         protected Parallizer3() {
-            super(format("Parallizer-III: %3d", ++pId));
+            super(String.format(Locale.US, "Parallizer-III: %3d", ++pId));
         }
 
         synchronized void parallize(final CountDownLatch latch, final double ascale, final double[] va,
                                     final double[][] matb, final double bscale, final double[] vc) {
             if (null != counter) {
-                final String msg = format("Parallizer %s still in use!", this);
+                final String msg = String.format(Locale.US, "Parallizer %s still in use!", this);
                 throw new IllegalStateException(msg);
             }
             alpha = ascale;

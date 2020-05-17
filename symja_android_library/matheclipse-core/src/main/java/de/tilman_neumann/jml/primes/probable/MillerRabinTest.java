@@ -13,11 +13,12 @@
  */
 package de.tilman_neumann.jml.primes.probable;
 
+import com.duy.util.ThreadLocalRandom;
+
 import static de.tilman_neumann.jml.base.BigIntConstants.I_1;
 
 import java.math.BigInteger;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Miller-Rabin probable prime test.

@@ -1,5 +1,7 @@
 package org.matheclipse.core.polynomials.symbolicexponent;
 
+import com.duy.util.ThreadLocalRandom;
+
 import java.io.Reader;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -12,7 +14,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.Predicates;

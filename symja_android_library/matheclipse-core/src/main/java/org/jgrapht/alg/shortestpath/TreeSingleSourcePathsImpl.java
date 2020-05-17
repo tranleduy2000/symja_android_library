@@ -82,8 +82,7 @@ public class TreeSingleSourcePathsImpl<V, E>
             Graph<V, E> g, V source, Map<V, Pair<Double, E>> distanceAndPredecessorMap) {
         this.g = DObjects.requireNonNull(g, "Graph is null");
         this.source = DObjects.requireNonNull(source, "Source vertex is null");
-        this.map = Objects
-                .requireNonNull(distanceAndPredecessorMap, "Distance and predecessor map is null");
+        this.map = DObjects.requireNonNull(distanceAndPredecessorMap, "Distance and predecessor map is null");
     }
 
     /**
