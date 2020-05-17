@@ -106,14 +106,14 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	}
 
 	public BigIntegerSym(BigInteger value) {
-		if (Config.MAX_BIT_COUNT < value.bitCount()) {
-			throw new ASTElementLimitExceeded(value.bitCount());
+		if (Config.MAX_BIT_LENGTH < value.bitLength()) {
+			throw new ASTElementLimitExceeded(value.bitLength());
 		}
 		fBigIntValue = value;
 	}
 
 	public BigIntegerSym(byte[] bytes) {
-		if (Config.MAX_BIT_COUNT < bytes.length * 8) {
+		if (Config.MAX_BIT_LENGTH < bytes.length * 8) {
 			throw new ASTElementLimitExceeded(bytes.length * 8);
 		}
 		fBigIntValue = new BigInteger(bytes);
@@ -423,7 +423,8 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,
 									 boolean usePrefix, boolean noSymbolPrefix) {
 		String prefix = usePrefix ? "F." : "";
-		int value = NumberUtil.toInt(fBigIntValue);
+		int value = toIntDefault(); // NumberUtil.toInt(fBigIntValue);
+		if (value != Integer.MIN_VALUE) {
 		switch (value) {
 		case -1:
 			return prefix + "CN1";
@@ -471,6 +472,9 @@ public class BigIntegerSym extends AbstractIntegerSym {
 			return prefix + "ZZ(" + value + "L)";
 		}
 
+		} else {
+			return prefix + "ZZ(\"" + fBigIntValue.toString() + "\", 10)";
+		}
 	}
 
 	@Override
@@ -637,7 +641,12 @@ public class BigIntegerSym extends AbstractIntegerSym {
 				default:
 			}
 		}
-		return valueOf(fBigIntValue.multiply(that.toBigNumerator()));
+		BigInteger thatBigIntValue = that.toBigNumerator();
+		if (Config.MAX_BIT_LENGTH < (fBigIntValue.bitLength() + thatBigIntValue.bitLength())) {
+			throw new ASTElementLimitExceeded(fBigIntValue.bitLength() + thatBigIntValue.bitLength());
+		}
+
+		return valueOf(fBigIntValue.multiply(thatBigIntValue));
 	}
 
 	/**

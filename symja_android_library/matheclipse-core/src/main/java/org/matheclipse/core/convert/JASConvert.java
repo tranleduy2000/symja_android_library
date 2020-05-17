@@ -341,11 +341,6 @@ public class JASConvert<C extends RingElem<C>> {
 				} else if (ast.isPower() && ast.base().isSymbol()) {
 					final ISymbol base = (ISymbol) ast.base();
 					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-					// int exponent = -1;
-					// try {
-					// exponent = Validate.checkPowerExponent(ast);
-					// } catch (WrongArgumentType e) {
-					// }
 					if (exponent < 0) {
 						throw new JASConversionException();
 						// "JASConvert:expr2Poly - invalid exponent: " + ast.arg2().toString());
@@ -358,11 +353,6 @@ public class JASConvert<C extends RingElem<C>> {
 				} else if (ast.isPower() && ast.arg1().isSlot()) {
 					final IAST base = (IAST) ast.arg1();
 					int exponent = ast.exponent().toIntDefault(Integer.MIN_VALUE);
-					// int exponent = -1;
-					// try {
-					// exponent = Validate.checkPowerExponent(ast);
-					// } catch (WrongArgumentType e) {
-					// }
 					if (exponent < 0) {
 						throw new JASConversionException();
 						// throw new ArithmeticException(
@@ -377,6 +367,9 @@ public class JASConvert<C extends RingElem<C>> {
 			}
 		} else if (exprPoly instanceof ISymbol) {
 			try {
+				if (exprPoly.isIndeterminate()) {
+					throw new JASConversionException();
+				}
 				return fPolyFactory.univariate(((ISymbol) exprPoly).getSymbolName(), 1L);
 			} catch (IllegalArgumentException iae) {
 				// fall through
@@ -414,7 +407,7 @@ public class JASConvert<C extends RingElem<C>> {
 					if (lExp == 1L) {
 						monomTimes.append(fVariables.get(ix));
 					} else {
-						monomTimes.append(F.Power(fVariables.get(ix), F.integer(lExp)));
+						monomTimes.append(F.Power(fVariables.get(ix), F.ZZ(lExp)));
 					}
 				} else {
 					return false;

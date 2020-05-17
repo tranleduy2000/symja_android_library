@@ -216,6 +216,8 @@ public class PolynomialsUtils {
 	 */
 	public static IAST buildPolynomial(final int degree, final IExpr x, final List<BigFraction> coefficients,
 			final RecurrenceCoefficientsGenerator generator) {
+		// do allocation at start to test limits
+		IASTAppendable result = F.PlusAlloc(degree + 1);
 
 		final int maxDegree = (int) FastMath.floor(FastMath.sqrt(2.0 * coefficients.size())) - 1;
 		synchronized (PolynomialsUtils.class) {
@@ -234,20 +236,13 @@ public class PolynomialsUtils {
 		// ...
 		final int start = degree * (degree + 1) / 2;
 
-		IASTAppendable result = F.PlusAlloc(degree + 1);
 		return result.appendArgs(0, degree + 1,
-                new IntFunction<IExpr>() {
-                    @Override
-                    public IExpr apply(int i) {
-                        return F.Times(F.fraction(coefficients.get(start + i)), F.Power(x, F.integer(i)));
-                    }
-                });
-		// for (int i = 0; i <= degree; ++i) {
-		// result.append(F.Times(F.fraction(coefficients.get(start + i)), F.Power(x, F.integer(i))));
-		// }
-		//
-		// // build the polynomial
-		// return result;
+				new IntFunction<IExpr>() {
+					@Override
+					public IExpr apply(int i) {
+						return F.Times(F.fraction(coefficients.get(start + i)), F.Power(x, F.ZZ(i)));
+					}
+				});
 
 	}
 
