@@ -425,7 +425,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	/** {@inheritDoc} */
-	public IASTAppendable appendArgs(int start, int end, IntFunction<IExpr> function) {
+	public IASTAppendable appendArgs(final int start, final int end, IntFunction<IExpr> function) {
 		if (start >= end) {
 			return this;
 		}
@@ -435,7 +435,12 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 			growAtEnd(length);
 		}
 		for (int i = start; i < end; i++) {
-			array[lastIndex++] = function.apply(i);
+			IExpr temp = function.apply(i);
+			if (temp.isPresent()) {
+				array[lastIndex++] = temp;
+				continue;
+			}
+			break;
 		}
 		return this;
 	}
@@ -606,34 +611,21 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 			}
 		if (obj instanceof AbstractAST) {
-			// if (obj instanceof AST0) {
-			// return obj.equals(this);
-			// }
-			IExpr head = array[firstIndex];
-			if (head != ((AbstractAST) obj).head() && head instanceof ISymbol) {
-				// compared with ISymbol object identity
-				return false;
-			}
-			if (hashCode() != obj.hashCode()) {
-				return false;
-			}
+			final IAST ast = (AbstractAST) obj;
 			final int size = lastIndex - firstIndex;
-			if (obj instanceof HMArrayList) {
-				final HMArrayList ast = (HMArrayList) obj;
 				if (size != ast.size()) {
 					return false;
 				}
-				int i1 = firstIndex + 1;
-				int i2 = ast.firstIndex + 1;
-				for (int i = 1; i < size; i++) {
-					if (!array[i1++].equals(ast.array[i2++])) {
+			final IExpr head = array[firstIndex];
+			if (head instanceof ISymbol) {
+				if (head != ast.head()) {
+					// compared with ISymbol object identity
+					return false;
+				}
+			} else if (!head.equals(ast.head())) {
 						return false;
 		}
-				}
-				return head instanceof ISymbol || head.equals(ast.array[ast.firstIndex]);
-			}
-			final AbstractAST ast = (AbstractAST) obj;
-			if (size != ast.size()) {
+			if (hashCode() != ast.hashCode()) {
 				return false;
 			}
 			return forAll(new ObjIntPredicate<IExpr>() {
@@ -641,7 +633,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 				public boolean test(IExpr x, int i) {
 					return x.equals(ast.get(i));
 				}
-			}, 0);
+			}, 1);
 		}
 		return false;
 	}
@@ -736,11 +728,13 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	/** {@inheritDoc} */
 	@Override
 	public final int indexOf(Predicate<? super IExpr> predicate) {
-		int start = firstIndex + 1;
+		int index = 1;
+		int start = firstIndex + index;
 		for (int i = start; i < lastIndex; i++) {
 			if (predicate.test(array[i])) {
-				return i;
+				return index;
 			}
+			index++;
 		}
 		return -1;
 	}
@@ -759,13 +753,15 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 	@Override
 	public final IExpr get(int location) {
+		if (Config.SHOW_STACKTRACE) {
+			int index;
+			if ((index = firstIndex + location) < lastIndex) {
+				return array[index];
+			}
+			throw new IndexOutOfBoundsException(
+					"Index: " + Integer.valueOf(location) + ", Size: " + Integer.valueOf(lastIndex - firstIndex));
+		}
 		return array[firstIndex + location];
-		// int index;
-		// if ((index = firstIndex + location) < lastIndex) {
-		// return array[index];
-		// }
-		// throw new IndexOutOfBoundsException(
-		// "Index: " + Integer.valueOf(location) + ", Size: " + Integer.valueOf(lastIndex - firstIndex));
 	}
 
 	private void growAtEnd(int required) {

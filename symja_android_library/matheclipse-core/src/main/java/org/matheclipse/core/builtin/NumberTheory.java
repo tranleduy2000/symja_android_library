@@ -1378,6 +1378,49 @@ public final class NumberTheory {
 
 	}
 
+	private static class DivisorSum extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+			IExpr head = ast.arg2();
+			IExpr condition = F.NIL;
+			if (arg1.isInteger()) {
+				IInteger n = (IInteger) arg1;
+				if (n.isPositive()) {
+					IAST list = n.divisors();
+					if (list.isList()) {
+						if (ast.isAST3()) {
+							condition = ast.arg3();
+						}
+						// Sum( head(divisor), list-of-divisors )
+						IASTAppendable sum = F.PlusAlloc(list.size());
+						for (int i = 1; i < list.size(); i++) {
+							IExpr divisor = list.get(i);
+							// apply condition on divisor
+							if (condition.isPresent() && !engine.evalTrue(F.unaryAST1(condition, divisor))) {
+								continue;
+							}
+							sum.append(F.unaryAST1(head, divisor));
+						}
+						return sum;
+					}
+				}
+
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_2_3;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.LISTABLE);
+		}
+	}
 	/**
 	 * <pre>
 	 * DivisorSigma(k, n)
@@ -4471,6 +4514,7 @@ public final class NumberTheory {
 			F.DiscreteDelta.setEvaluator(new DiscreteDelta());
 			F.Divisible.setEvaluator(new Divisible());
 			F.Divisors.setEvaluator(new Divisors());
+			F.DivisorSum.setEvaluator(new DivisorSum());
 			F.DivisorSigma.setEvaluator(new DivisorSigma());
 			F.EulerE.setEvaluator(new EulerE());
 			F.EulerPhi.setEvaluator(new EulerPhi());
