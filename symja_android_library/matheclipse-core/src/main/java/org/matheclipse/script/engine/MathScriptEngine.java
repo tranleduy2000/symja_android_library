@@ -220,7 +220,7 @@ public class MathScriptEngine extends AbstractScriptEngine {
         return new MathScriptEngineFactory();
     }
 
-    private Object printResult(IExpr result, boolean relaxedSyntax) throws IOException {
+    private String printResult(IExpr result, boolean relaxedSyntax) throws IOException {
         if (result.equals(F.Null)) {
             return "";
         }

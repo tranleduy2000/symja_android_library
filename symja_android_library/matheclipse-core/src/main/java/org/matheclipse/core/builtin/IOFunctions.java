@@ -184,11 +184,14 @@ public class IOFunctions {
 			"argtu", "`1` called with 1 argument; `2` or `3` arguments are expected.", //
 			"base", "Requested base `1` in `2` should be between 2 and `3`.", //
 			"boxfmt", "`1` is not a box formatting type.", //
+			"coef", "The first argument `1` of `2` should be a non-empty list of positive integers.", //
 			"color", "`1` is not a valid color or gray-level specification.", //
 			"compat", "`1` and `2` are incompatible units", //
 			"cxt", "`1` is not a valid context name.", //
 			"divz", "The argument `1` should be nonzero.", //
 			"digit", "Digit at position `1` in `2` is too large to be used in base `3`.", //
+			"drop", "Cannot drop positions `1` through `2` in `3`.", //
+			"eqf", "`1` is not a well-formed equation.", //
 			"exact", "Argument `1` is not an exact number.", //
 			"fftl", "Argument `1` is not a non-empty list or rectangular array of numeric quantities.", //
 			"fpct", "To many parameters in `1` to be filled from `2`.", //
@@ -200,11 +203,14 @@ public class IOFunctions {
 			"innf", "Non-negative integer or Infinity expected at position `1`.", //
 			"int", "Integer expected.", //
 			"intjava", "Java int value greater equal `1` expected instead of `2`.", //
+			"intlevel", "Level specification value greater equal `1` expected instead of `2`.", //
 			"intp", "Positive integer expected.", //
 			"intnn", "Non-negative integer expected.", //
 			"intnm", "Non-negative machine-sized integer expected at position `2` in `1`.", //
-			"intpm", "Positive integer (less equal 2147483647) expected at position `2` in `1`.", //
+			"intm", "Machine-sized integer expected at position `2` in `1`.", //
+			"intpm", "Positive machine-sized integer expected at position `2` in `1`.", //
 			"iterb", "Iterator does not have appropriate bounds.", //
+			"itform", "Argument `1` at position `2` does not have the correct form for an iterator.", //
 			"ivar", "`1` is not a valid variable.", //
 			"level", "Level specification `1` is not of the form n, {n}, or {m, n}.", //
 			"list", "List expected at position `1` in `2`.", //
@@ -212,35 +218,49 @@ public class IOFunctions {
 			"listofints", "List of Java int numbers expected in `1`.", //
 			"listoflongs", "List of Java long numbers expected in `1`.", //
 			"locked", "Symbol `1` is locked.", //
-			"matsq", "Argument `1` is not a non-empty square matrix.", //
+			"matrix", "Argument `1` at position `2` is not a non-empty rectangular matrix.", //
+			"matsq", "Argument `1` at position `2` is not a non-empty square matrix.", //
+			"nil", "unexpected NIL expression encountered.", //
 			"noopen", "Cannot open `1`.", //
 			"nonopt", "Options expected (instead of `1`) beyond position `2` in `3`. An option must be a rule or a list of rules.",//
 			"nord", "Invalid comparison with `1` attempted.", //
-			"nvld", "The expression `1` is not a valid interval.", //
+			"normal", "Nonatomic expression expected at position `1` in `2`.", "nquan",
+			"The Quantile specification `1` should be a number between `2` and `3`.", "nvld",
+			"The expression `1` is not a valid interval.", //
 			"notunicode",
 			"A character unicode, which should be a non-negative integer less than 1114112, is expected at position `2` in `1`.", //
-			"noval", "Symbol `1` in part assignment does not have an immediate value.", //
 			"noval", "Symbol `1` in part assignment does not have an immediate value.", //
 			"openx", "`1` is not open.", //
 			"optb", "Optional object `1` in `2` is not a single blank.", //
 			"ovfl", "Overflow occurred in computation.", //
 			"partd", "Part specification `1` is longer than depth of object.", //
 			"partw", "Part `1` of `2` does not exist.", //
+			"pilist",
+			"The arguments to `1` must be two lists of integers of identical length, with the second list only containing positive integers.", //
 			"plld", "Endpoints in `1` must be distinct machine-size real numbers.", //
 			"plln", "Limiting value `1` in `2` is not a machine-size real number.", //
 			"pspec", "Part specification `1` is neither an integer nor a list of integer.", //
+			"poly", "`1` is not a polynomial.", //
 			"polynomial", "Polynomial expected at position `1` in `2`.", //
 			"pkspec1", "The expression `1` cannot be used as a part specification.", // "
+			"range", "Range specification in `1` does not have appropriate bounds.", //
+			"rectt", "Rectangular array expected at position `1` in `2`.", //
 			"rvalue", "`1` is not a variable with a value, so its value cannot be changed.", //
 			"seqs", "Sequence specification expected, but got `1`.", //
 			"setp", "Part assignment to `1` could not be made", //
+			"setraw", "Cannot assign to raw object `1`.", //
 			"setps", "`1` in the part assignment is not a symbol.", //
+			"sing", "Matrix `1` is singular.", //
 			"span", "`1` is not a valid Span specification.", //
 			"stream", "`1` is not string, InputStream[], or OutputStream[]", //
 			"string", "String expected at position `1` in `2`.", //
 			"sym", "Argument `1` at position `2` is expected to be a symbol.", //
+			"tdlen", "Objects of unequal length in `1` cannot be combined.", //
 			"tag", "Rule for `1` can only be attached to `2`.", //
 			"take", "Cannot take positions `1` through `2` in `3`.", //
+			"unsupported", "`1` currently not supported in `2`.", //
+			"usraw", "Cannot unset object `1`.", //
+			"vloc", "The variable `1` cannot be localized so that it can be assigned to numerical values.", //
 			"vpow2", "Argument `1` is restricted to vectors with a length of power of 2.", //
 			"vrule", "Cannot set `1` to `2`, which is not a valid list of replacement rules.", //
 			"write", "Tag `1` in `2` is Protected.", //

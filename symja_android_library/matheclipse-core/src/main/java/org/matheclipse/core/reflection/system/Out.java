@@ -23,6 +23,7 @@ public class Out extends AbstractFunctionEvaluator {
 			if (list != null) {
 				return list.entry(-1);
 		}
+			return F.NIL;
 		}
 		final int position = ast.arg1().toIntDefault(0);
 		if (position != 0) {

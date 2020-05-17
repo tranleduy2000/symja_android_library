@@ -6,6 +6,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.frobenius.FrobeniusSolver;
@@ -58,27 +59,20 @@ public class FrobeniusSolve extends AbstractEvaluator {
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		if (ast.arg1().isList()) {
+		if (ast.arg1().isList() && ast.arg2().isInteger()) {
 			IAST list = ast.getAST(1);
 			try {
-				final IInteger[][] equations = new IInteger[1][list.size()];
-				// format looks like: { { 12, 16, 20, 27, 123 } };
-				list.forEach(new ObjIntConsumer<IExpr>() {
-					@Override
-					public void accept(IExpr x, int i) {
-						equations[0][i - 1] = (IInteger) x;
-					}
-				});
-				equations[0][list.argSize()] = (IInteger) ast.arg2();
+				int[] listInt = Validate.checkListOfInts(ast, list, Integer.MIN_VALUE, Integer.MAX_VALUE, engine);
+				if (listInt != null) {
+
+					IInteger[] solution;
+					IASTAppendable result = F.ListAlloc(8);
+					FrobeniusSolver solver = getSolver(listInt, (IInteger) ast.arg2());
 				int numberOfSolutions = -1; // all solutions
 				if (ast.size() == 4) {
-					numberOfSolutions = ((ISignedNumber) ast.arg3()).toInt();
+						numberOfSolutions = ast.arg3().toIntDefault(-1);
 				}
 
-				FrobeniusSolver solver = new FrobeniusSolver(equations);
-				IInteger[] solution;
-
-				IASTAppendable result = F.ListAlloc(8);
 				if (numberOfSolutions < 0) {
 					while ((solution = solver.take()) != null) {
 						result.append(F.List(solution));
@@ -93,19 +87,31 @@ public class FrobeniusSolve extends AbstractEvaluator {
 				}
 
 				return result;
+				}
 			} catch (LimitException le) {
 				throw le;
-			} catch (RuntimeException e) {
+			} catch (RuntimeException rex) {
 				if (Config.SHOW_STACKTRACE) {
-					e.printStackTrace();
+					rex.printStackTrace();
 				}
 			}
 		}
-		return null;
+		return F.NIL;
 	}
 
 	public int[] expectedArgSize() {
 		return IOFunctions.ARGS_2_3;
+	}
+	public static FrobeniusSolver getSolver(int[] listInt, IInteger number) {
+		IInteger[][] equations = new IInteger[1][listInt.length + 1];
+		// format looks like: { { 12, 16, 20, 27, 123 } };
+		for (int j = 0; j < listInt.length; j++) {
+			equations[0][j] = F.ZZ(listInt[j]);
+		}
+		// list.forEach((x, i) -> equations[0][i - 1] = (IInteger) x);
+		equations[0][listInt.length] = number;
+
+		return new FrobeniusSolver(equations);
 	}
 	/** {@inheritDoc} */
 	@Override

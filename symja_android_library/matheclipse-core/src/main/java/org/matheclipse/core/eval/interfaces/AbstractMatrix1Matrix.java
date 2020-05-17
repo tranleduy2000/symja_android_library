@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval.interfaces;
 
+import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
 import org.matheclipse.core.basic.Config;
@@ -23,6 +24,8 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 		try {
 			engine.setTogetherMode(true);
 
+			int[] dims = checkMatrixDimensions(ast.arg1());
+			if (dims != null) {
 			final IAST list = (IAST) ast.arg1();
 			matrix = Convert.list2Matrix(list);
 			if (matrix != null) {
@@ -30,6 +33,9 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 				return Convert.matrix2List(matrix);
 			}
 
+			}
+		} catch (MathRuntimeException mre) {
+			return engine.printMessage(ast.topHead(), mre);
 		} catch (final ClassCastException e) {
 			if (Config.SHOW_STACKTRACE) {
 				e.printStackTrace();
@@ -57,6 +63,8 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 		try {
 			engine.setTogetherMode(true);
 
+			int[] dims = checkMatrixDimensions(ast.arg1());
+			if (dims != null) {
 			if (engine.isApfloat()) {
 				final IAST list = (IAST) ast.arg1();
 				FieldMatrix<IExpr> fieldMatrix = Convert.list2Matrix(list);
@@ -70,7 +78,10 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 			matrix = list.toRealMatrix();
 			if (matrix != null) {
 				matrix = realMatrixEval(matrix);
+					if (matrix != null) {
 				return Convert.realMatrix2List(matrix);
+					}
+				}
 			}
 			return F.NIL;
 		} catch (final IndexOutOfBoundsException e) {
@@ -83,6 +94,15 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 		return evaluate(ast, engine);
 	}
 
+	/**
+	 * Check if <code>arg1</code> is a matrix.
+	 *
+	 * @param arg1
+	 * @return
+	 */
+	public int[] checkMatrixDimensions(IExpr arg1) {
+		return arg1.isMatrix();
+	}
 	/**
 	 * Evaluate the symbolic matrix for this algorithm.
 	 * 

@@ -1,17 +1,20 @@
 package org.matheclipse.core.reflection.system;
 
-import com.duy.lambda.Supplier;
-
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.Structure;
+import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.VisitorExpr;
+
+import java.util.List;
 
 import static org.matheclipse.core.expression.F.Abs;
 import static org.matheclipse.core.expression.F.C2;
@@ -21,18 +24,14 @@ import static org.matheclipse.core.expression.F.Cos;
 import static org.matheclipse.core.expression.F.Cosh;
 import static org.matheclipse.core.expression.F.Cot;
 import static org.matheclipse.core.expression.F.Csc;
-import static org.matheclipse.core.expression.F.Im;
 import static org.matheclipse.core.expression.F.Negate;
 import static org.matheclipse.core.expression.F.Plus;
 import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Re;
 import static org.matheclipse.core.expression.F.Sec;
 import static org.matheclipse.core.expression.F.Sin;
 import static org.matheclipse.core.expression.F.Sinh;
-import static org.matheclipse.core.expression.F.Sqrt;
 import static org.matheclipse.core.expression.F.Tan;
 import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.integer;
 
 /**
  * <pre>
@@ -103,33 +102,12 @@ public class ComplexExpand extends AbstractEvaluator {
 			if (result.isPresent()) {
 				x = result;
 			}
-			IExpr reX = Re(x);
-			IExpr imX = Im(x);
-			if (x.isSymbol()) {
-				if (head.equals(Re)) {
-					return x;
-				}
-				if (head.equals(Im)) {
-					return F.C0;
-				}
-				reX = x;
-				imX = F.C0;
-			} else {
-				reX = x.re();
-				imX = x.im();
-				IExpr temp = complexExpandNull(reX, fEngine);
-				if (temp.isPresent()) {
-					reX = temp;
-				}
-				temp = complexExpandNull(imX, fEngine);
-				if (temp.isPresent()) {
-					imX = temp;
-				}
-			}
+			IExpr reX = x.re();
+			IExpr imX = x.im();
 
 			if (head.equals(Abs)) {
 				// Sqrt[reX^2 + imX^2]
-				return complexExpand(Sqrt(Plus(Power(reX, C2), Power(imX, C2))), fEngine);
+				return F.Sqrt(Plus(Power(reX, C2), Power(imX, C2)));
 			}
 			if (head.equals(Cos)) {
 				// Cosh[Im[x]]*Cos[Re[x]]+I*Sinh[Im[x]]*Sin[Re[x]]
@@ -148,7 +126,7 @@ public class ComplexExpand extends AbstractEvaluator {
 				// ((2 I) Cos[Re[x]] Sinh[Im[x]])/(Cos[2 Re[x]]-Cosh[2
 				// Im[x]])
 				return Plus(
-						Times(integer(-2L), Cosh(imX), Sin(reX),
+						Times(F.CN2, Cosh(imX), Sin(reX),
 								Power(Plus(Cos(Times(C2, reX)), Times(CN1, Cosh(Times(C2, imX)))), CN1)),
 						Times(C2, CI, Cos(reX), Sinh(imX),
 								Power(Plus(Cos(Times(C2, reX)), Times(CN1, Cosh(Times(C2, imX)))), CN1)));
@@ -179,27 +157,65 @@ public class ComplexExpand extends AbstractEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		IExpr temp = Structure.threadLogicEquationOperators(ast.arg1(), ast, 1);
-		return temp.orElseGet(new Supplier<IExpr>() {
-            @Override
-            public IExpr get() {
-                return complexExpand(ast.arg1(), engine);
-            }
-        });
+		if (temp.isPresent()) {
+			return temp;
+		}
+		IAssumptions oldAssumptions = engine.getAssumptions();
+		try {
+			IExpr arg1 = ast.arg1();
+			IAST arg2 = F.NIL;
+			if (ast.isAST2()) {
+				arg2 = ast.arg2().isList() ? (IAST) ast.arg2() : F.List(ast.arg2());
 			}
+			VariablesSet eVar = new VariablesSet(arg1);
+			List<IExpr> varList = eVar.getVarList().copyTo();
+			IASTAppendable assumptionExpr = F.ListAlloc(varList.size() + 1);
+			for (int i = 0; i < varList.size(); i++) {
+				final IExpr variable = varList.get(i);
+				if (arg2.isPresent()) {
+					boolean hasMatched = false;
+					for (int j = 1; j < arg2.size(); j++) {
+						if (F.MatchQ.ofQ(variable, arg2.get(j))) {
+							hasMatched = true;
+							break;
+						}
+					}
+					if (hasMatched) {
+						continue;
+					}
+				}
+				assumptionExpr.append(F.Element(variable, F.Reals));
+			}
+
+			IAssumptions assumptions;
+			if (oldAssumptions == null) {
+				assumptions = org.matheclipse.core.eval.util.Assumptions.getInstance(assumptionExpr);
+			} else {
+				assumptions = oldAssumptions.addAssumption(assumptionExpr);
+			}
+			engine.setAssumptions(assumptions);
+
+			ComplexExpandVisitor tteVisitor = new ComplexExpandVisitor(engine);
+			IExpr result = arg1.accept(tteVisitor);
+			if (result.isPresent()) {
+				return result;
+			}
+			return arg1;
+		} finally {
+			engine.setAssumptions(oldAssumptions);
+		}
+	}
+
 	public int[] expectedArgSize() {
-		return IOFunctions.ARGS_0_1;
+		return IOFunctions.ARGS_1_2;
 	}
 
-	private static IExpr complexExpand(IExpr arg1, EvalEngine engine) {
-		return complexExpandNull(arg1, engine).orElse(arg1);
-	}
-
-	private static IExpr complexExpandNull(IExpr arg1, EvalEngine engine) {
-		ComplexExpandVisitor tteVisitor = new ComplexExpandVisitor(engine);
-		return arg1.accept(tteVisitor);
-	}
+	// private static IExpr complexExpandNull(IExpr arg1, EvalEngine engine) {
+	// ComplexExpandVisitor tteVisitor = new ComplexExpandVisitor(engine);
+	// return arg1.accept(tteVisitor);
+	// }
 
 	@Override
 	public void setUp(final ISymbol newSymbol) {
