@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.reflection.system.Ramp;
 
 import static org.matheclipse.core.expression.F.Compile;
 import static org.matheclipse.core.expression.F.ComplexExpand;
@@ -112,7 +113,7 @@ public final class FunctionDefinitions {
 			PolarPlot.setEvaluator(new org.matheclipse.core.reflection.system.PolarPlot());
 			Product.setEvaluator(new org.matheclipse.core.reflection.system.Product());
 
-			//Ramp.setEvaluator(new org.matheclipse.core.reflection.system.Ramp());
+			F.Ramp.setEvaluator(new org.matheclipse.core.reflection.system.Ramp());
 			//SemanticImport.setEvaluator(new org.matheclipse.core.reflection.system.SemanticImport());
 			//SemanticImportString.setEvaluator(new org.matheclipse.core.reflection.system.SemanticImportString());
 			Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());
