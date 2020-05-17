@@ -493,6 +493,7 @@ public class GraphFunctions {
 						if (dim != null) {
 							IAST m = (IAST) ast.arg1();
 							double[][] matrix = m.toDoubleMatrix();
+							if (matrix != null) {
 							int rowDim = dim[0];
 							int colDim = dim[1];
 							if (colDim == 2) {
@@ -528,6 +529,7 @@ public class GraphFunctions {
 								return F.List(sum, shortestTourList);
 							}
 							}
+						}
 					} else if (ast.arg1().isList()) {
 						IAST list = (IAST) ast.arg1();
 						if (list.size() > 2 && list.forAll(new Predicate<IExpr>() {

@@ -38,8 +38,8 @@ import java.util.List;
  * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
  * </p>
  * <p>
- * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence parser</a> for the idea,
- * how to parse the operators depending on their precedence.
+ * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence parser</a> for the idea, how to parse
+ * the operators depending on their precedence.
  * </p>
  */
 public class Parser extends Scanner {
