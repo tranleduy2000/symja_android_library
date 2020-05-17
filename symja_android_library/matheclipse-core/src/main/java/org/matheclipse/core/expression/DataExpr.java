@@ -36,7 +36,7 @@ public abstract class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 	 */
 	@Override
 	public IExpr accept(IVisitor visitor) {
-		return null;
+		return F.NIL;
 	}
 
 	/**
@@ -74,6 +74,34 @@ public abstract class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 	}
 
 	@Override
+	public int compareTo(IExpr expr) {
+		if (expr instanceof DataExpr) {
+			DataExpr<T> de = ((DataExpr<T>) expr);
+			if (fData != null) {
+				if (de.fData != null) {
+					int lhsID = System.identityHashCode(fData);
+					int rhsID = System.identityHashCode(de.fData);
+					if (lhsID > rhsID) {
+						return 1;
+					} else if (lhsID < rhsID) {
+						return -1;
+					}
+					return 0;
+				}
+				return 1;
+			}
+			return -1;
+		}
+		if (expr.isAST()) {
+			if (!expr.isDirectedInfinity()) {
+				return -1 * expr.compareTo(this);
+			}
+		}
+		final int x = hierarchy();
+		final int y = expr.hierarchy();
+		return (x < y) ? -1 : ((x == y) ? 0 : 1);
+	}
+	@Override
 	public IExpr evaluate(EvalEngine engine) {
 		return F.NIL;
 	}
@@ -91,7 +119,7 @@ public abstract class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 
 	@Override
 	public int hashCode() {
-		return (fData == null) ? 59 : 59 + fData.hashCode();
+		return (fData == null) ? 181 : 181 + fData.hashCode();
 	}
 
 	@Override

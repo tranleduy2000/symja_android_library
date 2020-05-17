@@ -373,7 +373,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
@@ -403,7 +403,7 @@ public class ConstantDefinitions {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.CONSTANT);
+			newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
 		}
 
 		@Override
