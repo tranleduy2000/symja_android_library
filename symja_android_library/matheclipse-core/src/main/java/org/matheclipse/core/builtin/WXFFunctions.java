@@ -35,7 +35,9 @@ public class WXFFunctions {
 			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				byte[] bArray = WL.serialize(arg1);
+				if (bArray != null) {
 				return ByteArrayExpr.newInstance(bArray);
+			}
 			}
 			return F.NIL;
 		}
