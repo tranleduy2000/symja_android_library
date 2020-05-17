@@ -32,10 +32,9 @@ public class VisitorReplaceAllWithPatternFlags extends VisitorReplaceAll {
 			if (temp.isOneIdentityAST1()) {
 				return temp.first();
 			}
+		}
 			return temp;
 		}
-		return F.NIL;
-	}
 	
 	@Override
 	public IExpr visit(IPattern element) {
@@ -68,27 +67,28 @@ public class VisitorReplaceAllWithPatternFlags extends VisitorReplaceAll {
 					}
 					i++;
 				}
-			if (result.isAST()) {
-				if (result.isFlatAST()) {
+				if (result.isAST()) {
+					if (result.isFlatAST()) {
 						IASTAppendable flattened = EvalAttributes.flattenDeep((IAST) result);
 						if (flattened.isPresent()) {
 							result = flattened;
+						}
 					}
-				}
-				if (result.isOneIdentityAST1()) {
+					if (result.isOneIdentityAST1()) {
 						return result.first();
-				} else if (result.isOrderlessAST()) {
-					EvalAttributes.sort((IASTMutable) result);
+					} else if (result.isOrderlessAST()) {
+						EvalAttributes.sort((IASTMutable) result);
+					}
+					((IAST) result).addEvalFlags(ast.getEvalFlags() & IAST.CONTAINS_PATTERN_EXPR);
+					// if (onlyNamedPatterns) {
+					// System.out.println(" " + lhsPatternExpr.toString() + " -> " + result.toString());
+					// }
 				}
-				// if (onlyNamedPatterns) {
-				// System.out.println(" " + lhsPatternExpr.toString() + " -> " + result.toString());
+				// if (result instanceof IASTMutable) {
+				// ((IASTMutable) result).setEvalFlags(ast.getEvalFlags() & IAST.CONTAINS_PATTERN_EXPR);
 				// }
+				return result;
 			}
-			// if (result instanceof IASTMutable) {
-			// ((IASTMutable) result).setEvalFlags(ast.getEvalFlags() & IAST.CONTAINS_PATTERN_EXPR);
-			// }
-			return result;
-		}
 			i++;
 		}
 		return F.NIL;
