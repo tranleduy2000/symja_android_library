@@ -13726,6 +13726,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testNestList() {
+		fail();
 		check("Length(NestList(#2,{},50))", //
 				"51");
 		check("NestList(#2,{},3)", //
