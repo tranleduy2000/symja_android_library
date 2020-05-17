@@ -2593,6 +2593,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return this instanceof IStringX;
     }
 
+    @Override
+    public boolean isString(String str) {
+        return this instanceof IStringX && toString().equals(str);
+    }
+
     /**
      * Test if this expression is a symbol (instanceof ISymbol)
      *

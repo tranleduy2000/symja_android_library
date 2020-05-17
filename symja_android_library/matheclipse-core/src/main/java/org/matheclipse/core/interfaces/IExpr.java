@@ -1815,6 +1815,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isString();
 
     /**
+     * Test if this expression is a string (instanceof IStringX) and equals <code>str</code>
+     *
+     * @return
+     */
+    boolean isString(String str);
+
+    /**
      * Test if this expression is a symbol (instanceof ISymbol)
      */
     boolean isSymbol();
