@@ -1,7 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import android.text.Layout;
-
 import com.duy.lang.DDouble;
 
 import org.apache.commons.lang3.StringUtils;
