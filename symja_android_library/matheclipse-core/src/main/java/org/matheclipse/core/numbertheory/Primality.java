@@ -27,6 +27,7 @@ import java.util.TreeSet;
 import de.tilman_neumann.jml.factor.CombinedFactorAlgorithm;
 import de.tilman_neumann.jml.factor.ecm.EllipticCurveMethod;
 import de.tilman_neumann.util.SortedMultiset;
+import it.unimi.dsi.fastutil.objects.Int2IntMap;
 
 /**
  * Provides primality probabilistic methods.
@@ -544,7 +545,7 @@ public class Primality {
 	 *            a map which counts the prime integer factors less equal than 32749
 	 * @return the rest factor or zero, if the number could be factored completely into primes less equal then 1021
 	 */
-	public static BigInteger countPrimes32749(final BigInteger val, Map<Integer, Integer> map) {
+	public static BigInteger countPrimes32749(final BigInteger val, Int2IntMap map) {
 		BigInteger[] divRem;
 		BigInteger result = val;
 		// int count = 0;

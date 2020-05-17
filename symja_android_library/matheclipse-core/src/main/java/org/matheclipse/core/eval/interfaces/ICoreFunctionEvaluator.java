@@ -17,12 +17,14 @@ public interface ICoreFunctionEvaluator extends IFunctionEvaluator {
 
         @Override
         public final IExpr evaluate(IAST ast, EvalEngine engine) {
-            return engine.evalAttributes(ast.topHead(), ast);
+            return F.NIL;// engine.evalAttributes(ast.topHead(), ast);
+
         }
 
         @Override
         public final IExpr numericEval(IAST ast, EvalEngine engine) {
-            return engine.evalAttributes(ast.topHead(), ast);
+            return F.NIL;// engine.evalAttributes(ast.topHead(), ast);
+
         }
 
         @Override

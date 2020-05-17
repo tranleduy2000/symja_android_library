@@ -33,6 +33,9 @@ import java.math.BigInteger;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import it.unimi.dsi.fastutil.objects.Int2IntMap;
+import it.unimi.dsi.fastutil.objects.Int2IntRBTreeMap;
+
 /**
  * Abstract base class for FractionSym and BigFractionSym
  * 
@@ -380,9 +383,11 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 		if (numerator != 1) {
 			d = d.pow(numerator);
 		}
-		SortedMap<Integer, Integer> bMap = new TreeMap<Integer, Integer>();
+		// SortedMap<Integer, Integer> bMap = new TreeMap<Integer, Integer>();
+		Int2IntMap bMap = new Int2IntRBTreeMap();
 		IAST bAST = AbstractIntegerSym.factorBigInteger(b, isNegative, numerator, root, bMap);
-		SortedMap<Integer, Integer> dMap = new TreeMap<Integer, Integer>();
+		// SortedMap<Integer, Integer> dMap = new TreeMap<Integer, Integer>();
+		Int2IntMap dMap = new Int2IntRBTreeMap();
 		IAST dAST = AbstractIntegerSym.factorBigInteger(d, false, numerator, root, dMap);
 		if (bAST.isPresent()) {
 			if (dAST.isPresent()) {

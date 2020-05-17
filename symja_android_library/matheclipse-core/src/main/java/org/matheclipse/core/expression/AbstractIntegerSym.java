@@ -30,6 +30,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.jas.arith.PrimeInteger;
+import it.unimi.dsi.fastutil.objects.Int2IntMap;
+import it.unimi.dsi.fastutil.objects.Int2IntRBTreeMap;
 
 /**
  * Abstract base class for IntegerSym and BigIntegerSym
@@ -458,19 +460,18 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 //		} catch (ArithmeticException aex) {
 			// go on with big integers
 //		}
-
-		SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
+		Int2IntMap map = new Int2IntRBTreeMap();
+		// SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
 		BigInteger rest = Primality.countPrimes32749(b.toBigNumerator(), map);
 
 		IASTAppendable result = F.ListAlloc(map.size() + 10);
 		if (sign() < 0) {
 			result.append(F.CN1);
 		}
-		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-			int key = entry.getKey();
-			// Swift changed: type is incompatible
+		for (Int2IntMap.Entry entry : map.int2IntEntrySet()) {
+			int key = entry.getIntKey();
 			IInteger is = valueOf(key);
-			for (int i = 0; i < entry.getValue(); i++) {
+			for (int i = 0; i < entry.getIntValue(); i++) {
 				result.append(is);
 			}
 		}
@@ -499,8 +500,8 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	/** {@inheritDoc} */
 	@Override
 	public IAST factorSmallPrimes(int numerator, int root) {
-		SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-		IASTAppendable result = F.NIL;
+		// SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
+		Int2IntMap map = new Int2IntRBTreeMap();
 		IInteger b = this;
 		boolean isNegative = false;
 		if (sign() < 0) {
@@ -519,7 +520,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	protected static IAST factorBigInteger(BigInteger number, boolean isNegative, int numerator, int denominator,
-			SortedMap<Integer, Integer> map) {
+			Int2IntMap map) {
 		if (number.compareTo(BigInteger.valueOf(7)) <= 0) {
 			return F.NIL;
 		}
@@ -527,11 +528,11 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		if (map.size() == 0) {
 			return F.NIL;
 		}
-		IASTAppendable result = F.TimesAlloc(map.size());
+		IASTAppendable result = F.TimesAlloc(map.size() + 1);
 		boolean evaled = false;
-		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-			int key = entry.getKey();
-			int value = entry.getValue();
+		for (Int2IntMap.Entry entry : map.int2IntEntrySet()) {
+			int key = entry.getIntKey();
+			int value = entry.getIntValue();
 			int mod = value % denominator;
 			int div = value / denominator;
 			if (div != 0) {

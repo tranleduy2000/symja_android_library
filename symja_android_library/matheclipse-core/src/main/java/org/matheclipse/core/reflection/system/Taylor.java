@@ -2,6 +2,7 @@ package org.matheclipse.core.reflection.system;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -19,6 +20,7 @@ public class Taylor extends AbstractFunctionEvaluator {
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		if (ast.isAST2() && (ast.arg2().isVector() == 3)) {
 
+			try {
 			IAST list = (IAST) ast.arg2();
 			final int upperLimit = Validate.checkIntType(list, 3, 0);
 			if (upperLimit < 0) {
@@ -30,12 +32,16 @@ public class Taylor extends AbstractFunctionEvaluator {
 			IExpr factor = null;
 			for (int i = 1; i <= upperLimit; i++) {
 				temp = F.D(temp, list.arg1());
-				factor = F.Times(F.Power(F.Factorial(F.integer(i)), F.CN1), F.Power(F.Plus(list.arg1(), F.Times(F.CN1, list.arg2())), F
-						.integer(i)));
+					factor = F.Times(F.Power(F.Factorial(F.ZZ(i)), F.CN1),
+							F.Power(F.Plus(list.arg1(), F.Times(F.CN1, list.arg2())), F.ZZ(i)));
 				fadd.append(F.Times(F.ReplaceAll(temp, F.Rule(list.arg1(), list.arg2())), factor));
 			}
 			return fadd;
  
+			} catch (final ValidateException ve) {
+				// int number validation
+				return engine.printMessage(ve.getMessage(ast.topHead()));
+			}
 		}
 		return F.NIL;
 	}

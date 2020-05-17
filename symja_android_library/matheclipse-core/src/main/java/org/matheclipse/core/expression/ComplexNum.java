@@ -376,6 +376,11 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 		return F.NIL;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public Complex evalComplex() {
+		return fComplex;
+	}
 	@Override
 	public INumber evalNumber() {
 		return this;
