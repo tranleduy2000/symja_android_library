@@ -66,18 +66,30 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 		final int[] j = new int[1];
 		multiset[j[0]++] = index[0];
 		array[index[0]] = lastT[0];
-		sortedList.forEach(start + 1, end, new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr x) {
-				if (x.equals(lastT[0])) {
-					multiset[j[0]++] = index[0];
-				} else {
-					multiset[j[0]++] = ++index[0];
-					array[index[0]] = x;
-					lastT[0] = x;
-				}
+		// objc-changed: memory issue
+		//sortedList.forEach(start + 1, end, new Consumer<IExpr>() {
+		//	@Override
+		//	public void accept(IExpr x) {
+		//		if (x.equals(lastT[0])) {
+		//			multiset[j[0]++] = index[0];
+		//		} else {
+		//			multiset[j[0]++] = ++index[0];
+		//			array[index[0]] = x;
+		//			lastT[0] = x;
+		//		}
+		//	}
+		//});
+		// objc-changed: memory issue
+		for (int i = start + 1; i < end; i++) {
+			IExpr x = sortedList.get(i);
+			if (x.equals(lastT[0])) {
+				multiset[j[0]++] = index[0];
+			} else {
+				multiset[j[0]++] = ++index[0];
+				array[index[0]] = x;
+				lastT[0] = x;
 			}
-		});
+		}
 	}
 
 	@Override

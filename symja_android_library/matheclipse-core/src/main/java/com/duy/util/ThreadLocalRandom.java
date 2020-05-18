@@ -56,9 +56,20 @@ public class ThreadLocalRandom extends Random {
         return nextDouble() * (bound - least) + least;
     }
 
-    public int nextInt(int start, int end) {
-        int bounds = (end - start) + 1;
-        int value = nextInt(bounds);
-        return start + value;
+    /**
+     * Returns a pseudorandom {@code int} value between the specified
+     * origin (inclusive) and the specified bound (exclusive).
+     *
+     * @param origin the least value returned
+     * @param bound  the upper bound (exclusive)
+     * @return a pseudorandom {@code int} value between the origin
+     * (inclusive) and the bound (exclusive)
+     * @throws IllegalArgumentException if {@code origin} is greater than
+     *                                  or equal to {@code bound}
+     */
+    public int nextInt(int origin, int bound) {
+        int range = (bound - origin);
+        int r = nextInt(range);
+        return origin + r;
     }
 }

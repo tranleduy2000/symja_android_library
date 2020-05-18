@@ -157,12 +157,22 @@ public class HashedOrderlessMatcher {
 	 */
 	protected static boolean exists2ASTArguments(IAST ast) {
 		final int[] counter = { 0 };
-		return ast.exists(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                return x.isAST() && ++counter[0] == 2;
-            }
-        }, 1);
+		// objc changed: memory issue
+//		return ast.exists(new Predicate<IExpr>() {
+//            @Override
+//            public boolean test(IExpr x) {
+//                return x.isAST() && ++counter[0] == 2;
+//            }
+//        }, 1);
+		// objc changed: memory issue
+		final int size = ast.size();
+		for (int i = 1; i < size; i++) {
+			IExpr x = ast.get(i);
+			if(x.isAST() && ++counter[0] == 2) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

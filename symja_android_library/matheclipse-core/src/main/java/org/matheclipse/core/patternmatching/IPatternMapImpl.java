@@ -121,30 +121,54 @@ public abstract class IPatternMapImpl implements IPatternMap {
             ruleWithoutPattern[0] = false;
         }
         final int[] listEvalFlags = new int[] { IAST.NO_FLAG };
-        lhsPatternExpr.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                if (x.isAST()) {
-                    final IAST lhsPatternAST = (IAST) x;
-                    if (lhsPatternAST.isPatternMatchingFunction()) {
-                        listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
-                    }
-                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
-                            ruleWithoutPattern, treeLevel + 1);
-                    priority[0] -= 11;
-                    if (x.isPatternDefault()) {
-                        listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
-                    }
-                } else if (x instanceof IPatternObject) {
-                    ruleWithoutPattern[0] = false;
-                    int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
-                    listEvalFlags[0] |= result[0];
-                    priority[0] -= result[1];
-                } else {
-                    priority[0] -= (50 - treeLevel);
+        // objc-changed: memory issue
+        // lhsPatternExpr.forEach(new Consumer<IExpr>() {
+        //     @Override
+        //     public void accept(IExpr x) {
+        //         if (x.isAST()) {
+        //             final IAST lhsPatternAST = (IAST) x;
+        //             if (lhsPatternAST.isPatternMatchingFunction()) {
+        //                 listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
+        //             }
+        //             listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
+        //                     ruleWithoutPattern, treeLevel + 1);
+        //             priority[0] -= 11;
+        //             if (x.isPatternDefault()) {
+        //                 listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+        //             }
+        //         } else if (x instanceof IPatternObject) {
+        //             ruleWithoutPattern[0] = false;
+        //             int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
+        //             listEvalFlags[0] |= result[0];
+        //             priority[0] -= result[1];
+        //         } else {
+        //             priority[0] -= (50 - treeLevel);
+        //         }
+        //     }
+        // }, 0);
+        // objc-changed: memory issue
+        for (int i = 0; i < lhsPatternExpr.size(); i++) {
+            IExpr x = lhsPatternExpr.get(i);
+            if (x.isAST()) {
+                final IAST lhsPatternAST = (IAST) x;
+                if (lhsPatternAST.isPatternMatchingFunction()) {
+                    listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
                 }
+                listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
+                        ruleWithoutPattern, treeLevel + 1);
+                priority[0] -= 11;
+                if (x.isPatternDefault()) {
+                    listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+                }
+            } else if (x instanceof IPatternObject) {
+                ruleWithoutPattern[0] = false;
+                int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
+                listEvalFlags[0] |= result[0];
+                priority[0] -= result[1];
+            } else {
+                priority[0] -= (50 - treeLevel);
             }
-        }, 0);
+        }
         lhsPatternExpr.setEvalFlags(listEvalFlags[0]);
         // disable flag "pattern with default value"
         // listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;

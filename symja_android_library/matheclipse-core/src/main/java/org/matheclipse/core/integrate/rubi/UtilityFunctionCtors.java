@@ -405,12 +405,13 @@ public class UtilityFunctionCtors {
         return F.binaryAST2(F.$rubi("EasyDQ"), a0, a1);
     }
 
-	private final static class EqQ extends B2 {
-		public EqQ() {
+    // swift changed: duplicate symbols
+	private final static class EqQClass extends B2 {
+		public EqQClass() {
 			super();
 		}
 
-		EqQ(IExpr arg1, IExpr arg2) {
+		EqQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -420,12 +421,12 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new EqQ(arg1, arg2);
+			return new EqQClass(arg1, arg2);
 		}
     }
 
     public static IAST EqQ(final IExpr a0, final IExpr a1) {
-		return new EqQ(a0, a1);
+		return new EqQClass(a0, a1);
     }
 
     public static IAST EqQ(final IExpr a0, final IExpr a1, final IExpr a2) {
@@ -544,12 +545,12 @@ public class UtilityFunctionCtors {
         return F.binaryAST2(F.$rubi("FactorOrder"), a0, a1);
     }
 
-	private static final class FalseQ extends B1 {
-		public FalseQ() {
+	private static final class FalseQClass extends B1 {
+		public FalseQClass() {
 			super();
 		}
 
-		FalseQ(IExpr arg1) {
+		FalseQClass(IExpr arg1) {
 			super(arg1);
 		}
 
@@ -559,11 +560,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new FalseQ(arg1);
+			return new FalseQClass(arg1);
 		}
 	}
     public static IAST FalseQ(final IExpr a0) {
-		return new FalseQ(a0);
+		return new FalseQClass(a0);
     }
 
     public static IAST FindTrigFactor(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3, final IExpr a4) {
@@ -598,12 +599,13 @@ public class UtilityFunctionCtors {
 		return F.unaryAST1(FixSimplify, a0);
 	}
 
-	private static final class FracPart extends B1 {
-		public FracPart() {
+	// swift changed: duplicate symbols
+	private static final class FracPartClass extends B1 {
+		public FracPartClass() {
 			super();
 		}
 
-		FracPart(IExpr arg1) {
+		FracPartClass(IExpr arg1) {
 			super(arg1);
 		}
 
@@ -613,12 +615,12 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new FracPart(arg1);
+			return new FracPartClass(arg1);
 		}
     }
 
     public static IAST FracPart(final IExpr a0) {
-		return new FracPart(a0);
+		return new FracPartClass(a0);
     }
 
     public static IAST FracPart(final IExpr a0, final IExpr a1) {
@@ -803,12 +805,13 @@ public class UtilityFunctionCtors {
         return F.ternaryAST3(F.$rubi("FunctionOfTrigQ"), a0, a1, a2);
     }
 
-	private final static class GtQ extends B2 {
-		public GtQ() {
+    // swift changed: duplicate symbols
+	private final static class GtQClass extends B2 {
+		public GtQClass() {
 			super();
 		}
 
-		GtQ(IExpr arg1, IExpr arg2) {
+		GtQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -818,24 +821,25 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new GtQ(arg1, arg2);
+			return new GtQClass(arg1, arg2);
 		}
 	}
 
     public static IAST GtQ(final IExpr a0, final IExpr a1) {
-		return new GtQ(a0, a1);
+		return new GtQClass(a0, a1);
     }
 
     public static IAST GtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
         return F.ternaryAST3(GtQ, a0, a1, a2);
     }
 
-	private final static class GeQ extends B2 {
-		public GeQ() {
+    // swift changed: duplicate symbols
+	private final static class GeQClass extends B2 {
+		public GeQClass() {
 			super();
 		}
 
-		GeQ(IExpr arg1, IExpr arg2) {
+		GeQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -845,11 +849,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new GeQ(arg1, arg2);
+			return new GeQClass(arg1, arg2);
 		}
 	}
     public static IAST GeQ(final IExpr a0, final IExpr a1) {
-		return new GeQ(a0, a1);
+		return new GeQClass(a0, a1);
     }
 
     public static IAST GeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
@@ -917,12 +921,13 @@ public class UtilityFunctionCtors {
         return F.unaryAST1(F.$rubi("HyperbolicQ"), a0);
     }
 
-	private final static class IGtQ extends B2 {
-		public IGtQ() {
+    // swift changed: duplicate symbols
+	private final static class IGtQClass extends B2 {
+		public IGtQClass() {
 			super();
 		}
 
-		IGtQ(IExpr arg1, IExpr arg2) {
+		IGtQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -932,23 +937,24 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new IGtQ(arg1, arg2);
+			return new IGtQClass(arg1, arg2);
 		}
 	}
     public static IAST IGtQ(final IExpr a0, final IExpr a1) {
-		return new IGtQ(a0, a1);
+		return new IGtQClass(a0, a1);
     }
 
     public static IAST IGeQ(final IExpr a0, final IExpr a1) {
         return F.binaryAST2(IGeQ, a0, a1);
     }
 
-	private final static class ILtQ extends B2 {
-		public ILtQ() {
+    // swift changed: duplicate symbols
+	private final static class ILtQClass extends B2 {
+		public ILtQClass() {
 			super();
 		}
 
-		ILtQ(IExpr arg1, IExpr arg2) {
+		ILtQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -958,11 +964,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new ILtQ(arg1, arg2);
+			return new ILtQClass(arg1, arg2);
 		}
 	}
     public static IAST ILtQ(final IExpr a0, final IExpr a1) {
-		return new ILtQ(a0, a1);
+		return new ILtQClass(a0, a1);
     }
 
     public static IAST ILeQ(final IExpr a0, final IExpr a1) {
@@ -1005,12 +1011,13 @@ public class UtilityFunctionCtors {
         return F.ternaryAST3(F.$rubi("InertTrigSumQ"), a0, a1, a2);
     }
 
-	private static final class IntPart extends B1 {
-		public IntPart() {
+    // swift changed: duplicate symbols
+	private static final class IntPartClass extends B1 {
+		public IntPartClass() {
 			super();
 		}
 
-		IntPart(IExpr arg1) {
+		IntPartClass(IExpr arg1) {
 			super(arg1);
 		}
 
@@ -1020,11 +1027,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new IntPart(arg1);
+			return new IntPartClass(arg1);
 		}
 	}
     public static IAST IntPart(final IExpr a0) {
-		return new IntPart(a0);
+		return new IntPartClass(a0);
     }
 
     public static IAST IntPart(final IExpr a0, final IExpr a1) {
@@ -1111,12 +1118,13 @@ public class UtilityFunctionCtors {
         return F.ternaryAST3(F.$rubi("KnownTrigIntegrandQ"), a0, a1, a2);
     }
 
-	private final static class LtQ extends B2 {
-		public LtQ() {
+    // swift changed: duplicate symbols
+	private final static class LtQClass extends B2 {
+		public LtQClass() {
 			super();
 		}
 
-		LtQ(IExpr arg1, IExpr arg2) {
+		LtQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -1126,24 +1134,25 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new LtQ(arg1, arg2);
+			return new LtQClass(arg1, arg2);
 		}
 	}
 
     public static IAST LtQ(final IExpr a0, final IExpr a1) {
-		return new LtQ(a0, a1);
+		return new LtQClass(a0, a1);
     }
 
     public static IAST LtQ(final IExpr a0, final IExpr a1, final IExpr a2) {
         return F.ternaryAST3(LtQ, a0, a1, a2);
     }
 
-	private final static class LeQ extends B2 {
-		public LeQ() {
+    // swift changed: duplicate symbols
+	private final static class LeQClass extends B2 {
+		public LeQClass() {
 			super();
 		}
 
-		LeQ(IExpr arg1, IExpr arg2) {
+		LeQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -1153,11 +1162,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new LeQ(arg1, arg2);
+			return new LeQClass(arg1, arg2);
 		}
 	}
     public static IAST LeQ(final IExpr a0, final IExpr a1) {
-		return new LeQ(a0, a1);
+		return new LeQClass(a0, a1);
     }
 
     public static IAST LeQ(final IExpr a0, final IExpr a1, final IExpr a2) {
@@ -1293,12 +1302,13 @@ public class UtilityFunctionCtors {
         return F.unaryAST1(F.$rubi("NegSumBaseQ"), a0);
     }
 
-	private final static class NeQ extends B2 {
-		public NeQ() {
+    // swift changed: duplicate symbols
+	private final static class NeQClass extends B2 {
+		public NeQClass() {
 			super();
 		}
 
-		NeQ(IExpr arg1, IExpr arg2) {
+		NeQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -1308,12 +1318,12 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new NeQ(arg1, arg2);
+			return new NeQClass(arg1, arg2);
 		}
     }
 
     public static IAST NeQ(final IExpr a0, final IExpr a1) {
-		return new NeQ(a0, a1);
+		return new NeQClass(a0, a1);
     }
 
     public static IAST NiceSqrtAuxQ(final IExpr a0) {
@@ -1472,12 +1482,13 @@ public class UtilityFunctionCtors {
         return F.ternaryAST3(F.$rubi("PolyGCD"), a0, a1, a2);
     }
 
-	private final static class PolyQ extends B2 {
-		public PolyQ() {
+    // swift changed: duplicate symbols
+	private final static class PolyQClass extends B2 {
+		public PolyQClass() {
 			super();
 		}
 
-		PolyQ(IExpr arg1, IExpr arg2) {
+		PolyQClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -1487,11 +1498,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new PolyQ(arg1, arg2);
+			return new PolyQClass(arg1, arg2);
 		}
 	}
     public static IAST PolyQ(final IExpr a0, final IExpr a1) {
-		return new PolyQ(a0, a1);
+		return new PolyQClass(a0, a1);
     }
 
     public static IAST PolyQ(final IExpr a0, final IExpr a1, final IExpr a2) {
@@ -1760,12 +1771,13 @@ public class UtilityFunctionCtors {
         return F.unaryAST1(F.$rubi("SignOfFactor"), a0);
     }
 
-	private final static class Simp extends B2 {
-		public Simp() {
+    // swift changed: duplicate symbols
+	private final static class SimpClass extends B2 {
+		public SimpClass() {
 			super();
 		}
 
-		Simp(IExpr arg1, IExpr arg2) {
+		SimpClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -1775,11 +1787,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new Simp(arg1, arg2);
+			return new SimpClass(arg1, arg2);
 		}
 	}
     public static IAST Simp(final IExpr a0, final IExpr a1) {
-		return new Simp(a0, a1);
+		return new SimpClass(a0, a1);
     }
 
     public static IAST SimpFixFactor(final IExpr a0, final IExpr a1) {
@@ -2058,12 +2070,13 @@ public class UtilityFunctionCtors {
         return F.binaryAST2(F.$rubi("UnifyTerms"), a0, a1);
     }
 
-	private final static class Unintegrable extends B2 {
-		public Unintegrable() {
+    // swift changed: duplicate symbols
+	private final static class UnintegrableClass extends B2 {
+		public UnintegrableClass() {
 			super();
 		}
 
-		Unintegrable(IExpr arg1, IExpr arg2) {
+		UnintegrableClass(IExpr arg1, IExpr arg2) {
 			super(arg1, arg2);
 		}
 
@@ -2073,11 +2086,11 @@ public class UtilityFunctionCtors {
 		}
 
 		public IASTMutable copy() {
-			return new Unintegrable(arg1, arg2);
+			return new UnintegrableClass(arg1, arg2);
 		}
 	}
     public static IAST Unintegrable(final IExpr a0, final IExpr a1) {
-		return new Unintegrable(a0, a1);
+		return new UnintegrableClass(a0, a1);
     }
 
     public static IAST UnifyInertTrigFunction(final IExpr a0, final IExpr a1) {

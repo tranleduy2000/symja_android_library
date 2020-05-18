@@ -5,6 +5,8 @@
 package edu.jas.poly;
 
 
+import com.google.j2objc.annotations.AutoreleasePool;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -1732,7 +1734,7 @@ public class GenPolynomial<C extends RingElem<C>> extends RingElemImpl<GenPolyno
         }
         GenPolynomial<C> p = ring.getZERO().copy();
         SortedMap<ExpVector, C> pv = p.val;
-        for (Map.Entry<ExpVector, C> m : val.entrySet()) {
+        for (@AutoreleasePool Map.Entry<ExpVector, C> m : val.entrySet()) {
             C a = m.getValue();
             ExpVector e = m.getKey();
             C c = a.multiply(s); // check non zero if not domain

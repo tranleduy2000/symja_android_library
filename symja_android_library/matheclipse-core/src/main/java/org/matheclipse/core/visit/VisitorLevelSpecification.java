@@ -317,23 +317,23 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 
 	@Override
 	public IExpr visit(final IASTMutable ast) {
-		final IASTMutable[] result = new IASTMutable[] { F.NIL };
+		final IASTMutable[] result = new IASTMutable[]{F.NIL};
 		if (ast.isPresent()) {
-			final int[] minDepth = new int[] { 0 };
-		try {
-			fCurrentLevel++;
-			if (fIncludeHeads) {
-				final IExpr temp = ast.get(0).accept(this);
-				if (temp.isPresent()) {
-					if (!result[0].isPresent()) {
-						result[0] = createResult(ast, temp);
+			final int[] minDepth = new int[]{0};
+			try {
+				fCurrentLevel++;
+				if (fIncludeHeads) {
+					final IExpr temp = ast.get(0).accept(this);
+					if (temp.isPresent()) {
+						if (!result[0].isPresent()) {
+							result[0] = createResult(ast, temp);
+						}
+						result[0].set(0, temp);
 					}
-					result[0].set(0, temp);
+					if (fCurrentDepth < minDepth[0]) {
+						minDepth[0] = fCurrentDepth;
+					}
 				}
-				if (fCurrentDepth < minDepth[0]) {
-					minDepth[0] = fCurrentDepth;
-				}
-			}
 				ast.forEach(new ObjIntConsumer<IExpr>() {
 					@Override
 					public void accept(IExpr x, int i) {
@@ -349,20 +349,20 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 						}
 					}
 				});
-		} finally {
-			fCurrentLevel--;
-		}
-		fCurrentDepth = --minDepth[0];
-		if (isInRange(fCurrentLevel, minDepth[0])) {
-			if (!result[0].isPresent()) {
-				return fFunction.apply(ast);
-			} else {
-				IExpr temp = fFunction.apply(result[0]);
-				if (temp.isPresent()) {
-					return temp;
+			} finally {
+				fCurrentLevel--;
+			}
+			fCurrentDepth = --minDepth[0];
+			if (isInRange(fCurrentLevel, minDepth[0])) {
+				if (!result[0].isPresent()) {
+					return fFunction.apply(ast);
+				} else {
+					IExpr temp = fFunction.apply(result[0]);
+					if (temp.isPresent()) {
+						return temp;
+					}
 				}
 			}
-		}
 		}
 		return result[0];
 	}

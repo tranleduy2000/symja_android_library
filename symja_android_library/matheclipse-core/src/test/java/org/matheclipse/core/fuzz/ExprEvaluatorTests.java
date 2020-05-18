@@ -2,6 +2,8 @@ package org.matheclipse.core.fuzz;
 
 import com.duy.util.ThreadLocalRandom;
 
+import junit.framework.TestCase;
+
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
@@ -25,8 +27,6 @@ import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.math.MathException;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
-
-import junit.framework.TestCase;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -393,8 +393,8 @@ public class ExprEvaluatorTests extends TestCase {
 			eval = new ExprEvaluator(engine, true, 20);
 			engine.init();
 			engine.setQuietMode(quietMode);
-						IASTAppendable ast = F.ast(sym);
-						try {
+			IASTAppendable ast = F.ast(sym);
+			try {
 				for (int k = 0; k < j; k++) {
 					int seedIndex = random.nextInt(1, seedList.size());
 					IExpr seed = seedList.get(seedIndex);
@@ -409,7 +409,7 @@ public class ExprEvaluatorTests extends TestCase {
 				}
 				// System.out.println(">> " + ast.toString());
 //				System.out.print(".");
-							eval.eval(ast);
+				eval.eval(ast);
 			} catch (FlowControlException mex) {
 				if (!quietMode) {
 					System.err.println(ast.toString());
@@ -434,9 +434,9 @@ public class ExprEvaluatorTests extends TestCase {
 				ve.printStackTrace();
 				System.err.println();
 				// fail();
-						} catch (MathException mex) {
+			} catch (MathException mex) {
 				System.err.println(ast.toString());
-							mex.printStackTrace();
+				mex.printStackTrace();
 				System.err.println();
 				fail();
 						} catch (RuntimeException rex) {
