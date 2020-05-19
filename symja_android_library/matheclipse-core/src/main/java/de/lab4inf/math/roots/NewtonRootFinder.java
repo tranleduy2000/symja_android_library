@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.roots;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 import de.lab4inf.math.differentiation.Differentiator;
@@ -89,7 +91,7 @@ public class NewtonRootFinder extends AbstractRootFinder {
             df = dF.f(xm);
             // check for multiple root
             if (abs(df) < TINY_DERIVATIVE) {
-                getLogger().info(format("found multiple root at x=%g", xm));
+                getLogger().info(format(Locale.US, "found multiple root at x=%g", xm));
                 return modnewton(fct, dF, xn, eps);
             }
             dx = f / df;

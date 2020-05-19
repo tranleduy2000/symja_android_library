@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.fitting;
 
+import java.util.Locale;
+
 import static java.lang.Math.pow;
 import static java.lang.String.format;
 
@@ -140,7 +142,7 @@ public class RationalFitter extends GenericFitter {
         double divider = q(x);
         if (divider == 0) {
             if (numerator != 0) {
-                getLogger().error(format("q(%f)=0!", x));
+                getLogger().error(format(Locale.US, "q(%f)=0!", x));
                 return Math.signum(numerator) * Double.MAX_VALUE;
             }
             return 0;

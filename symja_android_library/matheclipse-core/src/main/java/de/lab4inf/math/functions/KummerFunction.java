@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 import de.lab4inf.math.Integrable;
@@ -67,7 +69,7 @@ import static java.lang.String.format;
  * @since 14.05.2014
  */
 public class KummerFunction extends L4MFunction implements Differentiable, Integrable {
-    public static final String KUMMER = format("%sF%s", Strings.toLowerScript(1), Strings.toLowerScript(1));
+    public static final String KUMMER = format(Locale.US, "%sF%s", Strings.toLowerScript(1), Strings.toLowerScript(1));
     private static final int MIN_A_B = 25;
     private static final String B_0 = "b=%.0f none positiv integer for " + KUMMER;
     private static final double PRECISSION = 5.E-14;
@@ -195,7 +197,7 @@ public class KummerFunction extends L4MFunction implements Differentiable, Integ
         }
 
         System.err.printf("unhandled a=%f b=%f min=%d %n", a, b, minAB);
-        throw new IllegalStateException(format("a=%f b=%f", a, b));
+        throw new IllegalStateException(format(Locale.US, "a=%f b=%f", a, b));
         // if(b<1) {
         // y = fractionApprox(a,b,x);
         // } else {
@@ -229,7 +231,7 @@ public class KummerFunction extends L4MFunction implements Differentiable, Integ
         } else {
             // for negative n (-0) recursion
             if (x > 0)
-                LOGGER.warn(format("%s(%.2f,%.2f;%g) unstable (-0) recursion n=%d", KUMMER, a, b, x, n));
+                LOGGER.warn(format(Locale.US, "%s(%.2f,%.2f;%g) unstable (-0) recursion n=%d", KUMMER, a, b, x, n));
             yo = kummer(a + 1, b, x);
             for (int k = 0; k < -n; k++) {
                 // yk = (-(2*a-2*k-b+x)*ym+(a-k)*yo)/(b-a+k);
@@ -257,7 +259,7 @@ public class KummerFunction extends L4MFunction implements Differentiable, Integ
         ym = kummer(a, b, x);
         // for positive n (0+) recursion
         if (n > 0) {
-            LOGGER.warn(format("%s(%.2f,%.2f;%g) unstable (0+) recursion n=%d", KUMMER, a, b, x, n));
+            LOGGER.warn(format(Locale.US, "%s(%.2f,%.2f;%g) unstable (0+) recursion n=%d", KUMMER, a, b, x, n));
             yo = kummer(a, b - 1, x);
             for (int k = 1; k <= n; k++) {
                 yk = ((bk - 1 + x) * ym - (bk - 1) * yo) * bk / (x * (bk - a));
@@ -311,7 +313,7 @@ public class KummerFunction extends L4MFunction implements Differentiable, Integ
             }
         } else {
             // for (-+) minimal unstable recursion
-            LOGGER.warn(format("%s(%.2f,%.2f;%g) unstable (-+) recursion n=%d", KUMMER, a, b, x, n));
+            LOGGER.warn(format(Locale.US, "%s(%.2f,%.2f;%g) unstable (-+) recursion n=%d", KUMMER, a, b, x, n));
             yo = kummer(a + 1, b - 1, x);
             for (int i = 1; i <= m; i++) {
             	double k=i;
@@ -345,7 +347,7 @@ public class KummerFunction extends L4MFunction implements Differentiable, Integ
         double yo, ym, yk = -1, ak = a, bk = b;
         ym = kummer(a, b, x);
         if (n > 0) {
-            LOGGER.warn(format("%s(%.2f,%.2f;%g) unstable (++) recursion n=%d", KUMMER, a, b, x, n));
+            LOGGER.warn(format(Locale.US, "%s(%.2f,%.2f;%g) unstable (++) recursion n=%d", KUMMER, a, b, x, n));
             yo = kummer(a - 1, b - 1, x);
             // for positive n (++) recursion
             for (int k = 1; k <= n; k++) {
@@ -428,7 +430,7 @@ public class KummerFunction extends L4MFunction implements Differentiable, Integ
 
     @Override
     public String toString() {
-        return format("%s(%.2f,%.2f;x)", KUMMER, a, b);
+        return format(Locale.US, "%s(%.2f,%.2f;x)", KUMMER, a, b);
     }
 
     /*

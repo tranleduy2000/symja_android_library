@@ -63,7 +63,7 @@ public final class GaussLegendre extends L4MObject {
     static void calcCoefficients(final double[] x, final double[] w) {
         int i, j, n = x.length, m = (n + 1) / 2;
         double zn, zo, dP, p0, p1, p2;
-        // logger.info(format("Legendre degree: %d",n));
+        // logger.info(format(Locale.US, "Legendre degree: %d",n));
         for (i = 1; i <= m; i++) {
             // initial guess of the i-th root of polynom p_n
             zn = cos(PI * (i - 0.25) / (n + 0.5));
@@ -82,7 +82,7 @@ public final class GaussLegendre extends L4MObject {
                 // newtown iteration z_{j+1} = z_j - f(z_j)/f'(z_j)
                 zn = zo - p0 / dP;
             } while (!hasReachedAccuracy(zn, zo, PRECISSION));
-            // logger.info(format("z[%2d]=%.15f",i,zn));
+            // logger.info(format(Locale.US, "z[%2d]=%.15f",i,zn));
             x[i - 1] = -zn;
             x[n - i] = zn;
             w[i - 1] = 2.0 / ((1.0 - zn * zn) * dP * dP);

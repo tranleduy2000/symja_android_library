@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 import de.lab4inf.math.Integrable;
@@ -52,7 +54,7 @@ import static java.lang.String.format;
  * @since 26.05.2014
  */
 public class HypergeometricLimitFunction extends L4MFunction implements Differentiable, Integrable {
-    public static final String MSG0F1 = format("%sF%s", Strings.toLowerScript(0), Strings.toLowerScript(1));
+    public static final String MSG0F1 = format(Locale.US, "%sF%s", Strings.toLowerScript(0), Strings.toLowerScript(1));
     private static final String A_0 = "a=%.0f none positiv integer for " + MSG0F1;
     private static final double PRECISSION = 5.E-14;
     private static final int MAX_ITERATIONS = 500;
@@ -115,7 +117,7 @@ public class HypergeometricLimitFunction extends L4MFunction implements Differen
 
     @Override
     public String toString() {
-        return format("%s(%.2f; x)", MSG0F1, a);
+        return format(Locale.US, "%s(%.2f; x)", MSG0F1, a);
     }
 
     /*

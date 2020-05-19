@@ -500,7 +500,7 @@ public final class Randomizer extends L4MObject {
         // quick (cached) check that the Function is a probability density
         // function
         if (!pdfCheck(pdf, a, b)) {
-            final String msg = format("not a pdf %s", pdf.getClass().getName());
+            final String msg = format(Locale.US, "not a pdf %s", pdf.getClass().getName());
             final IllegalArgumentException error = new IllegalArgumentException(msg);
             getLogger().warn(msg);
             throw error;
@@ -533,7 +533,7 @@ public final class Randomizer extends L4MObject {
                     xRnd = rndBox(x - dx, x + dx);
                     y = pdf.f(xRnd);
                     if (y < 0 || y > 1) {
-                        getLogger().warn(format("wrong value pdf(%f)=%f", xRnd, y));
+                        getLogger().warn(format(Locale.US, "wrong value pdf(%f)=%f", xRnd, y));
                         isValid = false;
                         break;
                     }

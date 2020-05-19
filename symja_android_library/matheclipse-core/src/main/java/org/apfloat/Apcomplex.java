@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.Formattable;
 import java.util.Formatter;
+import java.util.Locale;
 
 import static java.util.FormattableFlags.LEFT_JUSTIFY;
 
@@ -840,11 +841,11 @@ public class Apcomplex
         {
             if (width == -1)
             {
-                formatter.format("(");
+                formatter.format(Locale.US, "(");
                 real().formatTo(formatter, flags, width, precision);
-                formatter.format(", ");
+                formatter.format(Locale.US, ", ");
                 imag().formatTo(formatter, flags, width, precision);
-                formatter.format(")");
+                formatter.format(Locale.US, ")");
             }
             else
             {
@@ -853,11 +854,11 @@ public class Apcomplex
                     Writer out = FormattingHelper.wrapAppendableWriter(formatter.out());
                     out = FormattingHelper.wrapPadWriter(out, (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY);
                     formatter = new Formatter(out, formatter.locale());
-                    formatter.format("(");
+                    formatter.format(Locale.US, "(");
                     real().formatTo(formatter, flags, -1, precision);
-                    formatter.format(", ");
+                    formatter.format(Locale.US, ", ");
                     imag().formatTo(formatter, flags, -1, precision);
-                    formatter.format(")");
+                    formatter.format(Locale.US, ")");
                     FormattingHelper.finishPad(out, width);
                 }
                 catch (IOException ioe)

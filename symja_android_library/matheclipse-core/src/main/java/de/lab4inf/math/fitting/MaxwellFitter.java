@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.fitting;
 
+import java.util.Locale;
+
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 import static java.lang.String.format;
@@ -73,7 +75,7 @@ public class MaxwellFitter extends GenericFitter {
                 dF /= a[0];
                 break;
             default:
-                throw new IllegalArgumentException(format("k:%d", k));
+                throw new IllegalArgumentException(format(Locale.US, "k:%d", k));
         }
         return dF;
     }
@@ -98,7 +100,7 @@ public class MaxwellFitter extends GenericFitter {
                 ddF = 0;
                 break;
             default:
-                throw new IllegalArgumentException(format("k:%d l:%d", k, l));
+                throw new IllegalArgumentException(format(Locale.US, "k:%d l:%d", k, l));
 
         }
         return ddF;

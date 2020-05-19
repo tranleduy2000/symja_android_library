@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.extrema;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.differentiation.Gradient;
 import de.lab4inf.math.differentiation.Hessian;
@@ -73,7 +75,7 @@ public class GradientOptimizer extends GenericOptimizer {
         Gradient g = getGradient(fct);
         Hessian h = getHessian(fct);
         if (DEBUG) {
-            logger.info(format("%3d %s r:%5.4f", iteration, display(x), norm(x)));
+            logger.info(format(Locale.US, "%3d %s r:%5.4f", iteration, display(x), norm(x)));
         }
         informIterationIsFinished(iteration, x);
         hessOld = identity(n);
@@ -97,7 +99,7 @@ public class GradientOptimizer extends GenericOptimizer {
             yn = aitkenAccelerate(x, a);
             if (DEBUG) {
                 delta = diff(yn, yo);
-                logger.info(format(" %3d %s r:%5.4f diff:%6.5f", iteration,
+                logger.info(format(Locale.US, " %3d %s r:%5.4f diff:%6.5f", iteration,
                         display(yn), norm(yn), delta));
             }
             informIterationIsFinished(iteration, yn);

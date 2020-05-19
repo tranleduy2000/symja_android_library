@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.fitting;
 
+import java.util.Locale;
+
 import static java.lang.Math.exp;
 import static java.lang.String.format;
 
@@ -78,7 +80,7 @@ public class SigmoidFitter extends GenericFitter {
                 dF = -2 * (x - b) / (c * c) * f * (1 - f);
                 break;
             default:
-                throw new IllegalArgumentException(format("k:%d", k));
+                throw new IllegalArgumentException(format(Locale.US, "k:%d", k));
         }
         return dF;
     }
@@ -114,7 +116,7 @@ public class SigmoidFitter extends GenericFitter {
                 }
                 break;
             default:
-                throw new IllegalArgumentException(format("k:%d l:%d", k, l));
+                throw new IllegalArgumentException(format(Locale.US, "k:%d l:%d", k, l));
 
         }
         return ddF;

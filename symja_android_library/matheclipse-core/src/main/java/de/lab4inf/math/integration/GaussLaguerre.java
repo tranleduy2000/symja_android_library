@@ -22,6 +22,7 @@
 package de.lab4inf.math.integration;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MObject;
 
@@ -78,7 +79,7 @@ public final class GaussLaguerre extends L4MObject {
                                  final double[] w) {
         int i, j, n = x.length;
         double ai, zn = 0, zo, dP, p0, p1, p2;
-        getLogger().info(format("Laguerre degree: %d v=%.3g", n, v));
+        getLogger().info(format(Locale.US, "Laguerre degree: %d v=%.3g", n, v));
         for (i = 1; i <= n; i++) {
             // initial guess of the i-th root of polynom p_n
             if (i == 1) {
@@ -105,7 +106,7 @@ public final class GaussLaguerre extends L4MObject {
                 // newtown iteration z_{j+1} = z_j - f(z_j)/f'(z_j)
                 zn = zo - p0 / dP;
             } while (!hasReachedAccuracy(zn, zo, PRECISSION));
-            getLogger().info(format("z[%2d]=%.15f", i, zn));
+            getLogger().info(format(Locale.US, "z[%2d]=%.15f", i, zn));
             x[i - 1] = zn;
             w[i - 1] = -exp(lngamma(v + n) - lngamma(n)) / (n * p1 * dP);
         }

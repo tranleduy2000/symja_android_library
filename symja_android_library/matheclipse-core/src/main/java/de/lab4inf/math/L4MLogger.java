@@ -123,9 +123,9 @@ public class L4MLogger extends Logger {
             }
         } else {
             String msg;
-            msg = format("allready registered %s by %s", loggerName, aLogger);
+            msg = format(Locale.US, "allready registered %s by %s", loggerName, aLogger);
             aLogger.warning(msg);
-            msg = format("could not register me: %s", this);
+            msg = format(Locale.US, "could not register me: %s", this);
             aLogger.warning(msg);
         }
         setLevel(Level.WARNING);

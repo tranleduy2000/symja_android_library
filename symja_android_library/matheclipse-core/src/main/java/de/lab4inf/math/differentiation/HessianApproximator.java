@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.differentiation;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
 
@@ -176,7 +178,7 @@ public class HessianApproximator extends L4MObject implements Hessian {
      */
     private void checkNaN(final int i, final int j, final double x) {
         if (Double.isNaN(x)) {
-            String msg = format("NaN Hess[%d][%d]", i, j);
+            String msg = format(Locale.US, "NaN Hess[%d][%d]", i, j);
             throw new IllegalArgumentException(msg);
         }
     }

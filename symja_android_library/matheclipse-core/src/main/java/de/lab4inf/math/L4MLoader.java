@@ -23,6 +23,7 @@ package de.lab4inf.math;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -74,7 +75,7 @@ public final class L4MLoader<T> extends L4MObject {
         if (null == sl) {
             sl = new L4MLoader<T>(clazz);
             LOADERS.put(clazz, sl);
-            getLogger().info(format("created %s", sl));
+            getLogger().info(format(Locale.US, "created %s", sl));
         }
         return sl;
     }
@@ -117,7 +118,7 @@ public final class L4MLoader<T> extends L4MObject {
                 getLogger().info(msg);
                 throw new IllegalArgumentException(msg);
             }
-            msg = format("%s implements %s", aService.getClass().getSimpleName(), clazz.getSimpleName());
+            msg = format(Locale.US, "%s implements %s", aService.getClass().getSimpleName(), clazz.getSimpleName());
             getLogger().info(msg);
         }
         return aService;
@@ -130,7 +131,7 @@ public final class L4MLoader<T> extends L4MObject {
      */
     @Override
     public String toString() {
-        return format("%s-%s", getClass().getSimpleName(), type.getSimpleName());
+        return format(Locale.US, "%s-%s", getClass().getSimpleName(), type.getSimpleName());
     }
 
     /*

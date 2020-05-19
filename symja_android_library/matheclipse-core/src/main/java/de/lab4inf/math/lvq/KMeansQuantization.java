@@ -129,7 +129,7 @@ public abstract class KMeansQuantization<V> extends VectorQuantization<V> {
         double cbDistance;
         List<V> newCodeBook = new ArrayList<V>(codeBookGuess);
         do {
-            // logger.info(format("begin iteration:%d ",ite));
+            // logger.info(format(Locale.US, "begin iteration:%d ",ite));
             codeBook = newCodeBook;
             codeMap = calculateCodeMap(set);
             // calculate a new optimized code book via center of gravity
@@ -141,14 +141,14 @@ public abstract class KMeansQuantization<V> extends VectorQuantization<V> {
                     V center = calculateCenter(sphere);
                     newCodeBook.add(center);
                     orphanedList.remove(cv);
-                    // logger.info(format("new cv[%d]:%s ",i,asString(center)));
+                    // logger.info(format(Locale.US, "new cv[%d]:%s ",i,asString(center)));
                 } else {
-                    // logger.info(format("orphaned cv[%d]:%s ",i,
+                    // logger.info(format(Locale.US, "orphaned cv[%d]:%s ",i,
                     // asString(cv)));
                     if (orphanedList.contains(cv)) {
                         orphanedList.remove(cv);
                         cv = createRndCodeVector();
-                        // logger.info(format("created rnd cv[%d]:%s ",i,
+                        // logger.info(format(Locale.US, "created rnd cv[%d]:%s ",i,
                         // asString(cv)));
                     }
                     orphanedList.add(cv);
@@ -156,7 +156,7 @@ public abstract class KMeansQuantization<V> extends VectorQuantization<V> {
                 }
             }
             cbDistance = codeBookDistance(newCodeBook, codeBook);
-            // logger.info(format("distance: %.3f orphaned:%b",
+            // logger.info(format(Locale.US, "distance: %.3f orphaned:%b",
             // cbDistance, orphanedList.size()>0));
             iterationFinished(ite, newCodeBook);
             if (orphanedList.size() > 0) {

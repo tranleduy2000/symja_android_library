@@ -21,6 +21,7 @@
 package de.lab4inf.math.lapack;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import de.lab4inf.math.BinaryOperator;
 import de.lab4inf.math.Complex;
@@ -305,7 +306,7 @@ public final class LinearAlgebra extends L4MObject {
      */
     public static void dimensionCheck(final int n) {
         if (n <= 0) {
-            final String msg = format("dimension %d is not positive", n);
+            final String msg = format(Locale.US, "dimension %d is not positive", n);
             getLogger().warn(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -3383,7 +3384,7 @@ public final class LinearAlgebra extends L4MObject {
         if (abs(c[0]) > 1)
             nbk /=  ((double)n) *  ((double)n) * abs(c[0]);
         if (nbk > Accuracy.FEPS) {
-            String msg = format("characteristic polynomial p%s numerical instable %.3g", Strings.toLowerScript(n), nbk);
+            String msg = format(Locale.US, "characteristic polynomial p%s numerical instable %.3g", Strings.toLowerScript(n), nbk);
             getLogger().error(msg);
             // throw new IllegalStateException(msg);
         }

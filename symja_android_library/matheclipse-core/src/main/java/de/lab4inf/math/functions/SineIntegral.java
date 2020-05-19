@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 import de.lab4inf.math.util.ChebyshevExpansion;
@@ -80,7 +82,7 @@ public class SineIntegral extends AbstractSiCiIntegrals implements Differentiabl
             c1 += A[i];
             c2 += abs(A[i]);
         }
-        getLogger().info(format("Sine integral check sum A[k]=%.15f; sum |A[k]|=%.15f", c1, c2));
+        getLogger().info(format(Locale.US, "Sine integral check sum A[k]=%.15f; sum |A[k]|=%.15f", c1, c2));
     }
 
     /**
@@ -122,7 +124,7 @@ public class SineIntegral extends AbstractSiCiIntegrals implements Differentiabl
         if (x <= n) {
             return FACULTY[x];
         }
-        getLogger().info(format("%d! not cached", x));
+        getLogger().info(format(Locale.US, "%d! not cached", x));
         f = FACULTY[n];
         for (int i = n + 1; i <= x; i++) {
             f *= i;

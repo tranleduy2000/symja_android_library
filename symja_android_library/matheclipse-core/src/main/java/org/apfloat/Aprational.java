@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.lang.ref.SoftReference;
 import java.math.BigInteger;
 import java.util.Formatter;
+import java.util.Locale;
 
 import static java.util.FormattableFlags.LEFT_JUSTIFY;
 import static org.apfloat.spi.RadixConstants.RADIX_FACTORS;
@@ -712,7 +713,7 @@ public class Aprational
             if (width == -1)
             {
                 numerator().formatTo(formatter, flags, width, precision);
-                formatter.format("/");
+                formatter.format(Locale.US, "/");
                 denominator().formatTo(formatter, flags, width, precision);
             }
             else
@@ -723,7 +724,7 @@ public class Aprational
                     out = FormattingHelper.wrapPadWriter(out, (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY);
                     formatter = new Formatter(out, formatter.locale());
                     numerator().formatTo(formatter, flags, -1, precision);
-                    formatter.format("/");
+                    formatter.format(Locale.US, "/");
                     denominator().formatTo(formatter, flags, -1, precision);
                     FormattingHelper.finishPad(out, width);
                 }

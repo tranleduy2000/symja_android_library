@@ -21,6 +21,7 @@
 package de.lab4inf.math.blas;
 
 import java.lang.reflect.Array;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -194,7 +195,7 @@ public abstract class BasicBlas extends de.lab4inf.math.L4MObject {
 
         protected Parallizer(final String name) {
             // super(BLAS_THREAD_GROUP,name);
-            super(format("%s-%s", BLAS, name));
+            super(format(Locale.US, "%s-%s", BLAS, name));
             LOGGER.info("created " + this);
         }
 

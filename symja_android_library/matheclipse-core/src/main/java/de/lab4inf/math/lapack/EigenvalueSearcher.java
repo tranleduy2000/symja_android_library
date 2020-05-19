@@ -22,6 +22,7 @@
 package de.lab4inf.math.lapack;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MLoader;
 import de.lab4inf.math.L4MObject;
@@ -70,9 +71,9 @@ public final class EigenvalueSearcher extends L4MObject {
         int i;
         final StringBuffer sb = new StringBuffer();
         for (i = 0; i < v.length - 1; i++) {
-            sb.append(format(" %.3f,", v[i]));
+            sb.append(format(Locale.US, " %.3f,", v[i]));
         }
-        sb.append(format(" %.3f", v[i]));
+        sb.append(format(Locale.US, " %.3f", v[i]));
         return sb.toString();
     }
 
@@ -132,8 +133,8 @@ public final class EigenvalueSearcher extends L4MObject {
             evMax = round(evMax, eps);
         }
         if (abs(evMin - evMax) > RELEPS * abs(evMax)) {
-            getLogger().info(format("EV min:%f max:%f", evMin, evMax));
-            getLogger().info(format("EVs %s", Arrays.toString(evs)));
+            getLogger().info(format(Locale.US, "EV min:%f max:%f", evMin, evMax));
+            getLogger().info(format(Locale.US, "EVs %s", Arrays.toString(evs)));
         }
         ek = round(evMax, eps);
         return ek;

@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.integration;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
 import de.lab4inf.math.Letters;
@@ -454,18 +456,18 @@ public final class Integrator extends L4MObject implements de.lab4inf.math.Integ
         double so, sn, sl, sr;
         // setThrowing(false);
         if (abs(b - a) < Accuracy.FEPS) {
-            getLogger().warn(format("to small \u0394x: %.2g", abs(b - a)));
+            getLogger().warn(format(Locale.US, "to small \u0394x: %.2g", abs(b - a)));
             return 0;
         }
         if (eps < epsMin) {
-            throw new ArithmeticException(format("to small \u03B5=%.2g", eps));
+            throw new ArithmeticException(format(Locale.US, "to small \u03B5=%.2g", eps));
         }
         so = sumWGL(a, b, n, fct);
         sl = sumWGL(a, m, n, fct);
         sr = sumWGL(m, b, n, fct);
         sn = sl + sr;
         if (relativeDifference(sn, so) > e) {
-            //getLogger().info(format("recursive: a=%.2g b=%.2g", a, b));
+            //getLogger().info(format(Locale.US, "recursive: a=%.2g b=%.2g", a, b));
             // make a recursive call for left and right part
             double wl = abs(sl) / (abs(sl) + abs(sr));
             double wr = abs(sr) / (abs(sl) + abs(sr));

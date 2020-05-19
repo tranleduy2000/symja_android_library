@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.fitting;
 
+import java.util.Locale;
+
 import static java.lang.Math.exp;
 import static java.lang.String.format;
 
@@ -76,7 +78,7 @@ public class GaussianNoiseFitter extends GaussianFitter {
         a[4] = (y[0] - y[n - 1]) / (x[0] - x[n - 1]);
         a[5] = a[4] / 100;
         for (int i = 0; i < a.length; i++) {
-            getLogger().info(format("a[%d]=%f", i, a[i]));
+            getLogger().info(format(Locale.US, "a[%d]=%f", i, a[i]));
         }
     }
 
@@ -182,7 +184,7 @@ public class GaussianNoiseFitter extends GaussianFitter {
         double b = a[2], c = a[1], amp = a[0], z = (x - b) / c, ddF = 0;
         double c2 = c * c, z2 = z * z;
         // if (k<0 || k>5 || l<0 || l>5) {
-        // throw new IllegalArgumentException(format("(k,l)=(%d,%d)",k,l));
+        // throw new IllegalArgumentException(format(Locale.US, "(k,l)=(%d,%d)",k,l));
         // }
         if (k > 2 || l > 2) {
             return 0;

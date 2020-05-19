@@ -22,6 +22,7 @@ package de.lab4inf.math.lapack;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 
 import de.lab4inf.math.L4MObject;
 
@@ -118,9 +119,9 @@ public class JacobiEigenvalueDecomposition extends L4MObject implements EigenVal
             }
         } while (!convergence && ++ite < m);
         if (ite >= m) {
-            throw new IllegalStateException(format("no convergence after %d iterations", m));
+            throw new IllegalStateException(format(Locale.US, "no convergence after %d iterations", m));
         } else {
-            getLogger().info(format("needed %d iterations for %.2g accuracy", ite, eps));
+            getLogger().info(format(Locale.US, "needed %d iterations for %.2g accuracy", ite, eps));
         }
         v = LinearAlgebra.transpose(v);
         // sort the eigenvalues for absolute magnitude, also swap the eigenvectors
@@ -159,7 +160,7 @@ public class JacobiEigenvalueDecomposition extends L4MObject implements EigenVal
             tan = abs(tau) + sqrt(1.0 + tau * tau);
             tan = 1 / tan;
         } else {
-            // getLogger().error(format("tau too big %f", tau));
+            // getLogger().error(format(Locale.US, "tau too big %f", tau));
             tan = 1 / abs(2 * tau);
         }
         if (tau < 0)

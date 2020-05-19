@@ -104,7 +104,7 @@ public final class Accuracy extends L4MObject {
         }
         QEPS = qeps.multiply(BigDecimal.TEN, mc);
         // if (DEBUG)
-        getLogger().info(String.format("feps:%8.2E  deps:%8.3G", FEPS, DEPS));
+        getLogger().info(String.format(Locale.US, "feps:%8.2E  deps:%8.3G", FEPS, DEPS));
     }
 
     /**

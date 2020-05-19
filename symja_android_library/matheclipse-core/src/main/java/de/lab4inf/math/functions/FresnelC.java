@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.util.ChebyshevExpansion;
 
 import static java.lang.Math.abs;
@@ -62,7 +64,7 @@ public class FresnelC extends AbstractFresnelIntegrals {
             c1 += A[i];
             c2 += abs(A[i]);
         }
-        getLogger().info(format("Fresnel Cosine check sum A[k]=%.15f;  sum |A[k]|=%.15f", c1, c2));
+        getLogger().info(format(Locale.US, "Fresnel Cosine check sum A[k]=%.15f;  sum |A[k]|=%.15f", c1, c2));
     }
 
     /**

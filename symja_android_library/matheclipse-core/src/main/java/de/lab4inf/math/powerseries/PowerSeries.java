@@ -22,6 +22,7 @@
 package de.lab4inf.math.powerseries;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Field;
@@ -412,7 +413,7 @@ public class PowerSeries extends L4MFunction implements Differentiable, Integrab
             if (i == 1)
                 sb.append("*x");
             else if (i > 1)
-                sb.append(format("*x**%d", i));
+                sb.append(format(Locale.US, "*x**%d", i));
 
             if (i < a.length - 1) {
                 if (a[i + 1] >= 0)

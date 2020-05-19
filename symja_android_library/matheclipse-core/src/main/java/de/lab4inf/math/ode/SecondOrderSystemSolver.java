@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.ode;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 
 import static de.lab4inf.math.lapack.LinearAlgebra.add;
@@ -144,7 +146,7 @@ public class SecondOrderSystemSolver extends AbstractOdeSolver implements Second
             }
         } while (diff(ya, yb) > eps && h > H_MIN);
         if (h < H_MIN) {
-            String msg = format("RKN no convergence h=%g", h);
+            String msg = format(Locale.US, "RKN no convergence h=%g", h);
             logger.warn(msg);
             throw new ArithmeticException(msg);
         }
@@ -159,7 +161,7 @@ public class SecondOrderSystemSolver extends AbstractOdeSolver implements Second
                           final double x1, final Function[] f, final double eps) {
         double e = eps / 10;
         if (eps < EPS_MIN) {
-            String msg = format("epsilon:%.2g less than esp_min=%.2g", eps, EPS_MIN);
+            String msg = format(Locale.US, "epsilon:%.2g less than esp_min=%.2g", eps, EPS_MIN);
             logger.warn(msg);
             e = max(e, EPS_MIN);
         }

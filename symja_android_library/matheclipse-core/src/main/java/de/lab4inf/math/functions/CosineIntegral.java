@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Constants;
 import de.lab4inf.math.util.ChebyshevExpansion;
 
@@ -71,7 +73,7 @@ public class CosineIntegral extends AbstractSiCiIntegrals {
             c1 += A[i];
             c2 += abs(A[i]);
         }
-        getLogger().info(format("Cosine integral check sum A[k]=%.15f; sum |A[k]|=%.15f", c1, c2));
+        getLogger().info(format(Locale.US, "Cosine integral check sum A[k]=%.15f; sum |A[k]|=%.15f", c1, c2));
     }
 
     /**

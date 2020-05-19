@@ -21,6 +21,7 @@
 package de.lab4inf.math.fitting;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
@@ -153,7 +154,7 @@ public class GaussianFitter extends GenericFitter {
         // introduce a penalty term if a[0]<= 0 or a[1] <=0
         double p = exp(-getPenaltyValue() * (a[0] + a[1]));
         if (isUsePenalty() && p > 1 && getLogger().isWarnEnabled()) {
-            final String msg = format("a=%.2e s=%.2f g=%.2f penalty:%.2g", a[0], a[1], g, p);
+            final String msg = format(Locale.US, "a=%.2e s=%.2f g=%.2f penalty:%.2g", a[0], a[1], g, p);
             getLogger().warn(format(msg));
         } else {
             p = 0;

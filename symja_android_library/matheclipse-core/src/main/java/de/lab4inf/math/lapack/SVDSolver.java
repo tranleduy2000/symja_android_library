@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.lapack;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Numeric;
 import de.lab4inf.math.util.Accuracy;
 
@@ -386,11 +388,11 @@ public final class SVDSolver extends LASolver {
         b = LinearAlgebra.sub(b, a);
         final double nr = norm(b);
         if (nr > FEPS) {
-            final String msg = format("wrong pseudo inverse norm: %.2g", nr);
+            final String msg = format(Locale.US, "wrong pseudo inverse norm: %.2g", nr);
             getLogger().error(msg);
             throw new SingularException(msg);
         }
-        getLogger().info(format("pseudo inverse check accuracy: %.3g", nr));
+        getLogger().info(format(Locale.US, "pseudo inverse check accuracy: %.3g", nr));
     }
 
     /**

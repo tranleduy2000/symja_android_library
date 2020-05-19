@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.extrema;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.lapack.LinearAlgebra;
 
@@ -147,7 +149,7 @@ public class PowellOptimizer extends GenericOptimizer {
             if (x[i] < a[i] || b[i] < x[i]) {
                 ok = false;
                 if (logger.isWarnEnabled()) {
-                    logger.warn(format("leaving interval A[%s] X[%s] B[%s]", display(a), display(x), display(b)));
+                    logger.warn(format(Locale.US, "leaving interval A[%s] X[%s] B[%s]", display(a), display(x), display(b)));
                 }
                 break;
             }
@@ -210,12 +212,12 @@ public class PowellOptimizer extends GenericOptimizer {
             }
             informIterationIsFinished(iter, xn);
             // if (logger.isInfoEnabled()) {
-            // logger.info(format("%d: %s", iter, display(xn)));
+            // logger.info(format(Locale.US, "%d: %s", iter, display(xn)));
             // }
         } while (!hasReachedAccuracy(xn, xo, getPrecision()) && ++iter < getMaxIterations());
         informOptimizationIsFinished(iter, xn);
         if (iter == getMaxIterations()) {
-            logger.warn(format("max iterations exceeded %s ", display(xn)));
+            logger.warn(format(Locale.US, "max iterations exceeded %s ", display(xn)));
             return false;
         }
         return checkInterval(a, b, xn);

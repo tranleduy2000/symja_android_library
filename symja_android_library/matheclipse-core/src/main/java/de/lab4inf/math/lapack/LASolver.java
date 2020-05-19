@@ -21,6 +21,7 @@
 package de.lab4inf.math.lapack;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import de.lab4inf.math.Complex;
 import de.lab4inf.math.L4MObject;
@@ -701,7 +702,7 @@ abstract class LASolver extends L4MObject implements Solver {
         final double dmax = maxabs(d);
         final double tol = n * dmax * DTINY;
         for (int i = 0; i < n; i++) {
-            // msg = format("diag[%d]=%.2e tol=%.2e", i, d[i],tol);
+            // msg = format(Locale.US, "diag[%d]=%.2e tol=%.2e", i, d[i],tol);
             // getLogger().warn(msg);
             if (Double.isNaN(d[i])) {
                 msg = format(DIAGONAL_NOT_A_NUMBER, i, i);
@@ -711,7 +712,7 @@ abstract class LASolver extends L4MObject implements Solver {
             }
             if (abs(d[i]) < tol) {
                 // msg = format(SINGULAR, i, i, d[i]);
-                msg = format("singular d[%d] tol=%.2e %s ", i, tol, Arrays.toString(d));
+                msg = format(Locale.US, "singular d[%d] tol=%.2e %s ", i, tol, Arrays.toString(d));
                 if (shouldThrowSingular) {
                     final SingularException error = new SingularException(msg);
                     throw error;

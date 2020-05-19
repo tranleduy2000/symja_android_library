@@ -81,7 +81,7 @@ public abstract class L4MObject {
      * @return version
      */
     public static String getVersion() {
-        return format("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_LABEL);
+        return format(Locale.US, "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_LABEL);
     }
 
     /**
@@ -304,7 +304,7 @@ public abstract class L4MObject {
      */
     @Override
     public String toString() {
-        return format("%s-%s", getClass().getSimpleName(), getVersion());
+        return format(Locale.US, "%s-%s", getClass().getSimpleName(), getVersion());
     }
 
     /*

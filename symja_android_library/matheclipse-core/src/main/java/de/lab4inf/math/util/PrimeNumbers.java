@@ -23,6 +23,7 @@ package de.lab4inf.math.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
@@ -366,7 +367,7 @@ public final class PrimeNumbers extends L4MObject implements PrimeSieve {
         } else {
             f = factors(x);
         }
-        final StringBuffer b = new StringBuffer(format("%d=%d", x, f[0]));
+        final StringBuffer b = new StringBuffer(format(Locale.US, "%d=%d", x, f[0]));
         for (int i = 1; i < f.length; i++) {
             b.append("*");
             b.append(f[i]);
@@ -506,7 +507,7 @@ public final class PrimeNumbers extends L4MObject implements PrimeSieve {
         for (i = 0; prime && p <= mp && i < lPrimes; prime = (x % p) != 0, p = LPRIMES[i], i++)
             ;
         if (prime && mp > maxLPrime) {
-            logger.warn(format("time consuming prime check for n=" + x));
+            logger.warn(format(Locale.US, "time consuming prime check for n=" + x));
             // the brute force, to be changed to better Atkin sieve?
             for (q = p + 2; prime && q < mp; prime = (x % q != 0), q += 2)
                 ;
@@ -660,7 +661,7 @@ public final class PrimeNumbers extends L4MObject implements PrimeSieve {
             intializeLong();
         if (x > getMaxPrimeCached()) {
             final double y = li(x);
-            final String msg = format("approx %s(%.1g)=%g", PI, x, y);
+            final String msg = format(Locale.US, "approx %s(%.1g)=%g", PI, x, y);
             logger.info(msg);
             return y;
         } else if (x < 2) {

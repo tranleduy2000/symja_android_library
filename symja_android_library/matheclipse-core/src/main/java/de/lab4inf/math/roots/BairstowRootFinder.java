@@ -23,6 +23,7 @@ package de.lab4inf.math.roots;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Locale;
 
 import de.lab4inf.math.Complex;
 import de.lab4inf.math.L4MObject;
@@ -251,7 +252,7 @@ public class BairstowRootFinder extends L4MObject {
             dv = (-g * v * c + (g * u - h) * d) / dis;
              /*
              if(abs(dis)<eps*1E3) {
-                 String msg = format("discriminant: %cu=%.1e %cv=%.1e %c=%.1e",
+                 String msg = format(Locale.US, "discriminant: %cu=%.1e %cv=%.1e %c=%.1e",
                          Letters.UPPER_DELTA,du,Letters.UPPER_DELTA,dv,Letters.UPPER_DELTA,dis);
                  getLogger().warn(msg);
              }
@@ -262,7 +263,7 @@ public class BairstowRootFinder extends L4MObject {
             du = max(abs(c), abs(d));   // (c,d) should converge to zero
         } while (++i < MAX_ITERATIONS && (dv > eps));
         if (i >= MAX_ITERATIONS) {
-            String msg = format("poor convergence: %cu=%.1e %cv=%.1e", Letters.UPPER_DELTA, du, Letters.UPPER_DELTA, dv);
+            String msg = format(Locale.US, "poor convergence: %cu=%.1e %cv=%.1e", Letters.UPPER_DELTA, du, Letters.UPPER_DELTA, dv);
             getLogger().warning(msg);
             //throw new IllegalStateException("no convergence");
         }

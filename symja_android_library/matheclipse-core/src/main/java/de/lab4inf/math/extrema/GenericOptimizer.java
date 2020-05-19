@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
@@ -234,7 +235,7 @@ public abstract class GenericOptimizer extends L4MObject implements Optimizer {
      * for an asynchron run.
      */
     protected final boolean startMinimize(final Function fct, final double... guess) {
-        Thread t = new WorkerThread(true, format("Minimizer-%d",
+        Thread t = new WorkerThread(true, format(Locale.US, "Minimizer-%d",
                 incrementThreadCounter()), fct, guess);
         t.start();
         return false;
@@ -249,7 +250,7 @@ public abstract class GenericOptimizer extends L4MObject implements Optimizer {
      * for an asynchron run
      */
     protected final boolean startMaximize(final Function fct, final double... guess) {
-        Thread t = new WorkerThread(false, format("Maximizer-%d",
+        Thread t = new WorkerThread(false, format(Locale.US, "Maximizer-%d",
                 incrementThreadCounter()), fct, guess);
         t.start();
         return false;
@@ -305,7 +306,7 @@ public abstract class GenericOptimizer extends L4MObject implements Optimizer {
     protected String display(final double... x) {
         StringBuffer s = new StringBuffer();
         for (int i = 0; i < x.length; i++) {
-            s.append(format("x[%d]:%+7.4f ", i, x[i]));
+            s.append(format(Locale.US, "x[%d]:%+7.4f ", i, x[i]));
         }
         return s.toString();
     }

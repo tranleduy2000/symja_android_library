@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.functions;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Differentiable;
 import de.lab4inf.math.Function;
 import de.lab4inf.math.Integrable;
@@ -66,7 +68,7 @@ import static java.lang.String.format;
  * @since 23.05.2014
  */
 public class HypergeometricGaussSeries extends L4MFunction implements Differentiable, Integrable {
-    public static final String GAUSS = format("%sF%s", Strings.toLowerScript(2), Strings.toLowerScript(1));
+    public static final String GAUSS = format(Locale.US, "%sF%s", Strings.toLowerScript(2), Strings.toLowerScript(1));
     private static final String C_0 = "c=%.0f none positiv integer for " + GAUSS;
     private static final double PRECISSION = 5.E-14;
     private static final int MAX_ITERATIONS = 50000;
@@ -148,7 +150,7 @@ public class HypergeometricGaussSeries extends L4MFunction implements Differenti
 
     @Override
     public String toString() {
-        return format("%s(%.2f,%.2f,%.2f; x)", GAUSS, a, b, c);
+        return format(Locale.US, "%s(%.2f,%.2f,%.2f; x)", GAUSS, a, b, c);
     }
 
     /*

@@ -24,6 +24,7 @@ package de.lab4inf.math.lvq;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import de.lab4inf.math.util.Accuracy;
 
@@ -127,7 +128,7 @@ public abstract class FuzzyCMeansQuantization<V> extends VectorQuantization<V> {
                 sum += m[i][j];
             }
             if (abs(sum - 1) > Accuracy.FEPS) {
-                msg = format("membership[%d] not unit: sum=%f", j, sum);
+                msg = format(Locale.US, "membership[%d] not unit: sum=%f", j, sum);
                 logger.error(msg);
                 throw new ArithmeticException(msg);
             }
@@ -139,7 +140,7 @@ public abstract class FuzzyCMeansQuantization<V> extends VectorQuantization<V> {
                 sum += m[i][j];
             }
             if (sum <= 0) {
-                msg = format("cluster[%d] is empty: sum=%f", i, sum);
+                msg = format(Locale.US, "cluster[%d] is empty: sum=%f", i, sum);
                 logger.error(msg);
                 throw new ArithmeticException(msg);
             }
@@ -181,20 +182,20 @@ public abstract class FuzzyCMeansQuantization<V> extends VectorQuantization<V> {
                 ci = mult(1.0 / sum, ci);
             } else {
                 ci = createRndCodeVector();
-                logger.info(format("no center found use random %s",
+                logger.info(format(Locale.US, "no center found use random %s",
                         asString(ci)));
             }
             for (V cv : cb) {
                 if (distance(cv, ci) < Accuracy.FEPS) {
-                    logger.info(format("c[%d] not unique %s", i, asString(ci)));
+                    logger.info(format(Locale.US, "c[%d] not unique %s", i, asString(ci)));
                     ci = createRndCodeVector();
-                    logger.info(format("create rnd %s", asString(ci)));
+                    logger.info(format(Locale.US, "create rnd %s", asString(ci)));
                     break;
                 }
             }
             cb.add(ci);
             codeMap.put(ci, vs);
-            // logger.info(format("new cv[%d]:%s ", i, asString(ci)));
+            // logger.info(format(Locale.US, "new cv[%d]:%s ", i, asString(ci)));
         }
         return cb;
     }
@@ -249,7 +250,7 @@ public abstract class FuzzyCMeansQuantization<V> extends VectorQuantization<V> {
      */
     public void setFuzzyfier(final double fuzzyfier) {
         if (fuzzyfier <= 1) {
-            String msg = format("fuzzyfier<=1: %f", fuzzyfier);
+            String msg = format(Locale.US, "fuzzyfier<=1: %f", fuzzyfier);
             throw new IllegalArgumentException(msg);
         }
         this.f = fuzzyfier;

@@ -21,6 +21,8 @@
 
 package de.lab4inf.math.extrema;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
 
@@ -112,7 +114,7 @@ public final class GoldenSearch extends L4MObject {
         double f1, f2;
         int ite = 0;
         // if(debugFlag && getLogger().isInfoEnabled()) {
-        // getLogger().info(format("START: [%.5f - %.5f]",xa,xb));
+        // getLogger().info(format(Locale.US, "START: [%.5f - %.5f]",xa,xb));
         // }
         do {
             x1 = xa + A1 * (xb - xa);
@@ -135,12 +137,12 @@ public final class GoldenSearch extends L4MObject {
             x = (xa + xb) / 2;
             checkEnclosure(ma, mb, xa, xb);
             // if(debugFlag && getLogger().isInfoEnabled()) {
-            // getLogger().info(format("%2d: f(%.5f)=%f [%.5f - %.5f]", ite, x,
+            // getLogger().info(format(Locale.US, "%2d: f(%.5f)=%f [%.5f - %.5f]", ite, x,
             // fct.f(x),xa,xb));
             // }
         } while (!hasConverged(xa, xb, eps, ++ite, maxIterations));
         if (debugFlag && getLogger().isInfoEnabled()) {
-            getLogger().info(format("opt: f(%.5f)=%f", x, fct.f(x)));
+            getLogger().info(format(Locale.US, "opt: f(%.5f)=%f", x, fct.f(x)));
         }
         return x;
     }

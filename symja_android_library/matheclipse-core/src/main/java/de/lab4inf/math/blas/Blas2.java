@@ -58,7 +58,7 @@ public final class Blas2 extends BasicBlas {
             workers[i] = worker;
         }
         pool = new ParallizerPool<Parallizer2>(workers);
-        LOGGER.info(format("creating #%d parallizers", nCached));
+        LOGGER.info(format(Locale.US, "creating #%d parallizers", nCached));
     }
 
     /**
@@ -378,13 +378,13 @@ public final class Blas2 extends BasicBlas {
         private int b, e;
 
         protected Parallizer2() {
-            super(format("Parallizer-II: %3d", ++pId));
+            super(format(Locale.US, "Parallizer-II: %3d", ++pId));
         }
 
         synchronized void parallize(final CountDownLatch latch, final int start, final int end, final double sa,
                                     final double[][] ma, final double[] vx, final double sb, final double[] vy) {
             if (null != counter) {
-                final String msg = format("Parallizer %s still in use!", this);
+                final String msg = format(Locale.US, "Parallizer %s still in use!", this);
                 throw new IllegalStateException(msg);
             }
             alpha = sa;

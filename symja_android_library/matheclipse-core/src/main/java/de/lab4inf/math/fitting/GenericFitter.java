@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.fitting;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.L4MObject;
 import de.lab4inf.math.Solver;
@@ -107,7 +109,7 @@ public abstract class GenericFitter extends L4MObject implements DataFitter {
      */
     protected GenericFitter(final int n) {
         if (n <= 0) {
-            throw new IllegalArgumentException(format("paramter size %d illegal", n));
+            throw new IllegalArgumentException(format(Locale.US, "paramter size %d illegal", n));
         }
         this.numParams = n;
         this.a = new double[n];
@@ -746,15 +748,15 @@ public abstract class GenericFitter extends L4MObject implements DataFitter {
     protected void printFit(final int n, final double[] x, final double[] y, final double delta) {
         // dimensionCheck(x, y);
         final int p = numParameters();
-        final StringBuffer b = new StringBuffer(format("Ite:%2d ", n));
+        final StringBuffer b = new StringBuffer(format(Locale.US, "Ite:%2d ", n));
         for (int i = 0; i < p; i++) {
-            b.append(format("a%d=", i));
-            b.append(format("%-8.2g ", a[i]));
+            b.append(format(Locale.US, "a%d=", i));
+            b.append(format(Locale.US, "%-8.2g ", a[i]));
         }
-        b.append(format(" chi2: %8.2g", chi2(x, y)));
-        b.append(format(" delta: %8.2g", delta));
+        b.append(format(Locale.US, " chi2: %8.2g", chi2(x, y)));
+        b.append(format(Locale.US, " delta: %8.2g", delta));
         if (isUsePenalty()) {
-            b.append(format(" penalty: %.0f", penaltyValue));
+            b.append(format(Locale.US, " penalty: %.0f", penaltyValue));
         }
         logger.info(b.toString());
     }
@@ -939,7 +941,7 @@ public abstract class GenericFitter extends L4MObject implements DataFitter {
                 }
             } while (chi1 > chi0 && ++m < MAX_MARQUARDTS);
             if (m >= MAX_MARQUARDTS) {
-                final String msg = format("fitt error at iteration %d", n);
+                final String msg = format(Locale.US, "fitt error at iteration %d", n);
                 final IllegalStateException error = new IllegalStateException(msg);
                 logger.error(msg, error);
                 throw error;

@@ -9,6 +9,8 @@
 
 package de.lab4inf.math.extrema;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.differentiation.Gradient;
 import de.lab4inf.math.differentiation.Hessian;
@@ -83,7 +85,7 @@ public class BroydenOptimizer extends GenericOptimizer {
         Aitken[] aitken = new Aitken[n];
         for (int i = 0; i < n; aitken[i] = new Aitken(), i++) ;
         if (debug) {
-            getLogger().info(format("%15s %3d %s r:%5.4f", th, iteration,
+            getLogger().info(format(Locale.US, "%15s %3d %s r:%5.4f", th, iteration,
                     display(p), norm(p)));
         }
         informIterationIsFinished(iteration, p);
@@ -124,7 +126,7 @@ public class BroydenOptimizer extends GenericOptimizer {
             yn = aitkenAccelerate(pp, aitken);
             if (debug) {
                 delta = diff(pp, p);
-                getLogger().info(format("%15s %3d %s r:%5.4f diff:%6.5f", th,
+                getLogger().info(format(Locale.US, "%15s %3d %s r:%5.4f diff:%6.5f", th,
                         iteration, display(yn), norm(yn), delta));
             }
             informIterationIsFinished(iteration, yn);
@@ -133,7 +135,7 @@ public class BroydenOptimizer extends GenericOptimizer {
         } while (!hasReachedAccuracy(yn, yo, getPrecision())
                 && ++iteration <= getMaxIterations());
         if (iteration > getMaxIterations()) {
-            getLogger().warn(format("no convergence, limit: %s", display(yn)));
+            getLogger().warn(format(Locale.US, "no convergence, limit: %s", display(yn)));
         }
         for (int i = 0; i < n; i++) {
             guess[i] = round(yn[i], getPrecision());

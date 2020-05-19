@@ -200,7 +200,7 @@ public final class CacheBuilderSpec {
     }
 
     private static String format(String format, Object... args) {
-        return String.format(Locale.ROOT, format, args);
+        return String.format(Locale.US, format, args);
     }
 
     /**

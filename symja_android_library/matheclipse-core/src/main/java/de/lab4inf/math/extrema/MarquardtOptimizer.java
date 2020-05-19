@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.extrema;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Function;
 import de.lab4inf.math.differentiation.Gradient;
 import de.lab4inf.math.differentiation.Hessian;
@@ -72,7 +74,7 @@ public class MarquardtOptimizer extends GenericOptimizer {
         id = identity(n);
         fo = fct.f(x);
         if (DEBUG) {
-            logger.info(format("%3d %s f:%.2g", iteration, display(x), fo));
+            logger.info(format(Locale.US, "%3d %s f:%.2g", iteration, display(x), fo));
         }
         do {
             xo = x;
@@ -107,7 +109,7 @@ public class MarquardtOptimizer extends GenericOptimizer {
             }
             fo = f;
             if (DEBUG) {
-                logger.info(format("%15s %3d %s f:%.2g lambda:%.5f", iteration,
+                logger.info(format(Locale.US, "%15s %3d %s f:%.2g lambda:%.5f", iteration,
                         display(x), f, lamda));
             }
             informIterationIsFinished(iteration, x);
