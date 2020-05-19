@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.lambda.DoubleUnaryOperator;
+import com.gx.common.math.DoubleMath;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
@@ -61,6 +62,8 @@ import org.matheclipse.core.reflection.system.rules.SincRules;
 import org.matheclipse.core.reflection.system.rules.SinhRules;
 import org.matheclipse.core.reflection.system.rules.TanRules;
 import org.matheclipse.core.reflection.system.rules.TanhRules;
+
+import java.math.RoundingMode;
 
 import static org.matheclipse.core.expression.F.ArcCot;
 import static org.matheclipse.core.expression.F.ArcCoth;
@@ -3225,11 +3228,28 @@ public class ExpTrigsFunctions {
 		try {
 			long l1 = b.toLong();
 			long l2 = arg.toLong();
-			double res = Math.log(l2) / Math.log(l1);
-			if (F.isNumIntValue(res)) {
-				int r = Double.valueOf(Math.round(res)).intValue();
-				if (arg.equals(b.pow(r))) {
-					return F.ZZ(r);
+			if (l1 > 0L && l2 > 0L) {
+				boolean inverse = false;
+				if (l1 > l2) {
+					long t = l2;
+					l2 = l1;
+					l1 = t;
+					inverse = true;
+				}
+				double numericResult = Math.log(l2) / Math.log(l1);
+				if (F.isNumIntValue(numericResult)) {
+					long symbolicResult = DoubleMath.roundToLong(numericResult, RoundingMode.HALF_UP);
+					if (inverse) {
+						if (b.equals(arg.pow(symbolicResult))) {
+							// cross checked result
+							return F.QQ(1L, symbolicResult);
+						}
+					} else {
+						if (arg.equals(b.pow(symbolicResult))) {
+							// cross checked result
+							return F.ZZ(symbolicResult);
+						}
+					}
 				}
 			}
 		} catch (ArithmeticException ae) {

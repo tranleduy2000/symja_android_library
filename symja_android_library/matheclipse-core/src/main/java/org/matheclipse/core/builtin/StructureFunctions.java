@@ -9,6 +9,7 @@ import com.duy.lambda.Predicate;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.LastCalculationsHistory;
 import org.matheclipse.core.eval.exception.ReturnException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
@@ -37,6 +38,7 @@ import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.IndexedLevel;
 import org.matheclipse.core.visit.ModuleReplaceAll;
 import org.matheclipse.core.visit.VisitorLevelSpecification;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +46,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
-public class Structure {
+public class StructureFunctions {
 	private final static Set<ISymbol> LOGIC_EQUATION_HEADS = Collections
 			.newSetFromMap(new IdentityHashMap<ISymbol, Boolean>(29));
 	private final static Set<ISymbol> PLUS_LOGIC_EQUATION_HEADS = Collections
@@ -640,8 +642,9 @@ public class Structure {
 							return IOFunctions.printMessage(F.Function, "fpct", F.List(symbolSlots, function), engine);
 						}
 						java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
-						final int moduleCounter = engine.incModuleCounter();
-						IExpr subst = arg2.accept(new ModuleReplaceAll(moduleVariables, engine, "$"+moduleCounter));
+						// final long moduleCounter = engine.incModuleCounter();
+						IExpr subst = arg2
+								.accept(new ModuleReplaceAll(moduleVariables, engine, engine.uniqueName("$")));
 						if (subst.isPresent()) {
 							arg2 = subst;
 						}
@@ -1026,7 +1029,7 @@ public class Structure {
 							return ((IAST) arg2).setAtCopy(index, F.unaryAST1(arg1, list.get(index)));
 					}
 				} catch (RuntimeException ae) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							ae.printStackTrace();
 						}
 					}
@@ -1515,10 +1518,10 @@ public class Structure {
 				// IPatternMap patternMap2 = pmEvaluator2.getPatternMap();
 
 				int[] priority1 = new int[] { PatternMap.DEFAULT_RULE_PRIORITY };
-				IPatternMap patternMap1 = IPatternMapImpl.determinePatterns(arg1, priority1);
+				IPatternMapImpl.determinePatterns(arg1, priority1);
 				// patternMap1.determinePatterns(arg1, priority1);
 				int[] priority2 = new int[] { PatternMap.DEFAULT_RULE_PRIORITY };
-				IPatternMap patternMap2 = IPatternMapImpl.determinePatterns(arg2, priority2);
+				IPatternMapImpl.determinePatterns(arg2, priority2);
 				// patternMap2.determinePatterns(arg2, priority2);
 				if (pmEvaluator1.isRuleWithoutPatterns()) {
 					if (pmEvaluator2.isRuleWithoutPatterns()) {
@@ -1548,6 +1551,15 @@ public class Structure {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			EvalEngine newEngine = new EvalEngine("", engine.getRecursionLimit(), engine.getIterationLimit(),
+					engine.getOutPrintStream(), engine.getErrorPrintStream(), engine.isRelaxedSyntax());
+
+			LastCalculationsHistory lch = engine.getOutList();
+			if (lch != null) {
+				newEngine.setOutListDisabled(false, lch.size());
+			}
+			engine.reset();
+			EvalEngine.set(newEngine);
 			return F.Null;
 		}
 		public int[] expectedArgSize() {
@@ -1618,10 +1630,10 @@ public class Structure {
 					}
 			}
 
-			try {
+				try {
 					final IExpr arg1 = ast.arg1();
-				IExpr arg2 = ast.arg2();
-				if (lastIndex == 3) {
+					IExpr arg2 = ast.arg2();
+					if (lastIndex == 3) {
 						final IASTAppendable result = F.ListAlloc(10);
 						com.duy.lambda.Function<IExpr, IExpr> sf = new com.duy.lambda.Function<IExpr, IExpr>() {
 							@Override
@@ -1632,41 +1644,36 @@ public class Structure {
 							}
 						};
 
-					VisitorLevelSpecification level = new VisitorLevelSpecification(sf, ast.get(lastIndex), heads,
-							engine);
+						VisitorLevelSpecification level = new VisitorLevelSpecification(sf, ast.get(lastIndex), heads,
+								engine);
 
-					arg2.accept(level);
+						arg2.accept(level);
 						result.forEach(result.size(), new Consumer<IExpr>() {
 							@Override
 							public void accept(IExpr x) {
 								engine.evaluate(x);
 							}
 						});
-					// for (int i = 1; i < result.size(); i++) {
-					// engine.evaluate(result.get(i));
-					// }
 
-				} else {
-					if (arg2.isAST()) {
-							engine.evaluate(((IAST) arg2).map(new com.duy.lambda.Function<IExpr, IExpr>() {
-								@Override
-								public IExpr apply(IExpr x) {
-									return F.unaryAST1(arg1, x);
-								}
-							}, heads ? 0 : 1));
 					} else {
-						engine.evaluate(arg2);
+						if (arg2.isAST()) {
+							((IAST) arg2).forEach(new Consumer<IExpr>() {
+								@Override
+								public void accept(IExpr x) {
+									engine.evaluate(F.unaryAST1(arg1, x));
+								}
+							}, heads ? 0 : 1);
+						}
 					}
-				}
-				return F.Null;
+					return F.Null;
 				} catch (final ValidateException ve) {
 					// see level specification
 					return engine.printMessage(ve.getMessage(ast.topHead()));
-			} catch (final ReturnException e) {
-				return e.getValue();
-				// don't catch Throw[] here !
+				} catch (final ReturnException e) {
+					return e.getValue();
+					// don't catch Throw[] here !
+				}
 			}
-		}
 			return F.NIL;
 		}
 
@@ -1715,6 +1722,10 @@ public class Structure {
 				}
 					if (arg1.isAssociation()) {
 						return ((IAssociation) arg1).sort();
+					}
+				} else {
+					if (arg1.isAssociation()) {
+						return ((IAssociation) arg1).sort(new Predicates.IsBinaryFalse(ast.arg2()));
 					}
 				}
 				final IASTMutable shallowCopy = ((IAST) ast.arg1()).copy();
@@ -1790,6 +1801,15 @@ public class Structure {
 				}
 			}
 			if (ast.isAST2()) {
+				try {
+//					if (ast.arg1().isDataSet()) {
+//						List<String> listOfStrings = Convert.toStringList(ast.arg2());
+//						if (listOfStrings != null) {
+//							ASTDataset dataset = (ASTDataset) ast.arg1();
+//							return dataset.groupBy(listOfStrings);
+//						}
+//						return F.NIL;
+//					}
 				if (ast.arg1().isAST()) {
 					IAST arg1 = (IAST) ast.arg1();
 					IExpr arg2 = ast.arg2();
@@ -1813,6 +1833,9 @@ public class Structure {
 						result.append(arg1.get(sortedIndex));
 					}
 					return result;
+				}
+				} catch (RuntimeException rex) {
+					return engine.printMessage(ast.topHead(), rex);
 				}
 			}
 
@@ -2157,7 +2180,7 @@ public class Structure {
 		Initializer.init();
 	}
 
-	private Structure() {
+	private StructureFunctions() {
 
 	}
 }

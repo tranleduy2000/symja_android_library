@@ -1,5 +1,6 @@
 package org.matheclipse.core.form.output;
 
+import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -17,8 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Converts an internal <code>IExpr</code> into a user readable string.
- * 
+ * <p>Transpile an internal <code>IExpr</code> into a JavaScript string. It can especially generate JavaScript output for
+ * usage with the JavaScript libraries:
+ * </p>
+ * <ul>
+ * <li><a href="https://github.com/paulmasson/mathcell">github.com/paulmasson/math</a></li>
+ * <li><a href="https://github.com/paulmasson/mathcell">github.com/paulmasson/mathcell</a></li>
+ * </ul>
  */
 public class JavaScriptFormFactory extends DoubleFormFactory {
 	/**
@@ -106,6 +112,14 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		FUNCTIONS_STR_MATHCELL.put(F.FresnelC, "fresnelC");
 		FUNCTIONS_STR_MATHCELL.put(F.FresnelS, "fresnelS");
 
+		FUNCTIONS_STR_MATHCELL.put(F.CosIntegral, "cosIntegral");
+		FUNCTIONS_STR_MATHCELL.put(F.CoshIntegral, "coshIntegral");
+		FUNCTIONS_STR_MATHCELL.put(F.LogIntegral, "logIntegral");
+		FUNCTIONS_STR_MATHCELL.put(F.SinIntegral, "sinIntegral");
+		FUNCTIONS_STR_MATHCELL.put(F.SinhIntegral, "sinhIntegral");
+
+		FUNCTIONS_STR_MATHCELL.put(F.ExpIntegralEi, "expIntegralEi");
+		FUNCTIONS_STR_MATHCELL.put(F.ExpIntegralE, "expIntegralE");
 		FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric0F1, "hypergeometric0F1");
 		FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric1F1, "hypergeometric1F1");
 		// FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric2??, "hypergeometric2F0");
@@ -381,22 +395,10 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 					return;
 				}
 			} else if (function.isPower()) {
-				IExpr base = function.base();
-				IExpr exponent = function.exponent();
-				if (exponent.isMinusOne()) {
-					buf.append("(1.0/");
-					convertInternal(buf, base);
-					buf.append(")");
+				convertPowerMathcell(buf, function);
 					return;
-				}
-				if (exponent.isNumEqualRational(F.C1D2)) {
-					buf.append("sqrt(");
-					convertInternal(buf, base);
-					buf.append(")");
-					return;
-				}
-				buf.append("pow");
-				convertArgs(buf, head, function);
+			} else if (function.head() == F.Surd && function.size() == 3) {
+				convertPowerMathcell(buf, function);
 				return;
 			} else if (function.isInfinity()) {
 				buf.append("Number.POSITIVE_INFINITY");
@@ -422,37 +424,29 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 					return;
 				}
 			} else if (function.head() == F.Piecewise && function.size() > 1) {
-				if (convertPiecewise(function, buf)) {
+				int[] dim = function.isPiecewise();
+				if (dim != null && convertPiecewise(dim, function, buf)) {
 						return;
 					}
 			} else if (function.head() == F.ConditionalExpression && function.size() == 3) {
 				convertConditionalExpression(function, buf);
 				return;
+				// } else if (function.head() == F.Clip && function.size() > 1) {
+				// if (convertClip(function, buf)) {
+				// return;
+				// }
+			}
+			IAST piecewiseExpand = Arithmetic.piecewiseExpand(function, F.Reals);
+			int[] dim = piecewiseExpand.isPiecewise();
+			if (dim != null && convertPiecewise(dim, piecewiseExpand, buf)) {
+				return;
 			}
 		} else {
 			if (function.isPower()) {
-				IExpr base = function.base();
-				IExpr exponent = function.exponent();
-				if (exponent.isMinusOne()) {
-					buf.append("(1.0/");
-					convertInternal(buf, base);
-					buf.append(")");
+				convertPower(buf, function);
 					return;
-				}
-				if (exponent.isNumEqualRational(F.C1D2)) {
-					buf.append("Math.sqrt(");
-					convertInternal(buf, base);
-					buf.append(")");
-					return;
-				}
-				if (exponent.isNumEqualRational(F.C1D3)) {
-					buf.append("Math.cbrt(");
-					convertInternal(buf, base);
-					buf.append(")");
-					return;
-				}
-				buf.append("Math.pow");
-				convertArgs(buf, head, function);
+			} else if (function.head() == F.Surd && function.size() == 3) {
+				convertPower(buf, function);
 				return;
 			} else if (function.isInfinity()) {
 			buf.append("Number.POSITIVE_INFINITY");
@@ -461,12 +455,17 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 			buf.append("Number.NEGATIVE_INFINITY");
 			return;
 			} else if (function.head() == F.Piecewise && function.size() > 1) {
-				if (convertPiecewise(function, buf)) {
+				int[] dim = function.isPiecewise();
+				if (dim != null && convertPiecewise(dim, function, buf)) {
 					return;
 				}
 			} else if (function.head() == F.ConditionalExpression && function.size() == 3) {
 				convertConditionalExpression(function, buf);
 				return;
+				// } else if (function.head() == F.Clip && function.size() > 1) {
+				// if (convertClip(function, buf)) {
+				// return;
+				// }
 			} else if (function.head() == F.Cot && function.size() == 2) {
 				buf.append("(1/Math.tan(");
 				convertInternal(buf, function.arg1());
@@ -476,6 +475,11 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				buf.append("((Math.PI/2.0)-Math.atan(");
 				convertInternal(buf, function.arg1());
 				buf.append("))");
+				return;
+			}
+			IAST piecewiseExpand = Arithmetic.piecewiseExpand(function, F.Reals);
+			int[] dim = piecewiseExpand.isPiecewise();
+			if (dim != null && convertPiecewise(dim, piecewiseExpand, buf)) {
 				return;
 			}
 		}
@@ -508,6 +512,85 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		convertArgs(buf, head, function);
 	}
 
+	/**
+	 * Convert the <code>Power(base, exponent)</code> expression into JavaScript form.
+	 *
+	 * @param buf
+	 * @param powerAST
+	 *            the <code>Power(base, exponent)</code> expression
+	 */
+	private void convertPower(final StringBuilder buf, final IAST powerAST) {
+		IExpr base = powerAST.base();
+		IExpr exponent = powerAST.exponent();
+		if (exponent.isMinusOne()) {
+			buf.append("(1.0/");
+			convertInternal(buf, base);
+			buf.append(")");
+			return;
+		}
+		if (exponent.isNumEqualRational(F.C1D2)) {
+			buf.append("Math.sqrt(");
+			convertInternal(buf, base);
+			buf.append(")");
+			return;
+		}
+		if (exponent.isNumEqualRational(F.C1D3)) {
+			buf.append("Math.cbrt(");
+			convertInternal(buf, base);
+			buf.append(")");
+			return;
+		}
+		buf.append("Math.pow");
+		convertArgs(buf, powerAST.head(), powerAST);
+		return;
+	}
+
+	/**
+	 * Convert the <code>Power(base, exponent)</code> expression into JavaScript form.
+	 *
+	 * @param buf
+	 * @param powerAST
+	 *            the <code>Power(base, exponent)</code> expression
+	 */
+	private void convertPowerMathcell(final StringBuilder buf, final IAST powerAST) {
+		IExpr base = powerAST.base();
+		IExpr exponent = powerAST.exponent();
+		if (exponent.isMinusOne()) {
+			buf.append("inv(");
+			convertInternal(buf, base);
+			buf.append(")");
+			return;
+		}
+		if (exponent.isNumEqualRational(F.C1D2)) {
+			buf.append("sqrt(");
+			convertInternal(buf, base);
+			buf.append(")");
+			return;
+		}
+		buf.append("pow");
+		convertArgs(buf, powerAST.head(), powerAST);
+		return;
+	}
+
+	// private boolean convertClip(final IAST function, final StringBuilder buf) {
+	// IExpr x = function.arg1();
+	// if (function.size() == 2) {
+	// if (convertPiecewise( //
+	// F.Piecewise(F.List(F.List(F.CN1, F.Less(x, F.CN1)), F.List(F.C1, F.Greater(x, F.C1))), x), //
+	// buf)) {
+	// return true;
+	// }
+	// }
+	// if (function.size() == 3 && function.second().isAST(F.List, 3)) {
+	// IExpr low = function.second().first();
+	// IExpr high = function.second().second();
+	// if (convertPiecewise(F.Piecewise(F.List(F.List(low, F.Less(x, low)), F.List(high, F.Greater(x, high))), x),
+	// buf)) {
+	// return true;
+	// }
+	// }
+	// return false;
+	// }
 	private void convertConditionalExpression(final IAST function, final StringBuilder buf) {
 		IExpr arg1 = function.arg1();
 		IExpr arg2 = function.arg2();
@@ -519,17 +602,15 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 		buf.append(") : ( Number.NaN ))");
 	}
 
-	private boolean convertPiecewise(final IAST function, final StringBuilder buffer) {
-		if (function.arg1().isList() && function.arg1().size() >= 2 && //
-				function.arg1().first().isList()) {
+	private boolean convertPiecewise(int dim[], final IAST function, final StringBuilder buffer) {
 			IAST list = (IAST) function.arg1();
+		IExpr last = function.size() == 3 ? function.arg2() : F.C0;
 			StringBuilder piecewiseBuffer = new StringBuilder();
 			if (INLINE_PIECEWISE) {
 				// use the ternary operator
 				int size = list.size();
 				piecewiseBuffer.append("(");
 				int countOpen = 0;
-				IExpr last = F.C0;
 				for (int i = 1; i < size; i++) {
 					IExpr arg = list.get(i);
 					if (arg.isAST(F.List, 3)) {
@@ -562,7 +643,6 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				return true;
 			} else {
 				// use if... statements
-				IExpr last = F.C0;
 				final int size = list.size();
 				for (int i = 1; i < size; i++) {
 					IExpr arg = list.get(i);
@@ -595,8 +675,6 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				return true;
 			}
 		}
-		return false;
-	}
 
 	protected boolean convertOperator(final Operator operator, final IAST list, final StringBuilder buf,
 									  final int precedence, ISymbol head) {
@@ -618,7 +696,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 				return OutputFormFactory.getOperator(head);
 				// String str = head.toString();
 				// if (fRelaxedSyntax) {
-				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase(Locale.US));
+				// operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
 				// } else {
 				// operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
 				// }
@@ -630,7 +708,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
 			// return OutputFormFactory.getOperator(head);
 			// // String str = head.toString();
 			// // if (fRelaxedSyntax) {
-			// // operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase(Locale.US));
+			// // operator = ASTNodeFactory.RELAXED_STYLE_FACTORY.get(str.toLowerCase());
 			// // } else {
 			// // operator = ASTNodeFactory.MMA_STYLE_FACTORY.get(str);
 			// // }

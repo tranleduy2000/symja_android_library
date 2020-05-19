@@ -1,8 +1,5 @@
 package it.unimi.dsi.fastutil.objects;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public interface Int2IntMap {
 
     int get(int key);
@@ -17,5 +14,7 @@ public interface Int2IntMap {
         int getIntKey();
 
         int getIntValue();
+
+        void setValue(int value);
     }
 }

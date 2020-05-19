@@ -297,6 +297,16 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	@Override
 	public abstract IInteger ceilFraction();
 
+	public int compareTo(final IExpr expr) {
+		if (expr.isNumber()) {
+			int c = this.compareTo(((INumber) expr).re());
+			if (c != 0) {
+				return c;
+			}
+		}
+		return -1;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public int complexSign() {
@@ -399,6 +409,12 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 		}
 		return F.NIL;
 	}
+
+	/** {@inheritDoc} */
+	public IInteger integerPart() {
+		return isNegative() ? ceilFraction() : floorFraction();
+	}
+
 	/**
 	 * Returns the denominator of this fraction.
 	 * 

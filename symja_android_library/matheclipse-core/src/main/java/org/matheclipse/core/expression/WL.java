@@ -8,6 +8,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -19,6 +20,7 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -623,7 +625,7 @@ public class WL {
 				wo.write(expr);
 				return wo.toByteArray();
 			} catch (IOException e) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
 			} finally {
@@ -656,7 +658,7 @@ public class WL {
 	 * @param bArray
 	 * @return
 	 */
-	public static IAST toList(byte[] bArray) {
+	public static IASTMutable toList(byte[] bArray) {
 		IASTAppendable list = F.ListAlloc(bArray.length);
 		for (int i = 0; i < bArray.length; i++) {
 			int value = 0x000000FF & bArray[i];

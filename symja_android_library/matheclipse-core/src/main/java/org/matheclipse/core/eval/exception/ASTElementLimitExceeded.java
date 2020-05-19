@@ -11,6 +11,16 @@ public class ASTElementLimitExceeded extends LimitException {
 		fLimit = limit;
 	}
 
+	/**
+	 * Set the exceeded limit to <code>(long)rowDimension*(long)columnDimension</code>.
+	 *
+	 * @param rowDimension
+	 * @param columnDimension
+	 */
+	public ASTElementLimitExceeded(final int rowDimension, final int columnDimension) {
+		fLimit = (long)rowDimension*(long)columnDimension;
+	}
+
 	@Override
 	public String getMessage() {
 		return "Maximum AST size " + fLimit + " exceeded" ;

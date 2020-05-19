@@ -190,6 +190,12 @@ public class ApfloatNum extends INumImpl implements INum {
 
 	/** {@inheritDoc} */
 	@Override
+	public long determinePrecision() {
+		return precision();
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public IExpr inc() {
 		return add(F.CD1);
 	}
@@ -441,7 +447,7 @@ public class ApfloatNum extends INumImpl implements INum {
 	/** {@inheritDoc} */
 	@Override
 	public IInteger ceilFraction() {
-		return F.integer(ApfloatMath.ceil(fApfloat).toBigInteger());
+		return F.ZZ(ApfloatMath.ceil(fApfloat).toBigInteger());
 	}
 
 	@Override
@@ -462,9 +468,14 @@ public class ApfloatNum extends INumImpl implements INum {
 	/** {@inheritDoc} */
 	@Override
 	public IInteger floorFraction() {
-		return F.integer(ApfloatMath.floor(fApfloat).toBigInteger());
+		return F.ZZ(ApfloatMath.floor(fApfloat).toBigInteger());
 	}
 
+
+	/** {@inheritDoc} */
+	public IInteger integerPart() {
+		return isNegative() ? ceilFraction() : floorFraction();
+	}
 
 	/**
 	 * Compares this expression with the specified expression for order. Returns a negative integer, zero, or a positive
@@ -475,10 +486,17 @@ public class ApfloatNum extends INumImpl implements INum {
 		if (expr instanceof ApfloatNum) {
 			return fApfloat.compareTo(((ApfloatNum) expr).fApfloat);
 		}
+		if (expr.isNumber()) {
 		if (expr.isReal()) {
 			return Double.compare(fApfloat.doubleValue(), ((ISignedNumber) expr).doubleValue());
 		}
-		return super.compareTo(expr);
+			int c = this.compareTo(((INumber) expr).re());
+			if (c != 0) {
+				return c;
+			}
+		}
+		return -1;
+		// return INum.super.compareTo(expr);
 	}
 
 	@Override

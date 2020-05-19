@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
 import com.duy.lambda.BiPredicate;
+import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
@@ -16,6 +17,7 @@ import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 import org.logicng.solvers.MiniSat;
 import org.logicng.solvers.SATSolver;
+import org.logicng.transformations.cnf.BDDCNFTransformation;
 import org.logicng.transformations.cnf.CNFFactorization;
 import org.logicng.transformations.dnf.DNFFactorization;
 import org.logicng.transformations.qmc.QuineMcCluskeyAlgorithm;
@@ -23,6 +25,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
@@ -69,6 +72,23 @@ public final class BooleanFunctions {
 	public final static GreaterEqual CONST_GREATER_EQUAL = new GreaterEqual();
 	public final static LessEqual CONST_LESS_EQUAL = new LessEqual();
 
+	private final static int[] FULL_BITSETS = new int[] { //
+			0b1, //
+			0b11, //
+			0b111, //
+			0b1111, //
+			0b11111, //
+			0b111111, //
+			0b1111111, //
+			0b11111111, //
+			0b111111111, //
+			0b1111111111, //
+			0b11111111111, //
+			0b111111111111, //
+			0b1111111111111, //
+			0b11111111111111, //
+			0b111111111111111 //
+	};
 	/**
 	 *
 	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
@@ -95,6 +115,7 @@ public final class BooleanFunctions {
 			F.Inequality.setEvaluator(new Inequality());
 			F.Less.setEvaluator(CONST_LESS);
 			F.LessEqual.setEvaluator(new LessEqual());
+			F.LogicalExpand.setEvaluator(new LogicalExpand());
 			F.Max.setEvaluator(new Max());
 			F.Min.setEvaluator(new Min());
 			F.MinMax.setEvaluator(new MinMax());
@@ -230,9 +251,9 @@ public final class BooleanFunctions {
 				return s;
 			}
 			EvalEngine engine = EvalEngine.get();
-			int moduleCounter = engine.incModuleCounter();
-			final String varAppend = "LF" + "$" + moduleCounter;
-			s = F.Dummy(varAppend);
+			// long moduleCounter = engine.incModuleCounter();
+			// final String varAppend = "LF" + "$" + moduleCounter;
+			s = F.Dummy(engine.uniqueName("LF$"));
 			variable2symbolMap.put(v, s);
 			return s;
 		}
@@ -247,16 +268,15 @@ public final class BooleanFunctions {
 			return factory.or(factory.and(result1), factory.and(result2));
 		}
 
-		private Formula convertXor(IAST ast) {
-			Formula arg1 = expr2BooleanFunction(ast.arg1());
-			Formula arg2 = expr2BooleanFunction(ast.arg2());
-			if (ast.size() > 3) {
-				IASTAppendable clone = ast.copyAppendable();
-				clone.remove(1);
-				arg2 = convertXor(clone);
-			}
-			return factory.or(factory.and(arg1, factory.not(arg2)), factory.and(factory.not(arg1), arg2));
-		}
+		// private Formula convertXor(IAST ast) {
+		// Formula arg1 = expr2BooleanFunction(ast.arg1());
+		// Formula arg2 = expr2BooleanFunction(ast.arg2());if(ast.size()>3)
+		// {
+		// IASTAppendable clone = ast.copyAppendable();
+		// clone.remove(1);
+		// arg2 = convertXor(clone);
+		// }return factory.or(factory.and(arg1,factory.not(arg2)),factory.and(factory.not(arg1),arg2));
+		// }
 
 		public Formula expr2BooleanFunction(final IExpr logicExpr) {
 			if (logicExpr instanceof IAST) {
@@ -266,32 +286,12 @@ public final class BooleanFunctions {
 					switch (functionID) {
 					case ID.And:
 						if (ast.isAnd()) {
-							final Formula[] result = new Formula[ast.argSize()];
-							ast.forEach(new ObjIntConsumer<IExpr>() {
-								@Override
-								public void accept(IExpr x, int i) {
-									result[i - 1] = LogicFormula.this.expr2BooleanFunction(x);
-								}
-							});
-							// for (int i = 1; i < ast.size(); i++) {
-							// result[i - 1] = expr2BooleanFunction(ast.get(i));
-							// }
-							return factory.and(result);
+							return convertAnd(ast);
 						}
 						break;
 					case ID.Or:
 						if (ast.isOr()) {
-							final Formula[] result = new Formula[ast.argSize()];
-							ast.forEach(new ObjIntConsumer<IExpr>() {
-								@Override
-								public void accept(IExpr x, int i) {
-									result[i - 1] = LogicFormula.this.expr2BooleanFunction(x);
-								}
-							});
-							// for (int i = 1; i < ast.size(); i++) {
-							// result[i - 1] = expr2BooleanFunction(ast.get(i));
-							// }
-							return factory.or(result);
+							return convertOr(ast);
 						}
 						break;
 					case ID.Nand:
@@ -331,7 +331,14 @@ public final class BooleanFunctions {
 						break;
 					case ID.Xor:
 						if (ast.isSameHeadSizeGE(F.Xor, 3)) {
-							return convertXor(ast);
+							IAST dnf = xorToDNF(ast);
+							if (dnf.isOr()) {
+								return convertOr(dnf);
+							}
+							if (dnf.isAnd()) {
+								return convertAnd(dnf);
+							}
+							return expr2BooleanFunction(dnf);
 						}
 						break;
 					case ID.Implies:
@@ -376,6 +383,27 @@ public final class BooleanFunctions {
 			throw new ArgumentTypeException(str);
 		}
 
+		private Formula convertOr(final IAST ast) {
+			final Formula[] result = new Formula[ast.argSize()];
+			ast.forEach(new ObjIntConsumer<IExpr>() {
+				@Override
+				public void accept(IExpr x, int i) {
+					result[i - 1] = LogicFormula.this.expr2BooleanFunction(x);
+				}
+			});
+			return factory.or(result);
+		}
+
+		private Formula convertAnd(final IAST ast) {
+			final Formula[] result = new Formula[ast.argSize()];
+			ast.forEach(new ObjIntConsumer<IExpr>() {
+				@Override
+				public void accept(IExpr x, int i) {
+					result[i - 1] = LogicFormula.this.expr2BooleanFunction(x);
+				}
+			});
+			return factory.and(result);
+		}
 		public FormulaFactory getFactory() {
 			return factory;
 		}
@@ -786,18 +814,36 @@ public final class BooleanFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-
-			if (ast.arg1().isSymbol()) {
-				if (ast.arg1().isTrue()) {
-					return F.C1;
-				}
-				if (ast.arg1().isFalse()) {
-					return F.C0;
-				}
+			IExpr arg1 = engine.evaluateNull(ast.arg1());
+			if (arg1.isPresent()) {
+				return booleValue(arg1, F.Boole(arg1));
 			}
-			return F.NIL;
+			return booleValue(ast.arg1(), F.NIL);
 		}
 
+		private IExpr booleValue(final IExpr arg1, IExpr defaultValue) {
+			if (arg1.isSymbol()) {
+				if (arg1.isTrue()) {
+					return F.C1;
+				}
+				if (arg1.isFalse()) {
+					return F.C0;
+				}
+				return defaultValue;
+			}
+			if (arg1.isList()) {
+				// Boole has attribute Listable
+				return ((IAST) arg1).mapThread(new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return F.Boole(x);
+					}
+				});
+			}
+			return defaultValue;
+		}
+
+		@Override
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_1;
 		}
@@ -862,44 +908,16 @@ public final class BooleanFunctions {
 
 			try {
 
-				FormulaTransformation transformation = transformation(ast, engine);
-				if (transformation != null) {
-					LogicFormula lf = new LogicFormula();
-					final Formula formula = lf.expr2BooleanFunction(ast.arg1());
-					return lf.booleanFunction2Expr(formula.transform(transformation));
-				}
+				return booleanConvert(ast, engine);
 
 			} catch (final ValidateException ve) {
 				// int number validation
-				return engine.printMessage(ve.getMessage(ast.topHead()));
+				return engine.printMessage(ast.topHead(), ve);
 			}
-			return F.NIL;
 		}
 
 		public int[] expectedArgSize() {
 			return IOFunctions.ARGS_1_2;
-		}
-		/**
-		 * Get the transformation from the ast options. Default is DNF.
-		 * 
-		 * @param ast
-		 * @param engine
-		 * @return <code>null</code> if no or wrong method is defined as option
-		 */
-		private static FormulaTransformation transformation(final IAST ast, EvalEngine engine) {
-			int size = ast.argSize();
-			if (size > 1 && ast.get(size).isString()) {
-				IStringX arg2 = (IStringX) ast.arg2();
-				String method = arg2.toString();
-				if (method.equals("DNF") || method.equals("SOP")) {
-					return new DNFFactorization();
-				} else if (method.equals("CNF") || method.equals("POS")) {
-					return new CNFFactorization();
-				}
-				engine.printMessage("Unknown method: " + method);
-				return null;
-			}
-			return new DNFFactorization();
 		}
 	}
 
@@ -2265,8 +2283,8 @@ public final class BooleanFunctions {
 				return res;
 
 				// return inequality(ast, engine);
-			} catch (ValidateException woa) {
-				return engine.printMessage(woa.getMessage());
+			} catch (ValidateException ve) {
+				return engine.printMessage(ast.topHead(), ve);
 			}
 		}
 
@@ -2447,6 +2465,50 @@ public final class BooleanFunctions {
 		}
 	}
 
+	private static class LogicalExpand extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+			if (ast.arg1().isAST()) {
+				IExpr subst = ast.arg1().replaceAll(new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						if (x.isAST()) {
+							IAST formula = (IAST) x;
+							if (x.isNot() && x.first().isOr()) {
+								IASTMutable result = ((IAST) x.first()).apply(F.And);
+								for (int i = 1; i < result.size(); i++) {
+									result.set(i, F.Not(result.get(i)));
+								}
+								return engine.evaluate(result);
+							}
+							if (formula.isSameHeadSizeGE(F.Xor, 3)) {
+								return xorToDNF(formula);
+							}
+							try {
+								return booleanConvert(F.BooleanConvert(formula, F.stringx("DNF")), engine);
+							} catch (final ValidateException ve) {
+							}
+						}
+						return F.NIL;
+					}
+				});
+				if (subst.isPresent()) {
+					return subst;
+				}
+			}
+			return arg1;
+		}
+
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+		}
+	}
 	/**
 	 * <pre>
 	 * Max(e_1, e_2, ..., e_i)
@@ -3550,8 +3612,6 @@ public final class BooleanFunctions {
 		 * @param booleanExpression
 		 * @param variables
 		 *            a list of variables
-		 * @param maxChoices
-		 *            maximum number of choices, which satisfy the given boolean expression
 		 * @return
 		 */
 		private static IInteger logicNGSatisfiabilityCount(IExpr booleanExpression, IAST variables) {
@@ -3706,7 +3766,7 @@ public final class BooleanFunctions {
 				return bruteForceSatisfiableQ(arg1, userDefinedVariables, 1) ? F.True : F.False;
 			} catch (final ValidateException ve) {
 				// int number validation
-				return engine.printMessage(ve.getMessage(ast.topHead()));
+				return engine.printMessage(ast.topHead(), ve);
 				}
 			}
 
@@ -3821,7 +3881,7 @@ public final class BooleanFunctions {
 				return bruteForceTautologyQ(arg1, userDefinedVariables, 1) ? F.True : F.False;
 			} catch (final ValidateException ve) {
 				// int number validation
-				return engine.printMessage(ve.getMessage(ast.topHead()));
+				return engine.printMessage(ast.topHead(), ve);
 				}
 			}
 
@@ -4412,6 +4472,41 @@ public final class BooleanFunctions {
 		return list;
 	}
 
+	/**
+	 * Get the transformation from the ast options. Default is DNF.
+	 *
+	 * @param ast
+	 * @param engine
+	 * @return <code>null</code> if no or wrong method is defined as option
+	 */
+	private static FormulaTransformation transformation(final IAST ast, EvalEngine engine) {
+		int size = ast.argSize();
+		if (size > 1 && ast.get(size).isString()) {
+			IStringX arg2 = (IStringX) ast.arg2();
+			String method = arg2.toString();
+			if (method.equals("DNF") || method.equals("SOP")) {
+				return new DNFFactorization();
+			} else if (method.equals("CNF") || method.equals("POS")) {
+				return new BDDCNFTransformation();// new CNFFactorization( );
+			}
+			// `1` currently not supported in `2`.
+			IOFunctions.printMessage(ast.topHead(), "unsupported", F.List(arg2,F.Method), engine);
+			return null;
+		}
+		return new DNFFactorization();
+	}
+
+	private static IExpr booleanConvert(final IAST ast, EvalEngine engine) throws ValidateException {
+		FormulaTransformation transformation = transformation(ast, engine);
+		if (transformation != null) {
+			LogicFormula lf = new LogicFormula();
+			Formula formula = lf.expr2BooleanFunction(ast.arg1()).transform(transformation);
+			// CNFSubsumption s = new CNFSubsumption();
+			// formula=s.apply(formula, false);
+			return lf.booleanFunction2Expr(formula);
+		}
+		return F.NIL;
+	}
 	public static List<Assignment> logicNGSatisfiabilityInstances(IExpr booleanExpression, Variable[] vars,
 			LogicFormula lf, int maxChoices) {
 
@@ -4422,6 +4517,54 @@ public final class BooleanFunctions {
 		return miniSat.enumerateAllModels(vars);
 	}
 
+	/**
+	 * Convert the XOR expression into DNF format.
+	 *
+	 * @param xorForm
+	 *            the <code>Xor(...)</code> expression
+	 * @return
+	 */
+	private static IAST xorToDNF(IAST xorForm) {
+		int size = xorForm.argSize();
+		if (size > 2) {
+			if (size <= 15) {
+				IASTAppendable orAST = F.Or();
+				// allBits filled with '1' up to size of bits
+				final int allBits = FULL_BITSETS[size - 1];
+				for (int i = allBits; i >= 0; i--) {
+					int singleBit = 0b1;
+					int count = 0;
+					for (int j = 0; j < size; j++) {
+						if ((singleBit & i) != 0) {
+							count++;
+						}
+						singleBit <<= 1;
+					}
+					if ((count % 2) == 1) {
+						IASTMutable andAST = F.ast(F.And, size, true);
+						singleBit = 0b1;
+						int startPos = 1;
+						int startNotPos = count + 1;
+						for (int j = 0; j < size; j++) {
+							if ((singleBit & i) == 0) {
+								andAST.set(startNotPos++, F.Not(xorForm.get(j + 1)));
+							} else {
+								andAST.set(startPos++, xorForm.get(j + 1));
+							}
+							singleBit <<= 1;
+						}
+						orAST.append(andAST);
+					}
+				}
+
+				return orAST;
+			}
+			throw new ASTElementLimitExceeded(Short.MAX_VALUE);
+		}
+		IExpr arg1 = xorForm.arg1();
+		IExpr arg2 = xorForm.arg2();
+		return F.Or(F.And(arg1, F.Not(arg2)), F.And(F.Not(arg1), arg2));
+	}
 
 	public static void initialize() {
 		Initializer.init();

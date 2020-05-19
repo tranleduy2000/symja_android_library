@@ -101,6 +101,9 @@ public class AST extends HMArrayList implements Externalizable {
 			return fDelegate.copyFrom(fFirstIndex);
 		}
 
+		public IASTAppendable copyAppendable(int additionalCapacity) {
+			return copyAppendable();
+		}
 		@Override
 		public IASTMutable copy() {
 			return fDelegate.copyFrom(fFirstIndex);
@@ -405,6 +408,21 @@ public class AST extends HMArrayList implements Externalizable {
 	}
 
 	@Override
+	public IASTAppendable copyAppendable(int additionalCapacity) {
+		AST ast = new AST();
+		// ast.fProperties = null;
+		if (size() + additionalCapacity > array.length) {
+			ast.array = new IExpr[size() + additionalCapacity];
+			System.arraycopy(array, 0, ast.array, 0, array.length);
+		} else {
+			ast.array = array.clone();
+		}
+		ast.hashValue = 0;
+		ast.firstIndex = firstIndex;
+		ast.lastIndex = lastIndex;
+		return ast;
+	}
+	@Override
 	public IAST getItems(int[] items, int length) {
 		AST result = new AST(length, true);
 		result.set(0,head());
@@ -509,7 +527,7 @@ public class AST extends HMArrayList implements Externalizable {
 			init(array);
 			int exprIDSize = objectInput.readByte();
 			for (int i = 0; i < exprIDSize; i++) {
-				this.array[i] = F.GLOBAL_IDS[objectInput.readShort()];
+				this.array[i] = F.exprID(objectInput.readShort()); //F.GLOBAL_IDS[objectInput.readShort()];
 			}
 			for (int i = exprIDSize; i < size; i++) {
 				this.array[i] = (IExpr) objectInput.readObject();
@@ -532,20 +550,18 @@ public class AST extends HMArrayList implements Externalizable {
 		int size = size();
 		byte attributeFlags = (byte) 0;
 		if (size > 0 && size < 128) {
-			ExprID temp = F.GLOBAL_IDS_MAP.get(head());
-			if (temp != null) {
-
-				short exprID = temp.getExprID();
+			short exprID = F.GLOBAL_IDS_MAP.getShort(head());
+			if (exprID >= 0) {
 				if (exprID <= Short.MAX_VALUE) {
 					int exprIDSize = 1;
 					short[] exprIDArray = new short[size];
 					exprIDArray[0] = exprID;
 					for (int i = 1; i < size; i++) {
-						temp = F.GLOBAL_IDS_MAP.get(get(i));
-						if (temp == null) {
+						exprID = F.GLOBAL_IDS_MAP.getShort(get(i));
+						if (exprID < 0) {
 							break;
 						}
-						exprID = temp.getExprID();
+//						exprID = temp.getExprID();
 						if (exprID <= Short.MAX_VALUE) {
 							exprIDArray[i] = exprID;
 							exprIDSize++;
@@ -576,7 +592,7 @@ public class AST extends HMArrayList implements Externalizable {
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		return optional(F.GLOBAL_IDS_MAP.get(this));
+		return optional( );
 	}
 
 	@Override

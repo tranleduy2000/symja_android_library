@@ -48,6 +48,7 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.visit.ModuleReplaceAll;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.io.PrintStream;
@@ -57,10 +58,13 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
- * The main evaluation algorithms for the .Symja computer algebra system
+ * The main evaluation algorithms for the .Symja computer algebra system. A single <code>EvalEngine</code> is associated
+ * with the current thread through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a>
+ * mechanism.
  */
 public class EvalEngine implements Serializable {
 
@@ -71,24 +75,23 @@ public class EvalEngine implements Serializable {
      */
     private static final long serialVersionUID = 8402201556123198590L;
     transient private static final ThreadLocal<EvalEngine> instance = new ThreadLocal<EvalEngine>() {
-        private int fID = 1;
 
         @Override
         public EvalEngine initialValue() {
-            if (DEBUG) {
-                System.out.println("ThreadLocal" + fID);
-            }
-            return new EvalEngine("ThreadLocal" + (fID++), 0, System.out, true);
+            return new EvalEngine("ThreadLocal", 0, System.out, true);
         }
     };
-    static public int MAX_THREADS_COUNT = 10;
-    static int fAnonymousCounter = 0;
+    private static AtomicLong MODULE_COUNTER = new AtomicLong();
     public transient Cache<IAST, IExpr> REMEMBER_AST_CACHE = null;
     public transient Set<ISymbol> fModifiedVariablesList;
     /**
      * The precision for numeric operations.
      */
     protected long fNumericPrecision;
+    /**
+     * The number of significant figures in the output expression
+     */
+    protected int fSignificantFigures;
     protected int fRecursionLimit;
     protected int fIterationLimit;
     protected boolean fPackageMode = Config.PACKAGE_MODE;
@@ -149,7 +152,6 @@ public class EvalEngine implements Serializable {
     transient Stack<ContextPath> fContextPathStack;
 
     transient ContextPath fContextPath;
-    transient int fModuleCounter = 0;
     /**
      * If <code>fOnOffUnique==true</code> this map contains the unique expressions which occurred during evaluation
      */
@@ -195,6 +197,7 @@ public class EvalEngine implements Serializable {
      * answer is stored in the evaluation engine.
      */
     private transient IExpr fAnswer = null;
+    private transient EvalEngine fCopiedEngine = null;
     /**
      * Flag for disabling the appending of expressions to the history list for the <code>Out[]</code> function.
      *
@@ -203,14 +206,16 @@ public class EvalEngine implements Serializable {
     transient private boolean fOutListDisabled = true;
 
     /**
-     *
+     * A single <code>EvalEngine</code> is associated with the current thread through a
+     * <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      */
     public EvalEngine() {
         this("", 0, System.out, false);
     }
 
     /**
-     * Constructor for an evaluation engine
+     * Constructor for an evaluation engine. A single <code>EvalEngine</code> is associated with the current thread
+     * through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      *
      * @param relaxedSyntax if <code>true</code>, the parser doesn't distinguish between upper and lower case identifiers
      */
@@ -218,8 +223,10 @@ public class EvalEngine implements Serializable {
         this("", 0, System.out, relaxedSyntax);
     }
 
+
     /**
-     * Constructor for an evaluation engine
+     * Constructor for an evaluation engine. A single <code>EvalEngine</code> is associated with the current thread
+     * through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      *
      * @param sessionID      an ID which uniquely identifies this session
      * @param recursionLimit the maximum allowed recursion limit (if set to zero, no limit will be checked)
@@ -249,7 +256,8 @@ public class EvalEngine implements Serializable {
     }
 
     /**
-     * Constructor for an evaluation engine
+     * Constructor for an evaluation engine. A single <code>EvalEngine</code> is associated with the current thread
+     * through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      *
      * @param sessionID      an ID which uniquely identifies this session
      * @param recursionLimit the maximum allowed recursion limit (if set to zero, no limit will be checked)
@@ -273,13 +281,7 @@ public class EvalEngine implements Serializable {
         return instance.get();
     }
 
-    synchronized public static int getNextAnonymousCounter() {
-        return ++fAnonymousCounter;
-    }
-
-    synchronized public static String getNextCounter() {
-        return Integer.toString(++fAnonymousCounter);
-    }
+    // static public int MAX_THREADS_COUNT = 10;
 
     /**
      * Check if the <code>ApfloatNum</code> number type should be used instead of the <code>Num</code> type and the
@@ -369,9 +371,9 @@ public class EvalEngine implements Serializable {
         engine.fFileSystemEnabled = fFileSystemEnabled;
         engine.fIterationLimit = fIterationLimit;
         engine.fModifiedVariablesList = fModifiedVariablesList;
-        engine.fModuleCounter = fModuleCounter;
         engine.fNumericMode = fNumericMode;
         engine.fNumericPrecision = fNumericPrecision;
+        engine.fSignificantFigures = fSignificantFigures;
         engine.fOutList = fOutList;
         engine.fOutListDisabled = fOutListDisabled;
         engine.fOutPrintStream = fOutPrintStream;
@@ -392,6 +394,7 @@ public class EvalEngine implements Serializable {
         engine.fTogetherMode = fTogetherMode;
         engine.fTraceMode = fTraceMode;
         engine.fTraceStack = fTraceStack;
+        fCopiedEngine = engine;
         return engine;
     }
 
@@ -431,25 +434,25 @@ public class EvalEngine implements Serializable {
         }
     }
 
-    public void cancel() {
-        fContextPath = null;
-        fErrorPrintStream = null;
-        fFileSystemEnabled = false;
-        fIterationLimit = 1;
-        fModifiedVariablesList = null;
-        fOutList = null;
-        fOutPrintStream = null;
-        fPackageMode = false;
-        fQuietMode = true;
-        fReapList = null;
-        fRecursionCounter = 1;
-        fRecursionLimit = 1;
-        fSeconds = 1;
-        fSessionID = null;
-        fStopRequested = true;
-        fTraceMode = false;
-        fTraceStack = null;
-    }
+    // public void cancel() {
+    // fContextPath = null;
+    // fErrorPrintStream = null;
+    // fFileSystemEnabled = false;
+    // fIterationLimit = 1;
+    // fModifiedVariablesList = null;
+    // fOutList = null;
+    // fOutPrintStream = null;
+    // fPackageMode = false;
+    // fQuietMode = true;
+    // fReapList = null;
+    // fRecursionCounter = 1;
+    // fRecursionLimit = 1;
+    // fSeconds = 1;
+    // fSessionID = null;
+    // fStopRequested = true;
+    // fTraceMode = false;
+    // fTraceStack = null;
+    // }
 
     /**
      * Decrement the recursion counter by 1 and return the result.
@@ -674,6 +677,11 @@ public class EvalEngine implements Serializable {
                 } else if (arg1.isAssociation()) {
                     // thread over the association
                     return ((IAssociation) arg1).mapThread(ast, 1);
+                } else if (arg1.isConditionalExpression()) {
+                    IExpr temp = ast.extractConditionalExpression(true);
+                    if (temp.isPresent()) {
+                        return temp;
+                    }
                 }
             }
         }
@@ -828,7 +836,7 @@ public class EvalEngine implements Serializable {
                 }
                 int indx = tempAST.indexOf(EvalEngineUtils.associationPredicate);
                 if (indx > 0) {
-                    return ((IAssociation) tempAST.get(indx)).mapThread(tempAST, indx);
+                    return ((IAST) tempAST.get(indx)).mapThread(tempAST, indx);
                 }
             }
 
@@ -838,6 +846,15 @@ public class EvalEngine implements Serializable {
                     if (tempAST.exists(EvalEngineUtils.indeterminatePredicate)) {
                         return F.Indeterminate;
                     }
+                    IExpr temp = tempAST.extractConditionalExpression(false);
+                    if (temp.isPresent()) {
+                        return temp;
+                    }
+                }
+            } else if (tempAST.isBooleanFormula() || tempAST.isComparatorFunction()) {
+                IExpr temp = tempAST.extractConditionalExpression(false);
+                if (temp.isPresent()) {
+                    return temp;
                 }
             }
 
@@ -946,6 +963,7 @@ public class EvalEngine implements Serializable {
      *
      * @param expr
      * @return
+     * @throws ArgumentTypeException
      */
     final public Complex evalComplex(final IExpr expr) {
         if (expr.isReal()) {
@@ -1148,6 +1166,13 @@ public class EvalEngine implements Serializable {
                             if (fStopRequested) {
                                 throw TimeoutException.TIMED_OUT;
                             }
+                            if (Config.SHOW_STACKTRACE) {
+                                if (temp.equals(result)) {
+                                    // Endless iteration detected in `1` in evaluation loop.
+                                    IOFunctions.printMessage(result.topHead(), "itendless", F.List(temp), this);
+                                    IterationLimitExceeded.throwIt(fIterationLimit, result);
+                                }
+                            }
                             fTraceStack.add(result, temp, fRecursionCounter, iterationCounter, "Evaluation loop");
                             result = temp;
                             if (fIterationLimit >= 0 && fIterationLimit <= ++iterationCounter) {
@@ -1178,6 +1203,13 @@ public class EvalEngine implements Serializable {
                             if (fStopRequested) {
                                 throw TimeoutException.TIMED_OUT;
                             }
+                            if (FEConfig.SHOW_STACKTRACE) {
+                                if (temp.equals(result)) {
+                                    // Endless iteration detected in `1` in evaluation loop.
+                                    IOFunctions.printMessage(result.topHead(), "itendless", F.List(temp), this);
+                                    IterationLimitExceeded.throwIt(fIterationLimit, result);
+                                }
+                            }
                             if (fOnOffMode) {
                                 printOnOffTrace(result, temp);
                             }
@@ -1189,10 +1221,10 @@ public class EvalEngine implements Serializable {
                             // System.out.println("("+iterationCounter+") --> " +
                             // temp.toString());
                             // }
-                            result = temp;
                             if (fIterationLimit >= 0 && fIterationLimit <= ++iterationCounter) {
-                                IterationLimitExceeded.throwIt(iterationCounter, result);
+                                IterationLimitExceeded.throwIt(iterationCounter, temp);
                             }
+                            result = temp;
                         } else {
                             return result;
                         }
@@ -1212,6 +1244,9 @@ public class EvalEngine implements Serializable {
                 fTraceStack.tearDown(fRecursionCounter);
             }
             fRecursionCounter--;
+            if (fStopRequested) {
+                throw TimeoutException.TIMED_OUT;
+            }
         }
     }
 
@@ -1277,7 +1312,7 @@ public class EvalEngine implements Serializable {
         // engine.setNumericPrecision(precision);
         for (int i = 1; i < ast1.size(); i++) {
             IExpr temp = ast1.get(i);
-            if (!temp.isNumeric() && temp.isNumericFunction()) {
+            if (!temp.isInexactNumber() && temp.isNumericFunction()) {
                 temp = evalLoop(F.N(temp));
                 if (temp.isPresent()) {
                     if (!copy.isPresent()) {
@@ -1313,6 +1348,12 @@ public class EvalEngine implements Serializable {
                 return evalWithoutNumericReset(expr);
             }
             if (expr.isAST()) {
+                if (expr.isOneIdentityAST1()) {
+                    if (expr.first().isAST()) {
+                        return evalHoldPattern((IAST) expr.first()).orElse(expr.first());
+                    }
+                    return expr.first();
+                }
                 return evalHoldPattern((IAST) expr).orElse(expr);
             }
             return expr;
@@ -1333,8 +1374,7 @@ public class EvalEngine implements Serializable {
      * @return an <code>IPatterMatcher</code> created from the given expression.
      */
     public final IPatternMatcher evalPatternMatcher(@Nonnull final IExpr patternExpression) {
-        IExpr temp = evalPattern(patternExpression);
-        return new PatternMatcher(temp);
+        return new PatternMatcher(evalPattern(patternExpression));
     }
 
     /**
@@ -1681,7 +1721,7 @@ public class EvalEngine implements Serializable {
         try {
             return evaluate(expr).isTrue();
         } catch (MathException fce) {
-            if (Config.SHOW_STACKTRACE) {
+            if (FEConfig.SHOW_STACKTRACE) {
                 fce.printStackTrace();
             }
             return false;
@@ -1931,6 +1971,18 @@ public class EvalEngine implements Serializable {
         fNumericPrecision = precision;
     }
 
+    /**
+     * Get significant figures for output floating point numbers
+     *
+     * @return
+     */
+    public int getSignificantFigures() {
+        return fSignificantFigures;
+    }
+
+    public void setSignificantFigures(int figures) {
+        fSignificantFigures = figures;
+    }
     public LastCalculationsHistory getOutList() {
         return fOutList;
     }
@@ -2028,20 +2080,24 @@ public class EvalEngine implements Serializable {
      *
      * @return the module counter
      */
-    public int incModuleCounter() {
-        return ++fModuleCounter;
+    public long incModuleCounter() {
+        return MODULE_COUNTER.incrementAndGet();
+    }
+
+    public String uniqueName(String prefix) {
+        return prefix + MODULE_COUNTER.incrementAndGet();
     }
 
     /**
      * <p>
-     * Reset the module counter to <code>0</code>. Used only in JUnit tests.
+     * Reset the module counter to <code>0</code>. Used only in unit tests.
      * </p>
-     * <b> Don't reset for reusable EvalEngine's.</b>
+     * <b> Don't reset for reusable EvalEngine's!</b>
      *
      * @return the module counter
      */
-    public void resetModuleCounter() {
-        fModuleCounter = 0;
+    public void resetModuleCounter4JUnit() {
+        MODULE_COUNTER = new AtomicLong();
     }
 
     /**
@@ -2058,6 +2114,7 @@ public class EvalEngine implements Serializable {
      */
     final public void init() {
         fNumericPrecision = 15;
+        fSignificantFigures = 6;
         fRecursionCounter = 0;
         fNumericMode = false;
         fTogetherMode = false;
@@ -2070,6 +2127,7 @@ public class EvalEngine implements Serializable {
         fTraceMode = false;
         fTraceStack = null;
         fStopRequested = false;
+        fCopiedEngine = null;
         fSeconds = 0;
         fModifiedVariablesList = null;
         fMessageShortcut = null;
@@ -2100,9 +2158,6 @@ public class EvalEngine implements Serializable {
         return fEvalLHSMode;
     }
 
-    public final boolean isEvalRHSMode() {
-        return fEvalRHSMode;
-    }
 
     // public final int traceSize() {
     // return fTraceStack.size();
@@ -2112,6 +2167,9 @@ public class EvalEngine implements Serializable {
     // fTraceStack.resetSize(fromPosition);
     // }
 
+    public final boolean isEvalRHSMode() {
+        return fEvalRHSMode;
+    }
     public final void setEvalRHSMode(boolean evalRHSMode) {
         fEvalRHSMode = evalRHSMode;
     }
@@ -2226,6 +2284,13 @@ public class EvalEngine implements Serializable {
      */
     public void setStopRequested(final boolean stopRequested) {
         fStopRequested = stopRequested;
+        if (stopRequested) {
+            if (fCopiedEngine != null) {
+                fCopiedEngine.setStopRequested(true);
+            }
+        } else {
+            fCopiedEngine = null;
+        }
     }
 
     public final boolean isThrowError() {
@@ -2275,7 +2340,7 @@ public class EvalEngine implements Serializable {
      * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
      */
     final public IExpr parse(String expression) {
-        return parse(expression, Config.EXPLICIT_TIMES_OPERATOR);
+        return parse(expression, FEConfig.EXPLICIT_TIMES_OPERATOR);
     }
 
     /**
@@ -2318,15 +2383,20 @@ public class EvalEngine implements Serializable {
      * @param rex the RuntimeException which should be printed
      */
     public IAST printMessage(ISymbol symbol, RuntimeException rex) {
+        String message = rex.getMessage();
         if (!isQuietMode()) {
             PrintStream stream = getErrorPrintStream();
             if (stream == null) {
                 stream = System.err;
             }
-            stream.println(symbol + ": " + rex.getMessage());
+            if (message != null) {
+                stream.println(symbol + ": " + message);
+            } else {
+                stream.println(symbol + ": " + rex.getClass().getSimpleName());
+            }
         }
         if (fThrowError) {
-            throw new IllegalArgument(rex.getMessage());
+            throw new IllegalArgument(message);
         }
         return F.NIL;
     }
@@ -2336,6 +2406,7 @@ public class EvalEngine implements Serializable {
      */
     public void reset() {
         fNumericPrecision = 15;
+        fSignificantFigures = 6;
         fNumericMode = false;
         fEvalLHSMode = false;
         fEvalRHSMode = false;
@@ -2344,9 +2415,10 @@ public class EvalEngine implements Serializable {
         fTraceMode = false;
         fTraceStack = null;
         fStopRequested = false;
+        fCopiedEngine = null;
         fSeconds = 0;
         fModifiedVariablesList = null;
-
+        fMessageShortcut = null;
         // Swift changed: call clear() before assign null value
         if (REMEMBER_AST_CACHE != null) {
             REMEMBER_AST_CACHE.cleanUp();
@@ -2370,10 +2442,12 @@ public class EvalEngine implements Serializable {
      *
      * @param b
      * @param precision
+     * @param figures   significant figures which should be displayed in output forms
      */
-    public void setNumericMode(final boolean b, long precision) {
+    public void setNumericMode(final boolean b, long precision, int figures) {
         fNumericMode = b;
         fNumericPrecision = precision;
+        fSignificantFigures = figures;
     }
 
     /**
@@ -2421,7 +2495,8 @@ public class EvalEngine implements Serializable {
     }
 
     public void stopRequest() {
-        fStopRequested = true;
+        setStopRequested(true);
+        // fStopRequested = true;
     }
 
     /**

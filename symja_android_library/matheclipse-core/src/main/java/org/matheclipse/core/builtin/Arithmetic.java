@@ -76,6 +76,7 @@ import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.math.MathException;
 
 import ch.ethz.idsc.tensor.qty.IQuantity;
@@ -450,7 +451,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 			} catch (ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), ve);
@@ -656,7 +657,7 @@ public final class Arithmetic {
                     return F.chopNumber((INumber) arg1, delta);
                 }
             } catch (Exception e) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
                     e.printStackTrace();
                 }
             }
@@ -992,7 +993,7 @@ public final class Arithmetic {
                 // }
 
             } catch (Exception e) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
                     e.printStackTrace();
                 }
             }
@@ -1230,7 +1231,7 @@ public final class Arithmetic {
                 }
             }
 			} catch (ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), ve);
@@ -1629,12 +1630,17 @@ public final class Arithmetic {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			try {
+				IExpr a = ast.arg1();
+				if (ast.isAST3()) {
+					// see GammaRules.m
+					return F.NIL;
+				}
             if (ast.size() != 3) {
-                return unaryOperator(ast.arg1());
+					return unaryOperator(a);
             }
-			return binaryOperator(ast, ast.arg1(), ast.arg2());
+				return binaryOperator(ast, a, ast.arg2());
 			} catch (ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), ve);
@@ -1643,7 +1649,7 @@ public final class Arithmetic {
 
 		@Override
 		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_1_2;
+			return IOFunctions.ARGS_1_3;
 		}
         @Override
         public IExpr e1ObjArg(final IExpr arg1) {
@@ -1748,15 +1754,12 @@ public final class Arithmetic {
 			// TODO implement GCD for gaussian integers
 			IInteger[] gi0 = c0.gaussianIntegers();
 			IInteger[] gi1 = c1.gaussianIntegers();
+			if (gi0 != null && gi1 != null) {
 			ComplexSym devidend = ComplexSym.valueOf(c0.getRealPart(), c0.getImaginaryPart());
 
-			devidend.gcd(gi1);
-			if (gi0 != null && gi1 != null) {
-				if (gi0[0].isOne() && gi0[1].isZero()) {
-					return F.C1;
-				}
-				if (gi1[0].isOne() && gi1[1].isZero()) {
-					return F.C1;
+				IInteger[] result = devidend.gcd(gi1);
+				if (result != null) {
+					return F.complex(result[0], result[1]);
 				}
 			}
 			return F.NIL;
@@ -1868,7 +1871,7 @@ public final class Arithmetic {
 
 			} catch (final ValidateException ve) {
 				// int number validation
-				return engine.printMessage(ve.getMessage(ast.topHead()));
+				return engine.printMessage(ast.topHead(), ve);
 			}
             return F.NIL;
         }
@@ -2221,20 +2224,20 @@ public final class Arithmetic {
      * {-1,-2,-3,-4,-5,-6,-7,-8,-9,-10}
      * </pre>
      */
-    private final static class Minus extends AbstractCoreFunctionEvaluator {
+	private final static class Minus extends AbstractFunctionEvaluator {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
-            if (ast.size() == 2) {
-                IExpr arg1 = engine.evaluate(ast.arg1());
-                return F.Times(F.CN1, arg1);
-            }
-			return engine.printMessage("Minus: exactly 1 argument expected");
+			return F.Times(F.CN1, ast.arg1());
         }
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+		}
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
 		}
     }
 
@@ -2288,30 +2291,42 @@ public final class Arithmetic {
         @Override
         public IExpr numericEval(final IAST ast, EvalEngine engine) {
 
-            final boolean numericMode = engine.isNumericMode();
+			IExpr arg1 = engine.evaluate(ast.arg1());
+			if (arg1.isInexactNumber()) {
+				return arg1;
+			}
+			final boolean oldNumericMode = engine.isNumericMode();
 			final long oldPrecision = engine.getNumericPrecision();
+			final int oldSignificantFigures = engine.getSignificantFigures();
             try {
-				long numericPrecision = engine.getNumericPrecision();// Config.MACHINE_PRECISION;
+				long numericPrecision = oldPrecision;// Config.MACHINE_PRECISION;
+				int significantFigures = oldSignificantFigures;
                 if (ast.isAST2()) {
 					IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
 					numericPrecision = arg2.toIntDefault();// Validate.checkIntType(arg2);
+					if (numericPrecision <= 0) {
+						// Requested precision `1` is smaller than `2`.
+						return IOFunctions.printMessage(ast.topHead(), "precsm", F.List(arg2, F.C1), engine);
+					}
+					final int maxSize = (Config.MAX_OUTPUT_SIZE > Short.MAX_VALUE) ? Short.MAX_VALUE
+							: Config.MAX_OUTPUT_SIZE;
+					significantFigures = (numericPrecision > maxSize) ? maxSize : (int) numericPrecision;
 					if (numericPrecision < Config.MACHINE_PRECISION) {
 						numericPrecision = Config.MACHINE_PRECISION;
 					}
                 }
-				IExpr arg1 = ast.arg1();
 				if (arg1.isNumericFunction()) {
-					engine.setNumericMode(true, numericPrecision);
+					engine.setNumericMode(true, numericPrecision, significantFigures);
 					return engine.evalWithoutNumericReset(arg1);
 				}
 
 				// first try symbolic evaluation, then numeric evaluation
 				engine.setNumericPrecision(numericPrecision);
 				IExpr temp = engine.evaluate(arg1);
-                engine.setNumericMode(true, numericPrecision);
+				engine.setNumericMode(true, numericPrecision, significantFigures);
 				return engine.evalWithoutNumericReset(temp);
             } finally {
-                engine.setNumericMode(numericMode);
+				engine.setNumericMode(oldNumericMode);
                 engine.setNumericPrecision(oldPrecision);
             }
         }
@@ -4298,7 +4313,7 @@ public final class Arithmetic {
 				// }
 				// return F.num(numerator.doubleValue() / denominator.doubleValue());
             } catch (Exception e) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
                     e.printStackTrace();
                 }
             }

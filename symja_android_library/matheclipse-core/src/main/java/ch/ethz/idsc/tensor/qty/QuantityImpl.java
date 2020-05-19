@@ -138,6 +138,10 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	}
 
 	@Override
+	public IASTAppendable copyAppendable(int additionalCapacity) {
+		return F.NIL;
+	}
+	@Override
 	public IExpr divide(IExpr scalar) {
 		if (scalar instanceof IQuantity) {
 			IQuantity quantity = (IQuantity) scalar;
@@ -465,7 +469,7 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		return optional(F.GLOBAL_IDS_MAP.get(this));
+		return optional( );
 	}
 
 }

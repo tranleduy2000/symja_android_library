@@ -42,6 +42,7 @@ import org.matheclipse.core.reflection.system.rules.ProductLogRules;
 import org.matheclipse.core.reflection.system.rules.StieltjesGammaRules;
 import org.matheclipse.core.reflection.system.rules.StruveHRules;
 import org.matheclipse.core.reflection.system.rules.StruveLRules;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.math.BigDecimal;
 
@@ -135,12 +136,12 @@ public class SpecialFunctions {
 							return GammaJS.incompleteBeta(zDouble, aDouble, bDouble);
 						}
 					} catch (ThrowException te) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							te.printStackTrace();
 						}
 						return te.getValue();
 					} catch (ValidateException ve) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							ve.printStackTrace();
 						}
 					} catch (RuntimeException rex) {
@@ -192,12 +193,12 @@ public class SpecialFunctions {
 						return F.num(GammaJS.beta(aDouble, bDouble));
 					}
 				} catch (ThrowException te) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						te.printStackTrace();
 					}
 					return te.getValue();
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
 				} catch (RuntimeException rex) {
@@ -302,7 +303,7 @@ public class SpecialFunctions {
 					return F.Times(F.Power(z, a), sum);
 				}
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -980,7 +981,7 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr e1ComplexArg(final Complex c) {
-			return F.complexNum(BesselJS.logGamma(c));
+			return F.complexNum(GammaJS.logGamma(c));
 		}
 		@Override
 		public IExpr e1DblArg(final double arg1) {
@@ -989,8 +990,7 @@ public class SpecialFunctions {
 					return F.CInfinity;
 				}
 				if (arg1 > 0.0) {
-					return Num.valueOf(BesselJS.logGamma(arg1));
-					// return Num.valueOf(de.lab4inf.math.functions.Gamma.lngamma(arg1));
+					return Num.valueOf(GammaJS.logGamma(arg1));
 				}
 			} catch (final MathIllegalStateException e) {
 			}
@@ -1006,8 +1006,7 @@ public class SpecialFunctions {
 				if (F.isZero(stack[top])) {
 					return Double.POSITIVE_INFINITY;
 				}
-				return BesselJS.logGamma(stack[top]);
-				// return de.lab4inf.math.functions.Gamma.lngamma(stack[top]);
+				return GammaJS.logGamma(stack[top]);
 			} catch (final MathIllegalStateException e) {
 			}
 			throw new UnsupportedOperationException();
@@ -1572,7 +1571,7 @@ public class SpecialFunctions {
 				}
 			}
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 			}
@@ -1653,7 +1652,7 @@ public class SpecialFunctions {
 				}
 			}
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 			}

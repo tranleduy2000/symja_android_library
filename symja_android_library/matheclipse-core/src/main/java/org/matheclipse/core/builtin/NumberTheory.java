@@ -21,6 +21,7 @@ import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.exception.WrongNumberOfArguments;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
@@ -45,6 +46,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.numbertheory.GaussianInteger;
 import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -132,9 +134,10 @@ public final class NumberTheory {
 			}
 
 		/**
-		 * Generates the Bell polynomial of the given index, where B(1) is 1. This is recursive.
+		 * Generates the Bell polynomial of the given index <code>n</code>, where B(1) is 1. This is recursive.
 		 * 
-		 * @param index
+		 * @param n
+		 * @param z
 		 * @return
 		 */
 		private static IExpr bellBPolynomial(int n, IExpr z) {
@@ -179,7 +182,7 @@ public final class NumberTheory {
 						return F.BellB(arg1);
 					}
 					if (n > 1) {
-						if (z.isZero() && n > 0) {
+						if (z.isZero()) {
 							return F.C0;
 				}
 						if (!z.isOne()) {
@@ -201,7 +204,7 @@ public final class NumberTheory {
 			} catch (MathRuntimeException mre) {
 				return engine.printMessage(ast.topHead(), mre);
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), rex);
@@ -255,7 +258,7 @@ public final class NumberTheory {
 					}
 
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -296,7 +299,7 @@ public final class NumberTheory {
 						}
 					}
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -732,7 +735,7 @@ public final class NumberTheory {
 					try {
 							return F.ZZ(chineseRemainders(nBig, aBig));
 					} catch (ArithmeticException ae) {
-						if (Config.SHOW_STACKTRACE) {
+							if (FEConfig.SHOW_STACKTRACE) {
 							ae.printStackTrace();
 						}
 					}
@@ -748,7 +751,7 @@ public final class NumberTheory {
 				} catch (ValidateException ve) {
 					return engine.printMessage(ast.topHead(), ve);
 					} catch (ArithmeticException ae) {
-						if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 							ae.printStackTrace();
 						}
 					}
@@ -1159,7 +1162,7 @@ public final class NumberTheory {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.ORDERLESS | ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+			newSymbol.setAttributes(ISymbol.ORDERLESS | ISymbol.LISTABLE);
 		}
 	}
 
@@ -1181,13 +1184,13 @@ public final class NumberTheory {
 	 * 1
 	 * </pre>
 	 */
-	private static class DiscreteDelta extends AbstractEvaluator {
+	private static class DiscreteDelta extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			int size = ast.size();
 			if (size > 1) {
-				IExpr arg1 = ast.arg1();
+				IExpr arg1 = engine.evaluate(ast.arg1());
 
 				if (size == 2) {
 					INumber temp = arg1.evalNumber();
@@ -1205,7 +1208,7 @@ public final class NumberTheory {
 					return F.NIL;
 				}
 
-				IExpr result = removeEval(ast);
+				IExpr result = removeEval(ast, engine);
 				if (result.isPresent()) {
 					if (result.isAST()) {
 						if (result.isAST() && ((IAST) result).size() > 1) {
@@ -1220,12 +1223,12 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
-		private static IExpr removeEval(final IAST ast) {
+		private static IExpr removeEval(final IAST ast, EvalEngine engine) {
 			IASTAppendable result = F.NIL;
 			int size = ast.size();
 			int j = 1;
 			for (int i = 1; i < size; i++) {
-				IExpr expr = ast.get(i);
+				IExpr expr = engine.evaluate(ast.get(i));
 				INumber temp = expr.evalNumber();
 				if (temp != null) {
 					if (temp.isZero()) {
@@ -1250,7 +1253,7 @@ public final class NumberTheory {
 
 		@Override
 		public void setUp(ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.ORDERLESS | ISymbol.NUMERICFUNCTION);
+			newSymbol.setAttributes(ISymbol.ORDERLESS | ISymbol.NUMERICFUNCTION);
 		}
 	}
 
@@ -1781,7 +1784,7 @@ public final class NumberTheory {
 				// create the output list
 				return F.List(F.ZZ(gcd), subList);
 			} catch (ArithmeticException ae) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ae.printStackTrace();
 				}
 			}
@@ -2204,9 +2207,9 @@ public final class NumberTheory {
 					}
 					return fibonacci(n);
 				}
-			} else if (arg1.isNumeric()) {
+			} else if (arg1.isInexactNumber()) {
 				INumber n = ((INumber) arg1).evaluatePrecision(engine);
-				if (ast.isAST2() && ast.arg2().isNumeric()) {
+				if (ast.isAST2() && ast.arg2().isInexactNumber()) {
 					INumber x = ((INumber) ast.arg2()).evaluatePrecision(engine);
 					return
 					// [$ ((x + Sqrt(4 + x^2))^n/2^n - (2^n*Cos(n*Pi))/(x + Sqrt(4 + x^2))^n)/Sqrt(4 + x^2) $]
@@ -2673,9 +2676,9 @@ public final class NumberTheory {
 
 					return lucalsL;
 				}
-			} else if (arg1.isNumeric()) {
+			} else if (arg1.isInexactNumber()) {
 				INumber n = ((INumber) arg1).evaluatePrecision(engine);
-				if (ast.isAST2() && ast.arg2().isNumeric()) {
+				if (ast.isAST2() && ast.arg2().isInexactNumber()) {
 					INumber x = ((INumber) ast.arg2()).evaluatePrecision(engine);
 					return
 					// [$ (x/2 + Sqrt(1 + x^2/4))^n + Cos(n*Pi)/(x/2 + Sqrt(1 + x^2/4))^n $]
@@ -3593,7 +3596,7 @@ public final class NumberTheory {
 				try {
 					return F.ZZ(Primality.prime(nthPrime));
 				} catch (RuntimeException ae) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ae.printStackTrace();
 					}
 					return F.NIL;
@@ -3807,7 +3810,7 @@ public final class NumberTheory {
 				} catch (LimitException le) {
 					throw le;
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -3868,7 +3871,7 @@ public final class NumberTheory {
 				} catch (LimitException le) {
 					throw le;
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -4016,7 +4019,7 @@ public final class NumberTheory {
 				// try to convert into a fractional number
 				return rationalize(arg1, epsilon).orElse(arg1);
 			} catch (Exception e) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
 			}
@@ -4084,12 +4087,12 @@ public final class NumberTheory {
 				}
 				return F.bool(isSquarefree(expr, varList));
 			} catch (JASConversionException e) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
 			} catch (RuntimeException e) {
 				// JAS may throw RuntimeExceptions
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
 			}
@@ -4252,7 +4255,7 @@ public final class NumberTheory {
 				try {
 				return stirlingS1((IInteger) nArg1, (IInteger) mArg2);
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -4340,7 +4343,7 @@ public final class NumberTheory {
 			} catch (MathRuntimeException mre) {
 				return engine.printMessage(ast.topHead(), mre);
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), rex);

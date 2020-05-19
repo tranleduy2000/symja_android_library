@@ -5,6 +5,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.mathml.MathMLFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -17,9 +18,9 @@ import java.text.NumberFormat;
  * 
  */
 public class MathMLUtilities {
-	protected final EvalEngine fEvalEngine;
+	protected EvalEngine fEvalEngine;
 
-	protected MathMLFormFactory fMathMLFactory;
+	// protected MathMLFormFactory fMathMLFactory;
 
 	/**
 	 * MS Internet Explorer client ?
@@ -40,41 +41,36 @@ public class MathMLUtilities {
 	 * Constructor for an object which converts an expression into presentation MathML output
 	 * 
 	 * @param evalEngine
-	 * @param mathMTagPrefix
+	 * @param mathMLTagPrefix
 	 *            if set to <code>true</code> use &quot;m:&quot; as tag prefix for the MathML output.
 	 * @param mathMLHeader
 	 *            print MathML header in output
-	 * @param numberFormat
-	 *            the number formatter (could be <code>null</code>)
 	 */
-	public MathMLUtilities(final EvalEngine evalEngine, final boolean mathMTagPrefix, final boolean mathMLHeader) {
-		this(evalEngine, mathMTagPrefix, mathMLHeader, null);
-	}
+//	public MathMLUtilities(final EvalEngine evalEngine, final boolean mathMLTagPrefix, final boolean mathMLHeader) {
+//		this(evalEngine, mathMLTagPrefix, mathMLHeader, null);
+//	}
 
 	/**
 	 * Constructor for an object which converts an expression into presentation MathML output
 	 * 
 	 * @param evalEngine
-	 * @param mathMTagPrefix
+	 * @param mathMLTagPrefix
 	 *            if set to <code>true</code> use &quot;m:&quot; as tag prefix for the MathML output.
 	 * @param mathMLHeader
 	 *            print MathML header in output
-	 * @param numberFormat
-	 *            the number formatter (could be <code>null</code>)
 	 */
-	public MathMLUtilities(final EvalEngine evalEngine, final boolean mathMTagPrefix, final boolean mathMLHeader,
-			NumberFormat numberFormat) {
+	public MathMLUtilities(final EvalEngine evalEngine, final boolean mathMLTagPrefix, final boolean mathMLHeader) {
 		fEvalEngine = evalEngine;
 		EvalEngine.set(fEvalEngine);
 		// set the thread local instance
 		startRequest();
-		if (mathMTagPrefix) {
-			fMathMLFactory = new MathMLFormFactory("m:", numberFormat);
-		} else {
-			fMathMLFactory = new MathMLFormFactory("", numberFormat);
-		}
+//		if (mathMLTagPrefix) {
+//			fMathMLFactory = new MathMLFormFactory("m:", numberFormat);
+//		} else {
+//			fMathMLFactory = new MathMLFormFactory("", numberFormat);
+//		}
 		// fParser = new Parser(relaxedSyntax);
-		fMSIE = mathMTagPrefix;
+		fMSIE = mathMLTagPrefix;
 		fMathMLHeader = mathMLHeader;
 	}
 
@@ -104,7 +100,7 @@ public class MathMLUtilities {
 				// node = fEvalEngine.parseNode(inputExpression);
 				// parsedExpression = AST2Expr.CONST.convert(node, fEvalEngine);
 			} catch (final RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 			}
 		}
@@ -127,7 +123,15 @@ public class MathMLUtilities {
 
 		if (objectExpression != null) {
 			try {
-				if (fMathMLFactory.convert(buf, objectExpression, Integer.MIN_VALUE, false)) {
+				MathMLFormFactory mathMLFactory;
+				if (fMSIE) {
+					mathMLFactory = new MathMLFormFactory("m:", null, fEvalEngine.getSignificantFigures() - 1,
+						fEvalEngine.getSignificantFigures() + 1);
+				}else {
+					mathMLFactory = new MathMLFormFactory("", null, fEvalEngine.getSignificantFigures() - 1,
+							fEvalEngine.getSignificantFigures() + 1);
+				}
+				if (mathMLFactory.convert(buf, objectExpression, Integer.MIN_VALUE, false)) {
 				if (fMSIE) {
 					out.write("<m:math>");
 					out.write(buf.toString());
@@ -156,7 +160,7 @@ public class MathMLUtilities {
 			} catch (final IOException ioe) {
 				//
 			} catch (final RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 			}
 		}
@@ -178,7 +182,7 @@ public class MathMLUtilities {
 			} catch (final IOException ioe) {
 				//
 			} catch (final RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 			}

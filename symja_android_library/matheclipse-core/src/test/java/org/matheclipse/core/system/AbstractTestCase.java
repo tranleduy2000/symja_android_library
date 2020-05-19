@@ -13,6 +13,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.script.engine.MathScriptEngine;
 
 import java.io.StringWriter;
+import java.util.Locale;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -27,6 +28,7 @@ public abstract class AbstractTestCase extends TestCase {
 
     public AbstractTestCase(String name) {
         super(name);
+        Locale.setDefault(Locale.US);
         Config.SERVER_MODE = false;
         Config.SHOW_STACKTRACE = true;
     }

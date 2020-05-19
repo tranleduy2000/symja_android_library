@@ -32,6 +32,7 @@ import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.Parser;
 import org.matheclipse.parser.client.ast.ASTNode;
 
@@ -142,7 +143,7 @@ public final class PatternMatching {
 							fis.close();
 						}
 					} catch (IOException e) {
-						if (Config.SHOW_STACKTRACE) {
+							if (FEConfig.SHOW_STACKTRACE) {
 							e.printStackTrace();
 						}
 					}
@@ -916,7 +917,7 @@ public final class PatternMatching {
 					}
 						stream.println(symbol.definitionToString());
 					} catch (IOException ioe) {
-						if (Config.SHOW_STACKTRACE) {
+							if (FEConfig.SHOW_STACKTRACE) {
 							ioe.printStackTrace();
 						}
 					}
@@ -925,6 +926,9 @@ public final class PatternMatching {
 			return F.Null;
 				} catch (RuntimeException rex) {
 					//
+					if (FEConfig.SHOW_STACKTRACE) {
+						rex.printStackTrace();
+					}
 				}
 		}
 			return F.NIL;
@@ -1229,7 +1233,7 @@ public final class PatternMatching {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL|ISymbol.SEQUENCEHOLD);
+			newSymbol.setAttributes( ISymbol.SEQUENCEHOLD);
 		}
 	}
 
@@ -1269,7 +1273,7 @@ public final class PatternMatching {
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL|ISymbol.SEQUENCEHOLD);
+			newSymbol.setAttributes(ISymbol.HOLDREST | ISymbol.SEQUENCEHOLD);
 		}
 	}
 
@@ -1451,7 +1455,7 @@ public final class PatternMatching {
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.HOLDALL|ISymbol.SEQUENCEHOLD);
+			newSymbol.setAttributes(ISymbol.HOLDFIRST | ISymbol.SEQUENCEHOLD);
 		}
 
 	}
@@ -1818,19 +1822,17 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			final int moduleCounter = engine.incModuleCounter();
 			if (ast.isAST1()) {
 				if (ast.arg1().isSymbol()) {
-					final String varAppend = ast.arg1().toString() + "$" + moduleCounter;
+					final String varAppend = ast.arg1().toString() + engine.uniqueName("$");
 					return F.symbol(varAppend, engine);
 				} else if (ast.arg1() instanceof IStringX) {
 					// TODO start counter by 1....
-					final String varAppend = ast.arg1().toString() + moduleCounter;
+					final String varAppend = engine.uniqueName(ast.arg1().toString());
 					return F.symbol(varAppend, engine);
 				}
 			}
-			final String varAppend = "$" + moduleCounter;
-			return F.symbol(varAppend, engine);
+			return F.symbol(engine.uniqueName("$"), engine);
 		}
 
 		@Override

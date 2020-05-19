@@ -1,5 +1,7 @@
 package org.matheclipse.core.interfaces;
 
+import com.duy.lambda.Supplier;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -42,12 +44,12 @@ public interface IAssociation extends IASTAppendable {
 	 * @param defaultValue
 	 * @return
 	 */
-	public IExpr getValue(IExpr key, IExpr defaultValue);
+	public IExpr getValue(IExpr key, Supplier<IExpr> defaultValue);
 
 	/**
 	 * Test if the <code>expr</code> is a key in this association.
 	 *
-	 * @param key
+	 * @param expr
 	 * @return
 	 */
 	public boolean isKey(IExpr expr);
@@ -83,7 +85,7 @@ public interface IAssociation extends IASTAppendable {
 	/**
 	 * Return the list of rules <code>{a->b, c:>d, ...}</code> represented by this association.
 	 */
-	public IAST normal();
+	public IAST normal(boolean nilIfUnevaluated);
 
 	/**
 	 * Return the list of rules as a matrix or list
@@ -97,6 +99,12 @@ public interface IAssociation extends IASTAppendable {
 	 */
 	public IAssociation sort();
 
+	/**
+	 * Return a new association sorted by the comparator.
+	 *
+	 * @return the sorted association
+	 */
+	public IAssociation sort(Comparator<IExpr> comparator);
 	/**
 	 * Get the values of this association as a<code>List(value1, value2,...)</code>
 	 *

@@ -34,7 +34,7 @@ public class Int2IntRBTreeMap implements Int2IntMap {
         ArrayList<Entry> copy = new ArrayList<>();
         copy.ensureCapacity(entries.size());
         for (Map.Entry<Integer, Integer> entry : entries) {
-            copy.add(new TreeMapEntry(entry.getKey(), entry.getValue()));
+            copy.add(new TreeMapEntry(internalMap, entry.getKey(), entry.getValue()));
         }
         return copy;
     }
@@ -42,8 +42,10 @@ public class Int2IntRBTreeMap implements Int2IntMap {
     static class TreeMapEntry implements Entry {
         int key;
         int value;
+        private TreeMap<Integer, Integer> internalMap;
 
-        public TreeMapEntry(int key, int value) {
+        public TreeMapEntry(TreeMap<Integer, Integer> internalMap, int key, int value) {
+            this.internalMap = internalMap;
             this.key = key;
             this.value = value;
         }
@@ -56,6 +58,11 @@ public class Int2IntRBTreeMap implements Int2IntMap {
         @Override
         public int getIntValue() {
             return value;
+        }
+
+        @Override
+        public void setValue(int newValue) {
+            internalMap.put(key, newValue);
         }
     }
 

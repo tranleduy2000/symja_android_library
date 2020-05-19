@@ -52,10 +52,11 @@ import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.builtin.QuantityFunctions;
 import org.matheclipse.core.builtin.RandomFunctions;
 import org.matheclipse.core.builtin.SeriesFunctions;
+import org.matheclipse.core.builtin.SimplifyFunctions;
 import org.matheclipse.core.builtin.SpecialFunctions;
 import org.matheclipse.core.builtin.StatisticsFunctions;
 import org.matheclipse.core.builtin.StringFunctions;
-import org.matheclipse.core.builtin.Structure;
+import org.matheclipse.core.builtin.StructureFunctions;
 import org.matheclipse.core.builtin.TensorFunctions;
 import org.matheclipse.core.builtin.VectorAnalysisFunctions;
 import org.matheclipse.core.builtin.WXFFunctions;
@@ -94,11 +95,11 @@ import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.trie.Tries;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -107,6 +108,7 @@ import java.util.concurrent.CountDownLatch;
 import ch.ethz.idsc.tensor.QuantityParser;
 import edu.jas.kern.ComputerThreads;
 import edu.jas.kern.PreemptStatus;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 
 /**
  *
@@ -118,6 +120,15 @@ public class F {
     // Android changed: more symbols
 	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 200];
 
+	private final static short EXPRID_MAX_BUILTIN_LENGTH = (short) (BUILT_IN_SYMBOLS.length + 1);
+
+	private static IExpr[] COMMON_IDS = null;
+
+	/**
+	 * Global map of predefined constant expressions.
+	 */
+	public final static Object2ShortOpenHashMap<IExpr> GLOBAL_IDS_MAP = new Object2ShortOpenHashMap<IExpr>(
+			EXPRID_MAX_BUILTIN_LENGTH + 1000);
 	/**
 	 * <p>
 	 * In computing, memoization or memoisation is an optimization technique used primarily to speed up computer
@@ -197,8 +208,10 @@ public class F {
     public final static IBuiltInSymbol $Aborted = F.initFinalSymbol("$Aborted", ID.$Aborted);
     /***/
     public final static IBuiltInSymbol $Assumptions = F.initFinalSymbol("$Assumptions", ID.$Assumptions);
-//	/***/
-//	public final static IBuiltInSymbol $Cancel = F.initFinalSymbol("$Cancel", ID.$Cancel);
+
+	/***/
+	public final static IBuiltInSymbol $Cancel = F.initFinalSymbol("$Cancel", ID.$Cancel);
+
     /***/
     public final static IBuiltInSymbol $Context = F.initFinalSymbol("$Context", ID.$Context);
     /***/
@@ -248,6 +261,8 @@ public class F {
 	/***/
 	public final static IBuiltInSymbol AbsoluteCorrelation = F.initFinalSymbol("AbsoluteCorrelation",
 			ID.AbsoluteCorrelation);
+	/***/
+	public final static IBuiltInSymbol AbsoluteTime = F.initFinalSymbol("AbsoluteTime", ID.AbsoluteTime);
 	/** Accumulate(list) - accumulate the values of `list` returning a new list. */
     public final static IBuiltInSymbol Accumulate = F.initFinalSymbol("Accumulate", ID.Accumulate);
 	/** AddTo(x, dx) - is equivalent to `x = x + dx`. */
@@ -605,6 +620,11 @@ public class F {
     /***/
     public final static IBuiltInSymbol Colon = F.initFinalSymbol("Colon", ID.Colon);
 	/***/
+	public final static IBuiltInSymbol ColorData = F.initFinalSymbol("ColorData", ID.ColorData);
+
+	/***/
+	public final static IBuiltInSymbol ColorFunction = F.initFinalSymbol("ColorFunction", ID.ColorFunction);
+	/***/
 	public final static IBuiltInSymbol Column = F.initFinalSymbol("Column", ID.Column);
     /***/
     public final static IBuiltInSymbol Commonest = F.initFinalSymbol("Commonest", ID.Commonest);
@@ -631,6 +651,8 @@ public class F {
     /***/
     public final static IBuiltInSymbol ComplexityFunction = F.initFinalSymbol("ComplexityFunction",
             ID.ComplexityFunction);
+	/***/
+	public final static IBuiltInSymbol ComplexPlot3D = F.initFinalSymbol("ComplexPlot3D", ID.ComplexPlot3D);
     /**
      * ComposeList(list-of-symbols, variable) - creates a list of compositions of the symbols applied at the argument
      * `x`.
@@ -746,6 +768,11 @@ public class F {
     public final static IBuiltInSymbol DSolve = F.initFinalSymbol("DSolve", ID.DSolve);
 	/***/
 	public final static IBuiltInSymbol Dataset = F.initFinalSymbol("Dataset", ID.Dataset);
+	/***/
+	public final static IBuiltInSymbol DateObject = F.initFinalSymbol("DateObject", ID.DateObject);
+
+	/***/
+	public final static IBuiltInSymbol DateValue = F.initFinalSymbol("DateValue", ID.DateValue);
 	/** Decrement(x) - decrements `x` by `1`, returning the original value of `x`. */
     public final static IBuiltInSymbol Decrement = F.initFinalSymbol("Decrement", ID.Decrement);
 	/**
@@ -1029,6 +1056,9 @@ public class F {
 	 * Levenberg-Marquardt algorithm.
 	 */
     public final static IBuiltInSymbol FindFit = F.initFinalSymbol("FindFit", ID.FindFit);
+	/***/
+	public final static IBuiltInSymbol FindGraphCommunities = F.initFinalSymbol("FindGraphCommunities",
+			ID.FindGraphCommunities);
 	/** FindHamiltonianCycle(graph) - find an hamiltonian cycle in the `graph`. */
 	public final static IBuiltInSymbol FindHamiltonianCycle = F.initFinalSymbol("FindHamiltonianCycle",
 			ID.FindHamiltonianCycle);
@@ -1224,6 +1254,9 @@ public class F {
 
 	/** GoldenRatio - is the golden ratio `(1+Sqrt(5))/2`. */
     public final static IBuiltInSymbol GoldenRatio = F.initFinalSymbol("GoldenRatio", ID.GoldenRatio);
+	/***/
+	public final static IBuiltInSymbol GompertzMakehamDistribution = F.initFinalSymbol("GompertzMakehamDistribution",
+			ID.GompertzMakehamDistribution);
 	/** Grad(function, list-of-variables) - gives the gradient of the function. */
     public final static IBuiltInSymbol Grad = F.initFinalSymbol("Grad", ID.Grad);
 	/** Graph({edge1,...,edgeN}) - create a graph from the given edges `edge1,...,edgeN`. */
@@ -1939,6 +1972,9 @@ public class F {
     /***/
     public final static IBuiltInSymbol Nothing = F.initFinalSymbol("Nothing", ID.Nothing);
 
+	/***/
+	public final static IBuiltInSymbol Now = F.initFinalSymbol("Now", ID.Now);
+
 	/** Null - is the implicit result of expressions that do not yield a result. */
     public final static IBuiltInSymbol Null = F.initFinalSymbol("Null", ID.Null);
 	/** NullSpace(matrix) - returns a list of vectors that span the nullspace of the `matrix`. */
@@ -2239,6 +2275,7 @@ public class F {
 	public final static IBuiltInSymbol Ramp = F.initFinalSymbol("Ramp", ID.Ramp);
 	/** RandomChoice({arg1, arg2, arg3,...}) - chooses a random `arg` from the list. */
     public final static IBuiltInSymbol RandomChoice = F.initFinalSymbol("RandomChoice", ID.RandomChoice);
+	public final static IBuiltInSymbol RandomComplex = F.initFinalSymbol("RandomComplex", ID.RandomComplex);
 	/** RandomInteger(n) - create a random integer number between `0` and `n`. */
     public final static IBuiltInSymbol RandomInteger = F.initFinalSymbol("RandomInteger", ID.RandomInteger);
 	/** RandomPrime(n) - create a random prime integer number between `2` and `n`. */
@@ -2265,6 +2302,7 @@ public class F {
     public final static IBuiltInSymbol ReadProtected = F.initFinalSymbol("ReadProtected", ID.ReadProtected);
 	/** Real - is the head of real (floating point) numbers. */
     public final static IBuiltInSymbol Real = F.initFinalSymbol("Real", ID.Real);
+	public final static IBuiltInSymbol RealDigits = F.initFinalSymbol("RealDigits", ID.RealDigits);
 	/** RealNumberQ(expr) - returns `True` if `expr` is an explicit number with no imaginary component. */
     public final static IBuiltInSymbol RealNumberQ = F.initFinalSymbol("RealNumberQ", ID.RealNumberQ);
 	/** Reals - is the set of real numbers. */
@@ -2401,6 +2439,8 @@ public class F {
     public final static IBuiltInSymbol Second = F.initFinalSymbol("Second", ID.Second);
 	/** Select({e1, e2, ...}, f) - returns a list of the elements `ei` for which `f(ei)` returns `True`. */
     public final static IBuiltInSymbol Select = F.initFinalSymbol("Select", ID.Select);
+	/***/
+	public final static IBuiltInSymbol SelectFirst = F.initFinalSymbol("SelectFirst", ID.SelectFirst);
 	/**
 	 * SemanticImport("path-to-filename") - if the file system is enabled, import the data from CSV files and do a
 	 * semantic interpretation of the columns.
@@ -2573,6 +2613,10 @@ public class F {
 	public final static IBuiltInSymbol StringSplit = F.initFinalSymbol("StringSplit", ID.StringSplit);
     /***/
     public final static IBuiltInSymbol StringTake = F.initFinalSymbol("StringTake", ID.StringTake);
+
+	/***/
+	public final static IBuiltInSymbol Structure = F.initFinalSymbol("Structure", ID.Structure);
+
 	/** StruveH(n, z) - returns the Struve function `H_n(z)`. */
     public final static IBuiltInSymbol StruveH = F.initFinalSymbol("StruveH", ID.StruveH);
 	/** StruveL(n, z) - returns the modified Struve function `L_n(z)`. */
@@ -2598,6 +2642,9 @@ public class F {
     public final static IBuiltInSymbol SubtractFrom = F.initFinalSymbol("SubtractFrom", ID.SubtractFrom);
 	/** Sum(expr, {i, imin, imax}) - evaluates the discrete sum of `expr` with `i` ranging from `imin` to `imax`. */
     public final static IBuiltInSymbol Sum = F.initFinalSymbol("Sum", ID.Sum);
+
+	public final static IBuiltInSymbol Summary = F.initFinalSymbol("Summary", ID.Summary);
+
     /***/
     public final static IBuiltInSymbol Superscript = F.initFinalSymbol("Superscript", ID.Superscript);
 	/** Surd(expr, n) - returns the `n`-th root of `expr`. If the result is defined, it's a real value. */
@@ -2679,6 +2726,8 @@ public class F {
     public final static IBuiltInSymbol Throw = F.initFinalSymbol("Throw", ID.Throw);
     /***/
     public final static IBuiltInSymbol TimeConstrained = F.initFinalSymbol("TimeConstrained", ID.TimeConstrained);
+	/***/
+	public final static IBuiltInSymbol TimeObject = F.initFinalSymbol("TimeObject", ID.TimeObject);
 	/** TimeValue(p, i, n) - returns a time value calculation. */
     public final static IBuiltInSymbol TimeValue = F.initFinalSymbol("TimeValue", ID.TimeValue);
 	/** Times(a, b, ...) - represents the product of the terms `a, b, ...`. */
@@ -2690,6 +2739,8 @@ public class F {
      * evaluation result of `x`.
      */
     public final static IBuiltInSymbol Timing = F.initFinalSymbol("Timing", ID.Timing);
+	/***/
+	public final static IBuiltInSymbol Today = F.initFinalSymbol("Today", ID.Today);
 	/** ToCharacterCode(string) - converts `string` into a list of corresponding integer character codes. */
     public final static IBuiltInSymbol ToCharacterCode = F.initFinalSymbol("ToCharacterCode", ID.ToCharacterCode);
 	/** ToExpression("string", form) - converts the `string` given in `form` into an expression. */
@@ -2848,6 +2899,8 @@ public class F {
 	public final static IBuiltInSymbol WeightedAdjacencyMatrix = F.initFinalSymbol("WeightedAdjacencyMatrix",
 			ID.WeightedAdjacencyMatrix);
 
+	/***/
+	public final static IBuiltInSymbol WeightedData = F.initFinalSymbol("WeightedData", ID.WeightedData);
 	/**
 	 * Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2` if `cond2`
 	 * evaluates to `True`, etc.
@@ -2883,9 +2936,9 @@ public class F {
 	/** Zeta(z) - returns the Riemann zeta function of `z`. */
     public final static IBuiltInSymbol Zeta = F.initFinalSymbol("Zeta", ID.Zeta);
 	public final static ISymbol $RealVector = initFinalHiddenSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realvector" : "$RealVector");
+			FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? "$realvector" : "$RealVector");
 	public final static ISymbol $RealMatrix = initFinalHiddenSymbol(
-			Config.PARSER_USE_LOWERCASE_SYMBOLS ? "$realmatrix" : "$RealMatrix");
+			FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? "$realmatrix" : "$RealMatrix");
 
 	// public final static ISymbol usage = initFinalHiddenSymbol("usage");
 
@@ -2944,7 +2997,7 @@ public class F {
 
 	public final static ISymbol ASymbol = initFinalHiddenSymbol("A");
 	public final static ISymbol BSymbol = initFinalHiddenSymbol("B");
-	public final static ISymbol CSymbol = F.C; // initFinalHiddenSymbol("C");
+	public final static ISymbol CSymbol = initFinalHiddenSymbol("C"); // don't use constant BuiltinSymbol 'C' here
 	public final static ISymbol FSymbol = initFinalHiddenSymbol("F");
 	public final static ISymbol GSymbol = initFinalHiddenSymbol("G");
 	public final static ISymbol PSymbol = initFinalHiddenSymbol("P");
@@ -3395,19 +3448,17 @@ public class F {
 	 */
 	public final static IInteger CN10 = AbstractIntegerSym.valueOf(-10);
 
-	/**
-	 * Global map of predefined constant expressions.
-	 */
-	public final static HashMap<IExpr, ExprID> GLOBAL_IDS_MAP = new HashMap<IExpr, ExprID>(1009);
     public static Map<ISymbol, IExpr> UNARY_INVERSE_FUNCTIONS = new IdentityHashMap<ISymbol, IExpr>();
     public static ISymbol[] DENOMINATOR_NUMERATOR_SYMBOLS = null;
     public static IExpr[] DENOMINATOR_TRIG_TRUE_EXPRS = null;
     public static ISymbol[] NUMERAATOR_NUMERATOR_SYMBOLS = null;
     public static IExpr[] NUMERATOR_TRIG_TRUE_EXPRS = null;
-    /**
-     * Global array of predefined constant expressions.
-     */
-    static IExpr[] GLOBAL_IDS = null;
+	public static IExpr exprID(short id) {
+		if (id >= EXPRID_MAX_BUILTIN_LENGTH) {
+			return COMMON_IDS[id - EXPRID_MAX_BUILTIN_LENGTH];
+		}
+		return BUILT_IN_SYMBOLS[id];
+	}
 
 	private final static CountDownLatch COUNT_DOWN_LATCH = new CountDownLatch(1);
 
@@ -3484,7 +3535,7 @@ public class F {
             Slot2 = unaryAST1(Slot, C2);
 			Slot3 = unaryAST1(Slot, C3);
 
-            GLOBAL_IDS = new IExpr[]{CN1, CN2, CN3, CN4, CN5, CN6, CN7, CN8, CN9, CN10, C0, C1, C2, C3, C4, C5, C6,
+			COMMON_IDS = new IExpr[] { CN1, CN2, CN3, CN4, CN5, CN6, CN7, CN8, CN9, CN10, C0, C1, C2, C3, C4, C5, C6,
                     C7, C8, C9, C10, CI, CNI, C1D2, CN1D2, C1D3, CN1D3, C1D4, CN1D4, CD0, CD1, CInfinity, CNInfinity,
                     CComplexInfinity, CSqrt2, CSqrt3, CSqrt5, CSqrt6, CSqrt7, CSqrt10, C1DSqrt2, C1DSqrt3, C1DSqrt5,
                     C1DSqrt6, C1DSqrt7, C1DSqrt10, Slot1, Slot2,
@@ -3501,98 +3552,105 @@ public class F {
                     t_DEFAULT, u_DEFAULT, v_DEFAULT, w_DEFAULT, x_DEFAULT, y_DEFAULT, z_DEFAULT, A_DEFAULT, B_DEFAULT,
                     C_DEFAULT, F_DEFAULT, G_DEFAULT,
                     // start symbol strings
-                    Algebraics, Booleans, ComplexInfinity, Catalan, Complexes, Degree, EulerGamma, False, Flat,
-                    Glaisher, GoldenRatio, HoldAll, HoldFirst, HoldForm, HoldRest, Indeterminate, Infinity, Integer,
-                    Integers, Khinchin, Listable, Modulus, Null, NumericFunction, OneIdentity, Orderless, Pi, Primes,
-                    Rationals, Real, Reals, Slot, SlotSequence, String, F.Symbol, True,
-                    // start function strings
-                    Abs, AddTo, And, Alternatives, Apart, AppellF1, Append, AppendTo, Apply, ArcCos, ArcCosh, ArcCot,
-                    ArcCoth, ArcCsc, ArcCsch, ArcSec, ArcSech, ArcSin, ArcSinh, ArcTan, ArcTanh, Arg, Array,
-                    // ArrayDepth,
-                    ArrayQ, Assumptions, AtomQ, Attributes,
-                    // BernoulliB,
-                    Binomial, Blank, Block, Boole,
-                    // BooleanConvert,
-                    BooleanMinimize, Break, Cancel, CartesianProduct, Cases, CatalanNumber, Catch, Ceiling,
-                    CharacteristicPolynomial,
-                    // ChebyshevT,
-                    ChessboardDistance, Chop, Clear, ClearAll, Coefficient, CoefficientList, Collect, Complement,
-                    Complex,
-                    // ComplexExpand,
-                    ComplexInfinity, ComposeList, CompoundExpression, Condition, Conjugate, ConjugateTranspose,
-                    ConstantArray, Continue, ContinuedFraction, CoprimeQ, Cos, Cosh, CosIntegral, CoshIntegral, Cot,
-                    Coth, Count, Cross, Csc, Csch, Curl, Decrement, Default, Defer, Definition, Delete, DeleteCases,
-                    // DeleteDuplicates,
-                    Denominator, Depth, Derivative, Det, DiagonalMatrix, DigitQ, Dimensions, DirectedInfinity,
-                    Discriminant, Distribute, Div, DivideBy, Divisible,
-                    // Divisors,
-                    Do, Dot, Drop, Eigenvalues, Eigenvectors, Element,
-                    // Eliminate,
-                    EllipticE, EllipticF, EllipticPi, Equal, Equivalent, Erf, Erfc, Erfi, EuclideanDistance,
-                    // EulerE,
-                    EulerPhi, EvenQ, Exp, Expand, ExpandAll, ExpIntegralE, ExpIntegralEi, Exponent, ExtendedGCD,
-                    Extract, Factor, Factorial, Factorial2, FactorInteger, FactorSquareFree, FactorSquareFreeList,
-                    FactorTerms, Flatten, Fibonacci, FindRoot, First, Fit, FixedPoint, Floor, Fold, FoldList, For,
-                    FractionalPart, FreeQ, FresnelC, FresnelS, FrobeniusSolve, FromCharacterCode, FromContinuedFraction,
-                    FullForm, FullSimplify, Function, Gamma, GCD, GeometricMean, Graphics, Graphics3D, Graphics3D,
-                    Greater, GreaterEqual, GroebnerBasis, HarmonicNumber, Head,
-                    // HermiteH,
-                    HilbertMatrix, Hold, HoldForm, Horner,
-                    // HornerForm,
-                    HurwitzZeta, HypergeometricPFQ, Hypergeometric2F1, Identity, IdentityMatrix, If, Im, Implies,
-                    Increment, Inner, Insert, IntegerPart, IntegerPartitions, IntegerQ, Integrate,
-                    // InterpolatingFunction, InterpolatingPolynomial,
-                    Intersection, Inverse, InverseErf, InverseFunction, JacobiMatrix, JacobiSymbol, JavaForm, Join,
-                    KOrderlessPartitions, KPartitions, LaplaceTransform, Last, LCM, LeafCount,
-                    // LaguerreL, LegendreP,
-                    Length, Less, LessEqual, LetterQ, Level, Limit, Line, LinearProgramming, LinearSolve, List, ListQ,
-                    Log,
-                    // Log2, Log10,
-                    LogGamma,
-                    // LogicalExpand,
-                    LogIntegral, LowerCaseQ, LUDecomposition, ManhattanDistance, Map, MapAll, MapThread, MatchQ,
-                    MathMLForm,
-                    // MatrixForm,
-                    MatrixPower, MatrixQ,
-                    // MatrixRank,
-                    Max, Mean, Median, MemberQ, Min, Mod, Module, MoebiusMu,
-                    // MonomialList,
-                    Most, Multinomial, Nand, Negative, Nest, NestList, NestWhile, NestWhileList, NextPrime,
-                    NFourierTransform, NIntegrate,
-                    // NMaximize, NMinimize,
-                    NonCommutativeMultiply, NonNegative, Nor, Norm, Not, NRoots, NSolve,
-                    // NullSpace,
-                    NumberQ, Numerator, NumericQ, OddQ, Options, Or, Order, OrderedQ, Out, Outer, PadLeft, PadRight,
-                    // ParametricPlot,
-                    Part, Partition, Pattern, Permutations, Piecewise, Plot, Plot3D, Plus,
-                    // Pochhammer,
-                    PolyGamma, PolyLog, PolynomialExtendedGCD, PolynomialGCD, PolynomialLCM, PolynomialQ,
-                    PolynomialQuotient, PolynomialQuotientRemainder, PolynomialRemainder, Position, Positive,
-                    PossibleZeroQ, Power, PowerExpand, PowerMod, PreDecrement, PreIncrement, Prepend, PrependTo,
-                    // Prime,
-                    PrimeQ, PrimitiveRootList, Print, Product, ProductLog, Quiet, Quotient, RandomInteger, RandomReal,
-                    // RandomSample,
-                    Range, Rational, Rationalize, Re, Reap, Refine, ReplaceAll, ReplacePart, ReplaceRepeated, Rest,
-                    Resultant, Return, Reverse, Riffle, RootIntervals, RootOf, Roots, Surd, RotateLeft, RotateRight,
-                    Round,
-                    // RowReduce,
-                    Rule, RuleDelayed, SameQ, Scan, Sec, Sech, Select, Sequence, Set, SetAttributes, SetDelayed, Show,
-                    Sign, SignCmp, Simplify, Sin, Sinc, SingularValueDecomposition, Sinh, SinIntegral, SinhIntegral,
-                    Solve, Sort, Sow, Sqrt, SquaredEuclideanDistance, SquareFreeQ, StirlingS2, StringDrop, StringJoin,
-                    StringLength, StringTake, Subfactorial, Subscript, Subsuperscript, Subsets, SubtractFrom, Sum,
-                    Superscript, Switch, SyntaxLength, SyntaxQ, Table, Take, Tan, Tanh, Taylor, TeXForm, Thread,
-                    Through, Throw, TimeConstrained, Times, TimesBy, Timing, ToCharacterCode, Together, ToString, Total,
-                    ToUnicode, Tr, Trace, Transpose, TrigExpand, TrigReduce, TrigToExp, TrueQ,
-                    // Tuples,
-                    Unequal, Unevaluated, Union, Unique, UnitStep,
-                    // UnitVector,
-                    UnsameQ, UpperCaseQ, UpSet, UpSetDelayed, ValueQ, VandermondeMatrix, Variables, VectorQ, Which,
-                    While, Xor,
-                    // Zeta
-                    NIL};
-
-            for (short i = 0; i < GLOBAL_IDS.length; i++) {
-                GLOBAL_IDS_MAP.put(GLOBAL_IDS[i], new ExprID(i));
+					// Algebraics, Booleans, ComplexInfinity, Catalan, Complexes, Degree, EulerGamma, False, Flat,
+					// Glaisher, GoldenRatio, HoldAll, HoldFirst, HoldForm, HoldRest, Indeterminate, Infinity, Integer,
+					// Integers, Khinchin, Listable, Modulus, Null, NumericFunction, OneIdentity, Orderless, Pi, Primes,
+					// Rationals, Real, Reals, Slot, SlotSequence, String, F.Symbol, True,
+					// // start function strings
+					// Abs, AddTo, And, Alternatives, Apart, AppellF1, Append, AppendTo, Apply, ArcCos, ArcCosh, ArcCot,
+					// ArcCoth, ArcCsc, ArcCsch, ArcSec, ArcSech, ArcSin, ArcSinh, ArcTan, ArcTanh, Arg, Array,
+					// // ArrayDepth,
+					// ArrayQ, Assumptions, AtomQ, Attributes,
+					// // BernoulliB,
+					// Binomial, Blank, Block, Boole,
+					// // BooleanConvert,
+					// BooleanMinimize, Break, Cancel, CartesianProduct, Cases, CatalanNumber, Catch, Ceiling,
+					// CharacteristicPolynomial,
+					// // ChebyshevT,
+					// ChessboardDistance, Chop, Clear, ClearAll, Coefficient, CoefficientList, Collect, Complement,
+					// Complex,
+					// // ComplexExpand,
+					// ComplexInfinity, ComposeList, CompoundExpression, Condition, Conjugate, ConjugateTranspose,
+					// ConstantArray, Continue, ContinuedFraction, CoprimeQ, Cos, Cosh, CosIntegral, CoshIntegral, Cot,
+					// Coth, Count, Cross, Csc, Csch, Curl, Decrement, Default, Defer, Definition, Delete, DeleteCases,
+					// // DeleteDuplicates,
+					// Denominator, Depth, Derivative, Det, DiagonalMatrix, DigitQ, Dimensions, DirectedInfinity,
+					// Discriminant, Distribute, Div, DivideBy, Divisible,
+					// // Divisors,
+					// Do, Dot, Drop, Eigenvalues, Eigenvectors, Element,
+					// // Eliminate,
+					// EllipticE, EllipticF, EllipticPi, Equal, Equivalent, Erf, Erfc, Erfi, EuclideanDistance,
+					// // EulerE,
+					// EulerPhi, EvenQ, Exp, Expand, ExpandAll, ExpIntegralE, ExpIntegralEi, Exponent, ExtendedGCD,
+					// Extract, Factor, Factorial, Factorial2, FactorInteger, FactorSquareFree, FactorSquareFreeList,
+					// FactorTerms, Flatten, Fibonacci, FindRoot, First, Fit, FixedPoint, Floor, Fold, FoldList, For,
+					// FractionalPart, FreeQ, FresnelC, FresnelS, FrobeniusSolve, FromCharacterCode,
+					// FromContinuedFraction,
+					// FullForm, FullSimplify, Function, Gamma, GCD, GeometricMean, Graphics, Graphics3D, Graphics3D,
+					// Greater, GreaterEqual, GroebnerBasis, HarmonicNumber, Head,
+					// // HermiteH,
+					// HilbertMatrix, Hold, HoldForm, Horner,
+					// // HornerForm,
+					// HurwitzZeta, HypergeometricPFQ, Hypergeometric2F1, Identity, IdentityMatrix, If, Im, Implies,
+					// Increment, Inner, Insert, IntegerPart, IntegerPartitions, IntegerQ, Integrate,
+					// // InterpolatingFunction, InterpolatingPolynomial,
+					// Intersection, Inverse, InverseErf, InverseFunction, JacobiMatrix, JacobiSymbol, JavaForm, Join,
+					// KOrderlessPartitions, KPartitions, LaplaceTransform, Last, LCM, LeafCount,
+					// // LaguerreL, LegendreP,
+					// Length, Less, LessEqual, LetterQ, Level, Limit, Line, LinearProgramming, LinearSolve, List,
+					// ListQ,
+					// Log,
+					// // Log2, Log10,
+					// LogGamma,
+					// // LogicalExpand,
+					// LogIntegral, LowerCaseQ, LUDecomposition, ManhattanDistance, Map, MapAll, MapThread, MatchQ,
+					// MathMLForm,
+					// // MatrixForm,
+					// MatrixPower, MatrixQ,
+					// // MatrixRank,
+					// Max, Mean, Median, MemberQ, Min, Mod, Module, MoebiusMu,
+					// // MonomialList,
+					// Most, Multinomial, Nand, Negative, Nest, NestList, NestWhile, NestWhileList, NextPrime,
+					// NFourierTransform, NIntegrate,
+					// // NMaximize, NMinimize,
+					// NonCommutativeMultiply, NonNegative, Nor, Norm, Not, NRoots, NSolve,
+					// // NullSpace,
+					// NumberQ, Numerator, NumericQ, OddQ, Options, Or, Order, OrderedQ, Out, Outer, PadLeft, PadRight,
+					// // ParametricPlot,
+					// Part, Partition, Pattern, Permutations, Piecewise, Plot, Plot3D, Plus,
+					// // Pochhammer,
+					// PolyGamma, PolyLog, PolynomialExtendedGCD, PolynomialGCD, PolynomialLCM, PolynomialQ,
+					// PolynomialQuotient, PolynomialQuotientRemainder, PolynomialRemainder, Position, Positive,
+					// PossibleZeroQ, Power, PowerExpand, PowerMod, PreDecrement, PreIncrement, Prepend, PrependTo,
+					// // Prime,
+					// PrimeQ, PrimitiveRootList, Print, Product, ProductLog, Quiet, Quotient, RandomInteger,
+					// RandomReal,
+					// // RandomSample,
+					// Range, Rational, Rationalize, Re, Reap, Refine, ReplaceAll, ReplacePart, ReplaceRepeated, Rest,
+					// Resultant, Return, Reverse, Riffle, RootIntervals, RootOf, Roots, Surd, RotateLeft, RotateRight,
+					// Round,
+					// // RowReduce,
+					// Rule, RuleDelayed, SameQ, Scan, Sec, Sech, Select, Sequence, Set, SetAttributes, SetDelayed,
+					// Show,
+					// Sign, SignCmp, Simplify, Sin, Sinc, SingularValueDecomposition, Sinh, SinIntegral, SinhIntegral,
+					// Solve, Sort, Sow, Sqrt, SquaredEuclideanDistance, SquareFreeQ, StirlingS2, StringDrop,
+					// StringJoin,
+					// StringLength, StringTake, Subfactorial, Subscript, Subsuperscript, Subsets, SubtractFrom, Sum,
+					// Superscript, Switch, SyntaxLength, SyntaxQ, Table, Take, Tan, Tanh, Taylor, TeXForm, Thread,
+					// Through, Throw, TimeConstrained, Times, TimesBy, Timing, ToCharacterCode, Together, ToString,
+					// Total,
+					// ToUnicode, Tr, Trace, Transpose, TrigExpand, TrigReduce, TrigToExp, TrueQ,
+					// // Tuples,
+					// Unequal, Unevaluated, Union, Unique, UnitStep,
+					// // UnitVector,
+					// UnsameQ, UpperCaseQ, UpSet, UpSetDelayed, ValueQ, VandermondeMatrix, Variables, VectorQ, Which,
+					// While, Xor,
+					// // Zeta
+			};
+			short exprID = EXPRID_MAX_BUILTIN_LENGTH;
+			GLOBAL_IDS_MAP.defaultReturnValue((short) -1);
+			for (short i = 0; i < COMMON_IDS.length; i++) {
+				GLOBAL_IDS_MAP.put(COMMON_IDS[i], exprID++);
             }
 
             PREDEFINED_INTERNAL_FORM_STRINGS.put("Pi", "Pi");
@@ -3622,7 +3680,8 @@ public class F {
             Programming.initialize();
             PatternMatching.initialize();
             Algebra.initialize();
-            Structure.initialize();
+			SimplifyFunctions.initialize();
+			StructureFunctions.initialize();
             ExpTrigsFunctions.initialize();
             NumberTheory.initialize();
             BooleanFunctions.initialize();
@@ -4149,7 +4208,7 @@ public class F {
      */
     private static ISymbol $s(final String symbolName, boolean setEval) {
         String name = symbolName;
-        if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
             if (symbolName.length() == 1) {
                 name = symbolName;
             } else {
@@ -4165,7 +4224,7 @@ public class F {
             return symbol;
         }
         if (Config.SERVER_MODE) {
-            if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
                 if (SYMBOL_OBSERVER.createPredefinedSymbol(name)) {
                     // second try, because the symbol may now be added to
                     // fSymbolMap
@@ -4214,7 +4273,7 @@ public class F {
     }
 
     public static ISymbol $rubi(final String symbolName, IEvaluator evaluator) {
-		String name = Config.PARSER_USE_LOWERCASE_SYMBOLS //
+		String name = FEConfig.PARSER_USE_LOWERCASE_SYMBOLS //
 				? (symbolName.length() == 1 ? symbolName : //
 						symbolName.toLowerCase(Locale.ENGLISH))//
 				: symbolName;
@@ -4721,6 +4780,9 @@ public class F {
         return new AST1(Boole, a);
     }
 
+	public static IAST BooleanConvert(final IExpr a0, final IExpr a1) {
+		return new AST2(BooleanConvert, a0, a1);
+	}
     /**
      * <pre>
      * BooleanQ(expr)
@@ -5639,33 +5701,31 @@ public class F {
     }
 
     /**
-     * Evaluate <code>Expand()</code> for the given expression. returns the given argument.
+	 * Evaluate <code>Expand()</code> for the given expression. Returns the evaluated expression or the given argument.
      *
-	 * @param a
+	 * @param expr
 	 *            the expression which should be evaluated
      * @return the evaluated expression
      * @see EvalEngine#evaluate(IExpr)
      */
-	public static IExpr evalExpand(IExpr result) {
+	public static IExpr evalExpand(IExpr expr) {
 		EvalEngine engine = EvalEngine.get();
-        if (result.isAST()) {
-            IAST ast = (IAST) result;
+		if (expr.isAST()) {
+			IAST ast = (IAST) expr;
             if (ast.isPlus()) {
 				if (ast.exists(new Predicate<IExpr>() {
-                    @Override
-                    public boolean test(IExpr x) {
-                        return x.isPlusTimesPower();
+					@Override
+					public boolean test(IExpr x) {
+						return x.isPlusTimesPower();
+					}
+				})) {
+					return engine.evaluate(Expand(expr));
                     }
-                })) {
-					return engine.evaluate(Expand(result));
-                }
-                return ast;
+			} else if (ast.isTimes() || ast.isPower()) {
+				return engine.evaluate(Expand(expr));
             }
-            if (ast.isTimes() || ast.isPower()) {
-				return engine.evaluate(Expand(result));
             }
-        }
-        return result;
+		return expr;
     }
 
     /**
@@ -6414,14 +6474,15 @@ public class F {
     // }
     public static IBuiltInSymbol initFinalSymbol(final String symbolName, int ordinal) {
 		String str;
-        if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
-            str = (symbolName.length() == 1) ? symbolName : symbolName.toLowerCase(Locale.US);
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+			str = (symbolName.length() == 1) ? symbolName : symbolName.toLowerCase();
         } else {
             str = symbolName;
         }
         IBuiltInSymbol temp = new BuiltInSymbol(str, ordinal);
         BUILT_IN_SYMBOLS[ordinal] = temp;
         org.matheclipse.core.expression.Context.SYSTEM.put(str, temp);
+		GLOBAL_IDS_MAP.put(temp, (short) ordinal);
         return temp;
     }
 
@@ -6741,14 +6802,37 @@ public class F {
         return isZero(value - ii.doubleValue(), Config.DOUBLE_TOLERANCE);
     }
 
+	/**
+	 * Test if <code>rational.doubleValue()</code> equals <code>value</code> within the tolerance
+	 * <code>Config.DOUBLE_TOLERANCE</code>.
+	 *
+	 * @param value
+	 * @param rational
+	 * @return
+	 * @throws ArithmeticException
+	 */
     public static boolean isNumEqualRational(double value, IRational rational) throws ArithmeticException {
         return isZero(value - rational.doubleValue(), Config.DOUBLE_TOLERANCE);
     }
 
+	/**
+	 * Test if the value is a Java <code>int</code> value within the tolerance <code>Config.DOUBLE_TOLERANCE</code>.
+	 *
+	 * @param value
+	 * @return
+	 */
     public static boolean isNumIntValue(double value) {
         return isZero(value - Math.rint(value), Config.DOUBLE_TOLERANCE);
     }
 
+	/**
+	 * Test if the value is a Java <code>int</code> value within the given tolerance <code>epsilon</code>.
+	 *
+	 * @param value
+	 * @param epsilon
+	 *            the tolerance
+	 * @return
+	 */
     public static boolean isNumIntValue(double value, double epsilon) {
         return isZero(value - Math.rint(value), epsilon);
     }
@@ -6830,8 +6914,9 @@ public class F {
      * @return
      */
     public static boolean isZero(org.hipparchus.complex.Complex value) {
-        //Swift changed: use DOUBLE_TOLERANCE in order to avoid infinity loop.
-        return isZero(value.getReal(), Config.DOUBLE_TOLERANCE)&& isZero(value.getImaginary(), Config.DOUBLE_TOLERANCE);
+        //Swift changed: use DOUBLE_TOLERANCE
+		return org.hipparchus.complex.Complex.equals(value, org.hipparchus.complex.Complex.ZERO,
+				Config.DOUBLE_TOLERANCE);
     }
 
 
@@ -6847,6 +6932,16 @@ public class F {
         // return -epsilon < x && x < epsilon;
     }
 
+	/**
+	 * Test if the absolute value is less <code>Config.MACHINE_EPSILON</code>.
+	 *
+	 * @param x
+	 * @param epsilon
+	 * @return
+	 */
+	public static boolean isZero(org.hipparchus.complex.Complex x, double epsilon) {
+		return org.hipparchus.complex.Complex.equals(x, org.hipparchus.complex.Complex.ZERO, epsilon);
+	}
 	public static IAST JSFormData(final String a0, final String format) {
 		return new AST2(JSFormData, F.$str(a0), F.$str(format));
 	}
@@ -7002,7 +7097,7 @@ public class F {
      * @see {@link #List()} to create an empty unmodifiable AST
      */
     public static IASTAppendable ListAlloc() {
-        return ast(List);
+		return ast(List, 3, false);
     }
 
     /**
@@ -7141,6 +7236,13 @@ public class F {
         return function(List, a);
     }
 
+	public static IAST List(final int... numbers) {
+		IInteger a[] = new IInteger[numbers.length];
+		for (int i = 0; i < numbers.length; i++) {
+			a[i] = ZZ(numbers[i]);
+		}
+		return function(List, a);
+	}
     public static IAST ListConvolve(final IExpr a0, final IExpr a1) {
         return new AST2(ListConvolve, a0, a1);
     }
@@ -7382,6 +7484,9 @@ public class F {
         return new AST1(Missing, a0);
     }
 
+	public static IAST Missing(final String str) {
+		return new AST1(Missing, stringx(str));
+	}
 	public static IAST Missing(final IExpr a0, final IExpr a1) {
 		return new AST2(Missing, a0, a1);
 	}
@@ -7458,6 +7563,9 @@ public class F {
         return function(Multinomial, a);
     }
 
+	public static IAST MultiplicativeOrder(final IExpr a0, final IExpr a1) {
+		return new AST2(MultiplicativeOrder, a0, a1);
+	}
     /**
      * Evaluate the given expression in numeric mode
      *
@@ -7965,6 +8073,9 @@ public class F {
         return new AST1(PowerExpand, a0);
     }
 
+	public static IAST PowerMod(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(PowerMod, a0, a1, a2);
+	}
     /**
      * Create a "predefined" symbol for constants or function names.
      *
@@ -7977,7 +8088,7 @@ public class F {
             return temp;
         }
         String lcSymbolName = symbolName;
-        if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
             if (symbolName.length() > 1) {
                 // use the lower case string here to use it as associated class
                 // name
@@ -8122,6 +8233,9 @@ public class F {
 
 	public static IAST Quotient(final IExpr a0, final IExpr a1, final IExpr a2) {
 		return new AST3(Quotient, a0, a1, a2);
+	}
+	public static IAST RandomComplex(final IExpr a0) {
+		return new AST1(RandomComplex, a0);
 	}
 	public static IAST RandomReal(final IExpr a0) {
 		return new AST1(RandomReal, a0);
@@ -8326,7 +8440,7 @@ public class F {
     }
 
     /**
-     * Create a unique dummy symbol which is retrieved from the evaluation engines context path.
+	 * Create a unique dummy symbol which is retrieved from the evaluation engines DUMMY context.
      *
 	 * @param symbolName
 	 *            the name of the symbol
@@ -8334,7 +8448,7 @@ public class F {
      */
     public static ISymbol Dummy(final String symbolName) {
         String name = symbolName;
-        if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
             if (symbolName.length() == 1) {
                 name = symbolName;
             } else {
@@ -8344,7 +8458,18 @@ public class F {
         return new Symbol(name, org.matheclipse.core.expression.Context.DUMMY);
     }
 
-    public static IBuiltInSymbol localBiFunction(final String symbolName, final BiFunction<IExpr, IExpr, IExpr> function) {
+	/**
+	 * Create a unique dummy symbol with prefix "$", which is retrieved from the evaluation engines DUMMY context.
+	 *
+	 * @param symbolName
+	 *            the name of the symbol
+	 * @return the symbol object from the context path
+	 */
+	public static ISymbol Dummy(EvalEngine engine) {
+		return Dummy(engine.uniqueName("$"));
+	}
+
+	public static IBuiltInSymbol localBiFunction(final String symbolName, final BiFunction<IExpr, IExpr, IExpr> function) {
         IBuiltInSymbol localBuittIn = new BuiltInSymbol(symbolName, java.lang.Integer.MAX_VALUE);
         localBuittIn.setEvaluator(new AbstractCoreFunctionEvaluator() {
             @Override

@@ -66,6 +66,12 @@ public final class NumStr extends Num {
 		return new Apfloat(fFloatStr + "E" + fExponent, precision);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public long determinePrecision() {
+		return precision();
+	}
+
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
 		if (engine.isNumericMode() && engine.isApfloat()) {
@@ -153,7 +159,7 @@ public final class NumStr extends Num {
 		return fFloatStr;
 	}
 
-	public long getNumericfPrecision() {
+	public long precision() {
 		return fPrecision;
 	}
 }

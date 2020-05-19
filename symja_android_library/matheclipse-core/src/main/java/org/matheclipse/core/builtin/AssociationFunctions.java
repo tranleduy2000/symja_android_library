@@ -2,6 +2,7 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
 import com.duy.util.MapWrapper;
 
 import org.matheclipse.core.basic.Config;
@@ -18,6 +19,7 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,7 +81,7 @@ public class AssociationFunctions {
 					}
 
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
 					return engine.printMessage(ast.topHead(), ve);
@@ -123,8 +125,10 @@ public class AssociationFunctions {
 					} catch (ValidateException ve) {
 						return engine.printMessage(F.Set, ve);
 					} catch (RuntimeException rex) {
-						engine.printMessage("Set: " + rex.getMessage());
-						return F.NIL;
+						if (FEConfig.SHOW_STACKTRACE) {
+							rex.printStackTrace();
+						}
+						return engine.printMessage(F.Set, rex);
 					}
 				}
 			}
@@ -151,7 +155,7 @@ public class AssociationFunctions {
                         });
 					}
 					IAssociation assoc = new ASTAssociation(map.size(), false);
-					for (Map.Entry<IExpr, MutableInt> elem : map.entrySet()) {
+					for (Map.Entry<IExpr, AssociationFunctions.MutableInt> elem : map.entrySet()) {
 						assoc.appendRule(F.Rule(elem.getKey(), F.ZZ(elem.getValue().value())));
 					}
 					return assoc;
@@ -216,6 +220,10 @@ public class AssociationFunctions {
 				IASTMutable list = ((IAssociation) arg1).keys();
 				return mapHeadIfPresent(list, head);
 			}
+			//if (arg1.isDataSet()) {
+			//	ASTDataset dataset = (ASTDataset) arg1;
+			//	return dataset.columnNames();
+			//}
 			if (arg1.isList()) {
 				if (arg1.isListOfRules(true)) {
 					IAST listOfRules = (IAST) arg1;
@@ -310,7 +318,13 @@ public class AssociationFunctions {
 					if (key.isList()) {
 						return ((IAST) key).mapThread(ast, 2);
 					}
-					return ((IAssociation) arg1).getValue(key, ast.arg3());
+					final IExpr arg3 = ast.arg3();
+					return ((IAssociation) arg1).getValue(key, new Supplier<IExpr>() {
+						@Override
+						public IExpr get() {
+							return arg3;
+						}
+					});
 				}
 			}
 			return F.NIL;
@@ -327,6 +341,41 @@ public class AssociationFunctions {
 		}
 	}
 
+	private static class Structure extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+//			if (arg1.isDataSet()) {
+//				ASTDataset dataset = (ASTDataset) arg1;
+//				return dataset.structure();
+//			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+	}
+
+	private static class Summary extends AbstractEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+//			if (arg1.isDataSet()) {
+//				ASTDataset dataset = (ASTDataset) arg1;
+//				return dataset.summary();
+//			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize() {
+			return IOFunctions.ARGS_1_1;
+		}
+	}
 	private static class Values extends AbstractEvaluator {
 
 		@Override

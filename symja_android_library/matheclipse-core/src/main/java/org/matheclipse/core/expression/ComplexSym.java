@@ -18,6 +18,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.math.BigInteger;
 
@@ -350,7 +351,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder("Complex");
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append('(');
 		} else {
 			buf.append('[');
@@ -359,7 +360,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			buf.append(fReal.numerator().toString());
 		} else {
 			buf.append("Rational");
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append('(');
 			} else {
 				buf.append('[');
@@ -367,7 +368,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			buf.append(fReal.numerator().toString());
 			buf.append(',');
 			buf.append(fReal.denominator().toString());
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append(')');
 			} else {
 				buf.append(']');
@@ -379,7 +380,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			buf.append(fImaginary.numerator().toString());
 		} else {
 			buf.append("Rational");
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append('(');
 			} else {
 				buf.append('[');
@@ -387,13 +388,13 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			buf.append(fImaginary.numerator().toString());
 			buf.append(',');
 			buf.append(fImaginary.denominator().toString());
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append(')');
 			} else {
 				buf.append(']');
 			}
 		}
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append(')');
 		} else {
 			buf.append(']');

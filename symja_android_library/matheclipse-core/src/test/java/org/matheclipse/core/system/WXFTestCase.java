@@ -50,7 +50,7 @@ public class WXFTestCase extends AbstractTestCase {
 		assertEquals(0, WL.parseVarint(bytes, 0)[0]);
 	}
 
-	public void testBinarySerialize() {
+	public void ztestBinarySerialize() {
 		// check("BinarySerialize(N(Pi,30))", //
 		// "");
 		check("BinarySerialize(SeriesData(x, 0, {1, 1, 1/2, 1/6, 1/24, 1/120}, 0, 6, 1)) // Normal", //

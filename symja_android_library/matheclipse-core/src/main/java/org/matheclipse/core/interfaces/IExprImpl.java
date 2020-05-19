@@ -21,6 +21,7 @@ import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.ExprField;
+import org.matheclipse.core.expression.ExprID;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
@@ -643,6 +644,23 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return plus(F.C1);
     }
 
+    @Override
+    public int indexOf(IExpr expr) {
+        return -1;
+    }
+
+    @Override
+    public int indexOf(Predicate<? super IExpr> predicate) {
+        return indexOf(predicate, 1);
+
+    }
+
+    @Override
+    public int indexOf(Predicate<? super IExpr> predicate, int fromIndex) {
+        return -1;
+
+    }
+
     /**
      * Return the internal Java form of this expression.
      *
@@ -1022,6 +1040,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isBuiltInSymbol() {
         return this instanceof IBuiltInSymbol;
+    }
+
+    @Override
+    public boolean isComparatorFunction() {
+        return false;
+
     }
 
     /**
@@ -2152,6 +2176,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return false;
     }
 
+    @Override
+    public int[] isPiecewise() {
+        return null;
+    }
+
     /**
      * Test if this expression is the addition function <code>Plus[&lt;arg1&gt;, &lt;arg2&gt;, ...]</code> with at least
      * 2 arguments.
@@ -2928,8 +2957,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     }
 
     @Override
-    public IExpr normal() {
-        return this;
+    public IExpr normal(boolean nilIfUnevaluated) {
+        return nilIfUnevaluated ? F.NIL : this;
     }
 
     /**
@@ -2955,9 +2984,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
      * @see NILPointer#optional(IExpr)
      */
     @Override
-    public IExpr optional(final IExpr that) {
-        if (that != null) {
-            return that;
+    public IExpr optional() {
+        short id = F.GLOBAL_IDS_MAP.getShort(this);
+        if (id >= 0) {
+            return new ExprID(id);
         }
         return this;
     }

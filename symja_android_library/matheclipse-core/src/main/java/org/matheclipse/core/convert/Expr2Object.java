@@ -58,10 +58,9 @@ public class Expr2Object {
 	 * 
 	 * @param expr
 	 * @param variable
-	 * @return <code>null</code> if the expression couldn't be converted to a
-	 *         polynomial.
+	 * @return <code>null</code> if the expression couldn't be converted to a polynomial.
 	 */
-	public static OpenIntToDoubleHashMap toPolynomialMap(IExpr expr, IExpr variable) {
+	private static OpenIntToDoubleHashMap toPolynomialMap(IExpr expr, IExpr variable) {
 		try {
 			OpenIntToDoubleHashMap map = new OpenIntToDoubleHashMap();
 			if (expr.isPlus()) {
@@ -146,7 +145,8 @@ public class Expr2Object {
 				}
 				return map;
 			}
-		} catch (Exception ex) {
+		} catch (RuntimeException ex) {
+			// roundToInt() throws ArithmeticException
 
 		}
 		return null;

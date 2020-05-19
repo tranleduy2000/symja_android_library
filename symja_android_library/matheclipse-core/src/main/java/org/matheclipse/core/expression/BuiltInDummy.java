@@ -32,6 +32,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -382,7 +383,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	 */
 	@Override
 	public String fullFormString() {
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			String str = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(fSymbolName);
 			if (str != null) {
 				return str;
@@ -515,7 +516,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 		if (symbolsAsFactoryMethod) {
 			return prefix + internalJavaStringAsFactoryMethod();
 		}
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			String name;
 			if (fSymbolName.length() == 1) {
 				name = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(fSymbolName);
@@ -688,7 +689,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
 	@Override
 	public final boolean isSymbolName(String name) {
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			if (fSymbolName.length() == 1) {
 				return fSymbolName.equals(name);
 			}
@@ -985,7 +986,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		return optional(F.GLOBAL_IDS_MAP.get(this));
+		return optional( );
 	}
 
 	/** {@inheritDoc} */

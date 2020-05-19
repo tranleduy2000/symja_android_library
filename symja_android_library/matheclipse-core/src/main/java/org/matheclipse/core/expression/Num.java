@@ -176,10 +176,16 @@ public class Num extends INumImpl implements INum {
 		if (expr instanceof Num) {
 			return Double.compare(fDouble, ((Num) expr).fDouble);
 		}
+		if (expr.isNumber()) {
 		if (expr.isReal()) {
 			return Double.compare(fDouble, ((ISignedNumber) expr).doubleValue());
 		}
-		return super.compareTo(expr);
+			int c = this.compareTo(((INumber) expr).re());
+			if (c != 0) {
+				return c;
+			}
+		}
+		return -1; // INum.super.compareTo(expr);
 	}
 
 	@Override
@@ -303,6 +309,12 @@ public class Num extends INumImpl implements INum {
 	public ISignedNumber fractionalPart() {
 		return F.num(getRealPart() % 1);
 	}
+
+	/** {@inheritDoc} */
+	public IInteger integerPart() {
+		return isNegative() ? ceilFraction() : floorFraction();
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public IInteger floorFraction() {
@@ -387,6 +399,12 @@ public class Num extends INumImpl implements INum {
 			return this;
 		}
 		return valueOf(1 / fDouble);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long determinePrecision() {
+		return Config.MACHINE_PRECISION;
 	}
 
 	/** {@inheritDoc} */

@@ -101,6 +101,38 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	// super(symbolName, context);
 	// fEvaluator = evaluator;
 	// }
+
+	/** {@inheritDoc} */
+	@Override
+	public final void assign(final IExpr value) {
+		fValue = value;
+		if (Config.FUZZ_TESTING) {
+			// Cannot assign to raw object `1`.
+			throw new NullPointerException();
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final void clearAttributes(final int attributes) {
+		if (Config.FUZZ_TESTING) {
+			// Cannot assign to raw object `1`.
+			throw new NullPointerException();
+		}
+		super.clearAttributes(attributes);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void clearAll(EvalEngine engine) {
+		if (Config.FUZZ_TESTING) {
+			// Cannot assign to raw object `1`.
+			throw new NullPointerException();
+		}
+		// clear(engine);
+		// fAttributes = NOATTRIBUTE;
+	}
+
 	@Override
 	public int compareTo(IExpr expr) {
 		if (expr instanceof BuiltInSymbol) {
@@ -176,6 +208,9 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 	protected String internalJavaStringAsFactoryMethod() {
 		if (Config.RUBI_CONVERT_SYMBOLS) {
 			if (fOrdinal >= 1) {
+				if (Config.RUBI_CONVERT_SYMBOLS && "C".equals(fSymbolName)  ) {
+					return fSymbolName + "Symbol";
+				}
 				return fSymbolName;
 			}
 		}

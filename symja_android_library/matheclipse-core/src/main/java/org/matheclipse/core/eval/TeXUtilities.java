@@ -5,6 +5,7 @@ import org.matheclipse.core.form.tex.TeXFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -15,8 +16,6 @@ import java.io.Writer;
  */
 public class TeXUtilities {
 	protected EvalEngine fEvalEngine;
-
-	protected TeXFormFactory fTeXFactory;
 
 	ExprParser fParser;
 
@@ -30,16 +29,6 @@ public class TeXUtilities {
 		fEvalEngine = evalEngine;
 		// set the thread local instance
 		EvalEngine.set(evalEngine);
-		fTeXFactory = new TeXFormFactory();
-		fParser = new ExprParser(evalEngine, relaxedSyntax);
-	}
-
-	public TeXUtilities(final EvalEngine evalEngine, final boolean relaxedSyntax, int exponentFigures,
-			int significantFigures) {
-		fEvalEngine = evalEngine;
-		// set the thread local instance
-		EvalEngine.set(evalEngine);
-		fTeXFactory = new TeXFormFactory(exponentFigures, significantFigures);
 		fParser = new ExprParser(evalEngine, relaxedSyntax);
 	}
 	/**
@@ -56,7 +45,7 @@ public class TeXUtilities {
 				return toTeX(parsedExpression, out);
 				// parsedExpression = AST2Expr.CONST.convert(node);
 			} catch (final RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 			}
 		}
@@ -74,13 +63,17 @@ public class TeXUtilities {
 		final StringBuilder buf = new StringBuilder();
 
 		if (objectExpression != null) {
+			int exponentFigures = fEvalEngine.getSignificantFigures() - 1;
+			int significantFigures = fEvalEngine.getSignificantFigures() + 1;
 			try {
 			IExpr result = objectExpression;
 			if (objectExpression.isAST()) {
 				fEvalEngine.reset();
 				result = fEvalEngine.evalHoldPattern((IAST) objectExpression, true, true);
 			}
-				if (fTeXFactory.convert(buf, result, 0)) {
+
+				TeXFormFactory teXFactory = new TeXFormFactory(exponentFigures, significantFigures);
+				if (teXFactory.convert(buf, result, 0)) {
 				out.write(buf.toString());
 					return true;
 				} else {
@@ -89,7 +82,7 @@ public class TeXUtilities {
 			} catch (final IOException ioe) {
 				// parsedExpression == null ==> fError occured
 			} catch (final RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 			}
 		}

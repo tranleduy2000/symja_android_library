@@ -11,6 +11,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.PatternMap;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.ObjectStreamException;
 import java.util.List;
@@ -36,7 +37,8 @@ public class Pattern extends Blank {
 
 	/**
 	 * 
-	 * @param numerator
+	 * @param symbol
+	 * @param check
 	 * @return
 	 */
 	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check) {
@@ -45,6 +47,11 @@ public class Pattern extends Blank {
 
 	/**
 	 * 
+	 * @param symbol
+	 * @param check
+	 * @param def
+	 *            if <code>true</code> use a default value, if matching isn't possible
+	 * @return
 	 */
 	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check, final boolean def) {
 		return new Pattern(symbol, check, def);
@@ -56,7 +63,7 @@ public class Pattern extends Blank {
 	/**
 	 * The associated symbol for this pattern
 	 */
-	final ISymbol fSymbol;
+	final private ISymbol fSymbol;
 
 	/** package private */
 	Pattern(@Nonnull final ISymbol symbol) {
@@ -173,8 +180,8 @@ public class Pattern extends Blank {
 		if (value != null) {
 			return expr.equals(value);
 		}
-		patternMap.setValue(this, expr);
-		return true;
+		return patternMap.setValue(this, expr);
+//		return true;
 	}
 
 	@Override
@@ -183,14 +190,14 @@ public class Pattern extends Blank {
 		// if (fOptionalValue != null || fDefault) {
 		if (fDefault) {
 			buf.append("Optional");
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append('(');
 			} else {
 				buf.append('[');
 			}
 		}
 		buf.append("Pattern");
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append('(');
 		} else {
 			buf.append('[');
@@ -198,7 +205,7 @@ public class Pattern extends Blank {
 		buf.append(fSymbol.toString());
 		buf.append(", ");
 		buf.append("Blank");
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append('(');
 		} else {
 			buf.append('[');
@@ -206,14 +213,14 @@ public class Pattern extends Blank {
 		if (fHeadTest != null) {
 			buf.append(fHeadTest.fullFormString());
 		}
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			buf.append("))");
 		} else {
 			buf.append("]]");
 		}
 
 		if (fDefault) {
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				buf.append(")");
 			} else {
 				buf.append("]");
@@ -352,6 +359,6 @@ public class Pattern extends Blank {
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		return optional(F.GLOBAL_IDS_MAP.get(this));
+		return optional();
 	}
 }

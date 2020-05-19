@@ -151,8 +151,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 		} else if (expr.isReal()) {
 			return Double.compare(fIntValue, ((ISignedNumber) expr).doubleValue());
 		}
-		return -1;
-		// return super.compareTo(expr);
+		return super.compareTo(expr);
 	}
 
 	@Override
@@ -979,7 +978,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		return optional(F.GLOBAL_IDS_MAP.get(this));
+		return optional();
 	}
 
 }

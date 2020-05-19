@@ -79,21 +79,47 @@ import edu.jas.structure.GcdRingElem;
  * </pre>
  */
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
+    public final static int ASTID = 1024;
 
-    int ASTID = 4096;
-    int BLANKID = 16384;
-    int COMPLEXID = 32;
-    int DOUBLECOMPLEXID = 4;
-    int DOUBLEID = 2;
-    int FRACTIONID = 16;
-    int INTEGERID = 8;
-    int METHODSYMBOLID = 8192;
-    int PATTERNID = 2048;
-    int SERIESID = 64;
-    int QUANTITYID = 128;
-    int STRINGID = 256;
-    int SYMBOLID = 512;
-    int DATAID = 1024;
+    public final static int BLANKID = 4096;
+
+    public final static int COMPLEXID = 32;
+
+    public final static int DOUBLECOMPLEXID = 4;
+
+    public final static int DOUBLEID = 2;
+
+    public final static int FRACTIONID = 16;
+
+    public final static int INTEGERID = 8;
+
+    public final static int METHODSYMBOLID = 8192;
+
+    public final static int PATTERNID = 2048;
+
+    public final static int SERIESID = 64;
+
+    public final static int QUANTITYID = 128;
+
+    public final static int STRINGID = 256;
+
+    public final static int SYMBOLID = 512;
+
+    public final static int DATASETID = 16384;
+
+    public final static int DATAID = 32786;
+
+    public final static int BYTEARRAYID = DATAID + 1;
+
+    public final static int COMPILEFUNCTONID = DATAID + 2;
+
+    public final static int GEOPOSITIONID = DATAID + 3;
+
+    public final static int GRAPHEXPRID = DATAID + 4;
+
+    public final static int DATEOBJECTEXPRID = DATAID + 5;
+
+    public final static int TIMEOBJECTEXPRID = DATAID + 6;
 
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
@@ -496,6 +522,34 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * classes.
      */
     IExpr inc();
+    /**
+     * If this is of type {@link IAST}, find the first argument position, which equals <code>expr</code>. The search
+     * starts at index <code>1</code>. Otherwise return <code>-1</code>.
+     *
+     * @param expr
+     * @return <code>-1</code> if no position was found
+     */
+    int indexOf(final IExpr expr);
+
+    /**
+     * If this is of type {@link IAST}, find the first argument position, which fulfills the <code>predicate</code>. The
+     * search starts at index <code>1</code>. Otherwise return <code>-1</code>.
+     *
+     * @param predicate
+     * @return the index of the first occurrence of the specified predicate, or <code>-1</code> if no position was found
+     */
+    int indexOf(Predicate<? super IExpr> predicate);
+
+    /**
+     * If this is of type {@link IAST}, find the first argument position, which fulfills the <code>predicate</code>. The
+     * search starts at index <code>fromIndex</code>. Otherwise return <code>-1</code>.
+     *
+     * @param predicate
+     * @param fromIndex
+     * @return the index of the first occurrence of the specified predicate, starting at the specified index, or
+     *         <code>-1</code> if no position was found
+     */
+    int indexOf(Predicate<? super IExpr> predicate, int fromIndex);
 
     /**
      * Return the internal Java form of this expression.
@@ -774,6 +828,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is a symbol (instanceof IBuiltInSymbol)
      */
     boolean isBuiltInSymbol();
+
+    /**
+     * Test if this expression is a comparator function (i.e. a function with head
+     * <code>Equal, Equivalent, Greater, GreaterEqual, Less, LessEqual, Inequlity, SameQ, Unequal, UnsameQ</code> where
+     * all arguments are also &quot;boolean formulas&quot;)
+     *
+     * @return <code>true</code>, if the given expression is a comparator function.
+     */
+     boolean isComparatorFunction();
 
     /**
      * Test if this expression is a symbolic complex number (i.e. <code>instanceof IComplex</code>)
@@ -1539,6 +1602,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isPi();
 
     /**
+     * Test if this expression is a <code>Piecewise({{...}}},...)</code> function and the first argument is a matrix
+     * with dimension <code>[row-dimension, 2]</code> and <code>row-dimension > 0</code>. Return the dimensions of the
+     * matrix as array <code>[row-dimension, column-dimension]</code>. The first argument is only a matrix, if it is a
+     * <code>List(...)</code> where all elements are lists with the header <code>List</code> and have the same size.
+     *
+     * @return <code>null</code> if the expression is not a <code>Piecewise({{...}}},...)</code> function or if the
+     *         first argument is not a matrix
+     */
+    int[] isPiecewise();
+
+    /**
      * Test if this expression is the addition function <code>Plus[&lt;arg1&gt;, &lt;arg2&gt;, ...]</code> with at least
      * 2 arguments.
      */
@@ -2064,17 +2138,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr negative();
 
     /**
-     * Converts a special expression (like a series) into a standard expression.
-     * <p>
-     * <p>
+     * Converts a <b>special expression</b> (like a series, association, dataset, ...) into a standard <i>normalized</i>
+     * expression.
+     *
      * <pre>
      * &gt;&gt; Normal(SeriesData(x, 0, {1, 0, -1, -4, -17, -88, -549}, -1, 6, 1))
      * 1/x-x-4*x^2-17*x^3-88*x^4-549*x^5
      * </pre>
      *
-     * @return the standard expression for special expressions ot <code>this</code> for the other expressions
+     * @param nilIfUnevaluated
+     *            if <code>true</code> return <code>F.NIL</code>, if no evaluation is necessary, otherwise
+     *            <code>this</code>.
+     *
+     * @return the standard expression for <b>special expression</b> or <code>F.NIL</code> otherwise
      */
-    IExpr normal();
+    IExpr normal(boolean nilIfUnevaluated);
 
     /**
      * Returns an <code>IExpr</code> whose value is <code>(-1) * this</code>. Calculates
@@ -2093,7 +2171,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>that</code> if <code>that!=null</code> or <code>this</code> in all other cases.
      * @see NILPointer#optional(IExpr)
      */
-    IExpr optional(final IExpr that);
+    IExpr optional();
 
     IExpr or(final IExpr that);
 

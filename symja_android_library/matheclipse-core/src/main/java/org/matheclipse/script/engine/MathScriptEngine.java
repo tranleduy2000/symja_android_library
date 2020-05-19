@@ -9,6 +9,7 @@ import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
@@ -122,7 +123,7 @@ public class MathScriptEngine extends AbstractScriptEngine {
             }
 
         } catch (final AbortException e) {
-            if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
                 e.printStackTrace();
             }
             try {
@@ -134,7 +135,7 @@ public class MathScriptEngine extends AbstractScriptEngine {
                 return e1.getMessage();
             }
         } catch (final FailedException e) {
-            if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
                 e.printStackTrace();
             }
             try {
@@ -152,13 +153,12 @@ public class MathScriptEngine extends AbstractScriptEngine {
             // catch parser errors here
             return e.getMessage();
         } catch (final MathException e) {
-            if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
                 e.printStackTrace();
             }
-            // catch parser errors here
             return e.getMessage();
         } catch (final ApfloatRuntimeException e) {
-            if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
                 e.printStackTrace();
             }
             // catch parser errors here
@@ -170,17 +170,17 @@ public class MathScriptEngine extends AbstractScriptEngine {
             // }
             // return e.getMessage();
             // }
-            if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
                 e.printStackTrace();
             }
             return "Exception: " + e.getMessage();
         } catch (final OutOfMemoryError e) {
-            if (Config.SHOW_STACKTRACE) {
+			if (Config.DEBUG) {
                 e.printStackTrace();
             }
             return "OutOfMemoryError";
         } catch (final StackOverflowError e) {
-            if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
                 e.printStackTrace();
             }
             return "StackOverflowError";
@@ -225,14 +225,23 @@ public class MathScriptEngine extends AbstractScriptEngine {
             return "";
         }
         final StringWriter buf = new StringWriter();
+        EvalEngine engine = EvalEngine.get();
+        OutputFormFactory off;
+
         if (fDecimalFormat != null) {
-            // DecimalFormatSymbols usSymbols = new DecimalFormatSymbols(Locale.US);
-            // DecimalFormat decimalFormat = new DecimalFormat(fDecimalFormat, usSymbols);
-            OutputFormFactory.get(relaxedSyntax, false, 5, 7).convert(buf, result);
+            int significantFigures = engine.getSignificantFigures();
+            off = OutputFormFactory.get(relaxedSyntax, false, significantFigures - 1, significantFigures + 1);
         } else {
-            OutputFormFactory.get(relaxedSyntax).convert(buf, result);
+            off = OutputFormFactory.get(relaxedSyntax);
         }
-        // print the result in the console
-        return buf.toString();
+        if (off.convert(buf, result)) {
+            // print the result in the console
+            return buf.toString();
+        }
+        if (Config.FUZZ_TESTING) {
+            throw new NullPointerException();
+        }
+        return "ERROR-IN-OUTPUTFORM";
     }
+
 }

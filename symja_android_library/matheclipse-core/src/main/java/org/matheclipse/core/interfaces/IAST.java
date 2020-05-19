@@ -417,6 +417,13 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     IASTAppendable copyAppendable();
 
     /**
+     * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied).
+     *
+     * @return a copy of this <code>IAST</code> instance.
+     */
+    public IASTAppendable copyAppendable(int additionalCapacity);
+
+    /**
      * Create a copy of this <code>AST</code>, which contains the same head and all elements from the given
      * <code>position</code> (inclusive).
      *
@@ -535,6 +542,20 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive)
      */
     IASTAppendable extract(int fromIndex, int toIndex);
+
+    /**
+     * <p>
+     * Extract <code>ConditionalExpression</code> from the arguments of <code>this</code> expression.
+     * </p>
+     * See <a href=
+     * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/ConditionalExpression.md">ConditionalExpression</a>
+     *
+     * @param isUnaryConditionalExpression
+     *            if <code>true</code> <code>this</code> is of the form
+     *            <code>head( ConditionalExpression(expr, condition) )</code>
+     * @return
+     */
+    public IExpr extractConditionalExpression(boolean isUnaryConditionalExpression);
 
     /**
      * Select all elements by applying the <code>function</code> to each argument in this <code>AST</code> and append

@@ -5,6 +5,7 @@ import com.duy.lambda.ObjIntConsumer;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -16,6 +17,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 /**
  * <pre>
@@ -62,9 +64,13 @@ public class FrobeniusSolve extends AbstractEvaluator {
 		if (ast.arg1().isList() && ast.arg2().isInteger()) {
 			IAST list = ast.getAST(1);
 			try {
-				int[] listInt = Validate.checkListOfInts(ast, list, Integer.MIN_VALUE, Integer.MAX_VALUE, engine);
+				int[] listInt = Validate.checkListOfInts(ast, list, true,engine);
 				if (listInt != null) {
+					for (int i = 0; i < listInt.length; i++) {
+						if (listInt[i] < 0 && ast.size() < 4) {
 
+						}
+					}
 					IInteger[] solution;
 					IASTAppendable result = F.ListAlloc(8);
 					FrobeniusSolver solver = getSolver(listInt, (IInteger) ast.arg2());
@@ -72,26 +78,24 @@ public class FrobeniusSolve extends AbstractEvaluator {
 				if (ast.size() == 4) {
 						numberOfSolutions = ast.arg3().toIntDefault(-1);
 				}
-
-				if (numberOfSolutions < 0) {
 					while ((solution = solver.take()) != null) {
-						result.append(F.List(solution));
+						if (result.size() >= Config.MAX_AST_SIZE) {
+							throw new ASTElementLimitExceeded(result.size());
 					}
-				} else {
-					while ((solution = solver.take()) != null) {
+						if (numberOfSolutions > 0) {
 						if (--numberOfSolutions < 0) {
 							break;
 						}
+						}
 						result.append(F.List(solution));
 					}
-				}
 
 				return result;
 				}
 			} catch (LimitException le) {
 				throw le;
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 			}

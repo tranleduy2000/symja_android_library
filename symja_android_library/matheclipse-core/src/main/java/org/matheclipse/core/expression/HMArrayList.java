@@ -32,6 +32,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -727,8 +728,8 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/** {@inheritDoc} */
 	@Override
-	public final int indexOf(Predicate<? super IExpr> predicate) {
-		int index = 1;
+	public final int indexOf(Predicate<? super IExpr> predicate, int fromIndex) {
+		int index = fromIndex;
 		int start = firstIndex + index;
 		for (int i = start; i < lastIndex; i++) {
 			if (predicate.test(array[i])) {
@@ -753,7 +754,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 	@Override
 	public final IExpr get(int location) {
-		if (Config.SHOW_STACKTRACE) {
+		if (FEConfig.SHOW_STACKTRACE) {
 			int index;
 			if ((index = firstIndex + location) < lastIndex) {
 				return array[index];
@@ -776,7 +777,9 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 			firstIndex = 0;
 			lastIndex = newLast;
 		} else {
+//			if (Config.FUZZ_TESTING) {
 			// throw new NullPointerException();
+//			}
 			int increment = size / 2;
 			if (required > increment) {
 				increment = required;

@@ -1,6 +1,7 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Predicate;
+import com.duy.lambda.Supplier;
 
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -83,10 +84,11 @@ public class ASTAssociation extends AST implements IAssociation {
 	/**
 	 * Adds the specified rule at the end of this association.
 	 *
-	 * @param object
-	 *            the object to add.
+	 * @param rule
+	 *            the rule to add at the end of this association
 	 * @return always true
 	 */
+	@Override
 	public final void appendRule(IAST rule) {
 		int index = size();
 		if (rule.isRule()) {
@@ -120,7 +122,11 @@ public class ASTAssociation extends AST implements IAssociation {
 	public ASTAssociation(final int initialCapacity, final boolean setLength) {
 		super(initialCapacity, setLength);
 		map = new Object2IntOpenHashMap<IExpr>();
+		if (setLength) {
+			set(0, F.Association);
+		} else {
 		append(F.Association);
+	}
 	}
 
 	private Integer getIndex(IExpr expr) {
@@ -136,7 +142,7 @@ public class ASTAssociation extends AST implements IAssociation {
 		ast.hashValue = 0;
 		ast.firstIndex = firstIndex;
 		ast.lastIndex = lastIndex;
-		ast.map = (Object2IntOpenHashMap<IExpr>) map.clone();
+		ast.map = map.clone();
 		return ast;
 	}
 
@@ -148,7 +154,23 @@ public class ASTAssociation extends AST implements IAssociation {
 		ast.hashValue = 0;
 		ast.firstIndex = firstIndex;
 		ast.lastIndex = lastIndex;
-		ast.map = (Object2IntOpenHashMap<IExpr>) map.clone();
+		ast.map = map.clone();
+		return ast;
+	}
+
+	@Override
+	public IASTAppendable copyAppendable(int additionalCapacity) {
+		ASTAssociation ast = new ASTAssociation();
+		// ast.fProperties = null;
+		if (size() + additionalCapacity > array.length) {
+			ast.array = new IExpr[size() + additionalCapacity];
+		} else {
+			ast.array = array.clone();
+		}
+		ast.hashValue = 0;
+		ast.firstIndex = firstIndex;
+		ast.lastIndex = lastIndex;
+		ast.map = map.clone();
 		return ast;
 	}
 
@@ -172,7 +194,7 @@ public class ASTAssociation extends AST implements IAssociation {
 		ast.hashValue = 0;
 		ast.firstIndex = firstIndex;
 		ast.lastIndex = lastIndex;
-		ast.map = (Object2IntOpenHashMap<IExpr>) map.clone();
+		ast.map = map.clone();
 		return ast;
 	}
 
@@ -191,7 +213,8 @@ public class ASTAssociation extends AST implements IAssociation {
 		return true;
 	}
 
-	public IAST normal() {
+	@Override
+	public IAST normal(boolean nilIfUnevaluated) {
 		if (normalCache != null) {
 			return normalCache;
 		}
@@ -214,6 +237,7 @@ public class ASTAssociation extends AST implements IAssociation {
 		return list;
 	}
 
+	@Override
 	public IAST matrixOrList() {
 
 		boolean numericKeys = true;
@@ -249,10 +273,12 @@ public class ASTAssociation extends AST implements IAssociation {
 		}
 	}
 
+	@Override
 	public boolean isKey(IExpr key) {
 		return map.containsKey(key);
 	}
 
+	@Override
 	public ArrayList<String> keyNames() {
 		ArrayList<String> list = new ArrayList<String>();
 		for (Object2IntMap.Entry<IExpr> element : map.object2IntEntrySet()) {
@@ -261,6 +287,7 @@ public class ASTAssociation extends AST implements IAssociation {
 		return list;
 	}
 
+	@Override
 	public IASTMutable keys() {
 		return keys(F.List);
 	}
@@ -278,6 +305,7 @@ public class ASTAssociation extends AST implements IAssociation {
 		return list;
 	}
 
+	@Override
 	public IASTMutable values() {
 		return values(F.List);
 	}
@@ -288,8 +316,9 @@ public class ASTAssociation extends AST implements IAssociation {
 		return list;
 	}
 
+	@Override
 	public IExpr getKey(int position) {
-		IAST ast = normal();
+		IAST ast = normal(false);
 		IExpr temp = ast.get(position).first();
 		if (temp.isPresent()) {
 			return F.Key(temp);
@@ -297,14 +326,21 @@ public class ASTAssociation extends AST implements IAssociation {
 		return F.C0;
 	}
 
-	public IExpr getValue(IExpr key) {
-		return getValue(key, F.Missing(F.stringx("KeyAbsent"), key));
+	@Override
+	public IExpr getValue(final IExpr key) {
+		return getValue(key, new Supplier<IExpr>() {
+			@Override
+			public IExpr get() {
+				return F.Missing(F.stringx("KeyAbsent"), key);
+			}
+		});
 	}
 
-	public IExpr getValue(IExpr key, IExpr defaultValue) {
+	@Override
+	public IExpr getValue(IExpr key, Supplier<IExpr> defaultValue) {
 		int index = map.getInt(key);
 		if (index == 0) {
-			return defaultValue;// F.Missing(F.stringx("KeyAbsent"), key);
+			return defaultValue.get();// F.Missing(F.stringx("KeyAbsent"), key);
 		}
 		if (index < 0) {
 			index *= -1;
@@ -312,6 +348,7 @@ public class ASTAssociation extends AST implements IAssociation {
 		return get(index);
 	}
 
+	@Override
 	public IAST getItems(int[] items, int length) {
 		ASTAssociation assoc = new ASTAssociation(length, false);
 		if (length > 0) {
@@ -336,7 +373,7 @@ public class ASTAssociation extends AST implements IAssociation {
 				return assoc;
 			}
 
-			IAST ast = normal();
+			IAST ast = normal(false);
 			for (int i = 0; i < length; i++) {
 				assoc.appendRule((IAST) ast.get(items[i]));
 			}
@@ -348,7 +385,7 @@ public class ASTAssociation extends AST implements IAssociation {
 	@Override
 	public IAST filter(IASTAppendable filterAST, Predicate<? super IExpr> predicate) {
 		if (filterAST instanceof ASTAssociation) {
-			IAST list = normal();
+			IAST list = normal(false);
 			for (int i = 1; i < size(); i++) {
 				if (predicate.test(get(i))) {
 					((ASTAssociation) filterAST).appendRule((IAST) list.get(i));
@@ -367,7 +404,7 @@ public class ASTAssociation extends AST implements IAssociation {
 			if (count[0] >= maxMatches) {
 				return filterAST;
 			}
-			IAST list = normal();
+			IAST list = normal(false);
 			for (int i = 1; i < size(); i++) {
 				if (predicate.test(get(i))) {
 					if (++count[0] == maxMatches) {
@@ -382,39 +419,106 @@ public class ASTAssociation extends AST implements IAssociation {
 		return super.filter(filterAST, predicate, maxMatches);
 	}
 
+	@Override
 	public String fullFormString() {
 		return normal(F.Association).fullFormString();
 	}
 
-	public IAssociation sort() {
-		List<Integer> indices = new ArrayList<Integer>(argSize());
-		for (int i = 1; i < size(); i++) {
-			indices.add(i);
-		}
-		Comparator<Integer> comparator = new Comparator<Integer>() {
-			public int compare(Integer i, Integer j) {
-				return get(i).compareTo(get(j));
-			}
-		};
-		Collections.sort(indices, comparator);
-		ASTAssociation result = new ASTAssociation(size(), false);
+	@Override
+	public IExpr remove(int location) {
+		normalCache = null;
+		IExpr result = super.remove(location);
 		for (Object2IntMap.Entry<IExpr> element : map.object2IntEntrySet()) {
-			// for (Map.Entry<IExpr, Integer> element : map.entrySet()) {
 			int value = element.getIntValue();
-			if (value < 0) {
-				value *= -1;
+			int indx = value;
+			if (indx < 0) {
+				indx *= -1;
 			}
-			int newValue = indices.get(value - 1);
-			result.append(get(newValue));
-			result.map.put(element.getKey(), newValue);
+			if (indx > location) {
+				element.setValue(value > 0 ? --value : ++value);
+			} else if (indx == location) {
+				map.remove(element.getKey(), value);
+			}
 		}
 		return result;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public final IASTMutable removeAtCopy(int position) {
+		ASTAssociation assoc = copy();
+		assoc.remove(position);
+		return assoc;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public IAST rest() {
+		if (size() > 1) {
+			return removeAtCopy(1);
+		}
+		return this;
+	}
+
+	@Override
+	public IAssociation sort() {
+		return sort(null);
+	}
+
+	@Override
+	public IAssociation sort(final Comparator<IExpr> comp) {
+		List<Integer> indices = new ArrayList<Integer>(argSize());
+		for (int i = 1; i < size(); i++) {
+			indices.add(i);
+		}
+		Comparator<Integer> comparator;
+		if (comp == null) {
+			comparator = new Comparator<Integer>() {
+				@Override
+			public int compare(Integer i, Integer j) {
+				return get(i).compareTo(get(j));
+			}
+		};
+		} else {
+			comparator = new Comparator<Integer>() {
+				@Override
+				public int compare(Integer i, Integer j) {
+					return comp.compare(get(i), get(j));
+				}
+			};
+		}
+		Collections.sort(indices, comparator);
+		ASTAssociation result = new ASTAssociation(argSize(), true);
+		for (Object2IntMap.Entry<IExpr> element : map.object2IntEntrySet()) {
+			// for (Map.Entry<IExpr, Integer> element : map.entrySet()) {
+			int value = element.getIntValue();
+			int indx = value;
+			if (indx < 0) {
+				indx *= -1;
+			}
+			for (int i = 0; i < indices.size(); i++) {
+				if (indices.get(i) == indx) {
+					indx = i + 1;
+					break;
+				}
+			}
+			int newValue = indices.get(indx - 1);
+			result.set(indx, get(newValue));
+			if (value < 0) {
+				result.map.put(element.getKey(), -indx);
+			} else {
+				result.map.put(element.getKey(), indx);
+			}
+		}
+		return result;
+	}
+
+	@Override
 	public IAssociation keySort() {
 		return keySort(null);
 	}
 
+	@Override
 	public IAssociation keySort(Comparator<IExpr> comparator) {
 		IASTMutable list = keys();
 		if (comparator == null) {
@@ -447,7 +551,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		IAST ast = normal();
+		IAST ast = normal(false);
 		objectOutput.writeObject(ast);
 	}
 }

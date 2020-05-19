@@ -110,9 +110,25 @@ public interface IPatternMap extends Cloneable {
 
     public void setRHSEvaluated(boolean evaluated);
 
-    public void setValue(IPatternObject pattern, IExpr expr);
+	/**
+	 * Assign the value to the pattern.
+	 *
+	 * @param pattern
+	 *            the pattern expression
+	 * @param expr
+	 * @return <code>true</code> if assignment was successful, <code>false</code> otherwise.
+	 */
+    public boolean setValue(IPatternObject pattern, IExpr expr);
 
-    public void setValue(IPatternSequence pattern, IAST sequence);
+	/**
+	 * Assign the sequence to the pattern sequence.
+	 *
+	 * @param pattern
+	 *            the pattern sequence expression
+	 * @param sequence
+	 * @return <code>true</code> if assignment was successful, <code>false</code> otherwise.
+	 */
+    public boolean setValue(IPatternSequence pattern, IAST sequence);
 
     /**
      * Gives the number of symbols used in this map.

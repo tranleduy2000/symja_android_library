@@ -2,7 +2,6 @@ package org.matheclipse.core.builtin;
 
 import com.duy.util.Base64;
 
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.expression.F;
@@ -11,6 +10,7 @@ import org.matheclipse.core.expression.data.ByteArrayExpr;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IDataExpr;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 
 
 public class WXFFunctions {
@@ -49,8 +49,8 @@ public class WXFFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
 				try {
-				IExpr arg1 = engine.evaluate(ast.arg1());
-				if (arg1.isList()) {
+					IExpr arg1 = engine.evaluate(ast.arg1());
+					if (arg1.isList()) {
 						byte[] bArray = WL.toByteArray((IAST) arg1);
 						return ByteArrayExpr.newInstance(bArray);
 					} else if (arg1.isString()) {
@@ -59,12 +59,12 @@ public class WXFFunctions {
 					}
 
 					return engine.printMessage("ByteArray: list of byte values expected");
-					} catch (RuntimeException cce) {
-						if (Config.SHOW_STACKTRACE) {
-							cce.printStackTrace();
-						}
+				} catch (RuntimeException cce) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						cce.printStackTrace();
 					}
 				}
+			}
 			return F.NIL;
 		}
 	}
@@ -82,7 +82,7 @@ public class WXFFunctions {
 						// System.out.println(temp);
 						return temp;
 					} catch (RuntimeException cce) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							cce.printStackTrace();
 						}
 					}
@@ -93,7 +93,7 @@ public class WXFFunctions {
 	}
 
 	public static boolean isByteArray(IExpr arg1) {
-		return arg1 instanceof IDataExpr && arg1.head().equals(F.ByteArray);
+		return arg1 instanceof ByteArrayExpr;
 	}
 
 
