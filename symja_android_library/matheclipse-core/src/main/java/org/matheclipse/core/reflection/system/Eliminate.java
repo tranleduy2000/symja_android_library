@@ -466,6 +466,13 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	 */
 	private static IExpr matchSpecialExpressions(IAST ast, IExpr exprWithoutVariable, IExpr x) {
 		if (exprWithoutVariable.isZero()) {
+			final Matcher matcher = initMatcher(x);
+			return matcher.replaceAll(ast);
+		}
+		return F.NIL;
+	}
+
+	private static Matcher initMatcher(IExpr x) {
 		final Matcher matcher = new Matcher();
 			// match a_.*variable^n_.+b_.*variable^m_ to E^(((-I)*Pi + Log(a) - Log(b))/(m - n))
 			matcher.caseOf(
@@ -474,9 +481,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 						F.Exp(F.Times(F.Power(F.Plus(F.m, F.Negate(F.n)), -1),
 								F.Plus(F.Times(F.CNI, F.Pi), F.Log(F.a), F.Negate(F.Log(F.b))))),
 						F.And(F.FreeQ(F.a, x), F.FreeQ(F.b, x), F.FreeQ(F.n, x), F.FreeQ(F.m, x))));
-			return matcher.replaceAll(ast);
-		}
-		return F.NIL;
+		return matcher;
 	}
 
 	public Eliminate() {
@@ -499,7 +504,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 		for (int i = 0; i < analyzerList.size(); i++) {
 			IExpr variableExpr = eliminateAnalyze(analyzerList.get(i).getExpr(), variable, engine);
 			if (variableExpr.isPresent()) {
-				variableExpr = engine.evaluate(variableExpr);
+				variableExpr = engine.evalQuiet(variableExpr);
 				IExpr expr;
 				IAST rule = F.Rule(variable, variableExpr);
 				analyzerList.remove(i);

@@ -1,6 +1,8 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Function;
+import com.duy.lambda.Supplier;
+import com.gx.common.base.Suppliers;
 
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.WindowFunctions;
@@ -16,6 +18,7 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.Matcher;
 import org.matheclipse.core.polynomials.QuarticSolver;
+import org.matheclipse.core.reflection.system.rules.FunctionExpandRules;
 
 import static org.matheclipse.core.expression.F.Beta;
 import static org.matheclipse.core.expression.F.BetaRegularized;
@@ -57,9 +60,9 @@ import static org.matheclipse.core.expression.F.z_;
  * 362880/(b*(1+b)*(2+b)*(3+b)*(4+b)*(5+b)*(6+b)*(7+b)*(8+b)*(9+b))
  * </pre>
  */
-public class FunctionExpand extends AbstractEvaluator {
+public class FunctionExpand extends AbstractEvaluator implements FunctionExpandRules {
 
-	private final static Matcher MATCHER = new Matcher( );
+	private static Supplier<Matcher> LAZY_MATCHER;
 
 	/**
 	 *
@@ -68,7 +71,8 @@ public class FunctionExpand extends AbstractEvaluator {
 	 */
     private static class Initializer {
 
-        private static void init() {
+		private static Matcher init() {
+			Matcher MATCHER = new Matcher();
             // Beta
             MATCHER.caseOf(Beta(z_, a_, b_), //
                     // [$ Beta(a, b)*(1 - (1 - z)^b*Sum((Pochhammer(b, k)*z^k)/k!, {k, 0, a - 1})) /; IntegerQ(a)&&a>0
@@ -258,6 +262,15 @@ public class FunctionExpand extends AbstractEvaluator {
             MATCHER.caseOf(F.ParzenWindow.of(x_), WindowFunctions.parzenWindow(x));
             MATCHER.caseOf(F.TukeyWindow.of(x_), WindowFunctions.tukeyWindow(x));
 
+			for (int i = 1; i < RULES.size(); i++) {
+				IExpr arg = RULES.get(i);
+				if (arg.isAST(F.SetDelayed, 3)) {
+					MATCHER.caseOf(arg.first(), arg.second());
+				} else if (arg.isAST(F.Set, 3)) {
+					MATCHER.caseOf(arg.first(), arg.second());
+				}
+			}
+			return MATCHER;
         }
     }
 
@@ -343,6 +356,9 @@ public class FunctionExpand extends AbstractEvaluator {
 		}
 		return F.NIL;
 	}
+	private static Matcher getMatcher() {
+		return LAZY_MATCHER.get();
+	}
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 		IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
@@ -372,7 +388,7 @@ public class FunctionExpand extends AbstractEvaluator {
 				if (assumptions != null) {
 					try {
 						engine.setAssumptions(assumptions);
-						IExpr temp = MATCHER.replaceAll(arg1, new Function<IAST, IExpr>() {
+						IExpr temp = getMatcher().replaceAll(arg1, new Function<IAST, IExpr>() {
 							@Override
 							public IExpr apply(IAST ast1) {
 								return beforeRules(ast1);
@@ -387,7 +403,7 @@ public class FunctionExpand extends AbstractEvaluator {
 			}
 
 		}
-		IExpr temp = MATCHER.replaceAll(arg1, new Function<IAST, IExpr>() {
+		IExpr temp = getMatcher().replaceAll(arg1, new Function<IAST, IExpr>() {
 			@Override
 			public IExpr apply(IAST ast1) {
 				return beforeRules(ast1);
@@ -402,7 +418,14 @@ public class FunctionExpand extends AbstractEvaluator {
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {
-		Initializer.init();
+		// Initializer.init();
+//		LAZY_MATCHER = Suppliers.memoize(() -> Initializer.init());
+		LAZY_MATCHER =  new Supplier<Matcher>() {
+			@Override
+			public Matcher get() {
+				return Initializer.init();
+			}
+		};
 		newSymbol.setAttributes(ISymbol.LISTABLE);
 	}
 
