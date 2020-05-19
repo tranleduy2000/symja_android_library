@@ -402,4 +402,61 @@ public class ComplexSymTest {
 		assertEquals(expected, result[1]);
 
 	}
+
+	@Test
+	public void testGcd11() {
+
+		ComplexSym one = ComplexSym.valueOf(BigInteger.ONE, BigInteger.ZERO);
+		ComplexSym minusOne = ComplexSym.valueOf(BigInteger.ONE, BigInteger.ZERO);
+		ComplexSym I = ComplexSym.valueOf(BigInteger.ZERO, BigInteger.ONE);
+		ComplexSym minusI = ComplexSym.valueOf(BigInteger.ZERO, BigInteger.ONE.negate());
+
+		// gcd(1,1) ==> 1
+		IInteger[] parm = one.gaussianIntegers();
+		IInteger[] result = one.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(I,1) ==> 1
+		parm = one.gaussianIntegers();
+		result = I.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(-I,1) ==> 1
+		parm = one.gaussianIntegers();
+		result = minusI.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(1,I) ==> 1
+		parm = I.gaussianIntegers();
+		result = one.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(1,-I) ==> 1
+		parm = minusI.gaussianIntegers();
+		result = one.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(-I,I) ==> 1
+		parm = I.gaussianIntegers();
+		result = minusI.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(I,-I) ==> 1
+		parm = minusI.gaussianIntegers();
+		result = I.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+
+		// gcd(-I,-I) ==> 1
+		parm = minusI.gaussianIntegers();
+		result = minusI.gcd(parm);
+		assertEquals(F.C1, result[0]);
+		assertEquals(F.C0, result[1]);
+	}
 }

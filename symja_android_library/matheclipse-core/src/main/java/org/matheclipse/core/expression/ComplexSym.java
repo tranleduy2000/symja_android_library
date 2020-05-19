@@ -336,9 +336,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		return valueOf(fReal.fractionalPart(), fImaginary.fractionalPart());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public IComplex integerPart() {
 		return valueOf(fReal.integerPart(), fImaginary.integerPart());
@@ -565,14 +563,14 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	public IInteger[] gcd(final IInteger[] dividers) {
 
 		if ((fReal.isZero() && fImaginary.isZero()) || (dividers[0].isZero() && dividers[1].isZero())) {
-			return new IInteger[] {new IntegerSym(), new IntegerSym()};
+			return new IInteger[] { F.C0, F.C0 };
 		}
 
 		IInteger[] integerAndRemainder;
 
 		ComplexSym dividend = ComplexSym.valueOf(this.fReal, this.fImaginary);
 
-		while(dividers[0].intValue() != 0 || dividers[1].intValue() != 0) {
+		while (!dividers[0].isZero() || !dividers[1].isZero()) {
 			integerAndRemainder = dividend.integerAndRemainderDivisionGuassian(dividers);
 
 			dividend.fReal = dividers[0];
