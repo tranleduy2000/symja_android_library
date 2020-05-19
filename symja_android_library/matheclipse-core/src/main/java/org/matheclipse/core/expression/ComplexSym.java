@@ -238,6 +238,16 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			}
 			return fImaginary.compareTo(((ComplexSym) expr).fImaginary);
 		}
+		if (expr.isNumber()) {
+			int c = fReal.compareTo(((INumber) expr).re());
+			if (c != 0) {
+				return c;
+			}
+			if (expr.isReal()) {
+				return 1;
+			}
+			return fImaginary.compareTo(((INumber) expr).im());
+		}
 		return super.compareTo(expr);
 	}
 
@@ -325,11 +335,20 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	public INumber fractionalPart() {
 		return valueOf(fReal.fractionalPart(), fImaginary.fractionalPart());
 	}
-	 
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IComplex integerPart() {
+		return valueOf(fReal.integerPart(), fImaginary.integerPart());
+	}
+
 	@Override
 	public INumber floorFraction() {
 		return valueOf((IRational) fReal.floorFraction(), (IRational) fImaginary.floorFraction());
 	}
+
 	@Override
 	public String fullFormString() {
 		StringBuilder buf = new StringBuilder("Complex");
@@ -521,6 +540,51 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 				fReal.multiply(parm1.getImaginaryPart()).add(parm1.getRealPart().multiply(fImaginary)));
 	}
 
+	public IInteger[] integerAndRemainderDivisionGuassian(final IInteger[] parm1) {
+
+		IRational numeratorReal = fReal.multiply(parm1[0]).subtract(fImaginary.multiply(parm1[1].negate()));
+
+		IRational numeratorImaginary = fReal.multiply(parm1[1].negate()).add(parm1[0].multiply(fImaginary));
+
+		IRational denominator = parm1[0].multiply(parm1[0]).add(parm1[1].multiply(parm1[1]));
+
+		if (denominator.isZero()) {
+			throw new IllegalArgumentException("Denominator can not be zero.");
+		}
+
+		IRational divisionReal = numeratorReal.divideBy(denominator).round();
+		IRational divisionImaginary = numeratorImaginary.divideBy(denominator).round();
+
+		IRational remainderReal = fReal.subtract(parm1[0].multiply(divisionReal)).subtract(parm1[1].multiply(divisionImaginary).negate());
+		IRational remainderImaginary = fImaginary.subtract(parm1[0].multiply(divisionImaginary)).subtract(parm1[1].multiply(divisionReal));
+
+		return new IInteger[] {  (IInteger)divisionReal, (IInteger)divisionImaginary, (IInteger)remainderReal, (IInteger)remainderImaginary };
+
+	}
+
+	public IInteger[] gcd(final IInteger[] dividers) {
+
+		if ((fReal.isZero() && fImaginary.isZero()) || (dividers[0].isZero() && dividers[1].isZero())) {
+			return new IInteger[] {new IntegerSym(), new IntegerSym()};
+		}
+
+		IInteger[] integerAndRemainder;
+
+		ComplexSym dividend = ComplexSym.valueOf(this.fReal, this.fImaginary);
+
+		while(dividers[0].intValue() != 0 || dividers[1].intValue() != 0) {
+			integerAndRemainder = dividend.integerAndRemainderDivisionGuassian(dividers);
+
+			dividend.fReal = dividers[0];
+			dividend.fImaginary = dividers[1];
+
+			dividers[0] = integerAndRemainder[2];
+			dividers[1] = integerAndRemainder[3];
+		}
+
+		return new IInteger[] {(IInteger)dividend.fReal, (IInteger)dividend.fImaginary};
+
+	}
 	@Override
 	public ComplexSym negate() {
 		return ComplexSym.valueOf(fReal.negate(), fImaginary.negate());

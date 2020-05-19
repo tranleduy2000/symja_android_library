@@ -1,6 +1,8 @@
 package org.matheclipse.core.eval.interfaces;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
@@ -21,10 +23,10 @@ import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
 public abstract class AbstractArgMultiple extends AbstractArg2 {
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 
 		if (ast.isAST2()) {
-			IExpr temp = binaryOperator(null, ast.arg1(), ast.arg2());
+			IExpr temp = binaryOperator(ast, ast.arg1(), ast.arg2(), engine);
 			if (temp.isPresent()) {
 				return temp;
 			}
@@ -42,12 +44,12 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 
 			while (i < tempAST.size()) {
 
-				tres = binaryOperator(null, temp, tempAST.get(i));
+				tres = binaryOperator(null, temp, tempAST.get(i), engine);
 
 				if (!tres.isPresent()) {
 
 					for (int j = i + 1; j < tempAST.size(); j++) {
-						tres = binaryOperator(null, temp, tempAST.get(j));
+						tres = binaryOperator(null, temp, tempAST.get(j), engine);
 
 						if (tres.isPresent()) {
 							evaled = true;
@@ -105,15 +107,14 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 	}
 
 	/**
-	 * Evaluate an <code>Orderless</code> AST if the
-	 * <code>getHashRuleMap()</code> method returns a
+	 * Evaluate an <code>Orderless</code> AST if the <code>getHashRuleMap()</code> method returns a
 	 * <code>HashedOrderlessMatcher</code>,
 	 * 
 	 * @param orderlessAST
 	 * @return
 	 * @see HashedPatternRules
 	 */
-	public IAST evaluateHashsRepeated(final IAST orderlessAST, EvalEngine engine) {
+	public IAST evaluateHashsRepeated(final IAST orderlessAST, final EvalEngine engine) {
 		HashedOrderlessMatcher hashRuleMap = getHashRuleMap();
 		if (hashRuleMap == null) {
 			return F.NIL;
@@ -130,8 +131,7 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 	 * @param rhs
 	 * @param condition
 	 * @see org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher#defineHashRule(org.matheclipse.core.interfaces.IExpr,
-	 *      org.matheclipse.core.interfaces.IExpr,
-	 *      org.matheclipse.core.interfaces.IExpr,
+	 *      org.matheclipse.core.interfaces.IExpr, org.matheclipse.core.interfaces.IExpr,
 	 *      org.matheclipse.core.interfaces.IExpr)
 	 */
 	public void defineHashRule(IExpr lhs1, IExpr lhs2, IExpr rhs, IExpr condition) {
@@ -144,8 +144,7 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 	 * @param rhs
 	 * @param condition
 	 * @see org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher#defineHashRule(org.matheclipse.core.interfaces.IExpr,
-	 *      org.matheclipse.core.interfaces.IExpr,
-	 *      org.matheclipse.core.interfaces.IExpr,
+	 *      org.matheclipse.core.interfaces.IExpr, org.matheclipse.core.interfaces.IExpr,
 	 *      org.matheclipse.core.interfaces.IExpr)
 	 */
 	public void setUpHashRule2(IExpr lhs1, IExpr lhs2, IExpr rhs, IExpr condition) {
@@ -153,8 +152,9 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 	}
 
 	@Override
-	public IExpr binaryOperator(IAST ast, final IExpr o0, final IExpr o1) {
+	public IExpr binaryOperator(IAST ast, final IExpr o0, final IExpr o1, EvalEngine engine) {
 		IExpr result = F.NIL;
+		try {
 		if (o0 instanceof INum) {
 			// use specialized methods for numeric mode
 			if (o1 instanceof INum) {
@@ -243,6 +243,9 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 			if (o1 instanceof IInteger) {
 				return eComIntArg((IComplex) o0, (IInteger) o1);
 			}
+				if (o1 instanceof IFraction) {
+					return e2ComArg((IComplex) o0, F.complex((IFraction) o1));
+				}
 			if (o1 instanceof IComplex) {
 				return e2ComArg((IComplex) o0, (IComplex) o1);
 			}
@@ -268,6 +271,17 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 			}
 		}
 
+		} catch (ValidateException ve) {
+			if (Config.SHOW_STACKTRACE) {
+				ve.printStackTrace();
+			}
+			return engine.printMessage(ast.topHead(), ve);
+		} catch (RuntimeException rex) {
+			if (Config.SHOW_STACKTRACE) {
+				rex.printStackTrace();
+			}
+			return engine.printMessage(ast.topHead(), rex);
+		}
 		return F.NIL;
 	}
 

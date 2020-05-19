@@ -1,7 +1,9 @@
 package org.matheclipse.core.eval.interfaces;
 
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
@@ -23,8 +25,9 @@ import org.matheclipse.core.interfaces.ISymbol;
  */
 public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 
-	public IExpr binaryOperator(IAST ast, final IExpr o0, final IExpr o1) {
+	public IExpr binaryOperator(IAST ast, final IExpr o0, final IExpr o1, EvalEngine engine) {
 		IExpr result = F.NIL;
+		try {
 		if (o0.isNumber() && o1.isNumber()) {
 			result = e2NumericArg(ast, o0, o1);
 			if (result.isPresent()) {
@@ -92,6 +95,17 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 			}
 		}
 
+		} catch (ValidateException ve) {
+			if (Config.SHOW_STACKTRACE) {
+				ve.printStackTrace();
+			}
+			return engine.printMessage(ast.topHead(), ve);
+		} catch (RuntimeException rex) {
+			if (Config.SHOW_STACKTRACE) {
+				rex.printStackTrace();
+			}
+			return engine.printMessage(ast.topHead(), rex);
+		}
 		return F.NIL;
 	}
 
@@ -206,9 +220,8 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-
-		return binaryOperator(ast, ast.arg1(), ast.arg2());
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		return binaryOperator(ast, ast.arg1(), ast.arg2(),engine);
 	}
 
 	public int[] expectedArgSize() {

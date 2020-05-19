@@ -323,6 +323,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         return plus(F.CN1);
     }
 
+    @Override
+    public long determinePrecision() {
+        return -1;
+
+    }
+
     /**
      * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns
      * <code>false</code> otherwise.

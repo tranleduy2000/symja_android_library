@@ -14,7 +14,6 @@ import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -238,6 +237,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * number classes.
      */
     IExpr dec();
+
+    /**
+     * Determine precision of this expression. Return -1 for symbolic evaluation.
+     *
+     * @return the precision of this expression. -1 for symbolic evaluation.
+     */
+    long determinePrecision();
 
     /**
      * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>. Returns

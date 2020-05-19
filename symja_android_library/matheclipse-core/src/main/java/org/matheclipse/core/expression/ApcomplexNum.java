@@ -7,9 +7,11 @@ import org.apfloat.ApfloatMath;
 import org.apfloat.ApfloatRuntimeException;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IComplexNumImpl;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -141,6 +143,11 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		return add(MINUS_ONE);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public long determinePrecision() {
+		return precision();
+	}
 	/** {@inheritDoc} */
 	@Override
 	public IExpr inc() {
@@ -467,6 +474,13 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 		if (fApcomplex.real().compareTo(that.real()) > 0) {
 			return 1;
 		}
+		if (that.imag().signum() == 0) {
+			if (fApcomplex.imag().signum() != 0) {
+				return 1;
+			}
+		} else if (fApcomplex.imag().signum() == 0) {
+			return -1;
+		}
 		return fApcomplex.imag().compareTo(that.imag());
 	}
 
@@ -476,10 +490,15 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	 */
 	@Override
 	public int compareTo(final IExpr expr) {
+		if (expr.isNumber()) {
 		if (expr instanceof ApcomplexNum) {
 			return compareTo(((ApcomplexNum) expr).fApcomplex);
 		}
-		return super.compareTo(expr);
+			Apcomplex apc = ((INumber) expr).apcomplexNumValue(precision()).fApcomplex;
+			return compareTo(apc);
+		}
+		return -1;
+		// return IComplexNum.super.compareTo(expr);
 	}
 
 	@Override
@@ -563,7 +582,31 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 				F.ZZ(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
 	}
 
-	
+	/** {@inheritDoc} */
+	@Override
+	public IComplex integerPart() {
+		// isNegative() ? ceilFraction() : floorFraction();
+		Apfloat re = fApcomplex.real();
+		Apfloat im = fApcomplex.imag();
+		IInteger reInt;
+		IInteger imInt;
+		if (re.signum() == -1) {
+			// ceilFraction
+			reInt = F.ZZ(ApfloatMath.ceil(re).toBigInteger());
+		} else {
+			// floorFraction
+			reInt = F.ZZ(ApfloatMath.floor(re).toBigInteger());
+		}
+		if (im.signum() == -1) {
+			// ceilFraction
+			imInt = F.ZZ(ApfloatMath.ceil(im).toBigInteger());
+		} else {
+			// floorFraction
+			imInt = F.ZZ(ApfloatMath.floor(im).toBigInteger());
+		}
+		return F.complex(reInt, imInt);
+	}
+
 	@Override
 	public long precision() throws ApfloatRuntimeException {
 		return fApcomplex.precision();

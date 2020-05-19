@@ -22,7 +22,8 @@ public interface INumber extends IExpr {
     /**
      * Get a <code>Apcomplex</code> number wrapped into an <code>ApcomplexNum</code> object.
      *
-     * @param precision set the precision of the resulting ApcomplexNum
+	 * @param precision
+	 *            set the precision of the resulting ApcomplexNum
      * @return this signed number represented as an ApcomplexNum
      */
     public ApcomplexNum apcomplexNumValue(long precision);
@@ -33,7 +34,7 @@ public interface INumber extends IExpr {
      * numeric value cannot be represented by an <code>long</code> type.
      *
      * @return the smallest (closest to negative infinity) <code>IInteger</code> value that is not less than
-     * <code>this</code> and is equal to a mathematical integer.
+	 *         <code>this</code> and is equal to a mathematical integer.
      */
     public INumber ceilFraction() throws ArithmeticException;
 
@@ -68,8 +69,8 @@ public interface INumber extends IExpr {
      * Gets the signum value of a complex number
      *
      * @return 0 for <code>this == 0</code>; +1 for <code>real(this) &gt; 0</code> or
-     * <code>( real(this)==0 &amp;&amp; imaginary(this) &gt; 0 )</code>; -1 for <code>real(this) &lt; 0 || (
-     * real(this) == 0 &amp;&amp; imaginary(this) &lt; 0 )
+	 *         <code>( real(this)==0 &amp;&amp; imaginary(this) &gt; 0 )</code>; -1 for <code>real(this) &lt; 0 || (
+	 *         real(this) == 0 &amp;&amp; imaginary(this) &lt; 0 )
      */
     public int complexSign();
 
@@ -113,6 +114,12 @@ public interface INumber extends IExpr {
      */
     public INumber fractionalPart();
 
+    /**
+     * Return the integer (real and imaginary) part of this number
+     *
+     * @return
+     */
+    public INumber integerPart();
 
     /**
      * Returns the imaginary part of a complex number
