@@ -562,7 +562,8 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
 	public IInteger[] gcd(final IInteger[] dividers) {
 
-		if ((fReal.isZero() && fImaginary.isZero()) || (dividers[0].isZero() && dividers[1].isZero())) {
+		if ((fReal.isZero() && fImaginary.isZero()) || //
+				(dividers[0].isZero() && dividers[1].isZero())) {
 			return new IInteger[] { F.C0, F.C0 };
 		}
 
@@ -580,6 +581,14 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			dividers[1] = integerAndRemainder[3];
 		}
 
+		IInteger fRealResult = (IInteger) dividend.fReal;
+		IInteger fImaginaryResult = (IInteger) dividend.fImaginary;
+
+		if ((fRealResult.isMinusOne() && fImaginaryResult.isZero()) || //
+				(fRealResult.isZero() && fImaginaryResult.isOne()) || //
+				(fRealResult.isZero() && fImaginaryResult.isMinusOne())) {
+			return new IInteger[] { F.C1, F.C0 };
+		}
 		return new IInteger[] {(IInteger)dividend.fReal, (IInteger)dividend.fImaginary};
 
 	}
