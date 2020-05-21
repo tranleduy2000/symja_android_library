@@ -2,6 +2,7 @@ package com.duy;
 
 import junit.framework.TestCase;
 
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -73,4 +74,18 @@ public class NumericTest extends TestCase {
                 "2.168");
     }
 
+    public void testSmallValue() {
+        ExprEvaluator exprEvaluator = new ExprEvaluator();
+        assertEquals(exprEvaluator.eval("N(0.00000000000000000000000000000091093835611, 100)").toString(),
+                "9.1093835611*10^-31");
+
+        assertEquals(exprEvaluator.eval("1/(N(0.0000000000000000001602176620898, 100))").toString(),
+                "6.241509125501484852088071665173164020252959820255548406024372975427711002340001391293975286331422184*10^18");
+
+        String expr = "(N(0.00000000000000000000000000000091093835611, 100))*(299792458)*(299792458)/(N(0.0000000000000000001602176620898, 100))";
+        EvalEngine engine = exprEvaluator.getEvalEngine();
+        exprEvaluator.eval(expr);
+        assertEquals(exprEvaluator.eval(expr).toString(),
+                "5.109989462990596090073354406528618388487843922686823477318769336034715783232952947882118172965136566*10^5");
+    }
 }

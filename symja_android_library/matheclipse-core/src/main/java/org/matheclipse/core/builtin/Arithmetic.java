@@ -2292,9 +2292,10 @@ public final class Arithmetic {
         public IExpr numericEval(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
-			if (arg1.isInexactNumber()) {
-				return arg1;
-			}
+			// Android changed: always using numeric evaluator to enable apfloat.
+            // if (arg1.isInexactNumber()) {
+            // 	return arg1;
+            // }
 			final boolean oldNumericMode = engine.isNumericMode();
 			final long oldPrecision = engine.getNumericPrecision();
 			final int oldSignificantFigures = engine.getSignificantFigures();

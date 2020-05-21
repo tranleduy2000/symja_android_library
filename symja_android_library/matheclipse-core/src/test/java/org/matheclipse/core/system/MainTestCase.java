@@ -1111,8 +1111,9 @@ public class MainTestCase extends AbstractTestCase {
 	public void testSystem082() {
 		check("N(Det({{Pi,2.0},{3,4}}))", //
 				"6.56637");
+		// Android changed
 		check("N(Det({{Pi,2.0},{3,4}}),50)", //
-				"6.56637");
+				"6.5663706143591724639918538741767406463623046875");
 
 		check("Det({{1,2},{3,4}})", //
 				"-2");
