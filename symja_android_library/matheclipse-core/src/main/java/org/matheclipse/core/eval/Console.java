@@ -10,6 +10,7 @@ import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
@@ -79,7 +80,8 @@ public class Console {
 		main(args);
 	}
     public static void main(final String args[]) {
-		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
+		Locale.setDefault(Locale.US);
+		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
 		Config.USE_VISJS = true;
 		Config.FILESYSTEM_ENABLED = true;
 		F.initSymbols(null, null, true);
@@ -368,20 +370,16 @@ public class Console {
                 // } else if (arg.equals("-debug")) {
                 // Config.DEBUG = true;
             } else if (arg.equals("-file")) {
+				if (i + 1 >= args.length) {
+					final String msg = "You must specify a file when using the -file argument";
+					stdout.println(msg);
+					throw ReturnException.RETURN_FALSE;
+				}
 
-                try {
                     // fFile = new File(args[i + 1]);
                     fEvaluator.eval(F.Get(args[i + 1]));
-
-                    // if (fFile.isFile()) {
-                    //
-                    // }
                     i++;
-                } catch (final ArrayIndexOutOfBoundsException aioobe) {
-                    final String msg = "You must specify a file when " + "using the -file argument";
-					stdout.println(msg);
-                    return;
-                }
+
             } else if (arg.equals("-default") || arg.equals("-d")) {
 				if (i + 1 >= args.length) {
 					final String msg = "You must specify a file when using the -d argument";
@@ -667,22 +665,21 @@ public class Console {
 	 * @param extension
 	 *            the file extension i.e. *.svg *.html
 	 */
-	private static void openInBrowser(String fileContent, String extension) {
-		File temp;
-		try {
-			temp = File.createTempFile("document", ".htm");
-			BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-			out.write(fileContent);
-			out.close();
-
-			stdout.println(temp.toURI().toString());
-
-			//Android changed: Android doesn't have package: java.awt
+	// private static void openInBrowser(String fileContent, String extension) {
+	// File temp;
+	// try {
+	// temp = File.createTempFile("document", ".htm");
+	// BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+	// out.write(fileContent);
+	// out.close();
+	//`
+	// stdout.println(temp.toURI().toString());
+	//
 //			java.awt.Desktop.getDesktop().browse(temp.toURI());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// }
 
     // private static void openURL(String url) {
     // if (Desktop.isDesktopSupported()) {

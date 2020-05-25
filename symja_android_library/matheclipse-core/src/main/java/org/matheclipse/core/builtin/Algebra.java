@@ -56,6 +56,7 @@ import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
 import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
 import org.matheclipse.core.visit.AbstractVisitorBoolean;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -765,7 +766,7 @@ public class Algebra {
 					}
 					return result;
 				} catch (JASConversionException e) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						e.printStackTrace();
 					}
 				}
@@ -940,7 +941,7 @@ public class Algebra {
 					}
 					return arg1;
 			} catch (Exception e) {
-				if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
 			}
@@ -1803,11 +1804,11 @@ public class Algebra {
 									timesAST.appendArgs(ast.size(), new IntFunction<IExpr>() {
 										@Override
 										public IExpr apply(int i) {
-											return F.Power(ast.get(i), F.integer(indices[ki]));
+											return F.Power(ast.get(i), F.ZZ(indices[ki]));
 										}
 									});
 								} else {
-									timesAST.append(F.Power(temp, F.integer(indices[k])));
+									timesAST.append(F.Power(temp, F.ZZ(indices[k])));
 								}
 							}
 
@@ -2763,7 +2764,7 @@ public class Algebra {
 					}
 					return F.NIL;
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -3078,12 +3079,12 @@ public class Algebra {
 				return jas.integerPoly2Expr(poly.monic());
 				}
 				} catch (java.lang.ClassCastException cce) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						cce.printStackTrace();
 					}
 					return F.NIL;
 			} catch (JASConversionException e) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 					e.printStackTrace();
 				}
 				IAST list = ast.setAtCopy(0, F.List);
@@ -3321,7 +3322,7 @@ public class Algebra {
 				} catch (LimitException le) {
 					throw le;
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 				}
@@ -3379,7 +3380,7 @@ public class Algebra {
 			F.REMEMBER_AST_CACHE.put(ast, result);
 			return result;
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 				return F.NIL;
@@ -3487,7 +3488,7 @@ public class Algebra {
 			}
 			return result[1];
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 				return F.NIL;
@@ -4677,7 +4678,7 @@ public class Algebra {
 				// }
 			}
 		} catch (RuntimeException rex) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				rex.printStackTrace();
 			}
 		}

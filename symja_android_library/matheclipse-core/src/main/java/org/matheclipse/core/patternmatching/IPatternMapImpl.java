@@ -229,7 +229,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
     }
 
     @Override
-    public IAST substituteASTPatternOrSymbols(IAST lhsPatternExpr, final boolean onlyNamedPatterns) {
+    public IExpr substituteASTPatternOrSymbols(IAST lhsPatternExpr, final boolean onlyNamedPatterns) {
         VisitorReplaceAllWithPatternFlags visitor = new VisitorReplaceAllWithPatternFlags(new Function<IExpr, IExpr>() {
             @Override
             public IExpr apply(IExpr input) {
@@ -256,6 +256,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
             if (temp.isPresent()) {
                 if (!result.isPresent()) {
                     result = lhsPatternExpr.setAtCopy(i, temp);
+                    // result.setEvalFlags(lhsPatternExpr.getEvalFlags());
                 } else {
                     result.set(i, temp);
                 }
@@ -263,22 +264,24 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         if (result.isPresent()) {
-            if (result.isFlatAST()) {
-                IASTMutable temp = EvalAttributes.flattenDeep((IAST) result);
-                if (temp.isPresent()) {
-                    result = temp;
-                }
-            }
-            // don't test for OneIdentity attribute here !
-            if (result.isOrderlessAST()) {
-                EvalAttributes.sort(result);
-            }
-            // set the eval flags
-            result.isFreeOfPatterns();
-            // System.out.println(" " + lhsPatternExpr.toString() + " -> " + result.toString());
-            return result;
+            return EvalAttributes.simpleEval(result);
+
+            // if (result.isFlatAST()) {
+            // IASTMutable temp = EvalAttributes.flattenDeep((IAST) result);
+            // if (temp.isPresent()) {
+            // result = temp;
+            // }
+            // }
+            // // don't test for OneIdentity attribute here !
+            // if (result.isOrderlessAST()) {
+            // EvalAttributes.sort(result);
+            // }
+            // // set the eval flags
+            // result.isFreeOfPatterns();
+            // // System.out.println(" " + lhsPatternExpr.toString() + " -> " + result.toString());
+            // return result;
         }
-        return lhsPatternExpr;
+        return F.NIL;
     }
     static final class PatternMap0 extends IPatternMapImpl implements IPatternMap {
         private final static int SIZE = 0;

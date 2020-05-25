@@ -5,6 +5,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,7 +233,7 @@ public final class ContextPath {
 
     public ISymbol removeSymbol(String symbolName) {
         String name = symbolName;
-        if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
             if (symbolName.length() == 1) {
                 name = symbolName;
             } else {

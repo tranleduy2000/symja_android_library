@@ -1910,7 +1910,7 @@ public final class Programming {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() >= 3) {
-					IExpr arg1 = engine.evalLoop(ast.arg1());
+				IExpr arg1 = engine.evaluateNull(ast.arg1());
 					if (arg1.isPresent()) {
 						if (!arg1.isAST()) {
 							IExpr result = ast.setAtCopy(1, arg1);
@@ -1932,7 +1932,7 @@ public final class Programming {
 					IExpr temp;
 						int astSize = ast.size();
 						for (int i = 2; i < astSize; i++) {
-							temp = engine.evalLoop(ast.get(i));
+					temp = engine.evaluateNull(ast.get(i));
 							if (temp.isPresent()) {
 								if (evaledAST.isPresent()) {
 									evaledAST.set(i, temp);

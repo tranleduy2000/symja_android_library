@@ -15,7 +15,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.core.trie.Tries;
+import org.matheclipse.parser.trie.Tries;
 
 import java.io.Serializable;
 import java.util.HashMap;

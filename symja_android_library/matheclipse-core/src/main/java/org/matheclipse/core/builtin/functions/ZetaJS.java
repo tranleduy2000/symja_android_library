@@ -3,10 +3,17 @@ package org.matheclipse.core.builtin.functions;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
+import com.duy.lambda.IntToDoubleFunction;
 
 import org.hipparchus.complex.Complex;
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.builtin.NumberTheory;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
+
 
 public class ZetaJS {
+	private final static int MAX_VALUE_HALF = Integer.MAX_VALUE / 2;
+
 	private ZetaJS() {
 	}
 
@@ -30,10 +37,19 @@ public class ZetaJS {
 		return s;
 	}
 
-	public static double summation(DoubleUnaryOperator f, double a, double b) {
+	public static double sumDouble(DoubleUnaryOperator f, double a, double b) {
 		double s = 0.0;
 
 		for (double i = a; i <= b; i++) {
+			s += f.applyAsDouble(i);
+		}
+		return s;
+	}
+
+	public static double sumInt(IntToDoubleFunction f, int a, int b) {
+		double s = 0;
+
+		for (int i = a; i <= b; i++) {
 			s += f.applyAsDouble(i);
 		}
 		return s;
@@ -82,21 +98,9 @@ public class ZetaJS {
 	// return mul( zeta(x), sub( 1, pow( 2, sub(1,x) ) ) );
 	// }
 
-	// public static Complex bernoulli( n ) {
-	//
-	// if ( !Number.isInteger(n) ) throw Error( 'Noninteger argument for Bernoulli number' );
-	//
-	// if ( n < 0 ) throw Error( 'Unsupported argument for Bernoulli number' );
-	//
-	// if ( n === 0 ) return 1;
-	//
-	// if ( n === 1 ) return -.5;
-	//
-	// if ( n & 1 ) return 0;
-	//
-	// return (-1)**(n+1) * n * zeta(-n+1);
-	//
-	// }
+	public static double bernoulliInt(int n) {
+		return NumberTheory.bernoulliDouble(n);
+	}
 
 	// public static Complex harmonic(int n ) {
 	//
@@ -106,37 +110,91 @@ public class ZetaJS {
 	//
 	// }
 
-	// public static Complex hurwitzZeta(Complex x, Complex a ) {
-	//
-	// // Johansson arxiv.org/abs/1309.2877
-	//
+	public static double hurwitzZeta(final double x, final double a) {
+
+		// Johansson arxiv.org/abs/1309.2877
+
 	// if ( isComplex(x) || isComplex(a) ) {
 	//
 	//
 	// } else {
-	//
-	// if ( x === 1 ) throw Error( 'Hurwitz zeta pole' );
-	//
-	// // dlmf.nist.gov/25.11.4
-	//
-	// if ( a > 1 ) {
-	// var m = Math.floor(a);
-	// a -= m;
-	// return hurwitzZeta(x,a) - summation( i => 1 / (a+i)**x, [0,m-1] );
+
+		if (x == 1.0) {
+			throw new ArgumentTypeException("Hurwitz zeta pole");
+		}
+		if (a < 0.0) {
+			throw new ArgumentTypeException("Hurwitz zeta a < 0.0 ");
+		}
+
+		// dlmf.nist.gov/25.11.4
+
+		if (a > 1.0) {
+			double m = Math.floor(a);
+			final double aValue = a - m;
+			return hurwitzZeta(x, aValue) - sumDouble(new DoubleUnaryOperator() {
+				@Override
+				public double applyAsDouble(double i) {
+					return 1.0 / Math.pow(aValue + i, x);
+				}
+			}, 0, m - 1);
+		}
+
+		// if ( a < 0.0 ) {
+		// return hurwitzZeta( x, complex(a) );
 	// }
-	//
-	// if ( a < 0 ) return hurwitzZeta( x, complex(a) );
-	//
-	// var n = Math.round( -log( tolerance, 2) ); // from bit precision
-	// var m = Math.round( -log( tolerance, 2) );
-	//
-	// var s = summation( i => 1 / (a+i)**x, [0,n-1] );
-	//
-	// var t = summation( i => bernoulli(2*i) / factorial(2*i) * gamma(x+2*i-1) / (a+n)**(2*i-1), [1,m] );
-	//
-	// return s + (a+n)**(1-x) / (x-1) + ( .5 + t / gamma(x) ) / (a+n)**x;
-	//
-	// }
-	//
-	// }
+
+		// Euler-Maclaurin has differences of large values in left-hand plane
+		// swith to difference summation: dlmf.nist.gov/25.11.9
+
+		double switchForms = -5.0;
+
+		if (x < switchForms) {
+
+			// x = 1 - x;
+			final double xValue = 1 - x;
+			double t = Math.cos(Math.PI * xValue / 2.0 - 2.0 * Math.PI * a);
+			double s = t;
+			int i = 1;
+
+			while (Math.abs(t) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
+				i++;
+				t = Math.cos(Math.PI * xValue / 2.0 - 2.0 * i * Math.PI * a) / Math.pow(i, xValue);
+				s += t;
+			}
+
+			return 2.0 * GammaJS.gamma(xValue) / Math.pow(2.0 * Math.PI, xValue) * s;
+
+		}
+
+		// Johansson arxiv.org/abs/1309.2877
+		final int n = 15; // recommendation of Vepstas, Efficient Algorithm, p.12
+
+		double S = sumDouble(new DoubleUnaryOperator() {
+			@Override
+			public double applyAsDouble(double i) {
+				return 1.0 / Math.pow(a + i, x);
+			}
+		}, 0, n - 1);
+
+		double I = Math.pow(a + n, 1.0 - x) / (x - 1.0);
+
+		double p = x / 2.0 / (a + n);
+		double t = bernoulliInt(2) * p;
+		int i = 1;
+
+		// converges rather quickly
+		while (Math.abs(p) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
+			i++;
+			if (i > MAX_VALUE_HALF) {
+				throw new ArgumentTypeException("Hurwitz zeta: i > MAX_VALUE_HALF");
+			}
+			int iPlusi = i + i;
+			p *= (x + iPlusi - 2.0) * (x + iPlusi - 3.0) / (iPlusi * (iPlusi - 1.0) * Math.pow(a + n, 2));
+			t += bernoulliInt(iPlusi) * p;
+		}
+
+		double T = (0.5 + t) / Math.pow(a + n, x);
+
+		return S + I + T;
+	}
 }

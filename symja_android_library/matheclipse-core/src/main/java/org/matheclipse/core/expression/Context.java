@@ -2,7 +2,7 @@ package org.matheclipse.core.expression;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.trie.Tries;
+import org.matheclipse.parser.trie.Tries;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;

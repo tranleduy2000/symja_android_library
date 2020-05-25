@@ -158,13 +158,12 @@ public class NumberUtil {
     }
 
     /**
-     * Converts this number to <code>int</code>; unlike {@link #intValue} this
-     * method raises {@link ArithmeticException} if this integer cannot be
-     * represented by an <code>int</code> type.
+	 * Converts this number to <code>int</code>; unlike {@link #intValue} this method raises {@link ArithmeticException}
+	 * if this integer cannot be represented by an <code>int</code> type.
      *
-     * @return the numeric value represented by this integer after conversion to
-     * type <code>int</code>.
-     * @throws ArithmeticException if conversion to <code>int</code> is not possible.
+	 * @return the numeric value represented by this integer after conversion to type <code>int</code>.
+	 * @throws ArithmeticException
+	 *             if conversion to <code>int</code> is not possible.
      */
     public static int toInt(BigInteger a) throws ArithmeticException {
         int val = a.intValue();
@@ -186,13 +185,12 @@ public class NumberUtil {
     }
 
     /**
-     * Converts this number to <code>int</code>; unlike {@link #intValue} this
-     * method raises {@link ArithmeticException} if this integer cannot be
-     * represented by an <code>int</code> type.
+	 * Converts this number to <code>int</code>; unlike {@link #intValue} this method raises {@link ArithmeticException}
+	 * if this integer cannot be represented by an <code>int</code> type.
      *
-     * @return the numeric value represented by this number after conversion to
-     * type <code>int</code>.
-     * @throws ArithmeticException if conversion to <code>int</code> is not possible.
+	 * @return the numeric value represented by this number after conversion to type <code>int</code>.
+	 * @throws ArithmeticException
+	 *             if conversion to <code>int</code> is not possible.
      */
     public static int toInt(double d) throws ArithmeticException {
         // roundToInt() throws ArithmeticException if rounding not possible
@@ -200,27 +198,16 @@ public class NumberUtil {
     }
 
     /**
-     * Converts this number to <code>long</code>; unlike {@link #longValue} this
-     * method raises {@link ArithmeticException} if this integer cannot be
-     * represented by an <code>long</code> type.
+	 * Converts this number to <code>long</code>; unlike {@link #longValue} this method raises
+	 * {@link ArithmeticException} if this integer cannot be represented by an <code>long</code> type.
      *
-     * @return the numeric value represented by this number after conversion to
-     * type <code>long</code>.
-     * @throws ArithmeticException if conversion to <code>long</code> is not possible.
+	 * @return the numeric value represented by this number after conversion to type <code>long</code>.
+	 * @throws ArithmeticException
+	 *             if conversion to <code>long</code> is not possible.
      */
     public static long toLong(double d) throws ArithmeticException {
         // roundToLong() throws ArithmeticException if rounding not possible
         return DoubleMath.roundToLong(d, RoundingMode.UNNECESSARY);
-    }
-
-    /**
-     * Compares the absolute value of two rational numbers.
-     *
-     * @param that the rational number to be compared with.
-     * @return <code>|this| > |that|</code>
-     */
-    public static boolean isLargerThan(BigFraction a, BigFraction b) {
-        return a.compareTo(b) > 0;
     }
 
     public static boolean isNegative(BigFraction a) {
@@ -233,7 +220,7 @@ public class NumberUtil {
 
     /**
      * Floor, round towards negative infinity.
-     * <p>
+	 * <P>
      * Possible loss of precision.
      */
     public static BigInteger floor(BigFraction f) {
@@ -284,16 +271,15 @@ public class NumberUtil {
 
     /**
      * Round.
-     * <p>
-     * Round mode is one of {
-     * <CODE>ROUND_UP, ROUND_DOWN, ROUND_CEILING, ROUND_FLOOR,
+	 * <P>
+	 * Round mode is one of { <CODE>ROUND_UP, ROUND_DOWN, ROUND_CEILING, ROUND_FLOOR,
      * ROUND_HALF_UP, ROUND_HALF_DOWN, ROUND_HALF_EVEN,
      * ROUND_HALF_CEILING, ROUND_HALF_FLOOR, ROUND_HALF_ODD,
      * ROUND_UNNECESSARY, DEFAULT_ROUND_MODE (==ROUND_HALF_UP)</CODE> .
-     * <p>
-     * If rounding isn't necessary, i.e. this BigRational is an integer, [as an
-     * optimization] this BigRational is returned.
-     * <p>
+	 * <P>
+	 * If rounding isn't necessary, i.e. this BigRational is an integer, [as an optimization] this BigRational is
+	 * returned.
+	 * <P>
      * Possible loss of precision.
      */
     // @PrecisionLoss
@@ -431,11 +417,9 @@ public class NumberUtil {
     }
 
     /**
-     * Test if the value is a perfect square (i.e. its square root is another
-     * integer). See <a href=
+	 * Test if the value is a perfect square (i.e. its square root is another integer). See <a href=
      * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
-     * Stackoverflow.com - Fastest way to determine if an integer's square root
-     * is an integer</a>
+	 * Stackoverflow.com - Fastest way to determine if an integer's square root is an integer</a>
      *
      * @param bi
      * @return <code>true</code> if the number is a perfect square.
@@ -450,11 +434,10 @@ public class NumberUtil {
     }
 
     /**
-     * Test if the fraction value is a perfect square (i.e. its numerator's and
-     * denominator's square root are integers). See <a href=
+	 * Test if the fraction value is a perfect square (i.e. its numerator's and denominator's square root are integers).
+	 * See <a href=
      * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
-     * Stackoverflow.com - Fastest way to determine if an integer's square root
-     * is an integer</a>
+	 * Stackoverflow.com - Fastest way to determine if an integer's square root is an integer</a>
      *
      * @param bf
      * @return <code>true</code> if the number is a perfect square.
@@ -471,11 +454,10 @@ public class NumberUtil {
     }
 
     /**
-     * Test if the fraction value is a perfect square (i.e. its numerator's and
-     * denominator's square root are integers). See <a href=
+	 * Test if the fraction value is a perfect square (i.e. its numerator's and denominator's square root are integers).
+	 * See <a href=
      * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
-     * Stackoverflow.com - Fastest way to determine if an integer's square root
-     * is an integer</a>
+	 * Stackoverflow.com - Fastest way to determine if an integer's square root is an integer</a>
      *
      * @param bf
      * @return <code>true</code> if the number is a perfect square.
@@ -492,11 +474,9 @@ public class NumberUtil {
     }
 
     /**
-     * Test if a long value is a perfect square (i.e. its square root is another
-     * integer). See <a href=
+	 * Test if a long value is a perfect square (i.e. its square root is another integer). See <a href=
      * "http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer">
-     * Stackoverflow.com - Fastest way to determine if an integer's square root
-     * is an integer</a>
+	 * Stackoverflow.com - Fastest way to determine if an integer's square root is an integer</a>
      *
      * @param n
      * @return <code>true</code> if the number is a perfect square.
@@ -549,11 +529,10 @@ public class NumberUtil {
     }
 
     /**
-     * Convert a <code>double</code> number into a reduced ratio of two
-     * BigIntegers that mathematically represents exactly the same value.
-     * <p>
-     * See: <a href="http://stackoverflow.com/questions/27259162">http://
-     * stackoverflow.com/questions/27259162</a>
+	 * Convert a <code>double</code> number into a reduced ratio of two BigIntegers that mathematically represents
+	 * exactly the same value.
+	 *
+	 * See: <a href="http://stackoverflow.com/questions/27259162">http:// stackoverflow.com/questions/27259162</a>
      *
      * @param value
      * @return

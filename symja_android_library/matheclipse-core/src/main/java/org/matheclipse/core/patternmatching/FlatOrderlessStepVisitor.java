@@ -49,8 +49,7 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 	/**
 	 * Convert the <code>sortedList</code> to an <code>int[]</code> array. Equal elements get the same index in the
 	 * resulting <code>int[]</code> array.
-	 * 
-	 * @param <T>
+	 *
 	 * @param sortedList
 	 * @param start
 	 * @param end
@@ -66,30 +65,18 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 		final int[] j = new int[1];
 		multiset[j[0]++] = index[0];
 		array[index[0]] = lastT[0];
-		// objc-changed: memory issue
-		//sortedList.forEach(start + 1, end, new Consumer<IExpr>() {
-		//	@Override
-		//	public void accept(IExpr x) {
-		//		if (x.equals(lastT[0])) {
-		//			multiset[j[0]++] = index[0];
-		//		} else {
-		//			multiset[j[0]++] = ++index[0];
-		//			array[index[0]] = x;
-		//			lastT[0] = x;
-		//		}
-		//	}
-		//});
-		// objc-changed: memory issue
-		for (int i = start + 1; i < end; i++) {
-			IExpr x = sortedList.get(i);
-			if (x.equals(lastT[0])) {
-				multiset[j[0]++] = index[0];
-			} else {
-				multiset[j[0]++] = ++index[0];
-				array[index[0]] = x;
-				lastT[0] = x;
+		sortedList.forEach(start + 1, end, new Consumer<IExpr>() {
+			@Override
+			public void accept(IExpr x) {
+				if (x.equals(lastT[0])) {
+					multiset[j[0]++] = index[0];
+				} else {
+					multiset[j[0]++] = ++index[0];
+					array[index[0]] = x;
+					lastT[0] = x;
+				}
 			}
-		}
+		});
 	}
 
 	@Override

@@ -317,7 +317,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 	 * @param engine
 	 * @return <code>F.NIL</code> if no multiple is found.
 	 */
-	public static IAST peelOff(final IAST plusAST, EvalEngine engine) {
+	public static IAST peelOff(final IAST plusAST, final EvalEngine engine) {
 		IRational k = null;
 		for (int i = 1; i < plusAST.size(); i++) {
 			IExpr temp = plusAST.get(i);
@@ -350,7 +350,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 	 * @param engine
 	 * @return <code>F.NIL</code> if no multiple is found.
 	 */
-	public static IExpr peelOffPlusRational(final IAST plusAST, EvalEngine engine) {
+	public static IExpr peelOffPlusRational(final IAST plusAST, final EvalEngine engine) {
 		IExpr k = null;
 		for (int i = 1; i < plusAST.size(); i++) {
 			IExpr temp = plusAST.get(i);
@@ -379,7 +379,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator {
 	 * @param engine
 	 * @return <code>F.NIL</code> if no multiple is found, otherwise return <code>List(rational-number, argument)</code>
 	 */
-	public static IAST peelOffPlusI(final IAST plusAST, EvalEngine engine) {
+	public static IAST peelOffPlusI(final IAST plusAST, final EvalEngine engine) {
 		for (int i = 1; i < plusAST.size(); i++) {
 			final IExpr arg = plusAST.get(i);
 			if (arg.isTimes()) {

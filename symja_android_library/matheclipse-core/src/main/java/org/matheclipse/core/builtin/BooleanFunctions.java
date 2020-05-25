@@ -33,6 +33,7 @@ import org.matheclipse.core.eval.interfaces.AbstractArg1;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -1344,12 +1345,12 @@ public final class BooleanFunctions {
 			IExpr a1 = arg2;
 			if (!a0.isReal() && a0.isNumericFunction()) {
 				a0 = engine.evalN(a0);
-			} else if (a1.isNumeric() && a0.isRational()) {
+			} else if (a1.isInexactNumber() && a0.isInexactNumber()) {
 				a0 = engine.evalN(a0);
 			}
 			if (!a1.isReal() && a1.isNumericFunction()) {
 				a1 = engine.evalN(a1);
-			} else if (a0.isNumeric() && a1.isRational()) {
+			} else if (a0.isInexactNumber() && a1.isRational()) {
 				a1 = engine.evalN(a1);
 			}
 
@@ -1663,10 +1664,11 @@ public final class BooleanFunctions {
 		 * @param arg1
 		 *            the left-hand-side of the comparison
 		 * @param arg2
-		 *            the right-hand-side of the comparison
+		 *            the right-hand-side of the comparison which is tested with {@link IExpr#isNumericFunction()}
+		 *            equals <code>true</code>.
 		 * @return
 		 */
-		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
 			if (arg2.isNegative()) {
 				// arg1 > "negative number"
 				if (arg1.isNonNegativeResult() || arg1.isPositiveResult()) {
@@ -1685,6 +1687,10 @@ public final class BooleanFunctions {
 				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.False;
 				}
+			}
+			ISignedNumber a2 = arg2.evalReal();
+			if (a2 != null && AbstractAssumptions.assumeGreaterThan(arg1, a2)) {
+				return F.True;
 			}
 			return F.NIL;
 		}
@@ -1820,11 +1826,11 @@ public final class BooleanFunctions {
 					// (i.e. Less instead of Greater)
 					return result;
 				}
-				if (arg2.isReal()) {
+				if (arg2.isNumericFunction()) {
 					// this part is used in other comparator operations like
 					// Less,
 					// GreaterEqual,...
-					IExpr temp2 = checkAssumptions(arg1, (ISignedNumber) arg2);
+					IExpr temp2 = checkAssumptions(arg1, arg2);
 					if (temp2.isPresent()) {
 						return temp2;
 					}
@@ -1874,12 +1880,12 @@ public final class BooleanFunctions {
 		private IExpr_COMPARE_TERNARY prepareCompare(IExpr a0, IExpr a1, EvalEngine engine) {
 			if (!a0.isReal() && a0.isNumericFunction()) {
 				a0 = engine.evalN(a0);
-			} else if (a1.isNumeric() && a0.isRational()) {
+			} else if (a1.isInexactNumber() && a0.isRational()) {
 				a0 = engine.evalN(a0);
 			}
 			if (!a1.isReal() && a1.isNumericFunction()) {
 				a1 = engine.evalN(a1);
-			} else if (a0.isNumeric() && a1.isRational()) {
+			} else if (a0.isInexactNumber() && a1.isRational()) {
 				a1 = engine.evalN(a1);
 			}
 
@@ -2041,7 +2047,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
 			if (arg2.isNegative()) {
 				// arg1 >= "negative number"
 				if (arg1.isNonNegativeResult() || arg1.isPositiveResult()) {
@@ -2060,6 +2066,10 @@ public final class BooleanFunctions {
 				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.False;
 				}
+			}
+			ISignedNumber a2 = arg2.evalReal();
+			if (a2 != null && AbstractAssumptions.assumeGreaterEqual(arg1, a2)) {
+				return F.True;
 			}
 			return F.NIL;
 		}
@@ -2331,7 +2341,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
 			if (arg2.isNegative()) {
 				// arg1 < "negative number"
 				if (arg1.isPositiveResult()) {
@@ -2351,6 +2361,10 @@ public final class BooleanFunctions {
 				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.True;
 				}
+			}
+			ISignedNumber a2 = arg2.evalReal();
+			if (a2 != null && AbstractAssumptions.assumeLessThan(arg1, a2)) {
+				return F.True;
 			}
 			return F.NIL;
 		}
@@ -2412,7 +2426,7 @@ public final class BooleanFunctions {
 
 		/** {@inheritDoc} */
 		@Override
-		protected IExpr checkAssumptions(IExpr arg1, ISignedNumber arg2) {
+		protected IExpr checkAssumptions(IExpr arg1, IExpr arg2) {
 			if (arg2.isNegative()) {
 				// arg1 <= "negative number"
 				if (arg1.isNonNegativeResult() || arg1.isPositiveResult()) {
@@ -2431,6 +2445,10 @@ public final class BooleanFunctions {
 				if (arg1.isNegativeResult() || arg1.isZero()) {
 					return F.True;
 				}
+			}
+			ISignedNumber a2 = arg2.evalReal();
+			if (a2 != null && AbstractAssumptions.assumeLessEqual(arg1, a2)) {
+				return F.True;
 			}
 			return F.NIL;
 		}
@@ -2468,37 +2486,41 @@ public final class BooleanFunctions {
 	private static class LogicalExpand extends AbstractFunctionEvaluator {
 
 		@Override
-		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg1 = ast.arg1();
 			if (ast.arg1().isAST()) {
-				IExpr subst = ast.arg1().replaceAll(new Function<IExpr, IExpr>() {
-					@Override
-					public IExpr apply(IExpr x) {
-						if (x.isAST()) {
-							IAST formula = (IAST) x;
-							if (x.isNot() && x.first().isOr()) {
-								IASTMutable result = ((IAST) x.first()).apply(F.And);
-								for (int i = 1; i < result.size(); i++) {
-									result.set(i, F.Not(result.get(i)));
-								}
-								return engine.evaluate(result);
-							}
-							if (formula.isSameHeadSizeGE(F.Xor, 3)) {
-								return xorToDNF(formula);
-							}
-							try {
-								return booleanConvert(F.BooleanConvert(formula, F.stringx("DNF")), engine);
-							} catch (final ValidateException ve) {
-							}
-						}
-						return F.NIL;
-					}
-				});
+				IExpr subst = ast.arg1().replaceAll(logicalExpand(engine));
 				if (subst.isPresent()) {
 					return subst;
 				}
 			}
 			return arg1;
+		}
+
+		private static Function<IExpr, IExpr> logicalExpand(final EvalEngine engine) {
+			return new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr x) {
+					if (x.isAST()) {
+						IAST formula = (IAST) x;
+						if (x.isNot() && x.first().isOr()) {
+							IASTMutable result = ((IAST) x.first()).apply(F.And);
+							for (int i = 1; i < result.size(); i++) {
+								result.set(i, F.Not(result.get(i)));
+							}
+							return engine.evaluate(result);
+						}
+						if (formula.isSameHeadSizeGE(F.Xor, 3)) {
+							return xorToDNF(formula);
+						}
+						try {
+							return booleanConvert(F.BooleanConvert(formula, F.stringx("DNF")), engine);
+						} catch (final ValidateException ve) {
+						}
+					}
+					return F.NIL;
+				}
+			};
 		}
 
 		public int[] expectedArgSize() {
@@ -3599,7 +3621,7 @@ public final class BooleanFunctions {
 				return logicNGSatisfiabilityCount(arg1, userDefinedVariables);
 			} catch (final ValidateException ve) {
 				// int number validation
-				return engine.printMessage(ve.getMessage(ast.topHead()));
+				return engine.printMessage(ast.topHead(), ve);
 				}
 			}
 

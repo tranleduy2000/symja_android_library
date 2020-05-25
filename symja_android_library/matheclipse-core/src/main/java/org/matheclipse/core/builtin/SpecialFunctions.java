@@ -13,6 +13,7 @@ import org.hipparchus.exception.MathIllegalStateException;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.functions.BesselJS;
 import org.matheclipse.core.builtin.functions.GammaJS;
+import org.matheclipse.core.builtin.functions.ZetaJS;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.eval.exception.ValidateException;
@@ -369,6 +370,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the error function.
 	 * 
+	 * @see org.matheclipse.core.reflection.system.InverseErf
 	 */
 	private final static class Erf extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
@@ -716,38 +718,39 @@ public class SpecialFunctions {
 				}
 			}
 
-			// if (engine.isDoubleMode()) {
-			// try {
-			// double sDouble = Double.NaN;
-			// double aDouble = Double.NaN;
-			// try {
-			// sDouble = s.evalDouble();
-			// aDouble = a.evalDouble();
-			// } catch (ValidateException ve) {
-			// }
-			// if (Double.isNaN(sDouble) || Double.isNaN(aDouble)) {
+			if (engine.isDoubleMode()) {
+				try {
+					double sDouble = Double.NaN;
+					double aDouble = Double.NaN;
+					try {
+						sDouble = s.evalDouble();
+						aDouble = a.evalDouble();
+					} catch (ValidateException ve) {
+					}
+					if (Double.isNaN(sDouble) || Double.isNaN(aDouble)) {
 			// Complex sc = s.evalComplex();
 			// Complex ac = a.evalComplex();
 			//
 			// return F.complexNum(ZetaJS.hurwitzZeta(sc, ac));
-			//
-			// } else {
-			// return ZetaJS.hurwitzZeta(sDouble, aDouble);
-			// }
-			// } catch (ThrowException te) {
-			// if (Config.SHOW_STACKTRACE) {
-			// te.printStackTrace();
-			// }
-			// return te.getValue();
-			// } catch (ValidateException ve) {
-			// if (Config.SHOW_STACKTRACE) {
-			// ve.printStackTrace();
-			// }
-			// } catch (RuntimeException rex) {
-			// // rex.printStackTrace();
-			// return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
-			// }
-			// }
+					} else {
+						if (aDouble >= 0 && sDouble != 1.0) {
+							return F.num(ZetaJS.hurwitzZeta(sDouble, aDouble));
+						}
+					}
+				} catch (ThrowException te) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						te.printStackTrace();
+					}
+					return te.getValue();
+				} catch (ValidateException ve) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						ve.printStackTrace();
+					}
+				} catch (RuntimeException rex) {
+					// rex.printStackTrace();
+					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
+				}
+			}
 
 			return NIL;
 		}

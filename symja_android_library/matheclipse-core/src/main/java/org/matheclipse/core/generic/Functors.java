@@ -33,10 +33,8 @@ public class Functors {
 
 		/**
 		 *
-		 * @param plusAST
-		 *            the complete AST which should be cloned in the {@code apply} method
-		 * @param position
-		 *            the position which should be replaced in the <code>apply()</code> method.
+		 * @param equalRule
+		 *            the left- and right-hand-side (i.e. arg1() and arg2()) which should be tested for equality
 		 */
 		public SingleRuleFunctor(IAST equalRule) {
 			lhs = equalRule.arg1();
@@ -103,10 +101,10 @@ public class Functors {
 
 		/**
 		 *
-		 * @param plusAST
-		 *            the complete AST which should be cloned in the {@code apply} method
-		 * @param position
-		 *            the position which should be replaced in the <code>apply()</code> method.
+		 * @param equalRules
+		 * @param matchers
+		 * @param result
+		 * @param engine
 		 */
 		public ListRulesPatternFunctor(Map<IExpr, IExpr> equalRules, List<PatternMatcherList> matchers,
 				IASTAppendable result, @Nonnull EvalEngine engine) {
@@ -166,7 +164,7 @@ public class Functors {
 	 * argument with the <code>#equals()</code> method. Therefore the left-hand-side shouldn't contain any pattern or
 	 * orderless expression.
 	 *
-	 * @param rulesMap
+	 * @param rule
 	 * @return
 	 */
 	public static Function<IExpr, IExpr> equalRule(IAST rule) {

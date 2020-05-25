@@ -196,6 +196,25 @@ public abstract class AbstractAssumptions implements IAssumptions {
 		return false;
 	}
 
+	public static boolean assumeLessEqual(final IExpr expr, final ISignedNumber number) {
+		if (expr.isReal()) {
+			return ((ISignedNumber) expr).isLE(number);
+		}
+		if (expr.isNumber()) {
+			return false;
+		}
+		if (expr.isRealConstant()) {
+			return ((ISignedNumberConstant) ((IBuiltInSymbol) expr).getEvaluator()).evalReal() <= number.doubleValue();
+		}
+		IAssumptions assumptions = EvalEngine.get().getAssumptions();
+		if (assumptions != null) {
+			if (assumptions.isLessEqual(expr, number)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean assumeLessThan(final IExpr expr, ISignedNumber number) {
 		if (expr.isReal()) {
 			return ((ISignedNumber) expr).isLT(number);
@@ -243,7 +262,7 @@ public abstract class AbstractAssumptions implements IAssumptions {
 
 	public static boolean assumeGreaterEqual(final IExpr expr, final ISignedNumber number) {
 		if (expr.isReal()) {
-			return !((ISignedNumber) expr).isLT(number);
+			return ((ISignedNumber) expr).isGT(number);
 		}
 		if (expr.isNumber()) {
 			return false;
@@ -373,6 +392,12 @@ public abstract class AbstractAssumptions implements IAssumptions {
 		}
 		if (expr.isRealConstant()) {
 			return F.True;
+		}
+		if (expr.isDirectedInfinity()) {
+			return F.False;
+		}
+		if (expr == F.Undefined) {
+			return F.Undefined;
 		}
 		IAssumptions assumptions = EvalEngine.get().getAssumptions();
 		if (assumptions != null) {
@@ -611,6 +636,11 @@ public abstract class AbstractAssumptions implements IAssumptions {
 
 	@Override
 	public boolean isInteger(IExpr expr) {
+		return false;
+	}
+
+	@Override
+	public boolean isLessEqual(IExpr expr, ISignedNumber number) {
 		return false;
 	}
 

@@ -1,5 +1,6 @@
 { 
- Log(1)=0, 
+ Log(Undefined)=Undefined,
+ Log(1)=0,
  Log(E)=1, 
  Log(E^(x_?RealNumberQ)):=x,
  Log(E^(x_Complex)):=x + 2*I*Pi*Floor((Pi-Im(x)) / (2*Pi)),

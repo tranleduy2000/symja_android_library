@@ -152,7 +152,7 @@ public interface IPatternMap extends Cloneable {
      */
      IExpr substitutePatternOrSymbols(final IExpr lhsPatternExpr, boolean onlyNamedPatterns);
 
-     IAST substituteASTPatternOrSymbols(final IAST lhsPatternExpr, boolean onlyNamedPatterns);
+     IExpr substituteASTPatternOrSymbols(final IAST lhsPatternExpr, boolean onlyNamedPatterns);
 
     /**
      * Substitute all symbols in the given expression with the current value of the corresponding internal pattern

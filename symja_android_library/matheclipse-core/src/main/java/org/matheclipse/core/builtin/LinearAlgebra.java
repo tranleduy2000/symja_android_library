@@ -3802,11 +3802,11 @@ public final class LinearAlgebra {
 
 				}
             } catch (final ClassCastException e) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
                     e.printStackTrace();
                 }
             } catch (final IndexOutOfBoundsException e) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
                     e.printStackTrace();
                 }
             } finally {
@@ -3895,12 +3895,12 @@ public final class LinearAlgebra {
                 }
 
 			} catch (final ValidateException ve) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
                 }
 				return engine.printMessage(ast.topHead(), ve);
             } catch (final IndexOutOfBoundsException e) {
-                if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
                     e.printStackTrace();
                 }
             }

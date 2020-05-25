@@ -35,9 +35,9 @@ import static org.matheclipse.core.expression.F.NIL;
  * </p>
  * </blockquote>
  * <p>
- * <code>ElementData</code> uses data from <a href=
- * "https://en.wikipedia.org/wiki/List_of_data_references_for_chemical_elements">Wikipedia
- * - List of data references for chemical elements</a>
+ * <code>ElementData</code> uses data from
+ * <a href= "https://en.wikipedia.org/wiki/List_of_data_references_for_chemical_elements">Wikipedia - List of data
+ * references for chemical elements</a>
  * </p>
  * <h3>Examples</h3>
  * 
@@ -89,12 +89,12 @@ import static org.matheclipse.core.expression.F.NIL;
  */
 public class ElementData extends AbstractFunctionEvaluator {
 
-	String[] PROPERTIES_DATA = { "Abbreviation", "AbsoluteBoilingPoint", "AbsoluteMeltingPoint", "AtomicNumber",
+	public final static String[] PROPERTIES_DATA = { "StandardName", "AtomicNumber", "Abbreviation", "AbsoluteBoilingPoint", "AbsoluteMeltingPoint",
 			"AtomicRadius", "AtomicWeight", "Block", "BoilingPoint", "BrinellHardness", "BulkModulus", "CovalentRadius",
 			"CrustAbundance", "Density", "DiscoveryYear", "ElectroNegativity", "ElectronAffinity",
 			"ElectronConfiguration", "ElectronConfigurationString", "ElectronShellConfiguration", "FusionHeat", "Group",
 			"IonizationEnergies", "LiquidDensity", "MeltingPoint", "MohsHardness", "Name", "Period", "PoissonRatio",
-			"Series", "ShearModulus", "SpecificHeat", "StandardName", "ThermalConductivity", "VanDerWaalsRadius",
+			"Series", "ShearModulus", "SpecificHeat",  "ThermalConductivity", "VanDerWaalsRadius",
 			"VaporizationHeat", "VickersHardness", "YoungModulus" };
 
 	private static java.util.Map<IExpr, IExpr> MAP_NUMBER_NAME = new HashMap<IExpr, IExpr>();
@@ -238,19 +238,34 @@ public class ElementData extends AbstractFunctionEvaluator {
 			return propertyList.get(32);
 		}
 		if (propertyStr.equals("BulkModulus")) {
+			if (propertyList.size() > 33) {
 			return propertyList.get(33);
 		}
+			return F.Missing(F.NotAvailable);
+		}
 		if (propertyStr.equals("ShearModulus")) {
+			if (propertyList.size() > 34) {
 			return propertyList.get(34);
 		}
+			return F.Missing(F.NotAvailable);
+		}
 		if (propertyStr.equals("ElectronConfiguration")) {
+			if (propertyList.size() > 35) {
 			return propertyList.get(35);
 		}
+			return F.Missing(F.NotAvailable);
+		}
 		if (propertyStr.equals("ElectronConfigurationString")) {
+			if (propertyList.size() > 36) {
 			return propertyList.get(36);
 		}
+			return F.Missing(F.NotAvailable);
+		}
 		if (propertyStr.equals("ElectronShellConfiguration")) {
+			if (propertyList.size() > 37) {
 			return propertyList.get(37);
+		}
+			return F.Missing(F.NotAvailable);
 		}
 		return NIL;
 	}

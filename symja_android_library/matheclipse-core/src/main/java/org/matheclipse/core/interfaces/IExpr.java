@@ -13,6 +13,7 @@ import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
+import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
@@ -1448,6 +1449,16 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isRealResult()
      */
     boolean isNumericFunction();
+
+    /**
+     * Test if this expression is a numeric function (i.e. a number, a symbolic constant or a function (with attribute
+     * NumericFunction) where all arguments are also &quot;numeric functions&quot;) under the assumption, that all
+     * variables contained in <code>varSet</code> are also numeric.
+     *
+     * @return <code>true</code>, if the given expression is a numeric function or value, assuming all variables contained
+     *         in <code>varSet</code> are also numeric.
+     */
+    boolean isNumericFunction(VariablesSet varSet);
 
     /**
      * Test if this expression contains a numeric number (i.e. of type <code>INum</code> or <code>IComplexNum</code>.

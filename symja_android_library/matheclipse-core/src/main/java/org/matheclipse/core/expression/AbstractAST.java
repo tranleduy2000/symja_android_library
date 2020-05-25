@@ -22,6 +22,7 @@ import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.StructureFunctions.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
+import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.Validate;
@@ -595,6 +596,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		/** {@inheritDoc} */
 		@Override
 		public final boolean isNumericFunction() {
+			return false;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final boolean isNumericFunction(VariablesSet varSet) {
 			return false;
 		}
 
@@ -1761,7 +1768,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		} else {
 			text.append(head.fullFormString());
 		}
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS && head.isSymbol()) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS && head.isSymbol()) {
 			text.append('(');
 		} else {
 			text.append('[');
@@ -1777,7 +1784,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 				}
 			}
 		}
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS && head.isSymbol()) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS && head.isSymbol()) {
 			text.append(')');
 		} else {
 			text.append(']');
@@ -2172,7 +2179,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if (temp.isSymbol()) {
 			ISymbol sym = (ISymbol) temp;
 			String name = null;
-			if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+			if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 				name = sym.toString();
 				if (name.length() > 0) {
 					name = name.toLowerCase(Locale.ENGLISH);
@@ -2429,7 +2436,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 */
 	@Override
 	public final boolean isAST(final String symbol) {
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			String name = symbol;
 			if (name.length() > 0) {
 				name = symbol.toLowerCase(Locale.ENGLISH);
@@ -2448,7 +2455,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 */
 	@Override
 	public final boolean isAST(final String symbol, final int length) {
-		if (Config.PARSER_USE_LOWERCASE_SYMBOLS) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
 			String name = symbol;
 			if (name.length() > 0) {
 				name = symbol.toLowerCase(Locale.ENGLISH);
@@ -3129,6 +3136,23 @@ public abstract class AbstractAST extends IASTMutableImpl {
 				@Override
 				public boolean test(IExpr x) {
 					return x.isNumericFunction();
+				}
+			});
+		}
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isNumericFunction(final VariablesSet varSet) {
+		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
+			// check if all arguments are &quot;numeric&quot;
+			return forAll(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isNumericFunction(varSet);
 				}
 			});
 		}

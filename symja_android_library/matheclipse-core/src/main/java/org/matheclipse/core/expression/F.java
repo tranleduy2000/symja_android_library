@@ -94,7 +94,7 @@ import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.core.trie.Tries;
+import org.matheclipse.parser.trie.Tries;
 import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
 
@@ -943,6 +943,11 @@ public class F {
     public final static IBuiltInSymbol End = F.initFinalSymbol("End", ID.End);
 	/** EndPackage( ) - end a package definition */
     public final static IBuiltInSymbol EndPackage = F.initFinalSymbol("EndPackage", ID.EndPackage);
+
+	/***/
+	public final static IBuiltInSymbol Entity = F.initFinalSymbol("Entity", ID.Entity);
+
+
     /**
      * Equal(x, y) - yields `True` if `x` and `y` are known to be equal, or `False` if `x` and `y` are known to be
      * unequal.
@@ -1039,6 +1044,10 @@ public class F {
     public final static IBuiltInSymbol FactorTerms = F.initFinalSymbol("FactorTerms", ID.FactorTerms);
 	/** Factorial(n) - returns the factorial number of the integer `n` */
     public final static IBuiltInSymbol Factorial = F.initFinalSymbol("Factorial", ID.Factorial);
+
+	/***/
+	public final static IBuiltInSymbol FactorialPower = F.initFinalSymbol("FactorialPower", ID.FactorialPower);
+
 	/** Factorial2(n) - returns the double factorial number of the integer `n`. */
     public final static IBuiltInSymbol Factorial2 = F.initFinalSymbol("Factorial2", ID.Factorial2);
 	/** False - the constant `False` represents the boolean value **false ***/
@@ -2910,6 +2919,13 @@ public class F {
     public final static IBuiltInSymbol While = F.initFinalSymbol("While", ID.While);
     /***/
     public final static IBuiltInSymbol White = F.initFinalSymbol("White", ID.White);
+
+	/***/
+	public final static IBuiltInSymbol WhittakerM = F.initFinalSymbol("WhittakerM", ID.WhittakerM);
+
+	/***/
+	public final static IBuiltInSymbol WhittakerW = F.initFinalSymbol("WhittakerW", ID.WhittakerW);
+
 	/***/
 	public final static IBuiltInSymbol Whitespace = F.initFinalSymbol("Whitespace", ID.Whitespace);
 	/**
@@ -3474,7 +3490,8 @@ public class F {
             // long start = System.currentTimeMillis();
             // System.out.println("Start");
             AST2Expr.initialize();
-            ExprParserFactory.initialize();
+			ExprParserFactory.initialize(Config.FUZZY_PARSER);
+
             PreemptStatus.setNotAllow();
             ComputerThreads.NO_THREADS = Config.JAS_NO_THREADS;
 
@@ -4393,6 +4410,23 @@ public class F {
 	public static IASTMutable ApplyListC1(final IExpr a0, final IExpr a1) {
 		return new AST3(Apply, a0, a1, CListC1);
 	}
+
+	public static IAST AiryAi(final IExpr a0) {
+		return new AST1(AiryAi, a0);
+	}
+
+	public static IAST AiryAiPrime(final IExpr a0) {
+		return new AST1(AiryAiPrime, a0);
+	}
+
+	public static IAST AiryBi(final IExpr a0) {
+		return new AST1(AiryBi, a0);
+	}
+
+	public static IAST AiryBiPrime(final IExpr a0) {
+		return new AST1(AiryBiPrime, a0);
+	}
+
 	public static IAST Array(final IExpr a0, final IExpr a1) {
 		return new AST2(Array, a0, a1);
 	}
@@ -4695,6 +4729,10 @@ public class F {
         return new AST1(Attributes, a);
     }
 
+	public static IAST BaseForm(final IExpr a0, final IExpr a1) {
+		return new AST2(F.BaseForm, a0, a1);
+	}
+
     /**
      * Bell number.
      *
@@ -4757,6 +4795,10 @@ public class F {
     public static IAST Binomial(final IExpr a0, final IExpr a1) {
         return new AST2(F.Binomial, a0, a1);
     }
+
+	public static IAST Binomial(final int a0, final int a1) {
+		return new AST2(F.Binomial, F.ZZ(a0), F.ZZ(a1));
+	}
 
     public static IAST BlankSequence() {
         return new AST0(BlankSequence);
@@ -5328,6 +5370,10 @@ public class F {
         return new AST0(Continue);
     }
 
+	public static IAST ContinuedFraction(final IExpr a0) {
+		return new AST1(ContinuedFraction, a0);
+	}
+
     public static IAST CoprimeQ(final IExpr a0, final IExpr a1) {
         return new AST2(CoprimeQ, a0, a1);
     }
@@ -5608,6 +5654,14 @@ public class F {
     public static IAST Element(final IExpr a0, final IExpr a1) {
         return new AST2(Element, a0, a1);
     }
+
+	public static IAST ElementData(final IExpr a0) {
+		return new AST1(ElementData, a0);
+	}
+
+	public static IAST ElementData(final IExpr a0, final IExpr a1) {
+		return new AST2(ElementData, a0, a1);
+	}
 
     public static IAST EllipticE(final IExpr a0) {
         return new AST1(EllipticE, a0);
@@ -6018,6 +6072,10 @@ public class F {
         return new AST1(Factorial, a0);
     }
 
+	public static IAST Factorial(final int a0) {
+		return new AST1(Factorial, F.ZZ(a0));
+	}
+
     public static IAST Factorial2(final IExpr a0) {
         return new AST1(Factorial2, a0);
     }
@@ -6344,6 +6402,10 @@ public class F {
         return new AST2(Hypergeometric0F1, a0, a1);
     }
 
+	public static IAST Hypergeometric1F1(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Hypergeometric1F1, a0, a1, a2);
+	}
+
     public static IAST Hypergeometric1F1Regularized(final IExpr a0, final IExpr a1, final IExpr a2) {
         return new AST3(Hypergeometric1F1Regularized, a0, a1, a2);
     }
@@ -6359,6 +6421,10 @@ public class F {
     public static IAST HypergeometricPFQRegularized(final IExpr a0, final IExpr a1, final IExpr a2) {
         return new AST3(HypergeometricPFQRegularized, a0, a1, a2);
     }
+
+	public static IAST HypergeometricU(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(HypergeometricU, a0, a1, a2);
+	}
 
     public static IAST Identity(final IExpr a0) {
         return new AST1(Identity, a0);
@@ -6696,6 +6762,27 @@ public class F {
         }
         return result;
     }
+
+	/**
+	 * Iterate over an integer range <code>from <= i <= to</code> with the step <code>step/code>.
+	 *
+	 * @param head
+	 *            the header symbol of the result
+	 * @param function
+	 *            the integer function which should be applied on each iterator value
+	 * @param from
+	 * @param to
+	 * @param step
+	 * @return
+	 */
+	public static IAST intIterator(ISymbol head, final IntFunction<IExpr> function, final int from, final int to,
+			final int step) {
+		IASTAppendable result = F.ast(head, to - from + 1, false);
+		for (int i = from; i <= to; i += step) {
+			result.append(function.apply(i));
+		}
+		return result;
+	}
 
     public static IAST intIterator(ISymbol head, final Function<IExpr, IExpr> function, final IAST list) {
         IASTAppendable result = F.ast(head, list.size(), false);
@@ -7919,8 +8006,8 @@ public class F {
 		return new AST2(Plot, a0, a1);
 	}
 
-	public static IAST Plot3D(final IExpr a0, final IExpr a1) {
-		return new AST2(Plot3D, a0, a1);
+	public static IAST Plot3D(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Plot3D, a0, a1, a2);
 	}
     public static IExpr plus(IExpr a, Integer i) {
 		return Plus(a, ZZ(i.longValue()));
@@ -8592,6 +8679,10 @@ public class F {
         return new AST3(Select, a0, a1, a2);
     }
 
+	public static IAST Select(final IExpr a0, final IExpr a1 ) {
+		return new AST2(Select, a0, a1);
+	}
+
     public final static IAST senary(final IExpr head, final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3,
                                     final IExpr a4, final IExpr a5) {
         return new AST(new IExpr[]{head, a0, a1, a2, a3, a4, a5});
@@ -8940,6 +9031,10 @@ public class F {
         return new AST3(Sum, a0, a1, a2);
     }
 
+	public static IAST Sum(final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
+		return quaternary(F.Sum, a0, a1, a2, a3);
+	}
+
     /**
      * Evaluate the sum from <code>iMin</code> to <code>iMax</code> and step <code>1</code>.
      *
@@ -8951,6 +9046,10 @@ public class F {
     public static IAST sum(final Function<IExpr, IExpr> function, final int iMin, final int iMax) {
         return intIterator(F.Plus, function, iMin, iMax, 1);
     }
+
+	public static IAST intSum(final IntFunction<IExpr> function, final int iMin, final int iMax) {
+		return intIterator(F.Plus, function, iMin, iMax, 1);
+	}
 
     /**
      * Evaluate the sum from <code>iMin</code> to <code>iMax</code> and step <code>iStep</code>.
@@ -9204,6 +9303,14 @@ public class F {
         return new AST1(Unevaluated, a0);
     }
 
+	public static IAST Union(final IExpr a0) {
+		return new AST1(Union, a0);
+	}
+
+	public static IAST Union(final IExpr a0, final IExpr a1) {
+		return new AST2(Union, a0, a1);
+	}
+
     public static IAST Unique(final IExpr a0) {
         return new AST1(Unique, a0);
     }
@@ -9251,6 +9358,14 @@ public class F {
     public static IAST While(final IExpr a0, final IExpr a1) {
         return new AST2(While, a0, a1);
     }
+
+	public static IAST WhittakerM(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(WhittakerM, a0, a1, a2);
+	}
+
+	public static IAST WhittakerW(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(WhittakerW, a0, a1, a2);
+	}
 
     public static IAST With(final IExpr a0, final IExpr a1) {
 		return new B2.With(a0, a1);

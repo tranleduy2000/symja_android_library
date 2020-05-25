@@ -9,6 +9,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import static org.matheclipse.core.expression.F.Abs;
 import static org.matheclipse.core.expression.F.Floor;
@@ -72,7 +73,7 @@ public class AssumptionTestCase extends TestCase {
 
 	public void testGreaterZeroOrInteger001() {
 		// don't distinguish between lower- and uppercase identifiers
-		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
+		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
 		EvalUtilities util = new EvalUtilities(false, true);
 		util.getEvalEngine().setAssumptions(new XGreaterZeroOrYInteger());
@@ -95,7 +96,7 @@ public class AssumptionTestCase extends TestCase {
 
 	public void testSqrt001() {
 		// don't distinguish between lower- and uppercase identifiers
-		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
+		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
 		EvalUtilities util = new EvalUtilities(false, true);
 
@@ -111,7 +112,7 @@ public class AssumptionTestCase extends TestCase {
 
 	public void testFloor001() {
 		// don't distinguish between lower- and uppercase identifiers
-		Config.PARSER_USE_LOWERCASE_SYMBOLS = true;
+		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
 		EvalUtilities util = new EvalUtilities(false, true);
 

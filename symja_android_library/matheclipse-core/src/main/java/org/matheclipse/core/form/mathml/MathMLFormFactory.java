@@ -36,7 +36,7 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.trie.Tries;
+import org.matheclipse.parser.trie.Tries;
 import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;

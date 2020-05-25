@@ -7,7 +7,7 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.core.trie.Tries;
+import org.matheclipse.parser.trie.Tries;
 
 import java.text.NumberFormat;
 import java.util.Map;

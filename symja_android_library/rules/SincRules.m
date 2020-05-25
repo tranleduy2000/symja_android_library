@@ -1,4 +1,5 @@
  {
+ Sinc(Undefined)=Undefined,
 	 Sinc(0)=1,
 	 Sinc(1/6*Pi)=Pi/3,
 	 Sinc(1/4*Pi)=2/Pi*Sqrt(2),

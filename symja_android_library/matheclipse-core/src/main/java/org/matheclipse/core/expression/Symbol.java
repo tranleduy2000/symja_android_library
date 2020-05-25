@@ -399,7 +399,8 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
      */
     @Override
     public boolean isPolynomialStruct() {
-        return isVariable();
+        return ((fAttributes & CONSTANT) == CONSTANT) || //
+                isVariable();
     }
     /**
      * {@inheritDoc}
@@ -800,7 +801,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
     @Override
     public final IExpr ofNIL(EvalEngine engine, IExpr... args) {
         IAST ast = F.function(this, args);
-        IExpr temp = engine.evalLoop(ast);
+        IExpr temp = engine.evaluateNull(ast);
         if (temp.isPresent() && temp.head() == this) {
             return F.NIL;
         }
@@ -1063,6 +1064,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return "$s(\"" + fSymbolName + "\")";
     }
 
+    // Android changed: remove reflection
 //    /**
 //     * {@inheritDoc}
 //     */

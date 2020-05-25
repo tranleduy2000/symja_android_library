@@ -14,6 +14,7 @@ import org.jgrapht.GraphType;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.PredicateQ;
+import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
@@ -422,7 +423,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
 
     @Override
     public IExpr evaluateHead(IAST ast, EvalEngine engine) {
-        IExpr result = engine.evalLoop(this);
+        IExpr result = engine.evaluateNull(this);
         if (result.isPresent()) {
             // set the new evaluated header !
             return ast.apply(result);
@@ -2017,6 +2018,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public boolean isNumericFunction() {
         return isNumber() || isConstantAttribute();
+    }
+
+    @Override
+    public boolean isNumericFunction(VariablesSet varSet) {
+        return isNumericFunction() || varSet.contains(this);
     }
 
     /**

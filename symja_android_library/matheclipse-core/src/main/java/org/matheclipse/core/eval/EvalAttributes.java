@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -65,6 +66,42 @@ public class EvalAttributes {
 		}
 		ast.addEvalFlags(IAST.IS_FLATTENED);
 		return F.NIL;
+	}
+
+	public static IExpr simpleEval(IASTMutable result) {
+		IASTMutable temp = result;
+		if (temp.isFlatAST()) {
+			IASTMutable t = EvalAttributes.flatten((IAST) temp);
+			if (t.isPresent()) {
+				temp = t;
+			}
+		}
+		if (temp.isOrderlessAST()) {
+			EvalAttributes.sort(temp);
+
+			if (temp.isPlus()) {
+				if (temp.first().isZero()) {
+					IAST rest = temp.rest();
+					rest.isFreeOfPatterns();
+					return rest.oneIdentity0();
+				}
+			} else if (temp.isTimes()) {
+				if (temp.first().isOne()) {
+					IAST rest = temp.rest();
+					rest.isFreeOfPatterns();
+					return rest.oneIdentity1();
+				}
+				// else if (temp.first().isZero()) {
+				// return temp.first();
+				// }
+			}
+		}
+		if (temp.isOneIdentityAST1()) {
+			return temp.first();
+		}
+
+		temp.isFreeOfPatterns();
+		return temp;
 	}
 
 	/**
@@ -324,9 +361,10 @@ public class EvalAttributes {
 	 * 
 	 * @param ast
 	 *            the AST will be sorted in place.
+	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
 	 */
-	public static final void sortLess(IASTMutable ast) {
-		sort(ast, new Predicates.IsBinaryFalse(F.Less));
+	public static final boolean sortLess(IASTMutable ast) {
+		return sort(ast, new Predicates.IsBinaryFalse(F.Less));
 	}
 
 	/**
@@ -348,12 +386,13 @@ public class EvalAttributes {
 			case 4:
 				return sort3Args(ast, false);
 			default:
-				sort(ast, Comparators.ExprComparator.CONS);
-				if (Config.SHOW_STACKTRACE) {
+				if (sort(ast, Comparators.ExprComparator.CONS)) {
+					if (FEConfig.SHOW_STACKTRACE) {
 					checkCachedHashcode(ast);
 				}
 				return true;
 			}
+		}
 		}
 		return false;
 	}
@@ -381,16 +420,55 @@ public class EvalAttributes {
 			case 4:
 				return sort3Args(ast, true);
 			default:
-				sort(ast, Comparators.ExprComparator.CONS);
+				if (sort(ast, Comparators.ExprComparator.CONS)) {
 				ast.addEvalFlags(IAST.IS_SORTED);
-				if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 					checkCachedHashcode(ast);
 				}
 				return true;
 			}
 		}
+		}
 		ast.addEvalFlags(IAST.IS_SORTED);
 		return false;
+	}
+
+	/**
+	 * Check if all arguments of the <code>ast</code> are sorted for the used <code>comparator</code>.
+	 *
+	 * @param ast
+	 * @param comparator
+	 *            a comparison function, which imposes a total ordering
+	 * @return
+	 */
+	public static final boolean isSorted(final IAST ast, Comparator<IExpr> comparator) {
+		return isSorted(ast, 1, comparator);
+	}
+
+	/**
+	 * Check if the arguments of <code>ast</code> starting from <code>fromPosition</code> are sorted for the used
+	 * <code>comparator</code>.
+	 *
+	 * @param ast
+	 * @param fromPosition
+	 *            start comparing the arguments from this position
+	 * @param comparator
+	 *            a comparison function, which imposes a total ordering
+	 * @return
+	 */
+	public static final boolean isSorted(final IAST ast, int fromPosition, Comparator<IExpr> comparator) {
+		if (ast.size() < fromPosition + 2) {
+			return true;
+		}
+		IExpr previous = ast.get(fromPosition);
+		for (int i = fromPosition + 1; i < ast.size(); i++) {
+			final IExpr current = ast.get(i);
+			if (comparator.compare(previous, current) > 0) {
+				return false;
+			}
+			previous = current;
+		}
+		return true;
 	}
 
 	/**
@@ -403,11 +481,12 @@ public class EvalAttributes {
 	 *            the AST will be sorted in place.
 	 * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
 	 */
-	public static final void sort(final IASTMutable ast, Comparator<IExpr> comparator) {
+	public static final boolean sort(final IASTMutable ast, Comparator<IExpr> comparator) {
 		if (ast.isAssociation()) {
 			throw new UnsupportedOperationException("Sort(list, comparator) not implemented for associations.");
 		}
 		if (ast.size() > 2) {
+			if (!isSorted(ast, comparator)) {
 		final IExpr[] a = ast.toArray();
 		int end = a.length;
 			if (Config.FUZZ_TESTING) {
@@ -417,7 +496,8 @@ public class EvalAttributes {
 						ast.set(j, a[j]);
 					}
 				} catch (java.lang.IllegalArgumentException iae) {
-					// java.util.TimSort.mergeHi(TimSort.java:899) - Comparison method violates its general contract!
+						// java.util.TimSort.mergeHi(TimSort.java:899) - Comparison method violates its general
+						// contract!
 					System.err.println(ast.toString());
 					throw iae;
 				}
@@ -427,7 +507,10 @@ public class EvalAttributes {
 			ast.set(j, a[j]);
 		}
 	}
+				return true;
 		}
+	}
+		return false;
 	}
 
 	/**
@@ -447,7 +530,7 @@ public class EvalAttributes {
 			if (setFlag) {
 			ast.addEvalFlags(IAST.IS_SORTED);
 			}
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				checkCachedHashcode(ast);
 			}
 			return true;
@@ -493,7 +576,7 @@ public class EvalAttributes {
 		ast.addEvalFlags(IAST.IS_SORTED);
 		}
 		if (evaled) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				checkCachedHashcode(ast);
 			}
 		}

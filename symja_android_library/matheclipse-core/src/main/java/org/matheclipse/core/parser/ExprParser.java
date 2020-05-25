@@ -142,12 +142,12 @@ public class ExprParser extends Scanner {
 	 *            if <code>true</code>, use '('...')' as brackets for arguments
 	 * @throws SyntaxError
 	 */
-	public ExprParser(final EvalEngine engine, final boolean relaxedSyntax) throws SyntaxError {
+	public ExprParser(final EvalEngine engine, final boolean relaxedSyntax) {
 		this(engine, ExprParserFactory.MMA_STYLE_FACTORY, relaxedSyntax);
 	}
 
 	// public ExprParser(final EvalEngine engine, final boolean relaxedSyntax,
-	// boolean packageMode) throws SyntaxError {
+	// boolean packageMode) {
 	// this(engine, ExprParserFactory.MMA_STYLE_FACTORY, relaxedSyntax,
 	// packageMode);
 	// }
@@ -160,12 +160,12 @@ public class ExprParser extends Scanner {
 	 *            if <code>true</code>, use '('...')' as brackets for arguments
 	 * @throws SyntaxError
 	 */
-	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax) throws SyntaxError {
+	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax) {
 		this(engine, factory, relaxedSyntax, false, FEConfig.EXPLICIT_TIMES_OPERATOR);
 	}
 
 	public ExprParser(final EvalEngine engine, IParserFactory factory, final boolean relaxedSyntax, boolean packageMode,
-			boolean explicitTimes) throws SyntaxError {
+			boolean explicitTimes) {
 		super(packageMode, explicitTimes);
 		this.fRelaxedSyntax = relaxedSyntax;
 		this.fFactory = factory;
@@ -255,7 +255,7 @@ public class ExprParser extends Scanner {
 		return function;
 	}
 
-	private IExpr convertSymbolOnInput(final String nodeStr, final String context) {
+	protected IExpr convertSymbolOnInput(final String nodeStr, final String context) {
 		if (fRelaxedSyntax) {
 			if (nodeStr.length() == 1) {
 				if (nodeStr.equals("I")) {
@@ -1161,6 +1161,36 @@ public class ExprParser extends Scanner {
 			fEngine.setNumericPrecision(precision);
 		}
 		return temp;
+	}
+
+	/**
+	 * Parse a list of comma separated expressions
+	 *
+	 * @param expression
+	 * @return
+	 * @throws SyntaxError
+	 */
+	public IExpr parseFuzzyList(final String expression) throws SyntaxError {
+		initialize(expression);
+		fRecursionDepth++;
+		IASTAppendable function = null;
+		try {
+			function = F.ListAlloc(16);
+			do {
+				function.append(parseExpression());
+				if (fToken != TT_COMMA) {
+					break;
+				}
+				getNextToken();
+				if (fToken == TT_EOF) {
+					break;
+				}
+			} while (true);
+
+		} finally {
+			fRecursionDepth--;
+		}
+		return function;
 	}
 
 	private IExpr parseArguments(IExpr head) {

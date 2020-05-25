@@ -10,6 +10,7 @@ import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.form.output.ASCIIPrettyPrinter3;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
@@ -82,9 +83,9 @@ public class MMAConsole {
 	}
 
 	public static void main(final String args[]) {
-
+		Locale.setDefault(Locale.US);
 		// distinguish between lower- and uppercase identifiers
-		Config.PARSER_USE_LOWERCASE_SYMBOLS = false;
+		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = false;
 		Config.USE_VISJS = true;
 		Config.FILESYSTEM_ENABLED = true;
 		F.initSymbols(null, null, true);

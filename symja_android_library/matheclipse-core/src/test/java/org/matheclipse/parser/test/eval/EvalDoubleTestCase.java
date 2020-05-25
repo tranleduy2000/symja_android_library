@@ -6,6 +6,7 @@ import java.util.HashSet;
 import org.junit.Assert;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.CoreCallbackFunction;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.eval.BooleanVariable;
 import org.matheclipse.parser.client.eval.DoubleEvaluator;
 import org.matheclipse.parser.client.eval.DoubleVariable;
@@ -36,7 +37,7 @@ public class EvalDoubleTestCase extends TestCase {
 
 	public void testEval001() {
 		check("42", "42.0");
-		if (!Config.EXPLICIT_TIMES_OPERATOR) {
+		if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
 			check("1.0E10", "EvalDouble#evaluate(ASTNode) not possible for: E10");
 			check("1.0E-10", "-7.281718171540955");
 			check("1.0E+10", "12.718281828459045");

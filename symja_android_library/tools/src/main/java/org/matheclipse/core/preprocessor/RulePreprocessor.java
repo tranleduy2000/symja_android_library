@@ -7,6 +7,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.patternmatching.RulesData;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -228,7 +229,7 @@ public class RulePreprocessor {
 	}
 
 	public static void main(final String[] args) {
-		Config.EXPLICIT_TIMES_OPERATOR = true;
+		FEConfig.EXPLICIT_TIMES_OPERATOR = true;
 		F.initSymbols();
 		// C:\\Users\\dev\\git\\symja_android_library
 		File sourceLocation = new File("..\\symja_android_library\\rules");

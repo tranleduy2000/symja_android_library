@@ -38,19 +38,25 @@ public class Config {
 	 * Maximum number for the leaf count of an expression so that <code>Factor()</code> will try a factoring. Has to be
 	 * an int value greater 0.
 	 */
-	public static final int MAX_FACTOR_LEAFCOUNT = 600;
+	public static final int MAX_FACTOR_LEAFCOUNT = 1000;
+
+	/**
+	 * Maximum number for the leaf count of an expression so that <code>PossibleZeroQ()</code> will try a factoring. Has to be
+	 * an int value greater 0.
+	 */
+	public static final int MAX_POSSIBLE_ZERO_LEAFCOUNT = 1000;
 
 	/**
 	 * Maximum number for the leaf count of an expression so that <code>Simplify()</code> will try calling
 	 * <code>Factor()</code>.
 	 */
-	public static final int MAX_SIMPLIFY_FACTOR_LEAFCOUNT = 50;
+	public static final int MAX_SIMPLIFY_FACTOR_LEAFCOUNT = 100;
 
 	/**
 	 * Maximum number for the leaf count of an expression so that <code>Simplify()</code> will try calling
 	 * <code>Apart()</code>.
 	 */
-	public static final int MAX_SIMPLIFY_APART_LEAFCOUNT = 50;
+	public static final int MAX_SIMPLIFY_APART_LEAFCOUNT = 100;
 
 	/**
 	 * Maximum number for the leaf count of an expression so that <code>Simplify()</code> will try calling
@@ -116,7 +122,13 @@ public class Config {
 	 * Set to true if in fuzz testing mode
 	 *
 	 */
-	public final static boolean FUZZ_TESTING = true;
+	public final static boolean FUZZ_TESTING = false;
+
+	/**
+	 * Set to true ifthe fuzzy parser should be used in the fre form API
+	 *
+	 */
+	public static boolean FUZZY_PARSER = false;
 
 	/**
 	 * Show the console output, if an expression has a head symbol with attribute <code>ISymbol.CONSOLE_OUTPUT</code>.
@@ -131,26 +143,6 @@ public class Config {
 	public final static boolean SHOW_PATTERN_EVAL_STEPS = false;
 
 	public final static Set<ISymbol> SHOW_PATTERN_SYMBOL_STEPS = new HashSet<ISymbol>();
-
-	/**
-	 * If <code>true</code> the parser doesn't distinguish between lower- or uppercase symbols (i.e. constants, function
-	 * names,...), with the exception of symbols with only one character (i.e. the variable &quot;i&quot; is different
-	 * from the imaginary unit &quot;I&quot;)
-	 */
-	public static boolean PARSER_USE_LOWERCASE_SYMBOLS = true;
-
-	/**
-	 * If <code>true</code> the parser doesn't allow "square brackets" instead of "parentheses" for enclosing function
-	 * arguments in relaxed mode. The syntax <code>f[x, y, ...]</code> isn't allowed then. Always use
-	 * <code>f(x, y, ...)</code>.
-	 * 
-	 */
-	public final static boolean PARSER_USE_STRICT_SYNTAX = false;
-
-	/**
-	 * Used to parse Rubi files. See <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Symbolic Integration Rules</a>
-	 */
-	public static boolean RUBI_CONVERT_SYMBOLS = false;
 
 	/**
 	 * Used to serialize the internal Rubi rules or the <code>org.matheclipse.core.reflection.system.rules</code>
@@ -288,39 +280,6 @@ public class Config {
 	 *
 	 */
 	public static boolean EXPENSIVE_JUNIT_TESTS = false;
-
-	/**
-	 * <p>
-	 * If <code>true</code> the <code>*</code> operator must be written for a <code>Times()</code> expression. I.e. you
-	 * cannot write <code>2(b+c)</code> anymore, but have to write <code>2*(b+c)</code> to get
-	 * <code>Times(2, Plus(b, c))</code>.
-	 * </p>
-	 * <p>
-	 * You also enable <a href="https://en.wikipedia.org/wiki/Scientific_notation#E-notation">scientific E-notation</a>.
-	 * I.e. <code>1E-2</code> is converted to a double value <code>0.01</code> for floating point numbers and not parsed
-	 * as <code>Plus(-2, E)</code> anymore.
-	 * </p>
-	 * <p>
-	 * You also enable integer literal input with a prefix, similar to
-	 * <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html">Java integer literals</a>
-	 * <ul>
-	 * <li><code>0b</code> or <code>0B</code> for binary numbers</li>
-	 * <li><code>0x</code> or <code>0X</code> for hexadecimal numbers</li>
-	 * <li><code>0o</code> or <code>0O</code> for octal numbers</li>
-	 * </ul>
-	 * </p>
-	 */
-	public static boolean EXPLICIT_TIMES_OPERATOR = false;
-
-	/**
-	 * <p>
-	 * If <code>true</code> the implicit <code>*</code> operator has a higher precedence than all other operators. I.e.
-	 * <code>1/2Pi</code> is parsed as <code>Power(Times(2, Pi), -1)</code>. If <code>false</code> the implicit
-	 * <code>*</code> operator has a normal precedence as in all other cases. I.e. <code>1/2Pi</code> is parsed as
-	 * <code>Times(Rational(1,2), Pi)</code>.
-	 * </p>
-	 */
-	public static boolean DOMINANT_IMPLICIT_TIMES = false;
 
 	/**
 	 * Default package mode with which the EvalEngines initially can be started
@@ -525,10 +484,10 @@ public class Config {
 					"</head>\n" + //
 					"\n" + //
 					"<body>\n" + //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.6/build/math.js\"></script>" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.8/build/math.js\"></script>" + //
 					"\n" + //
 					"\n" + //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.8.0/build/mathcell.js\"></script>\n"
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.8.8/build/mathcell.js\"></script>\n"
 					+ //
 					"<script src=\"https://cdn.jsdelivr.net/gh/mathjax/MathJax@2.7.5/MathJax.js?config=TeX-AMS_HTML\"></script>"
 					+ //
@@ -564,7 +523,7 @@ public class Config {
 					"\n" + //
 					"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraph.css\" />\n"
 					+ //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.6/build/math.js\"></script>\n"
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.8/build/math.js\"></script>\n"
 					+ "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.js\"\n" + //
 					"        type='text/javascript'></script>\n" + //
 					"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/geonext.min.js\"\n" + //
@@ -583,5 +542,39 @@ public class Config {
 					"\n" + //
 					"</body>\n" + //
 					"</html>";//
+
+	/**
+	 * HTML template for Plotly
+	 */
+	public final static String PLOTLY_PAGE = //
+			"<html>\n" + //
+					"<head>\n" + //
+					"<meta charset=\"utf-8\">\n" + //
+					"<title>Plotly</title>\n" + //
+					"    <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\r\n" + "</head>\r\n"
+					+ "<body>\n" + //
+					"    <div id='plotly' ></div>" + //
+					"`1`\n" + //
+					"</body>\n" + //
+					"</html>";//
+
+	/**
+	 * HTML template
+	 */
+	public final static String HTML_PAGE = //
+			"<html>\n" + //
+					"<head>\n" + //
+					"<meta charset=\"utf-8\">\n" + //
+					"<title>HTML</title>\n" + //
+					"</head>\n" + "<body>\n" + //
+					"`1`\n" + //
+					"</body>\n" + //
+					"</html>";//
+
 	public final static double DEFAULT_CHOP_DELTA = 1.0e-10;
+
+	/**
+	 * Used to parse Rubi files. See <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Symbolic Integration Rules</a>
+	 */
+	public static boolean RUBI_CONVERT_SYMBOLS = false;
 }

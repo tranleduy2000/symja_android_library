@@ -733,7 +733,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 
     // objc-changed
 	@AutoreleasePool
-	private void invokeMultisetPartitionsIteratorExecute(IStepVisitor visitor, IAST lhsPatternAST, ObjectRef<Boolean> resultRef) {
+	private void invokeMultisetPartitionsIteratorExecute(FlatOrderlessStepVisitor visitor, IAST lhsPatternAST, ObjectRef<Boolean> resultRef) {
 		MultisetPartitionsIterator iter = new MultisetPartitionsIterator(visitor, lhsPatternAST.argSize());
 		resultRef.set(iter.execute());
 		return;

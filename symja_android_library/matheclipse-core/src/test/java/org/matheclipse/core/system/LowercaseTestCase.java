@@ -5545,7 +5545,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("ElementData(\"Tc\", \"SpecificHeat\")", //
 				"Missing(NotAvailable)");
 		check("ElementData(\"Properties\")", //
-				"{Abbreviation,AbsoluteBoilingPoint,AbsoluteMeltingPoint,AtomicNumber,AtomicRadius,AtomicWeight,Block,BoilingPoint,BrinellHardness,BulkModulus,CovalentRadius,CrustAbundance,Density,DiscoveryYear,ElectroNegativity,ElectronAffinity,ElectronConfiguration,ElectronConfigurationString,ElectronShellConfiguration,FusionHeat,Group,IonizationEnergies,LiquidDensity,MeltingPoint,MohsHardness,Name,Period,PoissonRatio,Series,ShearModulus,SpecificHeat,StandardName,ThermalConductivity,VanDerWaalsRadius,VaporizationHeat,VickersHardness,YoungModulus}");
+				"{StandardName,AtomicNumber,Abbreviation,AbsoluteBoilingPoint,AbsoluteMeltingPoint,AtomicRadius,AtomicWeight,Block,BoilingPoint,BrinellHardness,BulkModulus,CovalentRadius,CrustAbundance,Density,DiscoveryYear,ElectroNegativity,ElectronAffinity,ElectronConfiguration,ElectronConfigurationString,ElectronShellConfiguration,FusionHeat,Group,IonizationEnergies,LiquidDensity,MeltingPoint,MohsHardness,Name,Period,PoissonRatio,Series,ShearModulus,SpecificHeat,ThermalConductivity,VanDerWaalsRadius,VaporizationHeat,VickersHardness,YoungModulus}");
 
 		check("ElementData(6)", "Carbon");
 		check("ElementData(\"Carbon\", \"Name\")", //
@@ -8516,6 +8516,26 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"-1<=y<=1");
 	}
 	public void testFunctionExpand() {
+		check("FunctionExpand(ProductLog(a*Log(a)), a > 42)", //
+				"Log(a)");
+		check("FunctionExpand(ProductLog(a*Log(a)), a >= 42)", //
+				"Log(a)");
+		check("FunctionExpand(ProductLog(a*Log(a)), a < 42)", //
+				"ProductLog(a*Log(a))");
+		check("FunctionExpand(ProductLog(a*Log(a)), a > 1/E)", //
+				"Log(a)");
+		check("FunctionExpand(ProductLog(a*Log(a)), a > 1/Pi)", //
+				"ProductLog(a*Log(a))");
+		check("FunctionExpand(ProductLog(a*Log(a)), a > 0.37)", //
+				"Log(a)");
+		check("FunctionExpand(ProductLog(a*Log(a)), a > 0.35)", //
+				"ProductLog(a*Log(a))");
+
+		check("FunctionExpand(Sin(4*ArcSin(x)))", //
+				"x*(-4*Sqrt(1-x^2)+8*(1-x^2)^(3/2))");
+		check("FunctionExpand(Sin(4*ArcTan(x)))", //
+				"(4*x-4*x^3)/(1+x^2)^2");
+
 		check("FunctionExpand(Cos(-7*ArcSin(x)))", //
 				"-7*Sqrt(1-x^2)+56*(1-x^2)^(3/2)-112*(1-x^2)^(5/2)+64*(1-x^2)^(7/2)");
 		check("FunctionExpand(Hypergeometric2F1(a, b, b -2, z))", //
@@ -9271,6 +9291,23 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testHurwitzZeta() {
+		// TODO
+		// check("HurwitzZeta(7,5.0)", //
+		// " ");
+		check("HurwitzZeta(3,0.2)", //
+				"125.739");
+		check("HurwitzZeta(.51, .87)", //
+				"-1.32016");
+
+		check("Table(HurwitzZeta(x, 0.5), {x,-2.0,2,0.25})", //
+				"{0.0,0.00695768,0.0164748,0.0283452,0.0416667,0.0541783,0.0608885,0.0509849,0.0,"
+						+ "-0.153878,-0.604899,-2.34624,ComplexInfinity,6.33397,4.77654,4.63811,4.9348}");
+
+		check("D(HurwitzZeta(s, x), x)", //
+				"-s*HurwitzZeta(1+s,x)");
+		check("HurwitzZeta(20,a) // FunctionExpand", //
+				"PolyGamma(19,a)/121645100408832000");
+
 		// http://fungrim.org/entry/6e69fc/
 		check("HurwitzZeta(6,11)", //
 				"-52107472322919827957/51219253009612800000+Pi^6/945");
@@ -9451,6 +9488,27 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"{1.01164,1.03627,1.06296}");
 	}
 
+	public void testHypergeometricU() {
+		// TODO throws hypergeometric function pole
+		// check("HypergeometricU(3, 2, 1.0)", //
+		// "0.105479");
+
+		check("D(HypergeometricU(a,b,x), x)", //
+				"-a*HypergeometricU(1+a,1+b,x)");
+		check("HypergeometricU(2, b, z)", //
+				"(-1+E^z*(2-b+z)*z^(1-b)*Gamma(-1+b,z))/(2-b)");
+		check("HypergeometricU(a, a+3, z)", //
+				"(1+(a*(1+a))/z^2+(2*a)/z)/z^a");
+		check("HypergeometricU(3, 2.5, 1.0)", //
+				"0.173724");
+		check("HypergeometricU(3, 2.5, 0.0)", //
+				"ComplexInfinity");
+		check("Table( HypergeometricU(3, 2.5, x), {x,-2.0,2,0.25})", //
+				"{0.19001+I*(-0.148415),0.27603+I*(-0.141362),0.39355+I*(-0.107638),0.553199+I*(-0.0227102)," //
+						+ "0.76904+I*0.163012,1.05965+I*0.56395,1.44956+I*1.52035,1.97105+I*4.83136,ComplexInfinity," //
+						+ "2.45436,0.688641,0.312167,0.173724,0.1086,0.0732253,0.0520871,0.0385635}");
+	}
+
 	public void testI() {
 		check("(3+I)*(3-I)", //
 				"10");
@@ -9561,8 +9619,21 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 			check("Export(\"c:\\\\temp\\\\dotgraph.graphml\",Graph({1 \\[DirectedEdge] 2, 2 \\[DirectedEdge] 3, 3 \\[DirectedEdge] 1}),\"GraphML\")", //
 					"c:\\temp\\dotgraph.graphml");
-			check("Import(\"c:\\\\temp\\\\dotgraph.graphml\", \"GraphML\")", //
-					"Graph[([1, 2, 3], [(1,2), (2,3), (3,1)])]");
+			check("gr=Import(\"c:\\\\temp\\\\dotgraph.graphml\", \"GraphML\")", //
+					"Graph({1,2,3},{1->2,2->3,3->1})");
+			check("ExportString(gr, \"GraphML\")", //
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?><graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n"
+							+ //
+							"<graph edgedefault=\"directed\">\r\n" + //
+							"<node id=\"1\"/>\r\n" + //
+							"<node id=\"2\"/>\r\n" + //
+							"<node id=\"3\"/>\r\n" + //
+							"<edge id=\"1\" source=\"1\" target=\"2\"/>\r\n" + //
+							"<edge id=\"2\" source=\"2\" target=\"3\"/>\r\n" + //
+							"<edge id=\"3\" source=\"3\" target=\"1\"/>\r\n" + //
+							"</graph>\r\n" + //
+							"</graphml>\r\n" + //
+							"");
 			check("Export(\"c:\\\\temp\\\\out.wxf\", {{5.7, 4.3}, {-1.2, 7.8}, {a, f(x)}}, \"WXF\")", //
 					"c:\\temp\\out.wxf");
 			check("Import(\"c:\\\\temp\\\\out.wxf\", \"WXF\")", //
@@ -15948,6 +16019,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPochhammer() {
+		check("Pochhammer(2-b,1)", //
+				"2-b");
 		check("Pochhammer({-7,-6,-5,-4,-3,-2,-1,0,1,2,3},-5)", //
 				"{-1/95040,-1/55440,-1/30240,-1/15120,-1/6720,-1/2520,-1/720,-1/120,ComplexInfinity,ComplexInfinity,ComplexInfinity}");
 		check("Pochhammer({-2,-1,0,1,2,3},-2)", //
@@ -16328,6 +16401,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testPolynomialQuotientRemainder() {
+		check("PolynomialQuotientRemainder(x^2 + x + 1, Pi*x + 1, x)", //
+				"{-1/Pi^2+1/Pi+x/Pi,1+1/Pi^2-1/Pi}");
 		check("PolynomialQuotientRemainder(x^2,1+(-1)*1,x)", //
 				"PolynomialQuotientRemainder(x^2,0,x)");
 		// test with Integer.MIN_VALUE
@@ -19834,12 +19909,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 					"b,12200,4\n" + //
 					"c,60000,33\n" + //
 					"\")", //
-					"Dataset[                                       \r\n" + //
+					"                                       \r\n" + //
 							" Products  |  Sales  |  Market_Share  |\r\n" + //
 							"---------------------------------------\r\n" + //
 							"        a  |   5500  |             3  |\r\n" + //
 							"        b  |  12200  |             4  |\r\n" + //
-							"        c  |  60000  |            33  |]");
+							"        c  |  60000  |            33  |");
 			check("SemanticImportString(\"Date\\tCity\\tSales\r\n" + //
 					" 2014/1/1\\tBoston\\t198\r\n" + //
 					" 2014/1/1\\tNew York\\t220\r\n" + //
@@ -24280,6 +24355,49 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"11");
 	}
 
+	public void testWhittakerM() {
+		check("D(WhittakerM(a,b,x), x)", //
+				"(1/2-a/x)*WhittakerM(a,b,x)+((1/2+a+b)*WhittakerM(1+a,b,x))/x");
+		check("WhittakerM(k, -1/2, 0)", //
+				"WhittakerM(k,-1/2,0)");
+		check("WhittakerM(k, -1/3, 0)", //
+				"0");
+		check("WhittakerM(k,  -2/3, 0)", //
+				"ComplexInfinity");
+		check("WhittakerM(1, 1, 0)", //
+				"0");
+		check("WhittakerM(0, 1, 0)", //
+				"0");
+		check("WhittakerM(0, 0, 0)", //
+				"0");
+		check("WhittakerM(2, 3, 1.7)", //
+				"4.07202");
+		// TODO
+		// check("WhittakerM(2, 0.5, 0.0)", //
+		// "0");
+		check("Table( WhittakerM(3, 2.5, x), {x,-2.0,2,0.25})", //
+				"{-21.74625+I*7.98944*10^-15,-12.85647+I*4.72339*10^-15,-7.14488+I*2.62498*10^-15,-3.64892+I*1.34059*10^-15,"//
+						+ "-1.64872,-0.613825,-0.160503,-0.0177054,Indeterminate,0.013789,0.0973501,"//
+						+ "0.28995,0.606531,1.04543,1.59424,2.23412,2.94304}");
+	}
+
+	public void testWhittakerW() {
+		check("D(WhittakerW(a,b,x), x)", //
+				"(1/2-a/x)*WhittakerW(a,b,x)-WhittakerW(1+a,b,x)/x");
+		check("WhittakerW(0, 0, 0)", //
+				"0");
+		// TODO
+		// check("WhittakerW(6, 4, 1.7)", //
+		// "4.07202");
+		// check("WhittakerW(2, 0.5, 0.0)", //
+		// "0");
+		// check("Table( WhittakerW(6, 4, x), {x,-2.0,2,0.25})", //
+		// "{-21.74625+I*7.98944*10^-15,-12.85647+I*4.72339*10^-15,-7.14488+I*2.62498*10^-15,-3.64892+I*1.34059*10^-15,"//
+		// +
+		// "-1.64872+I*6.05730*10^-16,-0.613825+I*2.25515*10^-16,-0.160503,-0.0177054,Indeterminate,0.013789,0.0973501,"//
+		// + "0.28995,0.606531,1.04543,1.59424,2.23412,2.94304}");
+	}
+
 	public void testWith() {
 		EvalEngine.get().resetModuleCounter4JUnit();
 //		check("With({x = 2 + y}, Hold(With({y = 4}, x + y)))", //
@@ -24385,6 +24503,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testZeta() {
+		check("D(Zeta(s, x), x)", //
+				"-s*Zeta(1+s,x)");
 		check("Zeta(-3.0)", //
 				"0.00833333");
 		check("Zeta(4.0)", //
