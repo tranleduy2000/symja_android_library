@@ -60,12 +60,14 @@ android {
             resources.srcDirs = ['src/main/resources']
             java.srcDirs += 'matheclipse-core/src/main/java/'
             java.srcDirs += 'matheclipse-frontend/src/main/java/'
+            java.srcDirs += "matheclipse-api/src/main/java/"
         }
 //        full {
 //            assets.srcDirs += 'matheclipse-core/src/main/resources/'
 //        }
         test {
             java.srcDirs += "matheclipse-core/src/test/java/"
+            java.srcDirs += "matheclipse-api/src/test/java/"
             java.srcDirs += "tools/src/main/java/"
         }
 
@@ -95,4 +97,7 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.jsoup:jsoup:1.13.1'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+    implementation 'com.atlassian.commonmark:commonmark:0.15.0'
+    implementation 'com.atlassian.commonmark:commonmark-ext-gfm-tables:0.15.0'
 }
