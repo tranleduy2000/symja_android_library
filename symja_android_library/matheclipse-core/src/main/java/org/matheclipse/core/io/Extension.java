@@ -37,7 +37,7 @@ public enum Extension {
 	WXF;
 	public static boolean isAllowedExtension(String extensionString) {
 		try {
-			Extension ext = valueOf(extensionString.toUpperCase());
+			Extension ext = valueOf(extensionString.toUpperCase(Locale.US));
 			if (ext != null) {
 				return true;
 			}
@@ -83,7 +83,7 @@ public enum Extension {
 			if (ucExtension.equals("DATA")) {
 				return DAT;
 			}
-			return valueOf(extensionString.toUpperCase());
+			return valueOf(extensionString.toUpperCase(Locale.US));
 		} catch (RuntimeException rex) {
 			//
 		}
@@ -101,7 +101,7 @@ public enum Extension {
 		try {
 			int pos = filename.lastIndexOf('.');
 			if (pos >= 1) {
-				return valueOf(filename.substring(pos + 1).toUpperCase());
+				return valueOf(filename.substring(pos + 1).toUpperCase(Locale.US));
 			}
 		} catch (RuntimeException rex) {
 			//
@@ -118,7 +118,7 @@ public enum Extension {
 	 */
 	public static Extension importExtension(String extensionString) {
 		try {
-			return valueOf(extensionString.toUpperCase());
+			return valueOf(extensionString.toUpperCase(Locale.US));
 		} catch (RuntimeException rex) {
 			//
 		}

@@ -17,6 +17,8 @@
  */
 package org.jheaps.tree;
 
+import android.annotation.SuppressLint;
+
 import org.jheaps.AddressableHeap;
 import org.jheaps.annotations.ConstantTime;
 import org.jheaps.annotations.LogarithmicTime;
@@ -452,12 +454,13 @@ public class BinaryTreeAddressableHeap<K, V> implements AddressableHeap<K, V>, S
      *
      * @param node the node number assuming that the root node is number one
      */
+    @SuppressLint("NewApi")
     private Node findParentNode(long node) {
         // assert node > 0;
 
         // find bit representation of node
         long[] s = {node};
-        BitSet bits = BitSet.valueOf(s);
+         BitSet bits = BitSet.valueOf(s);
 
         // traverse path to last node
         Node cur = root;

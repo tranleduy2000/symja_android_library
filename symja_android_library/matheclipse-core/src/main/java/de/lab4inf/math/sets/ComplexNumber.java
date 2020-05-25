@@ -20,6 +20,8 @@
 */
 package de.lab4inf.math.sets;
 
+import java.util.Locale;
+
 import de.lab4inf.math.Complex;
 import de.lab4inf.math.L4MObject;
 import de.lab4inf.math.Operand;
@@ -399,17 +401,17 @@ public final class ComplexNumber extends L4MObject implements Complex/* , Serial
                 buf.append('0');
             } else {
                 if (x != 0) {
-                    buf.append(String.format(fmt, x));
+                    buf.append(String.format(Locale.US, fmt, x));
                 }
                 if (y > 0) {
                     if (x != 0)
                         buf.append("+j");
                     else
                         buf.append("j");
-                    buf.append(String.format(fmt, y));
+                    buf.append(String.format(Locale.US, fmt, y));
                 } else if (y < 0) {
                     buf.append("-j");
-                    buf.append(String.format(fmt, -y));
+                    buf.append(String.format(Locale.US, fmt, -y));
                 }
             }
             asString = buf.toString().trim();

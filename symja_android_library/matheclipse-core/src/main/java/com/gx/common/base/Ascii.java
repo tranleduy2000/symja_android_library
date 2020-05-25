@@ -550,7 +550,7 @@ public final class Ascii {
      * <p>Note however that this method does not always behave identically to expressions such as:
      * <p>
      * <ul>
-     * <li>{@code string.toUpperCase().equals("UPPER CASE ASCII")}
+     * <li>{@code string.toUpperCase(Locale.US).equals("UPPER CASE ASCII")}
      * <li>{@code string.toLowerCase(Locale.US).equals("lower case ascii")}
      * </ul>
      * <p>

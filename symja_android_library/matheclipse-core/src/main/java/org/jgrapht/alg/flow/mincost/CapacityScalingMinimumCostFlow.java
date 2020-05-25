@@ -909,7 +909,7 @@ public class CapacityScalingMinimumCostFlow<V, E>
          */
         @Override
         public String toString() {
-            return String.format(
+            return String.format(Locale.US,
                     "(%d, %d), residual capacity = %s, reduced cost = %.1f, cost = %.1f",
                     revArc.head.id, head.id,
                     residualCapacity >= CAP_INF ? "INF" : String.valueOf(residualCapacity),

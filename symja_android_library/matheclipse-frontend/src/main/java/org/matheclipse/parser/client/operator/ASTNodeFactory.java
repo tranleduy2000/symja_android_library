@@ -532,7 +532,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 		String name = symbolName;
 		if (fIgnoreCase) {
 			if (name.length() > 1) {
-				name = symbolName.toLowerCase();
+				name = symbolName.toLowerCase(Locale.US);
 		}
 		}
 		// if (FEConfig.RUBI_CONVERT_SYMBOLS) {

@@ -93,6 +93,6 @@ repositories {
 }
 dependencies {
     testImplementation 'junit:junit:4.13'
-    testImplementation 'org.jsoup:jsoup:1.12.1'
+    testImplementation 'org.jsoup:jsoup:1.13.1'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
 }
