@@ -3,6 +3,7 @@ package org.matheclipse.core.expression;
 import com.duy.annotations.Nonnull;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
+import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
@@ -10,6 +11,7 @@ import com.duy.lang.DDouble;
 import com.gx.common.cache.Cache;
 import com.gx.common.cache.CacheBuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatContext;
@@ -71,6 +73,7 @@ import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.Lambda;
 import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.generic.Functors;
+import org.matheclipse.core.graphics.Show2SVG;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -78,6 +81,7 @@ import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
+import org.matheclipse.core.interfaces.IDataExpr;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
@@ -94,10 +98,14 @@ import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMap;
-import org.matheclipse.parser.trie.Tries;
 import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
+import org.matheclipse.parser.trie.Tries;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.IdentityHashMap;
@@ -9547,54 +9555,168 @@ public class F {
      *
      * @param expr
      * @return
-     * @throws java.io.IOException
+	 * @throws IOException
      */
     public static String show(IExpr expr) {
-//        if (expr.isSameHeadSizeGE(Show, 2)) {
-//            try {
-//                IAST show = (IAST) expr;
-//                if (show.size() > 1 && show.arg1().isSameHeadSizeGE(Graphics, 2)) {
-//                    return Console.openSVGOnDesktop(show);
-//                }
-//            } catch (Exception ex) {
-//                if (Config.SHOW_STACKTRACE) {
-//                    ex.printStackTrace();
-//                }
-//            }
-//        } else if (expr.head().equals(Graph) && expr instanceof IDataExpr) {
-//            String javaScriptStr = GraphFunctions.graphToJSForm((IDataExpr) expr);
-//            if (javaScriptStr != null) {
-//                try {
-//                    String html = Config.VISJS_PAGE;
-//                    html = html.replaceAll("`1`", javaScriptStr);
-//                    return Console.openHTMLOnDesktop(html);
-//                } catch (Exception ex) {
-//                    if (Config.SHOW_STACKTRACE) {
-//                        ex.printStackTrace();
-//                    }
-//                }
-//            }
-//        } else if (expr.isAST(JSFormData, 3) && expr.second().toString().equals("mathcell")) {
-//            try {
-//                String manipulateStr = ((IAST) expr).arg1().toString();
-//                String html = Config.MATHCELL_PAGE;
-//                html = html.replaceAll("`1`", manipulateStr);
-//                return Console.openHTMLOnDesktop(html);
-//            } catch (Exception ex) {
-//                if (Config.SHOW_STACKTRACE) {
-//                    ex.printStackTrace();
-//                }
-//            }
-//        }
+		try {
+			if (expr.isSameHeadSizeGE(Show, 2)) {
+				IAST show = (IAST) expr;
+				if (show.size() > 1 && show.arg1().isSameHeadSizeGE(Graphics, 2)) {
+					return openSVGOnDesktop(show);
+				}
+			} else if (expr.head().equals(Graph) && expr instanceof IDataExpr) {
+				String javaScriptStr = GraphFunctions.graphToJSForm((IDataExpr) expr);
+				if (javaScriptStr != null) {
+					String html = Config.VISJS_PAGE;
+					html = StringUtils.replace(html, "`1`", javaScriptStr);
+					html = StringUtils.replace(html, "`2`", "var options = {};");
+					return openHTMLOnDesktop(html);
+				}
+			} else if (expr.isAST(JSFormData, 3)) {
+				return printJSFormData(expr);
+			} else if (expr.isString()) {
+				IStringX str = (IStringX) expr;
+				if (str.getMimeType() == IStringX.TEXT_HTML) {
+					String htmlSnippet = str.toString();
+					String htmlPage = Config.HTML_PAGE;
+					htmlPage = StringUtils.replace(htmlPage, "`1`", htmlSnippet);
+					System.out.println(htmlPage);
+					return F.openHTMLOnDesktop(htmlPage);
+				}
+			} else if (expr.isList(new Predicate<IExpr>() {
+				@Override
+				public boolean test(IExpr x) {
+					return x.isAST(JSFormData, 3);
+				}
+			})) {
+				final StringBuilder buf = new StringBuilder();
+				((IAST) expr).forEach(new Consumer<IExpr>() {
+					@Override
+					public void accept(IExpr x) {
+						buf.append(printJSFormData(x));
+					}
+				});
+				return buf.toString();
+			}
+		} catch (Exception ex) {
+			if (FEConfig.SHOW_STACKTRACE) {
+				ex.printStackTrace();
+			}
+		}
         return null;
     }
 
-    public static IExpr zeroInteger() {
+	private static String printJSFormData(IExpr expr) {
+		IAST jsFormData = (IAST) expr;
+		if (jsFormData.arg2().toString().equals("mathcell")) {
+			try {
+				String manipulateStr = jsFormData.arg1().toString();
+				String html = Config.MATHCELL_PAGE;
+				html = StringUtils.replace(html, "`1`", manipulateStr);
+				return openHTMLOnDesktop(html);
+			} catch (Exception ex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ex.printStackTrace();
+				}
+			}
+		} else if (jsFormData.arg2().toString().equals("jsxgraph")) {
+			try {
+				String manipulateStr = jsFormData.arg1().toString();
+				String html = Config.JSXGRAPH_PAGE;
+				html = StringUtils.replace(html, "`1`", manipulateStr);
+				return openHTMLOnDesktop(html);
+			} catch (Exception ex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ex.printStackTrace();
+				}
+			}
+		} else if (jsFormData.arg2().toString().equals("plotly")) {
+			try {
+				String manipulateStr = jsFormData.arg1().toString();
+				String html = Config.PLOTLY_PAGE;
+				html = StringUtils.replace(html, "`1`", manipulateStr);
+				return openHTMLOnDesktop(html);
+			} catch (Exception ex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ex.printStackTrace();
+				}
+			}
+		} else if (jsFormData.arg2().toString().equals("treeform")) {
+			try {
+				String manipulateStr = jsFormData.arg1().toString();
+				String html = Config.VISJS_PAGE;
+				html = StringUtils.replace(html, "`1`", manipulateStr);
+				html = StringUtils.replace(html, "`2`", //
+						"  var options = {\n" + //
+								"		  edges: {\n" + //
+								"              smooth: {\n" + //
+								"                  type: 'cubicBezier',\n" + //
+								"                  forceDirection:  'vertical',\n" + //
+								"                  roundness: 0.4\n" + //
+								"              }\n" + //
+								"          },\n" + //
+								"          layout: {\n" + //
+								"              hierarchical: {\n" + //
+								"                  direction: \"UD\"\n" + //
+								"              }\n" + //
+								"          },\n" + //
+								"          nodes: {\n" + //
+								"            shape: 'box'\n" + //
+								"          },\n" + //
+								"          physics:false\n" + //
+								"      }; "//
+				);
+				return openHTMLOnDesktop(html);
+			} catch (Exception ex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ex.printStackTrace();
+				}
+			}
+		} else if (jsFormData.arg2().toString().equals("traceform")) {
+			try {
+				String jsStr = jsFormData.arg1().toString();
+				String html = Config.TRACEFORM_PAGE;
+				html = StringUtils.replace(html, "`1`", jsStr);
+				return openHTMLOnDesktop(html);
+			} catch (Exception ex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
 
-        return C0;
-    }
+	public static String openSVGOnDesktop(IAST show) throws IOException {
+		StringBuilder stw = new StringBuilder();
+		Show2SVG.graphicsToSVG(show.getAST(1), stw);
+		File temp = File.createTempFile("tempfile", ".svg");
+		BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+		bw.write(stw.toString());
+		bw.close();
+//		if (Desktop.isDesktopSupported()) {
+//			Desktop.getDesktop().open(temp);
+//		}
+		return temp.toString();
+	}
 
-    public static INum oneDouble() {
-        return CD1;
+	public static String openHTMLOnDesktop(String html) throws IOException {
+		File temp = File.createTempFile("tempfile", ".html");
+		BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+		bw.write(html);
+		bw.close();
+//		if (Desktop.isDesktopSupported()) {
+//			Desktop.getDesktop().open(temp);
+//		}
+		return temp.toString();
+	}
+
+	public static IExpr zeroInteger() {
+
+		return C0;
+	}
+
+	public static INum oneDouble() {
+		return CD1;
     }
 }
