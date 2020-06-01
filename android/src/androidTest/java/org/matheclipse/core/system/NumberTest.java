@@ -59,7 +59,7 @@ public class NumberTest extends TestCase {
 				fail();
 			}
 		} catch (RuntimeException rex) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				rex.printStackTrace();
 			}
 		}

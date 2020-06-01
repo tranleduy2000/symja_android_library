@@ -71,6 +71,7 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.Lambda;
+import org.matheclipse.core.expression.data.GraphExpr;
 import org.matheclipse.core.form.Documentation;
 import org.matheclipse.core.generic.Functors;
 import org.matheclipse.core.graphics.Show2SVG;
@@ -713,6 +714,9 @@ public class F {
     public final static IBuiltInSymbol Continue = F.initFinalSymbol("Continue", ID.Continue);
 	/** ContinuedFraction(number) - get the continued fraction representation of `number`. */
     public final static IBuiltInSymbol ContinuedFraction = F.initFinalSymbol("ContinuedFraction", ID.ContinuedFraction);
+
+	/***/
+	public final static IBuiltInSymbol ContourPlot = F.initFinalSymbol("ContourPlot", ID.ContourPlot);
     /**
      * Convergents({n1, n2, ...}) - return the list of convergents which represents the continued fraction list `{n1,
      * n2, ...}`.
@@ -1454,6 +1458,10 @@ public class F {
     public final static IBuiltInSymbol IntegerExponent = F.initFinalSymbol("IntegerExponent", ID.IntegerExponent);
 	/** IntegerLength(x) - gives the number of digits in the base-10 representation of `x`. */
     public final static IBuiltInSymbol IntegerLength = F.initFinalSymbol("IntegerLength", ID.IntegerLength);
+
+	/***/
+	public final static IBuiltInSymbol IntegerName = F.initFinalSymbol("IntegerName", ID.IntegerName);
+
 	/** IntegerPart(expr) - for real `expr` return the integer part of `expr`. */
     public final static IBuiltInSymbol IntegerPart = F.initFinalSymbol("IntegerPart", ID.IntegerPart);
 	/** IntegerPartitions(n) - returns all partitions of the integer `n`. */
@@ -1660,6 +1668,10 @@ public class F {
     public final static IBuiltInSymbol List = F.initFinalSymbol("List", ID.List);
 	/** ListConvolve(kernel-list, tensor-list) - create the convolution of the `kernel-list` with `tensor-list`. */
     public final static IBuiltInSymbol ListConvolve = F.initFinalSymbol("ListConvolve", ID.ListConvolve);
+
+	/***/
+	public final static IBuiltInSymbol ListContourPlot = F.initFinalSymbol("ListContourPlot", ID.ListContourPlot);
+
 	/** ListCorrelate(kernel-list, tensor-list) - create the correlation of the `kernel-list` with `tensor-list`. */
     public final static IBuiltInSymbol ListCorrelate = F.initFinalSymbol("ListCorrelate", ID.ListCorrelate);
 
@@ -2386,6 +2398,10 @@ public class F {
      */
     public final static IBuiltInSymbol RogersTanimotoDissimilarity = F.initFinalSymbol("RogersTanimotoDissimilarity",
             ID.RogersTanimotoDissimilarity);
+
+	/***/
+	public final static IBuiltInSymbol RomanNumeral = F.initFinalSymbol("RomanNumeral", ID.RomanNumeral);
+
     /***/
     public final static IBuiltInSymbol Root = F.initFinalSymbol("Root", ID.Root);
     /***/
@@ -4864,6 +4880,10 @@ public class F {
         return new AST1(BooleanQ, a);
     }
 
+	public static IAST BooleanTable(final IExpr a0, final IExpr a1) {
+		return new AST2(BooleanTable, a0, a1);
+	}
+
     public static IAST BesselI(final IExpr a0, final IExpr a1) {
         return new AST2(BesselI, a0, a1);
     }
@@ -4967,7 +4987,7 @@ public class F {
      * @param im
      * @return
      */
-    public static IComplex CC(final IFraction re, final IFraction im) {
+	public static IComplex CC(final IRational re, final IRational im) {
         return ComplexSym.valueOf(re, im);
     }
 
@@ -6677,6 +6697,14 @@ public class F {
         return new AST1(IntegerPart, a0);
     }
 
+	public static IAST IntegerName(final IExpr a0) {
+		return new AST1(IntegerName, a0);
+	}
+
+	public static IAST IntegerName(final IExpr a0, final IExpr a1) {
+		return new AST2(IntegerName, a0, a1);
+	}
+
     /**
      * <pre>
      * IntegerQ(expr)
@@ -7225,7 +7253,7 @@ public class F {
      * @param numbers
      * @return
      */
-    public static IAST List(final int n, final Integer... numbers) {
+	public static IAST tensorList(final int n, final Integer... numbers) {
         int nPositive = n;
         if (n < 0) {
             nPositive = -n;
@@ -7341,6 +7369,10 @@ public class F {
     public static IAST ListConvolve(final IExpr a0, final IExpr a1) {
         return new AST2(ListConvolve, a0, a1);
     }
+
+	public static IAST ListPlot(final IExpr a) {
+		return new AST1(ListPlot, a);
+	}
 
     /**
      * <pre>
@@ -7491,6 +7523,10 @@ public class F {
     public static IAST MathMLForm(final IExpr a0) {
         return new AST1(MathMLForm, a0);
     }
+
+	public static IAST MatrixForm(final IExpr a0) {
+		return new AST1(MatrixForm, a0);
+	}
 
     public static IAST MatrixPower(final IExpr a0, final IExpr a1) {
 
@@ -8012,6 +8048,10 @@ public class F {
 
 	public static IAST Plot(final IExpr a0, final IExpr a1) {
 		return new AST2(Plot, a0, a1);
+	}
+
+	public static IAST Plot(final IExpr a0, final IExpr a1, final IExpr a2) {
+		return new AST3(Plot, a0, a1, a2);
 	}
 
 	public static IAST Plot3D(final IExpr a0, final IExpr a1, final IExpr a2) {
@@ -8556,8 +8596,8 @@ public class F {
 	/**
 	 * Create a unique dummy symbol with prefix "$", which is retrieved from the evaluation engines DUMMY context.
 	 *
-	 * @param symbolName
-	 *            the name of the symbol
+	 * @param engine
+	 *            the evaluation engine
 	 * @return the symbol object from the context path
 	 */
 	public static ISymbol Dummy(EvalEngine engine) {
@@ -8634,6 +8674,10 @@ public class F {
     public static IAST Reverse(final IExpr a) {
         return new AST1(Reverse, a);
     }
+
+	public static IAST RomanNumeral(final IExpr a) {
+		return new AST1(RomanNumeral, a);
+	}
 
     public static IAST Root(final IExpr a0, final IExpr a1) {
         return new AST2(Root, a0, a1);
@@ -9564,8 +9608,8 @@ public class F {
 				if (show.size() > 1 && show.arg1().isSameHeadSizeGE(Graphics, 2)) {
 					return openSVGOnDesktop(show);
 				}
-			} else if (expr.head().equals(Graph) && expr instanceof IDataExpr) {
-				String javaScriptStr = GraphFunctions.graphToJSForm((IDataExpr) expr);
+			} else if (expr instanceof GraphExpr) {
+				String javaScriptStr = GraphFunctions.graphToJSForm((GraphExpr) expr);
 				if (javaScriptStr != null) {
 					String html = Config.VISJS_PAGE;
 					html = StringUtils.replace(html, "`1`", javaScriptStr);

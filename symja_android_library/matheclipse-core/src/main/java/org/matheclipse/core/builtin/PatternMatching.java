@@ -2152,7 +2152,7 @@ public final class PatternMatching {
 //			String str = Files.asCharSource(file, Charset.defaultCharset()).read();
 //			return Get.loadPackage(engine, str);
 //		} catch (IOException e) {
-//			if (Config.SHOW_STACKTRACE) {
+//			if (FEConfig.SHOW_STACKTRACE) {
 //				e.printStackTrace();
 //			}
 //			engine.printMessage("Get exception: " + e.getMessage());

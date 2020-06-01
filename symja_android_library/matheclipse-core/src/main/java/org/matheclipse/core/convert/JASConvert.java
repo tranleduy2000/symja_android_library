@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -286,7 +287,7 @@ public class JASConvert<C extends RingElem<C>> {
 		} catch (JASConversionException jce) {
 			throw jce;
 		} catch (RuntimeException rex) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				rex.printStackTrace();
 			}
 			// System.out.println("expr2JAS"+exprPoly.toString());

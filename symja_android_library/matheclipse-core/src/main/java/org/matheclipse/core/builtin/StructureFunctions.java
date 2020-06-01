@@ -1741,7 +1741,7 @@ public class StructureFunctions {
 					}
 					return shallowCopy;
 				} catch (RuntimeException rex) {
-					// if (Config.SHOW_STACKTRACE) {
+					// if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 					// }
 

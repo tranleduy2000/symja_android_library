@@ -106,14 +106,12 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
     /**
      * Determine all patterns (i.e. all objects of instance IPattern) in the given expression
-     *
+     * <p>
      * Increments this classes pattern counter.
      *
      * @param patternIndexMap
-     * @param lhsPatternExpr
-     *            the (left-hand-side) expression which could contain pattern objects.
-     * @param treeLevel
-     *            the level of the tree where the patterns are determined
+     * @param lhsPatternExpr  the (left-hand-side) expression which could contain pattern objects.
+     * @param treeLevel       the level of the tree where the patterns are determined
      */
     static int determinePatternsRecursive(final List<IExpr> patternIndexMap, final IAST lhsPatternExpr, final int[] priority,
                                           final boolean[] ruleWithoutPattern, final int treeLevel) {
@@ -174,6 +172,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
         // listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;
         return listEvalFlags[0];
     }
+
     @Override
     public abstract IPatternMap clone();
 
@@ -197,6 +196,14 @@ public abstract class IPatternMapImpl implements IPatternMap {
         return true;
     }
 
+    /**
+     * Substitute all patterns and symbols in the given expression with the current value of the corresponding internal
+     * pattern values arrays
+     *
+     * @param lhsPatternExpr    left-hand-side expression which may contain pattern objects
+     * @param onlyNamedPatterns TODO
+     * @return <code>F.NIL</code> if substitutions isn't possible
+     */
     @Override
     public IExpr substitutePatternOrSymbols(IExpr lhsPatternExpr, final boolean onlyNamedPatterns) {
         VisitorReplaceAllWithPatternFlags visitor = new VisitorReplaceAllWithPatternFlags(new Function<IExpr, IExpr>() {
@@ -289,7 +296,17 @@ public abstract class IPatternMapImpl implements IPatternMap {
         @Override
         public IPatternMap clone() {
             return new PatternMap0();
-        };
+        }
+
+        ;
+
+        @Override
+        public String toString() {
+            StringBuilder buf = new StringBuilder();
+            buf.append("Patterns[");
+            buf.append("]");
+            return buf.toString();
+        }
 
         @Override
         public IExpr[] copyPattern() {
@@ -322,7 +339,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         @Override
-        public IExpr getValue(@Nonnull IPatternObject pattern) {
+        public IExpr getValue(IPatternObject pattern) {
             return null;
         }
 
@@ -340,10 +357,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return true;
         }
 
-        public boolean isValueAssigned() {
-            return false;
-        }
-
         @Override
         public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
             return true;
@@ -352,6 +365,10 @@ public abstract class IPatternMapImpl implements IPatternMap {
         @Override
         public boolean isRuleWithoutPatterns() {
             return true;
+        }
+
+        public boolean isValueAssigned() {
+            return false;
         }
 
         @Override
@@ -387,17 +404,11 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return lhsPatternExpr;
         }
 
+        ;
+
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
             return rhsExpr;
-        };
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append("]");
-            return buf.toString();
         }
     }
 
@@ -415,7 +426,24 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.fSymbol1 = this.fSymbol1;
             result.fValue1 = this.fValue1;
             return result;
-        };
+        }
+
+        ;
+
+        @Override
+        public String toString() {
+            StringBuilder buf = new StringBuilder();
+            buf.append("Patterns[");
+            buf.append(fSymbol1.toString());
+            buf.append(" => ");
+            if (fValue1 != null) {
+                buf.append(fValue1.toString());
+            } else {
+                buf.append("?");
+            }
+            buf.append("]");
+            return buf.toString();
+        }
 
         @Override
         public IExpr[] copyPattern() {
@@ -459,7 +487,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         @Override
-        public IExpr getValue(@Nonnull IPatternObject pattern) {
+        public IExpr getValue(IPatternObject pattern) {
             IExpr sym = pattern.getSymbol();
             if (sym == null) {
                 sym = pattern;
@@ -488,15 +516,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return fValue1 != null;
         }
 
-        public boolean isValueAssigned() {
-            if (fValue1 != null) {
-                if (fSymbol1 instanceof ISymbol) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         @Override
         public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
             if (isAllPatternsAssigned()) {
@@ -513,6 +532,15 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
         @Override
         public boolean isRuleWithoutPatterns() {
+            return false;
+        }
+
+        public boolean isValueAssigned() {
+            if (fValue1 != null) {
+                if (fSymbol1 instanceof ISymbol) {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -572,6 +600,8 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return F.NIL;
         }
 
+        ;
+
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
             return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
@@ -586,21 +616,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return F.NIL;
                 }
             }).orElse(rhsExpr);
-        };
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append(fSymbol1.toString());
-            buf.append(" => ");
-            if (fValue1 != null) {
-                buf.append(fValue1.toString());
-            } else {
-                buf.append("?");
-            }
-            buf.append("]");
-            return buf.toString();
         }
     }
 
@@ -622,7 +637,34 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.fSymbol2 = this.fSymbol2;
             result.fValue2 = this.fValue2;
             return result;
-        };
+        }
+
+        ;
+
+        @Override
+        public String toString() {
+            StringBuilder buf = new StringBuilder();
+            buf.append("Patterns[");
+            buf.append(fSymbol1.toString());
+            buf.append(" => ");
+            if (fValue1 != null) {
+                buf.append(fValue1.toString());
+            } else {
+                buf.append("?");
+            }
+
+            buf.append(", ");
+            buf.append(fSymbol2.toString());
+            buf.append(" => ");
+            if (fValue2 != null) {
+                buf.append(fValue2.toString());
+            } else {
+                buf.append("?");
+            }
+
+            buf.append("]");
+            return buf.toString();
+        }
 
         @Override
         public IExpr[] copyPattern() {
@@ -675,7 +717,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         @Override
-        public IExpr getValue(@Nonnull IPatternObject pattern) {
+        public IExpr getValue(IPatternObject pattern) {
             IExpr sym = pattern.getSymbol();
             if (sym == null) {
                 sym = pattern;
@@ -713,21 +755,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         @Override
-        public boolean isValueAssigned() {
-            if (fValue1 != null) {
-                if (fSymbol1 instanceof ISymbol) {
-                    return true;
-                }
-            }
-            if (fValue2 != null) {
-                if (fSymbol2 instanceof ISymbol) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
         public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
             if (isAllPatternsAssigned()) {
                 return true;
@@ -743,6 +770,21 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
         @Override
         public boolean isRuleWithoutPatterns() {
+            return false;
+        }
+
+        @Override
+        public boolean isValueAssigned() {
+            if (fValue1 != null) {
+                if (fSymbol1 instanceof ISymbol) {
+                    return true;
+                }
+            }
+            if (fValue2 != null) {
+                if (fSymbol2 instanceof ISymbol) {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -817,6 +859,8 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return F.NIL;
         }
 
+        ;
+
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
             return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
@@ -834,31 +878,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return F.NIL;
                 }
             }).orElse(rhsExpr);
-        };
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append(fSymbol1.toString());
-            buf.append(" => ");
-            if (fValue1 != null) {
-                buf.append(fValue1.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append(", ");
-            buf.append(fSymbol2.toString());
-            buf.append(" => ");
-            if (fValue2 != null) {
-                buf.append(fValue2.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append("]");
-            return buf.toString();
         }
     }
 
@@ -884,7 +903,43 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.fSymbol3 = this.fSymbol3;
             result.fValue3 = this.fValue3;
             return result;
-        };
+        }
+
+        ;
+
+        @Override
+        public String toString() {
+            StringBuilder buf = new StringBuilder();
+            buf.append("Patterns[");
+            buf.append(fSymbol1.toString());
+            buf.append(" => ");
+            if (fValue1 != null) {
+                buf.append(fValue1.toString());
+            } else {
+                buf.append("?");
+            }
+
+            buf.append(", ");
+            buf.append(fSymbol2.toString());
+            buf.append(" => ");
+            if (fValue2 != null) {
+                buf.append(fValue2.toString());
+            } else {
+                buf.append("?");
+            }
+
+            buf.append(", ");
+            buf.append(fSymbol3.toString());
+            buf.append(" => ");
+            if (fValue3 != null) {
+                buf.append(fValue3.toString());
+            } else {
+                buf.append("?");
+            }
+
+            buf.append("]");
+            return buf.toString();
+        }
 
         @Override
         public IExpr[] copyPattern() {
@@ -946,7 +1001,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         @Override
-        public IExpr getValue(@Nonnull IPatternObject pattern) {
+        public IExpr getValue(IPatternObject pattern) {
             IExpr sym = pattern.getSymbol();
             if (sym == null) {
                 sym = pattern;
@@ -990,6 +1045,25 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
 
         @Override
+        public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
+            if (isAllPatternsAssigned()) {
+                return true;
+            }
+            return substitutedExpr.isFree(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    // compare object references with operator '==' here !
+                    return (fSymbol1 != x) && (fSymbol2 != x) && (fSymbol3 != x);
+                }
+            }, true);
+        }
+
+        @Override
+        public boolean isRuleWithoutPatterns() {
+            return false;
+        }
+
+        @Override
         public boolean isValueAssigned() {
             if (fValue1 != null) {
                 if (fSymbol1 instanceof ISymbol) {
@@ -1006,25 +1080,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return true;
                 }
             }
-            return false;
-        }
-
-        @Override
-        public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
-            if (isAllPatternsAssigned()) {
-                return true;
-            }
-            return substitutedExpr.isFree(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
-                    // compare object references with operator '==' here !
-                    return (fSymbol1 != x) && (fSymbol2 != x) && (fSymbol3 != x);
-                }
-            }, true);
-        }
-
-        @Override
-        public boolean isRuleWithoutPatterns() {
             return false;
         }
 
@@ -1114,6 +1169,8 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return F.NIL;
         }
 
+        ;
+
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
             return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
@@ -1134,40 +1191,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return F.NIL;
                 }
             }).orElse(rhsExpr);
-        };
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append(fSymbol1.toString());
-            buf.append(" => ");
-            if (fValue1 != null) {
-                buf.append(fValue1.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append(", ");
-            buf.append(fSymbol2.toString());
-            buf.append(" => ");
-            if (fValue2 != null) {
-                buf.append(fValue2.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append(", ");
-            buf.append(fSymbol3.toString());
-            buf.append(" => ");
-            if (fValue3 != null) {
-                buf.append(fValue3.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append("]");
-            return buf.toString();
         }
     }
 
@@ -1226,6 +1249,30 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return result;
         }
 
+        @Override
+        public String toString() {
+            if (fSymbolsOrPattern != null) {
+                StringBuilder buf = new StringBuilder();
+                buf.append("Patterns[");
+                int length = fSymbolsOrPattern.length;
+                for (int i = 0; i < length; i++) {
+                    buf.append(fSymbolsOrPattern[i].toString());
+                    buf.append(" => ");
+                    if (fSymbolsOrPatternValues[i] != null) {
+                        buf.append(fSymbolsOrPatternValues[i].toString());
+                    } else {
+                        buf.append("?");
+                    }
+                    if (i < length - 1) {
+                        buf.append(", ");
+                    }
+                }
+                buf.append("]");
+                return buf.toString();
+            }
+            return "PatternMap[]";
+        }
+
         /**
          * Copy the current values into a new array.
          *
@@ -1255,7 +1302,9 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int get(IExpr patternOrSymbol) {
             final int length = fSymbolsOrPattern.length;
@@ -1295,11 +1344,10 @@ public abstract class IPatternMapImpl implements IPatternMap {
         /**
          * Return the matched value for the given pattern object
          *
-         * @param pattern
-         *            the pattern object
+         * @param pattern the pattern object
          * @return <code>null</code> if no matched expression exists
          */
-        public IExpr getValue(@Nonnull IPatternObject pattern) {
+        public IExpr getValue(IPatternObject pattern) {
             ISymbol sym = pattern.getSymbol();
             if (sym != null) {
                 return val(sym);
@@ -1307,18 +1355,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             IExpr temp = pattern;
 
             int indx = get(temp);
-            return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
-        }
-
-        /**
-         * Return the matched value for the given symbol
-         *
-         * @param symbol
-         *            the symbol
-         * @return <code>null</code> if no matched expression exists
-         */
-        public final IExpr val(@Nonnull ISymbol symbol) {
-            int indx = get(symbol);
             return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
         }
 
@@ -1361,30 +1397,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return true;
         }
 
-        public boolean isValueAssigned() {
-            if (fSymbolsOrPatternValues != null) {
-                // at least one pattern has a value assigned?
-                final int length = fSymbolsOrPatternValues.length;
-                for (int i = 0; i < length; i++) {
-                    if (fSymbolsOrPatternValues[i] != null) {
-                        if (fSymbolsOrPattern[i] instanceof ISymbol) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Returns true if the given expression contains no patterns
-         *
-         * @return
-         */
-        public boolean isRuleWithoutPatterns() {
-            return fRuleWithoutPattern;
-        }
-
         /**
          * Check if the substituted expression still contains a symbol of a pattern expression.
          *
@@ -1412,6 +1424,30 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
             }
             return true;
+        }
+
+        /**
+         * Returns true if the given expression contains no patterns
+         *
+         * @return
+         */
+        public boolean isRuleWithoutPatterns() {
+            return fRuleWithoutPattern;
+        }
+
+        public boolean isValueAssigned() {
+            if (fSymbolsOrPatternValues != null) {
+                // at least one pattern has a value assigned?
+                final int length = fSymbolsOrPatternValues.length;
+                for (int i = 0; i < length; i++) {
+                    if (fSymbolsOrPatternValues[i] != null) {
+                        if (fSymbolsOrPattern[i] instanceof ISymbol) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         /**
@@ -1479,7 +1515,9 @@ public abstract class IPatternMapImpl implements IPatternMap {
             // throw new IllegalStateException("Patternsequence:" + pattern + " is not available");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int size() {
             if (fSymbolsOrPattern != null) {
@@ -1503,9 +1541,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
          * Substitute all symbols in the given expression with the current value of the corresponding internal pattern
          * values arrays
          *
-         * @param rhsExpr
-         *            right-hand-side expression, substitute all symbols from the pattern-matching values
-         *
+         * @param rhsExpr right-hand-side expression, substitute all symbols from the pattern-matching values
          * @return
          */
         public IExpr substituteSymbols(final IExpr rhsExpr) {
@@ -1532,28 +1568,15 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return rhsExpr;
         }
 
-        @Override
-        public String toString() {
-            if (fSymbolsOrPattern != null) {
-                StringBuilder buf = new StringBuilder();
-                buf.append("Patterns[");
-                int length = fSymbolsOrPattern.length;
-                for (int i = 0; i < length; i++) {
-                    buf.append(fSymbolsOrPattern[i].toString());
-                    buf.append(" => ");
-                    if (fSymbolsOrPatternValues[i] != null) {
-                        buf.append(fSymbolsOrPatternValues[i].toString());
-                    } else {
-                        buf.append("?");
-                    }
-                    if (i < length - 1) {
-                        buf.append(", ");
-                    }
-                }
-                buf.append("]");
-                return buf.toString();
-            }
-            return "PatternMap[]";
+        /**
+         * Return the matched value for the given symbol
+         *
+         * @param symbol the symbol
+         * @return <code>null</code> if no matched expression exists
+         */
+        public final IExpr val(ISymbol symbol) {
+            int indx = get(symbol);
+            return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
         }
 
         public IExpr[] getSymbolsOrPattern() {

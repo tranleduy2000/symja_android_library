@@ -24,6 +24,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 /**
  * <pre>
@@ -195,7 +196,7 @@ public class NIntegrate extends AbstractFunctionEvaluator {
 					} catch (MathRuntimeException mre) {
 						engine.printMessage(ast.topHead(), mre);
 					} catch (Exception e) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							e.printStackTrace();
 						}
 						engine.printMessage("NIntegrate: "+"(method=" + method + ") " + e.getMessage());

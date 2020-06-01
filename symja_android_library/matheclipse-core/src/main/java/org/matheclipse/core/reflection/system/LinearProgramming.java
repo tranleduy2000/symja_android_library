@@ -149,7 +149,7 @@ public class LinearProgramming extends AbstractFunctionEvaluator {
 		} catch (MathRuntimeException mre) {
 			// throw new WrappedException(oe);
 			return engine.printMessage(ast.topHead(), mre);
-			// if (Config.SHOW_STACKTRACE) {
+			// if (FEConfig.SHOW_STACKTRACE) {
 			// mre.printStackTrace();
 			// }
 		}

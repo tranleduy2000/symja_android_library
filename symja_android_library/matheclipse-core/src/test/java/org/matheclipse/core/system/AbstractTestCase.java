@@ -10,6 +10,7 @@ import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.graphics.Show2SVG;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.script.engine.MathScriptEngine;
 
 import java.io.StringWriter;
@@ -30,7 +31,7 @@ public abstract class AbstractTestCase extends TestCase {
         super(name);
         Locale.setDefault(Locale.US);
         Config.SERVER_MODE = false;
-        Config.SHOW_STACKTRACE = true;
+        FEConfig.SHOW_STACKTRACE = true;
     }
 
 	public void ESameTest(String expectedString, String evalString) {

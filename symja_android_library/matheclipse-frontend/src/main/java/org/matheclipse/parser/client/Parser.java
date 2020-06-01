@@ -68,11 +68,12 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
-	 * the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
+	 * idea, how to parse the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, use '('...')' as brackets for function arguments
 	 */
 	public Parser(final boolean relaxedSyntax) {
 		this(ASTNodeFactory.MMA_STYLE_FACTORY, relaxedSyntax);
@@ -87,8 +88,10 @@ public class Parser extends Scanner {
 	 * idea, how to parse the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
-	 * @param packageMode   parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param packageMode
+	 *            parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
 	 */
 	public Parser(final boolean relaxedSyntax, boolean packageMode) {
 		this(ASTNodeFactory.MMA_STYLE_FACTORY, relaxedSyntax, packageMode);
@@ -99,12 +102,14 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
-	 * the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
+	 * idea, how to parse the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param factory       a parser factory
-	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param factory
+	 *            a parser factory
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, use '('...')' as brackets for function arguments
 	 */
 	public Parser(INodeParserFactory factory, final boolean relaxedSyntax) {
 		this(factory, relaxedSyntax, false);
@@ -115,13 +120,16 @@ public class Parser extends Scanner {
 	 * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
 	 * </p>
 	 * <p>
-	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the idea, how to parse
-	 * the operators depending on their precedence.
+	 * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser"> Operator -precedence parser</a> for the
+	 * idea, how to parse the operators depending on their precedence.
 	 * </p>
 	 * 
-	 * @param factory       a parser factory
-	 * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
-	 * @param packageMode   parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
+	 * @param factory
+	 *            a parser factory
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, use '('...')' as brackets for function arguments
+	 * @param packageMode
+	 *            parse in &quot;package mode&quot; and initialize an internal list of ASTNodes
 	 */
 	public Parser(INodeParserFactory factory, final boolean relaxedSyntax, boolean packageMode) {
 		super(packageMode, FEConfig.EXPLICIT_TIMES_OPERATOR);
@@ -230,7 +238,7 @@ public class Parser extends Scanner {
 				if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
 					Operator oper = fFactory.get("Times");
 					if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
-					return getTimes(temp);
+						return getTimesImplicit(temp);
 				}
 			}
 			}
@@ -323,7 +331,7 @@ public class Parser extends Scanner {
 					if (!fExplicitTimes) {
 						Operator oper = fFactory.get("Times");
 						if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
-							return getTimes(temp);
+							return getTimesImplicit(temp);
 						}
 					}
 		}
@@ -810,7 +818,7 @@ public class Parser extends Scanner {
 		return symbol;
 	}
 
-	private ASTNode getTimes(ASTNode temp) throws SyntaxError {
+	private ASTNode getTimesImplicit(ASTNode temp) throws SyntaxError {
 		FunctionNode func = fFactory.createAST(new SymbolNode("Times"));
 		func.add(temp);
 		do {

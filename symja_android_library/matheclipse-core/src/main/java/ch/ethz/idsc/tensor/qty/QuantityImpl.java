@@ -170,6 +170,15 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
+		if (engine.isDoubleMode() && //
+				!arg1.isInexactNumber()) {
+			try {
+				double qDouble = arg1.evalDouble();
+				return setAtCopy(1, F.num(qDouble));
+			} catch (RuntimeException rex) {
+			}
+		}
+
 		return F.NIL;
 	}
 
@@ -273,6 +282,18 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 	@Override
 	public boolean isNonNegativeResult() {
 		return arg1.isNonNegativeResult();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isNumericFunction() {
+		return arg1.isNumericFunction();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isInexactNumber()  {
+		return arg1.isInexactNumber();
 	}
 
 	/** {@inheritDoc} */
@@ -414,6 +435,11 @@ public class QuantityImpl extends AbstractAST implements IQuantity, Externalizab
 
 	@Override
 	public IExpr set(int i, IExpr object) {
+		if (i == 1) {
+			IExpr oldArg1 = arg1;
+			arg1 = object;
+			return oldArg1;
+		}
 		throw new UnsupportedOperationException();
 	}
 

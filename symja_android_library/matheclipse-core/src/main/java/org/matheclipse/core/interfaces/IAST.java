@@ -137,6 +137,10 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     int OUTPUT_MULTILINE = 0x00100000;
 
+    /**
+     * The <code>Times(...)</code> expression was determined implicitly in the expression parser.
+     */
+    int TIMES_PARSED_IMPLICIT = 0x00200000;
 
     IExpr acceptChecked(IVisitor visitor);
 

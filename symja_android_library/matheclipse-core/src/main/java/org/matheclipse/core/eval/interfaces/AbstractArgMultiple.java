@@ -16,6 +16,7 @@ import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.hash.HashedOrderlessMatcher;
 import org.matheclipse.core.patternmatching.hash.HashedPatternRules;
+import org.matheclipse.parser.client.FEConfig;
 
 /**
  *
@@ -44,12 +45,12 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 
 			while (i < tempAST.size()) {
 
-				tres = binaryOperator(null, temp, tempAST.get(i), engine);
+				tres = binaryOperator(ast, temp, tempAST.get(i), engine);
 
 				if (!tres.isPresent()) {
 
 					for (int j = i + 1; j < tempAST.size(); j++) {
-						tres = binaryOperator(null, temp, tempAST.get(j), engine);
+						tres = binaryOperator(ast, temp, tempAST.get(j), engine);
 
 						if (tres.isPresent()) {
 							evaled = true;
@@ -272,12 +273,12 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 		}
 
 		} catch (ValidateException ve) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				ve.printStackTrace();
 			}
 			return engine.printMessage(ast.topHead(), ve);
 		} catch (RuntimeException rex) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				rex.printStackTrace();
 			}
 			return engine.printMessage(ast.topHead(), rex);

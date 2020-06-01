@@ -41,8 +41,8 @@ public class Config {
 	public static final int MAX_FACTOR_LEAFCOUNT = 1000;
 
 	/**
-	 * Maximum number for the leaf count of an expression so that <code>PossibleZeroQ()</code> will try a factoring. Has to be
-	 * an int value greater 0.
+	 * Maximum number for the leaf count of an expression so that <code>PossibleZeroQ()</code> will try a factoring. Has
+	 * to be an int value greater 0.
 	 */
 	public static final int MAX_POSSIBLE_ZERO_LEAFCOUNT = 1000;
 
@@ -113,12 +113,6 @@ public class Config {
 	public final static boolean DEBUG = false;
 
 	/**
-	 * Show the stack trace, if an exception is thrown in evaluation
-	 * 
-	 */
-	public static boolean SHOW_STACKTRACE = false;
-
-	/**
 	 * Set to true if in fuzz testing mode
 	 *
 	 */
@@ -134,7 +128,7 @@ public class Config {
 	 * Show the console output, if an expression has a head symbol with attribute <code>ISymbol.CONSOLE_OUTPUT</code>.
 	 * 
 	 */
-	public final static boolean SHOW_CONSOLE = true;
+	// public final static boolean SHOW_CONSOLE = false;
 
 	/**
 	 * Show the pattern-matching evaluation steps in the console output.
@@ -265,6 +259,13 @@ public class Config {
 	 * Print trigonometric functions in lower case characters.
 	 */
 	public static boolean MATHML_TRIG_LOWERCASE = true;
+
+	/**
+	 * Set this parameter to false if you would like a <code>\\begin{pmatrix} ... \\end{pmatrix}</code> output instead
+	 * of <code>\left( \begin{array} ... \end{array} \right)</code> in TeXForm.
+	 */
+	public static boolean MATRIX_TEXFORM = true;
+
 	/**
 	 * Enable tests and functions which use the local files. Don't use <code>final</code> here because of grpc
 	 * interface.

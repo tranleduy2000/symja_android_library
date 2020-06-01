@@ -64,7 +64,7 @@ public class IQuantityStatic {
     public static IExpr of(IExpr value, String string) {
         if (value instanceof IQuantity)
             throw MathException.of(value);
-        return QuantityImpl.of(value, IUnitStatic.of(string));
+        return QuantityImpl.of(value, IUnitStatic.ofPutIfAbsent(string));
     }
 
     /**

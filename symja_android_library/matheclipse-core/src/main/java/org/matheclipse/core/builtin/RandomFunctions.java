@@ -13,6 +13,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.math.BigInteger;
 
@@ -190,7 +191,7 @@ public final class RandomFunctions {
 					} while (randomNumber.compareTo(upperLimit) > 0);
 					return F.integer(randomNumber);
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 					return engine.printMessage("RandomPrime: There are no primes in the specified interval.");

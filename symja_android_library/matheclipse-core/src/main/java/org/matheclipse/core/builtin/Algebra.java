@@ -2120,7 +2120,7 @@ public class Algebra {
 					}
 				} catch (RuntimeException rex) {
 					// System.out.println("Factor failed: " + expr.toString());
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 					return expr;
@@ -2457,11 +2457,11 @@ public class Algebra {
 				// }
 				// }
 				// } catch (ClassCastException e2) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e2.printStackTrace();
 				// }
 				// } catch (JASConversionException e2) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e2.printStackTrace();
 				// }
 				// }
@@ -3930,7 +3930,7 @@ public class Algebra {
 							}
 						}
 					} catch (JASConversionException e2) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							e2.printStackTrace();
 						}
 					}
@@ -4505,7 +4505,7 @@ public class Algebra {
 			result[2] = substitutions.replaceBackward(result[2]);
 			return result;
 		} catch (RuntimeException e) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				e.printStackTrace();
 			}
 		}

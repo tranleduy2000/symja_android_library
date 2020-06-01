@@ -82,11 +82,6 @@ public class FrobeniusSolve extends AbstractEvaluator {
 						if (result.size() >= Config.MAX_AST_SIZE) {
 							throw new ASTElementLimitExceeded(result.size());
 					}
-						if (numberOfSolutions > 0) {
-						if (--numberOfSolutions < 0) {
-							break;
-						}
-						}
 						result.append(F.List(solution));
 					}
 

@@ -639,16 +639,24 @@ public class PredicateQ {
 				}
 			}
 			if ((ast.isAST2())) {
-				final IExpr arg1 = engine.evaluate(ast.arg1());
-				IExpr arg2 = ast.arg2();
-				if (!arg2.isCondition()) {
-					try {
-						arg2 = engine.evaluate(arg2);
-					} catch (RuntimeException rte) {
-
+				IExpr arg1 = ast.arg1();
+				IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
+				IExpr arg1Evaled = engine.evaluate(arg1);
+				if (matcher.test(arg1Evaled, engine)) {
+					return F.True;
 					}
+				if (arg1Evaled.isAST()) {
+					return F.bool(matcher.test(arg1, engine));
 				}
-				return F.bool(engine.evalPatternMatcher(arg2).test(arg1, engine));
+				// if (!arg2.isCondition()) {
+				// try {
+				// arg2 = engine.evaluate(arg2);
+				// } catch (RuntimeException rte) {
+				//
+				// }
+				// }
+				// return F.bool(engine.evalPatternMatcher(arg2).test(arg1, engine));
+
 			}
 			return F.False;
 		}

@@ -3511,11 +3511,11 @@ public class MainTestCase extends AbstractTestCase {
 		// assertEquals("", xVector.toString());
 		//
 		// } catch (final ClassCastException e) {
-		// if (Config.SHOW_STACKTRACE) {
+		// if (FEConfig.SHOW_STACKTRACE) {
 		// e.printStackTrace();
 		// }
 		// } catch (final IndexOutOfBoundsException e) {
-		// if (Config.SHOW_STACKTRACE) {
+		// if (FEConfig.SHOW_STACKTRACE) {
 		// e.printStackTrace();
 		// }
 		// }

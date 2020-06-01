@@ -122,7 +122,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     public void addAttributes(final int attributes);
 
     /**
-     * Set the value of the local variable on top of the local variable stack
+	 * Set the value of this variable
+	 *
      */
     public void assign(IExpr value);
 
@@ -136,14 +137,16 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
     /**
      * Clear the associated rules for this symbol
      *
-     * @param engine the evaluation engine
+	 * @param engine
+	 *            the evaluation engine
      */
     public void clear(EvalEngine engine);
 
     /**
      * Clear all associated rules and attributes for this symbol.
      *
-     * @param engine the evaluation engine
+	 * @param engine
+	 *            the evaluation engine
      */
     public void clearAll(EvalEngine engine);
 

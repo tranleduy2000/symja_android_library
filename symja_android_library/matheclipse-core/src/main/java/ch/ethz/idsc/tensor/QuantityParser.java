@@ -25,7 +25,7 @@ public enum QuantityParser {
             if (index < last && string.substring(last + 1).trim().isEmpty())
                 return IQuantityStatic.of( //
                         F.fromString(string.substring(0, index)), //
-                        IUnitStatic.of(string.substring(index + 1, last)));
+                        IUnitStatic.ofPutIfAbsent(string.substring(index + 1, last)));
             throw new IllegalArgumentException(string);
         }
         try {

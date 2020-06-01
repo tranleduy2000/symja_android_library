@@ -19,6 +19,7 @@ import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Pattern;
@@ -818,7 +819,7 @@ public final class StringFunctions {
 				return F.NIL;
 			}
 
-			return toCharacterCode(ast.arg1().toString(), "UTF-8", F.ListAlloc());
+			return toCharacterCode(ast.arg1().toString(), "UTF-8");
 		}
 
 		@Override
@@ -830,12 +831,13 @@ public final class StringFunctions {
 			newSymbol.setAttributes(ISymbol.LISTABLE);
 		}
 
-		public static IAST toCharacterCode(final String unicodeInput, final String inputEncoding,
-				final IASTAppendable list) {
+		public static IAST toCharacterCode(final String unicodeInput, final String inputEncoding) {
 			try {
 				final String utf8String = new String(unicodeInput.getBytes(inputEncoding), "UTF-8");
 				int characterCode;
-				for (int i = 0; i < utf8String.length(); i++) {
+				final int length = utf8String.length();
+				IASTAppendable list = F.ListAlloc(length);
+				for (int i = 0; i < length; i++) {
 					characterCode = utf8String.charAt(i);
 					list.append(F.ZZ(characterCode));
 				}
@@ -873,7 +875,7 @@ public final class StringFunctions {
 //						return texParser.toExpression(arg1.toString());
 					}
 				} catch (RuntimeException rex) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
 					return F.$Aborted;
@@ -899,7 +901,7 @@ public final class StringFunctions {
 			if (ast.arg1().isString()) {
 				return ast.arg1();
 			}
-			return F.stringx(inputForm(ast.arg1(), true));
+			return F.stringx(inputForm(ast.arg1()));
 		}
 
 		@Override
@@ -1017,13 +1019,19 @@ public final class StringFunctions {
 			return buf.toString();
 			}
 		} catch (RuntimeException rex) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				rex.printStackTrace();
 			}
 		}
 		return null;
 	}
 
+	public static String inputForm(final IExpr expression) {
+		if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+			return StringFunctions.inputForm(expression, true);
+		}
+		return StringFunctions.inputForm(expression, false);
+	}
 
 	public static void initialize() {
 		Initializer.init();

@@ -10,6 +10,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 
 public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 
@@ -37,11 +38,11 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 		} catch (MathRuntimeException mre) {
 			return engine.printMessage(ast.topHead(), mre);
 		} catch (final ClassCastException e) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				e.printStackTrace();
 			}
 		} catch (final IndexOutOfBoundsException e) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				e.printStackTrace();
 			}
 		} finally {
@@ -85,7 +86,7 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 			}
 			return F.NIL;
 		} catch (final IndexOutOfBoundsException e) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				e.printStackTrace();
 			}
 		} finally {

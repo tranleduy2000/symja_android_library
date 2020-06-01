@@ -16,6 +16,7 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.KleinInvariantJRules;
+import org.matheclipse.parser.client.FEConfig;
 
 public class EllipticIntegrals {
 	/**
@@ -114,7 +115,7 @@ public class EllipticIntegrals {
 							return F.complexNum(EllipticIntegralsJS.ellipticE(zDouble, mDouble));
 					}
 					} catch (ValidateException ve) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							ve.printStackTrace();
 				}
 					} catch (RuntimeException rex) {
@@ -160,7 +161,7 @@ public class EllipticIntegrals {
 						return F.complexNum(EllipticIntegralsJS.ellipticE(Math.PI / 2.0, zDouble));
 					}
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
 				} catch (RuntimeException rex) {
@@ -261,7 +262,7 @@ public class EllipticIntegrals {
 						return F.complexNum(EllipticIntegralsJS.ellipticF(zDouble, mDouble));
 				}
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 			}
 				} catch (RuntimeException rex) {
@@ -359,7 +360,7 @@ public class EllipticIntegrals {
 						return F.complexNum(EllipticIntegralsJS.ellipticK(mDouble));
 					}
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
 				} catch (RuntimeException rex) {
@@ -445,7 +446,7 @@ public class EllipticIntegrals {
 							return F.complexNum(EllipticIntegralsJS.ellipticPi(nDouble, zDouble, mDouble));
 						}
 					} catch (ValidateException ve) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							ve.printStackTrace();
 						}
 					} catch (RuntimeException rex) {
@@ -504,7 +505,7 @@ public class EllipticIntegrals {
 						return F.complexNum(EllipticIntegralsJS.ellipticPi(nDouble, Math.PI / 2.0, mDouble));
 				}
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
 				} catch (RuntimeException rex) {
@@ -915,7 +916,7 @@ public class EllipticIntegrals {
 					// unevaluated
 					return F.NIL;
 				} catch (ValidateException ve) {
-					if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
 				} catch (RuntimeException rex) {

@@ -1,5 +1,7 @@
 package org.matheclipse.core.expression;
 
+import com.duy.lambda.BiFunction;
+import com.duy.lambda.BiPredicate;
 import com.duy.lang.DMath;
 
 import org.apfloat.Apfloat;
@@ -54,7 +56,14 @@ public class IntervalSym {
 		if (isNormalized(intervalList)) {
 			return intervalList;
 		}
-		return normalize(intervalList, EvalEngine.get());
+		IAST norm = normalize(intervalList, EvalEngine.get());
+		if (norm.isPresent()) {
+			return norm;
+		}
+		if (isNormalized(intervalList)) {
+			return intervalList;
+		}
+		return F.NIL;
 	}
 
 	/**
@@ -75,7 +84,9 @@ public class IntervalSym {
 					result.set(i, temp);
 				}
 			}
-			EvalAttributes.sort(result, INTERVAL_COMPARATOR);
+			if (EvalAttributes.sort(result, INTERVAL_COMPARATOR)) {
+				evaled = true;
+			}
 			result.addEvalFlags(IAST.BUILT_IN_EVALED);
 			if (result.size() > 2) {
 				int j = 1;
@@ -112,10 +123,13 @@ public class IntervalSym {
 				return result;
 			}
 			if (intervalList instanceof IASTMutable) {
-				EvalAttributes.sort((IASTMutable) intervalList, INTERVAL_COMPARATOR);
 				intervalList.addEvalFlags(IAST.BUILT_IN_EVALED);
-			}
+				if (EvalAttributes.sort((IASTMutable) intervalList, INTERVAL_COMPARATOR)) {
 			return intervalList;
+				}
+			}
+			return F.NIL;
+			// return intervalList;
 		} catch (RuntimeException rex) {
 			engine.printMessage("Interval: " + rex.getMessage());
 		}
@@ -152,7 +166,6 @@ public class IntervalSym {
 					if (min.greaterThan(max).isTrue()) {
 						return F.List(max, min);
 					}
-					return F.List(min, max);
 				}
 				return F.NIL;
 			}
@@ -175,7 +188,7 @@ public class IntervalSym {
 			}
 			double value = ((ISignedNumber) arg).doubleValue();
 			return F.List(F.num(DMath.nextDown(value)), //
-					F.num(DMath.nextUp(value)));
+					F.num(Math.nextUp(value)));
 		}
 		return F.List(arg, arg);
 	}
@@ -341,26 +354,41 @@ public class IntervalSym {
 	}
 
 	public static IExpr arcsinh(final IAST ast) {
-		IAST interval = normalize(ast);
-		if (interval.isPresent()) {
-			try {
-				IASTMutable result = interval.copy();
-				for (int i = 1; i < interval.size(); i++) {
-					IAST list = (IAST) interval.get(i);
-					IExpr min = list.arg1();
-					IExpr max = list.arg2();
-					if (min.isRealResult() && //
-							max.isRealResult()) {
-						result.set(i, F.List(F.ArcSinh(min), F.ArcSinh(max)));
+		return mutableResult(ast, //
+				new BiPredicate<IExpr, IExpr>() {
+					@Override
+					public boolean test(IExpr min, IExpr max) {
+						return min.isRealResult() && max.isRealResult();
 					}
-				}
-				return result;
-			} catch (RuntimeException rex) {
-				//
-			}
+				}, //
+				new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr min, IExpr max) {
+						return F.List(F.ArcSinh(min), F.ArcSinh(max));
+					}
+				});
 		}
-		return F.NIL;
-	}
+	// public static IExpr arcsinh(final IAST ast) {
+	// IAST interval = normalize(ast);
+	// if (interval.isPresent()) {
+	// try {
+	// IASTMutable result = interval.copy();
+	// for (int i = 1; i < interval.size(); i++) {
+	// IAST list = (IAST) interval.get(i);
+	// IExpr min = list.arg1();
+	// IExpr max = list.arg2();
+	// if (min.isRealResult() && //
+	// max.isRealResult()) {
+	// result.set(i, F.List(F.ArcSinh(min), F.ArcSinh(max)));
+	// }
+	// }
+	// return result;
+	// } catch (RuntimeException rex) {
+	// //
+	// }
+	// }
+	// return F.NIL;
+	// }
 
 	public static IExpr arctanh(final IAST ast) {
 		IAST interval = normalize(ast);
@@ -442,18 +470,59 @@ public class IntervalSym {
 	}
 
 	public static IExpr arcsin(final IAST ast) {
+		final EvalEngine engine = EvalEngine.get();
+		return mutableResult(ast, //
+				new BiPredicate<IExpr, IExpr>() {
+					@Override
+					public boolean test(IExpr min, IExpr max) {
+						return engine.evalTrue(F.GreaterEqual(min, F.CN1)) && engine.evalTrue(F.LessEqual(max, F.C1));
+					}
+				}, //
+				new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr min, IExpr max) {
+						return F.List(F.ArcSin(min), F.ArcSin(max));
+					}
+				});
+	}
+//	public static IExpr arcsin(final IAST ast) {
+//		IAST interval = normalize(ast);
+//		if (interval.isPresent()) {
+//			try {
+//				EvalEngine engine = EvalEngine.get();
+//				IASTMutable result = interval.copy();
+//				for (int i = 1; i < interval.size(); i++) {
+//					IAST list = (IAST) interval.get(i);
+//					IExpr min = list.arg1();
+//					IExpr max = list.arg2();
+//					if (engine.evalTrue(F.GreaterEqual(min, F.CN1)) && //
+//							engine.evalTrue(F.LessEqual(max, F.C1))) {
+//						result.set(i, F.List(F.ArcSin(min), F.ArcSin(max)));
+//					} else {
+//						return F.NIL;
+//					}
+//				}
+//				return result;
+//			} catch (RuntimeException rex) {
+//				//
+//			}
+//		}
+//		return F.NIL;
+//	}
+
+	public static IExpr mutableResult(final IAST ast, //
+									  BiPredicate<IExpr, IExpr> condition, //
+									  BiFunction<IExpr, IExpr, IExpr> function) {
 		IAST interval = normalize(ast);
 		if (interval.isPresent()) {
 			try {
-				EvalEngine engine = EvalEngine.get();
 				IASTMutable result = interval.copy();
 				for (int i = 1; i < interval.size(); i++) {
 					IAST list = (IAST) interval.get(i);
 					IExpr min = list.arg1();
 					IExpr max = list.arg2();
-					if (engine.evalTrue(F.GreaterEqual(min, F.CN1)) && //
-							engine.evalTrue(F.LessEqual(max, F.C1))) {
-						result.set(i, F.List(F.ArcSin(min), F.ArcSin(max)));
+					if (condition.test(min, max)) {
+						result.set(i, function.apply(min, max));
 					} else {
 						return F.NIL;
 					}
@@ -467,25 +536,41 @@ public class IntervalSym {
 	}
 
 	public static IExpr arctan(final IAST ast) {
-		IAST interval = normalize(ast);
-		if (interval.isPresent()) {
-			try {
-				IASTMutable result = interval.copy();
-				for (int i = 1; i < interval.size(); i++) {
-					IAST list = (IAST) interval.get(i);
-					IExpr min = list.arg1();
-					IExpr max = list.arg2();
-					if (min.isRealResult() && max.isRealResult()) {
-					result.set(i, F.List(F.ArcTan(min), F.ArcTan(max)));
-				}
-				}
-				return result;
-			} catch (RuntimeException rex) {
-				//
-			}
+		return mutableResult(ast, //
+				new BiPredicate<IExpr, IExpr>() {
+					@Override
+					public boolean test(IExpr min, IExpr max) {
+						return min.isRealResult() && max.isRealResult();
+					}
+				}, //
+				new BiFunction<IExpr, IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr min, IExpr max) {
+						return F.List(F.ArcTan(min), F.ArcTan(max));
+					}
+				});
 		}
-		return F.NIL;
-	}
+	// public static IExpr arctan(final IAST ast) {
+	// IAST interval = normalize(ast);
+	// if (interval.isPresent()) {
+	// try {
+	// IASTMutable result = interval.copy();
+	// for (int i = 1; i < interval.size(); i++) {
+	// IAST list = (IAST) interval.get(i);
+	// IExpr min = list.arg1();
+	// IExpr max = list.arg2();
+	// if (min.isRealResult() && max.isRealResult()) {
+	// result.set(i, F.List(F.ArcTan(min), F.ArcTan(max)));
+	// }
+	// }
+	// return result;
+	// } catch (RuntimeException rex) {
+	// //
+	// }
+	// }
+	// return F.NIL;
+	// }
+
 	public static IAST coth(final IAST ast) {
 		IAST interval = normalize(ast);
 		if (interval.isPresent()) {

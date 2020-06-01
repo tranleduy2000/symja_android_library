@@ -10,7 +10,7 @@ public class FEConfig {
      * Show the stack trace, if an exception is thrown in evaluation
      *
      */
-    public final static boolean SHOW_STACKTRACE = false;
+    public static boolean SHOW_STACKTRACE = false;
 
     /**
      * If <code>true</code> the parser doesn't distinguish between lower- or uppercase symbols (i.e. constants, function

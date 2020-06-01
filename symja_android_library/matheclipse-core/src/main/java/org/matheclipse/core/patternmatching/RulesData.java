@@ -16,6 +16,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.AbstractVisitor;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -391,6 +392,10 @@ public final class RulesData implements Serializable {
 			}
 		}
 
+		if (!expr.isAST()) {
+			return F.NIL;
+		}
+
 		boolean evalRHSMode = engine.isEvalRHSMode();
 		try {
 			engine.setEvalRHSMode(true);
@@ -405,7 +410,7 @@ public final class RulesData implements Serializable {
 				for (IPatternMatcher patternEvaluator : fPatternDownRules) {
 					// if (patternEvaluator.fLhsPatternExpr.isAST(F.Integrate)) {
 					// System.out.println(((IPatternMatcher) patternEvaluator).getLHSPriority());
-					// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 2932) {
+					// if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 5665) {
 					// System.out.println("Debug from this line");
 					// }
 					// }
@@ -425,7 +430,7 @@ public final class RulesData implements Serializable {
 						// if (pmEvaluator.getLHSPriority() == 6656) {
 						// System.out.println("Debug from this line");
 						// }
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							if (isShowPriority(pmEvaluator)) {
 								System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
 							}
@@ -448,7 +453,7 @@ public final class RulesData implements Serializable {
 							// patternEvaluator).getLHSPriority());
 							// // }
 							// }
-							if (Config.SHOW_STACKTRACE) {
+							if (FEConfig.SHOW_STACKTRACE) {
 								if (isShowPriority(pmEvaluator)) {
 									System.out.println("matched: " + pmEvaluator.getLHSPriority() + ": " + pmEvaluator.toString());
 								}
@@ -466,7 +471,7 @@ public final class RulesData implements Serializable {
 							}
 							return result;
 						}
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							if (isShowPriority(pmEvaluator)) {
 								System.out.print("not matched: " + pmEvaluator.getLHSPriority() + " ");
 							}

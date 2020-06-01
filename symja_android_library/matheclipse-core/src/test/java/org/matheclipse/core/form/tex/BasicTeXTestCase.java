@@ -1,15 +1,16 @@
 package org.matheclipse.core.form.tex;
 
-import junit.framework.TestCase;
+import java.io.StringWriter;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.TeXUtilities;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
-import java.io.StringWriter;
+import junit.framework.TestCase;
 
 /**
  * Tests LaTeX export function
@@ -93,9 +94,14 @@ public class BasicTeXTestCase extends TestCase {
 	}
 
 	public void testTeX012a() {
-		// check("{{{1,2,3},{4,5,6}}}", "\\begin{pmatrix} 1 & 2 & 3 \\\\\n" + " 4 & 5 & 6 \\\\\n" + "\\end{pmatrix}");
-		check("MatrixForm({{1,2,3},{4,5,6}})", //
-				"\\begin{pmatrix}\n 1 & 2 & 3 \\\\\n" + " 4 & 5 & 6 \\\\\n" + "\\end{pmatrix}");
+		check(F.MatrixForm(F.List(F.List(1, 2, 3), F.List(3, 4, 5))), //
+				"\\left(\n" + //
+						"\\begin{array}{ccc}\n" + //
+						"1 & 2 & 3 \\\\\n" + //
+						"3 & 4 & 5 \\\n" + //
+						"\\\\\n" + //
+						"\\end{array}\n" + //
+						"\\right) ");
 	}
 
 	public void testTeX012b() {
@@ -291,10 +297,13 @@ public class BasicTeXTestCase extends TestCase {
 	}
 	public void testTeX027() {
 		check(new ASTRealMatrix(new double[][] { { 1.0, 2.0, 3.0 }, { 3.3, 4.4, 5.5 } }, false), //
-				"\\begin{pmatrix}\n" + //
-				" 1.0 & 2.0 & 3.0 \\\\\n" + //
-				" 3.3 & 4.4 & 5.5 \\\\\n" + //
-				"\\end{pmatrix}");
+				"\\left(\n" + //
+						"\\begin{array}{ccc}\n" + //
+				"1.0 & 2.0 & 3.0 \\\\\n" + //
+						"3.3 & 4.4 & 5.5 \\\n" + //
+						"\\\\\n" + //
+						"\\end{array}\n" + //
+						"\\right) ");
 	}
 
 	public void testTeX028() {

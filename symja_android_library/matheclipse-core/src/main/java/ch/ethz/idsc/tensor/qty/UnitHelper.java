@@ -30,8 +30,37 @@ import java.util.regex.Pattern;
         }
     };
 
-    /* package */
-    static String requireValid(String key) {
+	/**
+	 * @param str
+	 *            for instance "A*kg^-1*s^2"
+	 * @return unit <code>null</code> if unit couldn't be found
+	 */
+	IUnit lookup(String str) {
+		IUnit unit = map.get(str);
+		if (DObjects.isNull(unit)) {
+			unit = create(str);
+			// map.put(str, unit);
+		}
+		return unit;
+	}
+
+	/**
+	 * @param str
+	 *            for instance "A*kg^-1*s^2"
+	 * @return unit <code>null</code> if unit couldn't be found
+	 */
+	IUnit lookupAndPutIfAbsent(String str) {
+		IUnit unit = map.get(str);
+		if (DObjects.isNull(unit)) {
+			unit = create(str);
+			if (unit != null) {
+				map.put(str, unit);
+			}
+		}
+		return unit;
+	}
+
+	/* package */ static String requireValid(String key) {
         if (!PATTERN.matcher(key).matches())
             throw new IllegalArgumentException(key);
         return key;
@@ -43,13 +72,14 @@ import java.util.regex.Pattern;
             // lazy initialization
             ENGINE = new EvalEngine(false);
         }
+        // Switf changed
         IExpr value = F.nilPtr();
         String key = string.trim();
         NavigableMap<String, IExpr> map = new TreeMap<>();
-        if (key.length() == 0) {
-            value = F.C1;
-            map.put(key, value);
-        } else {
+		if (key.length() != 0) {
+			// value = F.C1;
+			// map.put(key, value);
+			// } else {
             // key = requireValid(key);
             value = ENGINE.parse(key);
             if (value.isTimes()) {
@@ -82,6 +112,9 @@ import java.util.regex.Pattern;
                 map.put(key, F.C1);
             }
         }
+		if (map.size() == 0) {
+			return null;
+		}
         return new UnitImpl(map);
     }
 
@@ -96,18 +129,5 @@ import java.util.regex.Pattern;
         } else if (!exponent.isZero()) {
             map.put(key, exponent);
         }
-    }
-
-    /**
-     * @param string, for instance "A*kg^-1*s^2"
-     * @return unit
-     */
-    /* package */ IUnit lookup(String string) {
-        IUnit unit = map.get(string);
-        if (DObjects.isNull(unit)) {
-            unit = create(string);
-            map.put(string, unit);
-        }
-        return unit;
     }
 }

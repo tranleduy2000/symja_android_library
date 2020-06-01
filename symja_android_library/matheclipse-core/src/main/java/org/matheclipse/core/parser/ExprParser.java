@@ -410,7 +410,7 @@ public class ExprParser extends Scanner {
 				if (!fExplicitTimes) {
 					Operator oper = fFactory.get("Times");
 					if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
-					return getTimes(temp);
+						return getTimesImplicit(temp);
 				}
 			}
 			}
@@ -521,7 +521,7 @@ public class ExprParser extends Scanner {
 					if (!fExplicitTimes) {
 						Operator oper = fFactory.get("Times");
 						if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
-							return getTimes(temp);
+							return getTimesImplicit(temp);
 						}
 					}
 				}
@@ -1105,8 +1105,7 @@ public class ExprParser extends Scanner {
 		return symbol;
 	}
 
-	private IExpr getTimes(IExpr temp) throws SyntaxError {
-		// FunctionNode func = fFactory.createAST(new SymbolNode("Times"));
+	private IExpr getTimesImplicit(IExpr temp) throws SyntaxError {
 		IASTAppendable func = F.TimesAlloc(8);
 		func.append(temp);
 		do {
@@ -1118,6 +1117,7 @@ public class ExprParser extends Scanner {
 			}
 			getNextToken();
 		} while (fToken == TT_PRECEDENCE_OPEN);
+		func.addEvalFlags(IAST.TIMES_PARSED_IMPLICIT);
 		return func;
 	}
 
@@ -1161,36 +1161,6 @@ public class ExprParser extends Scanner {
 			fEngine.setNumericPrecision(precision);
 		}
 		return temp;
-	}
-
-	/**
-	 * Parse a list of comma separated expressions
-	 *
-	 * @param expression
-	 * @return
-	 * @throws SyntaxError
-	 */
-	public IExpr parseFuzzyList(final String expression) throws SyntaxError {
-		initialize(expression);
-		fRecursionDepth++;
-		IASTAppendable function = null;
-		try {
-			function = F.ListAlloc(16);
-			do {
-				function.append(parseExpression());
-				if (fToken != TT_COMMA) {
-					break;
-				}
-				getNextToken();
-				if (fToken == TT_EOF) {
-					break;
-				}
-			} while (true);
-
-		} finally {
-			fRecursionDepth--;
-		}
-		return function;
 	}
 
 	private IExpr parseArguments(IExpr head) {
@@ -1239,7 +1209,7 @@ public class ExprParser extends Scanner {
 		return null;
 	}
 
-	private IExpr parseExpression() {
+	protected IExpr parseExpression() {
 		if (fToken == TT_SPAN) {
 			IASTAppendable span = F.ast(F.Span);
 			span.append(F.C1);
@@ -1324,8 +1294,13 @@ public class ExprParser extends Scanner {
 					// lazy evaluation of multiplication
 					oper = fFactory.get("Times");
 					if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
+						if (Config.FUZZY_PARSER && fToken == TT_IDENTIFIER) {
+							rhs = parseExpression();
+						} else {
 						rhs = parseLookaheadOperator(oper.getPrecedence());
-						lhs = F.$(F.$s(oper.getFunctionName()), lhs, rhs);
+						}
+						lhs = F.$(F.Times, lhs, rhs);
+						((IAST) lhs).addEvalFlags(IAST.TIMES_PARSED_IMPLICIT);
 						continue;
 					}
 				}

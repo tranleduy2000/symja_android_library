@@ -1471,11 +1471,11 @@ public final class LinearAlgebra {
 				}
 
 				// } catch (final ClassCastException e) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e.printStackTrace();
 				// }
 				// } catch (final IndexOutOfBoundsException e) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e.printStackTrace();
 				// }
 			} catch (final MathRuntimeException mre) {
@@ -1487,7 +1487,7 @@ public final class LinearAlgebra {
                 }
 				engine.printMessage(ast.topHead() + ": " + e.getMessage());
 				// } catch (final org.hipparchus.exception.MathRuntimeException e) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e.printStackTrace();
 				// }
             } finally {
@@ -3051,16 +3051,16 @@ public final class LinearAlgebra {
                 return Convert.matrix2List(resultMatrix);
 
 				// } catch (final ClassCastException e) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e.printStackTrace();
 				// }
 				// } catch (final ArithmeticException e) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e.printStackTrace();
 				// }
 				// throw new NonNegativeIntegerExpected(ast, 2);
 				// } catch (final IndexOutOfBoundsException e) {
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// e.printStackTrace();
 				// }
 				}

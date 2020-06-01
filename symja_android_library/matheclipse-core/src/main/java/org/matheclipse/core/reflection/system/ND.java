@@ -25,6 +25,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.QuarticSolver;
+import org.matheclipse.parser.client.FEConfig;
 
 /**
  * <pre><code>ND(function, x, value)
@@ -68,7 +69,7 @@ public class ND extends AbstractFunctionEvaluator {
 				return partialDerivative(arg1, (ISymbol) arg2, 1, arg3, engine);
 			}
 		} catch (ValidateException ve) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				ve.printStackTrace();
 			}
 		} catch (RuntimeException rex) {
@@ -95,7 +96,7 @@ public class ND extends AbstractFunctionEvaluator {
 			return F.num(f.value(factory.variable(0, a3Double)).getPartialDerivative(order));
 		}
 		// } catch (ValidateException ve) {
-		// if (Config.SHOW_STACKTRACE) {
+		// if (FEConfig.SHOW_STACKTRACE) {
 		// ve.printStackTrace();
 		// }
 		// } catch (RuntimeException rex) {

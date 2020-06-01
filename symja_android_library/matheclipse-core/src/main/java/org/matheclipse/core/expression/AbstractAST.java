@@ -1296,9 +1296,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if (isAST(F.N, 3)) {
 			long determinedPrecision = arg1().determinePrecision();
 			if (determinedPrecision > 0) {
-				if (determinedPrecision >= precision) {
-					return determinedPrecision;
-				}
+				return determinedPrecision;
 			}
 			int p = arg2().toIntDefault();
 			if (p >= Config.MACHINE_PRECISION) {
@@ -2709,11 +2707,15 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public final boolean isFreeAST(Predicate<IExpr> predicate) {
+		if (predicate.test(this)) {
+			return false;
+		}
 		if (predicate.test(head())) {
 			return false;
 		}
 		for (int i = 1; i < size(); i++) {
-			if (get(i).isAST() && !get(i).isFreeAST(predicate)) {
+			IExpr arg = get(i);
+			if (arg.isAST() && !arg.isFreeAST(predicate)) {
 				return false;
 			}
 		}
@@ -3720,6 +3722,21 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return false;
 		}
 		return engine.evalRules(symbol, this).isPresent();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final boolean isVariable() {
+		if (!head().isSymbol() || headID() >= 0) {
+			return false;
+		}
+		for (int i = 1; i < size(); i++) {
+			IExpr arg = get(i);
+			if (!arg.isVariable()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/** {@inheritDoc} */

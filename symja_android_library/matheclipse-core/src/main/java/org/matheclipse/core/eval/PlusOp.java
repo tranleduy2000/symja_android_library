@@ -9,6 +9,7 @@ import org.matheclipse.core.expression.IntervalSym;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.util.HashMap;
@@ -337,7 +338,7 @@ public final class PlusOp {
                 evaled = true;
         }
 		} catch (MathException mex) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				mex.printStackTrace();
 			}
 		}

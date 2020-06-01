@@ -19,6 +19,7 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IIterator;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.SumRules;
+import org.matheclipse.parser.client.FEConfig;
 
 import static org.matheclipse.core.expression.F.BernoulliB;
 import static org.matheclipse.core.expression.F.Binomial;
@@ -202,7 +203,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			// }
 				}
 			} catch (final ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				// see level specification
@@ -421,7 +422,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 			// engine.printMessage("Sum: Recursionlimit exceeded");
 			// return F.NIL;
 			// } catch (RuntimeException rex) {
-			// if (Config.SHOW_STACKTRACE) {
+			// if (FEConfig.SHOW_STACKTRACE) {
 			// rex.printStackTrace();
 			// }
 			// }finally {

@@ -61,7 +61,7 @@ public class Compile extends AbstractCoreFunctionEvaluator {
 //				AbstractFunctionEvaluator fun = (AbstractFunctionEvaluator) clazz.newInstance();
 //				return DataExpr.newInstance(F.CompiledFunction, fun);
 //			} catch (Exception rex) {
-//				if (Config.SHOW_STACKTRACE) {
+//				if (FEConfig.SHOW_STACKTRACE) {
 //					rex.printStackTrace();
 //				}
 //				return engine.printMessage("Compile: " + rex.getMessage());

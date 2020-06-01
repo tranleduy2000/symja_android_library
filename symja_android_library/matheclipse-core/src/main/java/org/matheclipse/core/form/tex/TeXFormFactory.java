@@ -349,32 +349,34 @@ public class TeXFormFactory {
 			int[] dims = ast.isMatrix();
 			if (dims != null) {
 				// create a LaTeX matrix
-					// problem with KaTeX?
-					// buf.append("\\left(\n\\begin{array}{");
-					// for (int i = 0; i < dims[1]; i++) {
-					// buf.append("c");
-					// }
-					// buf.append("}\n");
-					// if (ast.size() > 1) {
-					// for (int i = 1; i < ast.size(); i++) {
-					// IAST row = ast.getAST(i);
-					// for (int j = 1; j < row.size(); j++) {
-					// fFactory.convert(buf, row.get(j), 0);
-					// if (j < row.argSize()) {
-					// buf.append(" & ");
-					// }
-					// }
-					// if (i < ast.argSize()) {
-					// buf.append(" \\\\\n");
-					// } else {
-					//
-					// buf.append(" \n");
-					// }
-					// }
-					// }
-					// buf.append("\\end{array}\n\\right) ");
 
 					final IAST matrix = ast;
+
+					if (Config.MATRIX_TEXFORM) {
+					// problem with KaTeX?
+						buf.append("\\left(\n\\begin{array}{");
+						for (int i = 0; i < dims[1]; i++) {
+							buf.append("c");
+						}
+						buf.append("}\n");
+						if (ast.size() > 1) {
+							for (int i = 1; i < ast.size(); i++) {
+								IAST row = ast.getAST(i);
+								for (int j = 1; j < row.size(); j++) {
+									fFactory.convert(buf, row.get(j), 0);
+									if (j < row.argSize()) {
+										buf.append(" & ");
+									}
+								}
+								if (i < ast.argSize()) {
+									buf.append(" \\\\\n");
+								} else {
+									buf.append(" \\\n");
+								}
+							}
+						}
+						buf.append("\\\\\n\\end{array}\n\\right) ");
+					} else {
 					buf.append("\\begin{pmatrix}\n");
 					IAST row;
 					for (int i = 1; i < matrix.size(); i++) {
@@ -391,6 +393,7 @@ public class TeXFormFactory {
 					}
 
 					buf.append("\\end{pmatrix}");
+					}
 					return true;
 						}
 					}
@@ -468,6 +471,31 @@ public class TeXFormFactory {
 				}
 			} else {
 				final IAST matrix = (IAST) f.arg1();
+				if (Config.MATRIX_TEXFORM) {
+					// problem with KaTeX?
+					buf.append("\\left(\n\\begin{array}{");
+					for (int i = 0; i < dims[1]; i++) {
+						buf.append("c");
+					}
+					buf.append("}\n");
+					if (matrix.size() > 1) {
+						for (int i = 1; i < matrix.size(); i++) {
+							IAST row = matrix.getAST(i);
+							for (int j = 1; j < row.size(); j++) {
+								fFactory.convert(buf, row.get(j), 0);
+								if (j < row.argSize()) {
+									buf.append(" & ");
+								}
+							}
+							if (i < matrix.argSize()) {
+								buf.append(" \\\\\n");
+							} else {
+								buf.append(" \\\n");
+							}
+						}
+					}
+					buf.append("\\\\\n\\end{array}\n\\right) ");
+				} else {
 				buf.append("\\begin{pmatrix}\n");
 				IAST row;
 				for (int i = 1; i < matrix.size(); i++) {
@@ -484,6 +512,7 @@ public class TeXFormFactory {
 				}
 
 				buf.append("\\end{pmatrix}");
+			}
 			}
 			return true;
 		}
@@ -1613,9 +1642,6 @@ public class TeXFormFactory {
 			return;
 		}
 		final boolean isNegative = d.isNegative();
-		if (isNegative && (precedence > plusPrec)) {
-			buf.append("\\left( ");
-		}
 		if (d instanceof Num) {
 			convertDoubleString(buf, convertDoubleToFormattedString(d.getRealPart()), precedence, isNegative);
 		} else {

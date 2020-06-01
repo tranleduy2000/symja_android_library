@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 
@@ -135,7 +136,8 @@ public class ExprEvaluator {
 	private Map<ISymbol, IExpr> fVariableMap;
 	private final List<ISymbol> fVariables;
 
-	private final EvalEngine engine;
+	// Quit() function may set a new engine,so "final" is not possible here
+	private EvalEngine engine;
 
 	private IExpr fExpr;
 
@@ -205,7 +207,6 @@ public class ExprEvaluator {
 	 * Define a given variable on the <b>local variable stack</b> without assigning a value.
 	 * 
 	 * @param variable
-	 * @param value
 	 */
 	public ISymbol defineVariable(ISymbol variable) {
 		return defineVariable(variable, null);
@@ -243,7 +244,6 @@ public class ExprEvaluator {
 	 * Define a given variable name on the <b>local variable stack</b> without assigning a value.
 	 * 
 	 * @param variableName
-	 * @param value
 	 */
 	public ISymbol defineVariable(String variableName) {
 		return defineVariable(F.symbol(variableName, engine), null);
@@ -332,6 +332,7 @@ public class ExprEvaluator {
 	public IExpr eval(final IExpr expr) {
 		fExpr = expr;
 		// F.join();
+		try {
 		EvalEngine.set(engine);
 		engine.reset();
 		IExpr preRead = F.$PreRead.assignedValue();
@@ -345,6 +346,10 @@ public class ExprEvaluator {
 			engine.addOut(temp);
 		}
 		return temp;
+		} finally {
+			// Quit may set a new engine
+			engine = EvalEngine.get();
+		}
 	}
 
 	/**
@@ -442,12 +447,12 @@ public class ExprEvaluator {
 					work.setExpr(fExpr);
 				try {
 					F.await();
-						TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor); // Executors.newSingleThreadExecutor());
+						TimeLimiter timeLimiter = SimpleTimeLimiter.create(executor);
 					return timeLimiter.callWithTimeout(work, timeoutDuration, timeUnit);
 					} catch (org.matheclipse.core.eval.exception.TimeoutException e) {
 					return F.$Aborted;
 				} catch (java.util.concurrent.TimeoutException e) {
-						if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 							e.printStackTrace();
 						}
 						// Throwable t = e.getCause();
@@ -455,14 +460,14 @@ public class ExprEvaluator {
 						// throw (RuntimeException) t;
 						// }
 					return F.$Aborted;
-				} catch (com.gx.common.util.concurrent.UncheckedTimeoutException e) {
+					} catch (com.gx.common.util.concurrent.UncheckedTimeoutException e) {
 						// Throwable t = e.getCause();
 						// if (t instanceof RuntimeException) {
 						// throw (RuntimeException) t;
 						// }
 					return F.$Aborted;
 				} catch (Exception e) {
-					if (Config.SHOW_STACKTRACE) {
+						if (FEConfig.SHOW_STACKTRACE) {
 						e.printStackTrace();
 					}
 					return F.Null;

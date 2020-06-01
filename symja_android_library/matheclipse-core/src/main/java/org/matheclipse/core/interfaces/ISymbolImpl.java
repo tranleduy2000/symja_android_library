@@ -33,10 +33,37 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
         return assignedValue();
     }
 
+    /**
+     * Gives <code>true</code> if the system is in server mode and cannot be modified
+     *
+     * @return
+     */
+    @Override
+    public boolean isNumericFunctionAttribute() {
+        return ((getAttributes() & NUMERICFUNCTION) == NUMERICFUNCTION);
+    }
+
+    @Override
+    public boolean isProtected() {
+        return ((getAttributes() & PROTECTED) == PROTECTED) && !Config.DISABLE_PROTECTED_ATTR;
+
+    }
+
+    @Override
+    public boolean isSymbolID(int... ids) {
+        return false;
+    }
+
     public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
         return F.NIL;
     }
 
+    /**
+     * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
+     *
+     * @param args the arguments for which this function symbol should be evaluated
+     * @return
+     */
     @Override
     public IExpr of(Number... args) {
         IExpr[] array = new IExpr[args.length];
@@ -75,6 +102,11 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     }
 
     @Override
+    public boolean isConstantAttribute() {
+        return (getAttributes() & CONSTANT) == CONSTANT;
+    }
+
+    @Override
     public IExpr[] linear(IExpr variable) {
         if (this.equals(variable)) {
             return new IExpr[]{F.C0, F.C1};
@@ -82,31 +114,10 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
         return new IExpr[]{this, F.C0};
     }
 
-    @Override
-    public boolean isNumericFunctionAttribute() {
-        return ((getAttributes() & NUMERICFUNCTION) == NUMERICFUNCTION);
-    }
-
-    @Override
-    public boolean isProtected() {
-        return ((getAttributes() & PROTECTED) == PROTECTED) && !Config.DISABLE_PROTECTED_ATTR;
-
-    }
-
-    @Override
-    public boolean isSymbolID(int... ids) {
-        return false;
-    }
-
     public IExpr[] linearPower(IExpr variable) {
         if (this.equals(variable)) {
-            return new IExpr[] { F.C0, F.C1, F.C1 };
+            return new IExpr[]{F.C0, F.C1, F.C1};
         }
-        return new IExpr[] { this, F.C0, F.C1 };
-    }
-
-    @Override
-    public boolean isConstantAttribute() {
-        return (getAttributes() & CONSTANT) == CONSTANT;
+        return new IExpr[]{this, F.C0, F.C1};
     }
 }

@@ -15,6 +15,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IIterator;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.reflection.system.rules.ProductRules;
+import org.matheclipse.parser.client.FEConfig;
 
 import static org.matheclipse.core.expression.F.C1;
 import static org.matheclipse.core.expression.F.C1D2;
@@ -140,7 +141,7 @@ public class Product extends ListFunctions.Table implements ProductRules {
 		}
 
 		} catch (final ValidateException ve) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				ve.printStackTrace();
 			}
 			return EvalEngine.get().printMessage(ve.getMessage(F.Product));
@@ -255,7 +256,7 @@ public class Product extends ListFunctions.Table implements ProductRules {
 				return F.NIL;
 			}
 			} catch (final ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				return EvalEngine.get().printMessage(ve.getMessage(F.Product));

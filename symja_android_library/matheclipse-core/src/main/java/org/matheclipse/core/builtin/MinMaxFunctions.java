@@ -30,6 +30,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.visit.VisitorExpr;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -254,7 +255,7 @@ public class MinMaxFunctions {
 					}
 				}
 			} catch (RuntimeException rex) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					rex.printStackTrace();
 				}
 			}
@@ -467,7 +468,7 @@ public class MinMaxFunctions {
 				}
 			}
 			} catch (ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), ve);
@@ -556,7 +557,7 @@ public class MinMaxFunctions {
 				}
 			}
 			} catch (ValidateException ve) {
-				if (Config.SHOW_STACKTRACE) {
+				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
 				}
 				return engine.printMessage(ast.topHead(), ve);
@@ -601,7 +602,7 @@ public class MinMaxFunctions {
 				return result;
 			} catch (MathIllegalStateException oe) {
 				throw new WrappedException(oe);
-				// if (Config.SHOW_STACKTRACE) {
+				// if (FEConfig.SHOW_STACKTRACE) {
 				// oe.printStackTrace();
 				// }
 			}

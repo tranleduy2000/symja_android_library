@@ -7,6 +7,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.parser.ExprParser;
+import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.SyntaxError;
 
 import java.io.Writer;
@@ -20,11 +21,7 @@ public class EvalUtilities extends MathMLUtilities {
 	/**
 	 * Constructor for an object which evaluates an expression. By default the internal <code>EvalEngine</code> didn't
 	 * create a history list for the <code>Out[]</code> function.
-	 * 
-	 * @param evalEngine
-	 * @param mathMTagPrefix
-	 *            if set to <code>true</code> use &quot;m:&quot; as tag prefix for the MathML output.
-	 * @param relaxedSyntax
+	 *
 	 */
 	public EvalUtilities() {
 		this(new EvalEngine(), false, false);
@@ -33,28 +30,28 @@ public class EvalUtilities extends MathMLUtilities {
 	/**
 	 * Constructor for an object which evaluates an expression.
 	 * 
-	 * @param mathMTagPrefix
+	 * @param mathMLTagPrefix
 	 *            if set to <code>true</code> use &quot;m:&quot; as tag prefix for the MathML output.
 	 * @param relaxedSyntax
 	 *            if set to <code>true</code> use &quot;(...)&quot; instead of &quot;[...]&quot; for function arguments
 	 *            (i.e. sin(...) instead of sin[...]).
 	 */
-	public EvalUtilities(final boolean mathMTagPrefix, final boolean relaxedSyntax) {
-		this(new EvalEngine(relaxedSyntax), mathMTagPrefix, relaxedSyntax);
+	public EvalUtilities(final boolean mathMLTagPrefix, final boolean relaxedSyntax) {
+		this(new EvalEngine(relaxedSyntax), mathMLTagPrefix, relaxedSyntax);
 	}
 
 	/**
 	 * Constructor for an object which evaluates an expression.
 	 * 
 	 * @param evalEngine
-	 * @param mathMTagPrefix
+	 * @param mathMLTagPrefix
 	 *            if set to <code>true</code> use &quot;m:&quot; as tag prefix for the MathML output.
 	 * @param relaxedSyntax
 	 *            if set to <code>true</code> use &quot;(...)&quot; instead of &quot;[...]&quot; for function arguments
 	 *            (i.e. sin(...) instead of sin[...]).
 	 */
-	public EvalUtilities(final EvalEngine evalEngine, final boolean mathMTagPrefix, final boolean relaxedSyntax) {
-		super(evalEngine, mathMTagPrefix, relaxedSyntax);
+	public EvalUtilities(final EvalEngine evalEngine, final boolean mathMLTagPrefix, final boolean relaxedSyntax) {
+		super(evalEngine, mathMLTagPrefix, relaxedSyntax);
 	}
 
 	/**
@@ -67,6 +64,7 @@ public class EvalUtilities extends MathMLUtilities {
 	 */
 	public IExpr evaluate(final String inputExpression) {
 		if (inputExpression != null) {
+			try {
 			startRequest();
 			EvalEngine.set(fEvalEngine);
 			fEvalEngine.reset();
@@ -76,6 +74,10 @@ public class EvalUtilities extends MathMLUtilities {
 				IExpr temp = fEvalEngine.evaluate(parsedExpression);
 				fEvalEngine.addOut(temp);
 				return temp;
+			}
+			} finally {
+				// Quit may set a new engine
+				fEvalEngine = EvalEngine.get();
 			}
 		}
 		return F.NIL;
@@ -133,6 +135,7 @@ public class EvalUtilities extends MathMLUtilities {
 	 */
 	public IExpr evaluate(final IExpr parsedExpression) {
 		if (parsedExpression != null) {
+			try {
 			// F.join();
 			startRequest();
 			EvalEngine.set(fEvalEngine);
@@ -140,16 +143,18 @@ public class EvalUtilities extends MathMLUtilities {
 			IExpr temp = fEvalEngine.evaluate(parsedExpression);
 			fEvalEngine.addOut(temp);
 			return temp;
+			} finally {
+				// Quit may set a new engine
+				fEvalEngine = EvalEngine.get();
+			}
 		}
 		return F.NIL;
 	}
 
 	/**
-	 * Converts the inputExpression string into a MathML expression and writes the result to the given
-	 * <code>Writer</code>
+	 * Converts the <code>inputExpression</code> string into a MathML expression string.
 	 * 
 	 * @param inputExpression
-	 * @param out
 	 */
 	public String toJavaForm(final String inputExpression) {
 		if (inputExpression != null) {
@@ -157,8 +162,6 @@ public class EvalUtilities extends MathMLUtilities {
 			fEvalEngine.reset();
 			ExprParser parser = new ExprParser(fEvalEngine);
 			IExpr parsedExpression = parser.parse(inputExpression);
-			// node = fEvalEngine.parseNode(inputExpression);
-			// parsedExpression = AST2Expr.CONST.convert(node, fEvalEngine);
 			return parsedExpression.internalFormString(false, 0);
 		}
 		return "";
@@ -233,7 +236,7 @@ public class EvalUtilities extends MathMLUtilities {
 				return toMathML(result, out);
 			}
 		} catch (final Throwable e) {
-			if (Config.SHOW_STACKTRACE) {
+			if (FEConfig.SHOW_STACKTRACE) {
 				e.printStackTrace();
 			}
 		}

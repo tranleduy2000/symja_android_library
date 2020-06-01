@@ -753,7 +753,7 @@ public class EvalEngine implements Serializable {
                         return result;
                     }
                 } catch (ValidateException ve) {
-                    if (Config.SHOW_STACKTRACE) {
+					if (FEConfig.SHOW_STACKTRACE) {
                         ve.printStackTrace();
                     }
                     return printMessage(ast.topHead(), ve);
@@ -1166,7 +1166,7 @@ public class EvalEngine implements Serializable {
                             if (fStopRequested) {
                                 throw TimeoutException.TIMED_OUT;
                             }
-                            if (Config.SHOW_STACKTRACE) {
+							if (FEConfig.SHOW_STACKTRACE) {
                                 if (temp.equals(result)) {
                                     // Endless iteration detected in `1` in evaluation loop.
                                     IOFunctions.printMessage(result.topHead(), "itendless", F.List(temp), this);
