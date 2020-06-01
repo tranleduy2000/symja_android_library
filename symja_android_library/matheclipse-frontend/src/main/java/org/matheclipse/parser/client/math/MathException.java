@@ -1,7 +1,5 @@
 package org.matheclipse.parser.client.math;
 
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.FEConfig;
 
 public class MathException extends RuntimeException {
@@ -35,7 +33,7 @@ public class MathException extends RuntimeException {
 	 *
 	 */
 	public MathException() {
-		super(null, null, false, false);
+		super();
 	}
 
 	public MathException(String message) {
