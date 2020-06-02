@@ -43,7 +43,6 @@ import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
-import org.matheclipse.core.expression.ComplexSym;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.IntervalSym;
@@ -4830,6 +4829,17 @@ public final class Arithmetic {
                         if (root.isEven()) {
 							// Surd is not defined for even roots of negative values.
 							IOFunctions.printMessage(ast.topHead(), "noneg", F.CEmptyList, engine);
+                            return F.Indeterminate;
+                        }
+                    }
+                }
+                // Android changed: check numeric value is integer or not
+                else if (arg2.isNumeric() && !arg2.isComplex() && arg2.isNumEqualInteger(((INum) arg2).integerPart())) {
+                    IInteger root = ((INum) arg2).integerPart();
+                    if (base.isNegative()) {
+                        if (root.isEven()) {
+                            // necessary for two double args etc
+                            engine.printMessage("Surd(a,b) - undefined for negative \"a\" and even \"b\" values");
                             return F.Indeterminate;
                         }
                     }
