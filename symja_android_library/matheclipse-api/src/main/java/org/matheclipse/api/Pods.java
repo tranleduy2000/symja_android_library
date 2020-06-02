@@ -3,10 +3,11 @@ package org.matheclipse.api;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
-import com.duy.lambda.Supplier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.gx.common.base.Supplier;
+import com.gx.common.base.Suppliers;
 
 import org.apache.commons.codec.language.Soundex;
 import org.apache.commons.lang3.StringUtils;
@@ -89,6 +90,105 @@ public class Pods {
 
     public static final Soundex SOUNDEX = new Soundex();
     public static final Trie<String, ArrayList<IPod>> SOUNDEX_MAP = Tries.forStrings();
+
+	static {
+		for (int i = 0; i < STEMS.length; i += 2) {
+			STEM_MAP.put((String) STEMS[i], (IBuiltInSymbol) STEMS[i + 1]);
+		}
+	}
+	private static Supplier<Trie<String, ArrayList<IPod>>> LAZY_SOUNDEX = Suppliers.memoize(new com.gx.common.base.Supplier<Trie<String, ArrayList<IPod>>>() {
+        @Override
+        public Trie<String, ArrayList<IPod>> get() {
+            return initSoundex();
+        }
+    });
+
+	private static Trie<String, ArrayList<IPod>> initSoundex() {
+		Map<String, String> map = AST2Expr.PREDEFINED_SYMBOLS_MAP;
+
+		IAST[] list = ElementData1.ELEMENTS;
+		for (int i = 0; i < list.length; i++) {
+			String keyWord = list[i].arg3().toString();
+			addElementData(list[i].arg2().toString().toLowerCase(), keyWord);
+			soundexElementData(list[i].arg3().toString(), keyWord);
+		}
+		for (int i = 0; i < ID.Zeta; i++) {
+			ISymbol sym = F.symbol(i);
+			soundexHelp(sym.toString().toLowerCase(), sym);
+		}
+		// for (Map.Entry<String, String> entry : map.entrySet()) {
+		// soundexHelp(entry.getKey(), entry.getKey());
+		// }
+		// appendSoundex();
+		soundexHelp("cosine", F.Cos);
+		soundexHelp("sine", F.Sin);
+		soundexHelp("integral", F.Integrate);
+
+		return SOUNDEX_MAP;
+	}
+
+	private static void soundexHelp(String key, ISymbol value) {
+		String soundex = SOUNDEX.encode(key);
+		ArrayList<IPod> list = SOUNDEX_MAP.get(soundex);
+		if (list == null) {
+			list = new ArrayList<IPod>();
+			list.add(new DocumentationPod(value));
+			SOUNDEX_MAP.put(soundex, list);
+		} else {
+			list.add(new DocumentationPod(value));
+		}
+	}
+
+	private static void soundexElementData(String key, String value) {
+		String soundex = SOUNDEX.encode(key);
+		addElementData(soundex, value);
+	}
+
+	private static void addElementData(String soundex, String value) {
+		ArrayList<IPod> list = SOUNDEX_MAP.get(soundex);
+		if (list == null) {
+			list = new ArrayList<IPod>();
+			list.add(new ElementDataPod(value));
+			SOUNDEX_MAP.put(soundex, list);
+		} else {
+			list.add(new ElementDataPod(value));
+		}
+	}
+
+	final static String JSXGRAPH_IFRAME = //
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + //
+					"\n" + //
+					"<!DOCTYPE html PUBLIC\n" + //
+					"  \"-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN\"\n" + //
+					"  \"http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd\">\n" + //
+					"\n" + //
+					"<html xmlns=\"http://www.w3.org/1999/xhtml\" style=\"width: 100%; height: 100%; margin: 0; padding: 0\">\n"
+					+ //
+					"<head>\n" + //
+					"<meta charset=\"utf-8\">\n" + //
+					"<title>JSXGraph</title>\n" + //
+					"\n" + //
+					"<body style=\"width: 100%; height: 100%; margin: 0; padding: 0\">\n" + //
+					"\n" + //
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.css\" />\n"
+					+ //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.8/build/math.js\"></script>\n"
+					+ "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.js\"\n" + //
+					"        type=\"text/javascript\"></script>\n" + //
+					"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/geonext.min.js\"\n" + //
+					"        type=\"text/javascript\"></script>\n" + //
+
+					"\n" + //
+					"<div id=\"jxgbox\" class=\"jxgbox\" style=\"display: flex; width:99%; height:99%; margin: 0; flex-direction: column; overflow: hidden\">\n"
+					+ //
+					"<script>\n" + //
+					"`1`\n" + //
+					"</script>\n" + //
+					"</div>\n" + //
+					"\n" + //
+					"</body>\n" + //
+					"</html>";//
+
     protected final static String MATHCELL_IFRAME = //
             // "<html style=\"width: 100%; height: 100%; margin: 0; padding: 0\">\n"
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + //
@@ -183,107 +283,8 @@ public class Pods {
                     "</div>\n" + //
                     "</body>\n" + //
                     "</html>";//
-    final static String JSXGRAPH_IFRAME = //
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + //
-                    "\n" + //
-                    "<!DOCTYPE html PUBLIC\n" + //
-                    "  \"-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN\"\n" + //
-                    "  \"http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd\">\n" + //
-                    "\n" + //
-                    "<html xmlns=\"http://www.w3.org/1999/xhtml\" style=\"width: 100%; height: 100%; margin: 0; padding: 0\">\n"
-                    + //
-                    "<head>\n" + //
-                    "<meta charset=\"utf-8\">\n" + //
-                    "<title>JSXGraph</title>\n" + //
-                    "\n" + //
-                    "<body style=\"width: 100%; height: 100%; margin: 0; padding: 0\">\n" + //
-                    "\n" + //
-                    "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.css\" />\n"
-                    + //
-                    "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.8/build/math.js\"></script>\n"
-                    + "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.js\"\n" + //
-                    "        type=\"text/javascript\"></script>\n" + //
-                    "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/geonext.min.js\"\n" + //
-                    "        type=\"text/javascript\"></script>\n" + //
 
-                    "\n" + //
-                    "<div id=\"jxgbox\" class=\"jxgbox\" style=\"display: flex; width:99%; height:99%; margin: 0; flex-direction: column; overflow: hidden\">\n"
-                    + //
-                    "<script>\n" + //
-                    "`1`\n" + //
-                    "</script>\n" + //
-                    "</div>\n" + //
-                    "\n" + //
-                    "</body>\n" + //
-                    "</html>";//
-    private static Supplier<Trie<String, ArrayList<IPod>>> LAZY_SOUNDEX = new Supplier<Trie<String, ArrayList<IPod>>>() {
-        @Override
-        public Trie<String, ArrayList<IPod>> get() {
-            return Pods.initSoundex();
-        }
-    };
-
-    static {
-        for (int i = 0; i < STEMS.length; i += 2) {
-            STEM_MAP.put((String) STEMS[i], (IBuiltInSymbol) STEMS[i + 1]);
-        }
-    }
-
-    private static Trie<String, ArrayList<IPod>> initSoundex() {
-        Map<String, String> map = AST2Expr.PREDEFINED_SYMBOLS_MAP;
-
-        IAST[] list = ElementData1.ELEMENTS;
-        for (int i = 0; i < list.length; i++) {
-            String keyWord = list[i].arg3().toString();
-            addElementData(list[i].arg2().toString().toLowerCase(), keyWord);
-            soundexElementData(list[i].arg3().toString(), keyWord);
-        }
-        for (int i = 0; i < ID.Zeta; i++) {
-            ISymbol sym = F.symbol(i);
-            soundexHelp(sym.toString().toLowerCase(), sym);
-        }
-        // for (Map.Entry<String, String> entry : map.entrySet()) {
-        // soundexHelp(entry.getKey(), entry.getKey());
-        // }
-        // appendSoundex();
-        soundexHelp("cosine", F.Cos);
-        soundexHelp("sine", F.Sin);
-        soundexHelp("integral", F.Integrate);
-
-        return SOUNDEX_MAP;
-    }
-
-    private static void soundexHelp(String key, ISymbol value) {
-        String soundex = SOUNDEX.encode(key);
-        ArrayList<IPod> list = SOUNDEX_MAP.get(soundex);
-        if (list == null) {
-            list = new ArrayList<IPod>();
-            list.add(new DocumentationPod(value));
-            SOUNDEX_MAP.put(soundex, list);
-        } else {
-            list.add(new DocumentationPod(value));
-        }
-    }
-
-    private static void soundexElementData(String key, String value) {
-        String soundex = SOUNDEX.encode(key);
-        addElementData(soundex, value);
-    }
-
-    private static void addElementData(String soundex, String value) {
-        ArrayList<IPod> list = SOUNDEX_MAP.get(soundex);
-        if (list == null) {
-            list = new ArrayList<IPod>();
-            list.add(new ElementDataPod(value));
-            SOUNDEX_MAP.put(soundex, list);
-        } else {
-            list.add(new ElementDataPod(value));
-        }
-    }
-
-    /**
-     * package private
-     */
+	/** package private */
     static void addSymjaPod(ArrayNode podsArray, IExpr inExpr, IExpr outExpr, String title, String scanner, int formats,
                             ObjectMapper mapper, EvalEngine engine) {
         ArrayNode temp = mapper.createArrayNode();
@@ -357,6 +358,23 @@ public class Pods {
         createJSONFormat(node, engine, outExpr, plaintext, "", formats);
     }
 
+	/** package private */
+	static void addPod(ArrayNode podsArray, IExpr inExpr, IExpr outExpr, String plaintext,String sinput,  String title, String scanner,
+			int formats, ObjectMapper mapper, EvalEngine engine) {
+		ArrayNode temp = mapper.createArrayNode();
+		ObjectNode subpodsResult = mapper.createObjectNode();
+		subpodsResult.put("title", title);
+		subpodsResult.put("scanner", scanner);
+		subpodsResult.put("error", "false");
+		subpodsResult.put("numsubpods", 1);
+		subpodsResult.putPOJO("subpods", temp);
+		podsArray.add(subpodsResult);
+
+		ObjectNode node = mapper.createObjectNode();
+		temp.add(node);
+		createJSONFormat(node, engine, outExpr, plaintext, sinput, formats);
+	}
+
     static void integerPropertiesPod(ArrayNode podsArray, IInteger inExpr, IExpr outExpr, String title, String scanner,
                                      int formats, ObjectMapper mapper, EvalEngine engine) {
         ArrayNode temp = mapper.createArrayNode();
@@ -411,9 +429,7 @@ public class Pods {
         return intern;
     }
 
-    /**
-     * package private
-     */
+	/** package private */
     static int internFormat(int intern, String str) {
         if (str.equals(HTML_STR)) {
             intern |= HTML;
@@ -925,6 +941,24 @@ public class Pods {
         return numpods;
     }
 
+	private static class LevenshteinDistanceComparator implements Comparator<IPod> {
+		static final LevenshteinDistance ld = new LevenshteinDistance(128);
+
+		String str;
+
+		public LevenshteinDistanceComparator(String str) {
+			this.str = str;
+		}
+
+		@Override
+		public int compare(IPod arg0, IPod arg1) {
+			int d0 = ld.apply(str, arg0.keyWord());
+			int d1 = ld.apply(str, arg1.keyWord());
+			return d0 > d1 ? 1 : d0 < d1 ? -1 : 0;
+		}
+
+	}
+
     private static ArrayList<IPod> listOfPods(String inputWord) {
         Map<String, ArrayList<IPod>> map = LAZY_SOUNDEX.get();
         ArrayList<IPod> soundsLike = map.get(inputWord.toLowerCase());
@@ -982,9 +1016,7 @@ public class Pods {
         return F.NIL;
     }
 
-    /**
-     * package private
-     */
+	/** package private */
     static IExpr parseInput(String inputStr, EvalEngine engine) {
         engine.setPackageMode(false);
         final FuzzyParser parser = new FuzzyParser(engine);
@@ -1286,11 +1318,14 @@ public class Pods {
     }
 
     /**
+	 *
      * @param json
      * @param engine
      * @param outExpr
-     * @param plainText text which should obligatory be used for plaintext format
-     * @param sinput    Symja input string
+	 * @param plainText
+	 *            text which should obligatory be used for plaintext format
+	 * @param sinput
+	 *            Symja input string
      * @param formats
      */
     private static void createJSONFormat(ObjectNode json, EvalEngine engine, IExpr outExpr, String plainText,
@@ -1467,23 +1502,5 @@ public class Pods {
 //            }
 //        }
         return null;
-    }
-
-    private static class LevenshteinDistanceComparator implements Comparator<IPod> {
-        static final LevenshteinDistance ld = new LevenshteinDistance(128);
-
-        String str;
-
-        public LevenshteinDistanceComparator(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public int compare(IPod arg0, IPod arg1) {
-            int d0 = ld.apply(str, arg0.keyWord());
-            int d1 = ld.apply(str, arg1.keyWord());
-            return d0 > d1 ? 1 : d0 < d1 ? -1 : 0;
-        }
-
     }
 }
