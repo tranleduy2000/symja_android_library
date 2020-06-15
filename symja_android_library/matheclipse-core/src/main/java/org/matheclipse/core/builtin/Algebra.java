@@ -688,7 +688,7 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		public static IExpr cancelPowerTimes(IExpr powerTimesAST) throws JASConversionException {
+		private static IExpr cancelPowerTimes(IExpr powerTimesAST, EvalEngine engine) throws JASConversionException {
 			IExpr[] parts = fractionalParts(powerTimesAST, false);
 			if (parts != null) {
 				IExpr p00 = parts[0];
@@ -713,7 +713,8 @@ public class Algebra {
 				if (!p10.isOne()) {
 					IExpr[] result = cancelGCD(p00, p10);
 					if (result != null) {
-						return F.Times(result[0], result[1], p01, F.Power(F.Times(result[2], p11), F.CN1));
+						return engine
+								.evaluate(F.Times(result[0], result[1], p01, F.Power(F.Times(result[2], p11), F.CN1)));
 					}
 				}
 
@@ -806,26 +807,28 @@ public class Algebra {
 							|| (parts[1].isPower() && parts[1].exponent().isInteger()))) {
 				IExpr numer = parts[0];
 				// use long values see: https://lgtm.com/rules/7900075/
-				long numerExponent = 1;
-				long denomExponent = 1;
+				long numerExponent = 1L;
+				long denominatorExponent = 1L;
 				IExpr denom = parts[1];
 				if (numer.isPower()) {
 					numerExponent = numer.exponent().toIntDefault(Integer.MIN_VALUE);
 					numer = numer.base();
 				}
 				if (denom.isPower()) {
-					denomExponent = denom.exponent().toIntDefault(Integer.MIN_VALUE);
+					denominatorExponent = denom.exponent().toIntDefault(Integer.MIN_VALUE);
 					denom = denom.base();
 				}
-				if (numerExponent > 0 && denomExponent > 0) {
+				if (numerExponent > 0 && denominatorExponent > 0) {
 					temp = cancelNIL(F.Times(numer, F.Power(denom, -1)), engine);
 					if (temp.isPresent()) {
-						if (numerExponent > denomExponent) {
-							return F.Times(F.Power(temp, numerExponent - denomExponent),
-									F.Power(numer, numerExponent - denomExponent));
-						} else if (numerExponent < denomExponent) {
-							return F.Times(F.Power(temp, denomExponent - numerExponent),
-									F.Power(denom, -1 * (denomExponent - numerExponent)));
+						if (numerExponent > denominatorExponent) {
+							long exp = numerExponent - denominatorExponent;
+							// result^denomExponent * numer^exp
+							return F.Times(F.Power(temp, denominatorExponent), F.Power(numer, exp));
+						} else if (numerExponent < denominatorExponent) {
+							long exp = denominatorExponent - numerExponent;
+							// result^numerExponent / denom^exp
+							return F.Times(F.Power(temp, numerExponent), F.Power(denom, -1 * exp));
 						}
 						return F.Power(temp, numerExponent);
 					}
@@ -834,6 +837,12 @@ public class Algebra {
 			return F.NIL;
 		}
 
+		/**
+		 *
+		 * @param arg1
+		 * @param engine
+		 * @return <code>F.NIL</code> if no evaluations was possible
+		 */
 		private IExpr cancelNIL(IExpr arg1, EvalEngine engine) {
 			try {
 				if (arg1.isTimes() || arg1.isPower()) {
@@ -847,7 +856,7 @@ public class Algebra {
 				if (expandedArg1.isPlus()) {
 					return ((IAST) expandedArg1).mapThread(F.Cancel(null), 1);
 				} else if (expandedArg1.isTimes() || expandedArg1.isPower()) {
-					IExpr result = cancelPowerTimes(expandedArg1);
+					IExpr result = cancelPowerTimes(expandedArg1, engine);
 					if (result.isPresent()) {
 						return result;
 					}
@@ -2457,11 +2466,11 @@ public class Algebra {
 				// }
 				// }
 				// } catch (ClassCastException e2) {
-				// if (FEConfig.SHOW_STACKTRACE) {
+				// if (Config.SHOW_STACKTRACE) {
 				// e2.printStackTrace();
 				// }
 				// } catch (JASConversionException e2) {
-				// if (FEConfig.SHOW_STACKTRACE) {
+				// if (Config.SHOW_STACKTRACE) {
 				// e2.printStackTrace();
 				// }
 				// }
@@ -4461,9 +4470,10 @@ public class Algebra {
 			GenPolynomial<IExpr> gcd = engine.gcd(p1, p2);
 			IExpr[] result = new IExpr[3];
 			if (gcd.isONE()) {
-				result[0] = jas.exprPoly2Expr(gcd);
-				result[1] = jas.exprPoly2Expr(p1);
-				result[2] = jas.exprPoly2Expr(p2);
+					return null;
+					// result[0] = jas.exprPoly2Expr(gcd);
+					// result[1] = jas.exprPoly2Expr(p1);
+					// result[2] = jas.exprPoly2Expr(p2);
 			} else {
 				result[0] = F.C1;
 				result[1] = F.eval(jas.exprPoly2Expr(p1.divide(gcd)));
@@ -4492,9 +4502,10 @@ public class Algebra {
 			// }
 			IExpr[] result = new IExpr[3];
 			if (gcd.isONE()) {
-				result[0] = jas.complexPoly2Expr(gcd);
-				result[1] = jas.complexPoly2Expr(p1);
-				result[2] = jas.complexPoly2Expr(p2);
+				return null;
+				// result[0] = jas.complexPoly2Expr(gcd);
+				// result[1] = jas.complexPoly2Expr(p1);
+				// result[2] = jas.complexPoly2Expr(p2);
 			} else {
 				result[0] = F.C1;
 				result[1] = F.eval(jas.complexPoly2Expr(p1.divide(gcd)));
