@@ -5,7 +5,6 @@ import com.duy.concurrent.Executors;
 import com.gx.common.util.concurrent.SimpleTimeLimiter;
 import com.gx.common.util.concurrent.TimeLimiter;
 
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -137,7 +136,8 @@ public class ExprEvaluator {
 	private final List<ISymbol> fVariables;
 
 	// Quit() function may set a new engine,so "final" is not possible here
-	private EvalEngine engine;
+	// Android changed: make engine final
+	private final EvalEngine engine;
 
 	private IExpr fExpr;
 
@@ -333,22 +333,23 @@ public class ExprEvaluator {
 		fExpr = expr;
 		// F.join();
 		try {
-		EvalEngine.set(engine);
-		engine.reset();
-		IExpr preRead = F.$PreRead.assignedValue();
-		IExpr temp;
-		if (preRead != null && preRead.isPresent()) {
-			temp = engine.evaluate(F.unaryAST1(preRead, expr));
-		} else {
-			temp = engine.evaluate(expr);
-		}
-		if (!engine.isOutListDisabled()) {
-			engine.addOut(temp);
-		}
-		return temp;
+			EvalEngine.set(engine);
+			engine.reset();
+			IExpr preRead = F.$PreRead.assignedValue();
+			IExpr temp;
+			if (preRead != null && preRead.isPresent()) {
+				temp = engine.evaluate(F.unaryAST1(preRead, expr));
+			} else {
+				temp = engine.evaluate(expr);
+			}
+			if (!engine.isOutListDisabled()) {
+				engine.addOut(temp);
+			}
+			return temp;
 		} finally {
 			// Quit may set a new engine
-			engine = EvalEngine.get();
+			// Android changed: do not set new engine
+			// engine = EvalEngine.get();
 		}
 	}
 
