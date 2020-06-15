@@ -18,10 +18,8 @@ import org.logicng.formulas.Variable;
 import org.logicng.solvers.MiniSat;
 import org.logicng.solvers.SATSolver;
 import org.logicng.transformations.cnf.BDDCNFTransformation;
-import org.logicng.transformations.cnf.CNFFactorization;
 import org.logicng.transformations.dnf.DNFFactorization;
 import org.logicng.transformations.qmc.QuineMcCluskeyAlgorithm;
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -3703,7 +3701,12 @@ public final class BooleanFunctions {
 				String method = "SAT";
 				int maxChoices = 1;
 				if (ast.size() > 2) {
-					userDefinedVariables = ast.arg2().orNewList();
+					if (ast.arg2().equals(F.All)) {
+						maxChoices = Integer.MAX_VALUE;
+						userDefinedVariables = variablesInFormula;
+					} else {
+						userDefinedVariables = ast.arg2().orNewList();
+					}
 					IExpr complement = F.Complement.of(engine, userDefinedVariables, variablesInFormula);
 					if (complement.size() > 1 && complement.isList()) {
 						IASTAppendable or = F.Or();
