@@ -5,6 +5,7 @@ import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
+import com.duy.lang.DThreadLocal;
 import com.gx.common.cache.Cache;
 
 import org.hipparchus.complex.Complex;
@@ -74,7 +75,7 @@ public class EvalEngine implements Serializable {
      *
      */
     private static final long serialVersionUID = 8402201556123198590L;
-    transient private static final ThreadLocal<EvalEngine> instance = new ThreadLocal<EvalEngine>() {
+    transient private static final DThreadLocal<EvalEngine> instance = new DThreadLocal<EvalEngine>() {
 
         @Override
         public EvalEngine initialValue() {

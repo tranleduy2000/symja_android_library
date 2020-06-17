@@ -1,14 +1,5 @@
 package org.matheclipse.core.system;
 
-import com.duy.ArcTanTest;
-import com.duy.BooleanTest;
-import com.duy.CachedTest;
-import com.duy.CompatibleTest;
-import com.duy.GraphFunctionsTest;
-import com.duy.NumericTest;
-import com.duy.ParseNumberTest;
-import com.duy.ToStringTest;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -75,14 +66,14 @@ public class CompleteTestSuite extends TestCase {
 		suite.addTestSuite(WXFTestCase.class);
 		suite.addTestSuite(IntegerTestCase.class);
 
-		suite.addTestSuite(ArcTanTest.class);
-		suite.addTestSuite(BooleanTest.class);
-		suite.addTestSuite(CachedTest.class);
-		suite.addTestSuite(CompatibleTest.class);
-		suite.addTestSuite(GraphFunctionsTest.class);
-		suite.addTestSuite(NumericTest.class);
-		suite.addTestSuite(ParseNumberTest.class);
-		suite.addTestSuite(ToStringTest.class);
+		// suite.addTestSuite(ArcTanTest.class);
+		// suite.addTestSuite(BooleanTest.class);
+		// suite.addTestSuite(CachedTest.class);
+		// suite.addTestSuite(CompatibleTest.class);
+		// suite.addTestSuite(GraphFunctionsTest.class);
+		// suite.addTestSuite(NumericTest.class);
+		// suite.addTestSuite(ParseNumberTest.class);
+		// suite.addTestSuite(ToStringTest.class);
 
 		return suite;
 
