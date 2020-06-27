@@ -1050,7 +1050,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 							return F.NIL;
 						}
 						if (temp.isAST()) {
-						engine.REMEMBER_AST_CACHE.put(ast, temp);
+							engine.REMEMBER_AST_CACHE.put(ast, temp);
 						}
 						return temp;
 					}

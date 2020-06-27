@@ -143,35 +143,41 @@ public class EvalAttributes {
 	 * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>F#NIL</code>..
 	 */
 	public static IASTAppendable flattenDeep(final ISymbol head, final IAST ast) {
-		final int[] newSize = new int[1];
-		newSize[0] = 0;
-		final boolean[] flattened = new boolean[] { false };
+		// swift changed: memory issue
+		/*final*/ int/*[]*/ newSize /*= new int[1]*/;
+		newSize/*[0]*/ = 0;
+		/*final*/ boolean/*[]*/ flattened = /*new boolean[] {*/ false /*}*/;
 
-		ast.forEach(new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr expr) {
+		// swift changed: memory issue
+		//ast.forEach(new Consumer<IExpr>() {
+		//	@Override
+		//	public void accept(IExpr expr) {
+		for (int i = 1; i < ast.size(); i++) {
+			IExpr expr = ast.get(i);
+			if (expr.isAST(head)) {
+				flattened/*[0]*/ = true;
+				int temp = flattenAlloc(head, (IAST) expr);
+				newSize/*[0]*/ += temp;
+			} else {
+				newSize/*[0]*/++;
+			}
+		}
+		//});
+
+		if (flattened/*[0]*/) {
+			final IASTAppendable result = F.ast(ast.head(), newSize/*[0]*/, false);
+			//ast.forEach(new Consumer<IExpr>() {
+			//	@Override
+			//	public void accept(IExpr expr) {
+			for (int i = 1; i < ast.size(); i++) {
+				IExpr expr = ast.get(i);
 				if (expr.isAST(head)) {
-					flattened[0] = true;
-					int temp = flattenAlloc(head, (IAST) expr);
-					newSize[0] += temp;
+					result.appendArgs(flattenDeep(head, (IAST) expr).orElse((IAST) expr));
 				} else {
-					newSize[0]++;
+					result.append(expr);
 				}
 			}
-		});
-
-		if (flattened[0]) {
-			final IASTAppendable result = F.ast(ast.head(), newSize[0], false);
-			ast.forEach(new Consumer<IExpr>() {
-				@Override
-				public void accept(IExpr expr) {
-					if (expr.isAST(head)) {
-						result.appendArgs(flattenDeep(head, (IAST) expr).orElse((IAST) expr));
-					} else {
-						result.append(expr);
-					}
-				}
-			});
+			//});
 			return result;
 		}
 		return F.NIL;
@@ -190,35 +196,43 @@ public class EvalAttributes {
 	 * @see #flattenDeep(ISymbol, IAST)
 	 */
 	public static IASTAppendable flatten(final ISymbol head, final IAST ast) {
-		final int[] newSize = new int[1];
-		newSize[0] = 0;
-		final boolean[] flattened = new boolean[] { false };
+		//Swift changed: memory issues
+		/*final*/ int/*[]*/ newSize /*= new int[1]*/;
+		newSize/*[0]*/ = 0;
+		/*final*/ boolean/*[]*/ flattened = /*new boolean[] {*/ false /*}*/;
 
-		ast.forEach(new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr expr) {
+		//Swift changed: memory issues
+		//ast.forEach(new Consumer<IExpr>() {
+		//	@Override
+		//	public void accept(IExpr expr) {
+		for (int i = 1; i < ast.size(); i++) {
+			IExpr expr = ast.get(i);
+			if (expr.isAST(head)) {
+				flattened/*[0]*/ = true;
+				int temp = ((IAST) expr).argSize();// flattenAlloc(head, (IAST) expr);
+				newSize/*[0]*/ += temp;
+			} else {
+				newSize/*[0]*/++;
+			}
+		}
+		//	}
+		//});
+
+		if (flattened/*[0]*/) {
+			final IASTAppendable result = F.ast(ast.head(), newSize/*[0]*/, false);
+			//ast.forEach(new Consumer<IExpr>() {
+			//	@Override
+			//	public void accept(IExpr expr) {
+			for (int i = 1; i < ast.size(); i++) {
+				IExpr expr = ast.get(i);
 				if (expr.isAST(head)) {
-					flattened[0] = true;
-					int temp = ((IAST) expr).argSize();// flattenAlloc(head, (IAST) expr);
-					newSize[0] += temp;
+					result.appendArgs((IAST) expr);// flatten(head, (IAST) expr).orElse((IAST) expr));
 				} else {
-					newSize[0]++;
+					result.append(expr);
 				}
 			}
-		});
-
-		if (flattened[0]) {
-			final IASTAppendable result = F.ast(ast.head(), newSize[0], false);
-			ast.forEach(new Consumer<IExpr>() {
-				@Override
-				public void accept(IExpr expr) {
-					if (expr.isAST(head)) {
-						result.appendArgs((IAST) expr);// flatten(head, (IAST) expr).orElse((IAST) expr));
-					} else {
-						result.append(expr);
-					}
-				}
-			});
+			//	}
+			//});
 			return result;
 		}
 		return F.NIL;

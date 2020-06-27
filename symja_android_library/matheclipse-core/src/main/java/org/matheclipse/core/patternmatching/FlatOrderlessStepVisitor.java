@@ -1,7 +1,5 @@
 package org.matheclipse.core.patternmatching;
 
-import com.duy.lambda.Consumer;
-
 import org.matheclipse.core.combinatoric.IStepVisitor;
 import org.matheclipse.core.combinatoric.MultisetPartitionsIterator;
 import org.matheclipse.core.eval.EvalEngine;
@@ -58,25 +56,28 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
 	final private void toIntArray(IAST sortedList, int start, int end) {
 		multiset = new int[end - start];
 		array = new IExpr[end - start];
-		final IExpr[] lastT = new IExpr[1];
-		lastT[0] = sortedList.get(start);
+		/*final*/ IExpr/*[]*/ lastT /*= new IExpr[1]*/;
+		lastT/*[0]*/ = sortedList.get(start);
 
-		final int[] index = new int[1];
-		final int[] j = new int[1];
-		multiset[j[0]++] = index[0];
-		array[index[0]] = lastT[0];
-		sortedList.forEach(start + 1, end, new Consumer<IExpr>() {
-			@Override
-			public void accept(IExpr x) {
-				if (x.equals(lastT[0])) {
-					multiset[j[0]++] = index[0];
-				} else {
-					multiset[j[0]++] = ++index[0];
-					array[index[0]] = x;
-					lastT[0] = x;
-				}
+		/*final*/ int/*[]*/ index /*= new int[1]*/ = 0;
+		/*final*/ int/*[]*/ j = /*new int[1]*/ 0;
+		multiset[j/*[0]*/++] = index/*[0]*/;
+		array[index/*[0]*/] = lastT/*[0]*/;
+		// swift changed: memory issue
+		// sortedList.forEach(start + 1, end, new Consumer<IExpr>() {
+		// 	@Override
+		// 	public void accept(IExpr x) {
+		for (int i = start + 1; i < end; i++) {
+			IExpr x = sortedList.get(i);
+			if (x.equals(lastT/*[0]*/)) {
+				multiset[j/*[0]*/++] = index/*[0]*/;
+			} else {
+				multiset[j/*[0]*/++] = ++index/*[0]*/;
+				array[index/*[0]*/] = x;
+				lastT/*[0]*/ = x;
 			}
-		});
+		}
+		//});
 	}
 
 	@Override

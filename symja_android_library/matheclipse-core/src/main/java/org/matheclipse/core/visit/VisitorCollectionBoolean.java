@@ -1,7 +1,5 @@
 package org.matheclipse.core.visit;
 
-import com.duy.lambda.Consumer;
-
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
@@ -27,12 +25,15 @@ abstract public class VisitorCollectionBoolean<T extends IExpr> extends Abstract
 	@Override
 	public boolean visit(IAST list) {
 		int size = list.size();
-		list.forEach(fHeadOffset, size, new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
-                x.accept(VisitorCollectionBoolean.this);
-            }
-        });
+		// Swift changed: memory issue
+//		list.forEach(fHeadOffset, size, new Consumer<IExpr>() {
+//            @Override
+//            public void accept(IExpr x) {
+		for (int i = fHeadOffset; i < size; i++) {
+			IExpr x = list.get(i);
+			x.accept(VisitorCollectionBoolean.this);
+		}
+//        });
 		return false;
 	}
 }

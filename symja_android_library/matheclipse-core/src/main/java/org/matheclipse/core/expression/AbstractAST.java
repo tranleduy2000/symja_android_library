@@ -24,6 +24,7 @@ import org.matheclipse.core.builtin.StructureFunctions.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.EvalEngineUtils;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
@@ -3102,7 +3103,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	@Override
 	public boolean isNumericArgument() {
 		if (isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG)) {
-			return forAll(new Predicate<IExpr>() {
+			// swift changed: memory issue
+			return forAll(/*new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
 					return x.isNumericFunction() || //
@@ -3113,10 +3115,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
 								}
 							}));
 				}
-			});
+			}*/EvalEngineUtils.isNumericFunctionPredicate);
 				}
 		// TODO optimize this expression:
-		return isAST(F.Interval) && forAll(new Predicate<IExpr>() {
+		// swift changed: memory issue
+		return isAST(F.Interval) && forAll(/*new Predicate<IExpr>() {
 			@Override
 			public boolean test(IExpr x) {
 				return x.isNumericArgument() || //
@@ -3127,7 +3130,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 							}
 						}));
 			}
-		});
+		}*/EvalEngineUtils.isNumericArgumentPredicate);
 	}
 	/** {@inheritDoc} */
 	@Override
@@ -4738,12 +4741,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			copy.set(1, conditionalExpr.arg1());
 			return conditionalExpr.setAtCopy(1, copy);
 		}
-		int indx = indexOf(new Predicate<IExpr>() {
+		// swift changed: memory issue
+		int indx = indexOf(/*new Predicate<IExpr>() {
 			@Override
 			public boolean test(IExpr x) {
 				return x.isConditionalExpression();
 			}
-		});
+		}*/EvalEngineUtils.conditionalExpressionPredicate);
 		if (indx > 0) {
 			IAST conditionalExpr = (IAST) get(indx);
 			IASTAppendable andExpr = F.And();

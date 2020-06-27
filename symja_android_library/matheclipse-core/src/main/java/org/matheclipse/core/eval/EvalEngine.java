@@ -567,14 +567,17 @@ public class EvalEngine implements Serializable {
                     numericMode = fNumericMode;
                     try {
                         selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-                        ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
-                            @Override
-                            public void accept(IExpr arg, int i) {
-                                if (!arg.isAST(F.Unevaluated)) {
-                                    EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
-                                }
+                        // swift changed: memory issue
+                        //ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
+                        //    @Override
+                        //    public void accept(IExpr arg, int i) {
+                        for (int i = 2; i < astSize; i++) {
+                            IExpr arg = ast.get(i);
+                            if (!arg.isAST(F.Unevaluated)) {
+                                EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
                             }
-                        });
+                        }
+                        //});
                     } finally {
                         if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
                             fNumericMode = numericMode;
@@ -585,14 +588,17 @@ public class EvalEngine implements Serializable {
                     numericMode = fNumericMode;
                     try {
                         selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-                        ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
-                            @Override
-                            public void accept(IExpr arg, int i) {
-                                if (arg.isAST(F.Evaluate)) {
-                                    EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
-                                }
+                        // swift changed: memory issue
+                        //ast.forEach(2, astSize, new ObjIntConsumer<IExpr>() {
+                        //    @Override
+                        //    public void accept(IExpr arg, int i) {
+                        for (int i = 2; i < astSize; i++) {
+                            IExpr arg = ast.get(i);
+                            if (arg.isAST(F.Evaluate)) {
+                                EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
                             }
-                        });
+                        }
+                        //});
                     } finally {
                         if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
                             fNumericMode = numericMode;
@@ -2508,8 +2514,8 @@ public class EvalEngine implements Serializable {
      * @return the resulting ast with the <code>argHead</code> threaded into each ast argument or <code>F.NIL</code>
      */
     public IASTMutable threadASTListArgs(final IASTMutable ast) {
-
-        final int[] listLength = new int[]{-1};
+        // swift changed: memory issue
+        /*final*/ int/*[]*/ listLength = /*new int[]{*/-1/*}*/;
 //        if (ast.exists(new Predicate<IExpr>() {
 //            @Override
 //            public boolean test(IExpr x) {
@@ -2536,10 +2542,10 @@ public class EvalEngine implements Serializable {
         for (int i = 1; i < size; i++) {
             IExpr x = ast.get(i);
             if (x.isList()) {
-                if (listLength[0] < 0) {
-                    listLength[0] = ((IAST) x).argSize();
+                if (listLength/*[0]*/ < 0) {
+                    listLength/*[0]*/ = ((IAST) x).argSize();
                 } else {
-                    if (listLength[0] != ((IAST) x).argSize()) {
+                    if (listLength/*[0]*/ != ((IAST) x).argSize()) {
                         // Objects of unequal length in `1` cannot be combined.
                         IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
                         // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
@@ -2553,8 +2559,8 @@ public class EvalEngine implements Serializable {
             return F.NIL;
         }
 
-        if (listLength[0] != -1) {
-            IASTMutable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength[0]);
+        if (listLength/*[0]*/ != -1) {
+            IASTMutable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength/*[0]*/);
             result.addEvalFlags(IAST.IS_LISTABLE_THREADED);
             return result;
         }

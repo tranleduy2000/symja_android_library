@@ -19,6 +19,7 @@
 package net.numericalchameleon.util.phoneticalphabets;
 
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Vector;
 
 public class PhoneticAlphabet {
@@ -207,7 +208,7 @@ public class PhoneticAlphabet {
                 else {
                     hash.put(alphabet[i].substring(0, k),
                             alphabet[i].substring(0, 1) +
-                                    alphabet[i].substring(1, k).toLowerCase() +
+                                    alphabet[i].substring(1, k).toLowerCase(Locale.US) +
                                     alphabet[i].substring(k));
                     // add definition to the vector
                     moreThanOneVector.add(alphabet[i].substring(0, k));
@@ -235,7 +236,7 @@ public class PhoneticAlphabet {
      */
     public Vector get(String text) {
         Vector<String> v = new Vector<String>();
-        String textupper = text.toUpperCase();
+        String textupper = text.toUpperCase(Locale.US);
         String temp;
         boolean done;
         for (int i = 0; i < textupper.length(); i++) {
@@ -244,7 +245,7 @@ public class PhoneticAlphabet {
             for (int x = 0; x < moreThanOne.length; x++) {
                 int len = moreThanOne[x].length();
                 if ((textupper.length() - i >= len) &&
-                        (textupper.substring(i, i + len).equals(moreThanOne[x].toUpperCase()))) {
+                        (textupper.substring(i, i + len).equals(moreThanOne[x].toUpperCase(Locale.US)))) {
                     temp = ((String) hash.get(moreThanOne[x]));
                     if (temp != null) { // I found it in the hashtable
                         v.add(temp);
@@ -269,7 +270,7 @@ public class PhoneticAlphabet {
         // 1.4+ only:
         // String key = Character.toString(c);
         String key = String.valueOf(c);
-        String temp = (String) hash.get(key.toUpperCase());
+        String temp = (String) hash.get(key.toUpperCase(Locale.US));
         return ((temp != null) ? temp : key);
     }
 
