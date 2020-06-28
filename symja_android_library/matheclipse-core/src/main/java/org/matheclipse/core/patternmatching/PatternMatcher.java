@@ -30,7 +30,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PatternMatcher extends IPatternMatcher implements Externalizable {
@@ -148,7 +148,7 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 	 *
 	 */
 	@SuppressWarnings("serial")
-	/* package private */ final class StackMatcher extends ArrayDeque<Entry> {
+	/* package private */ final class StackMatcher extends LinkedList<Entry> {
 		final EvalEngine fEngine;
 
 		public StackMatcher(EvalEngine engine) {
