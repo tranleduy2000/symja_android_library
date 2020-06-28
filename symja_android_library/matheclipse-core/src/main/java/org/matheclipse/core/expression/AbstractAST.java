@@ -3115,7 +3115,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 								}
 							}));
 				}
-			}*/EvalEngineUtils.isNumericFunctionPredicate);
+			}*/EvalEngineUtils.isFunctionOrListNumericArgumentPredicate);
 				}
 		// TODO optimize this expression:
 		// swift changed: memory issue
@@ -3130,19 +3130,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
 							}
 						}));
 			}
-		}*/EvalEngineUtils.isNumericArgumentPredicate);
+		}*/EvalEngineUtils.isFunctionOrListNumericArgumentPredicate2);
 	}
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericFunction() {
 		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
 			// check if all arguments are &quot;numeric&quot;
-			return forAll(new Predicate<IExpr>() {
+			return forAll(/*new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
 					return x.isNumericFunction();
 				}
-			});
+			}*/EvalEngineUtils.isNumericFunctionPredicate);
 		}
 		return false;
 	}

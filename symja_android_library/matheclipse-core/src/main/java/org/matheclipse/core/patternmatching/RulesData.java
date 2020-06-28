@@ -419,27 +419,28 @@ public final class RulesData implements Serializable {
 						OperationSystem.checkInterrupt();
 						// obj-c changed: autoreleasepool
 						IPatternMatcher pmEvaluator;
-						pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
-						if (showSteps) {
-							if (isShowSteps(pmEvaluator)) {
-								IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
-								System.out.println(
-										" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
-							}
-						}
+						//pmEvaluator = (IPatternMatcher) patternEvaluator.clone(); // swift changed: memory issue
+						pmEvaluator = patternEvaluator;
+						//if (showSteps) {
+						//	if (isShowSteps(pmEvaluator)) {
+						//		IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
+						//		System.out.println(
+						//				" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
+						//	}
+						//}
 						// if (pmEvaluator.getLHSPriority() == 6656) {
 						// System.out.println("Debug from this line");
 						// }
-						if (FEConfig.SHOW_STACKTRACE) {
-							if (isShowPriority(pmEvaluator)) {
-								System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
-							}
-							// if (pmEvaluator.getLHSPriority() == 432) {
-							// System.out.println(pmEvaluator.toString());
-							// System.out.println(expr);
-							// System.out.println("Debug from this line");
-							// }
-						}
+						//if (FEConfig.SHOW_STACKTRACE) {
+						//	if (isShowPriority(pmEvaluator)) {
+						//		System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
+						//	}
+						//	// if (pmEvaluator.getLHSPriority() == 432) {
+						//	// System.out.println(pmEvaluator.toString());
+						//	// System.out.println(expr);
+						//	// System.out.println("Debug from this line");
+						//	// }
+						//}
 						// System.out.println(pmEvaluator.toString());
 						// System.out.println(">>"+expr);
 
@@ -479,9 +480,9 @@ public final class RulesData implements Serializable {
 					}
 				}
 			}
-		} catch (CloneNotSupportedException cnse) {
+		} /*catch (CloneNotSupportedException cnse) {
 			cnse.printStackTrace();
-		} finally {
+		}*/ finally {
 			engine.setEvalRHSMode(evalRHSMode);
 		}
 		return F.NIL;

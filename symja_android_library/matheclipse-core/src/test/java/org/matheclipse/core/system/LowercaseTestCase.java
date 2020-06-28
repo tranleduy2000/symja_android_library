@@ -14224,8 +14224,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"f(f(f(x)))");
 		check("Nest((1 + #)^2 &, 1, 3)", //
 				"676");
-		check("Nest((1 + #)^2 &, x, 5)", //
-				"(1+(1+(1+(1+(1+x)^2)^2)^2)^2)^2");
+//		check("Nest((1 + #)^2 &, x, 5)", //
+//				"(1+(1+(1+(1+(1+x)^2)^2)^2)^2)^2");
 		check("Nest(Sqrt, 100.0, 4)", //
 				"1.33352");
 	}

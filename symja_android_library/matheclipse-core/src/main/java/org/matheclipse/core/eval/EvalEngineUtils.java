@@ -34,30 +34,31 @@ public class EvalEngineUtils {
             return x.isConditionalExpression();
         }
     };
-    public static final Predicate<? super IExpr> isNumericFunctionPredicate1 = new Predicate<IExpr>() {
+    public static final Predicate<? super IExpr> isNumericFunctionPredicate = new Predicate<IExpr>() {
         @Override
         public boolean test(IExpr y) {
             return y.isNumericFunction();
         }
     };
-    public static final Predicate<? super IExpr> isNumericFunctionPredicate = new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-            return x.isNumericFunction() || //
-                    (x.isList() && ((IAST) x).forAll(isNumericFunctionPredicate1));
-        }
-    };
-    public static final Predicate<? super IExpr> isNumericArgumentPredicate1 = new Predicate<IExpr>() {
+    public static final Predicate<? super IExpr> isNumericArgumentPredicate = new Predicate<IExpr>() {
         @Override
         public boolean test(IExpr y) {
             return y.isNumericArgument();
         }
     };
-    public static final Predicate<? super IExpr> isNumericArgumentPredicate = new Predicate<IExpr>() {
+
+    public static final Predicate<? super IExpr> isFunctionOrListNumericArgumentPredicate = new Predicate<IExpr>() {
+        @Override
+        public boolean test(IExpr x) {
+            return x.isNumericFunction() || //
+                    (x.isList() && ((IAST) x).forAll(isNumericFunctionPredicate));
+        }
+    };
+    public static final Predicate<? super IExpr> isFunctionOrListNumericArgumentPredicate2 = new Predicate<IExpr>() {
         @Override
         public boolean test(IExpr x) {
             return x.isNumericArgument() || //
-                    (x.isList() && ((IAST) x).forAll(isNumericArgumentPredicate1));
+                    (x.isList() && ((IAST) x).forAll(isNumericArgumentPredicate));
         }
     };
 

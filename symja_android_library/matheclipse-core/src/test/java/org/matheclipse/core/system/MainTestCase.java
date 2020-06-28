@@ -41,6 +41,7 @@ public class MainTestCase extends AbstractTestCase {
 			String evaledResult = (String) scriptEngine.eval(evalString);
 			assertEquals(expectedResult, evaledResult);
 
+			checkPlusReversed(evaledResult);
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertEquals(e.getMessage(), "");

@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.eval.TimeConstrainedEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -34,23 +35,6 @@ public abstract class AbstractTestCase extends TestCase {
         FEConfig.SHOW_STACKTRACE = true;
     }
 
-	public void ESameTest(String expectedString, String evalString) {
-        try {
-            if (evalString.length() == 0 && expectedString.length() == 0) {
-                return;
-            }
-            // scriptEngine.put("STEPWISE",Boolean.TRUE);
-            String evaledResult = (String) fScriptEngine.eval(evalString);
-            String expectedResult = (String) fScriptEngine.eval(expectedString);
-
-            assertEquals(expectedResult, evaledResult);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertEquals("", "1");
-        }
-    }
-
     public void check(String evalString, String expectedResult) {
         System.out.println("evalString = " + evalString);
         check(fScriptEngine, evalString, expectedResult, -1);
@@ -74,21 +58,25 @@ public abstract class AbstractTestCase extends TestCase {
             } else {
                 assertEquals(expectedResult, evaledResult);
             }
+
+            checkPlusReversed(evaledResult);
+
         } catch (Exception e) {
             e.printStackTrace();
             assertEquals("", "1");
         }
     }
 
-	public String evalString(String evalString) {
+
+    public String evalString(String evalString) {
         try {
             // scriptEngine.put("STEPWISE",Boolean.TRUE);
-			return (String) fScriptEngine.eval(evalString);
+            return (String) fScriptEngine.eval(evalString);
         } catch (Exception e) {
             e.printStackTrace();
             assertEquals("", "1");
         }
-		return "";
+        return "";
     }
 
     public void checkNumeric(String evalString, String expectedResult) {
@@ -161,9 +149,9 @@ public abstract class AbstractTestCase extends TestCase {
     protected void setUp() {
         try {
             synchronized (fScriptManager) {
-				Config.FILESYSTEM_ENABLED = false;
-				EvalEngine engine = new EvalEngine();
-				fScriptEngine = new MathScriptEngine(engine);// fScriptManager.getEngineByExtension("m");
+                Config.FILESYSTEM_ENABLED = false;
+                EvalEngine engine = new EvalEngine();
+                fScriptEngine = new MathScriptEngine(engine);// fScriptManager.getEngineByExtension("m");
                 fScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 fScriptEngine.put("DECIMAL_FORMAT", "0.0####");
 
@@ -171,14 +159,60 @@ public abstract class AbstractTestCase extends TestCase {
                 fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
                 F.await();
 
-				EvalEngine.set(engine);
-				engine.init();
+                EvalEngine.set(engine);
+                engine.init();
                 engine.setRecursionLimit(256);
                 engine.setIterationLimit(500);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    protected void checkPlusReversed(String result) {
+        if (result.trim().isEmpty()) {
+            return;
+        }
+        if (result.contains("`")
+                || result.contains("\"") || result.contains("?") || result.contains("\n")) {
+            return;
+        }
+
+        ExprEvaluator exprEvaluator = new ExprEvaluator();
+        IExpr lhs;
+        try {
+            lhs = exprEvaluator.parse(result);
+        } catch (Exception e) {
+            lhs = null;
+        }
+        if (lhs == null) {
+            return;
+        }
+        if (!lhs.isFree(F.Indeterminate)
+                || lhs.head().equals(F.SetDelayed)
+                || lhs.head().equals(F.Set)
+                || lhs.head().equals(F.ConditionalExpression)
+                || lhs.head().equals(F.Piecewise)
+                || lhs.head().equals(F.Sequence)
+                || lhs.head().equals(F.Hold)
+                || lhs.head().equals(F.HoldForm)
+                || lhs.head().equals(F.Sum)
+                || lhs.head().equals(F.Product)
+                || !lhs.isFree(F.Slot)
+                || !lhs.isFree(F.TwoWayRule)
+                || lhs.head().equals(F.Graph)) {
+            return;
+        }
+
+        OutputFormFactory outputFormFactory = OutputFormFactory.get(true, true, 15, 18);
+        StringBuilder buf = new StringBuilder();
+        outputFormFactory.convert(buf, lhs);
+        IExpr rhs = exprEvaluator.parse(buf.toString());
+        System.out.println("lhs = " + lhs);
+        System.out.println("rhs = " + rhs);
+        boolean equal = exprEvaluator.eval(F.Equal(lhs, rhs)).isTrue();
+        assertTrue(equal);
 
     }
 

@@ -3093,7 +3093,7 @@ public final class Programming {
 	private static IExpr moduleSubstVariables(IAST intializerList, IExpr moduleBlock, final EvalEngine engine) {
 		// final long moduleCounter = engine.incModuleCounter();
 		final String varAppend = engine.uniqueName("$");
-		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
+		final java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>(5); // do not use default capacity
 		if (rememberModuleVariables(intializerList, varAppend, moduleVariables, engine)) {
 			IExpr result = moduleBlock.accept(new ModuleReplaceAll(moduleVariables, engine, varAppend));
 			return result.orElse(moduleBlock);
