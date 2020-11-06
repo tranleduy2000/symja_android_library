@@ -1,6 +1,11 @@
 package org.matheclipse.core.basic;
 
+import com.gx.common.math.BigIntegerMath;
+
 import org.matheclipse.core.eval.exception.MemoryLimitExceeded;
+
+import java.math.BigInteger;
+import java.math.RoundingMode;
 
 @SuppressWarnings("unused")
 public class OperationSystem {
@@ -155,6 +160,15 @@ public class OperationSystem {
         if (magLength1 > toomCook3Threshold && magLength2 > toomCook3Threshold) {
             throw new MemoryLimitExceeded("toomCook3Threshold " + toomCook3Threshold + " limit exceeded. " +
                     "magLength1 = " + magLength1 + "; magLength2 = " + magLength2);
+        }
+    }
+
+    public static void checkPowOperation(BigInteger b, int numerator) {
+        int log10 = BigIntegerMath.log10(b, RoundingMode.HALF_UP) + 1;
+        int numberOfDigits = Math.abs(log10 * numerator);
+        long maxDigits = (long) (Math.log(2) / Math.log(10) * Config.MAX_BIT_LENGTH);
+        if (numberOfDigits > maxDigits) {
+            throw new MemoryLimitExceeded("Number of digits is greater than " + maxDigits);
         }
     }
 }

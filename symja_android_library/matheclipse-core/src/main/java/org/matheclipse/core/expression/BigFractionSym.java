@@ -509,7 +509,9 @@ public class BigFractionSym extends AbstractFractionSym {
 			if (oint == 0)
 				return AbstractFractionSym.ZERO;
 		}
-		return valueOf(toBigNumerator().multiply(other), toBigDenominator());
+		BigInteger bigNumerator = toBigNumerator();
+		OperationSystem.checkMultiplicationOperation(bigNumerator.bitLength(), other.bitLength());
+		return valueOf(bigNumerator.multiply(other), toBigDenominator());
 	}
 
 	@Override

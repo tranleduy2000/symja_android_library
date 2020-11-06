@@ -8,6 +8,7 @@ import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -387,10 +388,12 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 			isNegative = true;
 		}
 		if (numerator != 1) {
+			OperationSystem.checkPowOperation(b, numerator);
 			b = b.pow(numerator);
 		}
 		BigInteger d = toBigDenominator();
 		if (numerator != 1) {
+			OperationSystem.checkPowOperation(d, numerator);
 			d = d.pow(numerator);
 		}
 		// SortedMap<Integer, Integer> bMap = new TreeMap<Integer, Integer>();
@@ -547,8 +550,16 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 			return ((IFraction) this).negate();
 		}
 
-		BigInteger newnum = toBigNumerator().multiply(other.toBigNumerator());
-		BigInteger newdenom = toBigDenominator().multiply(other.toBigDenominator());
+		BigInteger bigNumerator = toBigNumerator();
+		BigInteger otherBigNumerator = other.toBigNumerator();
+		OperationSystem.checkMultiplicationOperation(bigNumerator.bitLength(), otherBigNumerator.bitLength());
+		BigInteger newnum = bigNumerator.multiply(otherBigNumerator);
+
+		BigInteger bigDenominator = toBigDenominator();
+		BigInteger otherBigDenominator = other.toBigDenominator();
+		OperationSystem.checkMultiplicationOperation(bigDenominator.bitLength(), otherBigDenominator.bitLength());
+		BigInteger newdenom = bigDenominator.multiply(otherBigDenominator);
+
 		return valueOf(newnum, newdenom);
 	}
 

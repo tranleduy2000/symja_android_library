@@ -1,4 +1,4 @@
-package org.matheclipse.core.system;
+``package org.matheclipse.core.system;
 
 import junit.framework.TestCase;
 
@@ -174,8 +174,7 @@ public abstract class AbstractTestCase extends TestCase {
         if (result.trim().isEmpty()) {
             return;
         }
-        if (result.contains("`")
-                || result.contains("\"") || result.contains("?") || result.contains("\n")) {
+        if (result.contains("`") || result.contains("\"") || result.contains("?") || result.contains("\n")) {
             return;
         }
 
