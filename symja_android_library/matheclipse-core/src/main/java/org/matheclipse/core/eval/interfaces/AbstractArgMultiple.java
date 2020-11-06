@@ -100,7 +100,7 @@ public abstract class AbstractArgMultiple extends AbstractArg2 {
 		return F.NIL;
 	}
 
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return null;
 	}
 	public HashedOrderlessMatcher getHashRuleMap() {

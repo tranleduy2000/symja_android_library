@@ -11,6 +11,8 @@ public interface IInteger extends IRational {
      */
     int PRIME_CERTAINTY = 32;
 
+    void checkBitLength();
+
     /**
      * {@inheritDoc}
      */

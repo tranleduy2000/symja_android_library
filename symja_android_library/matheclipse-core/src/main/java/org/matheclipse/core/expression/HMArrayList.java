@@ -462,7 +462,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @see IExpr#head()
 	 */
 	@Override
-	public final IExpr arg1() {
+	public IExpr arg1() {
 		return array[firstIndex + 1];
 	}
 
@@ -476,7 +476,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @see IExpr#head()
 	 */
 	@Override
-	public final IExpr arg2() {
+	public IExpr arg2() {
 		return array[firstIndex + 2];
 	}
 
@@ -490,7 +490,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @see IExpr#head()
 	 */
 	@Override
-	public final IExpr arg3() {
+	public IExpr arg3() {
 		return array[firstIndex + 3];
 	}
 
@@ -504,7 +504,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @see IExpr#head()
 	 */
 	@Override
-	public final IExpr arg4() {
+	public IExpr arg4() {
 		return array[firstIndex + 4];
 	}
 
@@ -518,7 +518,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 * @see IExpr#head()
 	 */
 	@Override
-	public final IExpr arg5() {
+	public IExpr arg5() {
 		return array[firstIndex + 5];
 	}
 
@@ -606,7 +606,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	@Override
-	public final boolean equals(final Object obj) {
+	public boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
 
@@ -614,9 +614,9 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 		if (obj instanceof AbstractAST) {
 			final IAST ast = (AbstractAST) obj;
 			final int size = lastIndex - firstIndex;
-				if (size != ast.size()) {
-					return false;
-				}
+			if (size != ast.size()) {
+				return false;
+			}
 			final IExpr head = array[firstIndex];
 			if (head instanceof ISymbol) {
 				if (head != ast.head()) {
@@ -624,15 +624,15 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 					return false;
 				}
 			} else if (!head.equals(ast.head())) {
-						return false;
-		}
+				return false;
+			}
 			if (hashCode() != ast.hashCode()) {
 				return false;
 			}
 			return forAll(new ObjIntPredicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x, int i) {
-					return x.equals(ast.get(i));
+					return x.equals(ast.getRule(i));
 				}
 			}, 1);
 		}
@@ -753,7 +753,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 		return F.NIL;
 	}
 	@Override
-	public final IExpr get(int location) {
+	public IExpr get(int location) {
 		if (FEConfig.SHOW_STACKTRACE) {
 			int index;
 			if ((index = firstIndex + location) < lastIndex) {
@@ -777,9 +777,9 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 			firstIndex = 0;
 			lastIndex = newLast;
 		} else {
-//			if (Config.FUZZ_TESTING) {
+			// if (Config.FUZZ_TESTING) {
 			// throw new NullPointerException();
-//			}
+			// }
 			int increment = size / 2;
 			if (required > increment) {
 				increment = required;
@@ -849,7 +849,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		if (hashValue == 0) {
 			hashValue = 0x811c9dc5;// decimal 2166136261;
 			for (int i = firstIndex; i < lastIndex; i++) {
@@ -923,17 +923,17 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/** {@inheritDoc} */
 	@Override
-	public final IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, final int position) {
+	public final IASTAppendable mapThreadEvaled(final EvalEngine engine, IASTAppendable appendAST, final IAST replacement,
+												final int position) {
 		// final Function<IExpr, IExpr> function = Functors.replaceArg(replacement,
 		// position);
-		final EvalEngine engine = EvalEngine.get();
 		final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
-            @Override
-            public IExpr apply(IExpr x) {
-                IAST a = replacement.setAtCopy(position, x);
-                return engine.evaluate(a);
-            }
-        };
+			@Override
+			public IExpr apply(IExpr x) {
+				IAST a = replacement.setAtCopy(position, x);
+				return engine.evaluate(a);
+			}
+		};
 		IExpr temp;
 		for (int i = firstIndex + 1; i < lastIndex; i++) {
 			temp = function.apply(array[i]);
@@ -1049,7 +1049,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 	 *             when {@code location < 0 || >= size()}
 	 */
 	@Override
-	public final IExpr set(int location, IExpr object) {
+	public IExpr set(int location, IExpr object) {
 		hashValue = 0;
 		// if (0 <= location && location < (lastIndex - firstIndex)) {
 			IExpr result = array[firstIndex + location];

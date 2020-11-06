@@ -18,7 +18,7 @@ public class Interpolation extends AbstractEvaluator {
 		return (dims != null) ? F.InterpolatingFunction(ast.arg1()) : F.NIL;
 		}
 	@Override
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_1_1;
 	}
 }

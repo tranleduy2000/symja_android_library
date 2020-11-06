@@ -306,7 +306,7 @@ public class Sum extends ListFunctions.Table implements SumRules {
 		newSum.set(1, result);
 		return newSum;
 	}
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_INFINITY;
 	}
 	private IExpr collectConstantFactors(final IAST ast, IAST prod, VariablesSet variablesSet) {

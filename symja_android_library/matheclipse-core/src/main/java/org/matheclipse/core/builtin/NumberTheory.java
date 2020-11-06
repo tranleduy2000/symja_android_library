@@ -6,14 +6,19 @@ import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 import com.gx.common.math.BigIntegerMath;
 import com.gx.common.math.LongMath;
+import com.gx.common.util.concurrent.UncheckedExecutionException;
 
+import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.JASConvert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.Validate;
@@ -93,7 +98,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * BellB(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * the Bell number function counts the number of different ways to partition a set that has exactly <code>n</code>
@@ -106,7 +111,7 @@ public final class NumberTheory {
 	 * <ul>
 	 * <li><a href="https://en.wikipedia.org/wiki/Bell_number">Wikipedia - Bell number</a></li>
 	 * </ul>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; BellB(15)
 	 * 1382958545
@@ -116,7 +121,7 @@ public final class NumberTheory {
 
 		/**
 		 * Generates the Bell number of the given index, where B(1) is 1. This is recursive.
-		 * 
+		 *
 		 * @param index
 		 *            an int number >= 0
 		 * @return
@@ -128,14 +133,17 @@ public final class NumberTheory {
 				// Sum[StirlingS2[n, k], {k, 0, n}]
 				IInteger sum = F.C1;
 				for (int ki = 0; ki < index; ki++) {
-					sum = sum.add(stirlingS2(F.ZZ(index), F.ZZ(ki), ki));
+				sum = sum.add(stirlingS2(index, F.ZZ(ki), ki));
+				if (sum.bitLength() > Config.MAX_BIT_LENGTH / 100) {
+					BigIntegerLimitExceeded.throwIt(Config.MAX_BIT_LENGTH / 100);
+				}
 				}
 				return sum;
 			}
 
 		/**
 		 * Generates the Bell polynomial of the given index <code>n</code>, where B(1) is 1. This is recursive.
-		 * 
+		 *
 		 * @param n
 		 * @param z
 		 * @return
@@ -185,6 +193,9 @@ public final class NumberTheory {
 						if (z.isZero()) {
 							return F.C0;
 				}
+						if (n > Config.MAX_POLYNOMIAL_DEGREE) {
+							PolynomialDegreeLimitExceeded.throwIt(n);
+						}
 						if (!z.isOne()) {
 					// bell polynomials: Sum(StirlingS2(n, k)* z^k, {k, 0, n})
 					return bellBPolynomial(n, z);
@@ -213,7 +224,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -226,7 +237,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * BernoulliB(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * computes the Bernoulli number of the first kind.
@@ -279,7 +290,6 @@ public final class NumberTheory {
 							return F.Times(F.Power(F.CN1, n), F.BernoulliB(n));
 						}
 
-						return F.NIL;
 					}
 					if (n.isInteger() && n.isNonNegativeResult()) {
 						if (x.isNumEqualRational(F.C1D2)) {
@@ -308,7 +318,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -322,7 +332,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * Binomial(n, k)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the binomial coefficient of the 2 integers <code>n</code> and <code>k</code>
@@ -335,12 +345,12 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Binomial_coefficient">Wikipedia - Binomial coefficient</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; Binomial(4,2)
 	 * 6
-	 * 
-	 * &gt;&gt; Binomial(5, 3)   
+	 *
+	 * &gt;&gt; Binomial(5, 3)
 	 * 10
 	 * </pre>
 	 */
@@ -468,7 +478,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * CarmichaelLambda(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * the Carmichael function of <code>n</code>
@@ -480,7 +490,7 @@ public final class NumberTheory {
 	 * <ul>
 	 * <li><a href="https://en.wikipedia.org/wiki/Carmichael_function">Wikipedia - Carmichael function</a></li>
 	 * </ul>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; CarmichaelLambda(35)
 	 * 12
@@ -516,7 +526,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * CatalanNumber(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the catalan number for the integer argument <code>n</code>.
@@ -529,7 +539,7 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Catalan_number">Wikipedia - Catalan number</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; CatalanNumber(4)
 	 * 14
@@ -556,7 +566,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * ChineseRemainder({a1, a2, a3,...}, {n1, n2, n3,...})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * the chinese remainder function.
@@ -571,7 +581,7 @@ public final class NumberTheory {
 	 * <li><a href="https://rosettacode.org/wiki/Chinese_remainder_theorem">Rosetta Code - Chinese remainder
 	 * theorem</a></li>
 	 * </ul>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ChineseRemainder({0,3,4},{3,4,5})
 	 * 39
@@ -760,7 +770,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 	}
@@ -828,7 +838,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -979,7 +989,7 @@ public final class NumberTheory {
 
 			// int ip = (int) doubleValue;
 			IASTAppendable continuedFractionList = F
-					.ListAlloc(iterationLimit > 0 && iterationLimit < 1000 ? iterationLimit + 10 : 10);
+					.ListAlloc(iterationLimit > 0 && iterationLimit < 1000 ? iterationLimit + 10 : 100);
 			int aNow = (int) doubleValue;
 			double tNow = doubleValue - aNow;
 			double tNext;
@@ -1013,7 +1023,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * CoprimeQ(x, y)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * tests whether <code>x</code> and <code>y</code> are coprime by computing their greatest common divisor.
@@ -1026,14 +1036,14 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Coprime">Wikipedia - Coprime</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; CoprimeQ(7, 9)
 	 * True
 	 * &gt;&gt; CoprimeQ(-4, 9)
 	 * True
 	 * &gt;&gt; CoprimeQ(12, 15)
-	 * False 
+	 * False
 	 * &gt;&gt; CoprimeQ(2, 3, 5)
 	 * True
 	 * &gt;&gt; CoprimeQ(2, 4, 5)
@@ -1045,7 +1055,7 @@ public final class NumberTheory {
 		/**
 		 * The integers a and b are said to be <i>coprime</i> or <i>relatively prime</i> if they have no common factor
 		 * other than 1.
-		 * 
+		 *
 		 * See <a href="http://en.wikipedia.org/wiki/Coprime">Wikipedia:Coprime</a>
 		 */
 		@Override
@@ -1090,7 +1100,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -1103,7 +1113,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * DiracDelta(x)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * <code>DiracDelta</code> function returns <code>0</code> for all real numbers <code>x</code> where
@@ -1111,7 +1121,7 @@ public final class NumberTheory {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; DiracDelta(-42)
 	 * 0
@@ -1119,7 +1129,7 @@ public final class NumberTheory {
 	 * <p>
 	 * <code>DiracDelta</code> doesn't evaluate for <code>0</code>:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; DiracDelta(0)
 	 * DiracDelta(0)
@@ -1170,7 +1180,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * DiscreteDelta(n1, n2, n3, ...)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * <code>DiscreteDelta</code> function returns <code>1</code> if all the <code>ni</code> are <code>0</code>. Returns
@@ -1178,7 +1188,7 @@ public final class NumberTheory {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; DiscreteDelta(0, 0, 0.0)
 	 * 1
@@ -1261,14 +1271,14 @@ public final class NumberTheory {
 	 * <pre>
 	 * Divisible(n, m)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>True</code> if <code>n</code> could be divide by <code>m</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Divisible(42,7)
 	 * True
@@ -1282,7 +1292,7 @@ public final class NumberTheory {
 			if (ast.arg1().isList()) {
 				// thread over first list
 				IAST list = (IAST) ast.arg1();
-				return list.mapThread(F.ListAlloc(list.size()), ast, 1);
+				return list.mapThreadEvaled(engine, F.ListAlloc(list.size()), ast, 1);
 			}
 
 			IExpr result = engine.evaluate(F.Divide(ast.arg1(), ast.arg2()));
@@ -1303,13 +1313,13 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		/**
 		 * Return F.True or F.False if result is divisible. Return <code>F.NIL</code>, if the result could not be
 		 * determined.
-		 * 
+		 *
 		 * @param result
 		 * @return
 		 */
@@ -1335,25 +1345,25 @@ public final class NumberTheory {
 	 * <pre>
 	 * Divisors(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns all integers that divide the integer <code>n</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Divisors(990)
 	 * {1,2,3,5,6,9,10,11,15,18,22,30,33,45,55,66,90,99,110,165,198,330,495,990}
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt; Divisors(341550071728321)
 	 * {1,10670053,32010157,341550071728321}
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt; Divisors(2010)
@@ -1364,7 +1374,7 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluateArg1(final IExpr arg1, EvalEngine engine) {
-			if (arg1.isInteger()) {
+			if (arg1.isInteger() && !arg1.isZero()) {
 				IInteger i = (IInteger) arg1;
 				if (i.isNegative()) {
 					i = i.negate();
@@ -1415,7 +1425,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 
@@ -1428,7 +1438,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * DivisorSigma(k, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the sum of the <code>k</code>-th powers of the divisors of <code>n</code>.
@@ -1440,11 +1450,11 @@ public final class NumberTheory {
 	 * <ul>
 	 * <li><a href="https://en.wikipedia.org/wiki/Divisor_function">Wikipedia - Divisor function</a></li>
 	 * </ul>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; DivisorSigma(0,12)
 	 * 6
-	 * 
+	 *
 	 * &gt;&gt; DivisorSigma(1,12)
 	 * 28
 	 * </pre>
@@ -1467,7 +1477,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 
@@ -1523,7 +1533,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * EulerE(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the euler number <code>En</code>.
@@ -1536,7 +1546,7 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Euler_number">Wikipedia - Euler number</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; EulerE(6)
 	 * -61
@@ -1556,12 +1566,10 @@ public final class NumberTheory {
 
 					// The list of all Euler numbers as a vector, n=0,2,4,....
 					ArrayList<IInteger> a = new ArrayList<IInteger>();
-					if (a.size() == 0) {
-						a.add(F.C1);
-						a.add(F.C1);
-						a.add(F.C5);
-						a.add(AbstractIntegerSym.valueOf(61));
-					}
+					a.add(F.C1);
+					a.add(F.C1);
+					a.add(F.C5);
+					a.add(AbstractIntegerSym.valueOf(61));
 
 					IInteger eulerE = eulerE(a, n);
 					if (n > 0) {
@@ -1579,7 +1587,7 @@ public final class NumberTheory {
 
 		/**
 		 * Compute a coefficient in the internal table.
-		 * 
+		 *
 		 * @param a
 		 *            list of integers
 		 * @param n
@@ -1609,7 +1617,7 @@ public final class NumberTheory {
 
 		/**
 		 * The Euler number at the index provided.
-		 * 
+		 *
 		 * @param a
 		 *            list of integers
 		 * @param n
@@ -1632,7 +1640,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * EulerPhi(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * compute Euler's totient function.
@@ -1646,7 +1654,7 @@ public final class NumberTheory {
 	 * function</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; EulerPhi(10)
 	 * 4
@@ -1699,7 +1707,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * ExtendedGCD(n1, n2, ...)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * computes the extended greatest common divisor of the given integers.
@@ -1714,7 +1722,7 @@ public final class NumberTheory {
 	 * <li><a href= "https://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity">Wikipedia: Bézout's identity</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ExtendedGCD(10, 15)
 	 * {5,{-1,1}}
@@ -1722,7 +1730,7 @@ public final class NumberTheory {
 	 * <p>
 	 * <code>ExtendedGCD</code> works with any number of arguments:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; ExtendedGCD(10, 15, 7)
 	 * {1,{-3,3,-2}}
@@ -1730,13 +1738,13 @@ public final class NumberTheory {
 	 * <p>
 	 * Compute the greatest common divisor and check the result:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; numbers = {10, 20, 14};
-	 * 
+	 *
 	 * &gt;&gt; {gcd, factors} = ExtendedGCD(Sequence @@ numbers)
 	 * {2,{3,0,-2}}
-	 * 
+	 *
 	 * &gt;&gt; Plus @@ (numbers * factors)
 	 * 2
 	 * </pre>
@@ -1745,13 +1753,16 @@ public final class NumberTheory {
 
 		/**
 		 * Returns the gcd of two positive numbers plus the bezout relations
-		 * 
+		 *
 		 * See <a href="http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm"> Extended Euclidean algorithm</a> and
 		 * See <a href="http://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity">Bézout's identity</a>
-		 * 
+		 *
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.isAST1()) {
+				return F.NIL;
+			}
 			IExpr arg;
 			BigInteger[] gcdArgs = new BigInteger[ast.argSize()];
 			for (int i = 1; i < ast.size(); i++) {
@@ -1792,8 +1803,8 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
-			return IOFunctions.ARGS_2_INFINITY;
+		public int[] expectedArgSize(IAST ast) {
+			return IOFunctions.ARGS_1_INFINITY;
 		}
 		/**
 		 * Calculate the extended GCD
@@ -1907,27 +1918,27 @@ public final class NumberTheory {
 	/**
 	 * <pre>
 	 * Factorial(n)
-	 * 
+	 *
 	 * n!
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the factorial number of the integer <code>n</code>
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Factorial(3)
 	 * 6
-	 * 
+	 *
 	 * &gt;&gt; 4!
-	 * 24 
-	 * 
+	 * 24
+	 *
 	 * &gt;&gt; 10.5!
 	 * 1.1899423083962249E7
-	 * 
+	 *
 	 * &gt;&gt; !a! //FullForm
 	 * "Not(Factorial(a))"
 	 * </pre>
@@ -1942,7 +1953,7 @@ public final class NumberTheory {
 
 		/**
 		 * Returns the factorial of an integer n
-		 * 
+		 *
 		 * See <a href="http://en.wikipedia.org/wiki/Factorial">Factorial</a>
 		 */
 		@Override
@@ -1980,26 +1991,169 @@ public final class NumberTheory {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr x = ast.arg1();
+			IExpr n = ast.arg2();
 			if (ast.isAST2()) {
-				IExpr x = ast.arg1();
-				IExpr n = ast.arg2();
+				if (x.isInteger() && n.isInteger() && x.isNonNegativeResult() && n.isNonNegativeResult()) {
+					if (((IInteger) x).isLT((IInteger) n)) {
+						return F.C0;
+					}
+					if (((IInteger) x).equals((IInteger) n)) {
+						if (x.isZero()) {
+							return F.C1;
+						}
+						return x;
+					}
+				}
+			}
+			int ni = n.toIntDefault();
+			if (ni >= 0) {
+				if (Config.MAX_AST_SIZE < ni) {
+					ASTElementLimitExceeded.throwIt(ni);
+				}
+				int iterationLimit = EvalEngine.get().getIterationLimit();
+				if (iterationLimit <= ni) {
+					IterationLimitExceeded.throwIt(ni, ast);
+				}
+			} else {
+				if (n.isInteger()) {
+					return F.NIL;
+				}
+			}
+
+			if (ast.isAST2()) {
+				IExpr result = F.C1;
 				// x*(x-1)* (x-(n-1))
 
+				if (engine.evalTrue(F.Less(n, F.C0))) {
+					return F.NIL;
+				} else if (n.isZero()) {
+					return F.C1;
+				} else if (n.isOne()) {
+					return x;
+				} else {
+					if (engine.isDoubleMode()) {
+						double real = Double.NaN;
+						try {
+							real = x.evalDouble();
+						} catch (ArgumentTypeException ate) {
+							Complex temp = x.evalComplex();
+							if (temp == null) {
+								return F.NIL;
+							}
+							real = temp.getReal();
+						}
+						if (Double.isNaN(real)) {
+							return F.NIL;
+						}
+						double dN = n.evalDouble();
+						double i = real - dN + 1;
+						while (real >= i) {
+							result = result.multiply(x);
+							x = x.dec();
+							real--;
+						}
+						return result;
+					} else if (x.isExactNumber() && n.isRational()) {
+						IRational real = (IRational) ((INumber) x).re();
+						IRational dN = (IRational) n;
+						IRational i = real.subtract(dN).inc();
+						while (real.isGE(i)) {
+							result = result.multiply(x);
+							x = x.dec();
+							real = real.dec();
+						}
+						return result;
+					}
+				}
 				return F.NIL;
 			}
-			if (ast.isAST2()) {
-				IExpr x = ast.arg1();
-				IExpr n = ast.arg2();
+			if (ast.isAST3()) {
+				IExpr result = F.C1;
 				IExpr h = ast.arg3();
 				// x*(x-h)* (x-(n-1)*h)
 
+				if (engine.evalTrue(F.Less(n, F.C0))) {
 				return F.NIL;
+				} else if (n.isZero()) {
+					return F.C1;
+				} else if (n.isOne()) {
+					return x;
+				} else {
+					if (engine.isDoubleMode()) {
+						double real = Double.NaN;
+						try {
+							real = x.evalDouble();
+						} catch (ArgumentTypeException ate) {
+							Complex temp = x.evalComplex();
+							if (temp == null) {
+								return F.NIL;
+							}
+							real = temp.getReal();
+						}
+						if (Double.isNaN(real)) {
+							return F.NIL;
+						}
+						double dN = n.evalDouble();
+						double doubleH = h.evalDouble();
+						if (h.isZero()) {
+							while (engine.evalTrue(F.Greater(n, F.C0))) {
+								result = result.multiply(x);
+								n = n.dec();
+							}
+							return result;
+						} else if (engine.evalTrue(F.Greater(h, F.C0))) {
+							double i = real - (dN - 1) * doubleH;
+							while (real >= i) {
+								result = result.multiply(x);
+								x = x.minus(h);
+								real -= doubleH;
+							}
+							return result;
+						} else {
+							double i = real - (dN - 1) * doubleH;
+							while (real <= i) {
+								result = result.multiply(x);
+								x = x.minus(h);
+								real -= doubleH;
+							}
+							return result;
+						}
+					} else if (x.isExactNumber() && n.isRational() && h.isRational()) {
+						IRational real = (IRational) ((INumber) x).re();
+						IRational dN = (IRational) n;
+						IRational H = (IRational) h;
+						if (H.isZero()) {
+							while (dN.isGT(F.C0)) {
+								result = result.multiply(x);
+								dN = dN.dec();
+							}
+							return result;
+						}
+						if (H.isGT(F.C0)) {
+							IRational i = real.subtract(dN.dec().multiply(H));
+							while (real.isGE(i)) {
+								result = result.multiply(x);
+								x = x.minus(H);
+								real = real.subtract(H);
+							}
+							return result;
+						}
+						IRational i = real.subtract(dN.dec().multiply(H));
+						while (real.isLE(i)) {
+							result = result.multiply(x);
+							x = x.minus(H);
+							real = real.subtract(H);
+						}
+						return result;
+					}
+				}
 			}
 			return F.NIL;
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 
@@ -2012,10 +2166,10 @@ public final class NumberTheory {
 	/**
 	 * <pre>
 	 * Factorial2(n)
-	 * 
+	 *
 	 * n!!
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the double factorial number of the integer <code>n</code>.
@@ -2028,7 +2182,7 @@ public final class NumberTheory {
 	 * <li><a href= "http://en.wikipedia.org/wiki/Factorial#Double_factorial">Wikipedia - Double Factorial</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Factorial2(3)
 	 * 3
@@ -2109,25 +2263,25 @@ public final class NumberTheory {
 	 * <pre>
 	 * FactorInteger(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the factorization of <code>n</code> as a list of factors and exponents.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; FactorInteger(990)
 	 * {{2,1},{3,2},{5,1},{11,1}}
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt;&gt; FactorInteger(341550071728321)
 	 * {{10670053,1},{32010157,1}}
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt; factors = FactorInteger(2010)
@@ -2136,7 +2290,7 @@ public final class NumberTheory {
 	 * <p>
 	 * To get back the original number:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Times @@ Power @@@ factors
 	 * 2010
@@ -2144,7 +2298,7 @@ public final class NumberTheory {
 	 * <p>
 	 * <code>FactorInteger</code> factors rationals using negative exponents:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; FactorInteger(2010 / 2011)
 	 * {{2, 1}, {3, 1}, {5, 1}, {67, 1}, {2011, -1}}
@@ -2198,24 +2352,24 @@ public final class NumberTheory {
 	 * <pre>
 	 * Fibonacci(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the Fibonacci number of the integer <code>n</code>
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Fibonacci(0)
 	 * 0
-	 * 
+	 *
 	 * &gt;&gt; Fibonacci(1)
 	 * 1
-	 * 
+	 *
 	 * &gt;&gt; Fibonacci(10)
 	 * 55
-	 * 
+	 *
 	 * &gt;&gt; Fibonacci(200)
 	 * 280571172992510140037611932413038677189525
 	 * </pre>
@@ -2236,7 +2390,12 @@ public final class NumberTheory {
 				int n = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
 				if (n > Integer.MIN_VALUE) {
 					if (ast.isAST2()) {
-						return fibonacciPolynomialIterative(n, ast.arg2(), engine);
+						if (ast.arg2().isSymbol() || //
+								ast.arg2().isNumber() || //
+								ast.arg2().isAST()) {
+							return fibonacciPolynomialIterative(n, ast.arg2(), ast, engine);
+						}
+						return F.NIL;
 					}
 					return fibonacci(n);
 				}
@@ -2270,12 +2429,15 @@ public final class NumberTheory {
 		 *            the variable expression of the polynomial
 		 * @return
 		 */
-		public IExpr fibonacciPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+		public IExpr fibonacciPolynomialIterative(int n, IExpr x, IAST ast, final EvalEngine engine) {
 			int iArg = n;
 			if (n < 0) {
 				n *= (-1);
 			}
 
+			if (n > Config.MAX_POLYNOMIAL_DEGREE) {
+				PolynomialDegreeLimitExceeded.throwIt(n);
+			}
 			IExpr previousFibonacci = F.C0;
 			IExpr fibonacci = F.C1;
 			if (n == 0) {
@@ -2285,10 +2447,14 @@ public final class NumberTheory {
 				return fibonacci;
 			}
 
+			int iterationLimit = engine.getIterationLimit();
+			if (iterationLimit >= 0 && iterationLimit <= n) {
+				IterationLimitExceeded.throwIt(n, ast);
+			}
 			for (int i = 1; i < n; i++) {
 				IExpr temp = fibonacci;
 				if (fibonacci.isPlus()) {
-					fibonacci = ((IAST) fibonacci).mapThread(F.Times(x, null), 2);
+					fibonacci = ((IAST) fibonacci).mapThread(F.Times(x, F.Slot1), 2);
 				} else {
 					fibonacci = F.Times(x, fibonacci);
 				}
@@ -2302,7 +2468,7 @@ public final class NumberTheory {
 			return fibonacci;
 		}
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -2315,7 +2481,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * FrobeniusNumber({a1, ... ,aN})
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the Frobenius number of the nonnegative integers <code>{a1, ... ,aN}</code>
@@ -2335,7 +2501,7 @@ public final class NumberTheory {
 	 * <li><a href="https://en.wikipedia.org/wiki/Coin_problem">Wikipedia - Coin problem</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; FrobeniusNumber({1000, 1476, 3764, 4864, 4871, 7773})
 	 * 47350
@@ -2355,7 +2521,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -2421,7 +2587,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -2433,7 +2599,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * JacobiSymbol(m, n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * calculates the Jacobi symbol.
@@ -2446,7 +2612,7 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Jacobi_symbol">Wikipedia - Jacobi symbol</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; JacobiSymbol(1001, 9907)
 	 * -1
@@ -2478,7 +2644,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * KroneckerDelta(arg1, arg2, ... argN)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * if all arguments <code>arg1</code> to <code>argN</code> are equal return <code>1</code>, otherwise return
@@ -2486,11 +2652,11 @@ public final class NumberTheory {
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; KroneckerDelta(42)
 	 * 0
-	 * 
+	 *
 	 * &gt;&gt; KroneckerDelta(42, 42.0, 42)
 	 * 1
 	 * </pre>
@@ -2559,11 +2725,11 @@ public final class NumberTheory {
 				IAST list2 = (IAST) arg2;
 				if (arg3.isReal() && arg3.isPositive()) {
 					int n = arg3.toIntDefault(-1);
-					return linearRecurrence(list1, list2, n, engine);
+					return linearRecurrence(list1, list2, n, ast, engine);
 				}
 				if (arg3.isList() && arg3.size() == 2 && arg3.first().isReal()) {
 					int n = arg3.first().toIntDefault(-1);
-					IAST result = linearRecurrence(list1, list2, n, engine);
+					IAST result = linearRecurrence(list1, list2, n, ast, engine);
 					if (result.isPresent()) {
 						return result.get(n);
 					}
@@ -2573,10 +2739,10 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_3;
 		}
-		private IAST linearRecurrence(IAST list1, IAST list2, int n, EvalEngine engine) {
+		private IAST linearRecurrence(IAST list1, IAST list2, int n, IAST ast, EvalEngine engine) {
 			if (n < 0) {
 				return F.NIL;
 			}
@@ -2584,6 +2750,18 @@ public final class NumberTheory {
 			int size2 = list2.size();
 			if (size2 >= size1) {
 				int counter = 0;
+				if (Config.MAX_AST_SIZE < n) {
+					ASTElementLimitExceeded.throwIt(n);
+				}
+				int loopCounter = n;
+				if (size1 > 0) {
+					loopCounter = n * size1;
+				}
+
+				int iterationLimit = engine.getIterationLimit();
+				if (iterationLimit >= 0 && iterationLimit <= loopCounter) {
+					IterationLimitExceeded.throwIt(loopCounter, ast);
+				}
 				IASTAppendable result = F.ListAlloc(n);
 				int start = size2 - size1 + 1;
 				boolean isNumber = true;
@@ -2616,14 +2794,20 @@ public final class NumberTheory {
 						counter++;
 					}
 				} else {
+					long numberOfLeaves = n;
 					while (counter < n) {
 						int size = result.size();
-						IASTAppendable plusAST = F.PlusAlloc(size);
+						IASTAppendable plusAST = F.PlusAlloc(size1);
 						int k = size - 1;
 						for (int i = 1; i < size1; i++) {
 							plusAST.append(F.Times(list1.get(i), result.get(k--)));
 						}
-						result.append(engine.evaluate(plusAST));
+						IExpr temp = engine.evaluate(F.Expand(plusAST));
+						numberOfLeaves += temp.leafCount();
+						if (numberOfLeaves >= Config.MAX_AST_SIZE) {
+							ASTElementLimitExceeded.throwIt(numberOfLeaves);
+						}
+						result.append(temp);
 						counter++;
 					}
 				}
@@ -2671,7 +2855,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -2695,7 +2879,7 @@ public final class NumberTheory {
 				int n = ((IInteger) arg1).toIntDefault(Integer.MIN_VALUE);
 				if (n > Integer.MIN_VALUE) {
 					if (ast.isAST2()) {
-						return lucasLPolynomialIterative(n, ast.arg2(), engine);
+						return lucasLPolynomialIterative(n, ast.arg2(), ast, engine);
 					}
 					int iArg = n;
 					if (n < 0) {
@@ -2739,10 +2923,13 @@ public final class NumberTheory {
 		 *            the variable expression of the polynomial
 		 * @return
 		 */
-		private static IExpr lucasLPolynomialIterative(int n, IExpr x, final EvalEngine engine) {
+		private static IExpr lucasLPolynomialIterative(int n, IExpr x, final IAST ast, final EvalEngine engine) {
 			int iArg = n;
 			if (n < 0) {
 				n *= (-1);
+			}
+			if (n > Config.MAX_POLYNOMIAL_DEGREE) {
+				PolynomialDegreeLimitExceeded.throwIt(n);
 			}
 			IExpr previousLucasL = F.C2;
 			IExpr lucalsL = x;
@@ -2756,10 +2943,14 @@ public final class NumberTheory {
 				return lucalsL;
 			}
 
+			int iterationLimit = engine.getIterationLimit();
+			if (iterationLimit >= 0 && iterationLimit <= n) {
+				IterationLimitExceeded.throwIt(n, ast);
+			}
 			for (int i = 1; i < n; i++) {
 				IExpr temp = lucalsL;
 				if (lucalsL.isPlus()) {
-					lucalsL = ((IAST) lucalsL).mapThread(F.Times(x, null), 2);
+					lucalsL = ((IAST) lucalsL).mapThread(F.Times(x, F.Slot1), 2);
 				} else {
 					lucalsL = F.Times(x, lucalsL);
 				}
@@ -2772,7 +2963,7 @@ public final class NumberTheory {
 			return lucalsL;
 		}
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -2827,7 +3018,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -2840,7 +3031,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * MersennePrimeExponent(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the <code>n</code>th mersenne prime exponent. <code>2^n - 1</code> must be a prime number. Currently
@@ -2855,7 +3046,7 @@ public final class NumberTheory {
 	 * <li><a href="https://en.wikipedia.org/wiki/List_of_perfect_numbers">Wikipedia - List of perfect numbers</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Table(MersennePrimeExponent(i), {i,20})
 	 * {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423}
@@ -2888,7 +3079,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * MersennePrimeExponentQ(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>True</code> if <code>2^n - 1</code> is a prime number. Currently <code>0 &lt;= n &lt;= 47</code>
@@ -2903,7 +3094,7 @@ public final class NumberTheory {
 	 * <li><a href="https://en.wikipedia.org/wiki/List_of_perfect_numbers">Wikipedia - List of perfect numbers</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Select(Range(10000), MersennePrimeExponentQ)
 	 * {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,9941}
@@ -2940,7 +3131,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -2953,7 +3144,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * MoebiusMu(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * calculate the Möbius function.
@@ -2966,7 +3157,7 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/M%C3%B6bius_function">Wikipedia - Möbius function</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; MoebiusMu(30)
 	 * -1
@@ -3005,7 +3196,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * Multinomial(n1, n2, ...)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the multinomial coefficient <code>(n1+n2+...)!/(n1! n2! ...)</code>.
@@ -3018,18 +3209,18 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Multinomial_coefficient">Wikipedia: Multinomial coefficient</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Multinomial(2, 3, 4, 5)
 	 * 2522520
-	 * 
+	 *
 	 * &gt;&gt; Multinomial()
 	 * 1
 	 * </pre>
 	 * <p>
 	 * <code>Multinomial(n-k, k)</code> is equivalent to <code>Binomial(n, k)</code>.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Multinomial(2, 3)
 	 * 10
@@ -3091,7 +3282,7 @@ public final class NumberTheory {
 			}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return null;
 		}
 
@@ -3153,7 +3344,7 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 	}
@@ -3162,24 +3353,24 @@ public final class NumberTheory {
 	 * <pre>
 	 * NextPrime(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the next prime after <code>n</code>.
 	 * </p>
 	 * </blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * NextPrime(n, k)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the <code>k</code>th prime after <code>n</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; NextPrime(10000)
 	 * 10007
@@ -3219,6 +3410,10 @@ public final class NumberTheory {
 					// Positive integer (less equal 2147483647) expected at position `2` in `1`.
 					return IOFunctions.printMessage(F.NextPrime, "intpm", F.List(ast, F.C2), engine);
 				}
+				int iterationLimit = EvalEngine.get().getIterationLimit();
+				if (iterationLimit >= 0 && iterationLimit <= n) {
+					IterationLimitExceeded.throwIt(n, ast);
+				}
 				BigInteger temp = primeBase;
 				for (int i = 0; i < n; i++) {
 					temp = temp.nextProbablePrime();
@@ -3230,7 +3425,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -3239,21 +3434,21 @@ public final class NumberTheory {
 	 * <pre>
 	 * PartitionsP(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the number of unrestricted partitions of the integer <code>n</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; PartitionsP(50)
 	 * 204226
-	 * 
+	 *
 	 * &gt;&gt; PartitionsP(6)
 	 * 11
-	 * 
+	 *
 	 * &gt;&gt; IntegerPartitions(6)
 	 * {{6},{5,1},{4,2},{4,1,1},{3,3},{3,2,1},{3,1,1,1},{2,2,2},{2,2,1,1},{2,1,1,1,1},{1,1,1,1,1,1}}
 	 * </pre>
@@ -3280,7 +3475,7 @@ public final class NumberTheory {
 
 			/**
 			 * Return the number of partitions of i
-			 * 
+			 *
 			 * @param n
 			 *            the zero-based index into the list of partitions
 			 * @param capacity
@@ -3288,6 +3483,11 @@ public final class NumberTheory {
 			 * @return the ith partition number. This is 1 if i=0 or 1, 2 if i=2 and so forth.
 			 */
 			private BigInteger sumPartitionsP(int n, int capacity) {
+				int iterationLimit = EvalEngine.get().getIterationLimit();
+				long maxIterations = (long) capacity;
+				if (iterationLimit >= 0 && iterationLimit <= maxIterations) {
+					IterationLimitExceeded.throwIt(capacity, F.PartitionsP(F.ZZ(n)));
+				}
 				fList.ensureCapacity(capacity);
 				while (fList.size() <= capacity) {
 					BigInteger per = BigInteger.ZERO;
@@ -3331,8 +3531,14 @@ public final class NumberTheory {
 					if (result != null) {
 						return result;
 					}
-				} catch (RuntimeException rex) {
+					} catch (ValidateException ve) {
 					// e.printStackTrace();
+						return engine.printMessage(ast.topHead(), ve);
+					} catch (UncheckedExecutionException e) {
+						Throwable th = e.getCause();
+						if (th instanceof LimitException) {
+							throw (LimitException) th;
+						}
 				} catch (ExecutionException e) {
 					// e.printStackTrace();
 				}
@@ -3348,11 +3554,11 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		/**
-		 * 
+		 *
 		 * @param engine
 		 * @param n
 		 *            positive integer number
@@ -3379,18 +3585,18 @@ public final class NumberTheory {
 	 * <pre>
 	 * PartitionsQ(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * gives the number of partitions of the integer <code>n</code> into distinct parts
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; PartitionsQ(50)
 	 * 3658
-	 * 
+	 *
 	 * &gt;&gt; PartitionsQ(6)
 	 * 4
 	 * </pre>
@@ -3429,14 +3635,18 @@ public final class NumberTheory {
 							return result;
 						}
 					}
-				} catch (ArithmeticException e) {
+				} catch (ValidateException ve) {
 					// e.printStackTrace();
-				} catch (RuntimeException rex) {
-					// e.printStackTrace();
+					return engine.printMessage(ast.topHead(), ve);
+				} catch (UncheckedExecutionException e) {
+					Throwable th = e.getCause();
+					if (th instanceof LimitException) {
+						throw (LimitException) th;
+					}
 				} catch (ExecutionException e) {
 					// e.printStackTrace();
 				}
-				return F.NIL;
+					return F.NIL;
 			}
 				return F.C0;
 			}
@@ -3447,12 +3657,12 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		/**
 		 * TODO because of recursion you can get stack-overflows
-		 * 
+		 *
 		 * @param engine
 		 * @param n
 		 * @return
@@ -3474,9 +3684,13 @@ public final class NumberTheory {
 		}
 
 		private static IExpr sumPartitionsQ1(EvalEngine engine, IInteger n) {
-			IInteger sum = F.C0;
 			int nInt = n.toIntDefault(Integer.MIN_VALUE);
 			if (nInt >= 0) {
+				int iterationLimit = EvalEngine.get().getIterationLimit();
+				if (iterationLimit >= 0 && iterationLimit <= nInt) {
+					IterationLimitExceeded.throwIt(nInt, F.PartitionsQ(F.ZZ(nInt)));
+				}
+				IInteger sum = F.C0;
 				for (int k = 1; k <= nInt; k++) {
 					IExpr temp = termPartitionsQ1(engine, n, k);
 					if (!temp.isInteger()) {
@@ -3484,8 +3698,10 @@ public final class NumberTheory {
 					}
 					sum = sum.add((IInteger) temp);
 				}
-			}
 			return sum;
+		}
+			return F.NIL;
+
 		}
 
 		private static IExpr termPartitionsQ1(EvalEngine engine, IInteger n, int k) {
@@ -3495,7 +3711,12 @@ public final class NumberTheory {
 		}
 
 		private static IExpr sumPartitionsQ2(EvalEngine engine, IInteger n) {
-			int floorND2 = n.div(F.C2).toInt();
+			int floorND2 = n.div(F.C2).toIntDefault();
+			if (floorND2 >= 0) {
+				int iterationLimit = EvalEngine.get().getIterationLimit();
+				if (iterationLimit >= 0 && iterationLimit <= floorND2) {
+					IterationLimitExceeded.throwIt(floorND2, F.PartitionsQ(n));
+				}
 			IInteger sum = F.C0;
 			for (int k = 1; k <= floorND2; k++) {
 				IExpr temp = termPartitionsQ2(engine, n, k);
@@ -3505,6 +3726,8 @@ public final class NumberTheory {
 				sum = sum.add((IInteger) temp);
 			}
 			return sum;
+		}
+			return F.NIL;
 		}
 
 		private static IExpr termPartitionsQ2(EvalEngine engine, IInteger n, int k) {
@@ -3588,7 +3811,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -3601,14 +3824,14 @@ public final class NumberTheory {
 	 * <pre>
 	 * Prime(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the <code>n</code>th prime number.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Prime(1)
 	 * 2
@@ -3640,7 +3863,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -3678,10 +3901,15 @@ public final class NumberTheory {
 				int maxK = ((IInteger) x).toIntDefault(Integer.MIN_VALUE);
 				if (maxK >= 0) {
 					int result = 0;
+					BigInteger max = BigInteger.valueOf(maxK);
 					BigInteger temp = BigInteger.ONE;
+					int iterationLimit = engine.getIterationLimit();
+					if (iterationLimit >= 0 && iterationLimit < (maxK / 100)) {
+						IterationLimitExceeded.throwIt(maxK, ast);
+					}
 					for (int i = 2; i <= maxK; i++) {
 						temp = temp.nextProbablePrime();
-						if (temp.intValue() > maxK) {
+						if (temp.compareTo(max) > 0) {
 							break;
 						}
 						result++;
@@ -3694,7 +3922,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -3707,25 +3935,25 @@ public final class NumberTheory {
 	 * <pre>
 	 * PrimeOmega(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the sum of the exponents of the prime factorization of <code>n</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; PrimeOmega(990)
 	 * {{2,1},{3,2},{5,1},{11,1}}
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt;&gt; PrimeOmega(341550071728321)
 	 * {{10670053,1},{32010157,1}}
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ```
 	 * &gt;&gt; PrimeOmega(2010)
@@ -3765,7 +3993,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -3778,27 +4006,27 @@ public final class NumberTheory {
 	 * <pre>
 	 * PrimePowerQ(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>True</code> if <code>n</code> is a power of a prime number.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; PrimePowerQ(9)
 	 * True
-	 * 
+	 *
 	 * &gt;&gt; PrimePowerQ(52142)
 	 * False
-	 * 
+	 *
 	 * &gt;&gt; PrimePowerQ(-8)
 	 * True
-	 * 
+	 *
 	 * &gt;&gt; PrimePowerQ(371293)
 	 * True
-	 * 
+	 *
 	 * &gt;&gt; PrimePowerQ(1)
 	 * False
 	 * </pre>
@@ -3816,7 +4044,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -3852,7 +4080,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -3864,18 +4092,18 @@ public final class NumberTheory {
 	 * <pre>
 	 * PrimitiveRootList(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the list of the primitive roots of <code>n</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; PrimitiveRootList(37)
 	 * {2,5,13,15,17,18,19,20,22,24,32,35}
-	 * 
+	 *
 	 * &gt;&gt; PrimitiveRootList(127)
 	 * {3,6,7,12,14,23,29,39,43,45,46,48,53,55,56,57,58,65,67,78,83,85,86,91,92,93,96,97,101,106,109,110,112,114,116,118}
 	 * </pre>
@@ -4060,7 +4288,7 @@ public final class NumberTheory {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 
@@ -4073,18 +4301,18 @@ public final class NumberTheory {
 	 * <pre>
 	 * SquareFreeQ(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns <code>True</code> if <code>n</code> a square free integer number or a square free univariate polynomial.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; SquareFreeQ(9)
 	 * False
-	 * 
+	 *
 	 * &gt;&gt; SquareFreeQ(105)
 	 * True
 	 * </pre>
@@ -4133,7 +4361,7 @@ public final class NumberTheory {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		public static boolean isSquarefree(IExpr expr, List<IExpr> varList) throws JASConversionException {
@@ -4206,7 +4434,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * StirlingS1(n, k)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the Stirling numbers of the first kind.
@@ -4220,7 +4448,7 @@ public final class NumberTheory {
 	 * the first kind</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; StirlingS1(9, 6)
 	 * -4536
@@ -4258,6 +4486,7 @@ public final class NumberTheory {
 				counter++;
 				IInteger k;
 				IASTAppendable temp = F.PlusAlloc(counter >= 0 ? counter : 0);
+				long leafCount = 0;
 				for (int i = 0; i < counter; i++) {
 					k = F.ZZ(i);
 					if ((i & 1) == 1) { // isOdd(i) ?
@@ -4268,11 +4497,17 @@ public final class NumberTheory {
 					temp.append(Times(factorPlusMinus1, F.Binomial(Plus(k, nSubtract1), Plus(k, nSubtractm)),
 							F.Binomial(nTimes2Subtractm, F.Subtract(nSubtractm, k)),
 							F.StirlingS2(Plus(k, nSubtractm), k)));
+					leafCount += temp.leafCount();
+					if (leafCount > Config.MAX_AST_SIZE) {
+						ASTElementLimitExceeded.throwIt(leafCount);
+					}
 
 				}
 				return temp;
 			}
-			throw new ArithmeticException("StirlingS1(n, m): arguments out of range.");
+			// Machine-sized integer expected at position `2` in `1`.
+			String str = IOFunctions.getMessage("intm", F.List(F.ZZ(1), F.StirlingS1(n, m)));
+			throw new ArgumentTypeException(str);
 		}
 
 		/** {@inheritDoc} */
@@ -4285,20 +4520,14 @@ public final class NumberTheory {
 				return F.NIL;
 			}
 			if (nArg1.isInteger() && mArg2.isInteger()) {
-				try {
 				return stirlingS1((IInteger) nArg1, (IInteger) mArg2);
-				} catch (RuntimeException rex) {
-					if (FEConfig.SHOW_STACKTRACE) {
-						rex.printStackTrace();
-					}
-				}
 			}
 
 			return F.NIL;
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		@Override
@@ -4311,7 +4540,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * StirlingS2(n, k)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the Stirling numbers of the second kind.
@@ -4325,7 +4554,7 @@ public final class NumberTheory {
 	 * the second kind</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt;&gt; StirlingS2(10, 6)
 	 * 22827
@@ -4348,6 +4577,7 @@ public final class NumberTheory {
 					return F.C1;
 				}
 				if (nArg1.isInteger() && kArg2.isInteger()) {
+					int n = Validate.checkNonNegativeIntType(ast, 1);
 					IInteger ki = (IInteger) kArg2;
 					if (ki.greaterThan(nArg1).isTrue()) {
 						return C0;
@@ -4369,23 +4599,18 @@ public final class NumberTheory {
 
 					int k = ki.toIntDefault(0);
 					if (k != 0) {
-						return stirlingS2((IInteger) nArg1, ki, k);
+						return stirlingS2(n, ki, k);
 					}
 				}
 
 			} catch (MathRuntimeException mre) {
 				return engine.printMessage(ast.topHead(), mre);
-			} catch (RuntimeException rex) {
-				if (FEConfig.SHOW_STACKTRACE) {
-					rex.printStackTrace();
-				}
-				return engine.printMessage(ast.topHead(), rex);
 			}
 			return F.NIL;
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		@Override
@@ -4398,7 +4623,7 @@ public final class NumberTheory {
 	 * <pre>
 	 * Subfactorial(n)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * returns the subfactorial number of the integer <code>n</code>
@@ -4411,7 +4636,7 @@ public final class NumberTheory {
 	 * <li><a href="http://en.wikipedia.org/wiki/Derangement">Wikipedia - Derangement</a></li>
 	 * </ul>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Subfactorial(12)
 	 * 176214841
@@ -4425,7 +4650,7 @@ public final class NumberTheory {
 		 * <code>Subfactorial(n) = n * Subfactorial(n-1) + (-1)^n</code>
 		 * </p>
 		 * See <a href="http://en.wikipedia.org/wiki/Derangement">Wikipedia - Derangement</a>
-		 * 
+		 *
 		 * <pre>
 		 * result = 1;
 		 * for (long i = 3; i &lt;= n; i++) {
@@ -4437,7 +4662,7 @@ public final class NumberTheory {
 		 *   }
 		 * }
 		 * </pre>
-		 * 
+		 *
 		 * @param n
 		 * @return
 		 */
@@ -4485,14 +4710,14 @@ public final class NumberTheory {
 	 * <pre>
 	 * Unitize(expr)
 	 * </pre>
-	 * 
+	 *
 	 * <blockquote>
 	 * <p>
 	 * maps a non-zero <code>expr</code> to <code>1</code>, and a zero <code>expr</code> to <code>0</code>.
 	 * </p>
 	 * </blockquote>
 	 * <h3>Examples</h3>
-	 * 
+	 *
 	 * <pre>
 	 * &gt;&gt; Unitize((E + Pi)^2 - E^2 - Pi^2 - 2*E*Pi)
 	 * 0
@@ -4602,12 +4827,21 @@ public final class NumberTheory {
 	public static IInteger factorial(int ni) {
 		BigInteger result;
 		if (ni < 0) {
-			result = BigIntegerMath.factorial(-1 * ni);
+			int positiveN = -1 * ni;
+			int iterationLimit = EvalEngine.get().getIterationLimit();
+			if (iterationLimit >= 0 && iterationLimit < positiveN) {
+				IterationLimitExceeded.throwIt(positiveN, F.Factorial(F.ZZ(ni)));
+			}
+			result = BigIntegerMath.factorial(positiveN);
 			if ((ni & 0x0001) == 0x0001) {
 				// odd integer number
 				result = result.multiply(BigInteger.valueOf(-1L));
 			}
 		} else {
+			int iterationLimit = EvalEngine.get().getIterationLimit();
+			if (iterationLimit >= 0 && iterationLimit < ni) {
+				IterationLimitExceeded.throwIt(ni, F.Factorial(F.ZZ(ni)));
+			}
 			if (ni <= 20) {
 				return AbstractIntegerSym.valueOf(LongMath.factorial(ni));
 			}
@@ -4639,7 +4873,7 @@ public final class NumberTheory {
 	 * </p>
 	 * See: <a href= "https://www.rosettacode.org/wiki/Fibonacci_sequence#Iterative_28"> Roseatta code: Fibonacci
 	 * sequence.</a>
-	 * 
+	 *
 	 * @param iArg
 	 * @return
 	 */
@@ -4665,6 +4899,9 @@ public final class NumberTheory {
 			if ((temp & 0x00000001) == 0x00000001) { // odd?
 				d = result.multiply(c);
 				result = a.multiply(c).add(result.multiply(b).add(d));
+				if (result.bitLength() > Config.MAX_AST_SIZE * 8) {
+					IterationLimitExceeded.throwIt(result.bitLength(), F.Fibonacci(F.ZZ(iArg)));
+				}
 				a = a.multiply(b).add(d);
 			}
 
@@ -4761,9 +4998,7 @@ public final class NumberTheory {
 		}
 		IFraction[] bernoulli = new IFraction[n + 1];
 		bernoulli[0] = AbstractFractionSym.ONE;
-		bernoulli[1] = AbstractFractionSym.valueOf(-1, 2);// new
-															// BigFraction(-1,
-															// 2);
+		bernoulli[1] = AbstractFractionSym.valueOf(-1L, 2L);
 		for (int k = 2; k <= n; k++) {
 			bernoulli[k] = AbstractFractionSym.ZERO;
 			for (int i = 0; i < k; i++) {
@@ -4897,7 +5132,7 @@ public final class NumberTheory {
 	 * {@code n}-element set into {@code k} non-empty subsets.
 	 *
 	 * @param n
-	 *            the size of the set
+	 *            the size of the set. Must be a value > 0
 	 * @param k
 	 *            the number of non-empty subsets
 	 * @param ki
@@ -4905,25 +5140,14 @@ public final class NumberTheory {
 	 * @return {@code S2(nArg1,kArg2)} or throw <code>ArithmeticException</code> if <code>n</code> cannot be converted
 	 *         into a positive int number
 	 */
-	public static IInteger stirlingS2(IInteger n, IInteger k, int ki) throws MathRuntimeException {
-		// try {
-			int ni = n.toIntDefault(0);
-			if (ni != 0 && ni <= 25) {// S(26,9) = 11201516780955125625 is larger than Long.MAX_VALUE
-				return F.ZZ(CombinatoricsUtils.stirlingS2(ni, ki));
+	public static IInteger stirlingS2(int n, IInteger k, int ki) throws MathRuntimeException {
+		if (n != 0 && n <= 25) {// S(26,9) = 11201516780955125625 is larger than Long.MAX_VALUE
+			return F.ZZ(CombinatoricsUtils.stirlingS2(n, ki));
 			}
-		// } catch (MathRuntimeException mre) {
-		// if (Config.DEBUG) {
-		// mre.printStackTrace();
-		// }
-		// }
 		IInteger sum = F.C0;
-		int nInt = n.toIntDefault(-1);
-		if (nInt < 0) {
-			throw new ArithmeticException("StirlingS2(n,k) n is not a positive int number");
-		}
 		for (int i = 0; i < ki; i++) {
 			IInteger bin = binomial(k, F.ZZ(i));
-			IInteger pow = k.add(F.ZZ(-i)).pow(nInt);
+			IInteger pow = k.add(F.ZZ(-i)).pow(n);
 			if ((i & 1) == 1) { // isOdd(i) ?
 				sum = sum.add(bin.negate().multiply(pow));
 			} else {
@@ -4934,7 +5158,7 @@ public final class NumberTheory {
 	}
 	/**
 	 * The first 49 perfect numbers.
-	 * 
+	 *
 	 * See <a href= "https://en.wikipedia.org/wiki/List_of_perfect_numbers">List_of_perfect_numbers</a>
 	 */
 	private final static long[] PN_8 = { 6, 28, 496, 8128, 33550336L, 8589869056L, 137438691328L,
@@ -4942,7 +5166,7 @@ public final class NumberTheory {
 
 	/**
 	 * The first 47 mersenne prime exponents.
-	 * 
+	 *
 	 * See <a href="https://en.wikipedia.org/wiki/Mersenne_prime">Mersenne prime</a>
 	 */
 	private final static int[] MPE_47 = { 2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281,

@@ -51,7 +51,7 @@ public abstract class AbstractCorePredicateEvaluator extends AbstractCoreFunctio
 		// Validate.checkSize(ast, 2);
 		// return F.NIL;
 		}
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_1_2;
 	}
 

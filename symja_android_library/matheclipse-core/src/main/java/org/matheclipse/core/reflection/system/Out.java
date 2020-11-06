@@ -35,7 +35,7 @@ public class Out extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_0_1;
 	}
 }

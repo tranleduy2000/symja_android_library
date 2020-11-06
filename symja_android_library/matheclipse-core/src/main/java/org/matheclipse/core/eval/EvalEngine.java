@@ -744,7 +744,7 @@ public class EvalEngine implements Serializable {
                     // evaluate a built-in function.
                     final IFunctionEvaluator functionEvaluator = (IFunctionEvaluator) module;
                     int[] expected;
-                    if ((expected = functionEvaluator.expectedArgSize()) != null) {
+                    if ((expected = functionEvaluator.expectedArgSize(IAST ast)) != null) {
                         if (ast.argSize() < expected[0] || ast.argSize() > expected[1]) {
                             return IOFunctions.printArgMessage(ast, expected, this);
                         }

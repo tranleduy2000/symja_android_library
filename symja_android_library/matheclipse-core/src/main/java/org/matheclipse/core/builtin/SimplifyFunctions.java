@@ -1309,7 +1309,7 @@ public class SimplifyFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_INFINITY;
 		}
 
@@ -1419,7 +1419,7 @@ public class SimplifyFunctions {
 			return super.evaluate(ast, engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 

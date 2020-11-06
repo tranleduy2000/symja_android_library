@@ -136,7 +136,7 @@ public class ElementData extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_1_2;
 	}
 	private IExpr dataPoint(final IAST ast, IAST propertyList) {

@@ -43,7 +43,7 @@ public interface ICoreFunctionEvaluator extends IFunctionEvaluator {
         }
 
         @Override
-        public int[] expectedArgSize() {
+        public int[] expectedArgSize(IAST ast) {
             return null;
         }
     };

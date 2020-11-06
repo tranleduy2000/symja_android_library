@@ -225,7 +225,7 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 		return binaryOperator(ast, ast.arg1(), ast.arg2(),engine);
 	}
 
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_2;
 	}
 }

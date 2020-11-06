@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval.interfaces;
 
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IEvaluatorImpl;
 
 /**
@@ -8,7 +9,7 @@ import org.matheclipse.core.interfaces.IEvaluatorImpl;
 
 public abstract class IFunctionEvaluatorImpl extends IEvaluatorImpl implements IFunctionEvaluator {
     @Override
-    public int[] expectedArgSize() {
+    public int[] expectedArgSize(IAST ast) {
         return null;
     }
 

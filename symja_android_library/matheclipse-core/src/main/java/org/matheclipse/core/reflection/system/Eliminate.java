@@ -564,7 +564,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_2;
 	}
 	private static IExpr resultAsAndEquations(IAST result) {

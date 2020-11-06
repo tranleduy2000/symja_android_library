@@ -7,6 +7,8 @@ import com.duy.lambda.Function;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.visit.IVisitor;
 
@@ -342,7 +344,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     /**
      * Collect all arguments of this AST in a new set.
      *
-     * @return
+	 * @return <code>null</code> if a set couldn't be created
      */
     Set<IExpr> asSet();
 
@@ -357,7 +359,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return a clone of this <code>IAST</code> instance.
      * @deprecated use {@link #copyAppendable()} or {@link #copy()}
      */
-    IAST clone() throws CloneNotSupportedException;
+	@Deprecated
+	public IAST clone() throws CloneNotSupportedException;
 
     /**
      * Compare all adjacent elements from lowest to highest index and return true, if the binary predicate gives true in
@@ -413,15 +416,19 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
 
     /**
      * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
-     * to the <code>clone()</code> method, this method returns exactly the same type for
-     * <code>AST0, AST1, AST2,AST3</code>.
+	 * to the {@link #copy()} method, this method doesn't return exactly the same type for a given
+	 * <code>AST0, AST1, AST2, AST3...</code> object but transforms it into a new <code>AST</code> object, so that
+	 * additional arguments could be appended or at the end.
      *
      * @return a copy of this <code>IAST</code> instance.
      */
     IASTAppendable copyAppendable();
 
     /**
-     * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied).
+	 * Returns a shallow copy of this <code>IAST</code> instance (the elements themselves are not copied). In contrast
+	 * to the {@link #copy()} method, this method doesn't return exactly the same type for a given
+	 * <code>AST0, AST1, AST2, AST3...</code> object but transforms it into a new <code>AST</code> object, so that
+	 * additional arguments could be appended at the end.
      *
      * @return a copy of this <code>IAST</code> instance.
      */
@@ -539,11 +546,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
     boolean existsLeft(BiPredicate<IExpr, IExpr> stopPredicate);
 
     /**
-     * Copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive).
      *
-     * @param fromIndex
-     * @param toIndex
-     * @return copy of sub <code>AST</code> fromIndex (inclusive) to toIndex (exclusive)
+     * @deprecated use {@link #slice(int, int)} instead
      */
     IASTAppendable extract(int fromIndex, int toIndex);
 
@@ -790,6 +794,25 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     public IExpr get(IInteger location);
 
+    IExpr getValue(int location);
+
+    /**
+     * Assuming this is a list of rules or an <code>IAssociation</code>. Return the first rule which equals the
+     * <code>key</code> argument.
+     *
+     * @param key
+     * @return
+     */
+    IAST getRule(String key);
+
+    /**
+     * Assuming this is a list of rules or an <code>IAssociation</code>. Return the first rule which equals the
+     * <code>key</code> argument.
+     *
+     * @param key
+     * @return
+     */
+    IAST getRule(IExpr key);
 
     /**
      * Returns <code>length</code> number of elements specified in the <code>items</code> position array in this
@@ -872,6 +895,14 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @throws IndexOutOfBoundsException if one of the positions are out of range
      */
     IExpr getPart(final List<Integer> positions);
+    /**
+     * If this is an <code>IAssociation</code> return the rule at the position. Otherwise call
+     * <code>get(position)</code>
+     *
+     * @param position
+     * @return
+     */
+    IExpr getRule(int position);
 
     /**
      * Test if the last argument contains a pattern with a default argument.
@@ -1041,21 +1072,6 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     IAST map(final IExpr head, final Function<IExpr, IExpr> functor);
 
-    /**
-     * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
-     * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the
-     * currently mapped element and appends the element to <code>appendAST</code>.
-     *
-     * @param appendAST
-     * @param replacement an IAST there the argument at the given position is replaced by the currently mapped argument of this
-     *                    IAST.
-     * @param position
-     * @return <code>appendAST</code>
-     * @deprecated use IAST#mapThread() instead
-     */
-    @Deprecated
-    IAST mapAt(IASTAppendable appendAST, final IAST replacement, int position);
-
     IAST mapAt(final IASTAppendable replacement, int position);
 
     /**
@@ -1115,6 +1131,8 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      */
     IASTMutable mapThread(final IAST replacement, int position);
 
+    IASTMutable mapThreadEvaled(EvalEngine engine, final IAST replacement, int position);
+
 
     /**
      * Maps the elements of this IAST with the unary <code>function)</code>.
@@ -1139,7 +1157,7 @@ public interface IAST extends IExpr, Cloneable, Iterable<IExpr> {
      * @return <code>appendAST</code>
      * @see IAST#map(Function, int)
      */
-    IASTAppendable mapThread(IASTAppendable appendAST, final IAST replacement, int position);
+    IASTAppendable mapThreadEvaled(EvalEngine engine, IASTAppendable appendAST, final IAST replacement, int position);
 
     /**
      * Get the argument at index 1, if the <code>size() == 2</code> or the complete ast if the <code>size() > 2</code>

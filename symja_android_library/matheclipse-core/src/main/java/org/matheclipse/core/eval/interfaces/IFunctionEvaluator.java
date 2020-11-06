@@ -88,5 +88,5 @@ public interface IFunctionEvaluator extends IEvaluator {
 	 *
 	 * @return <code>null</code> is no range for the number of arguments is specified.
 	 */
-	 int[] expectedArgSize();
+	 int[] expectedArgSize(IAST ast);
 }

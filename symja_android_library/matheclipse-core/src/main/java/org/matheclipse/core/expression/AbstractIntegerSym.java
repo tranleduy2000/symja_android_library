@@ -2,12 +2,15 @@ package org.matheclipse.core.expression;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
+import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.ArithmeticUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.NumberTheory;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -26,9 +29,14 @@ import org.matheclipse.core.visit.IVisitorLong;
 
 import java.io.Externalizable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.Stack;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import edu.jas.arith.PrimeInteger;
 import it.unimi.dsi.fastutil.objects.Int2IntMap;
@@ -64,6 +72,79 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	public static final BigInteger BI_SEVEN = BigInteger.valueOf(7L);
 	public static final BigInteger BI_EIGHT = BigInteger.valueOf(8L);
 
+	@Override
+	public IAST divisors() {
+		if (isOne() || isMinusOne()) {
+			return F.List(F.C1);
+		}
+		Set<IInteger> set = divisorsSet();
+		final IASTAppendable resultList = F.ListAlloc(set.size() + 1);
+		for (IInteger divisor : set) {
+			resultList.append(divisor);
+		}
+		return resultList;
+	}
+
+	/**
+	 * Bottom-up divisors construction algorithm. Slightly faster than top-down.
+	 *
+	 * @param factors
+	 * @return the set of divisors of the number thats prime factorization is given
+	 */
+	private SortedSet<IInteger> divisorsSet() {
+		IAST factors = factorInteger();
+		if (factors.size() == 1) {
+			TreeSet<IInteger> treeSet = new TreeSet<IInteger>();
+			treeSet.add(F.C1);
+			return treeSet;
+		}
+
+		ArrayList<IInteger> primes = new ArrayList<>();
+		ArrayList<Integer> maxPowers = new ArrayList<>();
+		for (int i = 1; i < factors.size(); i++) {
+			IExpr arg = factors.get(i);
+			primes.add((IInteger) arg.first());
+			maxPowers.add(arg.second().toIntDefault());
+		}
+
+		TreeSet<IInteger> divisors = new TreeSet<IInteger>();
+		if (primes.size() == 0 || (primes.size() == 1 && primes.get(0).equals(F.C0))) {
+			return divisors;
+		}
+
+		Stack<ArrayList<Integer>> stack = new Stack<ArrayList<Integer>>();
+		ArrayList<Integer> emptyPowers = new ArrayList<Integer>();
+		for (int i = 0; i < maxPowers.size(); i++) {
+			emptyPowers.add(0);
+		}
+		stack.push(emptyPowers);
+
+		while (!stack.isEmpty()) {
+			ArrayList<Integer> powers = stack.pop();
+			// compute divisor from stack element
+			IInteger divisor = F.C1;
+			for (int i = 0; i < powers.size(); i++) {
+				int power = powers.get(i);
+				if (power > 0) {
+					// multiply entry to divisor
+					divisor = divisor.multiply(primes.get(i).pow(power));
+				}
+			}
+			if (divisors.add(divisor)) {
+				for (int i = 0; i < maxPowers.size(); i++) {
+					int maxPower = maxPowers.get(i);
+					int power = powers.get(i);
+					if (power < maxPower) {
+						// create new entry
+						ArrayList<Integer> enhancedPowers = new ArrayList<Integer>(powers); // copy
+						enhancedPowers.set(i, power + 1);
+						stack.push(enhancedPowers);
+					}
+				}
+			}
+		}
+		return divisors;
+	}
 	public static BigInteger jacobiSymbol(BigInteger a, BigInteger b) {
 		if (a.equals(BigInteger.ONE)) {
 			return BigInteger.ONE;
@@ -533,6 +614,9 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		if (number.compareTo(BigInteger.valueOf(7)) <= 0) {
 			return F.NIL;
 		}
+		if (number.bitLength() > Config.MAX_BIT_LENGTH / 100) {
+			BigIntegerLimitExceeded.throwIt(number.bitLength());
+		}
 		BigInteger rest = Primality.countPrimes32749(number, map);
 		if (map.size() == 0) {
 			return F.NIL;
@@ -566,35 +650,35 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		return F.NIL;
 	}
 
-//	private IAST factorizeInt(int intValue) {
-//		IASTAppendable result = F.ListAlloc();// tdivFactors.size() + extraSize);
-//		if (intValue < 0) {
-//			intValue *= -1;
-//			result.append(F.CN1);
-//		}
-//		TDiv31Barrett TDIV31 = new TDiv31Barrett();
-//		int prime = TDIV31.findSingleFactor(intValue);
-//		while (true) {
-//			prime = TDIV31.findSingleFactor(intValue);
-//			intValue /= prime;
-//			if (prime != 1) {
-//				result.append(F.ZZ(prime));
-//			} else {
-//				break;
-//			}
-//		}
-//		if (intValue != 1) {
-//			SortedMultiset<BigInteger> tdivFactors = TDIV31.factor(BigInteger.valueOf(intValue));
-//			for (Map.Entry<BigInteger, Integer> entry : tdivFactors.entrySet()) {
-//				final IInteger is = valueOf(entry.getKey());
-//				final int value = entry.getValue();
-//				for (int i = 0; i < value; i++) {
-//					result.append(is);
-//				}
-//			}
-//		}
-//		return result;
-//	}
+	// private IAST factorizeInt(int intValue) {
+	// IASTAppendable result = F.ListAlloc();// tdivFactors.size() + extraSize);
+	// if (intValue < 0) {
+	// intValue *= -1;
+	// result.append(F.CN1);
+	// }
+	// TDiv31Barrett TDIV31 = new TDiv31Barrett();
+	// int prime = TDIV31.findSingleFactor(intValue);
+	// while (true) {
+	// prime = TDIV31.findSingleFactor(intValue);
+	// intValue /= prime;
+	// if (prime != 1) {
+	// result.append(F.ZZ(prime));
+	// } else {
+	// break;
+	// }
+	// }
+	// if (intValue != 1) {
+	// SortedMultiset<BigInteger> tdivFactors = TDIV31.factor(BigInteger.valueOf(intValue));
+	// for (Map.Entry<BigInteger, Integer> entry : tdivFactors.entrySet()) {
+	// final IInteger is = valueOf(entry.getKey());
+	// final int value = entry.getValue();
+	// for (int i = 0; i < value; i++) {
+	// result.append(is);
+	// }
+	// }
+	// }
+	// return result;
+	// }
 	private IAST factorizeLong(long longValue) {
 		Map<Long, Integer> map = PrimeInteger.factors(longValue);
 		int resultSize = sign() < 0 ? 1 : 0;
@@ -637,11 +721,15 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
 	@Override
 	public IInteger factorial() {
-		int ni = toIntDefault(Integer.MIN_VALUE);
+		int ni = toIntDefault( );
 		if (ni > Integer.MIN_VALUE) {
 			return NumberTheory.factorial(ni);
 		}
 
+		int iterationLimit = EvalEngine.get().getIterationLimit();
+		if (iterationLimit <= ni) {
+			IterationLimitExceeded.throwIt(iterationLimit, F.Factorial(this));
+		}
 		IInteger result = F.C1;
 		if (compareTo(F.C0) == -1) {
 			result = F.CN1;
@@ -913,8 +1001,8 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		if (this instanceof IntegerSym && exponent < 63) {
 			try {
 				return valueOf(ArithmeticUtils.pow((long)((IntegerSym) this).fIntValue, (int) exponent));
-			} catch (RuntimeException ex) {
-				//
+			} catch (MathRuntimeException mrex) {
+				// result doesn't fit into a Java long
 			}
 		}
 
@@ -932,16 +1020,24 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 		while ((exp >>= 1) > 0L) {
 			x = x.multiply(x);
 			if ((exp & 1) != 0) {
+				r.checkBitLength();
 				r = r.multiply(x);
 			}
 		}
 
 		while (b2pow-- > 0L) {
+			r.checkBitLength();
 			r = r.multiply(r);
 		}
 		return r;
 	}
 
+	public void checkBitLength() {
+		final long bitLength = bitLength();
+		if (bitLength > Config.MAX_BIT_LENGTH) {
+			BigIntegerLimitExceeded.throwIt(bitLength);
+		}
+	}
 	/**
 	 * The primitive roots of this integer number
 	 *

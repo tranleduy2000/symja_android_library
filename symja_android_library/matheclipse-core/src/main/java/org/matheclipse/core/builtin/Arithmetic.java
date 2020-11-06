@@ -460,7 +460,7 @@ public final class Arithmetic {
 			return IOFunctions.printMessage(getFunctionSymbol(), "rvalue", F.List(leftHandSide), engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
         @Override
@@ -608,7 +608,7 @@ public final class Arithmetic {
 			return result;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
         @Override
@@ -666,7 +666,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
         @Override
@@ -793,7 +793,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
         private IExpr clip(IExpr x) {
@@ -1001,7 +1001,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
         @Override
@@ -1025,7 +1025,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
         @Override
@@ -1239,7 +1239,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
         protected ISymbol getFunctionSymbol() {
@@ -1271,7 +1271,7 @@ public final class Arithmetic {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 		@Override
@@ -1349,7 +1349,7 @@ public final class Arithmetic {
             return F.Divide(ast.arg1(), ast.arg2());
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
         @Override
@@ -1465,7 +1465,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_1;
 		}
         public static IExpr timesInf(IAST inf, IExpr a2) {
@@ -1648,7 +1648,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
         @Override
@@ -1876,7 +1876,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
         /**
@@ -2029,7 +2029,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
         /**
@@ -2135,7 +2135,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_INFINITY;
 		}
         /**
@@ -2184,7 +2184,7 @@ public final class Arithmetic {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -2235,7 +2235,7 @@ public final class Arithmetic {
 			newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
 		}
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
     }
@@ -2332,7 +2332,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
         @Override
@@ -2483,7 +2483,7 @@ public final class Arithmetic {
         }
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
         private static IASTAppendable createPiecewise(IASTAppendable piecewiseAST, IAST resultList) {
@@ -2574,7 +2574,7 @@ public final class Arithmetic {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 	}
@@ -4114,7 +4114,7 @@ public final class Arithmetic {
 			return F.NIL;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return null;
 		}
         /** {@inheritDoc} */
@@ -4138,7 +4138,7 @@ public final class Arithmetic {
             }
             return engine.printMessage("Precision: Numeric expression expected");
         }
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
         }
     }
@@ -4321,7 +4321,7 @@ public final class Arithmetic {
             return F.NIL;
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
     }
@@ -4428,7 +4428,7 @@ public final class Arithmetic {
             return evalRe(arg1, engine);
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
         /**
@@ -4592,7 +4592,7 @@ public final class Arithmetic {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -4635,7 +4635,7 @@ public final class Arithmetic {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -4851,7 +4851,7 @@ public final class Arithmetic {
 
 			return binaryOperator(ast, ast.arg1(), ast.arg2(),engine);
         }
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
     }
@@ -4931,7 +4931,7 @@ public final class Arithmetic {
             return F.Subtract(ast.arg1(), ast.arg2());
         }
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
         @Override

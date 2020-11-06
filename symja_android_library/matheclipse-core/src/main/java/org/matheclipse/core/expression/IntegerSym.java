@@ -3,6 +3,7 @@ package org.matheclipse.core.expression;
 import com.gx.common.math.IntMath;
 import com.gx.common.math.LongMath;
 
+import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;
 import org.matheclipse.core.builtin.Combinatoric.Subsets;
@@ -220,48 +221,6 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 		return Num.valueOf((fIntValue) / that.doubleValue());
 	}
 
-	/**
-	 * Return the divisors of this integer number.
-	 * 
-	 * <pre>
-	 * divisors(24) ==> {1,2,3,4,6,8,12,24}
-	 * </pre>
-	 */
-	@Override
-	public IAST divisors() {
-		if (isOne() || isMinusOne()) {
-			return F.List(F.C1);
-		}
-		Set<IInteger> set = new TreeSet<IInteger>();
-		final IAST primeFactorsList = factorize();
-		int len = primeFactorsList.argSize();
-
-		// build the k-subsets from the primeFactorsList
-		for (int k = 1; k < len; k++) {
-			final KSubsetsList iter = Subsets.createKSubsets(primeFactorsList, k, F.List(), 1);
-			for (IAST subset : iter) {
-				if (subset == null) {
-					break;
-				}
-				// create the product of all integers in the k-subset
-				IInteger factor = F.C1;
-				for (int j = 1; j < subset.size(); j++) {
-					factor = factor.multiply((IInteger) subset.get(j));
-				}
-				// add this divisor to the set collection
-				set.add(factor);
-			}
-		}
-
-		// build the final divisors list from the tree set
-		final IASTAppendable resultList = F.ListAlloc(set.size() + 1);
-		resultList.append(F.C1);
-		for (IInteger entry : set) {
-			resultList.append(entry);
-		}
-		resultList.append(this);
-		return resultList;
-	}
 
 	/**
 	 * @return
@@ -327,7 +286,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 		if (that instanceof IntegerSym) {
 			try {
 				return valueOf(ArithmeticUtils.gcd(fIntValue, ((IntegerSym) that).fIntValue));
-			} catch (RuntimeException ex) {
+			} catch (MathRuntimeException ex) {
 				//
 			}
 		}
@@ -556,7 +515,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 		if (that instanceof IntegerSym) {
 			try {
 				return valueOf(ArithmeticUtils.lcm(fIntValue, ((IntegerSym) that).fIntValue));
-			} catch (RuntimeException ex) {
+			} catch (MathRuntimeException ex) {
 				//
 			}
 		}
@@ -886,7 +845,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 	public IExpr sqrt() {
 		try {
 			return valueOf(IntMath.sqrt(fIntValue, RoundingMode.UNNECESSARY));
-		} catch (RuntimeException ex) {
+		} catch (ArithmeticException | IllegalArgumentException ex) {
 			return F.Sqrt(this);
 		}
 	}

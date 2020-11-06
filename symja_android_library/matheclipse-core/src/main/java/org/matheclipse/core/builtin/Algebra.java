@@ -411,7 +411,7 @@ public class Algebra {
 		 *            <code>a^(-x+y)</code> into numerator <code>a^y</code> and denominator <code>a^x</code>
 		 * @return the numerator and denominator expression
 		 */
-		public static IExpr[] fractionalPartsPower(final IAST powerAST, boolean trig, boolean splitPowerPlusExponents) {
+		private static IExpr[] fractionalPartsPower(final IAST powerAST, boolean trig, boolean splitPowerPlusExponents) {
 			IExpr[] parts = new IExpr[2];
 			parts[0] = F.C1;
 
@@ -511,7 +511,7 @@ public class Algebra {
 			return F.evalExpandAll(arg1, engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 
@@ -796,7 +796,7 @@ public class Algebra {
 			return arg1;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		private IExpr cancelFractionPowers(EvalEngine engine, IExpr arg1) {
@@ -854,7 +854,7 @@ public class Algebra {
 				IExpr expandedArg1 = F.evalExpandAll(arg1, engine);
 
 				if (expandedArg1.isPlus()) {
-					return ((IAST) expandedArg1).mapThread(F.Cancel(null), 1);
+					return ((IAST) expandedArg1).mapThread(F.Cancel(F.Slot1), 1);
 				} else if (expandedArg1.isTimes() || expandedArg1.isPower()) {
 					IExpr result = cancelPowerTimes(expandedArg1, engine);
 					if (result.isPresent()) {
@@ -1202,7 +1202,7 @@ public class Algebra {
 			}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -1305,7 +1305,7 @@ public class Algebra {
 			return arg1;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_5;
 		}
 
@@ -1504,7 +1504,7 @@ public class Algebra {
 					}
 					IExpr powerAST = F.Power(temp[1], F.CN1);
 					if (distributePlus && temp[0].isPlus()) {
-						IAST mappedAST = ((IAST) temp[0]).mapThread(F.Times(null, powerAST), 1);
+						IAST mappedAST = ((IAST) temp[0]).mapThreadEvaled(EvalEngine.get(), F.Times(null, powerAST), 1);
 						IExpr flattened = flattenOneIdentity(mappedAST, F.C0);// EvalAttributes.flatten(mappedAST).orElse(mappedAST);
 						return addExpanded(flattened);
 					}
@@ -1521,7 +1521,7 @@ public class Algebra {
 				return F.NIL;
 			}
 
-			private IExpr addExpanded(@Nonnull IExpr expr) {
+			private IExpr addExpanded(IExpr expr) {
 				if (expandNegativePowers && !distributePlus && expr.isAST()) {
 					((IAST) expr).addEvalFlags(IAST.IS_EXPANDED);
 				}
@@ -1718,8 +1718,8 @@ public class Algebra {
 			 */
 			private IExpr expandPlusTimesPlus(final IAST plusAST0, final IAST plusAST1) {
 				long numberOfTerms = (long) (plusAST0.argSize()) * (long) (plusAST1.argSize());
-				if (numberOfTerms > Integer.MAX_VALUE) {
-					throw new ArithmeticException("");
+				if (numberOfTerms > Config.MAX_AST_SIZE) {
+					throw new ASTElementLimitExceeded(numberOfTerms);
 				}
 				final IASTAppendable result = F.ast(F.Plus, (int) numberOfTerms, false);
 				plusAST0.forEach(new Consumer<IExpr>() {
@@ -1875,7 +1875,7 @@ public class Algebra {
 			if (ast.arg1().isAST()) {
 				IAST arg1 = (IAST) ast.arg1();
 				if (arg1.isList()) {
-					return arg1.mapThread(F.ListAlloc(arg1.size()), ast, 1);
+					return arg1.mapThreadEvaled(engine, F.ListAlloc(arg1.size()), ast, 1);
 				}
 				IExpr patt = null;
 				if (ast.size() > 2) {
@@ -1886,7 +1886,7 @@ public class Algebra {
 
 			return ast.arg1();
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -1946,7 +1946,7 @@ public class Algebra {
 			return arg1;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		private static IExpr setAllExpanded(IExpr expr, boolean expandNegativePowers, boolean distributePlus) {
@@ -1998,7 +1998,7 @@ public class Algebra {
 
 			if (ast.arg1().isList()) {
 				IAST list = (IAST) ast.arg1();
-				return list.mapThread(F.ListAlloc(list.size()), ast, 1);
+				return list.mapThreadEvaled(engine, F.ListAlloc(list.size()), ast, 1);
 			}
 			IExpr result = F.REMEMBER_AST_CACHE.getIfPresent(ast);
 			if (result != null) {
@@ -2048,7 +2048,7 @@ public class Algebra {
 			return expr;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		public IExpr factorExpr(final IAST ast, IExpr expr, final VariablesSet eVar, final boolean factorSquareFree,
@@ -2279,7 +2279,7 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -2324,7 +2324,7 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		private static IExpr factorList(IExpr expr, List<IExpr> varList, boolean factorSquareFree)
@@ -2479,7 +2479,7 @@ public class Algebra {
 			return ast.arg1();
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		/**
@@ -2590,7 +2590,7 @@ public class Algebra {
 			}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -2781,7 +2781,7 @@ public class Algebra {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_4;
 		}
 		@Override
@@ -3176,7 +3176,7 @@ public class Algebra {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -3395,7 +3395,7 @@ public class Algebra {
 				return F.NIL;
 		}
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_4;
 		}
 		public IExpr[] quotientRemainderModInteger(IExpr arg1, IExpr arg2, IExpr variable, IExpr option) {
@@ -3504,7 +3504,7 @@ public class Algebra {
 			}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_4;
 		}
 		@Override
@@ -3581,7 +3581,7 @@ public class Algebra {
 						IAST timesAST = (IAST) x1;
 						// Log[x_ * y_ * z_] :> Log(x)+Log(y)+Log(z)
 						IAST logResult = timesAST.setAtCopy(0, F.Plus);
-						logResult = logResult.mapThread(F.Log(F.Null), 1);
+						logResult = logResult.mapThread(F.Log(F.Slot1), 1);
 						return powerExpand(logResult, assumptions);
 					}
 				}
@@ -3676,7 +3676,7 @@ public class Algebra {
 			return ast.arg1();
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		public static IExpr powerExpand(final IAST ast, boolean assumptions) {
@@ -3850,8 +3850,8 @@ public class Algebra {
 			@Override
 			public IExpr visit(IASTMutable ast) {
 				if (!ast.isAST(F.Root)) {
-					IAST copied = replacement.setAtCopy(1, null);
-					return ast.mapThread(copied, 1);
+					// IAST copied = replacement.setAtCopy(1, null);
+					return ast.mapThread(replacement, 1);
 				}
 				return F.NIL;
 			}
@@ -4291,7 +4291,7 @@ public class Algebra {
 			return arg1;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		private static IExpr togetherExpr(IExpr arg1, EvalEngine engine) {
@@ -4377,7 +4377,7 @@ public class Algebra {
 			return VariablesSet.getAlgebraicVariables(ast.arg1());
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override

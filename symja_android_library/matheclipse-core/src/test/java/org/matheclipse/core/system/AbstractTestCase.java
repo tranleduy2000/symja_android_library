@@ -1,4 +1,4 @@
-``package org.matheclipse.core.system;
+package org.matheclipse.core.system;
 
 import junit.framework.TestCase;
 

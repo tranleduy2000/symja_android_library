@@ -4,6 +4,7 @@ import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
@@ -34,17 +35,20 @@ public class BigFractionSym extends AbstractFractionSym {
 	BigFraction fFraction;
 
 	BigFractionSym(BigFraction fraction) {
-		BigInteger temp = fraction.getNumerator();
-		if (Config.MAX_BIT_LENGTH < temp.bitLength()) {
-			throw new ASTElementLimitExceeded(temp.bitLength());
-		}
-		temp = fraction.getDenominator();
-		if (Config.MAX_BIT_LENGTH < temp.bitLength()) {
-			throw new ASTElementLimitExceeded(temp.bitLength());
-		}
 		fFraction = fraction;
+		checkBitLength();
 	}
 
+	// public void checkBitLength( ) {
+	// BigInteger temp = fFraction.getNumerator();
+	// if (Config.MAX_BIT_LENGTH < temp.bitLength()) {
+	// BigIntegerLimitExceeded.throwIt(temp.bitLength());
+	// }
+	// temp = fFraction.getDenominator();
+	// if (Config.MAX_BIT_LENGTH < temp.bitLength()) {
+	// BigIntegerLimitExceeded.throwIt(temp.bitLength());
+	// }
+	// }
 	/**
 	 * <p>
 	 * Construct a rational from two BigIntegers.
@@ -60,11 +64,11 @@ public class BigFractionSym extends AbstractFractionSym {
 	BigFractionSym(BigInteger nom, BigInteger denom) {
 		BigInteger temp = nom;
 		if (Config.MAX_BIT_LENGTH < temp.bitLength()) {
-			throw new ASTElementLimitExceeded(temp.bitLength());
+			BigIntegerLimitExceeded.throwIt(temp.bitLength());
 		}
 		temp = denom;
 		if (Config.MAX_BIT_LENGTH < temp.bitLength()) {
-			throw new ASTElementLimitExceeded(temp.bitLength());
+			BigIntegerLimitExceeded.throwIt(temp.bitLength());
 		}
 		fFraction = new BigFraction(nom, denom);
 	}
@@ -171,7 +175,7 @@ public class BigFractionSym extends AbstractFractionSym {
 			return Double.compare(fFraction.doubleValue(), ((ISignedNumber) expr).doubleValue());
 		}
 		return -1;
-//		return super.compareTo(expr);
+		// return super.compareTo(expr);
 	}
 
 	@Override
@@ -408,10 +412,9 @@ public class BigFractionSym extends AbstractFractionSym {
 	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators,
 									 boolean usePrefix, boolean noSymbolPrefix) {
 		String prefix = usePrefix ? "F." : "";
-		try {
-			// toInt throws ArithmeticException if conversion is not possible
-			int numerator = NumberUtil.toInt(fFraction.getNumerator());
-			int denominator = NumberUtil.toInt(fFraction.getDenominator());
+		int numerator = NumberUtil.toIntDefault(fFraction.getNumerator());
+		if (numerator == 1 || numerator == -1) {
+			int denominator = NumberUtil.toIntDefault(fFraction.getDenominator());
 			if (numerator == 1) {
 				switch (denominator) {
 				case 2:
@@ -422,8 +425,7 @@ public class BigFractionSym extends AbstractFractionSym {
 					return prefix + "C1D4";
 				default:
 				}
-			}
-			if (numerator == -1) {
+			} else if (numerator == -1) {
 				switch (denominator) {
 				case 2:
 					return prefix + "CN1D2";
@@ -434,9 +436,6 @@ public class BigFractionSym extends AbstractFractionSym {
 				default:
 				}
 			}
-		} catch (RuntimeException e) {
-			return prefix + "QQ(" + fFraction.getNumerator().toString() + "L," + fFraction.getDenominator().toString()
-					+ "L)";
 		}
 		return prefix + "QQ(" + fFraction.getNumerator().toString() + "L," + fFraction.getDenominator().toString()
 				+ "L)";
@@ -502,13 +501,17 @@ public class BigFractionSym extends AbstractFractionSym {
 	public IFraction mul(BigInteger other) {
 		if (other.bitLength() < 2) {
 			int oint = other.intValue();
-			if (oint == 1)
+			if (oint == 1) {
 				return this;
-			if (oint == -1)
+			}
+			if (oint == -1) {
 				return this.negate();
-			if (oint == 0)
+			}
+			if (oint == 0) {
 				return AbstractFractionSym.ZERO;
+			}
 		}
+		// swift changed: check memory usage
 		BigInteger bigNumerator = toBigNumerator();
 		OperationSystem.checkMultiplicationOperation(bigNumerator.bitLength(), other.bitLength());
 		return valueOf(bigNumerator.multiply(other), toBigDenominator());
@@ -533,6 +536,20 @@ public class BigFractionSym extends AbstractFractionSym {
 		return valueOf(newnum, toBigDenominator());
 	}
 
+	@Override
+	public IRational multiply(int n) {
+		if (n == 1) {
+			return this;
+		}
+		if (n == 0) {
+			return AbstractFractionSym.ZERO;
+		}
+		if (n == -1) {
+			return this.negate();
+		}
+		BigInteger newnum = toBigNumerator().multiply(BigInteger.valueOf(n));
+		return valueOf(newnum, toBigDenominator());
+	}
 	/**
 	 * Returns a new rational equal to <code>-this</code>.
 	 * 
@@ -546,7 +563,7 @@ public class BigFractionSym extends AbstractFractionSym {
 	@Override
 	public IRational normalize() {
 		if (toBigDenominator().equals(BigInteger.ONE)) {
-			return F.integer(toBigNumerator());
+			return F.ZZ(toBigNumerator());
 		}
 		if (toBigNumerator().equals(BigInteger.ZERO)) {
 			return F.C0;
@@ -570,9 +587,12 @@ public class BigFractionSym extends AbstractFractionSym {
 	@Override
 	public int toInt() throws ArithmeticException {
 		if (toBigDenominator().equals(BigInteger.ONE)) {
-			return NumberUtil.toInt(toBigNumerator());
-		}
-		if (toBigNumerator().equals(BigInteger.ZERO)) {
+			return toBigNumerator().intValueExact();
+			// int val = NumberUtil.toIntDefault(toBigNumerator());
+			// if (val != Integer.MIN_VALUE) {
+			// return val;
+			// }
+		} else if (toBigNumerator().equals(BigInteger.ZERO)) {
 			return 0;
 		}
 		throw new ArithmeticException("toInt: denominator != 1");
@@ -583,14 +603,15 @@ public class BigFractionSym extends AbstractFractionSym {
 	@Override
 	public int toIntDefault(int defaultValue) {
 		if (toBigDenominator().equals(BigInteger.ONE)) {
-			return NumberUtil.toInt(toBigNumerator());
-		}
-		if (toBigNumerator().equals(BigInteger.ZERO)) {
-			return 0;
-		}
+			try {
+				return toBigNumerator().intValueExact();
+			} catch (java.lang.ArithmeticException aex) {
 		return defaultValue;
 	}
-	
+		}
+		return fFraction.equals(BigFraction.ZERO) ? 0 : defaultValue;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public long toLong() throws ArithmeticException {

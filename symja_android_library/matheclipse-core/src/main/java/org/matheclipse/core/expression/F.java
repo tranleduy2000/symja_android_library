@@ -124,7 +124,7 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
  * Factory for creating Symja expression objects.
  *
  */
-public class F {
+public class F extends S {
     // private static final Cache<IAST, IAST> PARSER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(1024).build();
     // Android changed: more symbols
 	private final static IBuiltInSymbol[] BUILT_IN_SYMBOLS = new IBuiltInSymbol[ID.Zeta + 200];

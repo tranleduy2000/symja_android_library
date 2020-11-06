@@ -339,6 +339,44 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     @Override
+    public IExpr getValue(int location) {
+        return get(location);
+    }
+
+    @Override
+	public IAST getRule(final String key) {
+        int index = indexOf(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                return x.isRuleAST() && x.first().equals(F.$str(key));
+            }
+        });
+        if (index > 0) {
+            return (IAST) get(index);
+        }
+        return F.NIL;
+	}
+
+    @Override
+    public IAST getRule(final IExpr key) {
+        int index = indexOf(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                return x.isRuleAST() && x.first().equals(key);
+            }
+        });
+        if (index > 0) {
+            return (IAST) get(index);
+        }
+        return F.NIL;
+    }
+
+    @Override
+    public IExpr getRule(int position) {
+        return get(position);
+    }
+
+    @Override
     public boolean hasDefaultArgument() {
         if (size() > 1) {
             return last().isPatternDefault();
@@ -387,24 +425,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
             return last().isPatternDefault();
         }
         return false;
-    }
-
-    /**
-     * Maps the elements of this IAST with the unary functor <code>Functors.replaceArg(replacement, position)</code>,
-     * there <code>replacement</code> is an IAST at which the argument at the given position will be replaced by the
-     * currently mapped element and appends the element to <code>appendAST</code>.
-     *
-     * @param appendAST
-     * @param replacement an IAST there the argument at the given position is replaced by the currently mapped argument of this
-     *                    IAST.
-     * @param position
-     * @return <code>appendAST</code>
-     * @deprecated use IAST#mapThread() instead
-     */
-    @Deprecated
-    @Override
-    public IAST mapAt(IASTAppendable appendAST, final IAST replacement, int position) {
-        return mapThread(appendAST, replacement, position);
     }
 
     @Override

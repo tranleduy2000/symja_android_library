@@ -215,7 +215,7 @@ public class StructureFunctions {
 			return evalApply(arg1, arg2, evaledAST, lastIndex, heads, engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_4;
 		}
 
@@ -268,7 +268,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 	}
@@ -327,7 +327,7 @@ public class StructureFunctions {
 			return F.ZZ(depth((IAST) arg1, 1));
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		/**
@@ -533,7 +533,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 		@Override
@@ -602,7 +602,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -862,7 +862,7 @@ public class StructureFunctions {
 			return F.ZZ(engine.evaluate(ast.arg1()).leafCount());
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 	}
@@ -971,7 +971,7 @@ public class StructureFunctions {
 			}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_4;
 		}
 	}
@@ -994,7 +994,7 @@ public class StructureFunctions {
 			return result.isPresent() ? result : ast.arg2();
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 	}
@@ -1115,7 +1115,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 	}
@@ -1274,7 +1274,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 	}
@@ -1322,7 +1322,7 @@ public class StructureFunctions {
 			return F.C0;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 	}
@@ -1357,7 +1357,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -1500,7 +1500,7 @@ public class StructureFunctions {
 			head.set(0, F.unaryAST1(p, head.head()));
 			return result;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 	}
@@ -1562,7 +1562,7 @@ public class StructureFunctions {
 			EvalEngine.set(newEngine);
 			return F.Null;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_0;
 		}
 	}
@@ -1677,7 +1677,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_4;
 		}
 	}
@@ -1750,7 +1750,7 @@ public class StructureFunctions {
 
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -1841,7 +1841,7 @@ public class StructureFunctions {
 
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -1883,7 +1883,7 @@ public class StructureFunctions {
 			}
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 	}
@@ -1917,7 +1917,7 @@ public class StructureFunctions {
 			}
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 	}
@@ -1988,7 +1988,7 @@ public class StructureFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		/**
@@ -2094,7 +2094,7 @@ public class StructureFunctions {
 			}
 			return ast.arg1();
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}

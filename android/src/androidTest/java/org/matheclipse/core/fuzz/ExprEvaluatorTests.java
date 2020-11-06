@@ -312,7 +312,7 @@ public class ExprEvaluatorTests extends TestCase {
 				}
 			IEvaluator evaluator = sym.getEvaluator();
 			if (evaluator instanceof IFunctionEvaluator) {
-				int[] argSize = ((IFunctionEvaluator) evaluator).expectedArgSize();
+				int[] argSize = ((IFunctionEvaluator) evaluator).expectedArgSize(IAST ast);
 				if (argSize != null) {
 						int end = argSize[1];
 						if (end <= 10) {

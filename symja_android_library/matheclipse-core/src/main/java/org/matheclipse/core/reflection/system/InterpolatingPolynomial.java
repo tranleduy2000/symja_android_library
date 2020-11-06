@@ -141,7 +141,7 @@ public class InterpolatingPolynomial extends AbstractEvaluator {
 	}
 
 	@Override
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_2;
 	}
 	@Override

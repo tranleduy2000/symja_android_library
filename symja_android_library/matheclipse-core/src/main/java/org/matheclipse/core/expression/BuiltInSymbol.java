@@ -46,7 +46,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 			return predicate.test(engine.evaluate(arg1));
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 	}

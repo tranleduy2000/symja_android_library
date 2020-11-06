@@ -941,7 +941,7 @@ public class Solve extends AbstractFunctionEvaluator {
 		return of(ast, false, engine);
 	}
 
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_3;
 	}
 	/**

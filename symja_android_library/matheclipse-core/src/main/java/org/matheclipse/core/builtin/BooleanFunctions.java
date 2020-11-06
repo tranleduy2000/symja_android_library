@@ -496,7 +496,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		/**
@@ -743,7 +743,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		/**
@@ -843,7 +843,7 @@ public final class BooleanFunctions {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -915,7 +915,7 @@ public final class BooleanFunctions {
 			}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -998,7 +998,7 @@ public final class BooleanFunctions {
 			return ast.arg1();
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 	}
@@ -1091,7 +1091,7 @@ public final class BooleanFunctions {
 			return btp.booleanTable(ast.arg1(), 1);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 	}
@@ -1123,7 +1123,7 @@ public final class BooleanFunctions {
 			return booleanVariables(ast.arg1());
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		private static IAST booleanVariables(final IExpr expr) {
@@ -1570,7 +1570,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 		@Override
@@ -1621,7 +1621,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 		@Override
@@ -2182,7 +2182,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		@Override
@@ -2531,7 +2531,7 @@ public final class BooleanFunctions {
 			};
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -2610,7 +2610,7 @@ public final class BooleanFunctions {
 			return maximum(ast, false);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return null;
 		}
 		private IExpr maximum(IAST list, boolean flattenedList) {
@@ -2752,7 +2752,7 @@ public final class BooleanFunctions {
 			return minimum(ast, false);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return null;
 		}
 		private IExpr minimum(IAST list, final boolean flattenedList) {
@@ -2858,7 +2858,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 
@@ -2987,7 +2987,7 @@ public final class BooleanFunctions {
 				return F.NIL;
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -3054,7 +3054,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		/**
@@ -3141,7 +3141,7 @@ public final class BooleanFunctions {
 				return F.NIL;
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -3188,7 +3188,7 @@ public final class BooleanFunctions {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override
@@ -3513,7 +3513,7 @@ public final class BooleanFunctions {
 				}
 				return F.NIL;
 			}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -3633,7 +3633,7 @@ public final class BooleanFunctions {
 				}
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 		/**
@@ -3741,7 +3741,7 @@ public final class BooleanFunctions {
 				}
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 	}
@@ -3805,7 +3805,7 @@ public final class BooleanFunctions {
 				}
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 		/**
@@ -3920,7 +3920,7 @@ public final class BooleanFunctions {
 				}
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		/**
@@ -4013,7 +4013,7 @@ public final class BooleanFunctions {
 		}
 
 		@Override
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 		@Override

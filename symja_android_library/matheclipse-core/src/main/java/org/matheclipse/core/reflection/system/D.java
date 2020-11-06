@@ -1,7 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.BiFunction;
-import com.duy.lambda.Consumer;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 
@@ -300,7 +299,7 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 		if (fx.isList()) {
 			IAST list = (IAST) fx;
 			// thread over first list
-			return list.mapThread(F.ListAlloc(list.size()), ast, 1);
+				return list.mapThreadEvaled(engine, F.ListAlloc(list.size()), ast, 1);
 		}
 
 		IExpr x = ast.arg2();
@@ -381,27 +380,29 @@ public class D extends AbstractFunctionEvaluator implements DRules {
 			final IExpr header = listArg1.head();
 			if (listArg1.isPlus()) {
 				// D[a_+b_+c_,x_] -> D[a,x]+D[b,x]+D[c,x]
-				return listArg1.mapThread(F.D(F.Null, x), 1);
+					return listArg1.mapThread(F.D(F.Slot1, x), 1);
 			} else if (listArg1.isTimes()) {
 				return listArg1.map(F.PlusAlloc(16), new BinaryBindIth1st(listArg1, F.D(F.Null, x)));
 			} else if (listArg1.isPower()) {
 				// f ^ g
 				final IExpr f = listArg1.base();
 				final IExpr g = listArg1.exponent();
-				final IExpr y = ast.arg2();
 				if (g.isFree(x)) {
 					// g*D(f,y)*f^(g-1)
-					return F.Times(g, F.D(f, y), F.Power(f, g.dec()));
+					return F.Times(g, F.D(f, x), F.Power(f, g.dec()));
 				}
 				if (f.isFree(x)) {
+					if (f.isE()) {
+						return F.Times(F.D(g, x), F.Exp(g));
+					}
 					// D(g,y)*Log(f)*f^g
-					return F.Times(F.D(g, y), F.Log(f), F.Power(f, g));
+					return F.Times(F.D(g, x), F.Log(f), F.Power(f, g));
 				}
 
 				// D[f_^g_,y_]:= f^g*(((g*D[f,y])/f)+Log[f]*D[g,y])
 				final IASTAppendable resultList = F.TimesAlloc(2);
 				resultList.append(F.Power(f, g));
-				resultList.append(F.Plus(F.Times(g, F.D(f, y), F.Power(f, F.CN1)), F.Times(F.Log(f), F.D(g, y))));
+				resultList.append(F.Plus(F.Times(g, F.D(f, x), F.Power(f, F.CN1)), F.Times(F.Log(f), F.D(g, x))));
 				return resultList;
 			} else if ((header == F.Log) && (listArg1.isAST2())) {
 				if (listArg1.isFreeAt(1, x)) {

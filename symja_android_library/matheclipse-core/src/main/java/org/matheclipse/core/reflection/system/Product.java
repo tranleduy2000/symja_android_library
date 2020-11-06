@@ -294,7 +294,7 @@ public class Product extends ListFunctions.Table implements ProductRules {
 		newSum.set(1, result);
 		return newSum;
 	}
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_INFINITY;
 	}
 	@Override

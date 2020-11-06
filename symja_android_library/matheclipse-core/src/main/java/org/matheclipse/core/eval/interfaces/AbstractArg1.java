@@ -73,7 +73,7 @@ public abstract class AbstractArg1 extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_1_1;
 	}
 	public IExpr e1ObjArg(final IExpr o) {

@@ -134,7 +134,7 @@ public final class Programming {
 				throw AbortException.ABORTED;
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_0;
 		}
 
@@ -170,7 +170,7 @@ public final class Programming {
 				throw BreakException.CONST;
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_0;
 		}
 
@@ -209,7 +209,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 		@Override
@@ -252,7 +252,7 @@ public final class Programming {
 				return e.getValue();
 			}
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
 
@@ -281,7 +281,7 @@ public final class Programming {
 			}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 
@@ -391,7 +391,7 @@ public final class Programming {
 			}
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 
@@ -432,7 +432,7 @@ public final class Programming {
 			// return F.Hold(ast);
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_1;
 		}
 
@@ -665,7 +665,7 @@ public final class Programming {
 			}
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_INFINITY;
 		}
 
@@ -765,7 +765,7 @@ public final class Programming {
 
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 		// @Override
@@ -888,7 +888,7 @@ public final class Programming {
 
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 
@@ -993,7 +993,7 @@ public final class Programming {
 				}
 			}
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_4;
 		}
 
@@ -1085,7 +1085,7 @@ public final class Programming {
 
 			return F.NIL;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_4;
 		}
 
@@ -1103,7 +1103,7 @@ public final class Programming {
 			throw new AbortException();
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_0;
 		}
 
@@ -1201,7 +1201,7 @@ public final class Programming {
 			}
 				return F.NIL;
 			}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 
@@ -1241,7 +1241,7 @@ public final class Programming {
 			return evaluateNest(ast, engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_3;
 		}
 		public static IExpr evaluateNest(final IAST ast, EvalEngine engine) {
@@ -1334,7 +1334,7 @@ public final class Programming {
 			return resultList;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_3;
 		}
 
@@ -1397,7 +1397,7 @@ public final class Programming {
 			}, engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_3;
 		}
 
@@ -1464,7 +1464,7 @@ public final class Programming {
 			// Functors.append(F.ast(ast.arg1())), List(), engine);
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_3_3;
 		}
 		public static IAST nestList(final IExpr expr, final IExpr test, final Function<IExpr, IExpr> fn,
@@ -1688,7 +1688,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_2;
 		}
 		private IExpr enableOnOffTrace(IExpr arg1, boolean unique, EvalEngine engine) {
@@ -2055,7 +2055,7 @@ public final class Programming {
 					engine.setQuietMode(oldQuietMode);
 			}
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
 		}
 
@@ -2216,7 +2216,7 @@ public final class Programming {
 				throw new ReturnException();
 			}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_1;
 		}
 
@@ -2515,7 +2515,7 @@ public final class Programming {
 		}
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_3;
 		}
 		@Override
@@ -2574,7 +2574,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -2626,7 +2626,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -2705,7 +2705,7 @@ public final class Programming {
 			return F.NIL;
 		}
 
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 		@Override
@@ -2879,7 +2879,7 @@ public final class Programming {
 
 			return F.Null;
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
 
@@ -2918,7 +2918,7 @@ public final class Programming {
 			}
 			return IOFunctions.printMessage(ast.topHead(), "lvlist", F.List(arg1), engine);
 		}
-		public int[] expectedArgSize() {
+		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_2_2;
 		}
 

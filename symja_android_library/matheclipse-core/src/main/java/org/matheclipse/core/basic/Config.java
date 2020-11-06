@@ -7,6 +7,7 @@ import org.hipparchus.util.Precision;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,6 +65,10 @@ public class Config {
 	 */
 	public static final int MAX_SIMPLIFY_TOGETHER_LEAFCOUNT = 65;
 	/**
+	 * Maximum number of parsed input leaves of an expression
+	 */
+	public static long MAX_INPUT_LEAVES = Long.MAX_VALUE;
+	/**
 	 * Maximum output size in characters for an output form (i.e. TeXForm, MathMLForm,...I)
 	 */
 	public static int MAX_OUTPUT_SIZE = Integer.MAX_VALUE;
@@ -72,9 +77,17 @@ public class Config {
 	 */
 	public static int MAX_AST_SIZE = Integer.MAX_VALUE;
 	/**
+	 * Maximum number of row or column dimension allowed if creating a new matrix or vector
+	 */
+	public static int MAX_MATRIX_DIMENSION_SIZE = Integer.MAX_VALUE;
+	/**
 	 * Maximum number of elements which could be allocated for a BigInteger number
 	 */
 	public static int MAX_BIT_LENGTH = Integer.MAX_VALUE;
+	/**
+	 * Maximum degree of a polynomial generating function
+	 */
+	public static int MAX_POLYNOMIAL_DEGREE = Integer.MAX_VALUE;
 	static {
 		EXPR_CACHE = CacheBuilder.newBuilder().maximumSize(MAX_EXPR_CACHE_SIZE).weakKeys().weakValues().build();
 	}
@@ -116,10 +129,10 @@ public class Config {
 	 * Set to true if in fuzz testing mode
 	 *
 	 */
-	public final static boolean FUZZ_TESTING = false;
+	public static boolean FUZZ_TESTING = false;
 
 	/**
-	 * Set to true ifthe fuzzy parser should be used in the fre form API
+	 * Set to true if the fuzzy parser should be used in the free form Symja API
 	 *
 	 */
 	public static boolean FUZZY_PARSER = false;
@@ -130,6 +143,11 @@ public class Config {
 	 */
 	// public final static boolean SHOW_CONSOLE = false;
 
+	/**
+	 * Shorten an output string to a maximum length of <code>SHORTEN_STRING_LENGTH</code> characters. Print <<SHORT>> as
+	 * substitute of the middle of the expression if necessary.
+	 */
+	public static int SHORTEN_STRING_LENGTH = 80;
 	/**
 	 * Show the pattern-matching evaluation steps in the console output.
 	 * 
@@ -252,8 +270,14 @@ public class Config {
 
 	/**
 	 * Use <code>Num</code> objects for numeric calculations up to 16 digits precision.
+	 * @deprecated use {@link FEConfig#MACHINE_PRECISION}
 	 */
-	public static final long MACHINE_PRECISION = 16L;
+	public static final long MACHINE_PRECISION = FEConfig.MACHINE_PRECISION;
+
+	/**
+	 * The maximum precision which could be requested from a user for numerical calculations.
+	 */
+	public static long MAX_PRECISION_APFLOAT = Short.MAX_VALUE;
 
 	/**
 	 * Print trigonometric functions in lower case characters.
@@ -485,10 +509,10 @@ public class Config {
 					"</head>\n" + //
 					"\n" + //
 					"<body>\n" + //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.8/build/math.js\"></script>" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.4.0/build/math.js\"></script>" + //
 					"\n" + //
 					"\n" + //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.8.8/build/mathcell.js\"></script>\n"
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.9.0/build/mathcell.js\"></script>\n"
 					+ //
 					"<script src=\"https://cdn.jsdelivr.net/gh/mathjax/MathJax@2.7.5/MathJax.js?config=TeX-AMS_HTML\"></script>"
 					+ //
@@ -496,7 +520,7 @@ public class Config {
 					"<div class=\"mathcell\" style=\"width: 100%; height: 100%; padding: .25in .5in .5in .5in;\">\n" + //
 					"<script>\n" + //
 					"\n" + //
-					"var parent = document.scripts[ document.scripts.length - 1 ].parentNode;\n" + //
+					"var parent = document.currentScript.parentNode;\n" + //
 					"\n" + //
 					"var id = generateId();\n" + //
 					"parent.id = id;\n" + //
@@ -522,12 +546,12 @@ public class Config {
 					"\n" + //
 					"<body>\n" + //
 					"\n" + //
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraph.css\" />\n"
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraph.min.css\" />\n"
 					+ //
-					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.2.8/build/math.js\"></script>\n"
-					+ "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.js\"\n" + //
+					"<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.4.0/build/math.js\"></script>\n"
+					+ "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.min.js\"\n" + //
 					"        type='text/javascript'></script>\n" + //
-					"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/geonext.min.js\"\n" + //
+					"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/geonext.min.js\"\n" + //
 					"        type='text/javascript'></script>\n" + //
 					"\n" + //
 					"<div id=\"jxgbox\" class=\"jxgbox\" style=\"display: flex; width:99%; height:99%; margin: 0; flex-direction: column; overflow: hidden\">\n"
@@ -578,4 +602,8 @@ public class Config {
 	 * Used to parse Rubi files. See <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - Symbolic Integration Rules</a>
 	 */
 	public static boolean RUBI_CONVERT_SYMBOLS = false;
+
+	public static String getVersion() {
+		return "1.0.0-SNAPSHOT";
+	}
 }

@@ -8,6 +8,8 @@ import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.Combinatoric.Subsets;
 import org.matheclipse.core.builtin.Combinatoric.Subsets.KSubsetsList;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -107,14 +109,14 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
 	public BigIntegerSym(BigInteger value) {
 		if (Config.MAX_BIT_LENGTH < value.bitLength()) {
-			throw new ASTElementLimitExceeded(value.bitLength());
+			BigIntegerLimitExceeded.throwIt(value.bitLength());
 		}
 		fBigIntValue = value;
 	}
 
 	public BigIntegerSym(byte[] bytes) {
 		if (Config.MAX_BIT_LENGTH < bytes.length * 8) {
-			throw new ASTElementLimitExceeded(((long)bytes.length) * 8L);
+			BigIntegerLimitExceeded.throwIt(((long) bytes.length) * 8L);
 		}
 		fBigIntValue = new BigInteger(bytes);
 	}
@@ -261,48 +263,6 @@ public class BigIntegerSym extends AbstractIntegerSym {
 		return Num.valueOf(fBigIntValue.doubleValue() / that.doubleValue());
 	}
 
-	/**
-	 * Return the divisors of this integer number.
-	 *
-	 * <pre>
-	 * divisors(24) ==> {1,2,3,4,6,8,12,24}
-	 * </pre>
-	 */
-	@Override
-	public IAST divisors() {
-		if (isOne() || isMinusOne()) {
-			return F.List(F.C1);
-		}
-		Set<IInteger> set = new TreeSet<IInteger>();
-		final IAST primeFactorsList = factorize();
-		int len = primeFactorsList.argSize();
-
-		// build the k-subsets from the primeFactorsList
-		for (int k = 1; k < len; k++) {
-			final KSubsetsList iter = Subsets.createKSubsets(primeFactorsList, k, F.List(), 1);
-			for (IAST subset : iter) {
-				if (subset == null) {
-					break;
-				}
-				// create the product of all integers in the k-subset
-				IInteger factor = F.C1;
-				for (int j = 1; j < subset.size(); j++) {
-					factor = factor.multiply((IInteger) subset.get(j));
-				}
-				// add this divisor to the set collection
-				set.add(factor);
-			}
-		}
-
-		// build the final divisors list from the tree set
-		final IASTAppendable resultList = F.ListAlloc(set.size() + 2);
-		resultList.append(F.C1);
-		for (IInteger entry : set) {
-			resultList.append(entry);
-		}
-		resultList.append(this);
-		return resultList;
-	}
 
 	/**
 	 * @return
@@ -833,7 +793,9 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	public IExpr sqrt() {
 		try {
 			return valueOf(BigIntegerMath.sqrt(fBigIntValue, RoundingMode.UNNECESSARY));
-		} catch (RuntimeException ex) {
+		} catch (LimitException lime) {
+			throw lime;
+		} catch (RuntimeException rex) {
 			return F.Sqrt(this);
 		}
 	}
@@ -859,7 +821,11 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	/** {@inheritDoc} */
 	@Override
 	public int toInt() throws ArithmeticException {
-		return NumberUtil.toInt(fBigIntValue);
+		int val = NumberUtil.toIntDefault(fBigIntValue);
+		if (val != Integer.MIN_VALUE) {
+			return val;
+		}
+		throw new ArithmeticException("toInt: numerator is a big integer");
 	}
 
 	/** {@inheritDoc} */

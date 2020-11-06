@@ -138,7 +138,7 @@ public class Outer extends AbstractFunctionEvaluator {
 		OuterAlgorithm algorithm = new OuterAlgorithm(ast, head);
 		return algorithm.outer(3, ast.arg2(), F.ast(F.List, ast.argSize(), false));
 	}
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_3_INFINITY;
 	}
 }

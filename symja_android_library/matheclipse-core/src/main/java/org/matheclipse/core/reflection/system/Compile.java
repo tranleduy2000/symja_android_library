@@ -72,7 +72,7 @@ public class Compile extends AbstractCoreFunctionEvaluator {
 		}
 	}
 
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_2_2;
 	}
 }

@@ -50,7 +50,7 @@ public abstract class AbstractTrigArg1 extends AbstractArg1 {
 		return evaluateArg1(arg1, engine);
 	}
 
-	public int[] expectedArgSize() {
+	public int[] expectedArgSize(IAST ast) {
 		return IOFunctions.ARGS_1_1;
 	}
 	@Override
