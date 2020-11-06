@@ -9,6 +9,7 @@ import org.hipparchus.special.Gamma;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.ConstantDefinitions;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.INumber;
@@ -16,6 +17,7 @@ import org.matheclipse.core.interfaces.INumber;
 import java.util.Locale;
 
 import de.lab4inf.math.Function;
+import de.lab4inf.math.functions.IncompleteBeta;
 import de.lab4inf.math.gof.Visitor;
 import de.lab4inf.math.util.ContinuedFraction;
 
@@ -107,7 +109,7 @@ public class GammaJS {
 	private static double regGammaP(final double a, final double x, final double eps, final int max) {
 		double ret = 0;
 		if ((a <= 0.0) || (x < 0.0)) {
-			throw new IllegalArgumentException(String.format(Locale.US, "P(%f,%f)", a, x));
+			throw new ArgumentTypeException(String.format("P(%f,%f)", a, x));
 		}
 		if (a >= 1 && x > a) {
 			ret = 1.0 - regGammaQ(a, x, eps, max);
@@ -146,7 +148,7 @@ public class GammaJS {
 		double ret = 0;
 
 		if ((a <= 0.0) || (x < 0.0)) {
-			throw new IllegalArgumentException(String.format(Locale.US, "Q(%f,%f)", a, x));
+			throw new ArgumentTypeException(String.format("Q(%f,%f)", a, x));
 		}
 		if (x < a || a < 1.0) {
 			ret = 1.0 - regGammaP(a, x, epsilon, maxIterations);
@@ -165,7 +167,7 @@ public class GammaJS {
 
 	public static double factorialInt(double n) {
 		if (n < 0.0) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.FACTORIAL_NEGATIVE_PARAMETER, n);
+			throw new ArgumentTypeException("Factorial: n<0.0");
         }
 		double result = 1.0;
 		for (int i = 2; i <= n; i++) {
@@ -185,6 +187,9 @@ public class GammaJS {
 				.divide(y);
 	}
 
+	public static Complex beta(Complex x, Complex y, Complex z, Complex w) {
+		return beta(y, z, w).subtract(beta(x, z, w));
+	}
 	public static double beta(double x, double y) {
 		return Gamma.gamma(x) * Gamma.gamma(y) / Gamma.gamma(x + y);
 	}
@@ -193,6 +198,27 @@ public class GammaJS {
 		return Math.pow(x, y) * HypergeometricJS.hypergeometric2F1(y, 1.0 - z, y + 1.0, x) / y;
 	}
 
+	public static double beta(double x, double y, double z, double w) {
+		return beta(y, z, w) - beta(x, z, w);
+	}
+
+	public static Complex betaRegularized(Complex x, Complex y, Complex z) {
+		return beta(x, y, z).divide(beta(y, z));
+	}
+
+	public static Complex betaRegularized(Complex x, Complex y, Complex z, Complex w) {
+		return beta(x, y, z, w).divide(beta(z, w));
+	}
+
+	public static double betaRegularized(double x, double y, double z) {
+		// use A&amp;ST26.5.4 and A&amp;ST26.5.5
+		return IncompleteBeta.incBeta(x, y, z);
+		// return beta(x, y, z) / beta(y, z);
+	}
+
+	public static double betaRegularized(double x, double y, double z, double w) {
+		return beta(x, y, z, w) / beta(z, w);
+	}
 	public static INumber incompleteBeta(double x, double y, double z) {
 		if (x == -1 || x > 1) {
 			return F.complexNum(beta(new Complex(x), new Complex(y), new Complex(z)));
@@ -250,11 +276,11 @@ public class GammaJS {
 	 * @param y
 	 * @return
 	 */
-	public static Complex gamma(Complex x, final Complex y) {
+	public static Complex gamma(Complex x, Complex y) {
 		// patch lower end or evaluate exponential integral independently
 		if (F.isZero(x)) {
 			if (F.isZero(y)) {
-				throw new IllegalArgumentException("Gamma function pole");
+				throw new ArgumentTypeException("Gamma function pole");
 			}
 			// if (Complex.equals(x, Complex.ZERO, Config.SPECIAL_FUNCTIONS_TOLERANCE)) {
 			// // taylorSeries => (-EulerGamma - Log(y)) + x - 1/4 * x^2 + 1/18 * x^3 - 1/96 * x^4 + 1/600 * x^5
@@ -289,6 +315,7 @@ public class GammaJS {
 		if (xRe < 0.0 && F.isNumIntValue(xRe) && F.isZero(x.getImaginary())) {
 			// x is a negative integer
 			final double n = -xRe;
+			int iterationLimit = EvalEngine.get().getIterationLimit();
 			final Complex t = y.negate().exp().multiply(//
 					ZetaJS.complexSummation(new DoubleFunction<Complex>() {
 												@Override
@@ -296,7 +323,7 @@ public class GammaJS {
 													return new Complex(Math.pow(-1.0, k) * factorialInt(k)).divide(y.pow(k + 1));
 												}
 											}, //
-							0.0, n - 1.0));
+							0.0, n - 1.0, iterationLimit));
 
 			final double plusMinusOne = Math.pow(-1.0, n);
 			return expIntegralE(Complex.ONE, y).subtract(t).multiply(plusMinusOne / factorialInt(n));
@@ -314,7 +341,7 @@ public class GammaJS {
 	}
 
 	public static double expIntegralEi(double x) {
-		double useAsymptotic = 30.0;
+		double useAsymptotic = 26.0;
 
 		if (x < 0.0) {
 			return expIntegralEi(new Complex(x)).getReal();
@@ -351,7 +378,7 @@ public class GammaJS {
 	}
 
 	public static Complex expIntegralEi(Complex x) {
-		double useAsymptotic = 30.0;
+		double useAsymptotic = 26.0;
 		if (x.abs() > useAsymptotic) {
 
 			Complex s = Complex.ONE;
@@ -366,7 +393,10 @@ public class GammaJS {
 				i++;
 		}
 
-			return s.multiply(x.exp()).multiply(xInverse);
+			// combination of logarithms adds/subtracts Complex(0,Pi)
+			int sign = x.getImaginary() > 0 ? 1 : x.getImaginary() < 0 ? -1 : 0;
+
+			return s.multiply(x.exp()).multiply(xInverse).add(new Complex(0.0, sign * Math.PI));
 
 		}
 
@@ -381,20 +411,18 @@ public class GammaJS {
 		}
 
 		s = s.add(ConstantDefinitions.EULER_GAMMA).add(x.log());
-		// form (log(x)-log(1/x))/2 has wrong phase from -0 in division
-		// can either chop inv(x) or set phase explicitly
 
-		// TODO check this
-		// if (x.getReal() < 0.0 && F.isZero(x.getImaginary())) {
-		// return new Complex(s.getReal());
-		// }
+		// real on negative real axis, set phase explicitly rather than log combo
+		if (x.getReal() < 0.0 && F.isZero(x.getImaginary())) {
+			return new Complex(s.getReal(), 0.0);
+		}
 
 		return s;
 	}
 
 	public static double logIntegral(double x) {
 		if (x <= 0) {
-			throw new IllegalArgumentException("logIntegral: x<=0");
+			throw new ArgumentTypeException("logIntegral: x<=0");
 		}
 		return expIntegralEi(Math.log(x));
 	}
@@ -464,6 +492,25 @@ public class GammaJS {
 		return result;
 	}
 
+	public static Complex gammaRegularized(Complex x, double y, Complex z) {
+		return gamma(x, y, z).divide(gamma(x));
+	}
+
+	public static Complex gammaRegularized(Complex x, Complex y) {
+		return gamma(x, y).divide(gamma(x));
+	}
+
+	public static double gammaRegularized(double x, double y, double z) {
+		return org.hipparchus.special.Gamma.regularizedGammaQ(x, y) - //
+				org.hipparchus.special.Gamma.regularizedGammaQ(x, z);
+		// Complex cx = new Complex(x);
+		// return gamma(cx, y, new Complex(z)).divide(gamma(cx));
+	}
+
+	public static double gammaRegularized(double x, double y) {
+		return org.hipparchus.special.Gamma.regularizedGammaQ(x, y);
+		// return gamma(x, y) / gamma(x);
+	}
 	/**
 	 * Incomplete gamma function. Gamma(0, x).
 	 *

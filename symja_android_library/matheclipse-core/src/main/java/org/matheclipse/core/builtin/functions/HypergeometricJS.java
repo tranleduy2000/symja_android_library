@@ -1,5 +1,6 @@
 package org.matheclipse.core.builtin.functions;
 
+import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 
 import static java.lang.Math.abs;
@@ -10,7 +11,9 @@ import org.hipparchus.complex.Complex;
 import org.hipparchus.special.Gamma;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.expression.F;
 
@@ -21,12 +24,15 @@ import org.matheclipse.core.expression.F;
  */
 public class HypergeometricJS {
 	private HypergeometricJS() {
-
 	}
 
-	// public static Complex hypergeometricSeries(Complex[] A, Complex[] B, Complex x) {
-	// return hypergeometricSeries(A, B, x, Config.SPECIAL_FUNCTIONS_TOLERANCE);
-	// }
+	public static Complex complexAverage(Function<Complex, Complex> f, Complex x) {
+		return complexAverage(f, x, 1e-5);
+	}
+
+	public static Complex complexAverage(Function<Complex, Complex> f, Complex x, double offset) {
+		return f.apply(x.add(offset)).add(f.apply(x.subtract(offset))).divide(2.0);
+	}
 
 	public static Complex hypergeometricSeries(Complex[] A, Complex[] B, Complex x) { // , double tolerance
 		// see https://github.com/paulmasson/math/issues/12
@@ -130,13 +136,16 @@ public class HypergeometricJS {
 
 		double s = 1.0;
 		double p = 1.0;
-		int i = 1;
+		long i = 1;
+		long iterationLimit = EvalEngine.get().getIterationLimit();
 
 		while (Math.abs(p) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
 			p *= x / a / i;
 			s += p;
 			a++;
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.Hypergeometric0F1);
+			}
 		}
 
 		return s;
@@ -149,7 +158,7 @@ public class HypergeometricJS {
 	public static Complex hypergeometric0F1(Complex a, Complex x) {
 
 		final double useAsymptotic = 100;
-		if (F.isNumIntValue(a.getReal()) && a.getReal() <= 0 && a.getImaginary() == 0) {
+		if (a.isMathematicalInteger() && a.getReal() <= 0) {
 			throw new ArgumentTypeException("hypergeometric function pole");
 		}
 
@@ -175,14 +184,17 @@ public class HypergeometricJS {
 
 		Complex s = Complex.ONE;
 		Complex p = Complex.ONE;
-		int i = 1;
+		long i = 1;
+		long iterationLimit = EvalEngine.get().getIterationLimit();
 
 		while (Math.abs(p.getReal()) > Config.SPECIAL_FUNCTIONS_TOLERANCE || //
 				Math.abs(p.getImaginary()) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
 			p = p.multiply(x).multiply(a.reciprocal()).divide(i);
 			s = s.add(p);
 			a = a.add(1);
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.Hypergeometric0F1);
+			}
 		}
 
 		return s;
@@ -196,7 +208,7 @@ public class HypergeometricJS {
 	public static Complex hypergeometric1F1(Complex a, Complex b, Complex x) {
 
 		final double useAsymptotic = 30;
-		if (F.isNumIntValue(b.getReal()) && b.getReal() <= 0 && F.isZero(b.getImaginary())) {
+		if (b.isMathematicalInteger() && b.getReal() <= 0) {
 			throw new ArgumentTypeException("hypergeometric function pole");
 		}
 		// Kummer transformation
@@ -219,15 +231,18 @@ public class HypergeometricJS {
 
 		Complex s = Complex.ONE;
 		Complex p = Complex.ONE;
-		int i = 1;
+		long i = 1;
 
+		long iterationLimit = EvalEngine.get().getIterationLimit();
 		while (Math.abs(p.getReal()) > Config.SPECIAL_FUNCTIONS_TOLERANCE || //
 				Math.abs(p.getImaginary()) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
 			p = p.multiply(x).multiply(a).multiply(b.reciprocal()).divide(i);
 			s = s.add(p);
 			a = a.add(1.0);
 			b = b.add(1.0);
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.Hypergeometric1F1);
+			}
 		}
 
 		return s;
@@ -256,14 +271,17 @@ public class HypergeometricJS {
 
 		double s = 1;
 		double p = 1;
-		double i = 1;
+		long i = 1;
 
+		long iterationLimit = EvalEngine.get().getIterationLimit();
 		while (Math.abs(p) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
 			p *= x * a / b / i;
 			s += p;
 			a++;
 			b++;
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.Hypergeometric1F1);
+			}
 		}
 
 		return s;
@@ -446,20 +464,24 @@ public class HypergeometricJS {
 			}
 		}
 
-		if (F.isNumIntValue(c.getReal()) && c.getReal() <= 0 && F.isZero(c.getImaginary())) {
-			throw new ArgumentTypeException("hypergeometric function pole");
+		if (c.isMathematicalInteger() && c.getReal() <= 0) {
+			throw new ThrowException(F.CComplexInfinity);
+			// throw new ArgumentTypeException("hypergeometric function pole");
 		}
 		Complex s = Complex.ONE;
 		Complex p = Complex.ONE;
-		double i = 1;
+		int i = 1;
 
+		long iterationLimit = EvalEngine.get().getIterationLimit();
 		while (Math.abs(p.getReal()) > tolerance || Math.abs(p.getImaginary()) > tolerance) {
 			p = p.multiply(x).multiply(a).multiply(b).multiply(c.reciprocal()).divide(i);
 			s = s.add(p);
 			a = a.add(1);
 			b = b.add(1);
 			c = c.add(1);
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.Hypergeometric2F1);
+			}
 		}
 
 		return s;
@@ -474,7 +496,8 @@ public class HypergeometricJS {
 	public static double hypergeometric2F1(double a, double b, double c, double x, double tolerance) {
 
 		if (F.isNumIntValue(c) && c <= 0) {
-			throw new ArgumentTypeException("hypergeometric function pole");
+			throw new ThrowException(F.CComplexInfinity);
+			// throw new ArgumentTypeException("hypergeometric function pole");
 		}
 
 		// transformation from Abramowitz & Stegun p.559
@@ -509,7 +532,8 @@ public class HypergeometricJS {
 
 		double s = 1;
 		double p = 1;
-		double i = 1;
+		int i = 1;
+		long iterationLimit = EvalEngine.get().getIterationLimit();
 
 		while (Math.abs(p) > tolerance) {
 			p *= x * a * b / c / i;
@@ -517,7 +541,9 @@ public class HypergeometricJS {
 			a++;
 			b++;
 			c++;
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.Hypergeometric2F1);
+			}
 		}
 
 		return s;
@@ -642,7 +668,7 @@ public class HypergeometricJS {
 
 	public static Complex hypergeometricU(Complex a, Complex b, Complex x) {
 
-		double useAsymptotic = 15;
+		double useAsymptotic = 20;
 
 		// asymptotic form as per Johansson arxiv.org/abs/1606.06977
 		if (x.abs() > useAsymptotic) {
@@ -652,6 +678,15 @@ public class HypergeometricJS {
 
 		}
 
+		if (b.equals(Complex.ONE) || //
+				(F.isNumIntValue(b.getReal(), 1) && F.isZero(b.getImaginary()))) {
+			return complexAverage(new Function<Complex, Complex>() {
+				@Override
+				public Complex apply(Complex arg) {
+					return hypergeometricU(a, arg, x);
+				}
+			}, b);
+		}
 		Complex t1 = Arithmetic.lanczosApproxGamma(b.subtract(1))
 				.multiply(Arithmetic.lanczosApproxGamma(a).reciprocal()).multiply(x.pow(Complex.ONE.subtract(b))
 						.multiply(hypergeometric1F1(a.add(b.negate()).add(1.0), b.negate().add(2.0), x)));
