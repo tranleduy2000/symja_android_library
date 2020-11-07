@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -32,25 +32,21 @@ import org.logicng.formulas.Formula;
 
 /**
  * A handler for factorization methods (CNF, DNF).
- *
- * @version 1.0
+ * @version 1.6.2
  * @since 1.0
  */
-public interface FactorizationHandler {
+public interface FactorizationHandler extends Handler {
 
     /**
      * This method is called every time a distribution is performed.
-     *
      * @return whether the factorization should be continued or not
      */
     boolean performedDistribution();
 
     /**
      * This method is called every time a new clause is created.
-     *
      * @param clause the clause
      * @return whether the factorization should be continued or not
      */
     boolean createdClause(final Formula clause);
-
 }

@@ -202,8 +202,30 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      * {@inheritDoc}
      */
     @Override
-    public Field<T> getField() {
-        return field;
+    public FieldVector<T> append(FieldVector<T> v) {
+        if (v instanceof SparseFieldVector<?>) {
+            return append((SparseFieldVector<T>) v);
+        } else {
+            final int n = v.getDimension();
+            FieldVector<T> res = new SparseFieldVector<>(this, n);
+            for (int i = 0; i < n; i++) {
+                res.setEntry(i + virtualSize, v.getEntry(i));
+            }
+            return res;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NullArgumentException if d is null
+     */
+    @Override
+    public FieldVector<T> append(T d) throws NullArgumentException {
+        MathUtils.checkNotNull(d);
+        FieldVector<T> res = new SparseFieldVector<>(this, 1);
+        res.setEntry(virtualSize, d);
+        return res;
     }
 
     /**
@@ -218,41 +240,96 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      * {@inheritDoc}
      */
     @Override
-    public FieldVector<T> add(FieldVector<T> v) throws MathIllegalArgumentException {
-        if (v instanceof SparseFieldVector<?>) {
-            return add((SparseFieldVector<T>) v);
-        } else {
-            final int n = v.getDimension();
-            checkVectorDimensions(n);
-            SparseFieldVector<T> res = new SparseFieldVector<>(field, getDimension());
-            for (int i = 0; i < n; i++) {
-                res.setEntry(i, v.getEntry(i).add(getEntry(i)));
-            }
-            return res;
+    public T dotProduct(FieldVector<T> v) throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        T res = field.getZero();
+        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            res = res.add(v.getEntry(iter.key()).multiply(iter.value()));
         }
+        return res;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public FieldVector<T> subtract(FieldVector<T> v)
-            throws MathIllegalArgumentException {
-        if (v instanceof SparseFieldVector<?>) {
-            return subtract((SparseFieldVector<T>) v);
-        } else {
-            final int n = v.getDimension();
-            checkVectorDimensions(n);
-            SparseFieldVector<T> res = new SparseFieldVector<>(this);
-            for (int i = 0; i < n; i++) {
-                if (entries.containsKey(i)) {
-                    res.setEntry(i, entries.get(i).subtract(v.getEntry(i)));
-                } else {
-                    res.setEntry(i, field.getZero().subtract(v.getEntry(i)));
-                }
-            }
-            return res;
+    public FieldVector<T> ebeDivide(FieldVector<T> v)
+            throws MathRuntimeException {
+        checkVectorDimensions(v.getDimension());
+        SparseFieldVector<T> res = new SparseFieldVector<>(this);
+        OpenIntToFieldHashMap<T>.Iterator iter = res.entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            res.setEntry(iter.key(), iter.value().divide(v.getEntry(iter.key())));
         }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> ebeMultiply(FieldVector<T> v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.getDimension());
+        SparseFieldVector<T> res = new SparseFieldVector<>(this);
+        OpenIntToFieldHashMap<T>.Iterator iter = res.entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            res.setEntry(iter.key(), iter.value().multiply(v.getEntry(iter.key())));
+        }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDimension() {
+        return virtualSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T getEntry(int index) throws MathIllegalArgumentException {
+        checkIndex(index);
+        return entries.get(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Field<T> getField() {
+        return field;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> getSubVector(int index, int n)
+            throws MathIllegalArgumentException {
+        if (n < 0) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE, n);
+        }
+        checkIndex(index);
+        checkIndex(index + n - 1);
+        SparseFieldVector<T> res = new SparseFieldVector<>(field, n);
+        int end = index + n;
+        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int key = iter.key();
+            if (key >= index && key < end) {
+                res.setEntry(key - index, iter.value());
+            }
+        }
+        return res;
     }
 
     /**
@@ -270,43 +347,6 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
     public FieldVector<T> mapAddToSelf(T d) throws NullArgumentException {
         for (int i = 0; i < virtualSize; i++) {
             setEntry(i, getEntry(i).add(d));
-        }
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> mapSubtract(T d) throws NullArgumentException {
-        return copy().mapSubtractToSelf(d);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> mapSubtractToSelf(T d) throws NullArgumentException {
-        return mapAddToSelf(field.getZero().subtract(d));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> mapMultiply(T d) throws NullArgumentException {
-        return copy().mapMultiplyToSelf(d);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> mapMultiplyToSelf(T d) throws NullArgumentException {
-        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            entries.put(iter.key(), iter.value().multiply(d));
         }
         return this;
     }
@@ -357,57 +397,58 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      * {@inheritDoc}
      */
     @Override
-    public FieldVector<T> ebeMultiply(FieldVector<T> v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        SparseFieldVector<T> res = new SparseFieldVector<>(this);
-        OpenIntToFieldHashMap<T>.Iterator iter = res.entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            res.setEntry(iter.key(), iter.value().multiply(v.getEntry(iter.key())));
-        }
-        return res;
+    public FieldVector<T> mapMultiply(T d) throws NullArgumentException {
+        return copy().mapMultiplyToSelf(d);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public FieldVector<T> ebeDivide(FieldVector<T> v)
-            throws MathRuntimeException {
-        checkVectorDimensions(v.getDimension());
-        SparseFieldVector<T> res = new SparseFieldVector<>(this);
-        OpenIntToFieldHashMap<T>.Iterator iter = res.entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            res.setEntry(iter.key(), iter.value().divide(v.getEntry(iter.key())));
-        }
-        return res;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T dotProduct(FieldVector<T> v) throws MathIllegalArgumentException {
-        checkVectorDimensions(v.getDimension());
-        T res = field.getZero();
+    public FieldVector<T> mapMultiplyToSelf(T d) throws NullArgumentException {
         OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
         while (iter.hasNext()) {
             iter.advance();
-            res = res.add(v.getEntry(iter.key()).multiply(iter.value()));
+            entries.put(iter.key(), iter.value().multiply(d));
         }
-        return res;
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public FieldVector<T> projection(FieldVector<T> v)
-            throws MathRuntimeException {
-        checkVectorDimensions(v.getDimension());
-        return v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
+    public FieldVector<T> mapSubtract(T d) throws NullArgumentException {
+        return copy().mapSubtractToSelf(d);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> mapSubtractToSelf(T d) throws NullArgumentException {
+        return mapAddToSelf(field.getZero().subtract(d));
+    }
+
+    /**
+     * Optimized method to compute outer product when both vectors are sparse.
+     *
+     * @param v vector with which outer product should be computed
+     * @return the matrix outer product between instance and v
+     */
+    public FieldMatrix<T> outerProduct(SparseFieldVector<T> v) {
+        final int n = v.getDimension();
+        SparseFieldMatrix<T> res = new SparseFieldMatrix<>(field, virtualSize, n);
+        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            OpenIntToFieldHashMap<T>.Iterator iter2 = v.entries.iterator();
+            while (iter2.hasNext()) {
+                iter2.advance();
+                res.setEntry(iter.key(), iter2.key(), iter.value().multiply(iter2.value()));
+            }
+        }
+        return res;
     }
 
     /**
@@ -437,9 +478,23 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      * {@inheritDoc}
      */
     @Override
-    public T getEntry(int index) throws MathIllegalArgumentException {
-        checkIndex(index);
-        return entries.get(index);
+    public FieldVector<T> projection(FieldVector<T> v)
+            throws MathRuntimeException {
+        checkVectorDimensions(v.getDimension());
+        return v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NullArgumentException if value is null
+     */
+    @Override
+    public void set(T value) {
+        MathUtils.checkNotNull(value);
+        for (int i = 0; i < virtualSize; i++) {
+            setEntry(i, value);
+        }
     }
 
     /**
@@ -458,68 +513,6 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      * {@inheritDoc}
      */
     @Override
-    public int getDimension() {
-        return virtualSize;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> append(FieldVector<T> v) {
-        if (v instanceof SparseFieldVector<?>) {
-            return append((SparseFieldVector<T>) v);
-        } else {
-            final int n = v.getDimension();
-            FieldVector<T> res = new SparseFieldVector<>(this, n);
-            for (int i = 0; i < n; i++) {
-                res.setEntry(i + virtualSize, v.getEntry(i));
-            }
-            return res;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws NullArgumentException if d is null
-     */
-    @Override
-    public FieldVector<T> append(T d) throws NullArgumentException {
-        MathUtils.checkNotNull(d);
-        FieldVector<T> res = new SparseFieldVector<>(this, 1);
-        res.setEntry(virtualSize, d);
-        return res;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> getSubVector(int index, int n)
-            throws MathIllegalArgumentException {
-        if (n < 0) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE, n);
-        }
-        checkIndex(index);
-        checkIndex(index + n - 1);
-        SparseFieldVector<T> res = new SparseFieldVector<>(field, n);
-        int end = index + n;
-        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int key = iter.key();
-            if (key >= index && key < end) {
-                res.setEntry(key - index, iter.value());
-            }
-        }
-        return res;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setSubVector(int index, FieldVector<T> v)
             throws MathIllegalArgumentException {
         checkIndex(index);
@@ -528,54 +521,6 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
         for (int i = 0; i < n; i++) {
             setEntry(i + index, v.getEntry(i));
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws NullArgumentException if value is null
-     */
-    @Override
-    public void set(T value) {
-        MathUtils.checkNotNull(value);
-        for (int i = 0; i < virtualSize; i++) {
-            setEntry(i, value);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T[] toArray() {
-        T[] res = MathArrays.buildArray(field, virtualSize);
-        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            res[iter.key()] = iter.value();
-        }
-        return res;
-    }
-
-    /**
-     * Optimized method to compute outer product when both vectors are sparse.
-     *
-     * @param v vector with which outer product should be computed
-     * @return the matrix outer product between instance and v
-     */
-    public FieldMatrix<T> outerProduct(SparseFieldVector<T> v) {
-        final int n = v.getDimension();
-        SparseFieldMatrix<T> res = new SparseFieldMatrix<>(field, virtualSize, n);
-        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            OpenIntToFieldHashMap<T>.Iterator iter2 = v.entries.iterator();
-            while (iter2.hasNext()) {
-                iter2.advance();
-                res.setEntry(iter.key(), iter2.key(), iter.value().multiply(iter2.value()));
-            }
-        }
-        return res;
     }
 
     /**
@@ -599,6 +544,43 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
             } else {
                 res.setEntry(key, field.getZero().subtract(iter.value()));
             }
+        }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> subtract(FieldVector<T> v)
+            throws MathIllegalArgumentException {
+        if (v instanceof SparseFieldVector<?>) {
+            return subtract((SparseFieldVector<T>) v);
+        } else {
+            final int n = v.getDimension();
+            checkVectorDimensions(n);
+            SparseFieldVector<T> res = new SparseFieldVector<>(this);
+            for (int i = 0; i < n; i++) {
+                if (entries.containsKey(i)) {
+                    res.setEntry(i, entries.get(i).subtract(v.getEntry(i)));
+                } else {
+                    res.setEntry(i, field.getZero().subtract(v.getEntry(i)));
+                }
+            }
+            return res;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T[] toArray() {
+        T[] res = MathArrays.buildArray(field, virtualSize);
+        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            res[iter.key()] = iter.value();
         }
         return res;
     }
@@ -649,6 +631,24 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
         if (getDimension() != n) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
                     getDimension(), n);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> add(FieldVector<T> v) throws MathIllegalArgumentException {
+        if (v instanceof SparseFieldVector<?>) {
+            return add((SparseFieldVector<T>) v);
+        } else {
+            final int n = v.getDimension();
+            checkVectorDimensions(n);
+            SparseFieldVector<T> res = new SparseFieldVector<>(field, getDimension());
+            for (int i = 0; i < n; i++) {
+                res.setEntry(i, v.getEntry(i).add(getEntry(i)));
+            }
+            return res;
         }
     }
 
@@ -808,6 +808,25 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
      * {@inheritDoc}
      */
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((field == null) ? 0 : field.hashCode());
+        result = prime * result + virtualSize;
+        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            iter.advance();
+            int temp = iter.value().hashCode();
+            result = prime * result + temp;
+        }
+        return result;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {
@@ -849,23 +868,5 @@ public class SparseFieldVector<T extends FieldElement<T>> implements FieldVector
             }
         }
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((field == null) ? 0 : field.hashCode());
-        result = prime * result + virtualSize;
-        OpenIntToFieldHashMap<T>.Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            iter.advance();
-            int temp = iter.value().hashCode();
-            result = prime * result + temp;
-        }
-        return result;
     }
 }

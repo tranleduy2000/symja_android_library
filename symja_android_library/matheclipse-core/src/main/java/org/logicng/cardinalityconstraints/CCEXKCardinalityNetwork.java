@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -34,11 +34,10 @@ import org.logicng.formulas.Variable;
 /**
  * Encodes that exactly 'rhs' variables are assigned value true.  Uses the cardinality network
  * encoding due to Asín, Nieuwenhuis, Oliveras, and Rodríguez-Carbonell .
- *
  * @version 1.1
  * @since 1.1
  */
-final class CCEXKCardinalityNetwork implements CCAtMostK {
+public final class CCEXKCardinalityNetwork implements CCAtMostK {
 
     private final CCCardinalityNetworks cardinalityNetwork;
 
@@ -50,13 +49,13 @@ final class CCEXKCardinalityNetwork implements CCAtMostK {
     }
 
     @Override
-    public void build(final EncodingResult result, final Variable[] vars, int rhs) {
-        cardinalityNetwork.buildEXK(result, vars, rhs);
+    public void build(final EncodingResult result, final Variable[] vars, final int rhs) {
+        this.cardinalityNetwork.buildEXK(result, vars, rhs);
     }
 
     @Override
     public CCIncrementalData incrementalData() {
-        return cardinalityNetwork.incrementalData();
+        return this.cardinalityNetwork.incrementalData();
     }
 
     @Override

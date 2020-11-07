@@ -27,7 +27,7 @@ import org.hipparchus.exception.MathIllegalArgumentException;
 /**
  * Interface handling decomposition algorithms that can solve A &times; X = B.
  * <p>
- * Decomposition algorithms decompose an A matrix has a product of several specific
+ * Decomposition algorithms decompose an A matrix as a product of several specific
  * matrices from which they can solve A &times; X = B in least squares sense: they find X
  * such that ||A &times; X - B|| is minimal.
  * <p>
@@ -47,8 +47,8 @@ public interface DecompositionSolver {
      *
      * @param b right-hand side of the equation A &times; X = B
      * @return a vector X that minimizes the two norm of A &times; X - B
-     * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
-     * @throws MathIllegalArgumentException                          if the decomposed matrix is singular.
+     * @throws MathIllegalArgumentException if the matrices dimensions do not match.
+     * @throws MathIllegalArgumentException if the decomposed matrix is singular.
      */
     RealVector solve(RealVector b) throws MathIllegalArgumentException;
 
@@ -60,8 +60,8 @@ public interface DecompositionSolver {
      *
      * @param b right-hand side of the equation A &times; X = B
      * @return a matrix X that minimizes the two norm of A &times; X - B
-     * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
-     * @throws MathIllegalArgumentException                          if the decomposed matrix is singular.
+     * @throws MathIllegalArgumentException if the matrices dimensions do not match.
+     * @throws MathIllegalArgumentException if the decomposed matrix is singular.
      */
     RealMatrix solve(RealMatrix b) throws MathIllegalArgumentException;
 

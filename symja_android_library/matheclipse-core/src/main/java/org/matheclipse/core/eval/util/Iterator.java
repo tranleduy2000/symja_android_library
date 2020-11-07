@@ -4,9 +4,10 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.QuantityFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.NoEvalException;
 import org.matheclipse.core.eval.exception.ValidateException;
-import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.interfaces.IAST;
@@ -19,9 +20,9 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import ch.ethz.idsc.tensor.qty.IQuantity;
-import ch.ethz.idsc.tensor.qty.IQuantityStatic;
-import ch.ethz.idsc.tensor.qty.IUnit;
+import org.matheclipse.core.tensor.qty.IQuantity;
+import org.matheclipse.core.tensor.qty.IQuantityStatic;
+import org.matheclipse.core.tensor.qty.IUnit;
 
 import static org.matheclipse.core.expression.F.Divide;
 import static org.matheclipse.core.expression.F.Less;
@@ -174,7 +175,7 @@ public class Iterator {
 		@Override
 		public IExpr next() {
 			if (variable != null && variable != count) {
-				variable.assign(count);
+				variable.assignValue(count);
 			}
 			final IExpr temp = count;
 			if (maxCounterOrList.isList()) {
@@ -239,7 +240,7 @@ public class Iterator {
 				count = lowerLimit;
 			}
 			if (variable != null && variable != count) {
-				variable.assign(count);
+				variable.assignValue(count);
 			}
 			return true;
 		} 
@@ -251,7 +252,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(null);
+				variable.assignValue(null);
 			}
 			EvalEngine.get().setNumericMode(fNumericMode);
 		}
@@ -351,7 +352,7 @@ public class Iterator {
 		public IExpr next() {
 			final IExpr temp = F.num(count);
 			if (variable != null) {
-				variable.assign(temp);
+				variable.assignValue(temp);
 			}
 			count += step;
 			return temp;
@@ -383,7 +384,7 @@ public class Iterator {
 			}
 
 			if (variable != null) {
-				variable.assign(originalLowerLimit);
+				variable.assignValue(originalLowerLimit);
 			}
 			return true;
 		}
@@ -395,7 +396,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(variableValue);
+				variable.assignValue(variableValue);
 			}
 		}
 	}
@@ -497,7 +498,7 @@ public class Iterator {
 		public IExpr next() {
 			final ISignedNumber temp = count;
 			if (variable != null) {
-				variable.assign(temp);
+				variable.assignValue(temp);
 			}
 			count = (IRational) count.plus(step);
 			return temp;
@@ -527,7 +528,7 @@ public class Iterator {
 
 			if (variable != null) {
 				variableValue = variable.assignedValue();
-				variable.assign(originalLowerLimit);
+				variable.assignValue(originalLowerLimit);
 			}
 			return true;
 		}
@@ -539,7 +540,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(variableValue);
+				variable.assignValue(variableValue);
 			}
 		}
 	}
@@ -685,7 +686,7 @@ public class Iterator {
 		public IExpr next() {
 			final IQuantity temp = count;
 			if (variable != null) {
-				variable.assign(temp);
+				variable.assignValue(temp);
 			}
 			count = (IQuantity) count.plus(step);
 			return temp;
@@ -714,7 +715,7 @@ public class Iterator {
 			}
 			if (variable != null) {
 				variableValue = variable.assignedValue();
-				variable.assign(originalLowerLimit);
+				variable.assignValue(originalLowerLimit);
 			}
 			return true;
 		}
@@ -726,7 +727,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(variableValue);
+				variable.assignValue(variableValue);
 			}
 		}
 	}
@@ -822,7 +823,7 @@ public class Iterator {
 		public IExpr next() {
 			final ISignedNumber temp = count;
 			if (variable != null) {
-				variable.assign(temp);
+				variable.assignValue(temp);
 			}
 			count = (ISignedNumber) count.plus(step);
 			return temp;
@@ -854,7 +855,7 @@ public class Iterator {
 			}
 
 			if (variable != null) {
-				variable.assign(originalLowerLimit);
+				variable.assignValue(originalLowerLimit);
 			}
 			return true;
 		}
@@ -866,7 +867,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(variableValue);
+				variable.assignValue(variableValue);
 			}
 		}
 	}
@@ -976,7 +977,7 @@ public class Iterator {
 		public IExpr next() {
 			final IExpr temp = F.ZZ(count);
 			if (variable != null) {
-				variable.assign(temp);
+				variable.assignValue(temp);
 			}
 			count += step;
 			return temp;
@@ -1008,7 +1009,7 @@ public class Iterator {
 			}
 
 			if (variable != null) {
-				variable.assign(originalLowerLimit);
+				variable.assignValue(originalLowerLimit);
 			}
 			return true;
 		}
@@ -1020,7 +1021,7 @@ public class Iterator {
 		@Override
 		public void tearDown() {
 			if (variable != null) {
-				variable.assign(variableValue);
+				variable.assignValue(variableValue);
 			}
 		}
 	}
@@ -1050,6 +1051,7 @@ public class Iterator {
 				evalEngine.setNumericMode(true);
 			}
 			fNumericMode = evalEngine.isNumericMode();
+			int iterationLimit = evalEngine.getIterationLimit();
 			switch (list.size()) {
 
 			case 2:
@@ -1063,12 +1065,19 @@ public class Iterator {
 				if (upperLimit.isInteger()) {
 					try {
 						int iUpperLimit = ((IInteger) upperLimit).toInt();
+						if (iUpperLimit > iterationLimit && iterationLimit > 0) {
+							IterationLimitExceeded.throwIt(iUpperLimit, upperLimit);
+						}
 						return new IntIterator(variable, 1, iUpperLimit, 1);
 					} catch (ArithmeticException ae) {
 						//
 					}
 				} else if (upperLimit.isRational()) {
 					try {
+						int iUpperLimit = ((IRational) upperLimit).floor().toInt();
+						if (iUpperLimit > iterationLimit && iterationLimit > 0) {
+							IterationLimitExceeded.throwIt(iUpperLimit, upperLimit);
+						}
 						return new RationalIterator(variable, F.C1, (IRational) upperLimit, F.C1);
 					} catch (ArithmeticException ae) {
 						//
@@ -1083,6 +1092,7 @@ public class Iterator {
 							IOFunctions.getMessage("vloc", F.List(list.arg1()), EvalEngine.get()));
 				}
 
+				break;
 			case 3:
 				lowerLimit = F.C1;
 				upperLimit = evalEngine.evalWithoutNumericReset(list.arg2());
@@ -1221,6 +1231,8 @@ public class Iterator {
 			}
 
 			return new ExprIterator(variable, evalEngine, lowerLimit, upperLimit, step, fNumericMode);
+		} catch (LimitException le) {
+			throw  le;
 		} catch (RuntimeException rex) {
 			// Argument `1` at position `2` does not have the correct form for an iterator.
 			String str = IOFunctions.getMessage("itform", F.List(list, F.ZZ(position)), EvalEngine.get());
@@ -1358,6 +1370,8 @@ public class Iterator {
 				variable = null;
 			}
 			return new ExprIterator(variable, evalEngine, lowerLimit, upperLimit, step, fNumericMode);
+		} catch (LimitException le) {
+			throw le;
 		} catch (RuntimeException rex) {
 			throw new ClassCastException();
 		} finally {

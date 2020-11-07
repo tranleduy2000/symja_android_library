@@ -2,8 +2,10 @@ package org.matheclipse.core.interfaces;
 
 /**
  * An expression representing a complex number
+ *
  */
 public interface IComplex extends IBigNumber {
+	void checkBitLength();
 
     public IComplex add(IComplex val);
 
@@ -46,8 +48,15 @@ public interface IComplex extends IBigNumber {
 	public IComplex[] quotientRemainder(final IComplex c2);
 
     /**
-     * Return the normalized form of this number (i.e. if the imaginary part equals zero, return the real part as a fractional or
-     * integer number).
+	 * If possible, calculate the square root of this complex number. Otherwise return <code>null</code>.
+	 *
+	 * @return <code>null</code> if no symbolic complex root is found
+	 */
+	public IComplex sqrtCC();
+
+	/**
+	 * Return the normalized form of this number (i.e. if the imaginary part equals zero, return the real part as a
+	 * fractional or integer number).
      *
      * @return
      */

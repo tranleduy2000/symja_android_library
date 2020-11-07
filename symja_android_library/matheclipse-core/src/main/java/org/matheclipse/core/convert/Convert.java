@@ -16,10 +16,12 @@ import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.data.SparseArrayExpr;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISparseArray;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -84,6 +86,11 @@ public class Convert {
 			return null;
 		}
 
+		if (expr.isSparseArray()) {
+			ISparseArray array = (ISparseArray) expr;
+			return array.toFieldMatrix(false);
+		}
+		if (expr.isList()) {
 		IAST list = (IAST) expr;
 		IAST currInRow = (IAST) list.arg1();
 		if (currInRow.isAST0()) {
@@ -105,6 +112,8 @@ public class Convert {
 			}
 		}
 		return new Array2DRowFieldMatrix<IExpr>(elements, false);
+	}
+		return null;
 	}
 
 	/**
@@ -151,6 +160,33 @@ public class Convert {
 		return new Array2DRowFieldMatrix<IExpr>(elements, false);
 	}
 
+	public static FieldMatrix<IExpr> augmentedFieldMatrix(final FieldMatrix<IExpr> listMatrix,
+			final FieldVector<IExpr> listVector) throws ClassCastException, IndexOutOfBoundsException {
+		if (listMatrix == null || listVector == null) {
+			return null;
+		}
+		int matrixRows = listMatrix.getRowDimension();
+		int matrixColumns = listMatrix.getColumnDimension();
+		int vectorDimension = listVector.getDimension();
+		if (matrixRows != vectorDimension) {
+			return null;
+		}
+
+		if (matrixColumns == 0) {
+			// special case 0-Matrix
+			IExpr[][] array = new IExpr[0][0];
+			return new Array2DRowFieldMatrix<IExpr>(array, false);
+		}
+
+		final IExpr[][] elements = new IExpr[matrixRows][matrixColumns + 1];
+		for (int i = 0; i < matrixRows; i++) {
+			for (int j = 0; j < matrixColumns; j++) {
+				elements[i][j] = listMatrix.getEntry(i, j);
+			}
+			elements[i][matrixColumns] = listVector.getEntry(i);
+		}
+		return new Array2DRowFieldMatrix<IExpr>(elements, false);
+	}
 	/**
 	 * Returns a RealMatrix if possible.
 	 * 
@@ -231,6 +267,11 @@ public class Convert {
 			return null;
 		}
 
+		if (expr.isSparseArray()) {
+			ISparseArray array = (ISparseArray) expr;
+			return array.toFieldVector(false);
+		}
+		if (expr.isList()) {
 		final int rowSize = expr.argSize();
 		IAST list = (IAST) expr;
 
@@ -239,6 +280,8 @@ public class Convert {
 			elements[i] = list.get(i + 1);
 		}
 		return new ArrayFieldVector<IExpr>(elements, false);
+	}
+		return null;
 	}
 
 	public static Complex[] list2Complex(final IAST vector) throws ClassCastException {
@@ -288,6 +331,18 @@ public class Convert {
 	}
 
 	/**
+	 * Converts a FieldMatrix to the sparse array or list expression representation.
+	 *
+	 * @param matrix
+	 * @return <code>F.NIL</code> if no conversion was possible
+	 */
+	public static IExpr matrix2Expr(final FieldMatrix<IExpr> matrix) {
+		if (matrix instanceof SparseArrayExpr.SparseExprMatrix) {
+			return ((SparseArrayExpr.SparseExprMatrix) matrix).getSparseArray();
+		}
+		return Convert.matrix2List(matrix);
+	}
+	/**
 	 * Converts a FieldMatrix to the list expression representation.
 	 *
 	 * @param matrix
@@ -322,7 +377,9 @@ public class Convert {
 			}
 		}
 		if (matrixFormat) {
-		out.addEvalFlags(IAST.IS_MATRIX);
+			// because the rows can contain sub lists the IAST.IS_MATRIX flag cannot be set directly. isMatrix() must be
+			// used!
+			out.isMatrix(true);
 		}
 		return out;
 	}
@@ -372,7 +429,9 @@ public class Convert {
 			}
 		}
 		if (matrixFormat) {
-		out.addEvalFlags(IAST.IS_MATRIX);
+			// because the rows can contain sub lists the IAST.IS_MATRIX flag cannot be set directly. isMatrix() must be
+			// used!
+			out.isMatrix(true);
 		}
 		return out;
 	}
@@ -446,6 +505,37 @@ public class Convert {
 
 	/**
 	 * Convert a RealVector to a IAST list.
+	 *
+	 * @param vector
+	 * @return <code>F.NIL</code> if no conversion was possible
+	 */
+	public static IASTAppendable complexVector2List(final FieldVector<Complex> vector) {
+		return complexVector2List(vector, true);
+	}
+
+	/**
+	 * Convert a RealVector to a IAST list.
+	 *
+	 * @param vector
+	 * @param vectorFormat
+	 *            set flag for isVector() method
+	 * @return <code>F.NIL</code> if no conversion was possible
+	 */
+	public static IASTAppendable complexVector2List(final FieldVector<Complex> vector, boolean vectorFormat) {
+		if (vector == null) {
+			return F.NIL;
+		}
+		final int rowSize = vector.getDimension();
+
+		final IASTAppendable out = F.ListAlloc(rowSize);
+		for (int i = 0; i < rowSize; i++) {
+			out.append(F.complexNum(vector.getEntry(i)));
+		}
+		out.addEvalFlags(IAST.IS_VECTOR);
+		return out;
+	}
+	/**
+	 * Convert a RealVector to a IAST list.
 	 * 
 	 * @param vector
 	 * @return <code>F.NIL</code> if no conversion was possible
@@ -513,7 +603,9 @@ public class Convert {
 				}
 				list.append(row);
 			}
-			list.addEvalFlags(IAST.IS_MATRIX);
+			// because the rows can contain sub lists the IAST.IS_MATRIX flag cannot be set directly. isMatrix() must be
+			// used!
+			list.isMatrix(true);
 			return list;
 		} catch (final Exception ex) {
 		}
@@ -540,6 +632,21 @@ public class Convert {
 		return out;
 	}
 
+	/**
+	 * Converts a FieldVector to the sparse array or list expression representation.
+	 *
+	 * @param matrix
+	 * @return <code>F.NIL</code> if no conversion was possible
+	 */
+	public static IExpr vector2Expr(final FieldVector<IExpr> vector) {
+		if (vector == null) {
+			return F.NIL;
+		}
+		if (vector instanceof SparseArrayExpr.SparseExprVector) {
+			return ((SparseArrayExpr.SparseExprVector) vector).getSparseArray();
+		}
+		return Convert.vector2List(vector);
+	}
 	private Convert() {
 	}
 
@@ -601,5 +708,33 @@ public class Convert {
 			return null;
 		}
 		return dim;
+	}
+	/**
+	 * Convert the <code>RGBColor(r,g,b)</code> to a <code>org.matheclipse.core.convert.RGBColor</code>
+	 *
+	 * @param rgbColorAST
+	 * @return <code>null</code> if the conversion is not possible
+	 */
+	public static RGBColor toAWTColor(IExpr rgbColorAST) {
+		return toAWTColorDefault(rgbColorAST, null);
+	}
+
+	public static RGBColor toAWTColorDefault(IExpr rgbColorAST, RGBColor defaultColor) {
+		if (rgbColorAST.isAST(F.RGBColor, 4, 5)) {
+			IAST rgbColor = (IAST) rgbColorAST;
+			float r = (float) rgbColor.arg1().evalDouble();
+			float g = (float) rgbColor.arg2().evalDouble();
+			float b = (float) rgbColor.arg3().evalDouble();
+			return new RGBColor(r, g, b);
+		}
+		return defaultColor;
+	}
+
+	public static RGBColor toAWTColorDefault(IAST rgbColor) {
+		return toAWTColorDefault(rgbColor, RGBColor.BLACK);
+	}
+
+	public static String toHex(RGBColor c) {
+		return "#" + Integer.toHexString(c.getRGB()).substring(2);
 	}
 }

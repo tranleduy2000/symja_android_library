@@ -23,10 +23,10 @@ public class ASTElementLimitExceeded extends LimitException {
 
 	@Override
 	public String getMessage() {
-		return "Maximum AST size " + fLimit + " exceeded" ;
+		return "Maximum AST dimension " + fLimit + " exceeded";
 	}
 
-	public static void throwIt(final int limit ) {
+	public static void throwIt(final long limit) {
 		// HeapContext.enter();
 		// try {
 		throw new ASTElementLimitExceeded(limit);// .copy());

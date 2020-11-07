@@ -64,7 +64,7 @@ public class FrobeniusSolve extends AbstractEvaluator {
 		if (ast.arg1().isList() && ast.arg2().isInteger()) {
 			IAST list = ast.getAST(1);
 			try {
-				int[] listInt = Validate.checkListOfInts(ast, list, true,engine);
+				int[] listInt = Validate.checkListOfInts(ast, list, true, engine);
 				if (listInt != null) {
 					for (int i = 0; i < listInt.length; i++) {
 						if (listInt[i] < 0 && ast.size() < 4) {
@@ -74,18 +74,18 @@ public class FrobeniusSolve extends AbstractEvaluator {
 					IInteger[] solution;
 					IASTAppendable result = F.ListAlloc(8);
 					FrobeniusSolver solver = getSolver(listInt, (IInteger) ast.arg2());
-				int numberOfSolutions = -1; // all solutions
-				if (ast.size() == 4) {
+					int numberOfSolutions = -1; // all solutions
+					if (ast.size() == 4) {
 						numberOfSolutions = ast.arg3().toIntDefault(-1);
-				}
+					}
 					while ((solution = solver.take()) != null) {
 						if (result.size() >= Config.MAX_AST_SIZE) {
 							throw new ASTElementLimitExceeded(result.size());
-					}
+						}
 						result.append(F.List(solution));
 					}
 
-				return result;
+					return result;
 				}
 			} catch (LimitException le) {
 				throw le;

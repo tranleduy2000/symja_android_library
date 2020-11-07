@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.FEConfig;
@@ -22,10 +23,10 @@ public class FinancialFunctions {
 
 		private static void init() {
 		if (ToggleFeature.FINANCE) {
-			F.EffectiveInterest.setEvaluator(new EffectiveInterest());
-			F.TimeValue.setEvaluator(new TimeValue());
-			F.Annuity.setEvaluator(new Annuity());
-			F.AnnuityDue.setEvaluator(new AnnuityDue());
+				S.EffectiveInterest.setEvaluator(new EffectiveInterest());
+				S.TimeValue.setEvaluator(new TimeValue());
+				S.Annuity.setEvaluator(new Annuity());
+				S.AnnuityDue.setEvaluator(new AnnuityDue());
 		}
 	}
 	}
@@ -64,30 +65,46 @@ public class FinancialFunctions {
 			if (ast.size() == 2) {
 				int dim = a.isVector();
 				if (dim >= 0) {
-					IAST l = ((IAST) a).map(new Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							return x.inc();
-						}
-					}, 1);
-					return
-					// [$ -1 + GeometricMean(l) $]
-					F.Plus(F.CN1, F.GeometricMean(l)); // $$;
+					IExpr normal = a.normal(false);
+					if (normal.isList()) {
+						IAST l = ((IAST) normal).map(new Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr x) {
+								return x.inc();
+							}
+						}, 1);
+						return
+								// [$ -1 + GeometricMean(l) $]
+								F.Plus(F.CN1, F.GeometricMean(l)); // $$;
+					}
 				}
 				return F.NIL;
 			}
 			if (ast.size() == 3) {
 				final IExpr b = ast.arg2();
-				int dim = a.isVector();
-				if (dim >= 0) {
-					return ((IAST) a).map(new Function<IExpr, IExpr>() {
-						@Override
-						public IExpr apply(IExpr x) {
-							return EffectiveInterest.this.effectiveInterestFormula(x, b);
-						}
-					}, 1);
+				int length = a.isVector();
+				if (length >= 0) {
+					IExpr normal = a.normal(false);
+					if (normal.isList()) {
+						return ((IAST) normal).map(new Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr x) {
+								return EffectiveInterest.this.effectiveInterestFormula(x, b);
+							}
+						});
+					}
+					return F.NIL;
 				}
-				return effectiveInterestFormula(a, b);
+				int[] dim = a.isMatrix(false);
+				if (dim != null) {
+					if (dim[1] == 2) {
+						IExpr normal = a.normal(false);
+					}
+					return F.NIL;
+				}
+				if (!a.isList()) {
+					return effectiveInterestFormula(a, b);
+				}
 			}
 			return F.NIL;
 		}

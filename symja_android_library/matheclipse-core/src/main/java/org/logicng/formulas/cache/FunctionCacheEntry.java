@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,20 +30,20 @@ package org.logicng.formulas.cache;
 
 /**
  * The pre-defined function cache entries.
- *
- * @version 1.3
+ * @version 2.0
  * @since 1.0
  */
 public enum FunctionCacheEntry implements CacheEntry {
     SUBFORMULAS("sub-formulas"),
     VARPROFILE("variable profile"),
-    LITPROFILE("literal profile");
+    LITPROFILE("literal profile"),
+    DNNF_MODELCOUNT("DNNF model count"),
+    DEPTH("Formula depth");
 
     private final String description;
 
     /**
      * Constructs a new entry.
-     *
      * @param description the description of this entry
      */
     FunctionCacheEntry(final String description) {
@@ -52,6 +52,6 @@ public enum FunctionCacheEntry implements CacheEntry {
 
     @Override
     public String description() {
-        return "FunctionCacheEntry{description=" + description + "}";
+        return "FunctionCacheEntry{description=" + this.description + "}";
     }
 }

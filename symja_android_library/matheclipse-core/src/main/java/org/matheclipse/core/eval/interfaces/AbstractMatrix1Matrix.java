@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -18,7 +19,7 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 	}
 
 	@Override
-	public IExpr evaluate(final IAST ast, EvalEngine engine) {
+	public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 		FieldMatrix<IExpr> matrix;
 
 		boolean togetherMode = engine.isTogetherMode();
@@ -27,14 +28,15 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 
 			int[] dims = checkMatrixDimensions(ast.arg1());
 			if (dims != null) {
-			final IAST list = (IAST) ast.arg1();
-			matrix = Convert.list2Matrix(list);
+				matrix = Convert.list2Matrix(ast.arg1());
 			if (matrix != null) {
 				matrix = matrixEval(matrix);
 				return Convert.matrix2List(matrix);
 			}
 
 			}
+		} catch (LimitException le) {
+			throw le;
 		} catch (MathRuntimeException mre) {
 			return engine.printMessage(ast.topHead(), mre);
 		} catch (final ClassCastException e) {
@@ -57,7 +59,7 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 		return IOFunctions.ARGS_1_1;
 	}
 	@Override
-	public IExpr numericEval(final IAST ast, EvalEngine engine) {
+	public IExpr numericEval(final IAST ast, final EvalEngine engine) {
 		RealMatrix matrix;
 
 		boolean togetherMode = engine.isTogetherMode();
@@ -66,17 +68,15 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 
 			int[] dims = checkMatrixDimensions(ast.arg1());
 			if (dims != null) {
-			if (engine.isApfloat()) {
-				final IAST list = (IAST) ast.arg1();
-				FieldMatrix<IExpr> fieldMatrix = Convert.list2Matrix(list);
+				if (engine.isArbitraryMode()) {
+					FieldMatrix<IExpr> fieldMatrix = Convert.list2Matrix(ast.arg1());
 				if (fieldMatrix == null) {
 					return F.NIL;
 				}
 				fieldMatrix = matrixEval(fieldMatrix);
 				return Convert.matrix2List(fieldMatrix);
 			}
-			final IAST list = (IAST) ast.arg1();
-			matrix = list.toRealMatrix();
+				matrix = ast.arg1().toRealMatrix();
 			if (matrix != null) {
 				matrix = realMatrixEval(matrix);
 					if (matrix != null) {
@@ -85,14 +85,17 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 				}
 			}
 			return F.NIL;
-		} catch (final IndexOutOfBoundsException e) {
+		} catch (LimitException le) {
+			throw le;
+		} catch (final RuntimeException rex) {
 			if (FEConfig.SHOW_STACKTRACE) {
-				e.printStackTrace();
+				rex.printStackTrace();
 			}
+			return engine.printMessage(ast.topHead(), rex);
 		} finally {
 			engine.setTogetherMode(togetherMode);
 		}
-		return evaluate(ast, engine);
+//		return evaluate(ast, engine);
 	}
 
 	/**

@@ -115,14 +115,6 @@ public class DefaultIterativeLinearSolverEvent extends IterativeLinearSolverEven
      * {@inheritDoc}
      */
     @Override
-    public RealVector getRightHandSideVector() {
-        return b;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double getNormOfResidual() {
         return rnorm;
     }
@@ -139,6 +131,14 @@ public class DefaultIterativeLinearSolverEvent extends IterativeLinearSolverEven
             return r;
         }
         throw new MathRuntimeException(LocalizedCoreFormats.UNSUPPORTED_OPERATION);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealVector getRightHandSideVector() {
+        return b;
     }
 
     /**

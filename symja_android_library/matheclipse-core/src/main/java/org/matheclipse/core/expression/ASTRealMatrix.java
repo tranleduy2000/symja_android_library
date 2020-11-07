@@ -21,6 +21,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.HashSet;
 import java.util.RandomAccess;
 import java.util.Set;
 
@@ -97,8 +98,8 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 *            if <code>true</code> allocate new memory and copy all elements from the matrix
 	 */
 	public ASTRealMatrix(double[][] matrix, boolean deepCopy) {
-		if (Config.MAX_AST_SIZE < matrix.length|| //
-				Config.MAX_AST_SIZE < matrix[0].length) {
+		if (Config.MAX_MATRIX_DIMENSION_SIZE < matrix.length || //
+				Config.MAX_MATRIX_DIMENSION_SIZE < matrix[0].length) {
 			throw new ASTElementLimitExceeded(matrix.length, matrix[0].length);
 		}
 		this.matrix = new Array2DRowRealMatrix(matrix, deepCopy);
@@ -113,8 +114,8 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 *            if <code>true</code> allocate new memory and copy all elements from the matrix
 	 */
 	public ASTRealMatrix(RealMatrix matrix, boolean deepCopy) {
-		if (Config.MAX_AST_SIZE < matrix.getRowDimension() || //
-				Config.MAX_AST_SIZE < matrix.getColumnDimension()) {
+		if (Config.MAX_MATRIX_DIMENSION_SIZE < matrix.getRowDimension() || //
+				Config.MAX_MATRIX_DIMENSION_SIZE < matrix.getColumnDimension()) {
 			throw new ASTElementLimitExceeded(matrix.getRowDimension(), matrix.getColumnDimension());
 		}
 		if (deepCopy) {
@@ -201,11 +202,14 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	}
 	@Override
 	public Set<IExpr> asSet() {
-		throw new UnsupportedOperationException();
-		// empty set:
-		// return new HashSet<IExpr>();
-	}
+		int size = size();
+		Set<IExpr> set = new HashSet<IExpr>(size > 16 ? size : 16);
+		for (int i = 1; i < size; i++) {
+			set.add(get(i));
+		}
 
+		return set;
+	}
 	/**
 	 * Removes all elements from this {@code ArrayList}, leaving it empty.
 	 * 
@@ -280,6 +284,10 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 		return F.NIL;
 	}
 
+	@Override
+	public   IExpr evalEvaluate(EvalEngine engine) {
+		return F.NIL;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public final IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
@@ -378,6 +386,11 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean isListOfLists() {
+		return true;
+	}
+	/** {@inheritDoc} */
+	@Override
 	public final int[] isMatrix(boolean setMatrixFormat) {
 		int[] dim = new int[2];
 		dim[0] = matrix.getRowDimension();
@@ -423,19 +436,15 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr mapMatrixColumns(final int[] dim, final Function<IExpr, IExpr> f) {
+	public IExpr mapMatrixColumns(int[] dim, final Function<IExpr, IExpr> f) {
 		final int columnSize = dim[1];
 		IASTAppendable result = F.ListAlloc(columnSize);
 		return result.appendArgs(0, columnSize, new IntFunction<IExpr>() {
-            @Override
-            public IExpr apply(int j) {
-                return f.apply(new ASTRealVector(matrix.getColumnVector(j), false));
-            }
-        });
-		// for (int j = 0; j < columnSize; j++) {
-		// result.append(f.apply(new ASTRealVector(matrix.getColumnVector(j), false)));
-		// }
-		// return result;
+			@Override
+			public IExpr apply(int j) {
+				return f.apply(new ASTRealVector(matrix.getColumnVector(j), false));
+			}
+		});
 	}
 
 	@Override
@@ -444,35 +453,6 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 		this.matrix = (RealMatrix)objectInput.readObject();
 	}
 
-	/**
-	 * Removes the object at the specified location from this list.
-	 * 
-	 * @param location
-	 *            the index of the object to remove.
-	 * @return the removed object.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code location < 0 || >= size()}
-	 */
-	// @Override
-	// public IExpr remove(int location) {
-	// hashValue = 0;
-	// throw new UnsupportedOperationException();
-	// }
-
-	/**
-	 * Removes the objects in the specified range from the start to the end, but not including the end index.
-	 * 
-	 * @param start
-	 *            the index at which to start removing.
-	 * @param end
-	 *            the index one after the end of the range to remove.
-	 * @throws IndexOutOfBoundsException
-	 *             when {@code start < 0, start > end} or {@code end > size()}
-	 */
-	// protected void removeRange(int start, int end) {
-	// hashValue = 0;
-	// throw new UnsupportedOperationException();
-	// }
 
 	/**
 	 * Replaces the element at the specified location in this {@code ArrayList} with the specified object.
@@ -526,9 +506,10 @@ public class ASTRealMatrix extends AbstractAST implements Cloneable, Externaliza
 	 */
 	@Override
 	public IExpr[] toArray() {
-		IExpr[] result = new IExpr[matrix.getRowDimension()];
+		IExpr[] result = new IExpr[matrix.getRowDimension()+1];
+		result[0] = S.List;
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new ASTRealVector(matrix.getRowVector(i), false);
+			result[i+1] = new ASTRealVector(matrix.getRowVector(i), false);
 		}
 		return result;
 	}

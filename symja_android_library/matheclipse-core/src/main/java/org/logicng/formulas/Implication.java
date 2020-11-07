@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,13 +28,12 @@
 
 package org.logicng.formulas;
 
-import org.logicng.datastructures.Assignment;
-
 import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
+
+import org.logicng.datastructures.Assignment;
 
 /**
  * Boolean implication.
- *
  * @version 1.0
  * @since 1.0
  */
@@ -42,7 +41,6 @@ public final class Implication extends BinaryOperator {
 
     /**
      * Constructor.
-     *
      * @param left  the left-hand side operand
      * @param right the right-hand side operand
      * @param f     the factory which created this instance
@@ -73,17 +71,20 @@ public final class Implication extends BinaryOperator {
 
     @Override
     public int hashCode() {
-        if (this.hashCode == 0)
+        if (this.hashCode == 0) {
             this.hashCode = 37 * left.hashCode() + 39 * right.hashCode();
+        }
         return this.hashCode;
     }
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this)
+        if (other == this) {
             return true;
-        if (other instanceof Formula && this.f == ((Formula) other).f)
+        }
+        if (other instanceof Formula && this.f == ((Formula) other).f) {
             return false; // the same formula factory would have produced a == object
+        }
         if (other instanceof Implication) {
             Implication otherImp = (Implication) other;
             return this.left.equals(otherImp.left) && this.right.equals(otherImp.right);

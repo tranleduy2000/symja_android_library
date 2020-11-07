@@ -3,13 +3,17 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
+import org.hipparchus.linear.FieldMatrix;
+import org.hipparchus.linear.FieldVector;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -181,7 +185,7 @@ public class PredicateQ {
 				}
 				return false;
 			}
-			return F.Equal.ofQ(engine, F.Times(F.CN1, F.Conjugate(expr1)), expr2);
+			return S.Equal.ofQ(engine, F.Times(F.CN1, F.Conjugate(expr1)), expr2);
 		}
 
 
@@ -214,7 +218,7 @@ public class PredicateQ {
 				}
 				return false;
 			}
-			return F.Equal.ofQ(engine, F.Times(F.CN1, expr1), expr2);
+			return S.Equal.ofQ(engine, F.Times(F.CN1, expr1), expr2);
 		}
 
 
@@ -348,12 +352,12 @@ public class PredicateQ {
 					// Match the depth with the second argument
 					final IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
 					if (!matcher.test(F.ZZ(depth), engine)) {
-						return F.False;
+						return S.False;
 					}
 				}
-				return F.True;
+				return S.True;
 			}
-			return F.False;
+			return S.False;
 
 		}
 
@@ -554,7 +558,7 @@ public class PredicateQ {
 				// special for FreeQ(), don't implemented in MemberQ()!
 				if (arg1.isOrderlessAST() && arg2.isOrderlessAST() && arg1.head().equals(arg2.head())) {
 					if (!isFreeOrderless((IAST) arg1, (IAST) arg1)) {
-						return F.False;
+							return S.False;
 					}
 				}
 			}
@@ -599,7 +603,7 @@ public class PredicateQ {
 				}
 				return false;
 			}
-			return F.Equal.ofQ(engine, F.Conjugate(expr1), expr2);
+			return S.Equal.ofQ(engine, F.Conjugate(expr1), expr2);
 		}
 
 
@@ -643,7 +647,7 @@ public class PredicateQ {
 				IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
 				IExpr arg1Evaled = engine.evaluate(arg1);
 				if (matcher.test(arg1Evaled, engine)) {
-					return F.True;
+					return S.True;
 					}
 				if (arg1Evaled.isAST()) {
 					return F.bool(matcher.test(arg1, engine));
@@ -658,7 +662,7 @@ public class PredicateQ {
 				// return F.bool(engine.evalPatternMatcher(arg2).test(arg1, engine));
 
 			}
-			return F.False;
+			return S.False;
 		}
 
 
@@ -703,27 +707,52 @@ public class PredicateQ {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int[] dims = arg1.isMatrix();
 			if (dims == null) {
-				return F.False;
+				return S.False;
 			}
 
+			if (ast.isAST1()) {
+				return S.True;
+			}
 			if (ast.isAST2()) {
 				final IExpr arg2 = engine.evaluate(ast.arg2());
+				if (arg2.isSparseArray()) {
+					// TODO SparseArray
+					return F.NIL;
+				}
+
 				final IASTAppendable temp = F.ast(arg2);
 				temp.append(F.Slot1);
+				if (arg1.isAST()) {
 				IAST matrix = (IAST) arg1;
 				for (int i = 1; i < dims[0]; i++) {
-					if (!((IAST) matrix.get(i)).forAll(new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							temp.set(1, x);
-							return engine.evalTrue(temp);
+						if (!((IAST) matrix.get(i)).forAll(new Predicate<IExpr>() {
+							@Override
+							public boolean test(IExpr x) {
+								temp.set(1, x);
+								return engine.evalTrue(temp);
+							}
+						})) {
+							return S.False;
 						}
-					})) {
-						return F.False;
 					}
+					return S.True;
+				} else {
+					FieldMatrix<IExpr> matrix = Convert.list2Matrix(arg1);
+					if (matrix != null) {
+						for (int i = 0; i < dims[0]; i++) {
+							for (int j = 1; j < dims[1]; j++) {
+								IExpr expr = matrix.getEntry(i, j);
+								temp.set(1, expr);
+								if (!engine.evalTrue(temp)) {
+									return S.False;
+								}
+							}
+						}
+						return S.True;
 				}
 			}
-			return F.True;
+			}
+			return S.False;
 		}
 
 		public int[] expectedArgSize(IAST ast) {
@@ -795,7 +824,7 @@ public class PredicateQ {
 
 						return F.bool(arg1.accept(level));
 					}
-					return F.False;
+					return S.False;
 				}
 			} catch (final ValidateException ve) {
 				// see level specification
@@ -847,7 +876,7 @@ public class PredicateQ {
 
 		@Override
 		public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, OptionArgs options) {
-			IExpr option = options.getOption(F.GaussianIntegers);
+			IExpr option = options.getOption(S.GaussianIntegers);
 			if (!option.isTrue()) {
 				return evalArg1Boole(arg1, engine);
 			}
@@ -905,43 +934,65 @@ public class PredicateQ {
 			int[] dims = arg1.isMatrix();
 			if (dims == null ) {
 				// no square matrix
-				return F.False;
+				return S.False;
 			}
 			IExpr identityMatrix = F.NIL;
 			int[] identityMatrixDims = null;
 			if (dims[0] >= dims[1]) {
-				identityMatrix = F.Dot.of(engine, F.Transpose(arg1), arg1);
+				identityMatrix = S.Dot.of(engine, F.Transpose(arg1), arg1);
 				identityMatrixDims = identityMatrix.isMatrix();
 				if (identityMatrixDims == null || //
 						identityMatrixDims[0] != dims[1] || //
 						identityMatrixDims[1] != dims[1]) {
-					return F.False;
+					return S.False;
 				}
 			} else {
-				identityMatrix = F.Dot.of(engine, arg1, F.Transpose(arg1));
+				identityMatrix = S.Dot.of(engine, arg1, F.Transpose(arg1));
 				identityMatrixDims = identityMatrix.isMatrix();
 				if (identityMatrixDims == null || //
 						identityMatrixDims[0] != dims[0] || //
 						identityMatrixDims[1] != dims[0]) {
-					return F.False;
+					return S.False;
 				}
 			}
+			if (identityMatrix.isAST()) {
 			IAST matrix = (IAST) identityMatrix;
 			for (int i = 1; i <= identityMatrixDims[0]; i++) {
 				IAST row = (IAST) matrix.get(i);
 				for (int j = 1; j <= identityMatrixDims[1]; j++) {
+						final IExpr expr = row.get(j);
 					if (i == j) {
-						if (!F.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, row.get(j)))) {
-							return F.False;
+							if (!S.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, expr))) {
+								return S.False;
 						}
 					} else {
-						if (!F.PossibleZeroQ.ofQ(engine, row.get(j))) {
-							return F.False;
+							if (!S.PossibleZeroQ.ofQ(engine, expr)) {
+								return S.False;
+							}
 						}
 					}
+						}
+			} else {
+				FieldMatrix<IExpr> matrix = Convert.list2Matrix(identityMatrix);
+				if (matrix != null) {
+					for (int i = 0; i < dims[0]; i++) {
+						for (int j = 1; j < dims[1]; j++) {
+							final IExpr expr = matrix.getEntry(i, j);
+							if (i == j) {
+								if (!S.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, expr))) {
+									return S.False;
+								}
+							} else {
+								if (!S.PossibleZeroQ.ofQ(engine, expr)) {
+									return S.False;
+								}
+							}
+					}
 				}
+					return S.True;
 			}
-			return F.True;
+			}
+			return S.True;
 		}
 
 		public int[] expectedArgSize(IAST ast) {
@@ -999,7 +1050,7 @@ public class PredicateQ {
 				if (expr.isPlus()) {
 					IExpr[] commonFactors = InternalFindCommonFactorPlus.findCommonFactors((IAST) expr, true);
 					if (commonFactors != null) {
-						temp = engine.evaluate(F.Simplify(F.Times(commonFactors[0], commonFactors[1])));
+						temp = F.Simplify.of(engine, F.Times(commonFactors[0], commonFactors[1]));
 						if (temp.isNumber()) {
 							return temp.isZero();
 						}
@@ -1186,22 +1237,22 @@ public class PredicateQ {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isNumber()) {
 					if (arg1.isComplex() || arg1.isComplexNumeric()) {
-						return F.False;
+					return S.False;
 					}
 					return F.bool(arg1.isReal());
 				}
 				// CAUTION: the following can not be used because Rubi uses another definition
 				// IExpr temp = engine.evaluate(arg1);
 				// if (temp.isReal()) {
-				// return F.True;
+			// return S.True;
 				// }
 				// if (temp.isNumericFunction()) {
 				// temp = engine.evalN(arg1);
 				// if (temp.isReal()) {
-				// return F.True;
+			// return S.True;
 				// }
 				// }
-				return F.False;
+			return S.False;
 			}
 		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_1;
@@ -1285,9 +1336,10 @@ public class PredicateQ {
 			int[] dims = arg1.isMatrix();
 			if (dims == null || dims[0] != dims[1]) {
 				// no square matrix
-				return F.False;
+				return S.False;
 			}
 
+			if (arg1.isAST()) {
 			final IAST matrix = (IAST) arg1;
 			for (int i = 1; i <= dims[0]; i++) {
 				IAST row = matrix.getAST(i);
@@ -1295,11 +1347,27 @@ public class PredicateQ {
 					IExpr expr = row.get(j);
 					IExpr symmetricExpr = matrix.getPart(j, i);
 					if (!compareElements(expr, symmetricExpr, engine)) {
-						return F.False;
+							return S.False;
+						}
 					}
 				}
+				return S.True;
+			} else {
+				FieldMatrix<IExpr> matrix = Convert.list2Matrix(arg1);
+				if (matrix != null) {
+					for (int i = 0; i < dims[0]; i++) {
+						for (int j = i + 1; j < dims[1]; j++) {
+							IExpr expr = matrix.getEntry(i, j);
+							IExpr symmetricExpr = matrix.getEntry(j, i);
+							if (!compareElements(expr, symmetricExpr, engine)) {
+								return S.False;
+							}
+					}
+				}
+					return S.True;
+				}
 			}
-			return F.True;
+			return S.False;
 		}
 
 		public int[] expectedArgSize(IAST ast) {
@@ -1417,26 +1485,48 @@ public class PredicateQ {
 			final IExpr arg1 = engine.evaluate(ast.arg1());
 			int dim = arg1.isVector();
 			if (dim == (-1)) {
-				return F.False;
+				return S.False;
 			}
 
+			if (ast.isAST1()) {
+				return S.True;
+			}
 			if (ast.isAST2()) {
 				final IExpr arg2 = engine.evaluate(ast.arg2());
+				if (arg2.isSparseArray()) {
+					// TODO SparseArray
+					return F.NIL;
+				}
 				final IASTAppendable temp = F.ast(arg2);
 				temp.append(F.Slot1);
 
+				if (arg1.isAST()) {
 				IAST vector = (IAST) arg1;
-				if (!vector.forAll(new Predicate<IExpr>() {
-					@Override
-					public boolean test(IExpr x) {
-						temp.set(1, x);
-						return engine.evalTrue(temp);
+					if (!vector.forAll(new Predicate<IExpr>() {
+						@Override
+						public boolean test(IExpr x) {
+							temp.set(1, x);
+							return engine.evalTrue(temp);
+						}
+					})) {
+						return S.False;
 					}
-				})) {
-					return F.False;
+					return S.True;
+				} else {
+					FieldVector<IExpr> vector = Convert.list2Vector(arg1);
+					if (vector != null) {
+						for (int i = 0; i < dim; i++) {
+							IExpr expr = vector.getEntry(i);
+							temp.set(1, expr);
+							if (!engine.evalTrue(temp)) {
+								return S.False;
+							}
+						}
+						return S.True;
 				}
 			}
-			return F.True;
+			}
+			return S.False;
 		}
 
 		public int[] expectedArgSize(IAST ast) {
@@ -1450,7 +1540,7 @@ public class PredicateQ {
 		if (expr.isZero()) {
 			return true;
 		}
-		if (expr.leafCount() > Config.MAX_FACTOR_LEAFCOUNT && Config.MAX_FACTOR_LEAFCOUNT > 0) {
+		if (expr.leafCount() > Config.MAX_POSSIBLE_ZERO_LEAFCOUNT) {
 			return false;
 		}
 		if (expr.isPlusTimesPower()) {

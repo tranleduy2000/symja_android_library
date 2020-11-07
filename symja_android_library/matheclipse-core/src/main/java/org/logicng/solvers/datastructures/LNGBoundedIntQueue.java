@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/***************************************************************************************
+/*
  * Glucose -- Copyright (c) 2009-2014, Gilles Audemard, Laurent Simon
  * CRIL - Univ. Artois, France
  * LRI  - Univ. Paris Sud, France (2009-2013)
@@ -73,17 +73,14 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
  * OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- **************************************************************************************************/
+ */
 
 package org.logicng.solvers.datastructures;
 
 import org.logicng.collections.LNGIntVector;
 
-import java.util.Locale;
-
 /**
  * A bounded integer queue (for Glucose)
- *
  * @version 1.3
  * @since 1.0
  */
@@ -109,26 +106,26 @@ public final class LNGBoundedIntQueue {
 
     /**
      * Initializes the size of this queue.
-     *
      * @param size the size
      */
-    public void initSize(int size) {
+    public void initSize(final int size) {
         this.growTo(size);
     }
 
     /**
      * Pushes a new element to the queue.
-     *
      * @param x the new element
      */
-    public void push(int x) {
+    public void push(final int x) {
         if (this.queueSize == this.maxSize) {
             assert this.last == this.first;
             this.sumOfQueue -= this.elems.get(this.last);
-            if ((++this.last) == this.maxSize)
+            if ((++this.last) == this.maxSize) {
                 this.last = 0;
-        } else
+            }
+        } else {
             this.queueSize++;
+        }
         this.sumOfQueue += x;
         this.elems.set(this.first, x);
         if ((++this.first) == this.maxSize) {
@@ -139,7 +136,6 @@ public final class LNGBoundedIntQueue {
 
     /**
      * Returns the average value of this queue.
-     *
      * @return the average value of this queue
      */
     public int avg() {
@@ -148,10 +144,9 @@ public final class LNGBoundedIntQueue {
 
     /**
      * Grows this queue to a given size.
-     *
      * @param size the size
      */
-    private void growTo(int size) {
+    private void growTo(final int size) {
         this.elems.growTo(size, 0);
         this.first = 0;
         this.maxSize = size;
@@ -161,7 +156,7 @@ public final class LNGBoundedIntQueue {
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "LNGBoundedIntQueue{first=%d, last=%d, sumOfQueue=%d, maxSize=%d, queueSize=%d, elems=%s}",
+        return String.format("LNGBoundedIntQueue{first=%d, last=%d, sumOfQueue=%d, maxSize=%d, queueSize=%d, elems=%s}",
                 this.first, this.last, this.sumOfQueue, this.maxSize, this.queueSize, this.elems);
     }
 }

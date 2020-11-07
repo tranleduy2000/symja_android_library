@@ -1,10 +1,13 @@
 package org.matheclipse.core.expression;
 
+import com.duy.annotations.ObjcMemoryIssue;
+import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
+import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
 import com.gx.common.cache.Cache;
@@ -12,9 +15,7 @@ import com.gx.common.cache.CacheBuilder;
 
 import org.hipparchus.complex.Complex;
 import org.hipparchus.linear.Array2DRowRealMatrix;
-import org.hipparchus.linear.ArrayRealVector;
 import org.hipparchus.linear.RealMatrix;
-import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.jgrapht.graph.DefaultGraphType;
 import org.matheclipse.core.basic.Config;
@@ -28,6 +29,7 @@ import org.matheclipse.core.eval.EvalEngineUtils;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.FlowControlException;
 import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.exception.SymjaMathException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
@@ -82,6 +84,7 @@ import java.util.Set;
 
 import static org.jgrapht.graph.DefaultGraphType.Builder;
 
+@SuppressWarnings({"JavaDoc", "CatchMayIgnoreException", "JavadocReference"})
 public abstract class AbstractAST extends IASTMutableImpl {
 	protected static final class ASTIterator implements ListIterator<IExpr> {
 
@@ -165,7 +168,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @see java.util.Optional#isPresent
 	 */
 	//	 * Swift changed: implements INilPointer
-	private final static class NILPointer extends AbstractAST implements INilPointer {
+	private final static class NILPointer extends AbstractAST implements INilPointer, IAssociation {
 
 		private static final long serialVersionUID = -3552302876858011292L;
 
@@ -274,6 +277,18 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return F.NIL;
 			// throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public void appendRule(IExpr expr) {
+			ArgumentTypeException.throwNIL();
+		}
+
+		@Override
+		public void prependRule(IExpr rule) {
+			ArgumentTypeException.throwNIL();
+
+		}
+
 
 		@Override
 		public IExpr arg1() {
@@ -885,6 +900,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		public String toString() {
 			return "NIL";
 		}
+
 		@Override
 		public void appendRules(IAST listOfRules) {
 			ArgumentTypeException.throwNIL();
@@ -1631,15 +1647,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 * @param ast
 	 * @return
 	 */
-	public IExpr evalEvaluate(EvalEngine engine) {
-		IASTMutable[] rlist = new IASTMutable[] { F.NIL };
-		forEach(1, size(), (x, i) -> {
-			if (x.isAST(F.Evaluate)) {
-				engine.evalArg(rlist, this, x, i, false);
+	public IExpr evalEvaluate(final EvalEngine engine) {
+		final IASTMutable[] rlist = new IASTMutable[] { F.NIL };
+		forEach(1, size(), new ObjIntConsumer<IExpr>() {
+			@Override
+			public void accept(IExpr x, int i) {
+				if (x.isAST(F.Evaluate)) {
+					engine.evalArg(rlist, AbstractAST.this, x, i, false);
+				}
 			}
 		});
 		return rlist[0];
 	}
+
 	/** {@inheritDoc} */
 	@Override
 	public IExpr evaluate(EvalEngine engine) {
@@ -3031,21 +3051,39 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return this.equals(F.CInfinity);
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isBooleanFormula() {
-		return head().isBooleanFormulaSymbol() && forAll(x -> x.isBooleanFormula());
-            }
-	/** {@inheritDoc} */
+		return head().isBooleanFormulaSymbol() && forAll(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return x.isBooleanFormula();
+			}
+		});
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isBooleanResult() {
 		return head().isPredicateFunctionSymbol() //
 				|| ((head().isBooleanFormulaSymbol() || head().isComparatorFunctionSymbol()) //
-						&& forAll(x -> x.isBooleanResult()));
+						&& forAll(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return x.isBooleanResult();
+			}
+		}));
 	}
 
-	/** {@inheritDoc} */
-			@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isBooleanFunction() {
 		return head().isBooleanFormulaSymbol() && size() >= 2;
 	}
@@ -3332,7 +3370,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		return null;
 	}
 
-	public boolean isMember(IExpr pattern, boolean heads, IVisitorBoolean visitor) {
+	public boolean isMember(final IExpr pattern, boolean heads, IVisitorBoolean visitor) {
 		if (visitor != null) {
 			return super.isMember(pattern, heads, visitor);
 		}
@@ -3414,7 +3452,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	/** {@inheritDoc} */
 	@Override
+	@ObjcMemoryIssue
 	public boolean isNumericArgument() {
+		@ObjcMemoryIssueFix int a = 0;
 		if (isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG)) {
 			// swift changed: memory issue
 			return forAll(/*new Predicate<IExpr>() {
@@ -3450,12 +3490,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	public boolean isNumericFunction() {
 		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
 			// check if all arguments are &quot;numeric&quot;
-			return forAll(/*new Predicate<IExpr>() {
-				@Override
-				public boolean test(IExpr x) {
-					return x.isNumericFunction();
-				}
-			}*/EvalEngineUtils.isNumericFunctionPredicate);
+			return forAll(EvalEngineUtils.isNumericFunction);
 		}
 		return false;
 	}
@@ -4081,8 +4116,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericAST() {
-		return exists(x -> x.isInexactNumber());
+		return exists(new Predicate<IExpr>() {
+			@Override
+			public boolean test(IExpr x) {
+				return x.isInexactNumber();
+			}
+		});
 	}
+
 	/** {@inheritDoc} */
 	@Override
 	public final boolean isWith() {
@@ -4290,6 +4331,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	public IAST map(final Function<IExpr, IExpr> function) {
 		return map(function, 1);
 	}
+
 	/** {@inheritDoc} */
 	@Override
 	public IAST map(final Function<IExpr, IExpr> function, final int startOffset) {
@@ -5118,6 +5160,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 				new UnaryVariable2Slot(map, variableCollector));
 	}
 	/** {@inheritDoc} */
+	@ObjcMemoryIssue
 	@Override
 	public IExpr extractConditionalExpression(boolean isUnaryConditionalExpression) {
 		if (isUnaryConditionalExpression) {
@@ -5128,12 +5171,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return conditionalExpr.setAtCopy(1, copy);
 		}
 		// swift changed: memory issue
-		int indx = indexOf(/*new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isConditionalExpression();
-			}
-		}*/EvalEngineUtils.conditionalExpressionPredicate);
+		@ObjcMemoryIssueFix
+		int indx = indexOf(EvalEngineUtils.isConditionalExpression);
 		if (indx > 0) {
 			IAST conditionalExpr = (IAST) get(indx);
 			IASTAppendable andExpr = F.And();

@@ -41,14 +41,14 @@ import org.hipparchus.util.MathArrays;
  * <p>This class is based on the class with similar name from the
  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library.</p>
  * <ul>
- * <li>a {@link #getP() getP} method has been added,</li>
- * <li>the {@code det} method has been renamed as {@link #getDeterminant()
- * getDeterminant},</li>
- * <li>the {@code getDoublePivot} method has been removed (but the int based
- * {@link #getPivot() getPivot} method has been kept),</li>
- * <li>the {@code solve} and {@code isNonSingular} methods have been replaced
- * by a {@link #getSolver() getSolver} method and the equivalent methods
- * provided by the returned {@link DecompositionSolver}.</li>
+ *   <li>a {@link #getP() getP} method has been added,</li>
+ *   <li>the {@code det} method has been renamed as {@link #getDeterminant()
+ *   getDeterminant},</li>
+ *   <li>the {@code getDoublePivot} method has been removed (but the int based
+ *   {@link #getPivot() getPivot} method has been kept),</li>
+ *   <li>the {@code solve} and {@code isNonSingular} methods have been replaced
+ *   by a {@link #getSolver() getSolver} method and the equivalent methods
+ *   provided by the returned {@link DecompositionSolver}.</li>
  * </ul>
  *
  * @param <T> the type of the field elements
@@ -65,12 +65,12 @@ public class FieldLUDecomposition<T extends FieldElement<T>> {
     /**
      * Entries of LU decomposition.
      */
-    private T[][] lu;
+    private final T[][] lu;
 
     /**
      * Pivot permutation associated with LU decomposition.
      */
-    private int[] pivot;
+    private final int[] pivot;
 
     /**
      * Parity of the permutation associated with the LU decomposition.
@@ -293,6 +293,14 @@ public class FieldLUDecomposition<T extends FieldElement<T>> {
          * {@inheritDoc}
          */
         @Override
+        public boolean isNonSingular() {
+            return !singular;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public FieldVector<T> solve(FieldVector<T> b) {
             if (b instanceof ArrayFieldVector) {
                 return solve((ArrayFieldVector<T>) b);
@@ -333,6 +341,52 @@ public class FieldLUDecomposition<T extends FieldElement<T>> {
                 return new ArrayFieldVector<T>(field, bp, false);
 
             }
+        }
+
+        /**
+         * Solve the linear equation A &times; X = B.
+         * <p>The A matrix is implicit here. It is </p>
+         *
+         * @param b right-hand side of the equation A &times; X = B
+         * @return a vector X such that A &times; X = B
+         * @throws MathIllegalArgumentException if the matrices dimensions do not match.
+         * @throws MathIllegalArgumentException if the decomposed matrix is singular.
+         */
+        public ArrayFieldVector<T> solve(ArrayFieldVector<T> b) {
+            final int m = pivot.length;
+            final int length = b.getDimension();
+            if (length != m) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                        length, m);
+            }
+            if (singular) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.SINGULAR_MATRIX);
+            }
+
+            // Apply permutations to b
+            final T[] bp = MathArrays.buildArray(field, m);
+            for (int row = 0; row < m; row++) {
+                bp[row] = b.getEntry(pivot[row]);
+            }
+
+            // Solve LY = b
+            for (int col = 0; col < m; col++) {
+                final T bpCol = bp[col];
+                for (int i = col + 1; i < m; i++) {
+                    bp[i] = bp[i].subtract(bpCol.multiply(lu[i][col]));
+                }
+            }
+
+            // Solve UX = Y
+            for (int col = m - 1; col >= 0; col--) {
+                bp[col] = bp[col].divide(lu[col][col]);
+                final T bpCol = bp[col];
+                for (int i = 0; i < col; i++) {
+                    bp[i] = bp[i].subtract(bpCol.multiply(lu[i][col]));
+                }
+            }
+
+            return new ArrayFieldVector<T>(bp, false);
         }
 
         /**
@@ -397,14 +451,6 @@ public class FieldLUDecomposition<T extends FieldElement<T>> {
          * {@inheritDoc}
          */
         @Override
-        public boolean isNonSingular() {
-            return !singular;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public FieldMatrix<T> getInverse() {
             final int m = pivot.length;
             final T one = field.getOne();
@@ -413,52 +459,6 @@ public class FieldLUDecomposition<T extends FieldElement<T>> {
                 identity.setEntry(i, i, one);
             }
             return solve(identity);
-        }
-
-        /**
-         * Solve the linear equation A &times; X = B.
-         * <p>The A matrix is implicit here. It is </p>
-         *
-         * @param b right-hand side of the equation A &times; X = B
-         * @return a vector X such that A &times; X = B
-         * @throws MathIllegalArgumentException if the matrices dimensions do not match.
-         * @throws MathIllegalArgumentException if the decomposed matrix is singular.
-         */
-        public ArrayFieldVector<T> solve(ArrayFieldVector<T> b) {
-            final int m = pivot.length;
-            final int length = b.getDimension();
-            if (length != m) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                        length, m);
-            }
-            if (singular) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.SINGULAR_MATRIX);
-            }
-
-            // Apply permutations to b
-            final T[] bp = MathArrays.buildArray(field, m);
-            for (int row = 0; row < m; row++) {
-                bp[row] = b.getEntry(pivot[row]);
-            }
-
-            // Solve LY = b
-            for (int col = 0; col < m; col++) {
-                final T bpCol = bp[col];
-                for (int i = col + 1; i < m; i++) {
-                    bp[i] = bp[i].subtract(bpCol.multiply(lu[i][col]));
-                }
-            }
-
-            // Solve UX = Y
-            for (int col = m - 1; col >= 0; col--) {
-                bp[col] = bp[col].divide(lu[col][col]);
-                final T bpCol = bp[col];
-                for (int i = 0; i < col; i++) {
-                    bp[i] = bp[i].subtract(bpCol.multiply(lu[i][col]));
-                }
-            }
-
-            return new ArrayFieldVector<T>(bp, false);
         }
     }
 }

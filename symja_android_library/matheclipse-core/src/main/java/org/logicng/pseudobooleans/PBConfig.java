@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,26 +28,30 @@
 
 package org.logicng.pseudobooleans;
 
-import com.duy.lang.DSystem;
-
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
 /**
  * The configuration for a pseudo-Boolean encoder.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
 public final class PBConfig extends Configuration {
+
+    /**
+     * The pseudo-Boolean encoder.
+     */
+    public enum PB_ENCODER {
+        SWC, BINARY_MERGE, ADDER_NETWORKS, BEST
+    }
 
     final PB_ENCODER pbEncoder;
     final boolean binaryMergeUseGAC;
     final boolean binaryMergeNoSupportForSingleBit;
     final boolean binaryMergeUseWatchDog;
+
     /**
      * Constructs a new pseudo-Boolean encoder configuration from a given builder.
-     *
      * @param builder the builder
      */
     private PBConfig(final Builder builder) {
@@ -58,22 +62,23 @@ public final class PBConfig extends Configuration {
         this.binaryMergeUseWatchDog = builder.binaryMergeUseWatchDog;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("PBConfig{").append(DSystem.lineSeparator());
-        sb.append("pbEncoder=").append(this.pbEncoder).append(DSystem.lineSeparator());
-        sb.append("binaryMergeUseGAC=").append(this.binaryMergeUseGAC).append(DSystem.lineSeparator());
-        sb.append("binaryMergeNoSupportForSingleBit=").append(this.binaryMergeNoSupportForSingleBit).append(DSystem.lineSeparator());
-        sb.append("binaryMergeUseWatchDog=").append(this.binaryMergeUseWatchDog).append(DSystem.lineSeparator());
-        sb.append("}").append(DSystem.lineSeparator());
-        return sb.toString();
+    /**
+     * Returns a new builder for the configuration.
+     * @return the builder
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /**
-     * The pseudo-Boolean encoder.
-     */
-    public enum PB_ENCODER {
-        SWC, BINARY_MERGE, ADDER_NETWORKS, BEST
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("PBConfig{").append(System.lineSeparator());
+        sb.append("pbEncoder=").append(this.pbEncoder).append(System.lineSeparator());
+        sb.append("binaryMergeUseGAC=").append(this.binaryMergeUseGAC).append(System.lineSeparator());
+        sb.append("binaryMergeNoSupportForSingleBit=").append(this.binaryMergeNoSupportForSingleBit).append(System.lineSeparator());
+        sb.append("binaryMergeUseWatchDog=").append(this.binaryMergeUseWatchDog).append(System.lineSeparator());
+        sb.append("}").append(System.lineSeparator());
+        return sb.toString();
     }
 
     /**
@@ -85,9 +90,12 @@ public final class PBConfig extends Configuration {
         private boolean binaryMergeNoSupportForSingleBit = false;
         private boolean binaryMergeUseWatchDog = true;
 
+        private Builder() {
+            // Initialize only via factory
+        }
+
         /**
          * Sets the encoder for pseudo-Boolean constraints. The default value is {@code BEST}.
-         *
          * @param pbEncoder the pseudo-Boolean encoder
          * @return the builder
          */
@@ -99,7 +107,6 @@ public final class PBConfig extends Configuration {
         /**
          * Sets whether general arc consistency should be used in the binary merge encoding. The default value is {@code
          * true}.
-         *
          * @param binaryMergeUseGAC {@code true} if general arc consistency should be used, {@code false} otherwise
          * @return the builder
          */
@@ -110,7 +117,6 @@ public final class PBConfig extends Configuration {
 
         /**
          * Sets the support for single bits in the binary merge encoding. The default value is {@code false}.
-         *
          * @param binaryMergeNoSupportForSingleBit {@code true} if the support for single bits should be disabled,
          *                                         {@code false} otherwise
          * @return the builder
@@ -122,7 +128,6 @@ public final class PBConfig extends Configuration {
 
         /**
          * Sets whether the watchdog encoding should be used in the binary merge encoding. The default value is {@code true}.
-         *
          * @param binaryMergeUseWatchDog {@code true} if the watchdog encoding should be used, {@code false} otherwise
          * @return the builder
          */
@@ -133,7 +138,6 @@ public final class PBConfig extends Configuration {
 
         /**
          * Builds the pseudo-Boolean encoder configuration.
-         *
          * @return the configuration
          */
         public PBConfig build() {

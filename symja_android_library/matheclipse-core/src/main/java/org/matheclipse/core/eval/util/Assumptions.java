@@ -474,7 +474,7 @@ public class Assumptions extends AbstractAssumptions {
 			IExpr arg2 = lessEqualAST.arg2();
 			IExpr arg3 = lessEqualAST.arg3();
 			if (arg1.isReal() && arg3.isReal() && !arg2.isNumber()) {
-				if (!((ISignedNumber) arg1).isGT(((ISignedNumber) arg3))) {
+				if (((ISignedNumber) arg1).isLE(((ISignedNumber) arg3))) {
 					ISignedNumber num1 = (ISignedNumber) arg1;
 					ISignedNumber num3 = (ISignedNumber) arg3;
 					IExpr key = arg2;

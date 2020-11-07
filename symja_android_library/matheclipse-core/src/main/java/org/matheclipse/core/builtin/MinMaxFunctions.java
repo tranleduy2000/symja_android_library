@@ -22,6 +22,7 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -46,13 +47,13 @@ public class MinMaxFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.ArgMax.setEvaluator(new ArgMax());
-			F.ArgMin.setEvaluator(new ArgMin());
-			F.FunctionRange.setEvaluator(new FunctionRange());
-			F.Maximize.setEvaluator(new Maximize());
-			F.Minimize.setEvaluator(new Minimize());
-			F.NMaximize.setEvaluator(new NMaximize());
-			F.NMinimize.setEvaluator(new NMinimize());
+			S.ArgMax.setEvaluator(new ArgMax());
+			S.ArgMin.setEvaluator(new ArgMin());
+			S.FunctionRange.setEvaluator(new FunctionRange());
+			S.Maximize.setEvaluator(new Maximize());
+			S.Minimize.setEvaluator(new Minimize());
+			S.NMaximize.setEvaluator(new NMaximize());
+			S.NMinimize.setEvaluator(new NMinimize());
 		}
 	}
 
@@ -184,7 +185,7 @@ public class MinMaxFunctions {
 						IExpr l = interval.lower();
 						IExpr u = interval.upper();
 						if (x2.isMinusOne()) {
-							if (F.GreaterEqual.ofQ(engine, l, F.C1)) {
+							if (S.GreaterEqual.ofQ(engine, l, F.C1)) {
 								// [>= 1, u]
 								return F.Interval(F.Power(u, x2), F.Power(l, x2));
 							}
@@ -335,6 +336,9 @@ public class MinMaxFunctions {
 			if (ast.size() == 3) {
 				IExpr function = ast.arg1();
 				IExpr x = ast.arg2();
+				if (x.isAST(F.List, 2)) {
+					x = ast.arg2().first();
+				}
 				ISymbol head = ast.topHead();
 				if (x.isSymbol() || (x.isAST() && !x.isList())) {
 					return maximize(head, function, x, engine);
@@ -386,6 +390,9 @@ public class MinMaxFunctions {
 			if (ast.size() == 3) {
 				IExpr function = ast.arg1();
 				IExpr x = ast.arg2();
+				if (x.isAST(F.List, 2)) {
+					x = ast.arg2().first();
+				}
 				ISymbol head = ast.topHead();
 				if (x.isSymbol() || (x.isAST() && !x.isList())) {
 					return minimize(head, function, x, engine);
@@ -467,6 +474,11 @@ public class MinMaxFunctions {
 					}
 				}
 			}
+			} catch (org.hipparchus.exception.MathRuntimeException mrex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					mrex.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), mrex);
 			} catch (ValidateException ve) {
 				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
@@ -556,6 +568,11 @@ public class MinMaxFunctions {
 					}
 				}
 			}
+			} catch (org.hipparchus.exception.MathRuntimeException mrex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					mrex.printStackTrace();
+				}
+				return engine.printMessage(ast.topHead(), mrex);
 			} catch (ValidateException ve) {
 				if (FEConfig.SHOW_STACKTRACE) {
 					ve.printStackTrace();
@@ -577,19 +594,18 @@ public class MinMaxFunctions {
 
 		protected static List<LinearConstraint> getConstraints(final VariablesSet vars, IAST listOfconstraints) {
 			final List<LinearConstraint> constraints = new ArrayList<LinearConstraint>(listOfconstraints.size());
-			listOfconstraints.forEach((Consumer<IExpr>) (new Consumer<IExpr>() {
+			listOfconstraints.forEach(new Consumer<IExpr>() {
 				@Override
 				public void accept(IExpr x) {
 					Expr2LP x2LP = new Expr2LP(x, vars);
 					constraints.add(x2LP.expr2Constraint());
 				}
-			}));
+			});
 			return constraints;
 		}
 
-		protected static IExpr simplexSolver(VariablesSet vars, LinearObjectiveFunction f,
-				OptimizationData... optData) {
-			try {
+		protected static IExpr simplexSolver(VariablesSet vars, LinearObjectiveFunction f, OptimizationData... optData)
+				throws org.hipparchus.exception.MathRuntimeException {
 				SimplexSolver solver = new SimplexSolver();
 				PointValuePair solution = solver.optimize(optData);
 				double[] values = solution.getPointRef();
@@ -600,12 +616,6 @@ public class MinMaxFunctions {
 				}
 				IAST result = F.List(F.num(f.value(values)), list);
 				return result;
-			} catch (MathIllegalStateException oe) {
-				throw new WrappedException(oe);
-				// if (FEConfig.SHOW_STACKTRACE) {
-				// oe.printStackTrace();
-				// }
-			}
 		}
 	}
 

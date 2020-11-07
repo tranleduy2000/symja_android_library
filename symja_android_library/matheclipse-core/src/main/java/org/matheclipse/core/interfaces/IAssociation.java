@@ -8,17 +8,41 @@ import java.util.Comparator;
 public interface IAssociation extends IASTAppendable {
 
 	/**
-	 * Append a <code>Rule(a,b)</code> or <code>RuleDelayed(a,b)</code> expression.
+	 * Append a list of rules.
 	 *
-	 * @param rule
+	 * @param listOfRules
 	 */
-	public void appendRule(IAST rule);
+	public void appendRules(IAST listOfRules);
+
+	/**
+	 * Append a range of a list of rules.
+	 *
+	 * @param listOfRules
+	 * @param startPosition
+	 *            the start position inclusive
+	 * @param endPosition
+	 *            the end position exclusive
+	 */
+	public void appendRules(IAST listOfRules, int startPosition, int endPosition);
 
 	/**
 	 * Copy this association
 	 */
+	@Override
 	public IAssociation copy();
 
+	/**
+	 * Copy this association as empty association
+	 */
+	@Override
+	public IAssociation copyHead(final int intialCapacity);
+
+	/**
+	 * Append a single <code>Rule(a,b)</code> or <code>RuleDelayed(a,b)</code> expression.
+	 *
+	 * @param rule
+	 */
+	// public void appendRule(IExpr rule);
 	/**
 	 * Return the key which points to the <code>position</code>.
 	 *
@@ -27,6 +51,28 @@ public interface IAssociation extends IASTAppendable {
 	 */
 	public IExpr getKey(int position);
 
+	/**
+	 * Assuming this is a list of rules or an <code>IAssociation</code>. Return the first rule which equals the
+	 * <code>key</code> argument, otherwise return <code>F.NIL</code>.
+	 *
+	 * @param key
+	 * @return <code>F.NIL</code> if no rule was found.
+	 */
+	@Override
+	public IAST getRule(String key);
+
+	/**
+	 * Assuming this is a list of rules or an <code>IAssociation</code>. Return the first rule which equals the
+	 * <code>key</code> argument, otherwise return <code>F.NIL</code>.
+	 *
+	 * @param key
+	 * @return <code>F.NIL</code> if no rule was found.
+	 */
+	@Override
+	public IAST getRule(IExpr key);
+
+	@Override
+	public IAST getRule(int position);
 	/**
 	 * Return the value associated to the <code>key</code>. If no value is available return
 	 * <code>Missing("KeyAbsent", key)</code>
@@ -55,18 +101,18 @@ public interface IAssociation extends IASTAppendable {
 	public boolean isKey(IExpr expr);
 
 	/**
+	 * Get the key names of this association as an ArrayList<code>key1, key2,...</code>
+	 *
+	 * @return
+	 */
+	public ArrayList<String> keyNames();
+	/**
 	 * Get the keys of this association as a<code>List(key1, key2,...)</code>
 	 *
 	 * @return
 	 */
 	public IASTMutable keys();
 
-	/**
-	 * Get the key names of this association as an ArrayList<code>key1, key2,...</code>
-	 *
-	 * @return
-	 */
-	public ArrayList<String> keyNames();
 
 	/**
 	 * Return a new association sorted by the keys of the association.
@@ -83,14 +129,36 @@ public interface IAssociation extends IASTAppendable {
 	public IAssociation keySort(Comparator<IExpr> comparator);
 
 	/**
-	 * Return the list of rules <code>{a->b, c:>d, ...}</code> represented by this association.
-	 */
-	public IAST normal(boolean nilIfUnevaluated);
-
-	/**
 	 * Return the list of rules as a matrix or list
 	 */
 	public IAST matrixOrList();
+
+	/**
+	 * Return the list of rules <code>{a->b, c:>d, ...}</code> represented by this association.
+	 */
+	@Override
+	public IASTMutable normal(boolean nilIfUnevaluated);
+
+	/**
+	 * Prepend a list of rules.
+	 *
+	 * @param listOfRules
+	 */
+	public void prependRules(IAST listOfRules);
+
+	/**
+	 * Prepend a range of a list of rules.
+	 *
+	 * @param listOfRules
+	 * @param startPosition
+	 *            the start position inclusive
+	 * @param endPosition
+	 *            the end position exclusive
+	 */
+	public void prependRules(IAST listOfRules, int startPosition, int endPosition);
+
+	public IAssociation reverse(IAssociation newAssoc);
+
 
 	/**
 	 * Return a new association sorted by the values of the association.

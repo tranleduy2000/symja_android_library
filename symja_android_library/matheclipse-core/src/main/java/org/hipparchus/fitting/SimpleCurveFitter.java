@@ -21,37 +21,32 @@
  */
 package org.hipparchus.fitting;
 
+import java.util.Collection;
+
 import org.hipparchus.analysis.ParametricUnivariateFunction;
 import org.hipparchus.linear.DiagonalMatrix;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresBuilder;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem;
 
-import java.util.Collection;
-
 /**
  * Fits points to a user-defined {@link ParametricUnivariateFunction function}.
+ *
  */
 public class SimpleCurveFitter extends AbstractCurveFitter {
-    /**
-     * Function to fit.
-     */
+    /** Function to fit. */
     private final ParametricUnivariateFunction function;
-    /**
-     * Initial guess for the parameters.
-     */
+    /** Initial guess for the parameters. */
     private final double[] initialGuess;
-    /**
-     * Maximum number of iterations of the optimization algorithm.
-     */
+    /** Maximum number of iterations of the optimization algorithm. */
     private final int maxIter;
 
     /**
      * Constructor used by the factory methods.
      *
-     * @param function     Function to fit.
+     * @param function Function to fit.
      * @param initialGuess Initial guess. Cannot be {@code null}. Its length must
-     *                     be consistent with the number of parameters of the {@code function} to fit.
-     * @param maxIter      Maximum number of iterations of the optimization algorithm.
+     * be consistent with the number of parameters of the {@code function} to fit.
+     * @param maxIter Maximum number of iterations of the optimization algorithm.
      */
     private SimpleCurveFitter(ParametricUnivariateFunction function, double[] initialGuess, int maxIter) {
         this.function = function;
@@ -64,11 +59,12 @@ public class SimpleCurveFitter extends AbstractCurveFitter {
      * The maximum number of iterations of the optimization algorithm is set
      * to {@link Integer#MAX_VALUE}.
      *
-     * @param f     Function to fit.
+     * @param f Function to fit.
      * @param start Initial guess for the parameters.  Cannot be {@code null}.
-     *              Its length must be consistent with the number of parameters of the
-     *              function to fit.
+     * Its length must be consistent with the number of parameters of the
+     * function to fit.
      * @return a curve fitter.
+     *
      * @see #withStartPoint(double[])
      * @see #withMaxIterations(int)
      */
@@ -79,48 +75,44 @@ public class SimpleCurveFitter extends AbstractCurveFitter {
 
     /**
      * Configure the start point (initial guess).
-     *
      * @param newStart new start point (initial guess)
      * @return a new instance.
      */
     public SimpleCurveFitter withStartPoint(double[] newStart) {
         return new SimpleCurveFitter(function,
-                newStart.clone(),
-                maxIter);
+                                     newStart.clone(),
+                                     maxIter);
     }
 
     /**
      * Configure the maximum number of iterations.
-     *
      * @param newMaxIter maximum number of iterations
      * @return a new instance.
      */
     public SimpleCurveFitter withMaxIterations(int newMaxIter) {
         return new SimpleCurveFitter(function,
-                initialGuess,
-                newMaxIter);
+                                     initialGuess,
+                                     newMaxIter);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected LeastSquaresProblem getProblem(Collection<WeightedObservedPoint> observations) {
         // Prepare least-squares problem.
         final int len = observations.size();
-        final double[] target = new double[len];
+        final double[] target  = new double[len];
         final double[] weights = new double[len];
 
         int count = 0;
         for (WeightedObservedPoint obs : observations) {
-            target[count] = obs.getY();
+            target[count]  = obs.getY();
             weights[count] = obs.getWeight();
             ++count;
         }
 
-        final AbstractCurveFitter.TheoreticalValuesFunction model
-                = new AbstractCurveFitter.TheoreticalValuesFunction(function,
-                observations);
+        final TheoreticalValuesFunction model
+            = new TheoreticalValuesFunction(function,
+                                                                observations);
 
         // Create an optimizer for fitting the curve to the observed points.
         return new LeastSquaresBuilder().

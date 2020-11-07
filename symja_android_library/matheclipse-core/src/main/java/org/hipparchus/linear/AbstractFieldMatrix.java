@@ -30,6 +30,7 @@ import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.util.MathArrays;
 
 import java.util.ArrayList;
+import com.duy.lambda.Function;
 
 /**
  * Basic implementation of {@link FieldMatrix} methods regardless of the underlying storage.
@@ -251,7 +252,6 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
     @Override
     public FieldMatrix<T> multiplyTransposed(FieldMatrix<T> m) throws MathIllegalArgumentException {
         return multiply(m.transpose());
-
     }
 
     @Override
@@ -750,6 +750,26 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
      * {@inheritDoc}
      */
     @Override
+    public boolean isSquare() {
+        return getColumnDimension() == getRowDimension();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int getRowDimension();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int getColumnDimension();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public T getTrace() throws MathIllegalArgumentException {
         final int nRows = getRowDimension();
         final int nCols = getColumnDimension();
@@ -1058,25 +1078,72 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
         return walkInRowOrder(visitor, startRow, endRow, startColumn, endColumn);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean isSquare() {
-        return getColumnDimension() == getRowDimension();
+    public FieldMatrix<T> map(Function<T, T> function) {
+        return copy().mapToSelf(function);
+
+    }
+
+    @Override
+    public FieldMatrix<T> mapToSelf(final Function<T, T> function) {
+        walkInOptimizedOrder(new FieldMatrixChangingVisitor<T>() {
+
+            /** {@inheritDoc} */
+            @Override
+            public T visit(int row, int column, T value) {
+                // apply the function to the current entry
+                return function.apply(value);
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void start(int rows, int columns, int startRow, int endRow,
+                              int startColumn, int endColumn) {
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public T end() {
+                return getField().getZero();
+            }
+
+        });
+
+        return this;
+
     }
 
     /**
-     * {@inheritDoc}
+     * Get a string representation for this matrix.
+     *
+     * @return a string representation for this matrix
      */
     @Override
-    public abstract int getRowDimension();
+    public String toString() {
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        final StringBuffer res = new StringBuffer();
+        String fullClassName = getClass().getName();
+        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
+        res.append(shortClassName).append('{');
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract int getColumnDimension();
+        for (int i = 0; i < nRows; ++i) {
+            if (i > 0) {
+                res.append(',');
+            }
+            res.append('{');
+            for (int j = 0; j < nCols; ++j) {
+                if (j > 0) {
+                    res.append(',');
+                }
+                res.append(getEntry(i, j));
+            }
+            res.append('}');
+        }
+
+        res.append('}');
+        return res.toString();
+    }
 
     /**
      * Returns true iff <code>object</code> is a
@@ -1128,38 +1195,6 @@ public abstract class AbstractFieldMatrix<T extends FieldElement<T>>
             }
         }
         return ret;
-    }
-
-    /**
-     * Get a string representation for this matrix.
-     *
-     * @return a string representation for this matrix
-     */
-    @Override
-    public String toString() {
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        final StringBuffer res = new StringBuffer();
-        String fullClassName = getClass().getName();
-        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
-        res.append(shortClassName).append('{');
-
-        for (int i = 0; i < nRows; ++i) {
-            if (i > 0) {
-                res.append(',');
-            }
-            res.append('{');
-            for (int j = 0; j < nCols; ++j) {
-                if (j > 0) {
-                    res.append(',');
-                }
-                res.append(getEntry(i, j));
-            }
-            res.append('}');
-        }
-
-        res.append('}');
-        return res.toString();
     }
 
     /**

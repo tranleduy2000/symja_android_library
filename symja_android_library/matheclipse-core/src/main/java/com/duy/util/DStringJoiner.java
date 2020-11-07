@@ -49,8 +49,8 @@ import java.util.Objects;
  * }</pre>
  * <p>
  * A {@code StringJoiner} may be employed to create formatted output from a
- * {@link java.util.stream.Stream} using
- * {@link java.util.stream.Collectors#joining(CharSequence)}. For example:
+ * {@link com.duy.stream.Stream} using
+ * {@link com.duy.stream.Collectors#joining(CharSequence)}. For example:
  *
  * <pre> {@code
  * List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
@@ -58,8 +58,8 @@ import java.util.Objects;
  *     .map(i -> i.toString())
  *     .collect(Collectors.joining(", "));
  * }</pre>
- * @see java.util.stream.Collectors#joining(CharSequence)
- * @see java.util.stream.Collectors#joining(CharSequence, CharSequence, CharSequence)
+ * @see com.duy.stream.Collectors#joining(CharSequence)
+ * @see com.duy.stream.Collectors#joining(CharSequence, CharSequence, CharSequence)
  * @since 1.8
  */
 public final class DStringJoiner {

@@ -31,6 +31,7 @@ import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.NumStr;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -45,6 +46,7 @@ import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.ast.IParserFactory;
+import org.matheclipse.parser.client.math.MathException;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 
@@ -181,8 +183,18 @@ public class ExprParser extends Scanner {
 		IExpr expr = F.NIL;
 			// ID.Blank is lowest integer >ID in switch statement
 			switch (headID) {
+			case ID.Get:
+				if (ast.isAST1() && ast.arg1().isString()) {
+					return S.Get.of(ast.arg1());
+				}
+				break;
+			case ID.Import:
+				if (ast.isAST1() && ast.arg1().isString()) {
+					return S.Import.of(ast.arg1());
+				}
+				break;
 			case ID.Exp:
-				if (ast.isAST(F.Exp, 2)) {
+				if (ast.isAST1()) {
 					// rewrite from input: Exp(x) => E^x
 					return F.Power(F.E, ast.arg1());
 				}
@@ -199,7 +211,7 @@ public class ExprParser extends Scanner {
 			// break;
 
 			case ID.Sqrt:
-				if (ast.isAST(F.Sqrt, 2)) {
+				if (ast.isAST1()) {
 			// rewrite from input: Sqrt(x) => Power(x, 1/2)
 			return F.Power(ast.arg1(), F.C1D2);
 				}
@@ -217,12 +229,27 @@ public class ExprParser extends Scanner {
 				}
 				break;
 
+			case ID.Blank:
+				expr = PatternMatching.Blank.CONST.evaluate(ast, fEngine);
+				break;
+			case ID.BlankSequence:
+				expr = PatternMatching.BlankSequence.CONST.evaluate(ast, fEngine);
+				break;
+			case ID.BlankNullSequence:
+				expr = PatternMatching.BlankNullSequence.CONST.evaluate(ast, fEngine);
+				break;
 			case ID.Pattern:
 			expr = PatternMatching.Pattern.CONST.evaluate(ast, fEngine);
 				break;
 
-			case ID.Blank:
-			expr = PatternMatching.Blank.CONST.evaluate(ast, fEngine);
+			case ID.Optional:
+				expr = PatternMatching.Optional.CONST.evaluate(ast, fEngine);
+				break;
+			// case ID.OptionsPattern:
+			// expr = PatternMatching.OptionsPattern.CONST.evaluate(ast, fEngine);
+			// break;
+			case ID.Repeated:
+				expr = PatternMatching.Repeated.CONST.evaluate(ast, fEngine);
 				break;
 
 			case ID.Complex:
@@ -388,8 +415,21 @@ public class ExprParser extends Scanner {
 		switch (fToken) {
 		case TT_IDENTIFIER:
 			temp = getSymbol();
-			if (temp.isSymbol() && fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
-				temp = getBlankPatterns(temp);
+			if (temp.isSymbol()) {
+				ISymbol symbol = (ISymbol) temp;
+				if (fToken == TT_COLON) {
+					getNextToken();
+					if (fToken == TT_IDENTIFIER) {
+						temp = getSymbol();
+						temp = parseArguments(temp);
+						return F.Pattern(symbol, temp);
+					} else {
+						temp = getFactor(0);
+					}
+					temp = F.Pattern(symbol, temp);
+				} else if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
+					temp = getBlankPatterns(symbol);
+				}
 			}
 			return parseArguments(temp);
 		case TT_PRECEDENCE_OPEN:
@@ -497,6 +537,7 @@ public class ExprParser extends Scanner {
 			fRecursionDepth++;
 			try {
 				getNextToken();
+				if (fToken != TT_ASSOCIATION_CLOSE) {
 				do {
 					function.append(parseExpression());
 					if (fToken != TT_COMMA) {
@@ -509,9 +550,10 @@ public class ExprParser extends Scanner {
 				if (fToken != TT_ASSOCIATION_CLOSE) {
 					throwSyntaxError("\'|>\' expected.");
 				}
+				}
 				try {
-					temp = F.assoc(function);// F.unaryAST1(F.Association, function);
-				} catch (RuntimeException rex) {
+					temp = F.assoc(function);
+				} catch (MathException mex) {
 					// fallback if no rules were parsed
 					function.set(0, F.Association);
 					temp = function;
@@ -801,7 +843,7 @@ public class ExprParser extends Scanner {
 		if (head.isBuiltInSymbol()) {
 			IEvaluator eval = ((IBuiltInSymbol) head).getEvaluator();
 			if (eval instanceof IFunctionEvaluator) {
-				int[] args = ((IFunctionEvaluator) eval).expectedArgSize(IAST ast);
+				int[] args = ((IFunctionEvaluator) eval).expectedArgSize(F.NIL);
 				if (args != null && args[1] < 10) {
 					defaultSize = args[1] + 1;
 				}
@@ -915,17 +957,23 @@ public class ExprParser extends Scanner {
 					if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
 						fCurrentPosition += 2;
 						long precision = getJavaLong();
-						if (precision < Config.MACHINE_PRECISION) {
-							precision = Config.MACHINE_PRECISION;
+						if (precision < FEConfig.MACHINE_PRECISION) {
+							precision = FEConfig.MACHINE_PRECISION;
 						}
 						return F.num(new Apfloat(number, precision));
 					} else {
 						fCurrentPosition++;
-						long precision = getJavaLong();
-						if (precision < Config.MACHINE_PRECISION) {
-							precision = Config.MACHINE_PRECISION;
+						long precision = FEConfig.MACHINE_PRECISION;
+						if (isValidPosition() && Character.isDigit(fInputString[fCurrentPosition])) {
+							precision = getJavaLong();
+							if (precision < FEConfig.MACHINE_PRECISION) {
+								precision = FEConfig.MACHINE_PRECISION;
 						}
 						return F.num(new Apfloat(number, precision));
+						} else {
+							getNextToken();
+							return F.num(number);
+						}
 					}
 				}
 				temp = new NumStr(number);
@@ -934,7 +982,7 @@ public class ExprParser extends Scanner {
 				temp = F.ZZ(number, numFormat);
 				// temp = fFactory.createInteger(number, numFormat);
 			}
-		} catch (final Throwable e) {
+		} catch (final RuntimeException rex) {
 			throwSyntaxError("Number format error: " + number, number.length());
 		}
 		getNextToken();
@@ -942,7 +990,11 @@ public class ExprParser extends Scanner {
 	}
 
 	protected boolean isOperatorCharacters() {
-		return fFactory.isOperatorChar(fCurrentChar);// getOperatorCharacters().indexOf(fCurrentChar) >= 0;
+		return fFactory.isOperatorChar(fCurrentChar);
+	}
+
+	protected boolean isOperatorCharacters(char ch) {
+		return fFactory.isOperatorChar(ch);
 	}
 
 	final protected List<Operator> getOperator() {
@@ -985,13 +1037,17 @@ public class ExprParser extends Scanner {
 	 * 
 	 */
 	private IExpr getPart(final int min_precedence) throws SyntaxError {
+		IASTAppendable function = null;
 		IExpr temp = getFactor(min_precedence);
 
+		if (fToken == TT_COLON) {
+			getNextToken();
+			return F.Optional(temp, parseExpression());
+		}
 		if (fToken != TT_PARTOPEN) {
 			return temp;
 		}
 
-		IASTAppendable function = null;
 		do {
 			if (function == null) {
 				function = F.Part(2, temp);
@@ -1194,11 +1250,11 @@ public class ExprParser extends Scanner {
 		}
 	}
 
-	private IExpr parseCompoundExpressionNull(InfixExprOperator infixOperator, IExpr rhs) {
+	private IExpr parseCompoundExpressionNull(InfixExprOperator infixOperator, IExpr lhs) {
 		if (infixOperator.isOperator(";")) {
 			if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
-				return createInfixFunction(infixOperator, rhs, F.Null);
+				return createInfixFunction(infixOperator, lhs, F.Null);
 				// return infixOperator.createFunction(fFactory, rhs,
 				// fFactory.createSymbol("Null"));
 			}
@@ -1225,8 +1281,23 @@ public class ExprParser extends Scanner {
 					|| fToken == TT_PRECEDENCE_CLOSE) {
 				span.append(F.All);
 				return span;
+			} else if (fToken == TT_OPERATOR) {
+				InfixExprOperator infixOperator = determineBinaryOperator();
+				if (infixOperator != null && //
+						infixOperator.getOperatorString().equals(";")) {
+					span.append(F.All);
+					getNextToken();
+					IExpr compoundExpressionNull = parseCompoundExpressionNull(infixOperator, span);
+					if (compoundExpressionNull != null) {
+						return compoundExpressionNull;
+					}
+					while (fToken == TT_NEWLINE) {
+						getNextToken();
 			}
-			span.append(parseExpression(parsePrimary(0), 0));
+					return parseInfixOperator(span, infixOperator);
+				}
+			}
+			span.append(parseExpression());
 			return span;
 		}
 		IExpr temp = parseExpression(parsePrimary(0), 0);
@@ -1241,11 +1312,28 @@ public class ExprParser extends Scanner {
 				if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
 						|| fToken == TT_PRECEDENCE_CLOSE) {
 					return span;
+				} else if (fToken == TT_OPERATOR) {
+					return parseExpression(F.Times(span, F.Span(F.C1, S.All)), 0);
 				}
 			} else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE) {
 				span.append(F.All);
 				return span;
+			} else if (fToken == TT_OPERATOR) {
+				InfixExprOperator infixOperator = determineBinaryOperator();
+				if (infixOperator != null && //
+						infixOperator.getOperatorString().equals(";")) {
+					span.append(F.All);
+					getNextToken();
+					IExpr compoundExpressionNull = parseCompoundExpressionNull(infixOperator, span);
+					if (compoundExpressionNull != null) {
+						return compoundExpressionNull;
+					}
+					while (fToken == TT_NEWLINE) {
+						getNextToken();
+					}
+					return parseInfixOperator(span, infixOperator);
+				}
 			}
 			span.append(parseExpression(parsePrimary(0), 0));
 			if (fToken == TT_SPAN) {
@@ -1294,11 +1382,7 @@ public class ExprParser extends Scanner {
 					// lazy evaluation of multiplication
 					oper = fFactory.get("Times");
 					if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
-						if (Config.FUZZY_PARSER && fToken == TT_IDENTIFIER) {
-							rhs = parseExpression();
-						} else {
 						rhs = parseLookaheadOperator(oper.getPrecedence());
-						}
 						lhs = F.$(F.Times, lhs, rhs);
 						((IAST) lhs).addEvalFlags(IAST.TIMES_PARSED_IMPLICIT);
 						continue;
@@ -1439,7 +1523,7 @@ public class ExprParser extends Scanner {
 	}
 	private final IExpr parsePostfixOperator(IExpr lhs, PostfixExprOperator postfixOperator) {
 							getNextToken();
-							lhs = postfixOperator.createFunction(fFactory, lhs);
+		lhs = convert(postfixOperator.createFunction(fFactory, lhs));
 							lhs = parseArguments(lhs);
 		return lhs;
 	}
@@ -1498,7 +1582,7 @@ public class ExprParser extends Scanner {
 							// rhs =
 							// F.$(F.$s(postfixOperator.getFunctionName()),
 							// rhs);
-							rhs = postfixOperator.createFunction(fFactory, rhs);
+							rhs = convert(postfixOperator.createFunction(fFactory, rhs));
 							continue;
 						}
 					}

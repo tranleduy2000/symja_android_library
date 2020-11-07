@@ -1,9 +1,10 @@
 package org.matheclipse.core.eval;
 
 import com.duy.annotations.Nonnull;
+import com.duy.annotations.ObjcMemoryIssue;
+import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
-import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 import com.duy.lang.DThreadLocal;
 import com.gx.common.cache.Cache;
@@ -13,14 +14,16 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.Arithmetic;
 import org.matheclipse.core.builtin.IOFunctions;
+import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.builtin.Programming;
 import org.matheclipse.core.eval.exception.AbortException;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
-import org.matheclipse.core.eval.exception.IllegalArgument;
+import org.matheclipse.core.eval.exception.FlowControlException;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
+import org.matheclipse.core.eval.exception.SymjaMathException;
 import org.matheclipse.core.eval.exception.TimeoutException;
-import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.expression.ASTRealMatrix;
@@ -30,6 +33,9 @@ import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.ContextPath;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
+import org.matheclipse.core.expression.OptionsPattern;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -42,9 +48,11 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISignedNumber;
+import org.matheclipse.core.interfaces.ISparseArray;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
+import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
@@ -54,11 +62,12 @@ import org.matheclipse.parser.client.math.MathException;
 
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -67,14 +76,37 @@ import java.util.concurrent.atomic.AtomicLong;
  * with the current thread through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a>
  * mechanism.
  */
+@SuppressWarnings({"JavaDoc", "JavadocReference"})
 public class EvalEngine implements Serializable {
+    /**
+     * Stack to manage the <code>OptionsPattern()</code> mappings for a pattern-matching rule.
+     *
+     */
+    private static class OptionsStack extends ArrayDeque<IdentityHashMap<ISymbol, IASTAppendable>> {
 
-    // public final static Map<IBuiltInSymbol, Integer> STATISTICS = new TreeMap<IBuiltInSymbol, Integer>();
-    public final static boolean DEBUG = false;
+        private static final long serialVersionUID = 2720088062330091827L;
+
+        public OptionsStack() {
+            super();
+        }
+
+        public void push() {
+            push(new IdentityHashMap<ISymbol, IASTAppendable>());
+        }
+    }
+
     /**
      *
      */
     private static final long serialVersionUID = 8402201556123198590L;
+
+
+    public transient Cache<IAST, IExpr> rememberASTCache = null;
+
+    public final static boolean DEBUG = false;
+
+    private static AtomicLong MODULE_COUNTER = new AtomicLong();
+
     transient private static final DThreadLocal<EvalEngine> instance = new DThreadLocal<EvalEngine>() {
 
         @Override
@@ -82,20 +114,50 @@ public class EvalEngine implements Serializable {
             return new EvalEngine("ThreadLocal", 0, System.out, true);
         }
     };
-    private static AtomicLong MODULE_COUNTER = new AtomicLong();
-    public transient Cache<IAST, IExpr> REMEMBER_AST_CACHE = null;
-    public transient Set<ISymbol> fModifiedVariablesList;
+
     /**
-     * The precision for numeric operations.
+     * Get the thread local evaluation engine instance
+     *
+     * @return
      */
-    protected long fNumericPrecision;
+    public static EvalEngine get() {
+        return instance.get();
+    }
+
+
     /**
-     * The number of significant figures in the output expression
+     * Check if the <code>ApfloatNum</code> number type should be used instead of the <code>Num</code> type and the
+     * <code>ApcomplexNum</code> number type should be used instead of the <code>ComplexNum</code> type for numeric
+     * evaluations.
+     *
+	 * @param precision
+	 *            the given precision
+     * @return <code>true</code> if the given precision is greater than <code>EvalEngine.DOUBLE_PRECISION</code>
+     * @see ApfloatNum
+     * @see ApcomplexNum
      */
-    protected int fSignificantFigures;
-    protected int fRecursionLimit;
-    protected int fIterationLimit;
-    protected boolean fPackageMode = Config.PACKAGE_MODE;
+    public static boolean isApfloat(long precision) {
+		return precision > FEConfig.MACHINE_PRECISION;
+    }
+
+    /**
+     * Removes the current thread's value for the EvalEngine's thread-local variable.
+     *
+     * @see java.lang.ThreadLocal#remove()
+     */
+    public static void remove() {
+        instance.remove();
+    }
+
+    /**
+     * Set the thread local evaluation engine instance
+     *
+	 * @param engine
+	 *            the evaluation engine
+     */
+    public static void set(final EvalEngine engine) {
+        instance.set(engine);
+    }
     /**
      * If set to <code>true</code> the current thread should stop evaluation;
      */
@@ -150,28 +212,30 @@ public class EvalEngine implements Serializable {
      */
     transient PrintStream fErrorPrintStream = null;
 
-    transient Stack<ContextPath> fContextPathStack;
+	transient ArrayDeque<ContextPath> fContextPathStack;
 
     transient ContextPath fContextPath;
+
     /**
-     * If <code>fOnOffUnique==true</code> this map contains the unique expressions which occurred during evaluation
+     * The precision for numeric operations.
      */
-    transient HashMap<IExpr, IExpr> fOnOffUniqueMap = null;
+    protected long fNumericPrecision;
     /**
-     * If not null, this map contains the header symbols for which the interactive trace should be printed.
+     * The number of significant figures in the output expression
      */
-    transient IdentityHashMap<ISymbol, ISymbol> fOnOffMap = null;
-    /**
-     * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are shown during
-     * evaluation).
-     *
-     * @see org.matheclipse.core.builtin.function.Quiet
-     */
-    transient boolean fQuietMode = false;
-    /**
-     * If <code>true</code> the engine throws an error if an error message is printed during evaluation.
-     */
-    transient boolean fThrowError = false;
+    protected int fSignificantFigures;
+
+    protected int fRecursionLimit;
+
+    protected int fIterationLimit;
+
+    protected boolean fPackageMode = Config.PACKAGE_MODE;
+
+
+	/**
+	 * If <code>true</code> this engine doesn't distinguish between lower and upper case identifiers, with the exception
+	 * of identifiers with length 1.
+	 */
     private boolean fRelaxedSyntax;
 
     /**
@@ -181,6 +245,9 @@ public class EvalEngine implements Serializable {
      * associated reap list for the tag.
      */
     private transient java.util.List<IExpr> fReapList = null;
+
+    public transient Set<ISymbol> fModifiedVariablesList;
+
     /**
      * Set interactive trace mode on or off. See functions <code>On()</code> and <code>Off()</code>.
      */
@@ -190,9 +257,24 @@ public class EvalEngine implements Serializable {
      */
     transient private boolean fOnOffUnique = false;
     /**
+     * If <code>fOnOffUnique==true</code> this map contains the unique expressions which occurred during evaluation
+     */
+    transient HashMap<IExpr, IExpr> fOnOffUniqueMap = null;
+    /**
+     * If not null, this map contains the header symbols for which the interactive trace should be printed.
+     */
+    transient IdentityHashMap<ISymbol, ISymbol> fOnOffMap = null;
+
+	transient ArrayDeque<IExpr> fStack;
+    /**
      * The history list for the <code>Out[]</code> function.
+	 *
      */
     private transient LastCalculationsHistory fOutList = null;
+	/**
+	 * Contains possible options in a function call hierarchy
+	 */
+	private transient OptionsStack fOptionsStack;
     /**
      * Contains the last result (&quot;answer&quot;) expression of this evaluation engine or <code>null</code> if no
      * answer is stored in the evaluation engine.
@@ -207,8 +289,22 @@ public class EvalEngine implements Serializable {
     transient private boolean fOutListDisabled = true;
 
     /**
+     * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are shown during
+     * evaluation).
+     *
+     * @see org.matheclipse.core.builtin.function.Quiet
+     */
+    transient boolean fQuietMode = false;
+    /**
+     * If <code>true</code> the engine throws an error if an error message is printed during evaluation.
+	 *
+     */
+    transient boolean fThrowError = false;
+
+    /**
      * A single <code>EvalEngine</code> is associated with the current thread through a
      * <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
+	 *
      */
     public EvalEngine() {
         this("", 0, System.out, false);
@@ -218,26 +314,35 @@ public class EvalEngine implements Serializable {
      * Constructor for an evaluation engine. A single <code>EvalEngine</code> is associated with the current thread
      * through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      *
-     * @param relaxedSyntax if <code>true</code>, the parser doesn't distinguish between upper and lower case identifiers
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, the parser doesn't distinguish between upper and lower case identifiers
      */
     public EvalEngine(boolean relaxedSyntax) {
         this("", 0, System.out, relaxedSyntax);
     }
 
+	// static public int MAX_THREADS_COUNT = 10;
 
     /**
      * Constructor for an evaluation engine. A single <code>EvalEngine</code> is associated with the current thread
      * through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      *
-     * @param sessionID      an ID which uniquely identifies this session
-     * @param recursionLimit the maximum allowed recursion limit (if set to zero, no limit will be checked)
-     * @param iterationLimit the maximum allowed iteration limit (if set to zero, no limit will be checked)
-     * @param outStream      the output print stream
-     * @param errorStream    the print stream for error messages
-     * @param relaxedSyntax  if <code>true</code>, the parser doesn't distinguidh between upper and lower case identifiers
+	 * @param sessionID
+	 *            an ID which uniquely identifies this session
+	 * @param recursionLimit
+	 *            the maximum allowed recursion limit (if set to zero, no limit will be checked)
+	 * @param iterationLimit
+	 *            the maximum allowed iteration limit (if set to zero, no limit will be checked)
+	 * @param outStream
+	 *            the output print stream
+	 * @param errorStream
+	 *            the print stream for error messages
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, the parser doesn't distinguidh between upper and lower case identifiers
      */
     public EvalEngine(final String sessionID, final int recursionLimit, final int iterationLimit,
                       final PrintStream outStream, PrintStream errorStream, boolean relaxedSyntax) {
+		fOptionsStack = new OptionsStack();
         fSessionID = sessionID;
         // fExpressionFactory = f;
         fRecursionLimit = recursionLimit;
@@ -260,10 +365,14 @@ public class EvalEngine implements Serializable {
      * Constructor for an evaluation engine. A single <code>EvalEngine</code> is associated with the current thread
      * through a <a href="https://en.wikipedia.org/wiki/Thread-local_storage">ThreadLocal</a> mechanism.
      *
-     * @param sessionID      an ID which uniquely identifies this session
-     * @param recursionLimit the maximum allowed recursion limit (if set to zero, no limit will be checked)
-     * @param out            the output print stream
-     * @param relaxedSyntax  if <code>true</code>, the parser doesn't distinguidh between upper and lower case identifiers
+	 * @param sessionID
+	 *            an ID which uniquely identifies this session
+	 * @param recursionLimit
+	 *            the maximum allowed recursion limit (if set to zero, no limit will be checked)
+	 * @param out
+	 *            the output print stream
+	 * @param relaxedSyntax
+	 *            if <code>true</code>, the parser doesn't distinguidh between upper and lower case identifiers
      */
     public EvalEngine(final String sessionID, final int recursionLimit, final PrintStream out, boolean relaxedSyntax) {
         this(sessionID, recursionLimit, 1000, out, null, relaxedSyntax);
@@ -273,48 +382,6 @@ public class EvalEngine implements Serializable {
         this(sessionID, -1, -1, out, null, false);
     }
 
-    /**
-     * Get the thread local evaluation engine instance
-     *
-     * @return
-     */
-    public static EvalEngine get() {
-        return instance.get();
-    }
-
-    // static public int MAX_THREADS_COUNT = 10;
-
-    /**
-     * Check if the <code>ApfloatNum</code> number type should be used instead of the <code>Num</code> type and the
-     * <code>ApcomplexNum</code> number type should be used instead of the <code>ComplexNum</code> type for numeric
-     * evaluations.
-     *
-     * @param precision the given precision
-     * @return <code>true</code> if the given precision is greater than <code>EvalEngine.DOUBLE_PRECISION</code>
-     * @see ApfloatNum
-     * @see ApcomplexNum
-     */
-    public static boolean isApfloat(long precision) {
-        return precision > Config.MACHINE_PRECISION;
-    }
-
-    /**
-     * Removes the current thread's value for the EvalEngine's thread-local variable.
-     *
-     * @see java.lang.ThreadLocal#remove()
-     */
-    public static void remove() {
-        instance.remove();
-    }
-
-    /**
-     * Set the thread local evaluation engine instance
-     *
-     * @param engine the evaluation engine
-     */
-    public static void set(final EvalEngine engine) {
-        instance.set(engine);
-    }
 
     /**
      * For every evaluation store the list of modified variables in an internal list.
@@ -350,6 +417,44 @@ public class EvalEngine implements Serializable {
         fOutList.add(fAnswer);
     }
 
+	/**
+	 *
+	 * @param op
+	 * @param rule
+	 *            may be <code>null</code>
+	 */
+	public void addOptionsPattern(OptionsPattern op, IAST rule) {
+		IdentityHashMap<ISymbol, IASTAppendable> optionsPattern = fOptionsStack.peek();
+		IASTAppendable list = optionsPattern.get(op.getOptionsPatternHead());
+		if (list == null) {
+			list = F.ListAlloc(10);
+			optionsPattern.put(op.getOptionsPatternHead(), list);
+		}
+
+		IExpr defaultOptions = op.getDefaultOptions();
+		if (defaultOptions.isPresent()) {
+			IAST optionsList = null;
+			if (defaultOptions.isSymbol()) {
+				optionsList = PatternMatching.optionsList((ISymbol) defaultOptions, true);
+				PatternMatching.extractRules(optionsList, list);
+				// list.appendArgs(optionsList);
+			} else if (defaultOptions.isList()) {
+				PatternMatching.extractRules(defaultOptions, list);
+				// list.appendArgs((IAST) defaultOptions);
+			} else if (defaultOptions.isRuleAST()) {
+				PatternMatching.extractRules(defaultOptions, list);
+				// list.append(defaultOptions);
+			}
+		} else {
+			if (rule != null && rule.isRuleAST()) {
+				if (rule.first().isSymbol()) {
+					list.append(F.binaryAST2(rule.topHead(), ((ISymbol) rule.first()).getSymbolName(), rule.second()));
+				} else {
+					list.append(rule);
+				}
+			}
+		}
+	}
     private void beginTrace(Predicate<IExpr> matcher, IAST list) {
         setTraceMode(true);
         fTraceStack = new TraceStack(matcher, list);
@@ -360,9 +465,9 @@ public class EvalEngine implements Serializable {
      *
      * @return
      */
-    public EvalEngine copy() {
+	public synchronized EvalEngine copy() {
         EvalEngine engine = new EvalEngine();
-        engine.REMEMBER_AST_CACHE = REMEMBER_AST_CACHE;
+		engine.rememberASTCache = null; // rememberASTCache;
         engine.fAnswer = fAnswer;
         engine.fAssumptions = fAssumptions;
         engine.fContextPath = fContextPath.copy();
@@ -376,6 +481,7 @@ public class EvalEngine implements Serializable {
         engine.fNumericPrecision = fNumericPrecision;
         engine.fSignificantFigures = fSignificantFigures;
         engine.fOutList = fOutList;
+		engine.fOptionsStack = fOptionsStack;
         engine.fOutListDisabled = fOutListDisabled;
         engine.fOutPrintStream = fOutPrintStream;
         engine.fOnOffMap = fOnOffMap;
@@ -478,14 +584,19 @@ public class EvalEngine implements Serializable {
      * Evaluate the i-th argument of <code>ast</code>. This method may set evaluation flags in <code>ast</code> or
      * <code>result0</code>
      *
-     * @param result0           store the result of the evaluation in the i-th argument of the ast in <code>result0[0]</code>.
-     *                          <code>result0[0]</code> should be <code>F.NIL</code> if no evaluation occured.
-     * @param ast               the original <code>ast</code> for whixh the arguments should be evaluated
-     * @param arg               the i-th argument of <code>ast</code>
-     * @param i                 <code>arg</code> is the i-th argument of <code>ast</code>
-     * @param isNumericFunction if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
+	 * @param result0
+	 *            store the result of the evaluation in the i-th argument of the ast in <code>result0[0]</code>.
+	 *            <code>result0[0]</code> should be <code>F.NIL</code> if no evaluation occured.
+	 * @param ast
+	 *            the original <code>ast</code> for whixh the arguments should be evaluated
+	 * @param arg
+	 *            the i-th argument of <code>ast</code>
+	 * @param i
+	 *            <code>arg</code> is the i-th argument of <code>ast</code>
+	 * @param isNumericFunction
+	 *            if <code>true</code> the <code>NumericFunction</code> attribute is set for the <code>ast</code>'s head
      */
-    private void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) {
+    public void evalArg(IASTMutable[] result0, final IAST ast, IExpr arg, int i, boolean isNumericFunction) {
         OperationSystem.checkInterrupt();
         IExpr temp = evalLoop(arg);
         if (temp.isPresent()) {
@@ -533,7 +644,7 @@ public class EvalEngine implements Serializable {
             if ((ISymbol.HOLDFIRST & attr) == ISymbol.NOATTRIBUTE) {
                 // the HoldFirst attribute is disabled
                 try {
-                    if (!x.isAST(F.Unevaluated)) {
+					if (!x.isAST(S.Unevaluated)) {
                         selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
                         evalArg(rlist, ast, x, 1, isNumericFunction);
                         if (astSize == 2 && rlist[0].isPresent()) {
@@ -548,7 +659,7 @@ public class EvalEngine implements Serializable {
             } else {
                 // the HoldFirst attribute is set here
                 try {
-                    if (x.isAST(F.Evaluate)) {
+					if (x.isAST(S.Evaluate)) {
                         selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
                         evalArg(rlist, ast, x, 1, isNumericFunction);
                         if (astSize == 2 && rlist[0].isPresent()) {
@@ -573,7 +684,7 @@ public class EvalEngine implements Serializable {
                         //    public void accept(IExpr arg, int i) {
                         for (int i = 2; i < astSize; i++) {
                             IExpr arg = ast.get(i);
-                            if (!arg.isAST(F.Unevaluated)) {
+                            if (!arg.isAST(S.Unevaluated, 2)) {
                                 EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
                             }
                         }
@@ -660,7 +771,6 @@ public class EvalEngine implements Serializable {
 
         if ((ISymbol.LISTABLE & attr) == ISymbol.LISTABLE) {
             if (symbol.isBuiltInSymbol()) {
-                try {
                     if (arg1.isRealVector() && ((IAST) arg1).size() > 1) {
                         final IEvaluator module = ((IBuiltInSymbol) symbol).getEvaluator();
                         if (module instanceof DoubleUnaryOperator) {
@@ -674,16 +784,14 @@ public class EvalEngine implements Serializable {
                             return ASTRealMatrix.map((IAST) arg1, oper);
                         }
                     }
-                } catch (RuntimeException rex) {
-                    // org.matheclipse.core.eval.exception.ComplexResultException
-                    // may be thrown in applAsDouble()
-                }
                 if (arg1.isList()) {
                     // thread over the list
                     return EvalAttributes.threadList(ast, F.List, ast.head(), ((IAST) arg1).argSize());
                 } else if (arg1.isAssociation()) {
                     // thread over the association
                     return ((IAssociation) arg1).mapThread(ast, 1);
+				} else if (arg1.isSparseArray()) {
+					return ((ISparseArray) arg1).mapThread(ast, 1);
                 } else if (arg1.isConditionalExpression()) {
                     IExpr temp = ast.extractConditionalExpression(true);
                     if (temp.isPresent()) {
@@ -701,12 +809,13 @@ public class EvalEngine implements Serializable {
 
         if (!(arg1 instanceof IPatternObject) && arg1.isPresent()) {
             ISymbol lhsSymbol = arg1.isSymbol() ? (ISymbol) arg1 : arg1.topHead();
-            return lhsSymbol.evalUpRule(this, ast);
+			return lhsSymbol.evalUpRules(ast, this);
         }
         return F.NIL;
     }
 
     /**
+	 *
      * @param symbol
      * @param ast
      * @return <code>F.NIL</code> if no evaluation happened
@@ -744,7 +853,7 @@ public class EvalEngine implements Serializable {
                     // evaluate a built-in function.
                     final IFunctionEvaluator functionEvaluator = (IFunctionEvaluator) module;
                     int[] expected;
-                    if ((expected = functionEvaluator.expectedArgSize(IAST ast)) != null) {
+					if ((expected = functionEvaluator.expectedArgSize(ast)) != null) {
                         if (ast.argSize() < expected[0] || ast.argSize() > expected[1]) {
                             return IOFunctions.printArgMessage(ast, expected, this);
                         }
@@ -759,14 +868,21 @@ public class EvalEngine implements Serializable {
                     if (result.isPresent()) {
                         return result;
                     }
-                } catch (ValidateException ve) {
+				} catch (FlowControlException fce) {
+					throw fce;
+				} catch (SymjaMathException ve) {
+					if (ve instanceof LimitException) {
+						throw ve;
+					}
 					if (FEConfig.SHOW_STACKTRACE) {
                         ve.printStackTrace();
                     }
                     return printMessage(ast.topHead(), ve);
                 }
                 if (((ISymbol.DELAYED_RULE_EVALUATION & attr) == ISymbol.DELAYED_RULE_EVALUATION)) {
-                    return symbol.evalDownRule(this, ast);
+					// evaluate args especially for Sum() and Product(), although they have HOLDALL attribute
+					IExpr temp = evalArgs(ast, ISymbol.NOATTRIBUTE).orElse(ast);
+					return symbol.evalDownRule(this, temp);
                 } else {
                     if (!fNumericMode && fAssumptions == null
                             && (((ISymbol.HOLDALLCOMPLETE | ISymbol.NHOLDALL) & attr) == ISymbol.NOATTRIBUTE)) {
@@ -785,8 +901,10 @@ public class EvalEngine implements Serializable {
      * header attributes.
      * </p>
      *
-     * @param symbol the header symbol
-     * @param ast    the AST which should be evaluated
+	 * @param symbol
+	 *            the header symbol
+	 * @param ast
+	 *            the AST which should be evaluated
      * @return <code>F.NIL</code> if no evaluation was possible
      */
     public IExpr evalAttributes(@Nonnull ISymbol symbol, @Nonnull IAST ast) {
@@ -841,16 +959,16 @@ public class EvalEngine implements Serializable {
                 if (resultList.isPresent()) {
                     return evalArgs(resultList, ISymbol.NOATTRIBUTE).orElse(resultList);
                 }
-                int indx = tempAST.indexOf(EvalEngineUtils.associationPredicate);
+                int indx = tempAST.indexOf(EvalEngineUtils.isAssociation);
                 if (indx > 0) {
-                    return ((IAST) tempAST.get(indx)).mapThread(tempAST, indx);
+					return ((IAssociation) tempAST.get(indx)).mapThread(tempAST, indx);
                 }
             }
 
             if ((ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION) {
                 if (!((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL)) {
                     // Swift changed
-                    if (tempAST.exists(EvalEngineUtils.indeterminatePredicate)) {
+                    if (tempAST.exists(EvalEngineUtils.isIndeterminate)) {
                         return F.Indeterminate;
                     }
                     IExpr temp = tempAST.extractConditionalExpression(false);
@@ -858,7 +976,7 @@ public class EvalEngine implements Serializable {
                         return temp;
                     }
                 }
-            } else if (tempAST.isBooleanFormula() || tempAST.isComparatorFunction()) {
+			} else if (tempAST.isBooleanFunction() || tempAST.isComparatorFunction()) {
                 IExpr temp = tempAST.extractConditionalExpression(false);
                 if (temp.isPresent()) {
                     return temp;
@@ -893,13 +1011,13 @@ public class EvalEngine implements Serializable {
                 for (int i = 1; i < localVariablesList.size(); i++) {
                     if (localVariablesList.get(i).isSymbol()) {
                         variableSymbol = symbolList[i];
-                        variableSymbol.assign(blockVariables[i]);
+						variableSymbol.assignValue(blockVariables[i]);
                         variableSymbol.setRulesData(blockVariablesRulesData[i]);
                     } else if (localVariablesList.get(i).isAST(F.Set, 3)) {
                         final IAST setFun = (IAST) localVariablesList.get(i);
                         if (setFun.arg1().isSymbol()) {
                             variableSymbol = symbolList[i];
-                            variableSymbol.assign(blockVariables[i]);
+							variableSymbol.assignValue(blockVariables[i]);
                             variableSymbol.setRulesData(blockVariablesRulesData[i]);
                         }
                     }
@@ -912,10 +1030,15 @@ public class EvalEngine implements Serializable {
     /**
      * Evaluate an expression for a local &quot;dummy&quot; variable.
      *
-     * @param expr       the expression which should be evaluated for the given symbol
-     * @param symbol     the symbol which should be evaluated as a local variable
-     * @param localValue the value
-     * @param quiet      if <code>true</code> evaluate in quiet mode and suppress evaluation messages
+	 *
+	 * @param expr
+	 *            the expression which should be evaluated for the given symbol
+	 * @param symbol
+	 *            the symbol which should be evaluated as a local variable
+	 * @param localValue
+	 *            the value
+	 * @param quiet
+	 *            if <code>true</code> evaluate in quiet mode and suppress evaluation messages
      */
     public IExpr evalModuleDummySymbol(IExpr expr, ISymbol symbol, IExpr localValue, boolean quiet) {
         OperationSystem.checkInterrupt();
@@ -951,7 +1074,7 @@ public class EvalEngine implements Serializable {
      * @return
      * @see #evaluate(IExpr)
      */
-    final public double evalDouble(final IExpr expr) {
+	final public double evalDouble(final IExpr expr) throws ArgumentTypeException {
         if (expr.isReal()) {
             return ((ISignedNumber) expr).doubleValue();
         }
@@ -972,7 +1095,7 @@ public class EvalEngine implements Serializable {
      * @return
      * @throws ArgumentTypeException
      */
-    final public Complex evalComplex(final IExpr expr) {
+	final public Complex evalComplex(final IExpr expr) throws ArgumentTypeException {
         if (expr.isReal()) {
             return new Complex(((ISignedNumber) expr).doubleValue());
         }
@@ -991,24 +1114,6 @@ public class EvalEngine implements Serializable {
         throw new ArgumentTypeException("conversion into a double numeric value is not possible!");
     }
 
-    /**
-     * Evaluate arguments with the head <code>F.Evaluate</code>, i.e. <code>f(a, ... , Evaluate(x), ...)</code>
-     *
-     * @param ast
-     * @return
-     */
-    public final IExpr evalEvaluate(final IAST ast) {
-        final IASTMutable[] rlist = new IASTMutable[]{F.NIL};
-        ast.forEach(1, ast.size(), new ObjIntConsumer<IExpr>() {
-            @Override
-            public void accept(IExpr x, int i) {
-                if (x.isAST(F.Evaluate)) {
-                    EvalEngine.this.evalArg(rlist, ast, x, i, false);
-                }
-            }
-        });
-        return rlist[0];
-    }
 
     /**
      * Evaluate the Flat and Orderless attributes of the given <code>ast</code> recursively.
@@ -1124,8 +1229,10 @@ public class EvalEngine implements Serializable {
      * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
      *
      * @param ast
-     * @param noEvaluation        (sub-)expressions which contain no patterns should not be evaluated
-     * @param evalNumericFunction TODO
+	 * @param noEvaluation
+	 *            (sub-)expressions which contain no patterns should not be evaluated
+	 * @param evalNumericFunction
+	 *            TODO
      * @return <code>ast</code> if no evaluation was executed.
      */
     public IExpr evalHoldPattern(IAST ast, boolean noEvaluation, boolean evalNumericFunction) {
@@ -1141,11 +1248,12 @@ public class EvalEngine implements Serializable {
     /**
      * Evaluate an object, if evaluation is not possible return <code>F.NIL</code>.
      *
-     * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
      * @return the evaluated expression or <code>F.NIL</code> if evaluation isn't possible
      * @see EvalEngine#evalWithoutNumericReset(IExpr)
      */
-    public IExpr evalLoop(@Nonnull final IExpr expr) {
+    public final IExpr evalLoop(final IExpr expr) {
         OperationSystem.checkInterrupt();
         if ((fRecursionLimit > 0) && (fRecursionCounter > fRecursionLimit)) {
             if (Config.DEBUG) {
@@ -1157,7 +1265,11 @@ public class EvalEngine implements Serializable {
         try {
             IExpr temp;
             fRecursionCounter++;
+			stackPush(expr);
             if (fTraceMode) {
+				if (result.isAST(S.Unevaluated, 2)) {
+					return result.first();
+				}
                 fTraceStack.setUp(expr, fRecursionCounter);
                 temp = result.evaluate(this);
                 if (temp.isPresent()) {
@@ -1168,6 +1280,9 @@ public class EvalEngine implements Serializable {
                     result = temp;
                     long iterationCounter = 1;
                     while (true) {
+						if (result.isAST(S.Unevaluated, 2)) {
+							return result.first();
+						}
                         temp = result.evaluate(this);
                         if (temp.isPresent()) {
                             if (fStopRequested) {
@@ -1191,6 +1306,9 @@ public class EvalEngine implements Serializable {
                     }
                 }
             } else {
+				if (result.isAST(S.Unevaluated, 2)) {
+					return result.first();
+				}
                 temp = result.evaluate(this);
                 if (temp.isPresent()) {
                     if (fStopRequested) {
@@ -1205,6 +1323,9 @@ public class EvalEngine implements Serializable {
                     result = temp;
                     long iterationCounter = 1;
                     while (true) {
+						if (result.isAST(S.Unevaluated, 2)) {
+							return result.first();
+						}
                         temp = result.evaluate(this);
                         if (temp.isPresent()) {
                             if (fStopRequested) {
@@ -1247,6 +1368,7 @@ public class EvalEngine implements Serializable {
             printMessage("Evaluation aborted: " + result.toString());
             throw AbortException.ABORTED;
         } finally {
+			stackPop();
             if (fTraceMode) {
                 fTraceStack.tearDown(fRecursionCounter);
             }
@@ -1260,8 +1382,10 @@ public class EvalEngine implements Serializable {
     /**
      * Print the trace enabled by the <code>On({head1, head2,...})</code> function.
      *
-     * @param unevaledExpr the unevaluated expression
-     * @param evaledExpr   the evaluated expression
+	 * @param unevaledExpr
+	 *            the unevaluated expression
+	 * @param evaledExpr
+	 *            the evaluated expression
      */
     private void printOnOffTrace(IExpr unevaledExpr, IExpr evaledExpr) {
         boolean showExpr = true;
@@ -1345,10 +1469,11 @@ public class EvalEngine implements Serializable {
      * returns the input expression.
      * </p>
      *
-     * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
      * @return the evaluated object
      */
-    public final IExpr evalPattern(@Nonnull final IExpr expr) {
+	public final IExpr evalPattern(final IExpr expr) {
         boolean numericMode = fNumericMode;
         try {
             if (expr.isFreeOfPatterns()) {
@@ -1377,10 +1502,11 @@ public class EvalEngine implements Serializable {
      * mode to the value stored before the evaluation starts. If evaluation is not possible return the input object.
      * </p>
      *
-     * @param patternExpression the object which should be evaluated
+	 * @param patternExpression
+	 *            the object which should be evaluated
      * @return an <code>IPatterMatcher</code> created from the given expression.
      */
-    public final IPatternMatcher evalPatternMatcher(@Nonnull final IExpr patternExpression) {
+	public final IPatternMatcher evalPatternMatcher(final IExpr patternExpression) {
         return new PatternMatcher(evalPattern(patternExpression));
     }
 
@@ -1388,7 +1514,8 @@ public class EvalEngine implements Serializable {
      * Evaluate an expression in &quot;quiet mode&quot;. If evaluation is not possible return the input object. In
      * &quot;quiet mode&quot; all warnings would be suppressed.
      *
-     * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
      * @return the evaluated object
      * @see EvalEngine#evalWithoutNumericReset(IExpr)
      */
@@ -1406,7 +1533,8 @@ public class EvalEngine implements Serializable {
      * Evaluate an expression in &quot;quiet mode&quot;. If evaluation is not possible return <code>F.NIL</code>. In
      * &quot;quiet mode&quot; all warnings would be suppressed.
      *
-     * @param expr the expression which should be evaluated
+	 * @param expr
+	 *            the expression which should be evaluated
      * @return the evaluated object or <code>F.NUIL</code> if no evaluation was possible
      * @see EvalEngine#evalWithoutNumericReset(IExpr)
      */
@@ -1427,6 +1555,7 @@ public class EvalEngine implements Serializable {
      * @param argsAST
      * @return <code>F.NIL</code> if no evaluation happened
      */
+    @ObjcMemoryIssue(value = 2)
     public IExpr evalRules(ISymbol symbol, IAST argsAST) {
         // if (symbol instanceof BuiltInSymbol) {
         // try {
@@ -1436,14 +1565,15 @@ public class EvalEngine implements Serializable {
         // return F.NIL;
         // }
         // }
+        @ObjcMemoryIssueFix
         final IAST ast;
         // objc-changed: avoid using too much memory.
-        if (argsAST.exists(EvalEngineUtils.unevaluatedPredicate)) {
+        if (argsAST.exists(EvalEngineUtils.isASTUnevaluated2)) {
             ast = argsAST.map(new Function<IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr x) {
-                    if (x.isAST(F.Unevaluated, 2)) {
-                        return ((IAST) x).arg1();
+                    if (x.isAST(S.Unevaluated, 2)) {
+                        return ((IAST) x).first();
                     }
                     return x;
                 }
@@ -1474,7 +1604,7 @@ public class EvalEngine implements Serializable {
         for (int i = 1; i < size; i++) {
             IExpr x = ast.get(i);
             if (!(x instanceof IPatternObject) && x.isPresent()) {
-                result = x.topHead().evalUpRule(this, ast);
+                result = x.topHead().evalUpRules(ast, this);
                 if (result.isPresent()) {
                     exists = true;
                     break;
@@ -1543,7 +1673,8 @@ public class EvalEngine implements Serializable {
      * <code>SetDelayed[]</code>, <code>UpSet[]</code> or <code>UpSetDelayed[]</code> expression
      *
      * @param ast
-     * @param noEvaluation (sub-)expressions which contain no patterns should not be evaluated
+	 * @param noEvaluation
+	 *            (sub-)expressions which contain no patterns should not be evaluated
      * @return <code>ast</code> if no evaluation was executed.
      * @deprecated use evalHoldPattern
      */
@@ -1572,8 +1703,17 @@ public class EvalEngine implements Serializable {
             // AbstractFunctionEvaluator#setUp() method
             ((IBuiltInSymbol) symbol).getEvaluator();
         }
-        if (ast.isAST(F.Optional, 2)) {
-            return ((IFunctionEvaluator) F.Optional.getEvaluator()).evaluate(ast, this);
+		int headID = ast.headID();
+		if (headID >= 0) {
+			if (headID == ID.Blank || //
+					headID == ID.BlankSequence || //
+					headID == ID.BlankNullSequence || //
+					headID == ID.Pattern || //
+					headID == ID.Optional || //
+					headID == ID.OptionsPattern || //
+					headID == ID.Repeated) {
+				return ((IFunctionEvaluator) ((IBuiltInSymbol) ast.head()).getEvaluator()).evaluate(ast, this);
+			}
         }
 
         final int attr = symbol.getAttributes();
@@ -1584,10 +1724,15 @@ public class EvalEngine implements Serializable {
 
             if ((ISymbol.HOLDFIRST & attr) == ISymbol.NOATTRIBUTE) {
                 // the HoldFirst attribute isn't set here
-                if (astSize > 1 && ast.arg1().isAST()) {
+				if (astSize > 1) {
                     IExpr expr = ast.arg1();
                     if (expr.isAST()) {
                         resultList = evalSetAttributeArg(ast, 1, (IAST) expr, resultList, noEvaluation, level);
+					} else if (!expr.isPatternExpr()) {
+						IExpr temp = expr.evaluate(this);
+						if (temp.isPresent()) {
+							resultList = ast.setAtCopy(1, temp);
+						}
                     }
                 }
             }
@@ -1598,6 +1743,15 @@ public class EvalEngine implements Serializable {
                         IExpr expr = ast.get(i);
                         if (expr.isAST()) {
                             resultList = evalSetAttributeArg(ast, i, (IAST) expr, resultList, noEvaluation, level);
+						} else if (!expr.isPatternExpr()) {
+							IExpr temp = expr.evaluate(this);
+							if (temp.isPresent()) {
+								if (resultList.isPresent()) {
+									resultList.set(i, temp);
+								} else {
+									resultList = ast.setAtCopy(i, temp);
+								}
+							}
                         }
                     }
                 }
@@ -1644,6 +1798,7 @@ public class EvalEngine implements Serializable {
     }
 
     /**
+	 *
      * @param ast
      * @param attr
      * @param noEvaluation
@@ -1689,11 +1844,14 @@ public class EvalEngine implements Serializable {
      * Evaluate the expression and return the <code>Trace[expr]</code> (i.e. all (sub-)expressions needed to calculate
      * the result).
      *
-     * @param expr    the expression which should be evaluated.
-     * @param matcher a filter which determines the expressions which should be traced, If the matcher is set to
-     *                <code>null</code>, all expressions are traced.
-     * @param list    an IAST object which will be cloned for containing the traced expressions. Typically a
-     *                <code>F.List()</code> will be used.
+	 * @param expr
+	 *            the expression which should be evaluated.
+	 * @param matcher
+	 *            a filter which determines the expressions which should be traced, If the matcher is set to
+	 *            <code>null</code>, all expressions are traced.
+	 * @param list
+	 *            an IAST object which will be cloned for containing the traced expressions. Typically a
+	 *            <code>F.List()</code> will be used.
      * @return
      */
     public final IAST evalTrace(final IExpr expr, Predicate<IExpr> matcher, IAST list) {
@@ -1714,7 +1872,7 @@ public class EvalEngine implements Serializable {
      *
      * @param expr
      * @return <code>true</code> if the expression could be evaluated to symbol <code>True</code> and <code>false</code>
-     * in all other cases
+	 *         in all other cases
      */
     public final boolean evalTrue(final IExpr expr) {
         if (expr.isBuiltInSymbol()) {
@@ -1739,7 +1897,8 @@ public class EvalEngine implements Serializable {
      * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric
      * mode to the value stored before the evaluation starts. If evaluation is not possible return the input object.
      *
-     * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
      * @return the evaluated object
      */
     public final IExpr evaluate(final IExpr expr) {
@@ -1755,9 +1914,11 @@ public class EvalEngine implements Serializable {
     /**
      * Parse the given <code>expression String</code> into an IExpr and evaluate it.
      *
-     * @param expression an expression in math formula notation
+	 * @param expression
+	 *            an expression in math formula notation
      * @return
-     * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
      */
     final public IExpr evaluate(String expression) {
         return evaluate(parse(expression));
@@ -1766,10 +1927,13 @@ public class EvalEngine implements Serializable {
     /**
      * Parse the given <code>expression String</code> into an IExpr and evaluate it.
      *
-     * @param expression    an expression in math formula notation
-     * @param explicitTimes if <code>true</code> require times operator &quot;*&quot;
+	 * @param expression
+	 *            an expression in math formula notation
+	 * @param explicitTimes
+	 *            if <code>true</code> require times operator &quot;*&quot;
      * @return
-     * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
      */
     final public IExpr evaluate(String expression, boolean explicitTimes) {
         return evaluate(parse(expression, explicitTimes));
@@ -1779,7 +1943,8 @@ public class EvalEngine implements Serializable {
      * Store the current numeric mode and evaluate the expression <code>expr</code>. After evaluation reset the numeric
      * mode to the value stored before the evaluation starts. If evaluation is not possible return the input object.
      *
-     * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
      * @return the evaluated object
      */
     public final IExpr evaluateNonNumeric(final IExpr expr) {
@@ -1794,10 +1959,12 @@ public class EvalEngine implements Serializable {
     }
 
     /**
+	 *
      * Evaluate an object and reset the numeric mode to the value before the evaluation step. If evaluation is not
      * possible return <code>F.NIL</code>.
      *
-     * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
      * @return the evaluated object or <code>F.NIL</code> if no evaluation was possible
      */
     public final IExpr evaluateNull(final IExpr expr) {
@@ -1813,8 +1980,10 @@ public class EvalEngine implements Serializable {
      * Evaluate an object without resetting the numeric mode after the evaluation step. If evaluation is not possible
      * return the input object,
      *
-     * @param expr the object which should be evaluated
+	 * @param expr
+	 *            the object which should be evaluated
      * @return the evaluated object
+	 *
      */
     public final IExpr evalWithoutNumericReset(final IExpr expr) {
         return evalLoop(expr).orElse(expr);
@@ -1824,7 +1993,8 @@ public class EvalEngine implements Serializable {
      * Iterate over the arguments of <code>ast</code> and flatten the arguments of <code>Sequence(...)</code>
      * expressions.
      *
-     * @param ast an AST which may contain <code>Sequence(...)</code> expressions.
+	 * @param ast
+	 *            an AST which may contain <code>Sequence(...)</code> expressions.
      * @return
      */
     public IAST flattenSequences(final IAST ast) {
@@ -1912,54 +2082,34 @@ public class EvalEngine implements Serializable {
         return fAssumptions;
     }
 
-    /**
-     * Set the assumptions for this evaluation engine
-     *
-     * @param assumptions
-     */
-    public void setAssumptions(IAssumptions assumptions) {
-        this.fAssumptions = assumptions;
-    }
 
     public final Context getContext() {
         return fContextPath.currentContext();
     }
 
-    public void setContext(Context context) {
-        this.fContextPath.setCurrentContext(context);
-    }
 
     public ContextPath getContextPath() {
         return fContextPath;
     }
 
-    public void setContextPath(ContextPath contextPath) {
-        this.fContextPath = contextPath;
-    }
 
     public PrintStream getErrorPrintStream() {
         return fErrorPrintStream;
     }
 
-    public void setErrorPrintStream(final PrintStream errorPrintStream) {
-        fErrorPrintStream = errorPrintStream;
-    }
 
     public int getIterationLimit() {
+		if (fStopRequested) {
+			throw TimeoutException.TIMED_OUT;
+		}
         return fIterationLimit;
     }
 
-    public void setIterationLimit(final int i) {
-        fIterationLimit = i;
-    }
 
     public String getMessageShortcut() {
         return fMessageShortcut;
     }
 
-    public void setMessageShortcut(final String messageShortcut) {
-        fMessageShortcut = messageShortcut;
-    }
 
     /**
      * Get the list of modified variables
@@ -1974,9 +2124,6 @@ public class EvalEngine implements Serializable {
         return fNumericPrecision;
     }
 
-    public void setNumericPrecision(long precision) {
-        fNumericPrecision = precision;
-    }
 
     /**
      * Get significant figures for output floating point numbers
@@ -1987,20 +2134,26 @@ public class EvalEngine implements Serializable {
         return fSignificantFigures;
     }
 
-    public void setSignificantFigures(int figures) {
-        fSignificantFigures = figures;
-    }
     public LastCalculationsHistory getOutList() {
         return fOutList;
     }
 
+	public OptionsStack pushOptionsStack() {
+		fOptionsStack.push();
+		return fOptionsStack;
+	}
+
+	public void popOptionsStack() {
+		fOptionsStack.pop();
+	}
+
+	public Iterator<IdentityHashMap<ISymbol, IASTAppendable>> optionsStackIterator() {
+		return fOptionsStack.iterator();
+	}
     public PrintStream getOutPrintStream() {
         return fOutPrintStream;
     }
 
-    public void setOutPrintStream(final PrintStream outPrintStream) {
-        fOutPrintStream = outPrintStream;
-    }
 
     /**
      * Get the reap list object associated to the most enclosing <code>Reap()</code> statement. The even indices in
@@ -2014,14 +2167,11 @@ public class EvalEngine implements Serializable {
         return fReapList;
     }
 
-    /**
-     * @param reapList the reapList to set
-     */
-    public void setReapList(java.util.List<IExpr> reapList) {
-        this.fReapList = reapList;
-    }
 
     public int getRecursionCounter() {
+		if (fStopRequested) {
+			throw TimeoutException.TIMED_OUT;
+		}
         return fRecursionCounter;
     }
 
@@ -2029,23 +2179,17 @@ public class EvalEngine implements Serializable {
      * @return
      */
     public int getRecursionLimit() {
+		if (fStopRequested) {
+			throw TimeoutException.TIMED_OUT;
+		}
         return fRecursionLimit;
     }
 
-    /**
-     * @param i
-     */
-    public void setRecursionLimit(final int i) {
-        fRecursionLimit = i;
-    }
 
     public long getSeconds() {
         return fSeconds;
     }
 
-    public void setSeconds(long fSeconds) {
-        this.fSeconds = fSeconds;
-    }
 
     /**
      * @return
@@ -2055,10 +2199,12 @@ public class EvalEngine implements Serializable {
     }
 
     /**
-     * @param string
+	 * Get the current stack of expression evaluation.
+	 *
+	 * @return
      */
-    public void setSessionID(final String string) {
-        fSessionID = string;
+	public ArrayDeque<IExpr> getStack() {
+		return fStack;
     }
 
     /**
@@ -2070,17 +2216,6 @@ public class EvalEngine implements Serializable {
         return fTraceStack;
     }
 
-    /**
-     * Set the step listener for this evaluation engine. The method also calls <code>setTraceMode(true)</code> to enable
-     * the trace mode. The caller is responsible for calling <code>setTraceMode(false)</code> if no further listening is
-     * desirable.
-     *
-     * @param stepListener the listener which should listen to the evaluation steps.
-     */
-    public void setStepListener(IEvalStepListener stepListener) {
-        setTraceMode(true);
-        fTraceStack = stepListener;
-    }
 
     /**
      * Increment the module counter by 1 and return the result.
@@ -2120,6 +2255,7 @@ public class EvalEngine implements Serializable {
      * Initialize this <code>EvalEngine</code>
      */
     final public void init() {
+		stackBegin();
         fNumericPrecision = 15;
         fSignificantFigures = 6;
         fRecursionCounter = 0;
@@ -2138,22 +2274,49 @@ public class EvalEngine implements Serializable {
         fSeconds = 0;
         fModifiedVariablesList = null;
         fMessageShortcut = null;
-        fContextPathStack = new Stack<ContextPath>();
+		fContextPathStack = new ArrayDeque<ContextPath>();
         fContextPath = ContextPath.initialContext();
-        REMEMBER_AST_CACHE = null;
+		fOptionsStack = new OptionsStack();
+		rememberASTCache = null;
+	}
+
+	public ArrayDeque<IExpr> stackBegin() {
+		fStack = new ArrayDeque<IExpr>(256);
+		return fStack;
+	}
+
+	public void stackPush(IExpr expr) {
+		fStack.push(expr);
+	}
+
+	public IExpr stackPop() {
+		if (fStack.isEmpty()) {
+			return F.NIL;
+		}
+		return fStack.pop();
     }
 
     /**
-     * Check if the <code>ApfloatNum</code> number type should be used instead of the <code>Num</code> type and the
-     * <code>ApcomplexxNum</code> number type should be used instead of the <code>ComplexNum</code> type for numeric
-     * evaluations.
+	 * Check if the engine is in arbitrary precision mode and that <code>ApfloatNum</code> number type should be used
+	 * instead of the <code>Num</code> type and the <code>ApcomplexxNum</code> number type should be used instead of the
+	 * <code>ComplexNum</code> type for numeric evaluations.
      *
      * @return <code>true</code> if the required precision is greater than <code>EvalEngine.DOUBLE_PRECISION</code>
      * @see ApfloatNum
      * @see ApcomplexNum
+	 * @see #isDoubleMode()
      */
-    public final boolean isApfloat() {
-        return fNumericPrecision > Config.MACHINE_PRECISION;
+	public final boolean isArbitraryMode() {
+		return fNumericPrecision > FEConfig.MACHINE_PRECISION;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @deprecated use {@link #isArbitraryMode()}
+	 */
+	public final boolean isApfloatMode() {
+		return isArbitraryMode();
     }
 
     /**
@@ -2166,13 +2329,6 @@ public class EvalEngine implements Serializable {
     }
 
 
-    // public final int traceSize() {
-    // return fTraceStack.size();
-    // }
-    //
-    // public final void resetSize(int fromPosition) {
-    // fTraceStack.resetSize(fromPosition);
-    // }
 
     public final boolean isEvalRHSMode() {
         return fEvalRHSMode;
@@ -2185,9 +2341,6 @@ public class EvalEngine implements Serializable {
         return fFileSystemEnabled;
     }
 
-    public void setFileSystemEnabled(boolean fFileSystemEnabled) {
-        this.fFileSystemEnabled = fFileSystemEnabled;
-    }
 
     /**
      * @return <code>true</code> if the EvalEngine runs in numeric mode.
@@ -2196,19 +2349,14 @@ public class EvalEngine implements Serializable {
         return fNumericMode;
     }
 
-    /**
-     * @param b
-     */
-    public void setNumericMode(final boolean b) {
-        fNumericMode = b;
-    }
 
     /**
      * @return <code>true</code> if the EvalEngine runs in numeric mode and Java <code>double</code> numbers should be
-     * used for evaluating numeric functions.
+	 *         used for evaluating numeric functions.
+	 * @see #isArbitraryMode()
      */
     public final boolean isDoubleMode() {
-        return fNumericMode && !isApfloat();
+		return fNumericMode && !isArbitraryMode();
     }
 
     /**
@@ -2231,18 +2379,11 @@ public class EvalEngine implements Serializable {
         return fOutListDisabled;
     }
 
-    public void setOutListDisabled(LastCalculationsHistory outList) {
-        this.fOutList = outList;
-        this.fOutListDisabled = false;
-    }
 
     public final boolean isPackageMode() {
         return fPackageMode;
     }
 
-    public void setPackageMode(boolean packageMode) {
-        fPackageMode = packageMode;
-    }
 
     /**
      * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are shown in the
@@ -2256,28 +2397,15 @@ public class EvalEngine implements Serializable {
     }
 
     /**
-     * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are showw in the
-     * evaluation).
+	 * If <code>true</code> this engine doesn't distinguish between lower and upper case identifiers, with the exception
+	 * of identifiers with length 1.
      *
-     * @param quietMode
-     */
-    public void setQuietMode(boolean quietMode) {
-        this.fQuietMode = quietMode;
-    }
-
-    /**
      * @return the fRelaxedSyntax
      */
     public final boolean isRelaxedSyntax() {
         return fRelaxedSyntax;
     }
 
-    /**
-     * @param fRelaxedSyntax the fRelaxedSyntax to set
-     */
-    public void setRelaxedSyntax(boolean fRelaxedSyntax) {
-        this.fRelaxedSyntax = fRelaxedSyntax;
-    }
 
     /**
      * @return Returns the stopRequested.
@@ -2286,41 +2414,16 @@ public class EvalEngine implements Serializable {
         return fStopRequested;
     }
 
-    /**
-     * @param stopRequested The stopRequested to set.
-     */
-    public void setStopRequested(final boolean stopRequested) {
-        fStopRequested = stopRequested;
-        if (stopRequested) {
-            if (fCopiedEngine != null) {
-                fCopiedEngine.setStopRequested(true);
-            }
-        } else {
-            fCopiedEngine = null;
-        }
-    }
 
     public final boolean isThrowError() {
         return fThrowError;
     }
 
-    /**
-     * Throw an <code>IllegalArgument</code> exception if an error message is printed in method
-     * <code>printMessage()</code>.
-     *
-     * @param throwError
-     */
-    public void setThrowError(boolean throwError) {
-        this.fThrowError = throwError;
-    }
 
     public final boolean isTogetherMode() {
         return fTogetherMode;
     }
 
-    public void setTogetherMode(boolean fTogetherMode) {
-        this.fTogetherMode = fTogetherMode;
-    }
 
     /**
      * If the trace mode is set the system writes an evaluation trace list or if additionally the <i>stop after
@@ -2332,19 +2435,23 @@ public class EvalEngine implements Serializable {
         return fTraceMode;
     }
 
-    /**
-     * @param b
-     */
-    public void setTraceMode(final boolean b) {
-        fTraceMode = b;
-    }
+	// public final int traceSize() {
+	// return fTraceStack.size();
+	// }
+	//
+	// public final void resetSize(int fromPosition) {
+	// fTraceStack.resetSize(fromPosition);
+	// }
 
     /**
      * Parse the given <code>expression String</code> into an IExpr without evaluation.
      *
-     * @param expression an expression in math formula notation
+	 * @param expression
+	 *            an expression in math formula notation
+	 *
      * @return
-     * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
      */
     final public IExpr parse(String expression) {
         return parse(expression, FEConfig.EXPLICIT_TIMES_OPERATOR);
@@ -2353,10 +2460,13 @@ public class EvalEngine implements Serializable {
     /**
      * Parse the given <code>expression String</code> into an IExpr without evaluation.
      *
-     * @param expression    an expression in math formula notation
-     * @param explicitTimes if <code>true</code> require times operator &quot;*&quot;
+	 * @param expression
+	 *            an expression in math formula notation
+	 * @param explicitTimes
+	 *            if <code>true</code> require times operator &quot;*&quot;
      * @return
-     * @throws org.matheclipse.parser.client.SyntaxError if a parsing error occurs
+	 * @throws org.matheclipse.parser.client.SyntaxError
+	 *             if a parsing error occurs
      */
 
     final public IExpr parse(String expression, boolean explicitTimes) {
@@ -2368,9 +2478,11 @@ public class EvalEngine implements Serializable {
     /**
      * Print a message to the <code>Out</code> stream, if the engine is not in &quot;quiet mode&quot;.
      *
-     * @param str the message which should be printed
+	 * @param str
+	 *            the message which should be printed
+	 * @return <code>F.NIL</code>
      */
-    public IAST printMessage(String str) {
+	public IAST printMessage(String str) throws ArgumentTypeException {
         if (!isQuietMode()) {
             PrintStream stream = getErrorPrintStream();
             if (stream == null) {
@@ -2379,7 +2491,7 @@ public class EvalEngine implements Serializable {
             stream.println(str);
         }
         if (fThrowError) {
-            throw new IllegalArgument(str);
+			throw new ArgumentTypeException(str);
         }
         return F.NIL;
     }
@@ -2387,7 +2499,8 @@ public class EvalEngine implements Serializable {
     /**
      * Print a message to the <code>Out</code> stream, if the engine is not in &quot;quiet mode&quot;.
      *
-     * @param rex the RuntimeException which should be printed
+	 * @param rex
+	 *            the RuntimeException which should be printed
      */
     public IAST printMessage(ISymbol symbol, RuntimeException rex) {
         String message = rex.getMessage();
@@ -2403,15 +2516,17 @@ public class EvalEngine implements Serializable {
             }
         }
         if (fThrowError) {
-            throw new IllegalArgument(message);
+			throw new ArgumentTypeException(message);
         }
         return F.NIL;
     }
 
     /**
      * Reset the numeric mode flag and the recursion counter
+	 *
      */
     public void reset() {
+		stackBegin();
         fNumericPrecision = 15;
         fSignificantFigures = 6;
         fNumericMode = false;
@@ -2427,10 +2542,11 @@ public class EvalEngine implements Serializable {
         fModifiedVariablesList = null;
         fMessageShortcut = null;
         // Swift changed: call clear() before assign null value
-        if (REMEMBER_AST_CACHE != null) {
-            REMEMBER_AST_CACHE.cleanUp();
+        if (rememberASTCache != null) {
+            rememberASTCache.cleanUp();
         }
-        REMEMBER_AST_CACHE = null;
+        rememberASTCache = null;
+		fOptionsStack = new OptionsStack();
         if (fOnOffMode && fOnOffUnique) {
             fOnOffUniqueMap = new HashMap<IExpr, IExpr>();
         }
@@ -2444,12 +2560,52 @@ public class EvalEngine implements Serializable {
         }
     }
 
+	/**
+	 * Set the assumptions for this evaluation engine
+	 *
+	 * @param assumptions
+	 */
+	public void setAssumptions(IAssumptions assumptions) {
+		this.fAssumptions = assumptions;
+	}
+
+	public void setContextPath(ContextPath contextPath) {
+		this.fContextPath = contextPath;
+	}
+
+	public void setContext(Context context) {
+		this.fContextPath.setCurrentContext(context);
+	}
+
+	public void setErrorPrintStream(final PrintStream errorPrintStream) {
+		fErrorPrintStream = errorPrintStream;
+	}
+
+	public void setFileSystemEnabled(boolean fFileSystemEnabled) {
+		this.fFileSystemEnabled = fFileSystemEnabled;
+	}
+
+	public void setIterationLimit(final int i) {
+		fIterationLimit = i;
+	}
+
+	public void setMessageShortcut(final String messageShortcut) {
+		fMessageShortcut = messageShortcut;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setNumericMode(final boolean b) {
+		fNumericMode = b;
+	}
     /**
      * Set the numeric mode and precision of numeric calculations.
      *
      * @param b
      * @param precision
-     * @param figures   significant figures which should be displayed in output forms
+	 * @param figures
+	 *            significant figures which should be displayed in output forms
      */
     public void setNumericMode(final boolean b, long precision, int figures) {
         fNumericMode = b;
@@ -2457,11 +2613,21 @@ public class EvalEngine implements Serializable {
         fSignificantFigures = figures;
     }
 
+	public void setNumericPrecision(long precision) {
+		fNumericPrecision = precision;
+	}
+
+	public void setSignificantFigures(int figures) {
+		fSignificantFigures = figures;
+	}
     /**
-     * @param outListDisabled if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no
-     *                        history of the last calculations will be saved and the <code>Out()</code> function (or % operator)
-     *                        will be unevaluated.
-     * @param historyCapacity the number of last entries of the calculations which should be stored.
+	 *
+	 * @param outListDisabled
+	 *            if <code>false</code> create a <code>LastCalculationsHistory(historyCapacity)</code>, otherwise no
+	 *            history of the last calculations will be saved and the <code>Out()</code> function (or % operator)
+	 *            will be unevaluated.
+	 * @param historyCapacity
+	 *            the number of last entries of the calculations which should be stored.
      */
     public void setOutListDisabled(boolean outListDisabled, int historyCapacity) {
         if (outListDisabled == false) {
@@ -2477,10 +2643,13 @@ public class EvalEngine implements Serializable {
     /**
      * Set the mode for the <code>On()</code> or <code>Off()</code> function
      *
-     * @param onOffMode      if <code>true</code> every evaluation step will be printd to the defined out stream.
-     * @param headSymbolsMap the header symbols which should trigger an output in the trace
-     * @param uniqueTrace    the output is printed only once for a combination of _unevaluated_ input expression and _evaluated_
-     *                       output expression.
+	 * @param onOffMode
+	 *            if <code>true</code> every evaluation step will be printd to the defined out stream.
+	 * @param headSymbolsMap
+	 *            the header symbols which should trigger an output in the trace
+	 * @param uniqueTrace
+	 *            the output is printed only once for a combination of _unevaluated_ input expression and _evaluated_
+	 *            output expression.
      */
     public void setOnOffMode(final boolean onOffMode, IdentityHashMap<ISymbol, ISymbol> headSymbolsMap,
                              boolean uniqueTrace) {
@@ -2492,6 +2661,142 @@ public class EvalEngine implements Serializable {
         }
     }
 
+	public void setOptionsPattern(ISymbol lhsHead, IPatternMap patternMap) {
+		IdentityHashMap<ISymbol, IASTAppendable> optionsPattern = fOptionsStack.peek();
+		boolean setHead = patternMap.setOptionsPattern(this, lhsHead);
+		if (!optionsPattern.isEmpty()) {
+			for (Map.Entry<ISymbol, IASTAppendable> element : optionsPattern.entrySet()) {
+				ISymbol symbol = element.getKey();
+				IAST list = PatternMatching.optionsList(element.getKey(), true);
+				if (list.size() > 1) {
+					IASTAppendable tempList = optionsPattern.get(symbol);
+					if (tempList == null) {
+						tempList = F.ListAlloc(10);
+						optionsPattern.put(symbol, tempList);
+					}
+					tempList.appendArgs(list);
+				}
+			}
+		}
+		if (setHead) {
+			optionsPattern.put(S.LHS_HEAD, F.ast(lhsHead));
+		}
+	}
+
+	public void setOutListDisabled(LastCalculationsHistory outList) {
+		this.fOutList = outList;
+		this.fOutListDisabled = false;
+	}
+
+	public void setOutPrintStream(final PrintStream outPrintStream) {
+		fOutPrintStream = outPrintStream;
+	}
+
+	public void setPackageMode(boolean packageMode) {
+		fPackageMode = packageMode;
+	}
+
+	/**
+	 * If <code>true</code> the engine evaluates in &quot;quiet&quot; mode (i.e. no warning messages are showw in the
+	 * evaluation).
+	 *
+	 * @param quietMode
+	 */
+	public void setQuietMode(boolean quietMode) {
+		this.fQuietMode = quietMode;
+	}
+
+	/**
+	 * @param reapList
+	 *            the reapList to set
+	 */
+	public void setReapList(java.util.List<IExpr> reapList) {
+		this.fReapList = reapList;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setRecursionLimit(final int i) {
+		fRecursionLimit = i;
+	}
+
+	/**
+	 * @param fRelaxedSyntax
+	 *            the fRelaxedSyntax to set
+	 */
+	public void setRelaxedSyntax(boolean fRelaxedSyntax) {
+		this.fRelaxedSyntax = fRelaxedSyntax;
+	}
+
+	public void setSeconds(long fSeconds) {
+		this.fSeconds = fSeconds;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void setSessionID(final String string) {
+		fSessionID = string;
+	}
+
+	/**
+	 * Set the stack which should be active for the evaluation engine.
+	 *
+	 * @param stack
+	 */
+	public void setStack(ArrayDeque<IExpr> stack) {
+		fStack = stack;
+	}
+
+	/**
+	 * Set the step listener for this evaluation engine. The method also calls <code>setTraceMode(true)</code> to enable
+	 * the trace mode. The caller is responsible for calling <code>setTraceMode(false)</code> if no further listening is
+	 * desirable.
+	 *
+	 * @param stepListener
+	 *            the listener which should listen to the evaluation steps.
+	 */
+	public void setStepListener(IEvalStepListener stepListener) {
+		setTraceMode(true);
+		fTraceStack = stepListener;
+	}
+
+	/**
+	 * @param stopRequested
+	 *            The stopRequested to set.
+	 */
+	public void setStopRequested(final boolean stopRequested) {
+		fStopRequested = stopRequested;
+		if (stopRequested) {
+			if (fCopiedEngine != null) {
+				fCopiedEngine.setStopRequested(true);
+			}
+		} else {
+			fCopiedEngine = null;
+		}
+	}
+
+	/**
+	 * Throw an <code>IllegalArgument</code> exception if an error message is printed in method
+	 * <code>printMessage()</code>.
+	 *
+	 * @param throwError
+	 */
+	public void setThrowError(boolean throwError) {
+		this.fThrowError = throwError;
+	}
+
+	public void setTogetherMode(boolean fTogetherMode) {
+		this.fTogetherMode = fTogetherMode;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setTraceMode(final boolean b) {
+		fTraceMode = b;
+	}
     /**
      * The size of the <code>Out[]</code> list
      *
@@ -2513,54 +2818,51 @@ public class EvalEngine implements Serializable {
      * @param ast
      * @return the resulting ast with the <code>argHead</code> threaded into each ast argument or <code>F.NIL</code>
      */
+    @ObjcMemoryIssue
     public IASTMutable threadASTListArgs(final IASTMutable ast) {
-        // swift changed: memory issue
-        /*final*/ int/*[]*/ listLength = /*new int[]{*/-1/*}*/;
-//        if (ast.exists(new Predicate<IExpr>() {
-//            @Override
-//            public boolean test(IExpr x) {
-//                if (x.isList()) {
-//                    if (listLength[0] < 0) {
-//                        listLength[0] = ((IAST) x).argSize();
-//                    } else {
-//                        if (listLength[0] != ((IAST) x).argSize()) {
-//                            // Objects of unequal length in `1` cannot be combined.
-//                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
-//                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-//                            return true;
-//                        }
-//                    }
-//                }
-//                return false;
-//            }
-//        })) {
-//            return F.NIL;
-//        }
-        // swift changed: memory issue
-        boolean exists = false;
-        final int size = ast.size();
-        for (int i = 1; i < size; i++) {
-            IExpr x = ast.get(i);
-            if (x.isList()) {
-                if (listLength/*[0]*/ < 0) {
-                    listLength/*[0]*/ = ((IAST) x).argSize();
-                } else {
-                    if (listLength/*[0]*/ != ((IAST) x).argSize()) {
-                        // Objects of unequal length in `1` cannot be combined.
-                        IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
-                        // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-                        exists = true;
-                        break;
+		final ISymbol[] head = new ISymbol[] { null };
+		final int[] listLength = new int[] { -1 };
+		if (ast.exists(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+                if (x.isList()) {
+                    if (head[0] == null) {
+                        head[0] = S.List;
+                    }
+                    if (listLength[0] < 0) {
+                        listLength[0] = ((IAST) x).argSize();
+                    } else {
+                        if (listLength[0] != ((IAST) x).argSize()) {
+                            // Objects of unequal length in `1` cannot be combined.
+                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
+                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+                            return true;
+                        }
+                    }
+                } else if (x.isSparseArray()) {
+                    if (head[0] == null) {
+                        head[0] = S.SparseArray;
+                    }
+                    ISparseArray sp = (ISparseArray) x;
+                    if (listLength[0] < 0) {
+                        listLength[0] = sp.getDimension()[0];
+                    } else {
+                        if (listLength[0] != sp.getDimension()[0]) {
+                            // Objects of unequal length in `1` cannot be combined.
+                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
+                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+                            return true;
+                        }
                     }
                 }
+                return false;
             }
-        }
-        if (exists) {
+        })) {
             return F.NIL;
         }
 
-        if (listLength/*[0]*/ != -1) {
-            IASTMutable result = EvalAttributes.threadList(ast, F.List, ast.head(), listLength/*[0]*/);
+		if (listLength[0] != -1) {
+			IASTMutable result = EvalAttributes.threadList(ast, head[0], ast.head(), listLength[0]);
             result.addEvalFlags(IAST.IS_LISTABLE_THREADED);
             return result;
         }

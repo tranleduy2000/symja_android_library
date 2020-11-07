@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -33,10 +33,9 @@ import org.logicng.formulas.Variable;
 
 /**
  * An auxiliary variable for encoding results.
- * <p></p>
+ * <p>
  * This variable is used, if the result is added directly to a solver.  In this case no variable on the factory has
  * to be created.
- *
  * @version 1.3
  * @since 1.1
  */
@@ -46,15 +45,13 @@ final class EncodingAuxiliaryVariable extends Variable {
 
     /**
      * Constructs a new auxiliary variable
-     *
      * @param name    the literal name
      * @param negated {@code true} if the variables is negated, {@code false} otherwise
      */
-    EncodingAuxiliaryVariable(String name, boolean negated) {
+    EncodingAuxiliaryVariable(final String name, final boolean negated) {
         super(name, null);
         this.negated = negated;
     }
-
 
     @Override
     public Literal negate() {

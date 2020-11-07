@@ -3,7 +3,6 @@ package org.matheclipse.core.expression;
 import org.apfloat.Apfloat;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.interfaces.IAST;
@@ -29,6 +28,8 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Locale;
+
+import org.matheclipse.core.tensor.qty.IQuantity;
 
 /**
  * Methods for handling the WXF serialization format.
@@ -433,12 +434,13 @@ public class WL {
 		}
 
 		private void writeQuantity(IExpr arg1) throws IOException {
-			IAST ast = (IAST) arg1;
-			stream.write(WL.WXF_CONSTANTS.Function);
-			stream.write(varintBytes(ast.argSize()));
-			for (int i = 0; i < ast.size(); i++) {
-				write(ast.get(i));
-			}
+			IQuantity quantity = (IQuantity) arg1;
+			// simulate AST Quantity(..., ...)
+			stream.write(WXF_CONSTANTS.Function);
+			stream.write(varintBytes(2));
+			write(quantity.head());
+			write(quantity.value());
+			write(F.stringx(quantity.unitString()));
 		}
 		private void writeSeriesData(IExpr arg1) throws IOException {
 			ASTSeriesData ast = (ASTSeriesData) arg1;
@@ -642,12 +644,19 @@ public class WL {
 	 * Convert <code>List(<byte values>)</code> to Java byte array.
 	 * 
 	 * @param list
-	 * @return
+	 * @return <code>null</code> if the list is nota a list of bytes
 	 */
 	public static byte[] toByteArray(IAST list) {
 		byte[] result = new byte[list.size() - 1];
 		for (int i = 1; i < list.size(); i++) {
-			result[i - 1] = ((IInteger) list.get(i)).byteValue();
+			if (list.get(i).isInteger()) {
+				final int val = ((IInteger) list.get(i)).toIntDefault();
+				if (val >= 0 && val < 256) {
+					result[i - 1] = (byte) val;
+					continue;
+				}
+			}
+			return null;
 		}
 		return result;
 	}

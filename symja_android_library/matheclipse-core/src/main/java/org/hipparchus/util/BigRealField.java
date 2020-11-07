@@ -22,10 +22,10 @@
 
 package org.hipparchus.util;
 
+import java.io.Serializable;
+
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
-
-import java.io.Serializable;
 
 /**
  * Representation of real numbers with arbitrary precision field.
@@ -34,90 +34,69 @@ import java.io.Serializable;
  *
  * @see BigReal
  */
-public class BigRealField implements Field<BigReal>, Serializable {
+public class BigRealField implements Field<BigReal>, Serializable  {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20160327L;
 
-    /**
-     * Private constructor for the singleton.
+    /** Private constructor for the singleton.
      */
     private BigRealField() {
     }
 
-    /**
-     * Get the unique instance.
-     *
+    /** Get the unique instance.
      * @return the unique instance
      */
     public static BigRealField getInstance() {
         return LazyHolder.INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public BigReal getZero() {
-        return BigReal.ZERO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public BigReal getOne() {
         return BigReal.ONE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public BigReal getZero() {
+        return BigReal.ZERO;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public Class<? extends FieldElement<BigReal>> getRuntimeClass() {
         return BigReal.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(final Object other) {
         return this == other;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return 0xf38b3541;
     }
 
     // CHECKSTYLE: stop HideUtilityClassConstructor
+    /** Holder for the instance.
+     * <p>We use here the Initialization On Demand Holder Idiom.</p>
+     */
+    private static class LazyHolder {
+        /** Cached field instance. */
+        private static final BigRealField INSTANCE = new BigRealField();
+    }
+    // CHECKSTYLE: resume HideUtilityClassConstructor
 
-    /**
-     * Handle deserialization of the singleton.
-     *
+    /** Handle deserialization of the singleton.
      * @return the singleton instance
      */
     private Object readResolve() {
         // return the singleton instance
         return LazyHolder.INSTANCE;
-    }
-    // CHECKSTYLE: resume HideUtilityClassConstructor
-
-    /**
-     * Holder for the instance.
-     * <p>We use here the Initialization On Demand Holder Idiom.</p>
-     */
-    private static class LazyHolder {
-        /**
-         * Cached field instance.
-         */
-        private static final BigRealField INSTANCE = new BigRealField();
     }
 
 }

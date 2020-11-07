@@ -8,7 +8,10 @@ import com.duy.lambda.IntToDoubleFunction;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.NumberTheory;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
+import org.matheclipse.core.expression.F;
 
 
 public class ZetaJS {
@@ -17,38 +20,55 @@ public class ZetaJS {
 	private ZetaJS() {
 	}
 
-	public static Complex summation(Function<Complex, Complex> f, double a, double b) {
+	public static Complex summation(Function<Complex, Complex> f, double a, double b,
+			int iterationLimit) {
 
 		Complex s = Complex.ZERO;
 
+		int counter = 0;
 		for (double i = a; i <= b; i++) {
+			if (counter++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(counter, F.Sum);
+			}
 			s = s.add(f.apply(new Complex(i)));
 		}
 
 		return s;
 
 	}
-	public static Complex complexSummation(DoubleFunction<Complex> f, double a, double b) {
+	public static Complex complexSummation(DoubleFunction<Complex> f, double a, double b,
+			int iterationLimit) {
 		Complex s = Complex.ZERO;
 
+		int counter = 0;
 		for (double i = a; i <= b; i++) {
+			if (counter++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(counter, F.Sum);
+			}
 			s=s.add(f.apply(i));
 		}
 		return s;
 	}
 
-	public static double sumDouble(DoubleUnaryOperator f, double a, double b) {
+	public static double sumDouble(DoubleUnaryOperator f, double a, double b, int iterationLimit) {
 		double s = 0.0;
 
+		int counter = 0;
 		for (double i = a; i <= b; i++) {
+			if (counter++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(counter, F.Sum);
+			}
 			s += f.applyAsDouble(i);
 		}
 		return s;
 	}
 
-	public static double sumInt(IntToDoubleFunction f, int a, int b) {
+	public static double sumInt(IntToDoubleFunction f, int a, int b, int iterationLimit) {
 		double s = 0;
 
+		if ((b - a) > iterationLimit && iterationLimit > 0) {
+			IterationLimitExceeded.throwIt((b - a), F.Sum);
+		}
 		for (int i = a; i <= b; i++) {
 			s += f.applyAsDouble(i);
 		}
@@ -125,15 +145,17 @@ public class ZetaJS {
 
 		// dlmf.nist.gov/25.11.4
 
+		int iterationLimit = EvalEngine.get().getIterationLimit();
 		if (a.getReal() > 1.0) {
 			double m = Math.floor(a.getReal());
 			final Complex aValue = a.subtract(m);
-			return hurwitzZeta(x, aValue).subtract(summation(new Function<Complex, Complex>() {
-				@Override
-				public Complex apply(Complex i) {
-					return aValue.add(i).pow(x.negate());
-				}
-			}, 0, m - 1.0));
+			return hurwitzZeta(x, aValue)
+					.subtract(summation(new Function<Complex, Complex>() {
+						@Override
+						public Complex apply(Complex i) {
+							return aValue.add(i).pow(x.negate());
+						}
+					}, 0, m - 1.0, iterationLimit));
 			// return sub( hurwitzZeta(x,a), summation( i => pow( add(a,i), neg(x) ), [0,m-1] ) );
 		}
 
@@ -144,7 +166,7 @@ public class ZetaJS {
 				public Complex apply(Complex i) {
 					return a.add(i).pow(x.negate());
 				}
-			}, 0, m - 1.0));
+			}, 0, m - 1.0, iterationLimit));
 		}
 
 		// Euler-Maclaurin has differences of large values in left-hand plane
@@ -166,7 +188,7 @@ public class ZetaJS {
 			public Complex apply(Complex i) {
 				return a.add(i).pow(x.negate());
 			}
-		}, 0, n - 1);
+		}, 0, n - 1, iterationLimit);
 
 		Complex I = a.add(n).pow(x.add(-1.0)).divide(x.subtract(1.0));
 
@@ -202,6 +224,7 @@ public class ZetaJS {
 
 		// dlmf.nist.gov/25.11.4
 
+		int iterationLimit = EvalEngine.get().getIterationLimit();
 		if (a > 1.0) {
 			double m = Math.floor(a);
 			final double aValue = a - m;
@@ -210,7 +233,7 @@ public class ZetaJS {
 				public double applyAsDouble(double i) {
 					return 1.0 / Math.pow(aValue + i, x);
 				}
-			}, 0, m - 1);
+			}, 0, m - 1, iterationLimit);
 		}
 
 		if (a < 0.0) {
@@ -231,7 +254,9 @@ public class ZetaJS {
 			int i = 1;
 
 			while (Math.abs(t) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
-				i++;
+				if (i++ > iterationLimit && iterationLimit > 0) {
+					IterationLimitExceeded.throwIt(i, F.HurwitzZeta);
+				}
 				t = Math.cos(Math.PI * xValue / 2.0 - 2.0 * i * Math.PI * a) / Math.pow(i, xValue);
 				s += t;
 			}
@@ -248,7 +273,7 @@ public class ZetaJS {
 			public double applyAsDouble(double i) {
 				return 1.0 / Math.pow(a + i, x);
 			}
-		}, 0, n - 1);
+		}, 0, n - 1, iterationLimit);
 
 		double I = Math.pow(a + n, 1.0 - x) / (x - 1.0);
 
@@ -258,7 +283,15 @@ public class ZetaJS {
 
 		// converges rather quickly
 		while (Math.abs(p) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
-			i++;
+			if (i++ > iterationLimit && iterationLimit > 0) {
+				IterationLimitExceeded.throwIt(i, F.HurwitzZeta);
+			}
+			if (Double.isNaN(t)) {
+				throw new ArgumentTypeException("Hurwitz zeta: t == NaN");
+			}
+			if (Double.isInfinite(p)) {
+				throw new ArgumentTypeException("Hurwitz zeta: p == Infinity");
+			}
 			if (i > MAX_VALUE_HALF) {
 				throw new ArgumentTypeException("Hurwitz zeta: i > MAX_VALUE_HALF");
 			}

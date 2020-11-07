@@ -46,9 +46,9 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
-		final IExpr a1 = ast.arg1();
+		IExpr a1 = ast.arg1();
 		final IExpr s = ast.arg2();
-		final IExpr t = ast.arg3();
+		IExpr t = ast.arg3();
 		if (!s.isList() && !t.isList() && !s.equals(t)) {
 			if (a1.isFree(s)) {
 				return F.Times(a1, F.DiracDelta(t));
@@ -59,11 +59,11 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 					IASTAppendable result = F.TimesAlloc(arg1.size());
 					IASTAppendable rest = F.TimesAlloc(arg1.size());
 					arg1.filter(result, rest, new Predicate<IExpr>() {
-                        @Override
-                        public boolean test(IExpr x) {
-                            return x.isFree(s);
-                        }
-                    });
+						@Override
+						public boolean test(IExpr x) {
+							return x.isFree(s);
+						}
+					});
 					if (result.size() > 1) {
 						return F.Times(result.oneIdentity1(), F.InverseLaplaceTransform(rest, s, t));
 					}
@@ -75,14 +75,14 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 						// IExpr temp = Algebra.partialFractionDecompositionRational(new PartialFractionGenerator(),
 						// parts,s);
 						if (temp.isPlus()) {
-							return ((IAST) temp).mapThread(F.InverseLaplaceTransform(F.Null, s, t), 1);
+							return ((IAST) temp).mapThread(F.InverseLaplaceTransform(F.Slot1, s, t), 1);
 						}
 					}
 				}
 				if (arg1.isPlus()) {
 					// InverseLaplaceTransform[a_+b_+c_,s_,t_] ->
 					// InverseLaplaceTransform[a,s,t]+InverseLaplaceTransform[b,s,t]+InverseLaplaceTransform[c,s,t]
-					return arg1.mapThread(F.InverseLaplaceTransform(F.Null, s, t), 1);
+					return arg1.mapThread(F.InverseLaplaceTransform(F.Slot1, s, t), 1);
 				}
 			}
 		}

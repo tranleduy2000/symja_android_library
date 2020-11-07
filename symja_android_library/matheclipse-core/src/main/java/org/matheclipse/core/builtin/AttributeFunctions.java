@@ -11,8 +11,10 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
@@ -25,11 +27,11 @@ public class AttributeFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.Attributes.setEvaluator(new Attributes());
-			F.ClearAttributes.setEvaluator(new ClearAttributes());
-			F.SetAttributes.setEvaluator(new SetAttributes());
-			F.Protect.setEvaluator(new Protect());
-			F.Unprotect.setEvaluator(new Unprotect());
+			S.Attributes.setEvaluator(new Attributes());
+			S.ClearAttributes.setEvaluator(new ClearAttributes());
+			S.SetAttributes.setEvaluator(new SetAttributes());
+			S.Protect.setEvaluator(new Protect());
+			S.Unprotect.setEvaluator(new Unprotect());
 		}
 	}
 
@@ -82,10 +84,14 @@ public class AttributeFunctions {
 			return F.NIL;
 		}
 
-		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, EvalEngine engine) {
-			if (leftHandSide.isAST(F.Attributes, 2)) {
+		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, IBuiltInSymbol builtinSymbol, EvalEngine engine) {
+			if (leftHandSide.isAST(S.Attributes, 2)) {
+				if (!leftHandSide.first().isSymbol()) {
+					IOFunctions.printMessage(builtinSymbol, "setps", F.List(leftHandSide.first()), engine);
+					return rightHandSide;
+				}
 				IExpr temp=engine.evaluate(F.SetAttributes(leftHandSide.first(), rightHandSide));
-				if (temp.equals(F.Null) ) {
+				if (temp.equals(S.Null)) {
 					return rightHandSide;
 				}
 			}
@@ -145,7 +151,7 @@ public class AttributeFunctions {
 						clearAttributes(sym, arg2, engine);
 					}
 				}
-				return F.Null;
+						return S.Null;
 
 				}
 			}
@@ -177,7 +183,7 @@ public class AttributeFunctions {
 				ISymbol attribute = (ISymbol) attributes;
 
 				clearAttributes(sym, attribute);
-					return F.Null;
+				return S.Null;
 
 			} else {
 				if (attributes.isList()) {
@@ -192,10 +198,10 @@ public class AttributeFunctions {
 					// ISymbol attribute = (ISymbol) lst.get(i);
 					// clearAttributes(sym, attribute);
 					// }
-					return F.Null;
+					return S.Null;
 				}
 			}
-							return F.Null;
+			return S.Null;
 						}
 
 		/**
@@ -584,7 +590,7 @@ public class AttributeFunctions {
 				SetAttributes.addAttributes(sym, attributes, engine);
 			}
 		}
-		return F.Null;
+		return S.Null;
 	}
 
 

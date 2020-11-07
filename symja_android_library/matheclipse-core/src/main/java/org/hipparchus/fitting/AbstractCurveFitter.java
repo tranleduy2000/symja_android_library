@@ -21,14 +21,14 @@
  */
 package org.hipparchus.fitting;
 
+import java.util.Collection;
+
 import org.hipparchus.analysis.MultivariateMatrixFunction;
 import org.hipparchus.analysis.MultivariateVectorFunction;
 import org.hipparchus.analysis.ParametricUnivariateFunction;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresOptimizer;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LevenbergMarquardtOptimizer;
-
-import java.util.Collection;
 
 /**
  * Base class that contains common code for fitting parametric univariate
@@ -51,6 +51,7 @@ import java.util.Collection;
  * {@link #fit(Collection)} method for obtaining the parameters.
  * The problem setup, such as the choice of optimization algorithm
  * for fitting a specific function is delegated to subclasses.
+ *
  */
 public abstract class AbstractCurveFitter {
     /**
@@ -72,7 +73,6 @@ public abstract class AbstractCurveFitter {
      * The default implementation uses a {@link LevenbergMarquardtOptimizer
      * Levenberg-Marquardt} optimizer.
      * </p>
-     *
      * @return the optimizer to use for fitting the curve to the
      * given {@code points}.
      */
@@ -93,17 +93,13 @@ public abstract class AbstractCurveFitter {
      * Vector function for computing function theoretical values.
      */
     protected static class TheoreticalValuesFunction {
-        /**
-         * Function to fit.
-         */
+        /** Function to fit. */
         private final ParametricUnivariateFunction f;
-        /**
-         * Observations.
-         */
+        /** Observations. */
         private final double[] points;
 
         /**
-         * @param f            function to fit.
+         * @param f function to fit.
          * @param observations Observations.
          */
         public TheoreticalValuesFunction(final ParametricUnivariateFunction f,

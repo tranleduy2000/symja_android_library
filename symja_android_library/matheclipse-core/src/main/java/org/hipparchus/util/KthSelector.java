@@ -21,10 +21,10 @@
  */
 package org.hipparchus.util;
 
-import org.hipparchus.exception.NullArgumentException;
-
 import java.io.Serializable;
 import java.util.Arrays;
+
+import org.hipparchus.exception.NullArgumentException;
 
 
 /**
@@ -34,19 +34,13 @@ import java.util.Arrays;
  */
 public class KthSelector implements Serializable {
 
-    /**
-     * Serializable UID.
-     */
+    /** Serializable UID. */
     private static final long serialVersionUID = 20140713L;
 
-    /**
-     * Minimum selection size for insertion sort rather than selection.
-     */
+    /** Minimum selection size for insertion sort rather than selection. */
     private static final int MIN_SELECT_SIZE = 15;
 
-    /**
-     * A {@link PivotingStrategy} used for pivoting.
-     */
+    /** A {@link PivotingStrategy} used for pivoting.  */
     private final PivotingStrategy pivotingStrategy;
 
     /**
@@ -64,14 +58,12 @@ public class KthSelector implements Serializable {
      * @throws NullArgumentException when pivotingStrategy is null
      */
     public KthSelector(final PivotingStrategy pivotingStrategy)
-            throws NullArgumentException {
+        throws NullArgumentException {
         MathUtils.checkNotNull(pivotingStrategy);
         this.pivotingStrategy = pivotingStrategy;
     }
 
-    /**
-     * Get the pivoting strategy.
-     *
+    /** Get the pivoting strategy.
      * @return pivoting strategy
      */
     public PivotingStrategy getPivotingStrategy() {
@@ -81,9 +73,9 @@ public class KthSelector implements Serializable {
     /**
      * Select K<sup>th</sup> value in the array.
      *
-     * @param work       work array to use to find out the K<sup>th</sup> value
+     * @param work work array to use to find out the K<sup>th</sup> value
      * @param pivotsHeap cached pivots heap that can be used for efficient estimation
-     * @param k          the index whose value in the array is of interest
+     * @param k the index whose value in the array is of interest
      * @return K<sup>th</sup> value
      */
     public double select(final double[] work, final int[] pivotsHeap, final int k) {
@@ -112,12 +104,12 @@ public class KthSelector implements Serializable {
                 return work[k];
             } else if (k < pivot) {
                 // the element is in the left partition
-                end = pivot;
+                end  = pivot;
                 node = FastMath.min(2 * node + 1, usePivotsHeap ? pivotsHeap.length : end);
             } else {
                 // the element is in the right partition
                 begin = pivot + 1;
-                node = FastMath.min(2 * node + 2, usePivotsHeap ? pivotsHeap.length : end);
+                node  = FastMath.min(2 * node + 2, usePivotsHeap ? pivotsHeap.length : end);
             }
         }
         Arrays.sort(work, begin, end);
@@ -129,9 +121,9 @@ public class KthSelector implements Serializable {
      * elements such that all elements smaller than pivot are before it and
      * all elements larger than pivot are after it.
      *
-     * @param work  work array
+     * @param work work array
      * @param begin index of the first element of the slice of work array
-     * @param end   index after the last element of the slice of work array
+     * @param end index after the last element of the slice of work array
      * @param pivot initial index of the pivot
      * @return index of the pivot after partition
      */

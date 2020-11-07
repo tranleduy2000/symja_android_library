@@ -21,6 +21,8 @@
  */
 package org.hipparchus.stat.descriptive.summary;
 
+import java.io.Serializable;
+
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.AbstractStorelessUnivariateStatistic;
@@ -29,11 +31,9 @@ import org.hipparchus.stat.descriptive.WeightedEvaluation;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 
-import java.io.Serializable;
-
 
 /**
- * Returns the sum of the available values.
+  * Returns the sum of the available values.
  * <p>
  * If there are no values in the dataset, then 0 is returned.
  * If any of the values are
@@ -45,21 +45,15 @@ import java.io.Serializable;
  * <code>clear()</code> method, it must be synchronized externally.
  */
 public class Sum extends AbstractStorelessUnivariateStatistic
-        implements AggregatableStatistic<Sum>, WeightedEvaluation, Serializable {
+    implements AggregatableStatistic<Sum>, WeightedEvaluation, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * The number of values that have been added
-     */
+    /** The number of values that have been added */
     private long n;
 
-    /**
-     * The currently running sum
-     */
+    /** The currently running sum */
     private double value;
 
     /**
@@ -79,8 +73,65 @@ public class Sum extends AbstractStorelessUnivariateStatistic
      */
     public Sum(Sum original) throws NullArgumentException {
         MathUtils.checkNotNull(original);
-        this.n = original.n;
+        this.n     = original.n;
         this.value = original.value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void increment(final double d) {
+        value += d;
+        n++;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        return value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return n;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        value = 0;
+        n = 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void aggregate(Sum other) {
+        MathUtils.checkNotNull(other);
+        if (other.n > 0) {
+            this.n     += other.n;
+            this.value += other.value;
+        }
+    }
+
+    @Override
+    public void aggregate(Sum... others) {
+        MathUtils.checkNotNull(others);
+        for (Sum other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public void aggregate(Iterable<Sum> others) {
+        MathUtils.checkNotNull(others);
+        for (Sum other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        return 0;
     }
 
     /**
@@ -88,15 +139,15 @@ public class Sum extends AbstractStorelessUnivariateStatistic
      * or 0 if the designated subarray is empty.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the sum of the values or 0 if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     @Override
     public double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         double sum = Double.NaN;
         if (MathArrays.verifyValues(values, begin, length, true)) {
@@ -108,12 +159,9 @@ public class Sum extends AbstractStorelessUnivariateStatistic
         return sum;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public long getN() {
-        return n;
+    public double evaluate(double[] values, double[] weights) throws MathIllegalArgumentException {
+        return evaluate(values, weights, 0, values.length);
     }
 
     /**
@@ -123,22 +171,22 @@ public class Sum extends AbstractStorelessUnivariateStatistic
      * <p>
      * Throws <code>MathIllegalArgumentException</code> if any of the following are true:
      * <ul><li>the values array is null</li>
-     * <li>the weights array is null</li>
-     * <li>the weights array does not have the same length as the values array</li>
-     * <li>the weights array contains one or more infinite values</li>
-     * <li>the weights array contains one or more NaN values</li>
-     * <li>the weights array contains negative values</li>
-     * <li>the start and length arguments do not determine a valid array</li>
+     *     <li>the weights array is null</li>
+     *     <li>the weights array does not have the same length as the values array</li>
+     *     <li>the weights array contains one or more infinite values</li>
+     *     <li>the weights array contains one or more NaN values</li>
+     *     <li>the weights array contains negative values</li>
+     *     <li>the start and length arguments do not determine a valid array</li>
      * </ul></p>
      * <p>
      * Uses the formula, <pre>
      *    weighted sum = &Sigma;(values[i] * weights[i])
      * </pre></p>
      *
-     * @param values  the input array
+     * @param values the input array
      * @param weights the weights array
-     * @param begin   index of the first array element to include
-     * @param length  the number of elements to include
+     * @param begin index of the first array element to include
+     * @param length the number of elements to include
      * @return the sum of the values or 0 if length = 0
      * @throws MathIllegalArgumentException if the parameters are not valid
      */
@@ -155,38 +203,10 @@ public class Sum extends AbstractStorelessUnivariateStatistic
         return sum;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Sum copy() {
         return new Sum(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        value += d;
-        n++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        value = 0;
-        n = 0;
     }
 
 }

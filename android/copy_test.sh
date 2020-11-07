@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
-cp -R ../symja_android_library/matheclipse-core/src/test/java/ ./src/androidTest/java/
+TEST_DIR=./src/androidTest/java/
+rm -rf $TEST_DIR
+cp -R ../symja_android_library/matheclipse-core/src/test/java/ $TEST_DIR
+cp -R ../symja_android_library/matheclipse-io/src/test/java/ $TEST_DIR

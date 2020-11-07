@@ -261,6 +261,7 @@ public class BesselJS {
 	public static Complex besselK(double n, Complex x) {
 		return besselK(new Complex(n), x);
 	}
+
 	public static Complex besselK(Complex n, Complex x) {
 		final int useAsymptotic = 10;
 
@@ -286,17 +287,17 @@ public class BesselJS {
 				int counter = engine.incRecursionCounter();
 				if (counter > recursionLimit) {
 					RecursionLimitExceeded.throwIt(counter, F.BesselK);
-		}
+				}
 
 			}
 			if (n.isMathematicalInteger()) {
-		double nRe = n.getReal();
+				double nRe = n.getReal();
 				// TODO use complex differentiator here
 				// see https://github.com/Hipparchus-Math/hipparchus/issues/67
-			return besselK(new Complex(nRe + delta), x).add(besselK(new Complex(nRe - delta), x)).divide(2.0);
-		}
-		Complex product = new Complex(Math.PI / 2.0).divide(n.multiply(Math.PI).sin());
-		return product.multiply(besselI(n.negate(), x).subtract(besselI(n, x)));
+				return besselK(new Complex(nRe + delta), x).add(besselK(new Complex(nRe - delta), x)).divide(2.0);
+			}
+			Complex product = new Complex(Math.PI / 2.0).divide(n.multiply(Math.PI).sin());
+			return product.multiply(besselI(n.negate(), x).subtract(besselI(n, x)));
 		} finally {
 			if (recursionLimit > 0) {
 				engine.decRecursionCounter();

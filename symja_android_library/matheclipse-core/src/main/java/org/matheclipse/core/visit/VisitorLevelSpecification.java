@@ -6,10 +6,12 @@ import com.duy.lambda.ObjIntConsumer;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.SymjaMathException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
@@ -28,6 +30,7 @@ import org.matheclipse.parser.client.math.MathException;
  * Example: the nested list <code>{x,{y}}</code> has depth <code>3</code>
  * 
  */
+@SuppressWarnings("JavadocReference")
 public class VisitorLevelSpecification extends AbstractVisitor {
 	protected final Function<IExpr, IExpr> fFunction;
 
@@ -60,7 +63,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	 *            the given <i>level specification</i>
 	 * @param includeHeads
 	 *            set to <code>true</code>, if the header of an AST expression should be included
-	 * @throws MathException
+	 * @throws SymjaMathException
 	 *             if the <code>expr</code> is not a <i>level specification</i>
 	 */
 	public VisitorLevelSpecification(final Function<IExpr, IExpr> function, final IExpr unevaledLevelExpr,
@@ -316,10 +319,53 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 	}
 
 	@Override
+	public IExpr visit(final IAssociation assoc) {
+		final IAssociation[] result = new IAssociation[] { F.NIL };
+		if (assoc.isPresent()) {
+			final int[] minDepth = new int[] { 0 };
+			try {
+				fCurrentLevel++;
+				if (fIncludeHeads) {
+					// no include head for associations
+				}
+				assoc.forEach(new ObjIntConsumer<IExpr>() {
+					@Override
+					public void accept(IExpr x, int i) {
+						final IExpr temp = x.accept(VisitorLevelSpecification.this);
+						if (temp.isPresent()) {
+							if (!result[0].isPresent()) {
+								result[0] = VisitorLevelSpecification.this.createResult(assoc, temp);
+							}
+							result[0].set(i, assoc.getRule(i).setAtCopy(2, temp));
+						}
+						if (fCurrentDepth < minDepth[0]) {
+							minDepth[0] = fCurrentDepth;
+						}
+					}
+				});
+			} finally {
+				fCurrentLevel--;
+			}
+			fCurrentDepth = --minDepth[0];
+			if (isInRange(fCurrentLevel, minDepth[0])) {
+				if (!result[0].isPresent()) {
+					return fFunction.apply(assoc);
+				} else {
+					IExpr temp = fFunction.apply(result[0]);
+					if (temp.isPresent()) {
+						return temp;
+					}
+				}
+			}
+		}
+		return result[0];
+	}
+
+	@Override
 	public IExpr visit(final IASTMutable ast) {
-		final IASTMutable[] result = new IASTMutable[]{F.NIL};
+		final IASTMutable[] result = new IASTMutable[] { F.NIL };
 		if (ast.isPresent()) {
-			final int[] minDepth = new int[]{0};
+			final int[] minDepth = new int[] { 0 };
 			try {
 				fCurrentLevel++;
 				if (fIncludeHeads) {
@@ -367,6 +413,9 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 		return result[0];
 	}
 
+	public IAssociation createResult(IAssociation assoc, final IExpr x) {
+		return assoc.copy();
+	}
 	public IASTMutable createResult(IASTMutable ast, final IExpr x) {
 		return ast.copyAppendable();
 	}

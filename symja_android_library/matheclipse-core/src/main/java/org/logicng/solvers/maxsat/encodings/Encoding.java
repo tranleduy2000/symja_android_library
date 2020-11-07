@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/*****************************************************************************************
+/*
  * Open-WBO -- Copyright (c) 2013-2015, Ruben Martins, Vasco Manquinho, Ines Lynce
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -45,19 +45,18 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *****************************************************************************************/
+ */
 
 package org.logicng.solvers.maxsat.encodings;
-
-import org.logicng.collections.LNGIntVector;
-import org.logicng.solvers.sat.MiniSatStyleSolver;
 
 import static org.logicng.solvers.sat.MiniSatStyleSolver.LIT_UNDEF;
 import static org.logicng.solvers.sat.MiniSatStyleSolver.var;
 
+import org.logicng.collections.LNGIntVector;
+import org.logicng.solvers.sat.MiniSatStyleSolver;
+
 /**
  * Super-class for the different encodings.
- *
  * @version 1.3
  * @since 1.0
  */
@@ -75,113 +74,108 @@ public abstract class Encoding {
 
     /**
      * Adds a unit clause to the given SAT solver.
-     *
      * @param s the sat solver
      * @param a the unit literal
      */
-    void addUnitClause(final MiniSatStyleSolver s, int a) {
+    void addUnitClause(final MiniSatStyleSolver s, final int a) {
         this.addUnitClause(s, a, LIT_UNDEF);
     }
 
     /**
      * Adds a unit clause to the given SAT solver.
-     *
      * @param s        the sat solver
      * @param a        the unit literal
      * @param blocking the blocking literal
      */
-    private void addUnitClause(final MiniSatStyleSolver s, int a, int blocking) {
+    private void addUnitClause(final MiniSatStyleSolver s, final int a, final int blocking) {
         assert this.clause.size() == 0;
         assert a != LIT_UNDEF;
         assert var(a) < s.nVars();
         this.clause.push(a);
-        if (blocking != LIT_UNDEF)
+        if (blocking != LIT_UNDEF) {
             this.clause.push(blocking);
+        }
         s.addClause(this.clause, null);
         this.clause.clear();
     }
 
     /**
      * Adds a binary clause to the given SAT solver.
-     *
      * @param s the sat solver
      * @param a the first literal
      * @param b the second literal
      */
-    void addBinaryClause(final MiniSatStyleSolver s, int a, int b) {
+    void addBinaryClause(final MiniSatStyleSolver s, final int a, final int b) {
         this.addBinaryClause(s, a, b, LIT_UNDEF);
     }
 
     /**
      * Adds a binary clause to the given SAT solver.
-     *
      * @param s        the sat solver
      * @param a        the first literal
      * @param b        the second literal
      * @param blocking the blocking literal
      */
-    void addBinaryClause(final MiniSatStyleSolver s, int a, int b, int blocking) {
+    void addBinaryClause(final MiniSatStyleSolver s, final int a, final int b, final int blocking) {
         assert this.clause.size() == 0;
         assert a != LIT_UNDEF && b != LIT_UNDEF;
         assert var(a) < s.nVars() && var(b) < s.nVars();
         this.clause.push(a);
         this.clause.push(b);
-        if (blocking != LIT_UNDEF)
+        if (blocking != LIT_UNDEF) {
             this.clause.push(blocking);
+        }
         s.addClause(this.clause, null);
         this.clause.clear();
     }
 
     /**
      * Adds a ternary clause to the given SAT solver.
-     *
      * @param s the sat solver
      * @param a the first literal
      * @param b the second literal
      * @param c the third literal
      */
-    void addTernaryClause(final MiniSatStyleSolver s, int a, int b, int c) {
+    void addTernaryClause(final MiniSatStyleSolver s, final int a, final int b, final int c) {
         this.addTernaryClause(s, a, b, c, LIT_UNDEF);
     }
 
     /**
      * Adds a ternary clause to the given SAT solver.
-     *
      * @param s        the sat solver
      * @param a        the first literal
      * @param b        the second literal
      * @param c        the third literal
      * @param blocking the blocking literal
      */
-    void addTernaryClause(final MiniSatStyleSolver s, int a, int b, int c, int blocking) {
+    void addTernaryClause(final MiniSatStyleSolver s, final int a, final int b, final int c, final int blocking) {
         assert this.clause.size() == 0;
         assert a != LIT_UNDEF && b != LIT_UNDEF && c != LIT_UNDEF;
         assert var(a) < s.nVars() && var(b) < s.nVars() && var(c) < s.nVars();
         this.clause.push(a);
         this.clause.push(b);
         this.clause.push(c);
-        if (blocking != LIT_UNDEF)
+        if (blocking != LIT_UNDEF) {
             this.clause.push(blocking);
+        }
         s.addClause(this.clause, null);
         this.clause.clear();
     }
 
     /**
      * Adds a quaterary clause to the given SAT solver.
-     *
      * @param s the sat solver
      * @param a the first literal
      * @param b the second literal
      * @param c the third literal
      * @param d the fourth literal
      */
-    void addQuaternaryClause(final MiniSatStyleSolver s, int a, int b, int c, int d) {
+    void addQuaternaryClause(final MiniSatStyleSolver s, final int a, final int b, final int c, final int d) {
         this.addQuaternaryClause(s, a, b, c, d, LIT_UNDEF);
     }
 
     /**
      * Adds a quaterary clause to the given SAT solver.
-     *
      * @param s        the sat solver
      * @param a        the first literal
      * @param b        the second literal
@@ -189,7 +183,7 @@ public abstract class Encoding {
      * @param d        the fourth literal
      * @param blocking the blocking literal
      */
-    private void addQuaternaryClause(final MiniSatStyleSolver s, int a, int b, int c, int d, int blocking) {
+    private void addQuaternaryClause(final MiniSatStyleSolver s, final int a, final int b, final int c, final int d, final int blocking) {
         assert this.clause.size() == 0;
         assert a != LIT_UNDEF && b != LIT_UNDEF && c != LIT_UNDEF && d != LIT_UNDEF;
         assert var(a) < s.nVars() && var(b) < s.nVars() && var(c) < s.nVars() && var(d) < s.nVars();
@@ -197,8 +191,9 @@ public abstract class Encoding {
         this.clause.push(b);
         this.clause.push(c);
         this.clause.push(d);
-        if (blocking != LIT_UNDEF)
+        if (blocking != LIT_UNDEF) {
             this.clause.push(blocking);
+        }
         s.addClause(this.clause, null);
         this.clause.clear();
     }

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/*****************************************************************************************
+/*
  * Open-WBO -- Copyright (c) 2013-2015, Ruben Martins, Vasco Manquinho, Ines Lynce
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -45,37 +45,35 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *****************************************************************************************/
+ */
 
 package org.logicng.solvers.maxsat.encodings;
+
+import static org.logicng.solvers.sat.MiniSatStyleSolver.mkLit;
+import static org.logicng.solvers.sat.MiniSatStyleSolver.not;
 
 import org.logicng.collections.LNGIntVector;
 import org.logicng.solvers.maxsat.algorithms.MaxSAT;
 import org.logicng.solvers.sat.MiniSatStyleSolver;
 
-import static org.logicng.solvers.sat.MiniSatStyleSolver.mkLit;
-import static org.logicng.solvers.sat.MiniSatStyleSolver.not;
-
 /**
  * Encodes that exactly one literal from 'lits' is assigned value true.  Uses the Ladder/Regular encoding for
  * translating the AMO constraint into CNF.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
-final class Ladder extends Encoding {
+public class Ladder extends Encoding {
 
     /**
      * Encodes and adds the AMO constraint to the given solver.
-     *
      * @param s    the solver
      * @param lits the literals for the constraint
      */
     public void encode(final MiniSatStyleSolver s, final LNGIntVector lits) {
         assert lits.size() != 0;
-        if (lits.size() == 1)
+        if (lits.size() == 1) {
             addUnitClause(s, lits.get(0));
-        else {
+        } else {
             final LNGIntVector seqAuxiliary = new LNGIntVector();
             for (int i = 0; i < lits.size() - 1; i++) {
                 seqAuxiliary.push(mkLit(s.nVars(), false));

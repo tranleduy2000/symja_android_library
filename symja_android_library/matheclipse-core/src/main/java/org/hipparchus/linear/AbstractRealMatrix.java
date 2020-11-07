@@ -22,6 +22,7 @@
 
 package org.hipparchus.linear;
 
+import org.hipparchus.analysis.UnivariateFunction;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
@@ -73,110 +74,6 @@ public abstract class AbstractRealMatrix
             throw new MathIllegalArgumentException(LocalizedCoreFormats.AT_LEAST_ONE_COLUMN);
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSquare() {
-        return getColumnDimension() == getRowDimension();
-    }
-
-    /**
-     * Returns the number of rows of this matrix.
-     *
-     * @return the number of rows.
-     */
-    @Override
-    public abstract int getRowDimension();
-
-    /**
-     * Returns the number of columns of this matrix.
-     *
-     * @return the number of columns.
-     */
-    @Override
-    public abstract int getColumnDimension();
-
-    /**
-     * Returns true iff <code>object</code> is a
-     * <code>RealMatrix</code> instance with the same dimensions as this
-     * and all corresponding matrix entries are equal.
-     *
-     * @param object the object to test equality against.
-     * @return true if object equals this
-     */
-    @Override
-    public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (!(object instanceof RealMatrix)) {
-            return false;
-        }
-        RealMatrix m = (RealMatrix) object;
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        if (m.getColumnDimension() != nCols || m.getRowDimension() != nRows) {
-            return false;
-        }
-        for (int row = 0; row < nRows; ++row) {
-            for (int col = 0; col < nCols; ++col) {
-                if (getEntry(row, col) != m.getEntry(row, col)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Computes a hashcode for the matrix.
-     *
-     * @return hashcode for matrix
-     */
-    @Override
-    public int hashCode() {
-        int ret = 7;
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        ret = ret * 31 + nRows;
-        ret = ret * 31 + nCols;
-        for (int row = 0; row < nRows; ++row) {
-            for (int col = 0; col < nCols; ++col) {
-                ret = ret * 31 + (11 * (row + 1) + 17 * (col + 1)) *
-                        MathUtils.hash(getEntry(row, col));
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Get a string representation for this matrix.
-     *
-     * @return a string representation for this matrix
-     */
-    @Override
-    public String toString() {
-        final StringBuilder res = new StringBuilder();
-        String fullClassName = getClass().getName();
-        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
-        res.append(shortClassName).append(DEFAULT_FORMAT.format(this));
-        return res.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract RealMatrix createMatrix(int rowDimension, int columnDimension)
-            throws MathIllegalArgumentException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract RealMatrix copy();
 
     /**
      * {@inheritDoc}
@@ -377,15 +274,17 @@ public abstract class AbstractRealMatrix
         return data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getNorm() {
+        return getNorm1();
+    }
+
+    @Override
+    public double getNorm1() {
         return walkInColumnOrder(new RealMatrixPreservingVisitor() {
 
             /** Last row index. */
-            private double endRow;
+            private int endRow;
 
             /** Sum of absolute values on one column. */
             private double columnSum;
@@ -419,6 +318,49 @@ public abstract class AbstractRealMatrix
                 return maxColSum;
             }
         });
+
+    }
+
+    @Override
+    public double getNormInfty() {
+        return walkInRowOrder(new RealMatrixPreservingVisitor() {
+
+            /** Last column index. */
+            private int endColumn;
+
+            /** Sum of absolute values on one row. */
+            private double rowSum;
+
+            /** Maximal sum across all rows. */
+            private double maxRowSum;
+
+            /** {@inheritDoc} */
+            @Override
+            public void start(final int rows, final int columns,
+                              final int startRow, final int endRow,
+                              final int startColumn, final int endColumn) {
+                this.endColumn = endColumn;
+                rowSum = 0;
+                maxRowSum = 0;
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void visit(final int row, final int column, final double value) {
+                rowSum += FastMath.abs(value);
+                if (column == endColumn) {
+                    maxRowSum = FastMath.max(maxRowSum, rowSum);
+                    rowSum = 0;
+                }
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public double end() {
+                return maxRowSum;
+            }
+        });
+
     }
 
     /**
@@ -806,20 +748,6 @@ public abstract class AbstractRealMatrix
      * {@inheritDoc}
      */
     @Override
-    public abstract double getEntry(int row, int column)
-            throws MathIllegalArgumentException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract void setEntry(int row, int column, double value)
-            throws MathIllegalArgumentException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void addToEntry(int row, int column, double increment)
             throws MathIllegalArgumentException {
         MatrixUtils.checkMatrixIndex(this, row, column);
@@ -856,6 +784,30 @@ public abstract class AbstractRealMatrix
 
         return out;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSquare() {
+        return getColumnDimension() == getRowDimension();
+    }
+
+    /**
+     * Returns the number of rows of this matrix.
+     *
+     * @return the number of rows.
+     */
+    @Override
+    public abstract int getRowDimension();
+
+    /**
+     * Returns the number of columns of this matrix.
+     *
+     * @return the number of columns.
+     */
+    @Override
+    public abstract int getColumnDimension();
 
     /**
      * {@inheritDoc}
@@ -1131,12 +1083,6 @@ public abstract class AbstractRealMatrix
         return visitor.end();
     }
 
-
-    /*
-     * Empty implementations of these methods are provided in order to allow for
-     * the use of the @Override tag with Java 1.5.
-     */
-
     /**
      * {@inheritDoc}
      */
@@ -1176,4 +1122,138 @@ public abstract class AbstractRealMatrix
             throws MathIllegalArgumentException {
         return walkInRowOrder(visitor, startRow, endRow, startColumn, endColumn);
     }
+
+    @Override
+    public RealMatrix map(UnivariateFunction function) {
+        return copy().mapToSelf(function);
+    }
+
+    @Override
+    public RealMatrix mapToSelf(final UnivariateFunction function) {
+        walkInOptimizedOrder(new RealMatrixChangingVisitor() {
+
+            /** {@inheritDoc} */
+            @Override
+            public double visit(int row, int column, double value) {
+                // apply the function to the current entry
+                return function.value(value);
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void start(int rows, int columns, int startRow, int endRow,
+                              int startColumn, int endColumn) {
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public double end() {
+                return 0;
+            }
+
+        });
+
+        return this;
+
+    }
+
+    /**
+     * Get a string representation for this matrix.
+     *
+     * @return a string representation for this matrix
+     */
+    @Override
+    public String toString() {
+        final StringBuilder res = new StringBuilder();
+        String fullClassName = getClass().getName();
+        String shortClassName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
+        res.append(shortClassName).append(DEFAULT_FORMAT.format(this));
+        return res.toString();
+    }
+
+    /**
+     * Returns true iff <code>object</code> is a
+     * <code>RealMatrix</code> instance with the same dimensions as this
+     * and all corresponding matrix entries are equal.
+     *
+     * @param object the object to test equality against.
+     * @return true if object equals this
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof RealMatrix)) {
+            return false;
+        }
+        RealMatrix m = (RealMatrix) object;
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        if (m.getColumnDimension() != nCols || m.getRowDimension() != nRows) {
+            return false;
+        }
+        for (int row = 0; row < nRows; ++row) {
+            for (int col = 0; col < nCols; ++col) {
+                if (getEntry(row, col) != m.getEntry(row, col)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Computes a hashcode for the matrix.
+     *
+     * @return hashcode for matrix
+     */
+    @Override
+    public int hashCode() {
+        int ret = 7;
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        ret = ret * 31 + nRows;
+        ret = ret * 31 + nCols;
+        for (int row = 0; row < nRows; ++row) {
+            for (int col = 0; col < nCols; ++col) {
+                ret = ret * 31 + (11 * (row + 1) + 17 * (col + 1)) *
+                        MathUtils.hash(getEntry(row, col));
+            }
+        }
+        return ret;
+    }
+
+
+    /*
+     * Empty implementations of these methods are provided in order to allow for
+     * the use of the @Override tag with Java 1.5.
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract RealMatrix createMatrix(int rowDimension, int columnDimension)
+            throws MathIllegalArgumentException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract RealMatrix copy();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract double getEntry(int row, int column)
+            throws MathIllegalArgumentException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract void setEntry(int row, int column, double value)
+            throws MathIllegalArgumentException;
 }

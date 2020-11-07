@@ -21,10 +21,11 @@
  */
 package org.hipparchus.stat.descriptive.moment;
 
+import java.io.Serializable;
+
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.AggregatableStatistic;
-
-import java.io.Serializable;
+import org.hipparchus.util.MathUtils;
 
 /**
  * Computes a statistic related to the Second Central Moment.  Specifically,
@@ -51,16 +52,12 @@ import java.io.Serializable;
  * <code>clear()</code> method, it must be synchronized externally.
  */
 public class SecondMoment extends FirstMoment
-        implements AggregatableStatistic<SecondMoment>, Serializable {
+    implements AggregatableStatistic<SecondMoment>, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * Second moment of values that have been added
-     */
+    /** Second moment of values that have been added */
     protected double m2;
 
     /**
@@ -83,17 +80,7 @@ public class SecondMoment extends FirstMoment
         this.m2 = original.m2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SecondMoment copy() {
-        return new SecondMoment(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void increment(final double d) {
         if (n < 1) {
@@ -103,21 +90,52 @@ public class SecondMoment extends FirstMoment
         m2 += ((double) n - 1) * dev * nDev;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        super.clear();
+        m2 = Double.NaN;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public double getResult() {
         return m2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    public void aggregate(SecondMoment other) {
+        if (other.n > 0) {
+            final double oldN = n;
+            super.aggregate(other);
+            if (oldN == 0) {
+                m2 = other.m2;
+            } else {
+                m2 += other.m2 + (other.n * oldN) / n * dev * dev;
+            }
+        }
+    }
+
     @Override
-    public void clear() {
-        super.clear();
-        m2 = Double.NaN;
+    public void aggregate(SecondMoment... others) {
+        MathUtils.checkNotNull(others);
+        for (SecondMoment other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public void aggregate(Iterable<SecondMoment> others) {
+        MathUtils.checkNotNull(others);
+        for (SecondMoment other : others) {
+            aggregate(other);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SecondMoment copy() {
+        return new SecondMoment(this);
     }
 
 }

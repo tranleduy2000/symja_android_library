@@ -16,9 +16,11 @@
  */
 package org.hipparchus.stat;
 
-import org.hipparchus.exception.Localizable;
-
 import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
+import org.hipparchus.exception.Localizable;
 
 /**
  * Enumeration for localized messages formats used in exceptions messages.
@@ -54,37 +56,50 @@ public enum LocalizedStatFormats implements Localizable {
     TWO_OR_MORE_CATEGORIES_REQUIRED("two or more categories required, got {0}"),
     TWO_OR_MORE_VALUES_IN_CATEGORY_REQUIRED("two or more values required in each category, one has {0}");
 
-    /**
-     * Source English format.
-     */
+    /** Source English format. */
     private final String sourceFormat;
 
     /**
      * Simple constructor.
      *
      * @param sourceFormat source English format to use when no localized
-     *                     version is available
+     *        version is available
      */
     LocalizedStatFormats(final String sourceFormat) {
         this.sourceFormat = sourceFormat;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String getSourceString() {
         return sourceFormat;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String getLocalizedString(final Locale locale) {
+        // try {
+        //     final String path = LocalizedStatFormats.class.getName()
+        //         .replaceAll("\\.", "/");
+        //     ResourceBundle bundle = ResourceBundle
+        //         .getBundle("assets/" + path, locale, new UTF8Control());
+        //     if (bundle.getLocale().getLanguage().equals(locale.getLanguage())) {
+        //         final String translated = bundle.getString(name());
+        //         if ((translated != null) && (translated.length() > 0) &&
+        //             (!translated.toLowerCase(locale).contains("missing translation"))) {
+        //             // the value of the resource is the translated format
+        //             return translated;
+        //         }
+        //     }
+
+        // } catch (MissingResourceException mre) { // NOPMD
+        //     // do nothing here
+        // }
+
         // either the locale is not supported or the resource is unknown
         // don't translate and fall back to using the source format
         return sourceFormat;
+
     }
 
 }

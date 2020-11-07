@@ -6,7 +6,10 @@ import com.duy.lambda.Predicate;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.combinatoric.KSubsets;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
@@ -14,6 +17,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.IntRangeSpec;
 import org.matheclipse.core.eval.util.SetSpecification;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.frobenius.FrobeniusSolver;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -36,21 +40,22 @@ public final class Combinatoric {
 	private static class Initializer {
 
 		private static void init() {
-			F.CartesianProduct.setEvaluator(new CartesianProduct());
-			F.DiceDissimilarity.setEvaluator(new DiceDissimilarity());
-			F.IntegerPartitions.setEvaluator(new IntegerPartitions());
-			F.JaccardDissimilarity.setEvaluator(new JaccardDissimilarity());
-			F.KOrderlessPartitions.setEvaluator(new KOrderlessPartitions());
-			F.KPartitions.setEvaluator(new KPartitions());
-			F.MatchingDissimilarity.setEvaluator(new MatchingDissimilarity());
-			F.Partition.setEvaluator(new Partition());
-			F.Permutations.setEvaluator(new Permutations());
-			F.RogersTanimotoDissimilarity.setEvaluator(new RogersTanimotoDissimilarity());
-			F.RussellRaoDissimilarity.setEvaluator(new RussellRaoDissimilarity());
-			F.SokalSneathDissimilarity.setEvaluator(new SokalSneathDissimilarity());
-			F.Subsets.setEvaluator(new Subsets());
-			F.Tuples.setEvaluator(new Tuples());
-			F.YuleDissimilarity.setEvaluator(new YuleDissimilarity());
+			S.CartesianProduct.setEvaluator(new CartesianProduct());
+			S.DiceDissimilarity.setEvaluator(new DiceDissimilarity());
+			S.IntegerPartitions.setEvaluator(new IntegerPartitions());
+			S.JaccardDissimilarity.setEvaluator(new JaccardDissimilarity());
+			S.KOrderlessPartitions.setEvaluator(new KOrderlessPartitions());
+			S.KPartitions.setEvaluator(new KPartitions());
+			S.MatchingDissimilarity.setEvaluator(new MatchingDissimilarity());
+			S.Partition.setEvaluator(new Partition());
+			S.Permutations.setEvaluator(new Permutations());
+			S.RogersTanimotoDissimilarity.setEvaluator(new RogersTanimotoDissimilarity());
+			S.RussellRaoDissimilarity.setEvaluator(new RussellRaoDissimilarity());
+			S.Signature.setEvaluator(new Signature());
+			S.SokalSneathDissimilarity.setEvaluator(new SokalSneathDissimilarity());
+			S.Subsets.setEvaluator(new Subsets());
+			S.Tuples.setEvaluator(new Tuples());
+			S.YuleDissimilarity.setEvaluator(new YuleDissimilarity());
 		}
 	}
 
@@ -243,8 +248,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;
@@ -335,11 +340,11 @@ public final class Combinatoric {
 				if (len > n) {
 					size = len;
 				}
+				if (Config.MAX_AST_SIZE < size) {
+					ASTElementLimitExceeded.throwIt(size);
+				}
 				fPartititionsIndex = new int[size];
 				fCopiedResultIndex = new int[size];
-				for (int i = 0; i < size; i++) {
-					fPartititionsIndex[i] = 0;
-				}
 				fResultIndex = nextBeforehand();
 			}
 
@@ -428,6 +433,11 @@ public final class Combinatoric {
 				if (arg1.isInteger()) {
 					final int n = arg1.toIntDefault(-1);
 					if (n >= 0) {
+						int max = range.maximum();
+						if (max > n) {
+							range = new IntRangeSpec(1, n);
+							max = range.maximum();
+						}
 						if (ast.isAST3()) {
 							return frobeniusPartition(ast, engine);
 						}
@@ -437,11 +447,33 @@ public final class Combinatoric {
 						if (n == 1) {
 							return F.List(F.List(F.C1));
 						}
+						if (range.isIncluded(0) && !range.isIncluded(1)) {
+							return F.CEmptyList;
+						}
 						// try {
 						IASTAppendable temp;
-						final NumberPartitionsIterable comb = new NumberPartitionsIterable(n);
+						final NumberPartitionsIterable comb = new NumberPartitionsIterable(n, max);
 						IASTAppendable result = F.ListAlloc(50);
+						int iterationLimit = engine.getIterationLimit();
+						int iterationCounter = 0;
 						for (int j[] : comb) {
+							if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+								IterationLimitExceeded.throwIt(iterationCounter, ast);
+							}
+							if (j.length > max) {
+								if (j[max] != 0) {
+									continue;
+								}
+							}
+							int count = 0;
+							for (int i = 0; i < j.length; i++) {
+								if (j[i] != 0) {
+									count++;
+								}
+							}
+							if (!range.isIncluded(count)) {
+								continue;
+							}
 							temp = F.ListAlloc(j.length);
 							for (int i = 0; i < j.length; i++) {
 								if (j[i] != 0) {
@@ -450,8 +482,9 @@ public final class Combinatoric {
 									break;
 								}
 							}
-							if (range.isIncluded(temp.size() - 1)) {
 								result.append(temp);
+							if (max == 1) {
+								break;
 							}
 						}
 						return result;
@@ -469,7 +502,7 @@ public final class Combinatoric {
 		}
 
 		private static IExpr frobeniusPartition(final IAST ast, EvalEngine engine) {
-			if (ast.arg3().isList() && ast.arg3().size() > 1 && ast.arg1().isInteger()) {
+			if (ast.arg3().isNonEmptyList() && ast.arg1().isInteger()) {
 				try {
 					int[] listInt = Validate.checkListOfInts(ast, ast.arg3(), Integer.MIN_VALUE, Integer.MAX_VALUE,
 							engine);
@@ -494,12 +527,20 @@ public final class Combinatoric {
 						}
 
 						IASTAppendable result = F.ListAlloc(8);
+						int iterations = 0;
+						int iterationLimit = engine.getIterationLimit();
 						while ((solution = solver.take()) != null) {
+							if (iterationLimit > 0 && iterations > iterationLimit) {
+								IOFunctions.printMessage(ast.topHead(), "itlimpartial", F.List(F.ZZ(iterationLimit)),
+										engine);
+								return result;
+							}
 							if (numberOfSolutions >= 0) {
 								if (--numberOfSolutions < 0) {
 									break;
 								}
 							}
+							iterations++;
 							if (createFrobeniusSolution(solution, listInt, lowerLimitOfCoins, upperLimitOfCoins,
 									result)) {
 								continue;
@@ -570,8 +611,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;
@@ -940,8 +981,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;
@@ -1005,12 +1046,19 @@ public final class Combinatoric {
 					}
 					if (v > 0) {
 					while (i <= f.argSize()) {
+							if (i < 1) {
+								// i+=v might overflow and create a negative value
+								break;
+							}
 						temp = F.ast(f.head());
 						for (int j = i - n; j < i; j++) {
+								if (j + 1 < 1 || j + 1 >= f.size()) {
+									return result;
+								}
 							temp.append(f.get(j + 1));
 						}
+							result.append(temp);
 						i += v;
-						result.append(temp);
 
 					}
 					return result;
@@ -1348,8 +1396,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;
@@ -1408,8 +1456,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;
@@ -1456,6 +1504,38 @@ public final class Combinatoric {
 
 	}
 
+	public final static class Signature extends AbstractFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			if (ast.arg1().isList()) {
+				IAST list = (IAST) ast.arg1();
+				if (list.argSize() == 1) {
+					return F.C1;
+				}
+				int n = 0;
+				for (int i = 1; i < list.size(); i++) {
+					for (int j = i + 1; j < list.size(); j++) {
+						int compareTo = list.get(i).compareTo(list.get(j));
+						if (compareTo > 0) {
+							n++;
+						} else if (compareTo == 0) {
+							return F.C0;
+						}
+					}
+				}
+
+				return ((n % 2) == 0) ? F.C1 : F.CN1;
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public int[] expectedArgSize(IAST ast) {
+			return IOFunctions.ARGS_1_1;
+		}
+
+	}
 	private final static class SokalSneathDissimilarity extends AbstractEvaluator {
 
 		@Override
@@ -1463,8 +1543,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;
@@ -1716,7 +1796,7 @@ public final class Combinatoric {
 					}
 					IASTAppendable result = F.ListAlloc(16);
 					IAST temp = F.List();
-					tuplesOfLists(list, 1, result, temp);
+				tuplesOfLists(list, 1, result, temp, ast, engine);
 					return result;
 			} else if (ast.isAST2() && arg1.isAST() && ast.arg2().isInteger()) {
 				IExpr arg2 = ast.arg2();
@@ -1725,7 +1805,7 @@ public final class Combinatoric {
 				if (k >= 0) {
 					IASTAppendable result = F.ListAlloc(16);
 					IAST temp = F.ast(arg1.head());
-					tuples((IAST) arg1, k, result, temp);
+					tuples((IAST) arg1, k, result, temp, ast, engine);
 					return result;
 				}
 			}
@@ -1744,19 +1824,37 @@ public final class Combinatoric {
 		 * @param n
 		 * @param result
 		 * @param subResult
+		 * @param ast
+		 * @param engine
 		 */
-		private void tuples(final IAST originalList, final int n, IASTAppendable result, IAST subResult) {
+		private static void tuples(final IAST originalList, final int n, IASTAppendable result, IAST subResult,
+				IAST ast, EvalEngine engine) {
 			if (n == 0) {
 				result.append(subResult);
 				return;
 			}
+			final int recursionLimit = engine.getRecursionLimit();
+
+			try {
+
+				if (recursionLimit > 0) {
+					int counter = engine.incRecursionCounter();
+					if (counter > recursionLimit) {
+						RecursionLimitExceeded.throwIt(counter, ast);
+					}
+				}
 			IASTAppendable temp;
 			for (int j = 1; j < originalList.size(); j++) {
 				temp = subResult.copyAppendable();
 				temp.append(originalList.get(j));
-				tuples(originalList, n - 1, result, temp);
+					tuples(originalList, n - 1, result, temp, ast, engine);
+				}
+			} finally {
+				if (recursionLimit > 0) {
+					engine.decRecursionCounter();
 			}
 
+		}
 		}
 
 		/**
@@ -1769,18 +1867,28 @@ public final class Combinatoric {
 		 *            the result list
 		 * @param subResult
 		 *            the current subList which should be inserted in the result list
+		 * @param ast
+		 * @param engine
 		 */
-		private void tuplesOfLists(final IAST originalList, final int k, IASTAppendable result, IAST subResult) {
+		private void tuplesOfLists(final IAST originalList, final int k, IASTAppendable result, IAST subResult,
+				IAST ast, EvalEngine engine) {
 			if (k == originalList.size()) {
 				result.append(subResult);
 				return;
+			}
+			final int recursionLimit = engine.getRecursionLimit();
+			if (recursionLimit > 0) {
+				int counter = engine.incRecursionCounter();
+				if (counter > recursionLimit) {
+					RecursionLimitExceeded.throwIt(counter, ast);
+				}
 			}
 			IASTAppendable temp;
 			IAST subAST = (IAST) originalList.get(k);
 			for (int j = 1; j < subAST.size(); j++) {
 				temp = subResult.copyAppendable();
 				temp.append(subAST.get(j));
-				tuplesOfLists(originalList, k + 1, result, temp);
+				tuplesOfLists(originalList, k + 1, result, temp, ast, engine);
 			}
 
 		}
@@ -1794,8 +1902,8 @@ public final class Combinatoric {
 			int dim1 = ast.arg1().isVector();
 			int dim2 = ast.arg2().isVector();
 			if (dim1 == dim2 && dim1 > 0) {
-				IAST u = (IAST) ast.arg1();
-				IAST v = (IAST) ast.arg2();
+				IAST u = (IAST) ast.arg1().normal(false);
+				IAST v = (IAST) ast.arg2().normal(false);
 				int length = u.size();
 				int n10 = 0;
 				int n01 = 0;

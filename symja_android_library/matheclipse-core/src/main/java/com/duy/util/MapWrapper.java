@@ -4,6 +4,11 @@ import com.duy.lambda.BiConsumer;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.Function;
 
+import org.logicng.formulas.Variable;
+import org.logicng.graphs.datastructures.HypergraphNode;
+
+import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +40,27 @@ public class MapWrapper<K, V> {
             curValue = map.put(key, value);
         }
         return curValue;
+    }
+
+    /**
+     * Returns a comparator that compares {@link Map.Entry} in natural order on value.
+     *
+     * <p>The returned comparator is serializable and throws {@link
+     * NullPointerException} when comparing an entry with null values.
+     *
+     * @param <K> the type of the map keys
+     * @param <V> the {@link Comparable} type of the map values
+     * @return a comparator that compares {@link Map.Entry} in natural order on value.
+     * @see Comparable
+     * @since 1.8
+     */
+    public static <K, V extends Comparable<? super V>> Comparator<Map.Entry<K, V>> comparingByValue() {
+        return new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> c1, Map.Entry<K, V> c2) {
+                return c1.getValue().compareTo(c2.getValue());
+            }
+        };
     }
 
     public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {

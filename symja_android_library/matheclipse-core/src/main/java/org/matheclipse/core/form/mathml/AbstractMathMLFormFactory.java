@@ -16,6 +16,7 @@ import java.util.Map;
  * Abstract Factory for generating MathML output
  *
  */
+@SuppressWarnings("JavaDoc")
 abstract public class AbstractMathMLFormFactory {
 
 	public final static boolean USE_IDENTIFIERS = false;
@@ -99,24 +100,27 @@ abstract public class AbstractMathMLFormFactory {
 	 * @param buf
 	 * @param d
 	 * @param precedence
+	 * @param caller
 	 */
 	abstract public void convertDouble(StringBuilder buf, INum d, int precedence, boolean caller);
 
 	/**
-	 * convert a complex number with double real and imaginary part
+	 * Convert a complex number with double real and imaginary part
 	 *
 	 * @param buf
-	 * @param d
+	 * @param dc
 	 * @param precedence
+	 * @param caller
 	 */
 	abstract public void convertDoubleComplex(StringBuilder buf, IComplexNum dc, int precedence, boolean caller);
 
 	/**
-	 * convert an IInteger number
+	 * Convert an IInteger number
 	 *
 	 * @param buf
-	 * @param d
+	 * @param i
 	 * @param precedence
+	 * @param caller
 	 */
 	abstract public void convertInteger(StringBuilder buf, IInteger i, int precedence, boolean caller);
 
@@ -124,8 +128,9 @@ abstract public class AbstractMathMLFormFactory {
 	 * convert a fraction nummber
 	 *
 	 * @param buf
-	 * @param d
+	 * @param f
 	 * @param precedence
+	 * @param caller
 	 */
 	abstract public void convertFraction(StringBuilder buf, IRational f, int precedence, boolean caller);
 
@@ -133,35 +138,33 @@ abstract public class AbstractMathMLFormFactory {
 	 * convert a complex nummber
 	 *
 	 * @param buf
-	 * @param d
+	 * @param c
 	 * @param precedence
+	 * @param caller
 	 */
 	abstract public void convertComplex(StringBuilder buf, IComplex c, int precedence, boolean caller);
 
 	/**
-	 * convert a string
+	 * Convert a string
 	 *
 	 * @param buf
-	 * @param d
-	 * @param precedence
+	 * @param str
 	 */
 	abstract public void convertString(StringBuilder buf, String str);
 
 	/**
-	 * convert a symbol (i.e. functionname, constantname or variablename)
+	 * Convert a symbol (i.e. functionname, constantname or variablename)
 	 *
 	 * @param buf
-	 * @param d
-	 * @param precedence
+	 * @param sym
 	 */
 	abstract public void convertSymbol(StringBuilder buf, ISymbol sym);
 
 	/**
-	 * convert the heade of a function
+	 * Convert the head of a function
 	 *
 	 * @param buf
-	 * @param d
-	 * @param precedence
+	 * @param obj
 	 */
 	abstract public void convertHead(StringBuilder buf, IExpr obj);
 

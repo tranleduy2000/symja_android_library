@@ -91,7 +91,7 @@ public class JacobiPreconditioner implements RealLinearOperator {
      * {@inheritDoc}
      */
     @Override
-    public int getRowDimension() {
+    public int getColumnDimension() {
         return diag.getDimension();
     }
 
@@ -99,7 +99,7 @@ public class JacobiPreconditioner implements RealLinearOperator {
      * {@inheritDoc}
      */
     @Override
-    public int getColumnDimension() {
+    public int getRowDimension() {
         return diag.getDimension();
     }
 
@@ -126,6 +126,14 @@ public class JacobiPreconditioner implements RealLinearOperator {
         return new RealLinearOperator() {
             /** {@inheritDoc} */
             @Override
+            public RealVector operate(final RealVector x) {
+                return new ArrayRealVector(MathArrays.ebeDivide(x.toArray(),
+                        sqrtDiag.toArray()),
+                        false);
+            }
+
+            /** {@inheritDoc} */
+            @Override
             public int getRowDimension() {
                 return sqrtDiag.getDimension();
             }
@@ -134,14 +142,6 @@ public class JacobiPreconditioner implements RealLinearOperator {
             @Override
             public int getColumnDimension() {
                 return sqrtDiag.getDimension();
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public RealVector operate(final RealVector x) {
-                return new ArrayRealVector(MathArrays.ebeDivide(x.toArray(),
-                        sqrtDiag.toArray()),
-                        false);
             }
         };
     }

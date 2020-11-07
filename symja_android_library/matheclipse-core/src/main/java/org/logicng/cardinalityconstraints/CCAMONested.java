@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * PBLib       -- Copyright (c) 2012-2013  Peter Steinke
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -58,10 +58,10 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the nested encoding.
- * @version 1.3
+ * @version 2.0.0
  * @since 1.1
  */
-final class CCAMONested implements CCAtMostOne {
+public final class CCAMONested implements CCAtMostOne {
 
     private final int groupSize;
     private EncodingResult result;
@@ -70,7 +70,7 @@ final class CCAMONested implements CCAtMostOne {
      * Constructs the nested AMO encoder.
      * @param groupSize the group size
      */
-    CCAMONested(int groupSize) {
+    CCAMONested(final int groupSize) {
         this.groupSize = groupSize;
     }
 
@@ -86,18 +86,22 @@ final class CCAMONested implements CCAtMostOne {
      * @param vars the variables of the constraint
      */
     private void encodeIntern(final LNGVector<Literal> vars) {
-        if (vars.size() <= this.groupSize)
-            for (int i = 0; i + 1 < vars.size(); i++)
-                for (int j = i + 1; j < vars.size(); j++)
+        if (vars.size() <= this.groupSize) {
+            for (int i = 0; i + 1 < vars.size(); i++) {
+                for (int j = i + 1; j < vars.size(); j++) {
                     this.result.addClause(vars.get(i).negate(), vars.get(j).negate());
-        else {
+                }
+            }
+        } else {
             final LNGVector<Literal> l1 = new LNGVector<>(vars.size() / 2);
             final LNGVector<Literal> l2 = new LNGVector<>(vars.size() / 2);
             int i = 0;
-            for (; i < vars.size() / 2; i++)
+            for (; i < vars.size() / 2; i++) {
                 l1.push(vars.get(i));
-            for (; i < vars.size(); i++)
+            }
+            for (; i < vars.size(); i++) {
                 l2.push(vars.get(i));
+            }
             final Variable newVariable = this.result.newVariable();
             l1.push(newVariable);
             l2.push(newVariable.negate());

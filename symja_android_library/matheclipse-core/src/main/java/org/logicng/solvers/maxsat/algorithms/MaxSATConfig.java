@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,8 +28,6 @@
 
 package org.logicng.solvers.maxsat.algorithms;
 
-import com.duy.lang.DSystem;
-
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -37,83 +35,39 @@ import java.io.PrintStream;
 
 /**
  * The configuration object for a MaxSAT solver.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
 public final class MaxSATConfig extends Configuration {
 
-    final IncrementalStrategy incrementalStrategy;
-    final AMOEncoding amoEncoding;
-    final PBEncoding pbEncoding;
-    final CardinalityEncoding cardinalityEncoding;
-    final WeightStrategy weightStrategy;
-    final SolverType solverType;
-    final Verbosity verbosity;
-    final PrintStream output;
-    final boolean symmetry;
-    final int limit;
-    final boolean bmo;
-    /**
-     * Constructor for a MaxSAT configuration.
-     *
-     * @param builder the builder
-     */
-    private MaxSATConfig(final Builder builder) {
-        super(ConfigurationType.MAXSAT);
-        this.incrementalStrategy = builder.incrementalStrategy;
-        this.amoEncoding = builder.amoEncoding;
-        this.pbEncoding = builder.pbEncoding;
-        this.cardinalityEncoding = builder.cardinalityEncoding;
-        this.weightStrategy = builder.weightStrategy;
-        this.solverType = builder.solverType;
-        this.verbosity = builder.verbosity;
-        this.output = builder.output;
-        this.symmetry = builder.symmetry;
-        this.limit = builder.limit;
-        this.bmo = builder.bmo;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("MaxSATConfig{").append(DSystem.lineSeparator());
-        sb.append("incrementalStrategy=").append(this.incrementalStrategy).append(DSystem.lineSeparator());
-        sb.append("pbEncoding=").append(this.amoEncoding).append(DSystem.lineSeparator());
-        sb.append("pbEncoding=").append(this.pbEncoding).append(DSystem.lineSeparator());
-        sb.append("cardinalityEncoding=").append(this.cardinalityEncoding).append(DSystem.lineSeparator());
-        sb.append("weightStrategy=").append(this.weightStrategy).append(DSystem.lineSeparator());
-        sb.append("solverType=").append(this.solverType).append(DSystem.lineSeparator());
-        sb.append("verbosity=").append(this.verbosity).append(DSystem.lineSeparator());
-        sb.append("symmetry=").append(this.symmetry).append(DSystem.lineSeparator());
-        sb.append("limit=").append(this.limit).append(DSystem.lineSeparator());
-        sb.append("bmo=").append(this.bmo).append(DSystem.lineSeparator());
-        sb.append("}").append(DSystem.lineSeparator());
-        return sb.toString();
-    }
     /**
      * The solver type of the underlying SAT solver.
      */
     public enum SolverType {
         MINISAT, GLUCOSE
     }
+
     /**
      * The incremental strategy for cardinality and pseudo-boolean constraints.
      */
     public enum IncrementalStrategy {
         NONE, ITERATIVE
     }
+
     /**
      * The AMO encoding.
      */
     public enum AMOEncoding {
         LADDER
     }
+
     /**
      * The pseudo Boolean encoding.
      */
     public enum PBEncoding {
         SWC
     }
+
     /**
      * The cardinality constraint encoding.
      */
@@ -135,6 +89,62 @@ public final class MaxSATConfig extends Configuration {
         NONE, SOME
     }
 
+    final IncrementalStrategy incrementalStrategy;
+    final AMOEncoding amoEncoding;
+    final PBEncoding pbEncoding;
+    final CardinalityEncoding cardinalityEncoding;
+    final WeightStrategy weightStrategy;
+    final SolverType solverType;
+    final Verbosity verbosity;
+    final PrintStream output;
+    final boolean symmetry;
+    final int limit;
+    final boolean bmo;
+
+    /**
+     * Constructor for a MaxSAT configuration.
+     * @param builder the builder
+     */
+    private MaxSATConfig(final Builder builder) {
+        super(ConfigurationType.MAXSAT);
+        this.incrementalStrategy = builder.incrementalStrategy;
+        this.amoEncoding = builder.amoEncoding;
+        this.pbEncoding = builder.pbEncoding;
+        this.cardinalityEncoding = builder.cardinalityEncoding;
+        this.weightStrategy = builder.weightStrategy;
+        this.solverType = builder.solverType;
+        this.verbosity = builder.verbosity;
+        this.output = builder.output;
+        this.symmetry = builder.symmetry;
+        this.limit = builder.limit;
+        this.bmo = builder.bmo;
+    }
+
+    /**
+     * Returns a new builder for the configuration.
+     * @return the builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("MaxSATConfig{").append(System.lineSeparator());
+        sb.append("incrementalStrategy=").append(this.incrementalStrategy).append(System.lineSeparator());
+        sb.append("pbEncoding=").append(this.amoEncoding).append(System.lineSeparator());
+        sb.append("pbEncoding=").append(this.pbEncoding).append(System.lineSeparator());
+        sb.append("cardinalityEncoding=").append(this.cardinalityEncoding).append(System.lineSeparator());
+        sb.append("weightStrategy=").append(this.weightStrategy).append(System.lineSeparator());
+        sb.append("solverType=").append(this.solverType).append(System.lineSeparator());
+        sb.append("verbosity=").append(this.verbosity).append(System.lineSeparator());
+        sb.append("symmetry=").append(this.symmetry).append(System.lineSeparator());
+        sb.append("limit=").append(this.limit).append(System.lineSeparator());
+        sb.append("bmo=").append(this.bmo).append(System.lineSeparator());
+        sb.append("}");
+        return sb.toString();
+    }
+
     /**
      * The builder for a MaxSAT configuration.
      */
@@ -154,14 +164,13 @@ public final class MaxSATConfig extends Configuration {
         /**
          * Constructor for the builder.
          */
-        public Builder() {
+        private Builder() {
             this.amoEncoding = AMOEncoding.LADDER;
             this.pbEncoding = PBEncoding.SWC;
         }
 
         /**
          * Sets the incremental strategy. The default value is {@code NONE}.
-         *
          * @param inc the incremental strategy
          * @return the builder
          */
@@ -172,7 +181,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Sets the cardinality encoding. The default value is {@code TOTALIZER}.
-         *
          * @param card the cardinality encoding
          * @return the builder
          */
@@ -183,7 +191,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Sets the weight strategy. The default value is {@code NONE}.
-         *
          * @param weight the weight strategy
          * @return the builder
          */
@@ -194,7 +201,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Sets the underlying solver type. The default value is {@code GLUCOSE}.
-         *
          * @param solver the underlying solver type
          * @return the builder
          */
@@ -205,7 +211,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Enables symmetry handling. The default value is {@code true}.
-         *
          * @param symm {code true} if symmetry handling should be activated, {@code false} otherwise
          * @return the builder
          */
@@ -216,7 +221,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Sets the symmetry limit. The default value is {@code Integer.MAX_VALUE}.
-         *
          * @param lim the symmetry limit
          * @return the builder
          */
@@ -227,7 +231,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Enables BMO (Boolean Multilevel Optimization). The default value is {@code true}.
-         *
          * @param bmo {code true} if BMO should be activated, {@code false} otherwise
          * @return the builder
          */
@@ -239,7 +242,6 @@ public final class MaxSATConfig extends Configuration {
         /**
          * Sets the verbosity. The default value is {@code NONE}.  If you set the verbosity to {@code SOME} you have also to
          * set an output stream.
-         *
          * @param verb the verbosity level
          * @return the builder
          */
@@ -250,7 +252,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Sets the output stream for logging information.  The default ist {@code System.out}.
-         *
          * @param output the output stream for logging information
          * @return the builder
          */
@@ -261,7 +262,6 @@ public final class MaxSATConfig extends Configuration {
 
         /**
          * Builds the configuration.
-         *
          * @return the configuration.
          */
         public MaxSATConfig build() {

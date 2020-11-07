@@ -135,10 +135,6 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
         return 6;
     }
 
-    @Override
-    public Set<IExpr> asSet() {
-        throw new UnsupportedOperationException();
-    }
 
     /**
 	 * Returns a new {@code HMArrayList} with the same elements, the same size and the same capacity as this
@@ -347,6 +343,11 @@ public class ASTSeriesData extends AbstractAST implements Cloneable, Externaliza
 		// }
         return F.NIL;
     }
+
+	@Override
+	public IExpr evalEvaluate(EvalEngine engine) {
+		return F.NIL;
+	}
 
     /** {@inheritDoc} */
     @Override

@@ -2,7 +2,6 @@ package org.matheclipse.core.expression;
 
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
@@ -211,13 +210,14 @@ public class FractionSym extends AbstractFractionSym {
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr dec() {
+	public IRational dec() {
 		return add(F.CN1);
 	}
 
-	/** {@inheritDoc} */
+	/** {@inheritDoc}
+	 * @return*/
 	@Override
-	public IExpr inc() {
+	public IRational inc() {
 		return add(F.C1);
 	}
 
@@ -589,6 +589,20 @@ public class FractionSym extends AbstractFractionSym {
 		return valueOf(newnum, toBigDenominator());
 	}
 
+	@Override
+	public IRational multiply(int n) {
+		if (isZero() || n == 0) {
+			return F.C0;
+		}
+		if (n == 1) {
+			return this;
+		}
+		if (n == -1) {
+			return this.negate();
+		}
+		long newnum = (long) fNumerator * (long) n;
+		return valueOf(newnum, fDenominator);
+	}
 	/**
 	 * Returns a new rational equal to <code>-this</code>.
 	 * 

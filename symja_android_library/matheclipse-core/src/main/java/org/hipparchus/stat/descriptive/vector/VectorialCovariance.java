@@ -21,61 +21,48 @@
  */
 package org.hipparchus.stat.descriptive.vector;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.util.MathArrays;
-
-import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * Returns the covariance matrix of the available vectors.
  */
 public class VectorialCovariance implements Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 4118372414238930270L;
 
-    /**
-     * Sums for each component.
-     */
+    /** Sums for each component. */
     private final double[] sums;
 
-    /**
-     * Sums of products for each component.
-     */
+    /** Sums of products for each component. */
     private final double[] productsSums;
 
-    /**
-     * Indicator for bias correction.
-     */
+    /** Indicator for bias correction. */
     private final boolean isBiasCorrected;
 
-    /**
-     * Number of vectors in the sample.
-     */
+    /** Number of vectors in the sample. */
     private long n;
 
-    /**
-     * Constructs a VectorialCovariance.
-     *
-     * @param dimension       vectors dimension
+    /** Constructs a VectorialCovariance.
+     * @param dimension vectors dimension
      * @param isBiasCorrected if true, computed the unbiased sample covariance,
-     *                        otherwise computes the biased population covariance
+     * otherwise computes the biased population covariance
      */
     public VectorialCovariance(int dimension, boolean isBiasCorrected) {
-        sums = new double[dimension];
+        sums         = new double[dimension];
         productsSums = new double[dimension * (dimension + 1) / 2];
-        n = 0;
+        n            = 0;
         this.isBiasCorrected = isBiasCorrected;
     }
 
     /**
      * Add a new vector to the sample.
-     *
      * @param v vector to add
      * @throws MathIllegalArgumentException if the vector does not have the right dimension
      */
@@ -93,7 +80,6 @@ public class VectorialCovariance implements Serializable {
 
     /**
      * Get the covariance matrix.
-     *
      * @return covariance matrix
      */
     public RealMatrix getResult() {
@@ -119,7 +105,6 @@ public class VectorialCovariance implements Serializable {
 
     /**
      * Get the number of vectors in the sample.
-     *
      * @return number of vectors in the sample
      */
     public long getN() {
@@ -135,9 +120,19 @@ public class VectorialCovariance implements Serializable {
         Arrays.fill(productsSums, 0.0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (isBiasCorrected ? 1231 : 1237);
+        result = prime * result + (int) (n ^ (n >>> 32));
+        result = prime * result + Arrays.hashCode(productsSums);
+        result = prime * result + Arrays.hashCode(sums);
+        return result;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -156,21 +151,10 @@ public class VectorialCovariance implements Serializable {
         if (!Arrays.equals(productsSums, other.productsSums)) {
             return false;
         }
-        return Arrays.equals(sums, other.sums);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (isBiasCorrected ? 1231 : 1237);
-        result = prime * result + (int) (n ^ (n >>> 32));
-        result = prime * result + Arrays.hashCode(productsSums);
-        result = prime * result + Arrays.hashCode(sums);
-        return result;
+        if (!Arrays.equals(sums, other.sums)) {
+            return false;
+        }
+        return true;
     }
 
 }

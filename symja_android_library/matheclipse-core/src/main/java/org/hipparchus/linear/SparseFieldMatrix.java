@@ -73,7 +73,7 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
      * @param field           Field to which the elements belong.
      * @param rowDimension    Number of rows in the new matrix.
      * @param columnDimension Number of columns in the new matrix.
-     * @throws org.hipparchus.exception.MathIllegalArgumentException if row or column dimension is not positive.
+     * @throws MathIllegalArgumentException if row or column dimension is not positive.
      */
     public SparseFieldMatrix(final Field<T> field,
                              final int rowDimension, final int columnDimension) {
@@ -116,8 +116,16 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
      * {@inheritDoc}
      */
     @Override
-    public FieldMatrix<T> createMatrix(int rowDimension, int columnDimension) {
-        return new SparseFieldMatrix<T>(getField(), rowDimension, columnDimension);
+    public void addToEntry(int row, int column, T increment) {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+        final int key = computeKey(row, column);
+        final T value = entries.get(key).add(increment);
+        if (getField().getZero().equals(value)) {
+            entries.remove(key);
+        } else {
+            entries.put(key, value);
+        }
     }
 
     /**
@@ -126,6 +134,22 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
     @Override
     public FieldMatrix<T> copy() {
         return new SparseFieldMatrix<T>(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldMatrix<T> createMatrix(int rowDimension, int columnDimension) {
+        return new SparseFieldMatrix<T>(getField(), rowDimension, columnDimension);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getColumnDimension() {
+        return columns;
     }
 
     /**
@@ -142,30 +166,8 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
      * {@inheritDoc}
      */
     @Override
-    public void setEntry(int row, int column, T value) {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-        if (getField().getZero().equals(value)) {
-            entries.remove(computeKey(row, column));
-        } else {
-            entries.put(computeKey(row, column), value);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addToEntry(int row, int column, T increment) {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-        final int key = computeKey(row, column);
-        final T value = entries.get(key).add(increment);
-        if (getField().getZero().equals(value)) {
-            entries.remove(key);
-        } else {
-            entries.put(key, value);
-        }
+    public int getRowDimension() {
+        return rows;
     }
 
     /**
@@ -189,16 +191,14 @@ public class SparseFieldMatrix<T extends FieldElement<T>> extends AbstractFieldM
      * {@inheritDoc}
      */
     @Override
-    public int getRowDimension() {
-        return rows;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getColumnDimension() {
-        return columns;
+    public void setEntry(int row, int column, T value) {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+        if (getField().getZero().equals(value)) {
+            entries.remove(computeKey(row, column));
+        } else {
+            entries.put(computeKey(row, column), value);
+        }
     }
 
     /**

@@ -7,6 +7,7 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.IntegerSym;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -50,6 +51,7 @@ public final class Validate {
 	public static long[] checkListOfLongs(IAST ast, IExpr arg, long startValue, boolean quiet, EvalEngine engine) {
 		if (arg.isList()) {
 			IAST list = (IAST) arg;
+			if (list.argSize() > 0) {
 			long[] result = new long[list.argSize()];
 			long longValue = 0;
 			try {
@@ -76,15 +78,26 @@ public final class Validate {
 				//
 			}
 		}
+		}
 		if (!quiet) {
+			// List of Java long numbers expected in `1`.
 			IOFunctions.printMessage(ast.topHead(), "listoflongs", F.List(arg), engine);
 		}
 		return null;
 	}
 
+	/**
+	 *
+	 * @param ast
+	 * @param arg
+	 * @param nonNegative
+	 * @param engine
+	 * @return <code>null</code> if the conversion isn't possible
+	 */
 	public static BigInteger[] checkListOfBigIntegers(IAST ast, IExpr arg, boolean nonNegative, EvalEngine engine) {
-		if (arg.isList() && arg.size() > 1) {
+		if (arg.isNonEmptyList()) {
 			IAST list = (IAST) arg;
+			if (list.argSize() > 0) {
 			BigInteger[] result = new BigInteger[list.argSize()];
 
 			try {
@@ -116,14 +129,24 @@ public final class Validate {
 				}
 			}
 		}
+		}
 		// The first argument `1` of `2` should be a non-empty list of positive integers.
 		IOFunctions.printMessage(ast.topHead(), "coef", F.List(arg, ast.topHead()), engine);
 		return null;
 	}
 
+	/**
+	 *
+	 * @param ast
+	 * @param arg
+	 * @param nonNegative
+	 * @param engine
+	 * @return <code>null</code> if the conversion isn't possible
+	 */
 	public static int[] checkListOfInts(IAST ast, IExpr arg, boolean nonNegative, EvalEngine engine) {
-		if (arg.isList() && arg.size() > 1) {
+		if (arg.isNonEmptyList()) {
 			IAST list = (IAST) arg;
+			if (list.argSize() > 0) {
 			int[] result = new int[list.argSize()];
 
 			try {
@@ -150,6 +173,7 @@ public final class Validate {
 			}
 		}
 		}
+		}
 		// The first argument `1` of `2` should be a non-empty list of positive integers.
 		IOFunctions.printMessage(ast.topHead(), "coef", F.List(arg, ast.topHead()), engine);
 		return null;
@@ -169,6 +193,7 @@ public final class Validate {
 	public static int[] checkListOfInts(IAST ast, IExpr arg, int minValue, int maxValue, EvalEngine engine) {
 		if (arg.isList()) {
 			IAST list = (IAST) arg;
+			if (list.argSize() > 0) {
 			int[] result = new int[list.argSize()];
 			int intValue = 0;
 			try {
@@ -191,6 +216,7 @@ public final class Validate {
 			} catch (RuntimeException rex) {
 				//
 			}
+		}
 		}
 		IOFunctions.printMessage(ast.topHead(), "listofints", F.List(arg), engine);
 		return null;
@@ -466,7 +492,7 @@ public final class Validate {
 	 *            the position which has to be a variable or list of variables.
 	 * @param engine
 	 *            engine to print a message if the expression is no variable
-	 * @return a list of symbols defined at <code>ast.get(position)</code> or <code>F.NIL</code> if not.
+	 * @return a list of symbols defined at <code>ast.get(position)</code> or <code>F.NIL</code> otherwise.
 	 */
 	public static IAST checkIsVariableOrVariableList(IAST ast, int position, EvalEngine engine) {
 		IAST vars = null;
@@ -576,22 +602,17 @@ public final class Validate {
 	 */
 	public static IASTAppendable checkEquations(final IAST ast, int position) {
 		IExpr expr = ast.get(position);
+		int size = expr.size();
+		IASTAppendable termsEqualNumberList = F.ListAlloc(size > 0 ? size : 1);
 		if (expr.isList() || expr.isAnd()) {
-			final IAST listOrAndAST = (IAST) expr;
-			int size = listOrAndAST.size();
-			IASTAppendable termsEqualZeroList = F.ListAlloc(size);
-			return termsEqualZeroList.appendArgs(size, new IntFunction<IExpr>() {
-				@Override
-				public IExpr apply(int i) {
-					return checkEquation(listOrAndAST.get(i));
+			IAST listOrAndAST = (IAST) expr;
+			for (int i = 1; i < size; i++) {
+				checkEquation(listOrAndAST.get(i), termsEqualNumberList);
 				}
-			});
-			// for (int i = 1; i < size; i++) {
-			// termsEqualZeroList.append(checkEquation(listOrAndAST.get(i)));
-			// }
-			// return termsEqualZeroList;
+			return termsEqualNumberList;
 		}
-		return F.ListAlloc(checkEquation(expr));
+		checkEquation(expr, termsEqualNumberList);
+		return termsEqualNumberList;
 	}
 
 	/**
@@ -610,8 +631,7 @@ public final class Validate {
 		IASTAppendable termsEqualZeroList;
 		if (expr.isList() || expr.isAnd()) {
 
-			// a list of equations or inequations or a boolean AND expression of
-			// equations
+			// a list of equations or inequations or a boolean AND expression of equations
 			eqns = (IAST) expr;
 			termsEqualZeroList = F.ListAlloc(eqns.size());
 			for (int i = 1; i < eqns.size(); i++) {
@@ -620,7 +640,8 @@ public final class Validate {
 					termsEqualZeroList.append(checkEquationAndInequation(eq));
 				} else {
 					// not an equation or inequation
-					throw new ArgumentTypeException("equation or inequation expression expected at position " + i);
+					throw new ArgumentTypeException(
+							"binary equation or inequation expression expected at position " + i);
 				}
 			}
 			return termsEqualZeroList;
@@ -637,7 +658,7 @@ public final class Validate {
 					F.C0  };
 			return F.function(F.Equal, arr);
 		} 
-		if (eq.isAST()) {
+		if (eq.isAST2()) {
 			IAST equal = (IAST) eq;
 			IExpr head = equal.head();
 			if (head.equals(F.Equal) || head.equals(F.Unequal) || head.equals(F.Greater) || head.equals(F.GreaterEqual)
@@ -652,7 +673,8 @@ public final class Validate {
 			return F.False;
 		}
 		// not an equation or inequation
-		throw new ArgumentTypeException("equation or inequation expression expected instead of " + eq.toString());
+		throw new ArgumentTypeException(
+				"binary equation or inequation expression expected instead of " + eq.toString());
 	}
 
 	/**
@@ -660,16 +682,21 @@ public final class Validate {
 	 * 
 	 * @param expr
 	 *            the expression which should be an equation
-	 * @return
 	 */
-	private static IExpr checkEquation(IExpr expr) {
-		if (expr.isEqual()) {
+	private static void checkEquation(IExpr expr, IASTAppendable termsEqualNumberList) {
+		if (expr.isASTSizeGE(F.Equal, 3)) {
 			IAST equal = (IAST) expr;
-			return F.evalExpandAll(F.Subtract(equal.arg1(), equal.arg2()));
+			IExpr last = equal.last();
+			for (int i = 1; i < equal.size() - 1; i++) {
+				IExpr temp = F.evalExpandAll(F.Subtract(equal.get(i), last));
+				termsEqualNumberList.append(temp);
+			}
 		} else if (expr.isTrue()) {
-			return F.True;
+			termsEqualNumberList.append(F.True);
+			// return F.True;
 		} else if (expr.isFalse()) {
-			return F.False;
+			termsEqualNumberList.append(F.False);
+			// return F.False;
 		} else {
 			// not an equation
 			throw new ArgumentTypeException("Equal[] expression (a==b) expected instead of " + expr.toString());
@@ -677,6 +704,9 @@ public final class Validate {
 	}
 
 	public static void printException(final Appendable buf, final Throwable e) {
+		if (FEConfig.SHOW_STACKTRACE) {
+			e.printStackTrace();
+		}
 		String msg = e.getMessage();
 		try {
 			if (msg != null) {
@@ -689,4 +719,25 @@ public final class Validate {
 		}
 	}
 
+	/**
+	 * Test if a non-negative integer or Infinity is defined in <code>upToAST.arg1()</code>.
+	 *
+	 * @param upToAST
+	 * @param engine
+	 * @return
+	 */
+	public static int checkUpTo(IAST upToAST, EvalEngine engine) {
+		int upTo = Integer.MIN_VALUE;
+		if (upToAST.arg1().isInfinity()) {
+			upTo = Integer.MAX_VALUE;
+		} else {
+			upTo = upToAST.arg1().toIntDefault();
+		}
+		if (upTo < 0) {
+			// Non-negative integer or Infinity expected at position `1` in `2`.
+			IOFunctions.printMessage(S.UpTo, "innf", F.List(F.C1, upToAST), engine);
+			return Integer.MIN_VALUE;
+		}
+		return upTo;
+	}
 }

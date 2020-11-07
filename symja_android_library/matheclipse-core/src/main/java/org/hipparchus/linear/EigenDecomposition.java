@@ -41,14 +41,14 @@ import org.hipparchus.util.Precision;
  * class from the <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a>
  * library, with the following changes:
  * <ul>
- * <li>a {@link #getVT() getVt} method has been added,</li>
- * <li>two {@link #getRealEigenvalue(int) getRealEigenvalue} and
- * {@link #getImagEigenvalue(int) getImagEigenvalue} methods to pick up a
- * single eigenvalue have been added,</li>
- * <li>a {@link #getEigenvector(int) getEigenvector} method to pick up a
- * single eigenvector has been added,</li>
- * <li>a {@link #getDeterminant() getDeterminant} method has been added.</li>
- * <li>a {@link #getSolver() getSolver} method has been added.</li>
+ *   <li>a {@link #getVT() getVt} method has been added,</li>
+ *   <li>two {@link #getRealEigenvalue(int) getRealEigenvalue} and
+ *       {@link #getImagEigenvalue(int) getImagEigenvalue} methods to pick up a
+ *       single eigenvalue have been added,</li>
+ *   <li>a {@link #getEigenvector(int) getEigenvector} method to pick up a
+ *       single eigenvector has been added,</li>
+ *   <li>a {@link #getDeterminant() getDeterminant} method has been added.</li>
+ *   <li>a {@link #getSolver() getSolver} method has been added.</li>
  * </ul>
  * <p>
  * As of 3.1, this class supports general real matrices (both symmetric and non-symmetric):
@@ -573,7 +573,7 @@ public class EigenDecomposition {
     private SchurTransformer transformToSchur(final RealMatrix matrix) {
         final SchurTransformer schurTransform = new SchurTransformer(matrix);
         final double[][] matT = schurTransform.getT().getData();
-        final double norm = matrix.getNorm();
+        final double norm = matrix.getNorm1();
 
         realEigenvalues = new double[matT.length];
         imagEigenvalues = new double[matT.length];
@@ -905,6 +905,16 @@ public class EigenDecomposition {
         }
 
         /**
+         * @param i which eigenvalue to find the norm of
+         * @return the norm of ith (complex) eigenvalue.
+         */
+        private double eigenvalueNorm(int i) {
+            final double re = realEigenvalues[i];
+            final double im = imagEigenvalues[i];
+            return FastMath.sqrt(re * re + im * im);
+        }
+
+        /**
          * Get the inverse of the decomposed matrix.
          *
          * @return the inverse matrix.
@@ -931,16 +941,6 @@ public class EigenDecomposition {
                 }
             }
             return MatrixUtils.createRealMatrix(invData);
-        }
-
-        /**
-         * @param i which eigenvalue to find the norm of
-         * @return the norm of ith (complex) eigenvalue.
-         */
-        private double eigenvalueNorm(int i) {
-            final double re = realEigenvalues[i];
-            final double im = imagEigenvalues[i];
-            return FastMath.sqrt(re * re + im * im);
         }
     }
 }

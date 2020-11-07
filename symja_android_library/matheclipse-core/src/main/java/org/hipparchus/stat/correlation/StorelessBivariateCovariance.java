@@ -40,29 +40,19 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  */
 class StorelessBivariateCovariance {
 
-    /**
-     * the mean of variable x
-     */
+    /** the mean of variable x */
     private double meanX;
 
-    /**
-     * the mean of variable y
-     */
+    /** the mean of variable y */
     private double meanY;
 
-    /**
-     * number of observations
-     */
+    /** number of observations */
     private double n;
 
-    /**
-     * the running covariance estimate
-     */
+    /** the running covariance estimate */
     private double covarianceNumerator;
 
-    /**
-     * flag for bias correction
-     */
+    /** flag for bias correction */
     private boolean biasCorrected;
 
     /**
@@ -77,8 +67,8 @@ class StorelessBivariateCovariance {
      * Create an empty {@link StorelessBivariateCovariance} instance.
      *
      * @param biasCorrection if <code>true</code> the covariance estimate is corrected
-     *                       for bias, i.e. n-1 in the denominator, otherwise there is no bias correction,
-     *                       i.e. n in the denominator.
+     * for bias, i.e. n-1 in the denominator, otherwise there is no bias correction,
+     * i.e. n in the denominator.
      */
     StorelessBivariateCovariance(final boolean biasCorrection) {
         meanX = meanY = 0.0;
@@ -134,12 +124,12 @@ class StorelessBivariateCovariance {
      *
      * @return the current covariance
      * @throws MathIllegalArgumentException if the number of observations
-     *                                      is &lt; 2
+     * is &lt; 2
      */
     public double getResult() throws MathIllegalArgumentException {
         if (n < 2) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.INSUFFICIENT_DIMENSION,
-                    n, 2, true);
+                                                   n, 2, true);
         }
         if (biasCorrected) {
             return covarianceNumerator / (n - 1d);

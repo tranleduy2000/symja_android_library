@@ -68,6 +68,7 @@ android {
         test {
             java.srcDirs += "matheclipse-core/src/test/java/"
             java.srcDirs += "matheclipse-api/src/test/java/"
+            java.srcDirs += "matheclipse-io/src/test/java/"
             java.srcDirs += "tools/src/main/java/"
         }
 

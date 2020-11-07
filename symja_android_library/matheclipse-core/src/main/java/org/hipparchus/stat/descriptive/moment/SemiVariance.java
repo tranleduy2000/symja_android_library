@@ -22,13 +22,13 @@
 
 package org.hipparchus.stat.descriptive.moment;
 
+import java.io.Serializable;
+
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.StatUtils;
 import org.hipparchus.stat.descriptive.AbstractUnivariateStatistic;
 import org.hipparchus.util.MathArrays;
-
-import java.io.Serializable;
 
 /**
  * Computes the semivariance of a set of values with respect to a given cutoff value.
@@ -70,9 +70,7 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
      */
     public static final Direction DOWNSIDE_VARIANCE = Direction.DOWNSIDE;
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
     /**
@@ -98,9 +96,9 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
      * Constructs a SemiVariance with the specified <code>biasCorrected</code>
      * property and default (Downside) <code>varianceDirection</code> property.
      *
-     * @param biasCorrected setting for bias correction - true means
-     *                      bias will be corrected and is equivalent to using the argumentless
-     *                      constructor
+     * @param biasCorrected  setting for bias correction - true means
+     * bias will be corrected and is equivalent to using the argumentless
+     * constructor
      */
     public SemiVariance(final boolean biasCorrected) {
         this(biasCorrected, Direction.DOWNSIDE);
@@ -110,8 +108,8 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
      * Constructs a SemiVariance with the specified <code>Direction</code> property
      * and default (true) <code>biasCorrected</code> property
      *
-     * @param direction setting for the direction of the SemiVariance
-     *                  to calculate
+     * @param direction  setting for the direction of the SemiVariance
+     * to calculate
      */
     public SemiVariance(final Direction direction) {
         this(true, direction);
@@ -121,14 +119,15 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
      * Constructs a SemiVariance with the specified <code>isBiasCorrected</code>
      * property and the specified <code>Direction</code> property.
      *
-     * @param corrected setting for bias correction - true means
-     *                  bias will be corrected and is equivalent to using the argumentless
-     *                  constructor
-     * @param direction setting for the direction of the SemiVariance
-     *                  to calculate
+     * @param corrected  setting for bias correction - true means
+     * bias will be corrected and is equivalent to using the argumentless
+     * constructor
+     *
+     * @param direction  setting for the direction of the SemiVariance
+     * to calculate
      */
     public SemiVariance(final boolean corrected, final Direction direction) {
-        this.biasCorrected = corrected;
+        this.biasCorrected     = corrected;
         this.varianceDirection = direction;
     }
 
@@ -137,12 +136,18 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
      * to the {@code original}.
      *
      * @param original the {@code SemiVariance} instance to copy
-     * @throws NullArgumentException if original is null
+     * @throws NullArgumentException  if original is null
      */
     public SemiVariance(final SemiVariance original) throws NullArgumentException {
         super(original);
-        this.biasCorrected = original.biasCorrected;
+        this.biasCorrected     = original.biasCorrected;
         this.varianceDirection = original.varianceDirection;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SemiVariance copy() {
+        return new SemiVariance(this);
     }
 
     /**
@@ -153,211 +158,201 @@ public class SemiVariance extends AbstractUnivariateStatistic implements Seriali
      * <code>IllegalArgumentException</code> if the array is null.
      *
      * @param values the input array
-     * @param start  index of the first array element to include
+     * @param start index of the first array element to include
      * @param length the number of elements to include
      * @return the SemiVariance
      * @throws MathIllegalArgumentException if the parameters are not valid
      */
-    @Override
-    public double evaluate(final double[] values, final int start, final int length)
-            throws MathIllegalArgumentException {
-        double m = StatUtils.mean(values, start, length);
-        return evaluate(values, m, varianceDirection, biasCorrected, start, length);
-    }
+     @Override
+     public double evaluate(final double[] values, final int start, final int length)
+         throws MathIllegalArgumentException {
+         double m = StatUtils.mean(values, start, length);
+         return evaluate(values, m, varianceDirection, biasCorrected, start, length);
+     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SemiVariance copy() {
-        return new SemiVariance(this);
-    }
+     /**
+      * This method calculates {@link SemiVariance} for the entire array against the mean,
+      * using the current value of the biasCorrection instance property.
+      *
+      * @param values the input array
+      * @param direction the {@link Direction} of the semivariance
+      * @return the SemiVariance
+      * @throws MathIllegalArgumentException if values is null
+      */
+     public double evaluate(final double[] values, Direction direction)
+         throws MathIllegalArgumentException {
+         double m = StatUtils.mean(values);
+         return evaluate(values, m, direction, biasCorrected, 0, values.length);
+     }
 
-    /**
-     * This method calculates {@link SemiVariance} for the entire array against the mean,
-     * using the current value of the biasCorrection instance property.
-     *
-     * @param values    the input array
-     * @param direction the {@link Direction} of the semivariance
-     * @return the SemiVariance
-     * @throws MathIllegalArgumentException if values is null
-     */
-    public double evaluate(final double[] values, Direction direction)
-            throws MathIllegalArgumentException {
-        double m = StatUtils.mean(values);
-        return evaluate(values, m, direction, biasCorrected, 0, values.length);
-    }
+     /**
+      * Returns the {@link SemiVariance} of the designated values against the cutoff,
+      * using instance properties variancDirection and biasCorrection.
+      * <p>
+      * Returns <code>NaN</code> if the array is empty.
+      *
+      * @param values the input array
+      * @param cutoff the reference point
+      * @return the SemiVariance
+      * @throws MathIllegalArgumentException if values is null
+      */
+     public double evaluate(final double[] values, final double cutoff)
+         throws MathIllegalArgumentException {
+         return evaluate(values, cutoff, varianceDirection, biasCorrected, 0, values.length);
+     }
 
-    /**
-     * Returns the {@link SemiVariance} of the designated values against the cutoff,
-     * using instance properties variancDirection and biasCorrection.
-     * <p>
-     * Returns <code>NaN</code> if the array is empty.
-     *
-     * @param values the input array
-     * @param cutoff the reference point
-     * @return the SemiVariance
-     * @throws MathIllegalArgumentException if values is null
-     */
-    public double evaluate(final double[] values, final double cutoff)
-            throws MathIllegalArgumentException {
-        return evaluate(values, cutoff, varianceDirection, biasCorrected, 0, values.length);
-    }
+     /**
+      * Returns the {@link SemiVariance} of the designated values against the cutoff in the
+      * given direction, using the current value of the biasCorrection instance property.
+      * <p>
+      * Returns <code>NaN</code> if the array is empty.
+      *
+      * @param values the input array
+      * @param cutoff the reference point
+      * @param direction the {@link Direction} of the semivariance
+      * @return the SemiVariance
+      * @throws MathIllegalArgumentException if values is null
+      */
+     public double evaluate(final double[] values, final double cutoff, final Direction direction)
+         throws MathIllegalArgumentException {
+         return evaluate(values, cutoff, direction, biasCorrected, 0, values.length);
+     }
 
-    /**
-     * Returns the {@link SemiVariance} of the designated values against the cutoff in the
-     * given direction, using the current value of the biasCorrection instance property.
-     * <p>
-     * Returns <code>NaN</code> if the array is empty.
-     *
-     * @param values    the input array
-     * @param cutoff    the reference point
-     * @param direction the {@link Direction} of the semivariance
-     * @return the SemiVariance
-     * @throws MathIllegalArgumentException if values is null
-     */
-    public double evaluate(final double[] values, final double cutoff, final Direction direction)
-            throws MathIllegalArgumentException {
-        return evaluate(values, cutoff, direction, biasCorrected, 0, values.length);
-    }
+     /**
+      * Returns the {@link SemiVariance} of the designated values against the cutoff
+      * in the given direction with the provided bias correction.
+      * <p>
+      * Returns <code>NaN</code> if the array is empty.
+      *
+      * @param values the input array
+      * @param cutoff the reference point
+      * @param direction the {@link Direction} of the semivariance
+      * @param corrected the BiasCorrection flag
+      * @param start index of the first array element to include
+      * @param length the number of elements to include
+      * @return the SemiVariance
+      * @throws MathIllegalArgumentException if the parameters are not valid
+      */
+     public double evaluate(final double[] values, final double cutoff, final Direction direction,
+                            final boolean corrected, final int start, final int length)
+         throws MathIllegalArgumentException {
 
-    /**
-     * Returns the {@link SemiVariance} of the designated values against the cutoff
-     * in the given direction with the provided bias correction.
-     * <p>
-     * Returns <code>NaN</code> if the array is empty.
-     *
-     * @param values    the input array
-     * @param cutoff    the reference point
-     * @param direction the {@link Direction} of the semivariance
-     * @param corrected the BiasCorrection flag
-     * @param start     index of the first array element to include
-     * @param length    the number of elements to include
-     * @return the SemiVariance
-     * @throws MathIllegalArgumentException if the parameters are not valid
-     */
-    public double evaluate(final double[] values, final double cutoff, final Direction direction,
-                           final boolean corrected, final int start, final int length)
-            throws MathIllegalArgumentException {
+         MathArrays.verifyValues(values, start, length);
+         if (values.length == 0) {
+             return Double.NaN;
+         } else {
+             if (values.length == 1) {
+                 return 0.0;
+             } else {
 
-        MathArrays.verifyValues(values, start, length);
-        if (values.length == 0) {
-            return Double.NaN;
-        } else {
-            if (values.length == 1) {
-                return 0.0;
-            } else {
+                 double dev = 0.0;
+                 double sumsq = 0.0;
+                 final int end = start + length;
+                 for (int i = start; i < end; i++) {
+                     if (direction.considerObservation(values[i], cutoff)) {
+                         dev = values[i] - cutoff;
+                         sumsq += dev * dev;
+                     }
+                 }
 
-                double dev = 0.0;
-                double sumsq = 0.0;
-                final int end = start + length;
-                for (int i = start; i < end; i++) {
-                    if (direction.considerObservation(values[i], cutoff)) {
-                        dev = values[i] - cutoff;
-                        sumsq += dev * dev;
-                    }
-                }
+                 if (corrected) {
+                     return sumsq / (length - 1.0);
+                 } else {
+                     return sumsq / length;
+                 }
+             }
+         }
+     }
 
-                if (corrected) {
-                    return sumsq / (length - 1.0);
-                } else {
-                    return sumsq / length;
-                }
-            }
-        }
-    }
+     /**
+      * Returns true iff biasCorrected property is set to true.
+      *
+      * @return the value of biasCorrected.
+      */
+     public boolean isBiasCorrected() {
+         return biasCorrected;
+     }
 
-    /**
-     * Returns true iff biasCorrected property is set to true.
-     *
-     * @return the value of biasCorrected.
-     */
-    public boolean isBiasCorrected() {
-        return biasCorrected;
-    }
+     /**
+      * Returns a copy of this instance with the given biasCorrected setting.
+      *
+      * @param isBiasCorrected new biasCorrected property value
+      * @return a copy of this instance with the given bias correction setting
+      */
+     public SemiVariance withBiasCorrected(boolean isBiasCorrected) {
+         return new SemiVariance(isBiasCorrected, this.varianceDirection);
+     }
 
-    /**
-     * Returns a copy of this instance with the given biasCorrected setting.
-     *
-     * @param isBiasCorrected new biasCorrected property value
-     * @return a copy of this instance with the given bias correction setting
-     */
-    public SemiVariance withBiasCorrected(boolean isBiasCorrected) {
-        return new SemiVariance(isBiasCorrected, this.varianceDirection);
-    }
+     /**
+      * Returns the varianceDirection property.
+      *
+      * @return the varianceDirection
+      */
+     public Direction getVarianceDirection () {
+         return varianceDirection;
+     }
 
-    /**
-     * Returns the varianceDirection property.
-     *
-     * @return the varianceDirection
-     */
-    public Direction getVarianceDirection() {
-        return varianceDirection;
-    }
+     /**
+      * Returns a copy of this instance with the given direction setting.
+      *
+      * @param direction the direction of the semivariance
+      * @return a copy of this instance with the given direction setting
+      */
+     public SemiVariance withVarianceDirection(Direction direction) {
+         return new SemiVariance(this.biasCorrected, direction);
+     }
 
-    /**
-     * Returns a copy of this instance with the given direction setting.
-     *
-     * @param direction the direction of the semivariance
-     * @return a copy of this instance with the given direction setting
-     */
-    public SemiVariance withVarianceDirection(Direction direction) {
-        return new SemiVariance(this.biasCorrected, direction);
-    }
+     /**
+      * The direction of the semivariance - either upside or downside. The direction
+      * is represented by boolean, with true corresponding to UPSIDE semivariance.
+      */
+     public enum Direction {
+         /**
+          * The UPSIDE Direction is used to specify that the observations above the
+          * cutoff point will be used to calculate SemiVariance
+          */
+         UPSIDE (true),
 
-    /**
-     * The direction of the semivariance - either upside or downside. The direction
-     * is represented by boolean, with true corresponding to UPSIDE semivariance.
-     */
-    public enum Direction {
-        /**
-         * The UPSIDE Direction is used to specify that the observations above the
-         * cutoff point will be used to calculate SemiVariance
-         */
-        UPSIDE(true),
+         /**
+          * The DOWNSIDE Direction is used to specify that the observations below
+          * the cutoff point will be used to calculate SemiVariance
+          */
+         DOWNSIDE (false);
 
-        /**
-         * The DOWNSIDE Direction is used to specify that the observations below
-         * the cutoff point will be used to calculate SemiVariance
-         */
-        DOWNSIDE(false);
+         /**
+          * boolean value  UPSIDE <-> true
+          */
+         private boolean direction;
 
-        /**
-         * boolean value  UPSIDE <-> true
-         */
-        private boolean direction;
+         /**
+          * Create a Direction with the given value.
+          *
+          * @param b boolean value representing the Direction. True corresponds to UPSIDE.
+          */
+         Direction (boolean b) {
+             direction = b;
+         }
 
-        /**
-         * Create a Direction with the given value.
-         *
-         * @param b boolean value representing the Direction. True corresponds to UPSIDE.
-         */
-        Direction(boolean b) {
-            direction = b;
-        }
+         /**
+          * Returns the value of this Direction. True corresponds to UPSIDE.
+          *
+          * @return true if direction is UPSIDE; false otherwise
+          * @deprecated as of 1.4 replaced by {@link #considerObservation(double, double)}
+          */
+         @Deprecated
+         boolean getDirection () { // NOPMD - violation has been taken care as of 1.4 by deprecating this method and introcuding a new one
+             return direction;
+         }
 
-        /**
-         * Returns the value of this Direction. True corresponds to UPSIDE.
-         *
-         * @return true if direction is UPSIDE; false otherwise
-         * @deprecated as of 1.4 replaced by {@link #considerObservation(double, double)}
-         */
-        @Deprecated
-        boolean getDirection() { // NOPMD - violation has been taken care as of 1.4 by deprecating this method and introcuding a new one
-            return direction;
-        }
+         /** Check if observation should be considered.
+          * @param value observation value
+          * @param cutoff cutoff point
+          * @return true if observation should be considered.
+          * @since 1.4
+          */
+         boolean considerObservation(final double value, final double cutoff) {
+             return value > cutoff == direction;
+         }
 
-        /**
-         * Check if observation should be considered.
-         *
-         * @param value  observation value
-         * @param cutoff cutoff point
-         * @return true if observation should be considered.
-         * @since 1.4
-         */
-        boolean considerObservation(final double value, final double cutoff) {
-            return value > cutoff == direction;
-        }
-
-    }
+     }
 }

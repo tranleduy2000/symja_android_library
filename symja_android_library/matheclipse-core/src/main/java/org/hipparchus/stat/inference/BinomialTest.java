@@ -48,16 +48,16 @@ public class BinomialTest {
      * <li>Probability must be &ge; 0 and &le; 1.</li>
      * </ul>
      *
-     * @param numberOfTrials        number of trials performed
-     * @param numberOfSuccesses     number of successes observed
-     * @param probability           assumed probability of a single trial under the null hypothesis
+     * @param numberOfTrials number of trials performed
+     * @param numberOfSuccesses number of successes observed
+     * @param probability assumed probability of a single trial under the null hypothesis
      * @param alternativeHypothesis type of hypothesis being evaluated (one- or two-sided)
-     * @param alpha                 significance level of the test
+     * @param alpha significance level of the test
      * @return true if the null hypothesis can be rejected with confidence {@code 1 - alpha}
      * @throws MathIllegalArgumentException if {@code numberOfTrials} or {@code numberOfSuccesses} is negative
      * @throws MathIllegalArgumentException if {@code probability} is not between 0 and 1
      * @throws MathIllegalArgumentException if {@code numberOfTrials} &lt; {@code numberOfSuccesses} or
-     *                                      if {@code alternateHypothesis} is null.
+     * if {@code alternateHypothesis} is null.
      * @see AlternativeHypothesis
      */
     public boolean binomialTest(int numberOfTrials, int numberOfSuccesses, double probability,
@@ -90,15 +90,15 @@ public class BinomialTest {
      * <li>Probability must be &ge; 0 and &le; 1.</li>
      * </ul></p>
      *
-     * @param numberOfTrials        number of trials performed
-     * @param numberOfSuccesses     number of successes observed
-     * @param probability           assumed probability of a single trial under the null hypothesis
+     * @param numberOfTrials number of trials performed
+     * @param numberOfSuccesses number of successes observed
+     * @param probability assumed probability of a single trial under the null hypothesis
      * @param alternativeHypothesis type of hypothesis being evaluated (one- or two-sided)
      * @return p-value
      * @throws MathIllegalArgumentException if {@code numberOfTrials} or {@code numberOfSuccesses} is negative
      * @throws MathIllegalArgumentException if {@code probability} is not between 0 and 1
      * @throws MathIllegalArgumentException if {@code numberOfTrials} &lt; {@code numberOfSuccesses} or
-     *                                      if {@code alternateHypothesis} is null.
+     * if {@code alternateHypothesis} is null.
      * @see AlternativeHypothesis
      */
     public double binomialTest(int numberOfTrials, int numberOfSuccesses, double probability,
@@ -112,50 +112,50 @@ public class BinomialTest {
         MathUtils.checkRangeInclusive(probability, 0, 1);
         if (numberOfTrials < numberOfSuccesses) {
             throw new MathIllegalArgumentException(
-                    LocalizedCoreFormats.BINOMIAL_INVALID_PARAMETERS_ORDER,
-                    numberOfTrials, numberOfSuccesses);
+                LocalizedCoreFormats.BINOMIAL_INVALID_PARAMETERS_ORDER,
+                numberOfTrials, numberOfSuccesses);
         }
         MathUtils.checkNotNull(alternativeHypothesis);
 
         final BinomialDistribution distribution = new BinomialDistribution(numberOfTrials, probability);
         switch (alternativeHypothesis) {
-            case GREATER_THAN:
-                return 1 - distribution.cumulativeProbability(numberOfSuccesses - 1);
-            case LESS_THAN:
-                return distribution.cumulativeProbability(numberOfSuccesses);
-            case TWO_SIDED:
-                int criticalValueLow = 0;
-                int criticalValueHigh = numberOfTrials;
-                double pTotal = 0;
+        case GREATER_THAN:
+            return 1 - distribution.cumulativeProbability(numberOfSuccesses - 1);
+        case LESS_THAN:
+            return distribution.cumulativeProbability(numberOfSuccesses);
+        case TWO_SIDED:
+            int criticalValueLow = 0;
+            int criticalValueHigh = numberOfTrials;
+            double pTotal = 0;
 
-                while (true) {
-                    final double pLow = distribution.probability(criticalValueLow);
-                    final double pHigh = distribution.probability(criticalValueHigh);
+            while (true) {
+                final double pLow = distribution.probability(criticalValueLow);
+                final double pHigh = distribution.probability(criticalValueHigh);
 
-                    if (pLow == pHigh) {
-                        if (criticalValueLow == criticalValueHigh) { // One side can't move
-                            pTotal += pLow;
-                        } else {
-                            pTotal += 2 * pLow;
-                        }
-                        criticalValueLow++;
-                        criticalValueHigh--;
-                    } else if (pLow < pHigh) {
+                if (pLow == pHigh) {
+                    if (criticalValueLow == criticalValueHigh) { // One side can't move
                         pTotal += pLow;
-                        criticalValueLow++;
                     } else {
-                        pTotal += pHigh;
-                        criticalValueHigh--;
+                        pTotal += 2 * pLow;
                     }
-
-                    if (criticalValueLow > numberOfSuccesses || criticalValueHigh < numberOfSuccesses) {
-                        break;
-                    }
+                    criticalValueLow++;
+                    criticalValueHigh--;
+                } else if (pLow < pHigh) {
+                    pTotal += pLow;
+                    criticalValueLow++;
+                } else {
+                    pTotal += pHigh;
+                    criticalValueHigh--;
                 }
-                return pTotal;
-            default:
-                // this should never happen
-                throw MathRuntimeException.createInternalError();
+
+                if (criticalValueLow > numberOfSuccesses || criticalValueHigh < numberOfSuccesses) {
+                    break;
+                }
+            }
+            return pTotal;
+        default:
+            // this should never happen
+            throw MathRuntimeException.createInternalError();
         }
     }
 }

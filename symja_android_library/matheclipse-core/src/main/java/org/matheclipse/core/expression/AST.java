@@ -2,6 +2,8 @@ package org.matheclipse.core.expression;
 
 import com.duy.lambda.Consumer;
 
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -193,6 +195,9 @@ public class AST extends HMArrayList implements Externalizable {
 	}
 
 	protected static AST newInstance(final int intialCapacity, final IAST ast, int endPosition) {
+		if (Config.MAX_AST_SIZE < intialCapacity) {
+			ASTElementLimitExceeded.throwIt(intialCapacity);
+		}
 		AST result = new AST(intialCapacity, false);
 		result.appendAll(ast, 0, endPosition);
 		return result;
@@ -210,6 +215,9 @@ public class AST extends HMArrayList implements Externalizable {
 	 * @return
 	 */
 	public static AST newInstance(final int initialCapacity, final IExpr head, boolean initNull) {
+		if (Config.MAX_AST_SIZE < initialCapacity || initialCapacity < 0) {
+			ASTElementLimitExceeded.throwIt(initialCapacity);
+		}
 		AST ast = new AST(initialCapacity, initNull);
 		if (initNull) {
 			ast.set(0, head);
@@ -221,6 +229,9 @@ public class AST extends HMArrayList implements Externalizable {
 
 	public static AST newInstance(final ISymbol symbol, boolean evalComplex,
 			final org.hipparchus.complex.Complex... arr) {
+		if (Config.MAX_AST_SIZE < arr.length ) {
+			ASTElementLimitExceeded.throwIt(arr.length);
+		}
 		IExpr[] eArr = new IExpr[arr.length + 1];
 		eArr[0] = symbol;
 		if (evalComplex) {
@@ -249,6 +260,9 @@ public class AST extends HMArrayList implements Externalizable {
 	 * @return
 	 */
 	public static AST newInstance(final ISymbol symbol, final double... arr) {
+		if (Config.MAX_AST_SIZE < arr.length ) {
+			ASTElementLimitExceeded.throwIt(arr.length);
+		}
 		IExpr[] eArr = new IExpr[arr.length + 1];
 		eArr[0] = symbol;
 		for (int i = 1; i <= arr.length; i++) {
@@ -267,6 +281,9 @@ public class AST extends HMArrayList implements Externalizable {
 	 * @see Num
 	 */
 	public static AST newInstance(final ISymbol symbol, final double[][] matrix) {
+		if (Config.MAX_AST_SIZE < matrix.length) {
+			ASTElementLimitExceeded.throwIt(matrix.length);
+		}
 		IExpr[] eArr = new IExpr[matrix.length + 1];
 		eArr[0] = symbol;
 		for (int i = 1; i <= matrix.length; i++) {
@@ -276,6 +293,9 @@ public class AST extends HMArrayList implements Externalizable {
 	}
 
 	public static AST newInstance(final ISymbol symbol, final int... arr) {
+		if (Config.MAX_AST_SIZE < arr.length) {
+			ASTElementLimitExceeded.throwIt(arr.length);
+		}
 		IExpr[] eArr = new IExpr[arr.length + 1];
 		eArr[0] = symbol;
 		for (int i = 1; i <= arr.length; i++) {
@@ -343,7 +363,7 @@ public class AST extends HMArrayList implements Externalizable {
 		super(0);
 	}
 
-	/*package private */ AST(IExpr head, IExpr... es) {
+	/* package private */ AST(IExpr head, IExpr... es) {
 		super(head, es);
 	}
 
@@ -352,7 +372,7 @@ public class AST extends HMArrayList implements Externalizable {
 	 * 
 	 * @param es
 	 */
-	/*package private */ AST(IExpr[] es) {
+	/* package private */ AST(IExpr[] es) {
 		super(es);
 	}
 
@@ -527,7 +547,7 @@ public class AST extends HMArrayList implements Externalizable {
 			init(array);
 			int exprIDSize = objectInput.readByte();
 			for (int i = 0; i < exprIDSize; i++) {
-				this.array[i] = F.exprID(objectInput.readShort()); //F.GLOBAL_IDS[objectInput.readShort()];
+				this.array[i] = F.exprID(objectInput.readShort()); // F.GLOBAL_IDS[objectInput.readShort()];
 			}
 			for (int i = exprIDSize; i < size; i++) {
 				this.array[i] = (IExpr) objectInput.readObject();
@@ -561,7 +581,7 @@ public class AST extends HMArrayList implements Externalizable {
 						if (exprID < 0) {
 							break;
 						}
-//						exprID = temp.getExprID();
+						// exprID = temp.getExprID();
 						if (exprID <= Short.MAX_VALUE) {
 							exprIDArray[i] = exprID;
 							exprIDSize++;

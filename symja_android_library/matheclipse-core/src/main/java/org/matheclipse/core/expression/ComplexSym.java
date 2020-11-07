@@ -3,7 +3,9 @@ package org.matheclipse.core.expression;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.hipparchus.fraction.BigFraction;
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IExpr;
@@ -487,11 +489,22 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			}
 		}
 
-		int realNumerator = NumberUtil.toInt(fReal.toBigNumerator());
-		int realDenominator = NumberUtil.toInt(fReal.toBigDenominator());
-		int imagNumerator = NumberUtil.toInt(fImaginary.toBigNumerator());
-		int imagDenominator = NumberUtil.toInt(fImaginary.toBigDenominator());
-		return prefix+"CC(" + realNumerator + "L," + realDenominator + "L," + imagNumerator + "L," + imagDenominator + "L)";
+		int realNumerator = NumberUtil.toIntDefault(fReal.toBigNumerator());
+		int realDenominator = NumberUtil.toIntDefault(fReal.toBigDenominator());
+		int imagNumerator = NumberUtil.toIntDefault(fImaginary.toBigNumerator());
+		int imagDenominator = NumberUtil.toIntDefault(fImaginary.toBigDenominator());
+		if (realNumerator != Integer.MIN_VALUE && //
+				realDenominator != Integer.MIN_VALUE && //
+				imagNumerator != Integer.MIN_VALUE && //
+				imagDenominator != Integer.MIN_VALUE) {
+			return prefix + "CC(" + realNumerator + "L," + realDenominator + "L," + imagNumerator + "L,"
+					+ imagDenominator + "L)";
+		}
+		return prefix + "CC(" + //
+				fReal.internalJavaString(symbolsAsFactoryMethod, depth, useOperators, usePrefix, noSymbolPrefix) + //
+				"," + //
+				fImaginary.internalJavaString(symbolsAsFactoryMethod, depth, useOperators, usePrefix, noSymbolPrefix) + //
+				")";
 	}
 
 	@Override
@@ -532,6 +545,8 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
 	@Override
 	public IComplex multiply(final IComplex parm1) {
+		checkBitLength();
+		parm1.checkBitLength();
 		return ComplexSym.valueOf(
 				fReal.multiply(parm1.getRealPart()).subtract(fImaginary.multiply(parm1.getImaginaryPart())),
 				fReal.multiply(parm1.getImaginaryPart()).add(parm1.getRealPart().multiply(fImaginary)));
@@ -570,8 +585,8 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 			throw new IllegalArgumentException("Denominator can not be zero.");
 		}
 
-		IRational divisionReal = numeratorReal.divideBy(denominator).round();
-		IRational divisionImaginary = numeratorImaginary.divideBy(denominator).round();
+		IInteger divisionReal = numeratorReal.divideBy(denominator).round();
+		IInteger divisionImaginary = numeratorImaginary.divideBy(denominator).round();
 
 		IRational remainderReal = fReal.subtract(re.multiply(divisionReal))
 				.subtract(im.multiply(divisionImaginary).negate());
@@ -714,16 +729,31 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 		while ((exp >>= 1) > 0L) {
 			x = x.multiply(x);
 			if ((exp & 1) != 0) {
+				r.checkBitLength();
 				r = r.multiply(x);
 		}
 		}
 
+		r.checkBitLength();
 		while (b2pow-- > 0L) {
 			r = r.multiply(r);
+			r.checkBitLength();
 		}
 		return r;
 	}
 
+	public void checkBitLength() {
+		if (Integer.MAX_VALUE > Config.MAX_BIT_LENGTH) {
+			long bitLength = fReal.toBigNumerator().bitLength() + fReal.toBigDenominator().bitLength();
+			if (bitLength > Config.MAX_BIT_LENGTH / 4) {
+				BigIntegerLimitExceeded.throwIt(bitLength);
+			}
+			bitLength = fImaginary.toBigNumerator().bitLength() + fImaginary.toBigDenominator().bitLength();
+			if (bitLength > Config.MAX_BIT_LENGTH / 4) {
+				BigIntegerLimitExceeded.throwIt(bitLength);
+			}
+		}
+	}
 	@Override
 	public IRational rationalFactor() {
 		if (fReal.isZero()) {
@@ -753,6 +783,28 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 	@Override
 	public INumber round() {
 		return valueOf((IRational) fReal.round(), (IRational) fImaginary.round());
+	}
+	public IComplex sqrtCC() {
+		// https://math.stackexchange.com/a/44414
+		// this == c + d*I
+		IRational c = fReal;
+		IRational d = fImaginary;
+		IExpr val1 = c.multiply(c).add(d.multiply(d)).sqrt();
+		if (val1.isRational()) {
+			IExpr a = c.add((IRational) val1).divide(F.C2).sqrt();
+			if (a.isRational()) {
+				IExpr val2 = ((IRational) val1).subtract(c).divide(F.C2).sqrt();
+				if (val2.isRational()) {
+					// Sqrt(c + d*I) -> a + b*I
+					IRational b = ((IRational) val2);
+					return valueOf( //
+							(IRational) a, //
+							(d.sign() >= 0) ? b : b.negate()//
+					);
+				}
+			}
+		}
+		return null;
 	}
 	@Override
 	public IExpr times(final IExpr that) {

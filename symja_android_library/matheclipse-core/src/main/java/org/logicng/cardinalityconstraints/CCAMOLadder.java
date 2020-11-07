@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/*****************************************************************************************
+/*
  * Open-WBO -- Copyright (c) 2013-2015, Ruben Martins, Vasco Manquinho, Ines Lynce
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -45,7 +45,7 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *****************************************************************************************/
+ */
 
 package org.logicng.cardinalityconstraints;
 
@@ -54,11 +54,10 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the Ladder/Regular encoding.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
-final class CCAMOLadder implements CCAtMostOne {
+public final class CCAMOLadder implements CCAtMostOne {
 
     /**
      * Constructs the naive AMO encoder.
@@ -70,14 +69,15 @@ final class CCAMOLadder implements CCAtMostOne {
     public void build(final EncodingResult result, final Variable... vars) {
         result.reset();
         final Variable[] seqAuxiliary = new Variable[vars.length - 1];
-        for (int i = 0; i < vars.length - 1; i++)
+        for (int i = 0; i < vars.length - 1; i++) {
             seqAuxiliary[i] = result.newVariable();
+        }
         for (int i = 0; i < vars.length; i++) {
-            if (i == 0)
+            if (i == 0) {
                 result.addClause(vars[0].negate(), seqAuxiliary[0]);
-            else if (i == vars.length - 1)
+            } else if (i == vars.length - 1) {
                 result.addClause(vars[i].negate(), seqAuxiliary[i - 1].negate());
-            else {
+            } else {
                 result.addClause(vars[i].negate(), seqAuxiliary[i]);
                 result.addClause(seqAuxiliary[i - 1].negate(), seqAuxiliary[i]);
                 result.addClause(vars[i].negate(), seqAuxiliary[i - 1].negate());

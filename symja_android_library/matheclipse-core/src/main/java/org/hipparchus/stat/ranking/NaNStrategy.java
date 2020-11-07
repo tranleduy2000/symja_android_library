@@ -36,31 +36,22 @@ package org.hipparchus.stat.ranking;
  * <li>FAILED - If any NaN is encountered in the input array, an appropriate
  * exception is thrown</li>
  * </ul>
+ *
  */
 public enum NaNStrategy {
 
-    /**
-     * NaNs are considered minimal in the ordering
-     */
+    /** NaNs are considered minimal in the ordering */
     MINIMAL,
 
-    /**
-     * NaNs are considered maximal in the ordering
-     */
+    /** NaNs are considered maximal in the ordering */
     MAXIMAL,
 
-    /**
-     * NaNs are removed before computing ranks
-     */
+    /** NaNs are removed before computing ranks */
     REMOVED,
 
-    /**
-     * NaNs are left in place
-     */
+    /** NaNs are left in place */
     FIXED,
 
-    /**
-     * NaNs result in an exception
-     */
+    /** NaNs result in an exception */
     FAILED
 }

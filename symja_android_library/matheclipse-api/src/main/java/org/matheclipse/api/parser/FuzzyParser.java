@@ -15,6 +15,8 @@
  */
 package org.matheclipse.api.parser;
 
+import com.duy.lambda.Consumer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +34,7 @@ import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.NumStr;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -423,7 +426,7 @@ public class FuzzyParser extends Scanner {
 
 			getNextToken();
 			if (fToken == TT_PRECEDENCE_CLOSE || fToken == TT_ARGUMENTS_CLOSE) {
-				function.append(F.Null);
+				function.append(S.Null);
 				break;
 			}
 		} while (true);
@@ -832,7 +835,7 @@ public class FuzzyParser extends Scanner {
 		if (head.isBuiltInSymbol()) {
 			IEvaluator eval = ((IBuiltInSymbol) head).getEvaluator();
 			if (eval instanceof IFunctionEvaluator) {
-				int[] args = ((IFunctionEvaluator) eval).expectedArgSize();
+				int[] args = ((IFunctionEvaluator) eval).expectedArgSize(F.NIL);
 				if (args != null && args[1] < 10) {
 					defaultSize = args[1] + 1;
 				}
@@ -945,15 +948,15 @@ public class FuzzyParser extends Scanner {
 					if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
 						fCurrentPosition += 2;
 						long precision = getJavaLong();
-						if (precision < Config.MACHINE_PRECISION) {
-							precision = Config.MACHINE_PRECISION;
+						if (precision < FEConfig.MACHINE_PRECISION) {
+							precision = FEConfig.MACHINE_PRECISION;
 						}
 						return F.num(new Apfloat(number, precision));
 					} else {
 						fCurrentPosition++;
 						long precision = getJavaLong();
-						if (precision < Config.MACHINE_PRECISION) {
-							precision = Config.MACHINE_PRECISION;
+						if (precision < FEConfig.MACHINE_PRECISION) {
+							precision = FEConfig.MACHINE_PRECISION;
 						}
 						return F.num(new Apfloat(number, precision));
 					}
@@ -964,7 +967,7 @@ public class FuzzyParser extends Scanner {
 				temp = F.ZZ(number, numFormat);
 				// temp = fFactory.createInteger(number, numFormat);
 			}
-		} catch (final Throwable e) {
+		} catch (final RuntimeException rex) {
 			throwSyntaxError("Number format error: " + number, number.length());
 		}
 		getNextToken();
@@ -972,7 +975,11 @@ public class FuzzyParser extends Scanner {
 	}
 
 	protected boolean isOperatorCharacters() {
-		return fFactory.isOperatorChar(fCurrentChar);// getOperatorCharacters().indexOf(fCurrentChar) >= 0;
+		return fFactory.isOperatorChar(fCurrentChar);
+	}
+
+	protected boolean isOperatorCharacters(char ch) {
+		return fFactory.isOperatorChar(ch);
 	}
 
 	final protected List<Operator> getOperator() {
@@ -1205,7 +1212,7 @@ public class FuzzyParser extends Scanner {
 		if (infixOperator.isOperator(";")) {
 			if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
-				return createInfixFunction(infixOperator, rhs, F.Null);
+				return createInfixFunction(infixOperator, rhs, S.Null);
 				// return infixOperator.createFunction(fFactory, rhs,
 				// fFactory.createSymbol("Null"));
 			}
@@ -1383,7 +1390,7 @@ public class FuzzyParser extends Scanner {
 				if (infixOperator.isOperator(";")) {
 					if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
 							|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
-						ast.append(F.Null);
+						ast.append(S.Null);
 						break;
 					}
 				}
@@ -1414,11 +1421,14 @@ public class FuzzyParser extends Scanner {
 	 */
 	private IExpr parseInequality(final IAST ast, final FuzzyInfixExprOperator infixOperator) {
 		// rewrite to Inequality
-		IBuiltInSymbol head = (IBuiltInSymbol) ast.head();
-		IASTAppendable result = F.ast(F.Inequality, ast.size() + 2, false);
-		ast.forEach(x -> {
-			result.append(x);
-			result.append(head);
+		final IBuiltInSymbol head = (IBuiltInSymbol) ast.head();
+		final IASTAppendable result = F.ast(F.Inequality, ast.size() + 2, false);
+		ast.forEach(new Consumer<IExpr>() {
+			@Override
+			public void accept(IExpr x) {
+				result.append(x);
+				result.append(head);
+			}
 		});
 		FuzzyInfixExprOperator compareOperator = determineBinaryOperator();
 		result.set(result.size() - 1, F.$s(compareOperator.getFunctionName()));

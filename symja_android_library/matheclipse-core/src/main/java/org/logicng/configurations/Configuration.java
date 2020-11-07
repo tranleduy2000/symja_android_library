@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,7 +30,6 @@ package org.logicng.configurations;
 
 /**
  * A configuration in LogicNG.
- *
  * @version 1.0
  * @since 1.0
  */
@@ -39,7 +38,6 @@ public abstract class Configuration {
 
     /**
      * Constructs a new configuration with a given type.
-     *
      * @param type the configuration type
      */
     protected Configuration(final ConfigurationType type) {
@@ -48,7 +46,6 @@ public abstract class Configuration {
 
     /**
      * Returns the type of this configuration.
-     *
      * @return the type of this configuration
      */
     public ConfigurationType type() {

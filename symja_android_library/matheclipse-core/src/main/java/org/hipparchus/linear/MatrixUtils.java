@@ -36,6 +36,7 @@ import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
@@ -53,6 +54,78 @@ public class MatrixUtils {
      * A format for {@link RealMatrix} objects compatible with octave.
      */
     public static final RealMatrixFormat OCTAVE_FORMAT = new RealMatrixFormat("[", "]", "", "", "; ", ", ");
+
+    /**
+     * Pade coefficients required for the matrix exponential calculation.
+     */
+    private static final double[] PADE_COEFFICIENTS_3 = {
+            120.0,
+            60.0,
+            12.0,
+            1.0
+    };
+
+    /**
+     * Pade coefficients required for the matrix exponential calculation.
+     */
+    private static final double[] PADE_COEFFICIENTS_5 = {
+            30240.0,
+            15120.0,
+            3360.0,
+            420.0,
+            30.0,
+            1
+    };
+
+    /**
+     * Pade coefficients required for the matrix exponential calculation.
+     */
+    private static final double[] PADE_COEFFICIENTS_7 = {
+            17297280.0,
+            8648640.0,
+            1995840.0,
+            277200.0,
+            25200.0,
+            1512.0,
+            56.0,
+            1.0
+    };
+
+    /**
+     * Pade coefficients required for the matrix exponential calculation.
+     */
+    private static final double[] PADE_COEFFICIENTS_9 = {
+            17643225600.0,
+            8821612800.0,
+            2075673600.0,
+            302702400.0,
+            30270240.0,
+            2162160.0,
+            110880.0,
+            3960.0,
+            90.0,
+            1.0
+    };
+
+    /**
+     * Pade coefficients required for the matrix exponential calculation.
+     */
+    private static final double[] PADE_COEFFICIENTS_13 = {
+            6.476475253248e+16,
+            3.238237626624e+16,
+            7.7717703038976e+15,
+            1.1873537964288e+15,
+            129060195264000.0,
+            10559470521600.0,
+            670442572800.0,
+            33522128640.0,
+            1323241920.0,
+            40840800.0,
+            960960.0,
+            16380.0,
+            182.0,
+            1.0
+    };
 
     /**
      * Private constructor.
@@ -114,11 +187,11 @@ public class MatrixUtils {
      *
      * @param data input array
      * @return RealMatrix containing the values of the array
-     * @throws org.hipparchus.exception.MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
-     * @throws MathIllegalArgumentException                          if a row or column is empty.
-     * @throws NullArgumentException                                 if either {@code data} or {@code data[0]}
-     *                                                               is {@code null}.
-     * @throws MathIllegalArgumentException                          if {@code data} is not rectangular.
+     * @throws MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
+     * @throws MathIllegalArgumentException if a row or column is empty.
+     * @throws NullArgumentException        if either {@code data} or {@code data[0]}
+     *                                      is {@code null}.
+     * @throws MathIllegalArgumentException if {@code data} is not rectangular.
      * @see #createRealMatrix(int, int)
      */
     public static RealMatrix createRealMatrix(double[][] data)
@@ -143,10 +216,10 @@ public class MatrixUtils {
      * @param <T>  the type of the field elements
      * @param data input array
      * @return a matrix containing the values of the array.
-     * @throws org.hipparchus.exception.MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
-     * @throws MathIllegalArgumentException                          if a row or column is empty.
-     * @throws NullArgumentException                                 if either {@code data} or {@code data[0]}
-     *                                                               is {@code null}.
+     * @throws MathIllegalArgumentException if {@code data} is not rectangular (not all rows have the same length).
+     * @throws MathIllegalArgumentException if a row or column is empty.
+     * @throws NullArgumentException        if either {@code data} or {@code data[0]}
+     *                                      is {@code null}.
      * @see #createFieldMatrix(Field, int, int)
      */
     public static <T extends FieldElement<T>> FieldMatrix<T> createFieldMatrix(T[][] data)
@@ -720,7 +793,7 @@ public class MatrixUtils {
      * @param vector real vector to serialize
      * @param oos    stream where the real vector should be written
      * @throws IOException if object cannot be written to stream
-     * see #deserializeRealVector(Object, String, ObjectInputStream)
+     * @see #deserializeRealVector(Object, String, ObjectInputStream)
      */
     public static void serializeRealVector(final RealVector vector,
                                            final ObjectOutputStream oos)
@@ -751,36 +824,35 @@ public class MatrixUtils {
      * @throws IOException            if object cannot be read from the stream
      * @see #serializeRealVector(RealVector, ObjectOutputStream)
      */
-    // Android changed: remove reflection
-//    public static void deserializeRealVector(final Object instance,
-//                                             final String fieldName,
-//                                             final ObjectInputStream ois)
-//            throws ClassNotFoundException, IOException {
-//        try {
-//
-//            // read the vector data
-//            final int n = ois.readInt();
-//            final double[] data = new double[n];
-//            for (int i = 0; i < n; ++i) {
-//                data[i] = ois.readDouble();
-//            }
-//
-//            // create the instance
-//            final RealVector vector = new ArrayRealVector(data, false);
-//
-//            // set up the field
-//            final Field f =
-//                    instance.getClass().getDeclaredField(fieldName);
-//            f.setAccessible(true);
-//            f.set(instance, vector);
-//
-//        } catch (NoSuchFieldException | IllegalAccessException e) {
-//            IOException ioe = new IOException();
-//            ioe.initCause(e);
-//            throw ioe;
-//        }
-//
-//    }
+    public static void deserializeRealVector(final Object instance,
+                                             final String fieldName,
+                                             final ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
+        try {
+
+            // read the vector data
+            final int n = ois.readInt();
+            final double[] data = new double[n];
+            for (int i = 0; i < n; ++i) {
+                data[i] = ois.readDouble();
+            }
+
+            // create the instance
+            final RealVector vector = new ArrayRealVector(data, false);
+
+            // set up the field
+            final java.lang.reflect.Field f =
+                    instance.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            f.set(instance, vector);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
+        }
+
+    }
 
     /**
      * Serialize a {@link RealMatrix}.
@@ -821,7 +893,7 @@ public class MatrixUtils {
      * @param matrix real matrix to serialize
      * @param oos    stream where the real matrix should be written
      * @throws IOException if object cannot be written to stream
-     * see #deserializeRealMatrix(Object, String, ObjectInputStream)
+     * @see #deserializeRealMatrix(Object, String, ObjectInputStream)
      */
     public static void serializeRealMatrix(final RealMatrix matrix,
                                            final ObjectOutputStream oos)
@@ -856,39 +928,38 @@ public class MatrixUtils {
      * @throws IOException            if object cannot be read from the stream
      * @see #serializeRealMatrix(RealMatrix, ObjectOutputStream)
      */
-    // Android changed: remove reflection
-//    public static void deserializeRealMatrix(final Object instance,
-//                                             final String fieldName,
-//                                             final ObjectInputStream ois)
-//            throws ClassNotFoundException, IOException {
-//        try {
-//
-//            // read the matrix data
-//            final int n = ois.readInt();
-//            final int m = ois.readInt();
-//            final double[][] data = new double[n][m];
-//            for (int i = 0; i < n; ++i) {
-//                final double[] dataI = data[i];
-//                for (int j = 0; j < m; ++j) {
-//                    dataI[j] = ois.readDouble();
-//                }
-//            }
-//
-//            // create the instance
-//            final RealMatrix matrix = new Array2DRowRealMatrix(data, false);
-//
-//            // set up the field
-//            final Field f =
-//                    instance.getClass().getDeclaredField(fieldName);
-//            f.setAccessible(true);
-//            f.set(instance, matrix);
-//
-//        } catch (NoSuchFieldException | IllegalAccessException e) {
-//            IOException ioe = new IOException();
-//            ioe.initCause(e);
-//            throw ioe;
-//        }
-//    }
+    public static void deserializeRealMatrix(final Object instance,
+                                             final String fieldName,
+                                             final ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
+        try {
+
+            // read the matrix data
+            final int n = ois.readInt();
+            final int m = ois.readInt();
+            final double[][] data = new double[n][m];
+            for (int i = 0; i < n; ++i) {
+                final double[] dataI = data[i];
+                for (int j = 0; j < m; ++j) {
+                    dataI[j] = ois.readDouble();
+                }
+            }
+
+            // create the instance
+            final RealMatrix matrix = new Array2DRowRealMatrix(data, false);
+
+            // set up the field
+            final java.lang.reflect.Field f =
+                    instance.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            f.set(instance, matrix);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
+        }
+    }
 
     /**
      * Solve  a  system of composed of a Lower Triangular Matrix
@@ -1102,6 +1173,102 @@ public class MatrixUtils {
     }
 
     /**
+     * Computes the <a href="https://mathworld.wolfram.com/MatrixExponential.html">
+     * matrix exponential</a> of the given matrix.
+     * <p>
+     * The algorithm implementation follows the Pade approximant method of
+     * <p>Higham, Nicholas J. “The Scaling and Squaring Method for the Matrix Exponential
+     * Revisited.” SIAM Journal on Matrix Analysis and Applications 26, no. 4 (January 2005): 1179–93.</p>
+     *
+     * @param rm RealMatrix whose inverse shall be computed
+     * @return The inverse of {@code rm}
+     * @throws MathIllegalArgumentException if matrix is not square
+     */
+    public static RealMatrix matrixExponential(final RealMatrix rm) {
+
+        // Check that the input matrix is square
+        if (!rm.isSquare()) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.NON_SQUARE_MATRIX,
+                    rm.getRowDimension(), rm.getColumnDimension());
+        }
+
+        // Preprocessing to reduce the norm
+        int dim = rm.getRowDimension();
+        final RealMatrix identity = MatrixUtils.createRealIdentityMatrix(dim);
+        final double preprocessScale = rm.getTrace() / dim;
+        RealMatrix scaledMatrix = rm.copy();
+        scaledMatrix = scaledMatrix.subtract(identity.scalarMultiply(preprocessScale));
+
+        // Select pade degree required
+        final double l1Norm = rm.getNorm1();
+        double[] padeCoefficients;
+        int squaringCount = 0;
+
+        if (l1Norm < 1.495585217958292e-2) {
+            padeCoefficients = PADE_COEFFICIENTS_3;
+        } else if (l1Norm < 2.539398330063230e-1) {
+            padeCoefficients = PADE_COEFFICIENTS_5;
+        } else if (l1Norm < 9.504178996162932e-1) {
+            padeCoefficients = PADE_COEFFICIENTS_7;
+        } else if (l1Norm < 2.097847961257068) {
+            padeCoefficients = PADE_COEFFICIENTS_9;
+        } else {
+            padeCoefficients = PADE_COEFFICIENTS_13;
+
+            // Calculate scaling factor
+            final double normScale = 5.371920351148152;
+            squaringCount = Math.max(0, Math.getExponent(l1Norm / normScale));
+
+            // Scale matrix by power of 2
+            final int finalSquaringCount = squaringCount;
+            scaledMatrix.walkInOptimizedOrder(new DefaultRealMatrixChangingVisitor() {
+                @Override
+                public double visit(int row, int column, double value) {
+                    return Math.scalb(value, -finalSquaringCount);
+                }
+            });
+        }
+
+        // Calculate U and V using Horner
+        // See Golub, Gene H., and Charles F. van Loan. Matrix Computations. 4th ed.
+        // John Hopkins University Press, 2013.  pages 530/531
+        final RealMatrix scaledMatrix2 = scaledMatrix.multiply(scaledMatrix);
+        final int coeffLength = padeCoefficients.length;
+
+        // Calculate V
+        RealMatrix padeV = MatrixUtils.createRealMatrix(dim, dim);
+        for (int i = coeffLength - 1; i > 1; i -= 2) {
+            padeV = scaledMatrix2.multiply(padeV.add(identity.scalarMultiply(padeCoefficients[i])));
+        }
+        padeV = scaledMatrix.multiply(padeV.add(identity.scalarMultiply(padeCoefficients[1])));
+
+        // Calculate U
+        RealMatrix padeU = MatrixUtils.createRealMatrix(dim, dim);
+        for (int i = coeffLength - 2; i > 1; i -= 2) {
+            padeU = scaledMatrix2.multiply(padeU.add(identity.scalarMultiply(padeCoefficients[i])));
+        }
+        padeU = padeU.add(identity.scalarMultiply(padeCoefficients[0]));
+
+        // Calculate pade approximate by solving (U-V) F = (U+V) for F
+        RealMatrix padeNumer = padeU.add(padeV);
+        RealMatrix padeDenom = padeU.subtract(padeV);
+
+        // Calculate the matrix ratio
+        QRDecomposition decomposition = new QRDecomposition(padeDenom);
+        RealMatrix result = decomposition.getSolver().solve(padeNumer);
+
+        // Repeated squaring if matrix was scaled
+        for (int i = 0; i < squaringCount; i++) {
+            result = result.multiply(result);
+        }
+
+        // Undo preprocessing
+        result = result.scalarMultiply(Math.exp(preprocessScale));
+
+        return result;
+    }
+
+    /**
      * Converter for {@link FieldMatrix}/{@link Fraction}.
      */
     private static class FractionMatrixConverter extends DefaultFieldMatrixPreservingVisitor<Fraction> {
@@ -1187,4 +1354,6 @@ public class MatrixUtils {
             return new Array2DRowRealMatrix(data, false);
         }
     }
+
+
 }

@@ -19,6 +19,7 @@ import org.matheclipse.core.interfaces.IEvaluatorImpl;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -90,7 +91,11 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		super(symbolName, Context.SYSTEM);
 		fEvaluator = DUMMY_EVALUATOR;
 		fOrdinal = ordinal;
-		fAttributes = ISymbol.PROTECTED;
+		if (symbolName.charAt(0) != '$') {
+			fAttributes = ISymbol.PROTECTED;
+		} else if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+			fAttributes = ISymbol.PROTECTED;
+		}
 	}
 
 	// private BuiltInSymbol(final String symbolName, final IEvaluator evaluator) {
@@ -104,8 +109,8 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void assign(final IExpr value) {
-		fValue = value;
+	public final void assignValue(final IExpr value) {
+		super.assignValue(value);
 		if (Config.FUZZ_TESTING) {
 			// Cannot assign to raw object `1`.
 			throw new NullPointerException();
@@ -160,7 +165,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 		// final IEvaluator module = getEvaluator();
 		if (fEvaluator instanceof ISymbolEvaluator) {
 			if (engine.isNumericMode()) {
-				if (engine.isApfloat()) {
+				if (engine.isArbitraryMode()) {
 					return ((ISymbolEvaluator) fEvaluator).apfloatEval(this, engine);
 				} else {
 					return ((ISymbolEvaluator) fEvaluator).numericEval(this);
@@ -168,8 +173,8 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 			}
 			return ((ISymbolEvaluator) fEvaluator).evaluate(this);
 		}
-		if (fValue!=null) {
-			return fValue;
+		if (hasAssignedSymbolValue()) {
+			return assignedValue();
 		}
 		// if (hasLocalVariableStack()) {
 		// return ExprUtil.ofNullable(get());

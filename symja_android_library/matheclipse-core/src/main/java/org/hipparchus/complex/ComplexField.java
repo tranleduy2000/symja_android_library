@@ -22,10 +22,10 @@
 
 package org.hipparchus.complex;
 
+import java.io.Serializable;
+
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
-
-import java.io.Serializable;
 
 /**
  * Representation of the complex numbers field.
@@ -36,88 +36,67 @@ import java.io.Serializable;
  */
 public class ComplexField implements Field<Complex>, Serializable {
 
-    /**
-     * Serializable version identifier.
-     */
+    /** Serializable version identifier. */
     private static final long serialVersionUID = 20160305L;
 
-    /**
-     * Private constructor for the singleton.
+    /** Private constructor for the singleton.
      */
     private ComplexField() {
     }
 
-    /**
-     * Get the unique instance.
-     *
+    /** Get the unique instance.
      * @return the unique instance
      */
     public static ComplexField getInstance() {
         return LazyHolder.INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Complex getZero() {
-        return Complex.ZERO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Complex getOne() {
         return Complex.ONE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public Complex getZero() {
+        return Complex.ZERO;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public Class<? extends FieldElement<Complex>> getRuntimeClass() {
         return Complex.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(final Object other) {
         return this == other;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return 0x49250ae5;
     }
 
     // CHECKSTYLE: stop HideUtilityClassConstructor
+    /** Holder for the instance.
+     * <p>We use here the Initialization On Demand Holder Idiom.</p>
+     */
+    private static class LazyHolder {
+        /** Cached field instance. */
+        private static final ComplexField INSTANCE = new ComplexField();
+    }
+    // CHECKSTYLE: resume HideUtilityClassConstructor
 
-    /**
-     * Handle deserialization of the singleton.
-     *
+    /** Handle deserialization of the singleton.
      * @return the singleton instance
      */
     private Object readResolve() {
         // return the singleton instance
         return LazyHolder.INSTANCE;
-    }
-    // CHECKSTYLE: resume HideUtilityClassConstructor
-
-    /**
-     * Holder for the instance.
-     * <p>We use here the Initialization On Demand Holder Idiom.</p>
-     */
-    private static class LazyHolder {
-        /**
-         * Cached field instance.
-         */
-        private static final ComplexField INSTANCE = new ComplexField();
     }
 
 }

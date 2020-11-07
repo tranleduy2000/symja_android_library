@@ -36,14 +36,14 @@ import org.hipparchus.util.FastMath;
  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
- * <li>a {@link #getLT() getLT} method has been added,</li>
- * <li>the {@code isspd} method has been removed, since the constructor of
- * this class throws a {@link MathIllegalArgumentException} when a
- * matrix cannot be decomposed,</li>
- * <li>a {@link #getDeterminant() getDeterminant} method has been added,</li>
- * <li>the {@code solve} method has been replaced by a {@link #getSolver()
- * getSolver} method and the equivalent method provided by the returned
- * {@link DecompositionSolver}.</li>
+ *   <li>a {@link #getLT() getLT} method has been added,</li>
+ *   <li>the {@code isspd} method has been removed, since the constructor of
+ *   this class throws a {@link MathIllegalArgumentException} when a
+ *   matrix cannot be decomposed,</li>
+ *   <li>a {@link #getDeterminant() getDeterminant} method has been added,</li>
+ *   <li>the {@code solve} method has been replaced by a {@link #getSolver()
+ *   getSolver} method and the equivalent method provided by the returned
+ *   {@link DecompositionSolver}.</li>
  * </ul>
  *
  * @see <a href="http://mathworld.wolfram.com/CholeskyDecomposition.html">MathWorld</a>
@@ -229,6 +229,15 @@ public class CholeskyDecomposition {
          * {@inheritDoc}
          */
         @Override
+        public boolean isNonSingular() {
+            // if we get this far, the matrix was positive definite, hence non-singular
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public RealVector solve(final RealVector b) {
             final int m = lTData.length;
             if (b.getDimension() != m) {
@@ -308,15 +317,6 @@ public class CholeskyDecomposition {
             }
 
             return new Array2DRowRealMatrix(x);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            // if we get this far, the matrix was positive definite, hence non-singular
-            return true;
         }
 
         /**

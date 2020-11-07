@@ -21,30 +21,26 @@
  */
 package org.hipparchus.stat.descriptive.vector;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.stat.descriptive.StorelessMultivariateStatistic;
 import org.hipparchus.stat.descriptive.StorelessUnivariateStatistic;
 import org.hipparchus.util.MathUtils;
 
-import java.io.Serializable;
-import java.util.Arrays;
-
 /**
  * Uses an independent {@link StorelessUnivariateStatistic} instance
  * for each component of a vector.
  */
 public class VectorialStorelessStatistic
-        implements StorelessMultivariateStatistic, Serializable {
+    implements StorelessMultivariateStatistic, Serializable {
 
-    /**
-     * Serializable UID
-     */
+    /** Serializable UID */
     private static final long serialVersionUID = 20160413L;
 
-    /**
-     * Statistic for each component
-     */
+    /** Statistic for each component */
     private final StorelessUnivariateStatistic[] stats;
 
     /**
@@ -52,7 +48,7 @@ public class VectorialStorelessStatistic
      * and statistic implementation. A copy of the provided statistic
      * will be created for each component of the vector.
      *
-     * @param dimension           the vector dimension
+     * @param dimension the vector dimension
      * @param univariateStatistic the prototype statistic
      * @throws MathIllegalArgumentException if dimension &lt; 1
      */
@@ -60,7 +56,7 @@ public class VectorialStorelessStatistic
                                        StorelessUnivariateStatistic univariateStatistic) {
         if (dimension < 1) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL,
-                    dimension, 1);
+                                                   dimension, 1);
         }
         stats = new StorelessUnivariateStatistic[dimension];
         for (int i = 0; i < dimension; i++) {
@@ -68,9 +64,7 @@ public class VectorialStorelessStatistic
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void increment(double[] d) {
         MathUtils.checkDimension(d.length, stats.length);
@@ -79,9 +73,7 @@ public class VectorialStorelessStatistic
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public double[] getResult() {
         double[] result = new double[stats.length];
@@ -91,17 +83,13 @@ public class VectorialStorelessStatistic
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public long getN() {
         return stats[0].getN();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void clear() {
         for (StorelessUnivariateStatistic stat : stats) {
@@ -109,17 +97,22 @@ public class VectorialStorelessStatistic
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int getDimension() {
         return stats.length;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(stats);
+        return result;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -129,18 +122,10 @@ public class VectorialStorelessStatistic
             return false;
         }
         VectorialStorelessStatistic other = (VectorialStorelessStatistic) obj;
-        return Arrays.equals(stats, other.stats);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(stats);
-        return result;
+        if (!Arrays.equals(stats, other.stats)) {
+            return false;
+        }
+        return true;
     }
 
 }

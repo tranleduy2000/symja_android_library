@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,34 +28,19 @@
 
 package org.logicng.propositions;
 
-import org.logicng.collections.ImmutableFormulaList;
 import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
 
 /**
- * An interface for a proposition in LogicNG.  A proposition is a collection of formulas with a additional information
+ * An interface for a proposition in LogicNG.  A proposition is a formula with a additional information
  * like a textual description or a user-provided object.
- *
- * @version 1.0
+ * @version 2.0.0
  * @since 1.0
  */
 public abstract class Proposition {
 
     /**
-     * Returns the formulas of this constraint.
-     *
-     * @return the formulas of this constraint
-     */
-    public abstract ImmutableFormulaList formulas();
-
-    /**
      * Returns the formula of this proposition.
-     *
-     * @param f the formula factory
      * @return the formula of this proposition
      */
-    public Formula formula(final FormulaFactory f) {
-        return this.formulas().formula(f);
-    }
-
+    public abstract Formula formula();
 }

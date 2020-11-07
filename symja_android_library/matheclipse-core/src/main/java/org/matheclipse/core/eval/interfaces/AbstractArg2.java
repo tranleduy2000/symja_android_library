@@ -3,6 +3,7 @@ package org.matheclipse.core.eval.interfaces;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
@@ -96,6 +97,8 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 			}
 		}
 
+		} catch (LimitException le) {
+			throw le;
 		} catch (ValidateException ve) {
 			if (FEConfig.SHOW_STACKTRACE) {
 				ve.printStackTrace();
@@ -152,6 +155,8 @@ public abstract class AbstractArg2 extends AbstractFunctionEvaluator {
 				return result;
 			}
 			return e2ObjArg(ast, o0, o1);
+		} catch (LimitException le) {
+			throw le;
 		} catch (RuntimeException rex) {
 			// EvalEngine.get().printMessage(ast.topHead().toString() + ": " + rex.getMessage());
 		}

@@ -41,7 +41,7 @@ import java.util.Objects;
  * <p>Additional methods that depend on the presence or absence of a contained
  * value are provided, such as {@link #orElse(java.lang.Object) orElse()}
  * (return a default value if value not present) and
- * {link #ifPresent(java.util.function.Consumer) ifPresent()} (execute a block
+ * {link #ifPresent(com.duy.lambda.Consumer) ifPresent()} (execute a block
  * of code if the value is present).
  *
  * @since 1.8

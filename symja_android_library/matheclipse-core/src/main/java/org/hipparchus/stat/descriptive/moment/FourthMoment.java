@@ -21,9 +21,9 @@
  */
 package org.hipparchus.stat.descriptive.moment;
 
-import org.hipparchus.exception.NullArgumentException;
-
 import java.io.Serializable;
+
+import org.hipparchus.exception.NullArgumentException;
 
 /**
  * Computes a statistic related to the Fourth Central Moment. Specifically,
@@ -57,16 +57,12 @@ import java.io.Serializable;
  * one of the threads invokes the <code>increment()</code> or
  * <code>clear()</code> method, it must be synchronized externally.
  */
-class FourthMoment extends ThirdMoment implements Serializable {
+class FourthMoment extends ThirdMoment implements Serializable{
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * fourth moment of values that have been added
-     */
+    /** fourth moment of values that have been added */
     private double m4;
 
     /**
@@ -89,9 +85,7 @@ class FourthMoment extends ThirdMoment implements Serializable {
         this.m4 = original.m4;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void increment(final double d) {
         if (n < 1) {
@@ -109,12 +103,16 @@ class FourthMoment extends ThirdMoment implements Serializable {
         double n0 = n;
 
         m4 = m4 - 4.0 * nDev * prevM3 + 6.0 * nDevSq * prevM2 +
-                ((n0 * n0) - 3 * (n0 - 1)) * (nDevSq * nDevSq * (n0 - 1) * n0);
+            ((n0 * n0) - 3 * (n0 -1)) * (nDevSq * nDevSq * (n0 - 1) * n0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        return m4;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void clear() {
         super.clear();
@@ -122,16 +120,14 @@ class FourthMoment extends ThirdMoment implements Serializable {
     }
 
     /**
-     * {@inheritDoc}
+     * Throws {@link UnsupportedOperationException}.
      */
     @Override
-    public double getResult() {
-        return m4;
+    public void aggregate(SecondMoment other) {
+        throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public FourthMoment copy() {
         return new FourthMoment(this);

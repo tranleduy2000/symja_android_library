@@ -459,7 +459,7 @@ public final class Lists {
      * this reason.
      * <p>
      * <p><b>Java 8 users:</b> many use cases for this method are better addressed by {@link
-     * java.util.stream.Stream#map}. This method is not being deprecated, but we gently encourage you
+     * com.duy.stream.Stream#map}. This method is not being deprecated, but we gently encourage you
      * to migrate to streams.
      */
     public static <F, T> List<T> transform(

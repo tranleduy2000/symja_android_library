@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,6 +28,9 @@
 
 package org.logicng.formulas;
 
+import static org.logicng.formulas.FType.dual;
+import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
+
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Substitution;
 
@@ -37,12 +40,9 @@ import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
-import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
-
 /**
  * Boolean negation.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
 public final class Not extends Formula {
@@ -52,7 +52,6 @@ public final class Not extends Formula {
 
     /**
      * Constructor.
-     *
      * @param operand the operand of the negation
      * @param f       the factory which created this instance
      */
@@ -64,7 +63,6 @@ public final class Not extends Formula {
 
     /**
      * Returns the operand of this negation.
-     *
      * @return the operand of this negation
      */
     public Formula operand() {
@@ -158,22 +156,21 @@ public final class Not extends Formula {
                     for (final Formula op : this.operand) {
                         nops.add(op.negate().nnf());
                     }
-                    nnf = this.f.naryOperator(this.operand.type == FType.AND ? FType.OR : FType.AND, nops);
+                    nnf = this.f.naryOperator(dual(this.operand.type), nops);
                     break;
                 case IMPL:
-                    BinaryOperator binary = (BinaryOperator) this.operand;
-                    nnf = this.f.and(binary.left.nnf(), binary.right.negate().nnf());
+                    final BinaryOperator impl = (BinaryOperator) this.operand;
+                    nnf = this.f.and(impl.left.nnf(), impl.right.negate().nnf());
                     break;
                 case EQUIV:
-                    binary = (BinaryOperator) this.operand;
-                    nnf = this.f.and(this.f.or(binary.left.negate().nnf(), binary.right.negate().nnf()),
-                            this.f.or(binary.left.nnf(), binary.right.nnf()));
+                    final BinaryOperator equiv = (BinaryOperator) this.operand;
+                    nnf = this.f.and(this.f.or(equiv.left.negate().nnf(), equiv.right.negate().nnf()), this.f.or(equiv.left.nnf(), equiv.right.nnf()));
                     break;
                 case PBC:
                     nnf = this.operand.negate().nnf();
                     break;
                 default:
-                    nnf = this;
+                    throw new IllegalStateException("Did not expect formula of type: " + this.operand.type());
             }
             this.transformationCache.put(NNF, nnf);
         }
@@ -228,4 +225,5 @@ public final class Not extends Formula {
             }
         };
     }
+
 }

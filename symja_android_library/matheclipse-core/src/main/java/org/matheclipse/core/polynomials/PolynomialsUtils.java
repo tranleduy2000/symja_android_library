@@ -20,6 +20,8 @@ import com.duy.lambda.IntFunction;
 
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.FastMath;
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -236,6 +238,9 @@ public class PolynomialsUtils {
 		// ...
 		final int start = degree * (degree + 1) / 2;
 
+		if (start+degree + 1 >= Config.MAX_AST_SIZE) {
+			ASTElementLimitExceeded.throwIt(start+degree + 1);
+		}
 		return result.appendArgs(0, degree + 1,
 				new IntFunction<IExpr>() {
 					@Override
@@ -283,6 +288,9 @@ public class PolynomialsUtils {
 				ck = coefficients.get(startK + i);
 				ckm1 = coefficients.get(startKm1 + i);
 				coefficients.add(ck.multiply(ai[0]).add(ckPrev.multiply(ai[1])).subtract(ckm1.multiply(ai[2])));
+				if (coefficients.size() > Config.MAX_AST_SIZE) {
+					ASTElementLimitExceeded.throwIt(coefficients.size());
+				}
 			}
 
 			// degree k coefficient
@@ -293,6 +301,9 @@ public class PolynomialsUtils {
 			// degree k+1 coefficient
 			coefficients.add(ck.multiply(ai[1]));
 
+			if (coefficients.size() > Config.MAX_AST_SIZE) {
+				ASTElementLimitExceeded.throwIt(coefficients.size());
+			}
 		}
 
 	}

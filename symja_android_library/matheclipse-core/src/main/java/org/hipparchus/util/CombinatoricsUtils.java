@@ -21,50 +21,43 @@
  */
 package org.hipparchus.util;
 
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.special.Gamma;
-
-import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Combinatorial utilities.
  */
 public final class CombinatoricsUtils {
 
-    /**
-     * All long-representable factorials
-     */
-    static final long[] FACTORIALS = new long[]{
-            1l, 1l, 2l,
-            6l, 24l, 120l,
-            720l, 5040l, 40320l,
-            362880l, 3628800l, 39916800l,
-            479001600l, 6227020800l, 87178291200l,
-            1307674368000l, 20922789888000l, 355687428096000l,
-            6402373705728000l, 121645100408832000l, 2432902008176640000l};
+    /** All long-representable factorials */
+    static final long[] FACTORIALS = {
+                       1l,                  1l,                   2l,
+                       6l,                 24l,                 120l,
+                     720l,               5040l,               40320l,
+                  362880l,            3628800l,            39916800l,
+               479001600l,         6227020800l,         87178291200l,
+           1307674368000l,     20922789888000l,     355687428096000l,
+        6402373705728000l, 121645100408832000l, 2432902008176640000l };
 
-    /**
-     * Stirling numbers of the second kind.
-     */
-    static final AtomicReference<long[][]> STIRLING_S2 = new AtomicReference<>(null);
+    /** Stirling numbers of the second kind. */
+    static final AtomicReference<long[][]> STIRLING_S2 = new AtomicReference<> (null);
 
     /**
      * Default implementation of {@link #factorialLog(int)} method:
      * <ul>
-     * <li>No pre-computation</li>
-     * <li>No cache allocation</li>
+     *  <li>No pre-computation</li>
+     *  <li>No cache allocation</li>
      * </ul>
      */
     private static final FactorialLog FACTORIAL_LOG_NO_CACHE = FactorialLog.create();
 
-    /**
-     * Private constructor (class contains only static methods).
-     */
-    private CombinatoricsUtils() {
-    }
+    /** Private constructor (class contains only static methods). */
+    private CombinatoricsUtils() {}
 
 
     /**
@@ -90,11 +83,11 @@ public final class CombinatoricsUtils {
      * @return {@code n choose k}
      * @throws MathIllegalArgumentException if {@code n < 0}.
      * @throws MathIllegalArgumentException if {@code k > n}.
-     * @throws MathRuntimeException         if the result is too large to be
-     *                                      represented by a long integer.
+     * @throws MathRuntimeException if the result is too large to be
+     * represented by a long integer.
      */
     public static long binomialCoefficient(final int n, final int k)
-            throws MathIllegalArgumentException, MathRuntimeException {
+        throws MathIllegalArgumentException, MathRuntimeException {
         CombinatoricsUtils.checkBinomial(n, k);
         if ((n == k) || (k == 0)) {
             return 1;
@@ -171,11 +164,11 @@ public final class CombinatoricsUtils {
      * @return {@code n choose k}
      * @throws MathIllegalArgumentException if {@code n < 0}.
      * @throws MathIllegalArgumentException if {@code k > n}.
-     * @throws MathRuntimeException         if the result is too large to be
-     *                                      represented by a long integer.
+     * @throws MathRuntimeException if the result is too large to be
+     * represented by a long integer.
      */
     public static double binomialCoefficientDouble(final int n, final int k)
-            throws MathIllegalArgumentException, MathRuntimeException {
+        throws MathIllegalArgumentException, MathRuntimeException {
         CombinatoricsUtils.checkBinomial(n, k);
         if ((n == k) || (k == 0)) {
             return 1d;
@@ -183,16 +176,16 @@ public final class CombinatoricsUtils {
         if ((k == 1) || (k == n - 1)) {
             return n;
         }
-        if (k > n / 2) {
+        if (k > n/2) {
             return binomialCoefficientDouble(n, n - k);
         }
         if (n < 67) {
-            return binomialCoefficient(n, k);
+            return binomialCoefficient(n,k);
         }
 
         double result = 1d;
         for (int i = 1; i <= k; i++) {
-            result *= (double) (n - k + i) / (double) i;
+             result *= (double)(n - k + i) / (double)i;
         }
 
         return FastMath.floor(result + 0.5);
@@ -216,11 +209,11 @@ public final class CombinatoricsUtils {
      * @return {@code n choose k}
      * @throws MathIllegalArgumentException if {@code n < 0}.
      * @throws MathIllegalArgumentException if {@code k > n}.
-     * @throws MathRuntimeException         if the result is too large to be
-     *                                      represented by a long integer.
+     * @throws MathRuntimeException if the result is too large to be
+     * represented by a long integer.
      */
     public static double binomialCoefficientLog(final int n, final int k)
-            throws MathIllegalArgumentException, MathRuntimeException {
+        throws MathIllegalArgumentException, MathRuntimeException {
         CombinatoricsUtils.checkBinomial(n, k);
         if ((n == k) || (k == 0)) {
             return 0;
@@ -234,7 +227,7 @@ public final class CombinatoricsUtils {
          * return the log of the exact value
          */
         if (n < 67) {
-            return FastMath.log(binomialCoefficient(n, k));
+            return FastMath.log(binomialCoefficient(n,k));
         }
 
         /*
@@ -285,11 +278,11 @@ public final class CombinatoricsUtils {
      *
      * @param n argument
      * @return {@code n!}
-     * @throws MathRuntimeException         if the result is too large to be represented
-     *                                      by a {@code long}.
+     * @throws MathRuntimeException if the result is too large to be represented
+     * by a {@code long}.
      * @throws MathIllegalArgumentException if {@code n < 0}.
      * @throws MathIllegalArgumentException if {@code n > 20}: The factorial value is too
-     *                                      large to fit in a {@code long}.
+     * large to fit in a {@code long}.
      */
     public static long factorial(final int n) throws MathIllegalArgumentException {
         if (n < 0) {
@@ -317,7 +310,7 @@ public final class CombinatoricsUtils {
     public static double factorialDouble(final int n) throws MathIllegalArgumentException {
         if (n < 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.FACTORIAL_NEGATIVE_PARAMETER,
-                    n);
+                                           n);
         }
         if (n < 21) {
             return FACTORIALS[n];
@@ -346,23 +339,22 @@ public final class CombinatoricsUtils {
      * The preconditions are {@code 0 <= k <= n } (otherwise
      * {@code MathIllegalArgumentException} is thrown)
      * </p>
-     *
      * @param n the size of the set
      * @param k the number of non-empty subsets
      * @return {@code S(n,k)}
      * @throws MathIllegalArgumentException if {@code k < 0}.
      * @throws MathIllegalArgumentException if {@code k > n}.
-     * @throws MathRuntimeException         if some overflow happens, typically for n exceeding 25 and
-     *                                      k between 20 and n-2 (S(n,n-1) is handled specifically and does not overflow)
+     * @throws MathRuntimeException if some overflow happens, typically for n exceeding 25 and
+     * k between 20 and n-2 (S(n,n-1) is handled specifically and does not overflow)
      */
     public static long stirlingS2(final int n, final int k)
-            throws MathIllegalArgumentException, MathRuntimeException {
+        throws MathIllegalArgumentException, MathRuntimeException {
         if (k < 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL, k, 0);
         }
         if (k > n) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_LARGE,
-                    k, n);
+                                                   k, n);
         }
 
         long[][] stirlingS2 = STIRLING_S2.get();
@@ -375,7 +367,7 @@ public final class CombinatoricsUtils {
             // we must stop computation at row 26
             final int maxIndex = 26;
             stirlingS2 = new long[maxIndex][];
-            stirlingS2[0] = new long[]{1l};
+            stirlingS2[0] = new long[] { 1l };
             for (int i = 1; i < stirlingS2.length; ++i) {
                 stirlingS2[i] = new long[i + 1];
                 stirlingS2[i][0] = 0;
@@ -414,7 +406,7 @@ public final class CombinatoricsUtils {
                     if (sum < 0) {
                         // there was an overflow somewhere
                         throw new MathRuntimeException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
-                                n, 0, stirlingS2.length - 1);
+                                                          n, 0, stirlingS2.length - 1);
                     }
                 }
                 return sum / factorial(k);
@@ -457,10 +449,10 @@ public final class CombinatoricsUtils {
      */
     public static void checkBinomial(final int n,
                                      final int k)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         if (n < k) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.BINOMIAL_INVALID_PARAMETERS_ORDER,
-                    k, n, true);
+                                                k, n, true);
         }
         if (n < 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.BINOMIAL_NEGATIVE_PARAMETER, n);
@@ -484,7 +476,7 @@ public final class CombinatoricsUtils {
          * Creates an instance, reusing the already computed values if available.
          *
          * @param numValues Number of values of the function to compute.
-         * @param cache     Existing cache.
+         * @param cache Existing cache.
          * @throw MathIllegalArgumentException if {@code n < 0}.
          */
         private FactorialLog(int numValues,
@@ -497,8 +489,8 @@ public final class CombinatoricsUtils {
 
             final int beginCopy = 2;
             final int endCopy = cache == null || cache.length <= beginCopy ?
-                    beginCopy : cache.length <= numValues ?
-                    cache.length : numValues;
+                beginCopy : cache.length <= numValues ?
+                cache.length : numValues;
 
             // Copy available values.
             for (int i = beginCopy; i < endCopy; i++) {
@@ -513,7 +505,6 @@ public final class CombinatoricsUtils {
 
         /**
          * Creates an instance with no precomputed values.
-         *
          * @return instance with no precomputed values
          */
         public static FactorialLog create() {
@@ -542,7 +533,7 @@ public final class CombinatoricsUtils {
         public double value(final int n) {
             if (n < 0) {
                 throw new MathIllegalArgumentException(LocalizedCoreFormats.FACTORIAL_NEGATIVE_PARAMETER,
-                        n);
+                                               n);
             }
 
             // Use cache of precomputed values.

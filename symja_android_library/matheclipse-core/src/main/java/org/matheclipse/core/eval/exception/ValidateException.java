@@ -7,7 +7,7 @@ import org.matheclipse.parser.client.math.MathException;
  * Base exception for validating function arguments
  *
  */
-public abstract class ValidateException extends MathException {
+public abstract class ValidateException extends SymjaMathException {
 
 	/**
 	 * 

@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval;
 
+import org.matheclipse.core.eval.exception.SymjaMathException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.form.output.OutputFormFactory;
@@ -81,11 +82,20 @@ public class SymjaInterpreter extends EvalUtilities {
 				if (result.equals(F.Null)) {
 					return buf.toString();
 				}
-				if (OutputFormFactory.get(true).convert(buf, result)) {
+				if (OutputFormFactory.get(engine.isRelaxedSyntax()).convert(buf, result)) {
 			return buf.toString();
 				}
 			}
 			return "ERROR-IN-OUTPUTFORM";
+		} catch (SymjaMathException sma) {
+			Throwable me = sma.getCause();
+			Validate.printException(buf, me);
+			if (expr.equals(F.Null)) {
+				return buf.toString();
+			}
+			if (OutputFormFactory.get(engine.isRelaxedSyntax()).convert(buf, expr)) {
+				return buf.toString();
+			}
 		} catch (final RuntimeException re) {
 			Throwable me = re.getCause();
 			if (me instanceof MathException) {
@@ -142,7 +152,7 @@ public class SymjaInterpreter extends EvalUtilities {
 					if (result.equals(F.Null)) {
 						return buf.toString();
 					}
-					if (OutputFormFactory.get(true).convert(buf, result)) {
+					if (OutputFormFactory.get(engine.isRelaxedSyntax()).convert(buf, result)) {
 				return buf.toString();
 			}
 				}

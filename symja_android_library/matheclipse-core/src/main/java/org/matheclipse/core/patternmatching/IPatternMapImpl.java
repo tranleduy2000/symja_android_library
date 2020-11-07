@@ -1,14 +1,17 @@
 package org.matheclipse.core.patternmatching;
 
-import com.duy.annotations.Nonnull;
+import com.duy.annotations.ObjcMemoryIssue;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
+import org.hipparchus.util.Pair;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.OptionsPattern;
 import org.matheclipse.core.expression.Pattern;
+import org.matheclipse.core.expression.PatternNested;
 import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("JavaDoc")
 public abstract class IPatternMapImpl implements IPatternMap {
     /**
      * The default priority when associating a new rule to a symbol. Lower values have higher priorities.
@@ -37,68 +41,103 @@ public abstract class IPatternMapImpl implements IPatternMap {
      * @param patternIndexMap
      * @param pattern
      */
-    public static void addPattern(List<IExpr> patternIndexMap, IPatternObject pattern) {
+    public static void addPattern(List<Pair<IExpr, IPatternObject>> patternIndexMap, IPatternObject pattern) {
         ISymbol sym = pattern.getSymbol();
         if (sym != null) {
             for (int i = 0; i < patternIndexMap.size(); i++) {
-                if (patternIndexMap.get(i) == sym) {
+                if (patternIndexMap.get(i).getKey() == sym) {
                     return;
                 }
             }
-            patternIndexMap.add(sym);
+            patternIndexMap.add(new Pair(sym, pattern));
             return;
         }
-        patternIndexMap.add(pattern);
+        patternIndexMap.add(new Pair(pattern, pattern));
     }
 
     /**
      * Determine all patterns (i.e. all objects of instance IPattern) in the given expression
-     * <p>
+     *
      * Increments this classes pattern counter.
      *
-     * @param lhsPatternExpr the (left-hand-side) expression which could contain pattern objects.
+     * @param lhsPatternExpr
+     *            the (left-hand-side) expression which could contain pattern objects.
      * @return the priority of this pattern-matcher
      */
-    public static IPatternMap determinePatterns(final IExpr lhsPatternExpr, int[] priority) {
+    public static IPatternMap determinePatterns(final IExpr lhsPatternExpr, int[] priority, PatternNested p2) {
         // int[] priority = new int[] { DEFAULT_RULE_PRIORITY };
 
         if (lhsPatternExpr instanceof IAST) {
-            List<IExpr> patternIndexMap = new ArrayList<IExpr>();
-            boolean[] ruleWithoutPattern = new boolean[]{true};
+            List<Pair<IExpr, IPatternObject>> patternIndexMap = new ArrayList<Pair<IExpr, IPatternObject>>();
+            boolean[] ruleWithoutPattern = new boolean[] { true };
+            if (p2 != null) {
+                ruleWithoutPattern[0] = false;
+                int[] result = p2.addPattern(patternIndexMap);
+                priority[0] -= result[1];
+            }
+
             determinePatternsRecursive(patternIndexMap, (IAST) lhsPatternExpr, priority, ruleWithoutPattern, 1);
-            final int size = patternIndexMap.size();
+            int size = patternIndexMap.size();
             switch (size) {
                 case 1:
                     PatternMap1 patternMap1 = new PatternMap1();
-                    patternMap1.fSymbol1 = patternIndexMap.get(0);
+                    patternMap1.fSymbol1 = patternIndexMap.get(0).getFirst();
+                    patternMap1.fPatternObject1 = patternIndexMap.get(0).getSecond();
                     return patternMap1;
                 case 2:
                     PatternMap2 patternMap2 = new PatternMap2();
-                    patternMap2.fSymbol1 = patternIndexMap.get(0);
-                    patternMap2.fSymbol2 = patternIndexMap.get(1);
+                    patternMap2.fSymbol1 = patternIndexMap.get(0).getFirst();
+                    patternMap2.fPatternObject1 = patternIndexMap.get(0).getSecond();
+                    patternMap2.fSymbol2 = patternIndexMap.get(1).getFirst();
+                    patternMap2.fPatternObject2 = patternIndexMap.get(1).getSecond();
                     return patternMap2;
                 case 3:
                     PatternMap3 patternMap3 = new PatternMap3();
-                    patternMap3.fSymbol1 = patternIndexMap.get(0);
-                    patternMap3.fSymbol2 = patternIndexMap.get(1);
-                    patternMap3.fSymbol3 = patternIndexMap.get(2);
+                    patternMap3.fSymbol1 = patternIndexMap.get(0).getFirst();
+                    patternMap3.fPatternObject1 = patternIndexMap.get(0).getSecond();
+                    patternMap3.fSymbol2 = patternIndexMap.get(1).getFirst();
+                    patternMap3.fPatternObject2 = patternIndexMap.get(1).getSecond();
+                    patternMap3.fSymbol3 = patternIndexMap.get(2).getFirst();
+                    patternMap3.fPatternObject3 = patternIndexMap.get(2).getSecond();
                     return patternMap3;
             }
             PatternMap patternMap = new PatternMap();
             patternMap.fRuleWithoutPattern = ruleWithoutPattern[0];
             patternMap.fSymbolsOrPattern = new IExpr[size];
             patternMap.fSymbolsOrPatternValues = new IExpr[size];
+            patternMap.fPatternObjects = new IPatternObject[size];
             int i = 0;
-            for (IExpr entry : patternIndexMap) {
-                patternMap.fSymbolsOrPattern[i++] = entry;
+            for (Pair<IExpr, IPatternObject> entry : patternIndexMap) {
+                patternMap.fSymbolsOrPattern[i] = entry.getFirst();
+                patternMap.fPatternObjects[i] = entry.getSecond();
+                i++;
             }
             return patternMap;
+        } else if (lhsPatternExpr instanceof PatternNested) {
+            PatternNested pattern2 = (PatternNested) lhsPatternExpr;
+//			PatternMap1 patternMap1 = new PatternMap1();
+//			IPatternObject pattern = (IPatternObject) lhsPatternExpr;
+//			final ISymbol sym = pattern.getSymbol();
+//			patternMap1.fSymbol1 = (sym != null) ? sym : pattern;
+//			patternMap1.fPatternObject1 = pattern;
+            return determinePatterns(pattern2.getPatternExpr(), priority, pattern2);
         } else if (lhsPatternExpr instanceof IPatternObject) {
-            // patternMap.addSinglePattern((IPatternObject) lhsPatternExpr);
+            if (p2 != null) {
+                PatternMap2 patternMap2 = new PatternMap2();
+                patternMap2.fSymbol1 = p2.getSymbol();
+                patternMap2.fPatternObject1 = p2;
+
+                IPatternObject pattern = (IPatternObject) lhsPatternExpr;
+                final ISymbol sym = pattern.getSymbol();
+                patternMap2.fSymbol2 = (sym != null) ? sym : pattern;
+                patternMap2.fPatternObject2 = pattern;
+                return patternMap2;
+            }
             PatternMap1 patternMap1 = new PatternMap1();
             IPatternObject pattern = (IPatternObject) lhsPatternExpr;
             final ISymbol sym = pattern.getSymbol();
             patternMap1.fSymbol1 = (sym != null) ? sym : pattern;
+            patternMap1.fPatternObject1 = pattern;
             return patternMap1;
         }
         return PATTERN_MAP0;
@@ -106,75 +145,80 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
     /**
      * Determine all patterns (i.e. all objects of instance IPattern) in the given expression
-     * <p>
+     *
      * Increments this classes pattern counter.
      *
      * @param patternIndexMap
-     * @param lhsPatternExpr  the (left-hand-side) expression which could contain pattern objects.
-     * @param treeLevel       the level of the tree where the patterns are determined
+     * @param lhsPatternExpr
+     *            the (left-hand-side) expression which could contain pattern objects.
+     * @param treeLevel
+     *            the level of the tree where the patterns are determined
      */
-    static int determinePatternsRecursive(final List<IExpr> patternIndexMap, final IAST lhsPatternExpr, final int[] priority,
-                                          final boolean[] ruleWithoutPattern, final int treeLevel) {
+    @ObjcMemoryIssue
+    static int determinePatternsRecursive(final List<Pair<IExpr, IPatternObject>> patternIndexMap, final IAST lhsPatternExpr,
+                                          final int[] priority, final boolean[] ruleWithoutPattern, final int treeLevel) {
         if (lhsPatternExpr.isAlternatives() || lhsPatternExpr.isExcept()) {
             ruleWithoutPattern[0] = false;
         }
-        // objc-changed: memory issue
-        /*final*/ int/*[]*/ listEvalFlags =/* new int[] {*/ IAST.NO_FLAG /*}*/;
-        // lhsPatternExpr.forEach(new Consumer<IExpr>() {
-        //     @Override
-        //     public void accept(IExpr x) {
-        //         if (x.isAST()) {
-        //             final IAST lhsPatternAST = (IAST) x;
-        //             if (lhsPatternAST.isPatternMatchingFunction()) {
-        //                 listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
-        //             }
-        //             listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
-        //                     ruleWithoutPattern, treeLevel + 1);
-        //             priority[0] -= 11;
-        //             if (x.isPatternDefault()) {
-        //                 listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
-        //             }
-        //         } else if (x instanceof IPatternObject) {
-        //             ruleWithoutPattern[0] = false;
-        //             int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
-        //             listEvalFlags[0] |= result[0];
-        //             priority[0] -= result[1];
-        //         } else {
-        //             priority[0] -= (50 - treeLevel);
-        //         }
-        //     }
-        // }, 0);
-        // objc-changed: memory issue
-        for (int i = 0; i < lhsPatternExpr.size(); i++) {
-            IExpr x = lhsPatternExpr.get(i);
-            if (x.isAST()) {
-                final IAST lhsPatternAST = (IAST) x;
-                if (lhsPatternAST.isPatternMatchingFunction()) {
-                    listEvalFlags/*[0]*/ |= IAST.CONTAINS_PATTERN;
-                }
-                listEvalFlags/*[0]*/ |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
-                        ruleWithoutPattern, treeLevel + 1);
-                priority[0] -= 11;
-                if (x.isPatternDefault()) {
-                    listEvalFlags/*[0]*/ |= IAST.CONTAINS_DEFAULT_PATTERN;
-                }
-            } else if (x instanceof IPatternObject) {
-                ruleWithoutPattern[0] = false;
-                int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
-                listEvalFlags/*[0]*/ |= result[0];
-                priority[0] -= result[1];
-            } else {
-                priority[0] -= (50 - treeLevel);
+        final int[] listEvalFlags = new int[] { IAST.NO_FLAG };
+        if (lhsPatternExpr.isAlternatives() || //
+                lhsPatternExpr.isExcept() || //
+                lhsPatternExpr.isRepeated()) {
+            ruleWithoutPattern[0] = false;
+            if (lhsPatternExpr.isRepeated()) {
+                listEvalFlags[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
             }
         }
-        lhsPatternExpr.setEvalFlags(listEvalFlags/*[0]*/);
+
+        lhsPatternExpr.forEach(new Consumer<IExpr>() {
+            @Override
+            public void accept(IExpr x) {
+                if (x.isAST()) {
+                    final IAST lhsPatternAST = (IAST) x;
+                    if (lhsPatternAST.isPatternMatchingFunction()) {
+                        listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
+                    }
+                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
+                            ruleWithoutPattern, treeLevel + 1);
+                    priority[0] -= 11;
+                    if (x.isPatternDefault()) {
+                        listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+                    }
+                } else if (x instanceof IPatternObject) {
+                    ruleWithoutPattern[0] = false;
+                    int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
+                    listEvalFlags[0] |= result[0];
+                    priority[0] -= result[1];
+                    if (x instanceof PatternNested) {
+                        IExpr patternExpr = ((PatternNested) x).getPatternExpr();
+                        if (patternExpr.isAST()) {
+                            listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, (IAST) patternExpr, priority,
+                                    ruleWithoutPattern, treeLevel + 1);
+                            priority[0] -= 11;
+                            if (x.isPatternDefault()) {
+                                listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+                            }
+                        }
+                    }
+
+                } else {
+                    priority[0] -= (50 - treeLevel);
+                }
+            }
+        }, 0);
+        lhsPatternExpr.setEvalFlags(listEvalFlags[0]);
         // disable flag "pattern with default value"
         // listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;
-        return listEvalFlags/*[0]*/;
+        return listEvalFlags[0];
     }
 
     @Override
     public abstract IPatternMap clone();
+
+    @Override
+    public void initPatternBlank() {
+        initPattern();
+    }
 
     @Override
     public boolean isPatternTest(IExpr expr, IExpr patternTest, final EvalEngine engine) {
@@ -290,23 +334,33 @@ public abstract class IPatternMapImpl implements IPatternMap {
         }
         return F.NIL;
     }
+
+    /**
+     * @param op
+     * @param x      may be <code>null</code>
+     * @param engine
+     */
+    public static void addOptionsPattern(OptionsPattern op, IExpr x, EvalEngine engine) {
+        if (x.size() > 1 && //
+                (x.isSequence() || x.isList())) {
+            IAST list = (IAST) x;
+            for (int i = 1; i < list.size(); i++) {
+                // also for nested lists
+                addOptionsPattern(op, list.get(i), engine);
+            }
+        } else {
+            engine.addOptionsPattern(op, (IAST) x);
+        }
+
+    }
+
     static final class PatternMap0 extends IPatternMapImpl implements IPatternMap {
         private final static int SIZE = 0;
 
         @Override
         public IPatternMap clone() {
             return new PatternMap0();
-        }
-
-        ;
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append("]");
-            return buf.toString();
-        }
+		};
 
         @Override
         public IExpr[] copyPattern() {
@@ -352,11 +406,17 @@ public abstract class IPatternMapImpl implements IPatternMap {
         public void initPattern() {
         }
 
+		@Override
+		public final void initSlotValues() {
+		}
         @Override
         public boolean isAllPatternsAssigned() {
             return true;
         }
 
+		public boolean isValueAssigned() {
+			return false;
+		}
         @Override
         public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
             return true;
@@ -367,9 +427,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return true;
         }
 
-        public boolean isValueAssigned() {
-            return false;
-        }
 
         @Override
         public void resetPattern(IExpr[] patternValuesArray) {
@@ -404,11 +461,23 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return lhsPatternExpr;
         }
 
-        ;
 
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
             return rhsExpr;
+		};
+
+		@Override
+		public String toString() {
+			StringBuilder buf = new StringBuilder();
+			buf.append("Patterns[");
+			buf.append("]");
+			return buf.toString();
+		}
+
+		@Override
+		public boolean setOptionsPattern(EvalEngine engine, ISymbol lhsHead) {
+			return false;
         }
     }
 
@@ -417,6 +486,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
         IExpr fSymbol1;
         IExpr fValue1;
+		IPatternObject fPatternObject1;
         private transient boolean evaluatedRHS = false;
 
         @Override
@@ -425,25 +495,9 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.evaluatedRHS = false;
             result.fSymbol1 = this.fSymbol1;
             result.fValue1 = this.fValue1;
+			result.fPatternObject1 = this.fPatternObject1;
             return result;
-        }
-
-        ;
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append(fSymbol1.toString());
-            buf.append(" => ");
-            if (fValue1 != null) {
-                buf.append(fValue1.toString());
-            } else {
-                buf.append("?");
-            }
-            buf.append("]");
-            return buf.toString();
-        }
+		};
 
         @Override
         public IExpr[] copyPattern() {
@@ -511,11 +565,23 @@ public abstract class IPatternMapImpl implements IPatternMap {
             fValue1 = null;
         }
 
+		@Override
+		public final void initSlotValues() {
+			fValue1 = F.Slot1;
+		}
         @Override
         public boolean isAllPatternsAssigned() {
             return fValue1 != null;
         }
 
+		public boolean isValueAssigned() {
+			if (fValue1 != null) {
+				if (fSymbol1 instanceof ISymbol) {
+					return true;
+				}
+			}
+			return false;
+		}
         @Override
         public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
             if (isAllPatternsAssigned()) {
@@ -535,14 +601,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return false;
         }
 
-        public boolean isValueAssigned() {
-            if (fValue1 != null) {
-                if (fSymbol1 instanceof ISymbol) {
-                    return true;
-                }
-            }
-            return false;
-        }
 
         @Override
         public void resetPattern(IExpr[] patternValuesArray) {
@@ -555,6 +613,15 @@ public abstract class IPatternMapImpl implements IPatternMap {
             evaluatedRHS = evaluated;
         }
 
+		@Override
+		public boolean setOptionsPattern(EvalEngine engine, ISymbol lhsHead) {
+			if (fPatternObject1.isOptionsPattern()) {
+				OptionsPattern op = (OptionsPattern) fPatternObject1;
+				addOptionsPattern(op, fValue1, engine);
+				return lhsHead == op.getOptionsPatternHead();
+			}
+			return false;
+		}
         @Override
         public boolean setValue(IPatternObject pattern, IExpr expr) {
             ISymbol sym = pattern.getSymbol();
@@ -600,7 +667,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return F.NIL;
         }
 
-        ;
 
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
@@ -616,6 +682,21 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return F.NIL;
                 }
             }).orElse(rhsExpr);
+		};
+
+		@Override
+		public String toString() {
+			StringBuilder buf = new StringBuilder();
+			buf.append("Patterns[");
+			buf.append(fSymbol1.toString());
+			buf.append(" => ");
+			if (fValue1 != null) {
+				buf.append(fValue1.toString());
+			} else {
+				buf.append("?");
+			}
+			buf.append("]");
+			return buf.toString();
         }
     }
 
@@ -624,8 +705,10 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
         IExpr fSymbol1;
         IExpr fValue1;
+		IPatternObject fPatternObject1;
         IExpr fSymbol2;
         IExpr fValue2;
+		IPatternObject fPatternObject2;
         private transient boolean evaluatedRHS = false;
 
         @Override
@@ -634,37 +717,12 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.evaluatedRHS = false;
             result.fSymbol1 = this.fSymbol1;
             result.fValue1 = this.fValue1;
+			result.fPatternObject1 = this.fPatternObject1;
             result.fSymbol2 = this.fSymbol2;
             result.fValue2 = this.fValue2;
+			result.fPatternObject2 = this.fPatternObject2;
             return result;
-        }
-
-        ;
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append(fSymbol1.toString());
-            buf.append(" => ");
-            if (fValue1 != null) {
-                buf.append(fValue1.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append(", ");
-            buf.append(fSymbol2.toString());
-            buf.append(" => ");
-            if (fValue2 != null) {
-                buf.append(fValue2.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append("]");
-            return buf.toString();
-        }
+		};
 
         @Override
         public IExpr[] copyPattern() {
@@ -749,17 +807,47 @@ public abstract class IPatternMapImpl implements IPatternMap {
             fValue2 = null;
         }
 
+		@Override
+		public void initPatternBlank() {
+			evaluatedRHS = false;
+			if (fSymbol1 instanceof IPatternObject) {
+				fValue1 = null;
+			}
+			if (fSymbol2 instanceof IPatternObject) {
+				fValue2 = null;
+			}
+		}
+
+		@Override
+		public final void initSlotValues() {
+			fValue1 = F.Slot1;
+			fValue2 = F.Slot2;
+		}
         @Override
         public boolean isAllPatternsAssigned() {
             return fValue1 != null && fValue2 != null;
         }
 
+		@Override
+		public boolean isValueAssigned() {
+			if (fValue1 != null) {
+				if (fSymbol1 instanceof ISymbol) {
+					return true;
+				}
+			}
+			if (fValue2 != null) {
+				if (fSymbol2 instanceof ISymbol) {
+					return true;
+				}
+			}
+			return false;
+		}
         @Override
         public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
             if (isAllPatternsAssigned()) {
                 return true;
             }
-            return substitutedExpr.isFree(new Predicate<IExpr>() {
+			return substitutedExpr.isFree(new Predicate<IExpr>() {
                 @Override
                 public boolean test(IExpr x) {
                     // compare object references with operator '==' here !
@@ -773,20 +861,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return false;
         }
 
-        @Override
-        public boolean isValueAssigned() {
-            if (fValue1 != null) {
-                if (fSymbol1 instanceof ISymbol) {
-                    return true;
-                }
-            }
-            if (fValue2 != null) {
-                if (fSymbol2 instanceof ISymbol) {
-                    return true;
-                }
-            }
-            return false;
-        }
 
         @Override
         public void resetPattern(IExpr[] patternValuesArray) {
@@ -795,6 +869,25 @@ public abstract class IPatternMapImpl implements IPatternMap {
             fValue2 = patternValuesArray[1];
         }
 
+		@Override
+		public boolean setOptionsPattern(EvalEngine engine, ISymbol lhsHead) {
+			boolean result = false;
+			if (fPatternObject1.isOptionsPattern()) {
+				OptionsPattern op = (OptionsPattern) fPatternObject1;
+				addOptionsPattern(op, fValue1, engine);
+				if (lhsHead == op.getOptionsPatternHead()) {
+					result = true;
+				}
+			}
+			if (fPatternObject2.isOptionsPattern()) {
+				OptionsPattern op = (OptionsPattern) fPatternObject2;
+				addOptionsPattern(op, fValue2, engine);
+				if (lhsHead == op.getOptionsPatternHead()) {
+					result = true;
+				}
+			}
+			return result;
+		}
         @Override
         public void setRHSEvaluated(boolean evaluated) {
             evaluatedRHS = evaluated;
@@ -859,11 +952,10 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return F.NIL;
         }
 
-        ;
 
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
-            return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
+			return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr input) {
                     if (input.isSymbol()) {
@@ -878,7 +970,31 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return F.NIL;
                 }
             }).orElse(rhsExpr);
+		};
+
+		@Override
+		public String toString() {
+			StringBuilder buf = new StringBuilder();
+			buf.append("Patterns[");
+			buf.append(fSymbol1.toString());
+			buf.append(" => ");
+			if (fValue1 != null) {
+				buf.append(fValue1.toString());
+			} else {
+				buf.append("?");
         }
+			buf.append(", ");
+			buf.append(fSymbol2.toString());
+			buf.append(" => ");
+			if (fValue2 != null) {
+				buf.append(fValue2.toString());
+			} else {
+				buf.append("?");
+			}
+
+			buf.append("]");
+			return buf.toString();
+		}
     }
 
     static class PatternMap3 extends IPatternMapImpl implements IPatternMap {
@@ -886,10 +1002,13 @@ public abstract class IPatternMapImpl implements IPatternMap {
 
         IExpr fSymbol1;
         IExpr fValue1;
+		IPatternObject fPatternObject1;
         IExpr fSymbol2;
         IExpr fValue2;
+		IPatternObject fPatternObject2;
         IExpr fSymbol3;
         IExpr fValue3;
+		IPatternObject fPatternObject3;
         private transient boolean evaluatedRHS = false;
 
         @Override
@@ -898,48 +1017,15 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.evaluatedRHS = false;
             result.fSymbol1 = this.fSymbol1;
             result.fValue1 = this.fValue1;
+			result.fPatternObject1 = this.fPatternObject1;
             result.fSymbol2 = this.fSymbol2;
             result.fValue2 = this.fValue2;
+			result.fPatternObject2 = this.fPatternObject2;
             result.fSymbol3 = this.fSymbol3;
             result.fValue3 = this.fValue3;
+			result.fPatternObject3 = this.fPatternObject3;
             return result;
-        }
-
-        ;
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Patterns[");
-            buf.append(fSymbol1.toString());
-            buf.append(" => ");
-            if (fValue1 != null) {
-                buf.append(fValue1.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append(", ");
-            buf.append(fSymbol2.toString());
-            buf.append(" => ");
-            if (fValue2 != null) {
-                buf.append(fValue2.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append(", ");
-            buf.append(fSymbol3.toString());
-            buf.append(" => ");
-            if (fValue3 != null) {
-                buf.append(fValue3.toString());
-            } else {
-                buf.append("?");
-            }
-
-            buf.append("]");
-            return buf.toString();
-        }
+		};
 
         @Override
         public IExpr[] copyPattern() {
@@ -1039,29 +1125,17 @@ public abstract class IPatternMapImpl implements IPatternMap {
             fValue3 = null;
         }
 
+		@Override
+		public final void initSlotValues() {
+			fValue1 = F.Slot1;
+			fValue2 = F.Slot2;
+			fValue3 = F.Slot3;
+		}
         @Override
         public boolean isAllPatternsAssigned() {
             return fValue1 != null && fValue2 != null && fValue3 != null;
         }
 
-        @Override
-        public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
-            if (isAllPatternsAssigned()) {
-                return true;
-            }
-            return substitutedExpr.isFree(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr x) {
-                    // compare object references with operator '==' here !
-                    return (fSymbol1 != x) && (fSymbol2 != x) && (fSymbol3 != x);
-                }
-            }, true);
-        }
-
-        @Override
-        public boolean isRuleWithoutPatterns() {
-            return false;
-        }
 
         @Override
         public boolean isValueAssigned() {
@@ -1082,6 +1156,24 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
             return false;
         }
+		@Override
+		public boolean isFreeOfPatternSymbols(IExpr substitutedExpr) {
+			if (isAllPatternsAssigned()) {
+				return true;
+			}
+			return substitutedExpr.isFree(new Predicate<IExpr>() {
+                @Override
+                public boolean test(IExpr x) {
+                    // compare object references with operator '==' here !
+                    return (fSymbol1 != x) && (fSymbol2 != x) && (fSymbol3 != x);
+                }
+            }, true);
+		}
+
+		@Override
+		public boolean isRuleWithoutPatterns() {
+			return false;
+		}
 
         @Override
         public void resetPattern(IExpr[] patternValuesArray) {
@@ -1091,6 +1183,32 @@ public abstract class IPatternMapImpl implements IPatternMap {
             fValue3 = patternValuesArray[2];
         }
 
+		@Override
+		public boolean setOptionsPattern(EvalEngine engine, ISymbol lhsHead) {
+			boolean result = false;
+			if (fPatternObject1.isOptionsPattern()) {
+				OptionsPattern op = (OptionsPattern) fPatternObject1;
+				addOptionsPattern(op, fValue1, engine);
+				if (lhsHead == op.getOptionsPatternHead()) {
+					result = true;
+				}
+			}
+			if (fPatternObject2.isOptionsPattern()) {
+				OptionsPattern op = (OptionsPattern) fPatternObject2;
+				addOptionsPattern(op, fValue2, engine);
+				if (lhsHead == op.getOptionsPatternHead()) {
+					result = true;
+				}
+			}
+			if (fPatternObject3.isOptionsPattern()) {
+				OptionsPattern op = (OptionsPattern) fPatternObject3;
+				addOptionsPattern(op, fValue3, engine);
+				if (lhsHead == op.getOptionsPatternHead()) {
+					result = true;
+				}
+			}
+			return result;
+		}
         @Override
         public void setRHSEvaluated(boolean evaluated) {
             evaluatedRHS = evaluated;
@@ -1169,11 +1287,10 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return F.NIL;
         }
 
-        ;
 
         @Override
         public IExpr substituteSymbols(IExpr rhsExpr) {
-            return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
+			return rhsExpr.replaceAll(new Function<IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr input) {
                     if (input.isSymbol()) {
@@ -1191,6 +1308,40 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     return F.NIL;
                 }
             }).orElse(rhsExpr);
+		};
+
+		@Override
+		public String toString() {
+			StringBuilder buf = new StringBuilder();
+			buf.append("Patterns[");
+			buf.append(fSymbol1.toString());
+			buf.append(" => ");
+			if (fValue1 != null) {
+				buf.append(fValue1.toString());
+			} else {
+				buf.append("?");
+			}
+
+			buf.append(", ");
+			buf.append(fSymbol2.toString());
+			buf.append(" => ");
+			if (fValue2 != null) {
+				buf.append(fValue2.toString());
+			} else {
+				buf.append("?");
+			}
+
+			buf.append(", ");
+			buf.append(fSymbol3.toString());
+			buf.append(" => ");
+			if (fValue3 != null) {
+				buf.append(fValue3.toString());
+			} else {
+				buf.append("?");
+			}
+
+			buf.append("]");
+			return buf.toString();
         }
     }
 
@@ -1224,6 +1375,11 @@ public abstract class IPatternMapImpl implements IPatternMap {
          */
         IExpr[] fSymbolsOrPatternValues;
 
+		/**
+		 * Store a reference of the determined pattern object which should be immutable after method
+		 * <code>determinePatterns()</code>
+		 */
+		IPatternObject[] fPatternObjects;
         private transient boolean evaluatedRHS = false;
 
         public PatternMap() {
@@ -1241,6 +1397,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
             result.evaluatedRHS = false;
             // don't clone the fSymbolsOrPattern array which is final after the #determinePatterns() method
             result.fSymbolsOrPattern = this.fSymbolsOrPattern;
+			result.fPatternObjects = this.fPatternObjects;
             // avoid Arrays.copyOf because of Android version
             final int length = this.fSymbolsOrPatternValues.length;
             result.fSymbolsOrPatternValues = new IExpr[length];
@@ -1249,29 +1406,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return result;
         }
 
-        @Override
-        public String toString() {
-            if (fSymbolsOrPattern != null) {
-                StringBuilder buf = new StringBuilder();
-                buf.append("Patterns[");
-                int length = fSymbolsOrPattern.length;
-                for (int i = 0; i < length; i++) {
-                    buf.append(fSymbolsOrPattern[i].toString());
-                    buf.append(" => ");
-                    if (fSymbolsOrPatternValues[i] != null) {
-                        buf.append(fSymbolsOrPatternValues[i].toString());
-                    } else {
-                        buf.append("?");
-                    }
-                    if (i < length - 1) {
-                        buf.append(", ");
-                    }
-                }
-                buf.append("]");
-                return buf.toString();
-            }
-            return "PatternMap[]";
-        }
 
         /**
          * Copy the current values into a new array.
@@ -1302,9 +1436,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+		/** {@inheritDoc} */
         @Override
         public int get(IExpr patternOrSymbol) {
             final int length = fSymbolsOrPattern.length;
@@ -1344,7 +1476,8 @@ public abstract class IPatternMapImpl implements IPatternMap {
         /**
          * Return the matched value for the given pattern object
          *
-         * @param pattern the pattern object
+		 * @param pattern
+		 *            the pattern object
          * @return <code>null</code> if no matched expression exists
          */
         public IExpr getValue(IPatternObject pattern) {
@@ -1357,6 +1490,17 @@ public abstract class IPatternMapImpl implements IPatternMap {
             int indx = get(temp);
             return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
         }
+		/**
+		 * Return the matched value for the given symbol
+		 *
+		 * @param symbol
+		 *            the symbol
+		 * @return <code>null</code> if no matched expression exists
+		 */
+		public final IExpr val(ISymbol symbol) {
+			int indx = get(symbol);
+			return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
+		}
 
         public List<IExpr> getValuesAsList() {
             final int length = fSymbolsOrPatternValues.length;
@@ -1379,6 +1523,11 @@ public abstract class IPatternMapImpl implements IPatternMap {
             Arrays.fill(fSymbolsOrPatternValues, null);
         }
 
+		public final void initSlotValues() {
+			for (int i = 0; i < fSymbolsOrPatternValues.length; i++) {
+				fSymbolsOrPatternValues[i] = F.Slot(i + 1);
+			}
+		}
         /**
          * Check if all symbols in the symbols array have corresponding values assigned.
          *
@@ -1397,6 +1546,29 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return true;
         }
 
+		public boolean isValueAssigned() {
+			if (fSymbolsOrPatternValues != null) {
+				// at least one pattern has a value assigned?
+				final int length = fSymbolsOrPatternValues.length;
+				for (int i = 0; i < length; i++) {
+					if (fSymbolsOrPatternValues[i] != null) {
+						if (fSymbolsOrPattern[i] instanceof ISymbol) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Returns true if the given expression contains no patterns
+		 *
+		 * @return
+		 */
+		public boolean isRuleWithoutPatterns() {
+			return fRuleWithoutPattern;
+		}
         /**
          * Check if the substituted expression still contains a symbol of a pattern expression.
          *
@@ -1408,7 +1580,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
                 return true;
             }
             if (fSymbolsOrPattern != null) {
-                return substitutedExpr.isFree(new Predicate<IExpr>() {
+				return substitutedExpr.isFree(new Predicate<IExpr>() {
                     @Override
                     public boolean test(IExpr x) {
                         final int length = fSymbolsOrPattern.length;
@@ -1426,29 +1598,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return true;
         }
 
-        /**
-         * Returns true if the given expression contains no patterns
-         *
-         * @return
-         */
-        public boolean isRuleWithoutPatterns() {
-            return fRuleWithoutPattern;
-        }
-
-        public boolean isValueAssigned() {
-            if (fSymbolsOrPatternValues != null) {
-                // at least one pattern has a value assigned?
-                final int length = fSymbolsOrPatternValues.length;
-                for (int i = 0; i < length; i++) {
-                    if (fSymbolsOrPatternValues[i] != null) {
-                        if (fSymbolsOrPattern[i] instanceof ISymbol) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
 
         /**
          * Reset the values to the values in the given array
@@ -1477,6 +1626,22 @@ public abstract class IPatternMapImpl implements IPatternMap {
         // return true;
         // }
 
+		@Override
+		public boolean setOptionsPattern(EvalEngine engine, ISymbol lhsHead) {
+			boolean result = false;
+			if (fSymbolsOrPatternValues != null) {
+				for (int i = 0; i < fPatternObjects.length; i++) {
+					if (fPatternObjects[i].isOptionsPattern()) {
+						OptionsPattern op = (OptionsPattern) fPatternObjects[i];
+						addOptionsPattern(op, fSymbolsOrPatternValues[i], engine);
+						if (lhsHead == op.getOptionsPatternHead()) {
+							result = true;
+						}
+					}
+				}
+			}
+			return result;
+		}
         public final void setRHSEvaluated(boolean evaluated) {
             evaluatedRHS = evaluated;
         }
@@ -1515,9 +1680,7 @@ public abstract class IPatternMapImpl implements IPatternMap {
             // throw new IllegalStateException("Patternsequence:" + pattern + " is not available");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+		/** {@inheritDoc} */
         @Override
         public int size() {
             if (fSymbolsOrPattern != null) {
@@ -1541,7 +1704,9 @@ public abstract class IPatternMapImpl implements IPatternMap {
          * Substitute all symbols in the given expression with the current value of the corresponding internal pattern
          * values arrays
          *
-         * @param rhsExpr right-hand-side expression, substitute all symbols from the pattern-matching values
+		 * @param rhsExpr
+		 *            right-hand-side expression, substitute all symbols from the pattern-matching values
+		 *
          * @return
          */
         public IExpr substituteSymbols(final IExpr rhsExpr) {
@@ -1568,15 +1733,28 @@ public abstract class IPatternMapImpl implements IPatternMap {
             return rhsExpr;
         }
 
-        /**
-         * Return the matched value for the given symbol
-         *
-         * @param symbol the symbol
-         * @return <code>null</code> if no matched expression exists
-         */
-        public final IExpr val(ISymbol symbol) {
-            int indx = get(symbol);
-            return indx >= 0 ? fSymbolsOrPatternValues[indx] : null;
+		@Override
+		public String toString() {
+			if (fSymbolsOrPattern != null) {
+				StringBuilder buf = new StringBuilder();
+				buf.append("Patterns[");
+				int length = fSymbolsOrPattern.length;
+				for (int i = 0; i < length; i++) {
+					buf.append(fSymbolsOrPattern[i].toString());
+					buf.append(" => ");
+					if (fSymbolsOrPatternValues[i] != null) {
+						buf.append(fSymbolsOrPatternValues[i].toString());
+					} else {
+						buf.append("?");
+					}
+					if (i < length - 1) {
+						buf.append(", ");
+					}
+				}
+				buf.append("]");
+				return buf.toString();
+			}
+			return "PatternMap[]";
         }
 
         public IExpr[] getSymbolsOrPattern() {

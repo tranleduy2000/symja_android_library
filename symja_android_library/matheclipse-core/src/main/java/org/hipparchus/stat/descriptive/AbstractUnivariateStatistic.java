@@ -30,16 +30,12 @@ import org.hipparchus.util.MathUtils;
  * {@link UnivariateStatistic} interface.
  */
 public abstract class AbstractUnivariateStatistic
-        implements UnivariateStatistic {
+    implements UnivariateStatistic {
 
-    /**
-     * Stored data.
-     */
+    /** Stored data. */
     private double[] storedData;
 
-    /**
-     * Default constructor.
-     */
+    /** Default constructor. */
     protected AbstractUnivariateStatistic() {
         // This constructor is intentionally empty. Nothing special is needed here.
     }
@@ -49,7 +45,7 @@ public abstract class AbstractUnivariateStatistic
      * of the {@code original}.
      *
      * @param original the instance to copy
-     * @throws org.hipparchus.exception.NullArgumentException if original is null
+     * @throws org.hipparchus.exception.NullArgumentException  if original is null
      */
     protected AbstractUnivariateStatistic(AbstractUnivariateStatistic original) {
         MathUtils.checkNotNull(original);
@@ -62,34 +58,20 @@ public abstract class AbstractUnivariateStatistic
         return evaluate(values, 0, values.length);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public abstract double evaluate(double[] values, int begin, int length)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public abstract UnivariateStatistic copy();
-
-    /**
-     * Get a copy of the stored data array.
-     *
-     * @return copy of the stored data array (may be null)
-     */
-    public double[] getData() {
-        return (storedData == null) ? null : storedData.clone();
-    }
 
     /**
      * Set the data array.
      * <p>
      * The stored value is a copy of the parameter array, not the array itself.
      * </p>
-     *
      * @param values data array to store (may be null to remove stored data)
      * @see #evaluate()
      */
@@ -98,8 +80,15 @@ public abstract class AbstractUnivariateStatistic
     }
 
     /**
+     * Get a copy of the stored data array.
+     * @return copy of the stored data array (may be null)
+     */
+    public double[] getData() {
+        return (storedData == null) ? null : storedData.clone();
+    }
+
+    /**
      * Get a reference to the stored data array.
-     *
      * @return reference to the stored data array (may be null)
      */
     protected double[] getDataRef() {
@@ -110,10 +99,10 @@ public abstract class AbstractUnivariateStatistic
      * Set the data array.  The input array is copied, not referenced.
      *
      * @param values data array to store
-     * @param begin  the index of the first element to include
+     * @param begin the index of the first element to include
      * @param length the number of elements to include
      * @throws MathIllegalArgumentException if values is null or the indices
-     *                                      are not valid
+     * are not valid
      * @see #evaluate()
      */
     public void setData(final double[] values, final int begin, final int length)
@@ -130,7 +119,7 @@ public abstract class AbstractUnivariateStatistic
 
         if (begin + length > values.length) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.SUBARRAY_ENDS_AFTER_ARRAY_END,
-                    begin + length, values.length, true);
+                                                begin + length, values.length, true);
         }
         storedData = new double[length];
         System.arraycopy(values, begin, storedData, 0, length);

@@ -227,355 +227,6 @@ public class Array2DRowFieldMatrix<T extends FieldElement<T>>
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T[][] getData() {
-        return copyOut();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldMatrix<T> getSubMatrix(final int startRow, final int endRow,
-                                       final int startColumn, final int endColumn)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkSubMatrixIndex(this, startRow, endRow, startColumn, endColumn);
-        final int rowCount = endRow - startRow + 1;
-        final int columnCount = endColumn - startColumn + 1;
-        final T[][] outData = MathArrays.buildArray(getField(), rowCount, columnCount);
-        for (int i = 0; i < rowCount; ++i) {
-            System.arraycopy(data[startRow + i], startColumn, outData[i], 0, columnCount);
-        }
-
-        Array2DRowFieldMatrix<T> subMatrix = new Array2DRowFieldMatrix<>(getField());
-        subMatrix.data = outData;
-        return subMatrix;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSubMatrix(final T[][] subMatrix, final int row,
-                             final int column)
-            throws MathIllegalArgumentException, NullArgumentException {
-        if (data == null) {
-            if (row > 0) {
-                throw new MathIllegalStateException(LocalizedCoreFormats.FIRST_ROWS_NOT_INITIALIZED_YET, row);
-            }
-            if (column > 0) {
-                throw new MathIllegalStateException(LocalizedCoreFormats.FIRST_COLUMNS_NOT_INITIALIZED_YET, column);
-            }
-            final int nRows = subMatrix.length;
-            if (nRows == 0) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.AT_LEAST_ONE_ROW);
-            }
-
-            final int nCols = subMatrix[0].length;
-            if (nCols == 0) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.AT_LEAST_ONE_COLUMN);
-            }
-            data = MathArrays.buildArray(getField(), subMatrix.length, nCols);
-            for (int i = 0; i < data.length; ++i) {
-                if (subMatrix[i].length != nCols) {
-                    throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                            nCols, subMatrix[i].length);
-                }
-                System.arraycopy(subMatrix[i], 0, data[i + row], column, nCols);
-            }
-        } else {
-            super.setSubMatrix(subMatrix, row, column);
-        }
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T[] getRow(final int row) throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        final int nCols = getColumnDimension();
-        final T[] out = MathArrays.buildArray(getField(), nCols);
-        System.arraycopy(data[row], 0, out, 0, nCols);
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setRow(final int row, final T[] array)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        final int nCols = getColumnDimension();
-        if (array.length != nCols) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH_2x2,
-                    1, array.length, 1, nCols);
-        }
-        System.arraycopy(array, 0, data[row], 0, nCols);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T getEntry(final int row, final int column)
-            throws MathIllegalArgumentException {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-
-        return data[row][column];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setEntry(final int row, final int column, final T value)
-            throws MathIllegalArgumentException {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-
-        data[row][column] = value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addToEntry(final int row, final int column, final T increment)
-            throws MathIllegalArgumentException {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-
-        data[row][column] = data[row][column].add(increment);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void multiplyEntry(final int row, final int column, final T factor)
-            throws MathIllegalArgumentException {
-        checkRowIndex(row);
-        checkColumnIndex(column);
-
-        data[row][column] = data[row][column].multiply(factor);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T[] operate(final T[] v) throws MathIllegalArgumentException {
-        final int nRows = this.getRowDimension();
-        final int nCols = this.getColumnDimension();
-        if (v.length != nCols) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    v.length, nCols);
-        }
-        final T[] out = MathArrays.buildArray(getField(), nRows);
-        for (int row = 0; row < nRows; row++) {
-            final T[] dataRow = data[row];
-            T sum = getField().getZero();
-            for (int i = 0; i < nCols; i++) {
-                sum = sum.add(dataRow[i].multiply(v[i]));
-            }
-            out[row] = sum;
-        }
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T[] preMultiply(final T[] v) throws MathIllegalArgumentException {
-        final int nRows = getRowDimension();
-        final int nCols = getColumnDimension();
-        if (v.length != nRows) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
-                    v.length, nRows);
-        }
-
-        final T[] out = MathArrays.buildArray(getField(), nCols);
-        for (int col = 0; col < nCols; ++col) {
-            T sum = getField().getZero();
-            for (int i = 0; i < nRows; ++i) {
-                sum = sum.add(data[i][col].multiply(v[i]));
-            }
-            out[col] = sum;
-        }
-
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInRowOrder(final FieldMatrixChangingVisitor<T> visitor) {
-        final int rows = getRowDimension();
-        final int columns = getColumnDimension();
-        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
-        for (int i = 0; i < rows; ++i) {
-            final T[] rowI = data[i];
-            for (int j = 0; j < columns; ++j) {
-                rowI[j] = visitor.visit(i, j, rowI[j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInRowOrder(final FieldMatrixPreservingVisitor<T> visitor) {
-        final int rows = getRowDimension();
-        final int columns = getColumnDimension();
-        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
-        for (int i = 0; i < rows; ++i) {
-            final T[] rowI = data[i];
-            for (int j = 0; j < columns; ++j) {
-                visitor.visit(i, j, rowI[j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInRowOrder(final FieldMatrixChangingVisitor<T> visitor,
-                            final int startRow, final int endRow,
-                            final int startColumn, final int endColumn)
-            throws MathIllegalArgumentException {
-        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
-        visitor.start(getRowDimension(), getColumnDimension(),
-                startRow, endRow, startColumn, endColumn);
-        for (int i = startRow; i <= endRow; ++i) {
-            final T[] rowI = data[i];
-            for (int j = startColumn; j <= endColumn; ++j) {
-                rowI[j] = visitor.visit(i, j, rowI[j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInRowOrder(final FieldMatrixPreservingVisitor<T> visitor,
-                            final int startRow, final int endRow,
-                            final int startColumn, final int endColumn)
-            throws MathIllegalArgumentException {
-        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
-        visitor.start(getRowDimension(), getColumnDimension(),
-                startRow, endRow, startColumn, endColumn);
-        for (int i = startRow; i <= endRow; ++i) {
-            final T[] rowI = data[i];
-            for (int j = startColumn; j <= endColumn; ++j) {
-                visitor.visit(i, j, rowI[j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInColumnOrder(final FieldMatrixChangingVisitor<T> visitor) {
-        final int rows = getRowDimension();
-        final int columns = getColumnDimension();
-        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
-        for (int j = 0; j < columns; ++j) {
-            for (int i = 0; i < rows; ++i) {
-                final T[] rowI = data[i];
-                rowI[j] = visitor.visit(i, j, rowI[j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInColumnOrder(final FieldMatrixPreservingVisitor<T> visitor) {
-        final int rows = getRowDimension();
-        final int columns = getColumnDimension();
-        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
-        for (int j = 0; j < columns; ++j) {
-            for (int i = 0; i < rows; ++i) {
-                visitor.visit(i, j, data[i][j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInColumnOrder(final FieldMatrixChangingVisitor<T> visitor,
-                               final int startRow, final int endRow,
-                               final int startColumn, final int endColumn)
-            throws MathIllegalArgumentException {
-        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
-        visitor.start(getRowDimension(), getColumnDimension(),
-                startRow, endRow, startColumn, endColumn);
-        for (int j = startColumn; j <= endColumn; ++j) {
-            for (int i = startRow; i <= endRow; ++i) {
-                final T[] rowI = data[i];
-                rowI[j] = visitor.visit(i, j, rowI[j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T walkInColumnOrder(final FieldMatrixPreservingVisitor<T> visitor,
-                               final int startRow, final int endRow,
-                               final int startColumn, final int endColumn)
-            throws MathIllegalArgumentException {
-        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
-        visitor.start(getRowDimension(), getColumnDimension(),
-                startRow, endRow, startColumn, endColumn);
-        for (int j = startColumn; j <= endColumn; ++j) {
-            for (int i = startRow; i <= endRow; ++i) {
-                visitor.visit(i, j, data[i][j]);
-            }
-        }
-        return visitor.end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getRowDimension() {
-        return (data == null) ? 0 : data.length;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getColumnDimension() {
-        return ((data == null) || (data[0] == null)) ? 0 : data[0].length;
-    }
-
-    /**
      * Add {@code m} to this matrix.
      *
      * @param m Matrix to be added.
@@ -736,38 +387,6 @@ public class Array2DRowFieldMatrix<T extends FieldElement<T>>
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldMatrix<T> transposeMultiply(final FieldMatrix<T> m) {
-        if (m instanceof Array2DRowFieldMatrix) {
-            return transposeMultiply((Array2DRowFieldMatrix<T>) m);
-        } else {
-            MatrixUtils.checkSameRowDimension(this, m);
-
-            final int nRows = this.getColumnDimension();
-            final int nCols = m.getColumnDimension();
-            final int nSum = this.getRowDimension();
-
-            final FieldMatrix<T> out = MatrixUtils.createFieldMatrix(getField(), nRows, nCols);
-
-            // Multiply.
-            for (int k = 0; k < nSum; k++) {
-                final T[] dataK = data[k];
-                for (int row = 0; row < nRows; row++) {
-                    final T dataIRow = dataK[row];
-                    for (int col = 0; col < nCols; col++) {
-                        out.addToEntry(row, col, dataIRow.multiply(m.getEntry(k, col)));
-                    }
-                }
-            }
-
-            return out;
-
-        }
-    }
-
-    /**
      * Returns the result of postmultiplying {@code this^T} by {@code m}.
      *
      * @param m matrix to postmultiply by
@@ -803,6 +422,46 @@ public class Array2DRowFieldMatrix<T extends FieldElement<T>>
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldMatrix<T> transposeMultiply(final FieldMatrix<T> m) {
+        if (m instanceof Array2DRowFieldMatrix) {
+            return transposeMultiply((Array2DRowFieldMatrix<T>) m);
+        } else {
+            MatrixUtils.checkSameRowDimension(this, m);
+
+            final int nRows = this.getColumnDimension();
+            final int nCols = m.getColumnDimension();
+            final int nSum = this.getRowDimension();
+
+            final FieldMatrix<T> out = MatrixUtils.createFieldMatrix(getField(), nRows, nCols);
+
+            // Multiply.
+            for (int k = 0; k < nSum; k++) {
+                final T[] dataK = data[k];
+                for (int row = 0; row < nRows; row++) {
+                    final T dataIRow = dataK[row];
+                    for (int col = 0; col < nCols; col++) {
+                        out.addToEntry(row, col, dataIRow.multiply(m.getEntry(k, col)));
+                    }
+                }
+            }
+
+            return out;
+
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T[][] getData() {
+        return copyOut();
+    }
+
+    /**
      * Get a reference to the underlying data array.
      * This methods returns internal data, <strong>not</strong> fresh copy of it.
      *
@@ -810,6 +469,320 @@ public class Array2DRowFieldMatrix<T extends FieldElement<T>>
      */
     public T[][] getDataRef() {
         return data; // NOPMD - returning an internal array is intentional and documented here
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSubMatrix(final T[][] subMatrix, final int row,
+                             final int column)
+            throws MathIllegalArgumentException, NullArgumentException {
+        if (data == null) {
+            if (row > 0) {
+                throw new MathIllegalStateException(LocalizedCoreFormats.FIRST_ROWS_NOT_INITIALIZED_YET, row);
+            }
+            if (column > 0) {
+                throw new MathIllegalStateException(LocalizedCoreFormats.FIRST_COLUMNS_NOT_INITIALIZED_YET, column);
+            }
+            final int nRows = subMatrix.length;
+            if (nRows == 0) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.AT_LEAST_ONE_ROW);
+            }
+
+            final int nCols = subMatrix[0].length;
+            if (nCols == 0) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.AT_LEAST_ONE_COLUMN);
+            }
+            data = MathArrays.buildArray(getField(), subMatrix.length, nCols);
+            for (int i = 0; i < data.length; ++i) {
+                if (subMatrix[i].length != nCols) {
+                    throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                            nCols, subMatrix[i].length);
+                }
+                System.arraycopy(subMatrix[i], 0, data[i + row], column, nCols);
+            }
+        } else {
+            super.setSubMatrix(subMatrix, row, column);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T getEntry(final int row, final int column)
+            throws MathIllegalArgumentException {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+
+        return data[row][column];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEntry(final int row, final int column, final T value)
+            throws MathIllegalArgumentException {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+
+        data[row][column] = value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addToEntry(final int row, final int column, final T increment)
+            throws MathIllegalArgumentException {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+
+        data[row][column] = data[row][column].add(increment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void multiplyEntry(final int row, final int column, final T factor)
+            throws MathIllegalArgumentException {
+        checkRowIndex(row);
+        checkColumnIndex(column);
+
+        data[row][column] = data[row][column].multiply(factor);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRowDimension() {
+        return (data == null) ? 0 : data.length;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getColumnDimension() {
+        return ((data == null) || (data[0] == null)) ? 0 : data[0].length;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T[] operate(final T[] v) throws MathIllegalArgumentException {
+        final int nRows = this.getRowDimension();
+        final int nCols = this.getColumnDimension();
+        if (v.length != nCols) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    v.length, nCols);
+        }
+        final T[] out = MathArrays.buildArray(getField(), nRows);
+        for (int row = 0; row < nRows; row++) {
+            final T[] dataRow = data[row];
+            T sum = getField().getZero();
+            for (int i = 0; i < nCols; i++) {
+                sum = sum.add(dataRow[i].multiply(v[i]));
+            }
+            out[row] = sum;
+        }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T[] preMultiply(final T[] v) throws MathIllegalArgumentException {
+        final int nRows = getRowDimension();
+        final int nCols = getColumnDimension();
+        if (v.length != nRows) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH,
+                    v.length, nRows);
+        }
+
+        final T[] out = MathArrays.buildArray(getField(), nCols);
+        for (int col = 0; col < nCols; ++col) {
+            T sum = getField().getZero();
+            for (int i = 0; i < nRows; ++i) {
+                sum = sum.add(data[i][col].multiply(v[i]));
+            }
+            out[col] = sum;
+        }
+
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldMatrix<T> getSubMatrix(final int startRow, final int endRow,
+                                       final int startColumn, final int endColumn)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkSubMatrixIndex(this, startRow, endRow, startColumn, endColumn);
+        final int rowCount = endRow - startRow + 1;
+        final int columnCount = endColumn - startColumn + 1;
+        final T[][] outData = MathArrays.buildArray(getField(), rowCount, columnCount);
+        for (int i = 0; i < rowCount; ++i) {
+            System.arraycopy(data[startRow + i], startColumn, outData[i], 0, columnCount);
+        }
+
+        Array2DRowFieldMatrix<T> subMatrix = new Array2DRowFieldMatrix<>(getField());
+        subMatrix.data = outData;
+        return subMatrix;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInRowOrder(final FieldMatrixChangingVisitor<T> visitor) {
+        final int rows = getRowDimension();
+        final int columns = getColumnDimension();
+        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
+        for (int i = 0; i < rows; ++i) {
+            final T[] rowI = data[i];
+            for (int j = 0; j < columns; ++j) {
+                rowI[j] = visitor.visit(i, j, rowI[j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInRowOrder(final FieldMatrixPreservingVisitor<T> visitor) {
+        final int rows = getRowDimension();
+        final int columns = getColumnDimension();
+        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
+        for (int i = 0; i < rows; ++i) {
+            final T[] rowI = data[i];
+            for (int j = 0; j < columns; ++j) {
+                visitor.visit(i, j, rowI[j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInRowOrder(final FieldMatrixChangingVisitor<T> visitor,
+                            final int startRow, final int endRow,
+                            final int startColumn, final int endColumn)
+            throws MathIllegalArgumentException {
+        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
+        visitor.start(getRowDimension(), getColumnDimension(),
+                startRow, endRow, startColumn, endColumn);
+        for (int i = startRow; i <= endRow; ++i) {
+            final T[] rowI = data[i];
+            for (int j = startColumn; j <= endColumn; ++j) {
+                rowI[j] = visitor.visit(i, j, rowI[j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInRowOrder(final FieldMatrixPreservingVisitor<T> visitor,
+                            final int startRow, final int endRow,
+                            final int startColumn, final int endColumn)
+            throws MathIllegalArgumentException {
+        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
+        visitor.start(getRowDimension(), getColumnDimension(),
+                startRow, endRow, startColumn, endColumn);
+        for (int i = startRow; i <= endRow; ++i) {
+            final T[] rowI = data[i];
+            for (int j = startColumn; j <= endColumn; ++j) {
+                visitor.visit(i, j, rowI[j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInColumnOrder(final FieldMatrixChangingVisitor<T> visitor) {
+        final int rows = getRowDimension();
+        final int columns = getColumnDimension();
+        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
+        for (int j = 0; j < columns; ++j) {
+            for (int i = 0; i < rows; ++i) {
+                final T[] rowI = data[i];
+                rowI[j] = visitor.visit(i, j, rowI[j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInColumnOrder(final FieldMatrixPreservingVisitor<T> visitor) {
+        final int rows = getRowDimension();
+        final int columns = getColumnDimension();
+        visitor.start(rows, columns, 0, rows - 1, 0, columns - 1);
+        for (int j = 0; j < columns; ++j) {
+            for (int i = 0; i < rows; ++i) {
+                visitor.visit(i, j, data[i][j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInColumnOrder(final FieldMatrixChangingVisitor<T> visitor,
+                               final int startRow, final int endRow,
+                               final int startColumn, final int endColumn)
+            throws MathIllegalArgumentException {
+        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
+        visitor.start(getRowDimension(), getColumnDimension(),
+                startRow, endRow, startColumn, endColumn);
+        for (int j = startColumn; j <= endColumn; ++j) {
+            for (int i = startRow; i <= endRow; ++i) {
+                final T[] rowI = data[i];
+                rowI[j] = visitor.visit(i, j, rowI[j]);
+            }
+        }
+        return visitor.end();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T walkInColumnOrder(final FieldMatrixPreservingVisitor<T> visitor,
+                               final int startRow, final int endRow,
+                               final int startColumn, final int endColumn)
+            throws MathIllegalArgumentException {
+        checkSubMatrixIndex(startRow, endRow, startColumn, endColumn);
+        visitor.start(getRowDimension(), getColumnDimension(),
+                startRow, endRow, startColumn, endColumn);
+        for (int j = startColumn; j <= endColumn; ++j) {
+            for (int i = startRow; i <= endRow; ++i) {
+                visitor.visit(i, j, data[i][j]);
+            }
+        }
+        return visitor.end();
     }
 
     /**
@@ -838,6 +811,33 @@ public class Array2DRowFieldMatrix<T extends FieldElement<T>>
     private void copyIn(final T[][] in)
             throws MathIllegalArgumentException, NullArgumentException {
         setSubMatrix(in, 0, 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T[] getRow(final int row) throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        final int nCols = getColumnDimension();
+        final T[] out = MathArrays.buildArray(getField(), nCols);
+        System.arraycopy(data[row], 0, out, 0, nCols);
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRow(final int row, final T[] array)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        final int nCols = getColumnDimension();
+        if (array.length != nCols) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH_2x2,
+                    1, array.length, 1, nCols);
+        }
+        System.arraycopy(array, 0, data[row], 0, nCols);
     }
 
 }

@@ -35,9 +35,7 @@ import org.hipparchus.exception.MathIllegalStateException;
  * </ul>
  */
 public abstract class ContinuedFraction {
-    /**
-     * Maximum allowed numerical error.
-     */
+    /** Maximum allowed numerical error. */
     private static final double DEFAULT_EPSILON = 10e-9;
 
     /**
@@ -50,7 +48,6 @@ public abstract class ContinuedFraction {
     /**
      * Access the n-th a coefficient of the continued fraction.  Since a can be
      * a function of the evaluation point, x, that is passed in as well.
-     *
      * @param n the coefficient index to retrieve.
      * @param x the evaluation point.
      * @return the n-th a coefficient.
@@ -60,7 +57,6 @@ public abstract class ContinuedFraction {
     /**
      * Access the n-th b coefficient of the continued fraction.  Since b can be
      * a function of the evaluation point, x, that is passed in as well.
-     *
      * @param n the coefficient index to retrieve.
      * @param x the evaluation point.
      * @return the n-th b coefficient.
@@ -69,7 +65,6 @@ public abstract class ContinuedFraction {
 
     /**
      * Evaluates the continued fraction at the value x.
-     *
      * @param x the evaluation point.
      * @return the value of the continued fraction evaluated at x.
      * @throws MathIllegalStateException if the algorithm fails to converge.
@@ -80,8 +75,7 @@ public abstract class ContinuedFraction {
 
     /**
      * Evaluates the continued fraction at the value x.
-     *
-     * @param x       the evaluation point.
+     * @param x the evaluation point.
      * @param epsilon maximum error allowed.
      * @return the value of the continued fraction evaluated at x.
      * @throws MathIllegalStateException if the algorithm fails to converge.
@@ -92,15 +86,14 @@ public abstract class ContinuedFraction {
 
     /**
      * Evaluates the continued fraction at the value x.
-     *
-     * @param x             the evaluation point.
+     * @param x the evaluation point.
      * @param maxIterations maximum number of convergents
      * @return the value of the continued fraction evaluated at x.
      * @throws MathIllegalStateException if the algorithm fails to converge.
      * @throws MathIllegalStateException if maximal number of iterations is reached
      */
     public double evaluate(double x, int maxIterations)
-            throws MathIllegalStateException {
+        throws MathIllegalStateException {
         return evaluate(x, DEFAULT_EPSILON, maxIterations);
     }
 
@@ -110,25 +103,25 @@ public abstract class ContinuedFraction {
      * The implementation of this method is based on the modified Lentz algorithm as described
      * on page 18 ff. in:
      * <ul>
-     * <li>
-     * I. J. Thompson,  A. R. Barnett. "Coulomb and Bessel Functions of Complex Arguments and Order."
-     * <a target="_blank" href="http://www.fresco.org.uk/papers/Thompson-JCP64p490.pdf">
-     * http://www.fresco.org.uk/papers/Thompson-JCP64p490.pdf</a>
-     * </li>
+     *   <li>
+     *   I. J. Thompson,  A. R. Barnett. "Coulomb and Bessel Functions of Complex Arguments and Order."
+     *   <a target="_blank" href="http://www.fresco.org.uk/papers/Thompson-JCP64p490.pdf">
+     *   http://www.fresco.org.uk/papers/Thompson-JCP64p490.pdf</a>
+     *   </li>
      * </ul>
      * <b>Note:</b> the implementation uses the terms a<sub>i</sub> and b<sub>i</sub> as defined in
      * <a href="http://mathworld.wolfram.com/ContinuedFraction.html">Continued Fraction @ MathWorld</a>.
      * </p>
      *
-     * @param x             the evaluation point.
-     * @param epsilon       maximum error allowed.
+     * @param x the evaluation point.
+     * @param epsilon maximum error allowed.
      * @param maxIterations maximum number of convergents
      * @return the value of the continued fraction evaluated at x.
      * @throws MathIllegalStateException if the algorithm fails to converge.
      * @throws MathIllegalStateException if maximal number of iterations is reached
      */
     public double evaluate(double x, double epsilon, int maxIterations)
-            throws MathIllegalStateException {
+        throws MathIllegalStateException {
         final double small = 1e-50;
         double hPrev = getA(0, x);
 
@@ -178,7 +171,7 @@ public abstract class ContinuedFraction {
 
         if (n >= maxIterations) {
             throw new MathIllegalStateException(LocalizedCoreFormats.NON_CONVERGENT_CONTINUED_FRACTION,
-                    maxIterations, x);
+                                                maxIterations, x);
         }
 
         return hN;

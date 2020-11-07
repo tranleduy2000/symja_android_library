@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
+/*
+ * This is not the original file distributed by the Apache Software Foundation
+ * It has been modified by the Hipparchus project
+ */
+
 package org.hipparchus.linear;
 
 /**
  * Marker interface for {@link RealMatrix} implementations that require sparse backing storage
- * <p>
+ *
  * <p>
  * Caveat: Implementation are allowed to assume that, for any {@code x},
  * the equality {@code x * 0d == 0d} holds. But it is is not true for

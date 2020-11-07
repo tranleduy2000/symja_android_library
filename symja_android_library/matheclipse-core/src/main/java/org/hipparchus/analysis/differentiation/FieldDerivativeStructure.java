@@ -16,6 +16,7 @@
  */
 package org.hipparchus.analysis.differentiation;
 
+import org.hipparchus.CalculusFieldElementImpl;
 import org.hipparchus.Field;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -37,6 +38,7 @@ import org.hipparchus.util.MathUtils;
  * @see DSCompiler
  */
 public class FieldDerivativeStructure<T extends RealFieldElement<T>>
+        extends CalculusFieldElementImpl<FieldDerivativeStructure<T>>
         implements RealFieldElement<FieldDerivativeStructure<T>> {
 
     /**

@@ -57,11 +57,11 @@ public class FieldQRDecomposition<T extends RealFieldElement<T>> {
      * matrix R, and the rows ABOVE the diagonal are the Householder reflector vectors
      * from which an explicit form of Q can be recomputed if desired.</p>
      */
-    private T[][] qrt;
+    private final T[][] qrt;
     /**
      * The diagonal elements of R.
      */
-    private T[] rDiag;
+    private final T[] rDiag;
     /**
      * Cached value of Q.
      */
@@ -329,6 +329,14 @@ public class FieldQRDecomposition<T extends RealFieldElement<T>> {
          * {@inheritDoc}
          */
         @Override
+        public boolean isNonSingular() {
+            return !checkSingular(rDiag, threshold, false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public FieldVector<T> solve(FieldVector<T> b) {
             final int n = qrt.length;
             final int m = qrt[0].length;
@@ -450,14 +458,6 @@ public class FieldQRDecomposition<T extends RealFieldElement<T>> {
             }
 
             return new BlockFieldMatrix<T>(n, columns, xBlocks, false);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            return !checkSingular(rDiag, threshold, false);
         }
 
         /**

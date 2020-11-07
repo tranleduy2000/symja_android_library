@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * PBLib       -- Copyright (c) 2012-2013  Peter Steinke
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -51,21 +51,28 @@
 
 package org.logicng.cardinalityconstraints;
 
+import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.BOTH;
+import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.INPUT_TO_OUTPUT;
+import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.OUTPUT_TO_INPUT;
+
 import org.logicng.collections.LNGVector;
 import org.logicng.datastructures.EncodingResult;
 import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 
-import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.BOTH;
-import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.INPUT_TO_OUTPUT;
-import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.OUTPUT_TO_INPUT;
-
 /**
  * Implementation of a sorting network.
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
 public final class CCSorting {
+
+    /**
+     * The implication direction.
+     */
+    public enum ImplicationDirection {
+        INPUT_TO_OUTPUT, OUTPUT_TO_INPUT, BOTH
+    }
 
     private final LNGVector<LNGVector<Literal>> auxVars;
 
@@ -76,13 +83,14 @@ public final class CCSorting {
         this.auxVars = new LNGVector<>();
     }
 
-    private static int counterSorterValue(int m, int n) {
+    private static int counterSorterValue(final int m, final int n) {
         return 2 * n + (m - 1) * (2 * (n - 1) - 1) - (m - 2) - 2 * ((m - 1) * (m - 2) / 2);
     }
 
-    private static int directSorterValue(int n) {
-        if (n > 30)
+    private static int directSorterValue(final int n) {
+        if (n > 30) {
             return Integer.MAX_VALUE;
+        }
         return (int) Math.pow(2, n) - 1;
     }
 
@@ -94,17 +102,18 @@ public final class CCSorting {
      * @param output    the output literals
      * @param direction the sorting direction
      */
-    public void sort(int m, final LNGVector<Literal> input, final EncodingResult result, final LNGVector<Literal> output,
+    public void sort(final int m, final LNGVector<Literal> input, final EncodingResult result, final LNGVector<Literal> output,
                      final ImplicationDirection direction) {
         assert m >= 0;
         if (m == 0) {
             output.clear();
             return;
         }
-        int n = input.size();
+        final int n = input.size();
         int m2 = m;
-        if (m2 > n)
+        if (m2 > n) {
             m2 = n;
+        }
         if (n == 0) {
             output.clear();
             return;
@@ -133,13 +142,14 @@ public final class CCSorting {
             this.recursiveSorter(m2, input, result, output, direction);
             return;
         }
-        int counter = counterSorterValue(m2, n);
-        int direct = directSorterValue(n);
+        final int counter = counterSorterValue(m2, n);
+        final int direct = directSorterValue(n);
 
-        if (counter < direct)
+        if (counter < direct) {
             counterSorter(m2, input, result, output, direction);
-        else
+        } else {
             directSorter(m2, input, result, output, direction);
+        }
     }
 
     private void comparator(final Literal x1, final Literal x2, final Literal y, final EncodingResult result,
@@ -149,8 +159,9 @@ public final class CCSorting {
             result.addClause(x1.negate(), y);
             result.addClause(x2.negate(), y);
         }
-        if (direction == OUTPUT_TO_INPUT || direction == BOTH)
+        if (direction == OUTPUT_TO_INPUT || direction == BOTH) {
             result.addClause(y.negate(), x1, x2);
+        }
     }
 
     private void comparator(final Literal x1, final Literal x2, final Literal y1, final Literal y2, final EncodingResult result,
@@ -169,9 +180,9 @@ public final class CCSorting {
         }
     }
 
-    private void recursiveSorter(int m, int l, final LNGVector<Literal> input, final EncodingResult result,
+    private void recursiveSorter(final int m, final int l, final LNGVector<Literal> input, final EncodingResult result,
                                  final LNGVector<Literal> output, final ImplicationDirection direction) {
-        int n = input.size();
+        final int n = input.size();
         assert output.size() == 0;
         assert n > 1;
         assert m <= n;
@@ -180,10 +191,12 @@ public final class CCSorting {
         final LNGVector<Literal> tmpLitsO1 = new LNGVector<>();
         final LNGVector<Literal> tmpLitsO2 = new LNGVector<>();
 
-        for (int i = 0; i < l; i++)
+        for (int i = 0; i < l; i++) {
             tmpLitsA.push(input.get(i));
-        for (int i = l; i < n; i++)
+        }
+        for (int i = l; i < n; i++) {
             tmpLitsB.push(input.get(i));
+        }
 
         assert tmpLitsA.size() + tmpLitsB.size() == n;
 
@@ -196,67 +209,76 @@ public final class CCSorting {
         assert output.size() == m;
     }
 
-    private void recursiveSorter(int m, final LNGVector<Literal> input, final EncodingResult result,
+    private void recursiveSorter(final int m, final LNGVector<Literal> input, final EncodingResult result,
                                  final LNGVector<Literal> output, final ImplicationDirection direction) {
         assert m > 0;
         assert input.size() > 0;
         output.clear();
-        int n = input.size();
+        final int n = input.size();
         assert n > 1;
-        int l = n / 2;
+        final int l = n / 2;
         this.recursiveSorter(m, l, input, result, output, direction);
     }
 
-    private void counterSorter(int k, final LNGVector<Literal> x, final EncodingResult formula,
+    private void counterSorter(final int k, final LNGVector<Literal> x, final EncodingResult formula,
                                final LNGVector<Literal> output, final ImplicationDirection direction) {
-        int n = x.size();
-        auxVars.clear();
-        for (int i = 0; i < n; i++)
-            auxVars.push(new LNGVector<Literal>(k));
+        final int n = x.size();
+        this.auxVars.clear();
+        for (int i = 0; i < n; i++) {
+            this.auxVars.push(new LNGVector<Literal>(k));
+        }
 
-        for (int j = 0; j < k; j++)
-            for (int i = j; i < n; i++)
-                auxVars.get(i).set(j, formula.newVariable());
+        for (int j = 0; j < k; j++) {
+            for (int i = j; i < n; i++) {
+                this.auxVars.get(i).set(j, formula.newVariable());
+            }
+        }
         if (direction == INPUT_TO_OUTPUT || direction == BOTH) {
             for (int i = 0; i < n; i++) {
-                formula.addClause(x.get(i).negate(), auxVars.get(i).get(0));
-                if (i > 0)
-                    formula.addClause(auxVars.get(i - 1).get(0).negate(), auxVars.get(i).get(0));
+                formula.addClause(x.get(i).negate(), this.auxVars.get(i).get(0));
+                if (i > 0) {
+                    formula.addClause(this.auxVars.get(i - 1).get(0).negate(), this.auxVars.get(i).get(0));
+                }
             }
             for (int j = 1; j < k; j++) {
                 for (int i = j; i < n; i++) {
-                    formula.addClause(x.get(i).negate(), auxVars.get(i - 1).get(j - 1).negate(), auxVars.get(i).get(j));
-                    if (i > j)
-                        formula.addClause(auxVars.get(i - 1).get(j).negate(), auxVars.get(i).get(j));
+                    formula.addClause(x.get(i).negate(), this.auxVars.get(i - 1).get(j - 1).negate(), this.auxVars.get(i).get(j));
+                    if (i > j) {
+                        formula.addClause(this.auxVars.get(i - 1).get(j).negate(), this.auxVars.get(i).get(j));
+                    }
                 }
             }
         }
         assert direction == INPUT_TO_OUTPUT;
         output.clear();
-        for (int i = 0; i < k; i++)
-            output.push(auxVars.get(n - 1).get(i));
+        for (int i = 0; i < k; i++) {
+            output.push(this.auxVars.get(n - 1).get(i));
+        }
     }
 
-    private void directSorter(int m, final LNGVector<Literal> input, final EncodingResult formula,
+    private void directSorter(final int m, final LNGVector<Literal> input, final EncodingResult formula,
                               final LNGVector<Literal> output, final ImplicationDirection direction) {
         assert direction == INPUT_TO_OUTPUT;
-        int n = input.size();
+        final int n = input.size();
         assert n < 20;
         int bitmask = 1;
         final LNGVector<Literal> clause = new LNGVector<>();
         output.clear();
-        for (int i = 0; i < m; i++)
+        for (int i = 0; i < m; i++) {
             output.push(formula.newVariable());
+        }
         while (bitmask < Math.pow(2, n)) {
             int count = 0;
             clause.clear();
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++) {
                 if (((1 << i) & bitmask) != 0) {
                     count++;
-                    if (count > m)
+                    if (count > m) {
                         break;
+                    }
                     clause.push(input.get(i).negate());
                 }
+            }
             assert count > 0;
             if (count <= m) {
                 clause.push(output.get(count - 1));
@@ -275,24 +297,26 @@ public final class CCSorting {
      * @param output    the output vector
      * @param direction the sorting direction
      */
-    public void merge(int m, final LNGVector<Literal> inputA, final LNGVector<Literal> inputB, final EncodingResult formula,
+    public void merge(final int m, final LNGVector<Literal> inputA, final LNGVector<Literal> inputB, final EncodingResult formula,
                       final LNGVector<Literal> output, final ImplicationDirection direction) {
         assert m >= 0;
         if (m == 0) {
             output.clear();
             return;
         }
-        int a = inputA.size();
-        int b = inputB.size();
-        int n = a + b;
+        final int a = inputA.size();
+        final int b = inputB.size();
+        final int n = a + b;
         int m2 = m;
-        if (m2 > n)
+        if (m2 > n) {
             m2 = n;
+        }
         if (a == 0 || b == 0) {
-            if (a == 0)
+            if (a == 0) {
                 output.replaceInplace(inputB);
-            else
+            } else {
                 output.replaceInplace(inputA);
+            }
             return;
         }
         if (direction != INPUT_TO_OUTPUT) {
@@ -302,7 +326,7 @@ public final class CCSorting {
         directMerger(m2, inputA, inputB, formula, output, direction);
     }
 
-    private void recursiveMerger(int c, final LNGVector<Literal> inputA, int a, final LNGVector<Literal> inputB, int b,
+    private void recursiveMerger(final int c, final LNGVector<Literal> inputA, final int a, final LNGVector<Literal> inputB, final int b,
                                  final EncodingResult formula, final LNGVector<Literal> output,
                                  final ImplicationDirection direction) {
         assert inputA.size() > 0;
@@ -311,10 +335,12 @@ public final class CCSorting {
         output.clear();
         int a2 = a;
         int b2 = b;
-        if (a2 > c)
+        if (a2 > c) {
             a2 = c;
-        if (b2 > c)
+        }
+        if (b2 > c) {
             b2 = c;
+        }
         if (c == 1) {
             final Variable y = formula.newVariable();
             comparator(inputA.get(0), inputB.get(0), y, formula, direction);
@@ -337,14 +363,18 @@ public final class CCSorting {
         final LNGVector<Literal> tmpLitsEvenA = new LNGVector<>();
         final LNGVector<Literal> tmpLitsEvenB = new LNGVector<>();
 
-        for (int i = 0; i < a2; i = i + 2)
+        for (int i = 0; i < a2; i = i + 2) {
             tmpLitsOddA.push(inputA.get(i));
-        for (int i = 0; i < b2; i = i + 2)
+        }
+        for (int i = 0; i < b2; i = i + 2) {
             tmpLitsOddB.push(inputB.get(i));
-        for (int i = 1; i < a2; i = i + 2)
+        }
+        for (int i = 1; i < a2; i = i + 2) {
             tmpLitsEvenA.push(inputA.get(i));
-        for (int i = 1; i < b2; i = i + 2)
+        }
+        for (int i = 1; i < b2; i = i + 2) {
             tmpLitsEvenB.push(inputB.get(i));
+        }
 
         merge(c / 2 + 1, tmpLitsOddA, tmpLitsOddB, formula, oddMerge, direction);
         merge(c / 2, tmpLitsEvenA, tmpLitsEvenB, formula, evenMerge, direction);
@@ -363,17 +393,18 @@ public final class CCSorting {
                     comparator(oddMerge.get(i), evenMerge.get(j), z0, z1, formula, direction);
                     output.push(z0);
                     output.push(z1);
-                    if (output.size() == c)
+                    if (output.size() == c) {
                         break;
+                    }
                 } else if (output.size() + 1 == c) {
                     final Variable z0 = formula.newVariable();
                     comparator(oddMerge.get(i), evenMerge.get(j), z0, formula, direction);
                     output.push(z0);
                     break;
                 }
-            } else if (i >= oddMerge.size() && j >= evenMerge.size())
+            } else if (i >= oddMerge.size() && j >= evenMerge.size()) {
                 break;
-            else if (i >= oddMerge.size()) {
+            } else if (i >= oddMerge.size()) {
                 assert j == evenMerge.size() - 1;
                 output.push(evenMerge.back());
                 break;
@@ -388,29 +419,28 @@ public final class CCSorting {
         assert output.size() == a2 + b2 || output.size() == c;
     }
 
-    private void directMerger(int m, final LNGVector<Literal> inputA, LNGVector<Literal> inputB, final EncodingResult formula,
-                              LNGVector<Literal> output, final ImplicationDirection direction) {
+    private void directMerger(final int m, final LNGVector<Literal> inputA, final LNGVector<Literal> inputB, final EncodingResult formula,
+                              final LNGVector<Literal> output, final ImplicationDirection direction) {
         assert direction == INPUT_TO_OUTPUT;
-        int a = inputA.size();
-        int b = inputB.size();
-        for (int i = 0; i < m; i++)
+        final int a = inputA.size();
+        final int b = inputB.size();
+        for (int i = 0; i < m; i++) {
             output.push(formula.newVariable());
-        int j = m < a ? m : a;
-        for (int i = 0; i < j; i++)
+        }
+        int j = Math.min(m, a);
+        for (int i = 0; i < j; i++) {
             formula.addClause(inputA.get(i).negate(), output.get(i));
-        j = m < b ? m : b;
-        for (int i = 0; i < j; i++)
+        }
+        j = Math.min(m, b);
+        for (int i = 0; i < j; i++) {
             formula.addClause(inputB.get(i).negate(), output.get(i));
-        for (int i = 0; i < a; i++)
-            for (int k = 0; k < b; k++)
-                if (i + k + 1 < m)
+        }
+        for (int i = 0; i < a; i++) {
+            for (int k = 0; k < b; k++) {
+                if (i + k + 1 < m) {
                     formula.addClause(inputA.get(i).negate(), inputB.get(k).negate(), output.get(i + k + 1));
-    }
-
-    /**
-     * The implication direction.
-     */
-    public enum ImplicationDirection {
-        INPUT_TO_OUTPUT, OUTPUT_TO_INPUT, BOTH
+                }
+            }
+        }
     }
 }

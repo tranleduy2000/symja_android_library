@@ -1,12 +1,11 @@
 package org.matheclipse.core.patternmatching;
 
-import com.duy.annotations.Nonnull;
-
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.IPatternSequence;
+import org.matheclipse.core.interfaces.ISymbol;
 
 import java.util.List;
 
@@ -60,7 +59,7 @@ public interface IPatternMap extends Cloneable {
 	 *            the pattern object
      * @return <code>null</code> if no matched expression exists
      */
-    public IExpr getValue(@Nonnull IPatternObject pattern);
+	public IExpr getValue(IPatternObject pattern);
 
     public List<IExpr> getValuesAsList();
 
@@ -68,6 +67,10 @@ public interface IPatternMap extends Cloneable {
      * Set all pattern values to <code>null</code>;
      */
     public void initPattern();
+
+    void initPatternBlank();
+
+    public void initSlotValues();
 
     /**
      * Check if all symbols in the symbols array have corresponding values assigned.
@@ -165,4 +168,24 @@ public interface IPatternMap extends Cloneable {
      */
     public IExpr substituteSymbols(final IExpr rhsExpr);
 
+	public boolean setOptionsPattern(final EvalEngine engine, ISymbol lhsHead);
+
+	// Move to org.matheclipse.core.patternmatching.IPatternMapImpl
+    // /**
+    //  * @param op
+    //  * @param x      may be <code>null</code>
+    //  * @param engine
+    //  */
+    // public static void addOptionsPattern(OptionsPattern op, IExpr x, EvalEngine engine) {
+    //     if (x.size() > 1 && //
+    //             (x.isSequence() || x.isList())) {
+    //         IAST list = (IAST) x;
+    //         for (int i = 1; i < list.size(); i++) {
+    //             // also for nested lists
+    //             addOptionsPattern(op, list.get(i), engine);
+    //         }
+    //     } else {
+    //         engine.addOptionsPattern(op, (IAST) x);
+    //     }
+    // }
 }

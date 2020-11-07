@@ -42,15 +42,8 @@ import java.util.List;
 public abstract class IASTImpl extends IExprImpl implements IAST {
 
     @Override
-    public abstract IAST clone() throws CloneNotSupportedException;
-
-    @Override
-    public IExpr acceptChecked(IVisitor visitor) {
-        try {
-            return accept(visitor);
-        } catch (StackOverflowError soe) {
-            throw new MemoryLimitExceeded("StackOverflowError in visitor");
-        }
+    public IAST addEvalFlags(int evalFlags) {
+        return (IAST) super.addEvalFlags(evalFlags);
     }
 
     @Override
@@ -142,6 +135,18 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     @Override
     public int[] toIntVector() {
         return null;
+    }
+
+    @Override
+    public abstract IAST clone() throws CloneNotSupportedException;
+
+    @Override
+    public IExpr acceptChecked(IVisitor visitor) {
+        try {
+            return accept(visitor);
+        } catch (StackOverflowError soe) {
+            throw new MemoryLimitExceeded("StackOverflowError in visitor");
+        }
     }
 
     /**
@@ -344,7 +349,7 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     }
 
     @Override
-	public IAST getRule(final String key) {
+    public IAST getRule(final String key) {
         int index = indexOf(new Predicate<IExpr>() {
             @Override
             public boolean test(IExpr x) {
@@ -355,7 +360,7 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
             return (IAST) get(index);
         }
         return F.NIL;
-	}
+    }
 
     @Override
     public IAST getRule(final IExpr key) {

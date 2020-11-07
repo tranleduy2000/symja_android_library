@@ -68,7 +68,9 @@ public class NumericTest extends TestCase {
         assertEquals(exprEvaluator.eval("LCM({1,2,3},3)").toString(),
                 "{3,6,3}");
         assertEquals(exprEvaluator.eval("Cos({1,2,3},4,{1,2,4})").toString(),
-                "{Cos(1,4,1),Cos(2,4,2),Cos(3,4,4)}");
+                "Cos({1,2,3},4,{1,2,4})");
+        assertEquals(exprEvaluator.eval("Cos({1,2,3})").toString(),
+                "{Cos(1),Cos(2),Cos(3)}");
     }
 
     public void testRound() {
@@ -131,10 +133,12 @@ public class NumericTest extends TestCase {
         }
 
         try {
-            exprEvaluator.eval(
+            // Test org.apfloat.ApfloatHelper#toBigInteger
+            IExpr result = exprEvaluator.eval(
                     "IntegerPart[" +
                             "N[Rationalize(7.632983698255881490491277878802104727687173409866438641630722914874999055316337727346395442234887161)" +
                             "*10^N(29995651.0, 100), 100]]");
+            System.out.println("result = " + result.size());
             fail();
         } catch (Exception e) {
             e.printStackTrace();

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * PBLib       -- Copyright (c) 2012-2013  Peter Steinke
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -57,11 +57,10 @@ import org.logicng.formulas.Variable;
 /**
  * Encodes that at most one variable is assigned value true.  Uses the binary encoding due to Doggett, Frisch, Peugniez,
  * and Nightingale.
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
-final class CCAMOBinary implements CCAtMostOne {
-
+public final class CCAMOBinary implements CCAtMostOne {
 
     /**
      * Constructs the binary AMO encoder.
@@ -77,8 +76,9 @@ final class CCAMOBinary implements CCAtMostOne {
         final int twoPowNBits = (int) Math.pow(2, numberOfBits);
         final int k = (twoPowNBits - vars.length) * 2;
         final Variable[] bits = new Variable[numberOfBits];
-        for (int i = 0; i < numberOfBits; i++)
+        for (int i = 0; i < numberOfBits; i++) {
             bits[i] = result.newVariable();
+        }
         int grayCode;
         int nextGray;
         int i = 0;
@@ -88,23 +88,27 @@ final class CCAMOBinary implements CCAtMostOne {
             grayCode = i ^ (i >> 1);
             i++;
             nextGray = i ^ (i >> 1);
-            for (int j = 0; j < numberOfBits; ++j)
+            for (int j = 0; j < numberOfBits; ++j) {
                 if ((grayCode & (1 << j)) == (nextGray & (1 << j))) {
-                    if ((grayCode & (1 << j)) != 0)
+                    if ((grayCode & (1 << j)) != 0) {
                         result.addClause(vars[index].negate(), bits[j]);
-                    else
+                    } else {
                         result.addClause(vars[index].negate(), bits[j].negate());
+                    }
                 }
+            }
             i++;
         }
         while (i < twoPowNBits) {
             index++;
             grayCode = i ^ (i >> 1);
-            for (int j = 0; j < numberOfBits; ++j)
-                if ((grayCode & (1 << j)) != 0)
+            for (int j = 0; j < numberOfBits; ++j) {
+                if ((grayCode & (1 << j)) != 0) {
                     result.addClause(vars[index].negate(), bits[j]);
-                else
+                } else {
                     result.addClause(vars[index].negate(), bits[j].negate());
+                }
+            }
             i++;
         }
     }

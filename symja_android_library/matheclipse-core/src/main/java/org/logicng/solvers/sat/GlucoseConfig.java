@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,15 +28,12 @@
 
 package org.logicng.solvers.sat;
 
-import com.duy.lang.DSystem;
-
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
 /**
  * The configuration object for the Glucose SAT solver.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
 public final class GlucoseConfig extends Configuration {
@@ -57,7 +54,6 @@ public final class GlucoseConfig extends Configuration {
 
     /**
      * Constructs a new Glucose configuration from a given builder.
-     *
      * @param builder the builder
      */
     private GlucoseConfig(final Builder builder) {
@@ -77,23 +73,31 @@ public final class GlucoseConfig extends Configuration {
         this.maxVarDecay = builder.maxVarDecay;
     }
 
+    /**
+     * Returns a new builder for the configuration.
+     * @return the builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("GlucoseConfig{").append(DSystem.lineSeparator());
-        sb.append("lbLBDMinimizingClause=").append(this.lbLBDMinimizingClause).append(DSystem.lineSeparator());
-        sb.append("lbLBDFrozenClause=").append(this.lbLBDFrozenClause).append(DSystem.lineSeparator());
-        sb.append("lbSizeMinimizingClause=").append(this.lbSizeMinimizingClause).append(DSystem.lineSeparator());
-        sb.append("firstReduceDB=").append(this.firstReduceDB).append(DSystem.lineSeparator());
-        sb.append("specialIncReduceDB=").append(this.specialIncReduceDB).append(DSystem.lineSeparator());
-        sb.append("incReduceDB=").append(this.incReduceDB).append(DSystem.lineSeparator());
-        sb.append("factorK=").append(this.factorK).append(DSystem.lineSeparator());
-        sb.append("factorR=").append(this.factorR).append(DSystem.lineSeparator());
-        sb.append("sizeLBDQueue=").append(this.sizeLBDQueue).append(DSystem.lineSeparator());
-        sb.append("sizeTrailQueue=").append(this.sizeTrailQueue).append(DSystem.lineSeparator());
-        sb.append("reduceOnSize=").append(this.reduceOnSize).append(DSystem.lineSeparator());
-        sb.append("reduceOnSizeSize=").append(this.reduceOnSizeSize).append(DSystem.lineSeparator());
-        sb.append("maxVarDecay=").append(this.maxVarDecay).append(DSystem.lineSeparator());
-        sb.append("}").append(DSystem.lineSeparator());
+        final StringBuilder sb = new StringBuilder("GlucoseConfig{").append(System.lineSeparator());
+        sb.append("lbLBDMinimizingClause=").append(this.lbLBDMinimizingClause).append(System.lineSeparator());
+        sb.append("lbLBDFrozenClause=").append(this.lbLBDFrozenClause).append(System.lineSeparator());
+        sb.append("lbSizeMinimizingClause=").append(this.lbSizeMinimizingClause).append(System.lineSeparator());
+        sb.append("firstReduceDB=").append(this.firstReduceDB).append(System.lineSeparator());
+        sb.append("specialIncReduceDB=").append(this.specialIncReduceDB).append(System.lineSeparator());
+        sb.append("incReduceDB=").append(this.incReduceDB).append(System.lineSeparator());
+        sb.append("factorK=").append(this.factorK).append(System.lineSeparator());
+        sb.append("factorR=").append(this.factorR).append(System.lineSeparator());
+        sb.append("sizeLBDQueue=").append(this.sizeLBDQueue).append(System.lineSeparator());
+        sb.append("sizeTrailQueue=").append(this.sizeTrailQueue).append(System.lineSeparator());
+        sb.append("reduceOnSize=").append(this.reduceOnSize).append(System.lineSeparator());
+        sb.append("reduceOnSizeSize=").append(this.reduceOnSizeSize).append(System.lineSeparator());
+        sb.append("maxVarDecay=").append(this.maxVarDecay).append(System.lineSeparator());
+        sb.append("}");
         return sb.toString();
     }
 
@@ -115,13 +119,16 @@ public final class GlucoseConfig extends Configuration {
         private int reduceOnSizeSize = 12;
         private double maxVarDecay = 0.95;
 
+        private Builder() {
+            // Initialize only via factory
+        }
+
         /**
          * Sets the minimal LBD required to minimize a clause to a given value.  The default value is 6.
-         *
          * @param lbLBDMinimizingClause the value (should be at least 3)
          * @return the builder
          */
-        public Builder lbLBDMinimizingClause(int lbLBDMinimizingClause) {
+        public Builder lbLBDMinimizingClause(final int lbLBDMinimizingClause) {
             this.lbLBDMinimizingClause = lbLBDMinimizingClause;
             return this;
         }
@@ -129,99 +136,90 @@ public final class GlucoseConfig extends Configuration {
         /**
          * Sets the value to protect clauses if their LBD decrease and is lower than it (for one turn).  The default value
          * is 30.
-         *
          * @param lbLBDFrozenClause the value
          * @return the builder
          */
-        public Builder lbLBDFrozenClause(int lbLBDFrozenClause) {
+        public Builder lbLBDFrozenClause(final int lbLBDFrozenClause) {
             this.lbLBDFrozenClause = lbLBDFrozenClause;
             return this;
         }
 
         /**
          * Sets the minimal size required to minimize a clause to a given value.  The default value is 30.
-         *
          * @param lbSizeMinimizingClause the value (should be at least 3)
          * @return the builder
          */
-        public Builder lbSizeMinimizingClause(int lbSizeMinimizingClause) {
+        public Builder lbSizeMinimizingClause(final int lbSizeMinimizingClause) {
             this.lbSizeMinimizingClause = lbSizeMinimizingClause;
             return this;
         }
 
         /**
          * Sets the number of conflicts before the first DB reduction to a given value.  The default value is 2000.
-         *
          * @param firstReduceDB the value
          * @return the builder
          */
-        public Builder firstReduceDB(int firstReduceDB) {
+        public Builder firstReduceDB(final int firstReduceDB) {
             this.firstReduceDB = firstReduceDB;
             return this;
         }
 
         /**
          * Sets the special increment for the DB reduction to a given value.  The default value is 1000.
-         *
          * @param specialIncReduceDB the value
          * @return the builder
          */
-        public Builder specialIncReduceDB(int specialIncReduceDB) {
+        public Builder specialIncReduceDB(final int specialIncReduceDB) {
             this.specialIncReduceDB = specialIncReduceDB;
             return this;
         }
 
         /**
          * Sets the increment for the DB reduction to a given value. The default value is 300.
-         *
          * @param incReduceDB the value
          * @return the builder
          */
-        public Builder incReduceDB(int incReduceDB) {
+        public Builder incReduceDB(final int incReduceDB) {
             this.incReduceDB = incReduceDB;
             return this;
         }
 
         /**
          * Sets the constant used to force restart to a given value.  The default value is 0.8.
-         *
          * @param factorK the value (should be in the range 0..1)
          * @return the builder
          */
-        public Builder factorK(double factorK) {
+        public Builder factorK(final double factorK) {
             this.factorK = factorK;
             return this;
         }
 
         /**
          * Sets the constant used to block restart to a given value.  The default value is 1.4.
-         *
          * @param factorR the value (should be in the range 1..5)
          * @return the builder
          */
-        public Builder factorR(double factorR) {
+        public Builder factorR(final double factorR) {
             this.factorR = factorR;
             return this;
         }
 
         /**
          * Sets the size of moving average for LBD (restarts) to a given value.  The default value is 50.
-         *
          * @param sizeLBDQueue the value (should be at least 10)
          * @return the builder
          */
-        public Builder sizeLBDQueue(int sizeLBDQueue) {
+        public Builder sizeLBDQueue(final int sizeLBDQueue) {
             this.sizeLBDQueue = sizeLBDQueue;
             return this;
         }
 
         /**
          * Sets the size of moving average for trail (block restarts) to a given value.  The default value is 5000.
-         *
          * @param sizeTrailQueue the value (should be at least 10)
          * @return the builder
          */
-        public Builder sizeTrailQueue(int sizeTrailQueue) {
+        public Builder sizeTrailQueue(final int sizeTrailQueue) {
             this.sizeTrailQueue = sizeTrailQueue;
             return this;
         }
@@ -229,11 +227,10 @@ public final class GlucoseConfig extends Configuration {
         /**
          * Turns on the size reduction during LBD computation like described in the XMinisat paper.  The default value is
          * {@code false}.
-         *
          * @param reduceOnSize {@code true} if the size reduction is turned on, {@code false} otherwise
          * @return the builder
          */
-        public Builder reduceOnSize(boolean reduceOnSize) {
+        public Builder reduceOnSize(final boolean reduceOnSize) {
             this.reduceOnSize = reduceOnSize;
             return this;
         }
@@ -241,29 +238,26 @@ public final class GlucoseConfig extends Configuration {
         /**
          * Sets the constant used during size reduction like described in the XMinisat paper to a given value.  The default
          * value is 12.
-         *
          * @param reduceOnSizeSize the value
          * @return the builder
          */
-        public Builder reduceOnSizeSize(int reduceOnSizeSize) {
+        public Builder reduceOnSizeSize(final int reduceOnSizeSize) {
             this.reduceOnSizeSize = reduceOnSizeSize;
             return this;
         }
 
         /**
          * Sets the maximal variable activity decay factor to a given value.  The default value is 0.95.
-         *
          * @param maxVarDecay the value (should be in the range 0..1)
          * @return the builder
          */
-        public Builder maxVarDecay(double maxVarDecay) {
+        public Builder maxVarDecay(final double maxVarDecay) {
             this.maxVarDecay = maxVarDecay;
             return this;
         }
 
         /**
          * Builds the Glucose configuration.
-         *
          * @return the configuration
          */
         public GlucoseConfig build() {

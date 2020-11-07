@@ -22,6 +22,7 @@
 
 package org.hipparchus.dfp;
 
+import org.hipparchus.CalculusFieldElementImpl;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.FastMath;
@@ -101,7 +102,7 @@ import java.util.Arrays;
  *
  * @see DfpField
  */
-public class Dfp implements RealFieldElement<Dfp> {
+public class Dfp extends CalculusFieldElementImpl<Dfp> implements RealFieldElement<Dfp> {
 
     /**
      * The radix, or base of this system.  Set to 10000
@@ -1036,6 +1037,7 @@ public class Dfp implements RealFieldElement<Dfp> {
      *
      * @return true if instance is infinite
      */
+    @Override
     public boolean isInfinite() {
         return nans == INFINITE;
     }

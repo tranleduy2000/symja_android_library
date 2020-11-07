@@ -1,6 +1,7 @@
 package org.matheclipse.core.graphics;
 
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.convert.RGBColor;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
@@ -33,8 +34,8 @@ public class Show2SVG {
 
 	private static void elementToSVG(IAST ast, StringBuilder buf, Dimensions2D dim) {
 		for (int i = 1; i < ast.size(); i++) {
-			if (ast.get(i).isSymbol()) {
-				dim.setColorRGB(ast.get(i).toString());
+			if (ast.get(i).isAST(F.RGBColor, 4)) {
+				dim.setColorRGB((IAST) ast.get(i));
 			} else if (ast.get(i).isSameHeadSizeGE(F.Line, 2)) {
 				lineToSVG(ast.getAST(i), buf, dim);
 			} else if (ast.get(i).isSameHeadSizeGE(F.Point, 2)) {
@@ -49,8 +50,8 @@ public class Show2SVG {
 		EvalEngine engine = EvalEngine.get();
 		IAST numericAST = (IAST) engine.evalN(ast);
 		Dimensions2D dim = new Dimensions2D(350, 350);
-		// TODO change to these rgb(24.720000%, 24.000000%, 60.000000%);
-		dim.setColorRGB("blue");
+		// set a default value
+		dim.color = RGBColor.BLUE;
 		if (numericAST.size() > 2) {
 			final OptionArgs options = new OptionArgs(numericAST.topHead(), numericAST, 2, engine);
 			IExpr option = options.getOption(F.PlotRange);
@@ -228,8 +229,8 @@ public class Show2SVG {
 		double x1 = ((ISignedNumber) point.arg1()).doubleValue();
 		double y1 = ((ISignedNumber) point.arg2()).doubleValue();
 
-		dim.minMax(x1 - Config.DOUBLE_EPSILON, x1 + Config.DOUBLE_EPSILON, y1 - Config.DOUBLE_EPSILON,
-				y1 + Config.DOUBLE_EPSILON);
+		dim.minMax(x1 - Config.DOUBLE_TOLERANCE, x1 + Config.DOUBLE_TOLERANCE, y1 - Config.DOUBLE_TOLERANCE,
+				y1 + Config.DOUBLE_TOLERANCE);
 	}
 
 	private static void pointToSVG(IAST ast, StringBuilder buf, Dimensions2D dim) {

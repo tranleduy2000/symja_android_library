@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,12 +30,12 @@ package org.logicng.pseudobooleans;
 
 import org.logicng.cardinalityconstraints.CCConfig;
 import org.logicng.cardinalityconstraints.CCEncoder;
-import org.logicng.collections.ImmutableFormulaList;
 import org.logicng.collections.LNGIntVector;
 import org.logicng.collections.LNGVector;
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
-import org.logicng.formulas.FType;
+import org.logicng.formulas.CFalse;
+import org.logicng.formulas.CardinalityConstraint;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
@@ -43,98 +43,94 @@ import org.logicng.formulas.PBConstraint;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * An encoder for pseudo-Boolean constraints.
- *
- * @version 1.5.1
+ * @version 2.0.0
  * @since 1.0
  */
 public class PBEncoder {
 
-    private final FormulaFactory f;
-    private final PBConfig config;
-    private final PBConfig defaultConfig;
-    private final CCEncoder ccEncoder;
+    protected final FormulaFactory f;
+    protected final PBConfig config;
+    protected final PBConfig defaultConfig;
+    protected final CCEncoder ccEncoder;
 
-    private PBSWC swc;
-    private PBAdderNetworks adderNetworks;
+    protected PBSWC swc;
+    protected PBAdderNetworks adderNetworks;
 
     /**
      * Constructs a new pseudo-Boolean encoder with given configurations.
-     *
      * @param f        the formula factory
      * @param pbConfig the pseudo-Boolean encoder configuration
      * @param ccConfig the cardinality constraints encoder configuration
      */
     public PBEncoder(final FormulaFactory f, final PBConfig pbConfig, final CCConfig ccConfig) {
         this.f = f;
-        this.defaultConfig = new PBConfig.Builder().build();
+        this.defaultConfig = PBConfig.builder().build();
         this.config = pbConfig;
         this.ccEncoder = new CCEncoder(f, ccConfig);
     }
 
     /**
      * Constructs a new pseudo-Boolean encoder with a given configuration.
-     *
      * @param f        the formula factory
      * @param pbConfig the pseudo-Boolean encoder configuration
      */
     public PBEncoder(final FormulaFactory f, final PBConfig pbConfig) {
         this.f = f;
-        this.defaultConfig = new PBConfig.Builder().build();
+        this.defaultConfig = PBConfig.builder().build();
         this.config = pbConfig;
         this.ccEncoder = new CCEncoder(f);
     }
 
     /**
      * Constructs a new pseudo-Boolean encoder which uses the configuration of the formula factory.
-     *
      * @param f the formula factory
      */
     public PBEncoder(final FormulaFactory f) {
         this.f = f;
-        this.defaultConfig = new PBConfig.Builder().build();
+        this.defaultConfig = PBConfig.builder().build();
         this.config = null;
         this.ccEncoder = new CCEncoder(f);
     }
 
     /**
      * Encodes a pseudo-Boolean constraint and returns its CNF encoding.
-     *
      * @param constraint the pseudo-Boolean constraint
      * @return the CNF encoding of the pseudo-Boolean constraint
      */
-    public ImmutableFormulaList encode(final PBConstraint constraint) {
-        if (constraint.isCC())
-            return this.ccEncoder.encode(constraint);
+    public List<Formula> encode(final PBConstraint constraint) {
+        if (constraint.isCC()) {
+            return this.ccEncoder.encode((CardinalityConstraint) constraint);
+        }
         final Formula normalized = constraint.normalize();
         switch (normalized.type()) {
             case TRUE:
-                return new ImmutableFormulaList(FType.AND);
+                return Collections.emptyList();
             case FALSE:
-                return new ImmutableFormulaList(FType.AND, this.f.falsum());
+                return Collections.<Formula>singletonList(this.f.falsum());
             case PBC:
                 final PBConstraint pbc = (PBConstraint) normalized;
-                if (pbc.isCC())
-                    return this.ccEncoder.encode(pbc);
-                return new ImmutableFormulaList(FType.AND, this.encode(pbc.operands(), pbc.coefficients(), pbc.rhs()));
+                if (pbc.isCC()) {
+                    return this.ccEncoder.encode((CardinalityConstraint) pbc);
+                }
+                return this.encode(pbc.operands(), pbc.coefficients(), pbc.rhs());
             case AND:
-                final List<Formula> list = new LinkedList<>();
+                final List<Formula> list = new ArrayList<>();
                 for (final Formula op : normalized) {
                     switch (op.type()) {
                         case FALSE:
-                            return new ImmutableFormulaList(FType.AND, this.f.falsum());
+                            return Collections.<Formula>singletonList(this.f.falsum());
                         case PBC:
-                            list.addAll(this.encode((PBConstraint) op).toList());
+                            list.addAll(this.encode((PBConstraint) op));
                             break;
                         default:
                             throw new IllegalArgumentException("Illegal return value of PBConstraint.normalize");
                     }
                 }
-                return new ImmutableFormulaList(FType.AND, list);
+                return Collections.unmodifiableList(list);
             default:
                 throw new IllegalArgumentException("Illegal return value of PBConstraint.normalize");
         }
@@ -144,19 +140,18 @@ public class PBEncoder {
      * Returns the current configuration of this encoder.  If the encoder was constructed with a given configuration, this
      * configuration will always be used.  Otherwise the current configuration of the formula factory is used or - if not
      * present - the default configuration.
-     *
      * @return the current configuration of
      */
     public PBConfig config() {
-        if (this.config != null)
+        if (this.config != null) {
             return this.config;
-        Configuration pbConfig = this.f.configurationFor(ConfigurationType.PB_ENCODER);
+        }
+        final Configuration pbConfig = this.f.configurationFor(ConfigurationType.PB_ENCODER);
         return pbConfig != null ? (PBConfig) pbConfig : this.defaultConfig;
     }
 
     /**
      * Builds a pseudo Boolean constraint of the form {@code c_1 * lit_1 + c_2 * lit_2 + ... + c_n * lit_n >= k}.
-     *
      * @param lits   the literals {@code lit_1 ... lit_n}
      * @param coeffs the coefficients {@code c_1 ... c_n}
      * @param rhs    the right hand side {@code k} of the constraint
@@ -164,38 +159,46 @@ public class PBEncoder {
      * @throws IllegalArgumentException if the right hand side of the cardinality constraint is negative or
      *                                  larger than the number of literals
      */
-    private List<Formula> encode(final Literal[] lits, final int[] coeffs, int rhs) {
-        if (rhs == Integer.MAX_VALUE)
+    protected List<Formula> encode(final Literal[] lits, final int[] coeffs, final int rhs) {
+        if (rhs == Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Overflow in the Encoding");
-        if (rhs < 0)
-            return Collections.singletonList((Formula) f.falsum());
+        }
+        if (rhs < 0) {
+            return Collections.<Formula>singletonList(this.f.falsum());
+        }
         final LNGVector<Literal> simplifiedLits = new LNGVector<>();
         final LNGIntVector simplifiedCoeffs = new LNGIntVector();
         final List<Formula> result = new ArrayList<>();
         if (rhs == 0) {
-            for (final Literal lit : lits)
+            for (final Literal lit : lits) {
                 result.add(lit.negate());
+            }
             return result;
         }
-        for (int i = 0; i < lits.length; i++)
+        for (int i = 0; i < lits.length; i++) {
             if (coeffs[i] <= rhs) {
                 simplifiedLits.push(lits[i]);
                 simplifiedCoeffs.push(coeffs[i]);
-            } else
+            } else {
                 result.add(lits[i].negate());
-        if (simplifiedLits.size() <= 1)
+            }
+        }
+        if (simplifiedLits.size() <= 1) {
             return result;
+        }
         switch (this.config().pbEncoder) {
             case SWC:
             case BEST:
-                if (this.swc == null)
+                if (this.swc == null) {
                     this.swc = new PBSWC(this.f);
+                }
                 return this.swc.encode(simplifiedLits, simplifiedCoeffs, rhs, result);
             case BINARY_MERGE:
-                return new PBBinaryMerge(f, this.config()).encode(simplifiedLits, simplifiedCoeffs, rhs, result);
+                return new PBBinaryMerge(this.f, this.config()).encode(simplifiedLits, simplifiedCoeffs, rhs, result);
             case ADDER_NETWORKS:
-                if (this.adderNetworks == null)
-                    this.adderNetworks = new PBAdderNetworks(f);
+                if (this.adderNetworks == null) {
+                    this.adderNetworks = new PBAdderNetworks(this.f);
+                }
                 return this.adderNetworks.encode(simplifiedLits, simplifiedCoeffs, rhs, result);
             default:
                 throw new IllegalStateException("Unknown pseudo-Boolean encoder: " + this.config().pbEncoder);

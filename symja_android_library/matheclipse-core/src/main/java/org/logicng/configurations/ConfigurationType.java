@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,18 +30,17 @@ package org.logicng.configurations;
 
 /**
  * The different types of configurations in LogicNG.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
 public enum ConfigurationType {
+    FORMULA_FACTORY,
     CNF,
     MINISAT,
     GLUCOSE,
-    CLEANELING,
     MAXSAT,
     MUS,
     CC_ENCODER,
     PB_ENCODER,
-    BACKBONE
+    FORMULA_RANDOMIZER
 }

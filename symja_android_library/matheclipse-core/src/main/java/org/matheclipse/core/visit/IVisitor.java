@@ -1,6 +1,7 @@
 package org.matheclipse.core.visit;
 
 import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IDataExpr;
@@ -15,9 +16,9 @@ import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * A visitor which could be used in the <code>org.matheclipse.core.interfaces.IExpr#accept()</code> method.
- * 
+ *
  * @param <T>
- * 
+ *
  * @see org.matheclipse.core.interfaces.IExpr
  */
 public interface IVisitor {
@@ -39,9 +40,10 @@ public interface IVisitor {
 	public abstract IExpr visit(IPattern element);
 
 	public abstract IExpr visit(IPatternSequence element);
-	
+
 	public abstract IExpr visit(IStringX element);
 
 	public abstract IExpr visit(IASTMutable ast);
 
+	IExpr visit(IAssociation assoc);
 }

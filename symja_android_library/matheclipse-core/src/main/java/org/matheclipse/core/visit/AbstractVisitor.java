@@ -1,6 +1,8 @@
 package org.matheclipse.core.visit;
 
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IDataExpr;
@@ -119,4 +121,8 @@ public abstract class AbstractVisitor implements IVisitor  {
 		return F.NIL;
 	}
 
+	@Override
+	public IExpr visit(IAssociation assoc) {
+		return visit((IASTMutable) assoc);
+	}
 }

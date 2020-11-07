@@ -6,6 +6,7 @@ import com.duy.lambda.IntFunction;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -19,10 +20,10 @@ public class VectorAnalysisFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.Curl.setEvaluator(new Curl());
-			F.Div.setEvaluator(new Div());
-			F.Grad.setEvaluator(new Grad());
-			F.RotationMatrix.setEvaluator(new RotationMatrix());
+			S.Curl.setEvaluator(new Curl());
+			S.Div.setEvaluator(new Div());
+			S.Grad.setEvaluator(new Grad());
+			S.RotationMatrix.setEvaluator(new RotationMatrix());
 		}
 	}
 
@@ -57,8 +58,8 @@ public class VectorAnalysisFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.arg1().isVector() >= 3) {
 				if (ast.arg2().isVector() == 3) {
-					IAST variables = (IAST) ast.arg2();
-					IAST vector = (IAST) ast.arg1();
+					IAST variables = (IAST) ast.arg2().normal(false);
+					IAST vector = (IAST) ast.arg1().normal(false);
 					IASTAppendable curlVector = F.ListAlloc(vector.size());
 					curlVector.append(
 							F.Subtract(F.D(vector.arg3(), variables.arg2()), F.D(vector.arg2(), variables.arg3())));
@@ -109,16 +110,16 @@ public class VectorAnalysisFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if ((ast.arg1().isVector() == ast.arg2().isVector()) && (ast.arg1().isVector() >= 0)) {
-				final IAST vector = (IAST) ast.arg1();
-				final IAST variables = (IAST) ast.arg2();
+				final IAST vector = (IAST) ast.arg1().normal(false);
+				final IAST variables = (IAST) ast.arg2().normal(false);
 				int size = vector.size();
 				IASTAppendable divergenceValue = F.PlusAlloc(size);
 				return divergenceValue.appendArgs(size, new IntFunction<IExpr>() {
-                    @Override
-                    public IExpr apply(int i) {
-                        return F.D(vector.get(i), variables.get(i));
-                    }
-                });
+					@Override
+					public IExpr apply(int i) {
+						return F.D(vector.get(i), variables.get(i));
+					}
+				});
 			}
 
 			return F.NIL;
@@ -134,7 +135,7 @@ public class VectorAnalysisFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
 			final IExpr function = ast.arg1();
-			if (ast.arg2().isVector() > 0) {
+			if (ast.arg2().isList() && ast.arg2().size() > 1) {
 				IAST variables = (IAST) ast.arg2();
 				final IASTAppendable dList = F.ListAlloc(variables.argSize());
 				variables.forEach(new Consumer<IExpr>() {
@@ -143,9 +144,6 @@ public class VectorAnalysisFunctions {
 						dList.append(engine.evaluate(F.D(function, x)));
 					}
 				});
-				// for (int i = 1; i < variables.size(); i++) {
-				// dList.append(engine.evaluate(F.D(function, variables.get(i))));
-				// }
 				return dList;
 			}
 

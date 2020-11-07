@@ -2,6 +2,7 @@ package org.matheclipse.core.form.output;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -113,7 +114,9 @@ public class JavaDoubleFormFactory extends DoubleFormFactory {
 		if (function.isNumericFunction()) {
 			try {
 				double value = EvalEngine.get().evalDouble(function);
-				buf.append("(" + value + ")");
+				buf.append("(");
+				buf.append(value);
+				buf.append(")");
 				return;
 			} catch (RuntimeException rex) {
 				//
@@ -132,6 +135,13 @@ public class JavaDoubleFormFactory extends DoubleFormFactory {
 			}
 		}
 		if (function.headID() > 0) {
+			if (function.isAST(S.Defer, 2) || //
+					function.isAST(S.Evaluate, 2) || //
+					function.isAST(S.Hold, 2) || //
+					function.isAST(S.Unevaluated, 2)) {
+				convertInternal(buf, function.first());
+				return;
+			}
 			if (function.isPower()) {
 				IExpr base = function.base();
 				IExpr exponent = function.exponent();

@@ -298,7 +298,7 @@ public class FunctionExpand extends AbstractEvaluator implements FunctionExpandR
 	private static IExpr sqrtDenest(IRational arg1, IExpr arg2) {
 		if (arg1.isNegative()) {
 			return sqrtDenest(arg1.negate(), arg2.negate()).//
-					map(new Function<IExpr, IExpr>() {
+					mapExpr(new Function<IExpr, IExpr>() {
 				@Override
 				public IExpr apply(IExpr x) {
 					return F.Times(F.CI, x);

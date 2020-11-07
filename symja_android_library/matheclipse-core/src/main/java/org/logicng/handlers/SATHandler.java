@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,23 +30,16 @@ package org.logicng.handlers;
 
 /**
  * Interface for a handler for SAT solvers.
- *
- * @version 1.0
+ * @version 1.6.2
  * @since 1.0
  */
-public interface SATHandler {
+public interface SATHandler extends Handler {
 
     /**
      * This method is called every time a conflict is found.
-     *
      * @return whether SAT solving should be continued or not
      */
     boolean detectedConflict();
-
-    /**
-     * This method is called when the SAT solver starts solving.
-     */
-    void startedSolving();
 
     /**
      * This method is called when the SAT solver finished solving.

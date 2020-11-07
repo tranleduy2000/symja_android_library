@@ -15,6 +15,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -47,23 +48,23 @@ public class HypergeometricFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.CosIntegral.setEvaluator(new CosIntegral());
-			F.CoshIntegral.setEvaluator(new CoshIntegral());
-			F.ExpIntegralE.setEvaluator(new ExpIntegralE());
-			F.ExpIntegralEi.setEvaluator(new ExpIntegralEi());
-			F.FresnelC.setEvaluator(new FresnelC());
-			F.FresnelS.setEvaluator(new FresnelS());
-			F.GegenbauerC.setEvaluator(new GegenbauerC());
-			F.Hypergeometric0F1.setEvaluator(new Hypergeometric0F1());
-			F.Hypergeometric1F1.setEvaluator(new Hypergeometric1F1());
-			F.Hypergeometric2F1.setEvaluator(new Hypergeometric2F1());
-			F.HypergeometricPFQ.setEvaluator(new HypergeometricPFQ());
-			F.HypergeometricU.setEvaluator(new HypergeometricU());
-			F.LogIntegral.setEvaluator(new LogIntegral());
-			F.SinIntegral.setEvaluator(new SinIntegral());
-			F.SinhIntegral.setEvaluator(new SinhIntegral());
-			F.WhittakerM.setEvaluator(new WhittakerM());
-			F.WhittakerW.setEvaluator(new WhittakerW());
+			S.CosIntegral.setEvaluator(new CosIntegral());
+			S.CoshIntegral.setEvaluator(new CoshIntegral());
+			S.ExpIntegralE.setEvaluator(new ExpIntegralE());
+			S.ExpIntegralEi.setEvaluator(new ExpIntegralEi());
+			S.FresnelC.setEvaluator(new FresnelC());
+			S.FresnelS.setEvaluator(new FresnelS());
+			S.GegenbauerC.setEvaluator(new GegenbauerC());
+			S.Hypergeometric0F1.setEvaluator(new Hypergeometric0F1());
+			S.Hypergeometric1F1.setEvaluator(new Hypergeometric1F1());
+			S.Hypergeometric2F1.setEvaluator(new Hypergeometric2F1());
+			S.HypergeometricPFQ.setEvaluator(new HypergeometricPFQ());
+			S.HypergeometricU.setEvaluator(new HypergeometricU());
+			S.LogIntegral.setEvaluator(new LogIntegral());
+			S.SinIntegral.setEvaluator(new SinIntegral());
+			S.SinhIntegral.setEvaluator(new SinhIntegral());
+			S.WhittakerM.setEvaluator(new WhittakerM());
+			S.WhittakerW.setEvaluator(new WhittakerW());
 		}
 
 	}
@@ -1059,7 +1060,7 @@ public class HypergeometricFunctions {
 
 		@Override
 		public IExpr evaluate(IAST ast, EvalEngine engine) {
-			IExpr a = ast.arg1();
+			final IExpr a = ast.arg1();
 			IExpr b = ast.arg2();
 			final IExpr z = ast.arg3();
 			if (a.isZero()) {
@@ -1103,39 +1104,39 @@ public class HypergeometricFunctions {
 				}
 			}
 			if (engine.isDoubleMode()) {
-					double aDouble = Double.NaN;
-					double bDouble = Double.NaN;
-					double zDouble = Double.NaN;
-					try {
-						aDouble = a.evalDouble();
-						bDouble = b.evalDouble();
-						zDouble = z.evalDouble();
-						return F.complexNum(HypergeometricJS.hypergeometricU(new Complex(aDouble), new Complex(bDouble),
-								new Complex(zDouble)));
-					} catch (ValidateException ve) {
-						if (FEConfig.SHOW_STACKTRACE) {
-							ve.printStackTrace();
-						}
-					}
-					Complex ac = a.evalComplex();
-					Complex bc = b.evalComplex();
-					Complex zc = z.evalComplex();
-					return F.complexNum(HypergeometricJS.hypergeometricU(ac, bc, zc));
-
-				}
-				} catch (ThrowException te) {
-					if (FEConfig.SHOW_STACKTRACE) {
-						te.printStackTrace();
-					}
-					return te.getValue();
+				double aDouble = Double.NaN;
+				double bDouble = Double.NaN;
+				double zDouble = Double.NaN;
+				try {
+					aDouble = a.evalDouble();
+					bDouble = b.evalDouble();
+					zDouble = z.evalDouble();
+					return F.complexNum(HypergeometricJS.hypergeometricU(new Complex(aDouble), new Complex(bDouble),
+							new Complex(zDouble)));
 				} catch (ValidateException ve) {
 					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
-				} catch (RuntimeException rex) {
-					// rex.printStackTrace();
-					return engine.printMessage(ast.topHead(), rex);
 				}
+				Complex ac = a.evalComplex();
+				Complex bc = b.evalComplex();
+				Complex zc = z.evalComplex();
+				return F.complexNum(HypergeometricJS.hypergeometricU(ac, bc, zc));
+
+			}
+			} catch (ThrowException te) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					te.printStackTrace();
+				}
+				return te.getValue();
+			} catch (ValidateException ve) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+			} catch (RuntimeException rex) {
+				// rex.printStackTrace();
+				return engine.printMessage(ast.topHead(), rex);
+			}
 			return F.NIL;
 		}
 

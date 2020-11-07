@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import com.duy.math.BigIntegerUtils;
 import com.gx.common.math.BigIntegerMath;
 
 import org.hipparchus.fraction.BigFraction;
@@ -454,7 +455,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	 * @return
 	 */
 	@Override
-	public ISignedNumber inverse() {
+	public IRational inverse() {
 		if (isOne()) {
 			return this;
 		}
@@ -602,7 +603,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 		}
 		BigInteger thatBigIntValue = that.toBigNumerator();
 		if (Config.MAX_BIT_LENGTH < (fBigIntValue.bitLength() + thatBigIntValue.bitLength())) {
-			throw new ASTElementLimitExceeded(fBigIntValue.bitLength() + thatBigIntValue.bitLength());
+			BigIntegerLimitExceeded.throwIt(fBigIntValue.bitLength() + thatBigIntValue.bitLength());
 		}
 
 		return valueOf(fBigIntValue.multiply(thatBigIntValue));
@@ -831,11 +832,11 @@ public class BigIntegerSym extends AbstractIntegerSym {
 	/** {@inheritDoc} */
 	@Override
 	public int toIntDefault(int defaultValue) {
-		int val = fBigIntValue.intValue();
-		if (!fBigIntValue.equals(BigInteger.valueOf(val))) {
+		try {
+			return BigIntegerUtils.intValueExact(fBigIntValue);
+		} catch (java.lang.ArithmeticException aex) {
 			return defaultValue;
 		}
-		return val;
 	}
 
 	/**

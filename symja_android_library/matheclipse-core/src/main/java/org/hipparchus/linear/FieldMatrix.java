@@ -23,6 +23,8 @@
 package org.hipparchus.linear;
 
 
+import com.duy.lambda.Function;
+
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -844,4 +846,27 @@ public interface FieldMatrix<T extends FieldElement<T>> extends AnyMatrix {
     T walkInOptimizedOrder(FieldMatrixPreservingVisitor<T> visitor,
                            int startRow, int endRow, int startColumn, int endColumn)
             throws MathIllegalArgumentException;
+
+    /**
+     * Acts as if implemented as:
+     * <pre>
+     *  return copy().mapToSelf(function);
+     * </pre>
+     * Returns a new matrix. Does not change instance data.
+     *
+     * @param function Function to apply to each entry.
+     * @return a new matrix.
+     * @since 1.7
+     */
+    FieldMatrix<T> map(Function<T, T> function);
+
+    /**
+     * Replace each entry by the result of applying the function to it.
+     *
+     * @param function Function to apply to each entry.
+     * @return a reference to this matrix.
+     * @since 1.7
+     */
+    FieldMatrix<T> mapToSelf(final Function<T, T> function);
+
 }

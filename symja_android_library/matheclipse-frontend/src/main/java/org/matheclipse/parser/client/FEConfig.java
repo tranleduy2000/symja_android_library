@@ -10,7 +10,12 @@ public class FEConfig {
      * Show the stack trace, if an exception is thrown in evaluation
      *
      */
-    public static boolean SHOW_STACKTRACE = false;
+	public static boolean SHOW_STACKTRACE = false;
+
+	/**
+	 * Use <code>Num</code> objects for numeric calculations up to 16 digits precision.
+	 */
+	public static final long MACHINE_PRECISION = 16L;
 
     /**
      * If <code>true</code> the parser doesn't distinguish between lower- or uppercase symbols (i.e. constants, function

@@ -15,6 +15,8 @@
  */
 package org.matheclipse.api.parser;
 
+import com.gx.common.base.CharMatcher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,6 @@ import org.matheclipse.parser.client.operator.Operator;
 import org.matheclipse.parser.trie.Trie;
 import org.matheclipse.parser.trie.Tries;
 
-import com.google.common.base.CharMatcher;
 
 public class FuzzyParserFactory implements IParserFactory {
 	/**

@@ -3,10 +3,10 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
+import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.LastCalculationsHistory;
@@ -19,6 +19,7 @@ import org.matheclipse.core.eval.util.Lambda;
 import org.matheclipse.core.eval.util.OpenFixedSizeMap;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -29,10 +30,10 @@ import org.matheclipse.core.interfaces.IComplexNum;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.ISparseArray;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMapImpl;
-import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.core.patternmatching.PatternMatcherAndEvaluator;
 import org.matheclipse.core.visit.AbstractVisitorLong;
 import org.matheclipse.core.visit.IndexedLevel;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
+@SuppressWarnings("JavaDoc")
 public class StructureFunctions {
 	private final static Set<ISymbol> LOGIC_EQUATION_HEADS = Collections
 			.newSetFromMap(new IdentityHashMap<ISymbol, Boolean>(29));
@@ -62,40 +64,41 @@ public class StructureFunctions {
 	private static class Initializer {
 
 		private static void init() {
-            F.Apply.setEvaluator(new Apply());
-			F.ByteCount.setEvaluator(new ByteCount());
-            F.Depth.setEvaluator(new Depth());
-            F.Flatten.setEvaluator(new Flatten());
-		    F.FlattenAt.setEvaluator(new FlattenAt());
-			F.Function.setEvaluator(new Function());
-            F.Head.setEvaluator(new Head());
-            F.LeafCount.setEvaluator(new LeafCount());
-            F.Map.setEvaluator(new Map());
-            F.MapAll.setEvaluator(new MapAll());
-            F.MapAt.setEvaluator(new MapAt());
-            F.MapIndexed.setEvaluator(new MapIndexed());
-            F.MapThread.setEvaluator(new MapThread());
-            F.Order.setEvaluator(new Order());
-            F.OrderedQ.setEvaluator(new OrderedQ());
-            F.Operate.setEvaluator(new Operate());
-            F.PatternOrder.setEvaluator(new PatternOrder());
-            F.Quit.setEvaluator(new Quit());
-            F.Scan.setEvaluator(new Scan());
-            F.Sort.setEvaluator(new Sort());
-			F.SortBy.setEvaluator(new SortBy());
-            F.Symbol.setEvaluator(new Symbol());
-            F.SymbolName.setEvaluator(new SymbolName());
-            F.Thread.setEvaluator(new Thread());
-            F.Through.setEvaluator(new Through());
-            ISymbol[] logicEquationHeads = { F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,
-                    F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual };
+			S.Apply.setEvaluator(new Apply());
+			S.ByteCount.setEvaluator(new ByteCount());
+			S.Depth.setEvaluator(new Depth());
+			S.Exit.setEvaluator(new QuitExit());
+			S.Flatten.setEvaluator(new Flatten());
+			S.FlattenAt.setEvaluator(new FlattenAt());
+			S.Function.setEvaluator(new StructureFunctions.Function());
+			S.Head.setEvaluator(new Head());
+			S.LeafCount.setEvaluator(new LeafCount());
+			S.Map.setEvaluator(new Map());
+			S.MapAll.setEvaluator(new MapAll());
+			S.MapAt.setEvaluator(new MapAt());
+			S.MapIndexed.setEvaluator(new MapIndexed());
+			S.MapThread.setEvaluator(new MapThread());
+			S.Order.setEvaluator(new Order());
+			S.OrderedQ.setEvaluator(new OrderedQ());
+			S.Operate.setEvaluator(new Operate());
+			S.PatternOrder.setEvaluator(new PatternOrder());
+			S.Quit.setEvaluator(new QuitExit());
+			S.Scan.setEvaluator(new Scan());
+			S.Sort.setEvaluator(new Sort());
+			S.SortBy.setEvaluator(new SortBy());
+			S.Symbol.setEvaluator(new Symbol());
+			S.SymbolName.setEvaluator(new SymbolName());
+			S.Thread.setEvaluator(new Thread());
+			S.Through.setEvaluator(new Through());
+			ISymbol[] logicEquationHeads = { S.And, S.Or, S.Xor, S.Nand, S.Nor, S.Not, S.Implies, S.Equivalent, S.Equal,
+					S.Unequal, S.Less, S.Greater, S.LessEqual, S.GreaterEqual };
             for (int i = 0; i < logicEquationHeads.length; i++) {
                 LOGIC_EQUATION_HEADS.add(logicEquationHeads[i]);
             }
             PLUS_LOGIC_EQUATION_HEADS.addAll(LOGIC_EQUATION_HEADS);
-            PLUS_LOGIC_EQUATION_HEADS.add(F.Plus);
+			PLUS_LOGIC_EQUATION_HEADS.add(S.Plus);
             LIST_LOGIC_EQUATION_HEADS.addAll(LOGIC_EQUATION_HEADS);
-            LIST_LOGIC_EQUATION_HEADS.add(F.List);
+			LIST_LOGIC_EQUATION_HEADS.add(S.List);
 	}
 	}
 
@@ -198,7 +201,7 @@ public class StructureFunctions {
 			int lastIndex = evaledAST.argSize();
 			boolean heads = false;
 			final OptionArgs options = new OptionArgs(evaledAST.topHead(), evaledAST, lastIndex, engine);
-			IExpr option = options.getOption(F.Heads);
+			IExpr option = options.getOption(S.Heads);
 			if (option.isPresent()) {
 				lastIndex--;
 				if (option.isTrue()) {
@@ -212,6 +215,9 @@ public class StructureFunctions {
 
 			IExpr arg1 = evaledAST.arg1();
 			IExpr arg2 = evaledAST.arg2();
+			if (arg1.isQuantity() || arg2.isQuantity()) {
+				return F.NIL;
+			}
 			return evalApply(arg1, arg2, evaledAST, lastIndex, heads, engine);
 		}
 
@@ -249,7 +255,7 @@ public class StructureFunctions {
 				}
 			} catch (final ValidateException ve) {
 				// see level specification
-				return engine.printMessage(ve.getMessage(F.Apply));
+				return engine.printMessage(ve.getMessage(S.Apply));
 
 			}
 			return F.NIL;
@@ -493,6 +499,15 @@ public class StructureFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			IExpr arg1 = engine.evaluate(ast.arg1());
+			if (ast.isAST1()) {
+				if (arg1.isSparseArray()) {
+					ISparseArray sparseArray = (ISparseArray) arg1;
+					return sparseArray.flatten();
+				}
+			}
+			if (arg1.isSparseArray()) {
+				arg1 = arg1.normal(false);
+			}
 			if (arg1.isAST()) {
 				IAST arg1AST = (IAST) arg1;
 				try {
@@ -615,7 +630,7 @@ public class StructureFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.head().equals(F.Function)) {
+			if (ast.head().equals(S.Function)) {
 				IExpr temp = engine.evalHoldPattern(ast, true, false);
 				if (temp.isPresent() && !temp.equals(ast)) {
 					return temp;
@@ -639,7 +654,7 @@ public class StructureFunctions {
 						}
 						if (symbolSlots.size() > ast.size()) {
 							// To many parameters in `1` to be filled from `2`.
-							return IOFunctions.printMessage(F.Function, "fpct", F.List(symbolSlots, function), engine);
+							return IOFunctions.printMessage(S.Function, "fpct", F.List(symbolSlots, function), engine);
 						}
 						java.util.IdentityHashMap<ISymbol, IExpr> moduleVariables = new IdentityHashMap<ISymbol, IExpr>();
 						// final long moduleCounter = engine.incModuleCounter();
@@ -686,33 +701,62 @@ public class StructureFunctions {
 
 	/**
 	 * <pre>
-	 * Head(expr)
+	 * <code>Head(expr)
+	 * </code>
 	 * </pre>
 	 * 
 	 * <blockquote>
 	 * <p>
 	 * returns the head of the expression or atom <code>expr</code>.
 	 * </p>
+	 * </blockquote>
+	 *
+	 * <pre>
+	 * <code>Head(expr, newHead)
+	 * </code>
+	 * </pre>
+	 *
+	 * <blockquote>
+	 * <p>
+	 * returns <code>newHead(Head(expr))</code>.
+	 * </p>
+	 * </blockquote>
 	 * <h3>Examples</h3>
 	 * 
 	 * <pre>
-	 * &gt; Head(a * b)
+	 * <code>&gt;&gt; Head(a * b)
 	 * Times
-	 * &gt; Head(6)
+	 *
+	 * &gt;&gt; Head(6)
 	 * Integer
-	 * &gt; Head(x)
+	 *
+	 * &gt;&gt; Head(6+I)
+	 * Complex
+	 *
+	 * &gt;&gt; Head(6.0)
+	 * Real
+	 *
+	 * &gt;&gt; Head(6.0+I)
+	 * Complex
+	 *
+	 * &gt;&gt; Head(3/4)
+	 * Rational
+	 *
+	 * &gt;&gt; Head(x)
 	 * Symbol
+	 * </code>
 	 * </pre>
-	 * 
-	 * </blockquote>
 	 */
 	private static class Head extends AbstractCoreFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.isAST1()) {
+			if (ast.isAST2()) {
+				return F.unaryAST1(engine.evaluate(ast.arg2()), engine.evaluate(ast.arg1()).head());
+			}
 				return engine.evaluate(ast.arg1()).head();
 			}
-			return F.Symbol;
+		public int[] expectedArgSize(IAST ast) {
+			return IOFunctions.ARGS_1_2;
 		}
 
 	}
@@ -933,19 +977,27 @@ public class StructureFunctions {
 			int lastIndex = ast.argSize();
 			boolean heads = false;
 			final OptionArgs options = new OptionArgs(ast.topHead(), ast, lastIndex, engine);
-			IExpr option = options.getOption(F.Heads);
+			IExpr option = options.getOption(S.Heads);
 			if (option.isPresent()) {
 				lastIndex--;
 				if (option.isTrue()) {
 					heads = true;
 				}
-				// } else {
-				// Validate.checkRange(ast, 3, 4);
 			}
 
 			try {
 				final IExpr arg1 = ast.arg1();
 				IExpr arg2 = ast.arg2();
+				if (ast.isAST2()) {
+					if (arg2.isSparseArray()) {
+						return ((ISparseArray) arg2).map(new com.duy.lambda.Function<IExpr, IExpr>() {
+							@Override
+							public IExpr apply(IExpr x) {
+								return F.unaryAST1(arg1, x);
+							}
+						});
+					}
+				}
 				VisitorLevelSpecification level;
 				if (lastIndex == 3) {
 					level = new VisitorLevelSpecification(new com.duy.lambda.Function<IExpr, IExpr>() {
@@ -1077,7 +1129,7 @@ public class StructureFunctions {
 			int lastIndex = ast.argSize();
 			boolean heads = false;
 			final OptionArgs options = new OptionArgs(ast.topHead(), ast, lastIndex, engine);
-			IExpr option = options.getOption(F.Heads);
+			IExpr option = options.getOption(S.Heads);
 			if (option.isPresent()) {
 				lastIndex--;
 				if (option.isTrue()) {
@@ -1167,7 +1219,8 @@ public class StructureFunctions {
 	 * MapThread(f, {{a, b}, {c, d}}, 2)
 	 * </pre>
 	 * <p>
-	 * Incompatible dimensions of objects at positions {2, 1} and {2, 2} of MapThread(f, {{a}, {b, c}}); dimensions are 1 and 2.<br />
+	 * Incompatible dimensions of objects at positions {2, 1} and {2, 2} of MapThread(f, {{a}, {b, c}}); dimensions are
+	 * 1 and 2.<br />
 	 * </p>
 	 * 
 	 * <pre>
@@ -1211,12 +1264,12 @@ public class StructureFunctions {
 				int size = lst.first().size() - 1;
 				IAST list;
 				if (level == recursionLevel + 1) {
-					list = EvalAttributes.threadList(lst, F.List, constant, size);
+					list = EvalAttributes.threadList(lst, S.List, constant, size);
 					if (resultList != null) {
 						resultList.append(list);
 					}
 				} else {
-					list = EvalAttributes.threadList(lst, F.List, F.List, size);
+					list = EvalAttributes.threadList(lst, S.List, S.List, size);
 					final IASTAppendable result = F.ListAlloc(size);
 					final int level = recursionLevel + 1;
 					list.forEach(new Consumer<IExpr>() {
@@ -1262,11 +1315,11 @@ public class StructureFunctions {
 						return tensor.apply(ast.arg1());
 					}
 					// if (level == 1) {
-					// return EvalAttributes.threadList(tensor, F.List, ast.arg1(), dims.get(level));
+					// return EvalAttributes.threadList(tensor, S.List, ast.arg1(), dims.get(level));
 					// }
 					return new MapThreadLevel(ast.arg1(), level).recursiveMapThread(0, tensor, null);
 				}
-				if (tensor.isAST(F.List, 1)) {
+				if (tensor.isEmptyList()) {
 					return tensor;
 				}
 				return engine.printMessage("MapThread: argument 2 dimensions less than level.");
@@ -1512,16 +1565,16 @@ public class StructureFunctions {
 			if (ast.size() == 3) {
 				IExpr arg1 = ast.arg1();
 				IExpr arg2 = ast.arg2();
-				final PatternMatcherAndEvaluator pmEvaluator1 = new PatternMatcherAndEvaluator(arg1, F.Null);
-				final PatternMatcherAndEvaluator pmEvaluator2 = new PatternMatcherAndEvaluator(arg2, F.Null);
+				final PatternMatcherAndEvaluator pmEvaluator1 = new PatternMatcherAndEvaluator(arg1, S.Null);
+				final PatternMatcherAndEvaluator pmEvaluator2 = new PatternMatcherAndEvaluator(arg2, S.Null);
 				// IPatternMap patternMap1 = pmEvaluator1.getPatternMap();
 				// IPatternMap patternMap2 = pmEvaluator2.getPatternMap();
 
-				int[] priority1 = new int[] { PatternMap.DEFAULT_RULE_PRIORITY };
-				IPatternMapImpl.determinePatterns(arg1, priority1);
+				int[] priority1 = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+				IPatternMapImpl.determinePatterns(arg1, priority1, null);
 				// patternMap1.determinePatterns(arg1, priority1);
-				int[] priority2 = new int[] { PatternMap.DEFAULT_RULE_PRIORITY };
-				IPatternMapImpl.determinePatterns(arg2, priority2);
+				int[] priority2 = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
+				IPatternMapImpl.determinePatterns(arg2, priority2, null);
 				// patternMap2.determinePatterns(arg2, priority2);
 				if (pmEvaluator1.isRuleWithoutPatterns()) {
 					if (pmEvaluator2.isRuleWithoutPatterns()) {
@@ -1547,10 +1600,18 @@ public class StructureFunctions {
 		}
 
 	}
-	private final static class Quit extends AbstractFunctionEvaluator {
+	/**
+	 * Implements both the <code>Exit()</code> and <code>Quit()</code> function.
+	 *
+	 */
+	private final static class QuitExit extends AbstractFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			return quitEngine(ast, engine);
+		}
+
+		private static IExpr quitEngine(final IAST ast, EvalEngine engine) {
 			EvalEngine newEngine = new EvalEngine("", engine.getRecursionLimit(), engine.getIterationLimit(),
 					engine.getOutPrintStream(), engine.getErrorPrintStream(), engine.isRelaxedSyntax());
 
@@ -1560,10 +1621,23 @@ public class StructureFunctions {
 			}
 			engine.reset();
 			EvalEngine.set(newEngine);
-			return F.Null;
+			if (ast.isAST1()) {
+				int value = ast.arg1().toIntDefault();
+				if (value < 0) {
+					return IOFunctions.printMessage(ast.topHead(), "intnn", F.List(), newEngine);
+				}
+				if (value > 0) {
+					return F.ZZ(value);
+		}
+			}
+			return S.Null;
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_0;
+			return IOFunctions.ARGS_0_1;
+		}
+		@Override
+		public void setUp(final ISymbol newSymbol) {
+			newSymbol.setAttributes(ISymbol.HOLDALL);
 		}
 	}
 
@@ -1621,7 +1695,7 @@ public class StructureFunctions {
 			boolean heads = false;
 				if (ast.size() > 3) {
 			final OptionArgs options = new OptionArgs(ast.topHead(), ast, lastIndex, engine);
-			IExpr option = options.getOption(F.Heads);
+					IExpr option = options.getOption(S.Heads);
 			if (option.isPresent()) {
 				lastIndex--;
 				if (option.isTrue()) {
@@ -1802,6 +1876,7 @@ public class StructureFunctions {
 			}
 			if (ast.isAST2()) {
 				try {
+					// swift changed: unsupported feature.
 //					if (ast.arg1().isDataSet()) {
 //						List<String> listOfStrings = Convert.toStringList(ast.arg2());
 //						if (listOfStrings != null) {
@@ -1819,7 +1894,7 @@ public class StructureFunctions {
 					for (int i = 1; i < arg1.size(); i++) {
 						IExpr unary = F.unaryAST1(arg2, arg1.get(i));
 						unary = engine.evaluate(unary);
-						sortAST.append(F.binaryAST2(F.List, unary, F.ZZ(i)));
+							sortAST.append(F.binaryAST2(S.List, unary, F.ZZ(i)));
 					}
 
 					EvalAttributes.sort(sortAST);
@@ -1977,7 +2052,7 @@ public class StructureFunctions {
 			// } else {
 			// level = new LevelSpec(1);
 			// }
-			IExpr head = F.List;
+			IExpr head = S.List;
 			if (ast.isAST2()) {
 				head = ast.arg2();
 			}
@@ -2013,7 +2088,7 @@ public class StructureFunctions {
 					} else {
 						if (listLength != ((IAST) list.get(i)).argSize()) {
 							// Objects of unequal length in `1` cannot be combined.
-							IOFunctions.printMessage(F.Thread, "tdlen", F.List(list), EvalEngine.get());
+							IOFunctions.printMessage(S.Thread, "tdlen", F.List(list), EvalEngine.get());
 							listLength = -1;
 							return F.NIL;
 							// for loop
@@ -2103,7 +2178,7 @@ public class StructureFunctions {
 	 * Maps the elements of the <code>expr</code> with the cloned <code>replacement</code>. <code>replacement</code> is
 	 * an IAST where the argument at the given position will be replaced by the currently mapped element. Thread over
 	 * the following headers:
-	 * <code>F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual</code>
+	 * <code>S.And, S.Or, S.Xor, S.Nand, S.Nor, S.Not, S.Implies, S.Equivalent, S.Equal,S.Unequal, S.Less, S.Greater, S.LessEqual, S.GreaterEqual</code>
 	 * 
 	 * @param expr
 	 *            typically the first element of <code>replacement</code> ast.
@@ -2128,7 +2203,7 @@ public class StructureFunctions {
 	 * Maps the elements of the <code>expr</code> with the cloned <code>replacement</code>. <code>replacement</code> is
 	 * an IAST where the argument at the given position will be replaced by the currently mapped element. Thread over
 	 * the following headers:
-	 * <code>F.Plus, F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual</code>
+	 * <code>S.Plus, S.And, S.Or, S.Xor, S.Nand, S.Nor, S.Not, S.Implies, S.Equivalent, S.Equal,S.Unequal, S.Less, S.Greater, S.LessEqual, S.GreaterEqual</code>
 	 * 
 	 * @param expr
 	 *            typically the first element of <code>replacement</code> ast.
@@ -2142,8 +2217,8 @@ public class StructureFunctions {
 		if (expr.size() > 1 && expr.isAST()) {
 			IAST ast = (IAST) expr;
 			if (PLUS_LOGIC_EQUATION_HEADS.contains(ast.head())) {
-				IASTMutable copy = replacement.setAtCopy(position, null);
-				return ast.mapThread(copy, position);
+				// IASTMutable copy = replacement.setAtCopy(position, null);
+				return ast.mapThread(replacement, position);
 			}
 		}
 		return F.NIL;
@@ -2153,7 +2228,7 @@ public class StructureFunctions {
 	 * Maps the elements of the <code>expr</code> with the cloned <code>replacement</code>. <code>replacement</code> is
 	 * an IAST where the argument at the given position will be replaced by the currently mapped element. Thread over
 	 * the following headers:
-	 * <code>F.List F.And, F.Or, F.Xor, F.Nand, F.Nor, F.Not, F.Implies, F.Equivalent, F.Equal,F.Unequal, F.Less, F.Greater, F.LessEqual, F.GreaterEqual</code>
+	 * <code>S.List S.And, S.Or, S.Xor, S.Nand, S.Nor, S.Not, S.Implies, S.Equivalent, S.Equal,S.Unequal, S.Less, S.Greater, S.LessEqual, S.GreaterEqual</code>
 	 *
 	 *
 	 * @param expr
@@ -2168,10 +2243,10 @@ public class StructureFunctions {
 		if (expr.size() > 1 && expr.isAST()) {
 			IAST ast = (IAST) expr;
 			if (LIST_LOGIC_EQUATION_HEADS.contains(ast.head())) {
-						IASTMutable copy = replacement.setAtCopy(position, null);
-						return ast.mapThread(copy, position);
-					}
-				}
+				// IASTMutable copy = replacement.setAtCopy(position, null);
+				return ast.mapThread(replacement, position);
+			}
+		}
 		return F.NIL;
 	}
 

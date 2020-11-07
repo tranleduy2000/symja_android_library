@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -36,10 +36,10 @@ import org.logicng.formulas.cache.CacheEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.stream.Stream;
 
 /**
  * Super class for formulas.
- *
  * @version 1.2
  * @since 1.0
  */
@@ -56,7 +56,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Constructs a new formula.
-     *
      * @param type the type of the formula
      * @param f    the factory which created this formula
      */
@@ -73,7 +72,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns the type of this formula.
-     *
      * @return the type of this formula
      */
     public FType type() {
@@ -82,7 +80,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns the factory of this formula.
-     *
      * @return the factory of this formula
      */
     public FormulaFactory factory() {
@@ -92,28 +89,24 @@ public abstract class Formula implements Iterable<Formula> {
     /**
      * Returns the number of atomic formulas of this formula.  An atomic formula is a predicate (constants and literals)
      * or a pseudo-Boolean constraint.
-     *
      * @return the number of atomic formulas of this formula.
      */
     public abstract long numberOfAtoms();
 
     /**
      * Returns the number of nodes of this formula.
-     *
      * @return the number of nodes of this formula.
      */
     public abstract long numberOfNodes();
 
     /**
      * Returns the number of operands of this formula.
-     *
      * @return the number of operands of this formula
      */
     public abstract int numberOfOperands();
 
     /**
      * Returns the number of internal nodes of this formula.
-     *
      * @return the number of internal nodes of this formula.
      */
     public long numberOfInternalNodes() {
@@ -122,14 +115,12 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns whether this formula is a constant formula ("True" or "False").
-     *
      * @return {@code true} if this formula is a constant formula, {@code false} otherwise
      */
     public abstract boolean isConstantFormula();
 
     /**
      * Returns whether this formula is an atomic formula (constant, literal, pseudo Boolean constraint), or not.
-     *
      * @return {@code true} if this formula is an atomic formula, {@code false} otherwise
      */
     public abstract boolean isAtomicFormula();
@@ -137,7 +128,6 @@ public abstract class Formula implements Iterable<Formula> {
     /**
      * Returns all variables occurring in this formula.  Returns an unmodifiable set, so do not try to change the variable
      * set manually.
-     *
      * @return all variables occurring in this formula
      */
     public abstract SortedSet<Variable> variables();
@@ -145,14 +135,12 @@ public abstract class Formula implements Iterable<Formula> {
     /**
      * Returns all literals occurring in this formula.  Returns an unmodifiable set, so do not try to change the literal
      * set manually.
-     *
      * @return all literals occurring in this formula
      */
     public abstract SortedSet<Literal> literals();
 
     /**
      * Returns {@code true} if a given variable name is found in this formula, {@code false} otherwise.
-     *
      * @param variable the variable to search for
      * @return {@code true} if a given variable is found in this formula
      */
@@ -162,7 +150,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns {@code true} if a given variable name is found in this formula, {@code false} otherwise.
-     *
      * @param variable the variable to search for
      * @return {@code true} if a given variable is found in this formula
      */
@@ -171,7 +158,6 @@ public abstract class Formula implements Iterable<Formula> {
     /**
      * Evaluates this formula with a given assignment.  A literal not covered by the assignment evaluates
      * to {@code false} if it is positive, otherwise it evaluates to {@code true}.
-     *
      * @param assignment the given assignment
      * @return the result of the evaluation, {@code true} or {@code false}
      */
@@ -179,7 +165,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Restricts this formula with a given assignment.
-     *
      * @param assignment the given assignment
      * @return a new restricted formula
      */
@@ -189,7 +174,6 @@ public abstract class Formula implements Iterable<Formula> {
      * Returns {@code true} if this formula contains a given node, {@code false} otherwise.
      * <p>
      * In particular, a {@code Literal} node {@code ~a} does NOT contain the node {@code a}.
-     *
      * @param formula the node
      * @return {@code true} if this formula contains a given node
      */
@@ -197,7 +181,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Performs a simultaneous substitution on this formula given a single mapping from variable to formula.
-     *
      * @param variable the variable
      * @param formula  the formula
      * @return a new substituted formula
@@ -210,7 +193,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Performs a given substitution on this formula.
-     *
      * @param substitution the substitution
      * @return a new substituted formula
      */
@@ -218,14 +200,12 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns a negated copy of this formula.
-     *
      * @return a negated copy of this formula
      */
     public abstract Formula negate();
 
     /**
      * Returns a copy of this formula which is in NNF.
-     *
      * @return a copy of this formula which is in NNF
      */
     public abstract Formula nnf();
@@ -245,7 +225,6 @@ public abstract class Formula implements Iterable<Formula> {
      * <p>
      * Since CNF is the input for the SAT or MaxSAT solvers, it has a special treatment here.  For other conversions, use
      * the according formula functions.
-     *
      * @return a copy of this formula which is in CNF
      */
     public Formula cnf() {
@@ -254,7 +233,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Transforms this formula with a given formula transformator and caches the result.
-     *
      * @param transformation the formula transformator
      * @return the transformed formula
      */
@@ -264,7 +242,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Transforms this formula with a given formula transformator.
-     *
      * @param transformation the formula transformator
      * @param cache          indicates whether the result (and associated predicates) should be cached in this formula's cache.
      * @return the transformed formula
@@ -276,7 +253,6 @@ public abstract class Formula implements Iterable<Formula> {
     /**
      * Evaluates a given predicate on this formula, caches the result, and returns {@code true} if the predicate holds,
      * {@code false} otherwise.
-     *
      * @param predicate the predicate
      * @return {@code true} if the predicate holds, {@code false} otherwise
      */
@@ -286,7 +262,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Evaluates a given predicate on this formula and returns {@code true} if the predicate holds, {@code false} otherwise.
-     *
      * @param predicate the predicate
      * @param cache     indicates whether the result should be cached in this formula's cache
      * @return {@code true} if the predicate holds, {@code false} otherwise
@@ -297,7 +272,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Applies a given function on this formula and returns the result.
-     *
      * @param function the function
      * @param cache    indicates whether the result should be cached in this formula's cache
      * @param <T>      the result type of the function
@@ -309,7 +283,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Applies a given function on this formula, caches and returns the result.
-     *
      * @param function the function
      * @param <T>      the result type of the function
      * @return the result of the function application
@@ -320,7 +293,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns an entry of the transformation cache of this formula.
-     *
      * @param key the cache key
      * @return the cache value or {@code null} if the key is not found
      */
@@ -330,7 +302,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Sets an entry in the transformation cache of this formula
-     *
      * @param key   the cache key
      * @param value the cache value
      */
@@ -340,7 +311,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns an entry of the predicate cache of this formula.
-     *
      * @param key the cache key
      * @return the cache value (which is {@code UNDEF} if nothing is present)
      */
@@ -354,7 +324,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Sets an entry in the predicate cache of this formula
-     *
      * @param key   the cache key
      * @param value the cache value
      */
@@ -364,7 +333,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Sets an entry in the predicate cache of this formula
-     *
      * @param key   the cache key
      * @param value the cache value
      */
@@ -374,7 +342,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Returns an entry of the function cache of this formula.
-     *
      * @param key the cache key
      * @return the cache value or {@code null} if the key is not found
      */
@@ -384,7 +351,6 @@ public abstract class Formula implements Iterable<Formula> {
 
     /**
      * Sets an entry in the function cache of this formula
-     *
      * @param key   the cache key
      * @param value the cache value
      */

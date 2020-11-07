@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**************************************************************************
+/*
  * Copyright (C) 2012 - 2014 Armin Biere JKU Linz
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -46,7 +46,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- ****************************************************************************/
+ */
 
 package org.logicng.collections;
 
@@ -54,7 +54,6 @@ import java.util.Locale;
 
 /**
  * A simple priority queue implementation for positive integer elements with double priorities taken from CleaneLing.
- *
  * @version 1.3
  * @since 1.0
  */
@@ -75,38 +74,34 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Returns the left position on the heap for a given position.
-     *
      * @param position the position
      * @return the left position
      */
-    private static int left(int position) {
+    private static int left(final int position) {
         return 2 * position + 1;
     }
 
     /**
      * Returns the right position on the heap for a given position.
-     *
      * @param position the position
      * @return the right position
      */
-    private static int right(int position) {
+    private static int right(final int position) {
         return 2 * position + 2;
     }
 
     /**
      * Returns the parent position on the heap for a given position.
-     *
      * @param position the position
      * @return the parent position
      */
-    private static int parent(int position) {
+    private static int parent(final int position) {
         assert position > 0;
         return (position - 1) / 2;
     }
 
     /**
      * Returns whether the queue is empty or not.
-     *
      * @return {@code true} if the queue is empty, {@code false} otherwise
      */
     public boolean empty() {
@@ -115,7 +110,6 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Returns the size of the queue.
-     *
      * @return the size of the queue
      */
     public int size() {
@@ -124,28 +118,25 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Returns whether a given element is already imported and present in the queue or not.
-     *
      * @param element the element
      * @return {@code true} if the element is already imported and present in the queue, {@code false otherwise}.
      */
-    public boolean contains(int element) {
+    public boolean contains(final int element) {
         return element >= 0 && this.imported(element) && this.pos.get(Math.abs(element)) >= 0;
     }
 
     /**
      * Returns the priority for a given element.
-     *
      * @param element the element
      * @return the priority of the element
      */
-    public double priority(int element) {
+    public double priority(final int element) {
         assert this.imported(element);
         return this.prior.get(Math.abs(element));
     }
 
     /**
      * Returns the top element of the priority queue (= the element with the largest priority).
-     *
      * @return the top element of the priority queue
      */
     public int top() {
@@ -154,13 +145,13 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Pushes a new positive element to the queue.
-     *
      * @param element the element
      * @throws IllegalArgumentException if the element to add is negative
      */
-    public void push(int element) {
-        if (element < 0)
+    public void push(final int element) {
+        if (element < 0) {
             throw new IllegalArgumentException("Cannot add negative integers to the priority queue");
+        }
         assert !this.contains(element);
         this.doImport(element);
         this.pos.set(element, this.heap.size());
@@ -171,38 +162,41 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Updated the priority of a given element.
-     *
      * @param element  the element
      * @param priority the new priority
      */
-    public void update(int element, double priority) {
+    public void update(final int element, final double priority) {
         this.doImport(element);
         final double q = this.prior.get(element);
-        if (Double.compare(q, priority) == 0)
+        if (Double.compare(q, priority) == 0) {
             return;
+        }
         this.prior.set(element, priority);
-        if (this.pos.get(element) < 0)
+        if (this.pos.get(element) < 0) {
             return;
-        if (priority < q)
+        }
+        if (priority < q) {
             this.down(element);
-        if (q < priority)
+        }
+        if (q < priority) {
             this.up(element);
+        }
     }
 
     /**
      * Removes a given element from the priority queue.  Its priority is kept as is.
-     *
      * @param element the element
      */
-    public void pop(int element) {
+    public void pop(final int element) {
         assert this.contains(element);
-        int i = this.pos.get(element);
+        final int i = this.pos.get(element);
         this.pos.set(element, -1);
-        int last = this.heap.back();
+        final int last = this.heap.back();
         this.heap.pop();
-        int j = this.heap.size();
-        if (i == j)
+        final int j = this.heap.size();
+        if (i == j) {
             return;
+        }
         assert i < j;
         this.pos.set(last, i);
         this.heap.set(i, last);
@@ -219,38 +213,37 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Rescores all priorities by multiplying them with the same factor.
-     *
      * @param factor the factor to multiply with
      */
-    public void rescore(double factor) {
-        for (int i = 0; i < this.prior.size(); i++)
+    public void rescore(final double factor) {
+        for (int i = 0; i < this.prior.size(); i++) {
             this.prior.set(i, this.prior.get(i) * factor);
+        }
     }
 
     /**
      * Compares two elements by their priority and returns whether the first element's priority is less then the second
      * element's priority.
-     *
      * @param e1 the first element
      * @param e2 the second element
      * @return {@code true} if the priority of the first element is less than the priority of the second element
      */
-    private boolean less(int e1, int e2) {
+    private boolean less(final int e1, final int e2) {
         return this.prior.get(e1) < this.prior.get(e2);
     }
 
     /**
      * Bubbles a given element up.
-     *
      * @param element the element
      */
-    private void up(int element) {
+    private void up(final int element) {
         int epos = this.pos.get(element);
         while (epos > 0) {
-            int ppos = parent(epos);
-            int p = this.heap.get(ppos);
-            if (!this.less(p, element))
+            final int ppos = parent(epos);
+            final int p = this.heap.get(ppos);
+            if (!this.less(p, element)) {
                 break;
+            }
             this.heap.set(epos, p);
             this.heap.set(ppos, element);
             this.pos.set(p, epos);
@@ -261,26 +254,28 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Bubbles a given element down.
-     *
      * @param element the element
      */
-    private void down(int element) {
+    private void down(final int element) {
         assert this.contains(element);
         int epos = this.pos.get(element);
-        int size = this.heap.size();
+        final int size = this.heap.size();
         while (true) {
             int cpos = left(epos);
-            if (cpos >= size)
+            if (cpos >= size) {
                 break;
+            }
             int c = this.heap.get(cpos);
-            int o;
-            int opos = right(epos);
+            final int o;
+            final int opos = right(epos);
             if (!this.less(element, c)) {
-                if (opos >= size)
+                if (opos >= size) {
                     break;
+                }
                 o = this.heap.get(opos);
-                if (!this.less(element, o))
+                if (!this.less(element, o)) {
                     break;
+                }
                 cpos = opos;
                 c = o;
             } else if (opos < size) {
@@ -300,21 +295,19 @@ public final class LNGDoublePriorityQueue {
 
     /**
      * Returns whether a given element is already imported.
-     *
      * @param element the element
      * @return {@code true} if the element is imported, {@code false} otherwise
      */
-    private boolean imported(int element) {
+    private boolean imported(final int element) {
         assert 0 <= element;
         return element < this.pos.size();
     }
 
     /**
      * Imports a given element.
-     *
      * @param element the element
      */
-    private void doImport(int element) {
+    private void doImport(final int element) {
         while (!this.imported(element)) {
             this.pos.push(-1);
             this.prior.push(0);
@@ -326,8 +319,9 @@ public final class LNGDoublePriorityQueue {
         final StringBuilder sb = new StringBuilder("LNGDoublePriorityQueue{");
         for (int i = 0; i < this.heap.size(); i++) {
             sb.append(String.format(Locale.ENGLISH, "<elem=%d, pos=%d, prio=%f>", this.heap.get(i), this.pos.get(i), this.prior.get(i)));
-            if (i != this.heap.size() - 1)
+            if (i != this.heap.size() - 1) {
                 sb.append(", ");
+            }
         }
         sb.append("}");
         return sb.toString();

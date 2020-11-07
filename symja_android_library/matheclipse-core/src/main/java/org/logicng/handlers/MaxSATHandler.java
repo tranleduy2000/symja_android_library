@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -32,22 +32,19 @@ import org.logicng.datastructures.Assignment;
 
 /**
  * Interface for a handler for MaxSAT solvers.
- *
- * @version 1.0
+ * @version 1.6.2
  * @since 1.0
  */
-public interface MaxSATHandler {
+public interface MaxSATHandler extends Handler {
 
     /**
      * Returns a SAT handler which can be used to cancel internal SAT calls of the MaxSAT solver.
-     *
      * @return a SAT handler
      */
     SATHandler satHandler();
 
     /**
      * This method is called when the MaxSAT solver found a new lower bound for a solution.
-     *
      * @param lowerBound the cost of the lower bound
      * @param model      the model of the lower bound, may be null if not applicable
      * @return whether solving process should be continued or not
@@ -56,7 +53,6 @@ public interface MaxSATHandler {
 
     /**
      * This method is called when the MaxSAT solver found a new upper bound for a solution.
-     *
      * @param upperBound the cost of the upper bound
      * @param model      the model of the upper bound, may be null if not applicable
      * @return whether solving process should be continued or not
@@ -64,9 +60,10 @@ public interface MaxSATHandler {
     boolean foundUpperBound(final int upperBound, final Assignment model);
 
     /**
-     * This method is called when the MaxSAT solver starts solving.
+     * This method is called every time the SAT solver finished.
+     * @return whether more models should be searched or not
      */
-    void startedSolving();
+    boolean satSolverFinished();
 
     /**
      * This method is called when the MaxSAT solver finished solving.
@@ -77,7 +74,6 @@ public interface MaxSATHandler {
      * Returns the last approximation of the result or -1 if there is no approximation for the lower bound.
      * If the handler does not cancel the solving process, it is not guaranteed that this
      * method will return the optimal result. Use the respective method of the MaxSAT solver instead.
-     *
      * @return the last approximation of the result or -1 if no approximation is known
      */
     int lowerBoundApproximation();
@@ -86,7 +82,6 @@ public interface MaxSATHandler {
      * Returns the last approximation of the result or -1 if there is no approximation for the lower bound.
      * If the handler does not cancel the solving process, it is not guaranteed that this
      * method will return the optimal result. Use the respective method of the MaxSAT solver instead.
-     *
      * @return the last approximation of the result or -1 if no approximation is known
      */
     int upperBoundApproximation();

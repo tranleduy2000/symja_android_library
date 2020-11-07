@@ -41,9 +41,9 @@ public enum PivotingStrategy {
          */
         @Override
         public int pivotIndex(final double[] work, final int begin, final int end)
-                throws MathIllegalArgumentException {
-            MathArrays.verifyValues(work, begin, end - begin);
-            return begin + (end - begin) / 2;
+            throws MathIllegalArgumentException {
+            MathArrays.verifyValues(work, begin, end-begin);
+            return begin + (end - begin)/2;
         }
     },
 
@@ -60,8 +60,8 @@ public enum PivotingStrategy {
          */
         @Override
         public int pivotIndex(final double[] work, final int begin, final int end)
-                throws MathIllegalArgumentException {
-            MathArrays.verifyValues(work, begin, end - begin);
+            throws MathIllegalArgumentException {
+            MathArrays.verifyValues(work, begin, end-begin);
             final int inclusiveEnd = end - 1;
             final int middle = begin + (inclusiveEnd - begin) / 2;
             final double wBegin = work[begin];
@@ -87,15 +87,14 @@ public enum PivotingStrategy {
     /**
      * Find pivot index of the array so that partition and K<sup>th</sup>
      * element selection can be made
-     *
-     * @param work  data array
+     * @param work data array
      * @param begin index of the first element of the slice
-     * @param end   index after the last element of the slice
+     * @param end index after the last element of the slice
      * @return the index of the pivot element chosen between the
      * first and the last element of the array slice
      * @throws MathIllegalArgumentException when indices exceeds range
      */
     public abstract int pivotIndex(double[] work, int begin, int end)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
 }

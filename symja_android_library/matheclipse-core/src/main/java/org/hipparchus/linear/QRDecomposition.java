@@ -42,10 +42,10 @@ import java.util.Arrays;
  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
- * <li>a {@link #getQT() getQT} method has been added,</li>
- * <li>the {@code solve} and {@code isFullRank} methods have been replaced
- * by a {@link #getSolver() getSolver} method and the equivalent methods
- * provided by the returned {@link DecompositionSolver}.</li>
+ *   <li>a {@link #getQT() getQT} method has been added,</li>
+ *   <li>the {@code solve} and {@code isFullRank} methods have been replaced
+ *   by a {@link #getSolver() getSolver} method and the equivalent methods
+ *   provided by the returned {@link DecompositionSolver}.</li>
  * </ul>
  *
  * @see <a href="http://mathworld.wolfram.com/QRDecomposition.html">MathWorld</a>
@@ -62,11 +62,11 @@ public class QRDecomposition {
      * matrix R, and the rows ABOVE the diagonal are the Householder reflector vectors
      * from which an explicit form of Q can be recomputed if desired.</p>
      */
-    private double[][] qrt;
+    private final double[][] qrt;
     /**
      * The diagonal elements of R.
      */
-    private double[] rDiag;
+    private final double[] rDiag;
     /**
      * Cached value of Q.
      */
@@ -335,6 +335,14 @@ public class QRDecomposition {
          * {@inheritDoc}
          */
         @Override
+        public boolean isNonSingular() {
+            return !checkSingular(rDiag, threshold, false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public RealVector solve(RealVector b) {
             final int n = qrt.length;
             final int m = qrt[0].length;
@@ -455,14 +463,6 @@ public class QRDecomposition {
             }
 
             return new BlockRealMatrix(n, columns, xBlocks, false);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            return !checkSingular(rDiag, threshold, false);
         }
 
         /**

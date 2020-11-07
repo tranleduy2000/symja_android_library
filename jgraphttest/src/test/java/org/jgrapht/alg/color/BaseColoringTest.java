@@ -27,7 +27,7 @@ import org.junit.*;
 
 import java.util.*;
 import com.duy.lambda.*;
-import java.util.stream.*;
+import com.duy.stream.*;
 
 import static org.junit.Assert.*;
 

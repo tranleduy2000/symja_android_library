@@ -46,7 +46,7 @@ import static com.gx.common.collect.CollectPreconditions.checkRemove;
  * in the {@link Iterators} class.
  * <p>
  * <p><b>Java 8 users:</b> several common uses for this class are now more comprehensively addressed
- * by the new {@link java.util.stream.Stream} library. Read the method documentation below for
+ * by the new {@link com.duy.stream.Stream} library. Read the method documentation below for
  * comparisons. This class is not being deprecated, but we gently encourage you to migrate to
  * streams.
  * <p>

@@ -197,7 +197,7 @@ public final class RandomFunctions {
 							return F.ZZ(min);
 						}
 					}
-					ThreadLocalRandom tlr = ThreadLocalRandom.current();
+					final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 					if (ast.isAST2()) {
 						IExpr arg2 = ast.arg2();
 						if (arg2.isList()) {
@@ -208,7 +208,12 @@ public final class RandomFunctions {
 							}
 							final int min2 = min;
 							final int max2 = max;
-							return ArrayBuilder.build(() -> F.ZZ(tlr.nextInt((max2 - min2) + 1) + min2), dimension);
+							return ArrayBuilder.build(new Supplier<IExpr>() {
+								@Override
+								public IExpr get() {
+									return F.ZZ(tlr.nextInt((max2 - min2) + 1) + min2);
+								}
+							}, dimension);
 
 						}
 						int size = arg2.toIntDefault(Integer.MIN_VALUE);
@@ -227,7 +232,7 @@ public final class RandomFunctions {
 			}
 			if (ast.arg1().isInteger()) {
 				// RandomInteger(100) gives an integer between 0 and 100
-				ThreadLocalRandom tlr = ThreadLocalRandom.current();
+				final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 				BigInteger upperLimit = ((IInteger) ast.arg1()).toBigNumerator();
 				boolean negative = false;
 				if (upperLimit.compareTo(BigInteger.ZERO) < 0) {
@@ -244,7 +249,12 @@ public final class RandomFunctions {
 						}
 						final BigInteger upperLimit2 = upperLimit;
 						final boolean negative2 = negative;
-						return ArrayBuilder.build(() -> randomBigInteger(upperLimit2, negative2, tlr), dimension);
+						return ArrayBuilder.build(new Supplier<IExpr>() {
+							@Override
+							public IExpr get() {
+								return RandomInteger.this.randomBigInteger(upperLimit2, negative2, tlr);
+							}
+						}, dimension);
 					}
 					int size = arg2.toIntDefault(Integer.MIN_VALUE);
 					if (size >= 0) {
@@ -499,7 +509,7 @@ public final class RandomFunctions {
 			return IOFunctions.ARGS_1_2;
 		}
 
-		public static IAST shuffle(IAST list, int n) {
+		public static IAST shuffle(final IAST list, int n) {
 			final int len = list.argSize();
 
 			// Shuffle indices.
@@ -514,7 +524,12 @@ public final class RandomFunctions {
 				return result;
 			}
 			// Create shuffled list.
-			return list.copy().setArgs(1, len + 1, i -> list.get(indexList[i - 1] + 1));
+			return list.copy().setArgs(1, len + 1, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return list.get(indexList[i - 1] + 1);
+				}
+			});
 		}
 	}
 

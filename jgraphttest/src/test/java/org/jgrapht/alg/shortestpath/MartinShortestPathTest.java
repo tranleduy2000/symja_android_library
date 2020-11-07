@@ -23,7 +23,7 @@ import org.jgrapht.graph.*;
 import org.junit.*;
 
 import java.util.*;
-import java.util.stream.*;
+import com.duy.stream.*;
 
 import static org.junit.Assert.assertEquals;
 

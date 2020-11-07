@@ -21,6 +21,9 @@
  */
 package org.hipparchus.stat.descriptive.moment;
 
+import java.io.Serializable;
+
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.StatUtils;
@@ -29,8 +32,6 @@ import org.hipparchus.stat.descriptive.AggregatableStatistic;
 import org.hipparchus.stat.descriptive.WeightedEvaluation;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
-
-import java.io.Serializable;
 
 /**
  * Computes the variance of the available values.  By default, the unbiased
@@ -75,16 +76,12 @@ import java.io.Serializable;
  * <code>clear()</code> method, it must be synchronized externally.
  */
 public class Variance extends AbstractStorelessUnivariateStatistic
-        implements AggregatableStatistic<Variance>, WeightedEvaluation, Serializable {
+    implements AggregatableStatistic<Variance>, WeightedEvaluation, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * SecondMoment is used in incremental calculation of Variance
-     */
+    /** SecondMoment is used in incremental calculation of Variance*/
     protected final SecondMoment moment;
 
     /**
@@ -129,9 +126,9 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * Constructs a Variance with the specified <code>isBiasCorrected</code>
      * property.
      *
-     * @param isBiasCorrected setting for bias correction - true means
-     *                        bias will be corrected and is equivalent to using the argumentless
-     *                        constructor
+     * @param isBiasCorrected  setting for bias correction - true means
+     * bias will be corrected and is equivalent to using the argumentless
+     * constructor
      */
     public Variance(boolean isBiasCorrected) {
         this(new SecondMoment(), true, isBiasCorrected);
@@ -141,10 +138,10 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * Constructs a Variance with the specified <code>isBiasCorrected</code>
      * property and the supplied external second moment.
      *
-     * @param isBiasCorrected setting for bias correction - true means
-     *                        bias will be corrected
-     * @param m2              the SecondMoment (Third or Fourth moments work
-     *                        here as well.)
+     * @param isBiasCorrected  setting for bias correction - true means
+     * bias will be corrected
+     * @param m2 the SecondMoment (Third or Fourth moments work
+     * here as well.)
      */
     public Variance(boolean isBiasCorrected, SecondMoment m2) {
         this(m2, false, isBiasCorrected);
@@ -153,15 +150,15 @@ public class Variance extends AbstractStorelessUnivariateStatistic
     /**
      * Constructs a Variance with the specified parameters.
      *
-     * @param m2              the SecondMoment (Third or Fourth moments work
-     *                        here as well.)
-     * @param incMoment       if the moment shall be incremented
-     * @param isBiasCorrected setting for bias correction - true means
-     *                        bias will be corrected
+     * @param m2 the SecondMoment (Third or Fourth moments work
+     * here as well.)
+     * @param incMoment if the moment shall be incremented
+     * @param isBiasCorrected  setting for bias correction - true means
+     * bias will be corrected
      */
     private Variance(SecondMoment m2, boolean incMoment, boolean isBiasCorrected) {
-        this.moment = m2;
-        this.incMoment = incMoment;
+        this.moment          = m2;
+        this.incMoment       = incMoment;
         this.isBiasCorrected = isBiasCorrected;
     }
 
@@ -174,9 +171,90 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      */
     public Variance(Variance original) throws NullArgumentException {
         MathUtils.checkNotNull(original);
-        this.moment = original.moment.copy();
-        this.incMoment = original.incMoment;
+        this.moment          = original.moment.copy();
+        this.incMoment       = original.incMoment;
         this.isBiasCorrected = original.isBiasCorrected;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>If all values are available, it is more accurate to use
+     * {@link #evaluate(double[])} rather than adding values one at a time
+     * using this method and then executing {@link #getResult}, since
+     * <code>evaluate</code> leverages the fact that is has the full
+     * list of values together to execute a two-pass algorithm.
+     * See {@link Variance}.
+     * <p>
+     * Note also that when {@link #Variance(SecondMoment)} is used to
+     * create a Variance, this method does nothing. In that case, the
+     * SecondMoment should be incremented directly.
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        if (moment.n == 0) {
+            return Double.NaN;
+        } else if (moment.n == 1) {
+            return 0d;
+        } else {
+            if (isBiasCorrected) {
+                return moment.m2 / (moment.n - 1d);
+            } else {
+                return moment.m2 / (moment.n);
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return moment.getN();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void aggregate(Variance other) {
+        MathUtils.checkNotNull(other);
+        if (incMoment) {
+            this.moment.aggregate(other.moment);
+        }
+    }
+
+    @Override
+    public void aggregate(Variance... others) {
+        MathUtils.checkNotNull(others);
+        for (Variance other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public void aggregate(Iterable<Variance> others) {
+        MathUtils.checkNotNull(others);
+        for (Variance other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
     }
 
     /**
@@ -194,15 +272,15 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * Throws <code>MathIllegalArgumentException</code> if the array is null.</p>
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     @Override
     public double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         double var = Double.NaN;
 
@@ -217,12 +295,9 @@ public class Variance extends AbstractStorelessUnivariateStatistic
         return var;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public long getN() {
-        return moment.getN();
+    public double evaluate(double[] values, double[] weights) throws MathIllegalArgumentException {
+        return 0;
     }
 
     /**
@@ -249,30 +324,30 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * <p>
      * Throws <code>IllegalArgumentException</code> if any of the following are true:
      * <ul><li>the values array is null</li>
-     * <li>the weights array is null</li>
-     * <li>the weights array does not have the same length as the values array</li>
-     * <li>the weights array contains one or more infinite values</li>
-     * <li>the weights array contains one or more NaN values</li>
-     * <li>the weights array contains negative values</li>
-     * <li>the start and length arguments do not determine a valid array</li>
+     *     <li>the weights array is null</li>
+     *     <li>the weights array does not have the same length as the values array</li>
+     *     <li>the weights array contains one or more infinite values</li>
+     *     <li>the weights array contains one or more NaN values</li>
+     *     <li>the weights array contains negative values</li>
+     *     <li>the start and length arguments do not determine a valid array</li>
      * </ul>
      * <p>
      * Does not change the internal state of the statistic.
      *
-     * @param values  the input array
+     * @param values the input array
      * @param weights the weights array
-     * @param begin   index of the first array element to include
-     * @param length  the number of elements to include
+     * @param begin index of the first array element to include
+     * @param length the number of elements to include
      * @return the weighted variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the parameters are not valid
      */
     @Override
     public double evaluate(final double[] values, final double[] weights,
                            final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         double var = Double.NaN;
-        if (MathArrays.verifyValues(values, weights, begin, length)) {
+        if (MathArrays.verifyValues(values, weights,begin, length)) {
             if (length == 1) {
                 var = 0.0;
             } else if (length > 1) {
@@ -301,16 +376,16 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * Does not change the internal state of the statistic.
      *
      * @param values the input array
-     * @param mean   the precomputed mean value
-     * @param begin  index of the first array element to include
+     * @param mean the precomputed mean value
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public double evaluate(final double[] values, final double mean,
                            final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         double var = Double.NaN;
         if (MathArrays.verifyValues(values, begin, length)) {
@@ -355,12 +430,12 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * Does not change the internal state of the statistic.
      *
      * @param values the input array
-     * @param mean   the precomputed mean value
+     * @param mean the precomputed mean value
      * @return the variance of the values or Double.NaN if the array is empty
      * @throws MathIllegalArgumentException if the array is null
      */
     public double evaluate(final double[] values, final double mean)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return evaluate(values, mean, 0, values.length);
     }
 
@@ -392,27 +467,27 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * <p>
      * Throws <code>MathIllegalArgumentException</code> if any of the following are true:
      * <ul><li>the values array is null</li>
-     * <li>the weights array is null</li>
-     * <li>the weights array does not have the same length as the values array</li>
-     * <li>the weights array contains one or more infinite values</li>
-     * <li>the weights array contains one or more NaN values</li>
-     * <li>the weights array contains negative values</li>
-     * <li>the start and length arguments do not determine a valid array</li>
+     *     <li>the weights array is null</li>
+     *     <li>the weights array does not have the same length as the values array</li>
+     *     <li>the weights array contains one or more infinite values</li>
+     *     <li>the weights array contains one or more NaN values</li>
+     *     <li>the weights array contains negative values</li>
+     *     <li>the start and length arguments do not determine a valid array</li>
      * </ul>
      * <p>
      * Does not change the internal state of the statistic.
      *
-     * @param values  the input array
+     * @param values the input array
      * @param weights the weights array
-     * @param mean    the precomputed weighted mean value
-     * @param begin   index of the first array element to include
-     * @param length  the number of elements to include
+     * @param mean the precomputed weighted mean value
+     * @param begin index of the first array element to include
+     * @param length the number of elements to include
      * @return the variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the parameters are not valid
      */
     public double evaluate(final double[] values, final double[] weights,
                            final double mean, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         double var = Double.NaN;
 
@@ -471,23 +546,23 @@ public class Variance extends AbstractStorelessUnivariateStatistic
      * <p>
      * Throws <code>MathIllegalArgumentException</code> if any of the following are true:
      * <ul><li>the values array is null</li>
-     * <li>the weights array is null</li>
-     * <li>the weights array does not have the same length as the values array</li>
-     * <li>the weights array contains one or more infinite values</li>
-     * <li>the weights array contains one or more NaN values</li>
-     * <li>the weights array contains negative values</li>
+     *     <li>the weights array is null</li>
+     *     <li>the weights array does not have the same length as the values array</li>
+     *     <li>the weights array contains one or more infinite values</li>
+     *     <li>the weights array contains one or more NaN values</li>
+     *     <li>the weights array contains negative values</li>
      * </ul>
      * <p>
      * Does not change the internal state of the statistic.
      *
-     * @param values  the input array
+     * @param values the input array
      * @param weights the weights array
-     * @param mean    the precomputed weighted mean value
+     * @param mean the precomputed weighted mean value
      * @return the variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the parameters are not valid
      */
     public double evaluate(final double[] values, final double[] weights, final double mean)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return evaluate(values, weights, mean, 0, values.length);
     }
 
@@ -509,60 +584,10 @@ public class Variance extends AbstractStorelessUnivariateStatistic
         return new Variance(this.moment, this.incMoment, biasCorrection);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Variance copy() {
         return new Variance(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>If all values are available, it is more accurate to use
-     * {@link #evaluate(double[])} rather than adding values one at a time
-     * using this method and then executing {@link #getResult}, since
-     * <code>evaluate</code> leverages the fact that is has the full
-     * list of values together to execute a two-pass algorithm.
-     * See {@link Variance}.
-     * <p>
-     * Note also that when {@link #Variance(SecondMoment)} is used to
-     * create a Variance, this method does nothing. In that case, the
-     * SecondMoment should be incremented directly.
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        if (moment.n == 0) {
-            return Double.NaN;
-        } else if (moment.n == 1) {
-            return 0d;
-        } else {
-            if (isBiasCorrected) {
-                return moment.m2 / (moment.n - 1d);
-            } else {
-                return moment.m2 / (moment.n);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
     }
 
 }

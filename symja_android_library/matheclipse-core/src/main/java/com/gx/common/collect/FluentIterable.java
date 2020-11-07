@@ -154,7 +154,7 @@ public abstract class FluentIterable<E> implements Iterable<E> {
      * <p>
      * <p>The returned iterable is an unmodifiable view of the input array.
      * <p>
-     * <p><b>{@code Stream} equivalent:</b> {@link java.util.stream.Stream#of(Object[])
+     * <p><b>{@code Stream} equivalent:</b> {@link com.duy.stream.Stream#of(Object[])
      * Stream.of(T...)}.
      *
      * @since 20.0 (since 18.0 as an overload of {@code of})
@@ -320,7 +320,7 @@ public abstract class FluentIterable<E> implements Iterable<E> {
     /**
      * Returns a fluent iterable containing the specified elements in order.
      * <p>
-     * <p><b>{@code Stream} equivalent:</b> {@link java.util.stream.Stream#of(Object[])
+     * <p><b>{@code Stream} equivalent:</b> {@link com.duy.stream.Stream#of(Object[])
      * Stream.of(T...)}.
      *
      * @since 20.0

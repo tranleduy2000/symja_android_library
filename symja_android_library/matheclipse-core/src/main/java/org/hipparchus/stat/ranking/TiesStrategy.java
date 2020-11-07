@@ -37,31 +37,22 @@ package org.hipparchus.stat.ranking;
  * applicable values. The assigned rank will always be an integer, (inclusively)
  * between the values returned by the MINIMUM and MAXIMUM strategies.</li>
  * </ul>
+ *
  */
 public enum TiesStrategy {
 
-    /**
-     * Ties assigned sequential ranks in order of occurrence
-     */
+    /** Ties assigned sequential ranks in order of occurrence */
     SEQUENTIAL,
 
-    /**
-     * Ties get the minimum applicable rank
-     */
+    /** Ties get the minimum applicable rank */
     MINIMUM,
 
-    /**
-     * Ties get the maximum applicable rank
-     */
+    /** Ties get the maximum applicable rank */
     MAXIMUM,
 
-    /**
-     * Ties get the average of applicable ranks
-     */
+    /** Ties get the average of applicable ranks */
     AVERAGE,
 
-    /**
-     * Ties get a random integral value from among applicable ranks
-     */
+    /** Ties get a random integral value from among applicable ranks */
     RANDOM
 }

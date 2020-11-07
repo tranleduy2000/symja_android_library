@@ -12,6 +12,7 @@ import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -42,14 +43,14 @@ public class SeriesFunctions {
 	private static class Initializer {
 
 		private static void init() {
-        F.Limit.setEvaluator(new Limit());
+			S.Limit.setEvaluator(new Limit());
         if (ToggleFeature.SERIES) {
-            F.ComposeSeries.setEvaluator(new ComposeSeries());
-            F.InverseSeries.setEvaluator(new InverseSeries());
-            F.Normal.setEvaluator(new Normal());
-            F.Series.setEvaluator(new Series());
-            F.SeriesCoefficient.setEvaluator(new SeriesCoefficient());
-            F.SeriesData.setEvaluator(new SeriesData());
+				S.ComposeSeries.setEvaluator(new ComposeSeries());
+				S.InverseSeries.setEvaluator(new InverseSeries());
+				S.Normal.setEvaluator(new Normal());
+				S.Series.setEvaluator(new Series());
+				S.SeriesCoefficient.setEvaluator(new SeriesCoefficient());
+				S.SeriesData.setEvaluator(new SeriesData());
         }
     }
 	}
@@ -71,7 +72,8 @@ public class SeriesFunctions {
      * 7
      * </pre>
      */
-    private final static class Limit extends AbstractFunctionEvaluator implements LimitRules {
+    @SuppressWarnings("JavadocReference")
+	private final static class Limit extends AbstractFunctionEvaluator implements LimitRules {
 		/**
 		 * Direction of limit computation
 		 *
@@ -188,7 +190,7 @@ public class SeriesFunctions {
 				boolean isLimit = false;
 				for (int i = 1; i < ast.size(); i++) {
 					IExpr temp = evalLimitQuiet(ast.get(i), this);
-					if (!temp.isFree(F.Limit)) {
+					if (!temp.isFree(S.Limit)) {
 						isLimit = true;
 					} else if (temp.isIndeterminate()) {
 						isIndeterminate = true;
@@ -208,8 +210,8 @@ public class SeriesFunctions {
             try {
 				// engine.setQuietMode(true);
 				// return evalLimit(expr, data, true);
-				IExpr direction = data.direction() == Direction.TWO_SIDED ? F.Reals : F.ZZ(data.direction().toInt());
-				return engine.evaluate(F.Limit(expr, data.rule(), F.Rule(F.Direction, direction)));
+				IExpr direction = data.direction() == Direction.TWO_SIDED ? S.Reals : F.ZZ(data.direction().toInt());
+				return engine.evaluate(F.Limit(expr, data.rule(), F.Rule(S.Direction, direction)));
             } finally {
                 engine.setQuietMode(quiet);
             }
@@ -232,7 +234,7 @@ public class SeriesFunctions {
                 if (result.isNumericFunction()) {
                     return result;
                 }
-                if (!result.equals(F.Indeterminate)) {
+			if (!result.equals(S.Indeterminate)) {
                     expression = result;
                 }
 			if (result.isFree(data.variable(), true)) {
@@ -267,7 +269,7 @@ public class SeriesFunctions {
                 }
 
             if (expression.isAST()) {
-				if (!limitValue.isNumericFunction() && limitValue.isFree(F.DirectedInfinity)
+				if (!limitValue.isNumericFunction() && limitValue.isFree(S.DirectedInfinity)
 						&& limitValue.isFree(data.variable())) {
 					// example Limit(E^(3*x), x->a) ==> E^(3*a)
 					return expr.replaceAll(data.rule()).orElse(expr);
@@ -882,9 +884,9 @@ public class SeriesFunctions {
 						.printMessage(ast.topHead() + ": variable symbol for rule definition expected at position 2!");
 			}
 			if (arg1.isList()) {
-				IASTMutable clone = ast.copy();
-				clone.set(1, null);
-				return ((IAST) arg1).mapThread(clone, 1);
+				// IASTMutable clone = ast.copy();
+				// clone.set(1, F.Slot1);
+				return ((IAST) arg1).mapThread(ast, 1);
             }
             boolean numericMode = engine.isNumericMode();
             try {
@@ -975,6 +977,10 @@ public class SeriesFunctions {
 				}
 			}
 			final IExpr arg1 = ast.arg1();
+			// IExpr normal=arg1.normal(true);
+			// if (normal.isPresent()) {
+			// return normal;
+			// }
 			IExpr result = arg1.replaceAll(normal(heads));
 			return result.orElse(arg1);
 		}
@@ -1171,11 +1177,8 @@ public class SeriesFunctions {
 					return temp;
 				}
 			} else if (function.isLog() && function.first().equals(x) && x0.isZero() && n >= 0) {
-				ASTSeriesData temp = new ASTSeriesData(x, x0, F.List(function), 0, n + 1, 1);
-				if (temp != null) {
-					return temp;
+				return new ASTSeriesData(x, x0, F.List(function), 0, n + 1, 1);
 				}
-			}
 			ISymbol power = F.Dummy("$$$n");
 			int denominator = 1;
 			IExpr temp = engine.evaluate(F.SeriesCoefficient(function, F.List(x, x0, power)));
@@ -1737,7 +1740,8 @@ public class SeriesFunctions {
                 IExpr x = ast.arg1();
                 IExpr x0 = ast.arg2();
 
-                if (ast.arg3().isVector() < 0) {
+				if (ast.arg3().isVector() < 0 || //
+						!ast.arg3().isAST()) {
                     return F.NIL;
                 }
                 IAST coefficients = (IAST) ast.arg3();

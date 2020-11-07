@@ -97,7 +97,7 @@ public class ConjugateGradient
      * {@code true} if positive-definiteness of matrix and preconditioner should
      * be checked.
      */
-    private boolean check;
+    private final boolean check;
 
     /**
      * Creates a new instance of this class, with <a href="#stopcrit">default

@@ -22,8 +22,8 @@ public abstract class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 
 	private static final long serialVersionUID = 4987827851920443376L;
 
+	protected IBuiltInSymbol fHead;
 
-	private IBuiltInSymbol fHead;
 	protected T fData;
 
 	protected DataExpr(final IBuiltInSymbol head, final T data) {
@@ -91,9 +91,9 @@ public abstract class DataExpr<T> extends IExprImpl implements IDataExpr<T> {
 			return -1;
 		}
 		if (expr.isAST()) {
-			if (!expr.isDirectedInfinity()) {
+//			if (expr.isDirectedInfinity()) {
 				return -1 * expr.compareTo(this);
-			}
+//			}
 		}
 		final int x = hierarchy();
 		final int y = expr.hierarchy();

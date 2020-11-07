@@ -487,9 +487,9 @@ public class ApfloatNum extends INumImpl implements INum {
 			return fApfloat.compareTo(((ApfloatNum) expr).fApfloat);
 		}
 		if (expr.isNumber()) {
-		if (expr.isReal()) {
-			return Double.compare(fApfloat.doubleValue(), ((ISignedNumber) expr).doubleValue());
-		}
+			if (expr.isReal()) {
+				return Double.compare(fApfloat.doubleValue(), ((ISignedNumber) expr).doubleValue());
+			}
 			int c = this.compareTo(((INumber) expr).re());
 			if (c != 0) {
 				return c;

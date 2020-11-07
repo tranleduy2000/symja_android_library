@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,13 +28,12 @@
 
 package org.logicng.formulas;
 
-import org.logicng.datastructures.Assignment;
-
 import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
+
+import org.logicng.datastructures.Assignment;
 
 /**
  * Boolean equivalence.
- *
  * @version 1.0
  * @since 1.0
  */
@@ -42,7 +41,6 @@ public final class Equivalence extends BinaryOperator {
 
     /**
      * Private constructor (initialize with {@code createNAryOperator()})
-     *
      * @param left  the left-hand side operand
      * @param right the right-hand side operand
      * @param f     the factory which created this instance
@@ -53,19 +51,19 @@ public final class Equivalence extends BinaryOperator {
 
     @Override
     public boolean evaluate(final Assignment assignment) {
-        return left.evaluate(assignment) == right.evaluate(assignment);
+        return this.left.evaluate(assignment) == this.right.evaluate(assignment);
     }
 
     @Override
     public Formula restrict(final Assignment assignment) {
-        return f.equivalence(left.restrict(assignment), right.restrict(assignment));
+        return this.f.equivalence(this.left.restrict(assignment), this.right.restrict(assignment));
     }
 
     @Override
     public Formula nnf() {
         Formula nnf = this.transformationCache.get(NNF);
         if (nnf == null) {
-            nnf = f.or(f.and(left.nnf(), right.nnf()), f.and(f.not(left).nnf(), f.not(right).nnf()));
+            nnf = this.f.and(this.f.or(this.f.not(this.left).nnf(), this.right.nnf()), this.f.or(this.f.not(this.right).nnf(), this.left.nnf()));
             this.transformationCache.put(NNF, nnf);
         }
         return nnf;
@@ -73,19 +71,22 @@ public final class Equivalence extends BinaryOperator {
 
     @Override
     public int hashCode() {
-        if (this.hashCode == 0)
-            this.hashCode = 41 * (left.hashCode() + right.hashCode());
+        if (this.hashCode == 0) {
+            this.hashCode = 41 * (this.left.hashCode() + this.right.hashCode());
+        }
         return this.hashCode;
     }
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this)
+        if (other == this) {
             return true;
-        if (other instanceof Formula && this.f == ((Formula) other).f)
+        }
+        if (other instanceof Formula && this.f == ((Formula) other).f) {
             return false; // the same formula factory would have produced a == object
+        }
         if (other instanceof Equivalence) {
-            Equivalence otherEq = (Equivalence) other;
+            final Equivalence otherEq = (Equivalence) other;
             return this.left.equals(otherEq.left) && this.right.equals(otherEq.right) ||
                     this.left.equals(otherEq.right) && this.right.equals(otherEq.left);
         }

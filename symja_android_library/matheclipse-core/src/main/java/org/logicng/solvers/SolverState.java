@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -29,23 +29,19 @@
 package org.logicng.solvers;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 /**
  * A wrapper class for the internal solver state.
- *
  * @version 1.1
  * @since 1.0
  */
 public final class SolverState {
 
     private final int id;
-
     private final int[] state;
 
     /**
      * Creates a new solver state with a given id and internal solver data.
-     *
      * @param id    the id
      * @param state the solver data
      */
@@ -56,16 +52,14 @@ public final class SolverState {
 
     /**
      * Returns the id of this state.
-     *
      * @return the id of this state
      */
     int id() {
-        return id;
+        return this.id;
     }
 
     /**
      * Returns the internal solver state.
-     *
      * @return the internal solver state
      */
     int[] state() {
@@ -74,6 +68,6 @@ public final class SolverState {
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "SolverState{id=%d, state=%s}", id, Arrays.toString(state));
+        return String.format("SolverState{id=%d, state=%s}", this.id, Arrays.toString(this.state));
     }
 }

@@ -27,8 +27,6 @@ import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
 
-import java.util.Locale;
-
 /**
  * Abstract base class for implementations of the
  * {@link StorelessUnivariateStatistic} interface.
@@ -37,13 +35,19 @@ import java.util.Locale;
  * implementations.
  */
 public abstract class AbstractStorelessUnivariateStatistic
-        implements StorelessUnivariateStatistic {
+    implements StorelessUnivariateStatistic {
 
+    /** {@inheritDoc} */
     @Override
-    public double evaluate(double[] values) throws MathIllegalArgumentException {
-        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
-        return evaluate(values, 0, values.length);
-    }
+    public abstract StorelessUnivariateStatistic copy();
+
+    /** {@inheritDoc} */
+    @Override
+    public abstract void clear();
+
+    /** {@inheritDoc} */
+    @Override
+    public abstract double getResult();
 
     @Override
     public double evaluate(double[] values, int begin, int length) throws MathIllegalArgumentException {
@@ -56,21 +60,20 @@ public abstract class AbstractStorelessUnivariateStatistic
         return Double.NaN;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract StorelessUnivariateStatistic copy();
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public abstract void increment(double d);
 
     @Override
     public void accept(double value) {
         increment(value);
+
+    }
+
+    @Override
+    public void incrementAll(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        incrementAll(values, 0, values.length);
     }
 
     @Override
@@ -84,17 +87,26 @@ public abstract class AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
+     * Returns true iff <code>object</code> is the same type of
+     * {@link StorelessUnivariateStatistic} (the object's class equals this
+     * instance) returning the same values as this for <code>getResult()</code>
+     * and <code>getN()</code>.
+     *
+     * @param object object to test equality against.
+     * @return true if object returns the same value as this
      */
     @Override
-    public abstract double getResult();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract void clear();
-
+    public boolean equals(Object object) {
+        if (object == this ) {
+            return true;
+        }
+        if (object == null || object.getClass() != this.getClass()) {
+            return false;
+        }
+        StorelessUnivariateStatistic other = (StorelessUnivariateStatistic) object;
+        return Precision.equalsIncludingNaN(other.getResult(), getResult()) &&
+               Precision.equalsIncludingNaN(other.getN(),      getN());
+    }
 
     /**
      * Returns hash code based on getResult() and getN().
@@ -106,33 +118,11 @@ public abstract class AbstractStorelessUnivariateStatistic
         return 31 * (31 + MathUtils.hash(getResult())) + MathUtils.hash(getN());
     }
 
-    /**
-     * Returns true iff <code>object</code> is the same type of
-     * {@link StorelessUnivariateStatistic} (the object's class equals this
-     * instance) returning the same values as this for <code>getResult()</code>
-     * and <code>getN()</code>.
-     *
-     * @param object object to test equality against.
-     * @return true if object returns the same value as this
-     */
-    @Override
-    public boolean equals(Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object == null || object.getClass() != this.getClass()) {
-            return false;
-        }
-        StorelessUnivariateStatistic other = (StorelessUnivariateStatistic) object;
-        return Precision.equalsIncludingNaN(other.getResult(), getResult()) &&
-                Precision.equalsIncludingNaN(other.getN(), getN());
-    }
-
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s: result=%f, N=%d",
-                getClass().getSimpleName(),
-                getResult(),
-                getN());
+        return String.format("%s: result=%f, N=%d",
+                             getClass().getSimpleName(),
+                             getResult(),
+                             getN());
     }
 }

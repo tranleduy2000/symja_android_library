@@ -21,6 +21,16 @@
  */
 package org.hipparchus.stat.descriptive.rank;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.hipparchus.analysis.UnivariateFunction;
 import org.hipparchus.analysis.interpolation.LinearInterpolator;
 import org.hipparchus.analysis.interpolation.NevilleInterpolator;
@@ -32,17 +42,6 @@ import org.hipparchus.stat.descriptive.StorelessUnivariateStatistic;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * A {@link StorelessUnivariateStatistic} estimating percentiles using the
@@ -58,11 +57,9 @@ import java.util.Locale;
  * {@link Percentile} should be used.
  */
 public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
-        implements StorelessUnivariateStatistic, Serializable {
+    implements StorelessUnivariateStatistic, Serializable {
 
-    /**
-     * The maximum array size used for psquare algorithm
-     */
+    /** The maximum array size used for psquare algorithm */
     private static final int PSQUARE_CONSTANT = 5;
 
     /**
@@ -71,14 +68,10 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
      */
     private static final double DEFAULT_QUANTILE_DESIRED = 50d;
 
-    /**
-     * Serial ID
-     */
+    /** Serial ID */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * A decimal formatter for print convenience
-     */
+    /** A decimal formatter for print convenience */
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("00.00");
 
     /**
@@ -118,15 +111,14 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
 
     /**
      * Constructs a PSquarePercentile with the specific percentile value.
-     *
      * @param p the percentile
-     * @throws MathIllegalArgumentException if p is not greater than 0 and less
-     *                                      than or equal to 100
+     * @throws MathIllegalArgumentException  if p is not greater than 0 and less
+     * than or equal to 100
      */
     public PSquarePercentile(final double p) {
         if (p > 100 || p < 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE,
-                    p, 0, 100);
+                                                   p, 0, 100);
         }
         this.quantile = p / 100d;// always set it within (0,1]
     }
@@ -160,31 +152,40 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
         this.initialFive.addAll(original.initialFive);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        double result = getResult();
+        result = Double.isNaN(result) ? 37 : result;
+        final double markersHash = markers == null ? 0 : markers.hashCode();
+        final double[] toHash = {result, quantile, markersHash, countOfObservations};
+        return Arrays.hashCode(toHash);
+    }
+
     /**
-     * A creation method to build Markers
+     * Returns true iff {@code o} is a {@code PSquarePercentile} returning the
+     * same values as this for {@code getResult()} and {@code getN()} and also
+     * having equal markers
      *
-     * @param initialFive list of initial five elements
-     * @param p           the quantile desired
-     * @return an instance of PSquareMarkers
-     */
-    public static PSquareMarkers newMarkers(final List<Double> initialFive, final double p) {
-        return new Markers(initialFive, p);
-    }
-
-    /**
-     * {@inheritDoc}
+     * @param o object to compare
+     * @return true if {@code o} is a {@code PSquarePercentile} with
+     * equivalent internal state
      */
     @Override
-    public long getN() {
-        return countOfObservations;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PSquarePercentile copy() {
-        return new PSquarePercentile(this);
+    public boolean equals(Object o) {
+        boolean result = false;
+        if (this == o) {
+            result = true;
+        } else if (o instanceof PSquarePercentile) {
+            PSquarePercentile that = (PSquarePercentile) o;
+            boolean isNotNull = markers != null && that.markers != null;
+            boolean isNull = markers == null && that.markers == null;
+            result = isNotNull ? markers.equals(that.markers) : isNull;
+            // markers as in the case of first
+            // five observations
+            result = result && getN() == that.getN();
+        }
+        return result;
     }
 
     /**
@@ -219,16 +220,52 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a string containing the last observation, the current estimate
+     * of the quantile and all markers.
+     *
+     * @return string representation of state data
      */
     @Override
-    public double getResult() {
-        if (Double.compare(quantile, 1d) == 0) {
-            pValue = maximum();
-        } else if (Double.compare(quantile, 0d) == 0) {
-            pValue = minimum();
+    public String toString() {
+        synchronized (this) {
+            synchronized (DECIMAL_FORMAT) {
+                if (markers == null) {
+                    return String.format("obs=%s pValue=%s",
+                                         DECIMAL_FORMAT.format(lastObservation),
+                                         DECIMAL_FORMAT.format(pValue));
+                } else {
+                    return String.format("obs=%s markers=%s",
+                                         DECIMAL_FORMAT.format(lastObservation), markers.toString());
+                }
+            }
         }
-        return pValue;
+   }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return countOfObservations;
+    }
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PSquarePercentile copy() {
+        return new PSquarePercentile(this);
+    }
+
+    /**
+     * Returns the quantile estimated by this statistic in the range [0.0-1.0]
+     *
+     * @return quantile estimated by {@link #getResult()}
+     */
+    public double quantile() {
+        return quantile;
     }
 
     /**
@@ -244,69 +281,16 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * Returns true iff {@code o} is a {@code PSquarePercentile} returning the
-     * same values as this for {@code getResult()} and {@code getN()} and also
-     * having equal markers
-     *
-     * @param o object to compare
-     * @return true if {@code o} is a {@code PSquarePercentile} with
-     * equivalent internal state
-     */
-    @Override
-    public boolean equals(Object o) {
-        boolean result = false;
-        if (this == o) {
-            result = true;
-        } else if (o instanceof PSquarePercentile) {
-            PSquarePercentile that = (PSquarePercentile) o;
-            boolean isNotNull = markers != null && that.markers != null;
-            boolean isNull = markers == null && that.markers == null;
-            result = isNotNull ? markers.equals(that.markers) : isNull;
-            // markers as in the case of first
-            // five observations
-            result = result && getN() == that.getN();
-        }
-        return result;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        double result = getResult();
-        result = Double.isNaN(result) ? 37 : result;
-        final double markersHash = markers == null ? 0 : markers.hashCode();
-        final double[] toHash = {result, quantile, markersHash, countOfObservations};
-        return Arrays.hashCode(toHash);
-    }
-
-    /**
-     * Returns a string containing the last observation, the current estimate
-     * of the quantile and all markers.
-     *
-     * @return string representation of state data
-     */
-    @Override
-    public synchronized String toString() {
-
-        if (markers == null) {
-            return String.format(Locale.US, "obs=%s pValue=%s",
-                    DECIMAL_FORMAT.format(lastObservation),
-                    DECIMAL_FORMAT.format(pValue));
-        } else {
-            return String.format(Locale.US, "obs=%s markers=%s",
-                    DECIMAL_FORMAT.format(lastObservation), markers.toString());
+    public double getResult() {
+        if (Double.compare(quantile, 1d) == 0) {
+            pValue = maximum();
+        } else if (Double.compare(quantile, 0d) == 0) {
+            pValue = minimum();
         }
-    }
-
-    /**
-     * Returns the quantile estimated by this statistic in the range [0.0-1.0]
-     *
-     * @return quantile estimated by {@link #getResult()}
-     */
-    public double quantile() {
-        return quantile;
+        return pValue;
     }
 
     /**
@@ -343,53 +327,6 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
     }
 
     /**
-     * An interface that encapsulates abstractions of the
-     * P-square algorithm markers as is explained in the original works. This
-     * interface is exposed with protected access to help in testability.
-     */
-    protected interface PSquareMarkers {
-        /**
-         * Returns Percentile value computed thus far.
-         *
-         * @return percentile
-         */
-        double getPercentileValue();
-
-        /**
-         * A deep copy function to clone the current instance.
-         *
-         * @return deep copy of this instance
-         */
-        PSquareMarkers copySelf();
-
-        /**
-         * Returns the marker height (or percentile) of a given marker index.
-         *
-         * @param markerIndex is the index of marker in the marker array
-         * @return percentile value of the marker index passed
-         * @throws MathIllegalArgumentException in case the index is not within [1-5]
-         */
-        double height(int markerIndex);
-
-        /**
-         * Process a data point by moving the marker heights based on estimator.
-         *
-         * @param inputDataPoint is the data point passed
-         * @return computed percentile
-         */
-        double processDataPoint(double inputDataPoint);
-
-        /**
-         * An Estimate of the percentile value of a given Marker
-         *
-         * @param index the marker's index in the array of markers
-         * @return percentile estimate
-         * @throws MathIllegalArgumentException in case if index is not within [1-5]
-         */
-        double estimate(int index);
-    }
-
-    /**
      * Markers is an encapsulation of the five markers/buckets as indicated in
      * the original works.
      */
@@ -399,14 +336,10 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          */
         private static final long serialVersionUID = 1L;
 
-        /**
-         * Low marker index
-         */
+        /** Low marker index */
         private static final int LOW = 2;
 
-        /**
-         * High marker index
-         */
+        /** High marker index */
         private static final int HIGH = 4;
 
         /**
@@ -435,18 +368,18 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
                         .next(markerArray[i + 1]).index(i);
             }
             markerArray[0].previous(markerArray[0])
-                    .next(markerArray[1])
-                    .index(0);
+                          .next(markerArray[1])
+                          .index(0);
             markerArray[5].previous(markerArray[4])
-                    .next(markerArray[5])
-                    .index(5);
+                          .next(markerArray[5])
+                          .index(5);
         }
 
         /**
          * Constructor
          *
          * @param initialFive elements required to build Marker
-         * @param p           quantile required to be computed
+         * @param p quantile required to be computed
          */
         private Markers(final List<Double> initialFive, final double p) {
             this(createMarkerArray(initialFive, p));
@@ -456,7 +389,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          * Creates a marker array using initial five elements and a quantile
          *
          * @param initialFive list of initial five elements
-         * @param p           the pth quantile
+         * @param p the pth quantile
          * @return Marker array
          */
         private static Marker[] createMarkerArray(
@@ -469,13 +402,21 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
                         countObserved, PSQUARE_CONSTANT);
             }
             Collections.sort(initialFive);
-            return new Marker[]{
+            return new Marker[] {
                     new Marker(),// Null Marker
                     new Marker(initialFive.get(0), 1, 0, 1),
                     new Marker(initialFive.get(1), 1 + 2 * p, p / 2, 2),
                     new Marker(initialFive.get(2), 1 + 4 * p, p, 3),
                     new Marker(initialFive.get(3), 3 + 2 * p, (1 + p) / 2, 4),
-                    new Marker(initialFive.get(4), 5, 1, 5)};
+                    new Marker(initialFive.get(4), 5, 1, 5) };
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            return Arrays.deepHashCode(markerArray);
         }
 
         /**
@@ -495,65 +436,6 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
                 result = Arrays.deepEquals(markerArray, that.markerArray);
             }
             return result;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            return Arrays.deepHashCode(markerArray);
-        }
-
-        /**
-         * Returns string representation of the Marker array.
-         *
-         * @return Markers as a string
-         */
-        @Override
-        public String toString() {
-            return String.format(Locale.US, "m1=[%s],m2=[%s],m3=[%s],m4=[%s],m5=[%s]",
-                    markerArray[1].toString(), markerArray[2].toString(),
-                    markerArray[3].toString(), markerArray[4].toString(),
-                    markerArray[5].toString());
-        }
-
-        /**
-         * Returns the percentile computed thus far.
-         *
-         * @return height of mid point marker
-         */
-        @Override
-        public double getPercentileValue() {
-            return height(3);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Markers copySelf() {
-            return new Markers(new Marker[]{
-                    new Marker(),
-                    markerArray[1].copySelf(),
-                    markerArray[2].copySelf(),
-                    markerArray[3].copySelf(),
-                    markerArray[4].copySelf(),
-                    markerArray[5].copySelf()
-            });
-
-        }
-
-        /**
-         * Return marker height given index
-         *
-         * @param markerIndex index of marker within (1,6)
-         * @return marker height
-         */
-        @Override
-        public double height(final int markerIndex) {
-            MathUtils.checkRangeInclusive(markerIndex, 1, markerArray.length - 1);
-            return markerArray[markerIndex].markerHeight;
         }
 
         /**
@@ -582,12 +464,13 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
         }
 
         /**
-         * {@inheritDoc}
+         * Returns the percentile computed thus far.
+         *
+         * @return height of mid point marker
          */
         @Override
-        public double estimate(final int index) {
-            MathUtils.checkRangeInclusive(index, LOW, HIGH);
-            return markerArray[index].estimate();
+        public double getPercentileValue() {
+            return height(3);
         }
 
         /**
@@ -595,7 +478,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          *
          * @param observation the input value to be checked for
          * @return kth cell (of the markers ranging from 1-5) where observed
-         * sample fits
+         *         sample fits
          */
         private int findCellAndUpdateMinMax(final double observation) {
             k = -1;
@@ -627,15 +510,24 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
         }
 
         /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double estimate(final int index) {
+            MathUtils.checkRangeInclusive(index, LOW, HIGH);
+            return markerArray[index].estimate();
+        }
+
+        /**
          * Increment positions by d. Refer to algorithm paper for the
          * definition of d.
          *
-         * @param d          The increment value for the position
+         * @param d The increment value for the position
          * @param startIndex start index of the marker array
-         * @param endIndex   end index of the marker array
+         * @param endIndex end index of the marker array
          */
         private void incrementPositions(final int d, final int startIndex,
-                                        final int endIndex) {
+                final int endIndex) {
             for (int i = startIndex; i <= endIndex; i++) {
                 markerArray[i].incrementPosition(d);
             }
@@ -656,7 +548,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          *
          * @param anInputStream the input stream to be deserialized
          * @throws ClassNotFoundException thrown when a desired class not found
-         * @throws IOException            thrown due to any io errors
+         * @throws IOException thrown due to any io errors
          */
         private void readObject(ObjectInputStream anInputStream)
                 throws ClassNotFoundException, IOException {
@@ -670,6 +562,45 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
             markerArray[5].previous(markerArray[4]).next(markerArray[5]).index(5);
         }
 
+        /**
+         * Return marker height given index
+         *
+         * @param markerIndex index of marker within (1,6)
+         * @return marker height
+         */
+        @Override
+        public double height(final int markerIndex) {
+            MathUtils.checkRangeInclusive(markerIndex, 1, markerArray.length - 1);
+            return markerArray[markerIndex].markerHeight;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Markers copySelf() {
+            return new Markers(new Marker[] {
+                new Marker(),
+                markerArray[1].copySelf(),
+                markerArray[2].copySelf(),
+                markerArray[3].copySelf(),
+                markerArray[4].copySelf(),
+                markerArray[5].copySelf()
+            });
+
+        }
+
+        /**
+         * Returns string representation of the Marker array.
+         *
+         * @return Markers as a string
+         */
+        @Override
+        public String toString() {
+            return String.format("m1=[%s],m2=[%s],m3=[%s],m4=[%s],m5=[%s]",
+                    markerArray[1].toString(), markerArray[2].toString(),
+                    markerArray[3].toString(), markerArray[4].toString(),
+                    markerArray[5].toString());
+        }
+
     }
 
     /**
@@ -681,44 +612,53 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          * Serial Version ID
          */
         private static final long serialVersionUID = -3575879478288538431L;
-        /**
-         * Nonlinear interpolator
-         */
-        private final UnivariateInterpolator nonLinear = new NevilleInterpolator();
+
         /**
          * The marker index which is just a serial number for the marker in the
          * marker array of 5+1.
          */
         private int index;
+
         /**
          * The integral marker position. Refer to the variable n in the original
          * works.
          */
         private double intMarkerPosition;
+
         /**
          * Desired marker position. Refer to the variable n' in the original
          * works.
          */
         private double desiredMarkerPosition;
+
         /**
          * Marker height or the quantile. Refer to the variable q in the
          * original works.
          */
         private double markerHeight;
+
         /**
          * Desired marker increment. Refer to the variable dn' in the original
          * works.
          */
         private double desiredMarkerIncrement;
+
         /**
          * Next and previous markers for easy linked navigation in loops. this
          * is not serialized as they can be rebuilt during deserialization.
          */
         private transient Marker next;
+
         /**
          * The previous marker links
          */
         private transient Marker previous;
+
+        /**
+         * Nonlinear interpolator
+         */
+        private final UnivariateInterpolator nonLinear = new NevilleInterpolator();
+
         /**
          * Linear interpolator which is not serializable
          */
@@ -734,13 +674,13 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
         /**
          * Constructor of the marker with parameters
          *
-         * @param heightOfMarker          represent the quantile value
-         * @param makerPositionDesired    represent the desired marker position
+         * @param heightOfMarker represent the quantile value
+         * @param makerPositionDesired represent the desired marker position
          * @param markerPositionIncrement represent increments for position
-         * @param markerPositionNumber    represent the position number of marker
+         * @param markerPositionNumber represent the position number of marker
          */
         private Marker(double heightOfMarker, double makerPositionDesired,
-                       double markerPositionIncrement, double markerPositionNumber) {
+                double markerPositionIncrement, double markerPositionNumber) {
             this();
             this.markerHeight = heightOfMarker;
             this.desiredMarkerPosition = makerPositionDesired;
@@ -752,7 +692,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          * Sets the previous marker.
          *
          * @param previousMarker the previous marker to the current marker in
-         *                       the array of markers
+         *            the array of markers
          * @return this instance
          */
         private Marker previous(final Marker previousMarker) {
@@ -765,7 +705,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          * Sets the next marker.
          *
          * @param nextMarker the next marker to the current marker in the array
-         *                   of markers
+         *            of markers
          * @return this instance
          */
         private Marker next(final Marker nextMarker) {
@@ -824,12 +764,8 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
 
             if (di >= 1 && isNextHigher || di <= -1 && isPreviousLower) {
                 final int d = di >= 0 ? 1 : -1;
-                final double[] xval =
-                        new double[]{previous.intMarkerPosition,
-                                intMarkerPosition, next.intMarkerPosition};
-                final double[] yval =
-                        new double[]{previous.markerHeight, markerHeight,
-                                next.markerHeight};
+                final double[] xval = { previous.intMarkerPosition, intMarkerPosition, next.intMarkerPosition };
+                final double[] yval = { previous.markerHeight, markerHeight, next.markerHeight };
                 final double xD = intMarkerPosition + d;
 
                 UnivariateFunction univariateFunction =
@@ -839,10 +775,8 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
                 // If parabolic estimate is bad then turn linear
                 if (isEstimateBad(yval, markerHeight)) {
                     int delta = xD - xval[1] > 0 ? 1 : -1;
-                    final double[] xBad =
-                            new double[]{xval[1], xval[1 + delta]};
-                    final double[] yBad =
-                            new double[]{yval[1], yval[1 + delta]};
+                    final double[] xBad = { xval[1], xval[1 + delta] };
+                    final double[] yBad = { yval[1], yval[1 + delta] };
                     MathArrays.sortInPlace(xBad, yBad);// since d can be +/- 1
                     univariateFunction = linear.interpolate(xBad, yBad);
                     markerHeight = univariateFunction.value(xD);
@@ -856,7 +790,7 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
          * Check if parabolic/nonlinear estimate is bad by checking if the
          * ordinate found is beyond the y[0] and y[2].
          *
-         * @param y  the array to get the bounds
+         * @param y the array to get the bounds
          * @param yD the estimate
          * @return true if yD is a bad estimate
          */
@@ -900,13 +834,32 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
             return result;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public int hashCode() {
-            return Arrays.hashCode(new double[]{markerHeight, intMarkerPosition,
-                    desiredMarkerIncrement, desiredMarkerPosition, previous.index, next.index});
+            return Arrays.hashCode(new double[] {markerHeight, intMarkerPosition,
+                desiredMarkerIncrement, desiredMarkerPosition, previous.index, next.index});
+        }
+
+        /**
+         * Read Object to deserialize.
+         *
+         * @param anInstream Stream Object data
+         * @throws IOException thrown for IO Errors
+         * @throws ClassNotFoundException thrown for class not being found
+         */
+        private void readObject(ObjectInputStream anInstream)
+                throws ClassNotFoundException, IOException {
+            anInstream.defaultReadObject();
+            previous=next=this;
+            linear = new LinearInterpolator();
+        }
+
+        /** Copy this instance.
+         * @return copy of the instance
+         */
+        public Marker copySelf() {
+            return new Marker(markerHeight, desiredMarkerPosition, desiredMarkerIncrement, intMarkerPosition);
         }
 
         /**
@@ -921,29 +874,6 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
                     Precision.round(markerHeight, 2),
                     Precision.round(desiredMarkerIncrement, 2), previous.index,
                     next.index);
-        }
-
-        /**
-         * Read Object to deserialize.
-         *
-         * @param anInstream Stream Object data
-         * @throws IOException            thrown for IO Errors
-         * @throws ClassNotFoundException thrown for class not being found
-         */
-        private void readObject(ObjectInputStream anInstream)
-                throws ClassNotFoundException, IOException {
-            anInstream.defaultReadObject();
-            previous = next = this;
-            linear = new LinearInterpolator();
-        }
-
-        /**
-         * Copy this instance.
-         *
-         * @return copy of the instance
-         */
-        public Marker copySelf() {
-            return new Marker(markerHeight, desiredMarkerPosition, desiredMarkerIncrement, intMarkerPosition);
         }
     }
 
@@ -1004,21 +934,75 @@ public class PSquarePercentile extends AbstractStorelessUnivariateStatistic
             return isCollectionLess && super.addAll(collection);
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            return super.hashCode() + capacity;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public boolean equals(final Object other) {
             return super.equals(other) && capacity == ((FixedCapacityList<?>) other).capacity;
         }
 
+        /** {@inheritDoc} */
+        @Override
+        public int hashCode() {
+            return super.hashCode() + capacity;
+        }
+
+    }
+
+    /**
+     * A creation method to build Markers
+     *
+     * @param initialFive list of initial five elements
+     * @param p the quantile desired
+     * @return an instance of PSquareMarkers
+     */
+    public static PSquareMarkers newMarkers(final List<Double> initialFive, final double p) {
+        return new Markers(initialFive, p);
+    }
+
+    /**
+     * An interface that encapsulates abstractions of the
+     * P-square algorithm markers as is explained in the original works. This
+     * interface is exposed with protected access to help in testability.
+     */
+    protected interface PSquareMarkers {
+        /**
+         * Returns Percentile value computed thus far.
+         *
+         * @return percentile
+         */
+        double getPercentileValue();
+
+        /**
+         * A deep copy function to clone the current instance.
+         *
+         * @return deep copy of this instance
+         */
+        PSquareMarkers copySelf();
+
+        /**
+         * Returns the marker height (or percentile) of a given marker index.
+         *
+         * @param markerIndex is the index of marker in the marker array
+         * @return percentile value of the marker index passed
+         * @throws MathIllegalArgumentException in case the index is not within [1-5]
+         */
+        double height(int markerIndex);
+
+        /**
+         * Process a data point by moving the marker heights based on estimator.
+         *
+         * @param inputDataPoint is the data point passed
+         * @return computed percentile
+         */
+        double processDataPoint(double inputDataPoint);
+
+        /**
+         * An Estimate of the percentile value of a given Marker
+         *
+         * @param index the marker's index in the array of markers
+         * @return percentile estimate
+         * @throws MathIllegalArgumentException in case if index is not within [1-5]
+         */
+        double estimate(int index);
     }
 }

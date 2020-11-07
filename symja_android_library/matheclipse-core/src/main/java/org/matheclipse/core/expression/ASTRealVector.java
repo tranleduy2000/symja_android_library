@@ -21,6 +21,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.HashSet;
 import java.util.RandomAccess;
 import java.util.Set;
 
@@ -188,9 +189,12 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	}
 	@Override
 	public Set<IExpr> asSet() {
-		throw new UnsupportedOperationException();
-		// empty set:
-		// return new HashSet<IExpr>();
+		int size = size();
+		Set<IExpr> set = new HashSet<IExpr>(size > 16 ? size : 16);
+		for (int i = 1; i < size; i++) {
+			set.add(get(i));
+		}
+		return set;
 	}
 
 	/**
@@ -266,6 +270,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return F.NIL;
 	}
 
+	@Override
+	public IExpr evalEvaluate(EvalEngine engine) {
+		return F.NIL;
+	}
 	/** {@inheritDoc} */
 	@Override
 	public final IAST filterFunction(IASTAppendable filterAST, IASTAppendable restAST,
@@ -403,6 +411,11 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 		return vector.getDimension();
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public boolean isNumericAST() {
+		return true;
+	}
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
 		this.fEvalFlags = objectInput.readShort();
@@ -467,9 +480,10 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	 */
 	@Override
 	public IExpr[] toArray() {
-		IExpr[] result = new IExpr[vector.getDimension()];
+		IExpr[] result = new IExpr[vector.getDimension()+1];
+		result[0] = S.List;
 		for (int i = 0; i < result.length; i++) {
-			result[i] = F.num(vector.getEntry(i));
+			result[i+1] = F.num(vector.getEntry(i));
 
 		}
 		return result;

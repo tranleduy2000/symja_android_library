@@ -21,14 +21,15 @@
  */
 package org.hipparchus.stat.descriptive.summary;
 
+import java.io.Serializable;
+
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.hipparchus.stat.descriptive.AggregatableStatistic;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
-
-import java.io.Serializable;
 
 /**
  * Returns the sum of the squares of the available values.
@@ -43,21 +44,15 @@ import java.io.Serializable;
  * <code>clear()</code> method, it must be synchronized externally.
  */
 public class SumOfSquares extends AbstractStorelessUnivariateStatistic
-        implements AggregatableStatistic<SumOfSquares>, Serializable {
+    implements AggregatableStatistic<SumOfSquares>, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * Number of values that have been added
-     */
+    /** Number of values that have been added */
     private long n;
 
-    /**
-     * The currently running sumSq
-     */
+    /** The currently running sumSq */
     private double value;
 
     /**
@@ -77,8 +72,66 @@ public class SumOfSquares extends AbstractStorelessUnivariateStatistic
      */
     public SumOfSquares(SumOfSquares original) throws NullArgumentException {
         MathUtils.checkNotNull(original);
-        this.n = original.n;
+        this.n     = original.n;
         this.value = original.value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void increment(final double d) {
+        value += d * d;
+        n++;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        return value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return n;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        value = 0;
+        n = 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void aggregate(SumOfSquares other) {
+        MathUtils.checkNotNull(other);
+        if (other.n > 0) {
+            this.n     += other.n;
+            this.value += other.value;
+        }
+    }
+
+    @Override
+    public void aggregate(SumOfSquares... others) {
+        MathUtils.checkNotNull(others);
+        for (SumOfSquares other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public void aggregate(Iterable<SumOfSquares> others) {
+        MathUtils.checkNotNull(others);
+        for (SumOfSquares other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
     }
 
     /**
@@ -87,15 +140,15 @@ public class SumOfSquares extends AbstractStorelessUnivariateStatistic
      * is empty.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the sum of the squares of the values or 0 if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     @Override
-    public double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+    public double evaluate(final double[] values,final int begin, final int length)
+        throws MathIllegalArgumentException {
 
         double sumSq = Double.NaN;
         if (MathArrays.verifyValues(values, begin, length, true)) {
@@ -107,46 +160,10 @@ public class SumOfSquares extends AbstractStorelessUnivariateStatistic
         return sumSq;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public SumOfSquares copy() {
         return new SumOfSquares(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        value += d * d;
-        n++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        value = 0;
-        n = 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return n;
     }
 
 }

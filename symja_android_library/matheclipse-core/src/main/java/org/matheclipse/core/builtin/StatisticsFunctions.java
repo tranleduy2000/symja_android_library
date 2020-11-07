@@ -17,6 +17,7 @@ import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.random.RandomDataGenerator;
 import org.hipparchus.stat.StatUtils;
+import org.hipparchus.stat.correlation.PearsonsCorrelation;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
 import org.matheclipse.core.basic.Config;
@@ -35,6 +36,7 @@ import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -75,55 +77,55 @@ public class StatisticsFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.AbsoluteCorrelation.setEvaluator(new AbsoluteCorrelation());
-			F.ArithmeticGeometricMean.setEvaluator(new ArithmeticGeometricMean());
+			S.AbsoluteCorrelation.setEvaluator(new AbsoluteCorrelation());
+			S.ArithmeticGeometricMean.setEvaluator(new ArithmeticGeometricMean());
 			F.CDF.setEvaluator(new CDF());
-			F.PDF.setEvaluator(new PDF());
-			F.BernoulliDistribution.setEvaluator(new BernoulliDistribution());
-			F.BetaDistribution.setEvaluator(new BetaDistribution());
-			F.BinCounts.setEvaluator(new BinCounts());
-			F.BinomialDistribution.setEvaluator(new BinomialDistribution());
-			F.CentralMoment.setEvaluator(new CentralMoment());
-			F.ChiSquareDistribution.setEvaluator(new ChiSquareDistribution());
-			F.Correlation.setEvaluator(new Correlation());
-			F.Covariance.setEvaluator(new Covariance());
-			F.DiscreteUniformDistribution.setEvaluator(new DiscreteUniformDistribution());
-			F.ErlangDistribution.setEvaluator(new ErlangDistribution());
-			F.Expectation.setEvaluator(new Expectation());
-			F.ExponentialDistribution.setEvaluator(new ExponentialDistribution());
-			F.FiveNum.setEvaluator(new FiveNum());
-			F.FRatioDistribution.setEvaluator(new FRatioDistribution());
-			F.FrechetDistribution.setEvaluator(new FrechetDistribution());
-			F.GammaDistribution.setEvaluator(new GammaDistribution());
-			F.GeometricMean.setEvaluator(new GeometricMean());
-			F.GeometricDistribution.setEvaluator(new GeometricDistribution());
-			F.GompertzMakehamDistribution.setEvaluator(new GompertzMakehamDistribution());
-			F.GumbelDistribution.setEvaluator(new GumbelDistribution());
-			F.HarmonicMean.setEvaluator(new HarmonicMean());
-			F.HypergeometricDistribution.setEvaluator(new HypergeometricDistribution());
-			F.InverseCDF.setEvaluator(new InverseCDF());
-			F.KolmogorovSmirnovTest.setEvaluator(new KolmogorovSmirnovTest());
-			F.Kurtosis.setEvaluator(new Kurtosis());
-			F.LogNormalDistribution.setEvaluator(new LogNormalDistribution());
-			F.Mean.setEvaluator(new Mean());
-			F.MeanDeviation.setEvaluator(new MeanDeviation());
-			F.Median.setEvaluator(new Median());
-			F.NakagamiDistribution.setEvaluator(new NakagamiDistribution());
-			F.NormalDistribution.setEvaluator(new NormalDistribution());
-			F.PoissonDistribution.setEvaluator(new PoissonDistribution());
-			F.Probability.setEvaluator(new Probability());
-			F.Quantile.setEvaluator(new Quantile());
-			F.Quartiles.setEvaluator(new Quartiles());
-			F.RandomVariate.setEvaluator(new RandomVariate());
-			F.Rescale.setEvaluator(new Rescale());
-			F.Skewness.setEvaluator(new Skewness());
-			F.StandardDeviation.setEvaluator(new StandardDeviation());
-			F.Standardize.setEvaluator(new Standardize());
-			F.StudentTDistribution.setEvaluator(new StudentTDistribution());
-			F.SurvivalFunction.setEvaluator(new SurvivalFunction());
-			F.UniformDistribution.setEvaluator(new UniformDistribution());
-			F.Variance.setEvaluator(new Variance());
-			F.WeibullDistribution.setEvaluator(new WeibullDistribution());
+			S.PDF.setEvaluator(new PDF());
+			S.BernoulliDistribution.setEvaluator(new BernoulliDistribution());
+			S.BetaDistribution.setEvaluator(new BetaDistribution());
+			S.BinCounts.setEvaluator(new BinCounts());
+			S.BinomialDistribution.setEvaluator(new BinomialDistribution());
+			S.CentralMoment.setEvaluator(new CentralMoment());
+			S.ChiSquareDistribution.setEvaluator(new ChiSquareDistribution());
+			S.Correlation.setEvaluator(new Correlation());
+			S.Covariance.setEvaluator(new Covariance());
+			S.DiscreteUniformDistribution.setEvaluator(new DiscreteUniformDistribution());
+			S.ErlangDistribution.setEvaluator(new ErlangDistribution());
+			S.Expectation.setEvaluator(new Expectation());
+			S.ExponentialDistribution.setEvaluator(new ExponentialDistribution());
+			S.FiveNum.setEvaluator(new FiveNum());
+			S.FRatioDistribution.setEvaluator(new FRatioDistribution());
+			S.FrechetDistribution.setEvaluator(new FrechetDistribution());
+			S.GammaDistribution.setEvaluator(new GammaDistribution());
+			S.GeometricMean.setEvaluator(new GeometricMean());
+			S.GeometricDistribution.setEvaluator(new GeometricDistribution());
+			S.GompertzMakehamDistribution.setEvaluator(new GompertzMakehamDistribution());
+			S.GumbelDistribution.setEvaluator(new GumbelDistribution());
+			S.HarmonicMean.setEvaluator(new HarmonicMean());
+			S.HypergeometricDistribution.setEvaluator(new HypergeometricDistribution());
+			S.InverseCDF.setEvaluator(new InverseCDF());
+			S.KolmogorovSmirnovTest.setEvaluator(new KolmogorovSmirnovTest());
+			S.Kurtosis.setEvaluator(new Kurtosis());
+			S.LogNormalDistribution.setEvaluator(new LogNormalDistribution());
+			S.Mean.setEvaluator(new Mean());
+			S.MeanDeviation.setEvaluator(new MeanDeviation());
+			S.Median.setEvaluator(new Median());
+			S.NakagamiDistribution.setEvaluator(new NakagamiDistribution());
+			S.NormalDistribution.setEvaluator(new NormalDistribution());
+			S.PoissonDistribution.setEvaluator(new PoissonDistribution());
+			S.Probability.setEvaluator(new Probability());
+			S.Quantile.setEvaluator(new Quantile());
+			S.Quartiles.setEvaluator(new Quartiles());
+			S.RandomVariate.setEvaluator(new RandomVariate());
+			S.Rescale.setEvaluator(new Rescale());
+			S.Skewness.setEvaluator(new Skewness());
+			S.StandardDeviation.setEvaluator(new StandardDeviation());
+			S.Standardize.setEvaluator(new Standardize());
+			S.StudentTDistribution.setEvaluator(new StudentTDistribution());
+			S.SurvivalFunction.setEvaluator(new SurvivalFunction());
+			S.UniformDistribution.setEvaluator(new UniformDistribution());
+			S.Variance.setEvaluator(new Variance());
+			S.WeibullDistribution.setEvaluator(new WeibullDistribution());
 		}
 	}
 
@@ -267,7 +269,8 @@ public class StatisticsFunctions {
 	 * probability density function
 	 *
 	 */
-    public interface IPDF {
+    @SuppressWarnings("JavadocReference")
+	public interface IPDF {
 		/**
 		 *
 		 * <p>
@@ -331,8 +334,8 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr e2DblComArg(final IComplexNum a, final IComplexNum b) {
-			ApcomplexNum a1 = a.apcomplexNumValue(Config.MACHINE_PRECISION);
-			ApcomplexNum b1 = b.apcomplexNumValue(Config.MACHINE_PRECISION);
+			ApcomplexNum a1 = a.apcomplexNumValue(FEConfig.MACHINE_PRECISION);
+			ApcomplexNum b1 = b.apcomplexNumValue(FEConfig.MACHINE_PRECISION);
 			Apcomplex agm = ApcomplexMath.agm(a1.apcomplexValue(), b1.apcomplexValue());
 			return F.complex(agm.real().doubleValue(), agm.imag().doubleValue());
 			// IComplexNum a1 = a;
@@ -647,7 +650,7 @@ public class StatisticsFunctions {
 				// see exception handling in RandonmVariate() function
 				double p = dist.arg1().evalDouble();
 				if (0 <= p && p <= 1) {
-//					return F.ZZ(new BinomialGenerator(1, p, random).nextValue());
+					// return F.ZZ(new BinomialGenerator(1, p, random).nextValue());
 					RandomDataGenerator rdg = new RandomDataGenerator();
 					int[] vector = rdg.nextDeviates(
 							new org.hipparchus.distribution.discrete.BinomialDistribution(1, p), size);
@@ -678,7 +681,7 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
@@ -705,7 +708,7 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
@@ -795,7 +798,7 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
@@ -1221,7 +1224,7 @@ public class StatisticsFunctions {
 		public IExpr cdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr v = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(v.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.ChiSquaredDistribution(v.evalDouble()) //
@@ -1245,7 +1248,7 @@ public class StatisticsFunctions {
 		public IExpr inverseCDF(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr v = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(v.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.ChiSquaredDistribution(v.evalDouble()) //
@@ -1272,7 +1275,7 @@ public class StatisticsFunctions {
 		public IExpr pdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr v = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(v.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.ChiSquaredDistribution(v.evalDouble()) //
@@ -1354,19 +1357,52 @@ public class StatisticsFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IExpr a = ast.arg1();
-			IExpr b = ast.arg2();
-			int dim1 = a.isVector();
-			int dim2 = b.isVector();
+			try {
+				if (ast.isAST1()) {
+					// System.out.println(ast.arg1().toString());
+					if (ast.arg1() instanceof ASTRealMatrix) {
+						PearsonsCorrelation pc = new PearsonsCorrelation(((ASTRealMatrix) ast.arg1()).getRealMatrix());
+						return new ASTRealMatrix(pc.getCorrelationMatrix(), false);
+					}
+					int[] dim = ast.arg1().isMatrix();
+					if (dim != null && dim[0] > 1 && dim[1] > 1) {
+						RealMatrix matrix = ast.arg1().toRealMatrix();
+						if (matrix != null) {
+							PearsonsCorrelation pc = new PearsonsCorrelation(matrix);
+							return new ASTRealMatrix(pc.getCorrelationMatrix(), false);
+						}
+					}
+					return F.NIL;
+				}
+				IExpr arg1 = ast.arg1();
+				IExpr arg2 = ast.arg2();
+				int dim1 = arg1.isVector();
+				int dim2 = arg2.isVector();
 			if (dim1 >= 0 && dim1 == dim2) {
-				return F.Divide(F.Covariance(a, b), F.Times(F.StandardDeviation(a), F.StandardDeviation(b)));
+					if (engine.isDoubleMode() || //
+							arg1.isNumericAST() || //
+							arg2.isNumericAST()) {
+						double[] a = arg1.toDoubleVector();
+						if (a != null) {
+							double[] b = arg2.toDoubleVector();
+							if (b != null) {
+								PearsonsCorrelation pc = new PearsonsCorrelation();
+								return F.num(pc.correlation(a, b));
+							}
+						}
+					}
+					return F.Divide(F.Covariance(arg1, arg2),
+							F.Times(F.StandardDeviation(arg1), F.StandardDeviation(arg2)));
 			}
 			return F.NIL;
+			} catch (MathRuntimeException mrex) {
+				return IOFunctions.printMessage(ast.topHead(), mrex, engine);
+			}
 		}
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -1410,7 +1446,20 @@ public class StatisticsFunctions {
 				IAST param = F.List(F.List(F.C1D2, F.C0), //
 						F.List(F.C0, F.C1));
 
-				IAST list = (IAST) ast.arg1();
+				IExpr list = ast.arg1();
+				// if (engine.isDoubleMode()) {
+				// RealVector doubleArray = list.toRealVector();
+				// if (doubleArray != null) {
+				// IASTAppendable result = F.ListAlloc(5);
+				// result.append(F.num(doubleArray.getMinValue()));
+				// result.append(F.Quantile(list, F.C1D4, param));
+				// result.append(F.Median(list));
+				// result.append(F.Quantile(list, F.C3D4, param));
+				// result.append(F.num(doubleArray.getMaxValue()));
+				//
+				// return result;
+				// }
+				// }
 				IASTAppendable result = F.ListAlloc(5);
 
 				result.append(F.Min(list));
@@ -1472,7 +1521,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(
@@ -1497,7 +1546,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(
@@ -1528,7 +1577,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(
@@ -1777,7 +1826,7 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.GammaDistribution(a.evalDouble(),
@@ -1817,7 +1866,7 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.GammaDistribution(a.evalDouble(),
@@ -1940,7 +1989,7 @@ public class StatisticsFunctions {
 				//
 				IExpr a = dist.arg1();
 				IExpr b = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.GammaDistribution(a.evalDouble(),
@@ -1992,7 +2041,7 @@ public class StatisticsFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg1 = ast.arg1();
-			if (arg1.isList() && arg1.size() > 1) {
+			if (arg1.isNonEmptyList()) {
 				IAST list = (IAST) arg1;
 
 				int[] dim = list.isMatrix();
@@ -2325,7 +2374,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						final double z = (k.evalDouble() - n.evalDouble()) / m.evalDouble();
@@ -2350,7 +2399,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						double p = k.evalDouble();
@@ -2451,7 +2500,7 @@ public class StatisticsFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg1 = ast.arg1();
-			if (arg1.isList() && arg1.size() > 1) {
+			if (arg1.isNonEmptyList()) {
 				IAST list = (IAST) arg1;
 
 				int[] dim = list.isMatrix();
@@ -2512,7 +2561,7 @@ public class StatisticsFunctions {
      * </p>
      */
 	private final static class HypergeometricDistribution extends IDiscreteDistributionFunctionImpl
-			implements ICDF, IDiscreteDistribution, IPDF, IStatistics {
+			implements ICDF, IDiscreteDistribution, IPDF, IStatistics, IRandomVariate {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2656,6 +2705,21 @@ public class StatisticsFunctions {
 				int param[] = parameters(dist);
 				if (param != null) {
 					return F.NIL;
+				}
+			}
+			return F.NIL;
+		}
+
+		@Override
+		public IExpr randomVariate(Random random, IAST dist, int size) {
+			if (dist.isAST3()) {
+				int param[] = parameters(dist);
+				if (param != null) {
+					RandomDataGenerator rdg = new RandomDataGenerator();
+					int[] vector = rdg.nextDeviates(new org.hipparchus.distribution.discrete.HypergeometricDistribution(
+							param[2], param[1], param[0]), size);
+					return F.List(vector);
+
 				}
 			}
 			return F.NIL;
@@ -3114,7 +3178,7 @@ public class StatisticsFunctions {
 	 * </pre>
 	 */
 	private static class Expectation extends AbstractFunctionEvaluator {
-		// static final double CDF_NUMERIC_THRESHOLD = Config.DOUBLE_TOLERANCE;
+		// static final double CDF_NUMERIC_THRESHOLD = Config.DOUBLE_EPSILON;
 		//
 		// static boolean isFinished(IExpr p_equals, IExpr cumprob) {
 		// boolean finished = false;
@@ -3244,7 +3308,7 @@ public class StatisticsFunctions {
 		public IExpr cdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						double x = k.evalDouble();
@@ -3273,7 +3337,7 @@ public class StatisticsFunctions {
 		public IExpr inverseCDF(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						double x = k.evalDouble();
@@ -3572,7 +3636,7 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.LogNormalDistribution(n.evalDouble(),
@@ -3600,7 +3664,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.LogNormalDistribution(n.evalDouble(),
@@ -3632,7 +3696,7 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.LogNormalDistribution(n.evalDouble(),
@@ -3805,8 +3869,7 @@ public class StatisticsFunctions {
 				return F.NIL;
 			}
 			if (dim != null) {
-				IAST matrix = (IAST) ast.arg1();
-				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+				return arg1.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.MeanDeviation(x);
@@ -3814,19 +3877,23 @@ public class StatisticsFunctions {
 				});
 			}
 
-			int length = ast.arg1().isVector();
+			int length = arg1.isVector();
 			if (length > 0) {
-				IAST vector = (IAST) ast.arg1();
+				arg1 = arg1.normal(false);
+				if (arg1.isList()) {
+					IAST vector = (IAST) arg1;
 				int size = vector.size();
-				final IASTAppendable sum = F.PlusAlloc(size);
+					final IASTAppendable sum = F.PlusAlloc(size);
 				final IExpr mean = F.Mean.of(engine, F.Negate(vector));
-				vector.forEach(new Consumer<IExpr>() {
-					@Override
-					public void accept(IExpr x) {
-						sum.append(F.Abs(F.Plus(x, mean)));
-					}
-				});
+					vector.forEach(new Consumer<IExpr>() {
+						@Override
+						public void accept(IExpr x) {
+							sum.append(F.Abs(F.Plus(x, mean)));
+						}
+					});
 				return F.Times(F.Power(F.ZZ(size - 1), -1), sum);
+			}
+				return F.NIL;
 			}
 
 			if (arg1.isNumber()) {
@@ -3967,16 +4034,18 @@ public class StatisticsFunctions {
 				return F.NIL;
 			}
 			if (dim != null) {
-				IAST matrix = (IAST) arg1;
-				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+				return arg1.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
 						return F.Median(x);
 					}
 				});
-			}
-			if (arg1.isList()) {
-				final IAST list = (IAST) arg1;
+					}
+			int dimension = arg1.isVector();
+			if (dimension >= 0 || arg1.isList()) {
+				IExpr normal = arg1.normal(false);
+				if (normal.isList()) {
+					IAST list = (IAST) normal;
 				if (list.size() > 1) {
 					final IAST sortedList = EvalAttributes.copySortLess(list);
 					int size = sortedList.size();
@@ -3988,6 +4057,7 @@ public class StatisticsFunctions {
 						return sortedList.get(size / 2);
 					}
 				}
+			}
 			}
 			if (arg1.isDistribution()) {
 				return getDistribution(arg1).median((IAST) arg1);
@@ -4097,7 +4167,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.NakagamiDistribution(n.evalDouble(),
@@ -4123,7 +4193,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.NakagamiDistribution(n.evalDouble(),
@@ -4153,7 +4223,7 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.NakagamiDistribution(n.evalDouble(),
@@ -4333,7 +4403,7 @@ public class StatisticsFunctions {
 				//
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.NormalDistribution(n.evalDouble(),
@@ -4363,7 +4433,7 @@ public class StatisticsFunctions {
 			} else if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.NormalDistribution(n.evalDouble(),
@@ -4394,7 +4464,7 @@ public class StatisticsFunctions {
 				//
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.NormalDistribution(n.evalDouble(),
@@ -4821,8 +4891,7 @@ public class StatisticsFunctions {
 				return F.NIL;
 			}
 			if (dim != null) {
-				IAST matrix = (IAST) arg1;
-				return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+				return arg1.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr x) {
 						return ast.setAtCopy(1, x);
@@ -4830,7 +4899,11 @@ public class StatisticsFunctions {
 				});
 			}
 
-			if (arg1.isList()) {
+			int dimension = arg1.isVector();
+			if (dimension >= 0 || arg1.isList()) {
+				IExpr normal = arg1.normal(false);
+				if (normal.isList()) {
+					IAST list = (IAST) normal;
 				IExpr a = F.C0;
 				IExpr b = F.C0;
 				IExpr c = F.C1;
@@ -4847,19 +4920,22 @@ public class StatisticsFunctions {
 					d = arg3.second().second();
 				}
 
-				IAST list = (IAST) arg1;
 				int dim1 = list.argSize();
 				try {
-					if (dim1 >= 0 && ast.size() >= 3) {
+						if (dim1==0) {
+							// Argument `1` should be a non-empty list.
+							return IOFunctions.printMessage(ast.topHead(), "empt", F.List(list), engine);
+						}
+						if (dim1 > 0 && ast.size() >= 3) {
 
 						final IAST s = EvalAttributes.copySortLess(list);
 						final IInteger length = F.ZZ(s.argSize());
 
 						IExpr q = ast.arg2();
 						int dim2 = q.isVector();
-						if (dim2 >= 0) {
+							if (dim2 >= 0 && q.isList()) {
 							final IAST vector = ((IAST) q);
-							return vector.mapThread(ast.copy(), 2);
+								return vector.mapThread(ast, 2);
 							// if (vector.forAll(x -> x.isReal())) {
 							// return vector.map(scalar -> of(s, length, (ISignedNumber) scalar), 1);
 							// }
@@ -4897,7 +4973,8 @@ public class StatisticsFunctions {
 										// factor = c + d * FractionalPart(x);
 										IExpr factor = d.isZero() || xi.isZero() ? c
 												: F.Plus.of(engine, c, F.Times(d, xi.fractionalPart()));
-										// s[[Floor(x)]]+(s[[Ceiling(x)]]-s[[Floor(x)]]) * (c + d * FractionalPart(x))
+											// s[[Floor(x)]]+(s[[Ceiling(x)]]-s[[Floor(x)]]) * (c + d *
+											// FractionalPart(x))
 										return F.Plus(s.get(xFloor), //
 												F.Times(F.Subtract(s.get(xCeiling), s.get(xFloor)), factor));
 									}
@@ -4910,6 +4987,7 @@ public class StatisticsFunctions {
 					if (FEConfig.SHOW_STACKTRACE) {
 						ae.printStackTrace();
 					}
+				}
 				}
 			} else if (arg1.isDistribution() && ast.size() >= 3) {
 				final IExpr function = engine.evaluate(F.Quantile(arg1));
@@ -4932,20 +5010,20 @@ public class StatisticsFunctions {
 		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_3;
 		}
-		private IExpr of(IAST sorted, IInteger length, ISignedNumber scalar) {
-			if (scalar.isReal()) {
-				int index = 0;
-				if (scalar instanceof INum) {
-					index = ((INum) scalar).multiply(length).ceilFraction().subtract(F.C1).toIntDefault(-1);
-				} else {
-					index = ((IRational) scalar).multiply(length).ceil().subtract(F.C1).toIntDefault(-1);
-				}
-				if (index >= 0) {
-					return sorted.get(index + 1);
-				}
-			}
-			throw new ArithmeticException();
-		}
+		// private IExpr of(IAST sorted, IInteger length, ISignedNumber scalar) {
+		// if (scalar.isReal()) {
+		// int index = 0;
+		// if (scalar instanceof INum) {
+		// index = ((INum) scalar).multiply(length).ceilFraction().subtract(F.C1).toIntDefault(-1);
+		// } else {
+		// index = ((IRational) scalar).multiply(length).ceil().subtract(F.C1).toIntDefault(-1);
+		// }
+		// if (index >= 0) {
+		// return sorted.get(index + 1);
+		// }
+		// }
+		// throw new ArithmeticException();
+		// }
 
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -4962,7 +5040,7 @@ public class StatisticsFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr arg1 = ast.arg1();
-			if ((arg1.isList() && arg1.size() > 1) || arg1.isDistribution()) {
+			if ((arg1.isNonEmptyList()) || arg1.isDistribution()) {
 				IAST list = (IAST) arg1;
 				if (ast.size() == 3) {
 					IExpr arg2 = ast.arg2();
@@ -5314,13 +5392,18 @@ public class StatisticsFunctions {
 				return F.NIL;
 			}
 			if (dim != null) {
-				IAST matrix = (IAST) arg1;
-				return F.Transpose(matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+				IExpr temp = arg1.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 					@Override
 					public IExpr apply(IExpr v) {
 						return F.Standardize(v);
 					}
-				}));
+				});
+				return temp.ifPresent(new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return F.Transpose(x);
+					}
+				});
 			}
 
 			IExpr sd = F.StandardDeviation.of(engine, arg1);
@@ -5375,7 +5458,7 @@ public class StatisticsFunctions {
 		public IExpr cdf(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.TDistribution(n.evalDouble()) //
@@ -5408,7 +5491,7 @@ public class StatisticsFunctions {
 		public IExpr inverseCDF(IAST dist, IExpr k, EvalEngine engine) {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.TDistribution(n.evalDouble()) //
@@ -5451,7 +5534,7 @@ public class StatisticsFunctions {
 			if (dist.isAST1()) {
 				IExpr n = dist.arg1();
 				//
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.TDistribution(n.evalDouble()) //
@@ -5657,7 +5740,7 @@ public class StatisticsFunctions {
 			if (minMax != null) {
 				IExpr a = minMax[0];
 				IExpr b = minMax[1];
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.UniformRealDistribution(a.evalDouble(),
@@ -5684,7 +5767,7 @@ public class StatisticsFunctions {
 			if (minMax != null) {
 				IExpr a = minMax[0];
 				IExpr b = minMax[1];
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(a.isNumericArgument() || b.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.UniformRealDistribution(a.evalDouble(),
@@ -5948,7 +6031,7 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.WeibullDistribution(n.evalDouble(),
@@ -5976,7 +6059,7 @@ public class StatisticsFunctions {
 			if (dist.isAST2()) {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.WeibullDistribution(n.evalDouble(),
@@ -6009,7 +6092,7 @@ public class StatisticsFunctions {
 				IExpr n = dist.arg1();
 				IExpr m = dist.arg2();
 				//
-				if (!engine.isApfloat() && //
+				if (!engine.isArbitraryMode() && //
 						(n.isNumericArgument() || m.isNumericArgument() || k.isNumericArgument())) {
 					try {
 						return F.num(new org.hipparchus.distribution.continuous.WeibullDistribution(n.evalDouble(),

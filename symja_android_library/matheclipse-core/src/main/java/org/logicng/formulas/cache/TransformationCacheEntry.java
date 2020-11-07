@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,7 +30,6 @@ package org.logicng.formulas.cache;
 
 /**
  * The pre-defined transformation cache entries.
- *
  * @version 1.3
  * @since 1.0
  */
@@ -53,7 +52,6 @@ public enum TransformationCacheEntry implements CacheEntry {
 
     /**
      * Constructs a new entry.
-     *
      * @param description the description of this entry
      */
     TransformationCacheEntry(final String description) {

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -62,7 +62,6 @@ import java.util.List;
  * Incremental data for an at-most-k cardinality constraint.  When an at-most-k cardinality constraint is constructed,
  * it is possible to save incremental data with it.  Then one can modify the constraint after it is was created by
  * tightening the original bound.
- *
  * @version 1.1
  * @since 1.1
  */
@@ -78,7 +77,6 @@ public final class CCIncrementalData {
 
     /**
      * Constructs new incremental data for an at-most-k encoder and the given internal data.
-     *
      * @param result     the result
      * @param amkEncoder the at-most-one amkEncoder
      * @param rhs        the current right-hand-side
@@ -86,8 +84,8 @@ public final class CCIncrementalData {
      * @param vector2    the second internal vector
      * @param mod        the modulo value
      */
-    CCIncrementalData(final EncodingResult result, CCConfig.AMK_ENCODER amkEncoder, int rhs,
-                      final LNGVector<? extends Literal> vector1, final LNGVector<? extends Literal> vector2, int mod) {
+    CCIncrementalData(final EncodingResult result, final CCConfig.AMK_ENCODER amkEncoder, final int rhs,
+                      final LNGVector<? extends Literal> vector1, final LNGVector<? extends Literal> vector2, final int mod) {
         this.result = result;
         this.amkEncoder = amkEncoder;
         this.alkEncoder = null;
@@ -95,24 +93,21 @@ public final class CCIncrementalData {
         this.vector1 = vector1;
         this.vector2 = vector2;
         this.mod = mod;
-
     }
 
     /**
      * Constructs new incremental data for an at-most-k encoder and the given internal data.
-     *
      * @param result  the result
      * @param encoder the at-most-one amkEncoder
      * @param rhs     the current right-hand-side
      * @param vector1 the first internal vector
      */
-    CCIncrementalData(final EncodingResult result, CCConfig.AMK_ENCODER encoder, int rhs, final LNGVector<? extends Literal> vector1) {
+    CCIncrementalData(final EncodingResult result, final CCConfig.AMK_ENCODER encoder, final int rhs, final LNGVector<? extends Literal> vector1) {
         this(result, encoder, rhs, vector1, null, -1);
     }
 
     /**
      * Constructs new incremental data for an at-least-k encoder and the given internal data.
-     *
      * @param result     the result
      * @param alkEncoder the at-least-one amkEncoder
      * @param rhs        the current right-hand-side
@@ -121,8 +116,8 @@ public final class CCIncrementalData {
      * @param vector2    the second internal vector
      * @param mod        the modulo value
      */
-    CCIncrementalData(final EncodingResult result, CCConfig.ALK_ENCODER alkEncoder, int rhs, int nVars,
-                      final LNGVector<? extends Literal> vector1, final LNGVector<? extends Literal> vector2, int mod) {
+    CCIncrementalData(final EncodingResult result, final CCConfig.ALK_ENCODER alkEncoder, final int rhs, final int nVars,
+                      final LNGVector<? extends Literal> vector1, final LNGVector<? extends Literal> vector2, final int mod) {
         this.result = result;
         this.alkEncoder = alkEncoder;
         this.amkEncoder = null;
@@ -136,24 +131,22 @@ public final class CCIncrementalData {
 
     /**
      * Constructs new incremental data for an at-least-k encoder and the given internal data.
-     *
      * @param result     the result
      * @param alkEncoder the at-most-one amkEncoder
      * @param rhs        the current right-hand-side
      * @param nVars      the number of variables
      * @param vector1    the first internal vector
      */
-    CCIncrementalData(final EncodingResult result, CCConfig.ALK_ENCODER alkEncoder, int rhs, int nVars, final LNGVector<? extends Literal> vector1) {
+    CCIncrementalData(final EncodingResult result, final CCConfig.ALK_ENCODER alkEncoder, final int rhs, final int nVars, final LNGVector<? extends Literal> vector1) {
         this(result, alkEncoder, rhs, nVars, vector1, null, -1);
     }
 
     /**
      * Tightens the upper bound of an at-most-k constraint and returns the resulting formula.
-     *
      * @param rhs the new upperBound
      * @return the incremental encoding of the new upper bound
      */
-    public List<Formula> newUpperBound(int rhs) {
+    public List<Formula> newUpperBound(final int rhs) {
         this.result.reset();
         this.computeUBConstraint(this.result, rhs);
         return this.result.result();
@@ -165,47 +158,54 @@ public final class CCIncrementalData {
      * Usage constraints:
      * -New right hand side must be smaller than current right hand side.
      * -Cannot be used for at-least-k constraints.
-     *
      * @param rhs the new upperBound
      */
-    public void newUpperBoundForSolver(int rhs) {
+    public void newUpperBoundForSolver(final int rhs) {
         this.computeUBConstraint(this.result, rhs);
     }
 
-    private void computeUBConstraint(final EncodingResult result, int rhs) {
-        if (rhs >= this.currentRHS)
+    private void computeUBConstraint(final EncodingResult result, final int rhs) {
+        if (rhs >= this.currentRHS) {
             throw new IllegalArgumentException("New upper bound " + rhs + " + does not tighten the current bound of " + this.currentRHS);
+        }
         this.currentRHS = rhs;
-        if (this.amkEncoder == null)
+        if (this.amkEncoder == null) {
             throw new IllegalStateException("Cannot encode a new upper bound for an at-most-k constraint");
+        }
         switch (this.amkEncoder) {
             case MODULAR_TOTALIZER:
                 assert this.vector1.size() != 0 || this.vector2.size() != 0;
-                int ulimit = (rhs + 1) / this.mod;
-                int llimit = (rhs + 1) - ulimit * this.mod;
+                final int ulimit = (rhs + 1) / this.mod;
+                final int llimit = (rhs + 1) - ulimit * this.mod;
                 assert ulimit <= this.vector1.size();
                 assert llimit <= this.vector2.size();
-                for (int i = ulimit; i < this.vector1.size(); i++)
+                for (int i = ulimit; i < this.vector1.size(); i++) {
                     result.addClause(this.vector1.get(i).negate());
+                }
                 if (ulimit != 0 && llimit != 0) {
-                    for (int i = llimit - 1; i < this.vector2.size(); i++)
+                    for (int i = llimit - 1; i < this.vector2.size(); i++) {
                         result.addClause(this.vector1.get(ulimit - 1).negate(), this.vector2.get(i).negate());
+                    }
                 } else {
                     if (ulimit == 0) {
                         assert llimit != 0;
-                        for (int i = llimit - 1; i < this.vector2.size(); i++)
+                        for (int i = llimit - 1; i < this.vector2.size(); i++) {
                             result.addClause(this.vector2.get(i).negate());
-                    } else
+                        }
+                    } else {
                         result.addClause(this.vector1.get(ulimit - 1).negate());
+                    }
                 }
                 break;
             case TOTALIZER:
-                for (int i = rhs; i < this.vector1.size(); i++)
+                for (int i = rhs; i < this.vector1.size(); i++) {
                     result.addClause(this.vector1.get(i).negate());
+                }
                 break;
             case CARDINALITY_NETWORK:
-                if (this.vector1.size() > rhs)
+                if (this.vector1.size() > rhs) {
                     result.addClause(this.vector1.get(rhs).negate());
+                }
                 break;
             default:
                 throw new IllegalStateException("Unknown at-most-k encoder: " + this.amkEncoder);
@@ -214,11 +214,10 @@ public final class CCIncrementalData {
 
     /**
      * Tightens the lower bound of an at-least-k constraint and returns the resulting formula.
-     *
      * @param rhs the new upperBound
      * @return the incremental encoding of the new lower bound
      */
-    public List<Formula> newLowerBound(int rhs) {
+    public List<Formula> newLowerBound(final int rhs) {
         this.result.reset();
         this.computeLBConstraint(this.result, rhs);
         return this.result.result();
@@ -230,49 +229,56 @@ public final class CCIncrementalData {
      * Usage constraints:
      * -New right hand side must be greater than current right hand side.
      * -Cannot be used for at-most-k constraints.
-     *
      * @param rhs the new upperBound
      */
-    public void newLowerBoundForSolver(int rhs) {
+    public void newLowerBoundForSolver(final int rhs) {
         this.computeLBConstraint(this.result, rhs);
     }
 
-    private void computeLBConstraint(final EncodingResult result, int rhs) {
-        if (rhs <= this.currentRHS)
+    private void computeLBConstraint(final EncodingResult result, final int rhs) {
+        if (rhs <= this.currentRHS) {
             throw new IllegalArgumentException("New lower bound " + rhs + " + does not tighten the current bound of " + this.currentRHS);
+        }
         this.currentRHS = rhs;
-        if (this.alkEncoder == null)
+        if (this.alkEncoder == null) {
             throw new IllegalStateException("Cannot encode a new lower bound for an at-least-k constraint");
+        }
         switch (this.alkEncoder) {
             case TOTALIZER:
-                for (int i = 0; i < rhs; i++)
+                for (int i = 0; i < rhs; i++) {
                     result.addClause(this.vector1.get(i));
+                }
                 break;
             case MODULAR_TOTALIZER:
                 int newRHS = this.nVars - rhs;
                 assert this.vector1.size() != 0 || this.vector2.size() != 0;
-                int ulimit = (newRHS + 1) / this.mod;
-                int llimit = (newRHS + 1) - ulimit * this.mod;
+                final int ulimit = (newRHS + 1) / this.mod;
+                final int llimit = (newRHS + 1) - ulimit * this.mod;
                 assert ulimit <= this.vector1.size();
                 assert llimit <= this.vector2.size();
-                for (int i = ulimit; i < this.vector1.size(); i++)
+                for (int i = ulimit; i < this.vector1.size(); i++) {
                     result.addClause(this.vector1.get(i).negate());
+                }
                 if (ulimit != 0 && llimit != 0) {
-                    for (int i = llimit - 1; i < this.vector2.size(); i++)
+                    for (int i = llimit - 1; i < this.vector2.size(); i++) {
                         result.addClause(this.vector1.get(ulimit - 1).negate(), this.vector2.get(i).negate());
+                    }
                 } else {
                     if (ulimit == 0) {
                         assert llimit != 0;
-                        for (int i = llimit - 1; i < this.vector2.size(); i++)
+                        for (int i = llimit - 1; i < this.vector2.size(); i++) {
                             result.addClause(this.vector2.get(i).negate());
-                    } else
+                        }
+                    } else {
                         result.addClause(this.vector1.get(ulimit - 1).negate());
+                    }
                 }
                 break;
             case CARDINALITY_NETWORK:
                 newRHS = this.nVars - rhs;
-                if (this.vector1.size() > newRHS)
+                if (this.vector1.size() > newRHS) {
                     result.addClause(this.vector1.get(newRHS).negate());
+                }
                 break;
             default:
                 throw new IllegalStateException("Unknown at-least-k encoder: " + this.alkEncoder);
@@ -281,7 +287,6 @@ public final class CCIncrementalData {
 
     /**
      * Returns the current right hand side of this CCIncrementalData.
-     *
      * @return the current right hand side of this CCIncrementalData.
      */
     public int currentRHS() {

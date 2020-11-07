@@ -21,6 +21,7 @@ import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.exception.PolynomialDegreeLimitExceeded;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -171,7 +172,7 @@ public final class NumberTheory {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			try {
-			IExpr arg1 = ast.arg1();
+				IExpr arg1 = ast.arg1();
 				int n = arg1.toIntDefault(Integer.MIN_VALUE);
 				if (n < 0) {
 					if (arg1.isNumber()) {
@@ -192,25 +193,25 @@ public final class NumberTheory {
 					if (n > 1) {
 						if (z.isZero()) {
 							return F.C0;
-				}
+						}
 						if (n > Config.MAX_POLYNOMIAL_DEGREE) {
 							PolynomialDegreeLimitExceeded.throwIt(n);
 						}
 						if (!z.isOne()) {
-					// bell polynomials: Sum(StirlingS2(n, k)* z^k, {k, 0, n})
-					return bellBPolynomial(n, z);
-				}
+							// bell polynomials: Sum(StirlingS2(n, k)* z^k, {k, 0, n})
+							return bellBPolynomial(n, z);
+						}
 					}
 
 				} else {
-				// bell numbers start here
+					// bell numbers start here
 					if (n == 0) {
-					return F.C1;
-				}
+						return F.C1;
+					}
 					if (n > 0) {
-					IInteger bellB = bellNumber(n);
-					return bellB;
-				}
+						IInteger bellB = bellNumber(n);
+						return bellB;
+					}
 				}
 			} catch (MathRuntimeException mre) {
 				return engine.printMessage(ast.topHead(), mre);

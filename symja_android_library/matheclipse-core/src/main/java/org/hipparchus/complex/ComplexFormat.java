@@ -22,6 +22,11 @@
 
 package org.hipparchus.complex;
 
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+import java.util.Locale;
+
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -29,35 +34,21 @@ import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.util.CompositeFormat;
 import org.hipparchus.util.MathUtils;
 
-import java.text.FieldPosition;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Locale;
-
 /**
  * Formats a Complex number in cartesian format "Re(c) + Im(c)i".  'i' can
  * be replaced with 'j' (or anything else), and the number format for both real
  * and imaginary parts can be configured.
  */
-@SuppressWarnings("PMD.SingleMethodSingleton")
-// the violations have been taken care of as of 1.4, they correspond to deprecated methods
+@SuppressWarnings("PMD.SingleMethodSingleton") // the violations have been taken care of as of 1.4, they correspond to deprecated methods
 public class ComplexFormat {
 
-    /**
-     * The default imaginary character.
-     */
+     /** The default imaginary character. */
     private static final String DEFAULT_IMAGINARY_CHARACTER = "i";
-    /**
-     * The notation used to signify the imaginary part of the complex number.
-     */
+    /** The notation used to signify the imaginary part of the complex number. */
     private final String imaginaryCharacter;
-    /**
-     * The format used for the imaginary part.
-     */
+    /** The format used for the imaginary part. */
     private final NumberFormat imaginaryFormat;
-    /**
-     * The format used for the real part.
-     */
+    /** The format used for the real part. */
     private final NumberFormat realFormat;
 
     /**
@@ -73,7 +64,6 @@ public class ComplexFormat {
     /**
      * Create an instance with a custom number format for both real and
      * imaginary parts.
-     *
      * @param format the custom format for both real and imaginary parts.
      * @throws NullArgumentException if {@code realFormat} is {@code null}.
      */
@@ -87,14 +77,13 @@ public class ComplexFormat {
     /**
      * Create an instance with a custom number format for the real part and a
      * custom number format for the imaginary part.
-     *
-     * @param realFormat      the custom format for the real part.
+     * @param realFormat the custom format for the real part.
      * @param imaginaryFormat the custom format for the imaginary part.
      * @throws NullArgumentException if {@code imaginaryFormat} is {@code null}.
      * @throws NullArgumentException if {@code realFormat} is {@code null}.
-     */
+      */
     public ComplexFormat(NumberFormat realFormat, NumberFormat imaginaryFormat)
-            throws NullArgumentException {
+        throws NullArgumentException {
         MathUtils.checkNotNull(imaginaryFormat, LocalizedCoreFormats.IMAGINARY_FORMAT);
         MathUtils.checkNotNull(realFormat, LocalizedCoreFormats.REAL_FORMAT);
 
@@ -106,32 +95,30 @@ public class ComplexFormat {
     /**
      * Create an instance with a custom imaginary character, and the default
      * number format for both real and imaginary parts.
-     *
      * @param imaginaryCharacter The custom imaginary character.
-     * @throws NullArgumentException        if {@code imaginaryCharacter} is
-     *                                      {@code null}.
+     * @throws NullArgumentException if {@code imaginaryCharacter} is
+     * {@code null}.
      * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
-     *                                      empty string.
+     * empty string.
      */
     public ComplexFormat(String imaginaryCharacter)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
         this(imaginaryCharacter, CompositeFormat.getDefaultNumberFormat());
     }
 
     /**
      * Create an instance with a custom imaginary character, and a custom number
      * format for both real and imaginary parts.
-     *
      * @param imaginaryCharacter The custom imaginary character.
-     * @param format             the custom format for both real and imaginary parts.
-     * @throws NullArgumentException        if {@code imaginaryCharacter} is
-     *                                      {@code null}.
+     * @param format the custom format for both real and imaginary parts.
+     * @throws NullArgumentException if {@code imaginaryCharacter} is
+     * {@code null}.
      * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
-     *                                      empty string.
-     * @throws NullArgumentException        if {@code format} is {@code null}.
+     * empty string.
+     * @throws NullArgumentException if {@code format} is {@code null}.
      */
     public ComplexFormat(String imaginaryCharacter, NumberFormat format)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
         this(imaginaryCharacter, format, format);
     }
 
@@ -141,19 +128,19 @@ public class ComplexFormat {
      * part.
      *
      * @param imaginaryCharacter The custom imaginary character.
-     * @param realFormat         the custom format for the real part.
-     * @param imaginaryFormat    the custom format for the imaginary part.
-     * @throws NullArgumentException        if {@code imaginaryCharacter} is
-     *                                      {@code null}.
+     * @param realFormat the custom format for the real part.
+     * @param imaginaryFormat the custom format for the imaginary part.
+     * @throws NullArgumentException if {@code imaginaryCharacter} is
+     * {@code null}.
      * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
-     *                                      empty string.
-     * @throws NullArgumentException        if {@code imaginaryFormat} is {@code null}.
-     * @throws NullArgumentException        if {@code realFormat} is {@code null}.
+     * empty string.
+     * @throws NullArgumentException if {@code imaginaryFormat} is {@code null}.
+     * @throws NullArgumentException if {@code realFormat} is {@code null}.
      */
     public ComplexFormat(String imaginaryCharacter,
                          NumberFormat realFormat,
                          NumberFormat imaginaryFormat)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
         if (imaginaryCharacter == null) {
             throw new NullArgumentException();
         }
@@ -171,7 +158,6 @@ public class ComplexFormat {
     /**
      * Get the set of locales for which complex formats are available.
      * <p>This is the same set as the {@link NumberFormat} set.</p>
-     *
      * @return available complex format locales.
      */
     public static Locale[] getAvailableLocales() {
@@ -179,88 +165,7 @@ public class ComplexFormat {
     }
 
     /**
-     * Returns the default complex format for the current locale.
-     *
-     * @return the default complex format.
-     * @since 1.4
-     */
-    public static ComplexFormat getComplexFormat() {
-        return getComplexFormat(Locale.getDefault());
-    }
-
-    /**
-     * Returns the default complex format for the current locale.
-     *
-     * @return the default complex format.
-     * @deprecated as of 1.4, replaced by {@link #getComplexFormat()}
-     */
-    @Deprecated
-    public static ComplexFormat getInstance() {
-        return getComplexFormat();
-    }
-
-    /**
-     * Returns the default complex format for the given locale.
-     *
-     * @param locale the specific locale used by the format.
-     * @return the complex format specific to the given locale.
-     * @since 1.4
-     */
-    public static ComplexFormat getComplexFormat(Locale locale) {
-        NumberFormat f = CompositeFormat.getDefaultNumberFormat(locale);
-        return new ComplexFormat(f);
-    }
-
-    /**
-     * Returns the default complex format for the given locale.
-     *
-     * @param locale the specific locale used by the format.
-     * @return the complex format specific to the given locale.
-     * @deprecated as of 1.4, replaced by {@link #getComplexFormat(Locale)}
-     */
-    @Deprecated
-    public static ComplexFormat getInstance(Locale locale) {
-        return getComplexFormat(locale);
-    }
-
-    /**
-     * Returns the default complex format for the given locale.
-     *
-     * @param locale             the specific locale used by the format.
-     * @param imaginaryCharacter Imaginary character.
-     * @return the complex format specific to the given locale.
-     * @throws NullArgumentException        if {@code imaginaryCharacter} is
-     *                                      {@code null}.
-     * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
-     *                                      empty string.
-     * @since 1.4
-     */
-    public static ComplexFormat getComplexFormat(String imaginaryCharacter, Locale locale)
-            throws MathIllegalArgumentException, NullArgumentException {
-        NumberFormat f = CompositeFormat.getDefaultNumberFormat(locale);
-        return new ComplexFormat(imaginaryCharacter, f);
-    }
-
-    /**
-     * Returns the default complex format for the given locale.
-     *
-     * @param locale             the specific locale used by the format.
-     * @param imaginaryCharacter Imaginary character.
-     * @return the complex format specific to the given locale.
-     * @throws NullArgumentException        if {@code imaginaryCharacter} is
-     *                                      {@code null}.
-     * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
-     *                                      empty string.
-     * @deprecated as of 1.4, replaced by {@link #getComplexFormat(String, Locale)}
-     */
-    @Deprecated
-    public static ComplexFormat getInstance(String imaginaryCharacter, Locale locale)
-            throws MathIllegalArgumentException, NullArgumentException {
-        return getComplexFormat(imaginaryCharacter, locale);
-    }
-
-    /**
-     * This method calls {@link #format(Object, StringBuffer, FieldPosition)}.
+     * This method calls {@link #format(Object,StringBuffer,FieldPosition)}.
      *
      * @param c Complex object to format.
      * @return A formatted number in the form "Re(c) + Im(c)i".
@@ -270,7 +175,7 @@ public class ComplexFormat {
     }
 
     /**
-     * This method calls {@link #format(Object, StringBuffer, FieldPosition)}.
+     * This method calls {@link #format(Object,StringBuffer,FieldPosition)}.
      *
      * @param c Double object to format.
      * @return A formatted number.
@@ -282,10 +187,10 @@ public class ComplexFormat {
     /**
      * Formats a {@link Complex} object to produce a string.
      *
-     * @param complex    the object to format.
+     * @param complex the object to format.
      * @param toAppendTo where the text is to be appended
-     * @param pos        On input: an alignment field, if desired. On output: the
-     *                   offsets of the alignment field
+     * @param pos On input: an alignment field, if desired. On output: the
+     *            offsets of the alignment field
      * @return the value passed in as toAppendTo.
      */
     public StringBuffer format(Complex complex, StringBuffer toAppendTo,
@@ -318,10 +223,10 @@ public class ComplexFormat {
     /**
      * Format the absolute value of the imaginary part.
      *
-     * @param absIm      Absolute value of the imaginary part of a complex number.
+     * @param absIm Absolute value of the imaginary part of a complex number.
      * @param toAppendTo where the text is to be appended.
-     * @param pos        On input: an alignment field, if desired. On output: the
-     *                   offsets of the alignment field.
+     * @param pos On input: an alignment field, if desired. On output: the
+     * offsets of the alignment field.
      * @return the value passed in as toAppendTo.
      */
     private StringBuffer formatImaginary(double absIm,
@@ -344,28 +249,28 @@ public class ComplexFormat {
      * {@link Complex} object or a {@link Number} object.  Any other type of
      * object will result in an {@link IllegalArgumentException} being thrown.
      *
-     * @param obj        the object to format.
+     * @param obj the object to format.
      * @param toAppendTo where the text is to be appended
-     * @param pos        On input: an alignment field, if desired. On output: the
-     *                   offsets of the alignment field
+     * @param pos On input: an alignment field, if desired. On output: the
+     *            offsets of the alignment field
      * @return the value passed in as toAppendTo.
+     * @see java.text.Format#format(Object, StringBuffer, FieldPosition)
      * @throws MathIllegalArgumentException is {@code obj} is not a valid type.
-     * @see java.text.Format#format(java.lang.Object, java.lang.StringBuffer, java.text.FieldPosition)
      */
     public StringBuffer format(Object obj, StringBuffer toAppendTo,
                                FieldPosition pos)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         StringBuffer ret = null;
 
         if (obj instanceof Complex) {
-            ret = format((Complex) obj, toAppendTo, pos);
+            ret = format( (Complex)obj, toAppendTo, pos);
         } else if (obj instanceof Number) {
-            ret = format(new Complex(((Number) obj).doubleValue(), 0.0),
-                    toAppendTo, pos);
+            ret = format(new Complex(((Number)obj).doubleValue(), 0.0),
+                         toAppendTo, pos);
         } else {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.CANNOT_FORMAT_INSTANCE_AS_COMPLEX,
-                    obj.getClass().getName());
+                                                   obj.getClass().getName());
         }
 
         return ret;
@@ -373,7 +278,6 @@ public class ComplexFormat {
 
     /**
      * Access the imaginaryCharacter.
-     *
      * @return the imaginaryCharacter.
      */
     public String getImaginaryCharacter() {
@@ -382,7 +286,6 @@ public class ComplexFormat {
 
     /**
      * Access the imaginaryFormat.
-     *
      * @return the imaginaryFormat.
      */
     public NumberFormat getImaginaryFormat() {
@@ -390,8 +293,82 @@ public class ComplexFormat {
     }
 
     /**
+     * Returns the default complex format for the current locale.
+     * @return the default complex format.
+     * @since 1.4
+     */
+    public static ComplexFormat getComplexFormat() {
+        return getComplexFormat(Locale.getDefault());
+    }
+
+    /**
+     * Returns the default complex format for the current locale.
+     * @return the default complex format.
+     * @deprecated as of 1.4, replaced by {@link #getComplexFormat()}
+     */
+    @Deprecated
+    public static ComplexFormat getInstance() {
+        return getComplexFormat();
+    }
+
+    /**
+     * Returns the default complex format for the given locale.
+     * @param locale the specific locale used by the format.
+     * @return the complex format specific to the given locale.
+     * @since 1.4
+     */
+    public static ComplexFormat getComplexFormat(Locale locale) {
+        NumberFormat f = CompositeFormat.getDefaultNumberFormat(locale);
+        return new ComplexFormat(f);
+    }
+
+    /**
+     * Returns the default complex format for the given locale.
+     * @param locale the specific locale used by the format.
+     * @return the complex format specific to the given locale.
+     * @deprecated as of 1.4, replaced by {@link #getComplexFormat(Locale)}
+     */
+    @Deprecated
+    public static ComplexFormat getInstance(Locale locale) {
+        return getComplexFormat(locale);
+    }
+
+    /**
+     * Returns the default complex format for the given locale.
+     * @param locale the specific locale used by the format.
+     * @param imaginaryCharacter Imaginary character.
+     * @return the complex format specific to the given locale.
+     * @throws NullArgumentException if {@code imaginaryCharacter} is
+     * {@code null}.
+     * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
+     * empty string.
+     * @since 1.4
+     */
+    public static ComplexFormat getComplexFormat(String imaginaryCharacter, Locale locale)
+        throws MathIllegalArgumentException, NullArgumentException {
+        NumberFormat f = CompositeFormat.getDefaultNumberFormat(locale);
+        return new ComplexFormat(imaginaryCharacter, f);
+    }
+
+    /**
+     * Returns the default complex format for the given locale.
+     * @param locale the specific locale used by the format.
+     * @param imaginaryCharacter Imaginary character.
+     * @return the complex format specific to the given locale.
+     * @throws NullArgumentException if {@code imaginaryCharacter} is
+     * {@code null}.
+     * @throws MathIllegalArgumentException if {@code imaginaryCharacter} is an
+     * empty string.
+     * @deprecated as of 1.4, replaced by {@link #getComplexFormat(String, Locale)}
+     */
+    @Deprecated
+    public static ComplexFormat getInstance(String imaginaryCharacter, Locale locale)
+        throws MathIllegalArgumentException, NullArgumentException {
+        return getComplexFormat(imaginaryCharacter, locale);
+    }
+
+    /**
      * Access the realFormat.
-     *
      * @return the realFormat.
      */
     public NumberFormat getRealFormat() {
@@ -404,15 +381,15 @@ public class ComplexFormat {
      * @param source the string to parse.
      * @return the parsed {@link Complex} object.
      * @throws MathIllegalStateException if the beginning of the specified string
-     *                                   cannot be parsed.
+     * cannot be parsed.
      */
     public Complex parse(String source) throws MathIllegalStateException {
         ParsePosition parsePosition = new ParsePosition(0);
         Complex result = parse(source, parsePosition);
         if (parsePosition.getIndex() == 0) {
             throw new MathIllegalStateException(LocalizedCoreFormats.CANNOT_PARSE_AS_TYPE,
-                    source, parsePosition.getErrorIndex(),
-                    Complex.class);
+                                                source, parsePosition.getErrorIndex(),
+                                                Complex.class);
         }
         return result;
     }
@@ -421,7 +398,7 @@ public class ComplexFormat {
      * Parses a string to produce a {@link Complex} object.
      *
      * @param source the string to parse
-     * @param pos    input/ouput parsing parameter.
+     * @param pos input/ouput parsing parameter.
      * @return the parsed {@link Complex} object.
      */
     public Complex parse(String source, ParsePosition pos) {
@@ -444,23 +421,23 @@ public class ComplexFormat {
         char c = CompositeFormat.parseNextCharacter(source, pos);
         int sign = 0;
         switch (c) {
-            case 0:
-                // no sign
-                // return real only complex number
-                return new Complex(re.doubleValue(), 0.0);
-            case '-':
-                sign = -1;
-                break;
-            case '+':
-                sign = 1;
-                break;
-            default:
-                // invalid sign
-                // set index back to initial, error index should be the last
-                // character examined.
-                pos.setIndex(initialIndex);
-                pos.setErrorIndex(startIndex);
-                return null;
+        case 0 :
+            // no sign
+            // return real only complex number
+            return new Complex(re.doubleValue(), 0.0);
+        case '-' :
+            sign = -1;
+            break;
+        case '+' :
+            sign = 1;
+            break;
+        default :
+            // invalid sign
+            // set index back to initial, error index should be the last
+            // character examined.
+            pos.setIndex(initialIndex);
+            pos.setErrorIndex(startIndex);
+            return null;
         }
 
         // parse whitespace

@@ -6,6 +6,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPredicate;
@@ -15,15 +16,15 @@ public class ContainsFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.ContainsAny.setEvaluator(ContainsAny.CONST);
-			F.ContainsAll.setEvaluator(ContainsAll.CONST);
-			F.ContainsExactly.setEvaluator(ContainsExactly.CONST);
-			F.ContainsNone.setEvaluator(ContainsNone.CONST);
-			F.ContainsOnly.setEvaluator(ContainsOnly.CONST);
+			S.ContainsAny.setEvaluator(ContainsAny.CONST);
+			S.ContainsAll.setEvaluator(ContainsAll.CONST);
+			S.ContainsExactly.setEvaluator(ContainsExactly.CONST);
+			S.ContainsNone.setEvaluator(ContainsNone.CONST);
+			S.ContainsOnly.setEvaluator(ContainsOnly.CONST);
 			// seemed to be the same behavior as ContainsXXX functions, if the headers of the lists are identical
-			F.DisjointQ.setEvaluator(new DisjointQ());
-			F.IntersectingQ.setEvaluator(new IntersectingQ());
-			F.SubsetQ.setEvaluator(new SubsetQ());
+			S.DisjointQ.setEvaluator(new DisjointQ());
+			S.IntersectingQ.setEvaluator(new IntersectingQ());
+			S.SubsetQ.setEvaluator(new SubsetQ());
 		}
 
 	}
@@ -75,11 +76,12 @@ public class ContainsFunctions {
 		}
 
 		public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
-			return arg1.isList() && arg2.isList();
+			return arg1.isListOrAssociation() && arg2.isListOrAssociation();
 		}
 		public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest, final EvalEngine engine) {
 			for (int i = 1; i < list1.size(); i++) {
 				final IExpr list1Arg = list1.get(i);
+
 				if (list2.exists(new Predicate<IExpr>() {
 					@Override
 					public boolean test(IExpr x) {
@@ -88,12 +90,6 @@ public class ContainsFunctions {
 				})) {
 						return F.True;
 					}
-				// for (int j = 1; j < list2.size(); j++) {
-				// IExpr list2Arg = list2.get(j);
-				// if (engine.evalTrue(F.binaryAST2(sameTest, list1Arg, list2Arg))) {
-				// return F.True;
-				// }
-				// }
 			}
 			return F.False;
 		}
@@ -184,12 +180,6 @@ public class ContainsFunctions {
 				})) {
 						return F.False;
 					}
-				// for (int j = 1; j < list2.size(); j++) {
-				// IExpr list2Arg = list2.get(j);
-				// if (engine.evalTrue(F.binaryAST2(sameTest, list1Arg, list2Arg))) {
-				// return F.False;
-				// }
-				// }
 			}
 			return F.True;
 		}

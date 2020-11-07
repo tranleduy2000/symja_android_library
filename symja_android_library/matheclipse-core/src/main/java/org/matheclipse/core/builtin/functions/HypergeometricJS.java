@@ -666,7 +666,7 @@ public class HypergeometricJS {
 		return hypergeometricSeries(A, B, x);
 	}
 
-	public static Complex hypergeometricU(Complex a, Complex b, Complex x) {
+	public static Complex hypergeometricU(final Complex a, Complex b, final Complex x) {
 
 		double useAsymptotic = 20;
 

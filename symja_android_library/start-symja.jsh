@@ -7,7 +7,7 @@ import java.util.concurrent.*;
 import com.duy.lambda.*;
 import java.util.prefs.*;
 import java.util.regex.*;
-import java.util.stream.*;
+import com.duy.stream.*;
 import org.matheclipse.core.expression.*;
 import org.matheclipse.core.eval.*;
 import org.matheclipse.core.interfaces.*;

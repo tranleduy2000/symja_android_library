@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -37,23 +37,33 @@ import org.logicng.formulas.NAryOperator;
 import org.logicng.formulas.Not;
 import org.logicng.formulas.PBConstraint;
 
-import java.util.Locale;
-
 /**
  * Super class for a formula string representation.
- *
- * @version 1.3
+ * @version 2.0.0
  * @since 1.0
  */
 public abstract class FormulaStringRepresentation {
 
     /**
      * Returns the string representation of the given formula.
-     *
+     * <p>
+     * In order to add a prefix/suffix or do one-time calculations on the formula it is recommended to overwrite this
+     * method in sub-classes.
      * @param formula the formula
      * @return the string representation of the formula
      */
     public String toString(final Formula formula) {
+        return toInnerString(formula);
+    }
+
+    /**
+     * Returns the string representation of the given formula.
+     * <p>
+     * This method is used for recursive calls in order to format the sub-formulas.
+     * @param formula the formula
+     * @return the string representation of the formula
+     */
+    protected String toInnerString(final Formula formula) {
         switch (formula.type()) {
             case FALSE:
                 return this.falsum();
@@ -74,14 +84,10 @@ public abstract class FormulaStringRepresentation {
             case OR:
                 final NAryOperator nary = (NAryOperator) formula;
                 op = formula.type() == FType.AND ? this.and() : this.or();
-                return this.naryOperator(nary, String.format(Locale.US, "%s", op));
+                return this.naryOperator(nary, String.format("%s", op));
             case PBC:
                 final PBConstraint pbc = (PBConstraint) formula;
-                if (pbc.isTrivialFalse())
-                    return this.falsum();
-                else if (pbc.isTrivialTrue())
-                    return this.verum();
-                return String.format(Locale.US, "%s%s%d", this.pbLhs(pbc.operands(), pbc.coefficients()), this.pbComparator(pbc.comparator()), pbc.rhs());
+                return String.format("%s%s%d", this.pbLhs(pbc.operands(), pbc.coefficients()), this.pbComparator(pbc.comparator()), pbc.rhs());
             default:
                 throw new IllegalArgumentException("Cannot print the unknown formula type " + formula.type());
         }
@@ -89,32 +95,29 @@ public abstract class FormulaStringRepresentation {
 
     /**
      * Returns a bracketed string version of a given formula.
-     *
      * @param formula the formula
      * @return {@code "(" + formula.toString() + ")"}
      */
     protected String bracket(final Formula formula) {
-        return String.format(Locale.US, "%s%s%s", this.lbr(), this.toString(formula), this.rbr());
+        return String.format("%s%s%s", this.lbr(), this.toInnerString(formula), this.rbr());
     }
 
     /**
      * Returns the string representation of a binary operator.
-     *
      * @param operator the binary operator
      * @param opString the operator string
      * @return the string representation
      */
     protected String binaryOperator(final BinaryOperator operator, final String opString) {
         final String leftString = operator.type().precedence() < operator.left().type().precedence()
-                ? this.toString(operator.left()) : this.bracket(operator.left());
+                ? this.toInnerString(operator.left()) : this.bracket(operator.left());
         final String rightString = operator.type().precedence() < operator.right().type().precedence()
-                ? this.toString(operator.right()) : this.bracket(operator.right());
-        return String.format(Locale.US, "%s%s%s", leftString, opString, rightString);
+                ? this.toInnerString(operator.right()) : this.bracket(operator.right());
+        return String.format("%s%s%s", leftString, opString, rightString);
     }
 
     /**
      * Returns the string representation of an n-ary operator.
-     *
      * @param operator the n-ary operator
      * @param opString the operator string
      * @return the string representation
@@ -128,19 +131,18 @@ public abstract class FormulaStringRepresentation {
             if (++count == size) {
                 last = op;
             } else {
-                sb.append(operator.type().precedence() < op.type().precedence() ? this.toString(op) : this.bracket(op));
+                sb.append(operator.type().precedence() < op.type().precedence() ? this.toInnerString(op) : this.bracket(op));
                 sb.append(opString);
             }
         }
         if (last != null) {
-            sb.append(operator.type().precedence() < last.type().precedence() ? this.toString(last) : this.bracket(last));
+            sb.append(operator.type().precedence() < last.type().precedence() ? this.toInnerString(last) : this.bracket(last));
         }
         return sb.toString();
     }
 
     /**
      * Returns the string representation of the left-hand side of a pseudo-Boolean constraint.
-     *
      * @param operands     the literals of the constraint
      * @param coefficients the coefficients of the constraint
      * @return the string representation
@@ -169,56 +171,48 @@ public abstract class FormulaStringRepresentation {
 
     /**
      * Returns the string representation of false.
-     *
      * @return the string representation of false
      */
     protected abstract String falsum();
 
     /**
      * Returns the string representation of true.
-     *
      * @return the string representation of true
      */
     protected abstract String verum();
 
     /**
      * Returns the string representation of not.
-     *
      * @return the string representation of not
      */
     protected abstract String negation();
 
     /**
      * Returns the string representation of an implication.
-     *
      * @return the string representation of an implication
      */
     protected abstract String implication();
 
     /**
      * Returns the string representation of an equivalence.
-     *
      * @return the string representation of an equivalence
      */
     protected abstract String equivalence();
 
     /**
      * Returns the string representation of and.
-     *
      * @return the string representation of and
      */
     protected abstract String and();
 
     /**
      * Returns the string representation of or.
-     *
      * @return the string representation of or
      */
     protected abstract String or();
 
     /**
      * Returns the string representation of a pseudo-Boolean comparator.
-     *
      * @param comparator the pseudo-Boolean comparator
      * @return the string representation of a pseudo-Boolean comparator
      */
@@ -226,28 +220,24 @@ public abstract class FormulaStringRepresentation {
 
     /**
      * Returns the string representation of a pseudo-Boolean multiplication.
-     *
      * @return the string representation of a pseudo-Boolean multiplication
      */
     protected abstract String pbMul();
 
     /**
      * Returns the string representation of a pseudo-Boolean addition.
-     *
      * @return the string representation of a pseudo-Boolean addition
      */
     protected abstract String pbAdd();
 
     /**
      * Returns the string representation of a left bracket.
-     *
      * @return the string representation of a left bracket
      */
     protected abstract String lbr();
 
     /**
      * Returns the string representation of right bracket.
-     *
      * @return the string representation of right bracket
      */
     protected abstract String rbr();

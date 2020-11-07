@@ -157,16 +157,6 @@ public abstract class PreconditionedIterativeLinearSolver
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealVector solveInPlace(final RealLinearOperator a,
-                                   final RealVector b, final RealVector x0) throws
-            MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
-        return solveInPlace(a, null, b, x0);
-    }
-
-    /**
      * Returns an estimate of the solution to the linear system A &middot; x =
      * b.
      *
@@ -214,4 +204,14 @@ public abstract class PreconditionedIterativeLinearSolver
     public abstract RealVector solveInPlace(RealLinearOperator a,
                                             RealLinearOperator m, RealVector b, RealVector x0) throws
             MathIllegalArgumentException, NullArgumentException, MathIllegalStateException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealVector solveInPlace(final RealLinearOperator a,
+                                   final RealVector b, final RealVector x0) throws
+            MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        return solveInPlace(a, null, b, x0);
+    }
 }

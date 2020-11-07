@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -33,6 +33,7 @@ import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
+import org.logicng.handlers.ComputationHandler;
 import org.logicng.handlers.FactorizationHandler;
 
 import java.util.ArrayList;
@@ -40,39 +41,36 @@ import java.util.List;
 
 /**
  * An encoder for conjunctive normal form (CNF).
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
 public class CNFEncoder {
 
-    private final FormulaFactory f;
-    private final CNFConfig config;
-    private final CNFConfig defaultConfig;
+    protected final FormulaFactory f;
+    protected final CNFConfig config;
+    protected final CNFConfig defaultConfig;
 
-    private CNFFactorization factorization;
-    private CNFFactorization advancedFactorization;
-    private BDDCNFTransformation bddCnfTransformation;
-    private TseitinTransformation tseitin;
-    private PlaistedGreenbaumTransformation plaistedGreenbaum;
-    private int currentAtomBoundary;
-    private AdvancedFactorizationHandler factorizationHandler;
+    protected CNFFactorization factorization;
+    protected CNFFactorization advancedFactorization;
+    protected BDDCNFTransformation bddCnfTransformation;
+    protected TseitinTransformation tseitin;
+    protected PlaistedGreenbaumTransformation plaistedGreenbaum;
+    protected int currentAtomBoundary;
+    protected AdvancedFactorizationHandler factorizationHandler;
 
     /**
      * Constructs a new CNF encoder with a given configuration.
-     *
      * @param f      the formula factory
      * @param config the configuration
      */
     public CNFEncoder(final FormulaFactory f, final CNFConfig config) {
         this.f = f;
         this.config = config;
-        this.defaultConfig = new CNFConfig.Builder().build();
+        this.defaultConfig = CNFConfig.builder().build();
     }
 
     /**
      * Constructs a new CNF encoder which uses the configuration of the formula factory.
-     *
      * @param f the formula factory
      */
     public CNFEncoder(final FormulaFactory f) {
@@ -81,15 +79,15 @@ public class CNFEncoder {
 
     /**
      * Encodes a formula to CNF.
-     *
      * @param formula formula
      * @return the CNF encoding of the formula
      */
     public Formula encode(final Formula formula) {
         switch (this.config().algorithm) {
             case FACTORIZATION:
-                if (this.factorization == null)
+                if (this.factorization == null) {
                     this.factorization = new CNFFactorization();
+                }
                 return formula.transform(this.factorization);
             case TSEITIN:
                 if (this.tseitin == null || this.currentAtomBoundary != this.config().atomBoundary) {
@@ -104,15 +102,16 @@ public class CNFEncoder {
                 }
                 return formula.transform(this.plaistedGreenbaum);
             case BDD:
-                if (this.bddCnfTransformation == null)
+                if (this.bddCnfTransformation == null) {
                     this.bddCnfTransformation = new BDDCNFTransformation();
+                }
                 return formula.transform(this.bddCnfTransformation);
             case ADVANCED:
                 if (this.factorizationHandler == null) {
                     this.factorizationHandler = new AdvancedFactorizationHandler();
                     this.advancedFactorization = new CNFFactorization(this.factorizationHandler);
                 }
-                this.factorizationHandler.reset(this.config().distributionBoundary, this.config().createdClauseBoundary);
+                this.factorizationHandler.setBounds(this.config().distributionBoundary, this.config().createdClauseBoundary);
                 return this.advancedEncoding(formula);
             default:
                 throw new IllegalStateException("Unknown CNF encoding algorithm: " + this.config().algorithm);
@@ -121,24 +120,24 @@ public class CNFEncoder {
 
     /**
      * Encodes the given formula to CNF by first trying to use Factorization for the single sub-formulas.  When certain
-     * user-provided boundaries are met, the method is switched to Tseitin or Plaisted & Greenbaum.
-     *
+     * user-provided boundaries are met, the method is switched to Tseitin or Plaisted &amp; Greenbaum.
      * @param formula the formula
      * @return the CNF encoding of the formula
      */
-    private Formula advancedEncoding(final Formula formula) {
+    protected Formula advancedEncoding(final Formula formula) {
         if (formula.type() == FType.AND) {
             final List<Formula> operands = new ArrayList<>(formula.numberOfOperands());
-            for (final Formula op : formula)
+            for (final Formula op : formula) {
                 operands.add(singleAdvancedEncoding(op));
+            }
             return this.f.and(operands);
         }
         return singleAdvancedEncoding(formula);
     }
 
-    private Formula singleAdvancedEncoding(final Formula formula) {
+    protected Formula singleAdvancedEncoding(final Formula formula) {
         Formula result = formula.transform(this.advancedFactorization);
-        if (result == null)
+        if (result == null) {
             switch (this.config().fallbackAlgorithmForAdvancedEncoding) {
                 case TSEITIN:
                     if (this.tseitin == null || this.currentAtomBoundary != this.config().atomBoundary) {
@@ -157,6 +156,7 @@ public class CNFEncoder {
                 default:
                     throw new IllegalStateException("Invalid fallback CNF encoding algorithm: " + this.config().fallbackAlgorithmForAdvancedEncoding);
             }
+        }
         return result;
     }
 
@@ -164,12 +164,12 @@ public class CNFEncoder {
      * Returns the current configuration of this encoder.  If the encoder was constructed with a given configuration, this
      * configuration will always be used.  Otherwise the current configuration of the formula factory is used or - if not
      * present - the default configuration.
-     *
      * @return the current configuration of
      */
     public CNFConfig config() {
-        if (this.config != null)
+        if (this.config != null) {
             return this.config;
+        }
         final Configuration cnfConfig = this.f.configurationFor(ConfigurationType.CNF);
         return cnfConfig != null ? (CNFConfig) cnfConfig : this.defaultConfig;
     }
@@ -182,28 +182,35 @@ public class CNFEncoder {
     /**
      * The factorization handler for the advanced CNF encoding.
      */
-    private static class AdvancedFactorizationHandler implements FactorizationHandler {
+    protected static class AdvancedFactorizationHandler extends ComputationHandler implements FactorizationHandler {
 
-        private int distributionBoundary;
-        private int createdClauseBoundary;
-        private int currentDistributions;
-        private int currentClauses;
+        protected int distributionBoundary;
+        protected int createdClauseBoundary;
+        protected int currentDistributions;
+        protected int currentClauses;
 
-        private void reset(final int distributionBoundary, final int createdClauseBoundary) {
+        protected void setBounds(final int distributionBoundary, final int createdClauseBoundary) {
             this.distributionBoundary = distributionBoundary;
             this.createdClauseBoundary = createdClauseBoundary;
+        }
+
+        @Override
+        public void started() {
+            super.started();
             this.currentDistributions = 0;
             this.currentClauses = 0;
         }
 
         @Override
         public boolean performedDistribution() {
-            return this.distributionBoundary == -1 || ++this.currentDistributions <= this.distributionBoundary;
+            this.aborted = this.distributionBoundary != -1 && ++this.currentDistributions > this.distributionBoundary;
+            return !this.aborted;
         }
 
         @Override
         public boolean createdClause(final Formula clause) {
-            return this.createdClauseBoundary == -1 || ++this.currentClauses <= this.createdClauseBoundary;
+            this.aborted = this.createdClauseBoundary != -1 && ++this.currentClauses > this.createdClauseBoundary;
+            return !this.aborted;
         }
     }
 }

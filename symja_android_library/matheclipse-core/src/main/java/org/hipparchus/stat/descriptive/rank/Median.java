@@ -21,14 +21,14 @@
  */
 package org.hipparchus.stat.descriptive.rank;
 
+import java.io.Serializable;
+
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.AbstractUnivariateStatistic;
 import org.hipparchus.stat.descriptive.rank.Percentile.EstimationType;
 import org.hipparchus.stat.ranking.NaNStrategy;
 import org.hipparchus.util.KthSelector;
-
-import java.io.Serializable;
 
 
 /**
@@ -42,19 +42,13 @@ import java.io.Serializable;
  */
 public class Median extends AbstractUnivariateStatistic implements Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * Fixed quantile.
-     */
+    /** Fixed quantile. */
     private static final double FIXED_QUANTILE_50 = 50.0;
 
-    /**
-     * The percentile impl to calculate the median.
-     */
+    /** The percentile impl to calculate the median. */
     private final Percentile percentile;
 
     /**
@@ -69,17 +63,17 @@ public class Median extends AbstractUnivariateStatistic implements Serializable 
      * {@link NaNStrategy} and {@link KthSelector}.
      *
      * @param estimationType one of the percentile {@link EstimationType estimation types}
-     * @param nanStrategy    one of {@link NaNStrategy} to handle with NaNs
-     * @param kthSelector    {@link KthSelector} to use for pivoting during search
+     * @param nanStrategy one of {@link NaNStrategy} to handle with NaNs
+     * @param kthSelector {@link KthSelector} to use for pivoting during search
      * @throws MathIllegalArgumentException if p is not within (0,100]
-     * @throws NullArgumentException        if type or NaNStrategy passed is null
+     * @throws NullArgumentException if type or NaNStrategy passed is null
      */
     private Median(final EstimationType estimationType, final NaNStrategy nanStrategy,
                    final KthSelector kthSelector)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         percentile = new Percentile(FIXED_QUANTILE_50, estimationType,
-                nanStrategy, kthSelector);
+                                    nanStrategy, kthSelector);
     }
 
     /**
@@ -94,18 +88,14 @@ public class Median extends AbstractUnivariateStatistic implements Serializable 
         this.percentile = original.percentile.copy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public double evaluate(double[] values, int begin, int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return percentile.evaluate(values, begin, length);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Median copy() {
         return new Median(this);
@@ -130,13 +120,12 @@ public class Median extends AbstractUnivariateStatistic implements Serializable 
      */
     public Median withEstimationType(final EstimationType newEstimationType) {
         return new Median(newEstimationType,
-                percentile.getNaNStrategy(),
-                percentile.getKthSelector());
+                          percentile.getNaNStrategy(),
+                          percentile.getKthSelector());
     }
 
     /**
      * Get the {@link NaNStrategy NaN Handling} strategy used for computation.
-     *
      * @return {@code NaN Handling} strategy set during construction
      */
     public NaNStrategy getNaNStrategy() {
@@ -153,13 +142,12 @@ public class Median extends AbstractUnivariateStatistic implements Serializable 
      */
     public Median withNaNStrategy(final NaNStrategy newNaNStrategy) {
         return new Median(percentile.getEstimationType(),
-                newNaNStrategy,
-                percentile.getKthSelector());
+                          newNaNStrategy,
+                          percentile.getKthSelector());
     }
 
     /**
      * Get the {@link KthSelector kthSelector} used for computation.
-     *
      * @return the {@code kthSelector} set
      */
     public KthSelector getKthSelector() {
@@ -176,8 +164,8 @@ public class Median extends AbstractUnivariateStatistic implements Serializable 
      */
     public Median withKthSelector(final KthSelector newKthSelector) {
         return new Median(percentile.getEstimationType(),
-                percentile.getNaNStrategy(),
-                newKthSelector);
+                          percentile.getNaNStrategy(),
+                          newKthSelector);
     }
 
 }

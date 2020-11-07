@@ -1,7 +1,6 @@
 package org.matheclipse.core.expression;
 
-import com.duy.annotations.Nonnull;
-
+import org.hipparchus.util.Pair;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -10,7 +9,6 @@ import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMapImpl;
-import org.matheclipse.core.patternmatching.PatternMap;
 import org.matheclipse.parser.client.FEConfig;
 
 import java.io.ObjectStreamException;
@@ -24,12 +22,12 @@ import java.util.List;
  */
 public class Pattern extends Blank {
 
-	public static IPattern valueOf(@Nonnull final ISymbol symbol) {
+	public static IPattern valueOf(final ISymbol symbol) {
 		if (symbol.getContext().equals(Context.DUMMY)) {
-		IPattern value = F.PREDEFINED_PATTERN_MAP.get(symbol.toString());
-		if (value != null) {
-			return value;
-		}
+			IPattern value = F.PREDEFINED_PATTERN_MAP.get(symbol.toString());
+			if (value != null) {
+				return value;
+			}
 		}
 
 		return new Pattern(symbol);
@@ -41,7 +39,7 @@ public class Pattern extends Blank {
 	 * @param check
 	 * @return
 	 */
-	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check) {
+	public static IPattern valueOf(final ISymbol symbol, final IExpr check) {
 		return new Pattern(symbol, check);
 	}
 
@@ -53,7 +51,7 @@ public class Pattern extends Blank {
 	 *            if <code>true</code> use a default value, if matching isn't possible
 	 * @return
 	 */
-	public static IPattern valueOf(@Nonnull final ISymbol symbol, final IExpr check, final boolean def) {
+	public static IPattern valueOf(final ISymbol symbol, final IExpr check, final boolean def) {
 		return new Pattern(symbol, check, def);
 	}
 
@@ -63,27 +61,27 @@ public class Pattern extends Blank {
 	/**
 	 * The associated symbol for this pattern
 	 */
-	final private ISymbol fSymbol;
+	final protected ISymbol fSymbol;
 
 	/** package private */
-	Pattern(@Nonnull final ISymbol symbol) {
+	Pattern(final ISymbol symbol) {
 		this(symbol, null, false);
 	}
 
 	/** package private */
-	Pattern(@Nonnull final ISymbol symbol, IExpr condition) {
+	Pattern(final ISymbol symbol, IExpr condition) {
 		this(symbol, condition, false);
 	}
 
 	/** package private */
-	public Pattern(@Nonnull final ISymbol symbol, IExpr condition, boolean def) {
+	public Pattern(final ISymbol symbol, IExpr condition, boolean def) {
 		super(condition, def);
 		fSymbol = symbol;
 	}
 
 
 	@Override
-	public int[] addPattern(List<IExpr> patternIndexMap) {
+	public int[] addPattern(List<Pair<IExpr, IPatternObject>> patternIndexMap) {
 		IPatternMapImpl.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
 		if (isPatternDefault() || isPatternOptional()) {
@@ -118,6 +116,10 @@ public class Pattern extends Blank {
 		return super.compareTo(expr);
 	}
 
+	@Override
+	public IExpr copy() {
+		return new Pattern(fSymbol, fHeadTest, fDefault);
+	}
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -181,7 +183,7 @@ public class Pattern extends Blank {
 			return expr.equals(value);
 		}
 		return patternMap.setValue(this, expr);
-//		return true;
+		// return true;
 	}
 
 	@Override

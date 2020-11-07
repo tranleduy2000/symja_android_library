@@ -12,7 +12,6 @@ import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.ApcomplexNum;
-import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
@@ -35,12 +34,13 @@ import org.matheclipse.parser.client.operator.ASTNodeFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 import org.matheclipse.parser.client.operator.PostfixOperator;
+import org.matheclipse.parser.client.operator.Precedence;
 import org.matheclipse.parser.client.operator.PrefixOperator;
 
 import java.io.IOException;
 import java.math.BigInteger;
 
-import ch.ethz.idsc.tensor.qty.IQuantity;
+import org.matheclipse.core.tensor.qty.IQuantity;
 
 /**
  * Converts an internal <code>IExpr</code> into a user readable string.
@@ -127,11 +127,11 @@ public abstract class DoubleFormFactory {
 
 	protected void convertDoubleString(final StringBuilder buf, final String d, final int precedence,
 			final boolean isNegative) {
-		if (isNegative && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
+		if (isNegative && (Precedence.PLUS < precedence)) {
 			append(buf, "(");
 		}
 		append(buf, d);
-		if (isNegative && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
+		if (isNegative && (Precedence.PLUS < precedence)) {
 			append(buf, ")");
 		}
 	}
@@ -142,7 +142,7 @@ public abstract class DoubleFormFactory {
 			convertApcomplex(buf, ((ApcomplexNum) dc).apcomplexValue(), precedence, caller);
 			return;
 		}
-		if (ASTNodeFactory.PLUS_PRECEDENCE < precedence) {
+		if (Precedence.PLUS < precedence) {
 			if (caller == PLUS_CALL) {
 				append(buf, "+");
 				caller = false;
@@ -154,15 +154,15 @@ public abstract class DoubleFormFactory {
 		boolean realZero = F.isZero(realPart);
 		boolean imaginaryZero = F.isZero(imaginaryPart);
 		if (realZero && imaginaryZero) {
-			convertDoubleString(buf, convertDoubleToFormattedString(0.0), ASTNodeFactory.PLUS_PRECEDENCE, false);
+			convertDoubleString(buf, convertDoubleToFormattedString(0.0), Precedence.PLUS, false);
 		} else {
 			if (!realZero) {
 				append(buf, convertDoubleToFormattedString(realPart));
 				if (!imaginaryZero) {
 					append(buf, "+I*");
 					final boolean isNegative = imaginaryPart < 0;
-					convertDoubleString(buf, convertDoubleToFormattedString(imaginaryPart),
-							ASTNodeFactory.TIMES_PRECEDENCE, isNegative);
+					convertDoubleString(buf, convertDoubleToFormattedString(imaginaryPart), Precedence.TIMES,
+							isNegative);
 				}
 			} else {
 				if (caller == PLUS_CALL) {
@@ -171,17 +171,16 @@ public abstract class DoubleFormFactory {
 				}
 				append(buf, "I*");
 				final boolean isNegative = imaginaryPart < 0;
-				convertDoubleString(buf, convertDoubleToFormattedString(imaginaryPart), ASTNodeFactory.TIMES_PRECEDENCE,
-						isNegative);
+				convertDoubleString(buf, convertDoubleToFormattedString(imaginaryPart), Precedence.TIMES, isNegative);
 			}
 		}
-		if (ASTNodeFactory.PLUS_PRECEDENCE < precedence) {
+		if (Precedence.PLUS < precedence) {
 			append(buf, ")");
 		}
 	}
 
 	public void convertApcomplex(final StringBuilder buf, final Apcomplex dc, final int precedence, boolean caller) {
-		if (ASTNodeFactory.PLUS_PRECEDENCE < precedence) {
+		if (Precedence.PLUS < precedence) {
 			if (caller == PLUS_CALL) {
 				append(buf, "+");
 				caller = false;
@@ -193,15 +192,14 @@ public abstract class DoubleFormFactory {
 		boolean realZero = realPart.equals(Apcomplex.ZERO);
 		boolean imaginaryZero = imaginaryPart.equals(Apcomplex.ZERO);
 		if (realZero && imaginaryZero) {
-			convertDoubleString(buf, "0.0", ASTNodeFactory.PLUS_PRECEDENCE, false);
+			convertDoubleString(buf, "0.0", Precedence.PLUS, false);
 		} else {
 			if (!realZero) {
 				append(buf, convertApfloat(realPart));
 				if (!imaginaryZero) {
 					append(buf, "+I*");
 					final boolean isNegative = imaginaryPart.compareTo(Apcomplex.ZERO) < 0;
-					convertDoubleString(buf, convertApfloat(imaginaryPart), ASTNodeFactory.TIMES_PRECEDENCE,
-							isNegative);
+					convertDoubleString(buf, convertApfloat(imaginaryPart), Precedence.TIMES, isNegative);
 				}
 			} else {
 				if (caller == PLUS_CALL) {
@@ -210,10 +208,10 @@ public abstract class DoubleFormFactory {
 				}
 				append(buf, "I*");
 				final boolean isNegative = imaginaryPart.compareTo(Apcomplex.ZERO) < 0;
-				convertDoubleString(buf, convertApfloat(imaginaryPart), ASTNodeFactory.TIMES_PRECEDENCE, isNegative);
+				convertDoubleString(buf, convertApfloat(imaginaryPart), Precedence.TIMES, isNegative);
 			}
 		}
-		if (ASTNodeFactory.PLUS_PRECEDENCE < precedence) {
+		if (Precedence.PLUS < precedence) {
 			append(buf, ")");
 		}
 	}
@@ -234,7 +232,7 @@ public abstract class DoubleFormFactory {
 		if (!isNegative && caller == PLUS_CALL) {
 			append(buf, "+");
 		}
-		if (isNegative && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
+		if (isNegative && (Precedence.PLUS < precedence)) {
 			append(buf, "(");
 		}
 		final String str = i.toBigNumerator().toString();
@@ -255,7 +253,7 @@ public abstract class DoubleFormFactory {
 		// } else {
 			append(buf, str);
 		// }
-		if (isNegative && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
+		if (isNegative && (Precedence.PLUS < precedence)) {
 			append(buf, ")");
 		}
 	}
@@ -268,7 +266,7 @@ public abstract class DoubleFormFactory {
 			final int precedence, boolean caller) {
 		boolean isInteger = denominator.compareTo(BigInteger.ONE) == 0;
 		final boolean isNegative = numerator.compareTo(BigInteger.ZERO) < 0;
-		final int prec = isNegative ? ASTNodeFactory.PLUS_PRECEDENCE : ASTNodeFactory.TIMES_PRECEDENCE;
+		final int prec = isNegative ? Precedence.PLUS : Precedence.TIMES;
 		if (!isNegative) {
 			if (caller == PLUS_CALL) {
 				append(buf, "+");
@@ -327,7 +325,7 @@ public abstract class DoubleFormFactory {
 		boolean isReZero = c.getRealPart().isZero();
 		final boolean isImOne = c.getImaginaryPart().isOne();
 		final boolean isImMinusOne = c.getImaginaryPart().isMinusOne();
-		if (!isReZero && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
+		if (!isReZero && (Precedence.PLUS < precedence)) {
 			if (caller == PLUS_CALL) {
 				append(buf, "+");
 				caller = false;
@@ -335,7 +333,7 @@ public abstract class DoubleFormFactory {
 			append(buf, "(");
 		}
 		if (!isReZero) {
-			convertFraction(buf, c.getRealPart(), ASTNodeFactory.PLUS_PRECEDENCE, caller);
+			convertFraction(buf, c.getRealPart(), Precedence.PLUS, caller);
 		}
 		if (isImOne) {
 			if (isReZero) {
@@ -356,20 +354,20 @@ public abstract class DoubleFormFactory {
 			StringBuilder imagBuf = new StringBuilder();
 			try {
 				if (im.isNegative()) {
-					if (isReZero && (ASTNodeFactory.TIMES_PRECEDENCE < precedence)) {
+					if (isReZero && (Precedence.TIMES < precedence)) {
 						append(buf, "(");
 					}
 					append(buf, "-");
 					// oldColumnCounter = fColumnCounter;
 					// fColumnCounter = 0;
 					append(imagBuf, "I*");
-					convertFraction(imagBuf, im.negate(), ASTNodeFactory.TIMES_PRECEDENCE, NO_PLUS_CALL);
+					convertFraction(imagBuf, im.negate(), Precedence.TIMES, NO_PLUS_CALL);
 				} else {
 					if (isReZero) {
 						if (caller == PLUS_CALL) {
 							append(buf, "+");
 						}
-						if (ASTNodeFactory.TIMES_PRECEDENCE < precedence) {
+						if (Precedence.TIMES < precedence) {
 							append(buf, "(");
 						}
 						// oldColumnCounter = fColumnCounter;
@@ -381,7 +379,7 @@ public abstract class DoubleFormFactory {
 						// fColumnCounter = 0;
 						append(imagBuf, "I*");
 					}
-					convertFraction(imagBuf, im, ASTNodeFactory.TIMES_PRECEDENCE, NO_PLUS_CALL);
+					convertFraction(imagBuf, im, Precedence.TIMES, NO_PLUS_CALL);
 				}
 
 			} finally {
@@ -392,12 +390,12 @@ public abstract class DoubleFormFactory {
 			// newLine(buf);
 			// }
 			append(buf, str);
-			if (isReZero && (ASTNodeFactory.TIMES_PRECEDENCE < precedence)) {
+			if (isReZero && (Precedence.TIMES < precedence)) {
 				append(buf, ")");
 			}
 		}
 
-		if (!isReZero && (ASTNodeFactory.PLUS_PRECEDENCE < precedence)) {
+		if (!isReZero && (Precedence.PLUS < precedence)) {
 			append(buf, ")");
 		}
 	}
@@ -491,7 +489,7 @@ public abstract class DoubleFormFactory {
 			final IAST timesAST = (IAST) plusArg;
 			// IExpr arg1 = timesAST.arg1();
 			final InfixOperator TIMES_OPERATOR = (InfixOperator) ASTNodeFactory.MMA_STYLE_FACTORY.get("Times");
-			convertTimesFraction(buf, timesAST, TIMES_OPERATOR, ASTNodeFactory.TIMES_PRECEDENCE, caller);
+			convertTimesFraction(buf, timesAST, TIMES_OPERATOR, Precedence.TIMES, caller);
 		} else {
 			if (plusArg.isNegativeSigned()) {
 				// special case negative number or -Infinity...
@@ -500,7 +498,7 @@ public abstract class DoubleFormFactory {
 				if (caller == PLUS_CALL) {
 					append(buf, "+");
 				}
-				convertInternal(buf, plusArg, ASTNodeFactory.PLUS_PRECEDENCE, false);
+				convertInternal(buf, plusArg, Precedence.PLUS, false);
 			}
 
 		}
@@ -542,7 +540,7 @@ public abstract class DoubleFormFactory {
 					if (i < size) {
 						append(buf, operatorStr);
 					}
-					convertInternal(buf, arg1, ASTNodeFactory.TIMES_PRECEDENCE, false);
+					convertInternal(buf, arg1, Precedence.TIMES, false);
 				}
 
 				IExpr timesArg;
@@ -555,7 +553,7 @@ public abstract class DoubleFormFactory {
 						showOperator = true;
 					}
 
-					convertInternal(buf, timesArg, ASTNodeFactory.TIMES_PRECEDENCE, false);
+					convertInternal(buf, timesArg, Precedence.TIMES, false);
 
 				}
 			} else {
@@ -567,7 +565,7 @@ public abstract class DoubleFormFactory {
 						append(buf, operatorStr);
 					}
 
-					convertInternal(buf, plusArg, ASTNodeFactory.PLUS_PRECEDENCE, false);
+					convertInternal(buf, plusArg, Precedence.PLUS, false);
 
 				}
 			}
@@ -594,37 +592,36 @@ public abstract class DoubleFormFactory {
 			}
 			final IExpr fraction = parts[2];
 			if (fraction != null) {
-				convertNumber(buf, (ISignedNumber) fraction, ASTNodeFactory.PLUS_PRECEDENCE, caller);
+				convertNumber(buf, (ISignedNumber) fraction, Precedence.PLUS, caller);
 				append(buf, "*");
 				caller = NO_PLUS_CALL;
 			}
 			if (numerator.isReal()) {
-				convertNumber(buf, (ISignedNumber) numerator, ASTNodeFactory.PLUS_PRECEDENCE, caller);
+				convertNumber(buf, (ISignedNumber) numerator, Precedence.PLUS, caller);
 			} else if (numerator.isComplex() || numerator.isComplexNumeric()) {
-				convertNumber(buf, (INumber) numerator, ASTNodeFactory.DIVIDE_PRECEDENCE, caller);
+				convertNumber(buf, (INumber) numerator, Precedence.DIVIDE, caller);
 			} else {
 				if (numerator.isTimes() && numerator.isAST2() && numerator.first().isMinusOne()) {
 					append(buf, "-");
-					convertInternal(buf, numerator.second(), ASTNodeFactory.TIMES_PRECEDENCE, false);
+					convertInternal(buf, numerator.second(), Precedence.TIMES, false);
 				} else {
 					if (caller == PLUS_CALL) {
 						append(buf, "+");
 					}
 					// insert numerator in buffer:
 					if (numerator.isTimes()) {
-						convertTimesOperator(buf, (IAST) numerator, oper, ASTNodeFactory.DIVIDE_PRECEDENCE,
-								NO_PLUS_CALL);
+						convertTimesOperator(buf, (IAST) numerator, oper, Precedence.DIVIDE, NO_PLUS_CALL);
 					} else {
-						convertInternal(buf, numerator, ASTNodeFactory.DIVIDE_PRECEDENCE, false);
+						convertInternal(buf, numerator, Precedence.DIVIDE, false);
 					}
 				}
 			}
 			append(buf, "/");
 			// insert denominator in buffer:
 			if (denominator.isTimes()) {
-				convertTimesOperator(buf, (IAST) denominator, oper, ASTNodeFactory.DIVIDE_PRECEDENCE, NO_PLUS_CALL);
+				convertTimesOperator(buf, (IAST) denominator, oper, Precedence.DIVIDE, NO_PLUS_CALL);
 			} else {
-				convertInternal(buf, denominator, ASTNodeFactory.DIVIDE_PRECEDENCE, false);
+				convertInternal(buf, denominator, Precedence.DIVIDE, false);
 			}
 			if (currPrecedence < precedence) {
 				append(buf, ")");
@@ -649,7 +646,7 @@ public abstract class DoubleFormFactory {
 					append(buf, "-");
 					showOperator = false;
 				} else {
-					convertNumber(buf, (ISignedNumber) arg1, ASTNodeFactory.PLUS_PRECEDENCE, caller);
+					convertNumber(buf, (ISignedNumber) arg1, Precedence.PLUS, caller);
 				}
 			} else if (arg1.isComplex() && timesAST.size() > 2) {
 				convertComplex(buf, (IComplex) arg1, oper.getPrecedence(), caller);
@@ -723,21 +720,21 @@ public abstract class DoubleFormFactory {
 				return;
 			}
 			if (exp.complexSign() < 0) {
-				if (ASTNodeFactory.DIVIDE_PRECEDENCE < precedence) {
+				if (Precedence.DIVIDE < precedence) {
 					append(buf, "(");
 				}
 				append(buf, "1/");
 				if (exp.isMinusOne()) {
-					convertInternal(buf, list.arg1(), ASTNodeFactory.DIVIDE_PRECEDENCE, false);
-					if (ASTNodeFactory.DIVIDE_PRECEDENCE < precedence) {
+					convertInternal(buf, list.arg1(), Precedence.DIVIDE, false);
+					if (Precedence.DIVIDE < precedence) {
 						append(buf, ")");
 					}
 					return;
 				}
 				// flip presign of the exponent
 				IAST pow = list.setAtCopy(2, exp.opposite());
-				convertPowerOperator(buf, pow, oper, ASTNodeFactory.DIVIDE_PRECEDENCE);
-				if (ASTNodeFactory.DIVIDE_PRECEDENCE < precedence) {
+				convertPowerOperator(buf, pow, oper, Precedence.DIVIDE);
+				if (Precedence.DIVIDE < precedence) {
 					append(buf, ")");
 				}
 				return;
@@ -756,7 +753,7 @@ public abstract class DoubleFormFactory {
 			if (oper.getGrouping() == InfixOperator.RIGHT_ASSOCIATIVE && list.arg1().head().equals(list.head())) {
 				append(buf, "(");
 			} else {
-				if (oper.getOperatorString() == "^") {
+				if (oper.getOperatorString().equals("^")) {
 					final Operator operator = getOperator(list.arg1().topHead());
 					if (operator instanceof PostfixOperator) {
 						append(buf, "(");
@@ -767,7 +764,7 @@ public abstract class DoubleFormFactory {
 			if (oper.getGrouping() == InfixOperator.RIGHT_ASSOCIATIVE && list.arg1().head().equals(list.head())) {
 				append(buf, ")");
 			} else {
-				if (oper.getOperatorString() == "^") {
+				if (oper.getOperatorString().equals("^")) {
 					final Operator operator = getOperator(list.arg1().topHead());
 					if (operator instanceof PostfixOperator) {
 						append(buf, ")");
@@ -1241,9 +1238,8 @@ public abstract class DoubleFormFactory {
 	 * @throws IOException
 	 */
 	public boolean convertSeriesData(final StringBuilder buf, final ASTSeriesData seriesData, final int precedence) {
-		int operPrecedence = ASTNodeFactory.PLUS_PRECEDENCE;
 		StringBuilder tempBuffer = new StringBuilder();
-		if (operPrecedence < precedence) {
+		if (Precedence.PLUS < precedence) {
 			append(tempBuffer, "(");
 		}
 
@@ -1275,7 +1271,7 @@ public abstract class DoubleFormFactory {
 		} catch (Exception ex) {
 			return false;
 		}
-		if (operPrecedence < precedence) {
+		if (Precedence.PLUS < precedence) {
 			append(tempBuffer, ")");
 		}
 		buf.append(tempBuffer);
@@ -1284,9 +1280,8 @@ public abstract class DoubleFormFactory {
 	}
 
 	public boolean convertQuantityData(final StringBuilder buf, final IQuantity quantity, final int precedence) {
-		int operPrecedence = ASTNodeFactory.PLUS_PRECEDENCE;
 		StringBuilder tempBuffer = new StringBuilder();
-		if (operPrecedence < precedence) {
+		if (Precedence.PLUS < precedence) {
 			append(tempBuffer, "(");
 		}
 
@@ -1295,7 +1290,7 @@ public abstract class DoubleFormFactory {
 		} catch (Exception ex) {
 			return false;
 		}
-		if (operPrecedence < precedence) {
+		if (Precedence.PLUS < precedence) {
 			append(tempBuffer, ")");
 		}
 		buf.append(tempBuffer);

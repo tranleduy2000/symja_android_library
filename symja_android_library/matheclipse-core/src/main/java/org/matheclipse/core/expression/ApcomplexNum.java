@@ -178,7 +178,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public IComplexNum add(final IComplexNum val) {
-		return valueOf(fApcomplex.add(((ApcomplexNum) val).fApcomplex));
+		return valueOf(fApcomplex.add(val.apcomplexNumValue(fApcomplex.precision()).fApcomplex));
 	}
 
 	public ApcomplexNum add(final ApcomplexNum that) {
@@ -187,12 +187,12 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 
 	@Override
 	public IComplexNum multiply(final IComplexNum val) {
-		return valueOf(fApcomplex.multiply(((ApcomplexNum) val).fApcomplex));
+		return valueOf(fApcomplex.multiply(val.apcomplexNumValue(fApcomplex.precision()).fApcomplex));
 	}
 
 	@Override
 	public IComplexNum pow(final IComplexNum val) {
-		return valueOf(ApcomplexMath.pow(fApcomplex, ((ApcomplexNum) val).fApcomplex));
+		return valueOf(ApcomplexMath.pow(fApcomplex, val.apcomplexNumValue(fApcomplex.precision()).fApcomplex));
 	}
 
 	/**
@@ -491,9 +491,9 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 	@Override
 	public int compareTo(final IExpr expr) {
 		if (expr.isNumber()) {
-		if (expr instanceof ApcomplexNum) {
-			return compareTo(((ApcomplexNum) expr).fApcomplex);
-		}
+			if (expr instanceof ApcomplexNum) {
+				return compareTo(((ApcomplexNum) expr).fApcomplex);
+			}
 			Apcomplex apc = ((INumber) expr).apcomplexNumValue(precision()).fApcomplex;
 			return compareTo(apc);
 		}

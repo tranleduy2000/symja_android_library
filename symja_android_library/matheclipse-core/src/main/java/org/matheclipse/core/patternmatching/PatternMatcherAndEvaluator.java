@@ -200,15 +200,15 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 	 * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions
 	 * evaluates to <code>true</code>.
 	 * 
-	 * @return <code>true</code> if the right-hand-sides condition is fulfilled.
+	 * @return <code>true</code> if the right-hand-sides condition is fulfilled or not all patterns are assigned.
 	 */
 	@Override
 	public boolean checkRHSCondition(EvalEngine engine) {
-		IPatternMap patternMap = getPatternMap();
+		IPatternMap patternMap = createPatternMap();
 		if (patternMap.getRHSEvaluated()) {
 			return true;
 		}
-		if (!(fRightHandSide.isModule() || fRightHandSide.isWith() || fRightHandSide.isCondition())) {
+		if (!(fRightHandSide.isCondition() || fRightHandSide.isModule() || fRightHandSide.isWith())) {
 			return true;
 		} else {
 		if (!patternMap.isAllPatternsAssigned()) {
@@ -216,11 +216,9 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 			} else {
 				boolean matched = false;
 				IExpr rhs = patternMap.substituteSymbols(fRightHandSide);
+				engine.pushOptionsStack();
 				try {
-					// if (fLhsPatternExpr.isAST(F.Integrate)) {
-					// System.out.println(" :: " + getLHSPriority()+ " "+fLhsPatternExpr +" -> " +rhs);
-					// }
-					// System.out.println(rhs.toString());
+					engine.setOptionsPattern(fLhsPatternExpr.topHead(), patternMap);
 					fReturnResult = engine.evaluate(rhs);
 					matched = true;
 				} catch (final ConditionException e) {
@@ -228,6 +226,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				} catch (final ReturnException e) {
 					fReturnResult = e.getValue();
 					matched = true;
+				} finally {
+					engine.popOptionsStack();
 				}
 		patternMap.setRHSEvaluated(matched);
 		return matched;
@@ -237,11 +237,11 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr eval(final IExpr leftHandSide, @Nonnull EvalEngine engine) {
+	public IExpr eval(final IExpr leftHandSide, EvalEngine engine) {
 		return replace(leftHandSide, engine, true);
 	}
 
-	public IExpr replace(final IExpr leftHandSide, @Nonnull EvalEngine engine, boolean evaluate) {
+	public IExpr replace(final IExpr leftHandSide, EvalEngine engine, boolean evaluate) {
 		IPatternMap patternMap = null;
 		if (isRuleWithoutPatterns()) {
 			// no patterns found match equally:
@@ -272,7 +272,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 				return F.NIL;
 			}
 		} else {
-			patternMap = getPatternMap();
+			patternMap = createPatternMap();
 			patternMap.initPattern();
 			if (matchExpr(fLhsPatternExpr, leftHandSide, engine, new StackMatcher(engine))) {
 
@@ -288,12 +288,11 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 					return fReturnResult;
 				}
 				IExpr result = patternMap.substituteSymbols(fRightHandSide);
-				try {
-					// System.out.println(result.toString());
 					if (evaluate) {
-						result = engine.evaluate(result);
-					}
-					return result;
+					engine.pushOptionsStack();
+					try {
+						engine.setOptionsPattern(fLhsPatternExpr.topHead(), patternMap);
+						return engine.evaluate(result);
 				} catch (final ConditionException e) {
 					if (FEConfig.SHOW_STACKTRACE) {
 						logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
@@ -301,8 +300,13 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 					return F.NIL;
 				} catch (final ReturnException e) {
 					return e.getValue();
+					} finally {
+						engine.popOptionsStack();
 				}
 
+				} else {
+					return result;
+				}
 			}
 		}
 
@@ -402,8 +406,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 							if (getRHSleafCountSimplify() > pm.getRHSleafCountSimplify()) {
 								return 1;
 							}
-							return equivalentRHS(fRightHandSide, pm.fRightHandSide, getPatternMap(),
-									pm.getPatternMap());
+							return equivalentRHS(fRightHandSide, pm.fRightHandSide, createPatternMap(),
+									pm.createPatternMap());
 						}
 						return 1;
 					} else if (pm.fRightHandSide.isModuleOrWithCondition() || pm.fRightHandSide.isCondition()) {
@@ -456,7 +460,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 		}
 		if (fLhsPatternExpr != null) {
 			int[] priority = new int[] { IPatternMapImpl.DEFAULT_RULE_PRIORITY };
-			this.fPatternMap = IPatternMapImpl.determinePatterns(fLhsPatternExpr, priority);
+			this.fPatternMap = IPatternMapImpl.determinePatterns(fLhsPatternExpr, priority, null);
 		}
 		initRHSleafCountSimplify();
 	}

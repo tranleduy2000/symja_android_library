@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,7 +30,6 @@ package org.logicng.formulas;
 
 /**
  * Formula types for LogicNG.
- *
  * @version 1.3
  * @since 1.0
  */
@@ -43,14 +42,12 @@ public enum FType {
     NOT((byte) 0x05),
     LITERAL((byte) 0x06),
     TRUE((byte) 0x07),
-    FALSE((byte) 0x08),
-    NONE((byte) 0x42);
+    FALSE((byte) 0x08);
 
     private final byte precedence;
 
     /**
      * Constructs a new formula type with a given precedence and syntax string
-     *
      * @param precedence the precedence
      */
     FType(final byte precedence) {
@@ -59,10 +56,21 @@ public enum FType {
 
     /**
      * Returns the precedence of this formula type.
-     *
      * @return the precedence of this formula type
      */
     public byte precedence() {
         return this.precedence;
+    }
+
+    /**
+     * Returns the dual operator of the given operator, i.e AND for OR and vice versa.
+     * @param type the type (AND or OR)
+     * @return the dual operator
+     */
+    public static FType dual(final FType type) {
+        if (type != AND && type != OR) {
+            throw new IllegalArgumentException("Expected type AND or OR.");
+        }
+        return type == AND ? OR : AND;
     }
 }

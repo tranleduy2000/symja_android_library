@@ -123,7 +123,7 @@ import static com.gx.common.collect.CollectPreconditions.checkNonnegative;
  * <h3>For Java 8 users</h3>
  * <p>
  * <p>If you are using Java 8, this class is now obsolete. Most of its functionality is now provided
- * by {@link java.util.stream.Stream Stream} and by {@link Comparator} itself, and the rest can now
+ * by {@link com.duy.stream.Stream Stream} and by {@link Comparator} itself, and the rest can now
  * be found as static methods in our new {@link Comparators} class. See each method below for
  * further instructions. Whenever possible, you should change any references of type {@code
  * Ordering} to be of type {@code Comparator} instead. However, at this time we have no plan to

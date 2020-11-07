@@ -1,7 +1,9 @@
 package org.matheclipse.core.eval;
 
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
+import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.exception.SymjaMathException;
+import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.expression.ASTSeriesData;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -13,9 +15,10 @@ import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.math.MathException;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import ch.ethz.idsc.tensor.qty.IQuantity;
+import org.matheclipse.core.tensor.qty.IQuantity;
 
 /**
  * <p>
@@ -30,7 +33,7 @@ public final class PlusOp {
 	/**
 	 * Merge IExpr keys by adding their values into this map.
 	 */
-	private final Map<IExpr, IExpr> plusMap;
+	private Map<IExpr, IExpr> plusMap;
 
 	/**
 	 * <code>true</code> if plus was really evaluated
@@ -42,18 +45,26 @@ public final class PlusOp {
 	 */
 	private IExpr numberValue;
 
+	private final int capacity;
     /**
      * Constructor.
      *
-	 * @param size
+	 * @param capacity
 	 *            the approximated size of the resulting <code>Plus()</code> AST.
      */
-    public PlusOp(final int size) {
-        plusMap = new HashMap<IExpr, IExpr>(size + 5 + size / 10);
-        evaled = false;
-		numberValue = F.NIL;
+	public PlusOp(final int capacity) {
+		this.capacity = capacity;
+		this.plusMap = null; // new HashMap<IExpr, IExpr>(size + 5 + size / 10);
+		this.evaled = false;
+		this.numberValue = F.NIL;
     }
 
+	private Map<IExpr, IExpr> getMap() {
+		if (plusMap == null) {
+			plusMap = new HashMap<IExpr, IExpr>(capacity + 5 + capacity / 10);
+		}
+		return plusMap;
+	}
 
     /**
      * Add or merge the <code>key, value</code> pair into the given <code>plusMap</code>.
@@ -64,16 +75,17 @@ public final class PlusOp {
 	 *            the value expression
      */
     private boolean addMerge(final IExpr key, final IExpr value) {
-        IExpr temp = plusMap.get(key);
+		final Map<IExpr, IExpr> map = getMap();
+		IExpr temp = map.get(key);
         if (temp == null) {
-            plusMap.put(key, value);
+			map.put(key, value);
             return false;
         }
         // merge both values
         if (temp.isNumber() && value.isNumber()) {
             temp = temp.plus(value);
             if (temp.isZero()) {
-                plusMap.remove(key);
+				map.remove(key);
                 return true;
             }
         } else if (temp.head().equals(F.Plus)) {
@@ -84,7 +96,7 @@ public final class PlusOp {
         } else {
             temp = F.Plus(temp, value);
         }
-        plusMap.put(key, temp);
+		map.put(key, temp);
         return true;
     }
 
@@ -96,6 +108,12 @@ public final class PlusOp {
      */
     public IExpr getSum() {
 
+		if (plusMap == null) {
+			if (numberValue.isPresent() && !numberValue.isZero()) {
+				return numberValue;
+			}
+			return F.C0;
+		}
 		IASTAppendable result = F.PlusAlloc(plusMap.size() + 1);
 		if (numberValue.isPresent() && !numberValue.isZero()) {
             if (numberValue.isComplexInfinity()) {
@@ -115,7 +133,6 @@ public final class PlusOp {
             }
 			result.append(F.Times(element.getValue(), temp));
         }
-        // result.addEvalFlags(IAST.IS_EVALED);
         return result.oneIdentity0();
     }
 
@@ -228,6 +245,19 @@ public final class PlusOp {
 					return F.NIL;
 				}
 				return F.NIL;
+			} else if (arg.isQuantity()) {
+				// if (arg.isQuantity()) {
+				if (!numberValue.isPresent()) {
+					numberValue = arg;
+					return F.NIL;
+				}
+				IQuantity q = (IQuantity) arg;
+				numberValue = q.plus(numberValue);
+				if (numberValue.isPresent()) {
+					evaled = true;
+				}
+				return F.NIL;
+				// }
             } else if (arg.isAST()) {
                 final IAST ast = (IAST) arg;
                 final int headID = ((IAST) arg).headID();
@@ -238,10 +268,21 @@ public final class PlusOp {
 							if (!numberValue.isPresent()) {
                                     numberValue = arg;
                                     if (arg.isComplexInfinity()) {
-                                        if (plusMap.size() > 0) {
+									if (plusMap != null && plusMap.size() > 0) {
+										evaled = true;
+									}
+								} else {
+									if (plusMap != null) {
+										Iterator<Map.Entry<IExpr, IExpr>> iterator = plusMap.entrySet().iterator();
+										while (iterator.hasNext()) {
+											Map.Entry<IExpr, IExpr> entry = iterator.next();
+											if (entry.getKey().isRealResult()) {
+												iterator.remove();
                                             evaled = true;
                                         }
                                     }
+									}
+								}
                                     return F.NIL;
                                 }
                                 if (arg.isInfinity()) {
@@ -306,20 +347,20 @@ public final class PlusOp {
                                 return F.NIL;
                             }
                             break;
-                        case ID.Quantity:
-                            if (arg.isQuantity()) {
-							if (!numberValue.isPresent()) {
-                                    numberValue = arg;
-                                    return F.NIL;
-                                }
-                                IQuantity q = (IQuantity) arg;
-                                numberValue = q.plus(numberValue);
-                                if (numberValue.isPresent()) {
-                                    evaled = true;
-                                }
-                                return F.NIL;
-                            }
-                            break;
+					// case ID.Quantity:
+					// if (arg.isQuantity()) {
+					// if (!numberValue.isPresent()) {
+					// numberValue = arg;
+					// return F.NIL;
+					// }
+					// IQuantity q = (IQuantity) arg;
+					// numberValue = q.plus(numberValue);
+					// if (numberValue.isPresent()) {
+					// evaled = true;
+					// }
+					// return F.NIL;
+					// }
+					// break;
                         case ID.SeriesData:
                             if (arg instanceof ASTSeriesData) {
 							if (!numberValue.isPresent()) {
@@ -333,13 +374,26 @@ public final class PlusOp {
                             break;
                     }
                 }
+				// } else if (!numberValue.isPresent() && arg.isRealResult()) {
+				// numberValue = arg;
+				// return F.NIL;
             }
             if (addMerge(arg, F.C1)) {
                 evaled = true;
         }
-		} catch (MathException mex) {
+		} catch (ValidateException ve) {
 			if (FEConfig.SHOW_STACKTRACE) {
-				mex.printStackTrace();
+				ve.printStackTrace();
+			}
+			throw ve;
+		} catch (LimitException le) {
+			if (FEConfig.SHOW_STACKTRACE) {
+				le.printStackTrace();
+			}
+			throw le;
+		} catch (SymjaMathException sme) {
+			if (FEConfig.SHOW_STACKTRACE) {
+				sme.printStackTrace();
 			}
 		}
         return F.NIL;

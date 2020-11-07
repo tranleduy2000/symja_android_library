@@ -3,8 +3,10 @@ package org.matheclipse.core.builtin;
 import com.duy.util.Base64;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeStopException;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.expression.data.ByteArrayExpr;
 import org.matheclipse.core.interfaces.IAST;
@@ -22,9 +24,9 @@ public class WXFFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.BinarySerialize.setEvaluator(new BinarySerialize());
-			F.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
-			F.ByteArray.setEvaluator(new ByteArray());
+			S.BinarySerialize.setEvaluator(new BinarySerialize());
+			S.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
+			S.ByteArray.setEvaluator(new ByteArray());
 		}
 	}
 
@@ -48,22 +50,30 @@ public class WXFFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST1()) {
-				try {
-					IExpr arg1 = engine.evaluate(ast.arg1());
-					if (arg1.isList()) {
-						byte[] bArray = WL.toByteArray((IAST) arg1);
-						return ByteArrayExpr.newInstance(bArray);
-					} else if (arg1.isString()) {
+				// try {
+				IExpr arg1 = engine.evaluate(ast.arg1());
+				if (arg1.isList()) {
+					byte[] bArray = WL.toByteArray((IAST) arg1);
+					if (bArray == null) {
+						// The argument at position `1` in `2` should be a vector of unsigned byte values or a Base64
+						// encoded string.
+						String message = IOFunctions.getMessage("lend", F.List(F.C1, ast));
+						throw new ArgumentTypeStopException(message);
+					}
+					return ByteArrayExpr.newInstance(bArray);
+				} else if (arg1.isString()) {
+					try {
 						byte[] bArray = Base64.decode(arg1.toString(), Base64.NO_WRAP);
 						return ByteArrayExpr.newInstance(bArray);
+					} catch (IllegalArgumentException iae) {
+						//
 					}
 
-					return engine.printMessage("ByteArray: list of byte values expected");
-				} catch (RuntimeException cce) {
-					if (FEConfig.SHOW_STACKTRACE) {
-						cce.printStackTrace();
-					}
 				}
+				// The argument at position `1` in `2` should be a vector of unsigned byte values or a Base64 encoded
+				// string.
+				String message = IOFunctions.getMessage("lend", F.List(F.C1, ast));
+				throw new ArgumentTypeStopException(message);
 			}
 			return F.NIL;
 		}
@@ -76,15 +86,11 @@ public class WXFFunctions {
 			if (ast.isAST1()) {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (isByteArray(arg1)) {
-					try {
 						byte[] bArray = (byte[]) ((IDataExpr) arg1).toData();
+					if (bArray.length > 2) {
 						IExpr temp = WL.deserialize(bArray);
 						// System.out.println(temp);
 						return temp;
-					} catch (RuntimeException cce) {
-						if (FEConfig.SHOW_STACKTRACE) {
-							cce.printStackTrace();
-						}
 					}
 				}
 			}

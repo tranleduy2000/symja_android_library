@@ -8,7 +8,7 @@ import org.matheclipse.parser.client.math.MathException;
  * 
  * 
  */
-public abstract class LimitException extends MathException {
+public abstract class LimitException extends SymjaMathException {
 
 	/**
 	 * 
@@ -16,7 +16,7 @@ public abstract class LimitException extends MathException {
 	private static final long serialVersionUID = -8898766046639353179L;
 
 	/**
-	 * Constructs a new FlowControlException with the specified detail <code>message=null</code>,
+	 * Constructs a new exception with the specified detail <code>message=null</code>,
 	 * <code>cause=null</code>, <code>enableSuppression=false</code>, and <code>writableStackTrace=false</code> .
 	 * 
 	 */

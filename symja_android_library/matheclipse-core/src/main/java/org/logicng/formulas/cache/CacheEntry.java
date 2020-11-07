@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,14 +30,12 @@ package org.logicng.formulas.cache;
 
 /**
  * Interface for a cache entry in the formula cache.
- *
  * @version 1.0
  * @since 1.0
  */
 public interface CacheEntry {
     /**
      * Returns the description for this entry.
-     *
      * @return the description for this entry
      */
     String description();

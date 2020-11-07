@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -34,11 +34,10 @@ import org.logicng.formulas.Variable;
 /**
  * Encodes that at most 'rhs' variables are assigned value true.  Uses the cardinality network
  * encoding due to Asín, Nieuwenhuis, Oliveras, and Rodríguez-Carbonell .
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
-final class CCAMKCardinalityNetwork implements CCAtMostK {
+public final class CCAMKCardinalityNetwork implements CCAtMostK {
 
     private final CCCardinalityNetworks cardinalityNetwork;
 
@@ -50,24 +49,23 @@ final class CCAMKCardinalityNetwork implements CCAtMostK {
     }
 
     @Override
-    public void build(final EncodingResult result, final Variable[] vars, int rhs) {
-        cardinalityNetwork.buildAMK(result, vars, rhs);
+    public void build(final EncodingResult result, final Variable[] vars, final int rhs) {
+        this.cardinalityNetwork.buildAMK(result, vars, rhs);
     }
 
     @Override
     public CCIncrementalData incrementalData() {
-        return cardinalityNetwork.incrementalData();
+        return this.cardinalityNetwork.incrementalData();
     }
 
     /**
      * Builds the constraint for incremental usage.
-     *
      * @param result the result
      * @param vars   the variables
      * @param rhs    the right-hand side
      */
-    void buildForIncremental(final EncodingResult result, final Variable[] vars, int rhs) {
-        cardinalityNetwork.buildAMKForIncremental(result, vars, rhs);
+    void buildForIncremental(final EncodingResult result, final Variable[] vars, final int rhs) {
+        this.cardinalityNetwork.buildAMKForIncremental(result, vars, rhs);
     }
 
     @Override

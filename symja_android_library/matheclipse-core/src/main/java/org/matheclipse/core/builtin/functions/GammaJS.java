@@ -276,7 +276,7 @@ public class GammaJS {
 	 * @param y
 	 * @return
 	 */
-	public static Complex gamma(Complex x, Complex y) {
+	public static Complex gamma(Complex x, final Complex y) {
 		// patch lower end or evaluate exponential integral independently
 		if (F.isZero(x)) {
 			if (F.isZero(y)) {

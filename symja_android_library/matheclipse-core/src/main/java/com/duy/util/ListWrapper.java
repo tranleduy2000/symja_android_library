@@ -7,7 +7,7 @@ import java.util.List;
 public class ListWrapper<E> extends CollectionWrapper<E> {
 
 
-    private List<E> list;
+    private final List<E> list;
 
     public ListWrapper(List<E> collection) {
         super(collection);

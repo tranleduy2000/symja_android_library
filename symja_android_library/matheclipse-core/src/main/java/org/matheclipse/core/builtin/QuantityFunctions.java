@@ -1,31 +1,21 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.lambda.Function;
 import com.duy.lambda.UnaryOperator;
 
 import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
-import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.IStringX;
-import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.FEConfig;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.TextStyle;
-import java.util.HashMap;
-import java.util.Locale;
-
-import ch.ethz.idsc.tensor.qty.IQuantity;
-import ch.ethz.idsc.tensor.qty.IQuantityStatic;
-import ch.ethz.idsc.tensor.qty.IUnit;
-import ch.ethz.idsc.tensor.qty.IUnitStatic;
-import ch.ethz.idsc.tensor.qty.UnitSystemStatic;
+import org.matheclipse.core.tensor.qty.IQuantity;
+import org.matheclipse.core.tensor.qty.IQuantityStatic;
+import org.matheclipse.core.tensor.qty.IUnit;
+import org.matheclipse.core.tensor.qty.IUnitStatic;
+import org.matheclipse.core.tensor.qty.UnitSystemStatic;
 
 public class QuantityFunctions {
 //	final static HashMap<String, Function<LocalDateTime, IExpr>> DATEVALUE_MAP = new HashMap<String, Function<LocalDateTime, IExpr>>();
@@ -43,9 +33,9 @@ public class QuantityFunctions {
 //
 //			F.TimeObject.setEvaluator(new TimeObject());
 			if (ToggleFeature.QUANTITY) {
-				F.Quantity.setEvaluator(new Quantity());
-				F.QuantityMagnitude.setEvaluator(new QuantityMagnitude());
-				F.UnitConvert.setEvaluator(new UnitConvert());
+				S.Quantity.setEvaluator(new Quantity());
+				S.QuantityMagnitude.setEvaluator(new QuantityMagnitude());
+				S.UnitConvert.setEvaluator(new UnitConvert());
 			}
 
 			// integers
@@ -392,13 +382,13 @@ public class QuantityFunctions {
 				if (ast.size() == 2) {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					if (arg1.isQuantity()) {
-						return ((IAST) arg1).arg1();
+						return ((IQuantity) arg1).value();
 					}
 				} else if (ast.size() == 3) {
 					IExpr arg1 = engine.evaluate(ast.arg1());
 					IExpr arg2 = engine.evaluate(ast.arg2());
 					if (arg1.isQuantity()) {
-						ch.ethz.idsc.tensor.qty.QuantityMagnitude quantityMagnitude = ch.ethz.idsc.tensor.qty.QuantityMagnitude
+						org.matheclipse.core.tensor.qty.QuantityMagnitude quantityMagnitude = org.matheclipse.core.tensor.qty.QuantityMagnitude
 								.SI();
 						IUnit unit = IUnitStatic.of(arg2.toString());
 						if (unit==null) {
@@ -493,7 +483,7 @@ public class QuantityFunctions {
 	}
 
 	public  static IExpr unitConvert(IQuantity arg1, IUnit unit) {
-		ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+		org.matheclipse.core.tensor.qty.UnitConvert unitConvert = org.matheclipse.core.tensor.qty.UnitConvert.SI();
 		return unitConvert.to(unit).apply(arg1);
 	}
 }

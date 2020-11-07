@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -36,10 +36,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
+
 /**
  * Super class for Boolean binary operators.
- *
- * @version 1.5.1
+ * @version 2.0.0
  * @since 1.0
  */
 public abstract class BinaryOperator extends Formula {
@@ -50,7 +50,6 @@ public abstract class BinaryOperator extends Formula {
 
     /**
      * Constructor.
-     *
      * @param type  the type of the formula
      * @param left  the left-hand side operand
      * @param right the right-hand side operand
@@ -65,7 +64,6 @@ public abstract class BinaryOperator extends Formula {
 
     /**
      * Returns the left-hand side operator.
-     *
      * @return the left-hand side operator
      */
     public Formula left() {
@@ -74,7 +72,6 @@ public abstract class BinaryOperator extends Formula {
 
     /**
      * Returns the right-hand side operator.
-     *
      * @return the right-hand side operator
      */
     public Formula right() {
@@ -117,14 +114,14 @@ public abstract class BinaryOperator extends Formula {
     @Override
     public SortedSet<Variable> variables() {
         if (this.variables == null) {
-            this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(left, right));
+            this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(this.left, this.right));
         }
         return this.variables;
     }
 
     @Override
     public SortedSet<Literal> literals() {
-        return Collections.unmodifiableSortedSet(FormulaHelper.literals(left, right));
+        return Collections.unmodifiableSortedSet(FormulaHelper.literals(this.left, this.right));
     }
 
     @Override
@@ -175,4 +172,5 @@ public abstract class BinaryOperator extends Formula {
             }
         };
     }
+
 }

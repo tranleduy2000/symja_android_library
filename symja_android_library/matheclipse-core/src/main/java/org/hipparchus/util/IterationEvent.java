@@ -28,23 +28,19 @@ import java.util.EventObject;
  * {@link IterationManager} should be derived.
  */
 public class IterationEvent extends EventObject {
-    /**
-     * Serializable UID.
-     */
+    /** Serializable UID. */
     private static final long serialVersionUID = 20120128L;
 
-    /**
-     * The number of iterations performed so far.
-     */
+    /** The number of iterations performed so far. */
     private final int iterations;
 
     /**
      * Creates a new instance of this class.
      *
-     * @param source     the iterative algorithm on which the event initially
-     *                   occurred
+     * @param source the iterative algorithm on which the event initially
+     * occurred
      * @param iterations the number of iterations performed at the time
-     *                   {@code this} event is created
+     * {@code this} event is created
      */
     public IterationEvent(final Object source, final int iterations) {
         super(source);
@@ -60,4 +56,4 @@ public class IterationEvent extends EventObject {
     public int getIterations() {
         return iterations;
     }
-}
+ }

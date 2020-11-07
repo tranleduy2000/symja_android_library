@@ -21,75 +21,50 @@
  */
 package org.hipparchus.stat.regression;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
 
-import java.io.Serializable;
-import java.util.Arrays;
-
 /**
  * Results of a Multiple Linear Regression model fit.
+ *
  */
 public class RegressionResults implements Serializable {
 
-    /**
-     * INDEX of Sum of Squared Errors
-     */
+    /** INDEX of Sum of Squared Errors */
     private static final int SSE_IDX = 0;
-    /**
-     * INDEX of Sum of Squares of Model
-     */
+    /** INDEX of Sum of Squares of Model */
     private static final int SST_IDX = 1;
-    /**
-     * INDEX of R-Squared of regression
-     */
+    /** INDEX of R-Squared of regression */
     private static final int RSQ_IDX = 2;
-    /**
-     * INDEX of Mean Squared Error
-     */
+    /** INDEX of Mean Squared Error */
     private static final int MSE_IDX = 3;
-    /**
-     * INDEX of Adjusted R Squared
-     */
+    /** INDEX of Adjusted R Squared */
     private static final int ADJRSQ_IDX = 4;
-    /**
-     * UID
-     */
+    /** UID */
     private static final long serialVersionUID = 1l;
-    /**
-     * regression slope parameters
-     */
+    /** regression slope parameters */
     private final double[] parameters;
-    /**
-     * variance covariance matrix of parameters
-     */
+    /** variance covariance matrix of parameters */
     private final double[][] varCovData;
-    /**
-     * boolean flag for variance covariance matrix in symm compressed storage
-     */
+    /** boolean flag for variance covariance matrix in symm compressed storage */
     private final boolean isSymmetricVCD;
-    /**
-     * rank of the solution
-     */
+    /** rank of the solution */
     @SuppressWarnings("unused")
     private final int rank;
-    /**
-     * number of observations on which results are based
-     */
+    /** number of observations on which results are based */
     private final long nobs;
-    /**
-     * boolean flag indicator of whether a constant was included
-     */
+    /** boolean flag indicator of whether a constant was included*/
     private final boolean containsConstant;
-    /**
-     * array storing global results, SSE, MSE, RSQ, adjRSQ
-     */
+    /** array storing global results, SSE, MSE, RSQ, adjRSQ */
     private final double[] globalFitInfo;
 
     /**
-     * Set the default constructor to private access
-     * to prevent inadvertent instantiation
+     *  Set the default constructor to private access
+     *  to prevent inadvertent instantiation
      */
     @SuppressWarnings("unused")
     private RegressionResults() {
@@ -105,19 +80,19 @@ public class RegressionResults implements Serializable {
     /**
      * Constructor for Regression Results.
      *
-     * @param parameters            a double array with the regression slope estimates
-     * @param varcov                the variance covariance matrix, stored either in a square matrix
-     *                              or as a compressed
+     * @param parameters a double array with the regression slope estimates
+     * @param varcov the variance covariance matrix, stored either in a square matrix
+     * or as a compressed
      * @param isSymmetricCompressed a flag which denotes that the variance covariance
-     *                              matrix is in symmetric compressed format
-     * @param nobs                  the number of observations of the regression estimation
-     * @param rank                  the number of independent variables in the regression
-     * @param sumy                  the sum of the independent variable
-     * @param sumysq                the sum of the squared independent variable
-     * @param sse                   sum of squared errors
-     * @param containsConstant      true model has constant,  false model does not have constant
-     * @param copyData              if true a deep copy of all input data is made, if false only references
-     *                              are copied and the RegressionResults become mutable
+     * matrix is in symmetric compressed format
+     * @param nobs the number of observations of the regression estimation
+     * @param rank the number of independent variables in the regression
+     * @param sumy the sum of the independent variable
+     * @param sumysq the sum of the squared independent variable
+     * @param sse sum of squared errors
+     * @param containsConstant true model has constant,  false model does not have constant
+     * @param copyData if true a deep copy of all input data is made, if false only references
+     * are copied and the RegressionResults become mutable
      */
     public RegressionResults(
             final double[] parameters, final double[][] varcov, // NOPMD - storing a reference to the array is controlled by a user-supplied parameter
@@ -153,12 +128,12 @@ public class RegressionResults implements Serializable {
                 (nobs - rank);
         this.globalFitInfo[RSQ_IDX] = 1.0 -
                 this.globalFitInfo[SSE_IDX] /
-                        this.globalFitInfo[SST_IDX];
+                this.globalFitInfo[SST_IDX];
 
         if (!containsConstant) {
-            this.globalFitInfo[ADJRSQ_IDX] = 1.0 -
+            this.globalFitInfo[ADJRSQ_IDX] = 1.0-
                     (1.0 - this.globalFitInfo[RSQ_IDX]) *
-                            ((double) nobs / ((double) (nobs - rank)));
+                    ( (double) nobs / ( (double) (nobs - rank)));
         } else {
             this.globalFitInfo[ADJRSQ_IDX] = 1.0 - (sse * (nobs - 1.0)) /
                     (globalFitInfo[SST_IDX] * (nobs - rank));
@@ -169,12 +144,12 @@ public class RegressionResults implements Serializable {
      * <p>Returns the parameter estimate for the regressor at the given index.</p>
      *
      * <p>A redundant regressor will have its redundancy flag set, as well as
-     * a parameters estimated equal to {@code Double.NaN}</p>
+     *  a parameters estimated equal to {@code Double.NaN}</p>
      *
      * @param index Index.
      * @return the parameters estimated for regressor at index.
      * @throws MathIllegalArgumentException if {@code index} is not in the interval
-     *                                      {@code [0, number of parameters)}.
+     * {@code [0, number of parameters)}.
      */
     public double getParameterEstimate(int index) throws MathIllegalArgumentException {
         if (parameters == null) {
@@ -190,7 +165,7 @@ public class RegressionResults implements Serializable {
      * <p>The parameter estimates are returned in the natural order of the data.</p>
      *
      * <p>A redundant regressor will have its redundancy flag set, as will
-     * a parameter estimate equal to {@code Double.NaN}.</p>
+     *  a parameter estimate equal to {@code Double.NaN}.</p>
      *
      * @return array of parameter estimates, null if no estimation occurred
      */
@@ -209,7 +184,7 @@ public class RegressionResults implements Serializable {
      * @param index Index.
      * @return the standard errors associated with parameters estimated at index.
      * @throws MathIllegalArgumentException if {@code index} is not in the interval
-     *                                      {@code [0, number of parameters)}.
+     * {@code [0, number of parameters)}.
      */
     public double getStdErrorOfEstimate(int index) throws MathIllegalArgumentException {
         if (parameters == null) {
@@ -232,7 +207,7 @@ public class RegressionResults implements Serializable {
      * which is redundant will be assigned <code>Double.NaN</code>. </p>
      *
      * @return an array standard errors associated with parameters estimates,
-     * null if no estimation occurred
+     *  null if no estimation occurred
      */
     public double[] getStdErrorOfEstimates() {
         if (parameters == null) {
@@ -260,7 +235,7 @@ public class RegressionResults implements Serializable {
      * @param j {@code j}th regression parameter.
      * @return the covariance of the parameter estimates.
      * @throws MathIllegalArgumentException if {@code i} or {@code j} is not in the
-     *                                      interval {@code [0, number of parameters)}.
+     * interval {@code [0, number of parameters)}.
      */
     public double getCovarianceOfParameters(int i, int j) throws MathIllegalArgumentException {
         if (parameters == null) {
@@ -348,7 +323,7 @@ public class RegressionResults implements Serializable {
      * @return sum of squared errors associated with the regression model
      */
     public double getErrorSumSquares() {
-        return this.globalFitInfo[SSE_IDX];
+        return this.globalFitInfo[ SSE_IDX];
     }
 
     /**
@@ -362,7 +337,7 @@ public class RegressionResults implements Serializable {
      * @return sum of squared deviations of y values
      */
     public double getMeanSquareError() {
-        return this.globalFitInfo[MSE_IDX];
+        return this.globalFitInfo[ MSE_IDX];
     }
 
     /**
@@ -380,7 +355,7 @@ public class RegressionResults implements Serializable {
      * @return r-square, a double in the interval [0, 1]
      */
     public double getRSquared() {
-        return this.globalFitInfo[RSQ_IDX];
+        return this.globalFitInfo[ RSQ_IDX];
     }
 
     /**
@@ -398,14 +373,13 @@ public class RegressionResults implements Serializable {
      * @return adjusted R-Squared statistic
      */
     public double getAdjustedRSquared() {
-        return this.globalFitInfo[ADJRSQ_IDX];
+        return this.globalFitInfo[ ADJRSQ_IDX];
     }
 
     /**
      * Returns true if the regression model has been computed including an intercept.
      * In this case, the coefficient of the intercept is the first element of the
      * {@link #getParameterEstimates() parameter estimates}.
-     *
      * @return true if the model has an intercept term
      */
     public boolean hasIntercept() {

@@ -5,12 +5,14 @@ import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.Comparators;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISparseArray;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.FEConfig;
 
@@ -51,7 +53,7 @@ public class EvalAttributes {
 	 * 
 	 * @return returns the flattened list or <code>F.NIL</code>
 	 */
-	public static IASTAppendable flattenDeep(@Nonnull final IAST ast) {
+	public static IASTAppendable flattenDeep(final IAST ast) {
 		if ((ast.getEvalFlags() & IAST.IS_FLATTENED) == IAST.IS_FLATTENED) {
 			// already flattened
 			return F.NIL;
@@ -114,7 +116,7 @@ public class EvalAttributes {
 	 * @return returns the flattened list or <code>F.NIL</code>
 	 * @see #flattenDeep(IAST)
 	 */
-	public static IASTAppendable flatten(@Nonnull final IAST ast) {
+	public static IASTAppendable flatten(final IAST ast) {
 		if ((ast.getEvalFlags() & IAST.IS_FLATTENED) == IAST.IS_FLATTENED) {
 			// already flattened
 			return F.NIL;
@@ -501,29 +503,29 @@ public class EvalAttributes {
 		}
 		if (ast.size() > 2) {
 			if (!isSorted(ast, comparator)) {
-		final IExpr[] a = ast.toArray();
-		int end = a.length;
-			if (Config.FUZZ_TESTING) {
-				try {
+				final IExpr[] a = ast.toArray();
+				int end = a.length;
+				if (Config.FUZZ_TESTING) {
+					try {
+						Arrays.sort(a, 1, ast.size(), comparator);
+						for (int j = 1; j < end; j++) {
+							ast.set(j, a[j]);
+						}
+					} catch (java.lang.IllegalArgumentException iae) {
+						// java.util.TimSort.mergeHi(TimSort.java:899) - Comparison method violates its general
+						// contract!
+						System.err.println(ast.toString());
+						throw iae;
+					}
+				} else {
 					Arrays.sort(a, 1, ast.size(), comparator);
 					for (int j = 1; j < end; j++) {
 						ast.set(j, a[j]);
 					}
-				} catch (java.lang.IllegalArgumentException iae) {
-						// java.util.TimSort.mergeHi(TimSort.java:899) - Comparison method violates its general
-						// contract!
-					System.err.println(ast.toString());
-					throw iae;
 				}
-			} else {
-		Arrays.sort(a, 1, ast.size(), comparator);
-		for (int j = 1; j < end; j++) {
-			ast.set(j, a[j]);
-		}
-	}
 				return true;
+			}
 		}
-	}
 		return false;
 	}
 
@@ -622,10 +624,29 @@ public class EvalAttributes {
 			final IASTAppendable subResult = F.ast(argHead, listSize - 1, true);
 
 			for (int i = 1; i < listSize; i++) {
-				if (listHead == F.List && //
-						ast.get(i).isList()) {
+				if (listHead == S.List && //
+						(ast.get(i).isList() || ast.get(i).isSparseArray())) {
+					if (ast.get(i).isList()) {
+						final IAST arg = (IAST) ast.get(i);
+						subResult.set(i, arg.get(j));
+					} else if (ast.get(i).isSparseArray()) {
+						final ISparseArray arg = (ISparseArray) ast.get(i);
+						subResult.set(i, arg.get(j));
+						// subResult.set(i, Programming.sparsePart(arg, F.Part(arg, F.ZZ(j)), 2, EvalEngine.get()));
+					}
+				} else if (listHead == S.SparseArray) {
+					if (ast.get(i).isList() || ast.get(i).isSparseArray()) {
+						if (ast.get(i).isList()) {
 					final IAST arg = (IAST) ast.get(i);
 					subResult.set(i, arg.get(j));
+						} else if (ast.get(i).isSparseArray()) {
+							final ISparseArray arg = (ISparseArray) ast.get(i);
+							subResult.set(i, arg.get(j));
+							// subResult.set(i, Programming.sparsePart(arg, F.Part(arg, F.ZZ(j)), 2, EvalEngine.get()));
+						}
+					} else {
+						subResult.set(i, ast.get(i));
+					}
 				} else if (ast.get(i).isAST(listHead)) {
 					final IAST arg = (IAST) ast.get(i);
 					subResult.set(i, arg.get(j));
@@ -634,24 +655,28 @@ public class EvalAttributes {
 				}
 			}
 			if (!result.isPresent()) {
+				IExpr head = listHead == S.SparseArray ? S.List : listHead;
 				switch (listLength) {
 				case 1:
-					result = F.unaryAST1(listHead, F.Slot1);
+					result = F.unaryAST1(head, F.Slot1);
 					break;
 				case 2:
-					result = F.binaryAST2(listHead, F.Slot1, F.Slot2);
+					result = F.binaryAST2(head, F.Slot1, F.Slot2);
 					break;
 				case 3:
-					result = F.ternaryAST3(listHead, F.Slot1, F.Slot2, F.Slot3);
+					result = F.ternaryAST3(head, F.Slot1, F.Slot2, F.Slot3);
 					break;
 				default:
-					result = F.ast(listHead, listLength, true);
+					result = F.ast(head, listLength, true);
 				}
 
 			}
 			result.set(j, subResult);
 		}
 
+		if (listHead == S.SparseArray) {
+			return F.unaryAST1(S.SparseArray, result);
+		}
 		return result;
 	}
 

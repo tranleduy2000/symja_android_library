@@ -8,6 +8,8 @@ import org.matheclipse.core.expression.F;
  */
 
 public abstract class IRationalImpl extends ISignedNumberImpl implements IRational {
+    public abstract IRational inverse();
+
     @Override
     public abstract IRational negate();
 
@@ -16,6 +18,10 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
      */
     @Override
     public abstract IRational abs();
+
+    public abstract IRational dec();
+
+    public abstract IRational inc();
 
     public abstract IRational add(IRational parm1);
 
@@ -34,6 +40,11 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
     @Override
     public IInteger getNumerator() {
         return numerator();
+    }
+
+    @Override
+    public IRational imRational() {
+        return F.C0;
     }
 
     @Override
@@ -62,11 +73,6 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
     @Override
     public IRational reRational() {
         return this;
-    }
-
-    @Override
-    public IRational imRational() {
-        return F.C0;
     }
 
     public abstract IRational subtract(IRational parm1);

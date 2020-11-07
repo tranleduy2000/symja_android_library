@@ -21,63 +21,49 @@
  */
 package org.hipparchus.stat.descriptive;
 
+import java.io.Serializable;
+
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
-
-import java.io.Serializable;
 
 /**
  * Value object representing the results of a univariate
  * statistical summary.
  */
 public class StatisticalSummaryValues
-        implements Serializable, StatisticalSummary {
+    implements Serializable, StatisticalSummary {
 
-    /**
-     * Serialization id
-     */
+    /** Serialization id */
     private static final long serialVersionUID = 20160406L;
 
-    /**
-     * The sample mean
-     */
+    /** The sample mean */
     private final double mean;
 
-    /**
-     * The sample variance
-     */
+    /** The sample variance */
     private final double variance;
 
-    /**
-     * The number of observations in the sample
-     */
+    /** The number of observations in the sample */
     private final long n;
 
-    /**
-     * The maximum value
-     */
+    /** The maximum value */
     private final double max;
 
-    /**
-     * The minimum value
-     */
+    /** The minimum value */
     private final double min;
 
-    /**
-     * The sum of the sample values
-     */
+    /** The sum of the sample values */
     private final double sum;
 
     /**
-     * Constructor.
-     *
-     * @param mean     the sample mean
-     * @param variance the sample variance
-     * @param n        the number of observations in the sample
-     * @param max      the maximum value
-     * @param min      the minimum value
-     * @param sum      the sum of the values
+      * Constructor.
+      *
+      * @param mean  the sample mean
+      * @param variance  the sample variance
+      * @param n  the number of observations in the sample
+      * @param max  the maximum value
+      * @param min  the minimum value
+      * @param sum  the sum of the values
      */
     public StatisticalSummaryValues(double mean, double variance, long n,
                                     double max, double min, double sum) {
@@ -91,35 +77,19 @@ public class StatisticalSummaryValues
     }
 
     /**
-     * @return Returns the mean.
-     */
-    @Override
-    public double getMean() {
-        return mean;
-    }
-
-    /**
-     * @return Returns the variance.
-     */
-    @Override
-    public double getVariance() {
-        return variance;
-    }
-
-    /**
-     * @return Returns the standard deviation
-     */
-    @Override
-    public double getStandardDeviation() {
-        return FastMath.sqrt(variance);
-    }
-
-    /**
      * @return Returns the max.
      */
     @Override
     public double getMax() {
         return max;
+    }
+
+    /**
+     * @return Returns the mean.
+     */
+    @Override
+    public double getMean() {
+        return mean;
     }
 
     /**
@@ -147,6 +117,22 @@ public class StatisticalSummaryValues
     }
 
     /**
+     * @return Returns the standard deviation
+     */
+    @Override
+    public double getStandardDeviation() {
+        return FastMath.sqrt(variance);
+    }
+
+    /**
+     * @return Returns the variance.
+     */
+    @Override
+    public double getVariance() {
+        return variance;
+    }
+
+    /**
      * Returns true iff <code>object</code> is a
      * <code>StatisticalSummary</code> instance and all
      * statistics have the same values as this.
@@ -163,12 +149,12 @@ public class StatisticalSummaryValues
             return false;
         }
         StatisticalSummary other = (StatisticalSummary) object;
-        return Precision.equalsIncludingNaN(other.getMax(), getMax()) &&
-                Precision.equalsIncludingNaN(other.getMean(), getMean()) &&
-                Precision.equalsIncludingNaN(other.getMin(), getMin()) &&
-                Precision.equalsIncludingNaN(other.getN(), getN()) &&
-                Precision.equalsIncludingNaN(other.getSum(), getSum()) &&
-                Precision.equalsIncludingNaN(other.getVariance(), getVariance());
+        return Precision.equalsIncludingNaN(other.getMax(),      getMax())  &&
+               Precision.equalsIncludingNaN(other.getMean(),     getMean()) &&
+               Precision.equalsIncludingNaN(other.getMin(),      getMin())  &&
+               Precision.equalsIncludingNaN(other.getN(),        getN())    &&
+               Precision.equalsIncludingNaN(other.getSum(),      getSum())  &&
+               Precision.equalsIncludingNaN(other.getVariance(), getVariance());
     }
 
     /**
@@ -198,13 +184,13 @@ public class StatisticalSummaryValues
         StringBuilder outBuffer = new StringBuilder(200); // the size is just a wild guess
         String endl = "\n";
         outBuffer.append("StatisticalSummaryValues:").append(endl).
-                append("n: ").append(getN()).append(endl).
-                append("min: ").append(getMin()).append(endl).
-                append("max: ").append(getMax()).append(endl).
-                append("mean: ").append(getMean()).append(endl).
-                append("std dev: ").append(getStandardDeviation()).append(endl).
-                append("variance: ").append(getVariance()).append(endl).
-                append("sum: ").append(getSum()).append(endl);
+                  append("n: ").append(getN()).append(endl).
+                  append("min: ").append(getMin()).append(endl).
+                  append("max: ").append(getMax()).append(endl).
+                  append("mean: ").append(getMean()).append(endl).
+                  append("std dev: ").append(getStandardDeviation()).append(endl).
+                  append("variance: ").append(getVariance()).append(endl).
+                  append("sum: ").append(getSum()).append(endl);
         return outBuffer.toString();
     }
 

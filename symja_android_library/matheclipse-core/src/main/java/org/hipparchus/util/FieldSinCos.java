@@ -16,31 +16,23 @@
  */
 package org.hipparchus.util;
 
-/**
- * Holder for both sin and cosine values.
+/** Holder for both sin and cosine values.
  * <p>
  * This class is a simple container, it does not provide any computational method.
  * </p>
- *
- * @param <T> the type of the field elements
  * @see FastMath#sinCos(org.hipparchus.RealFieldElement)
+ * @param <T> the type of the field elements
  * @since 1.4
  */
 public class FieldSinCos<T> {
 
-    /**
-     * Value of the sine.
-     */
+    /** Value of the sine. */
     private final T sin;
 
-    /**
-     * Value of the cosine.
-     */
+    /** Value of the cosine. */
     private final T cos;
 
-    /**
-     * Simple constructor.
-     *
+    /** Simple constructor.
      * @param sin value of the sine
      * @param cos value of the cosine
      */
@@ -49,18 +41,14 @@ public class FieldSinCos<T> {
         this.cos = cos;
     }
 
-    /**
-     * Get the value of the sine.
-     *
+    /** Get the value of the sine.
      * @return value of the sine
      */
     public T sin() {
         return sin;
     }
 
-    /**
-     * Get the value of the cosine.
-     *
+    /** Get the value of the cosine.
      * @return value of the cosine
      */
     public T cos() {

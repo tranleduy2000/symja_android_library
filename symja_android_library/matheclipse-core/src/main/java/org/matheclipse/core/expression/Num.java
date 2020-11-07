@@ -6,6 +6,7 @@ import com.gx.common.math.DoubleMath;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatRuntimeException;
+import org.hipparchus.util.MathUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
@@ -20,6 +21,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.FEConfig;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -250,13 +252,21 @@ public class Num extends INumImpl implements INum {
 	}
 
 	@Override
-	public boolean equals(final Object arg0) {
-		if (this == arg0) {
+	public boolean equals(final Object other) {
+		if (this == other) {
 			return true;
 		}
-		if (arg0 instanceof Num) {
-			return fDouble == ((Num) arg0).fDouble;
+		if (other instanceof Num) {
+			final Num c = (Num) other;
+			if (Double.isNaN(c.fDouble)) {
+				return Double.isNaN(fDouble);
+			} else {
+				return MathUtils.equals(fDouble, c.fDouble);
 		}
+		}
+		// if (other instanceof Num) {
+		// return fDouble == ((Num) other).fDouble;
+		// }
 		return false;
 	}
 
@@ -276,7 +286,7 @@ public class Num extends INumImpl implements INum {
 		if (Double.isNaN(fDouble)) {
 			return F.Indeterminate;
 		}
-		if (engine.isNumericMode() && engine.isApfloat()) {
+		if (engine.isNumericMode() && engine.isArbitraryMode()) {
 			return ApfloatNum.valueOf(fDouble, engine.getNumericPrecision());
 		}
 		return F.NIL;
@@ -355,7 +365,11 @@ public class Num extends INumImpl implements INum {
 
 	@Override
 	public final int hashCode() {
-		return DDouble.hashCode(fDouble);
+		if (Double.isNaN(fDouble)) {
+			return 11;
+		}
+		return 37 * 17 * MathUtils.hash(fDouble);
+		// return Double.hashCode(fDouble);
 	}
 
 	@Override
@@ -377,6 +391,13 @@ public class Num extends INumImpl implements INum {
 	public String internalJavaString(boolean symbolsAsFactoryMethod, int depth, boolean useOperators, boolean usePrefix,
 			boolean noSymbolPrefix) {
 		String prefix = usePrefix ? "F." : "";
+		if (isZero()) {
+			return prefix + "CD0";
+		} else if (isOne()) {
+			return prefix + "CD1";
+		} else if (isMinusOne()) {
+			return prefix + "CND1";
+		}
 		return prefix + "num(" + fDouble + ")";
 	}
 
@@ -404,7 +425,7 @@ public class Num extends INumImpl implements INum {
 	/** {@inheritDoc} */
 	@Override
 	public long determinePrecision() {
-		return Config.MACHINE_PRECISION;
+		return FEConfig.MACHINE_PRECISION;
 	}
 
 	/** {@inheritDoc} */

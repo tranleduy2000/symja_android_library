@@ -23,6 +23,7 @@ package org.hipparchus.stat;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
+import org.hipparchus.stat.descriptive.DescriptiveStatistics;
 import org.hipparchus.stat.descriptive.UnivariateStatistic;
 import org.hipparchus.stat.descriptive.moment.GeometricMean;
 import org.hipparchus.stat.descriptive.moment.Mean;
@@ -42,54 +43,34 @@ import org.hipparchus.util.MathArrays;
  */
 public final class StatUtils {
 
-    /**
-     * sum
-     */
+    /** sum */
     private static final UnivariateStatistic SUM = new Sum();
 
-    /**
-     * sumSq
-     */
+    /** sumSq */
     private static final UnivariateStatistic SUM_OF_SQUARES = new SumOfSquares();
 
-    /**
-     * prod
-     */
+    /** prod */
     private static final UnivariateStatistic PRODUCT = new Product();
 
-    /**
-     * sumLog
-     */
+    /** sumLog */
     private static final UnivariateStatistic SUM_OF_LOGS = new SumOfLogs();
 
-    /**
-     * min
-     */
+    /** min */
     private static final UnivariateStatistic MIN = new Min();
 
-    /**
-     * max
-     */
+    /** max */
     private static final UnivariateStatistic MAX = new Max();
 
-    /**
-     * mean
-     */
+    /** mean */
     private static final UnivariateStatistic MEAN = new Mean();
 
-    /**
-     * variance
-     */
+    /** variance */
     private static final Variance VARIANCE = new Variance();
 
-    /**
-     * percentile
-     */
+    /** percentile */
     private static final Percentile PERCENTILE = new Percentile();
 
-    /**
-     * geometric mean
-     */
+    /** geometric mean */
     private static final GeometricMean GEOMETRIC_MEAN = new GeometricMean();
 
     /**
@@ -104,7 +85,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the input array is null.
      *
-     * @param values array of values to sum
+     * @param values  array of values to sum
      * @return the sum of the values or <code>Double.NaN</code> if the array is empty
      * @throws MathIllegalArgumentException if the array is null
      */
@@ -119,14 +100,14 @@ public final class StatUtils {
      * Throws <code>IllegalArgumentException</code> if the array is null.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the sum of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double sum(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return SUM.evaluate(values, begin, length);
     }
 
@@ -136,7 +117,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      *
-     * @param values input array
+     * @param values  input array
      * @return the sum of the squared values or <code>Double.NaN</code> if the array is empty
      * @throws MathIllegalArgumentException if the array is null
      */
@@ -152,14 +133,14 @@ public final class StatUtils {
      * Throws <code>IllegalArgumentException</code> if the array is null.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the sum of the squares of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double sumSq(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return SUM_OF_SQUARES.evaluate(values, begin, length);
     }
 
@@ -185,14 +166,14 @@ public final class StatUtils {
      * Throws <code>IllegalArgumentException</code> if the array is null.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the product of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double product(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return PRODUCT.evaluate(values, begin, length);
     }
 
@@ -202,7 +183,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.summary.SumOfLogs}.
+     * See {@link SumOfLogs}.
      *
      * @param values the input array
      * @return the sum of the natural logs of the values or Double.NaN if the array is empty
@@ -218,18 +199,18 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.summary.SumOfLogs}.
+     * See {@link SumOfLogs}.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the sum of the natural logs of the values or Double.NaN if
      * length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     * parameters are not valid
      */
     public static double sumLog(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return SUM_OF_LOGS.evaluate(values, begin, length);
     }
 
@@ -239,7 +220,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Mean} for
+     * See {@link Mean} for
      * details on the computing algorithm.
      *
      * @param values the input array
@@ -257,18 +238,18 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Mean Mean} for
+     * See {@link Mean Mean} for
      * details on the computing algorithm.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the mean of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     * parameters are not valid
      */
     public static double mean(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return MEAN.evaluate(values, begin, length);
     }
 
@@ -278,7 +259,7 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.GeometricMean GeometricMean}
+     * See {@link GeometricMean GeometricMean}
      * for details on the computing algorithm.
      *
      * @param values the input array
@@ -296,18 +277,18 @@ public final class StatUtils {
      * <p>
      * Throws <code>IllegalArgumentException</code> if the array is null.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.GeometricMean GeometricMean}
+     * See {@link GeometricMean GeometricMean}
      * for details on the computing algorithm.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the geometric mean of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double geometricMean(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return GEOMETRIC_MEAN.evaluate(values, begin, length);
     }
 
@@ -319,7 +300,7 @@ public final class StatUtils {
      * the denominator). Use {@link #populationVariance(double[])} for the non-bias-corrected
      * population variance.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -343,7 +324,7 @@ public final class StatUtils {
      * the denominator). Use {@link #populationVariance(double[], int, int)} for the non-bias-corrected
      * population variance.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -352,14 +333,14 @@ public final class StatUtils {
      * array index parameters are not valid.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double variance(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return VARIANCE.evaluate(values, begin, length);
     }
 
@@ -372,7 +353,7 @@ public final class StatUtils {
      * the denominator). Use {@link #populationVariance(double[], double, int, int)} for
      * the non-bias-corrected population variance.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -386,15 +367,15 @@ public final class StatUtils {
      * array index parameters are not valid.
      *
      * @param values the input array
-     * @param mean   the precomputed mean value
-     * @param begin  index of the first array element to include
+     * @param mean the precomputed mean value
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double variance(final double[] values, final double mean, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return VARIANCE.evaluate(values, mean, begin, length);
     }
 
@@ -407,7 +388,7 @@ public final class StatUtils {
      * the denominator).  Use {@link #populationVariance(double[], double)} for the
      * non-bias-corrected population variance.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -420,7 +401,7 @@ public final class StatUtils {
      * Throws <code>MathIllegalArgumentException</code> if the array is null.
      *
      * @param values the input array
-     * @param mean   the precomputed mean value
+     * @param mean the precomputed mean value
      * @return the variance of the values or Double.NaN if the array is empty
      * @throws MathIllegalArgumentException if the array is null
      */
@@ -433,7 +414,7 @@ public final class StatUtils {
      * population variance</a> of the entries in the input array, or
      * <code>Double.NaN</code> if the array is empty.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the formula and computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -454,7 +435,7 @@ public final class StatUtils {
      * the input array, or <code>Double.NaN</code> if the designated subarray
      * is empty.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * Returns 0 for a single-value (i.e. length = 1) sample.
@@ -463,14 +444,14 @@ public final class StatUtils {
      * array index parameters are not valid.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the population variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double populationVariance(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return new Variance(false).evaluate(values, begin, length);
     }
 
@@ -480,7 +461,7 @@ public final class StatUtils {
      * the input array, using the precomputed mean value.  Returns
      * <code>Double.NaN</code> if the designated subarray is empty.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -494,16 +475,16 @@ public final class StatUtils {
      * array index parameters are not valid.
      *
      * @param values the input array
-     * @param mean   the precomputed mean value
-     * @param begin  index of the first array element to include
+     * @param mean the precomputed mean value
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the population variance of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double populationVariance(final double[] values, final double mean,
                                             final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return new Variance(false).evaluate(values, mean, begin, length);
     }
 
@@ -512,7 +493,7 @@ public final class StatUtils {
      * population variance</a> of the entries in the input array, using the precomputed
      * mean value. Returns <code>Double.NaN</code> if the array is empty.
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.moment.Variance Variance} for
+     * See {@link Variance Variance} for
      * details on the computing algorithm.
      * <p>
      * The formula used assumes that the supplied mean value is the arithmetic
@@ -524,12 +505,12 @@ public final class StatUtils {
      * Throws <code>MathIllegalArgumentException</code> if the array is null.
      *
      * @param values the input array
-     * @param mean   the precomputed mean value
+     * @param mean the precomputed mean value
      * @return the population variance of the values or Double.NaN if the array is empty
      * @throws MathIllegalArgumentException if the array is null
      */
     public static double populationVariance(final double[] values, final double mean)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return new Variance(false).evaluate(values, mean);
     }
 
@@ -569,14 +550,14 @@ public final class StatUtils {
      * </ul>
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the maximum of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double max(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return MAX.evaluate(values, begin, length);
     }
 
@@ -616,14 +597,14 @@ public final class StatUtils {
      * </ul>
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the minimum of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     public static double min(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return MIN.evaluate(values, begin, length);
     }
 
@@ -633,24 +614,24 @@ public final class StatUtils {
      * <p>
      * <ul>
      * <li>Returns <code>Double.NaN</code> if <code>values</code> has length
-     * <code>0</code></li>
+     *  <code>0</code></li>
      * <li>Returns (for any value of <code>p</code>) <code>values[0]</code>
-     * if <code>values</code> has length <code>1</code></li>
+     *  if <code>values</code> has length <code>1</code></li>
      * <li>Throws <code>IllegalArgumentException</code> if <code>values</code>
-     * is null  or p is not a valid quantile value (p must be greater than 0
-     * and less than or equal to 100)</li>
+     *  is null  or p is not a valid quantile value (p must be greater than 0
+     *  and less than or equal to 100)</li>
      * </ul>
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.rank.Percentile Percentile}
+     * See {@link Percentile Percentile}
      * for a description of the percentile estimation algorithm used.
      *
      * @param values input array of values
-     * @param p      the percentile value to compute
+     * @param p the percentile value to compute
      * @return the percentile value or Double.NaN if the array is empty
      * @throws MathIllegalArgumentException if <code>values</code> is null or p is invalid
      */
     public static double percentile(final double[] values, final double p) throws MathIllegalArgumentException {
-        return PERCENTILE.evaluate(values, p);
+        return PERCENTILE.evaluate(values,p);
     }
 
     /**
@@ -662,25 +643,25 @@ public final class StatUtils {
      * <ul>
      * <li>Returns <code>Double.NaN</code> if <code>length = 0</code></li>
      * <li>Returns (for any value of <code>p</code>) <code>values[begin]</code>
-     * if <code>length = 1 </code></li>
+     *  if <code>length = 1 </code></li>
      * <li>Throws <code>MathIllegalArgumentException</code> if <code>values</code>
-     * is null, <code>begin</code> or <code>length</code> is invalid, or
-     * <code>p</code> is not a valid quantile value (p must be greater than 0
-     * and less than or equal to 100)</li>
+     *  is null, <code>begin</code> or <code>length</code> is invalid, or
+     *  <code>p</code> is not a valid quantile value (p must be greater than 0
+     *  and less than or equal to 100)</li>
      * </ul>
      * <p>
-     * See {@link org.hipparchus.stat.descriptive.rank.Percentile Percentile}
+     * See {@link Percentile Percentile}
      * for a description of the percentile estimation algorithm used.
      *
      * @param values array of input values
-     * @param p      the percentile to compute
-     * @param begin  the first (0-based) element to include in the computation
+     * @param p the percentile to compute
+     * @param begin the first (0-based) element to include in the computation
      * @param length the number of array elements to include
      * @return the percentile value
      * @throws MathIllegalArgumentException if the parameters are not valid or the input array is null
      */
     public static double percentile(final double[] values, final int begin, final int length, final double p)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return PERCENTILE.evaluate(values, begin, length, p);
     }
 
@@ -688,14 +669,14 @@ public final class StatUtils {
      * Returns the sum of the (signed) differences between corresponding elements of the
      * input arrays -- i.e., sum(sample1[i] - sample2[i]).
      *
-     * @param sample1 the first array
-     * @param sample2 the second array
+     * @param sample1  the first array
+     * @param sample2  the second array
      * @return sum of paired differences
      * @throws MathIllegalArgumentException if the arrays do not have the same (positive) length.
      * @throws MathIllegalArgumentException if the sample arrays are empty.
      */
     public static double sumDifference(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         int n = sample1.length;
         MathArrays.checkEqualLength(sample1, sample2);
@@ -713,14 +694,14 @@ public final class StatUtils {
      * Returns the mean of the (signed) differences between corresponding elements of the
      * input arrays -- i.e., sum(sample1[i] - sample2[i]) / sample1.length.
      *
-     * @param sample1 the first array
-     * @param sample2 the second array
+     * @param sample1  the first array
+     * @param sample2  the second array
      * @return mean of paired differences
      * @throws MathIllegalArgumentException if the arrays do not have the same (positive) length.
      * @throws MathIllegalArgumentException if the sample arrays are empty.
      */
     public static double meanDifference(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         return sumDifference(sample1, sample2) / sample1.length;
     }
 
@@ -728,16 +709,16 @@ public final class StatUtils {
      * Returns the variance of the (signed) differences between corresponding elements of the
      * input arrays -- i.e., var(sample1[i] - sample2[i]).
      *
-     * @param sample1        the first array
-     * @param sample2        the second array
-     * @param meanDifference the mean difference between corresponding entries
+     * @param sample1  the first array
+     * @param sample2  the second array
+     * @param meanDifference   the mean difference between corresponding entries
      * @return variance of paired differences
      * @throws MathIllegalArgumentException if the arrays do not have the same length.
      * @throws MathIllegalArgumentException if the arrays length is less than 2.
-     * @see #meanDifference(double[], double[])
+     * @see #meanDifference(double[],double[])
      */
     public static double varianceDifference(final double[] sample1, final double[] sample2, double meanDifference)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         double sum1 = 0d;
         double sum2 = 0d;
@@ -746,14 +727,42 @@ public final class StatUtils {
         MathArrays.checkEqualLength(sample1, sample2);
         if (n < 2) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL,
-                    n, 2);
+                                                   n, 2);
         }
         for (int i = 0; i < n; i++) {
             diff = sample1[i] - sample2[i];
-            sum1 += (diff - meanDifference) * (diff - meanDifference);
+            sum1 += (diff - meanDifference) *(diff - meanDifference);
             sum2 += diff - meanDifference;
         }
         return (sum1 - (sum2 * sum2 / n)) / (n - 1);
+    }
+
+    /**
+     * Normalize (standardize) the sample, so it is has a mean of 0 and a standard deviation of 1.
+     *
+     * @param sample Sample to normalize.
+     * @return normalized (standardized) sample.
+     */
+    public static double[] normalize(final double... sample) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
+        // Add the data from the series to stats
+        for (int i = 0; i < sample.length; i++) {
+            stats.addValue(sample[i]);
+        }
+
+        // Compute mean and standard deviation
+        double mean = stats.getMean();
+        double standardDeviation = stats.getStandardDeviation();
+
+        // initialize the standardizedSample, which has the same length as the sample
+        double[] standardizedSample = new double[sample.length];
+
+        for (int i = 0; i < sample.length; i++) {
+            // z = (x- mean)/standardDeviation
+            standardizedSample[i] = (sample[i] - mean) / standardDeviation;
+        }
+        return standardizedSample;
     }
 
 }

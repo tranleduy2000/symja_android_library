@@ -1,5 +1,7 @@
 package org.matheclipse.core.reflection.system;
 
+import com.duy.annotations.ObjcMemoryIssue;
+import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
@@ -23,6 +25,7 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.parser.client.FEConfig;
@@ -539,9 +542,11 @@ public class Integrate extends AbstractFunctionEvaluator {
 	public Integrate() {
 	}
 
+	@ObjcMemoryIssue
 	@Override
 	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
 		// Android changed: perform reading integrate rules
+		// @ObjcMemoryIssueFix
 		new IntegrateInitializer().run();
 
 		try {
@@ -795,13 +800,13 @@ public class Integrate extends AbstractFunctionEvaluator {
 									F.Plus(F.Times(l0, F.x), F.Times(l1, F.Log(F.x))));
 						}
 					} else if (exp.isPositive()) {
-						IExpr expP1 = exp.inc();
+						IRational expP1 = exp.inc();
 						if (exp.isEven()) {
 							// l0*x + (l1*x^(expP1))/(expP1)
 							return F.Plus(F.Times(l0, F.x), F.Times(expP1.inverse(), l1, F.Power(F.x, expP1)));
 						}
 					} else if (exp.isNegative()) {
-						IExpr expP1 = exp.inc();
+						IRational expP1 = exp.inc();
 						if (exp.isEven()) {
 							// -(l1/(expP1*x^expP1)) + l0*x
 							return F.Plus(F.Times(l0, F.x),
@@ -820,7 +825,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 					IExpr l1 = lin[1];
 					constant = F.Divide(F.Negate(l0), l1);
 					IInteger exp = (IInteger) power.exponent();
-					IExpr expP1 = exp.inc();
+					IRational expP1 = exp.inc();
 					if (exp.isNegative()) {
 						if (exp.isMinusOne()) {
 							// Abs(l0 + l1 * x) ^ (-1)
@@ -974,7 +979,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 	 * @return
 	 */
 	private static IExpr mapIntegrate(IAST ast, final IExpr x) {
-		return ast.mapThread(F.Integrate(null, x), 1);
+		return ast.mapThread(F.Integrate(F.Slot1, x), 1);
 	}
 
 	/**
@@ -1020,8 +1025,8 @@ public class Integrate extends AbstractFunctionEvaluator {
 			boolean newCache = false;
 			try {
 
-				if (engine.REMEMBER_AST_CACHE != null) {
-					IExpr result = engine.REMEMBER_AST_CACHE.getIfPresent(ast);
+				if (engine.rememberASTCache != null) {
+					IExpr result = engine.rememberASTCache.getIfPresent(ast);
 					if (result != null) {// &&engine.getRecursionCounter()>0) {
 						if (result.isPresent()) {
 							return result;
@@ -1030,7 +1035,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 					}
 				} else {
 					newCache = true;
-					engine.REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(50).build();
+					engine.rememberASTCache = CacheBuilder.newBuilder().maximumSize(50).build();
 				}
 				try {
 					engine.setQuietMode(true);
@@ -1039,18 +1044,18 @@ public class Integrate extends AbstractFunctionEvaluator {
 					}
 
 					// System.out.println(ast.toString());
-					engine.REMEMBER_AST_CACHE.put(ast, F.NIL);
+					engine.rememberASTCache.put(ast, F.NIL);
 					IExpr temp = F.Integrate.evalDownRule(EvalEngine.get(), ast);
 					if (temp.isPresent()) {
 						if (temp.equals(ast)) {
-							// if (FEConfig.SHOW_STACKTRACE) {
+							if (FEConfig.SHOW_STACKTRACE) {
 							engine.setQuietMode(false);
 							IOFunctions.printMessage(F.Integrate, "rubiendless", F.List(temp), engine);
-							// }
+							}
 							return F.NIL;
 						}
 						if (temp.isAST()) {
-							engine.REMEMBER_AST_CACHE.put(ast, temp);
+							engine.rememberASTCache.put(ast, temp);
 						}
 						return temp;
 					}
@@ -1080,7 +1085,7 @@ public class Integrate extends AbstractFunctionEvaluator {
 			} finally {
 				engine.setRecursionLimit(limit);
 				if (newCache) {
-					engine.REMEMBER_AST_CACHE = null;
+					engine.rememberASTCache = null;
 				}
 				engine.setQuietMode(quietMode);
 			}
@@ -1156,12 +1161,14 @@ public class Integrate extends AbstractFunctionEvaluator {
 		}
 	}
 
+	@ObjcMemoryIssue
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.HOLDALL);
 		super.setUp(newSymbol);
 
 		// Android changed: call static initializer in evaluate() method.
+		// @ObjcMemoryIssueFix
 //		if (Config.THREAD_FACTORY != null) {
 //			INIT_THREAD = Config.THREAD_FACTORY.newThread(new IntegrateInitializer());
 //		} else {

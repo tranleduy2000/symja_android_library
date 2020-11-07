@@ -42,13 +42,13 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * </blockquote>
  * <p>
  * <dl>
- * <dt><a name="BARR1994">Barret et al. (1994)</a></dt>
- * <dd>
- * R. Barrett, M. Berry, T. F. Chan, J. Demmel, J. M. Donato, J. Dongarra,
- * V. Eijkhout, R. Pozo, C. Romine and H. Van der Vorst,
- * <em>Templates for the Solution of Linear Systems: Building Blocks for
- * Iterative Methods</em>, SIAM
- * </dd>
+ *  <dt><a name="BARR1994">Barret et al. (1994)</a></dt>
+ *  <dd>
+ *   R. Barrett, M. Berry, T. F. Chan, J. Demmel, J. M. Donato, J. Dongarra,
+ *   V. Eijkhout, R. Pozo, C. Romine and H. Van der Vorst,
+ *   <em>Templates for the Solution of Linear Systems: Building Blocks for
+ *   Iterative Methods</em>, SIAM
+ *  </dd>
  * </dl>
  */
 public interface RealLinearOperator {

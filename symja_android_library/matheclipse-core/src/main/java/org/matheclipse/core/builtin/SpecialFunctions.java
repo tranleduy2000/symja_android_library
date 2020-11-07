@@ -15,6 +15,8 @@ import org.matheclipse.core.builtin.functions.BesselJS;
 import org.matheclipse.core.builtin.functions.GammaJS;
 import org.matheclipse.core.builtin.functions.ZetaJS;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
+import org.matheclipse.core.eval.exception.PolynomialDegreeLimitExceeded;
 import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg1;
@@ -27,6 +29,7 @@ import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -79,28 +82,28 @@ public class SpecialFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.Beta.setEvaluator(new Beta());
-			F.BetaRegularized.setEvaluator(new BetaRegularized());
-			F.DirichletEta.setEvaluator(new DirichletEta());
-			F.Erf.setEvaluator(new Erf());
-			F.Erfc.setEvaluator(new Erfc());
-			F.Erfi.setEvaluator(new Erfi());
-			F.GammaRegularized.setEvaluator(new GammaRegularized());
-			F.HurwitzZeta.setEvaluator(new HurwitzZeta());
-			F.HypergeometricPFQRegularized.setEvaluator(new HypergeometricPFQRegularized());
-			F.InverseErf.setEvaluator(new InverseErf());
-			F.InverseErfc.setEvaluator(new InverseErfc());
-			F.InverseBetaRegularized.setEvaluator(new InverseBetaRegularized());
-			F.InverseGammaRegularized.setEvaluator(new InverseGammaRegularized());
-			F.LogGamma.setEvaluator(new LogGamma());
-			F.MeijerG.setEvaluator(new MeijerG());
-			F.PolyGamma.setEvaluator(new PolyGamma());
-			F.PolyLog.setEvaluator(new PolyLog());
-			F.ProductLog.setEvaluator(new ProductLog());
-			F.StieltjesGamma.setEvaluator(new StieltjesGamma());
-			F.StruveH.setEvaluator(new StruveH());
-			F.StruveL.setEvaluator(new StruveL());
-			F.Zeta.setEvaluator(new Zeta());
+			S.Beta.setEvaluator(new Beta());
+			S.BetaRegularized.setEvaluator(new BetaRegularized());
+			S.DirichletEta.setEvaluator(new DirichletEta());
+			S.Erf.setEvaluator(new Erf());
+			S.Erfc.setEvaluator(new Erfc());
+			S.Erfi.setEvaluator(new Erfi());
+			S.GammaRegularized.setEvaluator(new GammaRegularized());
+			S.HurwitzZeta.setEvaluator(new HurwitzZeta());
+			S.HypergeometricPFQRegularized.setEvaluator(new HypergeometricPFQRegularized());
+			S.InverseErf.setEvaluator(new InverseErf());
+			S.InverseErfc.setEvaluator(new InverseErfc());
+			S.InverseBetaRegularized.setEvaluator(new InverseBetaRegularized());
+			S.InverseGammaRegularized.setEvaluator(new InverseGammaRegularized());
+			S.LogGamma.setEvaluator(new LogGamma());
+			S.MeijerG.setEvaluator(new MeijerG());
+			S.PolyGamma.setEvaluator(new PolyGamma());
+			S.PolyLog.setEvaluator(new PolyLog());
+			S.ProductLog.setEvaluator(new ProductLog());
+			S.StieltjesGamma.setEvaluator(new StieltjesGamma());
+			S.StruveH.setEvaluator(new StruveH());
+			S.StruveL.setEvaluator(new StruveL());
+			S.Zeta.setEvaluator(new Zeta());
 		}
 	}
 
@@ -115,8 +118,8 @@ public class SpecialFunctions {
 				IExpr z = ast.arg1();
 				IExpr a = ast.arg2();
 				IExpr b = ast.arg3();
+				try {
 				if (engine.isDoubleMode()) {
-					try {
 						double aDouble = Double.NaN;
 						double bDouble = Double.NaN;
 						double zDouble = Double.NaN;
@@ -136,20 +139,7 @@ public class SpecialFunctions {
 						} else {
 							return GammaJS.incompleteBeta(zDouble, aDouble, bDouble);
 						}
-					} catch (ThrowException te) {
-						if (FEConfig.SHOW_STACKTRACE) {
-							te.printStackTrace();
 						}
-						return te.getValue();
-					} catch (ValidateException ve) {
-						if (FEConfig.SHOW_STACKTRACE) {
-							ve.printStackTrace();
-						}
-					} catch (RuntimeException rex) {
-						// rex.printStackTrace();
-						return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
-					}
-				}
 				int bInt = b.toIntDefault();
 				if (bInt > 0) {
 					IInteger n = F.ZZ(bInt);
@@ -167,6 +157,19 @@ public class SpecialFunctions {
 					// F.Pochhammer(a, k)), F.List(k, F.C0, F.Plus(F.CN1, n)))); // $$;
 					// }
 				}
+				} catch (ThrowException te) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						te.printStackTrace();
+					}
+					return te.getValue();
+				} catch (ValidateException ve) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						ve.printStackTrace();
+					}
+				} catch (RuntimeException rex) {
+					// rex.printStackTrace();
+					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
+				}
 				return F.NIL;
 			}
 			IExpr a = ast.arg1();
@@ -175,8 +178,8 @@ public class SpecialFunctions {
 			if (a.isZero() || b.isZero()) {
 				return F.CComplexInfinity;
 			}
+			try {
 			if (engine.isDoubleMode()) {
-				try {
 					double aDouble = Double.NaN;
 					double bDouble = Double.NaN;
 					try {
@@ -193,19 +196,6 @@ public class SpecialFunctions {
 					} else {
 						return F.num(GammaJS.beta(aDouble, bDouble));
 					}
-				} catch (ThrowException te) {
-					if (FEConfig.SHOW_STACKTRACE) {
-						te.printStackTrace();
-					}
-					return te.getValue();
-				} catch (ValidateException ve) {
-					if (FEConfig.SHOW_STACKTRACE) {
-						ve.printStackTrace();
-					}
-				} catch (RuntimeException rex) {
-					// rex.printStackTrace();
-					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
-				}
 			}
 			if (a.isNumber() && b.isNumber()) {
 				if (a.isInteger() && a.isPositive() && b.isInteger() && b.isPositive()) {
@@ -223,6 +213,19 @@ public class SpecialFunctions {
 			IExpr sum = a.plus(b);
 			if (sum.isInteger() && sum.isNegative()) {
 				return F.C0;
+			}
+			} catch (ThrowException te) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					te.printStackTrace();
+				}
+				return te.getValue();
+			} catch (ValidateException ve) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					ve.printStackTrace();
+				}
+			} catch (RuntimeException rex) {
+				// rex.printStackTrace();
+				return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
 			}
 			return F.NIL;
 		}
@@ -244,8 +247,16 @@ public class SpecialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.size() == 4) {
+			if (ast.isAST3()) {
+				return betaRegularized3(ast, engine);
+			}
+			if (ast.argSize()==4) {
+				return betaRegularized4(ast, engine);
+			}
+			return F.NIL;
+		}
 
+		private static IExpr betaRegularized3(final IAST ast, EvalEngine engine) {
 				try {
 			IExpr z = ast.arg1();
 			IExpr a = ast.arg2();
@@ -276,9 +287,18 @@ public class SpecialFunctions {
 						double zn = engine.evalDouble(z);
 						double an = engine.evalDouble(a);
 						double nn = engine.evalDouble(n);
-							// TODO improve with regularizedIncompleteBetaFunction() -
+						int iterationLimit = EvalEngine.get().getIterationLimit();
+						int aInt = (int) an;
+						if (aInt > iterationLimit && iterationLimit > 0) {
+							IterationLimitExceeded.throwIt(aInt, ast.topHead());
+						}
+						int nInt = (int) nn;
+						if (nInt > iterationLimit && iterationLimit > 0) {
+							IterationLimitExceeded.throwIt(nInt, ast.topHead());
+						}
+						// TODO improve with regularizedIncompleteBetaFunction() ???
 							// https://github.com/haifengl/smile/blob/master/math/src/main/java/smile/math/special/Beta.java
-						return F.num(de.lab4inf.math.functions.IncompleteBeta.incBeta(zn, an, nn));
+						return F.num(GammaJS.betaRegularized(zn, an, nn));
 						} catch (IllegalArgumentException rex) {
 							// from de.lab4inf.math.functions.IncompleteBeta.checkParameters()
 						} catch (ValidateException ve) {
@@ -292,6 +312,9 @@ public class SpecialFunctions {
 					// for n>=0; BetaRegularized(z, a, -n)=0
 					return F.C0;
 				}
+					if (ni > Config.MAX_POLYNOMIAL_DEGREE) {
+						PolynomialDegreeLimitExceeded.throwIt(ni);
+					}
 					IASTAppendable sum = F.PlusAlloc(ni);
 					// {k, 0, n - 1}
 					for (int k = 0; k < ni; k++) {
@@ -307,6 +330,48 @@ public class SpecialFunctions {
 					if (FEConfig.SHOW_STACKTRACE) {
 						rex.printStackTrace();
 					}
+				}
+			return F.NIL;
+		}
+
+		/**
+		 * Evaluate for 4 arguments
+		 *
+		 * @param ast
+		 * @param engine
+		 * @return
+		 */
+		private static IExpr betaRegularized4(final IAST ast, EvalEngine engine) {
+			try {
+				IExpr z = ast.arg1();
+				IExpr a = ast.arg2();
+				IExpr n = ast.arg3();
+				IExpr w = ast.arg4();
+				if (engine.isDoubleMode()) {
+					try {
+						double zn = engine.evalDouble(z);
+						double an = engine.evalDouble(a);
+						double nn = engine.evalDouble(n);
+						double wn = engine.evalDouble(w);
+						int iterationLimit = EvalEngine.get().getIterationLimit();
+						int aInt = (int) an;
+						if (aInt > iterationLimit && iterationLimit > 0) {
+							IterationLimitExceeded.throwIt(aInt, ast.topHead());
+						}
+						int nInt = (int) nn;
+						if (nInt > iterationLimit && iterationLimit > 0) {
+							IterationLimitExceeded.throwIt(nInt, ast.topHead());
+						}
+						return F.num(GammaJS.betaRegularized(zn, an, nn, wn));
+					} catch (IllegalArgumentException rex) {
+						// from de.lab4inf.math.functions.IncompleteBeta.checkParameters()
+					} catch (ValidateException ve) {
+						// from org.matheclipse.core.eval.EvalEngine.evalDouble()
+					}
+				}
+			} catch (RuntimeException rex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					rex.printStackTrace();
 				}
 			}
 			return F.NIL;
@@ -513,6 +578,7 @@ public class SpecialFunctions {
 	 *
 	 * @see org.matheclipse.core.reflection.system.InverseErf
 	 */
+	@SuppressWarnings("JavadocReference")
 	private final static class Erfi extends AbstractFunctionEvaluator {
 
 		@Override
@@ -573,25 +639,21 @@ public class SpecialFunctions {
 				IExpr z1 = ast.arg2();
 			if (ast.isAST3()) {
 					IExpr z2 = ast.arg3();
-					if (engine.isDoubleMode() && //
-							a.isNumericFunction() && z1.isNumericFunction()) {
-						double x = a.evalDouble();
-						return F.num(org.hipparchus.special.Gamma.regularizedGammaQ(x, z1.evalDouble()) - //
-								org.hipparchus.special.Gamma.regularizedGammaQ(x, z2.evalDouble()));
+					return gammaRegularzed3(a, z1, z2, ast, engine);
 					}
-				if (a.isOne()) {
-					// E^(-arg2)-E^(-arg3)
-						return F.Subtract(F.Power(F.E, F.Negate(z1)), F.Power(F.E, F.Negate(z2)));
+				return gammaRegularized2(a, z1, ast, engine);
+			} catch (MathIllegalArgumentException miae) {
+				return IOFunctions.printMessage(F.GammaRegularized, "argillegal",
+						F.List(F.stringx(miae.getMessage()), ast), engine);
+			} catch (RuntimeException rex) {
+				return IOFunctions.printMessage(F.GammaRegularized, "argillegal",
+						F.List(F.stringx(rex.getMessage()), ast), engine);
 				}
-				if (a.isInteger()&&a.isNegative()) {
-					return F.C0;
 			}
-				// TODO add more rules
 
 
 
-				return F.NIL;
-			}
+		private static IExpr gammaRegularized2(IExpr a, IExpr z1, IAST ast, EvalEngine engine) {
 			if (a.isZero()) {
 				return F.C0;
 			} else if (a.isNumEqualRational(F.C1D2)) {
@@ -603,11 +665,36 @@ public class SpecialFunctions {
 			} else if (a.isInteger() && a.isNegative()) {
 				return F.C0;
 			}
-				if (engine.isDoubleMode() && //
-						a.isNumericFunction() && z1.isNumericFunction()) {
-					return F.num(org.hipparchus.special.Gamma.regularizedGammaQ(a.evalDouble(), z1.evalDouble()));
+			if (engine.isDoubleMode()) {
+				try {
+					double aDouble = Double.NaN;
+					double z1Double = Double.NaN;
+					try {
+						aDouble = a.evalDouble();
+						z1Double = z1.evalDouble();
+					} catch (ValidateException ve) {
+					}
+					if (Double.isNaN(aDouble) || Double.isNaN(z1Double)) {
+						// TODO complex numbers
+					} else {
+						return F.num(GammaJS.gammaRegularized(aDouble, z1Double));
 				}
 
+				} catch (ThrowException te) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						te.printStackTrace();
+					}
+					return te.getValue();
+				} catch (ValidateException ve) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						ve.printStackTrace();
+					}
+					return engine.printMessage(ast.topHead() + ": " + ve.getMessage());
+				} catch (RuntimeException rex) {
+					// rex.printStackTrace();
+					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
+				}
+			}
 				if (z1.isZero()) {
 				IExpr temp = a.re();
 				if (temp.isPositive()) {
@@ -620,13 +707,53 @@ public class SpecialFunctions {
 				// (E/Gamma[a])*Subfactorial(a - 1)
 				return F.Times(F.E, F.Power(F.Gamma(a), -1), F.Subfactorial(F.Plus(F.CN1, a)));
 			}
-			} catch (MathIllegalArgumentException miae) {
-				return IOFunctions.printMessage(F.GammaRegularized, "argillegal",
-						F.List(F.stringx(miae.getMessage()), ast), engine);
+			return F.NIL;
+		}
+
+		private static IExpr gammaRegularzed3(IExpr a, IExpr z1, IExpr z2, final IAST ast, EvalEngine engine) {
+			if (engine.isDoubleMode()) {
+				try {
+					double aDouble = Double.NaN;
+					double z1Double = Double.NaN;
+					double z2Double = Double.NaN;
+					try {
+						aDouble = a.evalDouble();
+						z1Double = z1.evalDouble();
+						z2Double = z2.evalDouble();
+					} catch (ValidateException ve) {
+					}
+					if (Double.isNaN(aDouble) || Double.isNaN(z1Double) || //
+							Double.isNaN(z2Double)) {
+						// TODO
+						// Complex sc = s.evalComplex();
+						// Complex ac = a.evalComplex();
+						// return F.complexNum(ZetaJS.hurwitzZeta(sc, ac));
+					} else {
+						return F.num(GammaJS.gammaRegularized(aDouble, z1Double, z2Double));
+					}
+				} catch (ThrowException te) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						te.printStackTrace();
+					}
+					return te.getValue();
+				} catch (ValidateException ve) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						ve.printStackTrace();
+					}
+					return engine.printMessage(ast.topHead() + ": " + ve.getMessage());
 			} catch (RuntimeException rex) {
-				return IOFunctions.printMessage(F.GammaRegularized, "argillegal",
-						F.List(F.stringx(rex.getMessage()), ast), engine);
+					// rex.printStackTrace();
+					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
+				}
 			}
+			if (a.isOne()) {
+				// E^(-arg2)-E^(-arg3)
+				return F.Subtract(F.Power(F.E, F.Negate(z1)), F.Power(F.E, F.Negate(z2)));
+			}
+			if (a.isInteger() && a.isNegative()) {
+				return F.C0;
+			}
+			// TODO add more rules
 			return F.NIL;
 		}
 
@@ -748,6 +875,7 @@ public class SpecialFunctions {
 					if (FEConfig.SHOW_STACKTRACE) {
 						ve.printStackTrace();
 					}
+					return engine.printMessage(ast.topHead() + ": " + ve.getMessage());
 				} catch (RuntimeException rex) {
 					// rex.printStackTrace();
 					return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
@@ -771,6 +899,7 @@ public class SpecialFunctions {
 	/**
 	 * Returns the inverse erf.
 	 * 
+	 * @see org.matheclipse.core.reflection.system.Erf
 	 */
 	private final static class InverseErf extends AbstractTrigArg1 implements INumeric {
 
@@ -1063,7 +1192,7 @@ public class SpecialFunctions {
 				IExpr arg2 = ast.arg2();
 				IExpr z = ast.arg3();
 				if (z.isList()) {
-					return ((IAST) z).mapThread(ast.setAtCopy(3, F.Null), 3);
+					return ((IAST) z).mapThread(ast.setAtCopy(3, F.Slot1), 3);
 				}
 				if (arg1.isList() && arg2.isList()) {
 					IAST list1 = (IAST) arg1;
@@ -1372,12 +1501,12 @@ public class SpecialFunctions {
 				return d;
 			}
 			try {
-				return F.num(ApfloatMath.w(new Apfloat(new BigDecimal(d.doubleValue()), Config.MACHINE_PRECISION)));
+				return F.num(ApfloatMath.w(new Apfloat(new BigDecimal(d.doubleValue()), FEConfig.MACHINE_PRECISION)));
 			} catch (Exception ce) {
 
 			}
 			return F.complexNum(
-					ApcomplexMath.w(new Apfloat(new BigDecimal(d.doubleValue()), Config.MACHINE_PRECISION)));
+					ApcomplexMath.w(new Apfloat(new BigDecimal(d.doubleValue()), FEConfig.MACHINE_PRECISION)));
 		}
 
 		@Override
@@ -1385,11 +1514,11 @@ public class SpecialFunctions {
 			if (arg1.isZero()) {
 				return arg1;
 			}
-			Apcomplex c = new Apcomplex(new Apfloat(new BigDecimal(arg1.getRealPart()), Config.MACHINE_PRECISION),
-					new Apfloat(new BigDecimal(arg1.getImaginaryPart()), Config.MACHINE_PRECISION));
-//			if (Config.FUZZ_TESTING) {
-//				System.err.println(c.toString());
-//			}
+			Apcomplex c = new Apcomplex(new Apfloat(new BigDecimal(arg1.getRealPart()), FEConfig.MACHINE_PRECISION),
+					new Apfloat(new BigDecimal(arg1.getImaginaryPart()), FEConfig.MACHINE_PRECISION));
+			// if (Config.FUZZ_TESTING) {
+			// System.err.println(c.toString());
+			// }
 			return F.complexNum(ApcomplexMath.w(c));
 		}
 
@@ -1468,8 +1597,8 @@ public class SpecialFunctions {
 						if (z instanceof ComplexNum) {
 							ComplexNum cn = (ComplexNum) z;
 							Apcomplex c = new Apcomplex(
-									new Apfloat(new BigDecimal(cn.getRealPart()), Config.MACHINE_PRECISION),
-									new Apfloat(new BigDecimal(cn.getImaginaryPart()), Config.MACHINE_PRECISION));
+									new Apfloat(new BigDecimal(cn.getRealPart()), FEConfig.MACHINE_PRECISION),
+									new Apfloat(new BigDecimal(cn.getImaginaryPart()), FEConfig.MACHINE_PRECISION));
 							return F.complexNum(ApcomplexMath.w(c, ki));
 						}
 					}
@@ -1480,7 +1609,7 @@ public class SpecialFunctions {
 					if (z instanceof Num) {
 						Num n = (Num) z;
 						return F.complexNum(ApcomplexMath
-								.w(new Apfloat(new BigDecimal(n.doubleValue()), Config.MACHINE_PRECISION), ki));
+								.w(new Apfloat(new BigDecimal(n.doubleValue()), FEConfig.MACHINE_PRECISION), ki));
 					}
 				}
 			}

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,6 +28,8 @@
 
 package org.logicng.formulas;
 
+import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
+
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Substitution;
 import org.logicng.util.FormulaHelper;
@@ -41,12 +43,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
-import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
 
 /**
  * Super class for Boolean n-ary operators.
- *
- * @version 1.5.1
+ * @version 2.0.0
  * @since 1.0
  */
 public abstract class NAryOperator extends Formula {
@@ -56,7 +56,6 @@ public abstract class NAryOperator extends Formula {
 
     /**
      * Constructor.
-     *
      * @param type     the operator's type
      * @param operands the list of operands
      * @param f        the factory which created this instance
@@ -109,14 +108,14 @@ public abstract class NAryOperator extends Formula {
     @Override
     public SortedSet<Variable> variables() {
         if (this.variables == null) {
-            this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(operands));
+            this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(this.operands));
         }
         return this.variables;
     }
 
     @Override
     public SortedSet<Literal> literals() {
-        return Collections.unmodifiableSortedSet(FormulaHelper.literals(operands));
+        return Collections.unmodifiableSortedSet(FormulaHelper.literals(this.operands));
     }
 
     @Override
@@ -194,7 +193,6 @@ public abstract class NAryOperator extends Formula {
 
     /**
      * Helper method for generating the hashcode.
-     *
      * @param shift shift value
      * @return hashcode
      */
@@ -208,6 +206,25 @@ public abstract class NAryOperator extends Formula {
             this.hashCode = temp;
         }
         return this.hashCode;
+    }
+
+    protected boolean compareOperands(final Formula[] other) {
+        if (this.operands.length != other.length) {
+            return false;
+        }
+        for (final Formula op1 : this.operands) {
+            boolean found = false;
+            for (final Formula op2 : other) {
+                if (op1.equals(op2)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -234,4 +251,5 @@ public abstract class NAryOperator extends Formula {
             }
         };
     }
+
 }

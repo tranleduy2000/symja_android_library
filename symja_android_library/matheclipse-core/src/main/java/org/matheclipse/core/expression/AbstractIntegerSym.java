@@ -771,7 +771,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	@Override
-	public ISignedNumber roundClosest(ISignedNumber multiple) {
+	public IRational roundClosest(ISignedNumber multiple) {
 		if (!multiple.isRational()) {
 			// Android changed: use DOUBLE_TOLERANCE to avoid infinity loop in some functions
 			multiple = F.fraction(multiple.doubleValue(), Config.DOUBLE_TOLERANCE);
@@ -796,7 +796,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 	}
 
 	@Override
-	public abstract ISignedNumber inverse();
+	public abstract IRational inverse();
 
 	// public static BigInteger jacobiSymbol(long a, long b) {
 	// return jacobiSymbol(BigInteger.valueOf(a), BigInteger.valueOf(b));

@@ -27,7 +27,7 @@ import org.junit.*;
 import org.junit.experimental.categories.*;
 
 import java.util.*;
-import java.util.stream.*;
+import com.duy.stream.*;
 
 import static org.jgrapht.util.MathUtil.log2;
 

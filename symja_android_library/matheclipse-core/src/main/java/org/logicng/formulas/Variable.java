@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -32,7 +32,6 @@ package org.logicng.formulas;
  * Boolean variables.
  * <p>
  * A variable is a shortcut for a positive literal.
- *
  * @version 1.0
  * @since 1.0
  */
@@ -40,7 +39,6 @@ public class Variable extends Literal {
 
     /**
      * Constructor.
-     *
      * @param name the literal name
      * @param f    the factory which created this literal
      */

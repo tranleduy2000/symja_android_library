@@ -28,6 +28,7 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * That is, the entire data set need not be loaded into memory. As observations
  * become available, they can be added to the regression  model and an updated
  * estimate regression statistics can be calculated.
+ *
  */
 public interface UpdatingMultipleLinearRegression {
 
@@ -51,7 +52,7 @@ public interface UpdatingMultipleLinearRegression {
      * @param x the independent variables which form the design matrix
      * @param y the dependent or response variable
      * @throws MathIllegalArgumentException if the length of {@code x} does not equal
-     *                                      the number of independent variables in the model
+     * the number of independent variables in the model
      */
     void addObservation(double[] x, double y) throws MathIllegalArgumentException;
 
@@ -61,9 +62,9 @@ public interface UpdatingMultipleLinearRegression {
      *
      * @param x a series of observations on the independent variables
      * @param y a series of observations on the dependent variable
-     *          The length of x and y must be the same
+     * The length of x and y must be the same
      * @throws MathIllegalArgumentException if {@code x} is not rectangular, does not match
-     *                                      the length of {@code y} or does not contain sufficient data to estimate the model
+     * the length of {@code y} or does not contain sufficient data to estimate the model
      */
     void addObservations(double[][] x, double[] y) throws MathIllegalArgumentException;
 
@@ -76,18 +77,16 @@ public interface UpdatingMultipleLinearRegression {
 
     /**
      * Performs a regression on data present in buffers and outputs a RegressionResults object
-     *
      * @return RegressionResults acts as a container of regression output
      * @throws MathIllegalArgumentException if the model is not correctly specified
      * @throws MathIllegalArgumentException if there is not sufficient data in the model to
-     *                                      estimate the regression parameters
+     * estimate the regression parameters
      */
     RegressionResults regress() throws MathIllegalArgumentException;
 
     /**
      * Performs a regression on data present in buffers including only regressors
      * indexed in variablesToInclude and outputs a RegressionResults object
-     *
      * @param variablesToInclude an array of indices of regressors to include
      * @return RegressionResults acts as a container of regression output
      * @throws MathIllegalArgumentException if the model is not correctly specified

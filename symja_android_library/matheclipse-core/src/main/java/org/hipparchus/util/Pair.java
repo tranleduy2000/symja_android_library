@@ -33,13 +33,9 @@ package org.hipparchus.util;
  * @param <V> Value type.
  */
 public class Pair<K, V> {
-    /**
-     * Key.
-     */
+    /** Key. */
     private final K key;
-    /**
-     * Value.
-     */
+    /** Value. */
     private final V value;
 
     /**
@@ -61,20 +57,6 @@ public class Pair<K, V> {
      */
     public Pair(Pair<? extends K, ? extends V> entry) {
         this(entry.getKey(), entry.getValue());
-    }
-
-    /**
-     * Convenience factory method that calls the
-     * {@link #Pair(Object, Object) constructor}.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     * @param k   First element of the pair.
-     * @param v   Second element of the pair.
-     * @return a new {@code Pair} containing {@code k} and {@code v}.
-     */
-    public static <K, V> Pair<K, V> create(K k, V v) {
-        return new Pair<K, V>(k, v);
     }
 
     /**
@@ -130,9 +112,9 @@ public class Pair<K, V> {
         }
         Pair<?, ?> other = (Pair<?, ?>) o;
         return (key == null ? other.key == null :
-                key.equals(other.key)) &&
-                (value == null ? other.value == null :
-                        value.equals(other.value));
+                              key.equals(other.key)) &&
+               (value == null ? other.value == null :
+                                value.equals(other.value));
     }
 
     /**
@@ -150,11 +132,23 @@ public class Pair<K, V> {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "[" + getKey() + ", " + getValue() + "]";
+    }
+
+    /**
+     * Convenience factory method that calls the
+     * {@link #Pair(Object, Object) constructor}.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param k First element of the pair.
+     * @param v Second element of the pair.
+     * @return a new {@code Pair} containing {@code k} and {@code v}.
+     */
+    public static <K, V> Pair<K, V> create(K k, V v) {
+        return new Pair<K, V>(k, v);
     }
 }

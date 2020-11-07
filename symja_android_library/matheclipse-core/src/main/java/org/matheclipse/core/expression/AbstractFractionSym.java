@@ -2,8 +2,6 @@ package org.matheclipse.core.expression;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
-import org.hipparchus.exception.LocalizedCoreFormats;
-import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;
@@ -32,8 +30,6 @@ import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
 import java.math.BigInteger;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import it.unimi.dsi.fastutil.objects.Int2IntMap;
 import it.unimi.dsi.fastutil.objects.Int2IntRBTreeMap;
@@ -464,7 +460,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 	}
 
 	@Override
-	public ISignedNumber roundClosest(ISignedNumber multiple) {
+	public IRational roundClosest(ISignedNumber multiple) {
 		if (!multiple.isRational()) {
 			multiple = F.fraction(multiple.doubleValue(), Config.DOUBLE_EPSILON);
 		}

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -33,15 +33,13 @@ import org.logicng.formulas.Variable;
 
 /**
  * The interface for at-most-one (AMO) cardinality constraints.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
-interface CCAtMostOne {
+public interface CCAtMostOne {
 
     /**
      * Builds a cardinality constraint of the form {@code var_1 + var_2 + ... + var_n <= 1}.
-     *
      * @param result the result for the encoding
      * @param vars   the variables {@code var_1 ... var_n}
      */

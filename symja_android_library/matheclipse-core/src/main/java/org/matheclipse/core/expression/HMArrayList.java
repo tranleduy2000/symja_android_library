@@ -879,7 +879,7 @@ public abstract class HMArrayList extends IASTAppendableImpl implements Cloneabl
 
 	/** {@inheritDoc} */
 	@Override
-	public final IAST map(final Function<IExpr, IExpr> function, final int startOffset) {
+	public IAST map(final Function<IExpr, IExpr> function, final int startOffset) {
 		// Swift changed: fix incompatible type
 		IASTMutable result = F.nilPtr();
 		int i = firstIndex + startOffset;

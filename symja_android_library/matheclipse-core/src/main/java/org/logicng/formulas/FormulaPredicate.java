@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,15 +30,14 @@ package org.logicng.formulas;
 
 /**
  * A predicate on a formula.
- *
- * @version 1.0
+ * @version 2.0.0
  * @since 1.0
  */
+@FunctionalInterface
 public interface FormulaPredicate {
 
     /**
      * Tests the predicate on a given formula.
-     *
      * @param formula the input formula
      * @param cache   indicates whether the result should be cached in the formula's cache
      * @return {@code true} if the formula holds, {@code false} otherwise

@@ -15,7 +15,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import java.util.Calendar;
 import java.util.Properties;
 
-import ch.ethz.idsc.tensor.io.ResourceData;
+import org.matheclipse.core.tensor.io.ResourceData;
 
 import static org.matheclipse.core.expression.F.Power;
 import static org.matheclipse.core.expression.F.Times;

@@ -21,6 +21,7 @@
  */
 
 package org.hipparchus.stat.regression;
+import java.io.Serializable;
 
 import org.hipparchus.distribution.continuous.TDistribution;
 import org.hipparchus.exception.LocalizedCoreFormats;
@@ -29,8 +30,6 @@ import org.hipparchus.stat.LocalizedStatFormats;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
-
-import java.io.Serializable;
 
 /**
  * Estimates an ordinary least squares regression model
@@ -64,49 +63,39 @@ import java.io.Serializable;
  * {@code hasIntercept} property is false, the model is estimated without a
  * constant term and {@link #getIntercept()} returns {@code 0}.</li>
  * </ul></p>
+ *
  */
 public class SimpleRegression implements Serializable, UpdatingMultipleLinearRegression {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = -3004689053607543335L;
-    /**
-     * include an intercept or not
-     */
-    private final boolean hasIntercept;
-    /**
-     * sum of x values
-     */
+
+    /** sum of x values */
     private double sumX;
-    /**
-     * total variation in x (sum of squared deviations from xbar)
-     */
+
+    /** total variation in x (sum of squared deviations from xbar) */
     private double sumXX;
-    /**
-     * sum of y values
-     */
+
+    /** sum of y values */
     private double sumY;
-    /**
-     * total variation in y (sum of squared deviations from ybar)
-     */
+
+    /** total variation in y (sum of squared deviations from ybar) */
     private double sumYY;
-    /**
-     * sum of products
-     */
+
+    /** sum of products */
     private double sumXY;
-    /**
-     * number of observations
-     */
+
+    /** number of observations */
     private long n;
-    /**
-     * mean of accumulated x values, used in updating formulas
-     */
+
+    /** mean of accumulated x values, used in updating formulas */
     private double xbar;
-    /**
-     * mean of accumulated y values, used in updating formulas
-     */
+
+    /** mean of accumulated y values, used in updating formulas */
     private double ybar;
+
+    /** include an intercept or not */
+    private final boolean hasIntercept;
     // ---------------------Public methods--------------------------------------
 
     /**
@@ -115,18 +104,17 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
     public SimpleRegression() {
         this(true);
     }
-
     /**
-     * Create a SimpleRegression instance, specifying whether or not to estimate
-     * an intercept.
-     *
-     * <p>Use {@code false} to estimate a model with no intercept.  When the
-     * {@code hasIntercept} property is false, the model is estimated without a
-     * constant term and {@link #getIntercept()} returns {@code 0}.</p>
-     *
-     * @param includeIntercept whether or not to include an intercept term in
-     *                         the regression model
-     */
+    * Create a SimpleRegression instance, specifying whether or not to estimate
+    * an intercept.
+    *
+    * <p>Use {@code false} to estimate a model with no intercept.  When the
+    * {@code hasIntercept} property is false, the model is estimated without a
+    * constant term and {@link #getIntercept()} returns {@code 0}.</p>
+    *
+    * @param includeIntercept whether or not to include an intercept term in
+    * the regression model
+    */
     public SimpleRegression(boolean includeIntercept) {
         super();
         hasIntercept = includeIntercept;
@@ -141,15 +129,16 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      * 1983, American Statistician, vol. 37, pp. 242-247, referenced in
      * Weisberg, S. "Applied Linear Regression". 2nd Ed. 1985.</p>
      *
+     *
      * @param x independent variable value
      * @param y dependent variable value
      */
-    public void addData(final double x, final double y) {
+    public void addData(final double x,final double y) {
         if (n == 0) {
             xbar = x;
             ybar = y;
         } else {
-            if (hasIntercept) {
+            if( hasIntercept ){
                 final double fact1 = 1.0 + n;
                 final double fact2 = n / (1.0 + n);
                 final double dx = x - xbar;
@@ -160,11 +149,11 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
                 xbar += dx / fact1;
                 ybar += dy / fact1;
             }
-        }
-        if (!hasIntercept) {
-            sumXX += x * x;
-            sumYY += y * y;
-            sumXY += x * y;
+         }
+        if( !hasIntercept ){
+            sumXX += x * x ;
+            sumYY += y * y ;
+            sumXY += x * y ;
         }
         sumX += x;
         sumY += y;
@@ -202,7 +191,7 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
                 sumXY += reg.sumXY + dx * dy * fact2;
                 xbar += dx * fact1;
                 ybar += dy * fact1;
-            } else {
+            }else{
                 sumXX += reg.sumXX;
                 sumYY += reg.sumYY;
                 sumXY += reg.sumXY;
@@ -220,13 +209,13 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      * SimpleRegression instances in streaming mode where the regression
      * is applied to a sliding "window" of observations, however the caller is
      * responsible for maintaining the set of observations in the window.</p>
-     * <p>
+     *
      * The method has no effect if there are no points of data (i.e. n=0)
      *
      * @param x independent variable value
      * @param y dependent variable value
      */
-    public void removeData(final double x, final double y) {
+    public void removeData(final double x,final double y) {
         if (n > 0) {
             if (hasIntercept) {
                 final double fact1 = n - 1.0;
@@ -246,9 +235,9 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
                 xbar -= x / fact1;
                 ybar -= y / fact1;
             }
-            sumX -= x;
-            sumY -= y;
-            n--;
+             sumX -= x;
+             sumY -= y;
+             n--;
         }
     }
 
@@ -268,21 +257,69 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      *
      * @param data array of observations to be added
      * @throws MathIllegalArgumentException if the length of {@code data[i]} is not
-     *                                      greater than or equal to 2
+     * greater than or equal to 2
      */
     public void addData(final double[][] data) throws MathIllegalArgumentException {
         for (int i = 0; i < data.length; i++) {
-            if (data[i].length < 2) {
-                throw new MathIllegalArgumentException(LocalizedStatFormats.INVALID_REGRESSION_OBSERVATION,
-                        data[i].length, 2);
+            if( data[i].length < 2 ){
+               throw new MathIllegalArgumentException(LocalizedStatFormats.INVALID_REGRESSION_OBSERVATION,
+                    data[i].length, 2);
             }
             addData(data[i][0], data[i][1]);
         }
     }
 
     /**
+     * Adds one observation to the regression model.
+     *
+     * @param x the independent variables which form the design matrix
+     * @param y the dependent or response variable
+     * @throws MathIllegalArgumentException if the length of {@code x} does not equal
+     * the number of independent variables in the model
+     */
+    @Override
+    public void addObservation(final double[] x,final double y)
+            throws MathIllegalArgumentException {
+        if( x == null || x.length == 0 ){
+            throw new MathIllegalArgumentException(LocalizedStatFormats.INVALID_REGRESSION_OBSERVATION,x!=null?x.length:0, 1);
+        }
+        addData( x[0], y );
+    }
+
+    /**
+     * Adds a series of observations to the regression model. The lengths of
+     * x and y must be the same and x must be rectangular.
+     *
+     * @param x a series of observations on the independent variables
+     * @param y a series of observations on the dependent variable
+     * The length of x and y must be the same
+     * @throws MathIllegalArgumentException if {@code x} is not rectangular, does not match
+     * the length of {@code y} or does not contain sufficient data to estimate the model
+     */
+    @Override
+    public void addObservations(final double[][] x,final double[] y) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(x, LocalizedCoreFormats.INPUT_ARRAY);
+        MathUtils.checkNotNull(y, LocalizedCoreFormats.INPUT_ARRAY);
+        MathUtils.checkDimension(x.length, y.length);
+        boolean obsOk = true;
+        for( int i = 0 ; i < x.length; i++){
+            if( x[i] == null || x[i].length == 0 ){
+                obsOk = false;
+            }
+        }
+        if( !obsOk ){
+            throw new MathIllegalArgumentException(
+                  LocalizedStatFormats.NOT_ENOUGH_DATA_FOR_NUMBER_OF_PREDICTORS,
+                  0, 1);
+        }
+        for( int i = 0 ; i < x.length ; i++){
+            addData( x[i][0], y[i] );
+        }
+    }
+
+    /**
      * Removes observations represented by the elements in <code>data</code>.
-     * <p>
+      * <p>
      * If the array is larger than the current n, only the first n elements are
      * processed.  This method permits the use of SimpleRegression instances in
      * streaming mode where the regression is applied to a sliding "window" of
@@ -297,6 +334,29 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
         for (int i = 0; i < data.length && n > 0; i++) {
             removeData(data[i][0], data[i][1]);
         }
+    }
+
+    /**
+     * Clears all data from the model.
+     */
+    @Override
+    public void clear() {
+        sumX = 0d;
+        sumXX = 0d;
+        sumY = 0d;
+        sumYY = 0d;
+        sumXY = 0d;
+        n = 0;
+    }
+
+    /**
+     * Returns the number of observations that have been added to the model.
+     *
+     * @return n number of observations that have been added.
+     */
+    @Override
+    public long getN() {
+        return n;
     }
 
     /**
@@ -359,222 +419,21 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
     }
 
     /**
-     * Returns the number of observations that have been added to the model.
-     *
-     * @return n number of observations that have been added.
-     */
-    @Override
-    public long getN() {
-        return n;
-    }
-
-    /**
-     * Adds one observation to the regression model.
-     *
-     * @param x the independent variables which form the design matrix
-     * @param y the dependent or response variable
-     * @throws MathIllegalArgumentException if the length of {@code x} does not equal
-     *                                      the number of independent variables in the model
-     */
-    @Override
-    public void addObservation(final double[] x, final double y)
-            throws MathIllegalArgumentException {
-        if (x == null || x.length == 0) {
-            throw new MathIllegalArgumentException(LocalizedStatFormats.INVALID_REGRESSION_OBSERVATION, x != null ? x.length : 0, 1);
-        }
-        addData(x[0], y);
-    }
-
-    /**
-     * Adds a series of observations to the regression model. The lengths of
-     * x and y must be the same and x must be rectangular.
-     *
-     * @param x a series of observations on the independent variables
-     * @param y a series of observations on the dependent variable
-     *          The length of x and y must be the same
-     * @throws MathIllegalArgumentException if {@code x} is not rectangular, does not match
-     *                                      the length of {@code y} or does not contain sufficient data to estimate the model
-     */
-    @Override
-    public void addObservations(final double[][] x, final double[] y) throws MathIllegalArgumentException {
-        MathUtils.checkNotNull(x, LocalizedCoreFormats.INPUT_ARRAY);
-        MathUtils.checkNotNull(y, LocalizedCoreFormats.INPUT_ARRAY);
-        MathUtils.checkDimension(x.length, y.length);
-        boolean obsOk = true;
-        for (int i = 0; i < x.length; i++) {
-            if (x[i] == null || x[i].length == 0) {
-                obsOk = false;
-            }
-        }
-        if (!obsOk) {
-            throw new MathIllegalArgumentException(
-                    LocalizedStatFormats.NOT_ENOUGH_DATA_FOR_NUMBER_OF_PREDICTORS,
-                    0, 1);
-        }
-        for (int i = 0; i < x.length; i++) {
-            addData(x[i][0], y[i]);
-        }
-    }
-
-    /**
-     * Clears all data from the model.
-     */
-    @Override
-    public void clear() {
-        sumX = 0d;
-        sumXX = 0d;
-        sumY = 0d;
-        sumYY = 0d;
-        sumXY = 0d;
-        n = 0;
-    }
-
-    /**
-     * Performs a regression on data present in buffers and outputs a RegressionResults object.
-     *
-     * <p>If there are fewer than 3 observations in the model and {@code hasIntercept} is true
-     * a {@code MathIllegalArgumentException} is thrown.  If there is no intercept term, the model must
-     * contain at least 2 observations.</p>
-     *
-     * @return RegressionResults acts as a container of regression output
-     * @throws MathIllegalArgumentException if the model is not correctly specified
-     * @throws MathIllegalArgumentException if there is not sufficient data in the model to
-     *                                      estimate the regression parameters
-     */
-    @Override
-    public RegressionResults regress() throws MathIllegalArgumentException {
-        if (hasIntercept) {
-            if (n < 3) {
-                throw new MathIllegalArgumentException(LocalizedStatFormats.NOT_ENOUGH_DATA_REGRESSION);
-            }
-            if (FastMath.abs(sumXX) > Precision.SAFE_MIN) {
-                final double[] params = new double[]{getIntercept(), getSlope()};
-                final double mse = getMeanSquareError();
-                final double _syy = sumYY + sumY * sumY / n;
-                final double[] vcv = new double[]{mse * (xbar * xbar / sumXX + 1.0 / n), -xbar * mse / sumXX, mse / sumXX};
-                return new RegressionResults(params, new double[][]{vcv}, true, n, 2, sumY, _syy, getSumSquaredErrors(), true,
-                        false);
-            } else {
-                final double[] params = new double[]{sumY / n, Double.NaN};
-                // final double mse = getMeanSquareError();
-                final double[] vcv = new double[]{ybar / (n - 1.0), Double.NaN, Double.NaN};
-                return new RegressionResults(params, new double[][]{vcv}, true, n, 1, sumY, sumYY, getSumSquaredErrors(), true,
-                        false);
-            }
-        } else {
-            if (n < 2) {
-                throw new MathIllegalArgumentException(LocalizedStatFormats.NOT_ENOUGH_DATA_REGRESSION);
-            }
-            if (!Double.isNaN(sumXX)) {
-                final double[] vcv = new double[]{getMeanSquareError() / sumXX};
-                final double[] params = new double[]{sumXY / sumXX};
-                return new RegressionResults(params, new double[][]{vcv}, true, n, 1, sumY, sumYY, getSumSquaredErrors(), false,
-                        false);
-            } else {
-                final double[] vcv = new double[]{Double.NaN};
-                final double[] params = new double[]{Double.NaN};
-                return new RegressionResults(params, new double[][]{vcv}, true, n, 1, Double.NaN, Double.NaN, Double.NaN, false,
-                        false);
-            }
-        }
-    }
-
-    /**
-     * Performs a regression on data present in buffers including only regressors
-     * indexed in variablesToInclude and outputs a RegressionResults object
-     *
-     * @param variablesToInclude an array of indices of regressors to include
-     * @return RegressionResults acts as a container of regression output
-     * @throws MathIllegalArgumentException if the variablesToInclude array is null or zero length
-     * @throws MathIllegalArgumentException if a requested variable is not present in model
-     */
-    @Override
-    public RegressionResults regress(int[] variablesToInclude) throws MathIllegalArgumentException {
-        if (variablesToInclude == null || variablesToInclude.length == 0) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.ARRAY_ZERO_LENGTH_OR_NULL_NOT_ALLOWED);
-        }
-        if (variablesToInclude.length > 2 || (variablesToInclude.length > 1 && !hasIntercept)) {
-            throw new MathIllegalArgumentException(
-                    LocalizedCoreFormats.ARRAY_SIZE_EXCEEDS_MAX_VARIABLES,
-                    (variablesToInclude.length > 1 && !hasIntercept) ? 1 : 2);
-        }
-
-        if (hasIntercept) {
-            if (variablesToInclude.length == 2) {
-                if (variablesToInclude[0] == 1) {
-                    throw new MathIllegalArgumentException(LocalizedCoreFormats.NOT_INCREASING_SEQUENCE);
-                } else if (variablesToInclude[0] != 0) {
-                    throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
-                            variablesToInclude[0], 0, 1);
-                }
-                if (variablesToInclude[1] != 1) {
-                    throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
-                            variablesToInclude[0], 0, 1);
-                }
-                return regress();
-            } else {
-                if (variablesToInclude[0] != 1 && variablesToInclude[0] != 0) {
-                    throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
-                            variablesToInclude[0], 0, 1);
-                }
-                final double _mean = sumY * sumY / n;
-                final double _syy = sumYY + _mean;
-                if (variablesToInclude[0] == 0) {
-                    //just the mean
-                    final double[] vcv = new double[]{sumYY / (((n - 1) * n))};
-                    final double[] params = new double[]{ybar};
-                    return new RegressionResults(
-                            params, new double[][]{vcv}, true, n, 1,
-                            sumY, _syy + _mean, sumYY, true, false);
-
-                } else if (variablesToInclude[0] == 1) {
-                    //final double _syy = sumYY + sumY * sumY / ((double) n);
-                    final double _sxx = sumXX + sumX * sumX / n;
-                    final double _sxy = sumXY + sumX * sumY / n;
-                    final double _sse = FastMath.max(0d, _syy - _sxy * _sxy / _sxx);
-                    final double _mse = _sse / ((n - 1));
-                    if (!Double.isNaN(_sxx)) {
-                        final double[] vcv = new double[]{_mse / _sxx};
-                        final double[] params = new double[]{_sxy / _sxx};
-                        return new RegressionResults(
-                                params, new double[][]{vcv}, true, n, 1,
-                                sumY, _syy, _sse, false, false);
-                    } else {
-                        final double[] vcv = new double[]{Double.NaN};
-                        final double[] params = new double[]{Double.NaN};
-                        return new RegressionResults(
-                                params, new double[][]{vcv}, true, n, 1,
-                                Double.NaN, Double.NaN, Double.NaN, false, false);
-                    }
-                }
-            }
-        } else {
-            if (variablesToInclude[0] != 0) {
-                throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
-                        variablesToInclude[0], 0, 0);
-            }
-            return regress();
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the slope of the estimated regression line.
-     * <p>
-     * The least squares estimate of the slope is computed using the
-     * <a href="http://www.xycoon.com/estimation4.htm">normal equations</a>.
-     * The slope is sometimes denoted b1.</p>
-     * <p>
-     * <strong>Preconditions</strong>: <ul>
-     * <li>At least two observations (with at least two different x values)
-     * must have been added before invoking this method. If this method is
-     * invoked before a model can be estimated, <code>Double.NaN</code> is
-     * returned.
-     * </li></ul></p>
-     *
-     * @return the slope of the regression line
-     */
+    * Returns the slope of the estimated regression line.
+    * <p>
+    * The least squares estimate of the slope is computed using the
+    * <a href="http://www.xycoon.com/estimation4.htm">normal equations</a>.
+    * The slope is sometimes denoted b1.</p>
+    * <p>
+    * <strong>Preconditions</strong>: <ul>
+    * <li>At least two observations (with at least two different x values)
+    * must have been added before invoking this method. If this method is
+    * invoked before a model can be estimated, <code>Double.NaN</code> is
+    * returned.
+    * </li></ul></p>
+    *
+    * @return the slope of the regression line
+    */
     public double getSlope() {
         if (n < 2) {
             return Double.NaN; //not enough data
@@ -637,7 +496,7 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
 
     /**
      * Returns the sum of squared deviations of the x values about their mean.
-     * <p>
+     *
      * If {@code n < 2}, this returns <code>Double.NaN</code>.</p>
      *
      * @return sum of squared deviations of x values
@@ -750,11 +609,11 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      * @return standard error associated with intercept estimate
      */
     public double getInterceptStdErr() {
-        if (!hasIntercept) {
+        if( !hasIntercept ){
             return Double.NaN;
         }
         return FastMath.sqrt(
-                getMeanSquareError() * ((1d / n) + (xbar * xbar) / sumXX));
+            getMeanSquareError() * ((1d / n) + (xbar * xbar) / sumXX));
     }
 
     /**
@@ -798,8 +657,6 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
         return getSlopeConfidenceInterval(0.05d);
     }
 
-    // ---------------------Private methods-----------------------------------
-
     /**
      * Returns the half-width of a (100-100*alpha)% confidence interval for
      * the slope estimate.
@@ -832,18 +689,18 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      * @throws MathIllegalArgumentException if the confidence interval can not be computed.
      */
     public double getSlopeConfidenceInterval(final double alpha)
-            throws MathIllegalArgumentException {
+    throws MathIllegalArgumentException {
         if (n < 3) {
             return Double.NaN;
         }
         if (alpha >= 1 || alpha <= 0) {
             throw new MathIllegalArgumentException(LocalizedStatFormats.SIGNIFICANCE_LEVEL,
-                    alpha, 0, 1);
+                                          alpha, 0, 1);
         }
         // No advertised MathIllegalArgumentException here - will return NaN above
         TDistribution distribution = new TDistribution(n - 2);
         return getSlopeStdErr() *
-                distribution.inverseCumulativeProbability(1d - alpha / 2d);
+            distribution.inverseCumulativeProbability(1d - alpha / 2d);
     }
 
     /**
@@ -865,7 +722,8 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      * <code>Double.NaN</code>.</p>
      *
      * @return significance level for slope/correlation
-     * @throws org.hipparchus.exception.MathIllegalStateException if the significance level can not be computed.
+     * @throws org.hipparchus.exception.MathIllegalStateException
+     * if the significance level can not be computed.
      */
     public double getSignificance() {
         if (n < 3) {
@@ -874,22 +732,24 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
         // No advertised MathIllegalArgumentException here - will return NaN above
         TDistribution distribution = new TDistribution(n - 2);
         return 2d * (1.0 - distribution.cumulativeProbability(
-                FastMath.abs(getSlope()) / getSlopeStdErr()));
+                    FastMath.abs(getSlope()) / getSlopeStdErr()));
     }
 
+    // ---------------------Private methods-----------------------------------
+
     /**
-     * Returns the intercept of the estimated regression line, given the slope.
-     * <p>
-     * Will return <code>NaN</code> if slope is <code>NaN</code>.</p>
-     *
-     * @param slope current slope
-     * @return the intercept of the regression line
-     */
+    * Returns the intercept of the estimated regression line, given the slope.
+    * <p>
+    * Will return <code>NaN</code> if slope is <code>NaN</code>.</p>
+    *
+    * @param slope current slope
+    * @return the intercept of the regression line
+    */
     private double getIntercept(final double slope) {
-        if (hasIntercept) {
-            return (sumY - slope * sumX) / n;
-        }
-        return 0.0;
+      if( hasIntercept){
+        return (sumY - slope * sumX) / n;
+      }
+      return 0.0;
     }
 
     /**
@@ -900,5 +760,134 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      */
     private double getRegressionSumSquares(final double slope) {
         return slope * slope * sumXX;
+    }
+
+    /**
+     * Performs a regression on data present in buffers and outputs a RegressionResults object.
+     *
+     * <p>If there are fewer than 3 observations in the model and {@code hasIntercept} is true
+     * a {@code MathIllegalArgumentException} is thrown.  If there is no intercept term, the model must
+     * contain at least 2 observations.</p>
+     *
+     * @return RegressionResults acts as a container of regression output
+     * @throws MathIllegalArgumentException if the model is not correctly specified
+     * @throws MathIllegalArgumentException if there is not sufficient data in the model to
+     * estimate the regression parameters
+     */
+    @Override
+    public RegressionResults regress() throws MathIllegalArgumentException {
+        if (hasIntercept) {
+            if (n < 3) {
+                throw new MathIllegalArgumentException(LocalizedStatFormats.NOT_ENOUGH_DATA_REGRESSION);
+            }
+            if (FastMath.abs(sumXX) > Precision.SAFE_MIN) {
+                final double[] params = { getIntercept(), getSlope() };
+                final double mse = getMeanSquareError();
+                final double _syy = sumYY + sumY * sumY / n;
+                final double[] vcv = { mse * (xbar * xbar / sumXX + 1.0 / n), -xbar * mse / sumXX, mse / sumXX };
+                return new RegressionResults(params, new double[][] { vcv }, true, n, 2, sumY, _syy, getSumSquaredErrors(), true,
+                        false);
+            } else {
+                final double[] params = { sumY / n, Double.NaN };
+                // final double mse = getMeanSquareError();
+                final double[] vcv = { ybar / (n - 1.0), Double.NaN, Double.NaN };
+                return new RegressionResults(params, new double[][] { vcv }, true, n, 1, sumY, sumYY, getSumSquaredErrors(), true,
+                        false);
+            }
+        } else {
+            if (n < 2) {
+                throw new MathIllegalArgumentException(LocalizedStatFormats.NOT_ENOUGH_DATA_REGRESSION);
+            }
+            if (!Double.isNaN(sumXX)) {
+                final double[] vcv = { getMeanSquareError() / sumXX };
+                final double[] params = { sumXY / sumXX };
+                return new RegressionResults(params, new double[][] { vcv }, true, n, 1, sumY, sumYY, getSumSquaredErrors(), false,
+                        false);
+            } else {
+                final double[] vcv = { Double.NaN };
+                final double[] params = { Double.NaN };
+                return new RegressionResults(params, new double[][] { vcv }, true, n, 1, Double.NaN, Double.NaN, Double.NaN, false,
+                        false);
+            }
+        }
+    }
+
+    /**
+     * Performs a regression on data present in buffers including only regressors
+     * indexed in variablesToInclude and outputs a RegressionResults object
+     * @param variablesToInclude an array of indices of regressors to include
+     * @return RegressionResults acts as a container of regression output
+     * @throws MathIllegalArgumentException if the variablesToInclude array is null or zero length
+     * @throws MathIllegalArgumentException if a requested variable is not present in model
+     */
+    @Override
+    public RegressionResults regress(int[] variablesToInclude) throws MathIllegalArgumentException {
+        if (variablesToInclude == null || variablesToInclude.length == 0) {
+          throw new MathIllegalArgumentException(LocalizedCoreFormats.ARRAY_ZERO_LENGTH_OR_NULL_NOT_ALLOWED);
+        }
+        if (variablesToInclude.length > 2 || (variablesToInclude.length > 1 && !hasIntercept)) {
+            throw new MathIllegalArgumentException(
+                    LocalizedCoreFormats.ARRAY_SIZE_EXCEEDS_MAX_VARIABLES,
+                    (variablesToInclude.length > 1 && !hasIntercept) ? 1 : 2);
+        }
+
+        if (hasIntercept) {
+            if (variablesToInclude.length == 2) {
+                if (variablesToInclude[0] == 1) {
+                    throw new MathIllegalArgumentException(LocalizedCoreFormats.NOT_INCREASING_SEQUENCE);
+                } else if (variablesToInclude[0] != 0) {
+                    throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
+                                                           variablesToInclude[0], 0, 1);
+                }
+                if (variablesToInclude[1] != 1) {
+                     throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
+                                                            variablesToInclude[0], 0, 1);
+                }
+                return regress();
+            }else{
+                if( variablesToInclude[0] != 1 && variablesToInclude[0] != 0 ) {
+                     throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
+                                                            variablesToInclude[0], 0, 1);
+                }
+                final double _mean = sumY * sumY / n;
+                final double _syy = sumYY + _mean;
+                if( variablesToInclude[0] == 0 ){
+                    //just the mean
+                    final double[] vcv = { sumYY/(((n-1)*n)) };
+                    final double[] params = { ybar };
+                    return new RegressionResults(
+                      params, new double[][] {vcv}, true, n, 1,
+                      sumY, _syy+_mean, sumYY,true,false);
+
+                }else if( variablesToInclude[0] == 1){
+                    //final double _syy = sumYY + sumY * sumY / ((double) n);
+                    final double _sxx = sumXX + sumX * sumX / n;
+                    final double _sxy = sumXY + sumX * sumY / n;
+                    final double _sse = FastMath.max(0d, _syy - _sxy * _sxy / _sxx);
+                    final double _mse = _sse/((n-1));
+                    if( !Double.isNaN(_sxx) ){
+                        final double[] vcv = { _mse / _sxx };
+                        final double[] params = { _sxy/_sxx };
+                        return new RegressionResults(
+                                    params, new double[][] {vcv}, true, n, 1,
+                                    sumY, _syy, _sse,false,false);
+                    }else{
+                        final double[] vcv = {Double.NaN };
+                        final double[] params = { Double.NaN };
+                        return new RegressionResults(
+                                    params, new double[][] {vcv}, true, n, 1,
+                                    Double.NaN, Double.NaN, Double.NaN,false,false);
+                    }
+                }
+            }
+        } else {
+            if (variablesToInclude[0] != 0) {
+                throw new MathIllegalArgumentException(LocalizedCoreFormats.OUT_OF_RANGE_SIMPLE,
+                                                       variablesToInclude[0], 0, 0);
+            }
+            return regress();
+        }
+
+        return null;
     }
 }

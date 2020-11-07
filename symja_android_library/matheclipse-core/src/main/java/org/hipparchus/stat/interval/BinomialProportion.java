@@ -32,7 +32,8 @@ import org.hipparchus.util.MathUtils;
 /**
  * Utility methods to generate confidence intervals for a binomial proportion.
  *
- * @see <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval">
+ * @see
+ * <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval">
  * Binomial proportion confidence interval (Wikipedia)</a>
  */
 public class BinomialProportion {
@@ -43,11 +44,8 @@ public class BinomialProportion {
      */
     private static final NormalDistribution NORMAL_DISTRIBUTION = new NormalDistribution(0, 1);
 
-    /**
-     * Utility class, prevent instantiation.
-     */
-    private BinomialProportion() {
-    }
+    /** Utility class, prevent instantiation. */
+    private BinomialProportion() {}
 
     /**
      * Create an Agresti-Coull binomial confidence interval for the true
@@ -62,22 +60,24 @@ public class BinomialProportion {
      * <li>{@code confidenceLevel} must be strictly between 0 and 1 (exclusive)</li>
      * </ul>
      *
-     * @param numberOfTrials       number of trials
+     * @see
+     * <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Agresti-Coull_Interval">
+     * Agresti-Coull interval (Wikipedia)</a>
+     *
+     * @param numberOfTrials number of trials
      * @param probabilityOfSuccess observed probability of success
-     * @param confidenceLevel      desired probability that the true probability of
-     *                             success falls within the returned interval
+     * @param confidenceLevel desired probability that the true probability of
+     * success falls within the returned interval
      * @return Confidence interval containing the probability of success with
      * probability {@code confidenceLevel}
      * @throws MathIllegalArgumentException if {@code numberOfTrials <= 0}.
      * @throws MathIllegalArgumentException if {@code probabilityOfSuccess} is not in the interval [0, 1].
      * @throws MathIllegalArgumentException if {@code confidenceLevel} is not in the interval (0, 1).
-     * @see <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Agresti-Coull_Interval">
-     * Agresti-Coull interval (Wikipedia)</a>
      */
     public static ConfidenceInterval getAgrestiCoullInterval(int numberOfTrials,
                                                              double probabilityOfSuccess,
                                                              double confidenceLevel)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         checkParameters(numberOfTrials, probabilityOfSuccess, confidenceLevel);
 
@@ -88,14 +88,14 @@ public class BinomialProportion {
         final double zSquared = FastMath.pow(z, 2);
         final double modifiedNumberOfTrials = numberOfTrials + zSquared;
         final double modifiedSuccessesRatio = (1.0 / modifiedNumberOfTrials) *
-                (numberOfSuccesses + 0.5 * zSquared);
+                                              (numberOfSuccesses + 0.5 * zSquared);
         final double difference = z * FastMath.sqrt(1.0 / modifiedNumberOfTrials *
-                modifiedSuccessesRatio *
-                (1 - modifiedSuccessesRatio));
+                                                    modifiedSuccessesRatio *
+                                                    (1 - modifiedSuccessesRatio));
 
         return new ConfidenceInterval(modifiedSuccessesRatio - difference,
-                modifiedSuccessesRatio + difference,
-                confidenceLevel);
+                                      modifiedSuccessesRatio + difference,
+                                      confidenceLevel);
     }
 
     /**
@@ -111,22 +111,24 @@ public class BinomialProportion {
      * <li>{@code confidenceLevel} must be strictly between 0 and 1 (exclusive)</li>
      * </ul>
      *
-     * @param numberOfTrials       number of trials
+     * @see
+     * <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper-Pearson_interval">
+     * Clopper-Pearson interval (Wikipedia)</a>
+     *
+     * @param numberOfTrials number of trials
      * @param probabilityOfSuccess observed probability of success
-     * @param confidenceLevel      desired probability that the true probability of
-     *                             success falls within the returned interval
+     * @param confidenceLevel desired probability that the true probability of
+     * success falls within the returned interval
      * @return Confidence interval containing the probability of success with
      * probability {@code confidenceLevel}
      * @throws MathIllegalArgumentException if {@code numberOfTrials <= 0}.
      * @throws MathIllegalArgumentException if {@code probabilityOfSuccess} is not in the interval [0, 1].
      * @throws MathIllegalArgumentException if {@code confidenceLevel} is not in the interval (0, 1).
-     * @see <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper-Pearson_interval">
-     * Clopper-Pearson interval (Wikipedia)</a>
      */
     public static ConfidenceInterval getClopperPearsonInterval(int numberOfTrials,
                                                                double probabilityOfSuccess,
                                                                double confidenceLevel)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         checkParameters(numberOfTrials, probabilityOfSuccess, confidenceLevel);
 
@@ -139,21 +141,21 @@ public class BinomialProportion {
 
             final FDistribution distributionLowerBound =
                     new FDistribution(2 * (numberOfTrials - numberOfSuccesses + 1),
-                            2 * numberOfSuccesses);
+                                      2 * numberOfSuccesses);
 
             final double fValueLowerBound =
                     distributionLowerBound.inverseCumulativeProbability(1 - alpha);
             lowerBound = numberOfSuccesses /
-                    (numberOfSuccesses + (numberOfTrials - numberOfSuccesses + 1) * fValueLowerBound);
+                         (numberOfSuccesses + (numberOfTrials - numberOfSuccesses + 1) * fValueLowerBound);
 
             final FDistribution distributionUpperBound =
                     new FDistribution(2 * (numberOfSuccesses + 1),
-                            2 * (numberOfTrials - numberOfSuccesses));
+                                      2 * (numberOfTrials - numberOfSuccesses));
 
             final double fValueUpperBound =
                     distributionUpperBound.inverseCumulativeProbability(1 - alpha);
             upperBound = (numberOfSuccesses + 1) * fValueUpperBound /
-                    (numberOfTrials - numberOfSuccesses + (numberOfSuccesses + 1) * fValueUpperBound);
+                         (numberOfTrials - numberOfSuccesses + (numberOfSuccesses + 1) * fValueUpperBound);
         }
 
         return new ConfidenceInterval(lowerBound, upperBound, confidenceLevel);
@@ -172,22 +174,24 @@ public class BinomialProportion {
      * <li>{@code confidenceLevel} must be strictly between 0 and 1 (exclusive)</li>
      * </ul>
      *
-     * @param numberOfTrials       number of trials
+     * @see
+     * <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval">
+     * Normal approximation interval (Wikipedia)</a>
+     *
+     * @param numberOfTrials number of trials
      * @param probabilityOfSuccess observed probability of success
-     * @param confidenceLevel      desired probability that the true probability of
-     *                             success falls within the returned interval
+     * @param confidenceLevel desired probability that the true probability of
+     * success falls within the returned interval
      * @return Confidence interval containing the probability of success with
      * probability {@code confidenceLevel}
      * @throws MathIllegalArgumentException if {@code numberOfTrials <= 0}.
      * @throws MathIllegalArgumentException if {@code probabilityOfSuccess} is not in the interval [0, 1].
      * @throws MathIllegalArgumentException if {@code confidenceLevel} is not in the interval (0, 1).
-     * @see <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval">
-     * Normal approximation interval (Wikipedia)</a>
      */
     public static ConfidenceInterval getNormalApproximationInterval(int numberOfTrials,
                                                                     double probabilityOfSuccess,
                                                                     double confidenceLevel)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         checkParameters(numberOfTrials, probabilityOfSuccess, confidenceLevel);
 
@@ -195,7 +199,7 @@ public class BinomialProportion {
         final double alpha = (1.0 - confidenceLevel) / 2;
 
         final double difference = NORMAL_DISTRIBUTION.inverseCumulativeProbability(1 - alpha) *
-                FastMath.sqrt(1.0 / numberOfTrials * mean * (1 - mean));
+                                  FastMath.sqrt(1.0 / numberOfTrials * mean * (1 - mean));
         return new ConfidenceInterval(mean - difference, mean + difference, confidenceLevel);
     }
 
@@ -212,22 +216,24 @@ public class BinomialProportion {
      * <li>{@code confidenceLevel} must be strictly between 0 and 1 (exclusive)</li>
      * </ul>
      *
-     * @param numberOfTrials       number of trials
+     * @see
+     * <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">
+     * Wilson score interval (Wikipedia)</a>
+     *
+     * @param numberOfTrials number of trials
      * @param probabilityOfSuccess observed probability of success
-     * @param confidenceLevel      desired probability that the true probability of
-     *                             success falls within the returned interval
+     * @param confidenceLevel desired probability that the true probability of
+     * success falls within the returned interval
      * @return Confidence interval containing the probability of success with
      * probability {@code confidenceLevel}
      * @throws MathIllegalArgumentException if {@code numberOfTrials <= 0}.
      * @throws MathIllegalArgumentException if {@code probabilityOfSuccess} is not in the interval [0, 1].
      * @throws MathIllegalArgumentException if {@code confidenceLevel} is not in the interval (0, 1).
-     * @see <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">
-     * Wilson score interval (Wikipedia)</a>
      */
     public static ConfidenceInterval getWilsonScoreInterval(int numberOfTrials,
                                                             double probabilityOfSuccess,
                                                             double confidenceLevel)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         checkParameters(numberOfTrials, probabilityOfSuccess, confidenceLevel);
 
@@ -240,7 +246,7 @@ public class BinomialProportion {
         final double modifiedSuccessRatio = mean + (1.0 / (2 * numberOfTrials)) * zSquared;
         final double difference =
                 z * FastMath.sqrt(1.0 / numberOfTrials * mean * (1 - mean) +
-                        (1.0 / (4 * FastMath.pow(numberOfTrials, 2)) * zSquared));
+                                  (1.0 / (4 * FastMath.pow(numberOfTrials, 2)) * zSquared));
 
         final double lowerBound = factor * (modifiedSuccessRatio - difference);
         final double upperBound = factor * (modifiedSuccessRatio + difference);
@@ -250,9 +256,9 @@ public class BinomialProportion {
     /**
      * Verifies that parameters satisfy preconditions.
      *
-     * @param numberOfTrials       number of trials (must be positive)
+     * @param numberOfTrials number of trials (must be positive)
      * @param probabilityOfSuccess probability of successes (must be between 0 and 1)
-     * @param confidenceLevel      confidence level (must be strictly between 0 and 1)
+     * @param confidenceLevel confidence level (must be strictly between 0 and 1)
      * @throws MathIllegalArgumentException if {@code numberOfTrials <= 0}.
      * @throws MathIllegalArgumentException if {@code probabilityOfSuccess is not in the interval [0, 1]}.
      * @throws MathIllegalArgumentException if {@code confidenceLevel} is not in the interval (0, 1)}.
@@ -262,12 +268,12 @@ public class BinomialProportion {
                                         double confidenceLevel) {
         if (numberOfTrials <= 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_TRIALS,
-                    numberOfTrials);
+                                                   numberOfTrials);
         }
         MathUtils.checkRangeInclusive(probabilityOfSuccess, 0, 1);
         if (confidenceLevel <= 0 || confidenceLevel >= 1) {
             throw new MathIllegalArgumentException(LocalizedStatFormats.OUT_OF_BOUNDS_CONFIDENCE_LEVEL,
-                    confidenceLevel, 0, 1);
+                                                   confidenceLevel, 0, 1);
         }
     }
 

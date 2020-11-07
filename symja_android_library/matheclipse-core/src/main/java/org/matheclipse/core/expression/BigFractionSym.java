@@ -1,9 +1,10 @@
 package org.matheclipse.core.expression;
 
+import com.duy.math.BigIntegerUtils;
+
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
-import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IExpr;
@@ -195,13 +196,14 @@ public class BigFractionSym extends AbstractFractionSym {
 
 	/** {@inheritDoc} */
 	@Override
-	public IExpr dec() {
+	public IRational dec() {
 		return add(F.CN1);
 	}
 
-	/** {@inheritDoc} */
+	/** {@inheritDoc}
+	 * @return*/
 	@Override
-	public IExpr inc() {
+	public IRational inc() {
 		return add(F.C1);
 	}
 
@@ -587,11 +589,7 @@ public class BigFractionSym extends AbstractFractionSym {
 	@Override
 	public int toInt() throws ArithmeticException {
 		if (toBigDenominator().equals(BigInteger.ONE)) {
-			return toBigNumerator().intValueExact();
-			// int val = NumberUtil.toIntDefault(toBigNumerator());
-			// if (val != Integer.MIN_VALUE) {
-			// return val;
-			// }
+			return BigIntegerUtils.intValueExact(toBigNumerator());
 		} else if (toBigNumerator().equals(BigInteger.ZERO)) {
 			return 0;
 		}
@@ -604,10 +602,10 @@ public class BigFractionSym extends AbstractFractionSym {
 	public int toIntDefault(int defaultValue) {
 		if (toBigDenominator().equals(BigInteger.ONE)) {
 			try {
-				return toBigNumerator().intValueExact();
+				return BigIntegerUtils.intValueExact(toBigNumerator());
 			} catch (java.lang.ArithmeticException aex) {
-		return defaultValue;
-	}
+				return defaultValue;
+			}
 		}
 		return fFraction.equals(BigFraction.ZERO) ? 0 : defaultValue;
 	}

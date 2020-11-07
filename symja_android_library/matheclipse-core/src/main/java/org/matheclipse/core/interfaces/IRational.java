@@ -15,21 +15,16 @@ public interface IRational extends ISignedNumber, IBigNumber {
     @Override
     public IRational abs();
 
-    /**
-     * Return the fractional part of this fraction
-     *
-     * @return
-     */
-    public IRational fractionalPart();
-
-    @Override
-    public IRational negate();
-
     public IRational add(IRational parm1);
 
     public IInteger ceil();
 
+	public void checkBitLength();
+
     public int compareInt(final int value);
+
+	@Override
+	public IRational dec();
 
     /**
      * Returns the denominator of this fraction.
@@ -74,6 +69,14 @@ public interface IRational extends ISignedNumber, IBigNumber {
     public IInteger floor();
 
     /**
+     * Return the fractional part of this fraction
+     *
+     * @return
+     */
+	@Override
+    public IRational fractionalPart();
+
+    /**
      * Returns the denominator of this fraction.
      *
      * @return denominator
@@ -96,6 +99,15 @@ public interface IRational extends ISignedNumber, IBigNumber {
      * @deprecated use {@link #numerator()}
      */
     IInteger getNumerator();
+
+    IRational imRational();
+
+    @Override
+    public IRational inc();
+
+    /** {@inheritDoc} */
+    @Override
+    public IRational inverse();
 
     /**
      * <p>
@@ -121,6 +133,9 @@ public interface IRational extends ISignedNumber, IBigNumber {
 
     public IRational multiply(IRational parm1);
 
+    @Override
+    public IRational negate();
+
     /**
      * Return the normalized form of this number (i.e. if the denominator part equals one, return the numerator part as
      * an integer number).
@@ -140,15 +155,18 @@ public interface IRational extends ISignedNumber, IBigNumber {
      * Returns this number raised at the specified exponent. See
      * <a href="https://en.wikipedia.org/wiki/Exponentiation_by_squaring">Wikipedia - Exponentiation by squaring</a>
      *
-     * @param exp the exponent.
+	 * @param exp
+	 *            the exponent.
      * @return <code>this<sup>exp</sup></code>
-     * @throws ArithmeticException if {@code 0^0} is given.
+	 * @throws ArithmeticException
+	 *             if {@code 0^0} is given.
      */
     public IRational pow(final long exp) throws ArithmeticException;
 
     IRational reRational();
 
-    IRational imRational();
+    @Override
+    public IRational roundClosest(ISignedNumber factor);
 
     public IRational subtract(IRational parm1);
 

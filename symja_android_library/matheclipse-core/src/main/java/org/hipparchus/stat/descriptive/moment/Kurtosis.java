@@ -21,14 +21,15 @@
  */
 package org.hipparchus.stat.descriptive.moment;
 
+import java.io.Serializable;
+
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
-
-import java.io.Serializable;
 
 
 /**
@@ -51,16 +52,12 @@ import java.io.Serializable;
  * one of the threads invokes the <code>increment()</code> or
  * <code>clear()</code> method, it must be synchronized externally.
  */
-public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Serializable {
+public class Kurtosis extends AbstractStorelessUnivariateStatistic  implements Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * Fourth Moment on which this statistic is based
-     */
+    /**Fourth Moment on which this statistic is based */
     protected final FourthMoment moment;
 
     /**
@@ -75,7 +72,7 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
      * Construct a Kurtosis.
      */
     public Kurtosis() {
-        moment = new FourthMoment();
+        moment    = new FourthMoment();
         incMoment = true;
     }
 
@@ -86,7 +83,7 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
      */
     public Kurtosis(final FourthMoment m4) {
         this.moment = m4;
-        incMoment = false;
+        incMoment   = false;
     }
 
     /**
@@ -98,8 +95,62 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
      */
     public Kurtosis(Kurtosis original) throws NullArgumentException {
         MathUtils.checkNotNull(original);
-        this.moment = original.moment.copy();
+        this.moment    = original.moment.copy();
         this.incMoment = original.incMoment;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>Note that when {@link #Kurtosis(FourthMoment)} is used to
+     * create a Variance, this method does nothing. In that case, the
+     * FourthMoment should be incremented directly.</p>
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        double kurtosis = Double.NaN;
+        if (moment.getN() > 3) {
+            double variance = moment.m2 / (moment.n - 1);
+                if (moment.n <= 3 || variance < 10E-20) {
+                    kurtosis = 0.0;
+                } else {
+                    double n = moment.n;
+                    kurtosis =
+                        (n * (n + 1) * moment.getResult() -
+                                3 * moment.m2 * moment.m2 * (n - 1)) /
+                                ((n - 1) * (n -2) * (n -3) * variance * variance);
+                }
+        }
+        return kurtosis;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return moment.getN();
+    }
+
+    /* UnvariateStatistic Approach  */
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
     }
 
     /**
@@ -111,15 +162,15 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
      * Throws <code>IllegalArgumentException</code> if the array is null.</p>
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the kurtosis of the values or Double.NaN if length is less than 4
      * @throws MathIllegalArgumentException if the input array is null or the array
-     *                                      index parameters are not valid
+     * index parameters are not valid
      */
     @Override
     public double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         // Initialize the kurtosis
         double kurt = Double.NaN;
@@ -143,9 +194,9 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
             double n0 = length;
 
             double coefficientOne =
-                    (n0 * (n0 + 1)) / ((n0 - 1) * (n0 - 2) * (n0 - 3));
+                (n0 * (n0 + 1)) / ((n0 - 1) * (n0 - 2) * (n0 - 3));
             double termTwo =
-                    (3 * FastMath.pow(n0 - 1, 2.0)) / ((n0 - 2) * (n0 - 3));
+                (3 * FastMath.pow(n0 - 1, 2.0)) / ((n0 - 2) * (n0 - 3));
 
             // Calculate kurtosis
             kurt = (coefficientOne * accum3) - termTwo;
@@ -153,66 +204,10 @@ public class Kurtosis extends AbstractStorelessUnivariateStatistic implements Se
         return kurt;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return moment.getN();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Kurtosis copy() {
         return new Kurtosis(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>Note that when {@link #Kurtosis(FourthMoment)} is used to
-     * create a Variance, this method does nothing. In that case, the
-     * FourthMoment should be incremented directly.</p>
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /* UnvariateStatistic Approach  */
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        double kurtosis = Double.NaN;
-        if (moment.getN() > 3) {
-            double variance = moment.m2 / (moment.n - 1);
-            if (moment.n <= 3 || variance < 10E-20) {
-                kurtosis = 0.0;
-            } else {
-                double n = moment.n;
-                kurtosis =
-                        (n * (n + 1) * moment.getResult() -
-                                3 * moment.m2 * moment.m2 * (n - 1)) /
-                                ((n - 1) * (n - 2) * (n - 3) * variance * variance);
-            }
-        }
-        return kurtosis;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
     }
 
 }

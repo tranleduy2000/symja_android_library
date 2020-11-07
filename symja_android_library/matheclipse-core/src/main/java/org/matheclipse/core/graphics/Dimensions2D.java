@@ -1,5 +1,6 @@
 package org.matheclipse.core.graphics;
 
+import org.matheclipse.core.convert.RGBColor;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -8,7 +9,7 @@ import java.util.Locale;
 
 public class Dimensions2D {
 
-	public Color color;
+	public RGBColor color;
 	public int width;
 	public int height;
 
@@ -25,7 +26,7 @@ public class Dimensions2D {
 	}
 
 	public Dimensions2D(int width, int height) {
-		this.color = Color.BLACK;
+		this.color = RGBColor.BLACK;
 		this.width = width;
 		this.height = height;
 		this.xMin = Double.MAX_VALUE;
@@ -92,24 +93,12 @@ public class Dimensions2D {
 		this.axes = axes;
 	}
 
-	public void setColorRGB(String color) {
-		String c = color.toLowerCase(Locale.US);
-		if (c.equals("white")) {
-			this.color = Color.WHITE;
-		} else if (c.equals("black")) {
-			this.color = Color.BLACK;
-		} else if (c.equals("blue")) {
-			this.color = Color.BLUE;
-		} else if (c.equals("green")) {
-			this.color = Color.GREEN;
-		} else if (c.equals("magenta")) {
-			this.color = Color.MAGENTA;
-		} else if (c.equals("orange")) {
-			this.color = Color.ORANGE;
-		} else if (c.equals("red")) {
-			this.color = Color.RED;
-		} else if (c.equals("yellow")) {
-			this.color = Color.YELLOW;
+	public void setColorRGB(IAST rgbColor) {
+		if (rgbColor.size() == 4 || rgbColor.size() == 5) {
+			float r = (float) rgbColor.arg1().evalDouble();
+			float g = (float) rgbColor.arg2().evalDouble();
+			float b = (float) rgbColor.arg3().evalDouble();
+			color = new RGBColor(r, g, b);
 		}
 	}
 

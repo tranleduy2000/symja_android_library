@@ -21,9 +21,13 @@
  */
 package org.hipparchus.stat.descriptive;
 
+
 import com.duy.lambda.DoubleConsumer;
 
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
+import org.hipparchus.util.MathArrays;
+import org.hipparchus.util.MathUtils;
 
 /**
  * Extends the definition of {@link UnivariateStatistic} with
@@ -39,7 +43,7 @@ import org.hipparchus.exception.MathIllegalArgumentException;
  * state of the respective statistic.
  */
 public interface StorelessUnivariateStatistic
-        extends UnivariateStatistic, DoubleConsumer {
+    extends UnivariateStatistic, DoubleConsumer {
 
     /**
      * {@inheritDoc}
@@ -54,7 +58,7 @@ public interface StorelessUnivariateStatistic
      * accurate implementation that works directly with the input array.
      *
      * @param values the input array
-     * @param begin  the index of the first element to include
+     * @param begin the index of the first element to include
      * @param length the number of elements to include
      * @return the value of the statistic applied to the included array entries
      * @throws MathIllegalArgumentException if the array is null or the indices are not valid
@@ -62,28 +66,31 @@ public interface StorelessUnivariateStatistic
      */
     @Override
     double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException;
-
-    /**
-     * Returns a copy of the statistic with the same internal state.
-     *
-     * @return a copy of the statistic
-     */
-    @Override
-    StorelessUnivariateStatistic copy();
+        throws MathIllegalArgumentException;
 
     /**
      * Updates the internal state of the statistic to reflect the addition of the new value.
-     *
-     * @param d the new value.
+     * @param d  the new value.
      */
     void increment(double d);
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     void accept(double value);
+
+    /**
+     * Updates the internal state of the statistic to reflect addition of
+     * all values in the values array. Does not clear the statistic first --
+     * i.e., the values are added <strong>incrementally</strong> to the dataset.
+     * <p>
+     * The default implementation delegates to
+     * <code>incrementAll(double[], int, int)</code> in the natural way.
+     *
+     * @param values  array holding the new values to add
+     * @throws MathIllegalArgumentException if the array is null
+     */
+    void incrementAll(double[] values) throws MathIllegalArgumentException;
+
 
     /**
      * Updates the internal state of the statistic to reflect addition of
@@ -94,17 +101,17 @@ public interface StorelessUnivariateStatistic
      * The default implementation just calls {@link #increment} in a loop over
      * the specified portion of the input array.
      *
-     * @param values array holding the new values to add
+     * @param values  array holding the new values to add
      * @param start  the array index of the first value to add
-     * @param length the number of elements to add
+     * @param length  the number of elements to add
      * @throws MathIllegalArgumentException if the array is null or the index
      */
     void incrementAll(double[] values, int start, int length)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
+
 
     /**
      * Returns the current value of the Statistic.
-     *
      * @return value of the statistic, <code>Double.NaN</code> if it
      * has been cleared or just instantiated.
      */
@@ -112,7 +119,6 @@ public interface StorelessUnivariateStatistic
 
     /**
      * Returns the number of values that have been added.
-     *
      * @return the number of values.
      */
     long getN();
@@ -121,5 +127,13 @@ public interface StorelessUnivariateStatistic
      * Clears the internal state of the Statistic
      */
     void clear();
+
+    /**
+     * Returns a copy of the statistic with the same internal state.
+     *
+     * @return a copy of the statistic
+     */
+    @Override
+    StorelessUnivariateStatistic copy();
 
 }

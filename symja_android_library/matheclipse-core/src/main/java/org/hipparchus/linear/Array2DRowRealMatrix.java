@@ -145,6 +145,24 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealMatrix createMatrix(final int rowDimension,
+                                   final int columnDimension)
+            throws MathIllegalArgumentException {
+        return new Array2DRowRealMatrix(rowDimension, columnDimension);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealMatrix copy() {
+        return new Array2DRowRealMatrix(copyOut(), false);
+    }
+
+    /**
      * Compute the sum of {@code this} and {@code m}.
      *
      * @param m Matrix to be added.
@@ -312,38 +330,6 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealMatrix transposeMultiply(final RealMatrix m) {
-        if (m instanceof Array2DRowRealMatrix) {
-            return transposeMultiply((Array2DRowRealMatrix) m);
-        } else {
-            MatrixUtils.checkSameRowDimension(this, m);
-
-            final int nRows = this.getColumnDimension();
-            final int nCols = m.getColumnDimension();
-            final int nSum = this.getRowDimension();
-
-            final RealMatrix out = MatrixUtils.createRealMatrix(nRows, nCols);
-
-            // Multiply.
-            for (int k = 0; k < nSum; k++) {
-                final double[] dataK = data[k];
-                for (int row = 0; row < nRows; row++) {
-                    final double dataIRow = dataK[row];
-                    for (int col = 0; col < nCols; col++) {
-                        out.addToEntry(row, col, dataIRow * m.getEntry(k, col));
-                    }
-                }
-            }
-
-            return out;
-
-        }
-    }
-
-    /**
      * Returns the result of postmultiplying {@code this^T} by {@code m}.
      *
      * @param m matrix to postmultiply by
@@ -380,46 +366,35 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
     }
 
     /**
-     * Get a reference to the underlying data array.
-     *
-     * @return 2-dimensional array of entries.
-     */
-    public double[][] getDataRef() {
-        return data; // NOPMD - returning an internal array is intentional and documented here
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public int getRowDimension() {
-        return (data == null) ? 0 : data.length;
-    }
+    public RealMatrix transposeMultiply(final RealMatrix m) {
+        if (m instanceof Array2DRowRealMatrix) {
+            return transposeMultiply((Array2DRowRealMatrix) m);
+        } else {
+            MatrixUtils.checkSameRowDimension(this, m);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getColumnDimension() {
-        return ((data == null) || (data[0] == null)) ? 0 : data[0].length;
-    }
+            final int nRows = this.getColumnDimension();
+            final int nCols = m.getColumnDimension();
+            final int nSum = this.getRowDimension();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealMatrix createMatrix(final int rowDimension,
-                                   final int columnDimension)
-            throws MathIllegalArgumentException {
-        return new Array2DRowRealMatrix(rowDimension, columnDimension);
-    }
+            final RealMatrix out = MatrixUtils.createRealMatrix(nRows, nCols);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RealMatrix copy() {
-        return new Array2DRowRealMatrix(copyOut(), false);
+            // Multiply.
+            for (int k = 0; k < nSum; k++) {
+                final double[] dataK = data[k];
+                for (int row = 0; row < nRows; row++) {
+                    final double dataIRow = dataK[row];
+                    for (int col = 0; col < nCols; col++) {
+                        out.addToEntry(row, col, dataIRow * m.getEntry(k, col));
+                    }
+                }
+            }
+
+            return out;
+
+        }
     }
 
     /**
@@ -431,23 +406,12 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
     }
 
     /**
-     * {@inheritDoc}
+     * Get a reference to the underlying data array.
+     *
+     * @return 2-dimensional array of entries.
      */
-    @Override
-    public RealMatrix getSubMatrix(final int startRow, final int endRow,
-                                   final int startColumn, final int endColumn)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkSubMatrixIndex(this, startRow, endRow, startColumn, endColumn);
-        final int rowCount = endRow - startRow + 1;
-        final int columnCount = endColumn - startColumn + 1;
-        final double[][] outData = new double[rowCount][columnCount];
-        for (int i = 0; i < rowCount; ++i) {
-            System.arraycopy(data[startRow + i], startColumn, outData[i], 0, columnCount);
-        }
-
-        Array2DRowRealMatrix subMatrix = new Array2DRowRealMatrix();
-        subMatrix.data = outData;
-        return subMatrix;
+    public double[][] getDataRef() {
+        return data; // NOPMD - returning an internal array is intentional and documented here
     }
 
     /**
@@ -492,33 +456,6 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
      * {@inheritDoc}
      */
     @Override
-    public double[] getRow(final int row) throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        final int nCols = getColumnDimension();
-        final double[] out = new double[nCols];
-        System.arraycopy(data[row], 0, out, 0, nCols);
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setRow(final int row, final double[] array)
-            throws MathIllegalArgumentException {
-        MatrixUtils.checkRowIndex(this, row);
-        final int nCols = getColumnDimension();
-        if (array.length != nCols) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH_2x2,
-                    1, array.length, 1, nCols);
-        }
-        System.arraycopy(array, 0, data[row], 0, nCols);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double getEntry(final int row, final int column)
             throws MathIllegalArgumentException {
         MatrixUtils.checkMatrixIndex(this, row, column);
@@ -555,6 +492,22 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
             throws MathIllegalArgumentException {
         MatrixUtils.checkMatrixIndex(this, row, column);
         data[row][column] *= factor;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRowDimension() {
+        return (data == null) ? 0 : data.length;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getColumnDimension() {
+        return ((data == null) || (data[0] == null)) ? 0 : data[0].length;
     }
 
     /**
@@ -605,6 +558,26 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
 
         return out;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealMatrix getSubMatrix(final int startRow, final int endRow,
+                                   final int startColumn, final int endColumn)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkSubMatrixIndex(this, startRow, endRow, startColumn, endColumn);
+        final int rowCount = endRow - startRow + 1;
+        final int columnCount = endColumn - startColumn + 1;
+        final double[][] outData = new double[rowCount][columnCount];
+        for (int i = 0; i < rowCount; ++i) {
+            System.arraycopy(data[startRow + i], startColumn, outData[i], 0, columnCount);
+        }
+
+        Array2DRowRealMatrix subMatrix = new Array2DRowRealMatrix();
+        subMatrix.data = outData;
+        return subMatrix;
     }
 
     /**
@@ -779,6 +752,33 @@ public class Array2DRowRealMatrix extends AbstractRealMatrix implements Serializ
     private void copyIn(final double[][] in)
             throws MathIllegalArgumentException, NullArgumentException {
         setSubMatrix(in, 0, 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double[] getRow(final int row) throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        final int nCols = getColumnDimension();
+        final double[] out = new double[nCols];
+        System.arraycopy(data[row], 0, out, 0, nCols);
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRow(final int row, final double[] array)
+            throws MathIllegalArgumentException {
+        MatrixUtils.checkRowIndex(this, row);
+        final int nCols = getColumnDimension();
+        if (array.length != nCols) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.DIMENSIONS_MISMATCH_2x2,
+                    1, array.length, 1, nCols);
+        }
+        System.arraycopy(array, 0, data[row], 0, nCols);
     }
 
     /**

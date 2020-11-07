@@ -37,14 +37,14 @@ import org.hipparchus.util.FastMath;
  * <p>This class is based on the class with similar name from the
  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library.</p>
  * <ul>
- * <li>a {@link #getP() getP} method has been added,</li>
- * <li>the {@code det} method has been renamed as {@link #getDeterminant()
- * getDeterminant},</li>
- * <li>the {@code getDoublePivot} method has been removed (but the int based
- * {@link #getPivot() getPivot} method has been kept),</li>
- * <li>the {@code solve} and {@code isNonSingular} methods have been replaced
- * by a {@link #getSolver() getSolver} method and the equivalent methods
- * provided by the returned {@link DecompositionSolver}.</li>
+ *   <li>a {@link #getP() getP} method has been added,</li>
+ *   <li>the {@code det} method has been renamed as {@link #getDeterminant()
+ *   getDeterminant},</li>
+ *   <li>the {@code getDoublePivot} method has been removed (but the int based
+ *   {@link #getPivot() getPivot} method has been kept),</li>
+ *   <li>the {@code solve} and {@code isNonSingular} methods have been replaced
+ *   by a {@link #getSolver() getSolver} method and the equivalent methods
+ *   provided by the returned {@link DecompositionSolver}.</li>
  * </ul>
  *
  * @see <a href="http://mathworld.wolfram.com/LUDecomposition.html">MathWorld</a>
@@ -294,6 +294,14 @@ public class LUDecomposition {
          * {@inheritDoc}
          */
         @Override
+        public boolean isNonSingular() {
+            return !singular;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public RealVector solve(RealVector b) {
             final int m = pivot.length;
             if (b.getDimension() != m) {
@@ -387,14 +395,6 @@ public class LUDecomposition {
             }
 
             return new Array2DRowRealMatrix(bp, false);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            return !singular;
         }
 
         /**

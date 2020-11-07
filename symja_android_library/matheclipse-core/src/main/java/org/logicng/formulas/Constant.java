@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -39,8 +39,7 @@ import java.util.TreeSet;
 
 /**
  * Super class for Boolean constants.
- *
- * @version 1.0
+ * @version 2.0.0
  * @since 1.0
  */
 public abstract class Constant extends Formula {
@@ -67,7 +66,6 @@ public abstract class Constant extends Formula {
 
     /**
      * Constructor.
-     *
      * @param type    the constant type
      * @param factory the factory which created this instance
      */
@@ -139,4 +137,5 @@ public abstract class Constant extends Formula {
     public Iterator<Formula> iterator() {
         return ITERATOR;
     }
+
 }

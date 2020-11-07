@@ -21,43 +21,38 @@
  */
 package org.hipparchus.fitting;
 
+import java.util.Collection;
+
 import org.hipparchus.analysis.polynomials.PolynomialFunction;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.DiagonalMatrix;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresBuilder;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem;
 
-import java.util.Collection;
-
 /**
  * Fits points to a {@link
- * org.hipparchus.analysis.polynomials.PolynomialFunction.Parametric polynomial}
+ * PolynomialFunction.Parametric polynomial}
  * function.
  * <br/>
  * The size of the {@link #withStartPoint(double[]) initial guess} array defines the
  * degree of the polynomial to be fitted.
  * They must be sorted in increasing order of the polynomial's degree.
  * The optimal values of the coefficients will be returned in the same order.
+ *
  */
 public class PolynomialCurveFitter extends AbstractCurveFitter {
-    /**
-     * Parametric function to be fitted.
-     */
+    /** Parametric function to be fitted. */
     private static final PolynomialFunction.Parametric FUNCTION = new PolynomialFunction.Parametric();
-    /**
-     * Initial guess.
-     */
+    /** Initial guess. */
     private final double[] initialGuess;
-    /**
-     * Maximum number of iterations of the optimization algorithm.
-     */
+    /** Maximum number of iterations of the optimization algorithm. */
     private final int maxIter;
 
     /**
      * Constructor used by the factory methods.
      *
      * @param initialGuess Initial guess.
-     * @param maxIter      Maximum number of iterations of the optimization algorithm.
+     * @param maxIter Maximum number of iterations of the optimization algorithm.
      * @throws MathRuntimeException if {@code initialGuess} is {@code null}.
      */
     private PolynomialCurveFitter(double[] initialGuess, int maxIter) {
@@ -73,6 +68,7 @@ public class PolynomialCurveFitter extends AbstractCurveFitter {
      *
      * @param degree Degree of the polynomial to be fitted.
      * @return a curve fitter.
+     *
      * @see #withStartPoint(double[])
      * @see #withMaxIterations(int)
      */
@@ -82,45 +78,41 @@ public class PolynomialCurveFitter extends AbstractCurveFitter {
 
     /**
      * Configure the start point (initial guess).
-     *
      * @param newStart new start point (initial guess)
      * @return a new instance.
      */
     public PolynomialCurveFitter withStartPoint(double[] newStart) {
         return new PolynomialCurveFitter(newStart.clone(),
-                maxIter);
+                                         maxIter);
     }
 
     /**
      * Configure the maximum number of iterations.
-     *
      * @param newMaxIter maximum number of iterations
      * @return a new instance.
      */
     public PolynomialCurveFitter withMaxIterations(int newMaxIter) {
         return new PolynomialCurveFitter(initialGuess,
-                newMaxIter);
+                                         newMaxIter);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected LeastSquaresProblem getProblem(Collection<WeightedObservedPoint> observations) {
         // Prepare least-squares problem.
         final int len = observations.size();
-        final double[] target = new double[len];
+        final double[] target  = new double[len];
         final double[] weights = new double[len];
 
         int i = 0;
         for (WeightedObservedPoint obs : observations) {
-            target[i] = obs.getY();
+            target[i]  = obs.getY();
             weights[i] = obs.getWeight();
             ++i;
         }
 
-        final AbstractCurveFitter.TheoreticalValuesFunction model =
-                new AbstractCurveFitter.TheoreticalValuesFunction(FUNCTION, observations);
+        final TheoreticalValuesFunction model =
+                new TheoreticalValuesFunction(FUNCTION, observations);
 
         if (initialGuess == null) {
             throw MathRuntimeException.createInternalError();

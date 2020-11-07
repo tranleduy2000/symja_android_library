@@ -21,15 +21,15 @@
  */
 package org.hipparchus.util;
 
-import org.hipparchus.Field;
-import org.hipparchus.FieldElement;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
+
+import org.hipparchus.Field;
+import org.hipparchus.FieldElement;
 
 /**
  * Open addressed map from int to FieldElement.
@@ -39,138 +39,107 @@ import java.util.NoSuchElementException;
  * {@link #iterator()} are fail-fast: they throw a
  * <code>ConcurrentModificationException</code> when they detect the map has been
  * modified during iteration.</p>
- *
  * @param <T> the type of the field elements
  */
 public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Serializable {
 
-    /**
-     * Status indicator for free table entries.
-     */
-    protected static final byte FREE = 0;
+    /** Status indicator for free table entries. */
+    protected static final byte FREE    = 0;
 
-    /**
-     * Status indicator for full table entries.
-     */
-    protected static final byte FULL = 1;
+    /** Status indicator for full table entries. */
+    protected static final byte FULL    = 1;
 
-    /**
-     * Status indicator for removed table entries.
-     */
+    /** Status indicator for removed table entries. */
     protected static final byte REMOVED = 2;
 
-    /**
-     * Serializable version identifier.
-     */
+    /** Serializable version identifier. */
     private static final long serialVersionUID = -9179080286849120720L;
 
-    /**
-     * Load factor for the map.
-     */
+    /** Load factor for the map. */
     private static final float LOAD_FACTOR = 0.5f;
 
-    /**
-     * Default starting size.
+    /** Default starting size.
      * <p>This must be a power of two for bit mask to work properly. </p>
      */
     private static final int DEFAULT_EXPECTED_SIZE = 16;
 
-    /**
-     * Multiplier for size growth when map fills up.
+    /** Multiplier for size growth when map fills up.
      * <p>This must be a power of two for bit mask to work properly. </p>
      */
     private static final int RESIZE_MULTIPLIER = 2;
 
-    /**
-     * Number of bits to perturb the index when probing for collision resolution.
-     */
+    /** Number of bits to perturb the index when probing for collision resolution. */
     private static final int PERTURB_SHIFT = 5;
 
-    /**
-     * Field to which the elements belong.
-     */
+    /** Field to which the elements belong. */
     private final Field<T> field;
-    /**
-     * Return value for missing entries.
-     */
-    private final T missingEntries;
-    /**
-     * Keys table.
-     */
+
+    /** Keys table. */
     private int[] keys;
-    /**
-     * Values table.
-     */
+
+    /** Values table. */
     private T[] values;
-    /**
-     * States table.
-     */
+
+    /** States table. */
     private byte[] states;
-    /**
-     * Current size of the map.
-     */
+
+    /** Return value for missing entries. */
+    private final T missingEntries;
+
+    /** Current size of the map. */
     private int size;
 
-    /**
-     * Bit mask for hash values.
-     */
+    /** Bit mask for hash values. */
     private int mask;
 
-    /**
-     * Modifications count.
-     */
+    /** Modifications count. */
     private transient int count;
 
     /**
      * Build an empty map with default size and using zero for missing entries.
-     *
      * @param field field to which the elements belong
      */
-    public OpenIntToFieldHashMap(final Field<T> field) {
+    public OpenIntToFieldHashMap(final Field<T>field) {
         this(field, DEFAULT_EXPECTED_SIZE, field.getZero());
     }
 
     /**
      * Build an empty map with default size
-     *
-     * @param field          field to which the elements belong
+     * @param field field to which the elements belong
      * @param missingEntries value to return when a missing entry is fetched
      */
-    public OpenIntToFieldHashMap(final Field<T> field, final T missingEntries) {
-        this(field, DEFAULT_EXPECTED_SIZE, missingEntries);
+    public OpenIntToFieldHashMap(final Field<T>field, final T missingEntries) {
+        this(field,DEFAULT_EXPECTED_SIZE, missingEntries);
     }
 
     /**
      * Build an empty map with specified size and using zero for missing entries.
-     *
-     * @param field        field to which the elements belong
+     * @param field field to which the elements belong
      * @param expectedSize expected number of elements in the map
      */
-    public OpenIntToFieldHashMap(final Field<T> field, final int expectedSize) {
-        this(field, expectedSize, field.getZero());
+    public OpenIntToFieldHashMap(final Field<T> field,final int expectedSize) {
+        this(field,expectedSize, field.getZero());
     }
 
     /**
      * Build an empty map with specified size.
-     *
-     * @param field          field to which the elements belong
-     * @param expectedSize   expected number of elements in the map
+     * @param field field to which the elements belong
+     * @param expectedSize expected number of elements in the map
      * @param missingEntries value to return when a missing entry is fetched
      */
-    public OpenIntToFieldHashMap(final Field<T> field, final int expectedSize,
-                                 final T missingEntries) {
+    public OpenIntToFieldHashMap(final Field<T> field,final int expectedSize,
+                                  final T missingEntries) {
         this.field = field;
         final int capacity = computeCapacity(expectedSize);
-        keys = new int[capacity];
+        keys   = new int[capacity];
         values = buildArray(capacity);
         states = new byte[capacity];
         this.missingEntries = missingEntries;
-        mask = capacity - 1;
+        mask   = capacity - 1;
     }
 
     /**
      * Copy constructor.
-     *
      * @param source map to copy
      */
     public OpenIntToFieldHashMap(final OpenIntToFieldHashMap<T> source) {
@@ -183,14 +152,13 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
         states = new byte[length];
         System.arraycopy(source.states, 0, states, 0, length);
         missingEntries = source.missingEntries;
-        size = source.size;
-        mask = source.mask;
+        size  = source.size;
+        mask  = source.mask;
         count = source.count;
     }
 
     /**
      * Compute the capacity needed for a given size.
-     *
      * @param expectedSize expected size of the map
      * @return capacity to use for the specified size
      */
@@ -198,7 +166,7 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
         if (expectedSize == 0) {
             return 1;
         }
-        final int capacity = (int) FastMath.ceil(expectedSize / LOAD_FACTOR);
+        final int capacity   = (int) FastMath.ceil(expectedSize / LOAD_FACTOR);
         final int powerOfTwo = Integer.highestOneBit(capacity);
         if (powerOfTwo == capacity) {
             return capacity;
@@ -208,7 +176,6 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Find the smallest power of two greater than the input value
-     *
      * @param i input value
      * @return smallest power of two greater than the input value
      */
@@ -217,8 +184,78 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
     }
 
     /**
+     * Get the stored value associated with the given key
+     * @param key key associated with the data
+     * @return data associated with the key
+     */
+    public T get(final int key) {
+
+        final int hash  = hashOf(key);
+        int index = hash & mask;
+        if (containsKey(key, index)) {
+            return values[index];
+        }
+
+        if (states[index] == FREE) {
+            return missingEntries;
+        }
+
+        int j = index;
+        for (int perturb = perturb(hash); states[index] != FREE; perturb >>= PERTURB_SHIFT) {
+            j = probe(perturb, j);
+            index = j & mask;
+            if (containsKey(key, index)) {
+                return values[index];
+            }
+        }
+
+        return missingEntries;
+
+    }
+
+    /**
+     * Check if a value is associated with a key.
+     * @param key key to check
+     * @return true if a value is associated with key
+     */
+    public boolean containsKey(final int key) {
+
+        final int hash  = hashOf(key);
+        int index = hash & mask;
+        if (containsKey(key, index)) {
+            return true;
+        }
+
+        if (states[index] == FREE) {
+            return false;
+        }
+
+        int j = index;
+        for (int perturb = perturb(hash); states[index] != FREE; perturb >>= PERTURB_SHIFT) {
+            j = probe(perturb, j);
+            index = j & mask;
+            if (containsKey(key, index)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Get an iterator over map elements.
+     * <p>The specialized iterators returned are fail-fast: they throw a
+     * <code>ConcurrentModificationException</code> when they detect the map
+     * has been modified during iteration.</p>
+     * @return iterator over the map elements
+     */
+    public Iterator iterator() {
+        return new Iterator();
+    }
+
+    /**
      * Perturb the hash for starting probing.
-     *
      * @param hash initial hash
      * @return perturbed hash
      */
@@ -228,11 +265,19 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Find the index at which a key should be inserted
-     *
-     * @param keys   keys table
+     * @param key key to lookup
+     * @return index at which key should be inserted
+     */
+    private int findInsertionIndex(final int key) {
+        return findInsertionIndex(keys, states, key, mask);
+    }
+
+    /**
+     * Find the index at which a key should be inserted
+     * @param keys keys table
      * @param states states table
-     * @param key    key to lookup
-     * @param mask   bit mask for hash values
+     * @param key key to lookup
+     * @param mask bit mask for hash values
      * @return index at which key should be inserted
      */
     private static int findInsertionIndex(final int[] keys, final byte[] states,
@@ -286,9 +331,8 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Compute next probe for collision resolution
-     *
      * @param perturb perturbed hash
-     * @param j       previous probe
+     * @param j previous probe
      * @return next probe
      */
     private static int probe(final int perturb, final int j) {
@@ -297,7 +341,6 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Change the index sign
-     *
      * @param index initial index
      * @return changed index
      */
@@ -306,118 +349,22 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
     }
 
     /**
-     * Compute the hash value of a key
-     *
-     * @param key key to hash
-     * @return hash value of the key
-     */
-    private static int hashOf(final int key) {
-        final int h = key ^ ((key >>> 20) ^ (key >>> 12));
-        return h ^ (h >>> 7) ^ (h >>> 4);
-    }
-
-    /**
-     * Get the stored value associated with the given key
-     *
-     * @param key key associated with the data
-     * @return data associated with the key
-     */
-    public T get(final int key) {
-
-        final int hash = hashOf(key);
-        int index = hash & mask;
-        if (containsKey(key, index)) {
-            return values[index];
-        }
-
-        if (states[index] == FREE) {
-            return missingEntries;
-        }
-
-        int j = index;
-        for (int perturb = perturb(hash); states[index] != FREE; perturb >>= PERTURB_SHIFT) {
-            j = probe(perturb, j);
-            index = j & mask;
-            if (containsKey(key, index)) {
-                return values[index];
-            }
-        }
-
-        return missingEntries;
-
-    }
-
-    /**
-     * Check if a value is associated with a key.
-     *
-     * @param key key to check
-     * @return true if a value is associated with key
-     */
-    public boolean containsKey(final int key) {
-
-        final int hash = hashOf(key);
-        int index = hash & mask;
-        if (containsKey(key, index)) {
-            return true;
-        }
-
-        if (states[index] == FREE) {
-            return false;
-        }
-
-        int j = index;
-        for (int perturb = perturb(hash); states[index] != FREE; perturb >>= PERTURB_SHIFT) {
-            j = probe(perturb, j);
-            index = j & mask;
-            if (containsKey(key, index)) {
-                return true;
-            }
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Get an iterator over map elements.
-     * <p>The specialized iterators returned are fail-fast: they throw a
-     * <code>ConcurrentModificationException</code> when they detect the map
-     * has been modified during iteration.</p>
-     *
-     * @return iterator over the map elements
-     */
-    public Iterator iterator() {
-        return new Iterator();
-    }
-
-    /**
-     * Find the index at which a key should be inserted
-     *
-     * @param key key to lookup
-     * @return index at which key should be inserted
-     */
-    private int findInsertionIndex(final int key) {
-        return findInsertionIndex(keys, states, key, mask);
-    }
-
-    /**
      * Get the number of elements stored in the map.
-     *
      * @return number of elements stored in the map
      */
     public int size() {
         return size;
     }
 
+
     /**
      * Remove the value associated with a key.
-     *
      * @param key key to which the value is associated
      * @return removed value
      */
     public T remove(final int key) {
 
-        final int hash = hashOf(key);
+        final int hash  = hashOf(key);
         int index = hash & mask;
         if (containsKey(key, index)) {
             return doRemove(index);
@@ -443,8 +390,7 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
     /**
      * Check if the tables contain an element associated with specified key
      * at specified index.
-     *
-     * @param key   key to check
+     * @param key key to check
      * @param index index to check
      * @return true if an element is associated with key at index
      */
@@ -454,12 +400,11 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Remove an element at specified index.
-     *
      * @param index index of the element to remove
      * @return removed value
      */
     private T doRemove(int index) {
-        keys[index] = 0;
+        keys[index]   = 0;
         states[index] = REMOVED;
         final T previous = values[index];
         values[index] = missingEntries;
@@ -470,8 +415,7 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Put a value associated with a key in the map.
-     *
-     * @param key   key to which value is associated
+     * @param key key to which value is associated
      * @param value value to put in the map
      * @return previous value associated with the key
      */
@@ -484,7 +428,7 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
             previous = values[index];
             newMapping = false;
         }
-        keys[index] = key;
+        keys[index]   = key;
         states[index] = FULL;
         values[index] = value;
         if (newMapping) {
@@ -503,10 +447,10 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
      */
     private void growTable() {
 
-        final int oldLength = states.length;
-        final int[] oldKeys = keys;
+        final int oldLength      = states.length;
+        final int[] oldKeys      = keys;
         final T[] oldValues = values;
-        final byte[] oldStates = states;
+        final byte[] oldStates   = states;
 
         final int newLength = RESIZE_MULTIPLIER * oldLength;
         final int[] newKeys = new int[newLength];
@@ -517,14 +461,14 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
             if (oldStates[i] == FULL) {
                 final int key = oldKeys[i];
                 final int index = findInsertionIndex(newKeys, newStates, key, newMask);
-                newKeys[index] = key;
+                newKeys[index]   = key;
                 newValues[index] = oldValues[i];
                 newStates[index] = FULL;
             }
         }
 
-        mask = newMask;
-        keys = newKeys;
+        mask   = newMask;
+        keys   = newKeys;
         values = newValues;
         states = newStates;
 
@@ -532,7 +476,6 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
     /**
      * Check if tables should grow due to increased size.
-     *
      * @return true if  tables should grow
      */
     private boolean shouldGrowTable() {
@@ -540,48 +483,26 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
     }
 
     /**
-     * Read a serialized object.
-     *
-     * @param stream input stream
-     * @throws IOException            if object cannot be read
-     * @throws ClassNotFoundException if the class corresponding
-     *                                to the serialized object cannot be found
+     * Compute the hash value of a key
+     * @param key key to hash
+     * @return hash value of the key
      */
-    private void readObject(final ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        count = 0;
+    private static int hashOf(final int key) {
+        final int h = key ^ ((key >>> 20) ^ (key >>> 12));
+        return h ^ (h >>> 7) ^ (h >>> 4);
     }
 
-    /**
-     * Build an array of elements.
-     *
-     * @param length size of the array to build
-     * @return a new array
-     */
-    @SuppressWarnings("unchecked") // field is of type T
-    private T[] buildArray(final int length) {
-        return (T[]) Array.newInstance(field.getRuntimeClass(), length);
-    }
 
-    /**
-     * Iterator class for the map.
-     */
+    /** Iterator class for the map. */
     public class Iterator {
 
-        /**
-         * Reference modification count.
-         */
+        /** Reference modification count. */
         private final int referenceCount;
 
-        /**
-         * Index of current element.
-         */
+        /** Index of current element. */
         private int current;
 
-        /**
-         * Index of next element.
-         */
+        /** Index of next element. */
         private int next;
 
         /**
@@ -604,7 +525,6 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
         /**
          * Check if there is a next element in the map.
-         *
          * @return true if there is a next element
          */
         public boolean hasNext() {
@@ -613,13 +533,12 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
         /**
          * Get the key of current entry.
-         *
          * @return key of current entry
-         * @throws ConcurrentModificationException if the map is modified during iteration
-         * @throws NoSuchElementException          if there is no element left in the map
+         * @exception ConcurrentModificationException if the map is modified during iteration
+         * @exception NoSuchElementException if there is no element left in the map
          */
         public int key()
-                throws ConcurrentModificationException, NoSuchElementException {
+            throws ConcurrentModificationException, NoSuchElementException {
             if (referenceCount != count) {
                 throw new ConcurrentModificationException();
             }
@@ -631,13 +550,12 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
         /**
          * Get the value of current entry.
-         *
          * @return value of current entry
-         * @throws ConcurrentModificationException if the map is modified during iteration
-         * @throws NoSuchElementException          if there is no element left in the map
+         * @exception ConcurrentModificationException if the map is modified during iteration
+         * @exception NoSuchElementException if there is no element left in the map
          */
         public T value()
-                throws ConcurrentModificationException, NoSuchElementException {
+            throws ConcurrentModificationException, NoSuchElementException {
             if (referenceCount != count) {
                 throw new ConcurrentModificationException();
             }
@@ -649,12 +567,11 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
         /**
          * Advance iterator one step further.
-         *
-         * @throws ConcurrentModificationException if the map is modified during iteration
-         * @throws NoSuchElementException          if there is no element left in the map
+         * @exception ConcurrentModificationException if the map is modified during iteration
+         * @exception NoSuchElementException if there is no element left in the map
          */
         public void advance()
-                throws ConcurrentModificationException, NoSuchElementException {
+            throws ConcurrentModificationException, NoSuchElementException {
 
             if (referenceCount != count) {
                 throw new ConcurrentModificationException();
@@ -677,6 +594,28 @@ public class OpenIntToFieldHashMap<T extends FieldElement<T>> implements Seriali
 
         }
 
+    }
+
+    /**
+     * Read a serialized object.
+     * @param stream input stream
+     * @throws IOException if object cannot be read
+     * @throws ClassNotFoundException if the class corresponding
+     * to the serialized object cannot be found
+     */
+    private void readObject(final ObjectInputStream stream)
+        throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        count = 0;
+    }
+
+    /** Build an array of elements.
+     * @param length size of the array to build
+     * @return a new array
+     */
+    @SuppressWarnings("unchecked") // field is of type T
+    private T[] buildArray(final int length) {
+        return (T[]) Array.newInstance(field.getRuntimeClass(), length);
     }
 
 }

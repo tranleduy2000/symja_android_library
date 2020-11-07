@@ -22,6 +22,7 @@
 
 package org.hipparchus.linear;
 
+import org.hipparchus.analysis.UnivariateFunction;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 
@@ -168,12 +169,30 @@ public interface RealMatrix extends AnyMatrix {
     double[][] getData();
 
     /**
-     * Returns the <a href="http://mathworld.wolfram.com/MaximumAbsoluteRowSumNorm.html">
-     * maximum absolute row sum norm</a> of the matrix.
+     * Returns the <a href="http://mathworld.wolfram.com/MaximumAbsoluteColumnSumNorm.html">
+     * maximum absolute column sum norm</a> (L<sub>1</sub>) of the matrix.
+     *
+     * @return norm
+     * @deprecated as of 1.7, replaced with either {@link #getNorm1()} or {@link #getNormInfty()}
+     */
+    @Deprecated
+    double getNorm();
+
+    /**
+     * Returns the <a href="http://mathworld.wolfram.com/MaximumAbsoluteColumnSumNorm.html">
+     * maximum absolute column sum norm</a> (L<sub>1</sub>) of the matrix.
      *
      * @return norm
      */
-    double getNorm();
+    double getNorm1();
+
+    /**
+     * Returns the <a href="http://mathworld.wolfram.com/MaximumAbsoluteRowSumNorm.html">
+     * maximum absolute row sum norm</a> (L<sub>&infin;</sub>) of the matrix.
+     *
+     * @return norm
+     */
+    double getNormInfty();
 
     /**
      * Returns the <a href="http://mathworld.wolfram.com/FrobeniusNorm.html">
@@ -860,4 +879,27 @@ public interface RealMatrix extends AnyMatrix {
     double walkInOptimizedOrder(RealMatrixPreservingVisitor visitor,
                                 int startRow, int endRow, int startColumn, int endColumn)
             throws MathIllegalArgumentException;
+
+    /**
+     * Acts as if implemented as:
+     * <pre>
+     *  return copy().mapToSelf(function);
+     * </pre>
+     * Returns a new matrix. Does not change instance data.
+     *
+     * @param function Function to apply to each entry.
+     * @return a new matrix.
+     * @since 1.7
+     */
+    RealMatrix map(UnivariateFunction function);
+
+    /**
+     * Replace each entry by the result of applying the function to it.
+     *
+     * @param function Function to apply to each entry.
+     * @return a reference to this matrix.
+     * @since 1.7
+     */
+    RealMatrix mapToSelf(final UnivariateFunction function);
+
 }

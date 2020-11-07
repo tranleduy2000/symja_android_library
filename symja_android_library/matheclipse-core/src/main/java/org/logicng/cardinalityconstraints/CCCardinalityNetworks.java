@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * PBLib       -- Copyright (c) 2012-2013  Peter Steinke
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -51,21 +51,21 @@
 
 package org.logicng.cardinalityconstraints;
 
+import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.BOTH;
+import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.INPUT_TO_OUTPUT;
+import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.OUTPUT_TO_INPUT;
+
 import org.logicng.collections.LNGVector;
 import org.logicng.datastructures.EncodingResult;
 import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 
-import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.BOTH;
-import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.INPUT_TO_OUTPUT;
-import static org.logicng.cardinalityconstraints.CCSorting.ImplicationDirection.OUTPUT_TO_INPUT;
-
 /**
  * Implementation of cardinality networks due to Asín, Nieuwenhuis, Oliveras, and Rodríguez-Carbonell.
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
-final class CCCardinalityNetworks {
+public final class CCCardinalityNetworks {
 
     private final CCSorting sorting;
     private CCIncrementalData incData;
@@ -77,63 +77,71 @@ final class CCCardinalityNetworks {
         this.sorting = new CCSorting();
     }
 
-    void buildAMK(final EncodingResult result, final Variable[] vars, int rhs) {
+    void buildAMK(final EncodingResult result, final Variable[] vars, final int rhs) {
         result.reset();
         final LNGVector<Literal> input = new LNGVector<>();
         final LNGVector<Literal> output = new LNGVector<>();
         if (rhs > vars.length / 2) {
-            int geq = vars.length - rhs;
-            for (final Variable v : vars)
+            final int geq = vars.length - rhs;
+            for (final Variable v : vars) {
                 input.push(v.negate());
-            sorting.sort(geq, input, result, output, OUTPUT_TO_INPUT);
-            for (int i = 0; i < geq; i++)
+            }
+            this.sorting.sort(geq, input, result, output, OUTPUT_TO_INPUT);
+            for (int i = 0; i < geq; i++) {
                 result.addClause(output.get(i));
+            }
         } else {
-            for (final Variable v : vars)
+            for (final Variable v : vars) {
                 input.push(v);
-            sorting.sort(rhs + 1, input, result, output, INPUT_TO_OUTPUT);
+            }
+            this.sorting.sort(rhs + 1, input, result, output, INPUT_TO_OUTPUT);
             assert output.size() > rhs;
             result.addClause(output.get(rhs).negate());
         }
     }
 
-    void buildAMKForIncremental(final EncodingResult result, final Variable[] vars, int rhs) {
+    void buildAMKForIncremental(final EncodingResult result, final Variable[] vars, final int rhs) {
         final LNGVector<Literal> input = new LNGVector<>();
         final LNGVector<Literal> output = new LNGVector<>();
-        for (final Variable var : vars)
+        for (final Variable var : vars) {
             input.push(var);
+        }
         this.sorting.sort(rhs + 1, input, result, output, INPUT_TO_OUTPUT);
         assert output.size() > rhs;
         result.addClause(output.get(rhs).negate());
         this.incData = new CCIncrementalData(result, CCConfig.AMK_ENCODER.CARDINALITY_NETWORK, rhs, output);
     }
 
-    void buildALK(final EncodingResult result, final Variable[] vars, int rhs) {
+    void buildALK(final EncodingResult result, final Variable[] vars, final int rhs) {
         result.reset();
         final LNGVector<Literal> input = new LNGVector<>();
         final LNGVector<Literal> output = new LNGVector<>();
         final int newRHS = vars.length - rhs;
         if (newRHS > vars.length / 2) {
-            int geq = vars.length - newRHS;
-            for (final Variable v : vars)
+            final int geq = vars.length - newRHS;
+            for (final Variable v : vars) {
                 input.push(v);
-            sorting.sort(geq, input, result, output, OUTPUT_TO_INPUT);
-            for (int i = 0; i < geq; i++)
+            }
+            this.sorting.sort(geq, input, result, output, OUTPUT_TO_INPUT);
+            for (int i = 0; i < geq; i++) {
                 result.addClause(output.get(i));
+            }
         } else {
-            for (final Variable v : vars)
+            for (final Variable v : vars) {
                 input.push(v.negate());
-            sorting.sort(newRHS + 1, input, result, output, INPUT_TO_OUTPUT);
+            }
+            this.sorting.sort(newRHS + 1, input, result, output, INPUT_TO_OUTPUT);
             assert output.size() > newRHS;
             result.addClause(output.get(newRHS).negate());
         }
     }
 
-    void buildALKForIncremental(final EncodingResult result, final Variable[] vars, int rhs) {
+    void buildALKForIncremental(final EncodingResult result, final Variable[] vars, final int rhs) {
         final LNGVector<Literal> input = new LNGVector<>();
         final LNGVector<Literal> output = new LNGVector<>();
-        for (final Variable var : vars)
+        for (final Variable var : vars) {
             input.push(var.negate());
+        }
         final int newRHS = vars.length - rhs;
         this.sorting.sort(newRHS + 1, input, result, output, INPUT_TO_OUTPUT);
         assert output.size() > newRHS;
@@ -141,12 +149,13 @@ final class CCCardinalityNetworks {
         this.incData = new CCIncrementalData(result, CCConfig.ALK_ENCODER.CARDINALITY_NETWORK, rhs, vars.length, output);
     }
 
-    void buildEXK(final EncodingResult result, final Variable[] vars, int rhs) {
+    void buildEXK(final EncodingResult result, final Variable[] vars, final int rhs) {
         result.reset();
         final LNGVector<Literal> input = new LNGVector<>();
         final LNGVector<Literal> output = new LNGVector<>();
-        for (final Variable var : vars)
+        for (final Variable var : vars) {
             input.push(var);
+        }
         this.sorting.sort(rhs + 1, input, result, output, BOTH);
         assert output.size() > rhs;
         result.addClause(output.get(rhs).negate());

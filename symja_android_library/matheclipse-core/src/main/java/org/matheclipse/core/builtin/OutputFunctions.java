@@ -22,7 +22,10 @@ import net.numericalchameleon.util.spokennumbers.TonganNumber;
 import net.numericalchameleon.util.spokennumbers.TurkishNumber;
 import net.numericalchameleon.util.spokennumbers.USEnglishNumber;
 
+import org.hipparchus.linear.FieldMatrix;
+import org.hipparchus.linear.FieldVector;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.MathMLUtilities;
@@ -32,6 +35,7 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.data.GraphExpr;
 import org.matheclipse.core.form.output.DoubleFormFactory;
 import org.matheclipse.core.form.output.JavaDoubleFormFactory;
@@ -50,6 +54,7 @@ import java.math.BigInteger;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class OutputFunctions {
 
@@ -61,20 +66,20 @@ public final class OutputFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.BaseForm.setEvaluator(new BaseForm());
-			F.CForm.setEvaluator(new CForm());
-			F.FullForm.setEvaluator(new FullForm());
-			F.HoldForm.setEvaluator(new HoldForm());
-			F.HornerForm.setEvaluator(new HornerForm());
-			F.InputForm.setEvaluator(new InputForm());
-			F.IntegerName.setEvaluator(new IntegerName());
-			F.JavaForm.setEvaluator(new JavaForm());
-			F.JSForm.setEvaluator(new JSForm());
-			F.MathMLForm.setEvaluator(new MathMLForm());
-			F.RomanNumeral.setEvaluator(new RomanNumeral());
-			F.TableForm.setEvaluator(new TableForm());
-			F.TeXForm.setEvaluator(new TeXForm());
-			F.TreeForm.setEvaluator(new TreeForm());
+			S.BaseForm.setEvaluator(new BaseForm());
+			S.CForm.setEvaluator(new CForm());
+			S.FullForm.setEvaluator(new FullForm());
+			S.HoldForm.setEvaluator(new HoldForm());
+			S.HornerForm.setEvaluator(new HornerForm());
+			S.InputForm.setEvaluator(new InputForm());
+			// S.IntegerName.setEvaluator(new IntegerName());
+			S.JavaForm.setEvaluator(new JavaForm());
+			S.JSForm.setEvaluator(new JSForm());
+			S.MathMLForm.setEvaluator(new MathMLForm());
+			S.RomanNumeral.setEvaluator(new RomanNumeral());
+			S.TableForm.setEvaluator(new TableForm());
+			S.TeXForm.setEvaluator(new TeXForm());
+			S.TreeForm.setEvaluator(new TreeForm());
 		}
 	}
 
@@ -155,7 +160,8 @@ public final class OutputFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-			return F.stringx(engine.evaluate(ast.arg1()).fullFormString(), IStringX.APPLICATION_SYMJA);
+			String fullForm = engine.evaluate(ast.arg1()).fullFormString();
+			return F.stringx(fullForm, IStringX.APPLICATION_SYMJA);
 		}
 
 		@Override
@@ -234,6 +240,19 @@ public final class OutputFunctions {
 					}
 					return F.stringx(sb.toString(), IStringX.TEXT_PLAIN);
 				}
+				int dim = arg1.isVector();
+				if (dim >= 0) {
+					FieldVector<IExpr> vector = Convert.list2Vector(arg1);
+					if (vector != null) {
+						StringBuilder sb = new StringBuilder();
+						for (int i = 0; i < dim; i++) {
+							sb.append(vector.getEntry(i).toString());
+							sb.append("\n");
+					}
+					return F.stringx(sb.toString(), IStringX.TEXT_PLAIN);
+				}
+			}
+				return F.stringx(arg1.toString(), IStringX.TEXT_PLAIN);
 			}
 			return F.NIL;
 		}
@@ -376,104 +395,114 @@ public final class OutputFunctions {
 		}
 	}
 
-	private static class IntegerName extends AbstractFunctionEvaluator {
-
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IExpr arg1 = ast.arg1();
-			if (arg1.isInteger()) {
-				IStringX language = F.stringx("English");
-				IStringX qual = F.stringx("Words");
-				if (ast.isAST2()) {
-					if (!ast.arg2().isString()) {
-						return F.NIL;
-					}
-					IStringX arg2 = (IStringX) ast.arg2();
-					if (arg2.isString("Dutch") || //
-							arg2.isString("Finnish") || //
-							arg2.isString("English") || //
-							arg2.isString("Esperanto") || //
-							arg2.isString("French") || //
-							arg2.isString("German") || //
-							arg2.isString("Hungarian") || //
-							arg2.isString("Italian") || //
-							arg2.isString("Latin") || //
-							arg2.isString("Polish") || //
-							arg2.isString("Portuguese") || //
-							arg2.isString("Romanian") || //
-							arg2.isString("Russian") || //
-							arg2.isString("Spanish") || //
-							arg2.isString("Swedish") || //
-							arg2.isString("Tongan") || //
-							arg2.isString("Turkish")) {
-						language = (IStringX) arg2;
-					} else {
-						qual = (IStringX) arg2;
-					}
-				}
-				try {
-					long value = ((IInteger) arg1).toLong();
-					if (qual.isString("Words")) {
-						SpokenNumber spokenNumber = null;
-						if (language.isString("Dutch")) {
-							spokenNumber = new DutchNumber(value);
-						} else if (language.isString("English")) {
-							spokenNumber = new USEnglishNumber(value);
-						} else if (language.isString("Esperanto")) {
-							spokenNumber = new EsperantoNumber(value);
-						} else if (language.isString("Finnish")) {
-							spokenNumber = new FinnishNumber(value);
-						} else if (language.isString("French")) {
-							spokenNumber = new FrenchNumber(value);
-						} else if (language.isString("German")) {
-							spokenNumber = new GermanNumber(value);
-						} else if (language.isString("Hungarian")) {
-							spokenNumber = new HungarianNumber(value);
-						} else if (language.isString("Italian")) {
-							spokenNumber = new ItalianNumber(value);
-						} else if (language.isString("Latin")) {
-							spokenNumber = new LatinNumber(value);
-						} else if (language.isString("Polish")) {
-							spokenNumber = new PolishNumber(value);
-						} else if (language.isString("Portuguese")) {
-							spokenNumber = new PortugueseNumber(value);
-						} else if (language.isString("Romanian")) {
-							spokenNumber = new RomanianNumber(value);
-						} else if (language.isString("Russian")) {
-							spokenNumber = new RussianNumber(value);
-						} else if (language.isString("Spanish")) {
-							spokenNumber = new SpanishNumber(value);
-						} else if (language.isString("Swedish")) {
-							spokenNumber = new SwedishNumber(value);
-						} else if (language.isString("Tongan")) {
-							spokenNumber = new TonganNumber(value);
-						} else if (language.isString("Turkish")) {
-							spokenNumber = new TurkishNumber(value);
-						}
-						if (spokenNumber != null) {
-							return F.stringx(spokenNumber.toString());
-						}
-					}
-				} catch (Exception ex) {
-//					if (FEConfig.SHOW_STACKTRACE) {
-						ex.printStackTrace();
+//	private static class IntegerName extends AbstractFunctionEvaluator {
+//
+//		@Override
+//		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+//			IExpr arg1 = ast.arg1();
+//			if (arg1.isInteger()) {
+//				NumberFormat formatter = null;
+//				try {
+//					long value = ((IInteger) arg1).toLong();
+//					if (value != Integer.MIN_VALUE && ast.isAST1()) {
+//						formatter = new RuleBasedNumberFormat(RuleBasedNumberFormat.SPELLOUT);
+//						String textNumber = formatter.format(value);
+//						if (textNumber != null) {
+//							return F.stringx(textNumber);
+//						}
 //					}
-				}
-			}
-			return F.NIL;
-		}
-
-		@Override
-		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
-		}
-
-		@Override
-		public void setUp(final ISymbol newSymbol) {
-			newSymbol.setAttributes(ISymbol.LISTABLE);
-		}
-
-	}
+//				IStringX language = F.stringx("English");
+//				IStringX qual = F.stringx("Words");
+//				if (ast.isAST2()) {
+//					if (!ast.arg2().isString()) {
+//						return F.NIL;
+//					}
+//					IStringX arg2 = (IStringX) ast.arg2();
+//					if (arg2.isString("Dutch") || //
+//							arg2.isString("Finnish") || //
+//							arg2.isString("English") || //
+//							arg2.isString("Esperanto") || //
+//							arg2.isString("French") || //
+//							arg2.isString("German") || //
+//							arg2.isString("Hungarian") || //
+//							arg2.isString("Italian") || //
+//							arg2.isString("Latin") || //
+//							arg2.isString("Polish") || //
+//							arg2.isString("Portuguese") || //
+//							arg2.isString("Romanian") || //
+//							arg2.isString("Russian") || //
+//							arg2.isString("Spanish") || //
+//							arg2.isString("Swedish") || //
+//							arg2.isString("Tongan") || //
+//							arg2.isString("Turkish")) {
+//						language = (IStringX) arg2;
+//					} else {
+//						qual = (IStringX) arg2;
+//					}
+//				}
+//					if (qual.isString("Words")) {
+//						if (language.isString("Dutch")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("nl"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("English")) {
+//							formatter = new RuleBasedNumberFormat(Locale.ENGLISH, RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Esperanto")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("eo"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Finnish")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("fi"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("French")) {
+//							formatter = new RuleBasedNumberFormat(Locale.FRENCH, RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("German")) {
+//							formatter = new RuleBasedNumberFormat(Locale.GERMAN, RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Hungarian")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("hu"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Italian")) {
+//							formatter = new RuleBasedNumberFormat(Locale.ITALIAN, RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Latin")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("vai"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Polish")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("pl"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Portuguese")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("pt"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Romanian")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("ro"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Russian")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("ru"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Spanish")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("es"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Swedish")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("sv"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Tongan")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("sv"), RuleBasedNumberFormat.SPELLOUT);
+//						} else if (language.isString("Turkish")) {
+//							formatter = new RuleBasedNumberFormat(new Locale("tr"), RuleBasedNumberFormat.SPELLOUT);
+//						}
+//						if (formatter != null) {
+//							String textNumber = formatter.format(value);
+//							if (textNumber != null) {
+//								return F.stringx(textNumber);
+//							}
+//						}
+//					}
+//				} catch (Exception ex) {
+//					if (FEConfig.SHOW_STACKTRACE) {
+//						ex.printStackTrace();
+//					}
+//				}
+//			}
+//			return F.NIL;
+//		}
+//
+//		@Override
+//		public int[] expectedArgSize(IAST ast) {
+//			return IOFunctions.ARGS_1_2;
+//		}
+//
+//		@Override
+//		public void setUp(final ISymbol newSymbol) {
+//			newSymbol.setAttributes(ISymbol.LISTABLE);
+//		}
+//
+//	}
 
 	/**
 	 * <pre>
@@ -785,17 +814,79 @@ public final class OutputFunctions {
 		return buf.toString();
 	}
 
+	public static boolean markdownTable(StringBuilder result, IExpr expr,
+			Function<IExpr, String> function, boolean fillUpWithSPACE) {
+		int[] dim = expr.isMatrix();
+		if (dim != null && dim[0] > 0 && dim[1] > 0) {
+			IAST matrix = (IAST) expr;
+			int rowDimension = dim[0];
+			int columnDimension = dim[1];
+			// int[] columnSizes = new int[columnDimension];
+			String[][] texts = new String[rowDimension][columnDimension];
+			for (int i = 0; i < rowDimension; i++) {
+				for (int j = 0; j < columnDimension; j++) {
+					final String str = function.apply(matrix.getPart(i + 1, j + 1));
+					texts[i][j] = str;
+					// if (str.length() > columnSizes[j]) {
+					// columnSizes[j] = str.length();
+					// }
+				}
+			}
+
+			StringBuilder[] sb = new StringBuilder[rowDimension];
+			for (int j = 0; j < rowDimension; j++) {
+				sb[j] = new StringBuilder();
+			}
+			int rowLength = 0;
+
+			for (int i = 0; i < columnDimension; i++) {
+				int columnLength = 0;
+				for (int j = 0; j < rowDimension; j++) {
+					String str = texts[j][i];
+					if (str.length() > columnLength) {
+						columnLength = str.length();
+					}
+					sb[j].append('|');
+					sb[j].append(str);
+				}
+				if (i < columnDimension - 1) {
+					rowLength += columnLength + 1;
+				} else {
+					rowLength += columnLength;
+				}
+				if (fillUpWithSPACE) {
+					for (int j = 0; j < rowDimension; j++) {
+						int rest = rowLength - sb[j].length();
+						for (int k = 0; k < rest; k++) {
+							sb[j].append(' ');
+						}
+					}
+				}
+			}
+
+			for (int i = 0; i < rowDimension; i++) {
+				result.append(sb[i]);
+				result.append("|");
+				if (i < rowDimension - 1) {
+					result.append("\n");
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 	public static boolean plaintextTable(StringBuilder result, IExpr expr, String delimiter,
 			Function<IExpr, String> function, boolean fillUpWithSPACE) {
 		int[] dim = expr.isMatrix();
-		if (dim != null) {
-			IAST matrix = (IAST) expr;
+		if (dim != null && dim[0] > 0 && dim[1] > 0) {
 			int rowDimension = dim[0];
 			int columnDimension = dim[1];
 			StringBuilder[] sb = new StringBuilder[rowDimension];
 			for (int j = 0; j < rowDimension; j++) {
 				sb[j] = new StringBuilder();
 			}
+			if (expr.isAST()) {
+				IAST matrix = (IAST) expr;
 			int rowLength = 0;
 
 			for (int i = 0; i < columnDimension; i++) {
@@ -820,6 +911,41 @@ public final class OutputFunctions {
 						int rest = rowLength - sb[j].length();
 						for (int k = 0; k < rest; k++) {
 							sb[j].append(' ');
+						}
+					}
+				}
+			}
+			} else {
+				FieldMatrix<IExpr> matrix = Convert.list2Matrix(expr);
+				int rowLength = 0;
+				if (matrix == null) {
+					return false;
+				} else {
+					for (int i = 0; i < columnDimension; i++) {
+						int columnLength = 0;
+						for (int j = 0; j < rowDimension; j++) {
+							IExpr arg = matrix.getEntry(j, i);
+							String str = function.apply(arg);
+							if (str.length() > columnLength) {
+								columnLength = str.length();
+							}
+							sb[j].append(str);
+							if (i < columnDimension - 1) {
+								sb[j].append(delimiter);
+							}
+						}
+						if (i < columnDimension - 1) {
+							rowLength += columnLength + 1;
+						} else {
+							rowLength += columnLength;
+						}
+						if (fillUpWithSPACE) {
+							for (int j = 0; j < rowDimension; j++) {
+								int rest = rowLength - sb[j].length();
+								for (int k = 0; k < rest; k++) {
+									sb[j].append(' ');
+								}
+							}
 						}
 					}
 				}

@@ -35,9 +35,7 @@ import org.hipparchus.exception.NullArgumentException;
  * select which exception must be thrown.
  */
 public class Incrementor {
-    /**
-     * Default callback.
-     */
+    /** Default callback. */
     private static final MaxCountExceededCallback DEFAULT_CALLBACK =
             new MaxCountExceededCallback() {
                 @Override
@@ -46,18 +44,26 @@ public class Incrementor {
                 }
             };
 
-    /**
-     * Upper limit for the counter.
-     */
+    /** Upper limit for the counter. */
     private final int maximalCount;
-    /**
-     * Function called at counter exhaustion.
-     */
+    /** Function called at counter exhaustion. */
     private final MaxCountExceededCallback maxCountCallback;
-    /**
-     * Current count.
-     */
+    /** Current count. */
     private int count;
+
+    /**
+     * Defines a method to be called at counter exhaustion.
+     * The {@link #trigger(int) trigger} method should usually throw an exception.
+     */
+    public interface MaxCountExceededCallback {
+        /**
+         * Function called when the maximal count has been reached.
+         *
+         * @param maximalCount Maximal count.
+         * @throws MathIllegalStateException at counter exhaustion
+         */
+        void trigger(int maximalCount) throws MathIllegalStateException;
+    }
 
     /**
      * Creates an Incrementor.
@@ -82,13 +88,13 @@ public class Incrementor {
      * Creates an Incrementor.
      *
      * @param max Maximal count.
-     * @param cb  Function to be called when the maximal count has been reached.
-     * @throws NullArgumentException        if {@code cb} is {@code null}.
+     * @param cb Function to be called when the maximal count has been reached.
+     * @throws NullArgumentException if {@code cb} is {@code null}.
      * @throws MathIllegalArgumentException if {@code max} is negative.
      */
     public Incrementor(int max,
-                       MaxCountExceededCallback cb)
-            throws NullArgumentException {
+                        MaxCountExceededCallback cb)
+        throws NullArgumentException {
         this(0, max, cb);
     }
 
@@ -96,15 +102,15 @@ public class Incrementor {
      * Creates an Incrementor.
      *
      * @param count Initial counter value.
-     * @param max   Maximal count.
-     * @param cb    Function to be called when the maximal count has been reached.
-     * @throws NullArgumentException        if {@code cb} is {@code null}.
+     * @param max Maximal count.
+     * @param cb Function to be called when the maximal count has been reached.
+     * @throws NullArgumentException if {@code cb} is {@code null}.
      * @throws MathIllegalArgumentException if {@code max} is negative.
      */
     private Incrementor(int count,
                         int max,
                         MaxCountExceededCallback cb)
-            throws NullArgumentException {
+        throws NullArgumentException {
         if (cb == null) {
             throw new NullArgumentException();
         }
@@ -124,8 +130,8 @@ public class Incrementor {
      */
     public Incrementor withCount(int value) {
         return new Incrementor(value,
-                this.maximalCount,
-                this.maxCountCallback);
+                               this.maximalCount,
+                               this.maxCountCallback);
     }
 
     /**
@@ -138,8 +144,8 @@ public class Incrementor {
      */
     public Incrementor withMaximalCount(int max) {
         return new Incrementor(0,
-                max,
-                this.maxCountCallback);
+                               max,
+                               this.maxCountCallback);
     }
 
     /**
@@ -151,8 +157,8 @@ public class Incrementor {
      */
     public Incrementor withCallback(MaxCountExceededCallback cb) {
         return new Incrementor(0,
-                this.maximalCount,
-                cb);
+                               this.maximalCount,
+                               cb);
     }
 
     /**
@@ -196,7 +202,7 @@ public class Incrementor {
     public boolean canIncrement(int nTimes) {
         if (nTimes < 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL,
-                    nTimes, 0);
+                                                   nTimes, 0);
         }
         return count + nTimes <= maximalCount;
     }
@@ -206,12 +212,13 @@ public class Incrementor {
      *
      * @param nTimes Number of increments.
      * @throws MathIllegalArgumentException if {@code nTimes} is negative.
+     *
      * @see #increment()
      */
     public void increment(int nTimes) {
         if (nTimes < 0) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_SMALL,
-                    nTimes, 0);
+                                                   nTimes, 0);
         }
 
         for (int i = 0; i < nTimes; i++) {
@@ -240,19 +247,5 @@ public class Incrementor {
      */
     public void reset() {
         count = 0;
-    }
-
-    /**
-     * Defines a method to be called at counter exhaustion.
-     * The {@link #trigger(int) trigger} method should usually throw an exception.
-     */
-    public interface MaxCountExceededCallback {
-        /**
-         * Function called when the maximal count has been reached.
-         *
-         * @param maximalCount Maximal count.
-         * @throws MathIllegalStateException at counter exhaustion
-         */
-        void trigger(int maximalCount) throws MathIllegalStateException;
     }
 }

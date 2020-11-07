@@ -21,6 +21,7 @@
  */
 package org.hipparchus.analysis.differentiation;
 
+import org.hipparchus.CalculusFieldElementImpl;
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
 import org.hipparchus.RealFieldElement;
@@ -47,7 +48,9 @@ import java.util.Map;
  * {@link DerivativeStructure} and use less memory.
  * </p>
  */
-public class SparseGradient implements RealFieldElement<SparseGradient>, Serializable {
+public class SparseGradient
+        extends CalculusFieldElementImpl<SparseGradient>
+        implements RealFieldElement<SparseGradient>, Serializable {
 
     /**
      * Serializable UID.

@@ -21,14 +21,14 @@
  */
 package org.hipparchus.stat.correlation;
 
+import java.util.Arrays;
+
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.linear.BlockRealMatrix;
 import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
-
-import java.util.Arrays;
 
 /**
  * Implementation of Kendall's Tau-b rank correlation.
@@ -50,13 +50,13 @@ import java.util.Arrays;
  * <p>
  * where:
  * <ul>
- * <li>n<sub>0</sub> = n * (n - 1) / 2</li>
- * <li>n<sub>c</sub> = Number of concordant pairs</li>
- * <li>n<sub>d</sub> = Number of discordant pairs</li>
- * <li>n<sub>1</sub> = sum of t<sub>i</sub> * (t<sub>i</sub> - 1) / 2 for all i</li>
- * <li>n<sub>2</sub> = sum of u<sub>j</sub> * (u<sub>j</sub> - 1) / 2 for all j</li>
- * <li>t<sub>i</sub> = Number of tied values in the i<sup>th</sup> group of ties in x</li>
- * <li>u<sub>j</sub> = Number of tied values in the j<sup>th</sup> group of ties in y</li>
+ *     <li>n<sub>0</sub> = n * (n - 1) / 2</li>
+ *     <li>n<sub>c</sub> = Number of concordant pairs</li>
+ *     <li>n<sub>d</sub> = Number of discordant pairs</li>
+ *     <li>n<sub>1</sub> = sum of t<sub>i</sub> * (t<sub>i</sub> - 1) / 2 for all i</li>
+ *     <li>n<sub>2</sub> = sum of u<sub>j</sub> * (u<sub>j</sub> - 1) / 2 for all j</li>
+ *     <li>t<sub>i</sub> = Number of tied values in the i<sup>th</sup> group of ties in x</li>
+ *     <li>u<sub>j</sub> = Number of tied values in the j<sup>th</sup> group of ties in y</li>
  * </ul>
  * <p>
  * This implementation uses the O(n log n) algorithm described in
@@ -71,9 +71,7 @@ import java.util.Arrays;
  */
 public class KendallsCorrelation {
 
-    /**
-     * correlation matrix
-     */
+    /** correlation matrix */
     private final RealMatrix correlationMatrix;
 
     /**
@@ -89,7 +87,7 @@ public class KendallsCorrelation {
      *
      * @param data rectangular array with columns representing variables
      * @throws IllegalArgumentException if the input data array is not
-     *                                  rectangular with at least two rows and two columns.
+     * rectangular with at least two rows and two columns.
      */
     public KendallsCorrelation(double[][] data) {
         this(MatrixUtils.createRealMatrix(data));
@@ -103,17 +101,6 @@ public class KendallsCorrelation {
      */
     public KendallsCorrelation(RealMatrix matrix) {
         correlationMatrix = computeCorrelationMatrix(matrix);
-    }
-
-    /**
-     * Returns the sum of the number from 1 .. n according to Gauss' summation formula:
-     * \[ \sum\limits_{k=1}^n k = \frac{n(n + 1)}{2} \]
-     *
-     * @param n the summation end
-     * @return the sum of the number from 1 to n
-     */
-    private static long sum(long n) {
-        return n * (n + 1) / 2l;
     }
 
     /**
@@ -155,7 +142,7 @@ public class KendallsCorrelation {
      * @return correlation matrix
      */
     public RealMatrix computeCorrelationMatrix(final double[][] matrix) {
-        return computeCorrelationMatrix(new BlockRealMatrix(matrix));
+       return computeCorrelationMatrix(new BlockRealMatrix(matrix));
     }
 
     /**
@@ -265,20 +252,27 @@ public class KendallsCorrelation {
     }
 
     /**
+     * Returns the sum of the number from 1 .. n according to Gauss' summation formula:
+     * \[ \sum\limits_{k=1}^n k = \frac{n(n + 1)}{2} \]
+     *
+     * @param n the summation end
+     * @return the sum of the number from 1 to n
+     */
+    private static long sum(long n) {
+        return n * (n + 1) / 2l;
+    }
+
+    /**
      * Helper data structure holding a (double, double) pair.
      */
     private static class DoublePair implements Comparable<DoublePair> {
-        /**
-         * The first value
-         */
+        /** The first value */
         private final double first;
-        /**
-         * The second value
-         */
+        /** The second value */
         private final double second;
 
         /**
-         * @param first  first value.
+         * @param first first value.
          * @param second second value.
          */
         DoublePair(double first, double second) {
@@ -286,23 +280,17 @@ public class KendallsCorrelation {
             this.second = second;
         }
 
-        /**
-         * @return the first value.
-         */
+        /** @return the first value. */
         public double getFirst() {
             return first;
         }
 
-        /**
-         * @return the second value.
-         */
+        /** @return the second value. */
         public double getSecond() {
             return second;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public int compareTo(DoublePair other) {
             int compareKey = Double.compare(getFirst(), other.getFirst());

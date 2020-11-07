@@ -21,7 +21,7 @@ import org.junit.*;
 
 import java.util.*;
 import com.duy.lambda.*;
-import java.util.stream.*;
+import com.duy.stream.*;
 
 /**
  * Tests for {@link VertexToIntegerMapping}

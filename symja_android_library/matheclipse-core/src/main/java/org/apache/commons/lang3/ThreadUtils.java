@@ -239,8 +239,8 @@ public class ThreadUtils {
     /**
      * A predicate for selecting threads.
      */
-    //if java minimal version for lang becomes 1.8 extend this interface from java.util.function.Predicate
-    public interface ThreadPredicate /*extends java.util.function.Predicate<Thread>*/{
+    //if java minimal version for lang becomes 1.8 extend this interface from com.duy.lambda.Predicate
+    public interface ThreadPredicate /*extends com.duy.lambda.Predicate<Thread>*/{
 
         /**
          * Evaluates this predicate on the given thread.
@@ -253,8 +253,8 @@ public class ThreadUtils {
     /**
      * A predicate for selecting threadgroups.
      */
-    //if java minimal version for lang becomes 1.8 extend this interface from java.util.function.Predicate
-    public interface ThreadGroupPredicate /*extends java.util.function.Predicate<ThreadGroup>*/{
+    //if java minimal version for lang becomes 1.8 extend this interface from com.duy.lambda.Predicate
+    public interface ThreadGroupPredicate /*extends com.duy.lambda.Predicate<ThreadGroup>*/{
 
         /**
          * Evaluates this predicate on the given threadgroup.

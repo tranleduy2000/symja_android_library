@@ -12,6 +12,7 @@ import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.operator.Precedence;
 import org.matheclipse.parser.trie.Tries;
 import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.operator.ASTNodeFactory;
@@ -240,7 +241,7 @@ public class MathMLContentFormFactory extends AbstractMathMLFormFactory {
 		tagStart(buf, "cn", "type=\"complex-cartesian\"");
 		convertFraction(buf, c.getRealPart(), precedence, caller);
 		tagStartEnd(buf, "sep");
-		convertFraction(buf, c.getImaginaryPart(), ASTNodeFactory.TIMES_PRECEDENCE, caller);
+		convertFraction(buf, c.getImaginaryPart(), Precedence.TIMES, caller);
 		tagEnd(buf, "cn");
 	}
 

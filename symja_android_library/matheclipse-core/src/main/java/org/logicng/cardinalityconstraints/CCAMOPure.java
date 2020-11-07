@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -34,25 +34,26 @@ import org.logicng.formulas.Variable;
 /**
  * Encodes that at most one variable is assigned value true.  Uses the 'naive' encoding with no introduction
  * of new variables but quadratic size.
- *
- * @version 1.1
+ * @version 2.0.0
  * @since 1.0
  */
-final class CCAMOPure implements CCAtMostOne {
+public final class CCAMOPure implements CCAtMostOne {
 
     /**
      * Constructs the naive AMO encoder.
      */
-    CCAMOPure() {
+    public CCAMOPure() {
         // intentionally left empty
     }
 
     @Override
     public void build(final EncodingResult result, final Variable... vars) {
         result.reset();
-        for (int i = 0; i < vars.length; i++)
-            for (int j = i + 1; j < vars.length; j++)
+        for (int i = 0; i < vars.length; i++) {
+            for (int j = i + 1; j < vars.length; j++) {
                 result.addClause(vars[i].negate(), vars[j].negate());
+            }
+        }
     }
 
     @Override

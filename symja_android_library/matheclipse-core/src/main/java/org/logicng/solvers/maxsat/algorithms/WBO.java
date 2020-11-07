@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/*****************************************************************************************
+/*
  * Open-WBO -- Copyright (c) 2013-2015, Ruben Martins, Vasco Manquinho, Ines Lynce
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -45,24 +45,9 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *****************************************************************************************/
+ */
 
 package org.logicng.solvers.maxsat.algorithms;
-
-import org.logicng.collections.LNGIntVector;
-import org.logicng.collections.LNGVector;
-import org.logicng.datastructures.Tristate;
-import org.logicng.solvers.sat.MiniSatStyleSolver;
-import org.logicng.util.Pair;
-
-import java.io.PrintStream;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static org.logicng.datastructures.Tristate.FALSE;
 import static org.logicng.datastructures.Tristate.TRUE;
@@ -72,15 +57,28 @@ import static org.logicng.solvers.maxsat.algorithms.MaxSATConfig.WeightStrategy;
 import static org.logicng.solvers.sat.MiniSatStyleSolver.not;
 import static org.logicng.solvers.sat.MiniSatStyleSolver.var;
 
+import org.logicng.collections.LNGIntVector;
+import org.logicng.collections.LNGVector;
+import org.logicng.datastructures.Tristate;
+import org.logicng.solvers.sat.MiniSatStyleSolver;
+import org.logicng.util.Pair;
+
+import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 /**
  * Weighted Boolean Optimization solver.
- *
- * @version 1.3
+ * @version 2.0.0
  * @since 1.0
  */
 public class WBO extends MaxSAT {
 
-    private final PrintStream output;
+    protected final PrintStream output;
     protected MiniSatStyleSolver solver;
     protected int nbCurrentSoft;
     protected WeightStrategy weightStrategy;
@@ -97,18 +95,17 @@ public class WBO extends MaxSAT {
      * Constructs a new solver with default values.
      */
     public WBO() {
-        this(new MaxSATConfig.Builder().build());
+        this(MaxSATConfig.builder().build());
     }
 
     /**
      * Constructs a new solver with a given configuration.
-     *
      * @param config the configuration
      */
     public WBO(final MaxSATConfig config) {
         super(config);
         this.solver = null;
-        verbosity = config.verbosity;
+        this.verbosity = config.verbosity;
         this.nbCurrentSoft = 0;
         this.weightStrategy = config.weightStrategy;
         this.symmetryStrategy = config.symmetry;
@@ -124,40 +121,45 @@ public class WBO extends MaxSAT {
 
     @Override
     public MaxSATResult search() {
-        nbInitialVariables = nVars();
-        if (currentWeight == 1) {
-            problemType = ProblemType.UNWEIGHTED;
+        this.nbInitialVariables = nVars();
+        if (this.currentWeight == 1) {
+            this.problemType = ProblemType.UNWEIGHTED;
             this.weightStrategy = WeightStrategy.NONE;
         }
-        if (this.symmetryStrategy)
+        if (this.symmetryStrategy) {
             this.initSymmetry();
-        if (problemType == ProblemType.UNWEIGHTED || this.weightStrategy == WeightStrategy.NONE)
+        }
+        if (this.problemType == ProblemType.UNWEIGHTED || this.weightStrategy == WeightStrategy.NONE) {
             return this.normalSearch();
-        else if (this.weightStrategy == WeightStrategy.NORMAL || this.weightStrategy == WeightStrategy.DIVERSIFY)
+        } else if (this.weightStrategy == WeightStrategy.NORMAL || this.weightStrategy == WeightStrategy.DIVERSIFY) {
             return this.weightSearch();
+        }
         throw new IllegalArgumentException("Unknown problem type.");
     }
 
-
-    private MiniSatStyleSolver rebuildWeightSolver(final WeightStrategy strategy) {
+    protected MiniSatStyleSolver rebuildWeightSolver(final WeightStrategy strategy) {
         assert strategy == WeightStrategy.NORMAL || strategy == WeightStrategy.DIVERSIFY;
         final MiniSatStyleSolver s = newSATSolver();
-        for (int i = 0; i < nVars(); i++)
+        for (int i = 0; i < nVars(); i++) {
             newSATVariable(s);
-        for (int i = 0; i < nHard(); i++)
-            s.addClause(hardClauses.get(i).clause(), null);
-        if (this.symmetryStrategy)
+        }
+        for (int i = 0; i < nHard(); i++) {
+            s.addClause(this.hardClauses.get(i).clause(), null);
+        }
+        if (this.symmetryStrategy) {
             this.symmetryBreaking();
+        }
         LNGIntVector clause = new LNGIntVector();
         this.nbCurrentSoft = 0;
         for (int i = 0; i < nSoft(); i++) {
-            if (softClauses.get(i).weight() >= currentWeight) {
+            if (this.softClauses.get(i).weight() >= this.currentWeight) {
                 this.nbCurrentSoft++;
                 clause.clear();
-                clause = new LNGIntVector(softClauses.get(i).clause());
-                for (int j = 0; j < softClauses.get(i).relaxationVars().size(); j++)
-                    clause.push(softClauses.get(i).relaxationVars().get(j));
-                clause.push(softClauses.get(i).assumptionVar());
+                clause = new LNGIntVector(this.softClauses.get(i).clause());
+                for (int j = 0; j < this.softClauses.get(i).relaxationVars().size(); j++) {
+                    clause.push(this.softClauses.get(i).relaxationVars().get(j));
+                }
+                clause.push(this.softClauses.get(i).assumptionVar());
 
                 s.addClause(clause, null);
             }
@@ -168,87 +170,98 @@ public class WBO extends MaxSAT {
     MiniSatStyleSolver rebuildSolver() {
         assert this.weightStrategy == WeightStrategy.NONE;
         final MiniSatStyleSolver s = newSATSolver();
-        for (int i = 0; i < nVars(); i++)
+        for (int i = 0; i < nVars(); i++) {
             newSATVariable(s);
-        for (int i = 0; i < nHard(); i++)
-            s.addClause(hardClauses.get(i).clause(), null);
-        if (this.symmetryStrategy)
+        }
+        for (int i = 0; i < nHard(); i++) {
+            s.addClause(this.hardClauses.get(i).clause(), null);
+        }
+        if (this.symmetryStrategy) {
             this.symmetryBreaking();
+        }
         LNGIntVector clause;
         for (int i = 0; i < nSoft(); i++) {
-            clause = new LNGIntVector(softClauses.get(i).clause());
-            for (int j = 0; j < softClauses.get(i).relaxationVars().size(); j++)
-                clause.push(softClauses.get(i).relaxationVars().get(j));
-            clause.push(softClauses.get(i).assumptionVar());
+            clause = new LNGIntVector(this.softClauses.get(i).clause());
+            for (int j = 0; j < this.softClauses.get(i).relaxationVars().size(); j++) {
+                clause.push(this.softClauses.get(i).relaxationVars().get(j));
+            }
+            clause.push(this.softClauses.get(i).assumptionVar());
             s.addClause(clause, null);
         }
         return s;
     }
 
-    private MiniSatStyleSolver rebuildHardSolver() {
+    protected MiniSatStyleSolver rebuildHardSolver() {
         final MiniSatStyleSolver s = newSATSolver();
-        for (int i = 0; i < nVars(); i++)
+        for (int i = 0; i < nVars(); i++) {
             newSATVariable(s);
-        for (int i = 0; i < nHard(); i++)
-            s.addClause(hardClauses.get(i).clause(), null);
+        }
+        for (int i = 0; i < nHard(); i++) {
+            s.addClause(this.hardClauses.get(i).clause(), null);
+        }
         return s;
     }
 
     void updateCurrentWeight(final WeightStrategy strategy) {
         assert strategy == WeightStrategy.NORMAL || strategy == WeightStrategy.DIVERSIFY;
-        if (strategy == WeightStrategy.NORMAL)
-            currentWeight = this.findNextWeight(currentWeight);
-        else if (strategy == WeightStrategy.DIVERSIFY)
-            currentWeight = this.findNextWeightDiversity(currentWeight);
+        if (strategy == WeightStrategy.NORMAL) {
+            this.currentWeight = this.findNextWeight(this.currentWeight);
+        } else if (strategy == WeightStrategy.DIVERSIFY) {
+            this.currentWeight = this.findNextWeightDiversity(this.currentWeight);
+        }
     }
 
-
-    private int findNextWeight(int weight) {
+    protected int findNextWeight(final int weight) {
         int nextWeight = 1;
         for (int i = 0; i < nSoft(); i++) {
-            if (softClauses.get(i).weight() > nextWeight && softClauses.get(i).weight() < weight)
-                nextWeight = softClauses.get(i).weight();
+            if (this.softClauses.get(i).weight() > nextWeight && this.softClauses.get(i).weight() < weight) {
+                nextWeight = this.softClauses.get(i).weight();
+            }
         }
         return nextWeight;
     }
 
-    private int findNextWeightDiversity(int weight) {
+    protected int findNextWeightDiversity(final int weight) {
         assert this.weightStrategy == WeightStrategy.DIVERSIFY;
-        assert nbSatisfiable > 0;
+        assert this.nbSatisfiable > 0;
         int nextWeight = weight;
         int nbClauses;
         final SortedSet<Integer> nbWeights = new TreeSet<>();
-        double alpha = 1.25;
+        final double alpha = 1.25;
         boolean findNext = false;
         while (true) {
-            if (nbSatisfiable > 1 || findNext)
+            if (this.nbSatisfiable > 1 || findNext) {
                 nextWeight = this.findNextWeight(nextWeight);
+            }
             nbClauses = 0;
             nbWeights.clear();
             for (int i = 0; i < nSoft(); i++) {
-                if (softClauses.get(i).weight() >= nextWeight) {
+                if (this.softClauses.get(i).weight() >= nextWeight) {
                     nbClauses++;
-                    nbWeights.add(softClauses.get(i).weight());
+                    nbWeights.add(this.softClauses.get(i).weight());
                 }
             }
-            if ((double) nbClauses / nbWeights.size() > alpha || nbClauses == nSoft())
+            if ((double) nbClauses / nbWeights.size() > alpha || nbClauses == nSoft()) {
                 break;
-            if (nbSatisfiable == 1 && !findNext)
+            }
+            if (this.nbSatisfiable == 1 && !findNext) {
                 findNext = true;
+            }
         }
         return nextWeight;
     }
 
-    private void encodeEO(final LNGIntVector lits) {
+    protected void encodeEO(final LNGIntVector lits) {
         assert lits.size() != 0;
-        LNGIntVector clause = new LNGIntVector();
+        final LNGIntVector clause = new LNGIntVector();
         if (lits.size() == 1) {
             clause.push(lits.get(0));
             addHardClause(clause);
         } else {
-            LNGIntVector auxVariables = new LNGIntVector();
-            for (int i = 0; i < lits.size() - 1; i++)
+            final LNGIntVector auxVariables = new LNGIntVector();
+            for (int i = 0; i < lits.size() - 1; i++) {
                 auxVariables.push(newLiteral(false));
+            }
             for (int i = 0; i < lits.size(); i++) {
                 if (i == 0) {
                     clause.clear();
@@ -291,49 +304,53 @@ public class WBO extends MaxSAT {
         }
     }
 
-    private void relaxCore(final LNGIntVector conflict, int weightCore, final LNGIntVector assumps) {
+    protected void relaxCore(final LNGIntVector conflict, final int weightCore, final LNGIntVector assumps) {
         assert conflict.size() > 0;
         assert weightCore > 0;
-        LNGIntVector lits = new LNGIntVector();
+        final LNGIntVector lits = new LNGIntVector();
         for (int i = 0; i < conflict.size(); i++) {
-            int indexSoft = this.coreMapping.get(conflict.get(i));
+            final int indexSoft = this.coreMapping.get(conflict.get(i));
 
-            if (softClauses.get(indexSoft).weight() == weightCore) {
+            if (this.softClauses.get(indexSoft).weight() == weightCore) {
                 final int p = newLiteral(false);
-                softClauses.get(indexSoft).relaxationVars().push(p);
+                this.softClauses.get(indexSoft).relaxationVars().push(p);
                 lits.push(p);
-                if (this.symmetryStrategy)
+                if (this.symmetryStrategy) {
                     this.symmetryLog(indexSoft);
+                }
             } else {
-                assert softClauses.get(indexSoft).weight() - weightCore > 0;
-                softClauses.get(indexSoft).setWeight(softClauses.get(indexSoft).weight() - weightCore);
-                LNGIntVector clause = new LNGIntVector(softClauses.get(indexSoft).clause());
-                LNGIntVector vars = new LNGIntVector(softClauses.get(indexSoft).relaxationVars());
+                assert this.softClauses.get(indexSoft).weight() - weightCore > 0;
+                this.softClauses.get(indexSoft).setWeight(this.softClauses.get(indexSoft).weight() - weightCore);
+                final LNGIntVector clause = new LNGIntVector(this.softClauses.get(indexSoft).clause());
+                final LNGIntVector vars = new LNGIntVector(this.softClauses.get(indexSoft).relaxationVars());
                 final int p = newLiteral(false);
                 vars.push(p);
                 lits.push(p);
                 addSoftClause(weightCore, clause, vars);
                 final int l = newLiteral(false);
-                softClauses.get(nSoft() - 1).setAssumptionVar(l);
+                this.softClauses.get(nSoft() - 1).setAssumptionVar(l);
                 this.coreMapping.put(l, nSoft() - 1);  // Map the new soft clause to its assumption literal.
                 assumps.push(not(l)); // Update the assumption vector.
-                if (this.symmetryStrategy)
+                if (this.symmetryStrategy) {
                     this.symmetryLog(nSoft() - 1);
+                }
             }
         }
         this.encodeEO(lits);
-        sumSizeCores += conflict.size();
+        this.sumSizeCores += conflict.size();
     }
 
     int computeCostCore(final LNGIntVector conflict) {
         assert conflict.size() != 0;
-        if (problemType == ProblemType.UNWEIGHTED)
+        if (this.problemType == ProblemType.UNWEIGHTED) {
             return 1;
+        }
         int coreCost = Integer.MAX_VALUE;
         for (int i = 0; i < conflict.size(); i++) {
-            int indexSoft = this.coreMapping.get(conflict.get(i));
-            if (softClauses.get(indexSoft).weight() < coreCost)
-                coreCost = softClauses.get(indexSoft).weight();
+            final int indexSoft = this.coreMapping.get(conflict.get(i));
+            if (this.softClauses.get(indexSoft).weight() < coreCost) {
+                coreCost = this.softClauses.get(indexSoft).weight();
+            }
         }
         return coreCost;
     }
@@ -345,72 +362,79 @@ public class WBO extends MaxSAT {
         }
     }
 
-    void symmetryLog(int p) {
-        if (nbSymmetryClauses < this.symmetryBreakingLimit) {
+    void symmetryLog(final int p) {
+        if (this.nbSymmetryClauses < this.symmetryBreakingLimit) {
             while (this.softMapping.size() <= p) {
                 this.softMapping.push(new LNGIntVector());
                 this.relaxationMapping.push(new LNGIntVector());
             }
-            this.softMapping.get(p).push(nbCores);
-            this.relaxationMapping.get(p).push(softClauses.get(p).relaxationVars().back());
-            if (this.softMapping.get(p).size() > 1)
+            this.softMapping.get(p).push(this.nbCores);
+            this.relaxationMapping.get(p).push(this.softClauses.get(p).relaxationVars().back());
+            if (this.softMapping.get(p).size() > 1) {
                 this.indexSoftCore.push(p);
+            }
         }
     }
 
-    private void symmetryBreaking() {
-        if (this.indexSoftCore.size() != 0 && nbSymmetryClauses < this.symmetryBreakingLimit) {
-            LNGIntVector[] coreIntersection = new LNGIntVector[nbCores];
-            LNGIntVector[] coreIntersectionCurrent = new LNGIntVector[nbCores];
-            for (int i = 0; i < nbCores; i++) {
+    protected void symmetryBreaking() {
+        if (this.indexSoftCore.size() != 0 && this.nbSymmetryClauses < this.symmetryBreakingLimit) {
+            final LNGIntVector[] coreIntersection = new LNGIntVector[this.nbCores];
+            final LNGIntVector[] coreIntersectionCurrent = new LNGIntVector[this.nbCores];
+            for (int i = 0; i < this.nbCores; i++) {
                 coreIntersection[i] = new LNGIntVector();
                 coreIntersectionCurrent[i] = new LNGIntVector();
             }
-            LNGIntVector coreList = new LNGIntVector();
+            final LNGIntVector coreList = new LNGIntVector();
             for (int i = 0; i < this.indexSoftCore.size(); i++) {
-                int p = this.indexSoftCore.get(i);
-                LNGIntVector addCores = new LNGIntVector();
+                final int p = this.indexSoftCore.get(i);
+                final LNGIntVector addCores = new LNGIntVector();
                 for (int j = 0; j < this.softMapping.get(p).size() - 1; j++) {
-                    int core = this.softMapping.get(p).get(j);
+                    final int core = this.softMapping.get(p).get(j);
                     addCores.push(core);
-                    if (coreIntersection[core].size() == 0)
+                    if (coreIntersection[core].size() == 0) {
                         coreList.push(core);
+                    }
                     assert j < this.relaxationMapping.get(p).size();
-                    assert var(this.relaxationMapping.get(p).get(j)) > nbInitialVariables;
+                    assert var(this.relaxationMapping.get(p).get(j)) > this.nbInitialVariables;
                     coreIntersection[core].push(this.relaxationMapping.get(p).get(j));
                 }
                 for (int j = 0; j < addCores.size(); j++) {
-                    int core = addCores.get(j);
-                    int b = this.softMapping.get(p).size() - 1;
+                    final int core = addCores.get(j);
+                    final int b = this.softMapping.get(p).size() - 1;
                     assert b < this.relaxationMapping.get(p).size();
-                    assert var(this.relaxationMapping.get(p).get(b)) > nbInitialVariables;
+                    assert var(this.relaxationMapping.get(p).get(b)) > this.nbInitialVariables;
                     coreIntersectionCurrent[core].push(this.relaxationMapping.get(p).get(b));
                 }
                 for (int k = 0; k < coreList.size(); k++) {
                     for (int m = 0; m < coreIntersection[coreList.get(k)].size(); m++) {
                         for (int j = m + 1; j < coreIntersectionCurrent[coreList.get(k)].size(); j++) {
-                            LNGIntVector clause = new LNGIntVector();
+                            final LNGIntVector clause = new LNGIntVector();
                             clause.push(not(coreIntersection[coreList.get(k)].get(m)));
                             clause.push(not(coreIntersectionCurrent[coreList.get(k)].get(j)));
                             Pair<Integer, Integer> symClause = new Pair<>(var(coreIntersection[coreList.get(k)].get(m)), var(coreIntersectionCurrent[coreList.get(k)].get(j)));
-                            if (var(coreIntersection[coreList.get(k)].get(m)) > var(coreIntersectionCurrent[coreList.get(k)].get(j)))
+                            if (var(coreIntersection[coreList.get(k)].get(m)) > var(coreIntersectionCurrent[coreList.get(k)].get(j))) {
                                 symClause = new Pair<>(var(coreIntersectionCurrent[coreList.get(k)].get(j)), var(coreIntersection[coreList.get(k)].get(m)));
+                            }
                             if (!this.duplicatedSymmetryClauses.contains(symClause)) {
                                 this.duplicatedSymmetryClauses.add(symClause);
                                 addHardClause(clause);
-                                nbSymmetryClauses++;
-                                if (this.symmetryBreakingLimit == nbSymmetryClauses)
+                                this.nbSymmetryClauses++;
+                                if (this.symmetryBreakingLimit == this.nbSymmetryClauses) {
                                     break;
+                                }
                             }
                         }
-                        if (this.symmetryBreakingLimit == nbSymmetryClauses)
+                        if (this.symmetryBreakingLimit == this.nbSymmetryClauses) {
                             break;
+                        }
                     }
-                    if (this.symmetryBreakingLimit == nbSymmetryClauses)
+                    if (this.symmetryBreakingLimit == this.nbSymmetryClauses) {
                         break;
+                    }
                 }
-                if (this.symmetryBreakingLimit == nbSymmetryClauses)
+                if (this.symmetryBreakingLimit == this.nbSymmetryClauses) {
                     break;
+                }
             }
         }
         this.indexSoftCore.clear();
@@ -419,114 +443,131 @@ public class WBO extends MaxSAT {
     Tristate unsatSearch() {
         assert this.assumptions.size() == 0;
         this.solver = this.rebuildHardSolver();
-        Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-        if (res == FALSE)
-            nbCores++;
-        else if (res == TRUE) {
-            nbSatisfiable++;
-            int cost = computeCostModel(this.solver.model(), Integer.MAX_VALUE);
-            assert cost <= ubCost;
-            ubCost = cost;
+        final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
+        satSolverFinished();
+        if (res == FALSE) {
+            this.nbCores++;
+        } else if (res == TRUE) {
+            this.nbSatisfiable++;
+            final int cost = computeCostModel(this.solver.model(), Integer.MAX_VALUE);
+            assert cost <= this.ubCost;
+            this.ubCost = cost;
             saveModel(this.solver.model());
-            if (verbosity != Verbosity.NONE)
-                this.output.println("o " + ubCost);
+            if (this.verbosity != Verbosity.NONE) {
+                this.output.println("o " + this.ubCost);
+            }
         }
         this.solver = null;
         return res;
     }
 
-    private MaxSATResult weightSearch() {
+    protected MaxSATResult weightSearch() {
         assert this.weightStrategy == WeightStrategy.NORMAL || this.weightStrategy == WeightStrategy.DIVERSIFY;
         final Tristate unsatResult = this.unsatSearch();
-        if (unsatResult == UNDEF)
+        if (unsatResult == UNDEF) {
             return MaxSATResult.UNDEF;
-        else if (unsatResult == FALSE)
+        } else if (unsatResult == FALSE) {
             return MaxSATResult.UNSATISFIABLE;
+        }
         this.initAssumptions(this.assumptions);
         this.updateCurrentWeight(this.weightStrategy);
         this.solver = this.rebuildWeightSolver(this.weightStrategy);
         while (true) {
             final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            if (res == UNDEF)
+            satSolverFinished();
+            if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
-            else if (res == FALSE) {
-                nbCores++;
+            } else if (res == FALSE) {
+                this.nbCores++;
                 assert this.solver.conflict().size() > 0;
-                int coreCost = this.computeCostCore(this.solver.conflict());
-                lbCost += coreCost;
-                if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", lbCost, this.solver.conflict().size(), coreCost));
-                if (!foundLowerBound(lbCost, null))
+                final int coreCost = this.computeCostCore(this.solver.conflict());
+                this.lbCost += coreCost;
+                if (this.verbosity != Verbosity.NONE) {
+                    this.output.println(String.format("c LB : %d CS : %d W : %d", this.lbCost, this.solver.conflict().size(), coreCost));
+                }
+                if (!foundLowerBound(this.lbCost, null)) {
                     return MaxSATResult.UNDEF;
+                }
                 this.relaxCore(this.solver.conflict(), coreCost, this.assumptions);
                 this.solver = this.rebuildWeightSolver(this.weightStrategy);
             } else {
-                nbSatisfiable++;
+                this.nbSatisfiable++;
                 if (this.nbCurrentSoft == nSoft()) {
-                    assert computeCostModel(this.solver.model(), Integer.MAX_VALUE) == lbCost;
-                    if (lbCost == ubCost && verbosity != Verbosity.NONE)
+                    assert computeCostModel(this.solver.model(), Integer.MAX_VALUE) == this.lbCost;
+                    if (this.lbCost == this.ubCost && this.verbosity != Verbosity.NONE) {
                         this.output.println("c LB = UB");
-                    if (lbCost < ubCost) {
-                        ubCost = lbCost;
+                    }
+                    if (this.lbCost < this.ubCost) {
+                        this.ubCost = this.lbCost;
                         saveModel(this.solver.model());
-                        if (verbosity != Verbosity.NONE)
-                            this.output.println("o " + lbCost);
+                        if (this.verbosity != Verbosity.NONE) {
+                            this.output.println("o " + this.lbCost);
+                        }
                     }
                     return MaxSATResult.OPTIMUM;
                 } else {
                     this.updateCurrentWeight(this.weightStrategy);
-                    int cost = computeCostModel(this.solver.model(), Integer.MAX_VALUE);
-                    if (cost < ubCost) {
-                        ubCost = cost;
+                    final int cost = computeCostModel(this.solver.model(), Integer.MAX_VALUE);
+                    if (cost < this.ubCost) {
+                        this.ubCost = cost;
                         saveModel(this.solver.model());
-                        if (verbosity != Verbosity.NONE)
-                            this.output.println("o " + ubCost);
+                        if (this.verbosity != Verbosity.NONE) {
+                            this.output.println("o " + this.ubCost);
+                        }
                     }
-                    if (lbCost == ubCost) {
-                        if (verbosity != Verbosity.NONE)
+                    if (this.lbCost == this.ubCost) {
+                        if (this.verbosity != Verbosity.NONE) {
                             this.output.println("c LB = UB");
+                        }
                         return MaxSATResult.OPTIMUM;
-                    } else if (!foundUpperBound(ubCost, null))
+                    } else if (!foundUpperBound(this.ubCost, null)) {
                         return MaxSATResult.UNDEF;
+                    }
                     this.solver = this.rebuildWeightSolver(this.weightStrategy);
                 }
             }
         }
     }
 
-    private MaxSATResult normalSearch() {
+    protected MaxSATResult normalSearch() {
         final Tristate unsatResult = this.unsatSearch();
-        if (unsatResult == UNDEF)
+        if (unsatResult == UNDEF) {
             return MaxSATResult.UNDEF;
-        else if (unsatResult == FALSE)
+        } else if (unsatResult == FALSE) {
             return MaxSATResult.UNSATISFIABLE;
+        }
         this.initAssumptions(this.assumptions);
         this.solver = this.rebuildSolver();
         while (true) {
             final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            if (res == UNDEF)
+            satSolverFinished();
+            if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
-            else if (res == FALSE) {
-                nbCores++;
+            } else if (res == FALSE) {
+                this.nbCores++;
                 assert this.solver.conflict().size() > 0;
-                int coreCost = this.computeCostCore(this.solver.conflict());
-                lbCost += coreCost;
-                if (verbosity != Verbosity.NONE)
-                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", lbCost, this.solver.conflict().size(), coreCost));
-                if (lbCost == ubCost) {
-                    if (verbosity != Verbosity.NONE)
+                final int coreCost = this.computeCostCore(this.solver.conflict());
+                this.lbCost += coreCost;
+                if (this.verbosity != Verbosity.NONE) {
+                    this.output.println(String.format("c LB : %d CS : %d W : %d", this.lbCost, this.solver.conflict().size(), coreCost));
+                }
+                if (this.lbCost == this.ubCost) {
+                    if (this.verbosity != Verbosity.NONE) {
                         this.output.println("c LB = UB");
+                    }
                     return MaxSATResult.OPTIMUM;
-                } else if (!foundLowerBound(lbCost, null))
+                } else if (!foundLowerBound(this.lbCost, null)) {
                     return MaxSATResult.UNDEF;
+                }
                 this.relaxCore(this.solver.conflict(), coreCost, this.assumptions);
                 this.solver = this.rebuildSolver();
             } else {
-                nbSatisfiable++;
-                ubCost = computeCostModel(this.solver.model(), Integer.MAX_VALUE);
-                assert lbCost == ubCost;
-                if (verbosity != Verbosity.NONE)
-                    this.output.println("o " + lbCost);
+                this.nbSatisfiable++;
+                this.ubCost = computeCostModel(this.solver.model(), Integer.MAX_VALUE);
+                assert this.lbCost == this.ubCost;
+                if (this.verbosity != Verbosity.NONE) {
+                    this.output.println("o " + this.lbCost);
+                }
                 saveModel(this.solver.model());
                 return MaxSATResult.OPTIMUM;
             }
@@ -534,9 +575,9 @@ public class WBO extends MaxSAT {
     }
 
     void initAssumptions(final LNGIntVector assumps) {
-        for (int i = 0; i < nbSoft; i++) {
+        for (int i = 0; i < this.nbSoft; i++) {
             final int l = newLiteral(false);
-            softClauses.get(i).setAssumptionVar(l);
+            this.softClauses.get(i).setAssumptionVar(l);
             this.coreMapping.put(l, i);
             assumps.push(not(l));
         }

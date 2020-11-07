@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * PBLib       -- Copyright (c) 2012-2013  Peter Steinke
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -64,10 +64,10 @@ import java.util.List;
 
 /**
  * The adder networks encoding for pseudo-Boolean constraints to CNF.
- * @version 1.1
+ * @version 2.0.0
  * @since 1.1
  */
-final class PBAdderNetworks implements PBEncoding {
+public final class PBAdderNetworks implements PBEncoding {
 
     private final FormulaFactory f;
     private List<Formula> formula;
@@ -80,26 +80,30 @@ final class PBAdderNetworks implements PBEncoding {
         this.f = f;
     }
 
-    private static int ldInt(int x) {
+    private static int ldInt(final int x) {
         int ldretutn = 0;
-        for (int i = 0; i < 31; i++)
-            if ((x & (1 << i)) > 0)
+        for (int i = 0; i < 31; i++) {
+            if ((x & (1 << i)) > 0) {
                 ldretutn = i + 1;
+            }
+        }
         return ldretutn;
     }
 
     @Override
-    public List<Formula> encode(LNGVector<Literal> lits, LNGIntVector coeffs, int rhs, List<Formula> formula) {
+    public List<Formula> encode(final LNGVector<Literal> lits, final LNGIntVector coeffs, final int rhs, final List<Formula> formula) {
         this.formula = formula;
         final LNGVector<Literal> result = new LNGVector<>();
         final LNGVector<LinkedList<Literal>> buckets = new LNGVector<>();
-        int nb = ldInt(rhs);
+        final int nb = ldInt(rhs);
         for (int iBit = 0; iBit < nb; ++iBit) {
             buckets.push(new LinkedList<Literal>());
             result.push(null);
-            for (int iVar = 0; iVar < lits.size(); iVar++)
-                if (((1 << iBit) & coeffs.get(iVar)) != 0)
+            for (int iVar = 0; iVar < lits.size(); iVar++) {
+                if (((1 << iBit) & coeffs.get(iVar)) != 0) {
                     buckets.back().push(lits.get(iVar));
+                }
+            }
         }
         this.adderTree(buckets, result);
         final LNGBooleanVector kBits = this.numToBits(buckets.size(), rhs);
@@ -113,8 +117,9 @@ final class PBAdderNetworks implements PBEncoding {
         Literal z;
 
         for (int i = 0; i < buckets.size(); i++) {
-            if (buckets.get(i).isEmpty())
+            if (buckets.get(i).isEmpty()) {
                 continue;
+            }
             if (i == buckets.size() - 1 && buckets.get(i).size() >= 2) {
                 buckets.push(new LinkedList<Literal>());
                 result.push(null);
@@ -123,8 +128,8 @@ final class PBAdderNetworks implements PBEncoding {
                 x = buckets.get(i).removeFirst();
                 y = buckets.get(i).removeFirst();
                 z = buckets.get(i).removeFirst();
-                Literal xs = this.faSum(x, y, z);
-                Literal xc = this.faCarry(x, y, z);
+                final Literal xs = this.faSum(x, y, z);
+                final Literal xc = this.faCarry(x, y, z);
                 buckets.get(i).add(xs);
                 buckets.get(i + 1).add(xc);
                 this.faExtra(xc, xs, x, y, z);
@@ -139,14 +144,14 @@ final class PBAdderNetworks implements PBEncoding {
         }
     }
 
-    private LNGBooleanVector numToBits(int n, int num) {
+    private LNGBooleanVector numToBits(final int n, final int num) {
         int number = num;
         final LNGBooleanVector bits = new LNGBooleanVector();
         for (int i = n - 1; i >= 0; i--) {
-            int tmp = 1 << i;
-            if (number < tmp)
+            final int tmp = 1 << i;
+            if (number < tmp) {
                 bits.push(false);
-            else {
+            } else {
                 bits.push(true);
                 number -= tmp;
             }
@@ -160,8 +165,9 @@ final class PBAdderNetworks implements PBEncoding {
         final List<Literal> clause = new ArrayList<>();
         boolean skip;
         for (int i = 0; i < xs.size(); ++i) {
-            if (ys.get(i) || xs.get(i) == null)
+            if (ys.get(i) || xs.get(i) == null) {
                 continue;
+            }
             clause.clear();
             skip = false;
             for (int j = i + 1; j < xs.size(); ++j) {
@@ -172,13 +178,15 @@ final class PBAdderNetworks implements PBEncoding {
                     }
                     clause.add(xs.get(j).negate());
                 } else {
-                    if (xs.get(j) == null)
+                    if (xs.get(j) == null) {
                         continue;
+                    }
                     clause.add(xs.get(j));
                 }
             }
-            if (skip)
+            if (skip) {
                 continue;
+            }
             clause.add(xs.get(i).negate());
             formula.add(this.f.clause(clause));
         }

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -36,13 +36,12 @@ import java.util.Map;
 
 /**
  * A Boolean substitution.
- *
- * @version 1.0
+ * @version 2.0.0
  * @since 1.0
  */
-public class Substitution {
+public final class Substitution {
 
-    protected final Map<Variable, Formula> subst;
+    private final Map<Variable, Formula> subst;
 
     /**
      * Constructs a new empty substitution.
@@ -53,7 +52,6 @@ public class Substitution {
 
     /**
      * Returns the number of mappings in this substitution.
-     *
      * @return the number of mappings in this substitution
      */
     public int size() {
@@ -64,7 +62,6 @@ public class Substitution {
      * Adds a mapping from variable to formula to this substitution.
      * <p>
      * If there is already a mapping for this variable, it will be overwritten.
-     *
      * @param variable the variable
      * @param formula  the formula
      */
@@ -74,7 +71,6 @@ public class Substitution {
 
     /**
      * Returns a formula for a given variable.  If there is no mapping for this variable, {@code null} is returned.
-     *
      * @param variable the variable
      * @return an formula of {@code null}
      */

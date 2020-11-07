@@ -21,6 +21,9 @@
  */
 package org.hipparchus.stat.descriptive.moment;
 
+import java.io.Serializable;
+
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.StatUtils;
@@ -30,8 +33,6 @@ import org.hipparchus.stat.descriptive.WeightedEvaluation;
 import org.hipparchus.stat.descriptive.summary.Sum;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
-
-import java.io.Serializable;
 
 /**
  * Computes the arithmetic mean of a set of values. Uses the definitional
@@ -48,7 +49,7 @@ import java.io.Serializable;
  * <ol>
  * <li>Initialize <code>m = </code> the first value</li>
  * <li>For each additional value, update using <br>
- * <code>m = m + (new value - m) / (number of observations)</code></li>
+ *   <code>m = m + (new value - m) / (number of observations)</code></li>
  * </ol>
  * <p>
  * If {@link #evaluate(double[])} is used to compute the mean of an array
@@ -69,16 +70,12 @@ import java.io.Serializable;
  * <code>clear()</code> method, it must be synchronized externally.
  */
 public class Mean extends AbstractStorelessUnivariateStatistic
-        implements AggregatableStatistic<Mean>, WeightedEvaluation, Serializable {
+    implements AggregatableStatistic<Mean>, WeightedEvaluation, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * First moment on which this statistic is based.
-     */
+    /** First moment on which this statistic is based. */
     protected final FirstMoment moment;
 
     /**
@@ -89,9 +86,7 @@ public class Mean extends AbstractStorelessUnivariateStatistic
      */
     protected final boolean incMoment;
 
-    /**
-     * Constructs a Mean.
-     */
+    /** Constructs a Mean. */
     public Mean() {
         moment = new FirstMoment();
         incMoment = true;
@@ -116,8 +111,73 @@ public class Mean extends AbstractStorelessUnivariateStatistic
      */
     public Mean(Mean original) throws NullArgumentException {
         MathUtils.checkNotNull(original);
-        this.moment = original.moment.copy();
+        this.moment    = original.moment.copy();
         this.incMoment = original.incMoment;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that when {@link #Mean(FirstMoment)} is used to
+     * create a Mean, this method does nothing. In that case, the
+     * FirstMoment should be incremented directly.
+     */
+    @Override
+    public void increment(final double d) {
+        if (incMoment) {
+            moment.increment(d);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        if (incMoment) {
+            moment.clear();
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        return moment.m1;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return moment.getN();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void aggregate(Mean other) {
+        MathUtils.checkNotNull(other);
+        if (incMoment) {
+            this.moment.aggregate(other.moment);
+        }
+    }
+
+    @Override
+    public void aggregate(Mean... others) {
+        MathUtils.checkNotNull(others);
+        for (Mean other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public void aggregate(Iterable<Mean> others) {
+        MathUtils.checkNotNull(others);
+        for (Mean other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
     }
 
     /**
@@ -126,15 +186,15 @@ public class Mean extends AbstractStorelessUnivariateStatistic
      * is empty.
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the mean of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     @Override
     public double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         if (MathArrays.verifyValues(values, begin, length)) {
             double sampleSize = length;
@@ -152,12 +212,9 @@ public class Mean extends AbstractStorelessUnivariateStatistic
         return Double.NaN;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public long getN() {
-        return moment.getN();
+    public double evaluate(double[] values, double[] weights) throws MathIllegalArgumentException {
+        return 0;
     }
 
     /**
@@ -173,31 +230,31 @@ public class Mean extends AbstractStorelessUnivariateStatistic
      * <p>
      * Throws <code>IllegalArgumentException</code> if any of the following are true:
      * <ul><li>the values array is null</li>
-     * <li>the weights array is null</li>
-     * <li>the weights array does not have the same length as the values array</li>
-     * <li>the weights array contains one or more infinite values</li>
-     * <li>the weights array contains one or more NaN values</li>
-     * <li>the weights array contains negative values</li>
-     * <li>the start and length arguments do not determine a valid array</li>
+     *     <li>the weights array is null</li>
+     *     <li>the weights array does not have the same length as the values array</li>
+     *     <li>the weights array contains one or more infinite values</li>
+     *     <li>the weights array contains one or more NaN values</li>
+     *     <li>the weights array contains negative values</li>
+     *     <li>the start and length arguments do not determine a valid array</li>
      * </ul>
      *
-     * @param values  the input array
+     * @param values the input array
      * @param weights the weights array
-     * @param begin   index of the first array element to include
-     * @param length  the number of elements to include
+     * @param begin index of the first array element to include
+     * @param length the number of elements to include
      * @return the mean of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the parameters are not valid
      */
     @Override
     public double evaluate(final double[] values, final double[] weights,
                            final int begin, final int length)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         if (MathArrays.verifyValues(values, weights, begin, length)) {
             Sum sum = new Sum();
 
             // Compute initial estimate using definitional formula
-            double sumw = sum.evaluate(weights, begin, length);
+            double sumw = sum.evaluate(weights,begin,length);
             double xbarw = sum.evaluate(values, weights, begin, length) / sumw;
 
             // Compute correction factor in second pass
@@ -205,49 +262,15 @@ public class Mean extends AbstractStorelessUnivariateStatistic
             for (int i = begin; i < begin + length; i++) {
                 correction += weights[i] * (values[i] - xbarw);
             }
-            return xbarw + (correction / sumw);
+            return xbarw + (correction/sumw);
         }
         return Double.NaN;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Mean copy() {
         return new Mean(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that when {@link #Mean(FirstMoment)} is used to
-     * create a Mean, this method does nothing. In that case, the
-     * FirstMoment should be incremented directly.
-     */
-    @Override
-    public void increment(final double d) {
-        if (incMoment) {
-            moment.increment(d);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return moment.m1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        if (incMoment) {
-            moment.clear();
-        }
     }
 
 }

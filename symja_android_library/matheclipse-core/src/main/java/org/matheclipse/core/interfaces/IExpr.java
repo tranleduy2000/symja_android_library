@@ -15,6 +15,8 @@ import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
@@ -79,6 +81,7 @@ import edu.jas.structure.GcdRingElem;
  *                                implements ISymbol, IExpr
  * </pre>
  */
+@SuppressWarnings({"UnnecessaryInterfaceModifier", "JavaDoc", "JavadocReference"})
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable, FieldElement<IExpr> {
     public final static int ASTID = 1024;
 
@@ -122,6 +125,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     public final static int TIMEOBJECTEXPRID = DATAID + 6;
 
+	public final static int FITTEDMODELID = DATAID + 7;
+
+	public final static int INTERPOLATEDFUNCTONID = DATAID + 8;
+
+	public final static int SPARSEARRAYID = DATAID + 9;
+
+	public final static int DISPATCHID = DATAID + 10;
+
+	public final static int TESTREPORTOBJECT = DATAID + 11;
+
+	public final static int TESTRESULTOBJECT = DATAID + 12;
     /**
      * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
      *
@@ -183,6 +197,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     Field<IExpr> getField();
 
     IExpr and(final IExpr that);
+    /**
+     * <p>
+     * Set an evaluation flag.
+     * </p>
+     * <b>Note</b> only certain data structures like <code>IAST</code> and <code>ISparseArray</code> support evaluation
+     * flags, otherwise the <code>this</code> object will be returned without modification.
+     *
+     * @param evalFlags
+     * @return
+     */
+    IExpr addEvalFlags(final int evalFlags);
 
     /**
      * @param leaves
@@ -445,6 +470,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean has(IExpr pattern);
+
+    /**
+     * Returns <code>false</code>, if <b>all of the elements</b> in the subexpressions or the expression itself, aren't
+     * a symbolic or numerical complex number or a structure with complex number arguments.
+     *
+     * @return <code>true</code> if this expression is a complex number or a structure with complex number arguments.
+     */
+    boolean hasComplexNumber();
 
     /**
      * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions or the expression itself,
@@ -815,6 +848,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isBooleanFormula();
 
     /**
+     * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
+     * <code>IBooleanFormula</code>.
+     *
+     * @return
+     */
+     boolean isBooleanFormulaSymbol();
+
+    /**
+     * Test if this expression is a boolean function with head <code>And, Equivalent, Nand, Nor, Not, Or, Xor</code>.
+     *
+     * @return
+     */
+     boolean isBooleanFunction();
+
+    /**
      * Test if this expression is a boolean function (i.e. a symbol or a boolean function like for example
      * <code>And, Equivalent, Equal, Greater, GreaterEqual, Less, LessEqual, Nand, Nor, Not, Or, Xor,...</code> where
      * all arguments are also &quot;boolean functions&quot;) or a symbol or some builtin predicates like for example
@@ -890,14 +938,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
     /**
      * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
-     * <code>IBooleanFormula</code>.
-     *
-     * @return
-     */
-    boolean isBooleanFormulaSymbol();
-
-    /**
-     * Test if this expression is a <code>IBuiltInSymbol</code> symbol and the evaluator implements
      * <code>IComparatorFunction</code>.
      *
      * @return
@@ -927,6 +967,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * Test if this expression is the function <code>Cosh[&lt;arg&gt;]</code>
      */
     boolean isCosh();
+
+    /**
+     * Test if this AST is a <code>Dataset</code> (i.e. instance of <code>IASTDataset</code>).
+     *
+     * @return
+     */
+    boolean isDataSet();
 
     /**
      * Test if this expression is the function <code>Defer[&lt;arg&gt;]</code>
@@ -1035,6 +1082,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * <code>Except[&lt;pattern1&gt;, &lt;pattern2&gt;]</code>
      */
     boolean isExcept();
+    /**
+     * Test if this expression is the <code>OptionsPattern</code> function <code>OptionsPattern()</code> or
+     * <code>OptionsPattern(&lt;symbol&gt;)</code>
+     *
+     * @return
+     */
+    boolean isOptionsPattern();
 
     /**
      * Test if this expression is already expanded i.e. <code>Plus, Times, Power</code> expression is expanded.
@@ -1047,6 +1101,24 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isFalse();
 
     boolean isFalseValue();
+
+    /**
+     * Are the given evaluation flags disabled for this list ?
+     *
+     * @param flags
+     * @return
+     * @see IAST#NO_FLAG
+     */
+     boolean isEvalFlagOff(int flags);
+
+    /**
+     * Are the given evaluation flags enabled for this list ?
+     *
+     * @param flags
+     * @return
+     * @see IAST#NO_FLAG
+     */
+    boolean isEvalFlagOn(int flags);
 
     /**
      * Test if this expression is an AST list, which contains a <b>header element</b> (i.e. a function symbol like for
@@ -1211,11 +1283,53 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isLEOrdered(IExpr expr);
 
     /**
+     * Test if this expression is an empty list (i.e. a list <code>{}</code>)
+     *
+     * @return
+     */
+    boolean isEmptyList();
+
+    /**
      * Test if this expression is a list (i.e. an AST with head List)
      */
     boolean isList();
 
+    /**
+     * Test if this expression is a list (i.e. an AST with head List) or an Association
+     *
+     * @return
+     */
+    boolean isListOrAssociation();
+
+    /**
+     * Test if this expression is a list (i.e. an AST with head List) with exactly 2 arguments
+     *
+     * @return
+     */
+    boolean isList1();
+
+    /**
+     * Test if this expression is a list (i.e. an AST with head List) with exactly 2 arguments
+     *
+     * @return
+     */
+    boolean isList2();
+
+    /**
+     * Test if this expression is a list (i.e. an AST with head List) with exactly 2 arguments
+     *
+     * @return
+     */
+    boolean isList3();
+
     boolean isList(Predicate<IExpr> pred);
+
+    /**
+     * Test if this expression is a list of DirectedEdge or UndirectedEdge
+     *
+     * @return
+     */
+    GraphType isListOfEdges();
 
     /**
      * Test if this expression is a list of lists
@@ -1226,12 +1340,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
     boolean isListOfLists();
 
-    /**
-     * Test if this expression is a list of DirectedEdge or UndirectedEdge
-     *
-     * @return
-     */
-    GraphType isListOfEdges();
+
 
     /**
      * Test if this expression is an DirectedEdge, UndirectedEdge, Rule, TwoWayRule.
@@ -1239,6 +1348,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return
      */
     boolean isEdge();
+
+    /**
+     * Test if this expression is a list of matrices
+     *
+     * @return
+     */
+    boolean isListOfMatrices();
 
     /**
      * Test if this expression is a list of rules (head Rule or RuleDelayed)
@@ -1260,6 +1376,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @see #isVector()
      */
     boolean isListOfRules(boolean ignoreEmptyList);
+
+    boolean isListOfRulesOrAssociation(boolean ignoreEmptyList);
+
+    /**
+     * Test if this expression is a list with at least one element (i.e. a list <code>{element, ...}</code>)
+     *
+     * @return
+     */
+    boolean isNonEmptyList();
 
     /**
      * Test if this expression is the function <code>Log[&lt;arg&gt;]</code>
@@ -1299,6 +1424,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>null</code> if the expression is not a matrix
      */
     int[] isMatrix(boolean setMatrixFormat);
+
+    /**
+     * Test if this expression is a matrix and return the dimensions as array [row-dimension, column-dimension]. This
+     * expression is a matrix, if it is a <code>ASTRealMatrix</code> or a <code>List(...)</code> where elements which
+     * could not be converted to a row vector are ignored.
+     *
+     * @return <code>null</code> if the expression is not a matrix
+     */
+    int[] isMatrixIgnore();
 
     /**
      * Returns <code>true</code>, if <b>at least one of the elements</b> in the subexpressions, match the given pattern.
@@ -1743,6 +1877,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     boolean isRational();
 
     /**
+     * Test if this expression is the <code>Repetead</code> function <code>Repetead(&lt;pattern1&gt;)</code>.
+     *
+     * @return
+     */
+    boolean isRepeated();
+
+    /**
      * Test if this expression is a rational function (i.e. a number, a symbolic constant or an rational function where
      * all arguments are also &quot;rational functions&quot;)
      *
@@ -1884,6 +2025,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     int[] isSpan(int size);
 
     /**
+     * Test if this expression is a instance of SparseArrayExpr
+     *
+     * @return
+     */
+    boolean isSparseArray();
+
+    /**
      * Test if this expression is the function <code>Power[&lt;arg1&gt;, 1/2]</code> (i.e.
      * <code>Sqrt[&lt;arg1&gt;]</code>).
      *
@@ -1991,6 +2139,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>-1</code> if the expression is no vector or <code>size()-1</code> of this vector AST.
      */
     int isVector();
+
+    /**
+     * Test if this expression is an IAST and contains at least one numeric argument.
+     *
+     * @return
+     */
+    boolean isNumericAST();
 
     /**
      * Test if this expression is the With function <code>With[&lt;arg1&gt;, &lt;arg2&gt;]</code>
@@ -2122,14 +2277,31 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     IExpr minus(final IExpr that);
 
     /**
+     * <p>
+     * This method assumes that <code>this</code> is a list of lists in matrix form. It combines the column values in a
+     * list as argument for the given <code>function</code>.
+     * </p>
+     * <b>Example</b> a matrix <code>{{x1, y1,...}, {x2, y2, ...}, ...}</code> will be converted to
+     * <code>{f.apply({x1, x2,...}), f.apply({y1, y2, ...}), ...}</code>
+     *
+     * @param dim
+     *            the dimension of the matrix
+     * @param f
+     *            a unary function
+     * @return
+     */
+    IExpr mapMatrixColumns(int[] dim, Function<IExpr, IExpr> f);
+
+    /**
      * If a value is present (i.e. this unequals F.NIL), apply the provided mapping function to it, and if the result is
      * non-NIL, return the result. Otherwise return <code>F.NIL</code>
      *
-     * @param mapper a mapping function to apply to the value, if present
+     * @param mapper
+     *            a mapping function to apply to the value, if present
      * @return an IExpr describing the result of applying a mapping function to the value of this object, if a value is
-     * present, otherwise return <code>F.NIL</code>.
+     *         present, otherwise return <code>F.NIL</code>.
      */
-    IExpr map(Function<? super IExpr, ? extends IExpr> mapper);
+    IExpr mapExpr(Function<? super IExpr, ? extends IExpr> mapper);
 
     IExpr mod(final IExpr that);
 
@@ -2344,6 +2516,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     @Nullable
     IExpr replaceAll(final IAST astRules);
 
+
     /**
      * Replace all (sub-) expressions with the given <code>java.util.Map</code>n. If no substitution matches, the method
      * returns <code>F.NIL</code>.
@@ -2354,6 +2527,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      */
 
     IExpr replaceAll(final Map<? extends IExpr, ? extends IExpr> map);
+
+
+    IExpr replaceAll(VisitorReplaceAll visitor);
 
     /**
      * Replace all subexpressions with the given rule set. A rule must contain the position of the subexpression which
@@ -2473,11 +2649,26 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     double[][] toDoubleMatrix();
 
     /**
+     * Convert this object into a <code>double[]</code> matrix, if a row is not convertible to double vector ignore the
+     * row.
+     *
+     * @return <code>null</code> if this object can not be converted into a <code>double[]</code> matrix
+     */
+     double[][] toDoubleMatrixIgnore();
+
+    /**
      * Convert this object into a <code>double[]</code> vector.
      *
      * @return <code>null</code> if this object can not be converted into a <code>double[]</code> vector
      */
     double[] toDoubleVector();
+    /**
+     * Convert this object into a <code>double[]</code> vector, if an argument is not convertible to double ignore the
+     * value.
+     *
+     * @return <code>null</code> if this object can not be converted into a <code>double[]</code> vector
+     */
+    double[] toDoubleVectorIgnore();
 
     /**
      * Convert this object into a <code>Complex[]</code> vector.
@@ -2526,6 +2717,13 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
      * @return <code>null</code> if this object can not be converted into a RealMatrix
      */
     RealMatrix toRealMatrix();
+
+    /**
+     * Convert this object into a RealMatrix.
+     *
+     * @return <code>null</code> if this object can not be converted into a RealMatrix
+     */
+    RealMatrix toRealMatrixIgnore();
 
     /**
      * Convert this object into a RealVector.

@@ -1,5 +1,6 @@
 package org.matheclipse.core.visit;
 
+import com.duy.annotations.ObjcMemoryIssue;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Supplier;
 
@@ -11,7 +12,7 @@ import org.matheclipse.core.interfaces.IExpr;
 /**
  * Visit every node of an <code>IExpr</code> expression.
  */
-public class VisitorExpr extends AbstractVisitor {
+public abstract class VisitorExpr extends AbstractVisitor {
 
 	public VisitorExpr() {
 	}
@@ -75,6 +76,7 @@ public class VisitorExpr extends AbstractVisitor {
 	 * @return the cloned <code>IAST</code> with changed evaluated subexpressions, or <code>F.NIL</code>, if no
 	 *         evaluation is possible
 	 */
+	@ObjcMemoryIssue
 	protected IExpr visitAST(IAST ast) {
 		IExpr temp;
 		// IASTAppendable result = F.NIL;

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -32,17 +32,27 @@ import org.logicng.datastructures.Assignment;
 
 /**
  * Interface for a handler for the enumeration of models.
- *
- * @version 1.0
+ * @version 1.6.2
  * @since 1.0
  */
-public interface ModelEnumerationHandler {
+public interface ModelEnumerationHandler extends Handler {
+
+    /**
+     * Returns a SAT handler which can be used to cancel internal SAT calls of the model enumeration process.
+     * @return a SAT handler
+     */
+    SATHandler satHandler();
 
     /**
      * This method is called every time a model is found.
-     *
      * @param assignment the respective model
      * @return whether more models should be searched or not
      */
     boolean foundModel(Assignment assignment);
+
+    /**
+     * This method is called every time the SAT solver finished.
+     * @return whether more models should be searched or not
+     */
+    boolean satSolverFinished();
 }

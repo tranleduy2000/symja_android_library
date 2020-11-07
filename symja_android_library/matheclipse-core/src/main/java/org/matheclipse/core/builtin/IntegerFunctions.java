@@ -6,7 +6,9 @@ import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
 
 import org.hipparchus.complex.Complex;
+import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractArg2;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
@@ -17,6 +19,7 @@ import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.ComplexSym;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.IntervalSym;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -52,22 +55,22 @@ public class IntegerFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.BitLength.setEvaluator(new BitLength());
-			F.Ceiling.setEvaluator(new Ceiling());
-			F.DigitCount.setEvaluator(new DigitCount());
-			F.Floor.setEvaluator(new Floor());
-			F.FractionalPart.setEvaluator(new FractionalPart());
-			F.FromDigits.setEvaluator(new FromDigits());
-			F.IntegerDigits.setEvaluator(new IntegerDigits());
-			F.IntegerExponent.setEvaluator(new IntegerExponent());
-			F.IntegerLength.setEvaluator(new IntegerLength());
-			F.IntegerPart.setEvaluator(new IntegerPart());
-			F.Mod.setEvaluator(new Mod());
-			F.PowerMod.setEvaluator(new PowerMod());
-			F.Quotient.setEvaluator(new Quotient());
-			F.QuotientRemainder.setEvaluator(new QuotientRemainder());
-			F.Round.setEvaluator(new Round());
-			F.UnitStep.setEvaluator(new UnitStep());
+			S.BitLength.setEvaluator(new BitLength());
+			S.Ceiling.setEvaluator(new Ceiling());
+			S.DigitCount.setEvaluator(new DigitCount());
+			S.Floor.setEvaluator(new Floor());
+			S.FractionalPart.setEvaluator(new FractionalPart());
+			S.FromDigits.setEvaluator(new FromDigits());
+			S.IntegerDigits.setEvaluator(new IntegerDigits());
+			S.IntegerExponent.setEvaluator(new IntegerExponent());
+			S.IntegerLength.setEvaluator(new IntegerLength());
+			S.IntegerPart.setEvaluator(new IntegerPart());
+			S.Mod.setEvaluator(new Mod());
+			S.PowerMod.setEvaluator(new PowerMod());
+			S.Quotient.setEvaluator(new Quotient());
+			S.QuotientRemainder.setEvaluator(new QuotientRemainder());
+			S.Round.setEvaluator(new Round());
+			S.UnitStep.setEvaluator(new UnitStep());
 		}
 	}
 
@@ -257,7 +260,7 @@ public class IntegerFunctions {
 				return Negate(Floor(negExpr));
 			}
 			if (arg1.isInterval()) {
-				return IntervalSym.mapSymbol(F.Ceiling, (IAST) arg1);
+				return IntervalSym.mapSymbol(S.Ceiling, (IAST) arg1);
 			}
 			return F.NIL;
 		}
@@ -276,13 +279,13 @@ public class IntegerFunctions {
 			IExpr result = F.NIL;
 			int radix = 10;
 			if (ast.isAST1()) {
-				result = F.IntegerDigits.of(engine, ast.arg1());
+				result = S.IntegerDigits.of(engine, ast.arg1());
 			} else if (ast.size() >= 3) {
 				radix = ast.arg2().toIntDefault();
 				if (radix <= 0) {
 					return F.NIL;
 				}
-				result = F.IntegerDigits.of(engine, ast.arg1(), ast.arg2());
+				result = S.IntegerDigits.of(engine, ast.arg1(), ast.arg2());
 			}
 			if (result.isList()) {
 				IAST list = (IAST) result;
@@ -298,6 +301,9 @@ public class IntegerFunctions {
 						return F.ZZ(count);
 					}
 					return F.NIL;
+				}
+				if (Config.MAX_AST_SIZE < radix  ) {
+					ASTElementLimitExceeded.throwIt(radix);
 				}
 				IExpr[] arr = new IExpr[radix];
 				for (int i = 0; i < arr.length; i++) {
@@ -1451,7 +1457,7 @@ public class IntegerFunctions {
 			try {
 				IExpr arg1 = engine.evaluate(ast.arg1());
 				if (arg1.isList()) {
-					return ((IAST) arg1).mapThread(ast.setAtCopy(1, F.Null), 1);
+					return ((IAST) arg1).mapThread(ast.setAtCopy(1, F.Slot1), 1);
 				}
 				if (ast.isAST2()) {
 					// Round(z, a)

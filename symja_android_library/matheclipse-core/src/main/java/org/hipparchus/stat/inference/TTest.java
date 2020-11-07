@@ -55,7 +55,7 @@ import org.hipparchus.util.MathUtils;
  * Input to tests can be either <code>double[]</code> arrays or
  * {@link StatisticalSummary} instances.
  * <p>
- * Uses Hipparchus {@link org.hipparchus.distribution.continuous.TDistribution}
+ * Uses Hipparchus {@link TDistribution}
  * implementation to estimate exact p-values.
  */
 public class TTest {
@@ -76,20 +76,20 @@ public class TTest {
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
      * @return t statistic
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the arrays are empty
      * @throws MathIllegalArgumentException if the length of the arrays is not equal
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
      */
     public double pairedT(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(sample1);
         checkSampleData(sample2);
         double meanDifference = StatUtils.meanDifference(sample1, sample2);
         return t(meanDifference, 0,
-                StatUtils.varianceDifference(sample1, sample2, meanDifference),
-                sample1.length);
+                 StatUtils.varianceDifference(sample1, sample2, meanDifference),
+                 sample1.length);
     }
 
     /**
@@ -122,14 +122,14 @@ public class TTest {
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
      * @return p-value for t-test
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the arrays are empty
      * @throws MathIllegalArgumentException if the length of the arrays is not equal
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double pairedTTest(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         double meanDifference = StatUtils.meanDifference(sample1, sample2);
         return tTest(meanDifference, 0,
@@ -163,19 +163,19 @@ public class TTest {
      *
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
-     * @param alpha   significance level of the test
+     * @param alpha significance level of the test
      * @return true if the null hypothesis can be rejected with
      * confidence 1 - alpha
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the arrays are empty
      * @throws MathIllegalArgumentException if the length of the arrays is not equal
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
      * @throws MathIllegalArgumentException if <code>alpha</code> is not in the range (0, 0.5]
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public boolean pairedTTest(final double[] sample1, final double[] sample2,
                                final double alpha)
-            throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         checkSignificanceLevel(alpha);
         return pairedTTest(sample1, sample2) < alpha;
@@ -192,19 +192,19 @@ public class TTest {
      * <li>The observed array length must be at least 2.
      * </li></ul></p>
      *
-     * @param mu       comparison constant
+     * @param mu comparison constant
      * @param observed array of values
      * @return t statistic
-     * @throws NullArgumentException        if <code>observed</code> is <code>null</code>
+     * @throws NullArgumentException if <code>observed</code> is <code>null</code>
      * @throws MathIllegalArgumentException if the length of <code>observed</code> is &lt; 2
      */
     public double t(final double mu, final double[] observed)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(observed);
         // No try-catch or advertised exception because args have just been checked
         return t(StatUtils.mean(observed), mu, StatUtils.variance(observed),
-                observed.length);
+                 observed.length);
     }
 
     /**
@@ -218,18 +218,18 @@ public class TTest {
      * <li><code>observed.getN() &ge; 2</code>.
      * </li></ul></p>
      *
-     * @param mu          comparison constant
+     * @param mu comparison constant
      * @param sampleStats DescriptiveStatistics holding sample summary statitstics
      * @return t statistic
-     * @throws NullArgumentException        if <code>sampleStats</code> is <code>null</code>
+     * @throws NullArgumentException if <code>sampleStats</code> is <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
      */
     public double t(final double mu, final StatisticalSummary sampleStats)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(sampleStats);
         return t(sampleStats.getMean(), mu, sampleStats.getVariance(),
-                sampleStats.getN());
+                 sampleStats.getN());
     }
 
     /**
@@ -263,18 +263,18 @@ public class TTest {
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
      * @return t statistic
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
      */
     public double homoscedasticT(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(sample1);
         checkSampleData(sample2);
         // No try-catch or advertised exception because args have just been checked
         return homoscedasticT(StatUtils.mean(sample1), StatUtils.mean(sample2),
-                StatUtils.variance(sample1), StatUtils.variance(sample2),
-                sample1.length, sample2.length);
+                              StatUtils.variance(sample1), StatUtils.variance(sample2),
+                              sample1.length, sample2.length);
     }
 
     /**
@@ -289,7 +289,7 @@ public class TTest {
      * <p>
      * &nbsp;&nbsp; <code>  t = (m1 - m2) / sqrt(var1/n1 + var2/n2)</code>
      * </p><p>
-     * where <strong><code>n1</code></strong> is the size of the first sample
+     *  where <strong><code>n1</code></strong> is the size of the first sample
      * <strong><code> n2</code></strong> is the size of the second sample;
      * <strong><code> m1</code></strong> is the mean of the first sample;
      * <strong><code> m2</code></strong> is the mean of the second sample;
@@ -303,18 +303,18 @@ public class TTest {
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
      * @return t statistic
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
      */
     public double t(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(sample1);
         checkSampleData(sample2);
         // No try-catch or advertised exception because args have just been checked
         return t(StatUtils.mean(sample1), StatUtils.mean(sample2),
-                StatUtils.variance(sample1), StatUtils.variance(sample2),
-                sample1.length, sample2.length);
+                 StatUtils.variance(sample1), StatUtils.variance(sample2),
+                 sample1.length, sample2.length);
     }
 
     /**
@@ -327,7 +327,7 @@ public class TTest {
      * This statistic can be used to perform a two-sample t-test to compare
      * sample means.</p>
      * <p>
-     * The returned  t-statistic is</p>
+      * The returned  t-statistic is</p>
      * <p>
      * &nbsp;&nbsp; <code>  t = (m1 - m2) / sqrt(var1/n1 + var2/n2)</code>
      * </p><p>
@@ -346,18 +346,18 @@ public class TTest {
      * @param sampleStats1 StatisticalSummary describing data from the first sample
      * @param sampleStats2 StatisticalSummary describing data from the second sample
      * @return t statistic
-     * @throws NullArgumentException        if the sample statistics are <code>null</code>
+     * @throws NullArgumentException if the sample statistics are <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
      */
     public double t(final StatisticalSummary sampleStats1,
                     final StatisticalSummary sampleStats2)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(sampleStats1);
         checkSampleData(sampleStats2);
         return t(sampleStats1.getMean(), sampleStats2.getMean(),
-                sampleStats1.getVariance(), sampleStats2.getVariance(),
-                sampleStats1.getN(), sampleStats2.getN());
+                 sampleStats1.getVariance(), sampleStats2.getVariance(),
+                 sampleStats1.getN(), sampleStats2.getN());
     }
 
     /**
@@ -393,18 +393,18 @@ public class TTest {
      * @param sampleStats1 StatisticalSummary describing data from the first sample
      * @param sampleStats2 StatisticalSummary describing data from the second sample
      * @return t statistic
-     * @throws NullArgumentException        if the sample statistics are <code>null</code>
+     * @throws NullArgumentException if the sample statistics are <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
      */
     public double homoscedasticT(final StatisticalSummary sampleStats1,
                                  final StatisticalSummary sampleStats2)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         checkSampleData(sampleStats1);
         checkSampleData(sampleStats2);
         return homoscedasticT(sampleStats1.getMean(), sampleStats2.getMean(),
-                sampleStats1.getVariance(), sampleStats2.getVariance(),
-                sampleStats1.getN(), sampleStats2.getN());
+                              sampleStats1.getVariance(), sampleStats2.getVariance(),
+                              sampleStats1.getN(), sampleStats2.getN());
     }
 
     /**
@@ -427,21 +427,21 @@ public class TTest {
      * <li>The observed array length must be at least 2.
      * </li></ul></p>
      *
-     * @param mu     constant value to compare sample mean against
+     * @param mu constant value to compare sample mean against
      * @param sample array of sample data values
      * @return p-value
-     * @throws NullArgumentException        if the sample array is <code>null</code>
+     * @throws NullArgumentException if the sample array is <code>null</code>
      * @throws MathIllegalArgumentException if the length of the array is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double tTest(final double mu, final double[] sample)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+        MathIllegalStateException {
 
         checkSampleData(sample);
         // No try-catch or advertised exception because args have just been checked
         return tTest(StatUtils.mean(sample), mu, StatUtils.variance(sample),
-                sample.length);
+                     sample.length);
     }
 
     /**
@@ -472,17 +472,17 @@ public class TTest {
      * <li>The observed array length must be at least 2.
      * </li></ul></p>
      *
-     * @param mu     constant value to compare sample mean against
+     * @param mu constant value to compare sample mean against
      * @param sample array of sample data values
-     * @param alpha  significance level of the test
+     * @param alpha significance level of the test
      * @return p-value
-     * @throws NullArgumentException        if the sample array is <code>null</code>
+     * @throws NullArgumentException if the sample array is <code>null</code>
      * @throws MathIllegalArgumentException if the length of the array is &lt; 2
      * @throws MathIllegalArgumentException if <code>alpha</code> is not in the range (0, 0.5]
-     * @throws MathIllegalStateException    if an error computing the p-value
+     * @throws MathIllegalStateException if an error computing the p-value
      */
     public boolean tTest(final double mu, final double[] sample, final double alpha)
-            throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         checkSignificanceLevel(alpha);
         return tTest(mu, sample) < alpha;
@@ -510,20 +510,20 @@ public class TTest {
      * <li>The sample must contain at least 2 observations.
      * </li></ul></p>
      *
-     * @param mu          constant value to compare sample mean against
+     * @param mu constant value to compare sample mean against
      * @param sampleStats StatisticalSummary describing sample data
      * @return p-value
-     * @throws NullArgumentException        if <code>sampleStats</code> is <code>null</code>
+     * @throws NullArgumentException if <code>sampleStats</code> is <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double tTest(final double mu, final StatisticalSummary sampleStats)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+        MathIllegalStateException {
 
         checkSampleData(sampleStats);
         return tTest(sampleStats.getMean(), mu, sampleStats.getVariance(),
-                sampleStats.getN());
+                     sampleStats.getN());
     }
 
     /**
@@ -555,19 +555,19 @@ public class TTest {
      * <li>The sample must include at least 2 observations.
      * </li></ul></p>
      *
-     * @param mu          constant value to compare sample mean against
+     * @param mu constant value to compare sample mean against
      * @param sampleStats StatisticalSummary describing sample data values
-     * @param alpha       significance level of the test
+     * @param alpha significance level of the test
      * @return p-value
-     * @throws NullArgumentException        if <code>sampleStats</code> is <code>null</code>
+     * @throws NullArgumentException if <code>sampleStats</code> is <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
      * @throws MathIllegalArgumentException if <code>alpha</code> is not in the range (0, 0.5]
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public boolean tTest(final double mu, final StatisticalSummary sampleStats,
                          final double alpha)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+               MathIllegalStateException {
 
         checkSignificanceLevel(alpha);
         return tTest(mu, sampleStats) < alpha;
@@ -606,20 +606,20 @@ public class TTest {
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
      * @return p-value for t-test
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double tTest(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+               MathIllegalStateException {
 
         checkSampleData(sample1);
         checkSampleData(sample2);
         // No try-catch or advertised exception because args have just been checked
         return tTest(StatUtils.mean(sample1), StatUtils.mean(sample2),
-                StatUtils.variance(sample1), StatUtils.variance(sample2),
-                sample1.length, sample2.length);
+                     StatUtils.variance(sample1), StatUtils.variance(sample2),
+                     sample1.length, sample2.length);
     }
 
     /**
@@ -652,22 +652,22 @@ public class TTest {
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
      * @return p-value for t-test
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double homoscedasticTTest(final double[] sample1, final double[] sample2)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+        MathIllegalStateException {
 
         checkSampleData(sample1);
         checkSampleData(sample2);
         // No try-catch or advertised exception because args have just been checked
         return homoscedasticTTest(StatUtils.mean(sample1),
-                StatUtils.mean(sample2),
-                StatUtils.variance(sample1),
-                StatUtils.variance(sample2),
-                sample1.length, sample2.length);
+                                  StatUtils.mean(sample2),
+                                  StatUtils.variance(sample1),
+                                  StatUtils.variance(sample2),
+                                  sample1.length, sample2.length);
     }
 
     /**
@@ -714,17 +714,17 @@ public class TTest {
      *
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
-     * @param alpha   significance level of the test
+     * @param alpha significance level of the test
      * @return true if the null hypothesis can be rejected with
      * confidence 1 - alpha
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
      * @throws MathIllegalArgumentException if <code>alpha</code> is not in the range (0, 0.5]
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public boolean tTest(final double[] sample1, final double[] sample2,
                          final double alpha)
-            throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         checkSignificanceLevel(alpha);
         return tTest(sample1, sample2) < alpha;
@@ -775,17 +775,17 @@ public class TTest {
      *
      * @param sample1 array of sample data values
      * @param sample2 array of sample data values
-     * @param alpha   significance level of the test
+     * @param alpha significance level of the test
      * @return true if the null hypothesis can be rejected with
      * confidence 1 - alpha
-     * @throws NullArgumentException        if the arrays are <code>null</code>
+     * @throws NullArgumentException if the arrays are <code>null</code>
      * @throws MathIllegalArgumentException if the length of the arrays is &lt; 2
      * @throws MathIllegalArgumentException if <code>alpha</code> is not in the range (0, 0.5]
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public boolean homoscedasticTTest(final double[] sample1, final double[] sample2,
                                       final double alpha)
-            throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         checkSignificanceLevel(alpha);
         return homoscedasticTTest(sample1, sample2) < alpha;
@@ -819,23 +819,23 @@ public class TTest {
      * at least 2 observations.
      * </li></ul></p>
      *
-     * @param sampleStats1 StatisticalSummary describing data from the first sample
-     * @param sampleStats2 StatisticalSummary describing data from the second sample
+     * @param sampleStats1  StatisticalSummary describing data from the first sample
+     * @param sampleStats2  StatisticalSummary describing data from the second sample
      * @return p-value for t-test
-     * @throws NullArgumentException        if the sample statistics are <code>null</code>
+     * @throws NullArgumentException if the sample statistics are <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double tTest(final StatisticalSummary sampleStats1,
                         final StatisticalSummary sampleStats2)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+        MathIllegalStateException {
 
         checkSampleData(sampleStats1);
         checkSampleData(sampleStats2);
         return tTest(sampleStats1.getMean(), sampleStats2.getMean(),
-                sampleStats1.getVariance(), sampleStats2.getVariance(),
-                sampleStats1.getN(), sampleStats2.getN());
+                     sampleStats1.getVariance(), sampleStats2.getVariance(),
+                     sampleStats1.getN(), sampleStats2.getN());
     }
 
     /**
@@ -865,25 +865,25 @@ public class TTest {
      * at least 2 observations.
      * </li></ul></p>
      *
-     * @param sampleStats1 StatisticalSummary describing data from the first sample
-     * @param sampleStats2 StatisticalSummary describing data from the second sample
+     * @param sampleStats1  StatisticalSummary describing data from the first sample
+     * @param sampleStats2  StatisticalSummary describing data from the second sample
      * @return p-value for t-test
-     * @throws NullArgumentException        if the sample statistics are <code>null</code>
+     * @throws NullArgumentException if the sample statistics are <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public double homoscedasticTTest(final StatisticalSummary sampleStats1,
                                      final StatisticalSummary sampleStats2)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+        MathIllegalStateException {
 
         checkSampleData(sampleStats1);
         checkSampleData(sampleStats2);
         return homoscedasticTTest(sampleStats1.getMean(),
-                sampleStats2.getMean(),
-                sampleStats1.getVariance(),
-                sampleStats2.getVariance(),
-                sampleStats1.getN(), sampleStats2.getN());
+                                  sampleStats2.getMean(),
+                                  sampleStats1.getVariance(),
+                                  sampleStats2.getVariance(),
+                                  sampleStats1.getN(), sampleStats2.getN());
     }
 
     /**
@@ -933,18 +933,18 @@ public class TTest {
      *
      * @param sampleStats1 StatisticalSummary describing sample data values
      * @param sampleStats2 StatisticalSummary describing sample data values
-     * @param alpha        significance level of the test
+     * @param alpha significance level of the test
      * @return true if the null hypothesis can be rejected with
      * confidence 1 - alpha
-     * @throws NullArgumentException        if the sample statistics are <code>null</code>
+     * @throws NullArgumentException if the sample statistics are <code>null</code>
      * @throws MathIllegalArgumentException if the number of samples is &lt; 2
      * @throws MathIllegalArgumentException if <code>alpha</code> is not in the range (0, 0.5]
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      */
     public boolean tTest(final StatisticalSummary sampleStats1,
                          final StatisticalSummary sampleStats2,
                          final double alpha)
-            throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
 
         checkSignificanceLevel(alpha);
         return tTest(sampleStats1, sampleStats2) < alpha;
@@ -963,17 +963,17 @@ public class TTest {
      */
     protected double df(double v1, double v2, double n1, double n2) {
         return (((v1 / n1) + (v2 / n2)) * ((v1 / n1) + (v2 / n2))) /
-                ((v1 * v1) / (n1 * n1 * (n1 - 1d)) + (v2 * v2) /
-                        (n2 * n2 * (n2 - 1d)));
+        ((v1 * v1) / (n1 * n1 * (n1 - 1d)) + (v2 * v2) /
+                (n2 * n2 * (n2 - 1d)));
     }
 
     /**
      * Computes t test statistic for 1-sample t-test.
      *
-     * @param m  sample mean
+     * @param m sample mean
      * @param mu constant to test against
-     * @param v  sample variance
-     * @param n  sample n
+     * @param v sample variance
+     * @param n sample n
      * @return t test statistic
      */
     protected double t(final double m, final double mu,
@@ -996,7 +996,7 @@ public class TTest {
      */
     protected double t(final double m1, final double m2,
                        final double v1, final double v2,
-                       final double n1, final double n2) {
+                       final double n1, final double n2)  {
         return (m1 - m2) / FastMath.sqrt((v1 / n1) + (v2 / n2));
     }
 
@@ -1014,28 +1014,28 @@ public class TTest {
      */
     protected double homoscedasticT(final double m1, final double m2,
                                     final double v1, final double v2,
-                                    final double n1, final double n2) {
-        final double pooledVariance = ((n1 - 1) * v1 + (n2 - 1) * v2) / (n1 + n2 - 2);
+                                    final double n1, final double n2)  {
+        final double pooledVariance = ((n1  - 1) * v1 + (n2 -1) * v2 ) / (n1 + n2 - 2);
         return (m1 - m2) / FastMath.sqrt(pooledVariance * (1d / n1 + 1d / n2));
     }
 
     /**
      * Computes p-value for 2-sided, 1-sample t-test.
      *
-     * @param m  sample mean
+     * @param m sample mean
      * @param mu constant to test against
-     * @param v  sample variance
-     * @param n  sample n
+     * @param v sample variance
+     * @param n sample n
      * @return p-value
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      * @throws MathIllegalArgumentException if n is not greater than 1
      */
     protected double tTest(final double m, final double mu,
                            final double v, final double n)
-            throws MathIllegalArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, MathIllegalStateException {
 
         final double t = FastMath.abs(t(m, mu, v, n));
-        final TDistribution distribution = new TDistribution(n - 1);
+        final TDistribution distribution = new TDistribution( n - 1);
         return 2.0 * distribution.cumulativeProbability(-t);
 
     }
@@ -1053,14 +1053,14 @@ public class TTest {
      * @param n1 first sample n
      * @param n2 second sample n
      * @return p-value
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      * @throws MathIllegalArgumentException if the estimated degrees of freedom is not
-     *                                      strictly positive
+     * strictly positive
      */
     protected double tTest(final double m1, final double m2,
                            final double v1, final double v2,
                            final double n1, final double n2)
-            throws MathIllegalArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, MathIllegalStateException {
 
         final double t = FastMath.abs(t(m1, m2, v1, v2, n1, n2));
         final double degreesOfFreedom = df(v1, v2, n1, n2);
@@ -1082,14 +1082,14 @@ public class TTest {
      * @param n1 first sample n
      * @param n2 second sample n
      * @return p-value
-     * @throws MathIllegalStateException    if an error occurs computing the p-value
+     * @throws MathIllegalStateException if an error occurs computing the p-value
      * @throws MathIllegalArgumentException if the estimated degrees of freedom is not
-     *                                      strictly positive
+     * strictly positive
      */
     protected double homoscedasticTTest(double m1, double m2,
                                         double v1, double v2,
                                         double n1, double n2)
-            throws MathIllegalArgumentException, MathIllegalStateException {
+        throws MathIllegalArgumentException, MathIllegalStateException {
 
         final double t = FastMath.abs(homoscedasticT(m1, m2, v1, v2, n1, n2));
         final double degreesOfFreedom = n1 + n2 - 2;
@@ -1105,11 +1105,11 @@ public class TTest {
      * @throws MathIllegalArgumentException if the significance level is out of bounds.
      */
     private void checkSignificanceLevel(final double alpha)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         if (alpha <= 0 || alpha > 0.5) {
             throw new MathIllegalArgumentException(LocalizedStatFormats.SIGNIFICANCE_LEVEL,
-                    alpha, 0.0, 0.5);
+                                          alpha, 0.0, 0.5);
         }
 
     }
@@ -1118,11 +1118,11 @@ public class TTest {
      * Check sample data.
      *
      * @param data Sample data.
-     * @throws NullArgumentException        if {@code data} is {@code null}.
+     * @throws NullArgumentException if {@code data} is {@code null}.
      * @throws MathIllegalArgumentException if there is not enough sample data.
      */
     private void checkSampleData(final double[] data)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         MathUtils.checkNotNull(data, LocalizedCoreFormats.INPUT_ARRAY);
         if (data.length < 2) {
@@ -1137,11 +1137,11 @@ public class TTest {
      * Check sample data.
      *
      * @param stat Statistical summary.
-     * @throws NullArgumentException        if {@code data} is {@code null}.
+     * @throws NullArgumentException if {@code data} is {@code null}.
      * @throws MathIllegalArgumentException if there is not enough sample data.
      */
     private void checkSampleData(final StatisticalSummary stat)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         MathUtils.checkNotNull(stat);
         if (stat.getN() < 2) {

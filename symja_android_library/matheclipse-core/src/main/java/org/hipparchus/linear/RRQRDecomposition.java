@@ -41,10 +41,10 @@ import org.hipparchus.util.FastMath;
  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
- * <li>a {@link #getQT() getQT} method has been added,</li>
- * <li>the {@code solve} and {@code isFullRank} methods have been replaced
- * by a {@link #getSolver() getSolver} method and the equivalent methods
- * provided by the returned {@link DecompositionSolver}.</li>
+ *   <li>a {@link #getQT() getQT} method has been added,</li>
+ *   <li>the {@code solve} and {@code isFullRank} methods have been replaced
+ *   by a {@link #getSolver() getSolver} method and the equivalent methods
+ *   provided by the returned {@link DecompositionSolver}.</li>
  * </ul>
  *
  * @see <a href="http://mathworld.wolfram.com/QRDecomposition.html">MathWorld</a>
@@ -135,23 +135,6 @@ public class RRQRDecomposition extends QRDecomposition {
 
     }
 
-    /**
-     * Get a solver for finding the A &times; X = B solution in least square sense.
-     * <p>
-     * Least Square sense means a solver can be computed for an overdetermined system,
-     * (i.e. a system with more equations than unknowns, which corresponds to a tall A
-     * matrix with more rows than columns). In any case, if the matrix is singular
-     * within the tolerance set at {@link RRQRDecomposition#RRQRDecomposition(RealMatrix,
-     * double) construction}, an error will be triggered when
-     * the {@link DecompositionSolver#solve(RealVector) solve} method will be called.
-     * </p>
-     *
-     * @return a solver
-     */
-    @Override
-    public DecompositionSolver getSolver() {
-        return new Solver(super.getSolver(), this.getP());
-    }
 
     /**
      * Returns the pivot matrix, P, used in the QR Decomposition of matrix A such that AP = QR.
@@ -209,6 +192,24 @@ public class RRQRDecomposition extends QRDecomposition {
     }
 
     /**
+     * Get a solver for finding the A &times; X = B solution in least square sense.
+     * <p>
+     * Least Square sense means a solver can be computed for an overdetermined system,
+     * (i.e. a system with more equations than unknowns, which corresponds to a tall A
+     * matrix with more rows than columns). In any case, if the matrix is singular
+     * within the tolerance set at {@link RRQRDecomposition#RRQRDecomposition(RealMatrix,
+     * double) construction}, an error will be triggered when
+     * the {@link DecompositionSolver#solve(RealVector) solve} method will be called.
+     * </p>
+     *
+     * @return a solver
+     */
+    @Override
+    public DecompositionSolver getSolver() {
+        return new Solver(super.getSolver(), this.getP());
+    }
+
+    /**
      * Specialized solver.
      */
     private static class Solver implements DecompositionSolver {
@@ -221,7 +222,7 @@ public class RRQRDecomposition extends QRDecomposition {
         /**
          * A permutation matrix for the pivots used in the QR decomposition
          */
-        private RealMatrix p;
+        private final RealMatrix p;
 
         /**
          * Build a solver from decomposed matrix.
@@ -238,6 +239,14 @@ public class RRQRDecomposition extends QRDecomposition {
          * {@inheritDoc}
          */
         @Override
+        public boolean isNonSingular() {
+            return upper.isNonSingular();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public RealVector solve(RealVector b) {
             return p.operate(upper.solve(b));
         }
@@ -248,14 +257,6 @@ public class RRQRDecomposition extends QRDecomposition {
         @Override
         public RealMatrix solve(RealMatrix b) {
             return p.multiply(upper.solve(b));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNonSingular() {
-            return upper.isNonSingular();
         }
 
         /**

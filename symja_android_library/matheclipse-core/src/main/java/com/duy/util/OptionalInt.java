@@ -39,7 +39,7 @@ import java.util.NoSuchElementException;
  * <p>Additional methods that depend on the presence or absence of a contained
  * value are provided, such as {@link #orElse(int) orElse()}
  * (return a default value if value not present) and
- * {@link #ifPresent(java.util.function.IntConsumer) ifPresent()} (execute a block
+ * {@link #ifPresent(com.duy.lambda.IntConsumer) ifPresent()} (execute a block
  * of code if the value is present).
  *
  * @since 1.8

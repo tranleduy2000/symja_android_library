@@ -21,6 +21,9 @@
  */
 package org.hipparchus.stat.inference;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hipparchus.distribution.continuous.NormalDistribution;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -32,12 +35,9 @@ import org.hipparchus.stat.ranking.TiesStrategy;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * An implementation of the Wilcoxon signed-rank test.
- * <p>
+ *
  * This implementation currently handles only paired (equal length) samples
  * and discards tied pairs from the analysis. The latter behavior differs from
  * the R implementation of wilcox.test and corresponds to the "wilcox"
@@ -45,9 +45,7 @@ import java.util.List;
  */
 public class WilcoxonSignedRankTest {
 
-    /**
-     * Ranking algorithm.
-     */
+    /** Ranking algorithm. */
     private final NaturalRanking naturalRanking;
 
     /**
@@ -56,14 +54,14 @@ public class WilcoxonSignedRankTest {
      */
     public WilcoxonSignedRankTest() {
         naturalRanking = new NaturalRanking(NaNStrategy.FIXED,
-                TiesStrategy.AVERAGE);
+                                            TiesStrategy.AVERAGE);
     }
 
     /**
      * Create a test instance using the given strategies for NaN's and ties.
      *
-     * @param nanStrategy  specifies the strategy that should be used for
-     *                     Double.NaN's
+     * @param nanStrategy specifies the strategy that should be used for
+     *        Double.NaN's
      * @param tiesStrategy specifies the strategy that should be used for ties
      */
     public WilcoxonSignedRankTest(final NaNStrategy nanStrategy,
@@ -78,16 +76,16 @@ public class WilcoxonSignedRankTest {
      * @param x first sample
      * @param y second sample
      * @return the number of indices where x[i] == y[i]
-     * @throws NullArgumentException        if {@code x} or {@code y} are {@code null}.
+     * @throws NullArgumentException if {@code x} or {@code y} are {@code null}.
      * @throws MathIllegalArgumentException if {@code x} or {@code y} are
-     *                                      zero-length
+     *         zero-length
      * @throws MathIllegalArgumentException if {@code x} and {@code y} do not
-     *                                      have the same length.
+     *         have the same length.
      * @throws MathIllegalArgumentException if all pairs are tied (i.e., if no
-     *                                      data remains when tied pairs have been removed.
+     *         data remains when tied pairs have been removed.
      */
     private int ensureDataConformance(final double[] x, final double[] y)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         if (x == null || y == null) {
             throw new NullArgumentException();
@@ -135,11 +133,11 @@ public class WilcoxonSignedRankTest {
      *
      * @param z sample
      * @return |z|
-     * @throws NullArgumentException        if {@code z} is {@code null}
+     * @throws NullArgumentException if {@code z} is {@code null}
      * @throws MathIllegalArgumentException if {@code z} is zero-length.
      */
     private double[] calculateAbsoluteDifferences(final double[] z)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         if (z == null) {
             throw new NullArgumentException();
@@ -188,14 +186,14 @@ public class WilcoxonSignedRankTest {
      * @param x the first sample
      * @param y the second sample
      * @return wilcoxonSignedRank statistic (the larger of W+ and W-)
-     * @throws NullArgumentException        if {@code x} or {@code y} are {@code null}.
+     * @throws NullArgumentException if {@code x} or {@code y} are {@code null}.
      * @throws MathIllegalArgumentException if {@code x} or {@code y} are
-     *                                      zero-length.
+     *         zero-length.
      * @throws MathIllegalArgumentException if {@code x} and {@code y} do not
-     *                                      have the same length.
+     *         have the same length.
      */
     public double wilcoxonSignedRank(final double[] x, final double[] y)
-            throws MathIllegalArgumentException, NullArgumentException {
+        throws MathIllegalArgumentException, NullArgumentException {
 
         ensureDataConformance(x, y);
 
@@ -224,7 +222,7 @@ public class WilcoxonSignedRankTest {
      * the given value.
      *
      * @param stat Wilcoxon signed rank statistic value
-     * @param n    number of subjects (corresponding to x.length)
+     * @param n number of subjects (corresponding to x.length)
      * @return two-sided exact p-value
      */
     private double calculateExactPValue(final double stat, final int n) {
@@ -260,7 +258,7 @@ public class WilcoxonSignedRankTest {
      * correction factor.
      *
      * @param stat Wilcoxon rank sum statistic
-     * @param n    number of subjects (corresponding to x.length minus any tied ranks)
+     * @param n number of subjects (corresponding to x.length minus any tied ranks)
      * @return two-sided asymptotic p-value
      */
     private double calculateAsymptoticPValue(final double stat, final int n) {
@@ -314,32 +312,32 @@ public class WilcoxonSignedRankTest {
      * to estimate the p-value including a continuity correction factor.
      * {@code wilcoxonSignedRankTest(x, y, true)} should give the same results
      * as {@code  wilcox.test(x, y, alternative = "two.sided", mu = 0,
-     * paired = TRUE, exact = FALSE, correct = TRUE)} in R (as long as
+     *     paired = TRUE, exact = FALSE, correct = TRUE)} in R (as long as
      * there are no tied pairs in the data).</li>
      * </ul>
      * </p>
      *
-     * @param x           the first sample
-     * @param y           the second sample
+     * @param x the first sample
+     * @param y the second sample
      * @param exactPValue if the exact p-value is wanted (only works for
-     *                    x.length &lt;= 30, if true and x.length &gt; 30, MathIllegalArgumentException is thrown)
+     *        x.length &lt;= 30, if true and x.length &gt; 30, MathIllegalArgumentException is thrown)
      * @return p-value
-     * @throws NullArgumentException        if {@code x} or {@code y} are {@code null}.
+     * @throws NullArgumentException if {@code x} or {@code y} are {@code null}.
      * @throws MathIllegalArgumentException if {@code x} or {@code y} are
-     *                                      zero-length or for all i, x[i] == y[i]
+     *         zero-length or for all i, x[i] == y[i]
      * @throws MathIllegalArgumentException if {@code x} and {@code y} do not
-     *                                      have the same length.
+     *         have the same length.
      * @throws MathIllegalArgumentException if {@code exactPValue} is
-     *                                      {@code true} and {@code x.length} &gt; 30
-     * @throws MathIllegalStateException    if the p-value can not be computed due
-     *                                      to a convergence error
-     * @throws MathIllegalStateException    if the maximum number of iterations is
-     *                                      exceeded
+     *         {@code true} and {@code x.length} &gt; 30
+     * @throws MathIllegalStateException if the p-value can not be computed due
+     *         to a convergence error
+     * @throws MathIllegalStateException if the maximum number of iterations is
+     *         exceeded
      */
     public double wilcoxonSignedRankTest(final double[] x, final double[] y,
                                          final boolean exactPValue)
-            throws MathIllegalArgumentException, NullArgumentException,
-            MathIllegalStateException {
+        throws MathIllegalArgumentException, NullArgumentException,
+        MathIllegalStateException {
 
         final int nTies = ensureDataConformance(x, y);
 
@@ -348,7 +346,7 @@ public class WilcoxonSignedRankTest {
 
         if (exactPValue && n > 30) {
             throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_LARGE,
-                    n, 30);
+                                                   n, 30);
         }
 
         if (exactPValue) {

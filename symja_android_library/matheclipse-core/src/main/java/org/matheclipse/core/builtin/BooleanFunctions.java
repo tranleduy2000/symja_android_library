@@ -20,6 +20,8 @@ import org.logicng.solvers.SATSolver;
 import org.logicng.transformations.cnf.BDDCNFTransformation;
 import org.logicng.transformations.dnf.DNFFactorization;
 import org.logicng.transformations.qmc.QuineMcCluskeyAlgorithm;
+import org.logicng.transformations.simplification.AdvancedSimplifier;
+import org.logicng.transformations.simplification.DefaultRatingFunction;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
@@ -36,6 +38,7 @@ import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.IntervalSym;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.generic.Comparators;
 import org.matheclipse.core.interfaces.IAST;
@@ -62,8 +65,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-import ch.ethz.idsc.tensor.qty.IQuantity;
+import org.matheclipse.core.tensor.qty.IQuantity;
+import org.matheclipse.core.tensor.qty.UnitConvert;
 
+@SuppressWarnings("JavaDoc")
 public final class BooleanFunctions {
 	public final static Equal CONST_EQUAL = new Equal();
 	public final static Greater CONST_GREATER = new Greater();
@@ -96,46 +101,46 @@ public final class BooleanFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.AllTrue.setEvaluator(new AllTrue());
-			F.And.setEvaluator(new And());
-			F.AnyTrue.setEvaluator(new AnyTrue());
-			F.Boole.setEvaluator(new Boole());
-			F.BooleanConvert.setEvaluator(new BooleanConvert());
-			F.BooleanMinimize.setEvaluator(new BooleanMinimize());
-			F.BooleanTable.setEvaluator(new BooleanTable());
-			F.BooleanVariables.setEvaluator(new BooleanVariables());
-			F.Equal.setEvaluator(CONST_EQUAL);
-			F.Equivalent.setEvaluator(new Equivalent());
-			F.Exists.setEvaluator(new Exists());
-			F.ForAll.setEvaluator(new ForAll());
-			F.Greater.setEvaluator(CONST_GREATER);
-			F.GreaterEqual.setEvaluator(new GreaterEqual());
-			F.Implies.setEvaluator(new Implies());
-			F.Inequality.setEvaluator(new Inequality());
-			F.Less.setEvaluator(CONST_LESS);
-			F.LessEqual.setEvaluator(new LessEqual());
-			F.LogicalExpand.setEvaluator(new LogicalExpand());
-			F.Max.setEvaluator(new Max());
-			F.Min.setEvaluator(new Min());
-			F.MinMax.setEvaluator(new MinMax());
-			F.Nand.setEvaluator(new Nand());
-			F.Negative.setEvaluator(new Negative());
-			F.NoneTrue.setEvaluator(new NoneTrue());
-			F.NonNegative.setEvaluator(new NonNegative());
-			F.NonPositive.setEvaluator(new NonPositive());
-			F.Nor.setEvaluator(new Nor());
-			F.Not.setEvaluator(new Not());
-			F.Or.setEvaluator(new Or());
-			F.Positive.setEvaluator(new Positive());
-			F.SameQ.setEvaluator(new SameQ());
-			F.SatisfiabilityCount.setEvaluator(new SatisfiabilityCount());
-			F.SatisfiabilityInstances.setEvaluator(new SatisfiabilityInstances());
-			F.SatisfiableQ.setEvaluator(new SatisfiableQ());
-			F.TautologyQ.setEvaluator(new TautologyQ());
-			F.TrueQ.setEvaluator(new TrueQ());
-			F.Unequal.setEvaluator(new Unequal());
-			F.UnsameQ.setEvaluator(new UnsameQ());
-			F.Xor.setEvaluator(new Xor());
+			S.AllTrue.setEvaluator(new AllTrue());
+			S.And.setEvaluator(new And());
+			S.AnyTrue.setEvaluator(new AnyTrue());
+			S.Boole.setEvaluator(new Boole());
+			S.BooleanConvert.setEvaluator(new BooleanConvert());
+			S.BooleanMinimize.setEvaluator(new BooleanMinimize());
+			S.BooleanTable.setEvaluator(new BooleanTable());
+			S.BooleanVariables.setEvaluator(new BooleanVariables());
+			S.Equal.setEvaluator(CONST_EQUAL);
+			S.Equivalent.setEvaluator(new Equivalent());
+			S.Exists.setEvaluator(new Exists());
+			S.ForAll.setEvaluator(new ForAll());
+			S.Greater.setEvaluator(CONST_GREATER);
+			S.GreaterEqual.setEvaluator(new GreaterEqual());
+			S.Implies.setEvaluator(new Implies());
+			S.Inequality.setEvaluator(new Inequality());
+			S.Less.setEvaluator(CONST_LESS);
+			S.LessEqual.setEvaluator(new LessEqual());
+			S.LogicalExpand.setEvaluator(new LogicalExpand());
+			S.Max.setEvaluator(new Max());
+			S.Min.setEvaluator(new Min());
+			S.MinMax.setEvaluator(new MinMax());
+			S.Nand.setEvaluator(new Nand());
+			S.Negative.setEvaluator(new Negative());
+			S.NoneTrue.setEvaluator(new NoneTrue());
+			S.NonNegative.setEvaluator(new NonNegative());
+			S.NonPositive.setEvaluator(new NonPositive());
+			S.Nor.setEvaluator(new Nor());
+			S.Not.setEvaluator(new Not());
+			S.Or.setEvaluator(new Or());
+			S.Positive.setEvaluator(new Positive());
+			S.SameQ.setEvaluator(new SameQ());
+			S.SatisfiabilityCount.setEvaluator(new SatisfiabilityCount());
+			S.SatisfiabilityInstances.setEvaluator(new SatisfiabilityInstances());
+			S.SatisfiableQ.setEvaluator(new SatisfiableQ());
+			S.TautologyQ.setEvaluator(new TautologyQ());
+			S.TrueQ.setEvaluator(new TrueQ());
+			S.Unequal.setEvaluator(new Unequal());
+			S.UnsameQ.setEvaluator(new UnsameQ());
+			S.Xor.setEvaluator(new Xor());
 		}
 	}
 
@@ -446,7 +451,7 @@ public final class BooleanFunctions {
 
 			// initialize all list elements with Null
 			for (int i = 0; i < map.size(); i++) {
-				list.set(i + 1, F.Null);
+				list.set(i + 1, S.Null);
 			}
 
 			for (Literal a : literals) {
@@ -467,7 +472,7 @@ public final class BooleanFunctions {
 
 			// initialize all list elements with Null
 			for (int i = 0; i < map.size(); i++) {
-				list.set(i + 1, F.Null);
+				list.set(i + 1, S.Null);
 			}
 
 			for (Literal a : literals) {
@@ -809,7 +814,7 @@ public final class BooleanFunctions {
 	 * Boole(a==7)
 	 * </pre>
 	 */
-	private static class Boole extends AbstractFunctionEvaluator {
+	private static class Boole extends AbstractCoreFunctionEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -947,48 +952,21 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			try {
-			FormulaFactory factory = new FormulaFactory();
-			LogicFormula lf = new LogicFormula(factory);
+				FormulaFactory factory = new FormulaFactory();
+				LogicFormula lf = new LogicFormula(factory);
 
-			Formula formula = lf.expr2BooleanFunction(ast.arg1());
-			// only DNF form can be used in QuineMcCluskeyAlgorithm at the moment
-			formula=formula.transform(new DNFFactorization());
-			IExpr ex = lf.booleanFunction2Expr(formula);
-			IASTAppendable vars = F.Or();
-			if (ex.isOr()) {
-				IAST orAST = (IAST) ex;
-				IASTAppendable rest = F.Or();
-				for (int i = 1; i < orAST.size(); i++) {
-					IExpr temp = orAST.get(i);
-					if (temp.isAnd()) {
-						rest.append(temp);
-					} else {
-						vars.append(temp);
-					}
+				Formula formula = lf.expr2BooleanFunction(ast.arg1());
+				final AdvancedSimplifier simplifier = new AdvancedSimplifier(new DefaultRatingFunction());
+				FormulaTransformation transformation = transformation(ast, engine);
+				if (transformation == null) {
+					return F.NIL;
 				}
-					if (rest.isEmpty()) {
-					vars = F.Or();
-				} else {
-				formula = lf.expr2BooleanFunction(rest);
-			}
-			}
-			formula = QuineMcCluskeyAlgorithm.compute(formula);
-			// System.out.println(formula.toString());
-			IExpr result = lf.booleanFunction2Expr(formula);
-			if (result.isOr()) {
-				vars.appendArgs((IAST) result);
-				EvalAttributes.sort(vars);
-				result = vars;
-			} else {
-				vars.append(result);
-				EvalAttributes.sort(vars);
-				result = vars;
-			}
-			return result;
+				final Formula simplified = formula.transform(simplifier).transform(transformation);
+				// formula = QuineMcCluskeyAlgorithm.compute(formula);
+				// System.out.println(formula.toString());
+				IExpr result = lf.booleanFunction2Expr(simplified);
+				return result;
 
-			// TODO CNF form after minimizing blows up the formula.
-			// FormulaTransformation transformation = BooleanConvert.transformation(ast, engine);
-			// return lf.booleanFunction2Expr(formula.transform(transformation));
 			} catch (final ValidateException ve) {
 				// int number validation
 				engine.printMessage(ast.topHead(), ve);
@@ -999,7 +977,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return IOFunctions.ARGS_1_2;
 		}
 	}
 
@@ -1061,16 +1039,16 @@ public final class BooleanFunctions {
 					ISymbol symbol = (ISymbol) sym;
 					IExpr value = symbol.assignedValue();
 					try {
-						symbol.assign(F.True);
+						symbol.assignValue(F.True);
 						booleanTable(expr, position + 1);
 					} finally {
-						symbol.assign(value);
+						symbol.assignValue(value);
 					}
 					try {
-						symbol.assign(F.False);
+						symbol.assignValue(F.False);
 						booleanTable(expr, position + 1);
 					} finally {
-						symbol.assign(value);
+						symbol.assignValue(value);
 					}
 				}
 				return resultList;
@@ -1281,7 +1259,7 @@ public final class BooleanFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
 				//Swift changed: can't declare enum inside protocol
-				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.UNDEFINED;
+				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.UNDECIDABLE;
 				if (ast.isAST2()) {
 					return equalNull(ast.arg1(), ast.arg2(), engine);
 				}
@@ -1327,7 +1305,7 @@ public final class BooleanFunctions {
 		 */
 		protected IExpr_COMPARE_TERNARY prepareCompare(final IExpr arg1, final IExpr arg2, EvalEngine engine) {
 			if (arg1.isIndeterminate() || arg2.isIndeterminate()) {
-				return IExpr_COMPARE_TERNARY.UNDEFINED;
+				return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 			}
 			if (arg1.isList() && arg2.isList()) {
 				IAST list1 = (IAST) arg1;
@@ -1344,7 +1322,7 @@ public final class BooleanFunctions {
 					}
 					if (b == IExpr_COMPARE_TERNARY.TRUE) {
 					} else {
-						return IExpr_COMPARE_TERNARY.UNDEFINED;
+						return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 					}
 				}
 				return IExpr_COMPARE_TERNARY.TRUE;
@@ -1408,7 +1386,7 @@ public final class BooleanFunctions {
 				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
-			return IExpr_COMPARE_TERNARY.UNDEFINED;
+			return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 		}
 
 		@Override
@@ -1514,7 +1492,7 @@ public final class BooleanFunctions {
 					if (boole.isTrue()) {
 						return result;
 					} else {
-						return result.mapThread(F.Not(null), 1);
+						return result.mapThread(F.Not(F.Slot1), 1);
 					}
 				}
 				return result;
@@ -1661,6 +1639,7 @@ public final class BooleanFunctions {
 	 * {True, True, True}
 	 * </pre>
 	 */
+	@SuppressWarnings("JavaDoc")
 	public static class Greater extends AbstractCoreFunctionEvaluator
 			implements ITernaryComparator, IComparatorFunction {
 		public final static Greater CONST = new Greater();
@@ -1734,7 +1713,7 @@ public final class BooleanFunctions {
 				}
 			}
 			//Swift changed: can't declare enum inside protocol
-			return IExpr_COMPARE_TERNARY.UNDEFINED;
+			return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 		}
 
 		/** {@inheritDoc} */
@@ -1780,14 +1759,14 @@ public final class BooleanFunctions {
 				if (comp != Integer.MIN_VALUE) {
 					return comp > 0 ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
 				}
-				return IExpr_COMPARE_TERNARY.UNDEFINED;
+				return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 			}
 
 			if (a0.equals(a1) && a0.isRealResult() && a1.isRealResult() && !a0.isList()) {
 				return IExpr_COMPARE_TERNARY.FALSE;
 			}
 
-			return IExpr_COMPARE_TERNARY.UNDEFINED;
+			return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 		}
 
 		/**
@@ -1993,6 +1972,10 @@ public final class BooleanFunctions {
 						}
 					}, F.C0, F.C1, F.List);
 					if (!result.arg1().isZero()) {
+						if (result.arg1().hasComplexNumber() || result.arg2().hasComplexNumber()) {
+							return IOFunctions.printMessage(originalHead, "nord", F.List(result.arg1()),
+									EvalEngine.get());
+						}
 						if (result.arg1().isNegative()) {
 							useOppositeHeader = !useOppositeHeader;
 						}
@@ -2008,6 +1991,10 @@ public final class BooleanFunctions {
 						}
 					}, F.C0, F.C0, F.List);
 					if (!result.arg1().isZero()) {
+						if (result.arg1().hasComplexNumber() || result.arg2().hasComplexNumber()) {
+							return IOFunctions.printMessage(originalHead, "nord", F.List(result.arg1()),
+									EvalEngine.get());
+						}
 						rhs = rhs.subtract(result.arg1());
 						return createComparatorResult(result.arg2(), rhs, useOppositeHeader, originalHead,
 								oppositeHead);
@@ -2104,7 +2091,7 @@ public final class BooleanFunctions {
 				if (comp != Integer.MIN_VALUE) {
 					return comp >= 0 ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
 				}
-				return IExpr_COMPARE_TERNARY.UNDEFINED;
+				return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 			}
 			return super.compareTernary(a0, a1);
 		}
@@ -2484,7 +2471,7 @@ public final class BooleanFunctions {
 				if (comp != Integer.MIN_VALUE) {
 					return comp <= 0 ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
 				}
-				return IExpr_COMPARE_TERNARY.UNDEFINED;
+				return IExpr_COMPARE_TERNARY.UNDECIDABLE;
 			}
 			// swap arguments
 			return super.compareTernary(a1, a0);
@@ -2589,7 +2576,7 @@ public final class BooleanFunctions {
 	 * x
 	 * </pre>
 	 */
-	private static class Max extends AbstractFunctionEvaluator {
+	private static class Max extends Min {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2602,18 +2589,15 @@ public final class BooleanFunctions {
 				return IntervalSym.max((IAST) ast.arg1());
 			}
 
-			IAST resultList = EvalAttributes.flattenDeep(F.List, ast);
-			if (resultList.isPresent()) {
-				return maximum(resultList, true);
-			}
-
-			return maximum(ast, false);
+			IASTAppendable result = F.ast(F.Max, ast.size(), false);
+			boolean evaled = flattenList(ast, result);
+			return maximum((IAST) result, evaled);
 		}
 
 		public int[] expectedArgSize(IAST ast) {
 			return null;
 		}
-		private IExpr maximum(IAST list, boolean flattenedList) {
+		private static IExpr maximum(IAST list, boolean flattenedList) {
 			boolean evaled = false;
 			// int j = 1;
 			IASTAppendable f = list.remove(new Predicate<IExpr>() {
@@ -2654,9 +2638,9 @@ public final class BooleanFunctions {
 				} else if (comp == IExpr_COMPARE_TERNARY.FALSE) {
 					evaled = true;
 				} else {
-					if (comp == IExpr_COMPARE_TERNARY.UNDEFINED) {
+					if (comp == IExpr_COMPARE_TERNARY.UNDECIDABLE) {
 						// undetermined
-						if (max1.isNumber()) {
+						if (max1.isRealResult()) {
 							f.append(max2);
 						} else {
 							f.append(max1);
@@ -2744,18 +2728,37 @@ public final class BooleanFunctions {
 				return IntervalSym.min((IAST) ast.arg1());
 			}
 
-			IAST resultList = EvalAttributes.flattenDeep(F.List, ast);
-			if (resultList.isPresent()) {
-				return minimum(resultList, true);
-			}
-
-			return minimum(ast, false);
+			IASTAppendable result = F.ast(F.Min, ast.size(), false);
+			boolean evaled = flattenList(ast, result);
+			return minimum((IAST) result, evaled);
 		}
 
 		public int[] expectedArgSize(IAST ast) {
 			return null;
 		}
-		private IExpr minimum(IAST list, final boolean flattenedList) {
+		protected boolean flattenList(IAST ast, IASTAppendable result) {
+			boolean evaled = false;
+			for (int i = 1; i < ast.size(); i++) {
+				final IExpr arg = ast.get(i);
+				int dim = arg.isVector();
+				if (dim >= 0) {
+					IExpr normal = arg.normal(false);
+					if (normal.isList()) {
+						flattenList((IAST) normal, result);
+						evaled = true;
+						continue;
+					}
+				} else if (arg.isList()) {
+					flattenList((IAST) arg, result);
+					evaled = true;
+					continue;
+				}
+				result.append(arg);
+			}
+			return evaled;
+		}
+
+		private static IExpr minimum(IAST list, final boolean flattenedList) {
 			boolean evaled = false;
 			IASTAppendable f = list.remove(new Predicate<IExpr>() {
 				@Override
@@ -2800,9 +2803,9 @@ public final class BooleanFunctions {
 				} else if (comp == IExpr_COMPARE_TERNARY.FALSE) {
 					evaled = true;
 				} else {
-					if (comp == IExpr_COMPARE_TERNARY.UNDEFINED) {
+					if (comp == IExpr_COMPARE_TERNARY.UNDECIDABLE) {
 						// undetermined
-						if (min1.isNumber()) {
+						if (min1.isRealResult()) {
 							f.append(min2);
 						} else {
 							f.append(min1);
@@ -3851,20 +3854,20 @@ public final class BooleanFunctions {
 				ISymbol symbol = (ISymbol) sym;
 				IExpr value = symbol.assignedValue();
 				try {
-					symbol.assign(F.True);
+					symbol.assignValue(F.True);
 					if (bruteForceSatisfiableQ(expr, variables, position + 1)) {
 						return true;
 					}
 				} finally {
-					symbol.assign(value);
+					symbol.assignValue(value);
 				}
 				try {
-					symbol.assign(F.False);
+					symbol.assignValue(F.False);
 					if (bruteForceSatisfiableQ(expr, variables, position + 1)) {
 						return true;
 					}
 				} finally {
-					symbol.assign(value);
+					symbol.assignValue(value);
 				}
 			}
 			return false;
@@ -3963,20 +3966,20 @@ public final class BooleanFunctions {
 				ISymbol symbol = (ISymbol) sym;
 				IExpr value = symbol.assignedValue();
 				try {
-					symbol.assign(F.True);
+					symbol.assignValue(F.True);
 					if (!bruteForceTautologyQ(expr, variables, position + 1)) {
 						return false;
 					}
 				} finally {
-					symbol.assign(value);
+					symbol.assignValue(value);
 				}
 				try {
-					symbol.assign(F.False);
+					symbol.assignValue(F.False);
 					if (!bruteForceTautologyQ(expr, variables, position + 1)) {
 						return false;
 					}
 				} finally {
-					symbol.assign(value);
+					symbol.assignValue(value);
 				}
 			}
 			return true;
@@ -4098,7 +4101,7 @@ public final class BooleanFunctions {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() > 2) {
-				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.UNDEFINED;
+				IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.UNDECIDABLE;
 				if (ast.isAST2()) {
 					return unequalNull(ast.arg1(), ast.arg2(), engine);
 				}
@@ -4118,7 +4121,7 @@ public final class BooleanFunctions {
 						b = compareTernary(result.get(i - 1), result.get(j++));
 						if (b == IExpr_COMPARE_TERNARY.TRUE) {
 							return F.False;
-						} else if (b == IExpr_COMPARE_TERNARY.UNDEFINED) {
+						} else if (b == IExpr_COMPARE_TERNARY.UNDECIDABLE) {
 							return F.NIL;
 						}
 					}
@@ -4336,7 +4339,8 @@ public final class BooleanFunctions {
 	private static IExpr quantityEquals(IQuantity q1, IQuantity q2) {
 		try {
 		if (!q1.unit().equals(q2.unit())) {
-			ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+				org.matheclipse.core.tensor.qty.UnitConvert unitConvert = org.matheclipse.core.tensor.qty.UnitConvert
+						.SI();
 			q2 = (IQuantity) unitConvert.to(q1.unit()).apply(q2);
 		}
 		if (q1.unit().equals(q2.unit())) {
@@ -4359,7 +4363,8 @@ public final class BooleanFunctions {
 	private static IExpr quantityUnequals(IQuantity q1, IQuantity q2) {
 		try {
 			if (!q1.unit().equals(q2.unit())) {
-				ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+				org.matheclipse.core.tensor.qty.UnitConvert unitConvert = org.matheclipse.core.tensor.qty.UnitConvert
+						.SI();
 				q2 = (IQuantity) unitConvert.to(q1.unit()).apply(q2);
 			}
 			if (q1.unit().equals(q2.unit())) {
@@ -4383,7 +4388,8 @@ public final class BooleanFunctions {
 	private static int quantityCompareTo(IQuantity q1, IQuantity q2) {
 		try {
 		if (!q1.unit().equals(q2.unit())) {
-			ch.ethz.idsc.tensor.qty.UnitConvert unitConvert = ch.ethz.idsc.tensor.qty.UnitConvert.SI();
+				org.matheclipse.core.tensor.qty.UnitConvert unitConvert = org.matheclipse.core.tensor.qty.UnitConvert
+						.SI();
 			q2 = (IQuantity) unitConvert.to(q1.unit()).apply(q2);
 		}
 		if (q1.unit().equals(q2.unit())) {
@@ -4517,15 +4523,15 @@ public final class BooleanFunctions {
 	private static FormulaTransformation transformation(final IAST ast, EvalEngine engine) {
 		int size = ast.argSize();
 		if (size > 1 && ast.get(size).isString()) {
-			IStringX arg2 = (IStringX) ast.arg2();
-			String method = arg2.toString();
+			IStringX lastArg = (IStringX) ast.get(size);
+			String method = lastArg.toString();
 			if (method.equals("DNF") || method.equals("SOP")) {
 				return new DNFFactorization();
 			} else if (method.equals("CNF") || method.equals("POS")) {
 				return new BDDCNFTransformation();// new CNFFactorization( );
 			}
 			// `1` currently not supported in `2`.
-			IOFunctions.printMessage(ast.topHead(), "unsupported", F.List(arg2,F.Method), engine);
+			IOFunctions.printMessage(ast.topHead(), "unsupported", F.List(lastArg, F.Method), engine);
 			return null;
 		}
 		return new DNFFactorization();
@@ -4575,7 +4581,7 @@ public final class BooleanFunctions {
 						}
 						singleBit <<= 1;
 					}
-					if ((count % 2) == 1) {
+					if ((count & 1) == 1) {
 						IASTMutable andAST = F.ast(F.And, size, true);
 						singleBit = 0b1;
 						int startPos = 1;

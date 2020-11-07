@@ -40,16 +40,16 @@ import org.hipparchus.util.Precision;
  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
- * <li>the {@code norm2} method which has been renamed as {@link #getNorm()
- * getNorm},</li>
- * <li>the {@code cond} method which has been renamed as {@link
- * #getConditionNumber() getConditionNumber},</li>
- * <li>the {@code rank} method which has been renamed as {@link #getRank()
- * getRank},</li>
- * <li>a {@link #getUT() getUT} method has been added,</li>
- * <li>a {@link #getVT() getVT} method has been added,</li>
- * <li>a {@link #getSolver() getSolver} method has been added,</li>
- * <li>a {@link #getCovariance(double) getCovariance} method has been added.</li>
+ *   <li>the {@code norm2} method which has been renamed as {@link #getNorm()
+ *   getNorm},</li>
+ *   <li>the {@code cond} method which has been renamed as {@link
+ *   #getConditionNumber() getConditionNumber},</li>
+ *   <li>the {@code rank} method which has been renamed as {@link #getRank()
+ *   getRank},</li>
+ *   <li>a {@link #getUT() getUT} method has been added,</li>
+ *   <li>a {@link #getVT() getVT} method has been added,</li>
+ *   <li>a {@link #getSolver() getSolver} method has been added,</li>
+ *   <li>a {@link #getCovariance(double) getCovariance} method has been added.</li>
  * </ul>
  *
  * @see <a href="http://mathworld.wolfram.com/SingularValueDecomposition.html">MathWorld</a>
@@ -741,7 +741,7 @@ public class SingularValueDecomposition {
          *
          * @param b Right-hand side of the equation A &times; X = B
          * @return a vector X that minimizes the two norm of A &times; X - B
-         * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
+         * @throws MathIllegalArgumentException if the matrices dimensions do not match.
          */
         @Override
         public RealVector solve(final RealVector b) {
@@ -757,7 +757,7 @@ public class SingularValueDecomposition {
          *
          * @param b Right-hand side of the equation A &times; X = B
          * @return a matrix X that minimizes the two norm of A &times; X - B
-         * @throws org.hipparchus.exception.MathIllegalArgumentException if the matrices dimensions do not match.
+         * @throws MathIllegalArgumentException if the matrices dimensions do not match.
          */
         @Override
         public RealMatrix solve(final RealMatrix b) {

@@ -38,8 +38,8 @@ import java.util.List;
  * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string representation
  * </p>
  * <p>
- * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence parser</a> for the idea, how to parse
- * the operators depending on their precedence.
+ * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence parser</a> for the idea,
+ * how to parse the operators depending on their precedence.
  * </p>
  */
 public class Parser extends Scanner {
@@ -214,7 +214,24 @@ public class Parser extends Scanner {
 		switch (fToken) {
 		case TT_IDENTIFIER:
 			final SymbolNode symbol = getSymbol();
-			if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
+			if (fToken == TT_COLON) {
+				getNextToken();
+				if (fToken == TT_IDENTIFIER) {
+					temp = getSymbol();
+					temp = parseArguments(temp);
+					final FunctionNode pattern = fFactory
+							.createFunction(fFactory.createSymbol(IConstantOperators.Pattern));
+					pattern.add(symbol);
+					pattern.add(temp);
+					return pattern;
+				} else {
+					temp = getFactor(0);
+				}
+				final FunctionNode pattern = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Pattern));
+				pattern.add(symbol);
+				pattern.add(temp);
+				temp = pattern;
+			} else if (fToken >= TT_BLANK && fToken <= TT_BLANK_COLON) {
 				temp = getBlankPatterns(symbol);
 			} else {
 				temp = symbol;
@@ -310,6 +327,7 @@ public class Parser extends Scanner {
 			fRecursionDepth++;
 			try {
 				getNextToken();
+				if (fToken != TT_ASSOCIATION_CLOSE) {
 				do {
 					function.add(parseExpression());
 					if (fToken != TT_COMMA) {
@@ -321,6 +339,7 @@ public class Parser extends Scanner {
 
 				if (fToken != TT_ASSOCIATION_CLOSE) {
 					throwSyntaxError("\'|>\' expected.");
+				}
 				}
 				final FunctionNode assoc = fFactory
 						.createFunction(fFactory.createSymbol(IConstantOperators.Association));
@@ -641,6 +660,9 @@ public class Parser extends Scanner {
 		return fFactory.isOperatorChar(fCurrentChar);
 	}
 
+	protected boolean isOperatorCharacters(char ch) {
+		return fFactory.isOperatorChar(ch);
+	}
 	/**
 	 * protected List<Operator> getOperator()
 	 *
@@ -717,19 +739,45 @@ public class Parser extends Scanner {
 	 */
 	private ASTNode getNumber(final boolean negative) throws SyntaxError {
 		ASTNode temp = null;
-		final Object[] result = getNumberString();
-		String number = (String) result[0];
-		final int numFormat = ((Integer) result[1]).intValue();
+		String number = "";
 		try {
+		final Object[] result = getNumberString();
+			number = (String) result[0];
+		final int numFormat = ((Integer) result[1]).intValue();
 			if (negative) {
 				number = '-' + number;
 			}
 			if (numFormat < 0) {
+				if (fCurrentChar == '`' && isValidPosition()) {
+					fCurrentPosition++;
+					if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
+						fCurrentPosition += 2;
+						long precision = getJavaLong();
+						if (precision < FEConfig.MACHINE_PRECISION) {
+							precision = FEConfig.MACHINE_PRECISION;
+						}
+						return fFactory.createDouble(number);
+						// return F.num(new Apfloat(number, precision));
+					} else {
+						fCurrentPosition++;
+						long precision = FEConfig.MACHINE_PRECISION;
+						if (isValidPosition() && Character.isDigit(fInputString[fCurrentPosition])) {
+							precision = getJavaLong();
+							if (precision < FEConfig.MACHINE_PRECISION) {
+								precision = FEConfig.MACHINE_PRECISION;
+							}
+							return fFactory.createDouble(number);
+						} else {
+							getNextToken();
+							return fFactory.createDouble(number);
+						}
+					}
+				}
 				temp = fFactory.createDouble(number);
 			} else {
 				temp = fFactory.createInteger(number, numFormat);
 			}
-		} catch (final RuntimeException e) {
+		} catch (final SyntaxError e) {
 			throwSyntaxError("Number format error: " + number, number.length());
 		}
 		getNextToken();
@@ -741,13 +789,19 @@ public class Parser extends Scanner {
 	 * 
 	 */
 	private ASTNode getPart(final int min_precedence) throws SyntaxError {
+		FunctionNode function = null;
 		ASTNode temp = getFactor(min_precedence);
 
+		if (fToken == TT_COLON) {
+			getNextToken();
+			function = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Optional), temp);
+			function.add(parseExpression());
+			return function;
+		}
 		if (fToken != TT_PARTOPEN) {
 			return temp;
 		}
 
-		FunctionNode function = null;
 		do {
 			if (function == null) {
 				function = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Part), temp);
@@ -882,14 +936,14 @@ public class Parser extends Scanner {
 		return lhs;
 	}
 
-	private ASTNode parseCompoundExpressionNull(InfixOperator infixOperator, ASTNode rhs) {
+	private ASTNode parseCompoundExpressionNull(InfixOperator infixOperator, ASTNode lhs) {
 		if (infixOperator.isOperator(";")) {
 			if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
-				return infixOperator.createFunction(fFactory, rhs, fFactory.createSymbol("Null"));
+				return infixOperator.createFunction(fFactory, lhs, fFactory.createSymbol("Null"));
 			}
 			if (fPackageMode && fRecursionDepth < 1) {
-				return infixOperator.createFunction(fFactory, rhs, fFactory.createSymbol("Null"));
+				return infixOperator.createFunction(fFactory, lhs, fFactory.createSymbol("Null"));
 			}
 		}
 		return null;
@@ -911,8 +965,31 @@ public class Parser extends Scanner {
 					|| fToken == TT_PRECEDENCE_CLOSE) {
 				span.add(fFactory.createSymbol(IConstantOperators.All));
 				return span;
+			} else if (fToken == TT_OPERATOR) {
+				InfixOperator infixOperator = determineBinaryOperator();
+				if (infixOperator != null && //
+						infixOperator.getOperatorString().equals(";")) {
+					span.add(fFactory.createSymbol(IConstantOperators.All));
+					getNextToken();
+					ASTNode compoundExpressionNull = parseCompoundExpressionNull(infixOperator, span);
+					if (compoundExpressionNull != null) {
+						return compoundExpressionNull;
+					}
+					while (fToken == TT_NEWLINE) {
+						getNextToken();
+					}
+					return parseInfixOperator(span, infixOperator);
+				}
 			}
 			span.add(parseExpression(parsePrimary(0), 0));
+			if (fToken == TT_SPAN) {
+				getNextToken();
+				if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
+						|| fToken == TT_PRECEDENCE_CLOSE) {
+					return span;
+			}
+			span.add(parseExpression(parsePrimary(0), 0));
+			}
 			return span;
 		}
 		ASTNode temp = parseExpression(parsePrimary(0), 0);
@@ -927,11 +1004,34 @@ public class Parser extends Scanner {
 				if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
 						|| fToken == TT_PRECEDENCE_CLOSE) {
 					return span;
+				} else if (fToken == TT_OPERATOR) {
+					FunctionNode times = fFactory.createAST(new SymbolNode("Times"));
+					times.add(span);
+					span = fFactory.createFunction(fFactory.createSymbol(IConstantOperators.Span));
+					span.add(fFactory.createInteger(1));
+					span.add(fFactory.createSymbol(IConstantOperators.All));
+					times.add(span);
+					return parseExpression(times, 0);
 				}
 			} else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE) {
 				span.add(fFactory.createSymbol(IConstantOperators.All));
 				return span;
+			} else if (fToken == TT_OPERATOR) {
+				InfixOperator infixOperator = determineBinaryOperator();
+				if (infixOperator != null && //
+						infixOperator.getOperatorString().equals(";")) {
+					span.add(fFactory.createSymbol(IConstantOperators.All));
+					getNextToken();
+					ASTNode compoundExpressionNull = parseCompoundExpressionNull(infixOperator, span);
+					if (compoundExpressionNull != null) {
+						return compoundExpressionNull;
+					}
+					while (fToken == TT_NEWLINE) {
+						getNextToken();
+					}
+					return parseInfixOperator(span, infixOperator);
+				}
 			}
 			span.add(parseExpression(parsePrimary(0), 0));
 			if (fToken == TT_SPAN) {

@@ -1,14 +1,18 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lambda.Consumer;
 import com.duy.lambda.IntFunction;
 
 import org.apache.commons.lang3.StringUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
+import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -21,6 +25,7 @@ import org.matheclipse.parser.client.FEConfig;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,17 +43,99 @@ public class IOFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			if (Config.FILESYSTEM_ENABLED) {
-				F.Input.setEvaluator(new Input());
-				F.InputString.setEvaluator(new InputString());
-			}
-			// F.General.setEvaluator(new General());
-			F.Message.setEvaluator(new Message());
-			F.Names.setEvaluator(new Names());
+			// S.General.setEvaluator(new General());
+			S.Echo.setEvaluator(new Echo());
+			S.EchoFunction.setEvaluator(new EchoFunction());
+			S.Message.setEvaluator(new Message());
+			S.Names.setEvaluator(new Names());
+			S.Print.setEvaluator(new Print());
+
+			S.Short.setEvaluator(new Short());
+			S.StyleForm.setEvaluator(new StyleForm());
 			for (int i = 0; i < MESSAGES.length; i += 2) {
-				F.General.putMessage(IPatternMatcher.SET, MESSAGES[i], F.stringx(MESSAGES[i + 1]));
+				S.General.putMessage(IPatternMatcher.SET, MESSAGES[i], F.stringx(MESSAGES[i + 1]));
 			}
 		}
+	}
+
+	private static class Echo extends Print {
+
+		@Override
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			final PrintStream s = engine.getOutPrintStream();
+			final PrintStream stream;
+			if (s == null) {
+				stream = System.out;
+			} else {
+				stream = s;
+			}
+			final StringBuilder buf = new StringBuilder();
+			OutputFormFactory out = OutputFormFactory.get(engine.isRelaxedSyntax());
+			boolean[] convert = new boolean[] { true };
+			IExpr arg1 = ast.arg1();
+			IExpr result = engine.evaluate(arg1);
+			if (ast.argSize() >= 2) {
+				IExpr arg2 = engine.evaluate(ast.arg2());
+				printExpression(arg2, out, buf, convert, engine);
+				if (ast.isAST3()) {
+					IExpr arg3 = engine.evaluate(F.unaryAST1(ast.arg3(), arg1));
+					printExpression(arg3, out, buf, convert, engine);
+				} else {
+					printExpression(result, out, buf, convert, engine);
+				}
+			} else {
+				printExpression(result, out, buf, convert, engine);
+			}
+			stream.println(buf.toString());
+			return result;
+		}
+
+		public int[] expectedArgSize(IAST ast) {
+			return IOFunctions.ARGS_1_3;
+		}
+	}
+
+	private final static class EchoFunction extends Print {
+		@Override
+		public IExpr evaluate(IAST ast, EvalEngine engine) {
+
+			if (ast.isAST1() && ast.head().isAST()) {
+				final int size = ast.head().size();
+				switch (size) {
+					case 1:
+						return F.unaryAST1(S.Echo, ast.arg1());
+					case 2:
+						return echo(ast.arg1(), ast.head().first(), engine);
+					case 3:
+						return F.ternaryAST3(S.Echo, ast.arg1(), ast.head().first(), ast.head().second());
+					default:
+				}
+			}
+			return F.NIL;
+		}
+
+		private static IExpr echo(final IExpr arg1, IExpr headFirst, EvalEngine engine) {
+			final PrintStream s = engine.getOutPrintStream();
+			final PrintStream stream;
+			if (s == null) {
+				stream = System.out;
+			} else {
+				stream = s;
+			}
+			final StringBuilder buf = new StringBuilder();
+			OutputFormFactory out = OutputFormFactory.get(engine.isRelaxedSyntax());
+			boolean[] convert = new boolean[] { true };
+			IExpr result = engine.evaluate(arg1);
+			IExpr arg3 = engine.evaluate(F.unaryAST1(headFirst, arg1));
+			printExpression(arg3, out, buf, convert, engine);
+			stream.println(buf.toString());
+			return result;
+		}
+
+		public int[] expectedArgSize(IAST ast) {
+			return IOFunctions.ARGS_0_2;
+		}
+
 	}
 
 	private static class Message extends AbstractEvaluator {
@@ -63,7 +150,7 @@ public class IOFunctions {
 					}
 					return F.stringx(": " + message);
 				}
-				if (ast.arg1().isAST(F.MessageName, 3)) {
+				if (ast.arg1().isAST(S.MessageName, 3)) {
 					IAST messageName = (IAST) ast.arg1();
 					String messageShortcut = messageName.arg2().toString();
 					if (messageName.arg1().isSymbol()) {
@@ -72,7 +159,7 @@ public class IOFunctions {
 							return temp;
 						}
 					}
-					return message(F.General, messageShortcut, ast);
+					return message(S.General, messageShortcut, ast);
 				}
 			}
 			return F.NIL;
@@ -85,46 +172,25 @@ public class IOFunctions {
 
 	}
 
-	private final static class InputString extends AbstractFunctionEvaluator {
+	private static class Short extends AbstractEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			return inputString(ast, engine);
+			return F.stringx(shorten(ast.arg1()));
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_1;
+			return IOFunctions.ARGS_1_1;
 		}
 	}
 
-	private final static class Input extends AbstractFunctionEvaluator {
+	private static class StyleForm extends AbstractEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			IExpr str = inputString(ast, engine);
-			if (str.isPresent()) {
-				return engine.evaluate(str.toString());
-			}
-			return F.NIL;
-		}
-
-		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_1;
-		}
-	}
-
-	private static IExpr inputString(final IAST ast, EvalEngine engine) {
-		final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")));
-		try {
-			if (ast.isAST1()) {
-				engine.getOutPrintStream().print(ast.arg1().toString());
-			}
-			final String str = in.readLine();
-			if (str != null) {
-				return F.stringx(str);
-			}
-		} catch (final IOException e1) {
-			e1.printStackTrace();
+			if (ast.head() == S.StyleForm) {
+				return ast.apply(S.Style);
 		}
 		return F.NIL;
+	}
 	}
 	private final static class Names extends AbstractFunctionEvaluator {
 		@Override
@@ -141,6 +207,50 @@ public class IOFunctions {
 
 		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_0_1;
+		}
+
+	}
+
+	private static class Print extends AbstractCoreFunctionEvaluator {
+
+		@Override
+		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			final PrintStream s = engine.getOutPrintStream();
+			final PrintStream stream;
+			if (s == null) {
+				stream = System.out;
+			} else {
+				stream = s;
+			}
+			final StringBuilder buf = new StringBuilder();
+			final OutputFormFactory out = OutputFormFactory.get(engine.isRelaxedSyntax());
+			final boolean[] convert = new boolean[] { true };
+			ast.forEach(new Consumer<IExpr>() {
+				@Override
+				public void accept(IExpr x) {
+					IExpr temp = engine.evaluate(x);
+					printExpression(temp, out, buf, convert, engine);
+				}
+			});
+			if (!convert[0]) {
+				stream.println("ERROR-IN-OUTPUTFORM");
+				return F.Null;
+			}
+			stream.println(buf.toString());
+			return F.Null;
+		}
+
+		protected static void printExpression(IExpr x, OutputFormFactory out, final StringBuilder buf,
+											  boolean[] convert, EvalEngine engine) {
+			if (x instanceof IStringX) {
+				buf.append(x.toString());
+			} else {
+				if (x.isASTSizeGE(S.Style, 2)) {
+					printExpression(x.first(), out, buf, convert, engine);
+				} else if (convert[0] && !out.convert(buf, x)) {
+					convert[0] = false;
+				}
+			}
 		}
 
 	}
@@ -184,6 +294,7 @@ public class IOFunctions {
 			"argx", "`1` called with `2` arguments; 1 argument is expected.", //
 			"argt", "`1` called with `2` arguments; `3` or `4` arguments are expected.", //
 			"argtu", "`1` called with 1 argument; `2` or `3` arguments are expected.", //
+			"argtype", "Arguments `1` and `2` of `3` should be either non-negative integers or one-character strings.", //
 			"base", "Requested base `1` in `2` should be between 2 and `3`.", //
 			"boxfmt", "`1` is not a box formatting type.", //
 			"coef", "The first argument `1` of `2` should be a non-empty list of positive integers.", //
@@ -192,17 +303,23 @@ public class IOFunctions {
 			"cxt", "`1` is not a valid context name.", //
 			"divz", "The argument `1` should be nonzero.", //
 			"digit", "Digit at position `1` in `2` is too large to be used in base `3`.", //
+			"dmval",
+			"Input value `1` lies outside the range of data in the interpolating function. Extrapolation will be used.",
 			"drop", "Cannot drop positions `1` through `2` in `3`.", //
+			"empt", "Argument `1` should be a non-empty list.", //
 			"eqf", "`1` is not a well-formed equation.", //
 			"exact", "Argument `1` is not an exact number.", //
+			"exdims", "The dimensions cannot be determined from the position `1`.", //
 			"fftl", "Argument `1` is not a non-empty list or rectangular array of numeric quantities.", //
 			"fpct", "To many parameters in `1` to be filled from `2`.", //
 			"fnsym", "First argument in `1` is not a symbol or a string naming a symbol.", //
 			"heads", "Heads `1` and `2` are expected to be the same.", //
 			"ilsnn", "Single or list of non-negative integers expected at position `1`.", //
+			"incpt", "incompatible elements in `1` cannot be joined.", //
 			"indet", "Indeterminate expression `1` encountered.", //
 			"infy", "Infinite expression `1` encountered.", //
-			"innf", "Non-negative integer or Infinity expected at position `1`.", //
+			"innf", "Non-negative integer or Infinity expected at position `1` in `2`.", //
+			"ins", "Cannot insert at position `1` in `2`.", //
 			"int", "Integer expected at position `2` in `1`.", //
 			"intjava", "Java int value greater equal `1` expected instead of `2`.", //
 			"intlevel", "Level specification value greater equal `1` expected instead of `2`.", //
@@ -212,10 +329,16 @@ public class IOFunctions {
 			"intm", "Machine-sized integer expected at position `2` in `1`.", //
 			"intpm", "Positive machine-sized integer expected at position `2` in `1`.", //
 			"intrange", "Integer expected in range `1` to `2`.", //
+			"invdt", "The argument is not a rule or a list of rules.", //
+			"invrl", "The argument `1` is not a valid Association or list of rules.", //
 			"iterb", "Iterator does not have appropriate bounds.", //
 			"itform", "Argument `1` at position `2` does not have the correct form for an iterator.", //
+			"itlim", "Iteration limit of `1` exceeded for `2`.", //
+			"itlimpartial", "Iteration limit of `1` exceeded. Returning partial results.", //
 			"itendless", "Endless iteration detected in `1` in evaluation loop.", //
 			"ivar", "`1` is not a valid variable.", //
+			"lend",
+			"The argument at position `1` in `2` should be a vector of unsigned byte values or a Base64 encoded string.", //
 			"level", "Level specification `1` is not of the form n, {n}, or {m, n}.", //
 			"list", "List expected at position `1` in `2`.", //
 			"listofbigints", "List of Java BigInteger numbers expected in `1`.", //
@@ -227,6 +350,7 @@ public class IOFunctions {
 			"lvset", "Local variable specification `1` contains `2`, which is an assignment to `3`; only assignments to symbols are allowed.", //
 			"matrix", "Argument `1` at position `2` is not a non-empty rectangular matrix.", //
 			"matsq", "Argument `1` at position `2` is not a non-empty square matrix.", //
+			"nliter", "Non-list iterator `1` at position `2` does not evaluate to a real numeric value.", //
 			"nil", "unexpected NIL expression encountered.", //
 			"noneg", "Surd is not defined for even roots of negative values.", //
 			"noopen", "Cannot open `1`.", //
@@ -238,10 +362,14 @@ public class IOFunctions {
 			"The expression `1` is not a valid interval.", //
 			"notunicode",
 			"A character unicode, which should be a non-negative integer less than 1114112, is expected at position `2` in `1`.", //
+			"noprime", "There are no primes in the specified interval.", //
 			"noval", "Symbol `1` in part assignment does not have an immediate value.", //
 			"nsmet", "This system cannot be solved with the methods available to `1`", //
+			"nvm", "The first Norm argument should be a scalar, vector or matrix.", //
 			"openx", "`1` is not open.", //
 			"optb", "Optional object `1` in `2` is not a single blank.", //
+			"optnf", "Option name `2` not found in defaults for `1`", //
+			"optx", "Unknown option `1` in `2`.", //
 			"ovfl", "Overflow occurred in computation.", //
 			"padlevel", "The padding specification `1` involves `2` levels; the list `3` has only `4` level.", //
 			"partd", "Part specification `1` is longer than depth of object.", //
@@ -253,9 +381,12 @@ public class IOFunctions {
 			"pspec", "Part specification `1` is neither an integer nor a list of integer.", //
 			"poly", "`1` is not a polynomial.", //
 			"polynomial", "Polynomial expected at position `1` in `2`.", //
+			"posr", "The left hand side of `2` in `1` doesn't match an int-array of depth `3`.", //
 			"pkspec1", "The expression `1` cannot be used as a part specification.", //
 			"precsm", "Requested precision `1` is smaller than `2`.", //
+			"precgt", "Requested precision `1` is greater than `2`.", //
 			"range", "Range specification in `1` does not have appropriate bounds.", //
+			"reclim2", "Recursion depth of `1` exceeded during evaluation of `2`.", //
 			"rectt", "Rectangular array expected at position `1` in `2`.", //
 			"rvalue", "`1` is not a variable with a value, so its value cannot be changed.", //
 			"rubiendless", "Endless iteration detected in `1` for Rubi pattern-matching rules.", //
@@ -286,7 +417,7 @@ public class IOFunctions {
 		Initializer.init();
 	}
 
-	public static IExpr message(ISymbol symbol, String messageShortcut, final IAST ast) {
+	public static IExpr message(ISymbol symbol, String messageShortcut, final IAST list) {
 		IExpr temp = symbol.evalMessage(messageShortcut);
 		String message = null;
 		if (temp.isPresent()) {
@@ -298,7 +429,7 @@ public class IOFunctions {
 			}
 					}
 		if (message != null) {
-			message = rawMessage(ast, message);
+			message = rawMessage(list, message);
 			return F.stringx(symbol.toString() + ": " + message);
 		}
 		return F.NIL;
@@ -320,10 +451,12 @@ public class IOFunctions {
 		}
 
 	/**
+	 * Format a message according to the shortcut from the <code>MESSAGES</code> array and print it to the error stream
+	 * with the <code>engine.printMessage()</code>method.
 	 *
 	 * @param symbol
 	 * @param messageShortcut
-	 *            the message shortcut defined in <code>MESSAGES</code> array
+	 *            the message shortcut defined in the <code>MESSAGES</code> array
 	 * @param listOfArgs
 	 *            a list of arguments which should be inserted into the message shortcuts placeholder
 	 * @param engine
@@ -347,7 +480,7 @@ public class IOFunctions {
 			engine.printMessage(symbol.toString() + ": " + message);
 		} else {
 			for (int i = 1; i < listOfArgs.size(); i++) {
-				message = StringUtils.replace(message, "`" + (i) + "`", listOfArgs.get(i).toString());
+				message = StringUtils.replace(message, "`" + (i) + "`", shorten(listOfArgs.get(i)));
 			}
 			engine.setMessageShortcut(messageShortcut);
 			engine.printMessage(symbol.toString() + ": " + message);
@@ -355,6 +488,9 @@ public class IOFunctions {
 		return F.NIL;
 	}
 
+	public static String getMessage(String messageShortcut, final IAST listOfArgs) {
+		return getMessage(messageShortcut, listOfArgs, EvalEngine.get());
+	}
 	public static String getMessage(String messageShortcut, final IAST listOfArgs, EvalEngine engine) {
 		IExpr temp = F.General.evalMessage(messageShortcut);
 		String message = null;
@@ -367,7 +503,7 @@ public class IOFunctions {
 			return message;
 		}
 		for (int i = 1; i < listOfArgs.size(); i++) {
-			message = StringUtils.replace(message, "`" + (i) + "`", listOfArgs.get(i).toString());
+			message = StringUtils.replace(message, "`" + (i) + "`", shorten(listOfArgs.get(i)));
 		}
 		engine.setMessageShortcut(messageShortcut);
 		return message;
@@ -382,13 +518,46 @@ public class IOFunctions {
 		return F.NIL;
 	}
 
-	private static String rawMessage(final IAST ast, String message) {
-				for (int i = 2; i < ast.size(); i++) {
-			message = StringUtils.replace(message, "`" + (i - 1) + "`", ast.get(i).toString());
+	private static String rawMessage(final IAST list, String message) {
+		for (int i = 2; i < list.size(); i++) {
+			message = StringUtils.replace(message, "`" + (i - 1) + "`", shorten(list.get(i)));
 				}
 		return message;
 	}
 
+	/**
+	 * Shorten the output string generated from <code>expr</code> to a maximum length of
+	 * <code>Config.SHORTEN_STRING_LENGTH</code> characters. Print <<SHORT>> as substitute of the middle of the
+	 * expression if necessary.
+	 *
+	 * @param expr
+	 * @return
+	 */
+	public static String shorten(IExpr expr) {
+		return shorten(expr, Config.SHORTEN_STRING_LENGTH);
+	}
+
+	/**
+	 * Shorten the output string generated from <code>expr</code> to a maximum length of <code>maximuLength</code>
+	 * characters. Print <<SHORT>> as substitute of the middle of the expression if necessary.
+	 *
+	 * @param expr
+	 * @param maximuLength
+	 *            the maximum length of the result string.
+	 * @return
+	 */
+	public static String shorten(IExpr expr, int maximuLength) {
+		String str = expr.toString();
+		if (str.length() > maximuLength) {
+			StringBuilder buf = new StringBuilder(maximuLength);
+			int halfLength = (maximuLength / 2) - 14;
+			buf.append(str.substring(0, halfLength));
+			buf.append("<<SHORT>>");
+			buf.append(str.substring(str.length() - halfLength));
+			return buf.toString();
+		}
+		return str;
+	}
 	public static IAST getNamesByPrefix(String name) {
 
 		if (name.length() == 0) {
@@ -446,11 +615,8 @@ public class IOFunctions {
 				return F.$s(AST2Expr.FUNCTION_STRINGS[i]);
 			}
 		});
-		// for (int i = 0; i < size; i++) {
-		// list.append(F.$s(AST2Expr.FUNCTION_STRINGS[i]));
-		// }
-		// return list;
 	}
+
 	private IOFunctions() {
 
 	}

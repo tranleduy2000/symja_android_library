@@ -8,6 +8,13 @@ public class IntRangeSpec {
 	final int min;
 	final int max;
 
+	public int minimum() {
+		return min;
+	}
+
+	public int maximum() {
+		return max;
+	}
 	/**
 	 * Create the range <code>[min, max]</code>
 	 * 
@@ -37,16 +44,17 @@ public class IntRangeSpec {
 	 * <li>&quot;{min, max}&quot; - gives <code>[&quot;min&quot;, &quot;max&quot;]</code></li>
 	 * </ul>
 	 * 
-	 * @param specification
+	 * @param ast
+	 * @param position
 	 * @return <code>null</code> if no <code>int</code> range in the interval <code>[0, Integer.MAX_VALUE]</code> could
 	 *         be determined
 	 */
 	public static IntRangeSpec createNonNegative(IAST ast, int position) {
 		IntRangeSpec range = null;
 		if (ast.size() <= position) {
-			range = IntRangeSpec.createNonNegative();
+			range =  createNonNegative();
 		} else if (ast.size() > position) {
-			range = IntRangeSpec.createNonNegative(ast.get(position));
+			range =  createNonNegative(ast.get(position));
 		}
 		return range;
 	}

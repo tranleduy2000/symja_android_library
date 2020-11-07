@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,7 +30,6 @@ package org.logicng.datastructures;
 
 /**
  * A tristate constant.  This constant can have three different values: {@code TRUE}, {@code FALSE}, and {@code UNDEF}.
- *
  * @version 1.0
  * @since 1.0
  */
@@ -39,7 +38,6 @@ public enum Tristate {
 
     /**
      * Returns the negation of a tristate constant.
-     *
      * @param l the tristate constant
      * @return the negation of the tristate constant
      */
@@ -49,7 +47,6 @@ public enum Tristate {
 
     /**
      * Constructs a tristate constant from an ordinary Boolean value.
-     *
      * @param b the Boolean value
      * @return the tristate constant
      */

@@ -720,14 +720,12 @@ public class JASConvert<C extends RingElem<C>> {
 
 
 	/**
-	 * Converts a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial to a MathEclipse AST with head
+	 * Converts a <a href="http://krum.rz.uni-mannheim.de/jas/">JAS</a> polynomial to a Symja AST with head
 	 * <code>Plus</code>
 	 *
 	 * @param poly
 	 *            a JAS polynomial
 	 * @param factorTerms
-	 *            TODO
-	 * @param variable
 	 * @return
 	 * @throws ArithmeticException
 	 * @throws ClassCastException

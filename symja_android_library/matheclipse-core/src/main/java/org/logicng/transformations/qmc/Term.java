@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -43,21 +43,19 @@ import java.util.List;
  * minterms of a canonical DNF and has its own representation as a vector
  * of tristates.  Two minterms are considered equals if their bit representation
  * is equals (independent of their associated minterms)
- *
- * @version 1.4.0
+ * @version 2.0.0
  * @since 1.4.0
  */
-class Term {
+public class Term {
 
-    private final Tristate[] bits;
-    private final List<Formula> minterms;
-    private final int termClass;
-    private final long undefNum;
-    private boolean used;
+    protected final Tristate[] bits;
+    protected final List<Formula> minterms;
+    protected final int termClass;
+    protected boolean used;
+    protected final long undefNum;
 
     /**
      * Constructs a new term with a given set of bits and the related minterms.
-     *
      * @param bits     the bits
      * @param minterms the minterms
      */
@@ -70,35 +68,36 @@ class Term {
 
     /**
      * Counts the number of non-negative bits of a given tristate vector.
-     *
      * @param bits the tristate vector
      * @return the number of non-negative bits
      */
-    private int countNonNegativeBits(final Tristate[] bits) {
+    protected int countNonNegativeBits(final Tristate[] bits) {
         int result = 0;
-        for (final Tristate bit : bits)
-            if (bit != Tristate.FALSE)
+        for (final Tristate bit : bits) {
+            if (bit != Tristate.FALSE) {
                 result++;
+            }
+        }
         return result;
     }
 
     /**
      * Computes a number representing the number and position of the UNDEF states in the bit array.
-     *
      * @param bits the bit array
      * @return the computed number
      */
-    private long computeUndefNum(final Tristate[] bits) {
+    protected long computeUndefNum(final Tristate[] bits) {
         long sum = 0;
-        for (int i = bits.length - 1; i >= 0; i--)
-            if (bits[i] == Tristate.UNDEF)
+        for (int i = bits.length - 1; i >= 0; i--) {
+            if (bits[i] == Tristate.UNDEF) {
                 sum += Math.pow(2, bits.length - 1 - i);
+            }
+        }
         return sum;
     }
 
     /**
      * Returns the bit array of this term.
-     *
      * @return the bit array of this term
      */
     Tristate[] bits() {
@@ -107,7 +106,6 @@ class Term {
 
     /**
      * Returns the associated minterms for this term.
-     *
      * @return the associated minterms for this term
      */
     List<Formula> minterms() {
@@ -116,7 +114,6 @@ class Term {
 
     /**
      * Returns the term class of this term.  The term class is the number of non-negative bits in the bit array.
-     *
      * @return the term class of this term
      */
     int termClass() {
@@ -125,7 +122,6 @@ class Term {
 
     /**
      * Returns whether this term was used in the combination step of QMC or not.
-     *
      * @return whether this term was used
      */
     boolean isUsed() {
@@ -134,7 +130,6 @@ class Term {
 
     /**
      * Sets whether this term was used in the combination step of QMC or not.
-     *
      * @param used whether this term was used
      */
     void setUsed(final boolean used) {
@@ -145,25 +140,29 @@ class Term {
      * Combines this term with another term if possible.  This is only possible if their bit vectors
      * differ in exactly one position.  In this case a new term with the new bit vector and the
      * combined minterms is returned.  If no union is possible, {@code null} is returned.
-     *
      * @param other the other term
      * @return a new combined term or {@code null} if not possible
      */
     Term combine(final Term other) {
-        if (this.bits.length != other.bits.length)
+        if (this.bits.length != other.bits.length) {
             return null;
-        if (this.undefNum != other.undefNum)
+        }
+        if (this.undefNum != other.undefNum) {
             return null;
+        }
         int diffPosition = -1;
-        for (int i = 0; i < this.bits.length; i++)
+        for (int i = 0; i < this.bits.length; i++) {
             if (this.bits[i] != other.bits[i]) {
-                if (diffPosition != -1)
+                if (diffPosition != -1) {
                     return null;
-                else
+                } else {
                     diffPosition = i;
+                }
             }
-        if (diffPosition == -1)
+        }
+        if (diffPosition == -1) {
             return null;
+        }
         final Tristate[] newBits = Arrays.copyOf(this.bits, this.bits.length);
         newBits[diffPosition] = Tristate.UNDEF;
         final List<Formula> newMinterms = new ArrayList<>(this.minterms);
@@ -173,7 +172,6 @@ class Term {
 
     /**
      * Translates this term to a formula for a given variable ordering
-     *
      * @param varOrder the variable ordering
      * @return the translation of this term to a formula
      */
@@ -181,23 +179,29 @@ class Term {
         final FormulaFactory f = varOrder.get(0).factory();
         assert this.bits.length == varOrder.size();
         final List<Literal> operands = new ArrayList<>(varOrder.size());
-        for (int i = 0; i < this.bits.length; i++)
-            if (this.bits[i] != Tristate.UNDEF)
+        for (int i = 0; i < this.bits.length; i++) {
+            if (this.bits[i] != Tristate.UNDEF) {
                 operands.add(this.bits[i] == Tristate.TRUE ? varOrder.get(i) : varOrder.get(i).negate());
+            }
+        }
         return f.and(operands);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Term term = (Term) o;
+        return Arrays.equals(this.bits, term.bits);
     }
 
     @Override
     public int hashCode() {
         return Arrays.hashCode(this.bits);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final Term term = (Term) o;
-        return Arrays.equals(this.bits, term.bits);
     }
 
     @Override

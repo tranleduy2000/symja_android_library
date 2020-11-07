@@ -21,6 +21,7 @@
  */
 package org.hipparchus.analysis.differentiation;
 
+import org.hipparchus.CalculusFieldElementImpl;
 import org.hipparchus.Field;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -64,7 +65,8 @@ import java.io.Serializable;
  * @see DSCompiler
  * @see FieldDerivativeStructure
  */
-public class DerivativeStructure implements RealFieldElement<DerivativeStructure>, Serializable {
+public class DerivativeStructure extends CalculusFieldElementImpl<DerivativeStructure>
+        implements RealFieldElement<DerivativeStructure>, Serializable {
 
     /**
      * Serializable UID.

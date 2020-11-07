@@ -17,6 +17,8 @@ import org.hipparchus.linear.FieldVector;
 import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.linear.RealVector;
+import org.hipparchus.linear.RiccatiEquationSolver;
+import org.hipparchus.linear.RiccatiEquationSolverImpl;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalAttributes;
@@ -50,6 +52,7 @@ import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IEvalStepListener;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
+import org.matheclipse.core.interfaces.ISparseArray;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.FEConfig;
 
@@ -1050,7 +1053,12 @@ public final class LinearAlgebra {
 				if (vector.isPresent()) {
                 int m = vector.size();
                 final int offset = ast.isAST2() ? Validate.checkIntType(ast, 2, Integer.MIN_VALUE) : 0;
-					return F.matrix((i, j) -> (i + offset) == j ? vector.get(i + 1) : F.C0, m - 1, m - 1);
+					return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+						@Override
+						public IExpr apply(Integer i, Integer j) {
+							return (i + offset) == j ? vector.get(i + 1) : F.C0;
+						}
+					}, m - 1, m - 1);
                     }
 			} catch (final ValidateException ve) {
 				// int number validation
@@ -1615,13 +1623,16 @@ public final class LinearAlgebra {
 			// FieldVector<Complex> rv = ced.getEigenvector(i);
 			// return Convert.complexVector2List(rv);
 			// });
-			EigenDecomposition ed = new EigenDecomposition(matrix);
+			final EigenDecomposition ed = new EigenDecomposition(matrix);
                 int size = matrix.getColumnDimension();
                 IASTAppendable list = F.ListAlloc(size);
-			return list.appendArgs(0, size, i -> {
+			return list.appendArgs(0, size, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
 					RealVector rv = ed.getEigenvector(i);
 					return Convert.vector2List(rv);
-                    });
+				}
+			});
 		}
 
     }
@@ -1647,8 +1658,13 @@ public final class LinearAlgebra {
 					// Positive integer (less equal 2147483647) expected at position `2` in `1`.
 					return IOFunctions.printMessage(F.FourierMatrix, "intpm", F.List(ast, F.C1), engine);
 				}
-				IAST scalar = F.Sqrt(F.QQ(1, m));
-				return F.matrix((i, j) -> unit(F.QQ(2L * ((long) i) * ((long) j), m).times(F.Pi)).times(scalar), m, m);
+				final IAST scalar = F.Sqrt(F.QQ(1, m));
+				return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+					@Override
+					public IExpr apply(Integer i, Integer j) {
+						return unit(F.QQ(2L * ((long) i) * ((long) j), m).times(F.Pi)).times(scalar);
+					}
+				}, m, m);
 			}
 			return F.NIL;
 		}
@@ -1789,7 +1805,12 @@ public final class LinearAlgebra {
             } else {
                 return F.NIL;
             }
-			return F.matrix((i, j) -> F.QQ(1, i + j + 1), rowSize, columnSize);
+			return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+				@Override
+				public IExpr apply(Integer i, Integer j) {
+					return F.QQ(1, i + j + 1);
+				}
+			}, rowSize, columnSize);
 		}
                 @Override
 		public int[] expectedArgSize(IAST ast) {
@@ -2086,25 +2107,41 @@ public final class LinearAlgebra {
                     variables = (IAST) ast.arg2();
                 }
                 if (variables.isPresent()) {
-					int variablesSize = variables.size();
+					final int variablesSize = variables.size();
 					if (ast.arg1().isAST()) {
-						IAST vector = (IAST) ast.arg1();
+						final IAST vector = (IAST) ast.arg1();
                     int vectorSize = vector.size();
                     IASTAppendable jacobiMatrix = F.ListAlloc(vectorSize);
                     final IAST vars = variables;
-						return jacobiMatrix.appendArgs(vectorSize, i -> {
-                            IASTAppendable jacobiRow = F.ListAlloc(variablesSize);
-							return jacobiRow.appendArgs(variablesSize, j -> F.D(vector.get(i), vars.get(j)));
+						return jacobiMatrix.appendArgs(vectorSize, new IntFunction<IExpr>() {
+							@Override
+							public IExpr apply(final int i) {
+								IASTAppendable jacobiRow = F.ListAlloc(variablesSize);
+								return jacobiRow.appendArgs(variablesSize, new IntFunction<IExpr>() {
+									@Override
+									public IExpr apply(int j) {
+										return F.D(vector.get(i), vars.get(j));
+									}
+								});
+							}
 						});
 					} else {
-						FieldVector<IExpr> vector = Convert.list2Vector(ast.arg1());
+						final FieldVector<IExpr> vector = Convert.list2Vector(ast.arg1());
 						if (vector != null) {
 							int vectorSize = vector.getDimension();
 							IASTAppendable jacobiMatrix = F.ListAlloc(vectorSize);
 							final IAST vars = variables;
-							return jacobiMatrix.appendArgs(vectorSize, i -> {
-								IASTAppendable jacobiRow = F.ListAlloc(variablesSize);
-								return jacobiRow.appendArgs(variablesSize, j -> F.D(vector.getEntry(i), vars.get(j)));
+							return jacobiMatrix.appendArgs(vectorSize, new IntFunction<IExpr>() {
+								@Override
+								public IExpr apply(final int i) {
+									IASTAppendable jacobiRow = F.ListAlloc(variablesSize);
+									return jacobiRow.appendArgs(variablesSize, new IntFunction<IExpr>() {
+										@Override
+										public IExpr apply(int j) {
+											return F.D(vector.getEntry(i), vars.get(j));
+										}
+									});
+								}
 							});
                                 }
                         }
@@ -2500,8 +2537,13 @@ public final class LinearAlgebra {
                     }
 					int m = dim[0];
 					int n = dim[1];
-					FieldMatrix<IExpr> matrix = Convert.list2Matrix(ast.arg1());
-					return F.matrix((i, j) -> i >= j - k ? matrix.getEntry(i, j) : F.C0, m, n);
+					final FieldMatrix<IExpr> matrix = Convert.list2Matrix(ast.arg1());
+					return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+						@Override
+						public IExpr apply(Integer i, Integer j) {
+							return i >= j - k ? matrix.getEntry(i, j) : F.C0;
+						}
+					}, m, n);
 				}
 			} catch (final ValidateException ve) {
 				// int number validation
@@ -2568,7 +2610,12 @@ public final class LinearAlgebra {
                     int size = iArr.length;
                     final IASTAppendable iList = F.ListAlloc(size);
                     // +1 because in Symja the offset is +1 compared to java arrays
-						iList.appendArgs(0, size, i -> F.ZZ(iArr[i] + 1));
+						iList.appendArgs(0, size, new IntFunction<IExpr>() {
+							@Override
+							public IExpr apply(int i) {
+								return F.ZZ(iArr[i] + 1);
+							}
+						});
                     return F.List(Convert.matrix2List(lMatrix), Convert.matrix2List(uMatrix), iList);
                 }
 
@@ -2931,39 +2978,54 @@ public final class LinearAlgebra {
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-            IExpr arg1 = ast.arg1();
-            int dim = arg1.isVector();
-            if (dim > (-1)) {
-                if (dim == 0) {
+			IExpr arg1 = ast.arg1();
+			int dim = arg1.isVector();
+			if (dim > (-1)) {
+				if (dim == 0) {
 					// The first Norm argument should be a scalar, vector or matrix.
 					return IOFunctions.printMessage(ast.topHead(), "nvm", F.List(), engine);
-                }
+				}
 				arg1 = arg1.normal(false);
 				if (arg1.isList()) {
-                IAST vector = (IAST) arg1;
-                if (ast.isAST2()) {
-						IExpr p = ast.arg2();
-                    if (p.isInfinity()) {
-							return vector.map(S.Max, x -> F.Abs(x));
-                    } else {
-                        if (p.isSymbol() || p.isReal()) {
-                            if (p.isZero()) {
-                                engine.printMessage("Norm: 0 not allowed as second argument!");
-                                return F.NIL;
-                            }
-                            if (p.isReal() && p.lessThan(F.C1).isTrue()) {
-                                engine.printMessage("Norm: Second argument is < 1!");
-                                return F.NIL;
-                            }
-								return F.Power(vector.map(S.Plus, x -> F.Power(F.Abs(x), p)), p.inverse());
+					IAST vector = (IAST) arg1;
+					if (ast.isAST2()) {
+						final IExpr p = ast.arg2();
+						if (p.isInfinity()) {
+							return vector.map(S.Max, new Function<IExpr, IExpr>() {
+								@Override
+								public IExpr apply(IExpr x) {
+									return F.Abs(x);
+								}
+							});
+						} else {
+							if (p.isSymbol() || p.isReal()) {
+								if (p.isZero()) {
+									engine.printMessage("Norm: 0 not allowed as second argument!");
+									return F.NIL;
+								}
+								if (p.isReal() && p.lessThan(F.C1).isTrue()) {
+									engine.printMessage("Norm: Second argument is < 1!");
+									return F.NIL;
+								}
+								return F.Power(vector.map(S.Plus, new Function<IExpr, IExpr>() {
+									@Override
+									public IExpr apply(IExpr x) {
+										return F.Power(F.Abs(x), p);
+									}
+								}), p.inverse());
 							}
 						}
 						return F.NIL;
 					}
-					return F.Sqrt(vector.map(S.Plus, x -> F.Sqr(F.Abs(x))));
-                    }
-                    return F.NIL;
-                }
+					return F.Sqrt(vector.map(S.Plus, new Function<IExpr, IExpr>() {
+						@Override
+						public IExpr apply(IExpr x) {
+							return F.Sqr(F.Abs(x));
+						}
+					}));
+				}
+				return F.NIL;
+			}
 			int[] matrixDim = arg1.isMatrix();
 			if (matrixDim != null) {
 				if (matrixDim[1] == 0) {
@@ -2989,7 +3051,7 @@ public final class LinearAlgebra {
 						IASTAppendable result = F.ast(S.Max, matrixDim[1], false);
 						for (int i = 0; i < matrixDim[1]; i++) {
 							result.append(F.num(sSVD.getEntry(i, i)));
-                    }
+						}
 						return result;
 					}
 
@@ -3003,21 +3065,21 @@ public final class LinearAlgebra {
 						e.printStackTrace();
 					}
 				}
-            }
-            if (arg1.isNumber()) {
-                if (ast.isAST2()) {
-                    return F.NIL;
-                }
-                // absolute Value of a number
-                return ((INumber) arg1).abs();
-            }
-			if (arg1.isNumericFunction()&&!arg1.isList()) {
-                if (ast.isAST2()) {
-                    return F.NIL;
-                }
-                // absolute Value
-                return F.Abs(arg1);
-            }
+			}
+			if (arg1.isNumber()) {
+				if (ast.isAST2()) {
+					return F.NIL;
+				}
+				// absolute Value of a number
+				return ((INumber) arg1).abs();
+			}
+			if (arg1.isNumericFunction() && !arg1.isList()) {
+				if (ast.isAST2()) {
+					return F.NIL;
+				}
+				// absolute Value
+				return F.Abs(arg1);
+			}
 			// The first Norm argument should be a scalar, vector or matrix.
 			return IOFunctions.printMessage(ast.topHead(), "nvm", F.List(), engine);
         }
@@ -3861,8 +3923,13 @@ public final class LinearAlgebra {
 				if (arg1.isAST()) {
                 final IAST mat = (IAST) arg1;
                 int len = dim[0] < dim[1] ? dim[0] : dim[1];
-					IASTAppendable tr = F.ast(header, len, true);
-					mat.forEach(1, len + 1, (x, i) -> tr.set(i, ((IAST) x).get(i)));
+					final IASTAppendable tr = F.ast(header, len, true);
+					mat.forEach(1, len + 1, new ObjIntConsumer<IExpr>() {
+						@Override
+						public void accept(IExpr x, int i) {
+							tr.set(i, ((IAST) x).get(i));
+						}
+					});
                 return tr;
 				} else {
 					FieldMatrix<IExpr> matrix = Convert.list2Matrix(arg1);
@@ -3880,8 +3947,13 @@ public final class LinearAlgebra {
             final int len = arg1.isVector();
             if (len >= 0) {
 				if (arg1.isAST()) {
-					IASTAppendable tr = F.ast(header, len, true);
-					((IAST) arg1).forEach(1, len + 1, (x, i) -> tr.set(i, x));
+					final IASTAppendable tr = F.ast(header, len, true);
+					((IAST) arg1).forEach(1, len + 1, new ObjIntConsumer<IExpr>() {
+						@Override
+						public void accept(IExpr x, int i) {
+							tr.set(i, x);
+						}
+					});
 					return tr;
 				} else {
 					FieldVector<IExpr> vector = Convert.list2Vector(arg1);
@@ -4022,7 +4094,12 @@ public final class LinearAlgebra {
 				// final IAST originalMatrix = (IAST) ast.arg1().normal(false);
 				final FieldMatrix<IExpr> matrix = Convert.list2Matrix(ast.arg1());
 				final FieldMatrix<IExpr> transposed = matrix.transpose();
-				IExpr transposedMatrix = Convert.matrix2Expr(transposed).mapExpr(x -> transform(x));
+				IExpr transposedMatrix = Convert.matrix2Expr(transposed).mapExpr(new Function<IExpr, IExpr>() {
+					@Override
+					public IExpr apply(IExpr x) {
+						return Transpose.this.transform(x);
+					}
+				});
 				// because the rows can contain sub lists the IAST.IS_MATRIX flag cannot be set directly. isMatrix()
 				// must be used!
 				transposedMatrix.isMatrix(true);
@@ -4036,6 +4113,7 @@ public final class LinearAlgebra {
 		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
 		}
+
 		protected IExpr transform(final IExpr expr) {
 			return expr;
 		}
@@ -4051,9 +4129,14 @@ public final class LinearAlgebra {
 		 *            number of columns of the matrix
 		 * @return
 		 */
-		private IAST transpose(final IAST matrix, int rows, int cols) {
+		private IAST transpose(final IAST matrix, final int rows, int cols) {
 			final IASTAppendable transposedMatrix = F.ast(F.List, cols, true);
-			transposedMatrix.setArgs(cols + 1, i -> F.ast(F.List, rows, true));
+			transposedMatrix.setArgs(cols + 1, new IntFunction<IExpr>() {
+				@Override
+				public IExpr apply(int i) {
+					return F.ast(F.List, rows, true);
+				}
+			});
 			// for (int i = 1; i <= cols; i++) {
 			// transposedMatrix.set(i, F.ast(F.List, rows, true));
 			// }
@@ -4166,10 +4249,10 @@ public final class LinearAlgebra {
     private static class UpperTriangularize extends AbstractFunctionEvaluator {
 
         @Override
-        public IExpr evaluate(final IAST ast, EvalEngine engine) {
+		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
 			int[] dim = ast.arg1().isMatrix(false);
-            if (dim != null) {
+			if (dim != null) {
 				try {
 					final int k;
 					if (ast.size() == 3) {
@@ -4177,23 +4260,29 @@ public final class LinearAlgebra {
 					} else {
 						k = 0;
 					}
-                int m = dim[0];
-                int n = dim[1];
-					FieldMatrix<IExpr> matrix = Convert.list2Matrix(ast.arg1());
-					return F.matrix((i, j) -> i <= j - k ? matrix.getEntry(i, j) : F.C0, m, n);
+					int m = dim[0];
+					int n = dim[1];
+					final FieldMatrix<IExpr> matrix = Convert.list2Matrix(ast.arg1());
+					return F.matrix(new BiFunction<Integer, Integer, IExpr>() {
+						@Override
+						public IExpr apply(Integer i, Integer j) {
+							return i <= j - k ? matrix.getEntry(i, j) : F.C0;
+						}
+					}, m, n);
 				} catch (final ValidateException ve) {
 					// int number validation
 					return engine.printMessage(ast.topHead(), ve);
-                    }
+				}
 			}
 			return F.NIL;
 		}
-                    @Override
+
+		@Override
 		public int[] expectedArgSize(IAST ast) {
 			return IOFunctions.ARGS_1_2;
-            }
+		}
 
-    }
+	}
 
     /**
      * <pre>
@@ -4241,7 +4330,12 @@ public final class LinearAlgebra {
                 // }
                 // };
                 final IndexTableGenerator generator = new IndexTableGenerator(indexArray, F.List, //
-						indx -> Power(lst.get(indx[0] + 1), F.ZZ(indx[1])));
+						new IIndexFunction<IExpr>() {
+							@Override
+							public IExpr evaluate(int[] indx) {
+								return Power(lst.get(indx[0] + 1), F.ZZ(indx[1]));
+							}
+						});
                 final IAST matrix = (IAST) generator.table();
 				// because the rows can contain sub lists the IAST.IS_MATRIX flag cannot be set directly. isMatrix()
 				// must be used!

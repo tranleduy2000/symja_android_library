@@ -50,7 +50,7 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     /**
      * Entries of the vector.
      */
-    private T[] data;
+    private final T[] data;
 
     /**
      * Build a 0-length vector.
@@ -417,6 +417,24 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     }
 
     /**
+     * Compute the sum of {@code this} and {@code v}.
+     *
+     * @param v vector to be added
+     * @return {@code this + v}
+     * @throws MathIllegalArgumentException if {@code v} is not the same size as
+     *                                      {@code this}
+     */
+    public ArrayFieldVector<T> add(ArrayFieldVector<T> v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.data.length);
+        T[] out = MathArrays.buildArray(field, data.length);
+        for (int i = 0; i < data.length; i++) {
+            out[i] = data[i].add(v.data[i]);
+        }
+        return new ArrayFieldVector<T>(field, out, false);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -432,6 +450,24 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
             }
             return new ArrayFieldVector<T>(field, out, false);
         }
+    }
+
+    /**
+     * Compute {@code this} minus {@code v}.
+     *
+     * @param v vector to be subtracted
+     * @return {@code this - v}
+     * @throws MathIllegalArgumentException if {@code v} is not the same size as
+     *                                      {@code this}
+     */
+    public ArrayFieldVector<T> subtract(ArrayFieldVector<T> v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.data.length);
+        T[] out = MathArrays.buildArray(field, data.length);
+        for (int i = 0; i < data.length; i++) {
+            out[i] = data[i].subtract(v.data[i]);
+        }
+        return new ArrayFieldVector<T>(field, out, false);
     }
 
     /**
@@ -582,6 +618,24 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     }
 
     /**
+     * Element-by-element multiplication.
+     *
+     * @param v vector by which instance elements must be multiplied
+     * @return a vector containing {@code this[i] * v[i]} for all {@code i}
+     * @throws MathIllegalArgumentException if {@code v} is not the same size as
+     *                                      {@code this}
+     */
+    public ArrayFieldVector<T> ebeMultiply(ArrayFieldVector<T> v)
+            throws MathIllegalArgumentException {
+        checkVectorDimensions(v.data.length);
+        T[] out = MathArrays.buildArray(field, data.length);
+        for (int i = 0; i < data.length; i++) {
+            out[i] = data[i].multiply(v.data[i]);
+        }
+        return new ArrayFieldVector<T>(field, out, false);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -601,212 +655,6 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
             }
             return new ArrayFieldVector<T>(field, out, false);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T dotProduct(FieldVector<T> v)
-            throws MathIllegalArgumentException {
-        if (v instanceof ArrayFieldVector) {
-            return dotProduct((ArrayFieldVector<T>) v);
-        } else {
-            checkVectorDimensions(v);
-            T dot = field.getZero();
-            for (int i = 0; i < data.length; i++) {
-                dot = dot.add(data[i].multiply(v.getEntry(i)));
-            }
-            return dot;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> projection(FieldVector<T> v)
-            throws MathRuntimeException {
-        return v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldMatrix<T> outerProduct(FieldVector<T> v) {
-        if (v instanceof ArrayFieldVector) {
-            return outerProduct((ArrayFieldVector<T>) v);
-        } else {
-            final int m = data.length;
-            final int n = v.getDimension();
-            final FieldMatrix<T> out = new Array2DRowFieldMatrix<>(field, m, n);
-            for (int i = 0; i < m; i++) {
-                for (int j = 0; j < n; j++) {
-                    out.setEntry(i, j, data[i].multiply(v.getEntry(j)));
-                }
-            }
-            return out;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T getEntry(int index) {
-        return data[index];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setEntry(int index, T value) {
-        try {
-            data[index] = value;
-        } catch (IndexOutOfBoundsException e) {
-            checkIndex(index);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getDimension() {
-        return data.length;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> append(FieldVector<T> v) {
-        if (v instanceof ArrayFieldVector) {
-            return append((ArrayFieldVector<T>) v);
-        } else {
-            return new ArrayFieldVector<T>(this, new ArrayFieldVector<T>(v));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> append(T in) {
-        final T[] out = MathArrays.buildArray(field, data.length + 1);
-        System.arraycopy(data, 0, out, 0, data.length);
-        out[data.length] = in;
-        return new ArrayFieldVector<T>(field, out, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FieldVector<T> getSubVector(int index, int n)
-            throws MathIllegalArgumentException {
-        if (n < 0) {
-            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE, n);
-        }
-        ArrayFieldVector<T> out = new ArrayFieldVector<>(field, n);
-        try {
-            System.arraycopy(data, index, out.data, 0, n);
-        } catch (IndexOutOfBoundsException e) {
-            checkIndex(index);
-            checkIndex(index + n - 1);
-        }
-        return out;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSubVector(int index, FieldVector<T> v) throws MathIllegalArgumentException {
-        try {
-            if (v instanceof ArrayFieldVector) {
-                set(index, (ArrayFieldVector<T>) v);
-            } else {
-                for (int i = index; i < index + v.getDimension(); ++i) {
-                    data[i] = v.getEntry(i - index);
-                }
-            }
-        } catch (IndexOutOfBoundsException e) {
-            checkIndex(index);
-            checkIndex(index + v.getDimension() - 1);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void set(T value) {
-        Arrays.fill(data, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T[] toArray() {
-        return data.clone();
-    }
-
-    /**
-     * Compute the sum of {@code this} and {@code v}.
-     *
-     * @param v vector to be added
-     * @return {@code this + v}
-     * @throws MathIllegalArgumentException if {@code v} is not the same size as
-     *                                      {@code this}
-     */
-    public ArrayFieldVector<T> add(ArrayFieldVector<T> v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.data.length);
-        T[] out = MathArrays.buildArray(field, data.length);
-        for (int i = 0; i < data.length; i++) {
-            out[i] = data[i].add(v.data[i]);
-        }
-        return new ArrayFieldVector<T>(field, out, false);
-    }
-
-    /**
-     * Compute {@code this} minus {@code v}.
-     *
-     * @param v vector to be subtracted
-     * @return {@code this - v}
-     * @throws MathIllegalArgumentException if {@code v} is not the same size as
-     *                                      {@code this}
-     */
-    public ArrayFieldVector<T> subtract(ArrayFieldVector<T> v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.data.length);
-        T[] out = MathArrays.buildArray(field, data.length);
-        for (int i = 0; i < data.length; i++) {
-            out[i] = data[i].subtract(v.data[i]);
-        }
-        return new ArrayFieldVector<T>(field, out, false);
-    }
-
-    /**
-     * Element-by-element multiplication.
-     *
-     * @param v vector by which instance elements must be multiplied
-     * @return a vector containing {@code this[i] * v[i]} for all {@code i}
-     * @throws MathIllegalArgumentException if {@code v} is not the same size as
-     *                                      {@code this}
-     */
-    public ArrayFieldVector<T> ebeMultiply(ArrayFieldVector<T> v)
-            throws MathIllegalArgumentException {
-        checkVectorDimensions(v.data.length);
-        T[] out = MathArrays.buildArray(field, data.length);
-        for (int i = 0; i < data.length; i++) {
-            out[i] = data[i].multiply(v.data[i]);
-        }
-        return new ArrayFieldVector<T>(field, out, false);
     }
 
     /**
@@ -843,6 +691,24 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T dotProduct(FieldVector<T> v)
+            throws MathIllegalArgumentException {
+        if (v instanceof ArrayFieldVector) {
+            return dotProduct((ArrayFieldVector<T>) v);
+        } else {
+            checkVectorDimensions(v);
+            T dot = field.getZero();
+            for (int i = 0; i < data.length; i++) {
+                dot = dot.add(data[i].multiply(v.getEntry(i)));
+            }
+            return dot;
+        }
+    }
+
+    /**
      * Compute the dot product.
      *
      * @param v vector with which dot product should be computed
@@ -861,6 +727,15 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> projection(FieldVector<T> v)
+            throws MathRuntimeException {
+        return v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
+    }
+
+    /**
      * Find the orthogonal projection of this vector onto another vector.
      *
      * @param v vector onto which {@code this} must be projected
@@ -872,6 +747,26 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     public ArrayFieldVector<T> projection(ArrayFieldVector<T> v)
             throws MathIllegalArgumentException, MathRuntimeException {
         return (ArrayFieldVector<T>) v.mapMultiply(dotProduct(v).divide(v.dotProduct(v)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldMatrix<T> outerProduct(FieldVector<T> v) {
+        if (v instanceof ArrayFieldVector) {
+            return outerProduct((ArrayFieldVector<T>) v);
+        } else {
+            final int m = data.length;
+            final int n = v.getDimension();
+            final FieldMatrix<T> out = new Array2DRowFieldMatrix<>(field, m, n);
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    out.setEntry(i, j, data[i].multiply(v.getEntry(j)));
+                }
+            }
+            return out;
+        }
     }
 
     /**
@@ -893,6 +788,34 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T getEntry(int index) {
+        return data[index];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDimension() {
+        return data.length;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> append(FieldVector<T> v) {
+        if (v instanceof ArrayFieldVector) {
+            return append((ArrayFieldVector<T>) v);
+        } else {
+            return new ArrayFieldVector<T>(this, new ArrayFieldVector<T>(v));
+        }
+    }
+
+    /**
      * Construct a vector by appending a vector to this vector.
      *
      * @param v vector to append to this one.
@@ -900,6 +823,67 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
      */
     public ArrayFieldVector<T> append(ArrayFieldVector<T> v) {
         return new ArrayFieldVector<T>(this, v);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> append(T in) {
+        final T[] out = MathArrays.buildArray(field, data.length + 1);
+        System.arraycopy(data, 0, out, 0, data.length);
+        out[data.length] = in;
+        return new ArrayFieldVector<T>(field, out, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldVector<T> getSubVector(int index, int n)
+            throws MathIllegalArgumentException {
+        if (n < 0) {
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE, n);
+        }
+        ArrayFieldVector<T> out = new ArrayFieldVector<>(field, n);
+        try {
+            System.arraycopy(data, index, out.data, 0, n);
+        } catch (IndexOutOfBoundsException e) {
+            checkIndex(index);
+            checkIndex(index + n - 1);
+        }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEntry(int index, T value) {
+        try {
+            data[index] = value;
+        } catch (IndexOutOfBoundsException e) {
+            checkIndex(index);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSubVector(int index, FieldVector<T> v) throws MathIllegalArgumentException {
+        try {
+            if (v instanceof ArrayFieldVector) {
+                set(index, (ArrayFieldVector<T>) v);
+            } else {
+                for (int i = index; i < index + v.getDimension(); ++i) {
+                    data[i] = v.getEntry(i - index);
+                }
+            }
+        } catch (IndexOutOfBoundsException e) {
+            checkIndex(index);
+            checkIndex(index + v.getDimension() - 1);
+        }
     }
 
     /**
@@ -916,6 +900,22 @@ public class ArrayFieldVector<T extends FieldElement<T>> implements FieldVector<
             checkIndex(index);
             checkIndex(index + v.data.length - 1);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void set(T value) {
+        Arrays.fill(data, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T[] toArray() {
+        return data.clone();
     }
 
     /**

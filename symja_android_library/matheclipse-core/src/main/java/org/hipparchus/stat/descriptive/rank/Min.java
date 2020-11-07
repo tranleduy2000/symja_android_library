@@ -21,14 +21,15 @@
  */
 package org.hipparchus.stat.descriptive.rank;
 
+import java.io.Serializable;
+
+import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
 import org.hipparchus.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.hipparchus.stat.descriptive.AggregatableStatistic;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
-
-import java.io.Serializable;
 
 /**
  * Returns the minimum of the available values.
@@ -46,21 +47,15 @@ import java.io.Serializable;
  * <code>clear()</code> method, it must be synchronized externally.
  */
 public class Min extends AbstractStorelessUnivariateStatistic
-        implements AggregatableStatistic<Min>, Serializable {
+    implements AggregatableStatistic<Min>, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
+    /** Serializable version identifier */
     private static final long serialVersionUID = 20150412L;
 
-    /**
-     * Number of values that have been added
-     */
+    /** Number of values that have been added */
     private long n;
 
-    /**
-     * Current value of the statistic
-     */
+    /** Current value of the statistic */
     private double value;
 
     /**
@@ -80,8 +75,69 @@ public class Min extends AbstractStorelessUnivariateStatistic
      */
     public Min(Min original) throws NullArgumentException {
         MathUtils.checkNotNull(original);
-        this.n = original.n;
+        this.n     = original.n;
         this.value = original.value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void increment(final double d) {
+        if (d < value || Double.isNaN(value)) {
+            value = d;
+        }
+        n++;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void clear() {
+        value = Double.NaN;
+        n = 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getResult() {
+        return value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getN() {
+        return n;
+    }
+
+    /** {@inheritDoc} */
+    public void aggregate(Min other) {
+        MathUtils.checkNotNull(other);
+        if (other.n > 0) {
+            if (other.value < this.value || Double.isNaN(this.value)) {
+                this.value = other.value;
+            }
+            this.n += other.n;
+        }
+    }
+
+    @Override
+    public void aggregate(Min... others) {
+        MathUtils.checkNotNull(others);
+        for (Min other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public void aggregate(Iterable<Min> others) {
+        MathUtils.checkNotNull(others);
+        for (Min other : others) {
+            aggregate(other);
+        }
+    }
+
+    @Override
+    public double evaluate(double[] values) throws MathIllegalArgumentException {
+        MathUtils.checkNotNull(values, LocalizedCoreFormats.INPUT_ARRAY);
+        return evaluate(values, 0, values.length);
     }
 
     /**
@@ -100,15 +156,15 @@ public class Min extends AbstractStorelessUnivariateStatistic
      * </ul>
      *
      * @param values the input array
-     * @param begin  index of the first array element to include
+     * @param begin index of the first array element to include
      * @param length the number of elements to include
      * @return the minimum of the values or Double.NaN if length = 0
      * @throws MathIllegalArgumentException if the array is null or the array index
-     *                                      parameters are not valid
+     *  parameters are not valid
      */
     @Override
-    public double evaluate(final double[] values, final int begin, final int length)
-            throws MathIllegalArgumentException {
+    public double evaluate(final double[] values,final int begin, final int length)
+        throws MathIllegalArgumentException {
 
         double min = Double.NaN;
         if (MathArrays.verifyValues(values, begin, length)) {
@@ -122,48 +178,10 @@ public class Min extends AbstractStorelessUnivariateStatistic
         return min;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getN() {
-        return n;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Min copy() {
         return new Min(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void increment(final double d) {
-        if (d < value || Double.isNaN(value)) {
-            value = d;
-        }
-        n++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getResult() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-        value = Double.NaN;
-        n = 0;
     }
 
 }

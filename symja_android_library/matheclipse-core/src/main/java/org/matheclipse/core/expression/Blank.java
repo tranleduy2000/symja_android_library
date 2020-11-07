@@ -1,5 +1,6 @@
 package org.matheclipse.core.expression;
 
+import org.hipparchus.util.Pair;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -97,7 +98,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	}
 
 	@Override
-	public int[] addPattern(List<IExpr> patternIndexMap) {
+	public int[] addPattern(List<Pair<IExpr, IPatternObject>> patternIndexMap) {
 		IPatternMapImpl.addPattern(patternIndexMap, this);
 		int[] result = new int[2];
 		if (isPatternDefault() || isPatternOptional()) {
@@ -143,12 +144,7 @@ public class Blank extends IPatternImpl implements IPattern {
 
 	@Override
 	public IExpr copy() {
-		try {
-			return (IExpr) clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return new Blank(fHeadTest, fDefault);
 	}
 
 	@Override
@@ -311,7 +307,7 @@ public class Blank extends IPatternImpl implements IPattern {
 	public boolean isConditionMatched(final IExpr expr, IPatternMap patternMap) {
 		if (fHeadTest == null || expr.head().equals(fHeadTest)) {
 			return patternMap.setValue(this, expr);
-//			return true;
+			// return true;
 		}
 		return false;
 	}

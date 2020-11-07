@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/*****************************************************************************************
+/*
  * Open-WBO -- Copyright (c) 2013-2015, Ruben Martins, Vasco Manquinho, Ines Lynce
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -45,7 +45,7 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *****************************************************************************************/
+ */
 
 package org.logicng.solvers.datastructures;
 
@@ -53,7 +53,6 @@ import org.logicng.collections.LNGIntVector;
 
 /**
  * A hard clause for the MaxSAT solver.
- *
  * @version 1.0
  * @since 1.0
  */
@@ -63,7 +62,6 @@ public final class MSHardClause {
 
     /**
      * Constructs a new hard clause.
-     *
      * @param clause the clause
      */
     public MSHardClause(final LNGIntVector clause) {
@@ -72,7 +70,6 @@ public final class MSHardClause {
 
     /**
      * Returns the clause of this hard clause.
-     *
      * @return the clause
      */
     public LNGIntVector clause() {
@@ -83,10 +80,11 @@ public final class MSHardClause {
     public String toString() {
         final StringBuilder sb = new StringBuilder("MSHardClause{lits=[");
         for (int i = 0; i < this.clause.size(); i++) {
-            int lit = this.clause.get(i);
+            final int lit = this.clause.get(i);
             sb.append((lit & 1) == 1 ? "-" : "").append(lit >> 1);
-            if (i != this.clause.size() - 1)
+            if (i != this.clause.size() - 1) {
                 sb.append(", ");
+            }
         }
         sb.append("]}");
         return sb.toString();

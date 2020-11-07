@@ -28,6 +28,7 @@ import org.matheclipse.core.eval.util.IAssumptions;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -115,32 +116,32 @@ public class Algebra {
 	private static class Initializer {
 
 		private static void init() {
-			F.Apart.setEvaluator(new Apart());
-			F.Cancel.setEvaluator(new Cancel());
-			F.Collect.setEvaluator(new Collect());
-			F.Denominator.setEvaluator(new Denominator());
-			F.Distribute.setEvaluator(new Distribute());
-			F.Expand.setEvaluator(new Expand());
-			F.ExpandAll.setEvaluator(new ExpandAll());
-			F.Factor.setEvaluator(new Factor());
-			F.FactorSquareFree.setEvaluator(new FactorSquareFree());
-			F.FactorSquareFreeList.setEvaluator(new FactorSquareFreeList());
-			F.FactorTerms.setEvaluator(new FactorTerms());
-			F.Numerator.setEvaluator(new Numerator());
+			S.Apart.setEvaluator(new Apart());
+			S.Cancel.setEvaluator(new Cancel());
+			S.Collect.setEvaluator(new Collect());
+			S.Denominator.setEvaluator(new Denominator());
+			S.Distribute.setEvaluator(new Distribute());
+			S.Expand.setEvaluator(new Expand());
+			S.ExpandAll.setEvaluator(new ExpandAll());
+			S.Factor.setEvaluator(new Factor());
+			S.FactorSquareFree.setEvaluator(new FactorSquareFree());
+			S.FactorSquareFreeList.setEvaluator(new FactorSquareFreeList());
+			S.FactorTerms.setEvaluator(new FactorTerms());
+			S.Numerator.setEvaluator(new Numerator());
 
-			F.PolynomialExtendedGCD.setEvaluator(new PolynomialExtendedGCD());
-			F.PolynomialGCD.setEvaluator(new PolynomialGCD());
-			F.PolynomialLCM.setEvaluator(new PolynomialLCM());
-			F.PolynomialQ.setEvaluator(new PolynomialQ());
-			F.PolynomialQuotient.setEvaluator(new PolynomialQuotient());
-			F.PolynomialQuotientRemainder.setEvaluator(new PolynomialQuotientRemainder());
-			F.PolynomialRemainder.setEvaluator(new PolynomialRemainder());
+			S.PolynomialExtendedGCD.setEvaluator(new PolynomialExtendedGCD());
+			S.PolynomialGCD.setEvaluator(new PolynomialGCD());
+			S.PolynomialLCM.setEvaluator(new PolynomialLCM());
+			S.PolynomialQ.setEvaluator(new PolynomialQ());
+			S.PolynomialQuotient.setEvaluator(new PolynomialQuotient());
+			S.PolynomialQuotientRemainder.setEvaluator(new PolynomialQuotientRemainder());
+			S.PolynomialRemainder.setEvaluator(new PolynomialRemainder());
 
-			F.PowerExpand.setEvaluator(new PowerExpand());
-			F.Root.setEvaluator(new Root());
-			F.Together.setEvaluator(new Together());
-			F.ToRadicals.setEvaluator(new ToRadicals());
-			F.Variables.setEvaluator(new Variables());
+			S.PowerExpand.setEvaluator(new PowerExpand());
+			S.Root.setEvaluator(new Root());
+			S.Together.setEvaluator(new Together());
+			S.ToRadicals.setEvaluator(new ToRadicals());
+			S.Variables.setEvaluator(new Variables());
 		}
 	}
 

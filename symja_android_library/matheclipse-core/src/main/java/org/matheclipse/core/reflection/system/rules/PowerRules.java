@@ -85,7 +85,7 @@ public interface PowerRules {
             // E^(3/2*I*Pi)=-I
             ISet(Exp(Times(CC(0L,1L,3L,2L),Pi)),
                     CNI),
-    // E^(I*Pi*n_):=(-1)^n/;Element(n,Integers)
+    // E^(I*Pi*n_):=(-1)^n/;n∈Integers
     ISetDelayed(Exp(Times(CI,Pi,n_)),
       Condition(Power(CN1,n),Element(n,Integers))),
             // E^(Pi*c_Complex):=Module({r=Re(c),j=Im(c)},If(EvenQ(j),1,-1)/;r==0&&IntegerQ(j))
@@ -106,9 +106,9 @@ public interface PowerRules {
             // E^Log(x_):=x
             ISetDelayed(Exp(Log(x_)),
                     x),
-            // E^(a_*Log(x_)/;FreeQ(a,x)):=x^a
-    ISetDelayed(Exp(Condition(Times(a_,Log(x_)),FreeQ(a,x))),
-                    Power(x,a)),
+    // E^(a_*Log(x_)):=x^a/;FreeQ(a,x)
+    ISetDelayed(Exp(Times(Log(x_),a_)),
+      Condition(Power(x,a),FreeQ(a,x))),
             // Tan(x_)^m_?(IntegerQ(#1)&&#1<0&):=Cot(x)^(-m)
             ISetDelayed(Power(Tan(x_),PatternTest(m_,Function(And(IntegerQ(Slot1),Less(Slot1,C0))))),
                     Power(Cot(x),Negate(m))),

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -36,7 +36,6 @@ import java.util.Arrays;
  * In theory one could use the {@link LNGVector} also for doubles.  But Java's auto-boxing comes with such a large
  * performance penalty that for the mission critical data structures of the SAT solvers we use this specialized
  * implementation.
- *
  * @version 1.1
  * @since 1.0
  */
@@ -54,7 +53,6 @@ public final class LNGDoubleVector {
 
     /**
      * Creates a vector with a given capacity.
-     *
      * @param size the capacity of the vector.
      */
     public LNGDoubleVector(int size) {
@@ -63,7 +61,6 @@ public final class LNGDoubleVector {
 
     /**
      * Creates a vector with a given capacity and a given initial element.
-     *
      * @param size the capacity of the vector
      * @param pad  the initial element
      */
@@ -75,7 +72,6 @@ public final class LNGDoubleVector {
 
     /**
      * Copy constructor.
-     *
      * @param other the other byte vector.
      */
     public LNGDoubleVector(final LNGDoubleVector other) {
@@ -85,7 +81,6 @@ public final class LNGDoubleVector {
 
     /**
      * Creates a vector with the given elements.
-     *
      * @param elems the elements
      */
     public LNGDoubleVector(final double... elems) {
@@ -95,7 +90,6 @@ public final class LNGDoubleVector {
 
     /**
      * Returns whether the vector is empty or not.
-     *
      * @return {@code true} if the vector is empty, {@code false} otherwise
      */
     public boolean empty() {
@@ -104,7 +98,6 @@ public final class LNGDoubleVector {
 
     /**
      * Returns the size of the vector.
-     *
      * @return the size of the vector
      */
     public int size() {
@@ -113,7 +106,6 @@ public final class LNGDoubleVector {
 
     /**
      * Returns the last element of the vector and leaves it on the vector.
-     *
      * @return the last element of the vector
      */
     public double back() {
@@ -122,7 +114,6 @@ public final class LNGDoubleVector {
 
     /**
      * Pushes an element at the end of the vector.
-     *
      * @param element the element to push
      */
     public void push(final double element) {
@@ -133,7 +124,6 @@ public final class LNGDoubleVector {
 
     /**
      * Pushes an element and assumes that there is enough space on the vector.
-     *
      * @param element the element to push
      * @throws ArrayIndexOutOfBoundsException if there was not enough space on the vector
      */
@@ -143,7 +133,6 @@ public final class LNGDoubleVector {
 
     /**
      * Returns the element at a given position in the vector.
-     *
      * @param position the position
      * @return the element at the position
      * @throws ArrayIndexOutOfBoundsException if the position is not found in the vector
@@ -154,7 +143,6 @@ public final class LNGDoubleVector {
 
     /**
      * Sets an element at a given position in the vector.
-     *
      * @param position the position
      * @param element  the element
      * @throws ArrayIndexOutOfBoundsException if the position is not found in the vector
@@ -172,39 +160,40 @@ public final class LNGDoubleVector {
 
     /**
      * Shrinks the vector to a given size.
-     *
      * @param newSize the new size
      */
     public void shrinkTo(int newSize) {
-        if (newSize < this.size)
+        if (newSize < this.size) {
             this.size = newSize;
+        }
     }
 
     /**
      * Grows the vector to a new size and initializes the new elements with a given value.
-     *
      * @param size the new size
      * @param pad  the value for new elements
      */
     public void growTo(int size, double pad) {
-        if (this.size >= size)
+        if (this.size >= size) {
             return;
+        }
         this.ensure(size);
-        for (int i = this.size; i < size; i++)
+        for (int i = this.size; i < size; i++) {
             this.elements[i] = pad;
+        }
         this.size = size;
     }
 
     /**
      * Removes a given number of elements from the vector.
-     *
      * @param num the number of elements to remove.
      * @throws ArrayIndexOutOfBoundsException if the number of elements to remove is larger than the size of the vector
      */
     public void removeElements(int num) {
         int count = num;
-        while (count-- > 0)
+        while (count-- > 0) {
             this.elements[--this.size] = -1;
+        }
     }
 
     /**
@@ -235,7 +224,6 @@ public final class LNGDoubleVector {
 
     /**
      * Returns this vector's contents as an array.
-     *
      * @return the array
      */
     public double[] toArray() {
@@ -244,7 +232,6 @@ public final class LNGDoubleVector {
 
     /**
      * Ensures that this vector has the given size.  If not - the size is doubled and the old elements are copied.
-     *
      * @param newSize the size to ensure
      */
     private void ensure(final int newSize) {
@@ -260,8 +247,9 @@ public final class LNGDoubleVector {
         final StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < this.size; i++) {
             sb.append(this.elements[i]);
-            if (i != this.size - 1)
+            if (i != this.size - 1) {
                 sb.append(", ");
+            }
         }
         sb.append("]");
         return sb.toString();

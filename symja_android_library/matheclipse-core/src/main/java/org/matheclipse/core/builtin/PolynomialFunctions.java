@@ -18,8 +18,13 @@ import org.matheclipse.core.convert.JASModInteger;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.JASConversionException;
 import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.exception.PolynomialDegreeLimitExceeded;
+import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrappedException;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
@@ -27,6 +32,7 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -95,25 +101,25 @@ public class PolynomialFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			F.BellY.setEvaluator(new BellY());
-			F.ChebyshevT.setEvaluator(new ChebyshevT());
-			F.ChebyshevU.setEvaluator(new ChebyshevU());
-			F.Coefficient.setEvaluator(new Coefficient());
-			F.CoefficientList.setEvaluator(new CoefficientList());
-			F.CoefficientRules.setEvaluator(new CoefficientRules());
-			F.Cyclotomic.setEvaluator(new Cyclotomic());
-			F.Discriminant.setEvaluator(new Discriminant());
-			F.Exponent.setEvaluator(new Exponent());
-			F.GroebnerBasis.setEvaluator(new GroebnerBasis());
-			F.HermiteH.setEvaluator(new HermiteH());
-			F.LaguerreL.setEvaluator(new LaguerreL());
-			F.LegendreP.setEvaluator(new LegendreP());
-			F.LegendreQ.setEvaluator(new LegendreQ());
-			F.MonomialList.setEvaluator(new MonomialList());
-			F.NRoots.setEvaluator(new NRoots());
-			F.Resultant.setEvaluator(new Resultant());
-			F.RootIntervals.setEvaluator(new RootIntervals());
-			F.Roots.setEvaluator(new Roots());
+			S.BellY.setEvaluator(new BellY());
+			S.ChebyshevT.setEvaluator(new ChebyshevT());
+			S.ChebyshevU.setEvaluator(new ChebyshevU());
+			S.Coefficient.setEvaluator(new Coefficient());
+			S.CoefficientList.setEvaluator(new CoefficientList());
+			S.CoefficientRules.setEvaluator(new CoefficientRules());
+			S.Cyclotomic.setEvaluator(new Cyclotomic());
+			S.Discriminant.setEvaluator(new Discriminant());
+			S.Exponent.setEvaluator(new Exponent());
+			S.GroebnerBasis.setEvaluator(new GroebnerBasis());
+			S.HermiteH.setEvaluator(new HermiteH());
+			S.LaguerreL.setEvaluator(new LaguerreL());
+			S.LegendreP.setEvaluator(new LegendreP());
+			S.LegendreQ.setEvaluator(new LegendreQ());
+			S.MonomialList.setEvaluator(new MonomialList());
+			S.NRoots.setEvaluator(new NRoots());
+			S.Resultant.setEvaluator(new Resultant());
+			S.RootIntervals.setEvaluator(new RootIntervals());
+			S.Roots.setEvaluator(new Roots());
 		}
 	}
 
@@ -295,7 +301,7 @@ public class PolynomialFunctions {
 					termOrder = JASIExpr.monomialOrder((ISymbol) ast.arg3(), termOrder);
 				} else {
 					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-					IExpr option = options.getOption(F.Modulus);
+					IExpr option = options.getOption(S.Modulus);
 					if (option.isPresent()) {
 						try {
 							if (option.isInteger()) {
@@ -444,7 +450,14 @@ public class PolynomialFunctions {
 
 			int n = ast.arg1().toIntDefault(-1);
 			if (n >= 0) {
+				if (n / 100 > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(n);
+				}
 				return cyclotomic(n, ast.arg2());
+			}
+			if (ast.arg1().isNumber()) {
+				// Non-negative machine-sized integer expected at position `2` in `1`.
+				IOFunctions.printMessage(ast.topHead(), "intnm", F.List(F.C1, ast), engine);
 			}
 			return F.NIL;
 		}
@@ -1119,6 +1132,20 @@ public class PolynomialFunctions {
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, final EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
+			if (arg1.isEqual()) {
+				IAST equalAST = (IAST) arg1;
+				if (equalAST.arg2().isZero()) {
+					arg1 = equalAST.arg1();
+				} else {
+					arg1 = engine.evaluate(F.Subtract(equalAST.arg1(), equalAST.arg2()));
+				}
+			} else {
+				if (!arg1.isPolynomialStruct()) {
+					return engine.printMessage(ast.topHead() + ": Equal() expression expected at position 1 instead of "
+							+ ast.arg1().toString());
+				}
+			}
 			IAST variables;
 			if (ast.size() == 2) {
 				VariablesSet eVar = new VariablesSet(ast.arg1());
@@ -1136,7 +1163,7 @@ public class PolynomialFunctions {
 			if (variables.size() <= 1) {
 				return F.NIL;
 			}
-			IExpr temp = roots(ast.arg1(), variables, engine);
+			IExpr temp = roots(arg1, variables, engine);
 			if (!temp.isList()) {
 				return F.NIL;
 			}
@@ -1144,15 +1171,11 @@ public class PolynomialFunctions {
 			int size = list.size();
 			IASTAppendable result = F.ListAlloc(size);
 			return result.appendArgs(size, new IntFunction<IExpr>() {
-                @Override
-                public IExpr apply(int i) {
-                    return engine.evalN(list.get(i));
-                }
-            });
-			// for (int i = 1; i < size; i++) {
-			// result.append(engine.evalN(list.get(i)));
-			// }
-			// return result;
+				@Override
+				public IExpr apply(int i) {
+					return engine.evalN(list.get(i));
+				}
+			});
 		}
 
 		@Override
@@ -1472,6 +1495,9 @@ public class PolynomialFunctions {
 				if (degree < 0) {
 					degree *= -1;
 				}
+				if (degree > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(degree);
+				}
 				return PolynomialsUtils.createChebyshevPolynomial(degree, ast.arg2());
 			}
 			if (n.isNumEqualRational(F.C1D2) || n.isNumEqualRational(F.CN1D2)) {
@@ -1549,6 +1575,9 @@ public class PolynomialFunctions {
 				if (degree == 1) {
 					return F.Times(F.C2, z);
 				}
+				if (degree > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(degree);
+				}
 				// (n, z) => Sum(((-1)^k*(n - k)!*(2*z)^(n - 2*k))/(k!*(n - 2*k)!), {k, 0, Floor(n/2)})
 				return F.sum(new Function<IExpr, IExpr>() {
                     @Override
@@ -1615,13 +1644,14 @@ public class PolynomialFunctions {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
+			IExpr arg1 = ast.arg1();
 			if (ast.isAST1()) {
-			int[] dim = ast.arg1().isMatrix();
-				if (dim != null) {
+				int[] dim = arg1.isMatrix();
+				if (dim != null && arg1.isAST()) {
 					if (dim[0] == 0 && dim[1] == 0) {
 						return F.C0;
 					}
-				IAST matrixArg1 = (IAST) ast.arg1();
+					IAST matrixArg1 = (IAST) arg1;
 
 				if (dim[0] == 1) {
 					if (dim[1] == 1) {
@@ -1638,8 +1668,8 @@ public class PolynomialFunctions {
 			if (ast.isAST2()) {
 				return F.NIL;
 			}
-			if (ast.arg1().isInteger() && ast.arg2().isInteger()) {
-				int n = ast.arg1().toIntDefault(Integer.MIN_VALUE);
+			if (arg1.isInteger() && ast.arg2().isInteger()) {
+				int n = arg1.toIntDefault(Integer.MIN_VALUE);
 				int k = ast.arg2().toIntDefault(Integer.MIN_VALUE);
 				if (n < 0 || k < 0 || //
 						!ast.arg3().isList() || //
@@ -1655,9 +1685,12 @@ public class PolynomialFunctions {
 				if (n < k) {
 					return F.C0;
 				}
+				if (n > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(n);
+				}
 				int max = n - k + 2;
 				if (max >= 0) {
-					return bellY(n, k, (IAST) ast.arg3());
+					return bellY(n, k, (IAST) ast.arg3(), ast, engine);
 				}
 			}
 			return F.NIL;
@@ -1715,7 +1748,7 @@ public class PolynomialFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.size() >= 3) {
 
-				if (ast.arg1().isVector() < 0 || ast.arg2().isVector() < 0) {
+				if (!ast.arg1().isList() || !ast.arg2().isList()) {
 					return F.NIL;
 				}
 				TermOrder termOrder = TermOrderByName.Lexicographic;
@@ -1863,37 +1896,78 @@ public class PolynomialFunctions {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
 			if (degree != Integer.MIN_VALUE) {
+				if (degree > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(degree);
+				}
 				if (ast.size() == 4) {
 					IExpr n = ast.arg1();
 					IExpr l = ast.arg2();
 					IExpr z = ast.arg3();
-					if (n.isZero()) {
-						return F.C1;
-					}
-					if (n.isOne()) {
-						// -z + l + 1
-						return F.Plus(F.C1, l, F.Negate(z));
-					}
-					if (degree < 0) {
-						return F.NIL;
-					}
-
-					// Recurrence relation for LaguerreL polynomials
-					// (1/n) * (((2*n + l - z - 1) )*LaguerreL(n - 1, l, z) - ((n + l - 1) )*LaguerreL(n - 2, l, z))
-					return F.Times(F.Power(n, F.CN1),
-							F.Plus(F.Times(F.CN1, F.Plus(F.CN1, l, n), F.LaguerreL(F.Plus(F.CN2, n), l, z)),
-									F.Times(F.Plus(F.CN1, l, F.Times(F.C2, n), F.Negate(z)),
-											F.LaguerreL(F.Plus(F.CN1, n), l, z))));
+					return laguerreLRecursive(n, degree, l, z, engine);
 				}
-			if (degree == 0) {
-				return F.C1;
-			}
-			if (degree > 0) {
+				if (degree == 0) {
+					return F.C1;
+				}
+				if (degree > 0) {
 					IExpr z = ast.arg2();
 					return PolynomialsUtils.createLaguerrePolynomial(degree, z);
 				}
 			}
 			return F.NIL;
+		}
+
+		private IExpr laguerreLRecursive(IExpr n, int degree, IExpr l, IExpr z, EvalEngine engine) {
+			if (degree == 0) {
+				return F.C1;
+			}
+			if (degree == 1) {
+				// -z + l + 1
+				return F.Plus(F.C1, l, F.Negate(z));
+			}
+			if (degree == 2) {
+				return
+						// [$ (1/2)*(2 + 3*l + l^2 - 4*z - 2*l*z + z^2) $]
+						F.Times(F.C1D2,
+								F.Plus(F.C2, F.Times(F.C3, l), F.Sqr(l), F.Times(F.CN4, z), F.Times(F.CN2, l, z), F.Sqr(z))); // $$;
+			}
+			if (degree < 0) {
+				return F.NIL;
+			}
+			try {
+				int recursionCounter = engine.incRecursionCounter();
+				int recursionLimit = engine.getRecursionLimit();
+				if (recursionCounter > recursionLimit) {
+					RecursionLimitExceeded.throwIt(recursionCounter, F.LaguerreL);
+				}
+
+				// Recurrence relation for LaguerreL polynomials
+				// (1/n) * (((2*n + l - z - 1) )*LaguerreL(n - 1, l, z) - ((n + l - 1) )*LaguerreL(n - 2, l, z))
+				IExpr laguerre1 = laguerreLRecursive(F.ZZ(degree - 2), degree - 2, l, z, engine);// F.LaguerreL.of(engine,
+				// F.Plus(F.CN2, n),
+				// l,
+				// z);
+				if (laguerre1.isIndeterminate()) {
+					throw new ArgumentTypeException("Indeterminate expression detected");
+				}
+				long leafCount1 = laguerre1.leafCount();
+				if (leafCount1 > Config.MAX_AST_SIZE) {
+					ASTElementLimitExceeded.throwIt(leafCount1);
+				}
+				IExpr laguerre2 = laguerreLRecursive(F.ZZ(degree - 1), degree - 1, l, z, engine);// F.LaguerreL.of(engine,
+				// F.Plus(F.CN1, n),
+				// l, z);
+				if (laguerre2.isIndeterminate()) {
+					throw new ArgumentTypeException("Indeterminate expression detected");
+				}
+				long leafCount2 = leafCount1 + laguerre2.leafCount();
+				if (leafCount2 > Config.MAX_AST_SIZE) {
+					ASTElementLimitExceeded.throwIt(leafCount2);
+				}
+				return F.Times(F.Power(n, F.CN1), F.Plus(F.Times(F.CN1, F.Plus(F.CN1, l, n), laguerre1),
+						F.Times(F.Plus(F.CN1, l, F.Times(F.C2, n), F.Negate(z)), laguerre2)));
+			} finally {
+				engine.decRecursionCounter();
+			}
 		}
 
 		@Override
@@ -1932,6 +2006,9 @@ public class PolynomialFunctions {
 
 			int degree = ast.arg1().toIntDefault(Integer.MIN_VALUE);
 			if (degree >= 0) {
+				if (degree > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(degree);
+				}
 				return PolynomialsUtils.createLegendrePolynomial(degree, ast.arg2());
 			}
 			return F.NIL;
@@ -1981,6 +2058,12 @@ public class PolynomialFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
+			if (ast != null && ast.size() > 1) {
+				int arg1 = ast.arg1().toIntDefault();
+				if (Math.abs(arg1) > Config.MAX_POLYNOMIAL_DEGREE) {
+					PolynomialDegreeLimitExceeded.throwIt(arg1);
+				}
+			}
 			return IOFunctions.ARGS_2_3;
 		}
 		@Override
@@ -2120,7 +2203,15 @@ public class PolynomialFunctions {
 		}
 
 	}
-	public static IExpr bellY(int n, int k, IAST symbols) {
+	public static IExpr bellY(int n, int k, IAST symbols, IAST ast, EvalEngine engine) {
+		final int recursionLimit = engine.getRecursionLimit();
+		try {
+			if (recursionLimit > 0) {
+				int counter = engine.incRecursionCounter();
+				if (counter > recursionLimit) {
+					RecursionLimitExceeded.throwIt(counter, ast);
+				}
+			}
 		if (n == 0 && k == 0) {
 			return F.C1;
 		}
@@ -2130,11 +2221,15 @@ public class PolynomialFunctions {
 		IExpr s = F.C0;
 		int a = 1;
 		int max = n - k + 2;
+			int iterationLimit = engine.getIterationLimit();
+			if (iterationLimit >= 0 && iterationLimit <= max) {
+				IterationLimitExceeded.throwIt(max, ast);
+			}
 		for (int m = 1; m < max; m++) {
 			if ((m < symbols.size()) && !symbols.get(m).isZero()) {
-				IExpr bellY = bellY(n - m, k - 1, symbols);
+					IExpr bellY = bellY(n - m, k - 1, symbols, ast, engine);
 				if (bellY.isPlus()) {
-					bellY = ((IAST) bellY).mapThread(F.Times(a, null, symbols.get(m)), 2);
+						bellY = ((IAST) bellY).mapThread(F.Times(a, F.Slot1, symbols.get(m)), 2);
 				} else {
 					bellY = F.Times(a, bellY, symbols.get(m));
 
@@ -2144,6 +2239,11 @@ public class PolynomialFunctions {
 			a = a * (n - m) / m;
 		}
 		return s;
+		} finally {
+			if (recursionLimit > 0) {
+				engine.decRecursionCounter();
+	}
+	}
 	}
 	/**
 	 * Get the coefficient list of a univariate polynomial.
@@ -2211,9 +2311,16 @@ public class PolynomialFunctions {
 		double[] coefficients = Expr2Object.toPolynomial(expr, variable);
 
 		if (coefficients != null) {
+			try {
 			LaguerreSolver solver = new LaguerreSolver(Config.DEFAULT_ROOTS_CHOP_DELTA);
 			org.hipparchus.complex.Complex[] roots = solver.solveAllComplex(coefficients, 0);
 			return Object2Expr.convertComplex(true, roots);
+			} catch (org.hipparchus.exception.MathRuntimeException mrex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					mrex.printStackTrace();
+				}
+				return F.NIL;
+			}
 		}
 		IExpr denom = F.C1;
 		if (expr.isAST()) {
@@ -2271,9 +2378,9 @@ public class PolynomialFunctions {
 	 * @param coefficients
 	 *            coefficients of the polynomial.
 	 * @return the roots of the polynomial
+	 * @throws RuntimeException
 	 */
-	@Nonnull
-	public static IAST findRoots(double... coefficients) {
+	private static IAST findRoots(double... coefficients) {
 		int N = coefficients.length - 1;
 
 		// Construct the companion matrix
@@ -2287,29 +2394,25 @@ public class PolynomialFunctions {
 			c.setEntry(i, i - 1, 1);
 		}
 
-		try {
 
-			EigenDecomposition ed = new EigenDecomposition(c);
+		EigenDecomposition ed = new EigenDecomposition(c);
 
-			final double[] realValues = ed.getRealEigenvalues();
-			final double[] imagValues = ed.getImagEigenvalues();
+		final double[] realValues = ed.getRealEigenvalues();
+		final double[] imagValues = ed.getImagEigenvalues();
 
-			IASTAppendable roots = F.ListAlloc(N);
-			return roots.appendArgs(0, N,
-                    new IntFunction<IExpr>() {
-                        @Override
-                        public IExpr apply(int i) {
-                            return F.chopExpr(F.complexNum(realValues[i], imagValues[i]), Config.DEFAULT_ROOTS_CHOP_DELTA);
-                        }
-                    });
-			// for (int i = 0; i < N; i++) {
-			// roots.append(F.chopExpr(F.complexNum(realValues[i], imagValues[i]),
-			// Config.DEFAULT_ROOTS_CHOP_DELTA));
-			// }
-			// return roots;
-		} catch (Exception ime) {
-			throw new WrappedException(ime);
-		}
+		IASTAppendable roots = F.ListAlloc(N);
+		return roots.appendArgs(0, N,
+				new IntFunction<IExpr>() {
+					@Override
+					public IExpr apply(int i) {
+						return F.chopExpr(F.complexNum(realValues[i], imagValues[i]), Config.DEFAULT_ROOTS_CHOP_DELTA);
+					}
+				});
+		// for (int i = 0; i < N; i++) {
+		// roots.append(F.chopExpr(F.complexNum(realValues[i], imagValues[i]),
+		// Config.DEFAULT_ROOTS_CHOP_DELTA));
+		// }
+		// return roots;
 
 	}
 
@@ -2622,7 +2725,7 @@ public class PolynomialFunctions {
 			newResult = QuarticSolver.createSet(newResult);
 			return newResult;
 		} catch (RuntimeException rex) {
-			// JAS may throw RuntimeExceptions
+			// JAS or "findRoots" may throw RuntimeExceptions
 			result = rootsOfExprPolynomial(expr, variables, true);
 		}
 		if (result.isPresent()) {

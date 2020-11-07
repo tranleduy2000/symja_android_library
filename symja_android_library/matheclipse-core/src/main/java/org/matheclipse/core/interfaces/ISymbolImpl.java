@@ -3,7 +3,6 @@ package org.matheclipse.core.interfaces;
 import com.duy.lambda.DoubleFunction;
 
 import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 
@@ -12,6 +11,14 @@ import org.matheclipse.core.expression.ID;
  */
 
 public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
+
+    @Override
+    public boolean isBooleanFormula() {
+        if (isConstantAttribute() && !(isTrue() || isFalse())) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public IAST f(IExpr arg1) {
@@ -65,19 +72,10 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
      * @return
      */
     @Override
-    public IExpr of(Number... args) {
+    public IExpr of(int... args) {
         IExpr[] array = new IExpr[args.length];
         for (int i = 0; i < array.length; i++) {
-            array[i] = Object2Expr.convert(args[i]);
-        }
-        return of(array);
-    }
-
-    @Override
-    public IExpr of(Boolean... args) {
-        IExpr[] array = new IExpr[args.length];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = args[i].booleanValue() ? F.True : F.False;
+            array[i] = F.ZZ(args[i]);
         }
         return of(array);
     }
@@ -92,13 +90,17 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     }
 
     @Override
-    public int ordinal() {
-        return ID.UNKNOWN;
+    public IExpr of(boolean... args) {
+        IExpr[] array = new IExpr[args.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = args[i] ? F.True : F.False;
+        }
+        return of(array);
     }
 
     @Override
-    public void set(IExpr value) {
-        assign(value);
+    public int ordinal() {
+        return ID.UNKNOWN;
     }
 
     @Override

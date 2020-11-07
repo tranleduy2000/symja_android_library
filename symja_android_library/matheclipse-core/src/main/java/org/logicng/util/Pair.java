@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,14 +28,10 @@
 
 package org.logicng.util;
 
-import com.duy.util.DObjects;
-
-import java.util.Locale;
 import java.util.Objects;
 
 /**
  * Data structure for a pair.
- *
  * @param <A> the type parameter of the first entry
  * @param <B> the type parameter of the second entry
  * @version 1.2
@@ -48,7 +44,6 @@ public class Pair<A, B> {
 
     /**
      * Constructs a new pair.
-     *
      * @param a the first entry
      * @param b the second entry
      */
@@ -59,40 +54,39 @@ public class Pair<A, B> {
 
     /**
      * Returns the first entry of this pair.
-     *
      * @return the first entry
      */
     public A first() {
-        return a;
+        return this.a;
     }
 
     /**
      * Returns the second entry of this pair.
-     *
      * @return the second entry
      */
     public B second() {
-        return b;
+        return this.b;
     }
 
     @Override
     public int hashCode() {
-        return DObjects.hash(a, b);
+        return Objects.hash(this.a, this.b);
     }
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
+        }
         if (other instanceof Pair) {
-            Pair o = (Pair) other;
-            return DObjects.equals(b, o.b) && DObjects.equals(a, o.a);
+            final Pair<?, ?> o = (Pair<?, ?>) other;
+            return Objects.equals(this.b, o.b) && Objects.equals(this.a, o.a);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "<%s, %s>", a, b);
+        return String.format("<%s, %s>", this.a, this.b);
     }
 }

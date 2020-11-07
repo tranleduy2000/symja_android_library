@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,16 +30,15 @@ package org.logicng.formulas;
 
 /**
  * A function on a formula.
- *
  * @param <T> the result type of the function
- * @version 1.0
+ * @version 2.0.0
  * @since 1.0
  */
+@FunctionalInterface
 public interface FormulaFunction<T> {
 
     /**
      * Applies this function to a given formula.
-     *
      * @param formula the input formula
      * @param cache   indicates whether the result should be cached in this formula's cache
      * @return the result of the application

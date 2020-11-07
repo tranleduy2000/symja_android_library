@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * PBLib       -- Copyright (c) 2012-2013  Peter Steinke
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -58,10 +58,10 @@ import org.logicng.formulas.Variable;
 
 /**
  * Encodes that at most one variable is assigned value true.  Uses the bimander encoding due to Hölldobler and Nguyen.
- * @version 1.3
+ * @version 2.0.0
  * @since 1.1
  */
-final class CCAMOBimander implements CCAtMostOne {
+public final class CCAMOBimander implements CCAtMostOne {
 
     private final LNGVector<LNGVector<Literal>> groups;
     private final LNGVector<Literal> bits;
@@ -74,7 +74,7 @@ final class CCAMOBimander implements CCAtMostOne {
     /**
      * Constructs the bimander AMO encoder with a given number of groups.
      */
-    CCAMOBimander(int m) {
+    CCAMOBimander(final int m) {
         this.m = m;
         this.groups = new LNGVector<>();
         this.bits = new LNGVector<>();
@@ -103,26 +103,30 @@ final class CCAMOBimander implements CCAtMostOne {
             grayCode = i ^ (i >> 1);
             i++;
             nextGray = i ^ (i >> 1);
-            for (int j = 0; j < this.numberOfBits; j++)
+            for (int j = 0; j < this.numberOfBits; j++) {
                 if ((grayCode & (1 << j)) == (nextGray & (1 << j))) {
-                    if ((grayCode & (1 << j)) != 0)
-                        for (int p = 0; p < this.groups.get(index).size(); ++p)
-                            this.result.addClause(this.groups.get(index).get(p).negate(), this.bits.get(j));
-                    else
-                        for (int p = 0; p < this.groups.get(index).size(); ++p)
-                            this.result.addClause(this.groups.get(index).get(p).negate(), this.bits.get(j).negate());
+                    handleGrayCode(grayCode, index, j);
                 }
+            }
         }
         for (; i < this.twoPowNBits; i++) {
             index++;
             grayCode = i ^ (i >> 1);
-            for (int j = 0; j < this.numberOfBits; j++)
-                if ((grayCode & (1 << j)) != 0)
-                    for (int p = 0; p < this.groups.get(index).size(); ++p)
-                        this.result.addClause(this.groups.get(index).get(p).negate(), this.bits.get(j));
-                else
-                    for (int p = 0; p < this.groups.get(index).size(); ++p)
-                        this.result.addClause(this.groups.get(index).get(p).negate(), this.bits.get(j).negate());
+            for (int j = 0; j < this.numberOfBits; j++) {
+                handleGrayCode(grayCode, index, j);
+            }
+        }
+    }
+
+    private void handleGrayCode(final int grayCode, final int index, final int j) {
+        if ((grayCode & (1 << j)) != 0) {
+            for (int p = 0; p < this.groups.get(index).size(); ++p) {
+                this.result.addClause(this.groups.get(index).get(p).negate(), this.bits.get(j));
+            }
+        } else {
+            for (int p = 0; p < this.groups.get(index).size(); ++p) {
+                this.result.addClause(this.groups.get(index).get(p).negate(), this.bits.get(j).negate());
+            }
         }
     }
 
@@ -130,11 +134,12 @@ final class CCAMOBimander implements CCAtMostOne {
      * Initializes the groups
      * @param vars the variables of the constraint
      */
-    private void initializeGroups(LNGVector<Literal> vars) {
-        int n = vars.size();
+    private void initializeGroups(final LNGVector<Literal> vars) {
+        final int n = vars.size();
         this.groups.clear();
-        for (int i = 0; i < this.m; i++)
+        for (int i = 0; i < this.m; i++) {
             this.groups.push(new LNGVector<Literal>());
+        }
 
         int g = (int) Math.ceil((double) n / this.m);
         int ig = 0;
@@ -147,8 +152,9 @@ final class CCAMOBimander implements CCAtMostOne {
             g = g + (int) Math.ceil((double) (n - i) / (this.m - ig));
         }
 
-        for (int i = 0; i < this.groups.size(); i++)
+        for (int i = 0; i < this.groups.size(); i++) {
             this.encodeNaive(this.groups.get(i));
+        }
     }
 
     /**
@@ -159,8 +165,9 @@ final class CCAMOBimander implements CCAtMostOne {
         this.numberOfBits = (int) Math.ceil(Math.log(this.m) / Math.log(2));
         this.twoPowNBits = (int) Math.pow(2, this.numberOfBits);
         this.k = (this.twoPowNBits - this.m) * 2;
-        for (int i = 0; i < this.numberOfBits; ++i)
-            this.bits.push(result.newVariable());
+        for (int i = 0; i < this.numberOfBits; ++i) {
+            this.bits.push(this.result.newVariable());
+        }
     }
 
     /**
@@ -168,10 +175,13 @@ final class CCAMOBimander implements CCAtMostOne {
      * @param vars the variables of the constraint
      */
     private void encodeNaive(final LNGVector<Literal> vars) {
-        if (vars.size() > 1)
-            for (int i = 0; i < vars.size(); i++)
-                for (int j = i + 1; j < vars.size(); j++)
+        if (vars.size() > 1) {
+            for (int i = 0; i < vars.size(); i++) {
+                for (int j = i + 1; j < vars.size(); j++) {
                     this.result.addClause(vars.get(i).negate(), vars.get(j).negate());
+                }
+            }
+        }
     }
 
     @Override

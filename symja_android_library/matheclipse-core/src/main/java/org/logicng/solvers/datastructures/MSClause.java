@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -26,7 +26,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-/******************************************************************************************
+/*
  * MiniSat -- Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -40,7 +40,7 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
  * OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- ******************************************************************************************/
+ */
 
 package org.logicng.solvers.datastructures;
 
@@ -50,28 +50,32 @@ import java.util.Comparator;
 
 /**
  * A clause of the SAT solver for MiniSAT-style solvers.
- *
- * @version 1.0.1
+ * @version 2.0.0
  * @since 1.0
  */
-public class MSClause {
+public final class MSClause {
 
     /**
      * A comparator for clauses based on LBD and activity (used for the Glucose solver).
      */
     public static final Comparator<MSClause> glucoseComparator = new Comparator<MSClause>() {
         @Override
-        public int compare(final MSClause x, final MSClause y) {
-            if (x.size() > 2 && y.size() == 2)
+        public int compare(MSClause x, MSClause y) {
+            if (x.size() > 2 && y.size() == 2) {
                 return -1;
-            if (y.size() > 2 && x.size() == 2)
+            }
+            if (y.size() > 2 && x.size() == 2) {
                 return 1;
-            if (x.size() == 2 && y.size() == 2)
+            }
+            if (x.size() == 2 && y.size() == 2) {
                 return 1;
-            if (x.lbd() > y.lbd())
+            }
+            if (x.lbd() > y.lbd()) {
                 return -1;
-            if (x.lbd() < y.lbd())
+            }
+            if (x.lbd() < y.lbd()) {
                 return 1;
+            }
             return x.activity() < y.activity() ? -1 : 1;
         }
     };
@@ -81,7 +85,7 @@ public class MSClause {
      */
     public static final Comparator<MSClause> minisatComparator = new Comparator<MSClause>() {
         @Override
-        public int compare(final MSClause x, final MSClause y) {
+        public int compare(MSClause x, MSClause y) {
             return x.size() > 2 && (y.size() == 2 || x.activity() < y.activity()) ? -1 : 1;
         }
     };
@@ -99,25 +103,24 @@ public class MSClause {
 
     /**
      * Constructs a new clause
-     *
      * @param ps     the vector of literals
      * @param learnt {@code true} if it is a learnt clause, {@code false} otherwise
      */
-    public MSClause(final LNGIntVector ps, boolean learnt) {
+    public MSClause(final LNGIntVector ps, final boolean learnt) {
         this(ps, learnt, false);
     }
 
     /**
      * Constructs a new clause
-     *
      * @param ps       the vector of literals
      * @param learnt   {@code true} if it is a learnt clause, {@code false} otherwise
      * @param isAtMost {@code true} if it is an at-most clause, {@code false} otherwise
      */
-    public MSClause(final LNGIntVector ps, boolean learnt, boolean isAtMost) {
+    public MSClause(final LNGIntVector ps, final boolean learnt, final boolean isAtMost) {
         this.data = new LNGIntVector(ps.size());
-        for (int i = 0; i < ps.size(); i++)
+        for (int i = 0; i < ps.size(); i++) {
             this.data.unsafePush(ps.get(i));
+        }
         this.learnt = learnt;
         this.szWithoutSelectors = 0;
         this.seen = false;
@@ -130,7 +133,6 @@ public class MSClause {
 
     /**
      * Returns the size (number of literals) of this clause.
-     *
      * @return the size
      */
     public int size() {
@@ -139,27 +141,24 @@ public class MSClause {
 
     /**
      * Returns the literal at index {@code i}.
-     *
      * @param i the index
      * @return the literal at index {@code i}
      */
-    public int get(int i) {
+    public int get(final int i) {
         return this.data.get(i);
     }
 
     /**
      * Sets the literal at index {@code i}.
-     *
      * @param i   the index
      * @param lit the literal
      */
-    public void set(int i, int lit) {
+    public void set(final int i, final int lit) {
         this.data.set(i, lit);
     }
 
     /**
      * Returns the activity of this clause.
-     *
      * @return the activity of this clause
      */
     public double activity() {
@@ -168,10 +167,9 @@ public class MSClause {
 
     /**
      * Increments this clause's activity by a given value
-     *
      * @param inc the increment value
      */
-    public void incrementActivity(double inc) {
+    public void incrementActivity(final double inc) {
         this.activity += inc;
     }
 
@@ -184,7 +182,6 @@ public class MSClause {
 
     /**
      * Returns {@code true} if this clause is learnt, {@code false} otherwise.
-     *
      * @return {@code true} if this clause is learnt
      */
     public boolean learnt() {
@@ -193,7 +190,6 @@ public class MSClause {
 
     /**
      * Returns the size of this clause without selector variables.
-     *
      * @return the size of this clause without selector variables
      */
     public int sizeWithoutSelectors() {
@@ -202,16 +198,14 @@ public class MSClause {
 
     /**
      * Sets the size of this clause without selector variables.
-     *
      * @param szWithoutSelectors the size of this clause without selector variables
      */
-    public void setSizeWithoutSelectors(int szWithoutSelectors) {
+    public void setSizeWithoutSelectors(final int szWithoutSelectors) {
         this.szWithoutSelectors = szWithoutSelectors;
     }
 
     /**
      * Returns {@code true} if this clause is marked 'seen', {@code false} otherwise.
-     *
      * @return {@code true} if this clause is marked 'seen'
      */
     public boolean seen() {
@@ -220,16 +214,14 @@ public class MSClause {
 
     /**
      * Marks this clause with the given 'seen' flag.
-     *
      * @param seen the 'seen' flag
      */
-    public void setSeen(boolean seen) {
+    public void setSeen(final boolean seen) {
         this.seen = seen;
     }
 
     /**
      * Returns the LBD of this clause.
-     *
      * @return the LBD of this clause
      */
     public long lbd() {
@@ -238,16 +230,14 @@ public class MSClause {
 
     /**
      * Sets the LBD of this clause.
-     *
      * @param lbd the LBD of this clause
      */
-    public void setLBD(long lbd) {
+    public void setLBD(final long lbd) {
         this.lbd = lbd;
     }
 
     /**
      * Returns {@code true} if this clause can be deleted, {@code false} otherwise.
-     *
      * @return {@code true} if this clause can be deleted
      */
     public boolean canBeDel() {
@@ -256,16 +246,14 @@ public class MSClause {
 
     /**
      * Sets whether this clause can be deleted or not.
-     *
      * @param canBeDel {@code true} if it can be deleted, {@code false} otherwise
      */
-    public void setCanBeDel(boolean canBeDel) {
+    public void setCanBeDel(final boolean canBeDel) {
         this.canBeDel = canBeDel;
     }
 
     /**
      * Returns {@code true} if this clause is a one literal watched clause, {@code false} otherwise
-     *
      * @return {@code true} if this clause is a one literal watched clause
      */
     public boolean oneWatched() {
@@ -274,16 +262,14 @@ public class MSClause {
 
     /**
      * Sets whether this clause is a one literal watched clause or not.
-     *
      * @param oneWatched {@code true} if it is a one literal watched clause, {@code false} otherwise
      */
-    public void setOneWatched(boolean oneWatched) {
+    public void setOneWatched(final boolean oneWatched) {
         this.oneWatched = oneWatched;
     }
 
     /**
      * Returns {@code true} if this is an at-most clause, {@code false} otherwise.
-     *
      * @return {@code true} if this is an at-most clause
      */
     public boolean isAtMost() {
@@ -292,7 +278,6 @@ public class MSClause {
 
     /**
      * Returns the number of watchers if this is an at-most clause.
-     *
      * @return the number of watchers
      */
     public int atMostWatchers() {
@@ -302,10 +287,9 @@ public class MSClause {
 
     /**
      * Sets the number of watchers for this at-most clause.
-     *
      * @param atMostWatchers the number of watchers
      */
-    public void setAtMostWatchers(int atMostWatchers) {
+    public void setAtMostWatchers(final int atMostWatchers) {
         assert this.isAtMost;
         this.atMostWatchers = atMostWatchers;
     }
@@ -323,7 +307,7 @@ public class MSClause {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return this == o;
     }
 
@@ -341,13 +325,13 @@ public class MSClause {
         sb.append("atMostWatchers=").append(this.atMostWatchers).append(", ");
         sb.append("lits=[");
         for (int i = 0; i < this.data.size(); i++) {
-            int lit = this.data.get(i);
+            final int lit = this.data.get(i);
             sb.append((lit & 1) == 1 ? "-" : "").append(lit >> 1);
-            if (i != this.data.size() - 1)
+            if (i != this.data.size() - 1) {
                 sb.append(", ");
+            }
         }
         sb.append("]}");
         return sb.toString();
     }
-
 }
