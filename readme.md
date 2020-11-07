@@ -1,6 +1,6 @@
 ## Symja Library - Java Symbolic Math System for Android NCalc calculator
 
-**Note**: this repository contains the **Java 8** version of the project. The [NCalc](https://github.com/tranleduy2000/ncalc) Android calculator project 
+**Note**: this repository contains the **Java 8** version of the project. The [NCalc](https://github.com/tranleduy2000/ncalc) Android calculator project
 maintains a **[Java 7 Android branch](https://github.com/tranleduy2000/symja_android_library)** of the [Android *.AAR library](https://github.com/tranleduy2000/symja_android_library/releases).
 
 Try the Android or iOS apps:
@@ -14,7 +14,7 @@ or help testing the latest [Android BETA version](https://github.com/axkr/symja_
 
 Read the [Symja Manual](symja_android_library/doc/index.md) for the description of the Symja language or [browse the available functions](symja_android_library/doc/functions/). We encourage everyone to participate in our [Wiki](https://github.com/axkr/symja_android_library/wiki).
 
-[![Join the chat at https://gitter.im/symja_android_library/Lobby](https://badges.gitter.im/symja_android_library/Lobby.svg)](https://gitter.im/symja_android_library/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/axkr/symja_android_library) [![Join the chat at https://gitter.im/symja_android_library/Lobby](https://badges.gitter.im/symja_android_library/Lobby.svg)](https://gitter.im/symja_android_library/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![LGTM Alerts](https://img.shields.io/lgtm/alerts/bitbucket/axelclk/symja_android_library)](https://lgtm.com/projects/b/axelclk/symja_android_library) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
 - [Features](#features)
 - [Applications](#applications)
@@ -31,16 +31,18 @@ Features of the Symja language:
 
 * arbitrary precision integers, rational and complex numbers. Polynomial, list functions and [Association](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Association.md)s
 * [differentiation](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/D.md), [integration](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Integrate.md), [equation solving](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Solve.md), [linear algebra](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/98-function-by-category.md#linear-algebra), [number theory](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/98-function-by-category.md#number-theory), [combinatorial](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/98-function-by-category.md#combinatorial), [logic](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/03-comparisons-and-boolean-logic.md) and polynomial functions...
+* unified connectivity and interoperability through [Symja functions](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions) for open source libraries like [Hipparchus](https://github.com/Hipparchus-Math/hipparchus), [Tablesaw](https://github.com/jtablesaw/tablesaw), [JGraphT](https://github.com/jgrapht/jgrapht), [LogicNG](https://github.com/logic-ng/LogicNG), [JAS Java Algebra System](https://github.com/kredel/java-algebra-system), [apfloat](https://github.com/mtommila/apfloat)...
 * a general purpose [Term Rewriting System and Pattern Matching engine](symja_android_library/doc/07-functions-and-patterns.md)
-* use human readable math expression strings or the internal abstract syntax tree (AST) representation to code in Java. See the [Unit test examples](symja_android_library/matheclipse-core/src/test/java/org/matheclipse/io/system/LowercaseTestCase.java)
-* two [REPLs](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) are available in the library. A [Console.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/main/java/org/matheclipse/core/eval/Console.java) for standard math input and a [MMAConsole.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/main/java/org/matheclipse/core/eval/MMAConsole.java) for "Mathematica like syntax" input.
-* Symja with "Mathematica like syntax" input can also be used interactively in a [BeakerX/Jupyter Lab](https://github.com/axkr/symja_android_library/wiki/BeakerX-usage) environment
+* use human readable math expression strings or the internal abstract syntax tree (AST) representation to code in Java. See the [Unit test examples](symja_android_library/matheclipse-io/src/test/java/org/matheclipse/io/system/LowercaseTestCase.java)
+* two [REPLs](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) are available in the library. A [Console.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-io/src/main/java/org/matheclipse/io/eval/Console.java) for standard math input and a [MMAConsole.java](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-io/src/main/java/org/matheclipse/io/eval/MMAConsole.java) for "Mathematica like syntax" input.
 * Symja can also be used interactively in the [Java jshell](https://github.com/axkr/symja_android_library/wiki/JShell-usage)
-* the [Rubi symbolic integration rules](https://github.com/axkr/symja_android_library/wiki/Porting-Rubi-Integration-rules-to-Symja) are used to implement the [Integrate](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Integrate.md) function, they can be systematically applied to determine the antiderivative of a wide variety of mathematical expressions. 
+* the [Rubi symbolic integration rules](https://github.com/axkr/symja_android_library/wiki/Porting-Rubi-Integration-rules-to-Symja) are used to implement the [Integrate](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Integrate.md) function, they can be systematically applied to determine the antiderivative of a wide variety of mathematical expressions.
 
 ### Applications
 
-* [Appengine web interface symjaweb.appspot.com](http://symjaweb.appspot.com/) - available as open source in this [Github repository](https://github.com/axkr/symja_web) 
+* [Symja.org](https://symja.org/) - test the [Symja API](https://github.com/axkr/symja_android_library/wiki/API)
+
+* [Appengine web interface symjaweb.appspot.com](http://symjaweb.appspot.com/) - available as open source in this [Github repository](https://github.com/axkr/symja_web)
 
 * [Android App Calculator N+ on Google play store](https://play.google.com/store/apps/details?id=com.duy.calculator.free) - available as open source in this [Github repository](https://github.com/tranleduy2000/ncalc) provides an **IDE mode** to calculate arbitrary Symja expressions.
 
@@ -48,7 +50,7 @@ Features of the Symja language:
 
 ### Examples
 
-To get an idea of the kinds of expressions Symja handles, see the [tests in this file](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-core/src/test/java/org/matheclipse/core/system/LowercaseTestCase.java).
+To get an idea of the kinds of expressions Symja handles, see the [tests in this file](https://github.com/axkr/symja_android_library/blob/master/symja_android_library/matheclipse-io/src/test/java/org/matheclipse/io/system/LowercaseTestCase.java).
 
 ![Console Examples](console.gif)
 
@@ -63,7 +65,7 @@ To get an idea of the kinds of expressions Symja handles, see the [tests in this
 > [Factor(-1+x^16)](http://matheclipse.org/input?i=Factor(-1%2Bx^16))
 
 > [Manipulate(Plot3D(Sin(a * x * y), {x, -1.5, 1.5}, {y, -1.5, 1.5}), {a,1,5})](http://matheclipse.org/input?i=Manipulate(Plot3D(Sin(a*x*y),%20{x,%20-1.5,%201.5},%20{y,%20-1.5,%201.5}),%20{a,1,5}))
- 
+
 >[Plot(Piecewise({{x^2, x < 0}, {x, x >= 0&&x<1},{Cos(x-1), x >= 1}}), {x, -2, 12})](http://matheclipse.org/input?i=Plot(Piecewise({{x^2,%20x%20%3C%200},%20{x,%20x%20%3E=%200%26%26x%3C1},{Cos(x-1),%20x%20%3E=%201}}),%20{x,%20-2,%2012}))
 
 > [Refine(Abs(n*Abs(m)),n<0)](http://matheclipse.org/input?i=Refine(Abs(n*Abs(m)),%20n%3C0))
@@ -208,16 +210,16 @@ mvn clean install
 With the following command you can run the Symja console from the command line
 
 ```
-mvn exec:java -pl matheclipse-core
+mvn exec:java -pl matheclipse-io
 ```
- 
+
 With the following command you can run a symja console with a Mathematica-compatible syntax and functions
 
 ```
-mvn exec:java@mma -pl matheclipse-core 
+mvn exec:java@mma -pl matheclipse-io 
 ```
 
-With the following command you can build a fat jar which contains all needed classes
+With the following command you can build a fat jar (of the core library) which contains all needed classes
 
 ```
 mvn assembly:single -pl matheclipse-core
@@ -232,7 +234,7 @@ You can find JDK installers at:
 * http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
 If you're unsure how to install the JDK, you can find instructions for
-all operating systems here: 
+all operating systems here:
 
 * https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html
 
@@ -250,12 +252,12 @@ a) Fork the Symja repository to use as a starting point.
 * Click the "Fork" button in the top-right of the page.
 * Once your fork is ready, open the new repository's "Settings" by clicking the link in the menu bar on the left.
 * Change the repository name to the name of your Library and save your changes.
-  
+
 b) Clone your new repository to your Eclipse workspace.
 
 * Open Eclipse and select the "File -> Import..." menu item.
 * Select "Git -> Projects from Git", and click "Next >".
-* Select "URI" and click "Next >". 
+* Select "URI" and click "Next >".
 * Enter your repository's clone URL in the "URI" field. The remaining fields in the "Location" and "Connection" groups will get automatically filled in.
 * Enter your Github credentials in the "Authentication" group, and click "Next >".
 * Select the `master` branch on the next screen, and click "Next >".
@@ -275,11 +277,12 @@ If you have any questions about using or developing for this project, send me an
 
 If you would like to use parts of the system here are some of the associated licenses:
 
-* the [JAS Java Algebra System](http://krum.rz.uni-mannheim.de/jas/) is published under the (LESSER) GNU GENERAL PUBLIC LICENSE license. The Java bytecode is dual licenced also under the Apache 2.0 license to allow usage in Android projects.  
-* the [apfloat project](https://github.com/mtommila/apfloat) is published under the (LESSER) GNU GENERAL PUBLIC LICENSE license. 
+* the [JAS Java Algebra System](http://krum.rz.uni-mannheim.de/jas/) is published under the (LESSER) GNU GENERAL PUBLIC LICENSE license. The Java bytecode is dual licenced also under the Apache 2.0 license to allow usage in Android projects.
+* the [apfloat project](https://github.com/mtommila/apfloat) is published under the (LESSER) GNU GENERAL PUBLIC LICENSE license.
 * the [LogicNG project](https://github.com/logic-ng/LogicNG) is published under the Apache software license
 * the [Hipparchus Mathematics Library](https://www.hipparchus.org/) is published under the Apache software license
-* the [JGraphT Library](https://jgrapht.org/)  is published under the Eclipse Public License (EPL) or (LESSER) GNU GENERAL PUBLIC LICENSE license. 
+* the [JGraphT Library](https://jgrapht.org/)  is published under the Eclipse Public License (EPL) or (LESSER) GNU GENERAL PUBLIC LICENSE license.
+* the [Tablesaw](https://github.com/jtablesaw/tablesaw) is published under the Apache software license
 * the Symja parser libraries (org.matheclipse.parser* packages) are published under the APACHE LICENSE Version 2.0.
 
 [1]: mailto:axelclk@gmail.com
