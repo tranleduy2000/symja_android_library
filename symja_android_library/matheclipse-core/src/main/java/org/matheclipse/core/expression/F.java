@@ -71,6 +71,7 @@ import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.Predicates;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
@@ -3079,12 +3080,7 @@ public class F extends S {
 		if (expr.isAST()) {
 			IAST ast = (IAST) expr;
             if (ast.isPlus()) {
-				if (ast.exists(new Predicate<IExpr>() {
-					@Override
-					public boolean test(IExpr x) {
-						return x.isPlusTimesPower();
-					}
-				})) {
+				if (ast.exists(Predicates.isPlusTimesPower)) {
 					return engine.evaluate(Expand(expr));
                     }
 			} else if (ast.isTimes() || ast.isPower()) {
@@ -5391,12 +5387,7 @@ public class F extends S {
 
     public static IAST Plus(final IExpr a1, final IExpr a2) {
         if (a1 != null && a2 != null) {
-            return binaryASTOrderless(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr iExpr) {
-                    return iExpr.isPlus();
-                }
-            }, F.Plus, a1, a2);
+            return binaryASTOrderless(Predicates.isPlus, F.Plus, a1, a2);
         }
         return new B2.Plus(a1, a2);
     }
@@ -6612,12 +6603,7 @@ public class F extends S {
 	 */
     public static IASTMutable Times(final IExpr a1, final IExpr a2) {
         if (a1 != null && a2 != null) {
-            return binaryASTOrderless(new Predicate<IExpr>() {
-                @Override
-                public boolean test(IExpr iExpr) {
-                    return iExpr.isTimes();
-                }
-            }, F.Times, a1, a2);
+            return binaryASTOrderless(Predicates.isTimes, F.Times, a1, a2);
         }
         return new B2.Times(a1, a2);
     }

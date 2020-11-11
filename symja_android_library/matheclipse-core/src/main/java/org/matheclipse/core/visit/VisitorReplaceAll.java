@@ -257,15 +257,15 @@ public class VisitorReplaceAll extends VisitorExpr {
 				// something was evaluated - return a new IAST:
 				final IASTMutable result = assoc.setAtCopy(i, assoc.getRule(i).setAtCopy(2, temp));
 				i++;
-				assoc.forEach(i, size, new ObjIntConsumer<IExpr>() {
-					@Override
-					public void accept(IExpr x, int j) {
+				for (@ObjcMemoryIssueFix int j = i; j < size; j++) {
+					IExpr x = assoc.get(j);
+					{
 						IExpr t = x.accept(VisitorReplaceAll.this);
 						if (t.isPresent()) {
 							result.set(j, assoc.getRule(j).setAtCopy(2, t));
 						}
 					}
-				});
+				}
 				return postProcessing(result);
 
 			}

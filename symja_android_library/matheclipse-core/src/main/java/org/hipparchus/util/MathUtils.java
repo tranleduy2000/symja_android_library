@@ -22,6 +22,8 @@
 
 package org.hipparchus.util;
 
+import com.duy.lang.DDouble;
+
 import java.util.Arrays;
 
 import org.hipparchus.RealFieldElement;
@@ -59,7 +61,7 @@ public final class MathUtils {
      * @return the hash code
      */
     public static int hash(double value) {
-        return Double.hashCode(value);
+        return DDouble.hashCode(value);
     }
 
     /**

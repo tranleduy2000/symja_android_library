@@ -25,7 +25,7 @@ import org.matheclipse.core.builtin.StructureFunctions.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.EvalEngineUtils;
+import org.matheclipse.core.eval.Predicates;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.FlowControlException;
 import org.matheclipse.core.eval.exception.LimitException;
@@ -37,7 +37,6 @@ import org.matheclipse.core.eval.interfaces.IRewrite;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.ObjIntPredicate;
-import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.generic.UnaryVariable2Slot;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -2212,42 +2211,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
 	@Override
 	public final boolean hasTrigonometricFunction() {
-		return has(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				if (x.isAST1()) {
-					final IExpr head = x.head();
-					if (head.isBuiltInSymbol()) {
-						return //
-								(head == F.ArcCos) || //
-										(head == F.ArcCsc) || //
-										(head == F.ArcCot) || //
-										(head == F.ArcSec) || //
-										(head == F.ArcSin) || //
-										(head == F.ArcTan) || //
-										(head == F.Cos) || //
-										(head == F.Csc) || //
-										(head == F.Cot) || //
-										(head == F.Sec) || //
-										(head == F.Sin) || //
-										(head == F.Sinc) || //
-										(head == F.Tan) || //
-										(head == F.Cosh) || //
-										(head == F.Csch) || //
-										(head == F.Coth) || //
-										(head == F.Sech) || //
-										(head == F.Sinh) || //
-										(head == F.Tanh) || //
-										(head == F.Haversine) || //
-										(head == F.InverseHaversine);
-					}
-				}
-				if (x.isAST2()) {
-					return x.head() == F.ArcTan;
-				}
-				return false;
-			}
-		}, false);
+		return has(Predicates.hasTrigonometricFunction, false);
 
 	}
 
@@ -3056,12 +3020,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	 */
 	@Override
 	public boolean isBooleanFormula() {
-		return head().isBooleanFormulaSymbol() && forAll(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isBooleanFormula();
-			}
-		});
+		return head().isBooleanFormulaSymbol() && forAll(Predicates.isBooleanFormula);
 
 	}
 
@@ -3072,12 +3031,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	public boolean isBooleanResult() {
 		return head().isPredicateFunctionSymbol() //
 				|| ((head().isBooleanFormulaSymbol() || head().isComparatorFunctionSymbol()) //
-						&& forAll(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isBooleanResult();
-			}
-		}));
+						&& forAll(Predicates.isBooleanResult));
 	}
 
 	/**
@@ -3468,7 +3422,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 								}
 							}));
 				}
-			}*/EvalEngineUtils.isFunctionOrListNumericArgumentPredicate);
+			}*/Predicates.isFunctionOrListNumericArgumentPredicate);
 				}
 		// TODO optimize this expression:
 		// swift changed: memory issue
@@ -3483,14 +3437,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
 							}
 						}));
 			}
-		}*/EvalEngineUtils.isFunctionOrListNumericArgumentPredicate2);
+		}*/Predicates.isFunctionOrListNumericArgumentPredicate2);
 	}
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericFunction() {
 		if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
 			// check if all arguments are &quot;numeric&quot;
-			return forAll(EvalEngineUtils.isNumericFunction);
+			return forAll(Predicates.isNumericFunction);
 		}
 		return false;
 	}
@@ -3622,12 +3576,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		if (head().isBuiltInSymbol() && !((ISymbol) head()).isNumericFunctionAttribute()) {
 			return false;
 		}
-		if (exists(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return !x.isPolynomialStruct();
-			}
-		})) {
+		if (exists(Predicates.isNotPolynomialStruct)) {
 			return false;
 		}
 		return true;
@@ -4116,12 +4065,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isNumericAST() {
-		return exists(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.isInexactNumber();
-			}
-		});
+		return exists(Predicates.isInexactNumber);
 	}
 
 	/** {@inheritDoc} */
@@ -5156,7 +5100,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public final IExpr variables2Slots(final Map<IExpr, IExpr> map, final Collection<IExpr> variableCollector) {
-		return variables2Slots(this, Predicates.isUnaryVariableOrPattern(),
+		return variables2Slots(this, org.matheclipse.core.generic.Predicates.isUnaryVariableOrPattern(),
 				new UnaryVariable2Slot(map, variableCollector));
 	}
 	/** {@inheritDoc} */
@@ -5172,7 +5116,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 		}
 		// swift changed: memory issue
 		@ObjcMemoryIssueFix
-		int indx = indexOf(EvalEngineUtils.isConditionalExpression);
+		int indx = indexOf(Predicates.isConditionalExpression);
 		if (indx > 0) {
 			IAST conditionalExpr = (IAST) get(indx);
 			IASTAppendable andExpr = F.And();

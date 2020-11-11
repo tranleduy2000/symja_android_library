@@ -25,6 +25,7 @@ import org.hipparchus.util.MathUtils;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.LinearAlgebra;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.Predicates;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.ExprField;
@@ -1068,12 +1069,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 			}
 			positions = checkPositions(arrayRulesList, positionList, engine);
 			if (positions == null) {
-				if (positionList.forAll(new Predicate<IExpr>() {
-					@Override
-					public boolean test(IExpr x) {
-						return x.isBlank();
-					}
-				})) {
+				if (positionList.forAll(Predicates.isBlank)) {
 					if (!defaultValue[0].isPresent()) {
 						defaultValue[0] = rule1.arg2();
 					} else if (!defaultValue[0].equals(rule1.arg2())) {
@@ -1143,12 +1139,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 					IAST positionList = (IAST) rule.arg1();
 					positions = checkPositions(arrayRulesList, positionList, engine);
 					if (positions == null) {
-						if (positionList.forAll(new Predicate<IExpr>() {
-							@Override
-							public boolean test(IExpr x) {
-								return x.isBlank();
-							}
-						})) {
+						if (positionList.forAll(Predicates.isBlank)) {
 							if (!defaultValue[0].isPresent()) {
 								defaultValue[0] = rule.arg2();
 								continue;

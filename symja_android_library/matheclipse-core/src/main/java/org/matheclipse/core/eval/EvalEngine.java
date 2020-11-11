@@ -959,7 +959,7 @@ public class EvalEngine implements Serializable {
                 if (resultList.isPresent()) {
                     return evalArgs(resultList, ISymbol.NOATTRIBUTE).orElse(resultList);
                 }
-                int indx = tempAST.indexOf(EvalEngineUtils.isAssociation);
+                int indx = tempAST.indexOf(Predicates.isAssociation);
                 if (indx > 0) {
 					return ((IAssociation) tempAST.get(indx)).mapThread(tempAST, indx);
                 }
@@ -968,7 +968,7 @@ public class EvalEngine implements Serializable {
             if ((ISymbol.NUMERICFUNCTION & attr) == ISymbol.NUMERICFUNCTION) {
                 if (!((ISymbol.HOLDALL & attr) == ISymbol.HOLDALL)) {
                     // Swift changed
-                    if (tempAST.exists(EvalEngineUtils.isIndeterminate)) {
+                    if (tempAST.exists(Predicates.isIndeterminate)) {
                         return F.Indeterminate;
                     }
                     IExpr temp = tempAST.extractConditionalExpression(false);
@@ -1568,7 +1568,7 @@ public class EvalEngine implements Serializable {
         @ObjcMemoryIssueFix
         final IAST ast;
         // objc-changed: avoid using too much memory.
-        if (argsAST.exists(EvalEngineUtils.isASTUnevaluated2)) {
+        if (argsAST.exists(Predicates.isASTUnevaluated2)) {
             ast = argsAST.map(new Function<IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr x) {
@@ -1598,6 +1598,7 @@ public class EvalEngine implements Serializable {
 //            return result[0];
 //        }
         // swift changed: memory issue
+        @ObjcMemoryIssueFix
         boolean exists = false;
         IExpr result = F.NIL;
         final int size = ast.size();
@@ -2820,49 +2821,57 @@ public class EvalEngine implements Serializable {
      */
     @ObjcMemoryIssue
     public IASTMutable threadASTListArgs(final IASTMutable ast) {
-		final ISymbol[] head = new ISymbol[] { null };
-		final int[] listLength = new int[] { -1 };
-		if (ast.exists(new Predicate<IExpr>() {
-            @Override
-            public boolean test(IExpr x) {
-                if (x.isList()) {
-                    if (head[0] == null) {
-                        head[0] = S.List;
-                    }
-                    if (listLength[0] < 0) {
-                        listLength[0] = ((IAST) x).argSize();
-                    } else {
-                        if (listLength[0] != ((IAST) x).argSize()) {
-                            // Objects of unequal length in `1` cannot be combined.
-                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
-                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-                            return true;
-                        }
-                    }
-                } else if (x.isSparseArray()) {
-                    if (head[0] == null) {
-                        head[0] = S.SparseArray;
-                    }
-                    ISparseArray sp = (ISparseArray) x;
-                    if (listLength[0] < 0) {
-                        listLength[0] = sp.getDimension()[0];
-                    } else {
-                        if (listLength[0] != sp.getDimension()[0]) {
-                            // Objects of unequal length in `1` cannot be combined.
-                            IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
-                            // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
-                            return true;
-                        }
+		/*final*/ ISymbol/*[]*/ head = /*new ISymbol[] {*/ null /*}*/;
+		/*final*/ int/*[]*/ listLength = /*new int[] {*/ -1 /*}*/;
+
+		@ObjcMemoryIssueFix
+        boolean exists = false;
+        final int size = ast.size();
+        for (int i = 1; i < size; i++) {
+            IExpr x = ast.get(i);
+            if (x.isList()) {
+                if (head/*[0]*/ == null) {
+                    head/*[0]*/ = S.List;
+                }
+                if (listLength/*[0]*/ < 0) {
+                    listLength/*[0]*/ = ((IAST) x).argSize();
+                } else {
+                    if (listLength/*[0]*/ != ((IAST) x).argSize()) {
+                        // Objects of unequal length in `1` cannot be combined.
+                        IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
+                        // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+                        exists = true;
+                        break;
+                        /*return true;*/
                     }
                 }
-                return false;
+            } else if (x.isSparseArray()) {
+                if (head/*[0]*/ == null) {
+                    head/*[0]*/ = S.SparseArray;
+                }
+                ISparseArray sp = (ISparseArray) x;
+                if (listLength/*[0]*/ < 0) {
+                    listLength/*[0]*/ = sp.getDimension()[0];
+                } else {
+                    if (listLength/*[0]*/ != sp.getDimension()[0]) {
+                        // Objects of unequal length in `1` cannot be combined.
+                        IOFunctions.printMessage(F.Thread, "tdlen", F.List(ast), EvalEngine.get());
+                        // ast.addEvalFlags(IAST.IS_LISTABLE_THREADED);
+                        exists = true;
+                        break;
+                        /*return true;*/
+                    }
+                }
             }
-        })) {
+
+            /*return false;*/
+        }
+        if (exists) {
             return F.NIL;
         }
 
-		if (listLength[0] != -1) {
-			IASTMutable result = EvalAttributes.threadList(ast, head[0], ast.head(), listLength[0]);
+		if (listLength/*[0]*/ != -1) {
+			IASTMutable result = EvalAttributes.threadList(ast, head/*[0]*/, ast.head(), listLength/*[0]*/);
             result.addEvalFlags(IAST.IS_LISTABLE_THREADED);
             return result;
         }

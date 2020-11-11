@@ -1,6 +1,7 @@
 package org.matheclipse.core.visit;
 
 import com.duy.annotations.ObjcMemoryIssue;
+import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Supplier;
 
@@ -86,16 +87,17 @@ public abstract class VisitorExpr extends AbstractVisitor {
 			temp = ast.get(i).accept(this);
 			if (temp.isPresent()) {
 				// something was evaluated - return a new IAST:
+				@ObjcMemoryIssueFix
 				final IASTMutable result = ast.setAtCopy(i++, temp);
-				ast.forEach(i, size, new ObjIntConsumer<IExpr>() {
-					@Override
-					public void accept(IExpr x, int j) {
+				for (int j = i; j < size; j++) {
+					IExpr x = ast.get(j);
+					{
 						IExpr t = x.accept(VisitorExpr.this);
 						if (t.isPresent()) {
 							result.set(j, t);
 						}
 					}
-				});
+				}
 				return result;
 			}
 			i++;

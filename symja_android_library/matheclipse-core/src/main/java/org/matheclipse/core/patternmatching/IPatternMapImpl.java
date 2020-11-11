@@ -1,6 +1,7 @@
 package org.matheclipse.core.patternmatching;
 
 import com.duy.annotations.ObjcMemoryIssue;
+import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
@@ -160,43 +161,43 @@ public abstract class IPatternMapImpl implements IPatternMap {
         if (lhsPatternExpr.isAlternatives() || lhsPatternExpr.isExcept()) {
             ruleWithoutPattern[0] = false;
         }
-        final int[] listEvalFlags = new int[] { IAST.NO_FLAG };
+        @ObjcMemoryIssueFix
+        /*final*/ int/*[]*/ listEvalFlags = /*new int[] {*/ IAST.NO_FLAG /*}*/;
         if (lhsPatternExpr.isAlternatives() || //
                 lhsPatternExpr.isExcept() || //
                 lhsPatternExpr.isRepeated()) {
             ruleWithoutPattern[0] = false;
             if (lhsPatternExpr.isRepeated()) {
-                listEvalFlags[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
+                listEvalFlags/*[0]*/ = IAST.CONTAINS_PATTERN_SEQUENCE;
             }
         }
-
-        lhsPatternExpr.forEach(new Consumer<IExpr>() {
-            @Override
-            public void accept(IExpr x) {
+        for (int i = 0; i < lhsPatternExpr.size(); i++) {
+            IExpr x = lhsPatternExpr.get(i);
+            {
                 if (x.isAST()) {
                     final IAST lhsPatternAST = (IAST) x;
                     if (lhsPatternAST.isPatternMatchingFunction()) {
-                        listEvalFlags[0] |= IAST.CONTAINS_PATTERN;
+                        listEvalFlags/*[0]*/ |= IAST.CONTAINS_PATTERN;
                     }
-                    listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
+                    listEvalFlags/*[0]*/ |= determinePatternsRecursive(patternIndexMap, lhsPatternAST, priority,
                             ruleWithoutPattern, treeLevel + 1);
                     priority[0] -= 11;
                     if (x.isPatternDefault()) {
-                        listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+                        listEvalFlags/*[0]*/ |= IAST.CONTAINS_DEFAULT_PATTERN;
                     }
                 } else if (x instanceof IPatternObject) {
                     ruleWithoutPattern[0] = false;
                     int[] result = ((IPatternObject) x).addPattern(patternIndexMap);
-                    listEvalFlags[0] |= result[0];
+                    listEvalFlags/*[0]*/ |= result[0];
                     priority[0] -= result[1];
                     if (x instanceof PatternNested) {
                         IExpr patternExpr = ((PatternNested) x).getPatternExpr();
                         if (patternExpr.isAST()) {
-                            listEvalFlags[0] |= determinePatternsRecursive(patternIndexMap, (IAST) patternExpr, priority,
+                            listEvalFlags/*[0]*/ |= determinePatternsRecursive(patternIndexMap, (IAST) patternExpr, priority,
                                     ruleWithoutPattern, treeLevel + 1);
                             priority[0] -= 11;
                             if (x.isPatternDefault()) {
-                                listEvalFlags[0] |= IAST.CONTAINS_DEFAULT_PATTERN;
+                                listEvalFlags/*[0]*/ |= IAST.CONTAINS_DEFAULT_PATTERN;
                             }
                         }
                     }
@@ -205,11 +206,11 @@ public abstract class IPatternMapImpl implements IPatternMap {
                     priority[0] -= (50 - treeLevel);
                 }
             }
-        }, 0);
-        lhsPatternExpr.setEvalFlags(listEvalFlags[0]);
+        }
+        lhsPatternExpr.setEvalFlags(listEvalFlags/*[0]*/);
         // disable flag "pattern with default value"
         // listEvalFlags &= IAST.CONTAINS_NO_DEFAULT_PATTERN_MASK;
-        return listEvalFlags[0];
+        return listEvalFlags/*[0]*/;
     }
 
     @Override
