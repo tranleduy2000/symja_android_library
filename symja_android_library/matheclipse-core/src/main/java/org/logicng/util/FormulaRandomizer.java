@@ -37,6 +37,7 @@ import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import com.duy.stream.Collectors;
 
@@ -334,7 +335,7 @@ public final class FormulaRandomizer {
             final Variable[] variables = new Variable[config.numVars];
             final int decimalPlaces = (int) Math.ceil(Math.log10(config.numVars));
             for (int i = 0; i < variables.length; i++) {
-                variables[i] = f.variable("v" + String.format("%0" + decimalPlaces + "d", i));
+                variables[i] = f.variable("v" + String.format(Locale.US, "%0" + decimalPlaces + "d", i));
             }
             return variables;
         }

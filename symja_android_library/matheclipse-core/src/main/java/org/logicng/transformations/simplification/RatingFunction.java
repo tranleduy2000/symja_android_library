@@ -36,6 +36,6 @@ import org.logicng.formulas.FormulaFunction;
  * @version 2.0.0
  * @since 2.0.0
  */
-@FunctionalInterface
+
 public interface RatingFunction<N extends Number> extends FormulaFunction<N> {
 }

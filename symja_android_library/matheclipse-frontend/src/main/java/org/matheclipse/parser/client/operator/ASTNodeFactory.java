@@ -499,7 +499,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 		// name = toRubiString(name);
 		// }
 		// if (fIgnoreCase) {
-		// return new SymbolNode(symbolName.toLowerCase());
+		// return new SymbolNode(symbolName.toLowerCase(Locale.US));
 		// }
 		return new SymbolNode(name);
 	}

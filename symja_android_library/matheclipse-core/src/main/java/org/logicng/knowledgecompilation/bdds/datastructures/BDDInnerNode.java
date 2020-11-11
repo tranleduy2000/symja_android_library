@@ -28,6 +28,8 @@
 
 package org.logicng.knowledgecompilation.bdds.datastructures;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Variable;
 
 import java.util.Collections;
@@ -88,7 +90,7 @@ public final class BDDInnerNode implements BDDNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.var, this.low, this.high);
+        return DObjects.hash(this.var, this.low, this.high);
     }
 
     @Override
@@ -98,9 +100,9 @@ public final class BDDInnerNode implements BDDNode {
         }
         if (other instanceof BDDInnerNode) {
             final BDDInnerNode o = (BDDInnerNode) other;
-            return Objects.equals(this.var, o.var)
-                    && Objects.equals(this.low, o.low)
-                    && Objects.equals(this.high, o.high);
+            return DObjects.equals(this.var, o.var)
+                    && DObjects.equals(this.low, o.low)
+                    && DObjects.equals(this.high, o.high);
         }
         return false;
     }

@@ -1,5 +1,7 @@
 package org.matheclipse.core.builtin;
 
+import com.duy.lang.DDouble;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -2370,13 +2372,13 @@ public class ManipulateFunction {
 		}
 		double valavg = new Mean().evaluate(yValues);
 		double valdev = new StandardDeviation().evaluate(yValues, valavg);
-		if (Double.isFinite(valavg) && Double.isFinite(valdev)) {
+		if (DDouble.isFinite(valavg) && DDouble.isFinite(valdev)) {
 
 			int n1 = 0;
 			int n2 = values.length - 1;
 			if (valdev != 0) {
 				for (double v : yValues) {
-					if (Double.isFinite(v)) {
+					if (DDouble.isFinite(v)) {
 						if (Math.abs(v - valavg) / valdev < thresh) {
 							break;
 						}
@@ -2385,7 +2387,7 @@ public class ManipulateFunction {
 				}
 				for (int i = yValues.length - 1; i >= 0; i--) {
 					double v = yValues[i];
-					if (Double.isFinite(v)) {
+					if (DDouble.isFinite(v)) {
 						if (Math.abs(v - valavg) / valdev < thresh) {
 							break;
 						}
@@ -2403,14 +2405,14 @@ public class ManipulateFunction {
 		double vmax = 5.0;
 		for (int i = 0; i < yValues.length; i++) {
 			double v = yValues[i];
-			if (Double.isFinite(v) && v >= -5.0 && v <= 5.0) {
+			if (DDouble.isFinite(v) && v >= -5.0 && v <= 5.0) {
 				vmin = v;
 				break;
 			}
 		}
 		for (int i = yValues.length - 1; i >= 0; i--) {
 			double v = yValues[i];
-			if (Double.isFinite(v) && v >= -5.0 && v <= 5.0) {
+			if (DDouble.isFinite(v) && v >= -5.0 && v <= 5.0) {
 				vmax = v;
 				break;
 			}
@@ -2538,7 +2540,7 @@ public class ManipulateFunction {
 	private static void xBoundingBox(EvalEngine engine, double[] boundingbox, IExpr xExpr) {
 		try {
 			double xValue = engine.evalDouble(xExpr);
-			if (Double.isFinite(xValue)) {
+			if (DDouble.isFinite(xValue)) {
 				if (xValue < boundingbox[0]) {
 					boundingbox[0] = xValue;
 				}
@@ -2554,13 +2556,13 @@ public class ManipulateFunction {
 	private static void xBoundingBoxFunctionRange(double[] boundingbox, Dimensions2D plotRange) {
 		if (plotRange != null) {
 			double xValue = plotRange.xMin;
-			if (Double.isFinite(xValue)) {
+			if (DDouble.isFinite(xValue)) {
 				if (xValue < boundingbox[0]) { // min
 					boundingbox[0] = xValue;
 				}
 			}
 			xValue = plotRange.xMax;
-			if (Double.isFinite(xValue)) {
+			if (DDouble.isFinite(xValue)) {
 				if (xValue > boundingbox[2]) { // max
 					boundingbox[2] = xValue;
 				}
@@ -2571,13 +2573,13 @@ public class ManipulateFunction {
 	private static void yBoundingBoxFunctionRange(double[] boundingbox, Dimensions2D plotRange) {
 		if (plotRange != null) {
 			double yValue = plotRange.yMin;
-			if (Double.isFinite(yValue)) {
+			if (DDouble.isFinite(yValue)) {
 				if (yValue < boundingbox[3]) { // min
 					boundingbox[3] = yValue;
 				}
 			}
 			yValue = plotRange.yMax;
-			if (Double.isFinite(yValue)) {
+			if (DDouble.isFinite(yValue)) {
 				if (yValue > boundingbox[1]) { // max
 					boundingbox[1] = yValue;
 				}
@@ -2609,7 +2611,7 @@ public class ManipulateFunction {
 			if (l.isPresent()) {
 				try {
 					double xValue = engine.evalDouble(l);
-					if (Double.isFinite(xValue)) {
+					if (DDouble.isFinite(xValue)) {
 						if (xValue < boundingbox[0]) { // min
 							boundingbox[0] = xValue;
 						}
@@ -2621,7 +2623,7 @@ public class ManipulateFunction {
 			if (u.isPresent()) {
 				try {
 					double xValue = engine.evalDouble(u);
-					if (Double.isFinite(xValue)) {
+					if (DDouble.isFinite(xValue)) {
 						if (xValue > boundingbox[2]) { // max
 							boundingbox[2] = xValue;
 						}
@@ -2657,7 +2659,7 @@ public class ManipulateFunction {
 			if (l.isPresent()) {
 				try {
 					double yValue = engine.evalDouble(l);
-					if (Double.isFinite(yValue)) {
+					if (DDouble.isFinite(yValue)) {
 						if (yValue < boundingbox[3]) { // min
 							boundingbox[3] = yValue;
 						}
@@ -2670,7 +2672,7 @@ public class ManipulateFunction {
 			if (u.isPresent()) {
 				try {
 					double yValue = engine.evalDouble(u);
-					if (Double.isFinite(yValue)) {
+					if (DDouble.isFinite(yValue)) {
 						if (yValue > boundingbox[1]) { // max
 							boundingbox[1] = yValue;
 						}
@@ -2686,7 +2688,7 @@ public class ManipulateFunction {
 	private static void yBoundingBox(EvalEngine engine, double[] boundingbox, IExpr yExpr) {
 		try {
 			double yValue = engine.evalDouble(yExpr);
-			if (Double.isFinite(yValue)) {
+			if (DDouble.isFinite(yValue)) {
 				if (yValue > boundingbox[1]) {
 					boundingbox[1] = yValue;
 				}

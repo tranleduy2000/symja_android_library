@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 /**
  * A java console program to run the DoubleEvaluator and ComplexEvalVisitor numerical evaluators interactivly.
@@ -30,15 +31,15 @@ public class Console {
             try {
 				expr = console.readString(System.out, ">> ");
 				if (expr != null) {
-					if ((expr.length() >= 4) && expr.toLowerCase().substring(0, 4).equals("exit")) {
+					if ((expr.length() >= 4) && expr.toLowerCase(Locale.US).substring(0, 4).equals("exit")) {
 						break;
 					}
-					if ((expr.length() >= 6) && expr.toLowerCase().substring(0, 6).equals("double")) {
+					if ((expr.length() >= 6) && expr.toLowerCase(Locale.US).substring(0, 6).equals("double")) {
 						// console.fComplexEvaluatorMode = false;
 						System.out.println("Double evaluation mode (switch to other mode with keyword 'complex')");
                             continue;
                         }
-					// if ((expr.length() >= 7) && expr.toLowerCase().substring(0, 7).equals("complex")) {
+					// if ((expr.length() >= 7) && expr.toLowerCase(Locale.US).substring(0, 7).equals("complex")) {
 					// console.fComplexEvaluatorMode = true;
 					// System.out.println("Complex evaluation mode (switch to other mode with keyword 'double')");
 					// continue;

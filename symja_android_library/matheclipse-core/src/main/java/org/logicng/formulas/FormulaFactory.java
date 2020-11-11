@@ -28,6 +28,9 @@
 
 package org.logicng.formulas;
 
+import com.duy.lang.DSystem;
+import com.duy.util.DObjects;
+
 import static org.logicng.formulas.FType.AND;
 import static org.logicng.formulas.FType.FALSE;
 import static org.logicng.formulas.FType.LITERAL;
@@ -1314,7 +1317,7 @@ public class FormulaFactory {
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.rhs, this.comparator, Arrays.hashCode(this.coefficients), Arrays.hashCode(this.literals));
+            return DObjects.hash(this.rhs, this.comparator, Arrays.hashCode(this.coefficients), Arrays.hashCode(this.literals));
         }
 
         @Override
@@ -1354,7 +1357,7 @@ public class FormulaFactory {
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.rhs, this.comparator, Arrays.hashCode(this.literals));
+            return DObjects.hash(this.rhs, this.comparator, Arrays.hashCode(this.literals));
         }
 
         @Override
@@ -1374,22 +1377,22 @@ public class FormulaFactory {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("Name:              ").append(this.name).append(System.lineSeparator());
-        sb.append("Positive Literals: ").append(this.posLiterals.size()).append(System.lineSeparator());
-        sb.append("Negative Literals: ").append(this.negLiterals.size()).append(System.lineSeparator());
-        sb.append("Negations:         ").append(this.nots.size()).append(System.lineSeparator());
-        sb.append("Implications:      ").append(this.implications.size()).append(System.lineSeparator());
-        sb.append("Equivalences:      ").append(this.equivalences.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (2):  ").append(this.ands2.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (3):  ").append(this.ands3.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (4):  ").append(this.ands4.size()).append(System.lineSeparator());
-        sb.append("Conjunctions (>4): ").append(this.andsN.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (2):  ").append(this.ors2.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (3):  ").append(this.ors3.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (4):  ").append(this.ors4.size()).append(System.lineSeparator());
-        sb.append("Disjunctions (>4): ").append(this.orsN.size()).append(System.lineSeparator());
-        sb.append("Pseudo Booleans:   ").append(this.pbConstraints.size()).append(System.lineSeparator());
-        sb.append("CCs:               ").append(this.cardinalityConstraints.size()).append(System.lineSeparator());
+        sb.append("Name:              ").append(this.name).append(DSystem.lineSeparator());
+        sb.append("Positive Literals: ").append(this.posLiterals.size()).append(DSystem.lineSeparator());
+        sb.append("Negative Literals: ").append(this.negLiterals.size()).append(DSystem.lineSeparator());
+        sb.append("Negations:         ").append(this.nots.size()).append(DSystem.lineSeparator());
+        sb.append("Implications:      ").append(this.implications.size()).append(DSystem.lineSeparator());
+        sb.append("Equivalences:      ").append(this.equivalences.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (2):  ").append(this.ands2.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (3):  ").append(this.ands3.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (4):  ").append(this.ands4.size()).append(DSystem.lineSeparator());
+        sb.append("Conjunctions (>4): ").append(this.andsN.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (2):  ").append(this.ors2.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (3):  ").append(this.ors3.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (4):  ").append(this.ors4.size()).append(DSystem.lineSeparator());
+        sb.append("Disjunctions (>4): ").append(this.orsN.size()).append(DSystem.lineSeparator());
+        sb.append("Pseudo Booleans:   ").append(this.pbConstraints.size()).append(DSystem.lineSeparator());
+        sb.append("CCs:               ").append(this.cardinalityConstraints.size()).append(DSystem.lineSeparator());
         return sb.toString();
     }
 
@@ -1588,7 +1591,7 @@ public class FormulaFactory {
                 return false;
             }
             final FormulaFactoryStatistics that = (FormulaFactoryStatistics) o;
-            return Objects.equals(this.name, that.name) &&
+            return DObjects.equals(this.name, that.name) &&
                     this.positiveLiterals == that.positiveLiterals &&
                     this.negativeLiterals == that.negativeLiterals &&
                     this.negations == that.negations &&
@@ -1611,7 +1614,7 @@ public class FormulaFactory {
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.name, this.positiveLiterals, this.negativeLiterals, this.negations, this.implications, this.equivalences, this.conjunctions2,
+            return DObjects.hash(this.name, this.positiveLiterals, this.negativeLiterals, this.negations, this.implications, this.equivalences, this.conjunctions2,
                     this.conjunctions3, this.conjunctions4, this.conjunctionsN, this.disjunctions2, this.disjunctions3, this.disjunctions4, this.disjunctionsN,
                     this.pbcs, this.ccs, this.ccCounter, this.pbCounter, this.cnfCounter);
         }

@@ -449,7 +449,7 @@ public class FuzzyParserFactory implements IParserFactory {
 	// if (nodeStr.length() == 1) {
 	// return nodeStr;
 	// }
-	// String lowercaseName = nodeStr.toLowerCase();
+	// String lowercaseName = nodeStr.toLowerCase(Locale.US);
 	// String temp = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(lowercaseName);
 	// if (temp != null) {
 	// if (!temp.equals(nodeStr)) {
@@ -466,7 +466,7 @@ public class FuzzyParserFactory implements IParserFactory {
 	// }
 	// }
 	// } else {
-	// if (!nodeStr.equals(nodeStr.toLowerCase())) {
+	// if (!nodeStr.equals(nodeStr.toLowerCase(Locale.US))) {
 	// temp = F.PREDEFINED_INTERNAL_FORM_STRINGS.get(nodeStr);
 	// if (temp == null) {
 	// if (lowercaseName.length() > 1) {

@@ -38,6 +38,7 @@ import org.logicng.solvers.sat.MiniSatStyleSolver;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedSet;
 
 /**
@@ -160,7 +161,7 @@ public class DTreeLeaf extends DTree {
 
     @Override
     public String toString() {
-        return String.format("DTreeLeaf: %d, %s", this.id, this.clause);
+        return String.format(Locale.US, "DTreeLeaf: %d, %s", this.id, this.clause);
     }
 
     /**

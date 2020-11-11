@@ -28,6 +28,8 @@
 
 package org.logicng.graphs.datastructures;
 
+import com.duy.util.DObjects;
+
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -117,7 +119,7 @@ public final class Node<T> {
             return false;
         }
         final Node<?> node = (Node<?>) o;
-        return this.graph.equals(node.graph) && Objects.equals(this.content, node.content);
+        return this.graph.equals(node.graph) && DObjects.equals(this.content, node.content);
     }
 
     @Override

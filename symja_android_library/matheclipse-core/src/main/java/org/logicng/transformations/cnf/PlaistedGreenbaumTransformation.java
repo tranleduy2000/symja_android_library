@@ -41,6 +41,7 @@ import org.logicng.predicates.CNFPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Transformation of a formula into CNF due to Plaisted &amp; Greenbaum.  Results in this implementation will always be
@@ -163,6 +164,6 @@ public final class PlaistedGreenbaumTransformation implements FormulaTransformat
 
     @Override
     public String toString() {
-        return String.format("PlaistedGreenbaumTransformation{boundary=%d}", this.boundaryForFactorization);
+        return String.format(Locale.US, "PlaistedGreenbaumTransformation{boundary=%d}", this.boundaryForFactorization);
     }
 }

@@ -66,6 +66,7 @@ import org.logicng.util.Pair;
 
 import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.TreeMap;
 
 /**
@@ -355,7 +356,7 @@ public class IncWBO extends WBO {
                 final int coreCost = computeCostCore(this.solver.conflict());
                 this.lbCost += coreCost;
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c LB : %d CS : %d W : %d", this.lbCost, this.solver.conflict().size(), coreCost));
+                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", this.lbCost, this.solver.conflict().size(), coreCost));
                 }
                 if (!foundLowerBound(this.lbCost, null)) {
                     return MaxSATResult.UNDEF;
@@ -453,7 +454,7 @@ public class IncWBO extends WBO {
                 final int coreCost = computeCostCore(this.solver.conflict());
                 this.lbCost += coreCost;
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c LB : %d CS : %d W : %d", this.lbCost, this.solver.conflict().size(), coreCost));
+                    this.output.println(String.format(Locale.US, "c LB : %d CS : %d W : %d", this.lbCost, this.solver.conflict().size(), coreCost));
                 }
                 if (this.lbCost == this.ubCost) {
                     if (this.verbosity != Verbosity.NONE) {

@@ -28,6 +28,8 @@
 
 package org.logicng.primecomputation;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Literal;
 
 import java.util.List;
@@ -93,14 +95,14 @@ public final class PrimeResult {
             return false;
         }
         final PrimeResult that = (PrimeResult) o;
-        return Objects.equals(this.primeImplicants, that.primeImplicants) &&
-                Objects.equals(this.primeImplicates, that.primeImplicates) &&
+        return DObjects.equals(this.primeImplicants, that.primeImplicants) &&
+                DObjects.equals(this.primeImplicates, that.primeImplicates) &&
                 this.coverageType == that.coverageType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.primeImplicants, this.primeImplicates, this.coverageType);
+        return DObjects.hash(this.primeImplicants, this.primeImplicates, this.coverageType);
     }
 
     @Override

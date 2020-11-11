@@ -42,6 +42,7 @@ import org.logicng.predicates.CNFPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Transformation of a formula into CNF due to Tseitin.  Results in this implementation will always be cached.
@@ -154,6 +155,6 @@ public final class TseitinTransformation implements FormulaTransformation {
 
     @Override
     public String toString() {
-        return String.format("TseitinTransformation{boundary=%d}", this.boundaryForFactorization);
+        return String.format(Locale.US, "TseitinTransformation{boundary=%d}", this.boundaryForFactorization);
     }
 }

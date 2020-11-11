@@ -33,7 +33,7 @@ package org.logicng.formulas;
  * @version 2.0.0
  * @since 1.0
  */
-@FunctionalInterface
+
 public interface FormulaTransformation {
 
     /**

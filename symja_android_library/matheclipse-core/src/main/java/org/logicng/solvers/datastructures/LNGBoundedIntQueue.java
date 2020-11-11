@@ -79,6 +79,8 @@ package org.logicng.solvers.datastructures;
 
 import org.logicng.collections.LNGIntVector;
 
+import java.util.Locale;
+
 /**
  * A bounded integer queue (for Glucose)
  * @version 1.3
@@ -156,7 +158,7 @@ public final class LNGBoundedIntQueue {
 
     @Override
     public String toString() {
-        return String.format("LNGBoundedIntQueue{first=%d, last=%d, sumOfQueue=%d, maxSize=%d, queueSize=%d, elems=%s}",
+        return String.format(Locale.US, "LNGBoundedIntQueue{first=%d, last=%d, sumOfQueue=%d, maxSize=%d, queueSize=%d, elems=%s}",
                 this.first, this.last, this.sumOfQueue, this.maxSize, this.queueSize, this.elems);
     }
 }

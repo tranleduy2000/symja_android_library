@@ -28,6 +28,8 @@
 
 package org.logicng.util;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.Variable;
@@ -87,34 +89,34 @@ public final class FormulaRandomizerConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("FormulaRandomizerConfig{").append(System.lineSeparator());
-        sb.append("seed=").append(this.seed).append(System.lineSeparator());
-        sb.append("variables=").append(this.variables).append(System.lineSeparator());
-        sb.append("numVars=").append(this.numVars).append(System.lineSeparator());
-        sb.append("weightConstant=").append(this.weightConstant).append(System.lineSeparator());
-        sb.append("weightPositiveLiteral=").append(this.weightPositiveLiteral).append(System.lineSeparator());
-        sb.append("weightNegativeLiteral=").append(this.weightNegativeLiteral).append(System.lineSeparator());
-        sb.append("weightOr=").append(this.weightOr).append(System.lineSeparator());
-        sb.append("weightAnd=").append(this.weightAnd).append(System.lineSeparator());
-        sb.append("weightNot=").append(this.weightNot).append(System.lineSeparator());
-        sb.append("weightImpl=").append(this.weightImpl).append(System.lineSeparator());
-        sb.append("weightEquiv=").append(this.weightEquiv).append(System.lineSeparator());
-        sb.append("maximumOperandsAnd=").append(this.maximumOperandsAnd).append(System.lineSeparator());
-        sb.append("maximumOperandsOr=").append(this.maximumOperandsOr).append(System.lineSeparator());
-        sb.append("weightPbc=").append(this.weightPbc).append(System.lineSeparator());
-        sb.append("weightPbcCoeffPositive=").append(this.weightPbcCoeffPositive).append(System.lineSeparator());
-        sb.append("weightPbcCoeffNegative=").append(this.weightPbcCoeffNegative).append(System.lineSeparator());
-        sb.append("weightPbcTypeLe=").append(this.weightPbcTypeLe).append(System.lineSeparator());
-        sb.append("weightPbcTypeLt=").append(this.weightPbcTypeLt).append(System.lineSeparator());
-        sb.append("weightPbcTypeGe=").append(this.weightPbcTypeGe).append(System.lineSeparator());
-        sb.append("weightPbcTypeGt=").append(this.weightPbcTypeGt).append(System.lineSeparator());
-        sb.append("weightPbcTypeEq=").append(this.weightPbcTypeEq).append(System.lineSeparator());
-        sb.append("maximumOperandsPbc=").append(this.maximumOperandsPbc).append(System.lineSeparator());
-        sb.append("maximumCoefficientPbc=").append(this.maximumCoefficientPbc).append(System.lineSeparator());
-        sb.append("weightCc=").append(this.weightCc).append(System.lineSeparator());
-        sb.append("weightAmo=").append(this.weightAmo).append(System.lineSeparator());
-        sb.append("weightExo=").append(this.weightExo).append(System.lineSeparator());
-        sb.append("maximumOperandsCc=").append(this.maximumOperandsCc).append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("FormulaRandomizerConfig{").append(DSystem.lineSeparator());
+        sb.append("seed=").append(this.seed).append(DSystem.lineSeparator());
+        sb.append("variables=").append(this.variables).append(DSystem.lineSeparator());
+        sb.append("numVars=").append(this.numVars).append(DSystem.lineSeparator());
+        sb.append("weightConstant=").append(this.weightConstant).append(DSystem.lineSeparator());
+        sb.append("weightPositiveLiteral=").append(this.weightPositiveLiteral).append(DSystem.lineSeparator());
+        sb.append("weightNegativeLiteral=").append(this.weightNegativeLiteral).append(DSystem.lineSeparator());
+        sb.append("weightOr=").append(this.weightOr).append(DSystem.lineSeparator());
+        sb.append("weightAnd=").append(this.weightAnd).append(DSystem.lineSeparator());
+        sb.append("weightNot=").append(this.weightNot).append(DSystem.lineSeparator());
+        sb.append("weightImpl=").append(this.weightImpl).append(DSystem.lineSeparator());
+        sb.append("weightEquiv=").append(this.weightEquiv).append(DSystem.lineSeparator());
+        sb.append("maximumOperandsAnd=").append(this.maximumOperandsAnd).append(DSystem.lineSeparator());
+        sb.append("maximumOperandsOr=").append(this.maximumOperandsOr).append(DSystem.lineSeparator());
+        sb.append("weightPbc=").append(this.weightPbc).append(DSystem.lineSeparator());
+        sb.append("weightPbcCoeffPositive=").append(this.weightPbcCoeffPositive).append(DSystem.lineSeparator());
+        sb.append("weightPbcCoeffNegative=").append(this.weightPbcCoeffNegative).append(DSystem.lineSeparator());
+        sb.append("weightPbcTypeLe=").append(this.weightPbcTypeLe).append(DSystem.lineSeparator());
+        sb.append("weightPbcTypeLt=").append(this.weightPbcTypeLt).append(DSystem.lineSeparator());
+        sb.append("weightPbcTypeGe=").append(this.weightPbcTypeGe).append(DSystem.lineSeparator());
+        sb.append("weightPbcTypeGt=").append(this.weightPbcTypeGt).append(DSystem.lineSeparator());
+        sb.append("weightPbcTypeEq=").append(this.weightPbcTypeEq).append(DSystem.lineSeparator());
+        sb.append("maximumOperandsPbc=").append(this.maximumOperandsPbc).append(DSystem.lineSeparator());
+        sb.append("maximumCoefficientPbc=").append(this.maximumCoefficientPbc).append(DSystem.lineSeparator());
+        sb.append("weightCc=").append(this.weightCc).append(DSystem.lineSeparator());
+        sb.append("weightAmo=").append(this.weightAmo).append(DSystem.lineSeparator());
+        sb.append("weightExo=").append(this.weightExo).append(DSystem.lineSeparator());
+        sb.append("maximumOperandsCc=").append(this.maximumOperandsCc).append(DSystem.lineSeparator());
         sb.append('}');
         return sb.toString();
     }

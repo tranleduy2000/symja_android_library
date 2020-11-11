@@ -28,6 +28,8 @@
 
 package org.logicng.explanations.mus;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -66,9 +68,9 @@ public final class MUSConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MUSConfig{").append(System.lineSeparator());
-        sb.append("algorithm=").append(this.algorithm).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("MUSConfig{").append(DSystem.lineSeparator());
+        sb.append("algorithm=").append(this.algorithm).append(DSystem.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         return sb.toString();
     }
 

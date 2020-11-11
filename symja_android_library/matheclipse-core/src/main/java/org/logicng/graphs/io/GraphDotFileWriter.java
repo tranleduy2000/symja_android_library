@@ -28,6 +28,9 @@
 
 package org.logicng.graphs.io;
 
+import com.duy.lang.DSystem;
+import com.duy.nio.charset.DStandardCharsets;
+
 import org.logicng.graphs.datastructures.Graph;
 import org.logicng.graphs.datastructures.Node;
 
@@ -38,6 +41,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -73,27 +77,30 @@ public final class GraphDotFileWriter {
      * @throws IOException if there was a problem writing the file
      */
     public static <T> void write(final File file, final Graph<T> graph) throws IOException {
-        final StringBuilder sb = new StringBuilder(String.format("strict graph {%n"));
+        final StringBuilder sb = new StringBuilder(String.format(Locale.US, "strict graph {%n"));
 
         final Set<Node<T>> doneNodes = new LinkedHashSet<>();
         for (final Node<T> d : graph.nodes()) {
             for (final Node<T> n : d.neighbours()) {
                 if (!doneNodes.contains(n)) {
-                    sb.append("  ").append(d.content()).append(" -- ").append(n.content()).append(System.lineSeparator());
+                    sb.append("  ").append(d.content()).append(" -- ").append(n.content()).append(DSystem.lineSeparator());
                 }
             }
             doneNodes.add(d);
         }
         for (final Node<T> d : graph.nodes()) {
             if (d.neighbours().isEmpty()) {
-                sb.append("  ").append(d.content()).append(System.lineSeparator());
+                sb.append("  ").append(d.content()).append(DSystem.lineSeparator());
             }
         }
         sb.append("}");
 
-        try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
     }
 }

@@ -51,6 +51,8 @@ package org.logicng.solvers.datastructures;
 
 import org.logicng.collections.LNGIntVector;
 
+import java.util.Locale;
+
 /**
  * A soft clause for the MaxSAT solver.
  * @version 1.0
@@ -127,7 +129,7 @@ public final class MSSoftClause {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(String.format("MSSoftClause{weight=%d, assumption=%d lits=[", this.weight, this.assumptionVar));
+        final StringBuilder sb = new StringBuilder(String.format(Locale.US, "MSSoftClause{weight=%d, assumption=%d lits=[", this.weight, this.assumptionVar));
         for (int i = 0; i < this.clause.size(); i++) {
             final int lit = this.clause.get(i);
             sb.append((lit & 1) == 1 ? "-" : "").append(lit >> 1);

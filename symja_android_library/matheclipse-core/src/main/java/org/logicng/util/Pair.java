@@ -28,6 +28,9 @@
 
 package org.logicng.util;
 
+import com.duy.util.DObjects;
+
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -70,7 +73,7 @@ public class Pair<A, B> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.a, this.b);
+        return DObjects.hash(this.a, this.b);
     }
 
     @Override
@@ -80,13 +83,13 @@ public class Pair<A, B> {
         }
         if (other instanceof Pair) {
             final Pair<?, ?> o = (Pair<?, ?>) other;
-            return Objects.equals(this.b, o.b) && Objects.equals(this.a, o.a);
+            return DObjects.equals(this.b, o.b) && DObjects.equals(this.a, o.a);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return String.format("<%s, %s>", this.a, this.b);
+        return String.format(Locale.US, "<%s, %s>", this.a, this.b);
     }
 }

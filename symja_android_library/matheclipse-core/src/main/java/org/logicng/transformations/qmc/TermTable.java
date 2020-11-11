@@ -33,6 +33,7 @@ import org.logicng.formulas.Formula;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -246,12 +247,12 @@ public class TermTable {
             }
         }
         for (final String s : legend.keySet()) {
-            sb.append(String.format("%s | ", padRight(s, columnSize)));
+            sb.append(String.format(Locale.US, "%s | ", padRight(s, columnSize)));
         }
-        sb.append(String.format("%n"));
+        sb.append(String.format(Locale.US, "%n"));
 
         for (int i = 0; i < this.matrixLines.size(); i++) {
-            sb.append(String.format("%s | %s%n", lineHeaderStrings.get(i), formatMatrixLine(this.matrixLines.get(i), columnSize)));
+            sb.append(String.format(Locale.US, "%s | %s%n", lineHeaderStrings.get(i), formatMatrixLine(this.matrixLines.get(i), columnSize)));
         }
         return sb.toString();
     }
@@ -284,6 +285,6 @@ public class TermTable {
     }
 
     private static String padRight(final String s, final int n) {
-        return String.format("%1$-" + n + "s", s);
+        return String.format(Locale.US, "%1$-" + n + "s", s);
     }
 }

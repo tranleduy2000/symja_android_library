@@ -846,7 +846,11 @@ public class MatrixUtils {
             f.setAccessible(true);
             f.set(instance, vector);
 
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException e) {
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
+        } catch (IllegalAccessException e) {
             IOException ioe = new IOException();
             ioe.initCause(e);
             throw ioe;
@@ -954,7 +958,11 @@ public class MatrixUtils {
             f.setAccessible(true);
             f.set(instance, matrix);
 
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException e) {
+            IOException ioe = new IOException();
+            ioe.initCause(e);
+            throw ioe;
+        } catch (IllegalAccessException e) {
             IOException ioe = new IOException();
             ioe.initCause(e);
             throw ioe;

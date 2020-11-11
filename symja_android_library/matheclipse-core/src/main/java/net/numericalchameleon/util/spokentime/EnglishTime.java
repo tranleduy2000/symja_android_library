@@ -45,12 +45,12 @@ public class EnglishTime extends SpokenTime implements NumberToWordsInterface, M
                 syllables.add(NOON);
                 return;
             }
-            // timeInWords = String.format("%s o'clock", hoursInWords(hours));
+            // timeInWords = String.format(Locale.US, "%s o'clock", hoursInWords(hours));
             hoursInWords(hours);
             syllables.add(BLANK);
             syllables.add(OCLOCK);
         } else if (minutes == 15) {
-            // timeInWords = String.format("quarter after %s", hoursInWords(hours));
+            // timeInWords = String.format(Locale.US, "quarter after %s", hoursInWords(hours));
             if (type == HourclockType.HOURCLOCK12_COLLOQUIAL_UK) {
                 syllables.add(A_QUARTER);
             } else {
@@ -73,13 +73,13 @@ public class EnglishTime extends SpokenTime implements NumberToWordsInterface, M
                 hoursInWords(hours);
             } else {
                 // US
-                // timeInWords = String.format("%s %s", hoursInWords(hours), minutesInWords(minutes));
+                // timeInWords = String.format(Locale.US, "%s %s", hoursInWords(hours), minutesInWords(minutes));
                 hoursInWords(hours);
                 syllables.add(BLANK);
                 minutesInWords(minutes);
             }
         } else if (minutes == 45) {
-            // timeInWords = String.format("quarter to %s", hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "quarter to %s", hoursInWords(hours + 1));
             if (type == HourclockType.HOURCLOCK12_COLLOQUIAL_UK) {
                 syllables.add(A_QUARTER);
             } else {
@@ -90,7 +90,7 @@ public class EnglishTime extends SpokenTime implements NumberToWordsInterface, M
             syllables.add(BLANK);
             hoursInWords(hours + 1);
         } else if (minutes < 30) {
-            // timeInWords = String.format("%s after %s", minutesInWords(minutes), hoursInWords(hours));
+            // timeInWords = String.format(Locale.US, "%s after %s", minutesInWords(minutes), hoursInWords(hours));
             minutesInWords(minutes);
             if (minutes < 5) {
                 syllables.add(BLANK);
@@ -109,7 +109,7 @@ public class EnglishTime extends SpokenTime implements NumberToWordsInterface, M
             syllables.add(BLANK);
             hoursInWords(hours);
         } else {
-            // timeInWords = String.format("%s to %s", minutesInWords(60 - minutes), hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "%s to %s", minutesInWords(60 - minutes), hoursInWords(hours + 1));
             minutesInWords(60 - minutes);
             if (60 - minutes < 5) {
                 syllables.add(BLANK);

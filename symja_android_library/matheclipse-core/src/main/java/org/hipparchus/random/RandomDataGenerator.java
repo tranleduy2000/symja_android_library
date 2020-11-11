@@ -950,7 +950,7 @@ public class RandomDataGenerator extends ForwardingRandomGenerator
     /**
      * Interface for samplers of continuous distributions.
      */
-    @FunctionalInterface
+
     private interface RealDistributionSampler {
         /**
          * Return the next sample following the given distribution.

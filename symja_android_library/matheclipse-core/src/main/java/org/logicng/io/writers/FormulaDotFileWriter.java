@@ -28,6 +28,8 @@
 
 package org.logicng.io.writers;
 
+import com.duy.nio.charset.DStandardCharsets;
+
 import org.logicng.formulas.BinaryOperator;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.Literal;
@@ -42,6 +44,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -77,26 +80,29 @@ public final class FormulaDotFileWriter {
      * @throws IOException if there was a problem writing the file
      */
     public static void write(final File file, final Formula formula, boolean alignLiterals) throws IOException {
-        final StringBuilder sb = new StringBuilder(String.format("digraph G {%n"));
+        final StringBuilder sb = new StringBuilder(String.format(Locale.US, "digraph G {%n"));
         final Map<Formula, Integer> ids = new HashMap<>();
         if (alignLiterals && !formula.literals().isEmpty()) {
-            sb.append(String.format("{ rank = same;%n"));
+            sb.append(String.format(Locale.US, "{ rank = same;%n"));
         }
         int id = 0;
         for (final Literal lit : formula.literals()) {
             ids.put(lit, id);
             sb.append("  id").append(id).append(" [shape=box, label=\"").
-                    append(lit.phase() ? lit.name() : "¬" + lit.name()).append(String.format("\"];%n"));
+                    append(lit.phase() ? lit.name() : "¬" + lit.name()).append(String.format(Locale.US, "\"];%n"));
             id++;
         }
         if (alignLiterals && !formula.literals().isEmpty()) {
-            sb.append(String.format("}%n"));
+            sb.append(String.format(Locale.US, "}%n"));
         }
         generateDotString(formula, sb, ids);
-        sb.append(String.format("}%n"));
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+        sb.append(String.format(Locale.US, "}%n"));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
     }
 
@@ -109,19 +115,19 @@ public final class FormulaDotFileWriter {
     private static void generateDotString(final Formula formula, final StringBuilder sb, final Map<Formula, Integer> ids) {
         switch (formula.type()) {
             case FALSE:
-                sb.append(String.format("  false;%n"));
+                sb.append(String.format(Locale.US, "  false;%n"));
                 break;
             case TRUE:
-                sb.append(String.format("  true;%n"));
+                sb.append(String.format(Locale.US, "  true;%n"));
                 break;
             case LITERAL:
                 break;
             case PBC:
                 final int id = ids.size();
                 ids.put(formula, id);
-                sb.append("  id").append(id).append(" [label=\"").append(formula.toString()).append(String.format("\"];%n"));
+                sb.append("  id").append(id).append(" [label=\"").append(formula.toString()).append(String.format(Locale.US, "\"];%n"));
                 for (final Formula operand : ((PBConstraint) formula).operands()) {
-                    sb.append("  id").append(id).append(" -> id").append(ids.get(operand)).append(String.format(";%n"));
+                    sb.append("  id").append(id).append(" -> id").append(ids.get(operand)).append(String.format(Locale.US, ";%n"));
                 }
                 break;
             case NOT:
@@ -152,8 +158,8 @@ public final class FormulaDotFileWriter {
         }
         id = ids.size();
         ids.put(not, id);
-        sb.append("  id").append(id).append(String.format(" [label=\"¬\"];%n"));
-        sb.append("  id").append(id).append(" -> id").append(ids.get(not.operand())).append(String.format(";%n"));
+        sb.append("  id").append(id).append(String.format(Locale.US, " [label=\"¬\"];%n"));
+        sb.append("  id").append(id).append(" -> id").append(ids.get(not.operand())).append(String.format(Locale.US, ";%n"));
     }
 
     private static void generateBinaryDotString(final BinaryOperator formula, final StringBuilder sb,
@@ -166,11 +172,11 @@ public final class FormulaDotFileWriter {
         }
         final int id = ids.size();
         ids.put(formula, id);
-        sb.append("  id").append(id).append(" [label=\"").append(op).append(String.format("\"];%n"));
+        sb.append("  id").append(id).append(" [label=\"").append(op).append(String.format(Locale.US, "\"];%n"));
         sb.append("  id").append(id).append(" -> id").append(ids.get(formula.left()));
-        sb.append(directions ? String.format(" [label=\"l\"];%n") : String.format(";%n"));
+        sb.append(directions ? String.format(Locale.US, " [label=\"l\"];%n") : String.format(Locale.US, ";%n"));
         sb.append("  id").append(id).append(" -> id").append(ids.get(formula.right()));
-        sb.append(directions ? String.format(" [label=\"r\"];%n") : String.format(";%n"));
+        sb.append(directions ? String.format(Locale.US, " [label=\"r\"];%n") : String.format(Locale.US, ";%n"));
     }
 
     private static void generateNaryDotString(final NAryOperator formula, final StringBuilder sb,
@@ -182,9 +188,9 @@ public final class FormulaDotFileWriter {
         }
         final int id = ids.size();
         ids.put(formula, id);
-        sb.append("  id").append(id).append(" [label=\"").append(op).append(String.format("\"];%n"));
+        sb.append("  id").append(id).append(" [label=\"").append(op).append(String.format(Locale.US, "\"];%n"));
         for (final Formula operand : formula) {
-            sb.append("  id").append(id).append(" -> id").append(ids.get(operand)).append(String.format(";%n"));
+            sb.append("  id").append(id).append(" -> id").append(ids.get(operand)).append(String.format(Locale.US, ";%n"));
         }
     }
 }

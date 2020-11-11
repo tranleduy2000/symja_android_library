@@ -28,6 +28,8 @@
 
 package org.logicng.solvers.sat;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 import org.logicng.formulas.Formula;
@@ -169,24 +171,24 @@ public final class MiniSatConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MiniSatConfig{").append(System.lineSeparator());
-        sb.append("varDecay=").append(this.varDecay).append(System.lineSeparator());
-        sb.append("varInc=").append(this.varInc).append(System.lineSeparator());
-        sb.append("clauseMin=").append(this.clauseMin).append(System.lineSeparator());
-        sb.append("restartFirst=").append(this.restartFirst).append(System.lineSeparator());
-        sb.append("restartInc=").append(this.restartInc).append(System.lineSeparator());
-        sb.append("clauseDecay=").append(this.clauseDecay).append(System.lineSeparator());
-        sb.append("removeSatisfied=").append(this.removeSatisfied).append(System.lineSeparator());
-        sb.append("learntsizeFactor=").append(this.learntsizeFactor).append(System.lineSeparator());
-        sb.append("learntsizeInc=").append(this.learntsizeInc).append(System.lineSeparator());
-        sb.append("incremental=").append(this.incremental).append(System.lineSeparator());
-        sb.append("initialPhase=").append(this.initialPhase).append(System.lineSeparator());
-        sb.append("proofGeneration=").append(this.proofGeneration).append(System.lineSeparator());
-        sb.append("cnfMethod=").append(this.cnfMethod).append(System.lineSeparator());
-        sb.append("auxiliaryVariablesInModels=").append(this.auxiliaryVariablesInModels).append(System.lineSeparator());
-        sb.append("bbInitialUBCheckForRotatableLiterals=").append(this.bbInitialUBCheckForRotatableLiterals).append(System.lineSeparator());
-        sb.append("bbCheckForComplementModelLiterals=").append(this.bbCheckForComplementModelLiterals).append(System.lineSeparator());
-        sb.append("bbCheckForRotatableLiterals=").append(this.bbCheckForRotatableLiterals).append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("MiniSatConfig{").append(DSystem.lineSeparator());
+        sb.append("varDecay=").append(this.varDecay).append(DSystem.lineSeparator());
+        sb.append("varInc=").append(this.varInc).append(DSystem.lineSeparator());
+        sb.append("clauseMin=").append(this.clauseMin).append(DSystem.lineSeparator());
+        sb.append("restartFirst=").append(this.restartFirst).append(DSystem.lineSeparator());
+        sb.append("restartInc=").append(this.restartInc).append(DSystem.lineSeparator());
+        sb.append("clauseDecay=").append(this.clauseDecay).append(DSystem.lineSeparator());
+        sb.append("removeSatisfied=").append(this.removeSatisfied).append(DSystem.lineSeparator());
+        sb.append("learntsizeFactor=").append(this.learntsizeFactor).append(DSystem.lineSeparator());
+        sb.append("learntsizeInc=").append(this.learntsizeInc).append(DSystem.lineSeparator());
+        sb.append("incremental=").append(this.incremental).append(DSystem.lineSeparator());
+        sb.append("initialPhase=").append(this.initialPhase).append(DSystem.lineSeparator());
+        sb.append("proofGeneration=").append(this.proofGeneration).append(DSystem.lineSeparator());
+        sb.append("cnfMethod=").append(this.cnfMethod).append(DSystem.lineSeparator());
+        sb.append("auxiliaryVariablesInModels=").append(this.auxiliaryVariablesInModels).append(DSystem.lineSeparator());
+        sb.append("bbInitialUBCheckForRotatableLiterals=").append(this.bbInitialUBCheckForRotatableLiterals).append(DSystem.lineSeparator());
+        sb.append("bbCheckForComplementModelLiterals=").append(this.bbCheckForComplementModelLiterals).append(DSystem.lineSeparator());
+        sb.append("bbCheckForRotatableLiterals=").append(this.bbCheckForRotatableLiterals).append(DSystem.lineSeparator());
         sb.append("}");
         return sb.toString();
     }

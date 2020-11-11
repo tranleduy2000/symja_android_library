@@ -98,7 +98,7 @@ public class RomanNumeral {
     }
 
 //    public void setString(String myString) throws RomanNumeralException {
-//        sourceString = myString.toUpperCase();
+//        sourceString = myString.toUpperCase(Locale.US);
 //        try {
 //            sourceLong = convert2Long();
 //        } catch (RomanNumeralException e) {

@@ -1,8 +1,6 @@
 
 package org.matheclipse.core.builtin;
 
-import android.icu.text.Transliterator;
-
 import com.duy.lambda.Predicate;
 import com.gx.common.base.CharMatcher;
 
@@ -2056,9 +2054,9 @@ public final class StringFunctions {
 			try {
 				if (ignoreCase) {
 					pattern = java.util.regex.Pattern.compile(regex,
-							Pattern.UNICODE_CHARACTER_CLASS | Pattern.CASE_INSENSITIVE);
+							/*Pattern.UNICODE_CHARACTER_CLASS |*/ Pattern.CASE_INSENSITIVE);
 				} else {
-					pattern = java.util.regex.Pattern.compile(regex, Pattern.UNICODE_CHARACTER_CLASS);
+					pattern = java.util.regex.Pattern.compile(regex/*, Pattern.UNICODE_CHARACTER_CLASS*/);
 				}
 				return pattern;
 			} catch (IllegalArgumentException iae) {

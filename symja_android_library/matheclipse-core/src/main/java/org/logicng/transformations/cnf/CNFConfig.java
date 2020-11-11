@@ -28,8 +28,12 @@
 
 package org.logicng.transformations.cnf;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
+
+import java.util.Locale;
 
 /**
  * The configuration object for the CNF encoding.
@@ -74,13 +78,13 @@ public final class CNFConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(String.format("CNFConfig{%n"));
-        sb.append("algorithm=").append(this.algorithm).append(System.lineSeparator());
-        sb.append("fallbackAlgorithmForAdvancedEncoding=").append(this.fallbackAlgorithmForAdvancedEncoding).append(System.lineSeparator());
-        sb.append("distributedBoundary=").append(this.distributionBoundary).append(System.lineSeparator());
-        sb.append("createdClauseBoundary=").append(this.createdClauseBoundary).append(System.lineSeparator());
-        sb.append("atomBoundary=").append(this.atomBoundary).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder(String.format(Locale.US, "CNFConfig{%n"));
+        sb.append("algorithm=").append(this.algorithm).append(DSystem.lineSeparator());
+        sb.append("fallbackAlgorithmForAdvancedEncoding=").append(this.fallbackAlgorithmForAdvancedEncoding).append(DSystem.lineSeparator());
+        sb.append("distributedBoundary=").append(this.distributionBoundary).append(DSystem.lineSeparator());
+        sb.append("createdClauseBoundary=").append(this.createdClauseBoundary).append(DSystem.lineSeparator());
+        sb.append("atomBoundary=").append(this.atomBoundary).append(DSystem.lineSeparator());
+        sb.append("}").append(DSystem.lineSeparator());
         return sb.toString();
     }
 

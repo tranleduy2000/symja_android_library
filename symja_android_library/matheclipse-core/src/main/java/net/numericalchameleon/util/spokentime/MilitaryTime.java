@@ -29,14 +29,14 @@ class MilitaryTime {
         if (minutes == 0) {
             // hours
             if (hours > 0 && hours < 10) {
-                // timeInWords = String.format("%s %s",  mti.numberToWords(0), mti.numberToWords(hours*100));
+                // timeInWords = String.format(Locale.US, "%s %s",  mti.numberToWords(0), mti.numberToWords(hours*100));
                 mti.numberToWords(0);
                 mti.separator();
                 mti.numberToWords(hours);
                 mti.separator();
                 mti.hundredString();
             } else { // examples: 0000 or 1400
-                // timeInWords = String.format("%s %s", mti.numberToWords(hours), mti.getHundredString());
+                // timeInWords = String.format(Locale.US, "%s %s", mti.numberToWords(hours), mti.getHundredString());
                 mti.numberToWords(hours);
                 mti.separator();
                 mti.hundredString();

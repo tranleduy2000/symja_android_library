@@ -79,7 +79,8 @@ public final class DimacsReader {
      */
     public static List<Formula> readCNF(final File file, final FormulaFactory f, final String prefix) throws IOException {
         final List<Formula> result = new ArrayList<>();
-        try (final BufferedReader br = new BufferedReader(new FileReader(file))) {
+        final BufferedReader br = new BufferedReader(new FileReader(file));
+        try {
             while (br.ready()) {
                 final String line = br.readLine();
                 if (!line.startsWith("c") && !line.startsWith("p") && !line.trim().isEmpty()) {
@@ -101,6 +102,8 @@ public final class DimacsReader {
                     result.add(f.or(vars));
                 }
             }
+        } finally {
+            br.close();
         }
         return result;
     }

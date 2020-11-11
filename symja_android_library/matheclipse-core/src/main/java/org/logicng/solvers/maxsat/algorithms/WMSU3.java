@@ -64,6 +64,7 @@ import org.logicng.solvers.maxsat.encodings.Encoder;
 import org.logicng.solvers.sat.MiniSatStyleSolver;
 
 import java.io.PrintStream;
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -243,7 +244,7 @@ public class WMSU3 extends MaxSAT {
                     fullObjFunction.push(this.objFunction.get(i));
                 }
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c Relaxed soft clauses %d / %d", fullCoeffsFunction.size(), nSoft()));
+                    this.output.println(String.format(Locale.US, "c Relaxed soft clauses %d / %d", fullCoeffsFunction.size(), nSoft()));
                 }
                 this.lbCost++;
                 while (!subsetSum(fullCoeffsFunction, this.lbCost)) {
@@ -330,7 +331,7 @@ public class WMSU3 extends MaxSAT {
                     }
                 }
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c Relaxed soft clauses %d / %d", this.objFunction.size(), nSoft()));
+                    this.output.println(String.format(Locale.US, "c Relaxed soft clauses %d / %d", this.objFunction.size(), nSoft()));
                 }
                 this.solver = this.rebuildSolver();
                 this.lbCost++;
@@ -488,7 +489,7 @@ public class WMSU3 extends MaxSAT {
                     }
                 }
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c Relaxed soft clauses %d / %d", this.objFunction.size(), nSoft()));
+                    this.output.println(String.format(Locale.US, "c Relaxed soft clauses %d / %d", this.objFunction.size(), nSoft()));
                 }
                 assert posWeight < functions.size();
                 functions.set(posWeight, new LNGIntVector(this.objFunction));

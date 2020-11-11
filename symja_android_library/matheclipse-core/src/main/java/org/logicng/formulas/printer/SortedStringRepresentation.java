@@ -40,8 +40,10 @@ import org.logicng.formulas.Variable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -129,10 +131,10 @@ public final class SortedStringRepresentation extends DefaultStringRepresentatio
             case OR:
                 final NAryOperator nary = (NAryOperator) formula;
                 final String op = formula.type() == FType.AND ? and() : or();
-                return naryOperator(nary, String.format("%s", op));
+                return naryOperator(nary, String.format(Locale.US, "%s", op));
             case PBC:
                 final PBConstraint pbc = (PBConstraint) formula;
-                return String.format("%s%s%d", pbLhs(pbc.operands(), pbc.coefficients()), pbComparator(pbc.comparator()), pbc.rhs());
+                return String.format(Locale.US, "%s%s%d", pbLhs(pbc.operands(), pbc.coefficients()), pbComparator(pbc.comparator()), pbc.rhs());
             default:
                 throw new IllegalArgumentException("Cannot print the unknown formula type " + formula.type());
         }
@@ -151,7 +153,8 @@ public final class SortedStringRepresentation extends DefaultStringRepresentatio
             operands.add(op);
         }
         final int size = operator.numberOfOperands();
-        operands.sort(this.comparator);
+        Collections.sort(operands, this.comparator);
+//        operands.sort(this.comparator);
         final StringBuilder sb = new StringBuilder();
         int count = 0;
         Formula last = null;
@@ -231,7 +234,7 @@ public final class SortedStringRepresentation extends DefaultStringRepresentatio
         }
         final String leftString = FType.EQUIV.precedence() < left.type().precedence() ? toInnerString(left) : bracket(left);
         final String rightString = FType.EQUIV.precedence() < right.type().precedence() ? toInnerString(right) : bracket(right);
-        return String.format("%s%s%s", leftString, equivalence(), rightString);
+        return String.format(Locale.US, "%s%s%s", leftString, equivalence(), rightString);
     }
 
     static class FormulaComparator implements Comparator<Formula> {

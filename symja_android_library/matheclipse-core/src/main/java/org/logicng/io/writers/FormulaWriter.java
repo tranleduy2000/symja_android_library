@@ -28,6 +28,9 @@
 
 package org.logicng.io.writers;
 
+import com.duy.lang.DSystem;
+import com.duy.nio.charset.DStandardCharsets;
+
 import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.printer.FormulaStringRepresentation;
@@ -105,14 +108,17 @@ public final class FormulaWriter {
         final StringBuilder sb = new StringBuilder();
         if (splitAndMultiline && formula.type() == FType.AND) {
             for (final Formula f : formula) {
-                sb.append(formatter.toString(f)).append(System.lineSeparator());
+                sb.append(formatter.toString(f)).append(DSystem.lineSeparator());
             }
         } else {
             sb.append(formatter.toString(formula));
         }
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
     }
 }

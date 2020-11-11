@@ -134,6 +134,11 @@ public class RosenNumberPartitionIterator implements Iterator<int[]> {
 		return temp;
 	}
 
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * Reset this iterator to the start condition.
 	 */

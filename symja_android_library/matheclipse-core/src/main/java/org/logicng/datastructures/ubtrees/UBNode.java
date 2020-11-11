@@ -28,6 +28,8 @@
 
 package org.logicng.datastructures.ubtrees;
 
+import com.duy.util.DObjects;
+
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -105,14 +107,14 @@ public final class UBNode<T extends Comparable<T>> {
             return false;
         }
         final UBNode<?> ubNode = (UBNode<?>) o;
-        return Objects.equals(this.element, ubNode.element) &&
-                Objects.equals(this.children, ubNode.children) &&
-                Objects.equals(this.set, ubNode.set);
+        return DObjects.equals(this.element, ubNode.element) &&
+                DObjects.equals(this.children, ubNode.children) &&
+                DObjects.equals(this.set, ubNode.set);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.element, this.children, this.set);
+        return DObjects.hash(this.element, this.children, this.set);
     }
 
     @Override

@@ -859,7 +859,7 @@ public class BDDKernel {
     protected static class BddReorderRequest extends RuntimeException {
     }
 
-    @FunctionalInterface
+
     protected interface BddOperation {
         int perform() throws BddReorderRequest;
     }

@@ -36,7 +36,7 @@ import org.logicng.knowledgecompilation.bdds.BDD;
  * @version 2.0.0
  * @since 2.0.0
  */
-@FunctionalInterface
+
 public interface BDDFunction<T> {
 
     /**

@@ -48,6 +48,7 @@ import org.logicng.solvers.maxsat.algorithms.MaxSATConfig;
 import org.logicng.solvers.maxsat.algorithms.WBO;
 import org.logicng.solvers.maxsat.algorithms.WMSU3;
 
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -374,6 +375,6 @@ public class MaxSATSolver {
 
     @Override
     public String toString() {
-        return String.format("MaxSATSolver{result=%s, var2index=%s}", this.result, this.var2index);
+        return String.format(Locale.US, "MaxSATSolver{result=%s, var2index=%s}", this.result, this.var2index);
     }
 }

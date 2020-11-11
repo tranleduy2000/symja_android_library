@@ -79,6 +79,8 @@ package org.logicng.solvers.datastructures;
 
 import org.logicng.collections.LNGLongVector;
 
+import java.util.Locale;
+
 /**
  * A bounded long queue (for Glucose)
  * @version 1.3
@@ -174,7 +176,7 @@ public final class LNGBoundedLongQueue {
 
     @Override
     public String toString() {
-        return String.format("LNGBoundedLongQueue{first=%d, last=%d, sumOfQueue=%d, maxSize=%d, queueSize=%d, elems=%s}",
+        return String.format(Locale.US, "LNGBoundedLongQueue{first=%d, last=%d, sumOfQueue=%d, maxSize=%d, queueSize=%d, elems=%s}",
                 this.first, this.last, this.sumOfQueue, this.maxSize, this.queueSize, this.elems);
     }
 }

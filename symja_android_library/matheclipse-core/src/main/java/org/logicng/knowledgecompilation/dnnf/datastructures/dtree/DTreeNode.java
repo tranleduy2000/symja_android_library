@@ -39,6 +39,7 @@ import org.logicng.solvers.sat.MiniSatStyleSolver;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -257,7 +258,7 @@ public class DTreeNode extends DTree {
 
     @Override
     public String toString() {
-        return String.format("DTreeNode: [%s, %s]", this.left, this.right);
+        return String.format(Locale.US, "DTreeNode: [%s, %s]", this.left, this.right);
     }
 
     protected void excludeUnitLeafs(final List<DTreeLeaf> leafs) {

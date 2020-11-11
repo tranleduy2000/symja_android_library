@@ -61,6 +61,7 @@ import org.logicng.solvers.maxsat.encodings.Encoder;
 import org.logicng.solvers.sat.MiniSatStyleSolver;
 
 import java.io.PrintStream;
+import java.util.Locale;
 
 /**
  * Linear search solver with Boolean Multilevel Optimization (BMO)
@@ -151,7 +152,7 @@ public class LinearSU extends MaxSAT {
                         return MaxSATResult.UNDEF;
                     }
                 } else if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c BMO-UB : %d (Function %d/%d)", newCost, posWeight + 1, this.orderWeights.size()));
+                    this.output.println(String.format(Locale.US, "c BMO-UB : %d (Function %d/%d)", newCost, posWeight + 1, this.orderWeights.size()));
                 }
                 if (newCost == 0 && currentWeight == minWeight) {
                     return MaxSATResult.OPTIMUM;

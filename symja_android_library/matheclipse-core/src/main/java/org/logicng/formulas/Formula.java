@@ -36,7 +36,6 @@ import org.logicng.formulas.cache.CacheEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.stream.Stream;
 
 /**
  * Super class for formulas.

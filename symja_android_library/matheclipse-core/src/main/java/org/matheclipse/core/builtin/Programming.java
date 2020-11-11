@@ -825,13 +825,15 @@ public final class Programming {
 					final int iterationLimit = engine.getIterationLimit();
 					int iterationCounter = 1;
 					IExpr last;
-                    do {
+					do {
 						last = current;
 						current = engine.evaluate(F.Apply(f, F.List(current)));
-						if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+						iterationCounter++;
+						if (iterationLimit >= 0 && iterationLimit <= iterationCounter) {
 							IterationLimitExceeded.throwIt(iterationCounter, ast);
 						}
-					} while ((!current.isSame(last)) && (--iterations > 0));
+						iterations--;
+					} while ((!current.isSame(last)) && (iterations > 0));
 				return current;
 				}
 
@@ -960,10 +962,12 @@ public final class Programming {
 						current = engine.evaluate(F.Apply(f, F.List(current)));
 						list.append(current);
 
-						if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+						iterationCounter++;
+						if (iterationLimit >= 0 && iterationLimit <= iterationCounter) {
 							IterationLimitExceeded.throwIt(iterationCounter, ast);
 						}
-					} while ((!current.isSame(last)) && (--iterations > 0));
+						iterations--;
+					} while ((!current.isSame(last)) && (iterations > 0));
 				return list;
 
 				}
@@ -1060,14 +1064,16 @@ public final class Programming {
 					if (ast.size() == 5) {
 						engine.evaluate(body);
 					}
-					if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+					++iterationCounter;
+					if (iterationLimit >= 0 && iterationLimit <= iterationCounter) {
 						IterationLimitExceeded.throwIt(iterationCounter, ast);
 					}
 				} catch (final BreakException e) {
 					exit = true;
 					return F.Null;
 				} catch (final ContinueException e) {
-					if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+					++iterationCounter;
+					if (iterationLimit >= 0 && iterationLimit <= iterationCounter) {
 						IterationLimitExceeded.throwIt(iterationCounter, ast);
 					}
 					continue;

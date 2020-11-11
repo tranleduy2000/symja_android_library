@@ -31,7 +31,6 @@ package org.logicng.backbones;
 import com.duy.util.DCollections;
 import com.duy.util.DObjects;
 
-import static java.util.Collections.emptySortedSet;
 import static java.util.Collections.unmodifiableSortedSet;
 
 import org.logicng.datastructures.Tristate;

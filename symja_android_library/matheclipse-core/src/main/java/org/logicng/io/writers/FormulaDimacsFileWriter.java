@@ -28,6 +28,9 @@
 
 package org.logicng.io.writers;
 
+import com.duy.lang.DSystem;
+import com.duy.nio.charset.DStandardCharsets;
+
 import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.Literal;
@@ -42,6 +45,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -89,20 +93,23 @@ public final class FormulaDimacsFileWriter {
         }
         final StringBuilder sb = new StringBuilder("p cnf ");
         final int partsSize = formula.type().equals(FType.FALSE) ? 1 : parts.size();
-        sb.append(var2id.size()).append(" ").append(partsSize).append(System.lineSeparator());
+        sb.append(var2id.size()).append(" ").append(partsSize).append(DSystem.lineSeparator());
 
         for (final Formula part : parts) {
             for (final Literal lit : part.literals()) {
                 sb.append(lit.phase() ? "" : "-").append(var2id.get(lit.variable())).append(" ");
             }
-            sb.append(String.format(" 0%n"));
+            sb.append(String.format(Locale.US, " 0%n"));
         }
         if (formula.type().equals(FType.FALSE)) {
-            sb.append(String.format("0%n"));
+            sb.append(String.format(Locale.US, "0%n"));
         }
-        try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
         if (writeMapping) {
             final String mappingFileName = (fileName.endsWith(".cnf") ? fileName.substring(0, fileName.length() - 4) : fileName) + ".map";
@@ -113,11 +120,14 @@ public final class FormulaDimacsFileWriter {
     private static void writeMapping(final File mappingFile, final SortedMap<Variable, Long> var2id) throws IOException {
         final StringBuilder sb = new StringBuilder();
         for (final Map.Entry<Variable, Long> entry : var2id.entrySet()) {
-            sb.append(entry.getKey()).append(";").append(entry.getValue()).append(System.lineSeparator());
+            sb.append(entry.getKey()).append(";").append(entry.getValue()).append(DSystem.lineSeparator());
         }
-        try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mappingFile), StandardCharsets.UTF_8))) {
+        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mappingFile), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
     }
 }

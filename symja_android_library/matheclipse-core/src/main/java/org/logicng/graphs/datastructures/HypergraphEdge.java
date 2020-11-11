@@ -28,6 +28,8 @@
 
 package org.logicng.graphs.datastructures;
 
+import com.duy.util.DObjects;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -99,12 +101,12 @@ public final class HypergraphEdge<T> {
             return false;
         }
         final HypergraphEdge<?> that = (HypergraphEdge<?>) o;
-        return Objects.equals(this.nodes, that.nodes);
+        return DObjects.equals(this.nodes, that.nodes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.nodes);
+        return DObjects.hash(this.nodes);
     }
 
     @Override

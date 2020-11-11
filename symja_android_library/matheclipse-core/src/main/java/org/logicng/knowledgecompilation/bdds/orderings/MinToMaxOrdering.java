@@ -33,6 +33,7 @@ import org.logicng.formulas.Variable;
 import org.logicng.functions.VariableProfileFunction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -77,7 +78,8 @@ public final class MinToMaxOrdering implements VariableOrderingProvider {
 
     static Map<Variable, Integer> sortProfileByOccurrence(final Map<Variable, Integer> map, final Comparator<Map.Entry<Variable, Integer>> comparator) {
         final List<Map.Entry<Variable, Integer>> list = new ArrayList<>(map.entrySet());
-        list.sort(comparator);
+//        list.sort(comparator);
+        Collections.sort(list, comparator);
         final Map<Variable, Integer> result = new LinkedHashMap<>();
         for (final Map.Entry<Variable, Integer> entry : list) {
             result.put(entry.getKey(), entry.getValue());

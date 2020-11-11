@@ -28,6 +28,9 @@
 
 package org.logicng.graphs.io;
 
+import com.duy.lang.DSystem;
+import com.duy.nio.charset.DStandardCharsets;
+
 import org.logicng.graphs.datastructures.Graph;
 import org.logicng.graphs.datastructures.Node;
 import org.logicng.util.Pair;
@@ -84,15 +87,18 @@ public final class GraphDimacsFileWriter {
             }
             doneNodes.add(d);
         }
-        sb.append(node2id.size()).append(" ").append(edges.size()).append(System.lineSeparator());
+        sb.append(node2id.size()).append(" ").append(edges.size()).append(DSystem.lineSeparator());
 
         for (Pair<Node<T>, Node<T>> edge : edges) {
-            sb.append("e ").append(node2id.get(edge.first())).append(" ").append(node2id.get(edge.second())).append(System.lineSeparator());
+            sb.append("e ").append(node2id.get(edge.first())).append(" ").append(node2id.get(edge.second())).append(DSystem.lineSeparator());
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
         if (writeMapping) {
             String mappingFileName = (fileName.endsWith(".col") ? fileName.substring(0, fileName.length() - 4) : fileName) + ".map";
@@ -103,11 +109,14 @@ public final class GraphDimacsFileWriter {
     private static <T> void writeMapping(File mappingFile, Map<Node<T>, Long> node2id) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<Node<T>, Long> entry : node2id.entrySet()) {
-            sb.append(entry.getKey().content()).append(";").append(entry.getValue()).append(System.lineSeparator());
+            sb.append(entry.getKey().content()).append(";").append(entry.getValue()).append(DSystem.lineSeparator());
         }
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mappingFile), StandardCharsets.UTF_8))) {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mappingFile), DStandardCharsets.UTF_8));
+        try {
             writer.append(sb);
             writer.flush();
+        } finally {
+            writer.close();
         }
     }
 }

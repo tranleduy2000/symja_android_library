@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
  * @author Philip Diffenderfer
  * 
  */
+@SuppressWarnings("JavadocReference")
 public final class Tries
 {
 

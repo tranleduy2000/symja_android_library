@@ -62,6 +62,7 @@ import org.logicng.transformations.cnf.PlaistedGreenbaumTransformationSolver;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -442,7 +443,7 @@ public final class MiniSat extends SATSolver {
 
     @Override
     public String toString() {
-        return String.format("%s{result=%s, incremental=%s}", this.solver.getClass().getSimpleName(), this.result, this.incremental);
+        return String.format(Locale.US, "%s{result=%s, incremental=%s}", this.solver.getClass().getSimpleName(), this.result, this.incremental);
     }
 
     protected boolean lastResultIsUsable() {

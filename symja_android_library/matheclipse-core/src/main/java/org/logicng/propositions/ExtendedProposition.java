@@ -28,8 +28,11 @@
 
 package org.logicng.propositions;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Formula;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -69,7 +72,7 @@ public final class ExtendedProposition<T extends PropositionBackpack> extends Pr
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.formula, this.backpack);
+        return DObjects.hash(this.formula, this.backpack);
     }
 
     @Override
@@ -79,13 +82,13 @@ public final class ExtendedProposition<T extends PropositionBackpack> extends Pr
         }
         if (other instanceof ExtendedProposition) {
             final ExtendedProposition<?> o = (ExtendedProposition<?>) other;
-            return Objects.equals(this.formula, o.formula) && Objects.equals(this.backpack, o.backpack);
+            return DObjects.equals(this.formula, o.formula) && DObjects.equals(this.backpack, o.backpack);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return String.format("ExtendedProposition{formula=%s, backpack=%s}", this.formula, this.backpack);
+        return String.format(Locale.US, "ExtendedProposition{formula=%s, backpack=%s}", this.formula, this.backpack);
     }
 }

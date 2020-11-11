@@ -28,9 +28,12 @@
 
 package org.logicng.explanations;
 
+import com.duy.util.DObjects;
+
 import org.logicng.propositions.Proposition;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -72,7 +75,7 @@ public final class UNSATCore<T extends Proposition> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.propositions, this.isMUS);
+        return DObjects.hash(this.propositions, this.isMUS);
     }
 
     @Override
@@ -84,11 +87,11 @@ public final class UNSATCore<T extends Proposition> {
             return false;
         }
         final UNSATCore<?> unsatCore = (UNSATCore<?>) o;
-        return this.isMUS == unsatCore.isMUS && Objects.equals(this.propositions, unsatCore.propositions);
+        return this.isMUS == unsatCore.isMUS && DObjects.equals(this.propositions, unsatCore.propositions);
     }
 
     @Override
     public String toString() {
-        return String.format("UNSATCore{isMUS=%s, propositions=%s}", this.isMUS, this.propositions);
+        return String.format(Locale.US, "UNSATCore{isMUS=%s, propositions=%s}", this.isMUS, this.propositions);
     }
 }

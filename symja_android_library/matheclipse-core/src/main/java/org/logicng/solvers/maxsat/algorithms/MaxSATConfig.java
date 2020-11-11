@@ -28,6 +28,8 @@
 
 package org.logicng.solvers.maxsat.algorithms;
 
+import com.duy.lang.DSystem;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
 
@@ -130,17 +132,17 @@ public final class MaxSATConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MaxSATConfig{").append(System.lineSeparator());
-        sb.append("incrementalStrategy=").append(this.incrementalStrategy).append(System.lineSeparator());
-        sb.append("pbEncoding=").append(this.amoEncoding).append(System.lineSeparator());
-        sb.append("pbEncoding=").append(this.pbEncoding).append(System.lineSeparator());
-        sb.append("cardinalityEncoding=").append(this.cardinalityEncoding).append(System.lineSeparator());
-        sb.append("weightStrategy=").append(this.weightStrategy).append(System.lineSeparator());
-        sb.append("solverType=").append(this.solverType).append(System.lineSeparator());
-        sb.append("verbosity=").append(this.verbosity).append(System.lineSeparator());
-        sb.append("symmetry=").append(this.symmetry).append(System.lineSeparator());
-        sb.append("limit=").append(this.limit).append(System.lineSeparator());
-        sb.append("bmo=").append(this.bmo).append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("MaxSATConfig{").append(DSystem.lineSeparator());
+        sb.append("incrementalStrategy=").append(this.incrementalStrategy).append(DSystem.lineSeparator());
+        sb.append("pbEncoding=").append(this.amoEncoding).append(DSystem.lineSeparator());
+        sb.append("pbEncoding=").append(this.pbEncoding).append(DSystem.lineSeparator());
+        sb.append("cardinalityEncoding=").append(this.cardinalityEncoding).append(DSystem.lineSeparator());
+        sb.append("weightStrategy=").append(this.weightStrategy).append(DSystem.lineSeparator());
+        sb.append("solverType=").append(this.solverType).append(DSystem.lineSeparator());
+        sb.append("verbosity=").append(this.verbosity).append(DSystem.lineSeparator());
+        sb.append("symmetry=").append(this.symmetry).append(DSystem.lineSeparator());
+        sb.append("limit=").append(this.limit).append(DSystem.lineSeparator());
+        sb.append("bmo=").append(this.bmo).append(DSystem.lineSeparator());
         sb.append("}");
         return sb.toString();
     }

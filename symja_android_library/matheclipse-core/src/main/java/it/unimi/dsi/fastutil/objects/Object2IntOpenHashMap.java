@@ -91,7 +91,7 @@ public class Object2IntOpenHashMap<K> {
      * @implSpec The default implementation is equivalent to, for this {@code map}:
      *
      * <pre> {@code
-     * if (map.containsKey(key) && Objects.equals(map.get(key), value)) {
+     * if (map.containsKey(key) && DObjects.equals(map.get(key), value)) {
      *     map.remove(key);
      *     return true;
      * } else

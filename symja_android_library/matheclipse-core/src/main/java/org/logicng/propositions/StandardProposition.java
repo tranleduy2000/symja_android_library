@@ -28,8 +28,11 @@
 
 package org.logicng.propositions;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Formula;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -76,7 +79,7 @@ public final class StandardProposition extends Proposition {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.formula, this.description);
+        return DObjects.hash(this.formula, this.description);
     }
 
     @Override
@@ -86,13 +89,13 @@ public final class StandardProposition extends Proposition {
         }
         if (other instanceof StandardProposition) {
             final StandardProposition o = (StandardProposition) other;
-            return Objects.equals(this.formula, o.formula) && Objects.equals(this.description, o.description);
+            return DObjects.equals(this.formula, o.formula) && DObjects.equals(this.description, o.description);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return String.format("StandardProposition{formula=%s, description=%s}", this.formula, this.description);
+        return String.format(Locale.US, "StandardProposition{formula=%s, description=%s}", this.formula, this.description);
     }
 }

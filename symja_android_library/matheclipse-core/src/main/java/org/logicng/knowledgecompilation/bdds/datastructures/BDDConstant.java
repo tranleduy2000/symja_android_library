@@ -28,6 +28,8 @@
 
 package org.logicng.knowledgecompilation.bdds.datastructures;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Constant;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
@@ -105,7 +107,7 @@ public final class BDDConstant implements BDDNode {
     @Override
     public boolean equals(final Object other) {
         return this == other || other instanceof BDDConstant
-                && Objects.equals(this.value, ((BDDConstant) other).value);
+                && DObjects.equals(this.value, ((BDDConstant) other).value);
     }
 
     @Override

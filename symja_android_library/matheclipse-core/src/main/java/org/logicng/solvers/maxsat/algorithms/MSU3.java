@@ -61,6 +61,7 @@ import org.logicng.solvers.maxsat.encodings.Encoder;
 import org.logicng.solvers.sat.MiniSatStyleSolver;
 
 import java.io.PrintStream;
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -187,7 +188,7 @@ public class MSU3 extends MaxSAT {
                     }
                 }
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c Relaxed soft clauses %d / %d", currentObjFunction.size(), this.objFunction.size()));
+                    this.output.println(String.format(Locale.US, "c Relaxed soft clauses %d / %d", currentObjFunction.size(), this.objFunction.size()));
                 }
                 this.solver = this.rebuildSolver();
                 this.encoder.encodeCardinality(this.solver, currentObjFunction, this.lbCost);
@@ -277,7 +278,7 @@ public class MSU3 extends MaxSAT {
                     }
                 }
                 if (this.verbosity != Verbosity.NONE) {
-                    this.output.println(String.format("c Relaxed soft clauses %d / %d", currentObjFunction.size(), this.objFunction.size()));
+                    this.output.println(String.format(Locale.US, "c Relaxed soft clauses %d / %d", currentObjFunction.size(), this.objFunction.size()));
                 }
                 if (!this.encoder.hasCardEncoding()) {
                     if (this.lbCost != currentObjFunction.size()) {

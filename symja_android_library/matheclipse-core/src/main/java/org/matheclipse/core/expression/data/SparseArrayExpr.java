@@ -1169,7 +1169,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 								}
 							}
 						}
-						value.putIfAbsent(positions, rule.arg2());
+						new MapWrapper<>(value).putIfAbsent(positions, rule.arg2());
 					}
 				} else {
 					// if (rule.arg1().isList()) {
@@ -1192,7 +1192,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 								dimension[0] = n;
 							}
 						}
-						value.putIfAbsent(positions, rule.arg2());
+						new MapWrapper<>(value).putIfAbsent(positions, rule.arg2());
 					} else {
 						// pattern matching
 						if (!patternPositionsList(value, rule, dimension, arrayRulesList, engine)) {

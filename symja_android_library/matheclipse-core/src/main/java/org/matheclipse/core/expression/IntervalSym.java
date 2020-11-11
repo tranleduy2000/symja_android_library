@@ -40,7 +40,7 @@ public class IntervalSym {
 	 * IExprProcessor interface method boolean process (IExpr min, IExpr max, IASTAppendable result, int index), return
 	 * true or false;
 	 */
-	@FunctionalInterface
+
 	public interface IExprProcessor {
 		boolean process(IExpr min, IExpr max, IASTAppendable result, int index);
 	}

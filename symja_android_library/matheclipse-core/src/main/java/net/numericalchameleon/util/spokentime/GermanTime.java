@@ -54,10 +54,10 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
         syllables.add(UHR);
         if (minutes == 0) {
             // nicht eins Uhr, sondern ein Uhr
-            // timeInWords = String.format("%s %s", prefix, UHR);
+            // timeInWords = String.format(Locale.US, "%s %s", prefix, UHR);
             return;
         }
-        // timeInWords = String.format("%s Uhr %s", prefix, minutesInWords(minutes));
+        // timeInWords = String.format(Locale.US, "%s Uhr %s", prefix, minutesInWords(minutes));
         syllables.add(BLANK);
         minutesInWords(minutes);
     }
@@ -72,11 +72,11 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
         syllables.add(BLANK);
         syllables.add(UHR);
         if (minutes == 0) {
-            //timeInWords = String.format("%s Uhr", prefixHour);
+            //timeInWords = String.format(Locale.US, "%s Uhr", prefixHour);
             return;
         }
 
-        //timeInWords = String.format("%s Uhr und %s %s", prefixHour, (minutes == 1) ? GermanNumber.EINE: minutesInWords(minutes), wordMinutes);
+        //timeInWords = String.format(Locale.US, "%s Uhr und %s %s", prefixHour, (minutes == 1) ? GermanNumber.EINE: minutesInWords(minutes), wordMinutes);
         syllables.add(BLANK);
         syllables.add(UND);
         syllables.add(BLANK);
@@ -102,7 +102,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
         } else if (minutes == 15) {
             if (type == HourclockType.HOURCLOCK12_VARIANT1_DE
                     || type == HourclockType.HOURCLOCK12_VARIANT3_DE) { // DE West
-                //timeInWords = String.format("Viertel nach %s", hoursInWords(hours));
+                //timeInWords = String.format(Locale.US, "Viertel nach %s", hoursInWords(hours));
                 syllables.add(VIERTEL);
                 syllables.add(BLANK);
                 syllables.add(NACH);
@@ -110,7 +110,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
                 hoursInWords(hours);
             } else if (type == HourclockType.HOURCLOCK12_VARIANT2_DE
                     || type == HourclockType.HOURCLOCK12_VARIANT4_DE) { // DE Ost
-                // timeInWords = String.format("Viertel %s", hoursInWords(hours + 1));
+                // timeInWords = String.format(Locale.US, "Viertel %s", hoursInWords(hours + 1));
                 syllables.add(VIERTEL);
                 syllables.add(BLANK);
                 hoursInWords(hours + 1);
@@ -122,7 +122,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
                 hoursInWords(hours);
             }
         } else if (minutes == 30) {
-            // timeInWords = String.format("Halb %s", hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "Halb %s", hoursInWords(hours + 1));
             syllables.add(Halb);
             syllables.add(BLANK);
             hoursInWords(hours + 1);
@@ -138,12 +138,12 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
                     type == HourclockType.HOURCLOCK12_VARIANT4_DE) { // DE Ost
                 syllables.add(DREIVIERTEL);
             }
-            // timeInWords = String.format("%s %s", token, hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "%s %s", token, hoursInWords(hours + 1));
             syllables.add(BLANK);
             hoursInWords(hours + 1);
 
         } else if ((minutes >= 25) && (minutes < 30)) {
-            // timeInWords = String.format("%s vor halb %s", minutesInWords(30 - minutes), hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "%s vor halb %s", minutesInWords(30 - minutes), hoursInWords(hours + 1));
             minutesInWords(30 - minutes);
             syllables.add(BLANK);
             syllables.add(VOR);
@@ -154,7 +154,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
         } else if ((minutes >= 20) && (minutes < 25)) {
             if (type == HourclockType.HOURCLOCK12_VARIANT1_DE
                     || type == HourclockType.HOURCLOCK12_VARIANT4_DE) { // DE West
-                // timeInWords = String.format("%s nach %s", minutesInWords(minutes), hoursInWords(hours));
+                // timeInWords = String.format(Locale.US, "%s nach %s", minutesInWords(minutes), hoursInWords(hours));
                 minutesInWords(minutes);
                 syllables.add(BLANK);
                 syllables.add(NACH);
@@ -162,7 +162,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
                 hoursInWords(hours);
             } else if (type == HourclockType.HOURCLOCK12_VARIANT2_DE
                     || type == HourclockType.HOURCLOCK12_VARIANT3_DE) { // DE Ost
-                //timeInWords = String.format("%s vor halb %s", minutesInWords(30 - minutes), hoursInWords(hours + 1));
+                //timeInWords = String.format(Locale.US, "%s vor halb %s", minutesInWords(30 - minutes), hoursInWords(hours + 1));
                 minutesInWords(30 - minutes);
                 syllables.add(BLANK);
                 syllables.add(VOR);
@@ -179,7 +179,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
             }
 
         } else if ((minutes > 30) && (minutes <= 35)) {
-            // timeInWords = String.format("%s nach halb %s", minutesInWords(minutes - 30), hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "%s nach halb %s", minutesInWords(minutes - 30), hoursInWords(hours + 1));
             minutesInWords(minutes - 30);
             syllables.add(BLANK);
             syllables.add(NACH);
@@ -191,7 +191,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
             if (type == HourclockType.HOURCLOCK12_VARIANT1_DE
                     || type == HourclockType.HOURCLOCK12_VARIANT4_DE || // DE West
                     type == HourclockType.HOURCLOCK12_VARIANT1_CH) {
-                // timeInWords = String.format("%s vor %s", minutesInWords(60 - minutes), hoursInWords(hours + 1));
+                // timeInWords = String.format(Locale.US, "%s vor %s", minutesInWords(60 - minutes), hoursInWords(hours + 1));
                 minutesInWords(60 - minutes);
                 syllables.add(BLANK);
                 syllables.add(VOR);
@@ -199,7 +199,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
                 hoursInWords(hours + 1);
             } else if (type == HourclockType.HOURCLOCK12_VARIANT2_DE
                     || type == HourclockType.HOURCLOCK12_VARIANT3_DE) { // Ost
-                // timeInWords = String.format("%s nach halb %s", minutesInWords(minutes - 30), hoursInWords(hours + 1));
+                // timeInWords = String.format(Locale.US, "%s nach halb %s", minutesInWords(minutes - 30), hoursInWords(hours + 1));
                 minutesInWords(minutes - 30);
                 syllables.add(BLANK);
                 syllables.add(NACH);
@@ -210,7 +210,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
             }
 
         } else if (minutes > 40) {
-            // timeInWords = String.format("%s vor %s", minutesInWords(60 - minutes), hoursInWords(hours + 1));
+            // timeInWords = String.format(Locale.US, "%s vor %s", minutesInWords(60 - minutes), hoursInWords(hours + 1));
             minutesInWords(60 - minutes);
             syllables.add(BLANK);
             syllables.add(VOR);
@@ -224,7 +224,7 @@ public class GermanTime extends SpokenTime implements NumberToWordsInterface, Mi
                 syllables.add(BLANK);
                 hoursInWords(hours);
             } else { // Germany
-                // timeInWords = String.format("%s nach %s", minutesInWords(minutes), hoursInWords(hours));
+                // timeInWords = String.format(Locale.US, "%s nach %s", minutesInWords(minutes), hoursInWords(hours));
                 minutesInWords(minutes);
                 syllables.add(BLANK);
                 syllables.add(NACH);

@@ -18,6 +18,7 @@
  */
 package net.numericalchameleon.util.spokentime;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ public class Time {
     public static String format(Time time, int format) {
         switch (format) {
             case FORMAT24H:
-                return String.format("%02d:%02d", time.getHours(), time.getMinutes());
+                return String.format(Locale.US, "%02d:%02d", time.getHours(), time.getMinutes());
             case FORMAT12H:
                 int hour = time.getHours();
                 boolean am = true;
@@ -59,7 +60,7 @@ public class Time {
                     hour = 12;
                 }
                 String ampm = am ? "am" : "pm";
-                return String.format("%02d:%02d %s", hour, time.getMinutes(), ampm);
+                return String.format(Locale.US, "%02d:%02d %s", hour, time.getMinutes(), ampm);
             case FORMATDEC:
                 return Integer.toString(time.getHours() * 100 + time.getMinutes());
             default:
@@ -184,6 +185,6 @@ public class Time {
 
     @Override
     public String toString() {
-        return String.format("%02d:%02d", hours, minutes);
+        return String.format(Locale.US, "%02d:%02d", hours, minutes);
     }
 }

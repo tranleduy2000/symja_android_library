@@ -28,6 +28,8 @@
 
 package org.logicng.datastructures;
 
+import com.duy.util.DObjects;
+
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
@@ -38,6 +40,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -289,7 +292,7 @@ public final class Assignment {
 
     @Override
     public int hashCode() {
-        return Objects.hash(new HashSet<>(this.pos), new HashSet<>(this.neg));
+        return DObjects.hash(new HashSet<>(this.pos), new HashSet<>(this.neg));
     }
 
     @Override
@@ -302,14 +305,14 @@ public final class Assignment {
         }
         if (this.getClass() == other.getClass()) {
             final Assignment o = (Assignment) other;
-            return Objects.equals(new HashSet<>(this.pos), new HashSet<>(o.pos))
-                    && Objects.equals(new HashSet<>(this.neg), new HashSet<>(o.neg));
+            return DObjects.equals(new HashSet<>(this.pos), new HashSet<>(o.pos))
+                    && DObjects.equals(new HashSet<>(this.neg), new HashSet<>(o.neg));
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return String.format("Assignment{pos=%s, neg=%s}", this.pos, this.neg);
+        return String.format(Locale.US, "Assignment{pos=%s, neg=%s}", this.pos, this.neg);
     }
 }

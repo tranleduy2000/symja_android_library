@@ -37,6 +37,8 @@ import org.logicng.formulas.NAryOperator;
 import org.logicng.formulas.Not;
 import org.logicng.formulas.PBConstraint;
 
+import java.util.Locale;
+
 /**
  * Super class for a formula string representation.
  * @version 2.0.0
@@ -84,10 +86,10 @@ public abstract class FormulaStringRepresentation {
             case OR:
                 final NAryOperator nary = (NAryOperator) formula;
                 op = formula.type() == FType.AND ? this.and() : this.or();
-                return this.naryOperator(nary, String.format("%s", op));
+                return this.naryOperator(nary, String.format(Locale.US, "%s", op));
             case PBC:
                 final PBConstraint pbc = (PBConstraint) formula;
-                return String.format("%s%s%d", this.pbLhs(pbc.operands(), pbc.coefficients()), this.pbComparator(pbc.comparator()), pbc.rhs());
+                return String.format(Locale.US, "%s%s%d", this.pbLhs(pbc.operands(), pbc.coefficients()), this.pbComparator(pbc.comparator()), pbc.rhs());
             default:
                 throw new IllegalArgumentException("Cannot print the unknown formula type " + formula.type());
         }
@@ -99,7 +101,7 @@ public abstract class FormulaStringRepresentation {
      * @return {@code "(" + formula.toString() + ")"}
      */
     protected String bracket(final Formula formula) {
-        return String.format("%s%s%s", this.lbr(), this.toInnerString(formula), this.rbr());
+        return String.format(Locale.US, "%s%s%s", this.lbr(), this.toInnerString(formula), this.rbr());
     }
 
     /**
@@ -113,7 +115,7 @@ public abstract class FormulaStringRepresentation {
                 ? this.toInnerString(operator.left()) : this.bracket(operator.left());
         final String rightString = operator.type().precedence() < operator.right().type().precedence()
                 ? this.toInnerString(operator.right()) : this.bracket(operator.right());
-        return String.format("%s%s%s", leftString, opString, rightString);
+        return String.format(Locale.US, "%s%s%s", leftString, opString, rightString);
     }
 
     /**
