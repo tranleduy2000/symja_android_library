@@ -913,14 +913,14 @@ public class ManipulateFunction {
 			int[] colour = new int[] { 1 };
 			for (int i = 1; i < plots.size(); i++) {
 				IAST plot = (IAST) plots.get(i);
-				if (plot.isAST(S.ListLinePlot) || //
-						plot.isAST(S.ListPlot)) {
+				if (plot.isAST(F.ListLinePlot) || //
+						plot.isAST(F.ListPlot)) {
 					if (!JSXGraph.plot(plot, manipulateAST, toJS, function, boundingbox, colour, engine)) {
 						return F.NIL;
 					}
-				} else if (plot.isAST(S.Plot) || //
-						plot.isAST(S.ParametricPlot) || //
-						plot.isAST(S.PolarPlot)) {
+				} else if (plot.isAST(F.Plot) || //
+						plot.isAST(F.ParametricPlot) || //
+						plot.isAST(F.PolarPlot)) {
 					if (plot.size() >= 3 && plot.arg2().isList()) {
 						IAST plotRangeX = (IAST) plot.arg2();
 						IAST plotRangeY = F.NIL;
@@ -1886,22 +1886,22 @@ public class ManipulateFunction {
 				IAST listOfSymbols = (IAST) expr;
 				for (int i = 1; i < listOfSymbols.size(); i++) {
 					IExpr arg = listOfSymbols.get(i);
-					if (arg.isAST(S.ListLinePlot) || //
-							arg.isAST(S.ListPlot) || //
-							arg.isAST(S.Plot) || //
-							arg.isAST(S.ParametricPlot) || //
-							arg.isAST(S.PolarPlot)) {
+					if (arg.isAST(F.ListLinePlot) || //
+							arg.isAST(F.ListPlot) || //
+							arg.isAST(F.Plot) || //
+							arg.isAST(F.ParametricPlot) || //
+							arg.isAST(F.PolarPlot)) {
 						continue;
 					}
 					return F.NIL;
 				}
 				return listOfSymbols;
 			} else {
-				if (expr.isAST(S.ListLinePlot) || //
-						expr.isAST(S.ListPlot) || //
-						expr.isAST(S.Plot) || //
-						expr.isAST(S.ParametricPlot) || //
-						expr.isAST(S.PolarPlot)) {
+				if (expr.isAST(F.ListLinePlot) || //
+						expr.isAST(F.ListPlot) || //
+						expr.isAST(F.Plot) || //
+						expr.isAST(F.ParametricPlot) || //
+						expr.isAST(F.PolarPlot)) {
 					return F.List(expr);
 				}
 			}

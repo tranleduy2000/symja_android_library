@@ -22,8 +22,8 @@ public class SparseArrayFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.ArrayRules.setEvaluator(new ArrayRules());
-			S.SparseArray.setEvaluator(new SparseArray());
+			F.ArrayRules.setEvaluator(new ArrayRules());
+			F.SparseArray.setEvaluator(new SparseArray());
 		}
 	}
 
@@ -80,7 +80,7 @@ public class SparseArrayFunctions {
 			int[] dimension = null;
 			if (ast.size() >= 3) {
 				IExpr arg2 = ast.arg2();
-				if (arg2.equals(S.Automatic)) {
+				if (arg2.equals(F.Automatic)) {
 					// automatic detection enabled
 				} else if (arg2.isList()) {
 					// List of Java int numbers expected in `1`.
@@ -92,7 +92,7 @@ public class SparseArrayFunctions {
 					}
 				}
 				if (ast.size() == 5) {
-					if (dimension != null && arg1.equals(S.Automatic)) {
+					if (dimension != null && arg1.equals(F.Automatic)) {
 						if (ast.arg4().isList3()) {
 							IAST list = (IAST) ast.arg4();
 							int version = list.arg1().toIntDefault();

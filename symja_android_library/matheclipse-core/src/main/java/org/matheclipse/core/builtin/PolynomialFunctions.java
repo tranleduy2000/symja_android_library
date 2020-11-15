@@ -101,25 +101,25 @@ public class PolynomialFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.BellY.setEvaluator(new BellY());
-			S.ChebyshevT.setEvaluator(new ChebyshevT());
-			S.ChebyshevU.setEvaluator(new ChebyshevU());
-			S.Coefficient.setEvaluator(new Coefficient());
-			S.CoefficientList.setEvaluator(new CoefficientList());
-			S.CoefficientRules.setEvaluator(new CoefficientRules());
-			S.Cyclotomic.setEvaluator(new Cyclotomic());
-			S.Discriminant.setEvaluator(new Discriminant());
-			S.Exponent.setEvaluator(new Exponent());
-			S.GroebnerBasis.setEvaluator(new GroebnerBasis());
-			S.HermiteH.setEvaluator(new HermiteH());
-			S.LaguerreL.setEvaluator(new LaguerreL());
-			S.LegendreP.setEvaluator(new LegendreP());
-			S.LegendreQ.setEvaluator(new LegendreQ());
-			S.MonomialList.setEvaluator(new MonomialList());
-			S.NRoots.setEvaluator(new NRoots());
-			S.Resultant.setEvaluator(new Resultant());
-			S.RootIntervals.setEvaluator(new RootIntervals());
-			S.Roots.setEvaluator(new Roots());
+			F.BellY.setEvaluator(new BellY());
+			F.ChebyshevT.setEvaluator(new ChebyshevT());
+			F.ChebyshevU.setEvaluator(new ChebyshevU());
+			F.Coefficient.setEvaluator(new Coefficient());
+			F.CoefficientList.setEvaluator(new CoefficientList());
+			F.CoefficientRules.setEvaluator(new CoefficientRules());
+			F.Cyclotomic.setEvaluator(new Cyclotomic());
+			F.Discriminant.setEvaluator(new Discriminant());
+			F.Exponent.setEvaluator(new Exponent());
+			F.GroebnerBasis.setEvaluator(new GroebnerBasis());
+			F.HermiteH.setEvaluator(new HermiteH());
+			F.LaguerreL.setEvaluator(new LaguerreL());
+			F.LegendreP.setEvaluator(new LegendreP());
+			F.LegendreQ.setEvaluator(new LegendreQ());
+			F.MonomialList.setEvaluator(new MonomialList());
+			F.NRoots.setEvaluator(new NRoots());
+			F.Resultant.setEvaluator(new Resultant());
+			F.RootIntervals.setEvaluator(new RootIntervals());
+			F.Roots.setEvaluator(new Roots());
 		}
 	}
 
@@ -301,7 +301,7 @@ public class PolynomialFunctions {
 					termOrder = JASIExpr.monomialOrder((ISymbol) ast.arg3(), termOrder);
 				} else {
 					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-					IExpr option = options.getOption(S.Modulus);
+					IExpr option = options.getOption(F.Modulus);
 					if (option.isPresent()) {
 						try {
 							if (option.isInteger()) {

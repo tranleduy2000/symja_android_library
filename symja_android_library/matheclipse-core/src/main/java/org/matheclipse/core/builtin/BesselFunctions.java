@@ -30,20 +30,20 @@ public class BesselFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.AiryAi.setEvaluator(new AiryAi());
-			S.AiryAiPrime.setEvaluator(new AiryAiPrime());
-			S.AiryBi.setEvaluator(new AiryBi());
-			S.AiryBiPrime.setEvaluator(new AiryBiPrime());
-			S.BesselI.setEvaluator(new BesselI());
-			S.BesselJ.setEvaluator(new BesselJ());
-			S.BesselJZero.setEvaluator(new BesselJZero());
-			S.BesselK.setEvaluator(new BesselK());
-			S.BesselY.setEvaluator(new BesselY());
-			S.BesselYZero.setEvaluator(new BesselYZero());
-			S.HankelH1.setEvaluator(new HankelH1());
-			S.HankelH2.setEvaluator(new HankelH2());
-			S.SphericalBesselJ.setEvaluator(new SphericalBesselJ());
-			S.SphericalBesselY.setEvaluator(new SphericalBesselY());
+			F.AiryAi.setEvaluator(new AiryAi());
+			F.AiryAiPrime.setEvaluator(new AiryAiPrime());
+			F.AiryBi.setEvaluator(new AiryBi());
+			F.AiryBiPrime.setEvaluator(new AiryBiPrime());
+			F.BesselI.setEvaluator(new BesselI());
+			F.BesselJ.setEvaluator(new BesselJ());
+			F.BesselJZero.setEvaluator(new BesselJZero());
+			F.BesselK.setEvaluator(new BesselK());
+			F.BesselY.setEvaluator(new BesselY());
+			F.BesselYZero.setEvaluator(new BesselYZero());
+			F.HankelH1.setEvaluator(new HankelH1());
+			F.HankelH2.setEvaluator(new HankelH2());
+			F.SphericalBesselJ.setEvaluator(new SphericalBesselJ());
+			F.SphericalBesselY.setEvaluator(new SphericalBesselY());
 		}
 	}
 

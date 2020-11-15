@@ -69,7 +69,7 @@ public final class FunctionDefinitions {
 
 		private static void init() {
 			ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
-			// S.Dataset.setEvaluator(new org.matheclipse.core.reflection.system.Dataset());
+			// F.Dataset.setEvaluator(new org.matheclipse.core.reflection.system.Dataset());
 			D.setEvaluator(new org.matheclipse.core.reflection.system.D());
 			Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
 			DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
@@ -109,7 +109,7 @@ public final class FunctionDefinitions {
 			PolarPlot.setEvaluator(new org.matheclipse.core.reflection.system.PolarPlot());
 			Product.setEvaluator(new org.matheclipse.core.reflection.system.Product());
 
-			S.Ramp.setEvaluator(new org.matheclipse.core.reflection.system.Ramp());
+			F.Ramp.setEvaluator(new org.matheclipse.core.reflection.system.Ramp());
 			Solve.setEvaluator(new org.matheclipse.core.reflection.system.Solve());
 			Sum.setEvaluator(new org.matheclipse.core.reflection.system.Sum());
 			Taylor.setEvaluator(new org.matheclipse.core.reflection.system.Taylor());
@@ -120,7 +120,7 @@ public final class FunctionDefinitions {
 				//Compile.setEvaluator(new org.matheclipse.core.reflection.system.Compile());
 				//CreateDirectory.setEvaluator(new org.matheclipse.core.reflection.system.CreateDirectory());
 				Export.setEvaluator(new org.matheclipse.core.reflection.system.Export());
-				S.ExportString.setEvaluator(new org.matheclipse.core.reflection.system.ExportString());
+				F.ExportString.setEvaluator(new org.matheclipse.core.reflection.system.ExportString());
 				OptimizeExpression.setEvaluator(new org.matheclipse.core.reflection.system.OptimizeExpression());
 				Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());
 			}

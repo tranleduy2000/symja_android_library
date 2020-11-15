@@ -61,7 +61,7 @@ public class InterpolatingFunctionExpr<T> extends DataExpr<T> {
 	}
 
 	protected InterpolatingFunctionExpr(final T function, double min, double max) {
-		super(S.InterpolatingFunction, function);
+		super(F.InterpolatingFunction, function);
 		this.min = min;
 		this.max = max;
 	}
@@ -146,7 +146,7 @@ public class InterpolatingFunctionExpr<T> extends DataExpr<T> {
 		Object model = toData();
 		if (model instanceof SimpleRegression) {
 			SimpleRegression simpleModel = (SimpleRegression) model;
-			return F.Plus(F.num(simpleModel.getIntercept()), F.Times(F.num(simpleModel.getSlope()), S.C));
+			return F.Plus(F.num(simpleModel.getIntercept()), F.Times(F.num(simpleModel.getSlope()), F.C));
 		}
 		return F.NIL;
 	}

@@ -97,52 +97,52 @@ public final class LinearAlgebra {
 	private static class Initializer {
 
 		private static void init() {
-			S.ArrayDepth.setEvaluator(new ArrayDepth());
-			S.CharacteristicPolynomial.setEvaluator(new CharacteristicPolynomial());
-			S.CholeskyDecomposition.setEvaluator(new CholeskyDecomposition());
-			S.ConjugateTranspose.setEvaluator(new ConjugateTranspose());
-			S.Cross.setEvaluator(new Cross());
-			S.DesignMatrix.setEvaluator(new DesignMatrix());
-			S.Det.setEvaluator(new Det());
-			S.Diagonal.setEvaluator(new Diagonal());
-			S.DiagonalMatrix.setEvaluator(new DiagonalMatrix());
-			S.Dimensions.setEvaluator(new Dimensions());
-			S.Dot.setEvaluator(new Dot());
-			S.Eigenvalues.setEvaluator(new Eigenvalues());
-			S.Eigenvectors.setEvaluator(new Eigenvectors());
-			S.FourierMatrix.setEvaluator(new FourierMatrix());
-			S.FromPolarCoordinates.setEvaluator(new FromPolarCoordinates());
-			S.HilbertMatrix.setEvaluator(new HilbertMatrix());
-			S.IdentityMatrix.setEvaluator(new IdentityMatrix());
-			S.Inner.setEvaluator(new Inner());
-			S.Inverse.setEvaluator(new Inverse());
-			S.JacobiMatrix.setEvaluator(new JacobiMatrix());
-			S.LeastSquares.setEvaluator(new LeastSquares());
-			S.LinearSolve.setEvaluator(new LinearSolve());
-			S.LowerTriangularize.setEvaluator(new LowerTriangularize());
-			S.LUDecomposition.setEvaluator(new LUDecomposition());
-			S.MatrixMinimalPolynomial.setEvaluator(new MatrixMinimalPolynomial());
-			S.MatrixExp.setEvaluator(new MatrixExp());
-			S.MatrixPower.setEvaluator(new MatrixPower());
-			S.MatrixRank.setEvaluator(new MatrixRank());
-			S.Norm.setEvaluator(new Norm());
-			S.Normalize.setEvaluator(new Normalize());
-			S.NullSpace.setEvaluator(new NullSpace());
-			S.Orthogonalize.setEvaluator(new Orthogonalize());
-			S.PseudoInverse.setEvaluator(PseudoInverse.CONST);
-			S.Projection.setEvaluator(new Projection());
-			S.QRDecomposition.setEvaluator(new QRDecomposition());
-			S.RiccatiSolve.setEvaluator(new RiccatiSolve());
-			S.RowReduce.setEvaluator(new RowReduce());
-			S.SingularValueDecomposition.setEvaluator(new SingularValueDecomposition());
-			S.ToeplitzMatrix.setEvaluator(new ToeplitzMatrix());
-			S.ToPolarCoordinates.setEvaluator(new ToPolarCoordinates());
-			S.Tr.setEvaluator(new Tr());
-			S.Transpose.setEvaluator(new Transpose());
-			S.UpperTriangularize.setEvaluator(new UpperTriangularize());
-			S.UnitVector.setEvaluator(new UnitVector());
-			S.VandermondeMatrix.setEvaluator(new VandermondeMatrix());
-			S.VectorAngle.setEvaluator(new VectorAngle());
+			F.ArrayDepth.setEvaluator(new ArrayDepth());
+			F.CharacteristicPolynomial.setEvaluator(new CharacteristicPolynomial());
+			F.CholeskyDecomposition.setEvaluator(new CholeskyDecomposition());
+			F.ConjugateTranspose.setEvaluator(new ConjugateTranspose());
+			F.Cross.setEvaluator(new Cross());
+			F.DesignMatrix.setEvaluator(new DesignMatrix());
+			F.Det.setEvaluator(new Det());
+			F.Diagonal.setEvaluator(new Diagonal());
+			F.DiagonalMatrix.setEvaluator(new DiagonalMatrix());
+			F.Dimensions.setEvaluator(new Dimensions());
+			F.Dot.setEvaluator(new Dot());
+			F.Eigenvalues.setEvaluator(new Eigenvalues());
+			F.Eigenvectors.setEvaluator(new Eigenvectors());
+			F.FourierMatrix.setEvaluator(new FourierMatrix());
+			F.FromPolarCoordinates.setEvaluator(new FromPolarCoordinates());
+			F.HilbertMatrix.setEvaluator(new HilbertMatrix());
+			F.IdentityMatrix.setEvaluator(new IdentityMatrix());
+			F.Inner.setEvaluator(new Inner());
+			F.Inverse.setEvaluator(new Inverse());
+			F.JacobiMatrix.setEvaluator(new JacobiMatrix());
+			F.LeastSquares.setEvaluator(new LeastSquares());
+			F.LinearSolve.setEvaluator(new LinearSolve());
+			F.LowerTriangularize.setEvaluator(new LowerTriangularize());
+			F.LUDecomposition.setEvaluator(new LUDecomposition());
+			F.MatrixMinimalPolynomial.setEvaluator(new MatrixMinimalPolynomial());
+			F.MatrixExp.setEvaluator(new MatrixExp());
+			F.MatrixPower.setEvaluator(new MatrixPower());
+			F.MatrixRank.setEvaluator(new MatrixRank());
+			F.Norm.setEvaluator(new Norm());
+			F.Normalize.setEvaluator(new Normalize());
+			F.NullSpace.setEvaluator(new NullSpace());
+			F.Orthogonalize.setEvaluator(new Orthogonalize());
+			F.PseudoInverse.setEvaluator(PseudoInverse.CONST);
+			F.Projection.setEvaluator(new Projection());
+			F.QRDecomposition.setEvaluator(new QRDecomposition());
+			F.RiccatiSolve.setEvaluator(new RiccatiSolve());
+			F.RowReduce.setEvaluator(new RowReduce());
+			F.SingularValueDecomposition.setEvaluator(new SingularValueDecomposition());
+			F.ToeplitzMatrix.setEvaluator(new ToeplitzMatrix());
+			F.ToPolarCoordinates.setEvaluator(new ToPolarCoordinates());
+			F.Tr.setEvaluator(new Tr());
+			F.Transpose.setEvaluator(new Transpose());
+			F.UpperTriangularize.setEvaluator(new UpperTriangularize());
+			F.UnitVector.setEvaluator(new UnitVector());
+			F.VandermondeMatrix.setEvaluator(new VandermondeMatrix());
+			F.VectorAngle.setEvaluator(new VectorAngle());
     }
 	}
 
@@ -2991,7 +2991,7 @@ public final class LinearAlgebra {
 					if (ast.isAST2()) {
 						final IExpr p = ast.arg2();
 						if (p.isInfinity()) {
-							return vector.map(S.Max, new Function<IExpr, IExpr>() {
+							return vector.map(F.Max, new Function<IExpr, IExpr>() {
 								@Override
 								public IExpr apply(IExpr x) {
 									return F.Abs(x);
@@ -3007,7 +3007,7 @@ public final class LinearAlgebra {
 									engine.printMessage("Norm: Second argument is < 1!");
 									return F.NIL;
 								}
-								return F.Power(vector.map(S.Plus, new Function<IExpr, IExpr>() {
+								return F.Power(vector.map(F.Plus, new Function<IExpr, IExpr>() {
 									@Override
 									public IExpr apply(IExpr x) {
 										return F.Power(F.Abs(x), p);
@@ -3017,7 +3017,7 @@ public final class LinearAlgebra {
 						}
 						return F.NIL;
 					}
-					return F.Sqrt(vector.map(S.Plus, new Function<IExpr, IExpr>() {
+					return F.Sqrt(vector.map(F.Plus, new Function<IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x) {
 							return F.Sqr(F.Abs(x));
@@ -3048,7 +3048,7 @@ public final class LinearAlgebra {
 						final org.hipparchus.linear.SingularValueDecomposition svd = new org.hipparchus.linear.SingularValueDecomposition(
 								matrix);
 						RealMatrix sSVD = svd.getS();
-						IASTAppendable result = F.ast(S.Max, matrixDim[1], false);
+						IASTAppendable result = F.ast(F.Max, matrixDim[1], false);
 						for (int i = 0; i < matrixDim[1]; i++) {
 							result.append(F.num(sSVD.getEntry(i, i)));
 						}

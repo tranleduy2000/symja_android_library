@@ -23,10 +23,10 @@ public class FinancialFunctions {
 
 		private static void init() {
 		if (ToggleFeature.FINANCE) {
-				S.EffectiveInterest.setEvaluator(new EffectiveInterest());
-				S.TimeValue.setEvaluator(new TimeValue());
-				S.Annuity.setEvaluator(new Annuity());
-				S.AnnuityDue.setEvaluator(new AnnuityDue());
+				F.EffectiveInterest.setEvaluator(new EffectiveInterest());
+				F.TimeValue.setEvaluator(new TimeValue());
+				F.Annuity.setEvaluator(new Annuity());
+				F.AnnuityDue.setEvaluator(new AnnuityDue());
 		}
 	}
 	}

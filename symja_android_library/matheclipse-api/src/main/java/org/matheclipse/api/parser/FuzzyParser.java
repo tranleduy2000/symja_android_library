@@ -58,6 +58,7 @@ import org.matheclipse.parser.client.operator.Operator;
  * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence parser</a> for the idea,
  * how to parse the operators depending on their precedence.
  */
+@SuppressWarnings("JavadocReference")
 public class FuzzyParser extends Scanner {
 	static class NVisitorExpr extends VisitorExpr {
 		final int fPrecision;
@@ -426,7 +427,7 @@ public class FuzzyParser extends Scanner {
 
 			getNextToken();
 			if (fToken == TT_PRECEDENCE_CLOSE || fToken == TT_ARGUMENTS_CLOSE) {
-				function.append(S.Null);
+				function.append(F.Null);
 				break;
 			}
 		} while (true);
@@ -1212,7 +1213,7 @@ public class FuzzyParser extends Scanner {
 		if (infixOperator.isOperator(";")) {
 			if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
-				return createInfixFunction(infixOperator, rhs, S.Null);
+				return createInfixFunction(infixOperator, rhs, F.Null);
 				// return infixOperator.createFunction(fFactory, rhs,
 				// fFactory.createSymbol("Null"));
 			}
@@ -1390,7 +1391,7 @@ public class FuzzyParser extends Scanner {
 				if (infixOperator.isOperator(";")) {
 					if (fToken == TT_EOF || fToken == TT_ARGUMENTS_CLOSE || fToken == TT_LIST_CLOSE
 							|| fToken == TT_PRECEDENCE_CLOSE || fToken == TT_COMMA) {
-						ast.append(S.Null);
+						ast.append(F.Null);
 						break;
 					}
 				}

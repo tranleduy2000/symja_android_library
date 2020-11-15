@@ -82,28 +82,28 @@ public class SpecialFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.Beta.setEvaluator(new Beta());
-			S.BetaRegularized.setEvaluator(new BetaRegularized());
-			S.DirichletEta.setEvaluator(new DirichletEta());
-			S.Erf.setEvaluator(new Erf());
-			S.Erfc.setEvaluator(new Erfc());
-			S.Erfi.setEvaluator(new Erfi());
-			S.GammaRegularized.setEvaluator(new GammaRegularized());
-			S.HurwitzZeta.setEvaluator(new HurwitzZeta());
-			S.HypergeometricPFQRegularized.setEvaluator(new HypergeometricPFQRegularized());
-			S.InverseErf.setEvaluator(new InverseErf());
-			S.InverseErfc.setEvaluator(new InverseErfc());
-			S.InverseBetaRegularized.setEvaluator(new InverseBetaRegularized());
-			S.InverseGammaRegularized.setEvaluator(new InverseGammaRegularized());
-			S.LogGamma.setEvaluator(new LogGamma());
-			S.MeijerG.setEvaluator(new MeijerG());
-			S.PolyGamma.setEvaluator(new PolyGamma());
-			S.PolyLog.setEvaluator(new PolyLog());
-			S.ProductLog.setEvaluator(new ProductLog());
-			S.StieltjesGamma.setEvaluator(new StieltjesGamma());
-			S.StruveH.setEvaluator(new StruveH());
-			S.StruveL.setEvaluator(new StruveL());
-			S.Zeta.setEvaluator(new Zeta());
+			F.Beta.setEvaluator(new Beta());
+			F.BetaRegularized.setEvaluator(new BetaRegularized());
+			F.DirichletEta.setEvaluator(new DirichletEta());
+			F.Erf.setEvaluator(new Erf());
+			F.Erfc.setEvaluator(new Erfc());
+			F.Erfi.setEvaluator(new Erfi());
+			F.GammaRegularized.setEvaluator(new GammaRegularized());
+			F.HurwitzZeta.setEvaluator(new HurwitzZeta());
+			F.HypergeometricPFQRegularized.setEvaluator(new HypergeometricPFQRegularized());
+			F.InverseErf.setEvaluator(new InverseErf());
+			F.InverseErfc.setEvaluator(new InverseErfc());
+			F.InverseBetaRegularized.setEvaluator(new InverseBetaRegularized());
+			F.InverseGammaRegularized.setEvaluator(new InverseGammaRegularized());
+			F.LogGamma.setEvaluator(new LogGamma());
+			F.MeijerG.setEvaluator(new MeijerG());
+			F.PolyGamma.setEvaluator(new PolyGamma());
+			F.PolyLog.setEvaluator(new PolyLog());
+			F.ProductLog.setEvaluator(new ProductLog());
+			F.StieltjesGamma.setEvaluator(new StieltjesGamma());
+			F.StruveH.setEvaluator(new StruveH());
+			F.StruveL.setEvaluator(new StruveL());
+			F.Zeta.setEvaluator(new Zeta());
 		}
 	}
 

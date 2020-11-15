@@ -43,17 +43,17 @@ public class IOFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			// S.General.setEvaluator(new General());
-			S.Echo.setEvaluator(new Echo());
-			S.EchoFunction.setEvaluator(new EchoFunction());
-			S.Message.setEvaluator(new Message());
-			S.Names.setEvaluator(new Names());
-			S.Print.setEvaluator(new Print());
+			// F.General.setEvaluator(new General());
+			F.Echo.setEvaluator(new Echo());
+			F.EchoFunction.setEvaluator(new EchoFunction());
+			F.Message.setEvaluator(new Message());
+			F.Names.setEvaluator(new Names());
+			F.Print.setEvaluator(new Print());
 
-			S.Short.setEvaluator(new Short());
-			S.StyleForm.setEvaluator(new StyleForm());
+			F.Short.setEvaluator(new Short());
+			F.StyleForm.setEvaluator(new StyleForm());
 			for (int i = 0; i < MESSAGES.length; i += 2) {
-				S.General.putMessage(IPatternMatcher.SET, MESSAGES[i], F.stringx(MESSAGES[i + 1]));
+				F.General.putMessage(IPatternMatcher.SET, MESSAGES[i], F.stringx(MESSAGES[i + 1]));
 			}
 		}
 	}
@@ -103,11 +103,11 @@ public class IOFunctions {
 				final int size = ast.head().size();
 				switch (size) {
 					case 1:
-						return F.unaryAST1(S.Echo, ast.arg1());
+						return F.unaryAST1(F.Echo, ast.arg1());
 					case 2:
 						return echo(ast.arg1(), ast.head().first(), engine);
 					case 3:
-						return F.ternaryAST3(S.Echo, ast.arg1(), ast.head().first(), ast.head().second());
+						return F.ternaryAST3(F.Echo, ast.arg1(), ast.head().first(), ast.head().second());
 					default:
 				}
 			}
@@ -150,7 +150,7 @@ public class IOFunctions {
 					}
 					return F.stringx(": " + message);
 				}
-				if (ast.arg1().isAST(S.MessageName, 3)) {
+				if (ast.arg1().isAST(F.MessageName, 3)) {
 					IAST messageName = (IAST) ast.arg1();
 					String messageShortcut = messageName.arg2().toString();
 					if (messageName.arg1().isSymbol()) {
@@ -159,7 +159,7 @@ public class IOFunctions {
 							return temp;
 						}
 					}
-					return message(S.General, messageShortcut, ast);
+					return message(F.General, messageShortcut, ast);
 				}
 			}
 			return F.NIL;
@@ -186,8 +186,8 @@ public class IOFunctions {
 	private static class StyleForm extends AbstractEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.head() == S.StyleForm) {
-				return ast.apply(S.Style);
+			if (ast.head() == F.StyleForm) {
+				return ast.apply(F.Style);
 		}
 		return F.NIL;
 	}
@@ -245,7 +245,7 @@ public class IOFunctions {
 			if (x instanceof IStringX) {
 				buf.append(x.toString());
 			} else {
-				if (x.isASTSizeGE(S.Style, 2)) {
+				if (x.isASTSizeGE(F.Style, 2)) {
 					printExpression(x.first(), out, buf, convert, engine);
 				} else if (convert[0] && !out.convert(buf, x)) {
 					convert[0] = false;

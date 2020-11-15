@@ -165,7 +165,7 @@ public class Functors {
 	 * @return
 	 */
 	public static Function<IExpr, IExpr> equalRule(IAST rule) {
-		if (rule.first().isAST(S.HoldPattern, 2)) {
+		if (rule.first().isAST(F.HoldPattern, 2)) {
 			return new SingleRuleFunctor(rule.setAtCopy(1, rule.first().first()));
 		}
 		return new SingleRuleFunctor(rule);
@@ -325,7 +325,7 @@ public class Functors {
 		IExpr lhs = rule.arg1();
 		final IExpr rhs = rule.arg2();
 
-		if (lhs.isAST(S.HoldPattern, 2)) {
+		if (lhs.isAST(F.HoldPattern, 2)) {
 			lhs = lhs.first();
 		}
 

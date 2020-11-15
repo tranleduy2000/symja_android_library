@@ -57,20 +57,20 @@ public class AssociationFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.AssociateTo.setEvaluator(new AssociateTo());
-			S.Association.setEvaluator(new Association());
-			S.AssociationMap.setEvaluator(new AssociationMap());
-			S.AssociationThread.setEvaluator(new AssociationThread());
-			S.Counts.setEvaluator(new Counts());
-			S.KeyExistsQ.setEvaluator(new KeyExistsQ());
-			S.Keys.setEvaluator(new Keys());
-			S.KeySort.setEvaluator(new KeySort());
-			S.KeyTake.setEvaluator(new KeyTake());
-			S.LetterCounts.setEvaluator(new LetterCounts());
-			S.Lookup.setEvaluator(new Lookup());
-			S.Structure.setEvaluator(new Structure());
-			S.Summary.setEvaluator(new Summary());
-			S.Values.setEvaluator(new Values());
+			F.AssociateTo.setEvaluator(new AssociateTo());
+			F.Association.setEvaluator(new Association());
+			F.AssociationMap.setEvaluator(new AssociationMap());
+			F.AssociationThread.setEvaluator(new AssociationThread());
+			F.Counts.setEvaluator(new Counts());
+			F.KeyExistsQ.setEvaluator(new KeyExistsQ());
+			F.Keys.setEvaluator(new Keys());
+			F.KeySort.setEvaluator(new KeySort());
+			F.KeyTake.setEvaluator(new KeyTake());
+			F.LetterCounts.setEvaluator(new LetterCounts());
+			F.Lookup.setEvaluator(new Lookup());
+			F.Structure.setEvaluator(new Structure());
+			F.Summary.setEvaluator(new Summary());
+			F.Values.setEvaluator(new Values());
 		}
 	}
 
@@ -92,7 +92,7 @@ public class AssociationFunctions {
 						return result;
 					} else {
 						// The argument is not a rule or a list of rules.
-						return IOFunctions.printMessage(S.AssociateTo, "invdt", F.List(), EvalEngine.get());
+						return IOFunctions.printMessage(F.AssociateTo, "invdt", F.List(), EvalEngine.get());
 					}
 				}
 				return F.NIL;
@@ -106,7 +106,7 @@ public class AssociationFunctions {
 			if (sym.isPresent()) {
 				IExpr arg2 = engine.evaluate(ast.arg2());
 				Function<IExpr, IExpr> function = new AssociateToFunction(arg2);
-				IExpr[] results = ((ISymbol) sym).reassignSymbolValue(function, S.AssociateTo, engine);
+				IExpr[] results = ((ISymbol) sym).reassignSymbolValue(function, F.AssociateTo, engine);
 				if (results != null) {
 					return results[1];
 				}
@@ -484,7 +484,7 @@ public class AssociationFunctions {
 						if (key.isList()) {
 							return ((IAST) key).mapThread(ast, 2);
 						}
-						if (key.isAST(S.Key, 2)) {
+						if (key.isAST(F.Key, 2)) {
 							key = key.first();
 						}
 						IAST listOfRules = (IAST) arg1;
@@ -509,7 +509,7 @@ public class AssociationFunctions {
 					if (key.isList()) {
 						return ((IAST) key).mapThread(ast, 2);
 					}
-					if (key.isAST(S.Key, 2)) {
+					if (key.isAST(F.Key, 2)) {
 						key = key.first();
 					}
 					return ((IAssociation) arg1).getValue(key);
@@ -519,7 +519,7 @@ public class AssociationFunctions {
 					if (key.isList()) {
 						return ((IAST) key).mapThread(ast, 2);
 					}
-					if (key.isAST(S.Key, 2)) {
+					if (key.isAST(F.Key, 2)) {
 						key = key.first();
 					}
 					final IExpr arg3 = ast.arg3();

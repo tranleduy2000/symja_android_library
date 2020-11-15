@@ -526,12 +526,12 @@ public class AST2Expr {
 				break;
 			case ID.Get:
 				if (ast.isAST1() && ast.arg1().isString()) {
-					return S.Get.of(ast.arg1());
+					return F.Get.of(ast.arg1());
 				}
 				break;
 			case ID.Import:
 				if (ast.isAST1() && ast.arg1().isString()) {
-					return S.Import.of(ast.arg1());
+					return F.Import.of(ast.arg1());
 				}
 						break;
 				case ID.N:
@@ -557,7 +557,7 @@ public class AST2Expr {
 				case ID.Exp:
 					if (ast.isAST1()) {
 						// rewrite from input: Exp(x) => E^x
-					return F.Power(S.E, ast.arg1());
+					return F.Power(F.E, ast.arg1());
 					}
 					break;
 				case ID.Power:

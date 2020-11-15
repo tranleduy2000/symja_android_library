@@ -47,13 +47,13 @@ public class MinMaxFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.ArgMax.setEvaluator(new ArgMax());
-			S.ArgMin.setEvaluator(new ArgMin());
-			S.FunctionRange.setEvaluator(new FunctionRange());
-			S.Maximize.setEvaluator(new Maximize());
-			S.Minimize.setEvaluator(new Minimize());
-			S.NMaximize.setEvaluator(new NMaximize());
-			S.NMinimize.setEvaluator(new NMinimize());
+			F.ArgMax.setEvaluator(new ArgMax());
+			F.ArgMin.setEvaluator(new ArgMin());
+			F.FunctionRange.setEvaluator(new FunctionRange());
+			F.Maximize.setEvaluator(new Maximize());
+			F.Minimize.setEvaluator(new Minimize());
+			F.NMaximize.setEvaluator(new NMaximize());
+			F.NMinimize.setEvaluator(new NMinimize());
 		}
 	}
 
@@ -185,7 +185,7 @@ public class MinMaxFunctions {
 						IExpr l = interval.lower();
 						IExpr u = interval.upper();
 						if (x2.isMinusOne()) {
-							if (S.GreaterEqual.ofQ(engine, l, F.C1)) {
+							if (F.GreaterEqual.ofQ(engine, l, F.C1)) {
 								// [>= 1, u]
 								return F.Interval(F.Power(u, x2), F.Power(l, x2));
 							}

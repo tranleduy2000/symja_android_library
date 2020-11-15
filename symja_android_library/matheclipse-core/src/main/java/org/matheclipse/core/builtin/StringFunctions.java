@@ -49,39 +49,39 @@ public final class StringFunctions {
 
 		private static void init() {
 			LANGUAGE_MAP.put("English", "Latin");
-			S.Characters.setEvaluator(new Characters());
-			S.CharacterRange.setEvaluator(new CharacterRange());
-			S.FromCharacterCode.setEvaluator(new FromCharacterCode());
-			S.LetterQ.setEvaluator(new LetterQ());
-			S.LowerCaseQ.setEvaluator(new LowerCaseQ());
-			S.PrintableASCIIQ.setEvaluator(new PrintableASCIIQ());
-			S.RemoveDiacritics.setEvaluator(new RemoveDiacritics());
-			S.StringCases.setEvaluator(new StringCases());
-			S.StringCount.setEvaluator(new StringCount());
-			S.StringContainsQ.setEvaluator(new StringContainsQ());
-			S.StringDrop.setEvaluator(new StringDrop());
-			S.StringExpression.setEvaluator(new StringExpression());
-			S.StringInsert.setEvaluator(new StringInsert());
-			S.StringJoin.setEvaluator(new StringJoin());
-			S.StringLength.setEvaluator(new StringLength());
-			S.StringMatchQ.setEvaluator(new StringMatchQ());
-			S.StringPart.setEvaluator(new StringPart());
-			S.StringReplace.setEvaluator(new StringReplace());
-			S.StringRiffle.setEvaluator(new StringRiffle());
-			S.StringSplit.setEvaluator(new StringSplit());
-			S.StringTake.setEvaluator(new StringTake());
-			S.StringTrim.setEvaluator(new StringTrim());
-			S.SyntaxLength.setEvaluator(new SyntaxLength());
-			S.TextString.setEvaluator(new TextString());
-			S.ToCharacterCode.setEvaluator(new ToCharacterCode());
-			S.ToString.setEvaluator(new ToString());
-			S.ToUnicode.setEvaluator(new ToUnicode());
-			//S.Transliterate.setEvaluator(new Transliterate());
-			S.UpperCaseQ.setEvaluator(new UpperCaseQ());
+			F.Characters.setEvaluator(new Characters());
+			F.CharacterRange.setEvaluator(new CharacterRange());
+			F.FromCharacterCode.setEvaluator(new FromCharacterCode());
+			F.LetterQ.setEvaluator(new LetterQ());
+			F.LowerCaseQ.setEvaluator(new LowerCaseQ());
+			F.PrintableASCIIQ.setEvaluator(new PrintableASCIIQ());
+			F.RemoveDiacritics.setEvaluator(new RemoveDiacritics());
+			F.StringCases.setEvaluator(new StringCases());
+			F.StringCount.setEvaluator(new StringCount());
+			F.StringContainsQ.setEvaluator(new StringContainsQ());
+			F.StringDrop.setEvaluator(new StringDrop());
+			F.StringExpression.setEvaluator(new StringExpression());
+			F.StringInsert.setEvaluator(new StringInsert());
+			F.StringJoin.setEvaluator(new StringJoin());
+			F.StringLength.setEvaluator(new StringLength());
+			F.StringMatchQ.setEvaluator(new StringMatchQ());
+			F.StringPart.setEvaluator(new StringPart());
+			F.StringReplace.setEvaluator(new StringReplace());
+			F.StringRiffle.setEvaluator(new StringRiffle());
+			F.StringSplit.setEvaluator(new StringSplit());
+			F.StringTake.setEvaluator(new StringTake());
+			F.StringTrim.setEvaluator(new StringTrim());
+			F.SyntaxLength.setEvaluator(new SyntaxLength());
+			F.TextString.setEvaluator(new TextString());
+			F.ToCharacterCode.setEvaluator(new ToCharacterCode());
+			F.ToString.setEvaluator(new ToString());
+			F.ToUnicode.setEvaluator(new ToUnicode());
+			//F.Transliterate.setEvaluator(new Transliterate());
+			F.UpperCaseQ.setEvaluator(new UpperCaseQ());
 
 			// TeXParser.initialize();
 			if (!Config.FUZZY_PARSER) {
-				S.ToExpression.setEvaluator(new ToExpression());
+				F.ToExpression.setEvaluator(new ToExpression());
 			}
 		}
 	}
@@ -244,7 +244,7 @@ public final class StringFunctions {
 					if (unicode < 0 || unicode >= 1114112) {
 						// A character unicode, which should be a non-negative integer less than 1114112, is expected at
 						// position `2` in `1`.
-						return IOFunctions.printMessage(S.FromCharacterCode, "notunicode", F.List(charList, F.ZZ(i)),
+						return IOFunctions.printMessage(F.FromCharacterCode, "notunicode", F.List(charList, F.ZZ(i)),
 								engine);
 					}
 					ch = (char) unicode;
@@ -535,7 +535,7 @@ public final class StringFunctions {
 					boolean ignoreCase = false;
 					if (ast.size() > 3) {
 						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine, true);
-						IExpr option = options.getOption(S.IgnoreCase);
+						IExpr option = options.getOption(F.IgnoreCase);
 						if (option.isTrue()) {
 							ignoreCase = true;
 						}
@@ -619,7 +619,7 @@ public final class StringFunctions {
 					boolean ignoreCase = false;
 					if (ast.size() > 3) {
 						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine, true);
-						IExpr option = options.getOption(S.IgnoreCase);
+						IExpr option = options.getOption(F.IgnoreCase);
 						if (option.isTrue()) {
 							ignoreCase = true;
 				}
@@ -694,7 +694,7 @@ public final class StringFunctions {
 			boolean ignoreCase = false;
 			if (ast.size() > 3) {
 				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine, true);
-				IExpr option = options.getOption(S.IgnoreCase);
+				IExpr option = options.getOption(F.IgnoreCase);
 				if (option.isTrue()) {
 					ignoreCase = true;
 				}
@@ -714,9 +714,9 @@ public final class StringFunctions {
 					String s1 = arg1.toString();
 					java.util.regex.Matcher matcher = pattern.matcher(s1);
 					if (matcher.find()) {
-						return S.True;
+						return F.True;
 					}
-					return S.False;
+					return F.False;
 				}
 				return F.NIL;
 			}
@@ -1060,7 +1060,7 @@ public final class StringFunctions {
 				boolean ignoreCase = false;
 				if (ast.size() > 3) {
 					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine, true);
-					IExpr option = options.getOption(S.IgnoreCase);
+					IExpr option = options.getOption(F.IgnoreCase);
 					if (option.isTrue()) {
 						ignoreCase = true;
 					}
@@ -1078,9 +1078,9 @@ public final class StringFunctions {
 				String s1 = arg1.toString();
 				java.util.regex.Matcher matcher = pattern.matcher(s1);
 				if (matcher.matches()) {
-					return S.True;
+					return F.True;
 				}
-				return S.False;
+				return F.False;
 			}
 			return F.NIL;
 		}
@@ -1202,7 +1202,7 @@ public final class StringFunctions {
 				boolean ignoreCase = false;
 				if (ast.size() > 3) {
 					final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine, true);
-					IExpr option = options.getOption(S.IgnoreCase);
+					IExpr option = options.getOption(F.IgnoreCase);
 					if (option.isTrue()) {
 						ignoreCase = true;
 					}
@@ -1392,7 +1392,7 @@ public final class StringFunctions {
 			boolean ignoreCase = false;
 			if (ast.size() > 3) {
 				final OptionArgs options = new OptionArgs(ast.topHead(), ast, 3, engine, true);
-				IExpr option = options.getOption(S.IgnoreCase);
+				IExpr option = options.getOption(F.IgnoreCase);
 				if (option.isTrue()) {
 					ignoreCase = true;
 				}
@@ -1442,7 +1442,7 @@ public final class StringFunctions {
 					// }
 				String s = ast.arg1().toString();
 					IExpr arg2 = ast.arg2();
-					if (arg2.isAST(S.UpTo, 2)) {
+					if (arg2.isAST(F.UpTo, 2)) {
 						int upTo = Validate.checkUpTo((IAST) arg2, engine);
 						if (upTo == Integer.MIN_VALUE) {
 							return F.NIL;
@@ -2126,10 +2126,10 @@ public final class StringFunctions {
 			} else {
 				return Pattern.quote(str);
 			}
-		} else if (partOfRegex.isAST(S.Characters, 2) && partOfRegex.first().isString()) {
+		} else if (partOfRegex.isAST(F.Characters, 2) && partOfRegex.first().isString()) {
 			String str = ((IStringX) partOfRegex.first()).toString();
 			return "[" + str + "]";
-		} else if (partOfRegex.isAST(S.RegularExpression, 2) && partOfRegex.first().isString()) {
+		} else if (partOfRegex.isAST(F.RegularExpression, 2) && partOfRegex.first().isString()) {
 			return ((IStringX) partOfRegex.first()).toString();
 		} else if (partOfRegex instanceof RepeatedPattern) {
 			RepeatedPattern repeated = (RepeatedPattern) partOfRegex;
@@ -2150,7 +2150,7 @@ public final class StringFunctions {
 				}
 				return "(" + str + ")+";
 			}
-		} else if (partOfRegex.isAST(S.StringExpression)) {
+		} else if (partOfRegex.isAST(F.StringExpression)) {
 			IAST stringExpression = (IAST) partOfRegex;
 			return toRegexString(stringFunction, stringExpression, abbreviatedPatterns, engine);
 		} else if (partOfRegex.isBlank()) {
@@ -2164,7 +2164,7 @@ public final class StringFunctions {
 				// Repeated
 				return "(.|\\n)+";
 			}
-		} else if (partOfRegex.isAST(S.CharacterRange, 3)) {
+		} else if (partOfRegex.isAST(F.CharacterRange, 3)) {
 			String[] characterRange = characterRange((IAST) partOfRegex);
 			if (characterRange == null) {
 				return null;

@@ -2867,7 +2867,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isExcept() {
-		return isAST(S.Except, 2, 3);
+		return isAST(F.Except, 2, 3);
 	}
 
 	/** {@inheritDoc} */

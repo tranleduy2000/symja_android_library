@@ -481,7 +481,7 @@ public class ASTRealVector extends AbstractAST implements Cloneable, Externaliza
 	@Override
 	public IExpr[] toArray() {
 		IExpr[] result = new IExpr[vector.getDimension()+1];
-		result[0] = S.List;
+		result[0] = F.List;
 		for (int i = 0; i < result.length; i++) {
 			result[i+1] = F.num(vector.getEntry(i));
 

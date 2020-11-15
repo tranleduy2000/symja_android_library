@@ -47,8 +47,8 @@ public class SimplifyFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.FullSimplify.setEvaluator(new FullSimplify());
-			S.Simplify.setEvaluator(new Simplify());
+			F.FullSimplify.setEvaluator(new FullSimplify());
+			F.Simplify.setEvaluator(new Simplify());
 		}
 	}
 

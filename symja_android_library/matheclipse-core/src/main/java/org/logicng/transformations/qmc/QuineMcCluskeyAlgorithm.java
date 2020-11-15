@@ -28,8 +28,11 @@
 
 package org.logicng.transformations.qmc;
 
+import com.duy.annotations.ObjcMemoryIssue;
+import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.Function;
 import com.duy.util.MapWrapper;
+import com.google.j2objc.annotations.AutoreleasePool;
 
 import org.logicng.cardinalityconstraints.CCIncrementalData;
 import org.logicng.datastructures.Assignment;
@@ -156,9 +159,11 @@ public class QuineMcCluskeyAlgorithm {
      * @param termsInClasses the terms sorted in term classes
      * @return the combined terms
      */
+    @ObjcMemoryIssue
     static SortedMap<Integer, LinkedHashSet<Term>> combineInTermClasses(final SortedMap<Integer, LinkedHashSet<Term>> termsInClasses) {
+        @ObjcMemoryIssueFix
         final SortedMap<Integer, LinkedHashSet<Term>> newTermsInClasses = new TreeMap<>();
-        for (int i = 0; i < termsInClasses.lastKey(); i++) {
+        for (@AutoreleasePool int i = 0; i < termsInClasses.lastKey(); i++) {
             final LinkedHashSet<Term> thisClass = termsInClasses.get(i);
             final LinkedHashSet<Term> otherClass = termsInClasses.get(i + 1);
             if (thisClass != null && otherClass != null) {

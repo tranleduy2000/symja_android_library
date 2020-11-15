@@ -1075,17 +1075,17 @@ public class PatternMatcher extends IPatternMatcher implements Externalizable {
 		boolean matched = false;
 		switch (functionID) {
 			case ID.Association:
-				if (lhsPatternAST.isAST(S.Association, 2)) {
+				if (lhsPatternAST.isAST(F.Association, 2)) {
 					final IExpr[] patternValues = fPatternMap.copyPattern();
 					try {
 						if (lhsEvalExpr.isAssociation()) {
 							IAST lhsPatternAssociation = (IAST) lhsPatternAST;
 							// TODO set/determine pattern matching flags?
 							IASTMutable lhsPatternList = (IASTMutable) lhsPatternAssociation.normal(false);
-							lhsPatternList.set(0, S.Association);
+							lhsPatternList.set(0, F.Association);
 							IAssociation lhsEvalAssociation = (IAssociation) lhsEvalExpr;
 							IASTMutable lhsEvalList = lhsEvalAssociation.normal(false);
-							lhsEvalList.set(0, S.Association);
+							lhsEvalList.set(0, F.Association);
 							matched = matchExpr(lhsPatternList, lhsEvalList, engine, stackMatcher);
 							return matched;
 						}

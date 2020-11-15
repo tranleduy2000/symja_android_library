@@ -323,11 +323,11 @@ public class ClusteringFunctions {
 					int minPts = 1;
 					if (ast.size() > 2) {
 						final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-						IExpr option = options.getOption(S.Method);
+						IExpr option = options.getOption(F.Method);
 						if (option.isPresent()) {
 							method = option.toString();
 						}
-						option = options.getOption(S.DistanceFunction);
+						option = options.getOption(F.DistanceFunction);
 						if (option.isPresent()) {
 							measure = null;
 							if (option.isBuiltInSymbol()) {
@@ -435,15 +435,15 @@ public class ClusteringFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.BinaryDistance.setEvaluator(new BinaryDistance());
-			S.BrayCurtisDistance.setEvaluator(new BrayCurtisDistance());
-			S.CanberraDistance.setEvaluator(new CanberraDistance());
-			S.ChessboardDistance.setEvaluator(new ChessboardDistance());
-			S.CosineDistance.setEvaluator(new CosineDistance());
-			S.EuclideanDistance.setEvaluator(new EuclideanDistance());
-			S.FindClusters.setEvaluator(new FindClusters());
-			S.ManhattanDistance.setEvaluator(new ManhattanDistance());
-			S.SquaredEuclideanDistance.setEvaluator(new SquaredEuclideanDistance());
+			F.BinaryDistance.setEvaluator(new BinaryDistance());
+			F.BrayCurtisDistance.setEvaluator(new BrayCurtisDistance());
+			F.CanberraDistance.setEvaluator(new CanberraDistance());
+			F.ChessboardDistance.setEvaluator(new ChessboardDistance());
+			F.CosineDistance.setEvaluator(new CosineDistance());
+			F.EuclideanDistance.setEvaluator(new EuclideanDistance());
+			F.FindClusters.setEvaluator(new FindClusters());
+			F.ManhattanDistance.setEvaluator(new ManhattanDistance());
+			F.SquaredEuclideanDistance.setEvaluator(new SquaredEuclideanDistance());
 		}
 	}
 

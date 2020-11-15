@@ -6900,7 +6900,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFactor() {
-		fail();
 		System.out.println();
 
 		check("Factor(x^34+x^17+1)", //

@@ -27,11 +27,11 @@ public class AttributeFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.Attributes.setEvaluator(new Attributes());
-			S.ClearAttributes.setEvaluator(new ClearAttributes());
-			S.SetAttributes.setEvaluator(new SetAttributes());
-			S.Protect.setEvaluator(new Protect());
-			S.Unprotect.setEvaluator(new Unprotect());
+			F.Attributes.setEvaluator(new Attributes());
+			F.ClearAttributes.setEvaluator(new ClearAttributes());
+			F.SetAttributes.setEvaluator(new SetAttributes());
+			F.Protect.setEvaluator(new Protect());
+			F.Unprotect.setEvaluator(new Unprotect());
 		}
 	}
 
@@ -85,13 +85,13 @@ public class AttributeFunctions {
 		}
 
 		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, IBuiltInSymbol builtinSymbol, EvalEngine engine) {
-			if (leftHandSide.isAST(S.Attributes, 2)) {
+			if (leftHandSide.isAST(F.Attributes, 2)) {
 				if (!leftHandSide.first().isSymbol()) {
 					IOFunctions.printMessage(builtinSymbol, "setps", F.List(leftHandSide.first()), engine);
 					return rightHandSide;
 				}
 				IExpr temp=engine.evaluate(F.SetAttributes(leftHandSide.first(), rightHandSide));
-				if (temp.equals(S.Null)) {
+				if (temp.equals(F.Null)) {
 					return rightHandSide;
 				}
 			}
@@ -151,7 +151,7 @@ public class AttributeFunctions {
 						clearAttributes(sym, arg2, engine);
 					}
 				}
-						return S.Null;
+						return F.Null;
 
 				}
 			}
@@ -183,7 +183,7 @@ public class AttributeFunctions {
 				ISymbol attribute = (ISymbol) attributes;
 
 				clearAttributes(sym, attribute);
-				return S.Null;
+				return F.Null;
 
 			} else {
 				if (attributes.isList()) {
@@ -198,10 +198,10 @@ public class AttributeFunctions {
 					// ISymbol attribute = (ISymbol) lst.get(i);
 					// clearAttributes(sym, attribute);
 					// }
-					return S.Null;
+					return F.Null;
 				}
 			}
-			return S.Null;
+			return F.Null;
 						}
 
 		/**
@@ -590,7 +590,7 @@ public class AttributeFunctions {
 				SetAttributes.addAttributes(sym, attributes, engine);
 			}
 		}
-		return S.Null;
+		return F.Null;
 	}
 
 

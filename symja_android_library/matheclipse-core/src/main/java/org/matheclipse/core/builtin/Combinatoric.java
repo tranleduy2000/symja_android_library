@@ -40,22 +40,22 @@ public final class Combinatoric {
 	private static class Initializer {
 
 		private static void init() {
-			S.CartesianProduct.setEvaluator(new CartesianProduct());
-			S.DiceDissimilarity.setEvaluator(new DiceDissimilarity());
-			S.IntegerPartitions.setEvaluator(new IntegerPartitions());
-			S.JaccardDissimilarity.setEvaluator(new JaccardDissimilarity());
-			S.KOrderlessPartitions.setEvaluator(new KOrderlessPartitions());
-			S.KPartitions.setEvaluator(new KPartitions());
-			S.MatchingDissimilarity.setEvaluator(new MatchingDissimilarity());
-			S.Partition.setEvaluator(new Partition());
-			S.Permutations.setEvaluator(new Permutations());
-			S.RogersTanimotoDissimilarity.setEvaluator(new RogersTanimotoDissimilarity());
-			S.RussellRaoDissimilarity.setEvaluator(new RussellRaoDissimilarity());
-			S.Signature.setEvaluator(new Signature());
-			S.SokalSneathDissimilarity.setEvaluator(new SokalSneathDissimilarity());
-			S.Subsets.setEvaluator(new Subsets());
-			S.Tuples.setEvaluator(new Tuples());
-			S.YuleDissimilarity.setEvaluator(new YuleDissimilarity());
+			F.CartesianProduct.setEvaluator(new CartesianProduct());
+			F.DiceDissimilarity.setEvaluator(new DiceDissimilarity());
+			F.IntegerPartitions.setEvaluator(new IntegerPartitions());
+			F.JaccardDissimilarity.setEvaluator(new JaccardDissimilarity());
+			F.KOrderlessPartitions.setEvaluator(new KOrderlessPartitions());
+			F.KPartitions.setEvaluator(new KPartitions());
+			F.MatchingDissimilarity.setEvaluator(new MatchingDissimilarity());
+			F.Partition.setEvaluator(new Partition());
+			F.Permutations.setEvaluator(new Permutations());
+			F.RogersTanimotoDissimilarity.setEvaluator(new RogersTanimotoDissimilarity());
+			F.RussellRaoDissimilarity.setEvaluator(new RussellRaoDissimilarity());
+			F.Signature.setEvaluator(new Signature());
+			F.SokalSneathDissimilarity.setEvaluator(new SokalSneathDissimilarity());
+			F.Subsets.setEvaluator(new Subsets());
+			F.Tuples.setEvaluator(new Tuples());
+			F.YuleDissimilarity.setEvaluator(new YuleDissimilarity());
 		}
 	}
 

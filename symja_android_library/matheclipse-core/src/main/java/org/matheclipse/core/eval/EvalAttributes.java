@@ -624,7 +624,7 @@ public class EvalAttributes {
 			final IASTAppendable subResult = F.ast(argHead, listSize - 1, true);
 
 			for (int i = 1; i < listSize; i++) {
-				if (listHead == S.List && //
+				if (listHead == F.List && //
 						(ast.get(i).isList() || ast.get(i).isSparseArray())) {
 					if (ast.get(i).isList()) {
 						final IAST arg = (IAST) ast.get(i);
@@ -634,7 +634,7 @@ public class EvalAttributes {
 						subResult.set(i, arg.get(j));
 						// subResult.set(i, Programming.sparsePart(arg, F.Part(arg, F.ZZ(j)), 2, EvalEngine.get()));
 					}
-				} else if (listHead == S.SparseArray) {
+				} else if (listHead == F.SparseArray) {
 					if (ast.get(i).isList() || ast.get(i).isSparseArray()) {
 						if (ast.get(i).isList()) {
 					final IAST arg = (IAST) ast.get(i);
@@ -655,7 +655,7 @@ public class EvalAttributes {
 				}
 			}
 			if (!result.isPresent()) {
-				IExpr head = listHead == S.SparseArray ? S.List : listHead;
+				IExpr head = listHead == F.SparseArray ? F.List : listHead;
 				switch (listLength) {
 				case 1:
 					result = F.unaryAST1(head, F.Slot1);
@@ -674,8 +674,8 @@ public class EvalAttributes {
 			result.set(j, subResult);
 		}
 
-		if (listHead == S.SparseArray) {
-			return F.unaryAST1(S.SparseArray, result);
+		if (listHead == F.SparseArray) {
+			return F.unaryAST1(F.SparseArray, result);
 		}
 		return result;
 	}

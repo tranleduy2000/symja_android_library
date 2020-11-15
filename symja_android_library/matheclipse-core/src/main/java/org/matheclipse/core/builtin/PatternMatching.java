@@ -54,45 +54,45 @@ public final class PatternMatching {
 	private static class Initializer {
 
 		private static void init() {
-			S.FilterRules.setEvaluator(new FilterRules());
-			S.Hold.setEvaluator(new Hold());
-			S.HoldPattern.setEvaluator(new HoldPattern());
-			S.Identity.setEvaluator(new Identity());
-			S.Information.setEvaluator(new Information());
-			S.Literal.setEvaluator(new Literal());
-			S.MessageName.setEvaluator(new MessageName());
-			S.Optional.setEvaluator(Optional.CONST);
-			S.Options.setEvaluator(new Options());
-			S.OptionValue.setEvaluator(new OptionValue());
-			S.Rule.setEvaluator(new Rule());
-			S.RuleDelayed.setEvaluator(new RuleDelayed());
+			F.FilterRules.setEvaluator(new FilterRules());
+			F.Hold.setEvaluator(new Hold());
+			F.HoldPattern.setEvaluator(new HoldPattern());
+			F.Identity.setEvaluator(new Identity());
+			F.Information.setEvaluator(new Information());
+			F.Literal.setEvaluator(new Literal());
+			F.MessageName.setEvaluator(new MessageName());
+			F.Optional.setEvaluator(Optional.CONST);
+			F.Options.setEvaluator(new Options());
+			F.OptionValue.setEvaluator(new OptionValue());
+			F.Rule.setEvaluator(new Rule());
+			F.RuleDelayed.setEvaluator(new RuleDelayed());
 			// if (!Config.FUZZY_PARSER) {
-			S.Set.setEvaluator(new Set());
-			S.SetDelayed.setEvaluator(new SetDelayed());
+			F.Set.setEvaluator(new Set());
+			F.SetDelayed.setEvaluator(new SetDelayed());
 				// }
-			S.Unique.setEvaluator(new Unique());
+			F.Unique.setEvaluator(new Unique());
 			if (!Config.FUZZY_PARSER) {
-				S.Blank.setEvaluator(Blank.CONST);
-				S.BlankSequence.setEvaluator(BlankSequence.CONST);
-				S.BlankNullSequence.setEvaluator(BlankNullSequence.CONST);
-				S.DownValues.setEvaluator(new DownValues());
-				S.Pattern.setEvaluator(Pattern.CONST);
-				S.Clear.setEvaluator(new Clear());
-				S.ClearAll.setEvaluator(new ClearAll());
-				S.Context.setEvaluator(new Context());
-				S.Default.setEvaluator(new Default());
-				S.Definition.setEvaluator(new Definition());
-				S.Evaluate.setEvaluator(new Evaluate());
-				S.OptionsPattern.setEvaluator(OptionsPattern.CONST);
-				S.OwnValues.setEvaluator(new OwnValues());
-				S.Repeated.setEvaluator(Repeated.CONST);
-				S.RepeatedNull.setEvaluator(RepeatedNull.CONST);
-				S.TagSet.setEvaluator(new TagSet());
-				S.TagSetDelayed.setEvaluator(new TagSetDelayed());
-				S.Unset.setEvaluator(new Unset());
-				S.UpSet.setEvaluator(new UpSet());
-				S.UpSetDelayed.setEvaluator(new UpSetDelayed());
-				S.UpValues.setEvaluator(new UpValues());
+				F.Blank.setEvaluator(Blank.CONST);
+				F.BlankSequence.setEvaluator(BlankSequence.CONST);
+				F.BlankNullSequence.setEvaluator(BlankNullSequence.CONST);
+				F.DownValues.setEvaluator(new DownValues());
+				F.Pattern.setEvaluator(Pattern.CONST);
+				F.Clear.setEvaluator(new Clear());
+				F.ClearAll.setEvaluator(new ClearAll());
+				F.Context.setEvaluator(new Context());
+				F.Default.setEvaluator(new Default());
+				F.Definition.setEvaluator(new Definition());
+				F.Evaluate.setEvaluator(new Evaluate());
+				F.OptionsPattern.setEvaluator(OptionsPattern.CONST);
+				F.OwnValues.setEvaluator(new OwnValues());
+				F.Repeated.setEvaluator(Repeated.CONST);
+				F.RepeatedNull.setEvaluator(RepeatedNull.CONST);
+				F.TagSet.setEvaluator(new TagSet());
+				F.TagSetDelayed.setEvaluator(new TagSetDelayed());
+				F.Unset.setEvaluator(new Unset());
+				F.UpSet.setEvaluator(new UpSet());
+				F.UpSetDelayed.setEvaluator(new UpSetDelayed());
+				F.UpValues.setEvaluator(new UpValues());
 			}
 		}
 
@@ -406,7 +406,7 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, IBuiltInSymbol builtinSymbol,
 				EvalEngine engine) {
-			if (leftHandSide.isAST(S.Default) && leftHandSide.size() > 1) {
+			if (leftHandSide.isAST(F.Default) && leftHandSide.size() > 1) {
 				if (!leftHandSide.first().isSymbol()) {
 					IOFunctions.printMessage(builtinSymbol, "setps", F.List(leftHandSide.first()), engine);
 					return rightHandSide;
@@ -1001,18 +1001,18 @@ public final class PatternMatching {
 		@Override
 		public IExpr evaluateSet(final IExpr leftHandSide, IExpr rightHandSide, IBuiltInSymbol builtinSymbol,
 								 EvalEngine engine) {
-			if (leftHandSide.isAST(S.Options, 2) && leftHandSide.first().isSymbol()) {
+			if (leftHandSide.isAST(F.Options, 2) && leftHandSide.first().isSymbol()) {
 				ISymbol symbol = (ISymbol) leftHandSide.first();
 				if (!symbol.isProtected()) {
 					try {
-						if (!builtinSymbol.equals(S.SetDelayed)) {
+						if (!builtinSymbol.equals(F.SetDelayed)) {
 							rightHandSide = engine.evaluate(rightHandSide);
 						}
 					} catch (final ReturnException e) {
 						rightHandSide = e.getValue();
 					}
 					symbol.putDownRule(IPatternMatcher.SET, true, leftHandSide, rightHandSide, engine.isPackageMode());
-					if (builtinSymbol.equals(S.Set)) {
+					if (builtinSymbol.equals(F.Set)) {
 						return rightHandSide;
 					}
 					return F.Null;
@@ -1120,7 +1120,7 @@ public final class PatternMatching {
 					while (iter.hasNext()) {
 						IdentityHashMap<ISymbol, IASTAppendable> map = iter.next();
 						if (map != null) {
-							optionsPattern = map.get(S.LHS_HEAD);
+							optionsPattern = map.get(F.LHS_HEAD);
 							if (optionsPattern != null) {
 								ISymbol lhsHead = optionsPattern.topHead();
 								optionsPattern = map.get(lhsHead);
@@ -1222,7 +1222,7 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.head().equals(S.OptionsPattern)) {
+			if (ast.head().equals(F.OptionsPattern)) {
 				if (ast.isAST0()) {
 					return F.$OptionsPattern(null);
 				}
@@ -1312,7 +1312,7 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.head().equals(S.Repeated)) {
+			if (ast.head().equals(F.Repeated)) {
 				if (ast.isAST1()) {
 					return F.$Repeated(ast.arg1(), engine);
 						}
@@ -1338,7 +1338,7 @@ public final class PatternMatching {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-			if (ast.head().equals(S.RepeatedNull)) {
+			if (ast.head().equals(F.RepeatedNull)) {
 				if (ast.isAST1()) {
 					return F.$RepeatedNull(ast.arg1(), engine);
 				}
@@ -1559,8 +1559,8 @@ public final class PatternMatching {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			final IExpr leftHandSide = ast.arg1();
 			IExpr head = engine.evaluate(leftHandSide.head());
-			if (head.topHead().equals(S.Association)) {
-				head = S.Association;
+			if (head.topHead().equals(F.Association)) {
+				head = F.Association;
 			}
 			IExpr rightHandSide = ast.arg2();
 			try {
@@ -1576,7 +1576,7 @@ public final class PatternMatching {
 						IBuiltInSymbol symbol = (IBuiltInSymbol) head;
 						IEvaluator eval = symbol.getEvaluator();
 						if (eval instanceof ISetEvaluator) {
-							IExpr temp = ((ISetEvaluator) eval).evaluateSet(leftHandSide, rightHandSide, S.Set, engine);
+							IExpr temp = ((ISetEvaluator) eval).evaluateSet(leftHandSide, rightHandSide, F.Set, engine);
 							if (temp.isPresent()) {
 								return temp;
 							}
@@ -1706,7 +1706,7 @@ public final class PatternMatching {
 						IBuiltInSymbol symbol = (IBuiltInSymbol) head;
 						IEvaluator eval = symbol.getEvaluator();
 						if (eval instanceof ISetEvaluator) {
-							IExpr temp = ((ISetEvaluator) eval).evaluateSet(leftHandSide, rightHandSide, S.SetDelayed,
+							IExpr temp = ((ISetEvaluator) eval).evaluateSet(leftHandSide, rightHandSide, F.SetDelayed,
 									engine);
 							if (temp.isPresent()) {
 								return temp;

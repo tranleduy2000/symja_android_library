@@ -24,9 +24,9 @@ public class WXFFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.BinarySerialize.setEvaluator(new BinarySerialize());
-			S.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
-			S.ByteArray.setEvaluator(new ByteArray());
+			F.BinarySerialize.setEvaluator(new BinarySerialize());
+			F.BinaryDeserialize.setEvaluator(new BinaryDeserialize());
+			F.ByteArray.setEvaluator(new ByteArray());
 		}
 	}
 

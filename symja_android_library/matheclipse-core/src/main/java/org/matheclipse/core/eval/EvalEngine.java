@@ -644,7 +644,7 @@ public class EvalEngine implements Serializable {
             if ((ISymbol.HOLDFIRST & attr) == ISymbol.NOATTRIBUTE) {
                 // the HoldFirst attribute is disabled
                 try {
-					if (!x.isAST(S.Unevaluated)) {
+					if (!x.isAST(F.Unevaluated)) {
                         selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
                         evalArg(rlist, ast, x, 1, isNumericFunction);
                         if (astSize == 2 && rlist[0].isPresent()) {
@@ -659,7 +659,7 @@ public class EvalEngine implements Serializable {
             } else {
                 // the HoldFirst attribute is set here
                 try {
-					if (x.isAST(S.Evaluate)) {
+					if (x.isAST(F.Evaluate)) {
                         selectNumericMode(attr, ISymbol.NHOLDFIRST, localNumericMode);
                         evalArg(rlist, ast, x, 1, isNumericFunction);
                         if (astSize == 2 && rlist[0].isPresent()) {
@@ -684,7 +684,7 @@ public class EvalEngine implements Serializable {
                         //    public void accept(IExpr arg, int i) {
                         for (int i = 2; i < astSize; i++) {
                             IExpr arg = ast.get(i);
-                            if (!arg.isAST(S.Unevaluated, 2)) {
+                            if (!arg.isAST(F.Unevaluated, 2)) {
                                 EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
                             }
                         }
@@ -1267,7 +1267,7 @@ public class EvalEngine implements Serializable {
             fRecursionCounter++;
 			stackPush(expr);
             if (fTraceMode) {
-				if (result.isAST(S.Unevaluated, 2)) {
+				if (result.isAST(F.Unevaluated, 2)) {
 					return result.first();
 				}
                 fTraceStack.setUp(expr, fRecursionCounter);
@@ -1280,7 +1280,7 @@ public class EvalEngine implements Serializable {
                     result = temp;
                     long iterationCounter = 1;
                     while (true) {
-						if (result.isAST(S.Unevaluated, 2)) {
+						if (result.isAST(F.Unevaluated, 2)) {
 							return result.first();
 						}
                         temp = result.evaluate(this);
@@ -1306,7 +1306,7 @@ public class EvalEngine implements Serializable {
                     }
                 }
             } else {
-				if (result.isAST(S.Unevaluated, 2)) {
+				if (result.isAST(F.Unevaluated, 2)) {
 					return result.first();
 				}
                 temp = result.evaluate(this);
@@ -1323,7 +1323,7 @@ public class EvalEngine implements Serializable {
                     result = temp;
                     long iterationCounter = 1;
                     while (true) {
-						if (result.isAST(S.Unevaluated, 2)) {
+						if (result.isAST(F.Unevaluated, 2)) {
 							return result.first();
 						}
                         temp = result.evaluate(this);
@@ -1572,7 +1572,7 @@ public class EvalEngine implements Serializable {
             ast = argsAST.map(new Function<IExpr, IExpr>() {
                 @Override
                 public IExpr apply(IExpr x) {
-                    if (x.isAST(S.Unevaluated, 2)) {
+                    if (x.isAST(F.Unevaluated, 2)) {
                         return ((IAST) x).first();
                     }
                     return x;
@@ -2680,7 +2680,7 @@ public class EvalEngine implements Serializable {
 			}
 		}
 		if (setHead) {
-			optionsPattern.put(S.LHS_HEAD, F.ast(lhsHead));
+			optionsPattern.put(F.LHS_HEAD, F.ast(lhsHead));
 		}
 	}
 
@@ -2831,7 +2831,7 @@ public class EvalEngine implements Serializable {
             IExpr x = ast.get(i);
             if (x.isList()) {
                 if (head/*[0]*/ == null) {
-                    head/*[0]*/ = S.List;
+                    head/*[0]*/ = F.List;
                 }
                 if (listLength/*[0]*/ < 0) {
                     listLength/*[0]*/ = ((IAST) x).argSize();
@@ -2847,7 +2847,7 @@ public class EvalEngine implements Serializable {
                 }
             } else if (x.isSparseArray()) {
                 if (head/*[0]*/ == null) {
-                    head/*[0]*/ = S.SparseArray;
+                    head/*[0]*/ = F.SparseArray;
                 }
                 ISparseArray sp = (ISparseArray) x;
                 if (listLength/*[0]*/ < 0) {

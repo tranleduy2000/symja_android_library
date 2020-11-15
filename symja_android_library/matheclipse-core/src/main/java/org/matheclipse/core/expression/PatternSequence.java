@@ -182,7 +182,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 	@Override
 	public boolean matchPattern(final IExpr expr, IPatternMap patternMap) {
 		IAST sequence = F.Sequence(expr);
-		return matchPatternSequence(sequence, patternMap, S.Missing);
+		return matchPatternSequence(sequence, patternMap, F.Missing);
 	}
 
 	@Override

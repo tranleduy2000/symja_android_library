@@ -33,9 +33,9 @@ public class QuantityFunctions {
 //
 //			F.TimeObject.setEvaluator(new TimeObject());
 			if (ToggleFeature.QUANTITY) {
-				S.Quantity.setEvaluator(new Quantity());
-				S.QuantityMagnitude.setEvaluator(new QuantityMagnitude());
-				S.UnitConvert.setEvaluator(new UnitConvert());
+				F.Quantity.setEvaluator(new Quantity());
+				F.QuantityMagnitude.setEvaluator(new QuantityMagnitude());
+				F.UnitConvert.setEvaluator(new UnitConvert());
 			}
 
 			// integers

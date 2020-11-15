@@ -12,7 +12,7 @@ public class EntityFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.RGBColor.setEvaluator(new RGBColor());
+			F.RGBColor.setEvaluator(new RGBColor());
 		}
 	}
 

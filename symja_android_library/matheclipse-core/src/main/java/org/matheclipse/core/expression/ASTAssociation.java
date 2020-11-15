@@ -56,7 +56,7 @@ public class ASTAssociation extends AST implements IAssociation {
 	public ASTAssociation(IAST listOfRules) {
 		super(listOfRules.size(), false);
 		keyToIndexMap = new Object2IntOpenHashMap<IExpr>();
-		append(S.Association);
+		append(F.Association);
 
 		appendRules(listOfRules);
 	}
@@ -80,9 +80,9 @@ public class ASTAssociation extends AST implements IAssociation {
 		super(initialCapacity, setLength);
 		keyToIndexMap = new Object2IntOpenHashMap<IExpr>();
 		if (setLength) {
-			set(0, S.Association);
+			set(0, F.Association);
 				} else {
-			append(S.Association);
+			append(F.Association);
 				}
 			}
 	/** {@inheritDoc} */
@@ -422,7 +422,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
 	@Override
 	public String fullFormString() {
-		return normal(S.Association).fullFormString();
+		return normal(F.Association).fullFormString();
 	}
 
 	@Override
@@ -555,7 +555,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
 	@Override
 	public IASTMutable keys() {
-		return keys(S.List);
+		return keys(F.List);
 	}
 
 	protected IASTMutable keys(IBuiltInSymbol symbol) {
@@ -662,7 +662,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
 	@Override
 	public IASTMutable normal(boolean nilIfUnevaluated) {
-		return normal(S.List);
+		return normal(F.List);
 	}
 
 	protected IASTMutable normal(IBuiltInSymbol symbol) {
@@ -731,7 +731,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
-		append(S.Association);
+		append(F.Association);
 		IAST ast = (IAST) objectInput.readObject();
 		for (int i = 1; i < ast.size(); i++) {
 			appendRule(ast.get(i));
@@ -774,7 +774,7 @@ public class ASTAssociation extends AST implements IAssociation {
 	@Override
 	public IExpr set(int location, IExpr object) {
 		if (location != 0 && !object.isRuleAST()) {
-			ArgumentTypeException.throwArg(object, S.Association);
+			ArgumentTypeException.throwArg(object, F.Association);
 		}
 		return super.set(location, object);
 	}
@@ -825,7 +825,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
 	@Override
 	public IASTMutable values() {
-		return values(S.List);
+		return values(F.List);
 	}
 
 	protected IASTMutable values(IBuiltInSymbol symbol) {

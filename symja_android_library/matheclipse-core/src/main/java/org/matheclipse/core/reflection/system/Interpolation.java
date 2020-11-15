@@ -23,7 +23,7 @@ public class Interpolation extends AbstractEvaluator {
 		if (dims != null && dims[0] > 2 && dims[1] >= 2) {
 			String method = "";
 			final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-			IExpr option = options.getOption(S.Method);
+			IExpr option = options.getOption(F.Method);
 			if (option.isPresent()) {
 				method = option.toString();
 			}
@@ -32,7 +32,7 @@ public class Interpolation extends AbstractEvaluator {
 				if ("Hermite".equals(method)) {
 					return hermiteInterpolate((IAST) ast.arg1(), dims, engine);
 				}
-				return IOFunctions.printMessage(ast.topHead(), "optx", F.List(S.Method, ast), engine);
+				return IOFunctions.printMessage(ast.topHead(), "optx", F.List(F.Method, ast), engine);
 			}
 			if (ast.isAST1()) {
 				if (dims[1] >= 2) {
@@ -61,8 +61,8 @@ public class Interpolation extends AbstractEvaluator {
 					IExpr arg1 = matrix.get(j).first();
 					minMaxList.append(arg1);
 				}
-				double min = engine.evaluate(minMaxList.apply(S.Min, 1)).evalDouble();
-				double max = engine.evaluate(minMaxList.apply(S.Max, 1)).evalDouble();
+				double min = engine.evaluate(minMaxList.apply(F.Min, 1)).evalDouble();
+				double max = engine.evaluate(minMaxList.apply(F.Max, 1)).evalDouble();
 				if (rowsSize <= 5) {
 					IAST interpolator = F.Function(F.InterpolatingPolynomial(matrix, F.Slot1));
 					return InterpolatingFunctionExpr.newInstance(interpolator, min, max);
@@ -119,8 +119,8 @@ public class Interpolation extends AbstractEvaluator {
 			minMaxList.append(arg1);
 			interpolator.addSamplePoint(arg1, arr);
 		}
-		double min = engine.evaluate(minMaxList.apply(S.Min, 1)).evalDouble();
-		double max = engine.evaluate(minMaxList.apply(S.Max, 1)).evalDouble();
+		double min = engine.evaluate(minMaxList.apply(F.Min, 1)).evalDouble();
+		double max = engine.evaluate(minMaxList.apply(F.Max, 1)).evalDouble();
 		return InterpolatingFunctionExpr.newInstance(interpolator, min, max);
 	}
 	@Override

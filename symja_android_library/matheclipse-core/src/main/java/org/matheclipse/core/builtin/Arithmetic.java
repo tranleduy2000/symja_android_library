@@ -151,51 +151,51 @@ public final class Arithmetic {
 	private static class Initializer {
 
         private static void init() {
-			S.Plus.setDefaultValue(F.C0);
-			S.Plus.setEvaluator(CONST_PLUS);
-			S.Times.setDefaultValue(F.C1);
-			S.Times.setEvaluator(CONST_TIMES);
-			S.Power.setDefaultValue(2, F.C1);
-			S.Power.setEvaluator(CONST_POWER);
-			S.Sqrt.setEvaluator(new Sqrt());
-			S.Surd.setEvaluator(new Surd());
-			S.Minus.setEvaluator(new Minus());
+			F.Plus.setDefaultValue(F.C0);
+			F.Plus.setEvaluator(CONST_PLUS);
+			F.Times.setDefaultValue(F.C1);
+			F.Times.setEvaluator(CONST_TIMES);
+			F.Power.setDefaultValue(2, F.C1);
+			F.Power.setEvaluator(CONST_POWER);
+			F.Sqrt.setEvaluator(new Sqrt());
+			F.Surd.setEvaluator(new Surd());
+			F.Minus.setEvaluator(new Minus());
 
-			S.Abs.setEvaluator(new Abs());
-			S.AbsArg.setEvaluator(new AbsArg());
-			S.AddTo.setEvaluator(new AddTo());
-			S.Arg.setEvaluator(new Arg());
-			S.Chop.setEvaluator(new Chop());
-			S.Clip.setEvaluator(new Clip());
-			S.Complex.setEvaluator(CONST_COMPLEX);
-			S.ConditionalExpression.setEvaluator(new ConditionalExpression());
-			S.Conjugate.setEvaluator(new Conjugate());
-			S.Decrement.setEvaluator(new Decrement());
-			S.Differences.setEvaluator(new Differences());
-			S.DirectedInfinity.setEvaluator(new DirectedInfinity());
-			S.Divide.setEvaluator(new Divide());
-			S.DivideBy.setEvaluator(new DivideBy());
-			S.Gamma.setEvaluator(new Gamma());
-			S.GCD.setEvaluator(new GCD());
-			S.HarmonicNumber.setEvaluator(new HarmonicNumber());
-			S.Im.setEvaluator(new Im());
-			S.Increment.setEvaluator(new Increment());
-			S.LCM.setEvaluator(new LCM());
-			S.MantissaExponent.setEvaluator(new MantissaExponent());
-			S.N.setEvaluator(new N());
-			S.Piecewise.setEvaluator(new Piecewise());
-			S.PiecewiseExpand.setEvaluator(new PiecewiseExpand());
-			S.Pochhammer.setEvaluator(new Pochhammer());
-			S.Precision.setEvaluator(new Precision());
-			S.PreDecrement.setEvaluator(new PreDecrement());
-			S.PreIncrement.setEvaluator(new PreIncrement());
-			S.Rational.setEvaluator(CONST_RATIONAL);
-			S.Re.setEvaluator(new Re());
-			S.Sign.setEvaluator(new Sign());
-			S.SignCmp.setEvaluator(new SignCmp());
-			S.Subtract.setEvaluator(new Subtract());
-			S.SubtractFrom.setEvaluator(new SubtractFrom());
-			S.TimesBy.setEvaluator(new TimesBy());
+			F.Abs.setEvaluator(new Abs());
+			F.AbsArg.setEvaluator(new AbsArg());
+			F.AddTo.setEvaluator(new AddTo());
+			F.Arg.setEvaluator(new Arg());
+			F.Chop.setEvaluator(new Chop());
+			F.Clip.setEvaluator(new Clip());
+			F.Complex.setEvaluator(CONST_COMPLEX);
+			F.ConditionalExpression.setEvaluator(new ConditionalExpression());
+			F.Conjugate.setEvaluator(new Conjugate());
+			F.Decrement.setEvaluator(new Decrement());
+			F.Differences.setEvaluator(new Differences());
+			F.DirectedInfinity.setEvaluator(new DirectedInfinity());
+			F.Divide.setEvaluator(new Divide());
+			F.DivideBy.setEvaluator(new DivideBy());
+			F.Gamma.setEvaluator(new Gamma());
+			F.GCD.setEvaluator(new GCD());
+			F.HarmonicNumber.setEvaluator(new HarmonicNumber());
+			F.Im.setEvaluator(new Im());
+			F.Increment.setEvaluator(new Increment());
+			F.LCM.setEvaluator(new LCM());
+			F.MantissaExponent.setEvaluator(new MantissaExponent());
+			F.N.setEvaluator(new N());
+			F.Piecewise.setEvaluator(new Piecewise());
+			F.PiecewiseExpand.setEvaluator(new PiecewiseExpand());
+			F.Pochhammer.setEvaluator(new Pochhammer());
+			F.Precision.setEvaluator(new Precision());
+			F.PreDecrement.setEvaluator(new PreDecrement());
+			F.PreIncrement.setEvaluator(new PreIncrement());
+			F.Rational.setEvaluator(CONST_RATIONAL);
+			F.Re.setEvaluator(new Re());
+			F.Sign.setEvaluator(new Sign());
+			F.SignCmp.setEvaluator(new SignCmp());
+			F.Subtract.setEvaluator(new Subtract());
+			F.SubtractFrom.setEvaluator(new SubtractFrom());
+			F.TimesBy.setEvaluator(new TimesBy());
 
         }
 	}
@@ -436,7 +436,7 @@ public final class Arithmetic {
 						return F.NIL;
 					}
 					IExpr rhs = engine.evaluate(F.binaryAST2(getArithmeticSymbol(), temp, ast.arg2()));
-						return ((ISetEvaluator) eval).evaluateSet(leftHandSide, rhs, S.Set, engine);
+						return ((ISetEvaluator) eval).evaluateSet(leftHandSide, rhs, F.Set, engine);
 				}
 			}
 			if (leftHandSide.isSymbol()) {

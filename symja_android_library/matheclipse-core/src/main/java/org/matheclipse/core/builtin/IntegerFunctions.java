@@ -55,22 +55,22 @@ public class IntegerFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.BitLength.setEvaluator(new BitLength());
-			S.Ceiling.setEvaluator(new Ceiling());
-			S.DigitCount.setEvaluator(new DigitCount());
-			S.Floor.setEvaluator(new Floor());
-			S.FractionalPart.setEvaluator(new FractionalPart());
-			S.FromDigits.setEvaluator(new FromDigits());
-			S.IntegerDigits.setEvaluator(new IntegerDigits());
-			S.IntegerExponent.setEvaluator(new IntegerExponent());
-			S.IntegerLength.setEvaluator(new IntegerLength());
-			S.IntegerPart.setEvaluator(new IntegerPart());
-			S.Mod.setEvaluator(new Mod());
-			S.PowerMod.setEvaluator(new PowerMod());
-			S.Quotient.setEvaluator(new Quotient());
-			S.QuotientRemainder.setEvaluator(new QuotientRemainder());
-			S.Round.setEvaluator(new Round());
-			S.UnitStep.setEvaluator(new UnitStep());
+			F.BitLength.setEvaluator(new BitLength());
+			F.Ceiling.setEvaluator(new Ceiling());
+			F.DigitCount.setEvaluator(new DigitCount());
+			F.Floor.setEvaluator(new Floor());
+			F.FractionalPart.setEvaluator(new FractionalPart());
+			F.FromDigits.setEvaluator(new FromDigits());
+			F.IntegerDigits.setEvaluator(new IntegerDigits());
+			F.IntegerExponent.setEvaluator(new IntegerExponent());
+			F.IntegerLength.setEvaluator(new IntegerLength());
+			F.IntegerPart.setEvaluator(new IntegerPart());
+			F.Mod.setEvaluator(new Mod());
+			F.PowerMod.setEvaluator(new PowerMod());
+			F.Quotient.setEvaluator(new Quotient());
+			F.QuotientRemainder.setEvaluator(new QuotientRemainder());
+			F.Round.setEvaluator(new Round());
+			F.UnitStep.setEvaluator(new UnitStep());
 		}
 	}
 
@@ -260,7 +260,7 @@ public class IntegerFunctions {
 				return Negate(Floor(negExpr));
 			}
 			if (arg1.isInterval()) {
-				return IntervalSym.mapSymbol(S.Ceiling, (IAST) arg1);
+				return IntervalSym.mapSymbol(F.Ceiling, (IAST) arg1);
 			}
 			return F.NIL;
 		}
@@ -279,13 +279,13 @@ public class IntegerFunctions {
 			IExpr result = F.NIL;
 			int radix = 10;
 			if (ast.isAST1()) {
-				result = S.IntegerDigits.of(engine, ast.arg1());
+				result = F.IntegerDigits.of(engine, ast.arg1());
 			} else if (ast.size() >= 3) {
 				radix = ast.arg2().toIntDefault();
 				if (radix <= 0) {
 					return F.NIL;
 				}
-				result = S.IntegerDigits.of(engine, ast.arg1(), ast.arg2());
+				result = F.IntegerDigits.of(engine, ast.arg1(), ast.arg2());
 			}
 			if (result.isList()) {
 				IAST list = (IAST) result;

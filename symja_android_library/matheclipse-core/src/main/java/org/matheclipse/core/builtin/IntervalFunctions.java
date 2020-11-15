@@ -19,10 +19,10 @@ public class IntervalFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.Interval.setEvaluator(new Interval());
-			S.IntervalMemberQ.setEvaluator(new IntervalMemberQ());
-			S.IntervalIntersection.setEvaluator(new IntervalIntersection());
-			S.IntervalUnion.setEvaluator(new IntervalUnion());
+			F.Interval.setEvaluator(new Interval());
+			F.IntervalMemberQ.setEvaluator(new IntervalMemberQ());
+			F.IntervalIntersection.setEvaluator(new IntervalIntersection());
+			F.IntervalUnion.setEvaluator(new IntervalUnion());
 		}
 	}
 
@@ -258,7 +258,7 @@ public class IntervalFunctions {
 		}
 
 		private IAST intersection(final IAST interval1, final IAST interval2, EvalEngine engine) {
-			IASTAppendable result = F.ast(S.Interval, 3, false);
+			IASTAppendable result = F.ast(F.Interval, 3, false);
 			for (int i = 1; i < interval1.size(); i++) {
 				IAST list1 = (IAST) interval1.get(i);
 				IExpr min1 = list1.arg1();
@@ -349,7 +349,7 @@ public class IntervalFunctions {
 					}
 				}
 			}
-			IASTAppendable result = F.ast(S.Interval, size, false);
+			IASTAppendable result = F.ast(F.Interval, size, false);
 			for (int i = 1; i < ast.size(); i++) {
 				IAST interval = (IAST) ast.get(i);
 				for (int j = 1; j < interval.size(); j++) {

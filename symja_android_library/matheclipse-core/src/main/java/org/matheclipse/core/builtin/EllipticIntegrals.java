@@ -28,25 +28,25 @@ public class EllipticIntegrals {
 	private static class Initializer {
 
 		private static void init() {
-			S.EllipticE.setEvaluator(new EllipticE());
-			S.EllipticF.setEvaluator(new EllipticF());
-			S.EllipticK.setEvaluator(new EllipticK());
-			S.EllipticPi.setEvaluator(new EllipticPi());
-			S.EllipticTheta.setEvaluator(new EllipticTheta());
+			F.EllipticE.setEvaluator(new EllipticE());
+			F.EllipticF.setEvaluator(new EllipticF());
+			F.EllipticK.setEvaluator(new EllipticK());
+			F.EllipticPi.setEvaluator(new EllipticPi());
+			F.EllipticTheta.setEvaluator(new EllipticTheta());
 
-			// S.InverseWeierstrassP.setEvaluator(new InverseWeierstrassP());
-			S.JacobiAmplitude.setEvaluator(new JacobiAmplitude());
-			S.JacobiCN.setEvaluator(new JacobiCN());
-			S.JacobiDN.setEvaluator(new JacobiDN());
-			S.JacobiSN.setEvaluator(new JacobiSN());
-			S.JacobiZeta.setEvaluator(new JacobiZeta());
+			// F.InverseWeierstrassP.setEvaluator(new InverseWeierstrassP());
+			F.JacobiAmplitude.setEvaluator(new JacobiAmplitude());
+			F.JacobiCN.setEvaluator(new JacobiCN());
+			F.JacobiDN.setEvaluator(new JacobiDN());
+			F.JacobiSN.setEvaluator(new JacobiSN());
+			F.JacobiZeta.setEvaluator(new JacobiZeta());
 
-			S.KleinInvariantJ.setEvaluator(new KleinInvariantJ());
+			F.KleinInvariantJ.setEvaluator(new KleinInvariantJ());
 
-			S.WeierstrassHalfPeriods.setEvaluator(new WeierstrassHalfPeriods());
-			S.WeierstrassInvariants.setEvaluator(new WeierstrassInvariants());
-			S.WeierstrassP.setEvaluator(new WeierstrassP());
-			S.WeierstrassPPrime.setEvaluator(new WeierstrassPPrime());
+			F.WeierstrassHalfPeriods.setEvaluator(new WeierstrassHalfPeriods());
+			F.WeierstrassInvariants.setEvaluator(new WeierstrassInvariants());
+			F.WeierstrassP.setEvaluator(new WeierstrassP());
+			F.WeierstrassPPrime.setEvaluator(new WeierstrassPPrime());
 		}
 	}
 

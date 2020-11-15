@@ -34,10 +34,10 @@ public class ByteArrayExpr extends DataExpr<byte[]> implements Externalizable {
 	}
 
 	public ByteArrayExpr() {
-		super(S.ByteArray, null);
+		super(F.ByteArray, null);
 	}
 	protected ByteArrayExpr(final byte[] array) {
-		super(S.ByteArray, array);
+		super(F.ByteArray, array);
 	}
 
 	@Override

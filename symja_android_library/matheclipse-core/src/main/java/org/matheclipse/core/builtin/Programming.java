@@ -76,51 +76,51 @@ public final class Programming {
 	private static class Initializer {
 
 		private static void init() {
-			S.Abort.setEvaluator(new Abort());
-			S.AbsoluteTiming.setEvaluator(new AbsoluteTiming());
-			S.Break.setEvaluator(new Break());
-			S.Block.setEvaluator(new Block());
-			S.Catch.setEvaluator(new Catch());
-			S.Check.setEvaluator(new Check());
-			S.CompoundExpression.setEvaluator(new CompoundExpression());
-			S.Condition.setEvaluator(new Condition());
-			S.Continue.setEvaluator(new Continue());
-			S.Defer.setEvaluator(new Defer());
-			S.Do.setEvaluator(new Do());
-			S.FixedPoint.setEvaluator(new FixedPoint());
-			S.FixedPointList.setEvaluator(new FixedPointList());
-			S.For.setEvaluator(new For());
-			S.If.setEvaluator(new If());
-			S.Interrupt.setEvaluator(new Interrupt());
-			S.List.setEvaluator(new ListFunction());
-			S.Module.setEvaluator(new Module());
-			S.Nest.setEvaluator(new Nest());
-			S.NestList.setEvaluator(new NestList());
-			S.NestWhile.setEvaluator(new NestWhile());
-			S.NestWhileList.setEvaluator(new NestWhileList());
-			S.Part.setEvaluator(new Part());
-			S.Pause.setEvaluator(new Pause());
-			S.Quiet.setEvaluator(new Quiet());
-			S.Reap.setEvaluator(new Reap());
-			S.Return.setEvaluator(new Return());
-			S.Sow.setEvaluator(new Sow());
-			S.Stack.setEvaluator(new Programming.Stack());
-			S.StackBegin.setEvaluator(new StackBegin());
-			S.Switch.setEvaluator(new Switch());
-			S.TimeConstrained.setEvaluator(new TimeConstrained());
-			S.Timing.setEvaluator(new Timing());
-			S.Throw.setEvaluator(new Throw());
-			S.Unevaluated.setEvaluator(new Unevaluated());
-			S.Which.setEvaluator(new Which());
-			S.While.setEvaluator(new While());
-			S.With.setEvaluator(new With());
+			F.Abort.setEvaluator(new Abort());
+			F.AbsoluteTiming.setEvaluator(new AbsoluteTiming());
+			F.Break.setEvaluator(new Break());
+			F.Block.setEvaluator(new Block());
+			F.Catch.setEvaluator(new Catch());
+			F.Check.setEvaluator(new Check());
+			F.CompoundExpression.setEvaluator(new CompoundExpression());
+			F.Condition.setEvaluator(new Condition());
+			F.Continue.setEvaluator(new Continue());
+			F.Defer.setEvaluator(new Defer());
+			F.Do.setEvaluator(new Do());
+			F.FixedPoint.setEvaluator(new FixedPoint());
+			F.FixedPointList.setEvaluator(new FixedPointList());
+			F.For.setEvaluator(new For());
+			F.If.setEvaluator(new If());
+			F.Interrupt.setEvaluator(new Interrupt());
+			F.List.setEvaluator(new ListFunction());
+			F.Module.setEvaluator(new Module());
+			F.Nest.setEvaluator(new Nest());
+			F.NestList.setEvaluator(new NestList());
+			F.NestWhile.setEvaluator(new NestWhile());
+			F.NestWhileList.setEvaluator(new NestWhileList());
+			F.Part.setEvaluator(new Part());
+			F.Pause.setEvaluator(new Pause());
+			F.Quiet.setEvaluator(new Quiet());
+			F.Reap.setEvaluator(new Reap());
+			F.Return.setEvaluator(new Return());
+			F.Sow.setEvaluator(new Sow());
+			F.Stack.setEvaluator(new Programming.Stack());
+			F.StackBegin.setEvaluator(new StackBegin());
+			F.Switch.setEvaluator(new Switch());
+			F.TimeConstrained.setEvaluator(new TimeConstrained());
+			F.Timing.setEvaluator(new Timing());
+			F.Throw.setEvaluator(new Throw());
+			F.Unevaluated.setEvaluator(new Unevaluated());
+			F.Which.setEvaluator(new Which());
+			F.While.setEvaluator(new While());
+			F.With.setEvaluator(new With());
 
 			if (!Config.FUZZY_PARSER) {
-				S.CompiledFunction.setEvaluator(new CompiledFunction());
-				S.On.setEvaluator(new On());
-				S.Off.setEvaluator(new Off());
-				S.Trace.setEvaluator(new Trace());
-				S.TraceForm.setEvaluator(new TraceForm());
+				F.CompiledFunction.setEvaluator(new CompiledFunction());
+				F.On.setEvaluator(new On());
+				F.Off.setEvaluator(new Off());
+				F.Trace.setEvaluator(new Trace());
+				F.TraceForm.setEvaluator(new TraceForm());
 			}
 		}
 	}
@@ -265,9 +265,9 @@ public final class Programming {
 			} catch (final ThrowException e) {
 					if (ast.size() == 2) {
 						if (ThrowException.THROW_FALSE == e) {
-						return S.False;
+						return F.False;
 						} else if (ThrowException.THROW_TRUE == e) {
-						return S.True;
+						return F.True;
 						}
 						return e.getValue();
 					} else if (ast.size() == 3) {
@@ -697,7 +697,7 @@ public final class Programming {
 								} catch (final ReturnException e) {
 									return e.getValue();
 								} catch (final BreakException e) {
-									return S.Null;
+									return F.Null;
 								} catch (final ContinueException e) {
 									continue;
 								}
@@ -708,7 +708,7 @@ public final class Programming {
 							iter.tearDown();
 						}
 					}
-					return S.Null;
+					return F.Null;
 				}
 				fEngine.evaluate(input);
 
@@ -1791,15 +1791,15 @@ public final class Programming {
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			if (ast.isAST0()) {
 				engine.setOnOffMode(true, null, false);
-				return S.Null;
+				return F.Null;
 			}
 
 				IExpr arg1 = ast.first();
-			if (ast.isAST2() && ast.second().equals(S.Unique)) {
+			if (ast.isAST2() && ast.second().equals(F.Unique)) {
 				IdentityHashMap<ISymbol, ISymbol> map = null;
 				enableOnOffTrace(arg1, map, engine);
 				engine.setOnOffMode(true, map, true);
-				return S.Null;
+				return F.Null;
 				}
 			IdentityHashMap<ISymbol, ISymbol> map = null;
 			for (int i = 1; i < ast.size(); i++) {
@@ -1812,7 +1812,7 @@ public final class Programming {
 
 		private void enableOnOffTrace(IExpr arg1, IdentityHashMap<ISymbol, ISymbol> map, EvalEngine engine) {
 
-			if (!arg1.equals(S.All)) {
+			if (!arg1.equals(F.All)) {
 				IAST list = F.List(arg1);
 				if (arg1.isList()) {
 					list = (IAST) arg1;
@@ -1820,9 +1820,9 @@ public final class Programming {
 				map = new IdentityHashMap<ISymbol, ISymbol>();
 				for (int i = 1; i < list.size(); i++) {
 					if (list.get(i).isSymbol()) {
-						map.put((ISymbol) list.get(i), S.Null);
+						map.put((ISymbol) list.get(i), F.Null);
 					} else {
-						map.put(list.get(i).topHead(), S.Null);
+						map.put(list.get(i).topHead(), F.Null);
 					}
 				}
 			}
@@ -2166,7 +2166,7 @@ public final class Programming {
 					TimeUnit.SECONDS.sleep(pause);
 				} catch (InterruptedException e) {
 				}
-				return S.Null;
+				return F.Null;
 						}
 			return F.NIL;
 					}
@@ -3546,7 +3546,7 @@ public final class Programming {
 		if (ast.forAll(new Predicate<IExpr>() {
 			@Override
 			public boolean test(IExpr x) {
-				return (x.isInteger() && x.isPositive()) || x.equals(S.All);
+				return (x.isInteger() && x.isPositive()) || x.equals(F.All);
 			}
 		}, 2)) {
 			return arg1.getPart(ast, 2);

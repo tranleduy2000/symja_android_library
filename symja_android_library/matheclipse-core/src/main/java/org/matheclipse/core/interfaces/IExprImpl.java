@@ -596,8 +596,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
                            public boolean test(IExpr x) {
                                return (x.isComplex() || //
                                        x.isComplexNumeric() || //
-                                       x == S.I || //
-                                       x.isAST(S.Complex));
+                                       x == F.I || //
+                                       x.isAST(F.Complex));
                            }
                        }, //
                 false);
@@ -3063,10 +3063,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
                 }, 1);
                 return EvalEngine.get().evaluate(temp);
             }
-            IExpr temp = ((IAST) this).mapThread(F.binaryAST2(S.Times, F.Slot1, that), 1);
+            IExpr temp = ((IAST) this).mapThread(F.binaryAST2(F.Times, F.Slot1, that), 1);
             return EvalEngine.get().evaluate(temp);
         } else if (that.isPlus()) {
-            IExpr temp = ((IAST) that).mapThread(F.binaryAST2(S.Times, this, F.Slot1), 2);
+            IExpr temp = ((IAST) that).mapThread(F.binaryAST2(F.Times, this, F.Slot1), 2);
             return EvalEngine.get().evaluate(temp);
         }
         return times(that);

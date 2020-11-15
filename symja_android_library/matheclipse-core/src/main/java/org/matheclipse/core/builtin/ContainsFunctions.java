@@ -16,15 +16,15 @@ public class ContainsFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.ContainsAny.setEvaluator(ContainsAny.CONST);
-			S.ContainsAll.setEvaluator(ContainsAll.CONST);
-			S.ContainsExactly.setEvaluator(ContainsExactly.CONST);
-			S.ContainsNone.setEvaluator(ContainsNone.CONST);
-			S.ContainsOnly.setEvaluator(ContainsOnly.CONST);
+			F.ContainsAny.setEvaluator(ContainsAny.CONST);
+			F.ContainsAll.setEvaluator(ContainsAll.CONST);
+			F.ContainsExactly.setEvaluator(ContainsExactly.CONST);
+			F.ContainsNone.setEvaluator(ContainsNone.CONST);
+			F.ContainsOnly.setEvaluator(ContainsOnly.CONST);
 			// seemed to be the same behavior as ContainsXXX functions, if the headers of the lists are identical
-			S.DisjointQ.setEvaluator(new DisjointQ());
-			S.IntersectingQ.setEvaluator(new IntersectingQ());
-			S.SubsetQ.setEvaluator(new SubsetQ());
+			F.DisjointQ.setEvaluator(new DisjointQ());
+			F.IntersectingQ.setEvaluator(new IntersectingQ());
+			F.SubsetQ.setEvaluator(new SubsetQ());
 		}
 
 	}

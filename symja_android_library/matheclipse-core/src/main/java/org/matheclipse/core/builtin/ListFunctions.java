@@ -139,71 +139,71 @@ public final class ListFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.Accumulate.setEvaluator(new Accumulate());
-			S.Append.setEvaluator(new Append());
-			S.AppendTo.setEvaluator(new AppendTo());
-			S.Array.setEvaluator(new Array());
-			S.ArrayPad.setEvaluator(new ArrayPad());
-			S.Cases.setEvaluator(new Cases());
-			S.Catenate.setEvaluator(new Catenate());
-			S.Commonest.setEvaluator(new Commonest());
-			S.Complement.setEvaluator(new Complement());
-			S.Composition.setEvaluator(new Composition());
-			S.ComposeList.setEvaluator(new ComposeList());
-			S.ConstantArray.setEvaluator(new ConstantArray());
-			S.Count.setEvaluator(new Count());
-			S.CountDistinct.setEvaluator(new CountDistinct());
-			S.Delete.setEvaluator(new Delete());
-			S.DeleteDuplicates.setEvaluator(new DeleteDuplicates());
-			S.DeleteDuplicatesBy.setEvaluator(new DeleteDuplicatesBy());
-			S.DeleteCases.setEvaluator(new DeleteCases());
-			S.Dispatch.setEvaluator(new Dispatch());
-			S.DuplicateFreeQ.setEvaluator(new DuplicateFreeQ());
-			S.Drop.setEvaluator(new Drop());
-			S.Extract.setEvaluator(new Extract());
-			S.First.setEvaluator(new First());
-			S.GroupBy.setEvaluator(new GroupBy());
-			S.Fold.setEvaluator(new Fold());
-			S.FoldList.setEvaluator(new FoldList());
-			S.Gather.setEvaluator(new Gather());
-			S.GatherBy.setEvaluator(new GatherBy());
-			S.Insert.setEvaluator(new Insert());
-			S.Intersection.setEvaluator(new Intersection());
-			S.Join.setEvaluator(new Join());
-			S.Last.setEvaluator(new Last());
-			S.Length.setEvaluator(new Length());
-			S.LevelQ.setEvaluator(new LevelQ());
-			S.Level.setEvaluator(new Level());
-			S.Most.setEvaluator(new Most());
-			S.Nearest.setEvaluator(new Nearest());
-			S.PadLeft.setEvaluator(new PadLeft());
-			S.PadRight.setEvaluator(new PadRight());
-			S.Position.setEvaluator(new Position());
-			S.Prepend.setEvaluator(new Prepend());
-			S.PrependTo.setEvaluator(new PrependTo());
-			S.Range.setEvaluator(new Range());
-			S.Rest.setEvaluator(new Rest());
-			S.Reverse.setEvaluator(new Reverse());
-			S.Replace.setEvaluator(new Replace());
-			S.ReplaceAll.setEvaluator(new ReplaceAll());
-			S.ReplaceList.setEvaluator(new ReplaceList());
-			S.ReplacePart.setEvaluator(new ReplacePart());
-			S.ReplaceRepeated.setEvaluator(new ReplaceRepeated());
-			S.Riffle.setEvaluator(new Riffle());
-			S.RotateLeft.setEvaluator(new RotateLeft());
-			S.RotateRight.setEvaluator(new RotateRight());
-			S.Select.setEvaluator(new Select());
-			S.SelectFirst.setEvaluator(new SelectFirst());
-			S.Split.setEvaluator(new Split());
-			S.SplitBy.setEvaluator(new SplitBy());
-			S.Subdivide.setEvaluator(new Subdivide());
-			S.Table.setEvaluator(new Table());
-			S.Take.setEvaluator(new Take());
-			S.TakeLargest.setEvaluator(new TakeLargest());
-			S.TakeLargestBy.setEvaluator(new TakeLargestBy());
-			S.Tally.setEvaluator(new Tally());
-			S.Total.setEvaluator(new Total());
-			S.Union.setEvaluator(new Union());
+			F.Accumulate.setEvaluator(new Accumulate());
+			F.Append.setEvaluator(new Append());
+			F.AppendTo.setEvaluator(new AppendTo());
+			F.Array.setEvaluator(new Array());
+			F.ArrayPad.setEvaluator(new ArrayPad());
+			F.Cases.setEvaluator(new Cases());
+			F.Catenate.setEvaluator(new Catenate());
+			F.Commonest.setEvaluator(new Commonest());
+			F.Complement.setEvaluator(new Complement());
+			F.Composition.setEvaluator(new Composition());
+			F.ComposeList.setEvaluator(new ComposeList());
+			F.ConstantArray.setEvaluator(new ConstantArray());
+			F.Count.setEvaluator(new Count());
+			F.CountDistinct.setEvaluator(new CountDistinct());
+			F.Delete.setEvaluator(new Delete());
+			F.DeleteDuplicates.setEvaluator(new DeleteDuplicates());
+			F.DeleteDuplicatesBy.setEvaluator(new DeleteDuplicatesBy());
+			F.DeleteCases.setEvaluator(new DeleteCases());
+			F.Dispatch.setEvaluator(new Dispatch());
+			F.DuplicateFreeQ.setEvaluator(new DuplicateFreeQ());
+			F.Drop.setEvaluator(new Drop());
+			F.Extract.setEvaluator(new Extract());
+			F.First.setEvaluator(new First());
+			F.GroupBy.setEvaluator(new GroupBy());
+			F.Fold.setEvaluator(new Fold());
+			F.FoldList.setEvaluator(new FoldList());
+			F.Gather.setEvaluator(new Gather());
+			F.GatherBy.setEvaluator(new GatherBy());
+			F.Insert.setEvaluator(new Insert());
+			F.Intersection.setEvaluator(new Intersection());
+			F.Join.setEvaluator(new Join());
+			F.Last.setEvaluator(new Last());
+			F.Length.setEvaluator(new Length());
+			F.LevelQ.setEvaluator(new LevelQ());
+			F.Level.setEvaluator(new Level());
+			F.Most.setEvaluator(new Most());
+			F.Nearest.setEvaluator(new Nearest());
+			F.PadLeft.setEvaluator(new PadLeft());
+			F.PadRight.setEvaluator(new PadRight());
+			F.Position.setEvaluator(new Position());
+			F.Prepend.setEvaluator(new Prepend());
+			F.PrependTo.setEvaluator(new PrependTo());
+			F.Range.setEvaluator(new Range());
+			F.Rest.setEvaluator(new Rest());
+			F.Reverse.setEvaluator(new Reverse());
+			F.Replace.setEvaluator(new Replace());
+			F.ReplaceAll.setEvaluator(new ReplaceAll());
+			F.ReplaceList.setEvaluator(new ReplaceList());
+			F.ReplacePart.setEvaluator(new ReplacePart());
+			F.ReplaceRepeated.setEvaluator(new ReplaceRepeated());
+			F.Riffle.setEvaluator(new Riffle());
+			F.RotateLeft.setEvaluator(new RotateLeft());
+			F.RotateRight.setEvaluator(new RotateRight());
+			F.Select.setEvaluator(new Select());
+			F.SelectFirst.setEvaluator(new SelectFirst());
+			F.Split.setEvaluator(new Split());
+			F.SplitBy.setEvaluator(new SplitBy());
+			F.Subdivide.setEvaluator(new Subdivide());
+			F.Table.setEvaluator(new Table());
+			F.Take.setEvaluator(new Take());
+			F.TakeLargest.setEvaluator(new TakeLargest());
+			F.TakeLargestBy.setEvaluator(new TakeLargestBy());
+			F.Tally.setEvaluator(new Tally());
+			F.Total.setEvaluator(new Total());
+			F.Union.setEvaluator(new Union());
 
 		}
 
@@ -329,7 +329,7 @@ public final class ListFunctions {
 				if (iter.setUp()) {
 					try {
 						final int index = fIndex++;
-						if (fPrototypeList.head().equals(S.Plus) || fPrototypeList.head().equals(S.Times)) {
+						if (fPrototypeList.head().equals(F.Plus) || fPrototypeList.head().equals(F.Times)) {
 							if (iter.hasNext()) {
 								fCurrentIndex[index] = iter.next();
 								fCurrentVariable[index] = iter.getVariable();
@@ -338,7 +338,7 @@ public final class ListFunctions {
 									temp = fDefaultValue;
 								}
 								if (temp.isNumber()) {
-									if (fPrototypeList.head().equals(S.Plus)) {
+									if (fPrototypeList.head().equals(F.Plus)) {
 										return tablePlus(temp, iter, index);
 									} else {
 										return tableTimes(temp, iter, index);
@@ -371,7 +371,7 @@ public final class ListFunctions {
 				try {
 					if (iter.setUpThrow()) {
 						final int index = fIndex++;
-						if (fPrototypeList.head().equals(S.Plus) || fPrototypeList.head().equals(S.Times)) {
+						if (fPrototypeList.head().equals(F.Plus) || fPrototypeList.head().equals(F.Times)) {
 							if (iter.hasNext()) {
 								fCurrentIndex[index] = iter.next();
 								fCurrentVariable[index] = iter.getVariable();
@@ -380,7 +380,7 @@ public final class ListFunctions {
 									temp = fDefaultValue;
 								}
 								if (temp.isNumber()) {
-									if (fPrototypeList.head().equals(S.Plus)) {
+									if (fPrototypeList.head().equals(F.Plus)) {
 										return tablePlus(temp, iter, index);
 									} else {
 										return tableTimes(temp, iter, index);
@@ -666,7 +666,7 @@ public final class ListFunctions {
 						return result;
 					} else {
 						// The argument is not a rule or a list of rules.
-						return IOFunctions.printMessage(S.AppendTo, "invdt", F.List(), EvalEngine.get());
+						return IOFunctions.printMessage(F.AppendTo, "invdt", F.List(), EvalEngine.get());
 					}
 				}
 				if (!symbolValue.isAST()) {
@@ -683,7 +683,7 @@ public final class ListFunctions {
 			if (sym.isPresent()) {
 				IExpr arg2 = engine.evaluate(ast.arg2());
 				Function<IExpr, IExpr> function = new AppendToFunction(arg2);
-				IExpr[] results = ((ISymbol) sym).reassignSymbolValue(function, S.AppendTo, engine);
+				IExpr[] results = ((ISymbol) sym).reassignSymbolValue(function, F.AppendTo, engine);
 				if (results != null) {
 					return results[1];
 				}
@@ -940,7 +940,7 @@ public final class ListFunctions {
 				IAST arg1 = (IAST) ast.arg1();
 				int m = -1;
 				int n = -1;
-				if (ast.arg2().isAST(S.List, 3)) {
+				if (ast.arg2().isAST(F.List, 3)) {
 					IAST list = (IAST) ast.arg2();
 					m = list.arg1().toIntDefault(-1);
 					n = list.arg2().toIntDefault(-1);
@@ -979,7 +979,7 @@ public final class ListFunctions {
 			result.appendArgs(0, m, new IntFunction<IExpr>() {
 				@Override
 				public IExpr apply(int i) {
-					return atom.constantArray(S.List, 0, (int) columnDim);
+					return atom.constantArray(F.List, 0, (int) columnDim);
 				}
 			});
 
@@ -994,7 +994,7 @@ public final class ListFunctions {
 			result.appendArgs(0, n, new IntFunction<IExpr>() {
 				@Override
 				public IExpr apply(int i) {
-					return atom.constantArray(S.List, 0, (int) columnDim);
+					return atom.constantArray(F.List, 0, (int) columnDim);
 				}
 			});
 			return result;
@@ -1356,7 +1356,7 @@ public final class ListFunctions {
 
 			int n = -1;
 			if (ast.isAST2()) {
-					n = Validate.checkIntType(S.Commonest, ast.arg2(), 0, engine);
+					n = Validate.checkIntType(F.Commonest, ast.arg2(), 0, engine);
 					if (n == Integer.MIN_VALUE) {
 						return F.NIL;
 					}
@@ -2223,13 +2223,13 @@ public final class ListFunctions {
 					temp = list.get(i);
 					for (int j = i + 1; j < list.size(); j++) {
 						if (biPredicate.test(list.get(j), temp)) {
-							return S.False;
+							return F.False;
 						}
 					}
 				}
-				return S.True;
+				return F.True;
 			}
-			return S.False;
+			return F.False;
 		}
 
 		@Override
@@ -3141,7 +3141,7 @@ public final class ListFunctions {
 				IExpr arg = ast.get(i);
 				if (arg.isSparseArray()) {
 					isSparseArray = true;
-					if (head == S.List || useNormal) {
+					if (head == F.List || useNormal) {
 						useNormal = true;
 						continue;
 					}
@@ -4501,7 +4501,7 @@ public final class ListFunctions {
 						return result;
 					} else {
 						// The argument is not a rule or a list of rules.
-						return IOFunctions.printMessage(S.PrependTo, "invdt", F.List(), EvalEngine.get());
+						return IOFunctions.printMessage(F.PrependTo, "invdt", F.List(), EvalEngine.get());
 					}
 				}
 				if (!symbolValue.isAST()) {
@@ -6799,7 +6799,7 @@ public final class ListFunctions {
 						IExpr arg2 = ast.arg2();
 						if (arg2.isInfinity() || //
 								arg2.toIntDefault() >= dims.length) {
-							return sparseArray.total(S.Plus);
+							return sparseArray.total(F.Plus);
 						}
 					}
 					arg1 = sparseArray.normal(false);

@@ -38,7 +38,7 @@ public final class RandomFunctions {
 			F.RandomInteger.setEvaluator(new RandomInteger());
 			F.RandomPrime.setEvaluator(new RandomPrime());
 			F.RandomChoice.setEvaluator(new RandomChoice());
-			S.RandomComplex.setEvaluator(new RandomComplex());
+			F.RandomComplex.setEvaluator(new RandomComplex());
 			F.RandomReal.setEvaluator(new RandomReal());
 			F.RandomSample.setEvaluator(new RandomSample());
 		}
@@ -106,7 +106,7 @@ public final class RandomFunctions {
 					double im = tlr.nextDouble();
 					return F.complexNum(re, im);
 				} else if (ast.isAST1()) {
-					if (ast.arg1().isAST(S.List, 3)) {
+					if (ast.arg1().isAST(F.List, 3)) {
 						Complex min = engine.evalComplex(ast.arg1().first());
 						Complex max = engine.evalComplex(ast.arg1().second());
 						double minRe = min.getReal();
@@ -544,7 +544,7 @@ public final class RandomFunctions {
 
 		public static IASTMutable build(Supplier<IExpr> supplier, int[] dims) {
 			ArrayBuilder builder = new ArrayBuilder(supplier, dims);
-			IASTAppendable result = F.ast(S.List, dims[0], true);
+			IASTAppendable result = F.ast(F.List, dims[0], true);
 			builder.array(0, result);
 			return result;
 		}
@@ -560,7 +560,7 @@ public final class RandomFunctions {
 			int size1 = dims[position];
 			int size2 = dims[position + 1];
 			for (int i = 1; i <= size1; i++) {
-				IASTAppendable currentList = F.ast(S.List, size2, true);
+				IASTAppendable currentList = F.ast(F.List, size2, true);
 				list.set(i, currentList);
 				array(position + 1, currentList);
 			}

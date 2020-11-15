@@ -185,12 +185,12 @@ public class ExprParser extends Scanner {
 			switch (headID) {
 			case ID.Get:
 				if (ast.isAST1() && ast.arg1().isString()) {
-					return S.Get.of(ast.arg1());
+					return F.Get.of(ast.arg1());
 				}
 				break;
 			case ID.Import:
 				if (ast.isAST1() && ast.arg1().isString()) {
-					return S.Import.of(ast.arg1());
+					return F.Import.of(ast.arg1());
 				}
 				break;
 			case ID.Exp:
@@ -1313,7 +1313,7 @@ public class ExprParser extends Scanner {
 						|| fToken == TT_PRECEDENCE_CLOSE) {
 					return span;
 				} else if (fToken == TT_OPERATOR) {
-					return parseExpression(F.Times(span, F.Span(F.C1, S.All)), 0);
+					return parseExpression(F.Times(span, F.Span(F.C1, F.All)), 0);
 				}
 			} else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
 					|| fToken == TT_PRECEDENCE_CLOSE) {

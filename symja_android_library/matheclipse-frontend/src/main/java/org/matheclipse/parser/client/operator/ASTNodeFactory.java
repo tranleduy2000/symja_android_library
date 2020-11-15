@@ -288,7 +288,7 @@ public class ASTNodeFactory implements INodeParserFactory {
 							InfixOperator.RIGHT_ASSOCIATIVE),
 					new InfixOperator("\u00B7", "CenterDot", Precedence.CENTERDOT, InfixOperator.NONE), //
 					new InfixOperator("\u2299", "CircleDot", Precedence.CIRCLEDOT, InfixOperator.NONE), //
-					new InfixOperator("\u2208", "Element", Precedence.ELEMENT, InfixOperator.NONE), //
+					new InfixOperator("\u2208"/*∈*/, "Element", Precedence.ELEMENT, InfixOperator.NONE), //
 					new InfixOperator("\u22C2", "Intersection", Precedence.INTERSECTION, InfixOperator.NONE), //
 					new InfixOperator("\u2260", "Unequal", Precedence.UNEQUAL, InfixOperator.NONE), //
 					new InfixOperator("\u22C0", "Wedge", Precedence.WEDGE, InfixOperator.NONE)//

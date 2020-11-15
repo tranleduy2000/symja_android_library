@@ -126,7 +126,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 			final Trie<int[], IExpr> map = array.fData;
 			final int[] key = new int[] { row + 1, column + 1 };
 			IExpr value = map.get(key);
-			value = S.Plus.of(value != null ? value : array.defaultValue, increment);
+			value = F.Plus.of(value != null ? value : array.defaultValue, increment);
 			if (value.equals(array.defaultValue)) {
 				map.remove(key);
 			} else {
@@ -241,7 +241,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 			final Trie<int[], IExpr> map = array.fData;
 			final int[] key = new int[] { row + 1, column + 1 };
 			IExpr value = map.get(key);
-			value = S.Times.of(value != null ? value : array.defaultValue, factor);
+			value = F.Times.of(value != null ? value : array.defaultValue, factor);
 			if (value.equals(array.defaultValue)) {
 				map.remove(key);
 			} else {
@@ -313,6 +313,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 	 * <b>Note:</b> in Symja sparse arrays the offset is +1 compared to java arrays or hipparchus
 	 * <code>FieldVector</code>.
 	 */
+	@SuppressWarnings("JavadocReference")
 	public static class SparseExprVector implements FieldVector<IExpr> {
 		final SparseArrayExpr array;
 		/** Dimension of the vector. */
@@ -1074,7 +1075,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 						defaultValue[0] = rule1.arg2();
 					} else if (!defaultValue[0].equals(rule1.arg2())) {
 						// The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-						IOFunctions.printMessage(S.SparseArray, "posr",
+						IOFunctions.printMessage(F.SparseArray, "posr",
 								F.List(arrayRulesList, rule1.arg1(), F.ZZ(depth)), engine);
 						return null;
 					}
@@ -1086,7 +1087,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 						}
 					} else {
 						// The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-						IOFunctions.printMessage(S.SparseArray, "posr",
+						IOFunctions.printMessage(F.SparseArray, "posr",
 								F.List(arrayRulesList, positionList, F.ZZ(depth)), EvalEngine.get());
 						return null;
 					}
@@ -1145,20 +1146,20 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 								continue;
 							} else if (!defaultValue[0].equals(rule.arg2())) {
 								// The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-								IOFunctions.printMessage(S.SparseArray, "posr",
+								IOFunctions.printMessage(F.SparseArray, "posr",
 										F.List(arrayRulesList, rule.arg1(), F.ZZ(depth)), engine);
 								return null;
 							}
 						} else {
 							// The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-							IOFunctions.printMessage(S.SparseArray, "posr",
+							IOFunctions.printMessage(F.SparseArray, "posr",
 									F.List(arrayRulesList, rule.arg1(), F.ZZ(depth)), engine);
 							return null;
 						}
 					} else {
 						if (positions.length != depth) {
 							// The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-							IOFunctions.printMessage(S.SparseArray, "posr",
+							IOFunctions.printMessage(F.SparseArray, "posr",
 									F.List(arrayRulesList, rule.arg1(), F.ZZ(depth)), engine);
 							return null;
 						}
@@ -1178,7 +1179,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 					//
 					// } else {
 					// // The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-					// IOFunctions.printMessage(S.SparseArray, "posr",
+					// IOFunctions.printMessage(F.SparseArray, "posr",
 					// F.List(arrayRulesList, positionList, F.ZZ(depth)), EvalEngine.get());
 					// return null;
 					// }
@@ -1335,7 +1336,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 		PatternMatcherAndEvaluator matcher = new PatternMatcherAndEvaluator(rule.arg1(), rule.arg2());
 		if (matcher.isRuleWithoutPatterns()) {
 			// The left hand side of `2` in `1` doesn't match an int-array of depth `3`.
-			IOFunctions.printMessage(S.SparseArray, "posr", F.List(arrayRulesList, rule.arg1(), F.ZZ(depth)),
+			IOFunctions.printMessage(F.SparseArray, "posr", F.List(arrayRulesList, rule.arg1(), F.ZZ(depth)),
 					EvalEngine.get());
 			return false;
 		}
@@ -1409,7 +1410,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 	 * Constructor for serialization.
 	 */
 	public SparseArrayExpr() {
-		super(S.SparseArray, null);
+		super(F.SparseArray, null);
 	}
 
 	/**
@@ -1425,7 +1426,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 	 *            if <code>true</code> create a deep copy.
 	 */
 	protected SparseArrayExpr(final Trie<int[], IExpr> trie, int[] dimension, IExpr defaultValue, boolean deepCopy) {
-		super(S.SparseArray, trie);
+		super(F.SparseArray, trie);
 		if (deepCopy) {
 			this.fData = Tries.<IExpr>forInts();
 			for (TrieNode<int[], IExpr> entry : trie.nodeSet()) {
@@ -1461,7 +1462,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 		for (TrieNode<int[], IExpr> entry : fData.nodeSet()) {
 			int[] key = entry.getKey();
 			IExpr value = entry.getValue();
-			IAST lhs = F.ast(S.List, key);
+			IAST lhs = F.ast(F.List, key);
 			result.append(F.Rule(lhs, value));
 		}
 		result.append(F.Rule(F.constantArray(F.$b(), dimension.length), defaultValue));
@@ -1571,9 +1572,9 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 	 */
 	@Override
 	public String fullFormString() {
-		IAST dimensionList = F.ast(S.List, dimension);
-		IASTAppendable result = F.ast(S.SparseArray, 6, false);
-		result.append(S.Automatic);
+		IAST dimensionList = F.ast(F.List, dimension);
+		IASTAppendable result = F.ast(F.SparseArray, 6, false);
+		result.append(F.Automatic);
 		result.append(dimensionList);
 		result.append(defaultValue);
 		// create compressed sparse row (CSR) storage format (input form):
@@ -1604,7 +1605,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 				columnIndex++;
 				int[] newKey = new int[key.length - 1];
 				System.arraycopy(key, 1, newKey, 0, newKey.length);
-				IAST indice = F.ast(S.List, newKey);
+				IAST indice = F.ast(F.List, newKey);
 				columnIndiceMatrix.append(indice);
 				nonZeroValues.append(entry.getValue());
 			}
@@ -1614,7 +1615,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 			for (TrieNode<int[], IExpr> entry : fData.nodeSet()) {
 				int[] key = entry.getKey();
 				columnIndex++;
-				IAST indice = F.ast(S.List, key);
+				IAST indice = F.ast(F.List, key);
 				columnIndiceMatrix.append(indice);
 				nonZeroValues.append(entry.getValue());
 			}
@@ -1708,7 +1709,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 					count++;
 				} else if (partIndex[i - startPosition] > dims[i - startPosition] || //
 						partIndex[i - startPosition] <= 0) {
-					return IOFunctions.printMessage(S.Part, "partw", F.List(ast.get(i), ast), EvalEngine.get());
+					return IOFunctions.printMessage(F.Part, "partw", F.List(ast.get(i), ast), EvalEngine.get());
 				}
 			}
 			for (int i = partSize; i < dims.length; i++) {
@@ -1757,7 +1758,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 			return new SparseArrayExpr(value, newDimension, defaultValue.orElse(F.C0), false);
 
 		}
-		return IOFunctions.printMessage(S.Part, "partd", F.List(ast), EvalEngine.get());
+		return IOFunctions.printMessage(F.Part, "partd", F.List(ast), EvalEngine.get());
 
 	}
 
@@ -1768,7 +1769,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 
 	@Override
 	public ISymbol head() {
-		return S.SparseArray;
+		return F.SparseArray;
 	}
 
 	@Override
@@ -1862,20 +1863,20 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 	@Override
 	public IASTMutable normal(boolean nilIfUnevaluated) {
 		if (dimension.length > 0) {
-			return normalAppendable(S.List, dimension);
+			return normalAppendable(F.List, dimension);
 			// if (normalCache != null) {
 			// return normalCache;
 			// }
-			// IASTAppendable list = normalAppendable(S.List, dimension);
+			// IASTAppendable list = normalAppendable(F.List, dimension);
 			// normalCache = list;
 			// return normalCache;
 		}
-		return F.headAST0(S.List);
+		return F.headAST0(F.List);
 	}
 
 	@Override
 	public IASTMutable normal(int[] dims) {
-		return normalAppendable(S.List, dims);
+		return normalAppendable(F.List, dims);
 	}
 
 	private void normal(Trie<int[], IExpr> map, IASTMutable list, int[] dims, int position, int[] index) {
@@ -1896,7 +1897,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 		int size2 = dims[position + 1];
 		for (int i = 1; i <= size1; i++) {
 			index[position] = i;
-			IASTAppendable currentList = F.ast(S.List, size2, true);
+			IASTAppendable currentList = F.ast(F.List, size2, true);
 			list.set(i, currentList);
 			normal(map, currentList, dims, position + 1, index);
 		}
@@ -2033,7 +2034,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 
 	@Override
 	public IExpr total(IExpr head) {
-		if (head.equals(S.Plus) && defaultValue.isZero()) {
+		if (head.equals(F.Plus) && defaultValue.isZero()) {
 			IASTAppendable result = F.PlusAlloc(fData.size());
 			for (TrieNode<int[], IExpr> entry : fData.nodeSet()) {
 				result.append(entry.getValue());

@@ -27,10 +27,10 @@ public class AssumptionFunctions {
 	private static class Initializer {
 
 		private static void init() {
-			S.Arrays.setEvaluator(new Arrays());
-			S.Element.setEvaluator(new Element());
-			S.NotElement.setEvaluator(new NotElement());
-			S.Refine.setEvaluator(new Refine());
+			F.Arrays.setEvaluator(new Arrays());
+			F.Element.setEvaluator(new Element());
+			F.NotElement.setEvaluator(new NotElement());
+			F.Refine.setEvaluator(new Refine());
 	}
 	}
 

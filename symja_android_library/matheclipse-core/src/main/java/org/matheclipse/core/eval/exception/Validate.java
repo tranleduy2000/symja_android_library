@@ -735,7 +735,7 @@ public final class Validate {
 		}
 		if (upTo < 0) {
 			// Non-negative integer or Infinity expected at position `1` in `2`.
-			IOFunctions.printMessage(S.UpTo, "innf", F.List(F.C1, upToAST), engine);
+			IOFunctions.printMessage(F.UpTo, "innf", F.List(F.C1, upToAST), engine);
 			return Integer.MIN_VALUE;
 		}
 		return upTo;

@@ -32,17 +32,17 @@ public class DispatchExpr extends DataExpr<VisitorReplaceAll> implements Externa
 	 * Needed for serialization.
 	 */
 	public DispatchExpr() {
-		super(S.Dispatch, null);
+		super(F.Dispatch, null);
 		listOfRules = F.NIL;
 	}
 
 	protected DispatchExpr(final IAST listOfRules) {
-		super(S.Dispatch, new VisitorReplaceAll(listOfRules));
+		super(F.Dispatch, new VisitorReplaceAll(listOfRules));
 		this.listOfRules = listOfRules;
 	}
 
 	protected DispatchExpr(final IAssociation assoc) {
-		super(S.Dispatch, new VisitorReplaceAll(assoc));
+		super(F.Dispatch, new VisitorReplaceAll(assoc));
 		this.listOfRules = assoc.normal(false);
 	}
 
@@ -52,7 +52,7 @@ public class DispatchExpr extends DataExpr<VisitorReplaceAll> implements Externa
 	 * @param visitor
 	 */
 	protected DispatchExpr(final VisitorReplaceAll visitor, IAST listOfRules) {
-		super(S.Dispatch, visitor);
+		super(F.Dispatch, visitor);
 		this.listOfRules = listOfRules;
 	}
 
