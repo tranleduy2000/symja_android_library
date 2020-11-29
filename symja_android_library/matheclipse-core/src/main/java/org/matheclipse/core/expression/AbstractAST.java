@@ -1,7 +1,6 @@
 package org.matheclipse.core.expression;
 
 import com.duy.annotations.ObjcMemoryIssue;
-import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
@@ -3408,7 +3407,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 	@Override
 	@ObjcMemoryIssue
 	public boolean isNumericArgument() {
-		@ObjcMemoryIssueFix int a = 0;
 		if (isEvalFlagOn(IAST.CONTAINS_NUMERIC_ARG)) {
 			// swift changed: memory issue
 			return forAll(/*new Predicate<IExpr>() {
@@ -5115,7 +5113,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
 			return conditionalExpr.setAtCopy(1, copy);
 		}
 		// swift changed: memory issue
-		@ObjcMemoryIssueFix
 		int indx = indexOf(Predicates.isConditionalExpression);
 		if (indx > 0) {
 			IAST conditionalExpr = (IAST) get(indx);

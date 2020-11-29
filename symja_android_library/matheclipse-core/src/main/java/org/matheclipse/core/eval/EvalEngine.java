@@ -2,7 +2,6 @@ package org.matheclipse.core.eval;
 
 import com.duy.annotations.Nonnull;
 import com.duy.annotations.ObjcMemoryIssue;
-import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
@@ -35,7 +34,6 @@ import org.matheclipse.core.expression.ContextPath;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.OptionsPattern;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.integrate.rubi.UtilityFunctionCtors;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -1555,7 +1553,7 @@ public class EvalEngine implements Serializable {
      * @param argsAST
      * @return <code>F.NIL</code> if no evaluation happened
      */
-    @ObjcMemoryIssue(value = 2)
+    @ObjcMemoryIssue
     public IExpr evalRules(ISymbol symbol, IAST argsAST) {
         // if (symbol instanceof BuiltInSymbol) {
         // try {
@@ -1565,7 +1563,6 @@ public class EvalEngine implements Serializable {
         // return F.NIL;
         // }
         // }
-        @ObjcMemoryIssueFix
         final IAST ast;
         // objc-changed: avoid using too much memory.
         if (argsAST.exists(Predicates.isASTUnevaluated2)) {
@@ -1598,7 +1595,6 @@ public class EvalEngine implements Serializable {
 //            return result[0];
 //        }
         // swift changed: memory issue
-        @ObjcMemoryIssueFix
         boolean exists = false;
         IExpr result = F.NIL;
         final int size = ast.size();
@@ -2824,7 +2820,6 @@ public class EvalEngine implements Serializable {
 		/*final*/ ISymbol/*[]*/ head = /*new ISymbol[] {*/ null /*}*/;
 		/*final*/ int/*[]*/ listLength = /*new int[] {*/ -1 /*}*/;
 
-		@ObjcMemoryIssueFix
         boolean exists = false;
         final int size = ast.size();
         for (int i = 1; i < size; i++) {

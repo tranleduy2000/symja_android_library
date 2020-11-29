@@ -3,7 +3,6 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
-import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.Predicate;
 
@@ -19,7 +18,6 @@ import org.matheclipse.core.eval.util.Lambda;
 import org.matheclipse.core.eval.util.OpenFixedSizeMap;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -1792,8 +1790,8 @@ public class StructureFunctions {
 				IAST arg1 = (IAST) ast.arg1();
 				if (ast.isAST1()) {
 					if (arg1.isEvalFlagOn(IAST.IS_SORTED)) {
-					return arg1;
-				}
+						return arg1;
+					}
 					if (arg1.isAssociation()) {
 						return ((IAssociation) arg1).sort();
 					}

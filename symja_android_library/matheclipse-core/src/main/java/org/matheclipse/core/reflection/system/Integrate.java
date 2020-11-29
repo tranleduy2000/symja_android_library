@@ -1,7 +1,6 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.annotations.ObjcMemoryIssue;
-import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
@@ -546,7 +545,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 	@Override
 	public IExpr evaluate(final IAST holdallAST, final EvalEngine engine) {
 		// Android changed: perform reading integrate rules
-		// @ObjcMemoryIssueFix
 		new IntegrateInitializer().run();
 
 		try {
@@ -1168,7 +1166,6 @@ public class Integrate extends AbstractFunctionEvaluator {
 		super.setUp(newSymbol);
 
 		// Android changed: call static initializer in evaluate() method.
-		// @ObjcMemoryIssueFix
 //		if (Config.THREAD_FACTORY != null) {
 //			INIT_THREAD = Config.THREAD_FACTORY.newThread(new IntegrateInitializer());
 //		} else {

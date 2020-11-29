@@ -1,5 +1,7 @@
 package org.matheclipse.core.expression;
 
+import com.duy.lang.DInteger;
+
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.IStringXImpl;
@@ -12,6 +14,7 @@ import org.matheclipse.core.visit.IVisitorLong;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.Collator;
+import java.util.Comparator;
 import java.util.Locale;
 
 /**

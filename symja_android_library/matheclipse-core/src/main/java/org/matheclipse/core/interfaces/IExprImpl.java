@@ -3874,9 +3874,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     @Override
     public int compareTo(IExpr expr) {
         if (expr.isAST()) {
-            if (!expr.isDirectedInfinity()) {
-                return -1 * expr.compareTo(this);
-            }
+            // if (!expr.isDirectedInfinity()) {
+            return -1 * expr.compareTo(this);
+            // }
         }
         final int x = hierarchy();
         final int y = expr.hierarchy();

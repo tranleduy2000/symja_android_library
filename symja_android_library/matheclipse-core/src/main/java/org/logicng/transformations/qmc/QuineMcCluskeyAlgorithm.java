@@ -29,7 +29,6 @@
 package org.logicng.transformations.qmc;
 
 import com.duy.annotations.ObjcMemoryIssue;
-import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.Function;
 import com.duy.util.MapWrapper;
 import com.google.j2objc.annotations.AutoreleasePool;
@@ -161,7 +160,6 @@ public class QuineMcCluskeyAlgorithm {
      */
     @ObjcMemoryIssue
     static SortedMap<Integer, LinkedHashSet<Term>> combineInTermClasses(final SortedMap<Integer, LinkedHashSet<Term>> termsInClasses) {
-        @ObjcMemoryIssueFix
         final SortedMap<Integer, LinkedHashSet<Term>> newTermsInClasses = new TreeMap<>();
         for (@AutoreleasePool int i = 0; i < termsInClasses.lastKey(); i++) {
             final LinkedHashSet<Term> thisClass = termsInClasses.get(i);

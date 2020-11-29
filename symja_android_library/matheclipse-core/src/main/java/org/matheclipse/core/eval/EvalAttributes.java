@@ -1,11 +1,9 @@
 package org.matheclipse.core.eval;
 
-import com.duy.annotations.Nonnull;
 import com.duy.lambda.Consumer;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.Comparators;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
@@ -404,8 +402,8 @@ public class EvalAttributes {
 			default:
 				if (sort(ast, Comparators.ExprComparator.CONS)) {
 					if (FEConfig.SHOW_STACKTRACE) {
-					checkCachedHashcode(ast);
-				}
+						checkCachedHashcode(ast);
+					}
 				return true;
 			}
 		}

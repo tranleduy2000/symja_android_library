@@ -1,10 +1,7 @@
 package org.matheclipse.core.visit;
 
 import com.duy.annotations.ObjcMemoryIssue;
-import com.duy.annotations.ObjcMemoryIssueFix;
 import com.duy.lambda.Function;
-import com.duy.lambda.ObjIntConsumer;
-import com.duy.lambda.Supplier;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
@@ -129,14 +126,15 @@ public class VisitorReplaceAll extends VisitorExpr {
 	public void setPostProcessing(Function<IASTMutable, IExpr> postProcessing) {
 		this.fPostProcessing = postProcessing;
 	}
+
+	@ObjcMemoryIssue
 	@Override
 	public IExpr visit(final IASTMutable ast) {
-		return fFunction.apply(ast).orElseGet(new Supplier<IExpr>() {
-			@Override
-			public IExpr get() {
-				return VisitorReplaceAll.this.visitAST(ast);
-			}
-		});
+		IExpr temp = fFunction.apply(ast);
+		if (!temp.isPresent()) {
+			temp = VisitorReplaceAll.this.visitAST(ast);
+		}
+		return temp;
 	}
 
 	/**
@@ -257,7 +255,7 @@ public class VisitorReplaceAll extends VisitorExpr {
 				// something was evaluated - return a new IAST:
 				final IASTMutable result = assoc.setAtCopy(i, assoc.getRule(i).setAtCopy(2, temp));
 				i++;
-				for (@ObjcMemoryIssueFix int j = i; j < size; j++) {
+				for (int j = i; j < size; j++) {
 					IExpr x = assoc.get(j);
 					{
 						IExpr t = x.accept(VisitorReplaceAll.this);
@@ -283,7 +281,6 @@ public class VisitorReplaceAll extends VisitorExpr {
 			IExpr temp = ast.get(i).accept(this);
 			if (temp.isPresent()) {
 				// something was evaluated - return a new IAST:
-				@ObjcMemoryIssueFix
 				final IASTMutable result = ast.setAtCopy(i++, temp);
 
 				// objc-changed: memory issue

@@ -1,8 +1,6 @@
 package org.matheclipse.core.patternmatching;
 
 import com.duy.annotations.ObjcMemoryIssue;
-import com.duy.annotations.ObjcMemoryIssueFix;
-import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
@@ -161,7 +159,6 @@ public abstract class IPatternMapImpl implements IPatternMap {
         if (lhsPatternExpr.isAlternatives() || lhsPatternExpr.isExcept()) {
             ruleWithoutPattern[0] = false;
         }
-        @ObjcMemoryIssueFix
         /*final*/ int/*[]*/ listEvalFlags = /*new int[] {*/ IAST.NO_FLAG /*}*/;
         if (lhsPatternExpr.isAlternatives() || //
                 lhsPatternExpr.isExcept() || //
