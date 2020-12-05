@@ -5,6 +5,7 @@ import com.duy.lambda.DoubleFunction;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
+import org.hipparchus.special.Beta;
 import org.hipparchus.special.Gamma;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.Arithmetic;
@@ -212,8 +213,9 @@ public class GammaJS {
 
 	public static double betaRegularized(double x, double y, double z) {
 		// use A&amp;ST26.5.4 and A&amp;ST26.5.5
-		return IncompleteBeta.incBeta(x, y, z);
-		// return beta(x, y, z) / beta(y, z);
+//		return IncompleteBeta.incBeta(x, y, z);
+		return Beta.regularizedBeta(x, y, z);
+//		 return beta(x, y, z) / beta(y, z);
 	}
 
 	public static double betaRegularized(double x, double y, double z, double w) {

@@ -6,6 +6,7 @@ import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
+import org.matheclipse.core.builtin.functions.GammaJS;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
@@ -151,5 +152,10 @@ public class NumericTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void testBetaRegularized() {
+        double res = GammaJS.betaRegularized(0.9768451023103443, 337.0, 0.5);
+        assertEquals(res, 0.0000712171, 1E-9);
     }
 }

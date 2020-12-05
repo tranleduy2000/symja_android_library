@@ -448,32 +448,32 @@ public class StatisticsFunctions {
 					if (ast.arg1().isAST()) {
 						IAST dist = (IAST) ast.arg1();
 						IExpr xArg = F.NIL;
-			if (ast.isAST2()) {
+						if (ast.isAST2()) {
 							xArg = ast.arg2();
 
-								}
+						}
+
+						if (dist.head().isSymbol()) {
+							ISymbol head = (ISymbol) dist.head();
 
 							if (dist.head().isSymbol()) {
-								ISymbol head = (ISymbol) dist.head();
-
-								if (dist.head().isSymbol()) {
-									if (head instanceof IBuiltInSymbol) {
-										IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
-										if (evaluator instanceof ICDF) {
-											ICDF cdf = (ICDF) evaluator;
+								if (head instanceof IBuiltInSymbol) {
+									IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
+									if (evaluator instanceof ICDF) {
+										ICDF cdf = (ICDF) evaluator;
 										return cdf.cdf(dist, xArg, engine);
-										}
 									}
 								}
-
 							}
-						}
-					} catch (Exception ex) {
-					if (FEConfig.SHOW_STACKTRACE) {
-							ex.printStackTrace();
+
 						}
 					}
+				} catch (Exception ex) {
+					if (FEConfig.SHOW_STACKTRACE) {
+						ex.printStackTrace();
+					}
 				}
+			}
 
 			return F.NIL;
 		}
@@ -2508,8 +2508,7 @@ public class StatisticsFunctions {
 					return F.NIL;
 				}
 				if (dim != null) {
-					IAST matrix = list;
-					return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					return list.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x) {
 							return F.HarmonicMean(x);
@@ -5359,8 +5358,7 @@ public class StatisticsFunctions {
 					return F.NIL;
 				}
 				if (dim != null) {
-					IAST matrix = arg1;
-					return matrix.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
+					return arg1.mapMatrixColumns(dim, new Function<IExpr, IExpr>() {
 						@Override
 						public IExpr apply(IExpr x) {
 							return F.StandardDeviation(x);

@@ -257,33 +257,33 @@ public class SpecialFunctions {
 		}
 
 		private static IExpr betaRegularized3(final IAST ast, EvalEngine engine) {
-				try {
-			IExpr z = ast.arg1();
-			IExpr a = ast.arg2();
-			IExpr n = ast.arg3();
-					if (a.isZero() || (a.isInteger() && a.isNegative())) {
-						if (n.isZero() || (n.isInteger() && n.isNegative())) {
-							return F.Indeterminate;
-						}
-						return F.C1;
-					}
+			try {
+				IExpr z = ast.arg1();
+				IExpr a = ast.arg2();
+				IExpr n = ast.arg3();
+				if (a.isZero() || (a.isInteger() && a.isNegative())) {
 					if (n.isZero() || (n.isInteger() && n.isNegative())) {
+						return F.Indeterminate;
+					}
+					return F.C1;
+				}
+				if (n.isZero() || (n.isInteger() && n.isNegative())) {
+					return F.C0;
+				}
+				if (z.isZero()) {
+					if (engine.evalTrue(F.Greater(F.Re(a), F.C0))) {
 						return F.C0;
 					}
-					if (z.isZero()) {
-						if (engine.evalTrue(F.Greater(F.Re(a), F.C0))) {
-							return F.C0;
-						}
-						if (engine.evalTrue(F.Less(F.Re(a), F.C0))) {
-							return F.CComplexInfinity;
-						}
-					} else if (z.isOne()) {
-						if (engine.evalTrue(F.Greater(F.Re(n), F.C0))) {
-							return F.C1;
-						}
+					if (engine.evalTrue(F.Less(F.Re(a), F.C0))) {
+						return F.CComplexInfinity;
 					}
-					if (engine.isDoubleMode()) {
-						try {
+				} else if (z.isOne()) {
+					if (engine.evalTrue(F.Greater(F.Re(n), F.C0))) {
+						return F.C1;
+					}
+				}
+				if (engine.isDoubleMode()) {
+					try {
 						double zn = engine.evalDouble(z);
 						double an = engine.evalDouble(a);
 						double nn = engine.evalDouble(n);
@@ -297,21 +297,21 @@ public class SpecialFunctions {
 							IterationLimitExceeded.throwIt(nInt, ast.topHead());
 						}
 						// TODO improve with regularizedIncompleteBetaFunction() ???
-							// https://github.com/haifengl/smile/blob/master/math/src/main/java/smile/math/special/Beta.java
+						// https://github.com/haifengl/smile/blob/master/math/src/main/java/smile/math/special/Beta.java
 						return F.num(GammaJS.betaRegularized(zn, an, nn));
-						} catch (IllegalArgumentException rex) {
-							// from de.lab4inf.math.functions.IncompleteBeta.checkParameters()
-						} catch (ValidateException ve) {
-							// from org.matheclipse.core.eval.EvalEngine.evalDouble()
-						}
+					} catch (IllegalArgumentException rex) {
+						// from de.lab4inf.math.functions.IncompleteBeta.checkParameters()
+					} catch (ValidateException ve) {
+						// from org.matheclipse.core.eval.EvalEngine.evalDouble()
 					}
-			int ni = n.toIntDefault(Integer.MIN_VALUE);
-			if (ni != Integer.MIN_VALUE) {
-
-				if (ni < 0) {
-					// for n>=0; BetaRegularized(z, a, -n)=0
-					return F.C0;
 				}
+				int ni = n.toIntDefault(Integer.MIN_VALUE);
+				if (ni != Integer.MIN_VALUE) {
+
+					if (ni < 0) {
+						// for n>=0; BetaRegularized(z, a, -n)=0
+						return F.C0;
+					}
 					if (ni > Config.MAX_POLYNOMIAL_DEGREE) {
 						PolynomialDegreeLimitExceeded.throwIt(ni);
 					}
@@ -319,18 +319,18 @@ public class SpecialFunctions {
 					// {k, 0, n - 1}
 					for (int k = 0; k < ni; k++) {
 						// (Pochhammer(a, k)*(1 - z)^k)/k!
-							IInteger kk = F.ZZ(k);
+						IInteger kk = F.ZZ(k);
 						sum.append(F.Times(F.Power(F.Plus(F.C1, F.Negate(z)), kk), F.Power(F.Factorial(kk), -1),
 								F.Pochhammer(a, kk)));
 					}
 					// z^a * sum
 					return F.Times(F.Power(z, a), sum);
 				}
-				} catch (RuntimeException rex) {
-					if (FEConfig.SHOW_STACKTRACE) {
-						rex.printStackTrace();
-					}
+			} catch (RuntimeException rex) {
+				if (FEConfig.SHOW_STACKTRACE) {
+					rex.printStackTrace();
 				}
+			}
 			return F.NIL;
 		}
 
