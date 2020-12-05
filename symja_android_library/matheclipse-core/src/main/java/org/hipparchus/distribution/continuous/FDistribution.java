@@ -110,10 +110,10 @@ public class FDistribution extends AbstractRealDistribution {
      * <p>
      * The implementation of this method is based on
      * <ul>
-     * <li>
-     * <a href="http://mathworld.wolfram.com/F-Distribution.html">
-     * F-Distribution</a>, equation (4).
-     * </li>
+     *  <li>
+     *   <a href="http://mathworld.wolfram.com/F-Distribution.html">
+     *   F-Distribution</a>, equation (4).
+     *  </li>
      * </ul>
      */
     @Override
@@ -137,8 +137,8 @@ public class FDistribution extends AbstractRealDistribution {
      * <p>
      * For denominator degrees of freedom parameter {@code b}, the mean is
      * <ul>
-     * <li>if {@code b > 2} then {@code b / (b - 2)},</li>
-     * <li>else undefined ({@code Double.NaN}).
+     *  <li>if {@code b > 2} then {@code b / (b - 2)},</li>
+     *  <li>else undefined ({@code Double.NaN}).
      * </ul>
      */
     @Override
@@ -158,11 +158,11 @@ public class FDistribution extends AbstractRealDistribution {
      * For numerator degrees of freedom parameter {@code a} and denominator
      * degrees of freedom parameter {@code b}, the variance is
      * <ul>
-     * <li>
-     * if {@code b > 4} then
-     * {@code [2 * b^2 * (a + b - 2)] / [a * (b - 2)^2 * (b - 4)]},
-     * </li>
-     * <li>else undefined ({@code Double.NaN}).
+     *  <li>
+     *    if {@code b > 4} then
+     *    {@code [2 * b^2 * (a + b - 2)] / [a * (b - 2)^2 * (b - 4)]},
+     *  </li>
+     *  <li>else undefined ({@code Double.NaN}).
      * </ul>
      */
     @Override

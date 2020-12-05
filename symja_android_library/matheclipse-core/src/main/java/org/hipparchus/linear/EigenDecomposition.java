@@ -81,13 +81,17 @@ import org.hipparchus.util.Precision;
  */
 public class EigenDecomposition {
     /**
-     * Internally used epsilon criteria.
-     */
-    private static final double EPSILON = 1e-12;
+     * Default epsilon value to use for internal epsilon
+     **/
+    private static final double DEFAULT_EPSILON = 1e-12;
     /**
      * Maximum number of iterations accepted in the implicit QL transformation
      */
     private static final byte MAX_ITER = 30;
+    /**
+     * Internally used epsilon criteria.
+     */
+    private final double epsilon;
     /**
      * Whether the matrix is symmetric.
      */
@@ -140,8 +144,24 @@ public class EigenDecomposition {
      * @throws MathRuntimeException      if the decomposition of a general matrix
      *                                   results in a matrix with zero norm
      */
-    public EigenDecomposition(final RealMatrix matrix)
+    public EigenDecomposition(final RealMatrix matrix) {
+        this(matrix, DEFAULT_EPSILON);
+    }
+
+    /**
+     * Calculates the eigen decomposition of the given real matrix.
+     * <p>
+     * Supports decomposition of a general matrix since 3.1.
+     *
+     * @param matrix  Matrix to decompose.
+     * @param epsilon Epsilon used for internal tests (e.g. is singular, eigenvalue ratio, etc.)
+     * @throws MathIllegalStateException if the algorithm fails to converge.
+     * @throws MathRuntimeException      if the decomposition of a general matrix
+     *                                   results in a matrix with zero norm
+     */
+    public EigenDecomposition(final RealMatrix matrix, double epsilon)
             throws MathRuntimeException {
+        this.epsilon = epsilon;
         final double symTol = 10 * matrix.getRowDimension() * matrix.getColumnDimension() * Precision.EPSILON;
         isSymmetric = MatrixUtils.isSymmetric(matrix, symTol);
         if (isSymmetric) {
@@ -162,6 +182,21 @@ public class EigenDecomposition {
      * @throws MathIllegalStateException if the algorithm fails to converge.
      */
     public EigenDecomposition(final double[] main, final double[] secondary) {
+        this(main, secondary, DEFAULT_EPSILON);
+    }
+
+
+    /**
+     * Calculates the eigen decomposition of the symmetric tridiagonal
+     * matrix.  The Householder matrix is assumed to be the identity matrix.
+     *
+     * @param main      Main diagonal of the symmetric tridiagonal form.
+     * @param secondary Secondary of the tridiagonal form.
+     * @param epsilon   Epsilon used for internal tests (e.g. is singular, eigenvalue ratio, etc.)
+     * @throws MathIllegalStateException if the algorithm fails to converge.
+     */
+    public EigenDecomposition(final double[] main, final double[] secondary, double epsilon) {
+        this.epsilon = epsilon;
         isSymmetric = true;
         this.main = main.clone();
         this.secondary = secondary.clone();
@@ -217,14 +252,23 @@ public class EigenDecomposition {
             }
 
             for (int i = 0; i < imagEigenvalues.length; i++) {
-                if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) > 0) {
+                if (Precision.compareTo(imagEigenvalues[i], 0.0, epsilon) > 0) {
                     cachedD.setEntry(i, i + 1, imagEigenvalues[i]);
-                } else if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0) {
+                } else if (Precision.compareTo(imagEigenvalues[i], 0.0, epsilon) < 0) {
                     cachedD.setEntry(i, i - 1, imagEigenvalues[i]);
                 }
             }
         }
         return cachedD;
+    }
+
+    /**
+     * Get's the value for epsilon which is used for internal tests (e.g. is singular, eigenvalue ratio, etc.)
+     *
+     * @return the epsilon value.
+     */
+    public double getEpsilon() {
+        return epsilon;
     }
 
     /**
@@ -261,7 +305,7 @@ public class EigenDecomposition {
      */
     public boolean hasComplexEigenvalues() {
         for (int i = 0; i < imagEigenvalues.length; i++) {
-            if (!Precision.equals(imagEigenvalues[i], 0.0, EPSILON)) {
+            if (!Precision.equals(imagEigenvalues[i], 0.0, epsilon)) {
                 return true;
             }
         }
@@ -580,7 +624,7 @@ public class EigenDecomposition {
 
         for (int i = 0; i < realEigenvalues.length; i++) {
             if (i == (realEigenvalues.length - 1) ||
-                    Precision.equals(matT[i + 1][i], 0.0, norm * EPSILON)) {
+                    Precision.equals(matT[i + 1][i], 0.0, norm * epsilon)) {
                 realEigenvalues[i] = matT[i][i];
             } else {
                 final double x = matT[i + 1][i + 1];
@@ -632,7 +676,7 @@ public class EigenDecomposition {
         }
 
         // we can not handle a matrix with zero norm
-        if (Precision.equals(norm, 0.0, EPSILON)) {
+        if (Precision.equals(norm, 0.0, epsilon)) {
             throw new MathRuntimeException(LocalizedCoreFormats.ZERO_NORM);
         }
 
@@ -656,7 +700,7 @@ public class EigenDecomposition {
                     for (int j = l; j <= idx; j++) {
                         r += matrixT[i][j] * matrixT[j][idx];
                     }
-                    if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0) {
+                    if (Precision.compareTo(imagEigenvalues[i], 0.0, epsilon) < 0) {
                         z = w;
                         s = r;
                     } else {
@@ -718,7 +762,7 @@ public class EigenDecomposition {
                     }
                     double w = matrixT[i][i] - p;
 
-                    if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0) {
+                    if (Precision.compareTo(imagEigenvalues[i], 0.0, epsilon) < 0) {
                         z = w;
                         r = ra;
                         s = sa;
@@ -897,21 +941,11 @@ public class EigenDecomposition {
             for (int i = 0; i < realEigenvalues.length; ++i) {
                 // Looking for eigenvalues that are 0, where we consider anything much much smaller
                 // than the largest eigenvalue to be effectively 0.
-                if (Precision.equals(eigenvalueNorm(i) / largestEigenvalueNorm, 0, EPSILON)) {
+                if (Precision.equals(eigenvalueNorm(i) / largestEigenvalueNorm, 0, epsilon)) {
                     return false;
                 }
             }
             return true;
-        }
-
-        /**
-         * @param i which eigenvalue to find the norm of
-         * @return the norm of ith (complex) eigenvalue.
-         */
-        private double eigenvalueNorm(int i) {
-            final double re = realEigenvalues[i];
-            final double im = imagEigenvalues[i];
-            return FastMath.sqrt(re * re + im * im);
         }
 
         /**
@@ -941,6 +975,16 @@ public class EigenDecomposition {
                 }
             }
             return MatrixUtils.createRealMatrix(invData);
+        }
+
+        /**
+         * @param i which eigenvalue to find the norm of
+         * @return the norm of ith (complex) eigenvalue.
+         */
+        private double eigenvalueNorm(int i) {
+            final double re = realEigenvalues[i];
+            final double im = imagEigenvalues[i];
+            return FastMath.sqrt(re * re + im * im);
         }
     }
 }

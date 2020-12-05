@@ -128,7 +128,7 @@ public class TDistribution extends AbstractRealDistribution {
      * <p>
      * For degrees of freedom parameter {@code df}, the mean is
      * <ul>
-     * <li>if {@code df > 1} then {@code 0},</li>
+     *  <li>if {@code df > 1} then {@code 0},</li>
      * <li>else undefined ({@code Double.NaN}).</li>
      * </ul>
      */
@@ -148,10 +148,10 @@ public class TDistribution extends AbstractRealDistribution {
      * <p>
      * For degrees of freedom parameter {@code df}, the variance is
      * <ul>
-     * <li>if {@code df > 2} then {@code df / (df - 2)},</li>
-     * <li>if {@code 1 < df <= 2} then positive infinity
-     * ({@code Double.POSITIVE_INFINITY}),</li>
-     * <li>else undefined ({@code Double.NaN}).</li>
+     *  <li>if {@code df > 2} then {@code df / (df - 2)},</li>
+     *  <li>if {@code 1 < df <= 2} then positive infinity
+     *  ({@code Double.POSITIVE_INFINITY}),</li>
+     *  <li>else undefined ({@code Double.NaN}).</li>
      * </ul>
      */
     @Override

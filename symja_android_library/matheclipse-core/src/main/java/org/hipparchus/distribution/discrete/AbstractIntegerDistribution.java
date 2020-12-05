@@ -135,7 +135,7 @@ public abstract class AbstractIntegerDistribution implements IntegerDistribution
      * <li>{@link #getSupportLowerBound()} for {@code p = 0},</li>
      * <li>{@link #getSupportUpperBound()} for {@code p = 1}, and</li>
      * <li>{@link #solveInverseCumulativeProbability(double, int, int)} for
-     * {@code 0 < p < 1}.</li>
+     *     {@code 0 < p < 1}.</li>
      * </ul>
      */
     @Override

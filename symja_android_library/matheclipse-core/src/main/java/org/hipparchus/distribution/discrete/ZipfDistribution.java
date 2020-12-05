@@ -155,8 +155,8 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
      * For number of elements {@code N} and exponent {@code s}, the mean is
      * {@code Hs1 / Hs}, where
      * <ul>
-     * <li>{@code Hs1 = generalizedHarmonic(N, s - 1)},</li>
-     * <li>{@code Hs = generalizedHarmonic(N, s)}.</li>
+     *  <li>{@code Hs1 = generalizedHarmonic(N, s - 1)},</li>
+     *  <li>{@code Hs = generalizedHarmonic(N, s)}.</li>
      * </ul>
      */
     @Override
@@ -174,9 +174,9 @@ public class ZipfDistribution extends AbstractIntegerDistribution {
      * For number of elements {@code N} and exponent {@code s}, the mean is
      * {@code (Hs2 / Hs) - (Hs1^2 / Hs^2)}, where
      * <ul>
-     * <li>{@code Hs2 = generalizedHarmonic(N, s - 2)},</li>
-     * <li>{@code Hs1 = generalizedHarmonic(N, s - 1)},</li>
-     * <li>{@code Hs = generalizedHarmonic(N, s)}.</li>
+     *  <li>{@code Hs2 = generalizedHarmonic(N, s - 2)},</li>
+     *  <li>{@code Hs1 = generalizedHarmonic(N, s - 1)},</li>
+     *  <li>{@code Hs = generalizedHarmonic(N, s)}.</li>
      * </ul>
      */
     @Override

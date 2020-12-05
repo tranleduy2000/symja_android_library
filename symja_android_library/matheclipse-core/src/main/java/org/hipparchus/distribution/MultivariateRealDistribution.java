@@ -72,7 +72,7 @@ public interface MultivariateRealDistribution {
      *
      * @param sampleSize the number of random vectors to generate.
      * @return an array representing the random samples.
-     * @throws org.hipparchus.exception.MathIllegalArgumentException if {@code sampleSize} is not positive.
+     * @throws MathIllegalArgumentException if {@code sampleSize} is not positive.
      * @see #sample()
      */
     double[][] sample(int sampleSize) throws MathIllegalArgumentException;
