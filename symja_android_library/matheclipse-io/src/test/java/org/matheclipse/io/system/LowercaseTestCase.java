@@ -1393,7 +1393,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"35*x(3)*x(4)+21*x(2)*x(5)+7*x(1)*x(6)");
 	}
 
-	public void ztestBernoulliB() {
+	public void testBernoulliB() {
 		check("BernoulliB(4, 9)", //
 				"155519/30");
 		check("BernoulliB(4, -9)", //
@@ -1660,7 +1660,19 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testBetaRegularized() {
-		check("BetaRegularized(2,Quantity(1.2,\"m\"),1009)", //
+    // see github #203
+    check(
+        "BetaRegularized(1.0000001,1,1)", //
+        "1.0");
+    check(
+        "BetaRegularized(-0.000000001,1,1)", //
+        "-1.00000*10^-9");
+
+    check(
+        "BetaRegularized(0.9768451023103443, 337.0, 0.5)", //
+        "0.0000712171");
+    check(
+        "BetaRegularized(2,Quantity(1.2,\"m\"),1009)", //
 				"BetaRegularized(2,1.2[m],1009)");
 
 		check("BetaRegularized(0.99,ByteArray(1),1009)", //
@@ -1680,10 +1692,6 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"0");
 		check("BetaRegularized(1,a,42)", //
 				"1");
-//		check("BetaRegularized(1.0000001,1,1)", //
-//				"1.0");
-//		check("BetaRegularized(-0.000000001,1,1)", //
-//				"-1.00000*10^-9");
 		// TODO get Indeterminate
 		check("BetaRegularized(10^20., 10^30., 10.^20.)", //
 				"BetaRegularized(1.00000*10^20,1.00000*10^30,1.00000*10^20)");
@@ -4263,8 +4271,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"1-x+x^2-x^3+x^4-x^5+x^6-x^7+x^8-x^9+x^10-x^11+x^12-x^13+x^14-x^15+x^16-x^17+x^18-x^\n"
 						+ "19+x^20-x^21+x^22-x^23+x^24-x^25+x^26-x^27+x^28-x^29+x^30-x^31+x^32-x^33+x^34-x^\n"
 						+ "35+x^36-x^37+x^38-x^39+x^40-x^41+x^42-x^43+x^44-x^45+x^46");
-		// The case of the 105-th cyclotomic polynomial is interesting because 105 is the lowest integer that is the
-		// product of three distinct odd prime numbers and this polynomial is the first one that has a coefficient other
+    // The case of the 105-th cyclotomic polynomial is interesting because 105 is the lowest integer
+    // that is the
+    // product of three distinct odd prime numbers and this polynomial is the first one that has a
+    // coefficient other
 		// than 1, 0, or −1:
 		check("Cyclotomic(105, x)", //
 				"1+x+x^2-x^5-x^6-2*x^7-x^8-x^9+x^12+x^13+x^14+x^15+x^16+x^17-x^20-x^22-x^24-x^26-x^\n"
@@ -5266,7 +5276,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 				"177945374758153510836");
 		check("Resultant(f+g*x+h*x^2,g+2*h*x, x)", //
 				"-g^2*h+4*f*h^2");
-		// print message Discriminant: the function: Discriminant(Sqrt(x),x) has wrong argument Sqrt(x) at position:1:
+    // print message Discriminant: the function: Discriminant(Sqrt(x),x) has wrong argument Sqrt(x)
+    // at position:1:
 		// Polynomial expected!
 		check("Discriminant(x^(1/2), x)", "Discriminant(Sqrt(x),x)");
 
@@ -6912,10 +6923,12 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// System.out.println(i);
 		// String[] vars = new String[] { "a", "c", "d", "e", "x" };
 		// GenPolynomialRing<edu.jas.arith.BigInteger> fac;
-		// fac = new GenPolynomialRing<edu.jas.arith.BigInteger>(edu.jas.arith.BigInteger.ZERO, vars.length,
+    // fac = new GenPolynomialRing<edu.jas.arith.BigInteger>(edu.jas.arith.BigInteger.ZERO,
+    // vars.length,
 		// new TermOrder(TermOrder.INVLEX), vars);
 		//
-		// GenPolynomial<edu.jas.arith.BigInteger> poly = fac.parse("a*d*e + c*d^2*x + a*e^2*x + c*d*e*x^2");
+    // GenPolynomial<edu.jas.arith.BigInteger> poly = fac.parse("a*d*e + c*d^2*x + a*e^2*x +
+    // c*d*e*x^2");
 		// System.out.println("A: " + poly.toString());
 		// FactorAbstract<edu.jas.arith.BigInteger> factorAbstract = FactorFactory
 		// .getImplementation(edu.jas.arith.BigInteger.ZERO);
@@ -7905,13 +7918,17 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFindInstance() {
-//		check("FindInstance(1,{a,b,c,d},Booleans)", //
-//				"FindInstance(1,{a,b,c,d},Booleans)");
-//		check("FindInstance(-1+4*Sin(x)==0,x)", //
-//				"{{x->ArcSin(1/4)}}");
-//		check("FindInstance(2*Sin(x)==1/2,x)", //
-//				"{{x->ArcSin(1/4)}}");
-		check("FindInstance((a || b || c) && (! a || ! b || ! c) && True, {a, b, c}, 2)",
+		check(
+				"FindInstance(1,{a,b,c,d},Booleans)", //
+				"FindInstance(1,{a,b,c,d},Booleans)");
+		check(
+				"FindInstance(-1+4*Sin(x)==0,x)", //
+				"{{x->ArcSin(1/4)}}");
+		check(
+				"FindInstance(2*Sin(x)==1/2,x)", //
+				"{{x->ArcSin(1/4)}}");
+		check(
+				"FindInstance((a || b || c) && (! a || ! b || ! c) && True, {a, b, c}, 2)",
 				"{{a->False,b->True,c->True},{a->False,b->True,c->False}}");
 
 		check("FindInstance({x^2==4,x+y^2==6}, {x,y})", //
@@ -8088,8 +8105,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("FindVertexCover({DirectedEdge(2,1), DirectedEdge(1,3), DirectedEdge(3,6), DirectedEdge(6,1),"//
 				+ " DirectedEdge(4,6), DirectedEdge(1,5), DirectedEdge(5,4) })", //
 				"FindVertexCover({2->1,1->3,3->6,6->1,4->6,1->5,5->4})");
+  }
 
-	}
 	public void testFindShortestPath() {
 		check("FindShortestPath(Graph({1 -> 2, 2 -> 4, 1 -> 3,  3 -> 2, 3 -> 4},{EdgeWeight->{3.0,1.0,1.0,1.0,3.0}}),1,4)", //
 				"{1,3,2,4}");
@@ -8939,8 +8956,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 	}
 
 	public void testFullSimplify() {
-		// MMA factorizes this to (-2 + x)*(-1 + x) ? Although the ComplexityFunction returns 9 for both expressions
-		check("2-3*x+x^2 // FullSimplify", //
+    // MMA factorizes this to (-2 + x)*(-1 + x) ? Although the ComplexityFunction returns 9 for both
+    // expressions
+    check(
+        "2-3*x+x^2 // FullSimplify", //
 				"2-3*x+x^2");
 		// MMA doesn't factorize this
 		check("f(2-3*Sin(x)+Sin(x)^2) // FullSimplify", //
@@ -8953,7 +8972,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		check("PolynomialQuotientRemainder((d-2*d*Sqrt(-e/d)*x-e*x^2),(2*d^2*Sqrt(-e/d)+4*d*e*x-2*d*e*Sqrt(-e/d)*x^2),x)", //
 				"{1/(2*d*Sqrt(-e/d)),0}");
 		// check("FullSimplify((1/(d + e*x^2) * (1-((2*x*(d*Sqrt(-(e/d)) + e*x))/(d + e*x^2)))) / " //
-		// + "(-((4*e*x^2*(d*Sqrt(-(e/d)) + e*x))/(d + e*x^2)^2) + (2*e*x)/(d + e*x^2) + (2*(d*Sqrt(-(e/d)) + e*x))/(d +
+    // + "(-((4*e*x^2*(d*Sqrt(-(e/d)) + e*x))/(d + e*x^2)^2) + (2*e*x)/(d + e*x^2) +
+    // (2*(d*Sqrt(-(e/d)) + e*x))/(d +
 		// e*x^2)))", //
 		// "(d-2*d*Sqrt(-e/d)*x-e*x^2)/(2*d^2*Sqrt(-e/d)+4*d*e*x-2*d*e*Sqrt(-e/d)*x^2)");
 		check("FullSimplify((1/(d + e*x^2) * (1-((2*x*(d*Sqrt(-(e/d)) + e*x))/(d + e*x^2)))) / " //
@@ -9926,9 +9946,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// " ");
 		check("HurwitzZeta(2147483647,3.141592653589793)", //
 				"HurwitzZeta(2.14748*10^9,3.14159)");
-		check("HurwitzZeta(1.5708,1317624576693539401)", //
-				"HurwitzZeta(1.5708,1.31762*10^18)");
-		check("HurwitzZeta(3,0.2)", //
+    check(
+        "HurwitzZeta(1.5708,1317624576693539401)", //
+        "7.95681*10^-11");
+    check(
+        "HurwitzZeta(3,0.2)", //
 				"125.739");
 		check("HurwitzZeta(.51, .87)", //
 				"-1.32016");
@@ -10712,8 +10734,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 
 		check("IntegerPartitions(50, All, {6, 9, 20})", //
 				"{{20,9,9,6,6},{20,6,6,6,6,6}}");
-		// https://oeis.org/A214772 - McNugget partitions - Number of partitions of n into parts 6, 9 or 20.
-		check("Table(Length(IntegerPartitions(i, All, {6, 9, 20})), {i,0, 100, 1})", //
+    // https://oeis.org/A214772 - McNugget partitions - Number of partitions of n into parts 6, 9 or
+    // 20.
+    check(
+        "Table(Length(IntegerPartitions(i, All, {6, 9, 20})), {i,0, 100, 1})", //
 				"{1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,2,0,1,1,0,0,2,0,1,2,0,1,2,0,1,2,0,1,3,0,2,2,\n"
 						+ "1,1,3,0,2,3,1,2,3,1,2,3,1,2,4,1,3,3,2,2,5,1,3,4,2,3,5,2,3,5,2,3,6,2,4,5,3,3,7,2,\n"
 						+ "5,6,3,4,7,3,5,7,3,5,8,3,6,7,4,5,9,3,7,8,5}");
@@ -12421,19 +12445,27 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// {-1577780898195/827587904419-11087326045520/827587904419*I,
 		// 35583840059240/5793115330933+275839049310660/5793115330933*I,
 		// -3352155369084/827587904419-28321055437140/827587904419*I}
-//		check("LeastSquares({{1,1},{1,2},{1,3.0}},{})", //
-//				"LeastSquares(\n" + //
-//						"{{1,1},\n" + //
-//						" {1,2},\n" + //
-//						" {1,3.0}},{})");
-//		check("Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2})", //
-//				"{{I*2,I*3/2,I*4/3},{1+I*2/5,1+I*5/11,1+I*1/2},{2+I*6/19,2+I*7/20,2+I*8/21},{3+\n"
-//						+ "I*2/7,3+I*9/29,3+I*1/3}}");
-//		check("LeastSquares(Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2}), {1,1,1,1})", //
-//				"{-1577780898195/827587904419-I*11087326045520/827587904419,35583840059240/\n"
-//						+ "5793115330933+I*275839049310660/5793115330933,-3352155369084/827587904419-\n"
-//						+ "I*28321055437140/827587904419}");
-		check("LeastSquares({{1, 1}, {1, 2}, {1, 3.0}}, {7, 7, 8})", //
+    check(
+        "LeastSquares({{1,1},{1,2},{1,3.0}},{})", //
+        "LeastSquares(\n"
+            + //
+            "{{1,1},\n"
+            + //
+            " {1,2},\n"
+            + //
+            " {1,3.0}},{})");
+    check(
+        "Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2})", //
+        "{{I*2,I*3/2,I*4/3},{1+I*2/5,1+I*5/11,1+I*1/2},{2+I*6/19,2+I*7/20,2+I*8/21},{3+\n"
+            + "I*2/7,3+I*9/29,3+I*1/3}}");
+    check(
+        "LeastSquares(Table(Complex(i,Rational(2 * i + 2 + j, 1 + 9 * i + j)),{i,0,3},{j,0,2}), {1,1,1,1})", //
+        "{-1577780898195/827587904419-I*11087326045520/827587904419,35583840059240/\n"
+            + "5793115330933+I*275839049310660/5793115330933,-3352155369084/827587904419-\n"
+            + "I*28321055437140/827587904419}");
+
+    check(
+        "LeastSquares({{1, 1}, {1, 2}, {1, 3.0}}, {7, 7, 8})", //
 				"{6.33333,0.5}");
 		check("LeastSquares(SparseArray({{1, 1}, {1, 2}, {1, 3.0}}), SparseArray({7, 7, 8}))", //
 				"{6.33333,0.5}");
@@ -13055,7 +13087,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 						+ "1497,1983,2627,3480,4610,6107,8090,10717,14197,18807,24914,33004,43721,57918,\n"
 						+ "76725,101639,134643,178364,236282,313007,414646,549289,727653,963935}");
 
-		// A016064 Shortest legs of Heronian triangles (sides are consecutive integers, area is an integer).
+    // A016064 Shortest legs of Heronian triangles (sides are consecutive integers, area is an
+    // integer).
 		// https://oeis.org/A016064
 		check("LinearRecurrence({5, -5, 1}, {1, 3, 13}, 26)", //
 				"{1,3,13,51,193,723,2701,10083,37633,140451,524173,1956243,7300801,27246963,\n"
@@ -14440,9 +14473,8 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// "");
 		check("Minimize(x^2+4*x+4, {x})", //
 				"{0,{x->-2}}");
-		check("Minimize(x^2+4*x+4, {x})", //
-				"{0,{x->-2}}");
-		check("Minimize(x^4+7*x^3-2*x^2 + 42, x)", //
+    check(
+        "Minimize(x^4+7*x^3-2*x^2 + 42, x)", //
 				"{42+7*(-21/8-Sqrt(505)/8)^3-2*(21/8+Sqrt(505)/8)^2+(21/8+Sqrt(505)/8)^4,{x->-21/\n"
 						+ "8-Sqrt(505)/8}}");
 		check("Minimize(2*x^2 - 3*x + 5, x)", //
@@ -15105,8 +15137,10 @@ public class LowercaseTestCase extends AbstractTestCase {
 		// print NextPrime: Non-negative integer expected.
 		check("NextPrime(-10000)", //
 				"NextPrime(-10000)");
-		// NextPrime: Positive integer (less equal 2147483647) expected at position 2 in NextPrime(10000,-3).
-		check("NextPrime(10000, -3)", //
+    // NextPrime: Positive integer (less equal 2147483647) expected at position 2 in
+    // NextPrime(10000,-3).
+    check(
+        "NextPrime(10000, -3)", //
 				"NextPrime(10000,-3)");
 
 		check("NextPrime(10000)", //

@@ -2,6 +2,9 @@ package org.matheclipse.core.builtin.functions;
 
 import com.duy.lambda.DoubleFunction;
 
+import org.hipparchus.analysis.differentiation.DSFactory;
+import org.hipparchus.analysis.differentiation.FiniteDifferencesDifferentiator;
+import org.hipparchus.analysis.differentiation.UnivariateDifferentiableFunction;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -13,7 +16,9 @@ import org.matheclipse.core.builtin.ConstantDefinitions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.generic.UnaryNumerical;
 import org.matheclipse.core.interfaces.INumber;
+import org.matheclipse.core.interfaces.ISymbol;
 
 import java.util.Locale;
 
@@ -30,21 +35,17 @@ import static java.lang.Math.log;
 import static org.matheclipse.core.builtin.functions.HypergeometricJS.*;
 
 /**
- *
- * Ported from JavaScript file
- * <a href="https://github.com/paulmasson/math/blob/master/src/functions/gamma.js">gamma.js</a>
+ * Ported from JavaScript file <a
+ * href="https://github.com/paulmasson/math/blob/master/src/functions/gamma.js">gamma.js</a>
  */
 public class GammaJS {
-	private GammaJS() {
 
-	}
+  private GammaJS() {}
 
 	private static final double DEFAULT_EPSILON = 1.E-14;
 	private static final int MAX_ITERATIONS = 1500;
 
-	/**
-	 * Internal helper class for the continued fraction.
-	 */
+  /** Internal helper class for the continued fraction. */
 	static class RegularizedGammaFraction extends ContinuedFraction {
 		private final double a;
 
@@ -53,40 +54,40 @@ public class GammaJS {
 		}
 
 		/*
-		 * (non-Javadoc)
-		 *
-		 * @see de.lab4inf.math.util.ContinuedFraction#getA0(double)
-		 */
+     * (non-Javadoc)
+     *
+     * @see de.lab4inf.math.util.ContinuedFraction#getA0(double)
+     */
 		@Override
 		protected double getA0(final double x) {
 			return getAn(0, x);
 		}
 
 		/*
-		 * (non-Javadoc)
-		 *
-		 * @see de.lab4inf.math.util.ContinuedFraction#getAn(int, double)
-		 */
+     * (non-Javadoc)
+     *
+     * @see de.lab4inf.math.util.ContinuedFraction#getAn(int, double)
+     */
 		@Override
 		protected double getAn(final int n, final double x) {
 			return (2.0 * n + 1.0) - a + x;
 		}
 
 		/*
-		 * (non-Javadoc)
-		 *
-		 * @see de.lab4inf.math.util.ContinuedFraction#getBn(int, double)
-		 */
+     * (non-Javadoc)
+     *
+     * @see de.lab4inf.math.util.ContinuedFraction#getBn(int, double)
+     */
 		@Override
 		protected double getBn(final int n, final double x) {
 			return n * (a - n);
 		}
 
 		/*
-		 * (non-Javadoc)
-		 *
-		 * @see de.lab4inf.math.gof.Visitable#accept(de.lab4inf.math.gof.Visitor)
-		 */
+     * (non-Javadoc)
+     *
+     * @see de.lab4inf.math.gof.Visitable#accept(de.lab4inf.math.gof.Visitor)
+     */
 		@Override
 		public void accept(final Visitor<Function> visitor) {
 			visitor.visit(this);
@@ -94,23 +95,19 @@ public class GammaJS {
 	}
 
 	/**
-	 * Calculate the regularized gamma function P(a,x), with epsilon precision using maximal max iterations. The
-	 * algorithm uses series expansion 6.5.29 and formula 6.5.4 from A&amp;ST.
+   * Calculate the regularized gamma function P(a,x), with epsilon precision using maximal max
+   * iterations. The algorithm uses series expansion 6.5.29 and formula 6.5.4 from A&amp;ST.
 	 *
-	 * @param a
-	 *            the a parameter.
-	 * @param x
-	 *            the value.
-	 * @param eps
-	 *            the desired accuracy
-	 * @param max
-	 *            maximum number of iterations to complete
+   * @param a the a parameter.
+   * @param x the value.
+   * @param eps the desired accuracy
+   * @param max maximum number of iterations to complete
 	 * @return the regularized gamma function P(a,x)
 	 */
 	private static double regGammaP(final double a, final double x, final double eps, final int max) {
 		double ret = 0;
 		if ((a <= 0.0) || (x < 0.0)) {
-			throw new ArgumentTypeException(String.format(Locale.US, "P(%f,%f)", a, x));
+      throw new ArgumentTypeException(String.format("P(%f,%f)", a, x));
 		}
 		if (a >= 1 && x > a) {
 			ret = 1.0 - regGammaQ(a, x, eps, max);
@@ -132,24 +129,20 @@ public class GammaJS {
 	}
 
 	/**
-	 * Calculate the regularized gamma function Q(a,x) = 1 - P(a,x), with epsilon precision using maximal maxIterations.
-	 * The algorithm uses a continued fraction until convergence is reached.
+   * Calculate the regularized gamma function Q(a,x) = 1 - P(a,x), with epsilon precision using
+   * maximal maxIterations. The algorithm uses a continued fraction until convergence is reached.
 	 *
-	 * @param a
-	 *            the a parameter.
-	 * @param x
-	 *            the value.
-	 * @param epsilon
-	 *            the desired accuracy
-	 * @param maxIterations
-	 *            maximum number of iterations to complete
+   * @param a the a parameter.
+   * @param x the value.
+   * @param epsilon the desired accuracy
+   * @param maxIterations maximum number of iterations to complete
 	 * @return the regularized gamma function Q(a,x)
 	 */
 	private static double regGammaQ(final double a, final double x, final double epsilon, final int maxIterations) {
 		double ret = 0;
 
 		if ((a <= 0.0) || (x < 0.0)) {
-			throw new ArgumentTypeException(String.format(Locale.US, "Q(%f,%f)", a, x));
+      throw new ArgumentTypeException(String.format("Q(%f,%f)", a, x));
 		}
 		if (x < a || a < 1.0) {
 			ret = 1.0 - regGammaP(a, x, epsilon, maxIterations);
@@ -212,10 +205,17 @@ public class GammaJS {
 	}
 
 	public static double betaRegularized(double x, double y, double z) {
-		// use A&amp;ST26.5.4 and A&amp;ST26.5.5
-//		return IncompleteBeta.incBeta(x, y, z);
-		return Beta.regularizedBeta(x, y, z);
-//		 return beta(x, y, z) / beta(y, z);
+    // see github #203
+    if (y < 0.0) {
+      throw new ArgumentTypeException("y not positiv: " + y);
+    }
+    if (z < 0.0) {
+      throw new ArgumentTypeException("z not positiv: " + z);
+    }
+    if (x < 0 || x > 1) {
+      throw new ArgumentTypeException("x range wrong: " + x);
+    }
+    return org.hipparchus.special.Beta.regularizedBeta(x, y, z);
 	}
 
 	public static double betaRegularized(double x, double y, double z, double w) {
@@ -278,14 +278,15 @@ public class GammaJS {
 	 * @param y
 	 * @return
 	 */
-	public static Complex gamma(Complex x, final Complex y) {
+  public static Complex gamma(Complex x, final Complex y) {
 		// patch lower end or evaluate exponential integral independently
 		if (F.isZero(x)) {
 			if (F.isZero(y)) {
 				throw new ArgumentTypeException("Gamma function pole");
 			}
 			// if (Complex.equals(x, Complex.ZERO, Config.SPECIAL_FUNCTIONS_TOLERANCE)) {
-			// // taylorSeries => (-EulerGamma - Log(y)) + x - 1/4 * x^2 + 1/18 * x^3 - 1/96 * x^4 + 1/600 * x^5
+      // // taylorSeries => (-EulerGamma - Log(y)) + x - 1/4 * x^2 + 1/18 * x^3 - 1/96 * x^4 + 1/600
+      // * x^5
 			// Complex result = y.log().add(ConstantDefinitions.EULER_GAMMA).negate();
 			// double[] coeff = new double[] { 1.0, -0.25, 1.0 / 18.0, -1.0 / 96.0, 1.0 / 600.0 };
 			// Complex yPow = y;
@@ -318,14 +319,20 @@ public class GammaJS {
 			// x is a negative integer
 			final double n = -xRe;
 			int iterationLimit = EvalEngine.get().getIterationLimit();
-			final Complex t = y.negate().exp().multiply(//
-					ZetaJS.complexSummation(new DoubleFunction<Complex>() {
-												@Override
-												public Complex apply(double k) {
-													return new Complex(Math.pow(-1.0, k) * factorialInt(k)).divide(y.pow(k + 1));
-												}
-											}, //
-							0.0, n - 1.0, iterationLimit));
+      final Complex t =
+          y.negate()
+              .exp()
+              .multiply( //
+                  ZetaJS.complexSummation(
+						  new DoubleFunction<Complex>() {
+							  @Override
+							  public Complex apply(double k) {
+								  return new Complex(Math.pow(-1.0, k) * factorialInt(k)).divide(y.pow(k + 1));
+							  }
+						  }, //
+                      0.0,
+                      n - 1.0,
+                      iterationLimit));
 
 			final double plusMinusOne = Math.pow(-1.0, n);
 			return expIntegralE(Complex.ONE, y).subtract(t).multiply(plusMinusOne / factorialInt(n));
@@ -441,6 +448,32 @@ public class GammaJS {
 		// return result;
 	}
 
+  /**
+   * The digamma function.
+   *
+   * @return
+   */
+  public static double polyGamma(double x) {
+    //		  return diff( x => logGamma(x), x );
+    ISymbol xSymbol = F.Dummy("x");
+    FiniteDifferencesDifferentiator differentiator = new FiniteDifferencesDifferentiator(15, 0.01);
+    UnivariateDifferentiableFunction f =
+        differentiator.differentiate(
+            new UnaryNumerical(F.LogGamma(xSymbol), xSymbol, EvalEngine.get()));
+    DSFactory factory = new DSFactory(1, 1);
+    return f.value(factory.variable(0, x)).getPartialDerivative(1);
+  }
+
+  public static double polyGamma(int n, double x) {
+    //		  if ( arguments.length === 1 ) {
+    //			  return digamma(x);
+    //		  }
+    if (n <= 0) {
+      throw new ArgumentTypeException("PolyGamma: Unsupported polygamma index");
+    }
+
+    return Math.pow(-1, n + 1) * factorialInt(n) * ZetaJS.hurwitzZeta((double) n + 1, x);
+  }
 	public static Complex sinIntegral(Complex x) {
 		if (Complex.equals(x, Complex.ZERO, Config.SPECIAL_FUNCTIONS_TOLERANCE)) {
 			return Complex.ZERO;
@@ -537,10 +570,22 @@ public class GammaJS {
 		return x.pow(nSubtract1).multiply(gamma(Complex.ONE.subtract(n), x));
 	}
 
-	final static double[] c = { 57.1562356658629235, -59.5979603554754912, 14.1360979747417471, -0.491913816097620199,
-			.339946499848118887e-4, .465236289270485756e-4, -.983744753048795646e-4, .158088703224912494e-3,
-			-.210264441724104883e-3, .217439618115212643e-3, -.164318106536763890e-3, .844182239838527433e-4,
-			-.261908384015814087e-4, .368991826595316234e-5 };
+  static final double[] c = {
+    57.1562356658629235,
+    -59.5979603554754912,
+    14.1360979747417471,
+    -0.491913816097620199,
+    .339946499848118887e-4,
+    .465236289270485756e-4,
+    -.983744753048795646e-4,
+    .158088703224912494e-3,
+    -.210264441724104883e-3,
+    .217439618115212643e-3,
+    -.164318106536763890e-3,
+    .844182239838527433e-4,
+    -.261908384015814087e-4,
+    .368991826595316234e-5
+  };
 
 	public static Complex logGamma(Complex x) {
 		// if ( isComplex(x) ) {

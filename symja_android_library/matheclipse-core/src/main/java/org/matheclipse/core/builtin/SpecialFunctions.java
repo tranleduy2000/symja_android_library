@@ -15,6 +15,7 @@ import org.matheclipse.core.builtin.functions.BesselJS;
 import org.matheclipse.core.builtin.functions.GammaJS;
 import org.matheclipse.core.builtin.functions.ZetaJS;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.exception.PolynomialDegreeLimitExceeded;
 import org.matheclipse.core.eval.exception.ThrowException;
@@ -75,9 +76,8 @@ import static org.matheclipse.core.expression.F.Zeta;
 
 public class SpecialFunctions {
 	/**
-	 *
-	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
-	 * initializer</a>
+   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation
+   * in static initializer</a>
 	 */
 	private static class Initializer {
 
@@ -257,6 +257,21 @@ public class SpecialFunctions {
 		}
 
 		private static IExpr betaRegularized3(final IAST ast, EvalEngine engine) {
+      /** Calculate the machine accuracy, which is the smallest eps with 1<1+eps */
+      float feps = 2.E-6f;
+      float fy = 1.0f + feps;
+      while (fy > 1.0f) {
+        feps /= 2.0f;
+        fy = 1.0f + feps;
+      }
+      double FEPS = feps * 8;
+      double deps = ((double) feps) * ((double) 2.E-6f);
+      double dy = 1.0 + deps;
+      while (dy > 1.0) {
+        deps /= 2.0;
+        dy = 1.0 + deps;
+      }
+      double DEPS = deps * 8.0;
 			try {
 				IExpr z = ast.arg1();
 				IExpr a = ast.arg2();
@@ -299,8 +314,7 @@ public class SpecialFunctions {
 						// TODO improve with regularizedIncompleteBetaFunction() ???
 						// https://github.com/haifengl/smile/blob/master/math/src/main/java/smile/math/special/Beta.java
 						return F.num(GammaJS.betaRegularized(zn, an, nn));
-					} catch (IllegalArgumentException rex) {
-						// from de.lab4inf.math.functions.IncompleteBeta.checkParameters()
+          } catch (ArgumentTypeException ate) {
 					} catch (ValidateException ve) {
 						// from org.matheclipse.core.eval.EvalEngine.evalDouble()
 					}
@@ -385,31 +399,33 @@ public class SpecialFunctions {
 
 	}
 
-	private final static class DirichletEta extends AbstractArg1 {
+  private static final class DirichletEta extends AbstractArg1 {
 
 		@Override
 		public IExpr e1DblArg(final double d) {
-			if (F.isEqual(1.0, d)) {
-				return F.num(Math.log(2.0));
-			}
-			return e1ComplexArg(Complex.valueOf(d));
+      //      if (F.isEqual(1.0, d)) {
+      //        return F.num(Math.log(2.0));
+      //      }
+      //      return e1ComplexArg(Complex.valueOf(d));
+      return F.complexNum(ZetaJS.dirichletEta(d));
 		}
 
 		@Override
 		public IExpr e1ComplexArg(final Complex c) {
-			// mathcell formula
-			// return mul( zeta(x), sub( 1, pow( 2, sub(1,x) ) )
-			Complex zeta;
-			if (F.isEqual(c.getReal(), 1.0) && F.isZero(c.getImaginary())) {
-				zeta = Complex.valueOf(Math.log(2.0), 0.0);
-			} else {
-				de.lab4inf.math.Complex x = new de.lab4inf.math.sets.ComplexNumber(c.getReal(), c.getImaginary());
-				x = de.lab4inf.math.functions.Zeta.zeta(x);
-				zeta = Complex.valueOf(x.real(), x.imag());
-			}
-			Complex dirichletEta = zeta
-					.multiply(Complex.ONE.subtract(Complex.valueOf(2.0).pow(Complex.ONE.subtract(c))));
-			return F.complex(dirichletEta.getReal(), dirichletEta.getImaginary());
+      //      Complex zeta;
+      //      if (F.isEqual(c.getReal(), 1.0) && F.isZero(c.getImaginary())) {
+      //        zeta = Complex.valueOf(Math.log(2.0), 0.0);
+      //      } else {
+      //        de.lab4inf.math.Complex x =
+      //            new de.lab4inf.math.sets.ComplexNumber(c.getReal(), c.getImaginary());
+      //        x = de.lab4inf.math.functions.Zeta.zeta(x);
+      //        zeta = Complex.valueOf(x.real(), x.imag());
+      //      }
+      //      Complex dirichletEta =
+      //
+      // zeta.multiply(Complex.ONE.subtract(Complex.valueOf(2.0).pow(Complex.ONE.subtract(c))));
+      //      return F.complex(dirichletEta.getReal(), dirichletEta.getImaginary());
+      return F.complexNum(ZetaJS.dirichletEta(c));
 		}
 
 		@Override
@@ -437,7 +453,8 @@ public class SpecialFunctions {
 	 * 
 	 * @see org.matheclipse.core.reflection.system.InverseErf
 	 */
-	private final static class Erf extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
+  @SuppressWarnings("JavadocReference")
+  private static final class Erf extends AbstractTrigArg1 implements INumeric, DoubleUnaryOperator {
 
 		@Override
 		public double applyAsDouble(double operand) {
@@ -509,7 +526,7 @@ public class SpecialFunctions {
 		}
 	}
 
-	private final static class Erfc extends AbstractTrigArg1 implements INumeric {
+  private static final class Erfc extends AbstractTrigArg1 implements INumeric {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
@@ -789,7 +806,7 @@ public class SpecialFunctions {
 
 	}
 
-	private final static class HurwitzZeta extends AbstractFunctionEvaluator {
+  private static final class HurwitzZeta extends AbstractFunctionEvaluator {
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
 			IExpr s = ast.arg1();
@@ -834,12 +851,17 @@ public class SpecialFunctions {
 						int n = a.toIntDefault();
 						final int sNegate = sInt.negate().toIntDefault();
 						if (n > Integer.MIN_VALUE && sNegate > Integer.MIN_VALUE) {
-							return F.Subtract(F.Zeta(s), F.sum(new Function<IExpr, IExpr>() {
-								@Override
-								public IExpr apply(IExpr k) {
-									return k.power(sNegate);
-								}
-							}, 1, n - 1));
+							return F.Subtract(
+									F.Zeta(s),
+									F.sum(
+											new Function<IExpr, IExpr>() {
+												@Override
+												public IExpr apply(IExpr k) {
+													return k.power(sNegate);
+												}
+											},
+											1,
+											n - 1));
 						}
 					}
 				}
@@ -854,13 +876,10 @@ public class SpecialFunctions {
 						aDouble = a.evalDouble();
 					} catch (ValidateException ve) {
 					}
-					if (aDouble < 0.0 || //
-							Double.isNaN(sDouble) || //
-							Double.isNaN(aDouble)) {
-						// TODO
-			// Complex sc = s.evalComplex();
-			// Complex ac = a.evalComplex();
-			// return F.complexNum(ZetaJS.hurwitzZeta(sc, ac));
+					if (aDouble < 0.0 || Double.isNaN(sDouble) || Double.isNaN(aDouble)) {
+						Complex sc = s.evalComplex();
+						Complex ac = a.evalComplex();
+						return F.complexNum(ZetaJS.hurwitzZeta(sc, ac));
 					} else {
 						if (aDouble >= 0 && sDouble != 1.0) {
 							return F.num(ZetaJS.hurwitzZeta(sDouble, aDouble));
@@ -901,7 +920,8 @@ public class SpecialFunctions {
 	 * 
 	 * @see org.matheclipse.core.reflection.system.Erf
 	 */
-	private final static class InverseErf extends AbstractTrigArg1 implements INumeric {
+  @SuppressWarnings("JavadocReference")
+  private static final class InverseErf extends AbstractTrigArg1 implements INumeric {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
@@ -957,7 +977,8 @@ public class SpecialFunctions {
 	 * 
 	 * @see org.matheclipse.core.reflection.system.Erf
 	 */
-	private final static class InverseErfc extends AbstractTrigArg1 implements INumeric {
+  @SuppressWarnings("JavadocReference")
+  private static final class InverseErfc extends AbstractTrigArg1 implements INumeric {
 
 		@Override
 		public IExpr e1DblArg(final double arg1) {
@@ -1247,7 +1268,8 @@ public class SpecialFunctions {
 										// 0,1,1,1
 										IExpr b2 = l2.arg1();
 										return
-										// [$ (z^b1*Hypergeometric1F1Regularized(1 - a2 + b1, 1 + b1 - b2, z))/Gamma(a2
+                            // [$ (z^b1*Hypergeometric1F1Regularized(1 - a2 + b1, 1 + b1 - b2,
+                            // z))/Gamma(a2
 										// - b1) $]
 										F.Times(F.Power(z, b1), F.Power(F.Gamma(F.Subtract(a2, b1)), F.CN1),
 												F.Hypergeometric1F1Regularized(F.Plus(F.C1, F.Negate(a2), b1),
@@ -1294,7 +1316,8 @@ public class SpecialFunctions {
 										// 1,0,1,1
 										IExpr b2 = l2.arg1();
 										return
-										// [$ z^b1*Gamma(1 - a1 + b1)*Hypergeometric1F1Regularized(1 - a1 + b1, 1 +
+                            // [$ z^b1*Gamma(1 - a1 + b1)*Hypergeometric1F1Regularized(1 - a1 + b1,
+                            // 1 +
 										// b1 - b2, -z) $]
 										F.Times(F.Power(z, b1), F.Gamma(F.Plus(F.C1, F.Negate(a1), b1)),
 												F.Hypergeometric1F1Regularized(F.Plus(F.C1, F.Negate(a1), b1),
@@ -1322,7 +1345,8 @@ public class SpecialFunctions {
 										// 1,1,0,1
 										IExpr b2 = l2.arg1();
 										return
-										// [$ (z^(-1 + a1)*Hypergeometric1F1Regularized(1 - a1 + b2, 1 - a1 + a2,
+                            // [$ (z^(-1 + a1)*Hypergeometric1F1Regularized(1 - a1 + b2, 1 - a1 +
+                            // a2,
 										// 1/z))/Gamma(a1 - b2) $]
 										F.Times(F.Power(z, F.Plus(F.CN1, a1)),
 												F.Power(F.Gamma(F.Subtract(a1, b2)), F.CN1),
@@ -1336,7 +1360,8 @@ public class SpecialFunctions {
 									case 0:
 										// 1,1,1,0
 										return
-										// [$ z^(-1 + a1)*Gamma(1 - a1 + b1)*Hypergeometric1F1Regularized(1 - a1 + b1, 1
+                            // [$ z^(-1 + a1)*Gamma(1 - a1 + b1)*Hypergeometric1F1Regularized(1 - a1
+                            // + b1, 1
 										// - a1 + a2, -(1/z)) $]
 										F.Times(F.Power(z, F.Plus(F.CN1, a1)), F.Gamma(F.Plus(F.C1, F.Negate(a1), b1)),
 												F.Hypergeometric1F1Regularized(F.Plus(F.C1, F.Negate(a1), b1),
@@ -1385,12 +1410,53 @@ public class SpecialFunctions {
 				if (arg1.isMinusOne()) {
 					return F.LogGamma(arg2);
 				}
+        if (arg2.isOne()) {
+          int n = arg1.toIntDefault();
+          if (n > 0 && (n & 0x0001) == 0x0001) {
+            return F.Times(Factorial(F.ZZ(n)), F.Zeta(F.ZZ(n + 1)));
+          }
+        }
 				if (arg2.isIntegerResult() && arg2.isNegativeResult()) {
 					IExpr nu = arg1.re();
 					if (nu.isReal() && ((ISignedNumber) nu).isGT(F.CN1)) {
 						return F.CComplexInfinity;
 					}
 				}
+        if (engine.isDoubleMode()) {
+          try {
+            int n = arg1.toIntDefault();
+            if (n >= 0) {
+              double xDouble = Double.NaN;
+              try {
+                xDouble = arg2.evalDouble();
+              } catch (ValidateException ve) {
+              }
+              if (Double.isNaN(xDouble)) {
+                //                Complex xc = arg2.evalComplex();
+                //
+                //                return
+              } else {
+                if (n == 0) {
+                  return F.num(GammaJS.polyGamma(xDouble));
+                }
+                return F.num(GammaJS.polyGamma(n, xDouble));
+              }
+            }
+          } catch (ThrowException te) {
+            if (FEConfig.SHOW_STACKTRACE) {
+              te.printStackTrace();
+            }
+            return te.getValue();
+          } catch (ValidateException ve) {
+            if (FEConfig.SHOW_STACKTRACE) {
+              ve.printStackTrace();
+            }
+            return engine.printMessage(ast.topHead() + ": " + ve.getMessage());
+          } catch (RuntimeException rex) {
+            // rex.printStackTrace();
+            return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
+          }
+        }
 			}
 			return F.NIL;
 		}
@@ -1415,8 +1481,9 @@ public class SpecialFunctions {
 	private static class PolyLog extends AbstractFunctionEvaluator implements PolyLogRules {
 
 		/**
-		 * See <a href= "https://github.com/sympy/sympy/blob/master/sympy/functions/special/zeta_functions.py">Sympy -
-		 * zeta_functions.py</a>
+     * See <a href=
+     * "https://github.com/sympy/sympy/blob/master/sympy/functions/special/zeta_functions.py">Sympy
+     * - zeta_functions.py</a>
 		 */
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -1428,6 +1495,9 @@ public class SpecialFunctions {
 				return F.C0;
 			}
 			if (arg2.isOne()) {
+        if (arg1.isOne()) {
+          return F.CInfinity;
+        }
 				IExpr temp = arg1.re();
 				if (temp.isReal()) {
 					ISignedNumber num = (ISignedNumber) temp;
@@ -1459,7 +1529,41 @@ public class SpecialFunctions {
 					return Times(CN1, arg2, Plus(C1, arg2), Power(Plus(CN1, arg2), -3));
 				} else if (arg1.equals(F.CN3)) {
 					// (arg2*(1 + 4*arg2 + arg2^2))/(arg2 - 1)^4
-					return Times(arg2, Plus(C1, Times(C4, arg2), Sqr(arg2)), Power(Plus(C1, Negate(arg2)), -4));
+          return Times(
+              arg2, Plus(C1, Times(C4, arg2), Sqr(arg2)), Power(Plus(C1, Negate(arg2)), -4));
+        }
+      }
+      if (engine.isDoubleMode()) {
+        try {
+          double nDouble = Double.NaN;
+          double xDouble = Double.NaN;
+          try {
+            nDouble = arg1.evalDouble();
+            xDouble = arg2.evalDouble();
+          } catch (ValidateException ve) {
+          }
+
+          if (Double.isNaN(nDouble) || Double.isNaN(xDouble)) {
+            Complex nComplex = arg1.evalComplex();
+            Complex xComplex = arg2.evalComplex();
+            return F.complexNum(ZetaJS.polyLog(nComplex, xComplex));
+          } else {
+            return F.complexNum(ZetaJS.polyLog(nDouble, xDouble));
+          }
+
+        } catch (ThrowException te) {
+          if (FEConfig.SHOW_STACKTRACE) {
+            te.printStackTrace();
+          }
+          return te.getValue();
+        } catch (ValidateException ve) {
+          if (FEConfig.SHOW_STACKTRACE) {
+            ve.printStackTrace();
+          }
+          return engine.printMessage(ast.topHead() + ": " + ve.getMessage());
+        } catch (RuntimeException rex) {
+          // rex.printStackTrace();
+          return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
 				}
 			}
 			return F.NIL;
@@ -1483,13 +1587,10 @@ public class SpecialFunctions {
 	}
 
 	/**
-	 * <p>
-	 * Lambert W function
-	 * </p>
-	 * 
-	 * See: <a href="http://en.wikipedia.org/wiki/Lambert_W_function">Wikipedia - Lambert W function</a>
+   * Lambert W function See: <a href="http://en.wikipedia.org/wiki/Lambert_W_function">Wikipedia -
+   * Lambert W function</a>
 	 */
-	private final static class ProductLog extends AbstractArg12 implements ProductLogRules {
+  private static final class ProductLog extends AbstractArg12 implements ProductLogRules {
 		@Override
 		public IAST getRuleAST() {
 			return RULES;
@@ -1649,7 +1750,7 @@ public class SpecialFunctions {
 
 	}
 
-	private final static class StruveH extends AbstractFunctionEvaluator implements StruveHRules {
+  private static final class StruveH extends AbstractFunctionEvaluator implements StruveHRules {
 
 		// public IExpr e2DblArg(final INum d0, final INum d1) {
 		// double v = d0.reDoubleValue();
@@ -1730,7 +1831,7 @@ public class SpecialFunctions {
 
 	}
 
-	private final static class StruveL extends AbstractFunctionEvaluator implements StruveLRules {
+  private static final class StruveL extends AbstractFunctionEvaluator implements StruveLRules {
 
 		// public IExpr e2DblArg(final INum d0, final INum d1) {
 		// double v = d0.reDoubleValue();
@@ -1810,7 +1911,7 @@ public class SpecialFunctions {
 
 	}
 
-	private final static class Zeta extends AbstractArg12 {
+  private static final class Zeta extends AbstractArg12 {
 
 		@Override
 		public IExpr e1DblArg(INum num) {
@@ -1879,12 +1980,12 @@ public class SpecialFunctions {
 					if (nInt < 0) {
 						nInt *= -1;
 						// Zeta(s, -n) := Zeta(s) + Sum(1/k^s, {k, 1, n})
-						return Plus(F.sum(new Function<IExpr, IExpr>() {
-                            @Override
-                            public IExpr apply(IExpr k) {
-                                return Power(Power(k, s), -1);
-                            }
-                        }, 1, nInt), Zeta(s));
+            return Plus(F.sum(new Function<IExpr, IExpr>() {
+				@Override
+				public IExpr apply(IExpr k) {
+					return Power(Power(k, s), -1);
+				}
+			}, 1, nInt), Zeta(s));
 							}
 					}
 				}
