@@ -460,10 +460,10 @@ public final class RulesData implements Serializable {
 					if (patternEvaluator.isPatternHashAllowed(patternHash)) {
 						OperationSystem.checkMemory();
 						OperationSystem.checkInterrupt();
-						// obj-c changed: autoreleasepool
-						IPatternMatcher pmEvaluator;
-						//pmEvaluator = (IPatternMatcher) patternEvaluator.clone(); // swift changed: memory issue
-						pmEvaluator = patternEvaluator;
+
+						// obj-c changed: memory issue
+						// assigning pmEvaluator = patternEvaluator cause unrecognized selector
+						IPatternMatcher pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
 						//if (showSteps) {
 						//	if (isShowSteps(pmEvaluator)) {
 						//		IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
@@ -523,9 +523,9 @@ public final class RulesData implements Serializable {
 					}
 				}
 			}
-		} /*catch (CloneNotSupportedException cnse) {
+		} catch (CloneNotSupportedException cnse) {
 			cnse.printStackTrace();
-		}*/ finally {
+		} finally {
 			engine.setEvalRHSMode(evalRHSMode);
 		}
 		return F.NIL;
