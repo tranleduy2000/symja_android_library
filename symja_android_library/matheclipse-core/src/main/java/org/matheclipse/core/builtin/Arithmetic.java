@@ -123,7 +123,8 @@ import static org.matheclipse.core.expression.F.y_;
 
 public final class Arithmetic {
 	private static int g = 7;
-	// private static double[] p = { 0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+  // private static double[] p = { 0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+  // 771.32342877765313,
 	// -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6,
 	// 1.5056327351493116e-7 };
 	private static org.hipparchus.complex.Complex[] pComplex = new org.hipparchus.complex.Complex[] {
@@ -137,16 +138,15 @@ public final class Arithmetic {
 			new org.hipparchus.complex.Complex(9.9843695780195716e-6), //
 			new org.hipparchus.complex.Complex(1.5056327351493116e-7) //
 	};
-    public final static Plus CONST_PLUS = new Plus();
-    public final static Times CONST_TIMES = new Times();
-    public final static Power CONST_POWER = new Power();
-    public final static IFunctionEvaluator CONST_COMPLEX = new Complex();
-    public final static IFunctionEvaluator CONST_RATIONAL = new Rational();
+  public static final Plus CONST_PLUS = new Plus();
+  public static final Times CONST_TIMES = new Times();
+  public static final Power CONST_POWER = new Power();
+  public static final IFunctionEvaluator CONST_COMPLEX = new Complex();
+  public static final IFunctionEvaluator CONST_RATIONAL = new Rational();
 
 	/**
-	 *
-	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
-	 * initializer</a>
+   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation
+   * in static initializer</a>
 	 */
 	private static class Initializer {
 
@@ -201,21 +201,24 @@ public final class Arithmetic {
 	}
 
     /**
+   *
+   *
      * <pre>
      * Abs(expr)
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * returns the absolute value of the real or complex number <code>expr</code>.
-     * </p>
+   *
+   * <p>returns the absolute value of the real or complex number <code>expr</code>.
+   *
      * </blockquote>
-     * <p>
-     * See:<br />
-     * </p>
+   *
+   * <p>See:<br>
+   *
      * <ul>
-     * <li><a href="http://en.wikipedia.org/wiki/Absolute_value">Wikipedia - Absolute value</a></li>
+   *   <li><a href="http://en.wikipedia.org/wiki/Absolute_value">Wikipedia - Absolute value</a>
      * </ul>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -223,7 +226,8 @@ public final class Arithmetic {
      * 3
      * </pre>
      */
-    private final static class Abs extends AbstractTrigArg1 implements INumeric, AbsRules, DoubleUnaryOperator {
+  private static final class Abs extends AbstractTrigArg1
+      implements INumeric, AbsRules, DoubleUnaryOperator {
 
         private static final class AbsNumericFunction implements DoubleFunction<IExpr> {
             final ISymbol symbol;
@@ -357,10 +361,10 @@ public final class Arithmetic {
     }
 
 	/**
-	 * Return a list with the 2 values <code>Abs(x), Arg(x)</code> for a complex number <code>x</code>.
-	 *
+   * Return a list with the 2 values <code>Abs(x), Arg(x)</code> for a complex number <code>x</code>
+   * .
 	 */
-	private final static class AbsArg extends AbstractEvaluator {
+  private static final class AbsArg extends AbstractEvaluator {
 
 		@Override
 		public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -378,6 +382,8 @@ public final class Arithmetic {
 		}
 	}
     /**
+   *
+   *
      * <pre>
      * AddTo(x, dx)
      *
@@ -385,10 +391,11 @@ public final class Arithmetic {
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * is equivalent to <code>x = x + dx</code>.
-     * </p>
+   *
+   * <p>is equivalent to <code>x = x + dx</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -621,16 +628,19 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
      * Chop(numerical - expr)
      * </pre>
      *
      * <blockquote>
-     * <p>
-	 * replaces numerical values in the <code>numerical-expr</code> which are close to zero with symbolic value
-	 * <code>0</code>.
-     * </p>
+   *
+   * <p>replaces numerical values in the <code>numerical-expr</code> which are close to zero with
+   * symbolic value <code>0</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -678,16 +688,18 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
      * Clip(expr)
      * </pre>
      *
      * <blockquote>
-     * <p>
-	 * returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1</code> if
-	 * <code>expr</code> is less than <code>-1</code>. Returns <code>1</code> if <code>expr</code> is greater than
-	 * <code>1</code>.
-     * </p>
+   *
+   * <p>returns <code>expr</code> in the range <code>-1</code> to <code>1</code>. Returns <code>-1
+   * </code> if <code>expr</code> is less than <code>-1</code>. Returns <code>1</code> if <code>expr
+   * </code> is greater than <code>1</code>.
+   *
      * </blockquote>
      *
      * <pre>
@@ -695,11 +707,11 @@ public final class Arithmetic {
      * </pre>
      *
      * <blockquote>
-     * <p>
-	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>min</code> if
-	 * <code>expr</code> is less than <code>min</code>. Returns <code>max</code> if <code>expr</code> is greater than
-	 * <code>max</code>.
-     * </p>
+   *
+   * <p>returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>
+   * min</code> if <code>expr</code> is less than <code>min</code>. Returns <code>max</code> if
+   * <code>expr</code> is greater than <code>max</code>.
+   *
      * </blockquote>
      *
      * <pre>
@@ -707,12 +719,13 @@ public final class Arithmetic {
      * </pre>
      *
      * <blockquote>
-     * <p>
-	 * returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>vMin</code> if
-	 * <code>expr</code> is less than <code>min</code>. Returns <code>vMax</code> if <code>expr</code> is greater than
-	 * <code>max</code>.
-     * </p>
+   *
+   * <p>returns <code>expr</code> in the range <code>min</code> to <code>max</code>. Returns <code>
+   * vMin</code> if <code>expr</code> is less than <code>min</code>. Returns <code>vMax</code> if
+   * <code>expr</code> is greater than <code>max</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -747,7 +760,7 @@ public final class Arithmetic {
      * b
      * </pre>
      */
-    private final static class Clip extends AbstractFunctionEvaluator {
+  private static final class Clip extends AbstractFunctionEvaluator {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -825,18 +838,13 @@ public final class Arithmetic {
         /**
          * gives <code>vMin</code> for <code>x<min</code> and <code>vMax</code> for <code>x>max</code>.
          *
-		 * @param x
-		 *            the expression value
-		 * @param min
-		 *            minimum value
-		 * @param max
-		 *            maximum value
-		 * @param vMin
-		 *            value for x less than minimum
-		 * @param vMax
-		 *            value for x greater than minimum
-		 * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x is greater than
-		 *         max.
+     * @param x the expression value
+     * @param min minimum value
+     * @param max maximum value
+     * @param vMin value for x less than minimum
+     * @param vMax value for x greater than minimum
+     * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x
+     *     is greater than max.
          */
         private IExpr clip(IExpr x, ISignedNumber min, ISignedNumber max, IExpr vMin, IExpr vMax) {
             if (x.isReal()) {
@@ -869,14 +877,16 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
      * Complex
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * is the head of complex numbers.
-     * </p>
+   *
+   * <p>is the head of complex numbers.
+   *
      * </blockquote>
      *
      * <pre>
@@ -884,10 +894,11 @@ public final class Arithmetic {
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * constructs the complex number <code>a + I * b</code>.
-     * </p>
+   *
+   * <p>constructs the complex number <code>a + I * b</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -2014,15 +2025,18 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
      * Im(z)
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * returns the imaginary component of the complex number <code>z</code>.
-     * </p>
+   *
+   * <p>returns the imaginary component of the complex number <code>z</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -2033,7 +2047,7 @@ public final class Arithmetic {
      * 2.3
      * </pre>
      */
-    private final static class Im extends AbstractEvaluator {
+  private static final class Im extends AbstractEvaluator {
 
         @Override
         public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -2160,6 +2174,8 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
      * Increment(x)
      *
@@ -2861,12 +2877,11 @@ public final class Arithmetic {
         }
 
         /**
+     * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf">Experiments in
+     * Hash-coded Algebraic Simplification</a>
          *
-		 * See: <a href="http://www.cs.berkeley.edu/~fateman/papers/newsimp.pdf"> Experiments in Hash-coded Algebraic
-		 * Simplification</a>
-         *
-		 * @param ast
-		 *            the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be evaluated
+     * @param ast the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be
+     *     evaluated
          * @return the evaluated object or <code>null</code>, if evaluation isn't possible
          */
         @Override
@@ -3109,6 +3124,8 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
 	 * Power(a, b)
      *
@@ -3116,10 +3133,11 @@ public final class Arithmetic {
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * represents <code>a</code> raised to the power of <code>b</code>.
-     * </p>
+   *
+   * <p>represents <code>a</code> raised to the power of <code>b</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
      *
      * <pre>
@@ -3138,25 +3156,22 @@ public final class Arithmetic {
      * &gt;&gt; (y ^ 2) ^ 3
      * y^6
      * </pre>
-     * <p>
-     * Use a decimal point to force numeric evaluation:
-     * </p>
+   *
+   * <p>Use a decimal point to force numeric evaluation:
      *
      * <pre>
      * &gt;&gt; 4.0 ^ (1/3)
      * 1.5874010519681994
      * </pre>
-     * <p>
-     * <code>Power</code> has default value <code>1</code> for its second argument:
-     * </p>
+   *
+   * <p><code>Power</code> has default value <code>1</code> for its second argument:
      *
      * <pre>
      * &gt;&gt; a /. x_ ^ n_. :&gt; {x, n}
      * {a,1}
      * </pre>
-     * <p>
-     * <code>Power</code> can be used with complex numbers:
-     * </p>
+   *
+   * <p><code>Power</code> can be used with complex numbers:
      *
      * <pre>
      * &gt;&gt; (1.5 + 1.0*I) ^ 3.5
@@ -3456,7 +3471,12 @@ public final class Arithmetic {
             return base.pow(exponent);
         }
 
-		private static IExpr e2ApfloatArg(final ApfloatNum base, final ApfloatNum exponent) {
+        private static IExpr e2ApfloatArg(final ApfloatNum base, final ApfloatNum exponent) {
+            if (exponent.sign() < 0) {
+                ApcomplexNum b = base.apcomplexNumValue(base.precision());
+                ApcomplexNum e = exponent.apcomplexNumValue(base.precision());
+                return b.pow(e);
+            }
             return base.pow(exponent);
         }
 
@@ -4024,13 +4044,11 @@ public final class Arithmetic {
         }
 
         /**
-		 * Transform <code>Power(Times(a,b,c,Power(d,-1.0)....), -1.0)</code> to
-		 * <code>Times(a^(-1.0),b^(-1.0),c^(-1.0),d,....)</code>
+     * Transform <code>Power(Times(a,b,c,Power(d,-1.0)....), -1.0)</code> to <code>
+     * Times(a^(-1.0),b^(-1.0),c^(-1.0),d,....)</code>
          *
-		 * @param timesAST
-		 *            a <code>Times(...)</code> expression
-		 * @param arg2
-		 *            equals <code>-1</code> or <code>-1.0</code>
+     * @param timesAST a <code>Times(...)</code> expression
+     * @param arg2 equals <code>-1</code> or <code>-1.0</code>
          * @return <code>F.NIL</code> if the transformation isn't possible.
          */
 		private static IExpr powerTimesInverse(final IAST timesAST, final ISignedNumber arg2) {
@@ -4280,6 +4298,8 @@ public final class Arithmetic {
     }
 
     /**
+   *
+   *
      * <pre>
      * PreDecrement(x)
      *
@@ -4287,14 +4307,14 @@ public final class Arithmetic {
      * </pre>
      *
      * <blockquote>
-     * <p>
-     * decrements <code>x</code> by <code>1</code>, returning the new value of <code>x</code>.
-     * </p>
+   *
+   * <p>decrements <code>x</code> by <code>1</code>, returning the new value of <code>x</code>.
+   *
      * </blockquote>
+   *
      * <h3>Examples</h3>
-     * <p>
-     * <code>--a</code> is equivalent to <code>a = a - 1</code>:
-     * </p>
+   *
+   * <p><code>--a</code> is equivalent to <code>a = a - 1</code>:
      *
      * <pre>
 	 * &gt;&gt; a = 2
@@ -5277,20 +5297,15 @@ public final class Arithmetic {
 		}
 
 		/**
-		 * <p>
-		 * Distribute a leading integer factor over the integer powers if available.
-		 * </p>
-		 * Example: <code>12*2^x*3^y</code> distribute leading factor <code>12 == 2*2*3</code> to the Power expressions
+     * Distribute a leading integer factor over the integer powers if available. Example: <code>
+     * 12*2^x*3^y</code> distribute leading factor <code>12 == 2*2*3</code> to the Power expressions
 		 * <code>2^(2+x)*3^(1+y)</code>
 		 *
-		 * @param noEvalExpression
-		 *            return this expression if no evaluation step was done
-		 * @param times
-		 *            the <code>Times(...)</code> AST
-		 * @param leadingFactor
-		 *            the first factor in <code>Times(...)</code>
-		 * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an integer factor isn't
-		 *         possible
+     * @param noEvalExpression return this expression if no evaluation step was done
+     * @param times the <code>Times(...)</code> AST
+     * @param leadingFactor the first factor in <code>Times(...)</code>
+     * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
+     *     integer factor isn't possible
 		 */
 		private static IExpr distributeLeadingFactorModulus(IExpr noEvalExpression, IAST times,
 				IInteger leadingFactor) {
@@ -5339,19 +5354,15 @@ public final class Arithmetic {
 		}
 
 		/**
-		 * <p>
-		 * Distribute a leading factor <code>-1</code> to <code>Plus(...)</code> terms of the <code>times</code>
-		 * expression if possible.
-		 * </p>
-		 * <b>Example:</b> <code>-a*(2-x)</code> distribute leading factor <code>-1</code> to the <code>Plus(...)</code>
-		 * expression <code>(2-x)</code> returns <code>a*(-2+x)</code>
+     * Distribute a leading factor <code>-1</code> to <code>Plus(...)</code> terms of the <code>
+     * times</code> expression if possible. <b>Example:</b> <code>-a*(2-x)</code> distribute leading
+     * factor <code>-1</code> to the <code>Plus(...)</code> expression <code>(2-x)</code> returns
+     * <code>a*(-2+x)</code>
 		 *
-		 * @param noEvalExpr
-		 *            return this expression if no evaluation step was done
-		 * @param times
-		 *            the <code>Times(...)</code> AST
-		 * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an integer factor isn't
-		 *         possible
+     * @param noEvalExpr return this expression if no evaluation step was done
+     * @param times the <code>Times(...)</code> AST
+     * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
+     *     integer factor isn't possible
 		 */
 		private static IExpr distributeLeadingFactorCN1(IExpr noEvalExpr, IAST times) {
 			IASTAppendable result = F.NIL;
@@ -6006,7 +6017,8 @@ public final class Arithmetic {
 		private IExpr timesArgPower(final IExpr arg1, IExpr base2, IExpr exponent2) {
 			if (arg1.isNumber() && base2.isRational() && exponent2.isFraction()) {
 				if (arg1.isExactNumber() && exponent2.isNegative()) {
-					// arg1_ * base2_ ^exponent2_ /; expoennt2 negative fraction; base rational; arg1 IRational or
+          // arg1_ * base2_ ^exponent2_ /; expoennt2 negative fraction; base rational; arg1
+          // IRational or
 					// IComplex
 				IRational rat = ((INumber) arg1).rationalFactor();
 				if (rat != null) {
@@ -6115,15 +6127,19 @@ public final class Arithmetic {
 
 		// private IExpr timesInterval(final IExpr o0, final IExpr o1) {
 		// return F.Interval(F.List(
-		// F.Min(o0.lower().times(o1.lower()), o0.lower().times(o1.upper()), o0.upper().times(o1.lower()),
+    // F.Min(o0.lower().times(o1.lower()), o0.lower().times(o1.upper()),
+    // o0.upper().times(o1.lower()),
 		// o0.upper().times(o1.upper())),
-		// F.Max(o0.lower().times(o1.lower()), o0.lower().times(o1.upper()), o0.upper().times(o1.lower()),
+    // F.Max(o0.lower().times(o1.lower()), o0.lower().times(o1.upper()),
+    // o0.upper().times(o1.lower()),
 		// o0.upper().times(o1.upper()))));
 		// }
 
 	}
 
 	/**
+   *
+   *
 	 * <pre>
 	 * TimesBy(x, dx)
 	 *
@@ -6131,9 +6147,9 @@ public final class Arithmetic {
 	 * </pre>
 	 *
 	 * <blockquote>
-	 * <p>
-	 * is equivalent to <code>x = x * dx</code>.
-	 * </p>
+   *
+   * <p>is equivalent to <code>x = x * dx</code>.
+   *
 	 * </blockquote>
 	 * <h3>Examples</h3>
 	 *
