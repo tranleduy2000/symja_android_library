@@ -94,6 +94,10 @@ SeriesCoefficient(ArcSec(x_),{x_Symbol, a_, 1}):= 1/(Sqrt(1-1/a^2)*a^2)
 
   SeriesCoefficient(ProductLog(x_),{x_Symbol, 0, n_?NotListQ}) := Piecewise({{(-n)^(-1 + n)/n!, n >= 1}}, 0)
     /; FreeQ(n,x),
+    
+  SeriesCoefficient(PolyGamma(x_),{x_Symbol, 0, n_?NotListQ}) := Piecewise({{-1, n == -1}, {-EulerGamma, n == 0}, {(-1)^(1 + n)*Zeta(1 + n), n >= 1}}, 0) 
+    /; FreeQ(n,x),
+    
   SeriesCoefficient(PolyLog(k_, x_),{x_Symbol, 0, n_?NotListQ}) := Piecewise({{n^(-k), n >= 1}}, 0)
     /; FreeQ(k,x) && FreeQ(n,x),
 
