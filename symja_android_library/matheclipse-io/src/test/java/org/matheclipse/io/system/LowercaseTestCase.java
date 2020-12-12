@@ -7742,7 +7742,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 	public void testFibonacci() {
 		// Android changed:
 		check("Fibonacci(0.2114411444411100011, 5)", //
-				"0.1598551917369153727");
+				"0.1598551917369153728");
 		check("Fibonacci(5.8)", //
 				"7.26639");
 		check("Fibonacci(1+I/2)//N", //
