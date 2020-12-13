@@ -1862,20 +1862,20 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
   @Override
   public IASTMutable normal(boolean nilIfUnevaluated) {
     if (fDimension.length > 0) {
-      return normalAppendable(F.List, fDimension);
+      return normalAppendable(S.List, fDimension);
       // if (normalCache != null) {
       // return normalCache;
       // }
-      // IASTAppendable list = normalAppendable(F.List, dimension);
+      // IASTAppendable list = normalAppendable(S.List, dimension);
       // normalCache = list;
       // return normalCache;
     }
-    return F.headAST0(F.List);
+    return F.headAST0(S.List);
   }
 
   @Override
   public IASTMutable normal(int[] dims) {
-    return normalAppendable(F.List, dims);
+    return normalAppendable(S.List, dims);
   }
 
   private void normalRecursive(
@@ -1896,7 +1896,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
     int size2 = dims[position + 1];
     for (int i = 1; i <= size; i++) {
       index[position] = i;
-      IASTAppendable currentList = F.ast(F.List, size2, true);
+      IASTAppendable currentList = F.ast(S.List, size2, true);
       list.set(i, currentList);
       normalRecursive(map, currentList, dims, position + 1, index);
     }
@@ -2085,7 +2085,7 @@ public class SparseArrayExpr extends DataExpr<Trie<int[], IExpr>> implements ISp
 
   @Override
   public IExpr total(IExpr head) {
-    if (head.equals(F.Plus) && defaultValue.isZero()) {
+    if (head.equals(S.Plus) && defaultValue.isZero()) {
       IASTAppendable result = F.PlusAlloc(fData.size());
       for (TrieNode<int[], IExpr> entry : fData.nodeSet()) {
         result.append(entry.getValue());

@@ -1,14 +1,11 @@
 package org.matheclipse.core.reflection.system;
 
 import com.duy.lambda.Consumer;
-
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
-import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
-import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -16,6 +13,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.polynomials.longexponent.ExprPolynomial;
 import org.matheclipse.core.polynomials.longexponent.ExprPolynomialRing;
+import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
 import org.matheclipse.parser.client.FEConfig;
 
 /**
@@ -104,7 +102,7 @@ public class DSolve extends AbstractFunctionEvaluator {
 
   @Override
   public int[] expectedArgSize(IAST ast) {
-    return ARGS_3_3;
+    return IFunctionEvaluator.ARGS_3_3;
   }
 
   /**
@@ -220,7 +218,8 @@ public class DSolve extends AbstractFunctionEvaluator {
   }
 
   /**
-   * Equation <code>-1+y(0)</code> gives <code>[0, 1]</code> (representing the boundary equation y(0)==1)
+   * Equation <code>-1+y(0)</code> gives <code>[0, 1]</code> (representing the boundary equation
+   * y(0)==1)
    *
    * @param equation the equation
    * @param uFunction1Arg function name <code>y(x)</code>
@@ -305,8 +304,8 @@ public class DSolve extends AbstractFunctionEvaluator {
     return new IExpr[]{m, n};
   }
 
-  private static IExpr odeSeparable(EvalEngine engine, IExpr m, IExpr n, IExpr x, final IExpr y,
-      IExpr C_1) {
+  private static IExpr odeSeparable(
+      EvalEngine engine, IExpr m, IExpr n, IExpr x, final IExpr y, IExpr C_1) {
     if (n.isOne()) {
       IExpr fxExpr = F.NIL;
       IExpr gyExpr = F.NIL;

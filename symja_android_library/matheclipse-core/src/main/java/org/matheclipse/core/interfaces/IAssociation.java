@@ -1,7 +1,6 @@
 package org.matheclipse.core.interfaces;
 
 import com.duy.lambda.Supplier;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -19,7 +18,7 @@ public interface IAssociation extends IASTAppendable {
    *
    * @param listOfRules
    * @param startPosition the start position inclusive
-   * @param endPosition   the end position exclusive
+   * @param endPosition the end position exclusive
    */
   public void appendRules(IAST listOfRules, int startPosition, int endPosition);
 
@@ -79,8 +78,8 @@ public interface IAssociation extends IASTAppendable {
   public IExpr getValue(IExpr key);
 
   /**
-   * Return the value associated to the <code>key</code>. If no value is available return the
-   * <code>defaultValue</code>
+   * Return the value associated to the <code>key</code>. If no value is available return the <code>
+   * defaultValue</code>
    *
    * @param key
    * @param defaultValue
@@ -144,7 +143,7 @@ public interface IAssociation extends IASTAppendable {
    *
    * @param listOfRules
    * @param startPosition the start position inclusive
-   * @param endPosition   the end position exclusive
+   * @param endPosition the end position exclusive
    */
   public void prependRules(IAST listOfRules, int startPosition, int endPosition);
 

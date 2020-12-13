@@ -3,6 +3,7 @@ package org.matheclipse.core.reflection.system;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -39,7 +40,7 @@ public class EasterSunday extends AbstractFunctionEvaluator {
 				int month = (h + l - 7 * m + 114) / 31;
 				int day = ((h + l - 7 * m + 114) % 31) + 1;
 
-				return F.List(F.integer(y), F.integer(month), F.integer(day));
+        return F.List(F.ZZ(y), F.ZZ(month), F.ZZ(day));
 			}
 		} catch (ArithmeticException ae) {
 			// toInt() method may throw ArithmeticException
@@ -49,7 +50,7 @@ public class EasterSunday extends AbstractFunctionEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return ARGS_1_1;
+    return IFunctionEvaluator.ARGS_1_1;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

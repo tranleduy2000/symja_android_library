@@ -5,80 +5,76 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
-
-import org.gavaghan.geodesy.GlobalPosition;
 import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.INumber;
 
 public class ByteArrayExpr extends DataExpr<byte[]> implements Externalizable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5799157739970931450L;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 5799157739970931450L;
 
-	/**
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static ByteArrayExpr newInstance(final byte[] value) {
-		return new ByteArrayExpr(value);
-	}
+  /**
+   * @param value
+   * @return
+   */
+  public static ByteArrayExpr newInstance(final byte[] value) {
+    return new ByteArrayExpr(value);
+  }
 
-	public ByteArrayExpr() {
-		super(F.ByteArray, null);
-	}
-	protected ByteArrayExpr(final byte[] array) {
-		super(F.ByteArray, array);
-	}
+  public ByteArrayExpr() {
+    super(F.ByteArray, null);
+  }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj instanceof ByteArrayExpr) {
-			return Arrays.equals(fData, ((ByteArrayExpr) obj).fData);
-		}
-		return false;
-	}
+  protected ByteArrayExpr(final byte[] array) {
+    super(F.ByteArray, array);
+  }
 
-	@Override
-	public int hierarchy() {
-		return BYTEARRAYID;
-	}
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj instanceof ByteArrayExpr) {
+      return Arrays.equals(fData, ((ByteArrayExpr) obj).fData);
+    }
+    return false;
+  }
 
-	@Override
-	public int hashCode() {
-		return (fData == null) ? 541 : 541 + Arrays.hashCode(fData);
-	}
-	@Override
-	public IExpr copy() {
-		return new ByteArrayExpr(fData);
-	}
+  @Override
+  public int hierarchy() {
+    return BYTEARRAYID;
+  }
 
-	public IAST normal(boolean nilIfUnevaluated) {
-		byte[] bArray = toData();
-		return WL.toList(bArray);
-	}
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		final int len = in.readInt();
-		fData = new byte[len];
-		in.read(fData);
-	}
+  @Override
+  public int hashCode() {
+    return (fData == null) ? 541 : 541 + Arrays.hashCode(fData);
+  }
 
-	@Override
-	public void writeExternal(ObjectOutput output) throws IOException {
-		output.writeInt(fData.length);
-		output.write(fData);
-	}
+  @Override
+  public IExpr copy() {
+    return new ByteArrayExpr(fData);
+  }
+
+  public IAST normal(boolean nilIfUnevaluated) {
+    byte[] bArray = toData();
+    return WL.toList(bArray);
+  }
+
+  @Override
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    final int len = in.readInt();
+    fData = new byte[len];
+    in.read(fData);
+  }
+
+  @Override
+  public void writeExternal(ObjectOutput output) throws IOException {
+    output.writeInt(fData.length);
+    output.write(fData);
+  }
 }

@@ -1,87 +1,126 @@
 package org.matheclipse.core.interfaces;
 
-import org.matheclipse.core.expression.F;
-
 import java.util.Iterator;
 
-/**
- * Interface for an iterator with additional tearDown() method, to run the iterator again
- */
+/** Interface for an iterator with additional tearDown() method, to run the iterator again */
 public interface IIterator<E> extends Iterator<E> {
-    /**
-     * Set up this iterator.
-     *
-     * @return
-     */
-    boolean setUp();
 
-    /**
-     * Set up this iterator.
-     *
-     * @return
-     */
-    boolean setUpThrow();
+  /**
+   * Set up this iterator.
+   *
+   * @return
+   */
+  boolean setUp(); /*{
+    return true;
+  }*/
 
-    /**
-     * Get a hint of how much iterations probably will occurr.
-     *
-     * @return
-     */
-    int allocHint();
+  /**
+   * Set up this iterator.
+   *
+   * @return
+   */
+  boolean setUpThrow(); /* {
+    boolean result = setUp();
+    if (!isSetIterator() && !isNumericFunction()) {
+      throw NoEvalException.CONST;
+    }
+    return result;
+  }*/
 
-    /**
-     * Get the &quot;upper limit&quot; which is used in this iterator.
-     *
-     * @return <code>null</code> if no &quot;upper limit&quot; is defined
-     */
-    IExpr getUpperLimit();
+  /**
+   * Get a hint of how much iterations probably will occurr.
+   *
+   * @return
+   */
+  int allocHint(); /* {
+    return 10;
+  }*/
 
-    /**
-     * Get the &quot;lower limit&quot; which is used in this iterator.
-     *
-     * @return <code>null</code> if no &quot;lower limit&quot; is defined
-     */
-    IExpr getLowerLimit();
+  /**
+   * Get the &quot;upper limit&quot; which is used in this iterator.
+   *
+   * @return <code>null</code> if no &quot;upper limit&quot; is defined
+   */
+  IExpr getUpperLimit(); /* {
+    return null;
+  }*/
 
-    /**
-     * Get the &quot;step&quot; which is used in this iterator.
-     *
-     * @return <code>null</code> if no &quot;step&quot; is defined
-     */
-    IExpr getStep();
+  /**
+   * Get the &quot;lower limit&quot; which is used in this iterator.
+   *
+   * @return <code>null</code> if no &quot;lower limit&quot; is defined
+   */
+  IExpr getLowerLimit(); /*{
+    return null;
+  }*/
 
-    /**
-     * Get the variable which is used in this iterator.
-     *
-     * @return <code>null</code> if no variable is defined
-     */
-    ISymbol getVariable();
+  /**
+   * Get the &quot;step&quot; which is used in this iterator.
+   *
+   * @return <code>null</code> if no &quot;step&quot; is defined
+   */
+  IExpr getStep(); /* {
+    return null;
+  }*/
 
-    /**
-     * Test if &quot;lower limit&quot;, &quot;upper limit&quot; and &quot;step&quot; are numeric functions.
-     *
-     * @return
-     */
-    boolean isNumericFunction();
+  /**
+   * Get the variable which is used in this iterator.
+   *
+   * @return <code>null</code> if no variable is defined
+   */
+  ISymbol getVariable();/* {
+    return null;
+  }*/
 
-    /**
-     * Test if there's a valid variable set for the iterator.
-     *
-     * @return
-     */
-    boolean isSetIterator();
+  /**
+   * Test if &quot;lower limit&quot;, &quot;upper limit&quot; and &quot;step&quot; are numeric
+   * functions.
+   *
+   * @return
+   */
+  boolean isNumericFunction(); /*{
+    return false;
+  }*/
 
-    /**
-     * Test if there's a valid variable set for the iterator and the &quot;upper limit&quot; is a list.
-     *
-     * @return
-     */
-    boolean isValidVariable();
+  /**
+   * Test if there's a valid variable set for the iterator.
+   *
+   * @return
+   */
+  boolean isSetIterator();/*{
+    return false;
+  }*/
 
-    boolean isInvalidNumeric();
+  /**
+   * Test if there's a valid variable set for the iterator and the &quot;upper limit&quot; is a
+   * list.
+   *
+   * @return
+   */
+  boolean isValidVariable(); /*{
+    return false;
+  }*/
 
-    /**
-     * Tear down this iterator.
-     */
-    void tearDown();
+  boolean isInvalidNumeric(); /*{
+    if (!isSetIterator()) {
+      IExpr step = getStep();
+      if (step != null) {
+        if (step.isNonNegativeResult()) {
+          if (F.Negative.ofQ(F.Subtract(getUpperLimit(), getLowerLimit()))) {
+            return true;
+          }
+        } else if (step.isNegativeResult()) {
+          if (F.Negative.ofQ(F.Subtract(getLowerLimit(), getUpperLimit()))) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }*/
+
+  /**
+   * Tear down this iterator.
+   */
+  void tearDown();
 }

@@ -2671,6 +2671,15 @@ public class F {
    * negative exponents.
    */
   public static final IBuiltInSymbol Numerator = initFinalSymbol("Numerator", ID.Numerator);
+
+  public static final IBuiltInSymbol NumericArray =
+      F.initFinalSymbol("NumericArray", ID.NumericArray);
+
+  public static final IBuiltInSymbol NumericArrayQ =
+      F.initFinalSymbol("NumericArrayQ", ID.NumericArrayQ);
+
+  public static final IBuiltInSymbol NumericArrayType =
+      F.initFinalSymbol("NumericArrayType", ID.NumericArrayType);
   /***/
   public static final IBuiltInSymbol NumericFunction = initFinalSymbol("NumericFunction",
       ID.NumericFunction);
@@ -2820,6 +2829,12 @@ public class F {
       ID.Permutations);
   /** Pi - is the constant `Pi`. */
   public static final IBuiltInSymbol Pi = initFinalSymbol("Pi", ID.Pi);
+
+  /**
+   * Pick(nested-list, nested-selection) - returns the elements of `nested-list` that have value
+   * `True` in the corresponding position in `nested-selection`.
+   */
+  public static final IBuiltInSymbol Pick = F.initFinalSymbol("Pick", ID.Pick);
   /** PieChart(list-of-values) - plot a pie chart from a `list-of-values`. */
   public static final IBuiltInSymbol PieChart = initFinalSymbol("PieChart", ID.PieChart);
   /** Piecewise({{expr1, cond1}, ...}) - represents a piecewise function. */

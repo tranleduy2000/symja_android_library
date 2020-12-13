@@ -6,6 +6,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import junit.framework.TestCase;
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.eval.TimeConstrainedEvaluator;
@@ -150,6 +151,8 @@ public abstract class AbstractTestCase extends TestCase {
   protected void setUp() {
     try {
       synchronized (fScriptManager) {
+        //ToggleFeature.COMPILE = true;
+        IOInit.init();
         Config.MAX_AST_SIZE = 20000;
         Config.MAX_MATRIX_DIMENSION_SIZE = 100;
         Config.MAX_BIT_LENGTH = 200000;
@@ -164,12 +167,12 @@ public abstract class AbstractTestCase extends TestCase {
         fNumericScriptEngine = new MathScriptEngine();// fScriptManager.getEngineByExtension("m");
         fNumericScriptEngine.put("RELAXED_SYNTAX", Boolean.TRUE);
         F.await();
-        IOInit.init();
 
         EvalEngine.set(engine);
         engine.init();
         engine.setRecursionLimit(256);
         engine.setIterationLimit(500);
+        engine.setOutListDisabled(false, (short) 10);
       }
     } catch (Exception e) {
       e.printStackTrace();

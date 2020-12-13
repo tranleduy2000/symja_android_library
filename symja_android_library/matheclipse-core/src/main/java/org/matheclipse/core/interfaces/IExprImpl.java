@@ -2211,6 +2211,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     return this instanceof INum || this instanceof IComplexNum;
   }
 
+  @Override
+  public boolean isNumericArray() {
+    return false;
+  }
+
   /**
    * Test if this expression is a numeric number (i.e. an instance of type <code>INum</code> or
    * type

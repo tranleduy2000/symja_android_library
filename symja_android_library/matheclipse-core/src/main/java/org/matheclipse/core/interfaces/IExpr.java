@@ -83,59 +83,62 @@ import edu.jas.structure.GcdRingElem;
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable,
     FieldElement<IExpr> {
 
-  public final static int ASTID = 1024;
+  public static final int ASTID = 1024;
 
-  public final static int BLANKID = 4096;
+  public static final int BLANKID = 4096;
 
-  public final static int COMPLEXID = 32;
+  public static final int COMPLEXID = 32;
 
-  public final static int DOUBLECOMPLEXID = 4;
+  public static final int DOUBLECOMPLEXID = 4;
 
-  public final static int DOUBLEID = 2;
+  public static final int DOUBLEID = 2;
 
-  public final static int FRACTIONID = 16;
+  public static final int FRACTIONID = 16;
 
-  public final static int INTEGERID = 8;
+  public static final int INTEGERID = 8;
 
-  public final static int METHODSYMBOLID = 8192;
+  public static final int METHODSYMBOLID = 8192;
 
-  public final static int PATTERNID = 2048;
+  public static final int PATTERNID = 2048;
 
-  public final static int SERIESID = 64;
+  public static final int SERIESID = 64;
 
-  public final static int QUANTITYID = 128;
+  public static final int QUANTITYID = 128;
 
-  public final static int STRINGID = 256;
+  public static final int STRINGID = 256;
 
-  public final static int SYMBOLID = 512;
+  public static final int SYMBOLID = 512;
 
-  public final static int DATASETID = 16384;
+  public static final int DATASETID = 16384;
 
-  public final static int DATAID = 32786;
+  public static final int DATAID = 32786;
 
-  public final static int BYTEARRAYID = DATAID + 1;
+  public static final int BYTEARRAYID = DATAID + 1;
 
-  public final static int COMPILEFUNCTONID = DATAID + 2;
+  public static final int COMPILEFUNCTONID = DATAID + 2;
 
-  public final static int GEOPOSITIONID = DATAID + 3;
+  public static final int GEOPOSITIONID = DATAID + 3;
 
-  public final static int GRAPHEXPRID = DATAID + 4;
+  public static final int GRAPHEXPRID = DATAID + 4;
 
-  public final static int DATEOBJECTEXPRID = DATAID + 5;
+  public static final int DATEOBJECTEXPRID = DATAID + 5;
 
-  public final static int TIMEOBJECTEXPRID = DATAID + 6;
+  public static final int TIMEOBJECTEXPRID = DATAID + 6;
 
-  public final static int FITTEDMODELID = DATAID + 7;
+  public static final int FITTEDMODELID = DATAID + 7;
 
-  public final static int INTERPOLATEDFUNCTONID = DATAID + 8;
+  public static final int INTERPOLATEDFUNCTONID = DATAID + 8;
 
-  public final static int SPARSEARRAYID = DATAID + 9;
+  public static final int SPARSEARRAYID = DATAID + 9;
 
-  public final static int DISPATCHID = DATAID + 10;
+  public static final int NUMERICARRAYID = DATAID + 10;
 
-  public final static int TESTREPORTOBJECT = DATAID + 11;
+  public static final int DISPATCHID = DATAID + 11;
 
-  public final static int TESTRESULTOBJECT = DATAID + 12;
+  public static final int TESTREPORTOBJECT = DATAID + 12;
+
+  public static final int TESTRESULTOBJECT = DATAID + 13;
+
 
   /**
    * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
@@ -226,10 +229,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
   /**
    * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b>
-   * equals
-   * <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1). If this is an atom
-   * return size
-   * <code>-1</code>.
+   * equals <code>size() - 1</code> (i.e. the <b>number of elements</b> minus 1). If this is an atom
+   * return size <code>-1</code>.
    *
    * @return the number of arguments in this {@code IAST}.
    * @see #size()
@@ -1682,6 +1683,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>IComplexNum</code>.
    */
   boolean isNumeric();
+
+  /**
+   * Test if this expression is an instance of NumericArrayExpr
+   *
+   * @return
+   */
+  boolean isNumericArray(); /*{
+    return false;
+  }*/
 
   /**
    * Test if this expression is a numeric number (i.e. an instance of type <code>INum</code> or

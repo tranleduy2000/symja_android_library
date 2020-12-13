@@ -190,6 +190,7 @@ public final class ListFunctions {
       F.Nearest.setEvaluator(new Nearest());
       F.PadLeft.setEvaluator(new PadLeft());
       F.PadRight.setEvaluator(new PadRight());
+      F.Pick.setEvaluator(new Pick());
       F.Position.setEvaluator(new Position());
       F.Prepend.setEvaluator(new Prepend());
       F.PrependTo.setEvaluator(new PrependTo());
@@ -302,9 +303,7 @@ public final class ListFunctions {
     }
   }
 
-  /**
-   * Table structure generator (i.e. lists, vectors, matrices, tensors)
-   */
+  /** Table structure generator (i.e. lists, vectors, matrices, tensors) */
   public static class TableGenerator {
 
     final List<? extends IIterator<IExpr>> fIterList;
@@ -344,7 +343,7 @@ public final class ListFunctions {
         if (iter.setUp()) {
           try {
             final int index = fIndex++;
-            if (fPrototypeList.head().equals(F.Plus) || fPrototypeList.head().equals(F.Times)) {
+            if (fPrototypeList.head().equals(S.Plus) || fPrototypeList.head().equals(S.Times)) {
               if (iter.hasNext()) {
                 fCurrentIndex[index] = iter.next();
                 fCurrentVariable[index] = iter.getVariable();
@@ -353,7 +352,7 @@ public final class ListFunctions {
                   temp = fDefaultValue;
                 }
                 if (temp.isNumber()) {
-                  if (fPrototypeList.head().equals(F.Plus)) {
+                  if (fPrototypeList.head().equals(S.Plus)) {
                     return tablePlus(temp, iter, index);
                   } else {
                     return tableTimes(temp, iter, index);
@@ -386,7 +385,7 @@ public final class ListFunctions {
         try {
           if (iter.setUpThrow()) {
             final int index = fIndex++;
-            if (fPrototypeList.head().equals(F.Plus) || fPrototypeList.head().equals(F.Times)) {
+            if (fPrototypeList.head().equals(S.Plus) || fPrototypeList.head().equals(S.Times)) {
               if (iter.hasNext()) {
                 fCurrentIndex[index] = iter.next();
                 fCurrentVariable[index] = iter.getVariable();
@@ -547,27 +546,27 @@ public final class ListFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>expr</code> with <code>item</code> appended to its leaves.
-   * </p>
+   *
+   * <p>returns <code>expr</code> with <code>item</code> appended to its leaves.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
    * &gt;&gt; Append({1, 2, 3}, 4)
    * {1,2,3,4}
    * </pre>
-   * <p>
-   * <code>Append</code> works on expressions with heads other than <code>List</code>:
-   * </p>
+   *
+   * <p><code>Append</code> works on expressions with heads other than <code>List</code>:
    *
    * <pre>
    * &gt;&gt; Append(f(a, b), c)
    * f(a,b,c)
    * </pre>
-   * <p>
-   * Unlike <code>Join</code>, <code>Append</code> does not flatten lists in <code>item</code>:<br />
-   * </p>
+   *
+   * <p>Unlike <code>Join</code>, <code>Append</code> does not flatten lists in <code>item</code>:
+   * <br>
    *
    * <pre>
    * &gt;&gt; Append({a, b}, {c, d})
@@ -640,9 +639,8 @@ public final class ListFunctions {
    * &gt;&gt; s
    * {1}
    * </pre>
-   * <p>
-   * 'Append' works on expressions with heads other than 'List':<br />
-   * </p>
+   *
+   * <p>'Append' works on expressions with heads other than 'List':<br>
    *
    * <pre>
    * &gt;&gt; y = f()
@@ -652,17 +650,15 @@ public final class ListFunctions {
    * &gt;&gt; y
    * f(x)
    * </pre>
-   * <p>
-   * {} is not a variable with a value, so its value cannot be changed.
-   * </p>
+   *
+   * <p>{} is not a variable with a value, so its value cannot be changed.
    *
    * <pre>
    * &gt;&gt; AppendTo({}, 1)
    * AppendTo({}, 1)
    * </pre>
-   * <p>
-   * a is not a variable with a value, so its value cannot be changed.
-   * </p>
+   *
+   * <p>a is not a variable with a value, so its value cannot be changed.
    *
    * <pre>
    * &gt;&gt; AppendTo(a, b)
@@ -1774,9 +1770,7 @@ public final class ListFunctions {
       protected final IPatternMatcher matcher;
       protected int counter;
 
-      /**
-       * @return the counter
-       */
+      /** @return the counter */
       public int getCounter() {
         return counter;
       }
@@ -1825,16 +1819,19 @@ public final class ListFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * <code>CountDistinct(list)
    * </code>
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns the number of distinct entries in <code>list</code>.
-   * </p>
+   *
+   * <p>returns the number of distinct entries in <code>list</code>.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -1851,7 +1848,7 @@ public final class ListFunctions {
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       final IExpr arg1 = engine.evaluate(ast.arg1());
-      if (arg1.isAST()) {
+      if (arg1.isASTOrAssociation()) {
         final Set<IExpr> map = new HashSet<IExpr>();
         ((IAST) arg1).forEach(new Consumer<IExpr>() {
           @Override
@@ -2635,8 +2632,8 @@ public final class ListFunctions {
     }
 
     /**
-     * Traverse all <code>list</code> element's and filter out the elements in the given <code>positions</code>
-     * list.
+     * Traverse all <code>list</code> element's and filter out the elements in the given <code>
+     * positions</code> list.
      *
      * @param list
      * @param positions
@@ -2691,6 +2688,7 @@ public final class ListFunctions {
    * <p>returns the first element in <code>expr</code>.
    *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <p><code>First(expr)</code> is equivalent to <code>expr[[1]]</code>.
@@ -3375,7 +3373,7 @@ public final class ListFunctions {
       int index = ast.indexOf(new Predicate<IExpr>() {
         @Override
         public boolean test(IExpr x) {
-          return x.isAtom() && !x.isSparseArray();
+          return x.isAtom() && !x.isAssociation() && !x.isSparseArray();
         }
       });
       if (index > 0) {
@@ -3397,7 +3395,7 @@ public final class ListFunctions {
         IExpr arg = ast.get(i);
         if (arg.isSparseArray()) {
           isSparseArray = true;
-          if (head == F.List || useNormal) {
+          if (head == S.List || useNormal) {
             useNormal = true;
             continue;
           }
@@ -7311,12 +7309,13 @@ public final class ListFunctions {
 
       try {
         VisitorLevelSpecification level = null;
-        Function<IExpr, IExpr> tf = new Function<IExpr, IExpr>() {
-          @Override
-          public IExpr apply(IExpr x) {
-            return x.isAST() ? ((IAST) x).setAtCopy(0, F.Plus) : x;
-          }
-        };
+        Function<IExpr, IExpr> tf =
+            new Function<IExpr, IExpr>() {
+              @Override
+              public IExpr apply(IExpr x) {
+                return x.isASTOrAssociation() ? ((IAST) x).setAtCopy(0, S.Plus) : x;
+              }
+            };
 
         if (ast.isAST2()) {
           level = new TotalLevelSpecification(tf, ast.arg2(), false, engine);
@@ -7333,7 +7332,7 @@ public final class ListFunctions {
             IExpr arg2 = ast.arg2();
             if (arg2.isInfinity() || //
                 arg2.toIntDefault() >= dims.length) {
-              return sparseArray.total(F.Plus);
+              return sparseArray.total(S.Plus);
             }
           }
           arg1 = sparseArray.normal(false);

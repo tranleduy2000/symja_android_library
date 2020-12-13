@@ -279,12 +279,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
     @Override
     public void appendRule(IExpr expr) {
-      ArgumentTypeException.throwNIL();
+      append(expr);
     }
 
     @Override
     public void prependRule(IExpr rule) {
-      ArgumentTypeException.throwNIL();
+      append(1, rule);
     }
 
 
@@ -3049,7 +3049,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isExcept() {
-    return isAST(F.Except, 2, 3);
+    return isAST(S.Except, 2, 3);
   }
 
   /** {@inheritDoc} */
@@ -3215,9 +3215,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
         && forAll(Predicates.isBooleanResult));
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public boolean isBooleanFunction() {
     return head().isBooleanFormulaSymbol() && size() >= 2;
@@ -3752,19 +3750,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isPlus() {
-    return head() == F.Plus && 3 <= size();
+    return head() == S.Plus && 3 <= size();
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isPlus2() {
-    return head() == F.Plus && 3 == size();
+    return head() == S.Plus && 3 == size();
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isPlus3() {
-    return head() == F.Plus && 4 == size();
+    return head() == S.Plus && 4 == size();
   }
 
   /** {@inheritDoc} */
@@ -4087,20 +4085,20 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isSequence() {
-    return isSameHeadSizeGE(F.Sequence, 1);
+    return isSameHeadSizeGE(S.Sequence, 1);
   }
 
 
   /** {@inheritDoc} */
   @Override
   public final boolean isSin() {
-    return isSameHead(F.Sin, 2);
+    return isSameHead(S.Sin, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isSinh() {
-    return isSameHead(F.Sinh, 2);
+    return isSameHead(S.Sinh, 2);
   }
 
   /** {@inheritDoc} */
@@ -4579,9 +4577,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public final IAST map(IASTAppendable resultAST, IAST secondAST,
       BiFunction<IExpr, IExpr, IExpr> function) {

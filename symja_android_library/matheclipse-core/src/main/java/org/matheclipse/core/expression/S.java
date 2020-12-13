@@ -17,8 +17,30 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
  */
 public class S {
 
+  public static final IBuiltInSymbol Surd = F.Surd;
+  public static final IBuiltInSymbol LongForm = F.LongForm;
+  public static final IBuiltInSymbol GammaRegularized = F.GammaRegularized;
+  public static final IBuiltInSymbol SparseArray = F.SparseArray;
+  public static final IBuiltInSymbol Round = F.Round;
+  public static final IBuiltInSymbol PolyLog = F.PolyLog;
+  public static final IBuiltInSymbol Log = F.Log;
+  public static final IBuiltInSymbol NumericArray = F.NumericArray;
+  public static final IBuiltInSymbol RandomVariate = F.RandomVariate;
+  public static final IBuiltInSymbol NumericArrayQ = F.NumericArrayQ;
+  public static final IBuiltInSymbol NumericArrayType = F.NumericArrayType;
+  public static final IBuiltInSymbol Evaluate = F.Evaluate;
+  public static final IBuiltInSymbol Defer = F.Defer;
+  public static final IBuiltInSymbol Except = F.Except;
+  public static final IBuiltInSymbol Sinh = F.Sinh;
+  public static final IBuiltInSymbol ListLinePlot = F.ListLinePlot;
+  public static final IBuiltInSymbol Sequence = F.Sequence;
+  public static final IBuiltInSymbol ListPlot = F.ListPlot;
+  public static final IBuiltInSymbol Plot = F.Plot;
+  public static final IBuiltInSymbol ParametricPlot = F.ParametricPlot;
+  public static final IBuiltInSymbol PolarPlot = F.PolarPlot;
   public static final IBuiltInSymbol E = F.E;
   public static final IBuiltInSymbol Inner = F.Inner;
+  public static final IBuiltInSymbol Times = F.Times;
   public static final IBuiltInSymbol RegularExpression = F.RegularExpression;
   public static final IBuiltInSymbol Cos = F.Cos;
   public static final IBuiltInSymbol Cot = F.Cot;
