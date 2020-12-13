@@ -31,6 +31,9 @@ public class InterpolatingFunction extends AbstractEvaluator {
 
 
 	@Override
-	public void setUp(final ISymbol newSymbol) {
+  public int[] expectedArgSize(IAST ast) {
+    return ARGS_1_INFINITY_0;
 	}
+  @Override
+  public void setUp(final ISymbol newSymbol) {}
 }

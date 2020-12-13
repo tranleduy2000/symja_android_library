@@ -11,14 +11,13 @@ import java.util.TreeMap;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
-import org.matheclipse.parser.client.math.MathException;
 
 /* package */ class UnitImpl implements IUnit, Serializable {
 
-  private final Map<String, IExpr> navigableMap;
+  private final TreeMap<String, IExpr> navigableMap;
 
-  UnitImpl(Map<String, IExpr> navigableMap) {
-    this.navigableMap = Collections.unmodifiableMap(navigableMap);
+  UnitImpl(TreeMap<String, IExpr> navigableMap) {
+    this.navigableMap = new TreeMap<>(navigableMap);
   }
 
   @Override // from Unit
@@ -39,21 +38,21 @@ import org.matheclipse.parser.client.math.MathException;
 
   @Override // from Unit
   public IUnit add(IUnit unit) {
-    Map<String, IExpr> map = new TreeMap<>(navigableMap);
+    TreeMap<String, IExpr> map = new TreeMap<>(navigableMap);
     for (Entry<String, IExpr> entry : unit.map().entrySet()) {
       String key = entry.getKey();
       IExpr value = entry.getValue();
-        if (map.containsKey(key)) {
-            // TODO this may not always use the defined UnitHelper.EvalEngine
-            IExpr sum = F.Plus.of(UnitHelper.ENGINE, map.get(key), value);
-            if (sum.isZero()) {
-                map.remove(key); // exponents cancel out
-            } else {
-                map.put(key, sum); // exponent is updated
-            }
+      if (map.containsKey(key)) {
+        // TODO this may not always use the defined UnitHelper.EvalEngine
+        IExpr sum = F.Plus.of(UnitHelper.ENGINE, map.get(key), value);
+        if (sum.isZero()) {
+          map.remove(key); // exponents cancel out
         } else {
-            map.put(key, value); // unit is introduced
+          map.put(key, sum); // exponent is updated
         }
+      } else {
+        map.put(key, value); // unit is introduced
+      }
     }
     return new UnitImpl(map);
   }
@@ -61,11 +60,11 @@ import org.matheclipse.parser.client.math.MathException;
   @Override // from Unit
   public IUnit multiply(IExpr factor) {
     if (factor instanceof ISignedNumber) {
-      Map<String, IExpr> map = new TreeMap<>();
+      TreeMap<String, IExpr> map = new TreeMap<>();
       for (Entry<String, IExpr> entry : navigableMap.entrySet()) {
         // TODO this may not always use the defined UnitHelper.EvalEngine
         IExpr value = F.Times.of(UnitHelper.ENGINE, entry.getValue(), factor);
-          if (!value.isZero()) { map.put(entry.getKey(), value); }
+        if (!value.isZero()) { map.put(entry.getKey(), value); }
       }
       return new UnitImpl(map);
     }
@@ -77,7 +76,7 @@ import org.matheclipse.parser.client.math.MathException;
     return navigableMap;
   }
 
-  /** ************************************************ */
+  /** ******************************************** */
   @Override // from Object
   public int hashCode() {
     return navigableMap.hashCode();

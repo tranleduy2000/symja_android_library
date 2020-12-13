@@ -49,7 +49,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
   public IExpr arcTan(IExpr x) {
     if (x instanceof IQuantity) {
       IQuantity quantity = (IQuantity) x;
-			if (fData.equals(quantity.unit())) { return F.ArcTan.of(quantity.value(), arg1); }
+      if (fData.equals(quantity.unit())) return F.ArcTan.of(quantity.value(), arg1);
     }
     throw MathException.of(x, this);
   }

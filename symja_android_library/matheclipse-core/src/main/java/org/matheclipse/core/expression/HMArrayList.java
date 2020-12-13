@@ -22,18 +22,6 @@ import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
-import org.matheclipse.core.generic.ObjIntPredicate;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
-import org.matheclipse.core.interfaces.IASTMutable;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.FEConfig;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,6 +33,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.RandomAccess;
 import java.util.Set;
+import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.generic.ObjIntPredicate;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
 
 /**
  * HMArrayList is an implementation of a list, backed by an array. All optional operations adding,
@@ -950,7 +948,7 @@ public abstract class HMArrayList extends IASTAppendableImpl
 
   private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
     ObjectInputStream.GetField fields = stream.readFields();
-    lastIndex = fields.get("size", 0); //$NON-NLS-1$
+    lastIndex = fields.get("size", 0); // $NON-NLS-1$
     array = newElementArray(lastIndex);
     for (int i = 0; i < lastIndex; i++) {
       array[i] = (IExpr) stream.readObject();

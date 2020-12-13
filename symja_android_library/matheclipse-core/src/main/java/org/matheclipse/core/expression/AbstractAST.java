@@ -1304,10 +1304,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
   public Object asType(Class<?> clazz) {
     if (clazz.equals(Boolean.class)) {
       IExpr temp = F.eval(this);
-      if (temp.equals(F.True)) {
+      if (temp.equals(S.True)) {
         return Boolean.TRUE;
       }
-      if (temp.equals(F.False)) {
+      if (temp.equals(S.False)) {
         return Boolean.FALSE;
       }
     } else if (clazz.equals(Integer.class)) {
@@ -4251,7 +4251,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isUnevaluated() {
-    return isSameHead(F.Unevaluated, 2);
+    return isSameHead(S.Unevaluated, 2);
   }
 
   /** {@inheritDoc} */
@@ -5331,87 +5331,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return null;
   }
 
-  @Override
-  public String toMMA() {
-    try {
-      //      StringBuilder sb = new StringBuilder();
-      //      if (OutputFormFactory.get(false).convert(sb, this)) {
-      //        return sb.toString();
-      //      }
-
-      final StringBuilder buf = new StringBuilder();
-      if (size() > 0 && isList()) {
-        buf.append('{');
-        for (int i = 1; i < size(); i++) {
-          final IExpr o = get(i);
-          buf.append(get(i) == this ? "(this AST)" : o.toMMA());
-          if (i < argSize()) {
-            buf.append(", ");
-          }
-        }
-        buf.append('}');
-        return buf.toString();
-
-      } else if (isAST(F.Slot, 2) && (arg1().isReal())) {
-
-        final int slot = ((ISignedNumber) arg1()).toIntDefault();
-        if (slot <= 0) {
-          final String sep = ", ";
-          IExpr temp = null;
-          if (size() > 0) {
-            temp = head();
-          }
-          StringBuilder text;
-          if (temp == null) {
-            text = new StringBuilder("<null-tag>");
-          } else {
-            text = new StringBuilder(temp.toMMA());
-          }
-          text.append('[');
-          for (int i = 1; i < size(); i++) {
-            final IExpr o = get(i);
-            text = text.append(o == this ? "(this AST)" : o.toMMA());
-            if (i < argSize()) {
-              text.append(sep);
-            }
-          }
-          text.append(']');
-          return text.toString();
-        }
-        if (slot == 1) {
-          return "#";
-        }
-        return "#" + slot;
-      } else {
-        final String sep = ", ";
-        IExpr temp = null;
-        if (size() > 0) {
-          temp = head();
-        }
-        StringBuilder text;
-        if (temp == null) {
-          text = new StringBuilder("<null-tag>");
-        } else {
-          text = new StringBuilder(temp.toMMA());
-        }
-        text.append('[');
-        for (int i = 1; i < size(); i++) {
-          final IExpr o = getRule(i);
-          text = text.append(o == this ? "(this AST)" : o.toMMA());
-          if (i < argSize()) {
-            text.append(sep);
-          }
-        }
-        text.append(']');
-        return text.toString();
-      }
-    } catch (RuntimeException e) {
-      if (FEConfig.SHOW_STACKTRACE) {
-        System.out.println(fullFormString());
-      }
-      throw e;
-    }
-  }
 
   @Override
   public String toString() {

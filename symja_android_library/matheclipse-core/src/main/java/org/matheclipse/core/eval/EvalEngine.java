@@ -1348,6 +1348,10 @@ public class EvalEngine implements Serializable {
       }
       RecursionLimitExceeded.throwIt(fRecursionLimit, expr);
     }
+    if (fStopRequested) {
+      // check before going one recursion deeper
+      throw TimeoutException.TIMED_OUT;
+    }
     IExpr result = expr;
     try {
       IExpr temp;

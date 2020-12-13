@@ -31,13 +31,15 @@ import org.matheclipse.parser.client.math.MathException;
  * whereas <code>a.add(b)</code> throws an Exception.
  */
 public class IQuantityStatic {
+    static final char UNIT_OPENING_BRACKET = '[';
+    static final char UNIT_CLOSING_BRACKET = ']';
 
     /**
-     * Hint: function does not check parameters for null, although null as input is likely to cause problems
-     * subsequently.
+     * Hint: function does not check parameters for null, although null as input is likely to cause
+     * problems subsequently.
      *
      * @param value
-     * @param unit  for instance Unit.of("m*s^-1")
+     * @param unit for instance Unit.of("m*s^-1")
      * @return
      * @throws Exception if value is instance of {@code Quantity}
      */
@@ -53,32 +55,31 @@ public class IQuantityStatic {
     }
 
     /**
-     * Hint: function does not check parameters for null, although null as input is likely to cause problems
-     * subsequently.
+     * Hint: function does not check parameters for null, although null as input is likely to cause
+     * problems subsequently.
      *
      * @param value
      * @param string for instance "m*s^-2"
      * @return
      * @throws Exception if value is instance of {@code Quantity}
      */
-    public static IExpr of(IExpr value, String string) {
-        if (value instanceof IQuantity)
-            throw MathException.of(value);
+    static IExpr of(IExpr value, String string) {
+        if (value instanceof IQuantity) throw MathException.of(value);
         return QuantityImpl.of(value, IUnitStatic.ofPutIfAbsent(string));
     }
 
     /**
      * creates quantity with number encoded as {@link ISignedNumber}
-     * <p>
-     * Hint: function does not check parameters for null, although null as input is likely to cause problems
-     * subsequently.
+     *
+     * <p>Hint: function does not check parameters for null, although null as input is likely to cause
+     * problems subsequently.
      *
      * @param number non-null
      * @param unit
      * @return
      * @throws Exception if parameter number equals null
      */
-    public static IExpr of(Number number, IUnit unit) {
+    static IExpr of(Number number, IUnit unit) {
         return QuantityImpl.of(F.expr(number), unit);
     }
 
@@ -90,8 +91,8 @@ public class IQuantityStatic {
      * @return
      * @throws Exception if either parameter equals null
      */
-    public static IExpr of(Number number, String string) {
-        return QuantityImpl.of(F.expr(number), IUnitStatic.of(string));
+    static IExpr of(Number number, String string) {
+        return QuantityImpl.of(F.expr(number), IUnitStatic.ofPutIfAbsent(string));
     }
 
 }

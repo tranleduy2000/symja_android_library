@@ -300,12 +300,12 @@ public class QuantityFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns the quantity for <code>value</code> and <code>unit</code>
-   * </p>
+   *
+   * <p>returns the quantity for <code>value</code> and <code>unit</code>
+   *
    * </blockquote>
    */
-  private final static class Quantity extends AbstractCoreFunctionEvaluator {
+  private static final class Quantity extends AbstractCoreFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -349,6 +349,8 @@ public class QuantityFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * QuantityMagnitude(quantity)
    * </pre>
@@ -384,8 +386,8 @@ public class QuantityFunctions {
           IExpr arg1 = engine.evaluate(ast.arg1());
           IExpr arg2 = engine.evaluate(ast.arg2());
           if (arg1.isQuantity()) {
-            org.matheclipse.core.tensor.qty.QuantityMagnitude quantityMagnitude = org.matheclipse.core.tensor.qty.QuantityMagnitude
-                .SI();
+            org.matheclipse.core.tensor.qty.QuantityMagnitude quantityMagnitude =
+                org.matheclipse.core.tensor.qty.QuantityMagnitude.SI();
             IUnit unit = IUnitStatic.of(arg2.toString());
             if (unit == null) {
               return F.NIL;
@@ -411,8 +413,6 @@ public class QuantityFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * UnitConvert(quantity)
    * </pre>

@@ -2618,7 +2618,7 @@ public final class Arithmetic {
             return F.NIL;
           }
           if (noBoolean) {
-            // result = appendPiecewise(result, row.arg1(), F.True, matrixSize);
+            // result = appendPiecewise(result, row.arg1(), S.True, matrixSize);
             piecewiseAST = createPiecewise(piecewiseAST, result);
             piecewiseAST.append(row.arg1());
             return piecewiseAST;
@@ -2633,7 +2633,7 @@ public final class Arithmetic {
           evaluated = true;
           if (condition.isTrue()) {
             if (noBoolean) {
-              result = appendPiecewise(result, row.arg1(), F.True, matrixSize);
+              result = appendPiecewise(result, row.arg1(), S.True, matrixSize);
               return createPiecewise(piecewiseAST, result);
             }
             return row.arg1();
@@ -2780,15 +2780,15 @@ public final class Arithmetic {
    * represents the sum of the terms <code>a, b, ...</code>.
    * </p>
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
    * &gt;&gt; 1 + 2
    * 3
    * </pre>
-   * <p>
-   * <code>Plus</code> performs basic simplification of terms:
-   * </p>
+   *
+   * <p><code>Plus</code> performs basic simplification of terms:
    *
    * <pre>
    * &gt;&gt; a + b + a
@@ -2800,25 +2800,22 @@ public final class Arithmetic {
    * &gt;&gt; a + b + 4.5 + a + b + a + 2 + 1.5 * b
    * 6.5+3.0*a+3.5*b
    * </pre>
-   * <p>
-   * Apply <code>Plus</code> on a list to sum up its elements:
-   * </p>
+   *
+   * <p>Apply <code>Plus</code> on a list to sum up its elements:
    *
    * <pre>
    * &gt;&gt; Plus @@ {2, 4, 6}
    * 12
    * </pre>
-   * <p>
-   * The sum of the first <code>1000</code> integers:
-   * </p>
+   *
+   * <p>The sum of the first <code>1000</code> integers:
    *
    * <pre>
    * &gt;&gt; Plus @@ Range(1000)
    * 500500
    * </pre>
-   * <p>
-   * <code>Plus</code> has default value <code>0</code>:
-   * </p>
+   *
+   * <p><code>Plus</code> has default value <code>0</code>:
    *
    * <pre>
    * &gt;&gt; a /. n_. + x_ :&gt; {n, x}
@@ -3280,9 +3277,8 @@ public final class Arithmetic {
    * &gt;&gt; 0 ^ - (Pi + 2*E*I)
    * ComplexInfinity
    * </pre>
-   * <p>
-   * Indeterminate expression 0 ^ 0 encountered.
-   * </p>
+   *
+   * <p>Indeterminate expression 0 ^ 0 encountered.
    *
    * <pre>
    * &gt;&gt; 0 ^ 0
@@ -3520,7 +3516,8 @@ public final class Arithmetic {
 
 
     /**
-     * Split this integer into the nth-root (with prime factors less equal 1021) and the &quot;rest factor&quot;
+     * Split this integer into the nth-root (with prime factors less equal 1021) and the &quot;rest
+     * factor&quot;
      *
      * @return <code>{nth-root, rest factor}</code> or <code>null</code> if the root is not
      *     available
@@ -5151,10 +5148,11 @@ public final class Arithmetic {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * is equivalent to <code>x = x - dx</code>.
-   * </p>
+   *
+   * <p>is equivalent to <code>x = x - dx</code>.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -5191,10 +5189,11 @@ public final class Arithmetic {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * represents the subtraction of <code>b</code> from <code>a</code>.
-   * </p>
+   *
+   * <p>represents the subtraction of <code>b</code> from <code>a</code>.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -5401,9 +5400,10 @@ public final class Arithmetic {
      * Distribute a leading integer factor.
      *
      * @param noEvalExpression return this expression if no evaluation step was done
-     * @param originalExpr the original expression which is used, if <code>!noEvalExpression.isPresent()</code>
-     * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an integer factor isn't
-     * possible
+     * @param originalExpr the original expression which is used, if <code>
+     *     !noEvalExpression.isPresent()</code>
+     * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
+     *     integer factor isn't possible
      */
     private static IExpr distributeLeadingFactor(IExpr noEvalExpression, IAST originalExpr) {
       IExpr expr = noEvalExpression;
@@ -5490,7 +5490,7 @@ public final class Arithmetic {
      * @param noEvalExpr return this expression if no evaluation step was done
      * @param times the <code>Times(...)</code> AST
      * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
-     * integer factor isn't possible
+     *     integer factor isn't possible
      */
     private static IExpr distributeLeadingFactorCN1(IExpr noEvalExpr, IAST times) {
       IASTAppendable result = F.NIL;
@@ -6470,7 +6470,8 @@ public final class Arithmetic {
    * <code>Abs, Clip, If, Ramp, UnitStep</code>
    *
    * @param function
-   * @param domain if set to <code>F.Reals</code> a function like <code>Abs(x)</code> can be rewritten.
+   * @param domain if set to <code>F.Reals</code> a function like <code>Abs(x)</code> can be
+   *     rewritten.
    * @return
    */
   public static IAST piecewiseExpand(final IAST function, IBuiltInSymbol domain) {

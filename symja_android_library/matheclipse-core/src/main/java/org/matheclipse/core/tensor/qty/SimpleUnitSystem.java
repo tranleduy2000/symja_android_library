@@ -17,8 +17,7 @@ public class SimpleUnitSystem implements UnitSystem {
   /**
    * given properties map a unit expression to a {@link IQuantity}
    *
-   * <p>
-   * Example from the built-in file "/unit/si.properties":
+   * <p>Example from the built-in file "/unit/si.properties":
    *
    * <pre>
    * rad=1
@@ -79,9 +78,9 @@ public class SimpleUnitSystem implements UnitSystem {
         IExpr temp =
             DObjects.isNull(lookup) //
                 ? IQuantityStatic.of(F.C1, format(entry)) //
-            : lookup.isQuantity()//
-                ? ((IQuantity) lookup).power(entryValue)//
-                : F.Power.of(lookup, entryValue);
+                : lookup.isQuantity()//
+                    ? ((IQuantity) lookup).power(entryValue)//
+                    : F.Power.of(lookup, entryValue);
         if (temp.isQuantity()) {
           v1 = temp.times(value);
         } else {
@@ -94,7 +93,7 @@ public class SimpleUnitSystem implements UnitSystem {
             value = F.Times(temp, value);
           } else {
             value = F.Times(value, temp);
-        }
+          }
         }
       }
       return value;
@@ -109,10 +108,10 @@ public class SimpleUnitSystem implements UnitSystem {
 
   // helper function
   private static IExpr requireNumeric(IExpr scalar) {
-		if (scalar instanceof IStringX) { throw MathException.of(scalar); }
+    if (scalar instanceof IStringX) { throw MathException.of(scalar); }
     if (scalar instanceof IQuantity) {
       IQuantity quantity = (IQuantity) scalar;
-			if (quantity.value() instanceof IStringX) { throw MathException.of(scalar); }
+      if (quantity.value() instanceof IStringX) { throw MathException.of(scalar); }
     }
     return scalar;
   }

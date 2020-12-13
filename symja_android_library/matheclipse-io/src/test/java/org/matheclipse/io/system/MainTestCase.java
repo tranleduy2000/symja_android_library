@@ -11,9 +11,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.FEConfig;
 
-/**
- * Tests system.reflection classes
- */
+/** Tests system.reflection classes */
 public class MainTestCase extends AbstractTestCase {
 
   public MainTestCase(String name) {
@@ -81,9 +79,7 @@ public class MainTestCase extends AbstractTestCase {
     }
   }
 
-  /**
-   * Test system functions
-   */
+  /** Test system functions */
   public void testSystem000() {
     // assertEquals(PrimeList.getMersennePrime(4).toString(), "15");
     // assertEquals(PrimeList.getMersennePrime(128).toString(), "15");
@@ -173,11 +169,29 @@ public class MainTestCase extends AbstractTestCase {
     check("2.33`", //
         "2.33");
 
-    // check("\"a\\[NewLine]test\"", //
-//				"a\n" + "test");
+    check(
+        "\"a\\[NewLine]test\"", //
+        "a\n" + "test");
+
+    check(
+        "\"\\[Epsilon]\"", //
+        "ϵ");
+    check(
+        "string = \"\\:20AC\"", //
+        "€");
     // second backslash creates tabulator \t
-    // check("\"a\\\\[RawBackslash]\\[RawBackslash]test\"", //
-//				"a\\[RawBackslash]	est");
+    check(
+        "\"a\\\\[RawBackslash]\\[RawBackslash]test\"", //
+        "a\\[RawBackslash]	est");
+    check(
+        "getPattern::usage=\"\\:83b7\\:53d6\\:6587\\:4ef6\\:7684\\:5339\\:914d\\:6a21\\:5f0f\"", //
+        "获取文件的匹配模式");
+    check(
+        "string = \"\\.41\\:05E9\\:C350\"", //
+        "Aש썐");
+    check(
+        "string = \"\\.41\\:05E9\\:C350\\|01F602\"", //
+        "Aש썐\\|01F602");
   }
 
   public void testOut() {

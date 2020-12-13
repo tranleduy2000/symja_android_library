@@ -29,20 +29,17 @@ import org.matheclipse.core.interfaces.IExpr;
  */
 @SuppressWarnings("JavadocReference")
 public interface IQuantity extends IExpr, Comparable<IExpr> {
-    char UNIT_OPENING_BRACKET = '[';
-    char UNIT_CLOSING_BRACKET = ']';
 
-    IQuantity ofUnit(IExpr scalar);
+  char UNIT_OPENING_BRACKET = '[';
+  char UNIT_CLOSING_BRACKET = ']';
 
-    /**
-     * @return unit of quantity without value
-     */
-    IUnit unit();
+  public IQuantity ofUnit(IExpr scalar);
 
-	String unitString();
-    /**
-	 *
-     * @return value of quantity without unit
-     */
-    IExpr value();
+  /** @return unit of quantity without value */
+  IUnit unit();
+
+  String unitString();
+
+  /** @return value of quantity without unit */
+  IExpr value();
 }

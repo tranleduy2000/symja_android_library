@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 public class S {
 
   public static final IBuiltInSymbol Surd = F.Surd;
+  public static final IBuiltInSymbol Unevaluated = F.Unevaluated;
   public static final IBuiltInSymbol LongForm = F.LongForm;
   public static final IBuiltInSymbol GammaRegularized = F.GammaRegularized;
   public static final IBuiltInSymbol SparseArray = F.SparseArray;
