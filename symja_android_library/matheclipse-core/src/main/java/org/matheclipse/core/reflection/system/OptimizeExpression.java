@@ -242,7 +242,7 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_1;
+		return ARGS_1_1;
 	}
 	/**
 	 * Try to optimize/extract common sub-<code>IASTs</code> expressions to minimize the number of operations

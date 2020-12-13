@@ -8,10 +8,11 @@ import org.matheclipse.core.interfaces.IExpr;
  * Created by Duy on 2/20/2018.
  */
 
-public abstract class ICoreFunctionEvaluatorImpl extends IFunctionEvaluatorImpl implements ICoreFunctionEvaluator {
+public abstract class ICoreFunctionEvaluatorImpl extends IFunctionEvaluatorImpl implements
+    ICoreFunctionEvaluator {
 
-    @Override
-    public IExpr numericEval(IAST ast, EvalEngine engine) {
-        return evaluate(ast, engine);
-    }
+  @Override
+  public IExpr numericEval(IAST ast, EvalEngine engine) {
+    return evaluate(ast, engine);
+  }
 }

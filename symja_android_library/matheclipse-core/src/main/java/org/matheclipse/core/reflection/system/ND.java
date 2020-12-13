@@ -107,6 +107,6 @@ public class ND extends AbstractFunctionEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_3_3;
+		return ARGS_3_3;
 	}
 }

@@ -30,7 +30,7 @@ public class Interval extends AbstractEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_INFINITY;
+		return ARGS_1_INFINITY;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

@@ -196,7 +196,7 @@ public class QuantityFunctions {
 //
 //		@Override
 //		public int[] expectedArgSize(IAST ast) {
-//			return IOFunctions.ARGS_0_2;
+//			return ARGS_0_2;
 //		}
 //	}
 
@@ -241,7 +241,7 @@ public class QuantityFunctions {
 //
 //		@Override
 //		public int[] expectedArgSize(IAST ast) {
-//			return IOFunctions.ARGS_1_3;
+//			return ARGS_1_3;
 //		}
 //
 //		@Override
@@ -294,7 +294,7 @@ public class QuantityFunctions {
 //
 //		@Override
 //		public int[] expectedArgSize(IAST ast) {
-//			return IOFunctions.ARGS_0_1;
+//			return ARGS_0_1;
 //	}
 //	}
 
@@ -348,7 +348,7 @@ public class QuantityFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 	}
 
@@ -410,7 +410,7 @@ public class QuantityFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 	}
 
@@ -469,7 +469,7 @@ public class QuantityFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 	}
 
 	}

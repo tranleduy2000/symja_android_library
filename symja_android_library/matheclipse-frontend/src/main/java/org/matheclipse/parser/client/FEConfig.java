@@ -8,7 +8,7 @@ import org.matheclipse.parser.trie.TrieBuilder;
 public class FEConfig {
 
   /** Show the stack trace, if an exception is thrown in evaluation */
-  public static final boolean SHOW_STACKTRACE = false;
+  public static boolean SHOW_STACKTRACE = false;
 
   /** Use <code>Num</code> objects for numeric calculations up to 16 digits precision. */
   public static final long MACHINE_PRECISION = 16L;

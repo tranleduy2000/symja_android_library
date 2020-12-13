@@ -556,6 +556,6 @@ public class NSolve extends AbstractFunctionEvaluator {
 //		}
 	}
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_2_3;
+		return ARGS_2_3;
 	}
 }

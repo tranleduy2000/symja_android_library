@@ -216,7 +216,7 @@ public class FindRoot extends AbstractFunctionEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_2_INFINITY;
+		return ARGS_2_INFINITY;
 	}
 	private double findRoot(String method, int maxIterations, IAST list, ISignedNumber min, ISignedNumber max,
 			IExpr function, EvalEngine engine) {

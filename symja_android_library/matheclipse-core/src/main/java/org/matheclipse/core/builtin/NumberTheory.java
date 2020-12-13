@@ -226,7 +226,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -320,7 +320,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -772,7 +772,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 	}
 
@@ -840,7 +840,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
@@ -1102,7 +1102,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -1315,7 +1315,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		/**
 		 * Return F.True or F.False if result is divisible. Return <code>F.NIL</code>, if the result could not be
@@ -1427,7 +1427,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 
 		@Override
@@ -1479,7 +1479,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 		private static IExpr divisorSigma(final IExpr arg1, IInteger n) {
@@ -1805,7 +1805,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_INFINITY;
+			return ARGS_1_INFINITY;
 		}
 		/**
 		 * Calculate the extended GCD
@@ -2155,7 +2155,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 
 		@Override
@@ -2470,7 +2470,7 @@ public final class NumberTheory {
 		}
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2523,7 +2523,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2589,7 +2589,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2741,7 +2741,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 		private IAST linearRecurrence(IAST list1, IAST list2, int n, IAST ast, EvalEngine engine) {
 			if (n < 0) {
@@ -2857,7 +2857,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2965,7 +2965,7 @@ public final class NumberTheory {
 		}
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3020,7 +3020,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3133,7 +3133,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3346,7 +3346,7 @@ public final class NumberTheory {
 		}
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 	}
 
@@ -3427,7 +3427,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 	}
 
@@ -3556,7 +3556,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		/**
 		 *
@@ -3659,7 +3659,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		/**
 		 * TODO because of recursion you can get stack-overflows
@@ -3813,7 +3813,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3865,7 +3865,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3924,7 +3924,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3995,7 +3995,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -4046,7 +4046,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -4082,7 +4082,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -4290,7 +4290,7 @@ public final class NumberTheory {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 
 		@Override
@@ -4363,7 +4363,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		public static boolean isSquarefree(IExpr expr, List<IExpr> varList) throws JASConversionException {
 			JASConvert<BigRational> jas = new JASConvert<BigRational>(varList, BigRational.ZERO);
@@ -4529,7 +4529,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -4612,7 +4612,7 @@ public final class NumberTheory {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {

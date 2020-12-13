@@ -210,7 +210,7 @@ public class NIntegrate extends AbstractFunctionEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_2_INFINITY;
+		return ARGS_2_INFINITY;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

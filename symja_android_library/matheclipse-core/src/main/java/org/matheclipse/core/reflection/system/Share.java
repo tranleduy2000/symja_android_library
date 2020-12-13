@@ -189,7 +189,7 @@ public class Share extends AbstractFunctionEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_1;
+		return ARGS_1_1;
 	}
 	/**
 	 * Try to share common sub-<code>IASTs</code> expressions with the same object-id internally to minimize memory

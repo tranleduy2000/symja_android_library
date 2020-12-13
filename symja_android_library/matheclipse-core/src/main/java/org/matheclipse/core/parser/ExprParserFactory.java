@@ -16,27 +16,21 @@
 package org.matheclipse.core.parser;
 
 import com.gx.common.base.CharMatcher;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.convert.AST2Expr;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.parser.client.FEConfig;
-import org.matheclipse.parser.trie.Trie;
-import org.matheclipse.parser.trie.TrieMatch;
-import org.matheclipse.parser.trie.Tries;
 import org.matheclipse.parser.client.ast.IParserFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 import org.matheclipse.parser.client.operator.Precedence;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import org.matheclipse.parser.trie.Trie;
+import org.matheclipse.parser.trie.TrieMatch;
 
 public class ExprParserFactory implements IParserFactory {
 
@@ -262,10 +256,14 @@ public class ExprParserFactory implements IParserFactory {
 
   public static final ExprParserFactory RELAXED_STYLE_FACTORY = new ExprParserFactory();
 
-  /** */
+  /**
+   *
+   */
   private static Trie<String, Operator> fOperatorMap;
 
-  /** */
+  /**
+   *
+   */
   private static Trie<String, ArrayList<Operator>> fOperatorTokenStartSet;
 
   /**
@@ -360,15 +358,21 @@ public class ExprParserFactory implements IParserFactory {
               InfixExprOperator.LEFT_ASSOCIATIVE), //
           TAG_SET_OPERATOR, //
           new InfixExprOperator("@*", "Composition", Precedence.COMPOSITION, InfixOperator.NONE),
-          new InfixExprOperator("~~", "StringExpression", Precedence.STRINGEXPRESSION,
-              InfixOperator.NONE),
-          new InfixExprOperator("<->", "TwoWayRule", Precedence.TWOWAYRULE,
+            new InfixExprOperator(
+                "~~", "StringExpression", Precedence.STRINGEXPRESSION, InfixOperator.NONE),
+            new InfixExprOperator(
+                "<->", "TwoWayRule", Precedence.TWOWAYRULE, InfixOperator.RIGHT_ASSOCIATIVE), //
+            new InfixExprOperator(
+                "\uF120", "TwoWayRule", Precedence.TWOWAYRULE, InfixOperator.RIGHT_ASSOCIATIVE), //
+            new InfixExprOperator(
+                "\uF3D5",
+                "DirectedEdge",
+                Precedence.DIRECTEDEDGE,
               InfixOperator.RIGHT_ASSOCIATIVE), //
-          new InfixExprOperator("\uF120", "TwoWayRule", Precedence.TWOWAYRULE,
-              InfixOperator.RIGHT_ASSOCIATIVE), //
-          new InfixExprOperator("\uF3D5", "DirectedEdge", Precedence.DIRECTEDEDGE,
-              InfixOperator.RIGHT_ASSOCIATIVE), //
-          new InfixExprOperator("\uF3D4", "UndirectedEdge", Precedence.UNDIRECTEDEDGE,
+            new InfixExprOperator(
+                "\uF3D4",
+                "UndirectedEdge",
+                Precedence.UNDIRECTEDEDGE,
               InfixOperator.RIGHT_ASSOCIATIVE), //
           new InfixExprOperator("\u00B7", "CenterDot", Precedence.CENTERDOT,
               InfixExprOperator.NONE), //
@@ -453,13 +457,17 @@ public class ExprParserFactory implements IParserFactory {
     return fOperatorMap;
   }
 
-  /** */
+  /**
+   *
+   */
   @Override
   public Map<String, ArrayList<Operator>> getOperator2ListMap() {
     return fOperatorTokenStartSet;
   }
 
-  /** */
+  /**
+   *
+   */
   @Override
   public List<Operator> getOperatorList(final String key) {
     return fOperatorTokenStartSet.get(key);

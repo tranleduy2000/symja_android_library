@@ -16,7 +16,8 @@
 package org.matheclipse.core.parser;
 
 import com.duy.lambda.Consumer;
-
+import java.util.List;
+import java.util.Locale;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
@@ -31,7 +32,6 @@ import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.NumStr;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -49,9 +49,6 @@ import org.matheclipse.parser.client.ast.IParserFactory;
 import org.matheclipse.parser.client.math.MathException;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
-
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string
@@ -1059,8 +1056,8 @@ public class ExprParser extends Scanner {
                 getNextToken();
                 // fToken = TT_PARTCLOSE;
                 return function;
+              }
             }
-          }
             // scanner-step end
             // if (fInputString.length > fCurrentPosition && fInputString[fCurrentPosition] == ']')
             // {
@@ -1322,7 +1319,7 @@ public class ExprParser extends Scanner {
    * See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence
    * parser</a> for the idea, how to parse the operators depending on their precedence.
    *
-   * @param lhs            the already parsed left-hand-side of the operator
+   * @param lhs the already parsed left-hand-side of the operator
    * @param min_precedence
    * @return
    */
@@ -1462,7 +1459,7 @@ public class ExprParser extends Scanner {
    * Rewrite a chain of different comparator operators to an <code>Inequality(...)</code>
    * expression.
    *
-   * @param ast           the ast which should be rewritten
+   * @param ast the ast which should be rewritten
    * @param infixOperator
    * @return
    */

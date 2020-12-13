@@ -371,8 +371,8 @@ public interface IAST extends IExpr, Iterable<IExpr> {
    * @return a clone of this <code>IAST</code> instance.
    * @deprecated use {@link #copyAppendable()} or {@link #copy()}
    */
-  @Deprecated
-  public IAST clone() throws CloneNotSupportedException;
+//  @Deprecated
+//  public IAST clone() throws CloneNotSupportedException;
 
   /**
    * Compare all adjacent elements from lowest to highest index and return true, if the binary

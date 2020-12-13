@@ -69,7 +69,7 @@ public class ClusteringFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 	}
@@ -174,7 +174,7 @@ public class ClusteringFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 	}
@@ -220,7 +220,7 @@ public class ClusteringFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 	}
@@ -259,7 +259,7 @@ public class ClusteringFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 	}
@@ -423,7 +423,7 @@ public class ClusteringFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_5;
+			return ARGS_1_5;
 		}
 	}
 
@@ -540,7 +540,7 @@ public class ClusteringFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 	}

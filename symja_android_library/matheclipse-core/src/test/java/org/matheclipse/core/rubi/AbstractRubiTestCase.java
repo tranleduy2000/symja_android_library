@@ -228,7 +228,7 @@ public abstract class AbstractRubiTestCase extends TestCase {
 			F.await();
 			// start test with fresh instance
 			EvalEngine engine = new EvalEngine(isRelaxedSyntax);
-			fEvaluator = new ExprEvaluator(engine, true, 0);
+			fEvaluator = new ExprEvaluator(engine, true, (short) 0);
 			engine.setFileSystemEnabled(true);
 			engine.setRecursionLimit(256);
 			engine.setIterationLimit(500);

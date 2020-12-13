@@ -63,7 +63,7 @@ public class GeodesyFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 	}
 
@@ -89,7 +89,7 @@ public class GeodesyFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 	}
 	public static void initialize() {

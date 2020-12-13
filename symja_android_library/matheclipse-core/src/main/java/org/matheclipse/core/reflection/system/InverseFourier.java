@@ -35,7 +35,7 @@ public class InverseFourier extends AbstractFunctionEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_1;
+		return ARGS_1_1;
 	}
 
 	@Override

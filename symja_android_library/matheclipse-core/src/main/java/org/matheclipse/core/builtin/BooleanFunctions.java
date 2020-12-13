@@ -502,7 +502,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		/**
 		 * If all expressions evaluates to <code>true</code> for a given unary predicate function return
@@ -749,7 +749,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		/**
 		 * If any expression evaluates to <code>true</code> for a given unary predicate function return
@@ -849,7 +849,7 @@ public final class BooleanFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -921,7 +921,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 	}
 
@@ -977,7 +977,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 	}
 
@@ -1070,7 +1070,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 	}
 
@@ -1102,7 +1102,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		private static IAST booleanVariables(final IExpr expr) {
 			VariablesSet eVar = new VariablesSet();
@@ -1549,7 +1549,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -1600,7 +1600,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2170,7 +2170,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2519,7 +2519,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -2862,7 +2862,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 
 		@Override
@@ -2991,7 +2991,7 @@ public final class BooleanFunctions {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -3058,7 +3058,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		/**
 		 * If any expression evaluates to <code>true</code> for a given unary predicate function return
@@ -3145,7 +3145,7 @@ public final class BooleanFunctions {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -3192,7 +3192,7 @@ public final class BooleanFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3517,7 +3517,7 @@ public final class BooleanFunctions {
 				return F.NIL;
 			}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -3637,7 +3637,7 @@ public final class BooleanFunctions {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_3;
+			return ARGS_1_3;
 		}
 		/**
 		 * Use LogicNG MiniSAT method.
@@ -3745,7 +3745,7 @@ public final class BooleanFunctions {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_3;
+			return ARGS_1_3;
 		}
 	}
 
@@ -3809,7 +3809,7 @@ public final class BooleanFunctions {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_3;
+			return ARGS_1_3;
 		}
 		/**
 		 * Use LogicNG MiniSAT method.
@@ -3924,7 +3924,7 @@ public final class BooleanFunctions {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		/**
 		 * <p>
@@ -4017,7 +4017,7 @@ public final class BooleanFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {

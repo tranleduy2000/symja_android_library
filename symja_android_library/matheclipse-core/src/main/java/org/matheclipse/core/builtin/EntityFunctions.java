@@ -30,7 +30,7 @@ public class EntityFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_4;
+			return ARGS_3_4;
 		}
 
 	}

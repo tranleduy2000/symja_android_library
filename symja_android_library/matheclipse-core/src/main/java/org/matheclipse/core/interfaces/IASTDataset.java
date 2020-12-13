@@ -7,36 +7,51 @@ import java.io.Writer;
 import java.util.List;
 
 public interface IASTDataset extends IASTMutable {
-	public IASTAppendable columnNames();
 
-	public void csv(Writer writer) throws IOException;
+  public IASTAppendable columnNames();
 
-	/**
-	 * Return the value associated to the <code>key</code>. If no value is available return
-	 * <code>Missing("KeyAbsent", key)</code>
-	 *
-	 * @param key
-	 * @return
-	 */
-	public IExpr getValue(IExpr key);
+  public void csv(Writer writer) throws IOException;
 
-	/**
-	 * Return the value associated to the <code>key</code>. If no value is available return the
-	 * <code>defaultValue</code>
-	 *
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public IExpr getValue(IExpr key, Supplier<IExpr> defaultValue);
+  /**
+   * Return the value associated to the <code>key</code>. If no value is available return <code>
+   * Missing("KeyAbsent", key)</code>
+   *
+   * @param key
+   * @return
+   */
+  public IExpr getValue(IExpr key);
 
-	public IExpr groupBy(List<String> group);
+  /**
+   * Return the value associated to the <code>key</code>. If no value is available return the <code>
+   * defaultValue</code>
+   *
+   * @param key
+   * @param defaultValue
+   * @return
+   */
+  public IExpr getValue(IExpr key, Supplier<IExpr> defaultValue);
 
-	public IExpr select(IExpr row, IExpr column);
+  public IExpr groupBy(List<String> group);
 
-	public IASTDataset structure();
+  /**
+   * Select the row and column of a dataset.
+   *
+   * @param row
+   * @param column
+   * @return
+   */
+  public IExpr select(IExpr row, IExpr column);
 
-	public IASTDataset summary();
+  /**
+   * Select the row and column and parts of a dataset.
+   *
+   * @param ast
+   * @return
+   */
+  public IExpr select(IAST ast);
+  public IASTDataset structure();
 
-	public String datasetToJSForm() throws IOException;
+  public IASTDataset summary();
+
+  public String datasetToJSForm() throws IOException;
 }

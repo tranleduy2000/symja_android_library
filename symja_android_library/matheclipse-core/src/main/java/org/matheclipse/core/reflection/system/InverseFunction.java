@@ -57,7 +57,7 @@ public class InverseFunction extends AbstractFunctionEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_1;
+		return ARGS_1_1;
 	}
 	/**
 	 * Get the inverse function symbol if possible.

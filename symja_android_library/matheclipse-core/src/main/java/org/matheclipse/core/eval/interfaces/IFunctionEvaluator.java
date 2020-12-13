@@ -234,5 +234,9 @@ public interface IFunctionEvaluator extends IEvaluator {
    * @param engine
    * @return
    */
-  IExpr print(IAST ast, int expected, EvalEngine engine);
+  IExpr print(IAST ast, int expected, EvalEngine engine); /*{
+    // `1` called with `2` arguments; `3` arguments are expected.
+    return IOFunctions.printMessage(
+        ast.topHead(), "argrx", F.List(ast, F.ZZ(ast.argSize()), F.ZZ(expected)), engine);
+  }*/
 }

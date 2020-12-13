@@ -91,7 +91,7 @@ public class InverseLaplaceTransform extends AbstractFunctionEvaluator implement
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_3_3;
+		return ARGS_3_3;
 	}
 	@Override
 	public IAST getRuleAST() {

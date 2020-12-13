@@ -78,7 +78,7 @@ public class VectorAnalysisFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 	}
 
@@ -126,7 +126,7 @@ public class VectorAnalysisFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 	}
 
@@ -151,7 +151,7 @@ public class VectorAnalysisFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 	}
 

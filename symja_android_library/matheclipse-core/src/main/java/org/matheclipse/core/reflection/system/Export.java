@@ -66,7 +66,7 @@ public class Export extends AbstractEvaluator {
 				}
 
 				if (format.equals(Extension.CSV)) {
-					if (arg2.isDataSet()) {
+					if (arg2.isDataset()) {
 						((IASTDataset) arg2).csv(writer);
 						return arg1;
 					}
@@ -154,7 +154,7 @@ public class Export extends AbstractEvaluator {
 	}
 
     public int[] expectedArgSize(IAST ast) {
-        return IOFunctions.ARGS_2_3;
+        return ARGS_2_3;
     }
 	/**
 	 * See the documentation of {@link CsvFormat}, {@link ImageFormat}, {@link MatlabExport}, and {@link ObjectFormat}

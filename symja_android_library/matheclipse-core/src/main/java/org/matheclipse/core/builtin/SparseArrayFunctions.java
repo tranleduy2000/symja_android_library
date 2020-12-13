@@ -59,7 +59,7 @@ public class SparseArrayFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 
 	}
@@ -175,7 +175,7 @@ public class SparseArrayFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_4;
+			return ARGS_1_4;
 		}
 	}
 

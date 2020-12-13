@@ -137,7 +137,7 @@ public class TrigReduce extends AbstractEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_1;
+		return ARGS_1_1;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

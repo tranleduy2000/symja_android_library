@@ -53,7 +53,7 @@ public class ExportString extends AbstractEvaluator {
 				}
 
 				if (format.equals(Extension.CSV)) {
-					if (arg1.isDataSet()) {
+					if (arg1.isDataset()) {
 						((IASTDataset) arg1).csv(writer);
 						return F.stringx(writer.toString());
 					}
@@ -141,6 +141,6 @@ public class ExportString extends AbstractEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_2_2;
+		return ARGS_2_2;
 	}
 }

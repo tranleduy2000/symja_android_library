@@ -9,42 +9,84 @@ import org.matheclipse.core.interfaces.IExpr;
 
 public class CompiledFunctionExpr extends DataExpr<AbstractFunctionEvaluator> {
 
-	private static final long serialVersionUID = 3098987741558862963L;
+  private static final long serialVersionUID = 3098987741558862963L;
 
-	/**
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static CompiledFunctionExpr newInstance(final AbstractFunctionEvaluator value) {
-		return new CompiledFunctionExpr(value);
-	}
+  public static CompiledFunctionExpr newInstance(
+      IAST variables, IAST types, IExpr expr, final AbstractFunctionEvaluator value) {
+    return new CompiledFunctionExpr(variables, types, expr, value);
+  }
 
-	protected CompiledFunctionExpr(final AbstractFunctionEvaluator function) {
-		super(F.CompiledFunction, function);
-	}
+  private IAST variables;
+  private IAST types;
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj instanceof CompiledFunctionExpr) {
-			return fData.equals(((CompiledFunctionExpr) obj).fData);
-		}
-		return false;
-	}
+  private IExpr expr;
 
-	@Override
-	public int hashCode() {
-		return (fData == null) ? 461 : 461 + fData.hashCode();
-	}
-	public IExpr evaluate(IAST ast, EvalEngine engine) {
-		return fData.evaluate(ast, engine);
-	}
+  protected CompiledFunctionExpr(
+      IAST variables, IAST types, IExpr expr, final AbstractFunctionEvaluator function) {
+    super(F.CompiledFunction, function);
+    this.variables = variables;
+    this.types = types;
+    this.expr = expr;
+  }
 
-	@Override
-	public IExpr copy() {
-		return new CompiledFunctionExpr(fData);
-	}
+  @Override
+  public IExpr copy() {
+    return new CompiledFunctionExpr(variables, types, expr, fData);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj instanceof CompiledFunctionExpr) {
+      return fData.equals(((CompiledFunctionExpr) obj).fData);
+    }
+    return false;
+  }
+
+  public IExpr evaluate(IAST ast, EvalEngine engine) {
+    return fData.evaluate(ast, engine);
+  }
+
+  public IExpr getExpr() {
+    return expr;
+  }
+
+  public IAST getVariables() {
+    return variables;
+  }
+  @Override
+  public int hashCode() {
+    return (fData == null) ? 461 : 461 + fData.hashCode();
+  }
+
+  @Override
+  public int hierarchy() {
+    return COMPILEFUNCTONID;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    buf.append("CompiledFunction(Arg count: ");
+    buf.append(variables.argSize());
+    buf.append(" Types: {");
+    for (int i = 1; i < types.size(); i++) {
+      buf.append(types.get(i));
+      if (i < types.size() - 1) {
+        buf.append(",");
+      }
+    }
+    buf.append("} Variables: {");
+    for (int i = 1; i < variables.size(); i++) {
+      buf.append(variables.get(i));
+      if (i < variables.size() - 1) {
+        buf.append(",");
+      }
+    }
+    buf.append("}");
+    buf.append(")");
+    return buf.toString();
+  }
 }

@@ -126,8 +126,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Coefficient(polynomial, variable, exponent)
    * </pre>
@@ -255,7 +253,9 @@ public class PolynomialFunctions {
     }
   }
 
-  /** */
+  /**
+   *
+   */
   private static class CoefficientList extends AbstractFunctionEvaluator {
 
     @Override
@@ -417,8 +417,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Cyclotomic(n, x)
    * </pre>
@@ -493,9 +491,19 @@ public class PolynomialFunctions {
       }
       if (LongMath.isPrime(n)) {
         if (x.isRational()) {
-          return F.sumRational(i -> ((IRational) x).pow(i), 0, n - 1);
+          return F.sumRational(new IntFunction<IRational>() {
+            @Override
+            public IRational apply(int i) {
+              return ((IRational) x).pow(i);
+            }
+          }, 0, n - 1);
+        }
+        return F.sum(new Function<IExpr, IExpr>() {
+          @Override
+          public IExpr apply(IExpr i) {
+            return x.power(i);
           }
-        return F.sum(i -> x.power(i), 0, n - 1);
+        }, 0, n - 1);
       }
       if ((n & 0x00000001) == 0x00000000) {
         // n is even
@@ -542,8 +550,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Discriminant(poly, var)
    * </pre>
@@ -592,21 +598,21 @@ public class PolynomialFunctions {
     private static final IExpr QUARTIC =
         F.Plus(
             F.Times(F.Sqr(F.b), F.Sqr(F.c), F.Sqr(F.d)),
-        F.Times(F.CN4, F.a, F.Power(F.c, F.C3), F.Sqr(F.d)),
-        F.Times(F.CN4, F.Power(F.b, F.C3), F.Power(F.d, F.C3)),
-        F.Times(F.ZZ(18L), F.a, F.b, F.c, F.Power(F.d, F.C3)),
-        F.Times(F.ZZ(-27L), F.Sqr(F.a), F.Power(F.d, F.C4)),
-        F.Times(F.CN4, F.Sqr(F.b), F.Power(F.c, F.C3), F.e),
-        F.Times(F.ZZ(16L), F.a, F.Power(F.c, F.C4), F.e),
-        F.Times(F.ZZ(18L), F.Power(F.b, F.C3), F.c, F.d, F.e),
-        F.Times(F.ZZ(-80L), F.a, F.b, F.Sqr(F.c), F.d, F.e),
-        F.Times(F.CN6, F.a, F.Sqr(F.b), F.Sqr(F.d), F.e),
-        F.Times(F.ZZ(144L), F.Sqr(F.a), F.c, F.Sqr(F.d), F.e),
-        F.Times(F.ZZ(-27L), F.Power(F.b, F.C4), F.Sqr(F.e)),
-        F.Times(F.ZZ(144L), F.a, F.Sqr(F.b), F.c, F.Sqr(F.e)),
-        F.Times(F.ZZ(-128L), F.Sqr(F.a), F.Sqr(F.c), F.Sqr(F.e)),
-        F.Times(F.ZZ(-192L), F.Sqr(F.a), F.b, F.d, F.Sqr(F.e)),
-        F.Times(F.ZZ(256L), F.Power(F.a, F.C3), F.Power(F.e, F.C3)));
+            F.Times(F.CN4, F.a, F.Power(F.c, F.C3), F.Sqr(F.d)),
+            F.Times(F.CN4, F.Power(F.b, F.C3), F.Power(F.d, F.C3)),
+            F.Times(F.ZZ(18L), F.a, F.b, F.c, F.Power(F.d, F.C3)),
+            F.Times(F.ZZ(-27L), F.Sqr(F.a), F.Power(F.d, F.C4)),
+            F.Times(F.CN4, F.Sqr(F.b), F.Power(F.c, F.C3), F.e),
+            F.Times(F.ZZ(16L), F.a, F.Power(F.c, F.C4), F.e),
+            F.Times(F.ZZ(18L), F.Power(F.b, F.C3), F.c, F.d, F.e),
+            F.Times(F.ZZ(-80L), F.a, F.b, F.Sqr(F.c), F.d, F.e),
+            F.Times(F.CN6, F.a, F.Sqr(F.b), F.Sqr(F.d), F.e),
+            F.Times(F.ZZ(144L), F.Sqr(F.a), F.c, F.Sqr(F.d), F.e),
+            F.Times(F.ZZ(-27L), F.Power(F.b, F.C4), F.Sqr(F.e)),
+            F.Times(F.ZZ(144L), F.a, F.Sqr(F.b), F.c, F.Sqr(F.e)),
+            F.Times(F.ZZ(-128L), F.Sqr(F.a), F.Sqr(F.c), F.Sqr(F.e)),
+            F.Times(F.ZZ(-192L), F.Sqr(F.a), F.b, F.d, F.Sqr(F.e)),
+            F.Times(F.ZZ(256L), F.Power(F.a, F.C3), F.Power(F.e, F.C3)));
 
     // b^2*c^2*d^2*e^2 - 4*a*c^3*d^2*e^2 - 4*b^3*d^3*e^2 + 18*a*b*c*d^3*e^2 -
     // 27*a^2*d^4*e^2 - 4*b^2*c^3*e^3 + 16*a*c^4*e^3 + 18*b^3*c*d*e^3 -
@@ -747,8 +753,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Exponent(polynomial, x)
    * </pre>
@@ -919,8 +923,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Resultant(polynomial1, polynomial2, var)
    * </pre>
@@ -1140,8 +1142,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * NRoots(poly)
    * </pre>
@@ -1364,7 +1364,7 @@ public class PolynomialFunctions {
      *
      * @param arg
      * @param numeric if <code>true</code> create a numerically evaluated result. Otherwise return a
-     *     symbolic result.
+     *                symbolic result.
      * @return
      */
     public static IASTAppendable croots(final IExpr arg, boolean numeric) {
@@ -1433,8 +1433,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Roots(polynomial - equation, var)
    * </pre>
@@ -1512,8 +1510,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * ChebyshevT(n, x)
    * </pre>
@@ -1583,8 +1579,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * ChebyshevU(n, x)
    * </pre>
@@ -1685,8 +1679,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * BellY(n, k, {x1, x2, ... , xN})
    * </pre>
@@ -1776,8 +1768,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * GroebnerBasis({polynomial-list},{variable-list})
    * </pre>
@@ -1846,8 +1836,8 @@ public class PolynomialFunctions {
      * @param listOfVariables   a list of variable symbols
      * @param termOrder         the term order
      * @return <code>F.NIL</code> if <code>stopUnevaluatedOnPolynomialConversionError==true</code>
-     *     and one of the polynomials in <code>listOfPolynomials</code> are not convertible to JAS
-     *     polynomials
+     * and one of the polynomials in <code>listOfPolynomials</code> are not convertible to JAS
+     * polynomials
      */
     private static IAST computeGroebnerBasis(IAST listOfPolynomials, IAST listOfVariables,
         TermOrder termOrder) {
@@ -1898,8 +1888,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * HermiteH(n, x)
    * </pre>
@@ -1945,8 +1933,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * LaguerreL(n, x)
    * </pre>
@@ -2063,8 +2049,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * LegendreP(n, x)
    * </pre>
@@ -2115,8 +2099,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * LegendreQ(n, x)
    * </pre>
@@ -2168,8 +2150,6 @@ public class PolynomialFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * MonomialList(polynomial, list - of - variables)
    * </pre>
@@ -2261,7 +2241,8 @@ public class PolynomialFunctions {
     }
 
     /**
-     * Get the monomial list of a univariate polynomial with coefficients reduced by a modulo value.
+     * Get the monomial list of a univariate polynomial with coefficients reduced by a modulo
+     * value.
      *
      * @param polynomial    a polynomial expression
      * @param variablesList list of variables
@@ -2668,7 +2649,7 @@ public class PolynomialFunctions {
       IExpr f1 = F.Power(r, fraction);
       IASTAppendable result = F.ListAlloc(n);
       for (int k = 0; k < n; k++) {
-        IAST argCosSin = F.Times(fraction, F.Plus(theta, F.Times(F.ZZ(k + k), S.Pi)));
+        IAST argCosSin = F.Times(fraction, F.Plus(theta, F.Times(F.ZZ(k + k), F.Pi)));
         IAST f2 = F.Plus(F.Cos(argCosSin), F.Times(F.CI, F.Sin(argCosSin)));
         result.append(F.Times(f1, f2));
       }
@@ -2756,7 +2737,7 @@ public class PolynomialFunctions {
                   F.Power(F.CN1, F.fraction(i, varDegree)),
                   zNumerator,
                   zDenominator));
-      }
+        }
       }
       //      IExpr temp = EvalEngine.get().evaluate(result);
       //      System.out.println(temp.toString());
@@ -2964,8 +2945,8 @@ public class PolynomialFunctions {
    * @param listOfPolynomials a list of polynomials
    * @param listOfVariables   a list of variable symbols
    * @return <code>F.NIL</code> if <code>stopUnevaluatedOnPolynomialConversionError==true</code> and
-   *     one of the polynomials in <code>listOfPolynomials</code> are not convertible to JAS
-   *     polynomials
+   * one of the polynomials in <code>listOfPolynomials</code> are not convertible to JAS
+   * polynomials
    */
   public static IASTAppendable solveGroebnerBasis(IAST listOfPolynomials, IAST listOfVariables) {
     List<ISymbol> varList = new ArrayList<ISymbol>(listOfVariables.argSize());

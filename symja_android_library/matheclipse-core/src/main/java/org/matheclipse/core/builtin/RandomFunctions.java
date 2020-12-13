@@ -284,7 +284,7 @@ public final class RandomFunctions {
 
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_2;
+			return ARGS_0_2;
 		}
 	}
 
@@ -324,7 +324,7 @@ public final class RandomFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 	}
 
@@ -506,7 +506,7 @@ public final class RandomFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 
 		public static IAST shuffle(final IAST list, int n) {

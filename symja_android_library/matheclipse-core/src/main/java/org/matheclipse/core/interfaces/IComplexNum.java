@@ -4,36 +4,38 @@ package org.matheclipse.core.interfaces;
  *
  */
 public interface IComplexNum extends INumber {
-    public IComplexNum add(IComplexNum val);
 
-    @Override
-    public IComplexNum conjugate();
+  public IComplexNum add(IComplexNum val);
 
-    /**
-     * Return the absolute value of this complex number.
-     * <p>
-     * Returns <code>NaN</code> if either real or imaginary part is <code>NaN</code> and
-     * <code>Double.POSITIVE_INFINITY</code> if neither part is <code>NaN</code>, but at least one part takes an
-     * infinite value.
-     *
-     * @return the absolute value
-     */
-    public double dabs();
+  @Override
+  public IComplexNum conjugate();
 
-	public IComplexNum divide(IComplexNum val);
+  /**
+   * Return the absolute value of this complex number.
+   * <p>
+   * Returns <code>NaN</code> if either real or imaginary part is <code>NaN</code> and
+   * <code>Double.POSITIVE_INFINITY</code> if neither part is <code>NaN</code>, but at least one
+   * part takes an
+   * infinite value.
+   *
+   * @return the absolute value
+   */
+  public double dabs();
 
-    public double getImaginaryPart();
+  public IComplexNum divide(IComplexNum val);
 
-    public double getRealPart();
+  public double getImaginaryPart();
 
-    @Override
-    long leafCount();
+  public double getRealPart();
 
-    public IComplexNum multiply(IComplexNum val);
+  @Override
+  long leafCount();
 
-	public IComplexNum subtract(IComplexNum subtrahend);
+  public IComplexNum multiply(IComplexNum val);
 
-    public IComplexNum pow(IComplexNum val);
+  public IComplexNum subtract(IComplexNum subtrahend);
 
-    public long precision();
+  public IComplexNum pow(IComplexNum val);
+
+  public long precision();
 }

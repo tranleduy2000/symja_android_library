@@ -44,7 +44,7 @@ public class NFourierTransform extends AbstractFunctionEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_3_4;
+		return ARGS_3_4;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

@@ -33,7 +33,7 @@ public class VisitorReplaceSlots extends VisitorExpr {
 	}
 
 	private IExpr getSlot(IStringX str) {
-		if (astSlots.arg1().isDataSet()) {
+		if (astSlots.arg1().isDataset()) {
 			return ((IASTDataset) astSlots.arg1()).getValue(str);
 		}
 		if (astSlots.arg1().isAssociation()) {

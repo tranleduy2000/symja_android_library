@@ -150,7 +150,7 @@ public final class Programming {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_0;
+			return ARGS_0_0;
 		}
 
 		@Override
@@ -173,7 +173,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -208,7 +208,7 @@ public final class Programming {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_0;
+			return ARGS_0_0;
 		}
 
 		@Override
@@ -247,7 +247,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
@@ -290,7 +290,7 @@ public final class Programming {
 			}
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_3;
+			return ARGS_1_3;
 		}
 
 		@Override
@@ -348,7 +348,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 		@Override
@@ -458,7 +458,7 @@ public final class Programming {
 			return F.NIL;
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 		@Override
@@ -499,7 +499,7 @@ public final class Programming {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_1;
+			return ARGS_0_1;
 		}
 
 		@Override
@@ -737,7 +737,7 @@ public final class Programming {
 			return F.NIL;
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_INFINITY;
+			return ARGS_2_INFINITY;
 		}
 
 		@Override
@@ -846,7 +846,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 		// @Override
 		// public void setUp(final ISymbol newSymbol) {
@@ -980,7 +980,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 
 	}
@@ -1087,7 +1087,7 @@ public final class Programming {
 			}
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_4;
+			return ARGS_3_4;
 		}
 
 		@Override
@@ -1179,7 +1179,7 @@ public final class Programming {
 			return F.NIL;
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_4;
+			return ARGS_2_4;
 		}
 
 		@Override
@@ -1219,7 +1219,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_0;
+			return ARGS_0_0;
 		}
 
 		@Override
@@ -1314,7 +1314,7 @@ public final class Programming {
 				return F.NIL;
 			}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 		@Override
@@ -1372,7 +1372,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		public static IExpr nest(final IExpr expr, final int n, final Function<IExpr, IExpr> fn, EvalEngine engine) {
@@ -1452,7 +1452,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		@Override
@@ -1515,7 +1515,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		public static IExpr nestWhile(final IExpr expr, final IExpr test, final Function<IExpr, IExpr> fn,
@@ -1582,7 +1582,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 		public static IAST nestList(final IExpr expr, final IExpr test, final Function<IExpr, IExpr> fn,
 				final IASTAppendable resultList, EvalEngine engine) {
@@ -2173,7 +2173,7 @@ public final class Programming {
 
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 	}
@@ -2202,7 +2202,7 @@ public final class Programming {
 			}
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -2363,7 +2363,7 @@ public final class Programming {
 			}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_1;
+			return ARGS_0_1;
 		}
 
 		@Override
@@ -2475,7 +2475,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_0_1;
+			return ARGS_0_1;
 		}
 
 		@Override
@@ -2499,7 +2499,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2733,7 +2733,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 		@Override
 		public void setUp(ISymbol newSymbol) {
@@ -2766,7 +2766,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 	}
 
@@ -2798,7 +2798,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2850,7 +2850,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -2929,7 +2929,7 @@ public final class Programming {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -3097,7 +3097,7 @@ public final class Programming {
 			return F.Null;
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 
 		@Override
@@ -3136,7 +3136,7 @@ public final class Programming {
 			return IOFunctions.printMessage(ast.topHead(), "lvlist", F.List(arg1), engine);
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 		@Override

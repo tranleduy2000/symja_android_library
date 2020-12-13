@@ -33,7 +33,7 @@ public class Dataset extends AbstractEvaluator {
 				// return DataSetExpr.newInstance((IAST) ast.arg1());
 			}
 		}
-		if (ast.head().isDataSet()) {
+		if (ast.head().isDataset()) {
 			IASTDataset dataSet = (IASTDataset) ast.head();
 			IExpr arg1 = ast.arg1();
 			try {
@@ -50,12 +50,12 @@ public class Dataset extends AbstractEvaluator {
 							arg1.isAST(F.TakeLargest, 2) || //
 							arg1.isAST(F.TakeLargestBy, 3)) {
 						IExpr expr = dataSet.select(F.All, arg2);
-						if (expr.isDataSet()) {
+						if (expr.isDataset()) {
 							return F.unaryAST1(arg1, ((IASTDataset) expr).normal(false));
 						}
 					} else {
 						IExpr expr = engine.evaluate(F.unaryAST1(arg1, dataSet));
-						if (expr.isDataSet()) {
+						if (expr.isDataset()) {
 							return ((IASTDataset) expr).select(F.All, arg2);
 							// } else if (expr.isList() && ((IAST) expr).forAll(x -> x.isAssociation())) {
 							// return DataSetExpr.newInstance((IAST) ast.arg1());
@@ -77,6 +77,6 @@ public class Dataset extends AbstractEvaluator {
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_2;
+		return ARGS_1_2;
 	}
 }

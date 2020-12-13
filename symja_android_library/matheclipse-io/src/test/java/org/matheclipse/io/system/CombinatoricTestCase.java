@@ -15,23 +15,23 @@ public class CombinatoricTestCase extends AbstractTestCase {
      */
     public void testCombinatoric() {
 
-		// check("KOrderlessPartitions(f(g),1)", //
-		// "{f(g)}");
-		// check("KOrderlessPartitions(f(),1)", //
-		// "KOrderlessPartitions(f(),1)");
-		check("KOrderlessPartitions(w+x+x+y+z,5)", //
-				"KOrderlessPartitions(w+2*x+y+z,5)");
-		check("KOrderlessPartitions(w+x+x+y+z,6)", //
-				"KOrderlessPartitions(w+2*x+y+z,6)");
-		check("KOrderlessPartitions(w+x+x+y+z,3)",//
-                "{{w,2*x,y+z},{w,2*x+y,z},{w+2*x,y,z},{w,2*x+z,y},{w+2*x,z,y},{w,y,2*x+z},{w+y,2*x,z},{w,y+z,\n"
-                        + "2*x},{w+y,z,2*x},{w,z,2*x+y},{w+z,2*x,y},{w+z,y,2*x},{2*x,w,y+z},{2*x,w+y,z},{2*x,w+z,y},{\n"
-                        + "2*x,y,w+z},{2*x+y,w,z},{2*x,y+z,w},{2*x+y,z,w},{2*x,z,w+y},{2*x+z,w,y},{2*x+z,y,w},{y,w,\n"
-                        + "2*x+z},{y,w+2*x,z},{y,w+z,2*x},{y,2*x,w+z},{y,2*x+z,w},{y,z,w+2*x},{y+z,w,2*x},{y+z,\n"
-                        + "2*x,w},{z,w,2*x+y},{z,w+2*x,y},{z,w+y,2*x},{z,2*x,w+y},{z,2*x+y,w},{z,y,w+2*x}}");
-
-		check("KPartitions({v,w,x,y,z},3)",//
-                "{{{v},{w},{x,y,z}},{{v},{w,x},{y,z}},{{v},{w,x,y},{z}},{{v,w},{x},{y,z}},{{v,w},{x,y},{z}},{{v,w,x},{y},{z}}}");
+//		// check("KOrderlessPartitions(f(g),1)", //
+//		// "{f(g)}");
+//		// check("KOrderlessPartitions(f(),1)", //
+//		// "KOrderlessPartitions(f(),1)");
+//		check("KOrderlessPartitions(w+x+x+y+z,5)", //
+//				"KOrderlessPartitions(w+2*x+y+z,5)");
+//		check("KOrderlessPartitions(w+x+x+y+z,6)", //
+//				"KOrderlessPartitions(w+2*x+y+z,6)");
+//		check("KOrderlessPartitions(w+x+x+y+z,3)",//
+//                "{{w,2*x,y+z},{w,2*x+y,z},{w+2*x,y,z},{w,2*x+z,y},{w+2*x,z,y},{w,y,2*x+z},{w+y,2*x,z},{w,y+z,\n"
+//                        + "2*x},{w+y,z,2*x},{w,z,2*x+y},{w+z,2*x,y},{w+z,y,2*x},{2*x,w,y+z},{2*x,w+y,z},{2*x,w+z,y},{\n"
+//                        + "2*x,y,w+z},{2*x+y,w,z},{2*x,y+z,w},{2*x+y,z,w},{2*x,z,w+y},{2*x+z,w,y},{2*x+z,y,w},{y,w,\n"
+//                        + "2*x+z},{y,w+2*x,z},{y,w+z,2*x},{y,2*x,w+z},{y,2*x+z,w},{y,z,w+2*x},{y+z,w,2*x},{y+z,\n"
+//                        + "2*x,w},{z,w,2*x+y},{z,w+2*x,y},{z,w+y,2*x},{z,2*x,w+y},{z,2*x+y,w},{z,y,w+2*x}}");
+//
+//		check("KPartitions({v,w,x,y,z},3)",//
+//                "{{{v},{w},{x,y,z}},{{v},{w,x},{y,z}},{{v},{w,x,y},{z}},{{v,w},{x},{y,z}},{{v,w},{x,y},{z}},{{v,w,x},{y},{z}}}");
 
 		check("IntegerPartitions(3)", //
 				"{{3},{2,1},{1,1,1}}");

@@ -8,6 +8,7 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
 import org.matheclipse.core.eval.interfaces.ISymbolEvaluator;
 import org.matheclipse.core.interfaces.IAST;
@@ -24,365 +25,374 @@ import org.matheclipse.parser.client.FEConfig;
 import java.io.IOException;
 import java.io.ObjectStreamException;
 
-/**
- * Implements Symbols for function, constant and variable names
- * 
- */
+/** Implements Symbols for function, constant and variable names */
 public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
-	private final static class PredicateEvaluator extends AbstractCorePredicateEvaluator implements IPredicate {
-		Predicate<IExpr> predicate;
 
-		public PredicateEvaluator(Predicate<IExpr> predicate) {
-			this.predicate = predicate;
-		}
+  private static final class PredicateEvaluator extends AbstractCorePredicateEvaluator
+      implements IPredicate {
 
-		/** {@inheritDoc} */
-		@Override
-		public IExpr evaluate(final IAST ast, EvalEngine engine) {
-				return predicate.test(engine.evaluate(ast.arg1())) ? F.True : F.False;
-			}
+    Predicate<IExpr> predicate;
 
-		@Override
-		public boolean evalArg1Boole(IExpr arg1, EvalEngine engine) {
-			return predicate.test(engine.evaluate(arg1));
-		}
+    public PredicateEvaluator(Predicate<IExpr> predicate) {
+      this.predicate = predicate;
+    }
 
-		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
-		}
-	}
+    /** {@inheritDoc} */
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      return predicate.test(engine.evaluate(ast.arg1())) ? F.True : F.False;
+    }
 
-	private static class DummyEvaluator extends IEvaluatorImpl implements IEvaluator {
+    @Override
+    public boolean evalArg1Boole(IExpr arg1, EvalEngine engine) {
+      return predicate.test(engine.evaluate(arg1));
+    }
 
-		/**
-		 * Causes the current thread to wait until the INIT_THREAD has initialized the Integrate() rules.
-		 *
-		 */
-		@Override
-		public void await() throws InterruptedException {
-			F.await();
-		}
+    public int[] expectedArgSize(IAST ast) {
+      return IFunctionEvaluator.ARGS_1_1;
+    }
+  }
 
-		@Override
-		public void setUp(ISymbol newSymbol) {
-			// do nothing because of dummy evaluator
-		}
-	}
+  private static class DummyEvaluator extends IEvaluatorImpl implements IEvaluator {
 
-	/** 
-	 * 
-	 */
-	private static final long serialVersionUID = -4991038487281911261L;
+    /**
+     * Causes the current thread to wait until the INIT_THREAD has initialized the Integrate()
+     * rules.
+     */
+    @Override
+    public void await() throws InterruptedException {
+      F.await();
+    }
 
-	protected static final DummyEvaluator DUMMY_EVALUATOR = new DummyEvaluator();
+    @Override
+    public void setUp(ISymbol newSymbol) {
+      // do nothing because of dummy evaluator
+    }
+  }
 
-	/**
-	 * The evaluation class of this built-in-function. See packages: package
-	 * <code>org.matheclipse.core.builtin.function</code> and <code>org.matheclipse.core.reflection.system</code>.
-	 */
-	private transient IEvaluator fEvaluator;
+  /**
+   *
+   */
+  private static final long serialVersionUID = -4991038487281911261L;
 
-	private transient int fOrdinal;
+  public static final DummyEvaluator DUMMY_EVALUATOR = new DummyEvaluator();
 
-	// private BuiltInSymbol(final String symbolName) {
-	// this(symbolName, null);
-	// }
-	public BuiltInSymbol(final String symbolName, int ordinal) {
-		super(symbolName, Context.SYSTEM);
-		fEvaluator = DUMMY_EVALUATOR;
-		fOrdinal = ordinal;
-		if (symbolName.charAt(0) != '$') {
-			fAttributes = ISymbol.PROTECTED;
-		} else if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
-			fAttributes = ISymbol.PROTECTED;
-		}
-	}
+  /**
+   * The evaluation class of this built-in-function. See packages: package <code>
+   * org.matheclipse.core.builtin.function</code> and <code>org.matheclipse.core.reflection.system
+   * </code>.
+   */
+  private transient IEvaluator fEvaluator;
 
-	// private BuiltInSymbol(final String symbolName, final IEvaluator evaluator) {
-	// this(symbolName, Context.SYSTEM, evaluator);
-	// }
+  private transient int fOrdinal;
 
-	// private BuiltInSymbol(final String symbolName, Context context, final IEvaluator evaluator) {
-	// super(symbolName, context);
-	// fEvaluator = evaluator;
-	// }
+  // private BuiltInSymbol(final String symbolName) {
+  // this(symbolName, null);
+  // }
+  public BuiltInSymbol(final String symbolName, int ordinal) {
+    super(symbolName, Context.SYSTEM);
+    fEvaluator = DUMMY_EVALUATOR;
+    fOrdinal = ordinal;
+    if (symbolName.charAt(0) != '$') {
+      fAttributes = ISymbol.PROTECTED;
+    } else if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+      fAttributes = ISymbol.PROTECTED;
+    }
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public final void assignValue(final IExpr value) {
-		super.assignValue(value);
-		if (Config.FUZZ_TESTING) {
-			// Cannot assign to raw object `1`.
-			throw new NullPointerException();
-		}
-	}
+  // private BuiltInSymbol(final String symbolName, final IEvaluator evaluator) {
+  // this(symbolName, Context.SYSTEM, evaluator);
+  // }
 
-	/** {@inheritDoc} */
-	@Override
-	public final void clearAttributes(final int attributes) {
-		if (Config.FUZZ_TESTING) {
-			// Cannot assign to raw object `1`.
-			throw new NullPointerException();
-		}
-		super.clearAttributes(attributes);
-	}
+  // private BuiltInSymbol(final String symbolName, Context context, final IEvaluator evaluator) {
+  // super(symbolName, context);
+  // fEvaluator = evaluator;
+  // }
 
-	/** {@inheritDoc} */
-	@Override
-	public void clearAll(EvalEngine engine) {
-		if (Config.FUZZ_TESTING) {
-			// Cannot assign to raw object `1`.
-			throw new NullPointerException();
-		}
-		// clear(engine);
-		// fAttributes = NOATTRIBUTE;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final void assignValue(final IExpr value, boolean setDelayed) {
+    super.assignValue(value, setDelayed);
+    //    if (Config.FUZZ_TESTING) {
+    //      // Cannot assign to raw object `1`.
+    //      throw new NullPointerException();
+    //    }
+  }
 
-	@Override
-	public int compareTo(IExpr expr) {
-		if (expr instanceof BuiltInSymbol) {
-			final int ordinal = ((BuiltInSymbol) expr).fOrdinal;
-			return fOrdinal < ordinal ? -1 : fOrdinal == ordinal ? 0 : 1;
-		}
-		return super.compareTo(expr);
-	}
-	/** {@inheritDoc} */
-	@Override
-	public String definitionToString() throws IOException {
-		// dummy call to ensure, that the associated rules are loaded:
-		getEvaluator();
-		return super.definitionToString();
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final void clearAttributes(final int attributes) {
+    if (Config.FUZZ_TESTING) {
+      // Cannot assign to raw object `1`.
+      throw new NullPointerException();
+    }
+    super.clearAttributes(attributes);
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean equals(final Object obj) {
-		return this == obj;
-	}
-	/** {@inheritDoc} */
-	@Override
-	public IExpr evaluate(EvalEngine engine) {
-		// final IEvaluator module = getEvaluator();
-		if (fEvaluator instanceof ISymbolEvaluator) {
-			if (engine.isNumericMode()) {
-				if (engine.isArbitraryMode()) {
-					return ((ISymbolEvaluator) fEvaluator).apfloatEval(this, engine);
-				} else {
-					return ((ISymbolEvaluator) fEvaluator).numericEval(this);
-				}
-			}
-			return ((ISymbolEvaluator) fEvaluator).evaluate(this);
-		}
-		if (hasAssignedSymbolValue()) {
-			return assignedValue();
-		}
-		// if (hasLocalVariableStack()) {
-		// return ExprUtil.ofNullable(get());
-		// }
-		// IExpr result;
-		// if ((result = evalDownRule(engine, this)).isPresent()) {
-		// return result;
-		// }
-		return F.NIL;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public void clearAll(EvalEngine engine) {
+    if (Config.FUZZ_TESTING) {
+      // Cannot assign to raw object `1`.
+      throw new NullPointerException();
+    }
+    // clear(engine);
+    // fAttributes = NOATTRIBUTE;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public IExpr evaluateHead(IAST ast, EvalEngine engine) {
-		return isConstantAttribute() ? F.NIL : super.evaluateHead(ast, engine);
-	}
+  @Override
+  public int compareTo(IExpr expr) {
+    if (expr instanceof BuiltInSymbol) {
+      final int ordinal = ((BuiltInSymbol) expr).fOrdinal;
+      return fOrdinal < ordinal ? -1 : fOrdinal == ordinal ? 0 : 1;
+    }
+    return super.compareTo(expr);
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public IEvaluator getEvaluator() {
-		return fEvaluator;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public String definitionToString() throws IOException {
+    // dummy call to ensure, that the associated rules are loaded:
+    getEvaluator();
+    return super.definitionToString();
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public int hashCode() {
-		return fOrdinal;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public int ordinal() {
-		return fOrdinal;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public IExpr evaluate(EvalEngine engine) {
+    // final IEvaluator module = getEvaluator();
+    if (fEvaluator instanceof ISymbolEvaluator) {
+      if (engine.isNumericMode()) {
+        if (engine.isArbitraryMode()) {
+          return ((ISymbolEvaluator) fEvaluator).apfloatEval(this, engine);
+        } else {
+          return ((ISymbolEvaluator) fEvaluator).numericEval(this, engine);
+        }
+      }
+      return ((ISymbolEvaluator) fEvaluator).evaluate(this, engine);
+    }
+    if (hasAssignedSymbolValue()) {
+      return assignedValue();
+    }
+    // if (hasLocalVariableStack()) {
+    // return ExprUtil.ofNullable(get());
+    // }
+    // IExpr result;
+    // if ((result = evalDownRule(engine, this)).isPresent()) {
+    // return result;
+    // }
+    return F.NIL;
+  }
 
-	protected String internalJavaStringAsFactoryMethod() {
-		if (Config.RUBI_CONVERT_SYMBOLS) {
-			if (fOrdinal >= 1) {
-				if (Config.RUBI_CONVERT_SYMBOLS && "C".equals(fSymbolName)  ) {
-					return fSymbolName + "Symbol";
-				}
-				return fSymbolName;
-			}
-		}
-		return super.internalJavaStringAsFactoryMethod();
-	}
-	/** {@inheritDoc} */
-	@Override
-	public boolean isCoreFunctionSymbol() {
-		return fEvaluator instanceof ICoreFunctionEvaluator;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public IExpr evaluateHead(IAST ast, EvalEngine engine) {
+    return isConstantAttribute() ? F.NIL : super.evaluateHead(ast, engine);
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public  boolean isBooleanFormulaSymbol() {
-		return fEvaluator instanceof IBooleanFormula;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public IEvaluator getEvaluator() {
+    return fEvaluator;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public  boolean isComparatorFunctionSymbol() {
-		return fEvaluator instanceof IComparatorFunction;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode() {
+    return fOrdinal;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean isPredicateFunctionSymbol() {
-		return fEvaluator instanceof IPredicate;
-	}
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isHoldOrHoldFormOrDefer() {
-		return this.equals(F.Defer) || this.equals(F.Hold) || this.equals(F.HoldForm);
-	}
+  /** {@inheritDoc} */
+  @Override
+  public int ordinal() {
+    return fOrdinal;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isE() {
-		return this == F.E;
-	}
+  protected String internalJavaStringAsFactoryMethod() {
+    if (Config.RUBI_CONVERT_SYMBOLS) {
+      if (fOrdinal >= 1) {
+        if (Config.RUBI_CONVERT_SYMBOLS && "C".equals(fSymbolName)) {
+          return fSymbolName + "Symbol";
+        }
+        return fSymbolName;
+      }
+    }
+    return super.internalJavaStringAsFactoryMethod();
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isFalse() {
-		return this == F.False;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean isCoreFunctionSymbol() {
+    return fEvaluator instanceof ICoreFunctionEvaluator;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isIndeterminate() {
-		return this == F.Indeterminate;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean isBooleanFormulaSymbol() {
+    return fEvaluator instanceof IBooleanFormula;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isPi() {
-		return this == F.Pi;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean isComparatorFunctionSymbol() {
+    return fEvaluator instanceof IComparatorFunction;
+  }
 
-	@Override
-	final public boolean isNegative() {
-		if (isRealConstant()) {
-			return ((ISignedNumberConstant) fEvaluator).isNegative();
-		}
-		return false;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean isPredicateFunctionSymbol() {
+    return fEvaluator instanceof IPredicate;
+  }
 
-	@Override
-	final public boolean isPositive() {
-		if (isRealConstant()) {
-			return ((ISignedNumberConstant) fEvaluator).isPositive();
-		}
-		return false;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isHoldOrHoldFormOrDefer() {
+    return this.equals(F.Defer) || this.equals(F.Hold) || this.equals(F.HoldForm);
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isRealConstant() {
-		return fEvaluator instanceof ISignedNumberConstant;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isE() {
+    return this == F.E;
+  }
 
-	/** {@inheritDoc} */
-	final public boolean isSymbolID(int... ids) {
-		for (int i = 0; i < ids.length; i++) {
-			if (fOrdinal==ids[i]) {
-				return true;
-			}
-		}
-		return false;
-	}
-	/** {@inheritDoc} */
-	@Override
-	final public boolean isTrue() {
-		return this == F.True;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isFalse() {
+    return this == F.False;
+  }
 
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isIndeterminate() {
+    return this == F.Indeterminate;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public IExpr of(EvalEngine engine, IExpr... args) {
-		if (fEvaluator instanceof ICoreFunctionEvaluator) {
-			// evaluate a core function (without no rule definitions)
-			final ICoreFunctionEvaluator coreFunction = (ICoreFunctionEvaluator) getEvaluator();
-			IAST ast = F.ast(args, this);
-			return coreFunction.evaluate(ast, engine);
-		}
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isPi() {
+    return this == F.Pi;
+  }
 
-		return super.of(engine, args);
-	}
+  @Override
+  public final boolean isNegative() {
+    if (isRealConstant()) {
+      return ((ISignedNumberConstant) fEvaluator).isNegative();
+    }
+    return false;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean ofQ(EvalEngine engine, IExpr... args) {
-		if (args.length == 1) {
-			if (fEvaluator instanceof AbstractCorePredicateEvaluator) {
-			// evaluate a core function (without no rule definitions)
-			final AbstractCorePredicateEvaluator coreFunction = (AbstractCorePredicateEvaluator) getEvaluator();
-			return coreFunction.evalArg1Boole(args[0], engine);
-		}
-		}
-		return super.ofQ(engine, args);
-	}
+  @Override
+  public final boolean isPositive() {
+    if (isRealConstant()) {
+      return ((ISignedNumberConstant) fEvaluator).isPositive();
+    }
+    return false;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
-		if (fEvaluator instanceof ISignedNumberConstant) {
-			double value = ((ISignedNumberConstant) fEvaluator).evalReal();
-			if (value < Integer.MAX_VALUE && value > Integer.MIN_VALUE) {
-				return function.apply(value);
-		}
-		}
-		return F.NIL;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isRealConstant() {
+    return fEvaluator instanceof ISignedNumberConstant;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public final void setAttributes(final int attributes) {
-		super.setAttributes(attributes | ISymbol.PROTECTED);
-	}
-	/** {@inheritDoc} */
-	@Override
-	public final void setEvaluator(final IEvaluator evaluator) {
-		evaluator.setUp(this);
-		fEvaluator = evaluator;
-	}
-	/** {@inheritDoc} */
-	@Override
-	public final void setPredicateQ(final Predicate<IExpr> predicate) {
-		fEvaluator = new PredicateEvaluator(predicate);
-	}
+  /** {@inheritDoc} */
+  public final boolean isSymbolID(int... ids) {
+    for (int i = 0; i < ids.length; i++) {
+      if (fOrdinal == ids[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	// implementing of default method in IBuiltInSymbol
-	@Override
-	public ISymbol mapToGlobal(EvalEngine engine) {
-		return null;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isTrue() {
+    return this == F.True;
+  }
 
 
-	private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		fOrdinal = stream.readInt();
-	}
+  /** {@inheritDoc} */
+  @Override
+  public IExpr of(EvalEngine engine, IExpr... args) {
+    if (fEvaluator instanceof ICoreFunctionEvaluator) {
+      // evaluate a core function (without no rule definitions)
+      final ICoreFunctionEvaluator coreFunction = (ICoreFunctionEvaluator) getEvaluator();
+      IAST ast = F.ast(args, this);
+      return coreFunction.evaluate(ast, engine);
+    }
 
-	public Object readResolve() throws ObjectStreamException {
-		return F.symbol(fOrdinal);
-	}
+    return super.of(engine, args);
+  }
 
-	private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
-		stream.writeInt(fOrdinal);
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean ofQ(EvalEngine engine, IExpr... args) {
+    if (args.length == 1) {
+      if (fEvaluator instanceof AbstractCorePredicateEvaluator) {
+        // evaluate a core function (without no rule definitions)
+        final AbstractCorePredicateEvaluator coreFunction = (AbstractCorePredicateEvaluator) getEvaluator();
+        return coreFunction.evalArg1Boole(args[0], engine);
+      }
+    }
+    return super.ofQ(engine, args);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public IExpr mapConstantDouble(DoubleFunction<IExpr> function) {
+    if (fEvaluator instanceof ISignedNumberConstant) {
+      double value = ((ISignedNumberConstant) fEvaluator).evalReal();
+      if (value < Integer.MAX_VALUE && value > Integer.MIN_VALUE) {
+        return function.apply(value);
+      }
+    }
+    return F.NIL;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final void setAttributes(final int attributes) {
+    super.setAttributes(attributes | ISymbol.PROTECTED);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final void setEvaluator(final IEvaluator evaluator) {
+    evaluator.setUp(this);
+    fEvaluator = evaluator;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final void setPredicateQ(final Predicate<IExpr> predicate) {
+    fEvaluator = new PredicateEvaluator(predicate);
+  }
+
+  // implementing of default method in IBuiltInSymbol
+  @Override
+  public ISymbol mapToGlobal(EvalEngine engine) {
+    return null;
+  }
+
+
+  private void readObject(java.io.ObjectInputStream stream)
+      throws IOException, ClassNotFoundException {
+    fOrdinal = stream.readInt();
+  }
+
+  public Object readResolve() throws ObjectStreamException {
+    return F.symbol(fOrdinal);
+  }
+
+  private void writeObject(java.io.ObjectOutputStream stream) throws java.io.IOException {
+    stream.writeInt(fOrdinal);
+  }
 }

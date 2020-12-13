@@ -256,7 +256,7 @@ public class InterpolatingPolynomial extends AbstractEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_2_2;
+		return ARGS_2_2;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

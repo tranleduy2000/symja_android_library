@@ -156,7 +156,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -257,7 +257,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 	}
 
@@ -316,7 +316,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -418,7 +418,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -487,7 +487,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -556,7 +556,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -680,7 +680,7 @@ public class HypergeometricFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -738,7 +738,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -845,7 +845,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -985,7 +985,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_4_4;
+			return ARGS_4_4;
 		}
 		@Override
 		public void setUp(final ISymbol newSymbol) {
@@ -1041,7 +1041,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		@Override
@@ -1141,7 +1141,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		@Override
@@ -1249,7 +1249,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -1359,7 +1359,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -1437,7 +1437,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_1;
+			return ARGS_1_1;
 		}
 
 		@Override
@@ -1499,7 +1499,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		@Override
@@ -1561,7 +1561,7 @@ public class HypergeometricFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 		}
 
 		@Override

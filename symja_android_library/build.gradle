@@ -61,6 +61,7 @@ android {
             java.srcDirs += 'matheclipse-core/src/main/java/'
             java.srcDirs += 'matheclipse-frontend/src/main/java/'
             java.srcDirs += "matheclipse-api/src/main/java/"
+            java.srcDirs += "matheclipse-io/src/main/java/"
         }
 //        full {
 //            assets.srcDirs += 'matheclipse-core/src/main/resources/'

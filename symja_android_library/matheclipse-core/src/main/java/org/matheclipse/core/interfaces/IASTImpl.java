@@ -144,8 +144,8 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     return null;
   }
 
-  @Override
-  public abstract IAST clone() throws CloneNotSupportedException;
+  // @Override
+  // public abstract IAST clone() throws CloneNotSupportedException;
 
   @Override
   public IExpr acceptChecked(IVisitor visitor) {

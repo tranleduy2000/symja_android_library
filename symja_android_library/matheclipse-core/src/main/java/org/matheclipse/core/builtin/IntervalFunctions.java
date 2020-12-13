@@ -181,7 +181,7 @@ public class IntervalFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_2;
+			return ARGS_2_2;
 		}
 
 		@Override
@@ -285,7 +285,7 @@ public class IntervalFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_INFINITY;
+			return ARGS_1_INFINITY;
 		}
 
 		@Override
@@ -361,7 +361,7 @@ public class IntervalFunctions {
 		}
 
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_INFINITY;
+			return ARGS_1_INFINITY;
 		}
 
 		@Override

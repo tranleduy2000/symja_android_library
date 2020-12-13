@@ -1970,7 +1970,7 @@ public class ManipulateFunction {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_INFINITY;
+			return ARGS_1_INFINITY;
 		}
 
 		@Override

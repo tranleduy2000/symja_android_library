@@ -40,7 +40,7 @@ public class FinancialFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 	}
 
@@ -53,7 +53,7 @@ public class FinancialFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
 	}
 
@@ -111,7 +111,7 @@ public class FinancialFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
 		private IExpr effectiveInterestFormula(IExpr a, IExpr b) {
 			if (b.isZero()) {
@@ -212,7 +212,7 @@ public class FinancialFunctions {
 			return F.NIL;
 		}
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_3_3;
+			return ARGS_3_3;
 	}
 
 	}

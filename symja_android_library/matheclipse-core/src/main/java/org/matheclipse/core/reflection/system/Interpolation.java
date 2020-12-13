@@ -125,6 +125,6 @@ public class Interpolation extends AbstractEvaluator {
 	}
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_5;
+		return ARGS_1_5;
 	}
 }

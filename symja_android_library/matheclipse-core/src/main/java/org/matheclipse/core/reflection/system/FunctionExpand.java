@@ -390,7 +390,7 @@ public class FunctionExpand extends AbstractEvaluator implements FunctionExpandR
 	}
 
 	public int[] expectedArgSize(IAST ast) {
-		return IOFunctions.ARGS_1_2;
+		return ARGS_1_2;
 	}
 	@Override
 	public void setUp(final ISymbol newSymbol) {

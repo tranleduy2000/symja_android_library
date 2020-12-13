@@ -933,7 +933,7 @@ public class SeriesFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_2_3;
+			return ARGS_2_3;
 		}
         @Override
         public IAST getRuleAST() {
@@ -1009,7 +1009,7 @@ public class SeriesFunctions {
 
 		@Override
 		public int[] expectedArgSize(IAST ast) {
-			return IOFunctions.ARGS_1_2;
+			return ARGS_1_2;
 		}
     }
 
