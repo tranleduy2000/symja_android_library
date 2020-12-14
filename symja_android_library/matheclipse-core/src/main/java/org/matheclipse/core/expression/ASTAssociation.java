@@ -5,7 +5,15 @@ import com.duy.lambda.Function;
 import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
-
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
@@ -16,17 +24,6 @@ import org.matheclipse.core.interfaces.IAssociation;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.visit.IVisitor;
-
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 @SuppressWarnings({"JavaDoc", "JavadocReference"})
 public class ASTAssociation extends AST implements IAssociation {
@@ -53,7 +50,7 @@ public class ASTAssociation extends AST implements IAssociation {
   public ASTAssociation(IAST listOfRules) {
     super(listOfRules.size(), false);
     keyToIndexMap = new Object2IntOpenHashMap<IExpr>();
-    append(F.Association);
+    append(S.Association);
 
     appendRules(listOfRules);
   }
@@ -77,9 +74,9 @@ public class ASTAssociation extends AST implements IAssociation {
     super(initialCapacity, setLength);
     keyToIndexMap = new Object2IntOpenHashMap<IExpr>();
     if (setLength) {
-      set(0, F.Association);
+      set(0, S.Association);
     } else {
-      append(F.Association);
+      append(S.Association);
     }
   }
 
@@ -217,7 +214,6 @@ public class ASTAssociation extends AST implements IAssociation {
   //	  throw new UnsupportedOperationException();
   ////    return copy();
   //  }
-
   @Override
   public ASTAssociation copy() {
     ASTAssociation ast = new ASTAssociation();
@@ -263,14 +259,14 @@ public class ASTAssociation extends AST implements IAssociation {
   /** {@inheritDoc} */
   @Override
   public IASTAppendable copyHead() {
-    return F.ast(F.Association, size(), false);
+    return F.ast(S.Association, size(), false);
     // return new ASTAssociation(size(), false);
   }
 
   /** {@inheritDoc} */
   @Override
   public IASTAppendable copyHead(final int intialCapacity) {
-    return F.ast(F.Association, intialCapacity, false);
+    return F.ast(S.Association, intialCapacity, false);
     //    return new ASTAssociation(intialCapacity, false);
   }
 
@@ -420,7 +416,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
   @Override
   public String fullFormString() {
-    return normal(F.Association).fullFormString();
+    return normal(S.Association).fullFormString();
   }
 
   @Override
@@ -472,7 +468,7 @@ public class ASTAssociation extends AST implements IAssociation {
   @Override
   public IAST getRule(int position) {
     IExpr temp = super.get(position);
-    if (temp.isRuleAST()) {
+    if (temp != null && temp.isRuleAST()) {
       return (IAST) temp;
     }
     return F.NIL;
@@ -522,13 +518,23 @@ public class ASTAssociation extends AST implements IAssociation {
   }
 
   /**
-   * Test if this AST is an association <code>&lt;|a-&gt;b, c-&gt;d|&gt;</code>(i.e. type
-   * <code>AssociationAST</code>)
+   * Test if this AST is an association <code>&lt;|a-&gt;b, c-&gt;d|&gt;</code>(i.e. type <code>
+   * AssociationAST</code>)
    *
    * @return
    */
   @Override
   public boolean isAssociation() {
+    return true;
+  }
+
+  @Override
+  public boolean isAST() {
+    return false;
+  }
+
+  @Override
+  public boolean isAtom() {
     return true;
   }
 
@@ -554,7 +560,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
   @Override
   public IASTMutable keys() {
-    return keys(F.List);
+    return keys(S.List);
   }
 
   protected IASTMutable keys(IBuiltInSymbol symbol) {
@@ -661,7 +667,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
   @Override
   public IASTMutable normal(boolean nilIfUnevaluated) {
-    return normal(F.List);
+    return normal(S.List);
   }
 
   protected IASTMutable normal(IBuiltInSymbol symbol) {
@@ -729,7 +735,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
   @Override
   public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
-    append(F.Association);
+    append(S.Association);
     IAST ast = (IAST) objectInput.readObject();
     for (int i = 1; i < ast.size(); i++) {
       appendRule(ast.get(i));
@@ -770,11 +776,22 @@ public class ASTAssociation extends AST implements IAssociation {
   }
 
   @Override
-  public IExpr set(int location, IExpr object) {
-    if (location != 0 && !object.isRuleAST()) {
-      ArgumentTypeException.throwArg(object, F.Association);
+  public IExpr set(final int location, final IExpr rule) {
+    if (rule.isRuleAST() && location > 0) {
+      final IAST oldRule = getRule(location);
+      if (oldRule.isPresent()) {
+        keyToIndexMap.removeInt(oldRule.first());
+      }
+      keyToIndexMap.put(rule.first(), location);
+      return super.set(location, rule);
     }
-    return super.set(location, object);
+    if (location == 0) {
+      // set header
+      return super.set(0, rule);
+    }
+    // illegal arguments: \"`1`\" in `2`
+    ArgumentTypeException.throwArg(rule, S.Association);
+    return F.NIL;
   }
 
   @Override
@@ -807,7 +824,6 @@ public class ASTAssociation extends AST implements IAssociation {
     Collections.sort(indices, comparator);
     ASTAssociation result = new ASTAssociation(argSize(), true);
     for (Object2IntMap.Entry<IExpr> element : keyToIndexMap.object2IntEntrySet()) {
-      // for (Map.Entry<IExpr, Integer> element : keyToIndexMap.entrySet()) {
       int indx = element.getIntValue();
       for (int i = 0; i < indices.size(); i++) {
         if (indices.get(i) == indx) {
@@ -824,7 +840,7 @@ public class ASTAssociation extends AST implements IAssociation {
 
   @Override
   public IASTMutable values() {
-    return values(F.List);
+    return values(S.List);
   }
 
   protected IASTMutable values(IBuiltInSymbol symbol) {

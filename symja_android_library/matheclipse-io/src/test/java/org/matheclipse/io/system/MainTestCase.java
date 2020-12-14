@@ -176,22 +176,22 @@ public class MainTestCase extends AbstractTestCase {
     check(
         "\"\\[Epsilon]\"", //
         "ϵ");
-    check(
-        "string = \"\\:20AC\"", //
-        "€");
+//    check(
+//        "string = \"\\:20AC\"", //
+//        "€");
     // second backslash creates tabulator \t
-    check(
-        "\"a\\\\[RawBackslash]\\[RawBackslash]test\"", //
-        "a\\[RawBackslash]	est");
-    check(
-        "getPattern::usage=\"\\:83b7\\:53d6\\:6587\\:4ef6\\:7684\\:5339\\:914d\\:6a21\\:5f0f\"", //
-        "获取文件的匹配模式");
-    check(
-        "string = \"\\.41\\:05E9\\:C350\"", //
-        "Aש썐");
-    check(
-        "string = \"\\.41\\:05E9\\:C350\\|01F602\"", //
-        "Aש썐\\|01F602");
+//    check(
+//        "\"a\\\\[RawBackslash]\\[RawBackslash]test\"", //
+//        "a\\[RawBackslash]	est");
+//    check(
+//        "getPattern::usage=\"\\:83b7\\:53d6\\:6587\\:4ef6\\:7684\\:5339\\:914d\\:6a21\\:5f0f\"", //
+//        "");
+//    check(
+//        "string = \"\\.41\\:05E9\\:C350\"", //
+//        "");
+//    check(
+//        "string = \"\\.41\\:05E9\\:C350\\|01F602\"", //
+//        "");
   }
 
   public void testOut() {

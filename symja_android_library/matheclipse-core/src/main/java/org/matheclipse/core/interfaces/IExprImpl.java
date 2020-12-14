@@ -1,10 +1,17 @@
 package org.matheclipse.core.interfaces;
 
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.Sqrt;
+
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
-
+import edu.jas.structure.ElemFactory;
+import edu.jas.structure.RingElemImpl;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.hipparchus.Field;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.MathRuntimeException;
@@ -29,7 +36,6 @@ import org.matheclipse.core.expression.ExprID;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
@@ -39,16 +45,6 @@ import org.matheclipse.core.visit.VisitorReplaceAll;
 import org.matheclipse.core.visit.VisitorReplaceAllLambda;
 import org.matheclipse.core.visit.VisitorReplacePart;
 import org.matheclipse.core.visit.VisitorReplaceSlots;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import edu.jas.structure.ElemFactory;
-import edu.jas.structure.RingElemImpl;
-
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.Sqrt;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br />
@@ -3616,18 +3612,21 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public IExpr replaceRepeated(VisitorReplaceAll visitor) {
-    IExpr result = this;
-    IExpr temp = accept(visitor);
-    final int iterationLimit = EvalEngine.get().getIterationLimit();
-    int iterationCounter = 1;
-    while (temp.isPresent()) {
-      result = temp;
-      temp = result.accept(visitor);
-      if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
-        IterationLimitExceeded.throwIt(iterationCounter, result);
+    {
+      IExpr result = this;
+      IExpr temp = accept(visitor);
+      EvalEngine engine = EvalEngine.get();
+      final int iterationLimit = engine.getIterationLimit();
+      int iterationCounter = 1;
+      while (temp.isPresent()) {
+        result = engine.evaluate(temp);
+        temp = result.accept(visitor);
+        if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+          IterationLimitExceeded.throwIt(iterationCounter, result);
+        }
       }
+      return result;
     }
-    return result;
   }
 
   /**

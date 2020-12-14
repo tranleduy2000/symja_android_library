@@ -11,6 +11,7 @@ import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExprImpl;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.FEConfig;
 
@@ -327,7 +328,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
   @Override
   public IExpr getRHS() {
-    return ExprUtil.ofNullable(fRightHandSide);
+    return IExprImpl.ofNullable(fRightHandSide);
   }
 
   /**

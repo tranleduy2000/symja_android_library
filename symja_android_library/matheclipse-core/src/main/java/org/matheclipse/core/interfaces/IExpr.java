@@ -2881,20 +2881,33 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
   /**
    * Repeatedly replace all (sub-) expressions with the given visitor. If no substitution matches,
-   * the method returns
-   * <code>this</code>.
+   * the method returns <code>this</code>.
+   *
+   * @param visitor
+   * @return
    */
-  IExpr replaceRepeated(VisitorReplaceAll visitor);
+  IExpr replaceRepeated(VisitorReplaceAll visitor); /*{
+    IExpr result = this;
+    IExpr temp = accept(visitor);
+    EvalEngine engine = EvalEngine.get();
+    final int iterationLimit = engine.getIterationLimit();
+    int iterationCounter = 1;
+    while (temp.isPresent()) {
+      result = engine.evaluate(temp);
+      temp = result.accept(visitor);
+      if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+        IterationLimitExceeded.throwIt(iterationCounter, result);
+      }
+    }
+    return result;
+  }*/
 
   /**
    * <p>
    * Replace all occurrences of Slot[&lt;index&gt;] expressions with the expression at the
-   * appropriate
-   * <code>index</code> in the given <code>slotsList</code>.
-   * </p>
-   * <p>
-   * <b>Note:</b> If a slot value is <code>null</code> the Slot will not be substituted.
-   * </p>
+   * appropriate <code>index</code> in the given <code>slotsList</code>.
+   *
+   * <p><b>Note:</b> If a slot value is <code>null</code> the Slot will not be substituted.
    *
    * @param slotsList the values for the slots.
    * @return <code>null</code> if no substitution occurred.

@@ -4,7 +4,6 @@ import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntToDoubleFunction;
-
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.NumberTheory;
@@ -13,7 +12,6 @@ import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.NumberUtil;
-import org.matheclipse.core.expression.S;
 
 
 public class ZetaJS {
