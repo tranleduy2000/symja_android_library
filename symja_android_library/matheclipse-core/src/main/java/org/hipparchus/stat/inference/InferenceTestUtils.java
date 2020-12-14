@@ -21,8 +21,6 @@
  */
 package org.hipparchus.stat.inference;
 
-import java.util.Collection;
-
 import org.hipparchus.distribution.RealDistribution;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -40,9 +38,6 @@ public class InferenceTestUtils  {
 
     /** Singleton ChiSquareTest instance. */
     private static final ChiSquareTest CHI_SQUARE_TEST = new ChiSquareTest();
-
-    /** Singleton OneWayAnova instance. */
-    private static final OneWayAnova ONE_WAY_ANANOVA = new OneWayAnova();
 
     /** Singleton G-Test instance. */
     private static final GTest G_TEST = new GTest();
@@ -312,32 +307,6 @@ public class InferenceTestUtils  {
     }
 
     /**
-     * @see OneWayAnova#anovaFValue(Collection)
-     */
-    public static double oneWayAnovaFValue(final Collection<double[]> categoryData)
-        throws MathIllegalArgumentException, NullArgumentException {
-        return ONE_WAY_ANANOVA.anovaFValue(categoryData);
-    }
-
-    /**
-     * @see OneWayAnova#anovaPValue(Collection)
-     */
-    public static double oneWayAnovaPValue(final Collection<double[]> categoryData)
-        throws MathIllegalArgumentException, NullArgumentException,
-        MathIllegalStateException {
-        return ONE_WAY_ANANOVA.anovaPValue(categoryData);
-    }
-
-    /**
-     * @see OneWayAnova#anovaTest(Collection,double)
-     */
-    public static boolean oneWayAnovaTest(final Collection<double[]> categoryData,
-                                          final double alpha)
-        throws MathIllegalArgumentException, NullArgumentException, MathIllegalStateException {
-        return ONE_WAY_ANANOVA.anovaTest(categoryData, alpha);
-    }
-
-     /**
      * @see GTest#g(double[], long[])
      */
     public static double g(final double[] expected, final long[] observed)

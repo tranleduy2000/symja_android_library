@@ -15,4 +15,4 @@
 
 include ':symja_android_library', ':symja_android_library-lite-release'
 include ':jgraphttest'
-include ':android'
+//include ':android'

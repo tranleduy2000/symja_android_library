@@ -32,6 +32,7 @@ import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.NumStr;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -181,12 +182,12 @@ public class ExprParser extends Scanner {
       switch (headID) {
         case ID.Get:
           if (ast.isAST1() && ast.arg1().isString()) {
-            return F.Get.of(ast.arg1());
+            return S.Get.of(ast.arg1());
           }
           break;
         case ID.Import:
           if (ast.isAST1() && ast.arg1().isString()) {
-            return F.Import.of(ast.arg1());
+            return S.Import.of(ast.arg1());
           }
           break;
         case ID.Exp:
@@ -200,11 +201,12 @@ public class ExprParser extends Scanner {
         case ID.HoldForm:
           return ast;
 
-        // case ID.N:
-        // if (ast.isAST(F.N, 3)) {
-        // return convertN(ast);
-        // }
-        // break;
+          // Android changed: enable N visitor
+        case ID.N:
+          if (ast.isAST(F.N, 3)) {
+            return convertN(ast);
+          }
+          break;
 
         case ID.Sqrt:
           if (ast.isAST1()) {
@@ -396,7 +398,7 @@ public class ExprParser extends Scanner {
 
       getNextToken();
       if (fToken == TT_PRECEDENCE_CLOSE || fToken == TT_ARGUMENTS_CLOSE) {
-        function.append(F.Null);
+        function.append(S.Null);
         break;
       }
     } while (true);
@@ -1220,7 +1222,7 @@ public class ExprParser extends Scanner {
           || fToken == TT_LIST_CLOSE
           || fToken == TT_PRECEDENCE_CLOSE
           || fToken == TT_COMMA) {
-        return createInfixFunction(infixOperator, lhs, F.Null);
+        return createInfixFunction(infixOperator, lhs, S.Null);
         // return infixOperator.createFunction(fFactory, rhs,
         // fFactory.createSymbol("Null"));
       }
@@ -1279,7 +1281,7 @@ public class ExprParser extends Scanner {
             || fToken == TT_PRECEDENCE_CLOSE) {
           return span;
         } else if (fToken == TT_OPERATOR) {
-          return parseExpression(F.Times(span, F.Span(F.C1, F.All)), 0);
+          return parseExpression(F.Times(span, F.Span(F.C1, S.All)), 0);
         }
       } else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
           || fToken == TT_PRECEDENCE_CLOSE) {
@@ -1433,7 +1435,7 @@ public class ExprParser extends Scanner {
               || fToken == TT_LIST_CLOSE
               || fToken == TT_PRECEDENCE_CLOSE
               || fToken == TT_COMMA) {
-            ast.append(F.Null);
+            ast.append(S.Null);
             break;
           }
         }

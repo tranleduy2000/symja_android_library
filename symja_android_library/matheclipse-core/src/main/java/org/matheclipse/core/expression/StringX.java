@@ -529,7 +529,7 @@ public class StringX extends IStringXImpl implements IStringX {
 
   /** @return  */
   public String toLowerCase() {
-    return fString.toLowerCase();
+    return fString.toLowerCase(Locale.US);
   }
 
   /**

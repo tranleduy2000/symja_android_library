@@ -146,4 +146,10 @@ public class Predicates {
       return false;
     }
   };
+  public static Predicate<? super IExpr> isNegativeInfinity = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isNegativeInfinity();
+    }
+  };
 }

@@ -44,9 +44,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 
   /* package private */ int fIntValue;
 
-  /**
-   * do not use directly, needed for serialization/deserialization
-   */
+  /** do not use directly, needed for serialization/deserialization */
   public IntegerSym() {
     fIntValue = 0;
   }
@@ -224,9 +222,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   }
 
 
-  /**
-   * @return
-   */
+  /** @return */
   @Override
   public double doubleValue() {
     return fIntValue;
@@ -844,8 +840,8 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   /**
    * Returns the integer square root of this integer.
    *
-   * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative
-   * or it's impossible to find a square root return <code>F.Sqrt(this)</code>.
+   * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative or it's
+   *         impossible to find a square root return <code>F.Sqrt(this)</code>.
    */
   public IExpr sqrt() {
     try {
@@ -890,9 +886,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     return BigInteger.valueOf(fIntValue);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int toInt() throws ArithmeticException {
     return fIntValue;
@@ -904,9 +898,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     return fIntValue;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public long toLong() throws ArithmeticException {
     return fIntValue;
@@ -945,5 +937,4 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   private Object writeReplace() throws ObjectStreamException {
     return optional();
   }
-
 }

@@ -374,16 +374,20 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @deprecated use {@link #evalReal()} instead
    */
   @Deprecated
-  ISignedNumber evalSignedNumber();
+  ISignedNumber evalSignedNumber(); /*{
+    return evalReal();
+  }*/
 
   /**
    * Evaluate an expression
    *
    * @param engine the evaluation engine
    * @return the evaluated Object or <code>F.NIL</code> if the evaluation is not possible (i.e. the
-   * evaluation doesn't change the object).
+   *     evaluation doesn't change the object).
    */
-  IExpr evaluate(EvalEngine engine);
+  IExpr evaluate(EvalEngine engine); /*{
+    return F.NIL;
+  }*/
 
   IExpr evaluateHead(IAST ast, EvalEngine engine);
 

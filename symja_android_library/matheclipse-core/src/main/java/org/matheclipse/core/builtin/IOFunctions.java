@@ -937,8 +937,8 @@ public class IOFunctions {
       exact = false;
     }
     SuggestTree suggestTree = AST2Expr.getSuggestTree();
-    //    name = FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? name.toLowerCase() : name;
-    name = name.toLowerCase();
+    //    name = FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? name.toLowerCase(Locale.US) : name;
+    name = name.toLowerCase(Locale.US);
     Node n = suggestTree.getAutocompleteSuggestions(name);
     if (n != null) {
       IASTAppendable list = F.ListAlloc(n.listLength());
@@ -967,7 +967,7 @@ public class IOFunctions {
       return list;
     }
     SuggestTree suggestTree = AST2Expr.getSuggestTree();
-    namePrefix = FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? namePrefix.toLowerCase() : namePrefix;
+    namePrefix = FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? namePrefix.toLowerCase(Locale.US) : namePrefix;
     Node n = suggestTree.getAutocompleteSuggestions(namePrefix);
     if (n != null) {
       for (int i = 0; i < n.listLength(); i++) {

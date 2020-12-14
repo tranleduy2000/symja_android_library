@@ -352,10 +352,12 @@ public class ExprEvaluator {
       if (FEConfig.SHOW_STACKTRACE) {
         sma.printStackTrace();
       }
-      return expr;
+      // android changed:
+      throw sma;
+      //return expr;
     } finally {
       // Quit may set a new engine
-      engineRef[0] = EvalEngine.get();
+      // engineRef[0] = EvalEngine.get();
     }
   }
 

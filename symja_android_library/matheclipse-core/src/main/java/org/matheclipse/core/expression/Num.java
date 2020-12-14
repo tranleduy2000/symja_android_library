@@ -385,7 +385,7 @@ public class Num extends INumImpl implements INum {
       return 11;
     }
     return 37 * 17 * MathUtils.hash(fDouble);
-    // return Double.hashCode(fDouble);
+    // return DDouble.hashCode(fDouble);
   }
 
   @Override

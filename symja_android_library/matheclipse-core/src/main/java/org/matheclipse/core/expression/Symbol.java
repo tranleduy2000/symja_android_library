@@ -799,13 +799,13 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
   public final boolean isVariable() {
     return ((fAttributes & CONSTANT) != CONSTANT)
         && //
-        (this != F.ComplexInfinity)
+        (this != S.ComplexInfinity)
         && //
-        (this != F.Indeterminate)
+        (this != S.Indeterminate)
         && //
-        (this != F.DirectedInfinity)
+        (this != S.DirectedInfinity)
         && //
-        (this != F.Infinity);
+        (this != S.Infinity);
   }
 
   /** {@inheritDoc} */

@@ -18,6 +18,10 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 public class S {
 
   public static final IBuiltInSymbol Surd = F.Surd;
+  public static final IBuiltInSymbol ComplexInfinity = F.ComplexInfinity;
+  public static final IBuiltInSymbol Indeterminate = F.Indeterminate;
+  public static final IBuiltInSymbol DirectedInfinity = F.DirectedInfinity;
+  public static final IBuiltInSymbol Infinity = F.Infinity;
   public static final IBuiltInSymbol Unevaluated = F.Unevaluated;
   public static final IBuiltInSymbol LongForm = F.LongForm;
   public static final IBuiltInSymbol GammaRegularized = F.GammaRegularized;

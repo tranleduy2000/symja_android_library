@@ -1,7 +1,6 @@
 package com.duy;
 
 import junit.framework.TestCase;
-
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 
@@ -10,15 +9,16 @@ import org.matheclipse.core.interfaces.IExpr;
  */
 
 public class ToStringTest extends TestCase {
-    public void test1() {
-        IExpr parse = new ExprEvaluator().parse("3/(4*5)");
-        String s = parse.toString();
-        assertEquals(s, "3/(4*5)");
-    }
 
-    public void test2() {
-        IExpr parse = new ExprEvaluator().parse("2-(3+4)");
-        String s = parse.toString();
-        assertEquals(s, "2-(3+4)");
-    }
+  public void test1() {
+    IExpr parse = new ExprEvaluator().parse("3/(4*5)");
+    String s = parse.toString();
+    assertEquals(s, "3/(4*5)");
+  }
+
+  public void test2() {
+    IExpr parse = new ExprEvaluator().parse("2-(3+4)");
+    String s = parse.toString();
+    assertEquals(s, "2-(3+4)");
+  }
 }

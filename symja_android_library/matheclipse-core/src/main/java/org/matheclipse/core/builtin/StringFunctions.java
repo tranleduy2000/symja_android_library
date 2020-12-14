@@ -8,6 +8,7 @@ import com.gx.common.base.CharMatcher;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.matheclipse.core.basic.Config;
@@ -410,7 +411,7 @@ public final class StringFunctions {
         }
 
         if (ignoreCase) {
-          return F.ZZ(hammingDistance.apply(str1.toLowerCase(), str2.toLowerCase()));
+          return F.ZZ(hammingDistance.apply(str1.toLowerCase(Locale.US), str2.toLowerCase(Locale.US)));
         }
         return F.ZZ(hammingDistance.apply(str1, str2));
       }
@@ -553,7 +554,7 @@ public final class StringFunctions {
         if (ignoreCase) {
           return F.ZZ(
               levenshteinDistance.apply(
-                  arg1.toString().toLowerCase(), arg2.toString().toLowerCase()));
+                  arg1.toString().toLowerCase(Locale.US), arg2.toString().toLowerCase(Locale.US)));
         }
         return F.ZZ(levenshteinDistance.apply(arg1.toString(), arg2.toString()));
       }

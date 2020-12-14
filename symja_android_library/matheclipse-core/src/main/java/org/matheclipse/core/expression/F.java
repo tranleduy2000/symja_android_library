@@ -8203,7 +8203,7 @@ public class F {
     return error;
   }
   /**
-   * Test if the absolute value is less <code>Config.DOUBLE_EPSILON</code>.
+   * Test if the absolute value is less <code>Config.DOUBLE_TOLERANCE</code>.
    *
    * @param value
    * @return
