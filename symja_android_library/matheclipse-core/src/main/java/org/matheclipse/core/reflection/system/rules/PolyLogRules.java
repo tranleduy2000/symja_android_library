@@ -1,6 +1,30 @@
 package org.matheclipse.core.reflection.system.rules;
 
-import static org.matheclipse.core.expression.F.*;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C1D4;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CC;
+import static org.matheclipse.core.expression.F.CI;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CNI;
+import static org.matheclipse.core.expression.F.Catalan;
+import static org.matheclipse.core.expression.F.IInit;
+import static org.matheclipse.core.expression.F.ISet;
+import static org.matheclipse.core.expression.F.ISetDelayed;
+import static org.matheclipse.core.expression.F.List;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.PolyLog;
+import static org.matheclipse.core.expression.F.QQ;
+import static org.matheclipse.core.expression.F.Sqr;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.Undefined;
+import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.y_;
+
 import org.matheclipse.core.interfaces.IAST;
 
 /**
@@ -11,46 +35,45 @@ import org.matheclipse.core.interfaces.IAST;
  * the tools directory</a>.
  */
 public interface PolyLogRules {
-    /**
-     *
-     *
-     * <ul>
-     *   <li>index 0 - number of equal rules in <code>RULES</code>
-     * </ul>
-     */
-    public static final int[] SIZES = {8, 1};
 
-    public static final IAST RULES =
-        List(
-            IInit(PolyLog, SIZES),
-            // PolyLog(2,-1)=-Pi^2/12
-            ISet(PolyLog(C2, CN1), Times(QQ(-1L, 12L), Sqr(Pi))),
-            // PolyLog(2,1)=Pi^2/6
-            ISet(PolyLog(C2, C1), Times(QQ(1L, 6L), Sqr(Pi))),
-            // PolyLog(2,1/2)=Pi^2/12-Log(2)^2/2
-            ISet(PolyLog(C2, C1D2), Plus(Times(QQ(1L, 12L), Sqr(Pi)), Times(CN1D2, Sqr(Log(C2))))),
-            // PolyLog(2,2)=Pi^2/4+(-1)*I*Pi*Log(2)
-            ISet(PolyLog(C2, C2), Plus(Times(C1D4, Sqr(Pi)), Times(CNI, Pi, Log(C2)))),
-            // PolyLog(2,I)=I*Catalan-Pi^2/48
-            ISet(PolyLog(C2, CI), Plus(Times(CI, Catalan), Times(QQ(-1L, 48L), Sqr(Pi)))),
-            // PolyLog(2,-I)=-I*Catalan-Pi^2/48
-            ISet(PolyLog(C2, CNI), Plus(Times(CNI, Catalan), Times(QQ(-1L, 48L), Sqr(Pi)))),
-            // PolyLog(2,-I+1)=-I*Catalan+Pi^2/16-I*Pi*Log(2)/4
-            ISet(
-                PolyLog(C2, CC(1L, 1L, -1L, 1L)),
-                Plus(
-                    Times(CNI, Catalan),
-                    Times(QQ(1L, 16L), Sqr(Pi)),
-                    Times(CC(0L, 1L, -1L, 4L), Pi, Log(C2)))),
-            // PolyLog(2,1+I)=Pi^2/16+I*Catalan+I*Pi*Log(2)/4
-            ISet(
-                PolyLog(C2, CC(1L, 1L, 1L, 1L)),
-                Plus(
-                    Times(CI, Catalan),
-                    Times(QQ(1L, 16L), Sqr(Pi)),
-                    Times(CC(0L, 1L, 1L, 4L), Pi, Log(C2)))),
-            // PolyLog(Undefined,y_):=Undefined
-            ISetDelayed(PolyLog(Undefined, y_), Undefined),
-            // PolyLog(x_,Undefined):=Undefined
-            ISetDelayed(PolyLog(x_, Undefined), Undefined));
+  /**
+   * <ul>
+   *   <li>index 0 - number of equal rules in <code>RULES</code>
+   * </ul>
+   */
+  public static final int[] SIZES = {8, 1};
+
+  public static final IAST RULES =
+      List(
+          IInit(PolyLog, SIZES),
+          // PolyLog(2,-1)=-Pi^2/12
+          ISet(PolyLog(C2, CN1), Times(QQ(-1L, 12L), Sqr(Pi))),
+          // PolyLog(2,1)=Pi^2/6
+          ISet(PolyLog(C2, C1), Times(QQ(1L, 6L), Sqr(Pi))),
+          // PolyLog(2,1/2)=Pi^2/12-Log(2)^2/2
+          ISet(PolyLog(C2, C1D2), Plus(Times(QQ(1L, 12L), Sqr(Pi)), Times(CN1D2, Sqr(Log(C2))))),
+          // PolyLog(2,2)=Pi^2/4+(-1)*I*Pi*Log(2)
+          ISet(PolyLog(C2, C2), Plus(Times(C1D4, Sqr(Pi)), Times(CNI, Pi, Log(C2)))),
+          // PolyLog(2,I)=I*Catalan-Pi^2/48
+          ISet(PolyLog(C2, CI), Plus(Times(CI, Catalan), Times(QQ(-1L, 48L), Sqr(Pi)))),
+          // PolyLog(2,-I)=-I*Catalan-Pi^2/48
+          ISet(PolyLog(C2, CNI), Plus(Times(CNI, Catalan), Times(QQ(-1L, 48L), Sqr(Pi)))),
+          // PolyLog(2,-I+1)=-I*Catalan+Pi^2/16-I*Pi*Log(2)/4
+          ISet(
+              PolyLog(C2, CC(1L, 1L, -1L, 1L)),
+              Plus(
+                  Times(CNI, Catalan),
+                  Times(QQ(1L, 16L), Sqr(Pi)),
+                  Times(CC(0L, 1L, -1L, 4L), Pi, Log(C2)))),
+          // PolyLog(2,1+I)=Pi^2/16+I*Catalan+I*Pi*Log(2)/4
+          ISet(
+              PolyLog(C2, CC(1L, 1L, 1L, 1L)),
+              Plus(
+                  Times(CI, Catalan),
+                  Times(QQ(1L, 16L), Sqr(Pi)),
+                  Times(CC(0L, 1L, 1L, 4L), Pi, Log(C2)))),
+          // PolyLog(Undefined,y_):=Undefined
+          ISetDelayed(PolyLog(Undefined, y_), Undefined),
+          // PolyLog(x_,Undefined):=Undefined
+          ISetDelayed(PolyLog(x_, Undefined), Undefined));
 }

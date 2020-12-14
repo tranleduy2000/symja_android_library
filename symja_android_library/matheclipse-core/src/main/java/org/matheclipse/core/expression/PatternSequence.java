@@ -1,6 +1,9 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Function;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.hipparchus.util.Pair;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -9,7 +12,6 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IPatternSequenceImpl;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
-import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMapStatic;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
@@ -18,13 +20,7 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-/**
- * A concrete pattern sequence implementation (i.e. x__)
- */
+/** A concrete pattern sequence implementation (i.e. x__) */
 public class PatternSequence extends IPatternSequenceImpl implements IPatternSequence {
 
   /**
@@ -35,12 +31,11 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
   /**
    * Create a new PatternSequence.
    *
-   * @param symbol          the associated symbol of the pattern sequence. Maybe <code>null</code>.
-   * @param check           a header check.Maybe <code>null</code>.
-   * @param def             if <code>true</code> replace with default value, if no matching was
-   *                        possible
+   * @param symbol the associated symbol of the pattern sequence. Maybe <code>null</code>.
+   * @param check a header check.Maybe <code>null</code>.
+   * @param def if <code>true</code> replace with default value, if no matching was possible
    * @param zeroArgsAllowed if <code>true</code>, 0 arguments are allowed, otherwise the number of
-   *                        args has to be >= 1.
+   *     args has to be >= 1.
    * @return
    */
   public static PatternSequence valueOf(final ISymbol symbol, final IExpr check, final boolean def,
@@ -56,10 +51,10 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
   /**
    * Create a new PatternSequence.
    *
-   * @param symbol          the associated symbol of the pattern sequence. Maybe <code>null</code>.
-   * @param check           a header check.Maybe <code>null</code>.
+   * @param symbol the associated symbol of the pattern sequence. Maybe <code>null</code>.
+   * @param check a header check.Maybe <code>null</code>.
    * @param zeroArgsAllowed if <code>true</code>, 0 arguments are allowed, otherwise the number of
-   *                        args has to be >= 1.
+   * args has to be >= 1.
    * @return
    */
   public static PatternSequence valueOf(final ISymbol symbol, final IExpr check,
@@ -74,28 +69,22 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
   /**
    * Create a new PatternSequence.
    *
-   * @param symbol          the associated symbol of the pattern sequence. Maybe <code>null</code>.
+   * @param symbol the associated symbol of the pattern sequence. Maybe <code>null</code>.
    * @param zeroArgsAllowed if <code>true</code>, 0 arguments are allowed, otherwise the number of
-   *                        args has to be >= 1.
+   * args has to be >= 1.
    * @return
    */
   public static PatternSequence valueOf(final ISymbol symbol, boolean zeroArgsAllowed) {
     return valueOf(symbol, null, zeroArgsAllowed);
   }
 
-  /**
-   * The expression which should check this pattern sequence
-   */
+  /** The expression which should check this pattern sequence */
   protected IExpr fCondition;
 
-  /**
-   * The associated symbol for this pattern sequence
-   */
+  /** The associated symbol for this pattern sequence */
   protected ISymbol fSymbol;
 
-  /**
-   * Use default value, if no matching was found
-   */
+  /** Use default value, if no matching was found */
   protected boolean fDefault = false;
 
   protected boolean fZeroArgsAllowed = false;
@@ -213,9 +202,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
     return IAST.CONTAINS_PATTERN_SEQUENCE;
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   @Override
   public int getIndex(IPatternMap pm) {
     if (pm != null) {
@@ -224,9 +211,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
     return -1;
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   @Override
   public ISymbol getSymbol() {
     return fSymbol;
@@ -258,12 +243,12 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
           buffer.append(
               ","
                   + fCondition.internalJavaString(
-                      symbolsAsFactoryMethod,
-                      0,
-                      useOperators,
-                      usePrefix,
-                      noSymbolPrefix,
-                      variables));
+                  symbolsAsFactoryMethod,
+                  0,
+                  useOperators,
+                  usePrefix,
+                  noSymbolPrefix,
+                  variables));
         }
         if (fDefault) {
           if (fCondition == null) {
@@ -277,12 +262,12 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
           buffer.append(
               ","
                   + fCondition.internalJavaString(
-                      symbolsAsFactoryMethod,
-                      0,
-                      useOperators,
-                      usePrefix,
-                      noSymbolPrefix,
-                      variables));
+                  symbolsAsFactoryMethod,
+                  0,
+                  useOperators,
+                  usePrefix,
+                  noSymbolPrefix,
+                  variables));
         }
         if (fDefault) {
           buffer.append(",true");
@@ -294,49 +279,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
     return toString();
   }
 
-  // @Override
-  // public void setIndex(final int i) {
-  // fIndex = i;
-  // }
 
-  @Override
-  public String toMMA() {
-    final StringBuilder buffer = new StringBuilder();
-    if (fSymbol == null) {
-      buffer.append("__");
-      if (fZeroArgsAllowed) {
-        buffer.append('_');
-      }
-      if (fDefault) {
-        buffer.append('.');
-      }
-      if (fCondition != null) {
-        buffer.append(fCondition.toMMA());
-      }
-    } else {
-      if (fCondition == null) {
-        buffer.append(fSymbol.toMMA());
-        buffer.append("__");
-        if (fZeroArgsAllowed) {
-          buffer.append('_');
-        }
-        if (fDefault) {
-          buffer.append('.');
-        }
-      } else {
-        buffer.append(fSymbol.toMMA());
-        buffer.append("__");
-        if (fZeroArgsAllowed) {
-          buffer.append('_');
-        }
-        if (fDefault) {
-          buffer.append('.');
-        }
-        buffer.append(fCondition.toMMA());
-      }
-    }
-    return buffer.toString();
-  }
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder();
@@ -479,25 +422,19 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
     return F.NIL;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public IExpr accept(IVisitor visitor) {
     return visitor.visit(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public boolean accept(IVisitorBoolean visitor) {
     return visitor.visit(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int accept(IVisitorInt visitor) {
     return visitor.visit(this);

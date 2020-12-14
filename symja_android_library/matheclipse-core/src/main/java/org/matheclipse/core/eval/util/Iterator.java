@@ -319,7 +319,7 @@ public class Iterator {
      * Tests if this enumeration contains more elements.
      *
      * @return <code>true</code> if this enumeration contains more elements; <code>false</code>
-     *     otherwise.
+     * otherwise.
      */
     @Override
     public boolean hasNext() {
@@ -464,7 +464,7 @@ public class Iterator {
      * Tests if this enumeration contains more elements.
      *
      * @return <code>true</code> if this enumeration contains more elements; <code>false</code>
-     *     otherwise.
+     * otherwise.
      */
     @Override
     public boolean hasNext() {
@@ -648,7 +648,7 @@ public class Iterator {
      * Tests if this enumeration contains more elements.
      *
      * @return <code>true</code> if this enumeration contains more elements; <code>false</code>
-     *     otherwise.
+     * otherwise.
      */
     @Override
     public boolean hasNext() {
@@ -782,7 +782,7 @@ public class Iterator {
      * Tests if this enumeration contains more elements.
      *
      * @return <code>true</code> if this enumeration contains more elements; <code>false</code>
-     *     otherwise.
+     * otherwise.
      */
     @Override
     public boolean hasNext() {
@@ -933,7 +933,7 @@ public class Iterator {
      * Tests if this enumeration contains more elements.
      *
      * @return <code>true</code> if this enumeration contains more elements; <code>false</code>
-     *     otherwise.
+     * otherwise.
      */
     @Override
     public boolean hasNext() {

@@ -2,10 +2,8 @@ package org.matheclipse.io.system;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.ToggleFeature;
-import org.matheclipse.core.builtin.ConstantDefinitions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.data.ByteArrayExpr;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.parser.client.FEConfig;
@@ -1362,7 +1360,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     check(
         "ba1 = BaseEncode(StringToByteArray(\"Man is distinguished, not only by his reason, but by this singular passion from other animals, "
             + "which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable "
-            + "generation of knowledge, exceeds the short vehemence of any carnal pleasure.\")) ", //
+            + "generation of knowledge, exceeds the short vehemence of any carnal pleasure.\")) ",
+        //
         "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=");
 
     check(
@@ -1378,9 +1377,11 @@ public class LowercaseTestCase extends AbstractTestCase {
 
   public void testBaseEncode() {
     check(
-        "BaseEncode(ByteArray({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20})) ", //
+        "BaseEncode(ByteArray({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20})) ",
+        //
         "AQIDBAUGBwgJCgsMDQ4PEBESExQ=");
   }
+
   public void testBaseForm() {
     check("36^^zZz", //
         "46655");
@@ -4800,7 +4801,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "");
     check(
         "Definition(g)", //
-            "g(abc_):={abc}");
+        "g(abc_):={abc}");
     check("SetAttributes(f,Listable)", //
         "");
     check("f(x_):={x}", //
@@ -6654,6 +6655,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "Entropy(b,{a,c,c})", //
         "2/3*Log(3/2)/Log(b)+Log(3)/(3*Log(b))");
   }
+
   public void testEqual() {
     // https://github.com/axkr/symja_android_library/issues/142
     check("20-x*y*(x+y)==0", //
@@ -8321,11 +8323,13 @@ public class LowercaseTestCase extends AbstractTestCase {
         "{a->0.599211,w->1.51494,f->3.80421}");
     // initial guess [2.0, 1.0, 1.0] gives better result:
     check(
-        "FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), a* Sin(w*t + f), {{a, 2}, {w,1}, {f,1}}, t)", //
+        "FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), a* Sin(w*t + f), {{a, 2}, {w,1}, {f,1}}, t)",
+        //
         "{a->3.0,w->3.0,f->1.0}");
     // initial guess [2.0, 1.0, 1.0] with 1.0 by default:
     check(
-        "FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), a* Sin(w*t + f), {{a, 2}, w, f}, t)", //
+        "FindFit(Table({t, 3*Sin(3*t + 1)}, {t, -3, 3, 0.1}), a* Sin(w*t + f), {{a, 2}, w, f}, t)",
+        //
         "{a->3.0,w->3.0,f->1.0}");
 
     check("FindFit({{1,1},{2,4},{3,9},{4,16}}, " //
@@ -10451,6 +10455,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "Hold(g(1))", //
         "1");
   }
+
   public void testHoldAllComplete() {
     check("ClearAll(fump); "//
             + "SetAttributes(fump, HoldAllComplete);"//
@@ -10907,6 +10912,7 @@ public class LowercaseTestCase extends AbstractTestCase {
             + "In(5):=Do(In(3),{3})\n"
             + "In(6):=-Sqrt(3)+a");
   }
+
   public void testIm() {
     check(
         "Im(Quantity(2,\"m\"))", //
@@ -12670,7 +12676,8 @@ public class LowercaseTestCase extends AbstractTestCase {
         "(20.085536923187664)-Math.cos((9.869604401089358)/x)");
     // JSXGraph.org syntax
     check(
-        "JSForm(Manipulate(Plot(Sin(x)*Cos(1 + a*x), {x, 0, 2*Pi}, PlotRange->{-1,2}), {a,0,10}))", //
+        "JSForm(Manipulate(Plot(Sin(x)*Cos(1 + a*x), {x, 0, 2*Pi}, PlotRange->{-1,2}), {a,0,10}))",
+        //
         "var board = JXG.JSXGraph.initBoard('jxgbox', {axis:true,boundingbox:[-0.8641592653589794,2.7,7.147344572538565,-1.7]});\n"
             + "board.suspendUpdate();\n"
             + "var a = board.create('slider',[[-0.0630088815692249,2.2600000000000002],[6.346194188748811,2.2600000000000002],[0,0,10]],{name:'a'});\n"
@@ -15679,9 +15686,12 @@ public class LowercaseTestCase extends AbstractTestCase {
         "{\"Do\",\"If\",\"Im\",\"In\",\"ND\",\"On\",\"Or\",\"Pi\",\"Re\",\"Tr\"}");
     check(
         "Names(RegularExpression(\"System`...\")) // InputForm", //
-        "{\"Abs\",\"All\",\"And\",\"Arg\",\"CDF\",\"Cos\",\"Cot\",\"Csc\",\"Det\",\"Div\",\"Dot\",\"End\",\"Erf\",\"Exp\"," //
-            + "\"Fit\",\"For\",\"GCD\",\"Get\",\"Hue\",\"Key\",\"LCM\",\"Log\",\"Map\",\"Max\",\"Min\",\"Mod\",\"Nor\",\"Not\"," //
-            + "\"Now\",\"Off\",\"Out\",\"PDF\",\"Put\",\"Red\",\"Row\",\"Sec\",\"Set\",\"Sin\",\"Sow\",\"Sum\",\"Tan\",\"Top\"," //
+        "{\"Abs\",\"All\",\"And\",\"Arg\",\"CDF\",\"Cos\",\"Cot\",\"Csc\",\"Det\",\"Div\",\"Dot\",\"End\",\"Erf\",\"Exp\","
+            //
+            + "\"Fit\",\"For\",\"GCD\",\"Get\",\"Hue\",\"Key\",\"LCM\",\"Log\",\"Map\",\"Max\",\"Min\",\"Mod\",\"Nor\",\"Not\","
+            //
+            + "\"Now\",\"Off\",\"Out\",\"PDF\",\"Put\",\"Red\",\"Row\",\"Sec\",\"Set\",\"Sin\",\"Sow\",\"Sum\",\"Tan\",\"Top\","
+            //
             + "\"Xor\"}");
 
     check(
@@ -16047,6 +16057,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 //        "Needs({-1/2,{{1}},3})", //
 //        "Needs({-1/2,{{1}},3})");
   }
+
   public void testNest() {
     // iteration limit exceeded
     check(
@@ -17281,6 +17292,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "Out(2)", //
         "3.14159265358979323846264338327");
   }
+
   public void testOuter() {
     check("Outer(f, {a, b}, {x, y, z})", //
         "{{f(a,x),f(a,y),f(a,z)},{f(b,x),f(b,y),f(b,z)}}");
@@ -17401,7 +17413,8 @@ public class LowercaseTestCase extends AbstractTestCase {
     check(
         "With({r = Map(Fibonacci, Range(2, 14))}, "
             + //
-            "Position(#, {1, 0, 1})[[All, 1]] &@ Table(If(Length@ # < 3, {}, Take(#, -3)) &@ IntegerDigits@ Total@ Map(FromDigits@ PadRight({1}, Flatten@ #) &@ Reverse@ Position(r, #) &, Abs@ Differences@ NestWhileList(Function(k, k - SelectFirst(Reverse@ r, # < k &)), n + 1, # > 1 &)), {n, 373}))", //
+            "Position(#, {1, 0, 1})[[All, 1]] &@ Table(If(Length@ # < 3, {}, Take(#, -3)) &@ IntegerDigits@ Total@ Map(FromDigits@ PadRight({1}, Flatten@ #) &@ Reverse@ Position(r, #) &, Abs@ Differences@ NestWhileList(Function(k, k - SelectFirst(Reverse@ r, # < k &)), n + 1, # > 1 &)), {n, 373}))",
+        //
         "{4,12,17,25,33,38,46,51,59,67,72,80,88,93,101,106,114,122,127,135,140,148,156,\n"
             + //
             "161,169,177,182,190,195,203,211,216,224,232,237,245,250,258,266,271,279,284,292,\n"
@@ -18178,6 +18191,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "Pick(f(1, 2, 3, 4, 5, 6), {1, 0, 1, 0, 1, 1}, 1)", //
         "f(1,3,5,6)");
   }
+
   public void testPiecewise() {
     check("Piecewise({{x^2, x < 0}, {x, x > 0}})", //
         "Piecewise({{x^2,x<0},{x,x>0}},0)");
@@ -18501,14 +18515,15 @@ public class LowercaseTestCase extends AbstractTestCase {
     checkNumeric(
         "PolyLog(1.0,1.0)", //
         "Infinity");
+    // android changed.
     checkNumeric(
         "Table(PolyLog(1.0,z), {z,-2.0,2.0,0.1})", //
         "{-1.0986122886681098,-1.0647107369924282,-1.0296194171811581,-0.9932517730102833,-0.9555114450274362,-0.9162907318741549,"
-            + "-0.8754687373538997,-0.8329091229351038,-0.7884573603642698,-0.7419373447293769,-0.6931471805599448,-0.6418538861723944,"
+            + "-0.8754687373538997,-0.8329091229351038,-0.7884573603642698,-0.7419373447293769,Indeterminate,-0.6418538861723944,"
             + "-0.5877866649021186,-0.5306282510621699,-0.4700036292457351,-0.40546510810816394,-0.33647223662121256,-0.26236426446749056,"
             + "-0.18232155679395404,-0.09531017980432434,0.0,0.10536051565782702,0.22314355131421054,0.3566749439387334,0.5108256237659918,"
             + "0.6931471805599466,0.9162907318741567,1.2039728043259381,1.6094379124341034,2.3025850929940517,"
-            + "34.945041100449046+I*(-3.141592653589793),2.3025850929940384+I*(-3.141592653589793),1.609437912434096+I*(-3.141592653589793),"
+            + "Infinity,2.3025850929940384+I*(-3.141592653589793),1.609437912434096+I*(-3.141592653589793),"
             + "1.2039728043259328+I*(-3.141592653589793),0.9162907318741526+I*(-3.141592653589793),0.6931471805599431+I*(-3.141592653589793),"
             + "0.5108256237659887+I*(-3.141592653589793),0.35667494393873056+I*(-3.141592653589793),0.22314355131420804+I*(-3.141592653589793),"
             + "0.10536051565782467+I*(-3.141592653589793),-1.332267629550187E-15+I*(-3.141592653589793)}");
@@ -20878,6 +20893,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "ReleaseHold(f(Hold(1 + g(Hold(2 + 3)))))", //
         "f(1+g(Hold(2+3)))");
   }
+
   public void testRepeated() {
     check(
         "f(x: {{_, _} ..}) := Norm(N(x))", //
@@ -23521,7 +23537,8 @@ public class LowercaseTestCase extends AbstractTestCase {
         "{{x->1,y->2,z->3}}");
     // github #201 begin
     check(
-        "Solve({m1 u1^2 + m2 u2^2 == m1 v1^2 + m2 v2^2, m1 u1 + m2 u2 == m1 v1 + m2 v2}, {v1, v2})", //
+        "Solve({m1 u1^2 + m2 u2^2 == m1 v1^2 + m2 v2^2, m1 u1 + m2 u2 == m1 v1 + m2 v2}, {v1, v2})",
+        //
         "{{v2->u2,v1->u1}," //
             + "{v2->(2*m1*u1-m1*u2+m2*u2)/(m1+m2)," //
             + "v1->(m1*u1-m2*u1+2*m2*u2)/(m1+m2)}}");
@@ -27139,6 +27156,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "x /. Verbatim[_]->t", //
         "x");
   }
+
   public void testVertexList() {
     check("VertexList(Graph({1 -> 2, 2 -> 3, 1 -> 3, 4 -> 2}))", //
         "{1,2,3,4}");

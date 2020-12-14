@@ -3,6 +3,8 @@ package org.matheclipse.io.system;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.matheclipse.core.eval.util.ArraySetTest;
+import org.matheclipse.core.expression.ComplexSymTest;
 import org.matheclipse.io.form.mathml.MathMLPresentationTestCase;
 import org.matheclipse.io.form.tex.BasicTeXTestCase;
 import org.matheclipse.io.test.BracketBalancerTestCase;
@@ -74,14 +76,21 @@ public class CompleteTestSuite extends TestCase {
     // suite.addTestSuite(ParseNumberTest.class);
     // suite.addTestSuite(ToStringTest.class);
 
-		suite.addTestSuite(AssociationTest.class);
-		suite.addTestSuite(SparseArrayTest.class);
-		suite.addTestSuite(NumericArrayTest.class);
-		suite.addTestSuite(StringFunctionsTest.class);
-		//suite.addTestSuite(CompilerFunctionsTest.class);
-		suite.addTestSuite(SolveTest.class);
-		suite.addTestSuite(MMAFormTestCase.class);
-		// suite.addTestSuite(ArchUnitTests.class);
+    suite.addTestSuite(AssociationTest.class);
+    suite.addTestSuite(SparseArrayTest.class);
+    suite.addTestSuite(NumericArrayTest.class);
+    suite.addTestSuite(StringFunctionsTest.class);
+    //suite.addTestSuite(CompilerFunctionsTest.class);
+    suite.addTestSuite(SolveTest.class);
+    suite.addTestSuite(MMAFormTestCase.class);
+    // suite.addTestSuite(ArchUnitTests.class);
+
+    suite.addTestSuite(ConstantTest.class);
+    suite.addTestSuite(ApfloatTest.class);
+    suite.addTestSuite(DoubleToMMATest.class);
+    suite.addTestSuite(EllipticCurveMethodTest.class);
+    suite.addTestSuite(SimplifyCountTest.class);
+    suite.addTestSuite(ArraySetTest.class);
 
     return suite;
 

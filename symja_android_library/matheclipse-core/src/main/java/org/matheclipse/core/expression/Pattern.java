@@ -1,6 +1,8 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Function;
+import java.io.ObjectStreamException;
+import java.util.List;
 import org.hipparchus.util.Pair;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.interfaces.IAST;
@@ -9,12 +11,8 @@ import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
-import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMapStatic;
 import org.matheclipse.parser.client.FEConfig;
-
-import java.io.ObjectStreamException;
-import java.util.List;
 
 
 /** A pattern with assigned &quot;pattern name&quot; (i.e. <code>x_</code>) */
@@ -43,7 +41,7 @@ public class Pattern extends Blank {
   /**
    * @param symbol
    * @param check
-   * @param def    if <code>true</code> use a default value, if matching isn't possible
+   * @param def if <code>true</code> use a default value, if matching isn't possible
    * @return
    */
   public static IPattern valueOf(final ISymbol symbol, final IExpr check, final boolean def) {
@@ -321,12 +319,12 @@ public class Pattern extends Blank {
         buffer.append(
             ","
                 + fHeadTest.internalJavaString(
-                    symbolsAsFactoryMethod,
-                    0,
-                    useOperaators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables));
+                symbolsAsFactoryMethod,
+                0,
+                useOperaators,
+                usePrefix,
+                noSymbolPrefix,
+                variables));
       }
     }
     if (fDefault) {
@@ -349,25 +347,7 @@ public class Pattern extends Blank {
     return true;
   }
 
-  @Override
-  public String toMMA() {
-    final StringBuilder buffer = new StringBuilder();
-    if (fHeadTest == null) {
-      buffer.append(fSymbol.toMMA());
-      buffer.append('_');
-      if (fDefault) {
-        buffer.append('.');
-      }
-    } else {
-      buffer.append(fSymbol.toMMA());
-      buffer.append('_');
-      if (fDefault) {
-        buffer.append('.');
-      }
-      buffer.append(fHeadTest.toMMA());
-    }
-    return buffer.toString();
-  }
+
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder();

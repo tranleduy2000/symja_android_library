@@ -36,6 +36,7 @@ import org.matheclipse.core.expression.ExprID;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
+import org.matheclipse.core.form.output.WolframFormFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.polynomials.longexponent.ExprRingFactory;
@@ -3874,7 +3875,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
 
   @Override
   public String toMMA() {
-    return toString();
+    return WolframFormFactory.get().toString(this);
   }
 
   /**

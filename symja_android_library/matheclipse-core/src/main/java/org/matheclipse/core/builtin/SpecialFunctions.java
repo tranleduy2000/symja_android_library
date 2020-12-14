@@ -1,8 +1,31 @@
 package org.matheclipse.core.builtin;
 
+import static org.matheclipse.core.expression.F.BernoulliB;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.C4;
+import static org.matheclipse.core.expression.F.CComplexInfinity;
+import static org.matheclipse.core.expression.F.CInfinity;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.CN1D2;
+import static org.matheclipse.core.expression.F.CNInfinity;
+import static org.matheclipse.core.expression.F.Erf;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.NIL;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.QQ;
+import static org.matheclipse.core.expression.F.Sqr;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.Zeta;
+
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
-
+import java.math.BigDecimal;
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
@@ -30,7 +53,6 @@ import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
-import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -48,31 +70,6 @@ import org.matheclipse.core.reflection.system.rules.StieltjesGammaRules;
 import org.matheclipse.core.reflection.system.rules.StruveHRules;
 import org.matheclipse.core.reflection.system.rules.StruveLRules;
 import org.matheclipse.parser.client.FEConfig;
-
-import java.math.BigDecimal;
-
-import static org.matheclipse.core.expression.F.BernoulliB;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.C4;
-import static org.matheclipse.core.expression.F.CComplexInfinity;
-import static org.matheclipse.core.expression.F.CInfinity;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.CN1D2;
-import static org.matheclipse.core.expression.F.CNInfinity;
-import static org.matheclipse.core.expression.F.Erf;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.NIL;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.QQ;
-import static org.matheclipse.core.expression.F.Sqr;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.Zeta;
 
 public class SpecialFunctions {
 
@@ -1048,8 +1045,8 @@ public class SpecialFunctions {
           }
           if (engine.isDoubleMode()
               && (z.isNumericFunction(true)
-                  && a.isNumericFunction(true)
-                  && b.isNumericFunction(true))) {
+              && a.isNumericFunction(true)
+              && b.isNumericFunction(true))) {
             org.hipparchus.distribution.continuous.BetaDistribution beta = //
                 new org.hipparchus.distribution.continuous.BetaDistribution(a.evalDouble(),
                     b.evalDouble());

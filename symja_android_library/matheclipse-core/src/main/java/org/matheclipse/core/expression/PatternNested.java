@@ -70,8 +70,7 @@ public class PatternNested extends Pattern {
 
   /**
    * Check if the two left-hand-side pattern expressions are equivalent. (i.e. <code>f[x_,y_]</code>
-   * is equivalent to
-   * <code>f[a_,b_]</code> )
+   * is equivalent to <code>f[a_,b_]</code> )
    *
    * @param patternObject
    * @param pm1
@@ -159,18 +158,7 @@ public class PatternNested extends Pattern {
     return (fHeadTest == null || expr.head().equals(fHeadTest));
   }
 
-  @Override
-  public String toMMA() {
-    final StringBuilder buffer = new StringBuilder();
 
-    buffer.append('(');
-    buffer.append(fSymbol.toMMA());
-    buffer.append(':');
-    buffer.append(fPatternExpr.toMMA());
-    buffer.append(')');
-
-    return buffer.toString();
-  }
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder();

@@ -53,6 +53,7 @@ import org.matheclipse.core.builtin.ListFunctions;
 import org.matheclipse.core.builtin.ManipulateFunction;
 import org.matheclipse.core.builtin.MinMaxFunctions;
 import org.matheclipse.core.builtin.NumberTheory;
+import org.matheclipse.core.builtin.NumericArrayFunctions;
 import org.matheclipse.core.builtin.OutputFunctions;
 import org.matheclipse.core.builtin.PatternMatching;
 import org.matheclipse.core.builtin.PolynomialFunctions;
@@ -4826,7 +4827,7 @@ public class F {
 //			SourceCodeFunctions.initialize();
       SparseArrayFunctions.initialize();
 //			UnitTestingFunctions.initialize();
-      // NumericArrayFunctions.initialize();
+      NumericArrayFunctions.initialize();
 
       ComputationalGeometryFunctions.initialize();
 
@@ -10965,9 +10966,9 @@ public class F {
   }
 
   /**
-   * Show the result in an HTML page with the help of the Java <code>Desktop.getDesktop().open()</code>
-   * method. On some platforms the Desktop API may not be supported; use the
-   * <code>isDesktopSupported()</code> method todetermine if the current desktop is supported.
+   * Show the result in an HTML page with the help of the Java <code>Desktop.getDesktop().open()
+   * </code> method. On some platforms the Desktop API may not be supported; use the <code>
+   * isDesktopSupported()</code> method todetermine if the current desktop is supported.
    *
    * @param expr
    * @return

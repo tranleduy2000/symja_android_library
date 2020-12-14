@@ -244,16 +244,16 @@ public class ConstantDefinitions {
 
     public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
       if (rightHandSide.isInfinity()) {
-        F.$IterationLimit.assignValue(F.CN1, false);
+        S.$IterationLimit.assignValue(F.CN1, false);
         engine.setIterationLimit(-1);
         return rightHandSide;
       }
       int iterationLimit = rightHandSide.toIntDefault();
       if (iterationLimit < 20) {
         // Cannot set $IterationLimit to `1`; value must be Infinity or an integer at least 20.
-        return IOFunctions.printMessage(F.$IterationLimit, "limset", F.List(rightHandSide), engine);
+        return IOFunctions.printMessage(S.$IterationLimit, "limset", F.List(rightHandSide), engine);
       }
-      F.$IterationLimit.assignValue(F.ZZ(iterationLimit), setDelayed);
+      S.$IterationLimit.assignValue(F.ZZ(iterationLimit), setDelayed);
       engine.setIterationLimit(iterationLimit);
       return F.ZZ(iterationLimit);
     }
@@ -352,16 +352,16 @@ public class ConstantDefinitions {
 
     public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
       if (rightHandSide.isInfinity()) {
-        F.$RecursionLimit.assignValue(F.CN1, false);
+        S.$RecursionLimit.assignValue(F.CN1, false);
         engine.setRecursionLimit(-1);
         return rightHandSide;
       }
       int recursionLimit = rightHandSide.toIntDefault();
       if (recursionLimit < 20) {
         // Cannot set $RecursionLimit to `1`; value must be Infinity or an integer at least 20.
-        return IOFunctions.printMessage(F.$RecursionLimit, "limset", F.List(rightHandSide), engine);
+        return IOFunctions.printMessage(S.$RecursionLimit, "limset", F.List(rightHandSide), engine);
       }
-      F.$RecursionLimit.assignValue(F.ZZ(recursionLimit), setDelayed);
+      S.$RecursionLimit.assignValue(F.ZZ(recursionLimit), setDelayed);
       engine.setRecursionLimit(recursionLimit);
       return F.ZZ(recursionLimit);
     }
@@ -471,10 +471,11 @@ public class ConstantDefinitions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * represents an infinite complex quantity of undetermined direction.
-   * </p>
+   *
+   * <p>represents an infinite complex quantity of undetermined direction.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -829,9 +830,9 @@ public class ConstantDefinitions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * represents an infinite real quantity.
-   * </p>
+   *
+   * <p>represents an infinite real quantity.
+   *
    * </blockquote>
    *
    * <h3>Examples</h3>
@@ -860,9 +861,8 @@ public class ConstantDefinitions {
    * &gt;&gt; Infinity + Infinity
    * Infinity
    * </pre>
-   * <p>
-   * Indeterminate expression <code>0</code> Infinity encountered.
-   * </p>
+   *
+   * <p>Indeterminate expression <code>0</code> Infinity encountered.
    *
    * <pre>
    * &gt;&gt; Infinity / Infinity
@@ -963,10 +963,11 @@ public class ConstantDefinitions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * is the constant <code>Pi</code>.
-   * </p>
+   *
+   * <p>is the constant <code>Pi</code>.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>

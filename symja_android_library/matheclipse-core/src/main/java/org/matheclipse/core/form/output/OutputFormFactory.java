@@ -50,6 +50,7 @@ import org.matheclipse.parser.client.operator.PrefixOperator;
 
 /** Converts an internal <code>IExpr</code> into a user readable string. */
 public class OutputFormFactory {
+
   /** The conversion wasn't called with an operator preceding the <code>IExpr</code> object. */
   public static final boolean NO_PLUS_CALL = false;
 
@@ -63,13 +64,15 @@ public class OutputFormFactory {
   private final boolean fPlusReversed;
   private boolean fIgnoreNewLine = false;
   /** If <code>true</code> print leading and trailing quotes in Symja strings */
-  private boolean fQuotes = false;
+  protected boolean fQuotes = false;
   private boolean fEmpty = true;
   private int fColumnCounter;
   private int fExponentFigures;
   private int fSignificantFigures;
 
-  private OutputFormFactory(final boolean relaxedSyntax, final boolean reversed,
+  protected OutputFormFactory(
+      final boolean relaxedSyntax,
+      final boolean reversed,
       int exponentFigures,
       int significantFigures) {
     fRelaxedSyntax = relaxedSyntax;
@@ -1056,7 +1059,6 @@ public class OutputFormFactory {
 
         convert(buf, header, Integer.MIN_VALUE, true);
         // avoid fast StackOverflow
-        // convertFunctionArgs(buf, list);
         append(buf, "[");
         for (int i = 1; i < list.size(); i++) {
           convert(buf, list.get(i), Integer.MIN_VALUE, false);
@@ -1151,6 +1153,18 @@ public class OutputFormFactory {
                 convert(buf, normal, Integer.MIN_VALUE, false);
                 return;
 
+              }
+              break;
+            case ID.Out:
+              if (list.isAST1() && list.arg1().isInteger()) {
+                int lineNumber = list.arg1().toIntDefault();
+                if (lineNumber == -1) {
+                  buf.append("%");
+                  return;
+                } else if (lineNumber == -2) {
+                  buf.append("%%");
+                  return;
+                }
               }
               break;
             case ID.Part:
@@ -1683,7 +1697,7 @@ public class OutputFormFactory {
     fEmpty = false;
   }
 
-  private void append(Appendable buf, String str) throws IOException {
+  protected void append(Appendable buf, String str) throws IOException {
     buf.append(str);
     fColumnCounter += str.length();
     fEmpty = false;

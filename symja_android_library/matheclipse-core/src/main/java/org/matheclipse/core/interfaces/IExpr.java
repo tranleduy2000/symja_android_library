@@ -3090,7 +3090,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @return
    */
   String toMMA();/* {
-    return toString();
+       return  WolframFormFactory.get().toString(this);
   }*/
 
   @Override

@@ -1,8 +1,12 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Function;
-import com.duy.lang.DInteger;
-
+import com.duy.nio.charset.DStandardCharsets;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.Collator;
+import java.util.Locale;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.IStringXImpl;
@@ -11,12 +15,6 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.text.Collator;
-import java.util.Comparator;
-import java.util.Locale;
 
 /**
  * A concrete IString implementation
@@ -67,7 +65,7 @@ public class StringX extends IStringXImpl implements IStringX {
   }
 
   /**
-   * @param value    the internal Java string value
+   * @param value the internal Java string value
    * @param mimeType the mime type of the string
    * @return
    * @see IStringX#TEXT_PLAIN
@@ -174,9 +172,7 @@ public class StringX extends IStringXImpl implements IStringX {
     fString = str;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public IExpr accept(IVisitor visitor) {
     return visitor.visit(this);
@@ -186,17 +182,13 @@ public class StringX extends IStringXImpl implements IStringX {
   // return fString.compareTo(((StringImpl) o).fString);
   // }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public boolean accept(IVisitorBoolean visitor) {
     return visitor.visit(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int accept(IVisitorInt visitor) {
     return visitor.visit(this);
@@ -282,9 +274,7 @@ public class StringX extends IStringXImpl implements IStringX {
     return fString.endsWith(suffix);
   }
 
-  /**
-   * Equals doesn't compare the mime type.
-   */
+  /** Equals doesn't compare the mime type. */
   @Override
   public boolean equals(final Object obj) {
     if (this == obj) {
@@ -312,12 +302,9 @@ public class StringX extends IStringXImpl implements IStringX {
     return "\"" + fString + "\"";
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   public byte[] getBytes() {
-    Charset charset = Charset.forName("UTF-8");
-    return fString.getBytes(charset);
+    return fString.getBytes(DStandardCharsets.UTF_8);
   }
 
   /**
@@ -392,9 +379,7 @@ public class StringX extends IStringXImpl implements IStringX {
     return fString.indexOf(str, fromIndex);
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   public String intern() {
     return fString.intern();
   }
@@ -537,12 +522,12 @@ public class StringX extends IStringXImpl implements IStringX {
     return fString.substring(beginIndex, endIndex);
   }
 
-  /** @return */
+  /** @return  */
   public char[] toCharArray() {
     return fString.toCharArray();
   }
 
-  /** @return */
+  /** @return  */
   public String toLowerCase() {
     return fString.toLowerCase();
   }
@@ -555,18 +540,13 @@ public class StringX extends IStringXImpl implements IStringX {
     return fString.toLowerCase(locale);
   }
 
-  @Override
-  public String toMMA() {
-    return "\"" + fString + "\"";
-  }
+
   @Override
   public String toString() {
     return fString;
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   public String toUpperCase() {
     return fString.toUpperCase(Locale.US);
   }
@@ -579,7 +559,7 @@ public class StringX extends IStringXImpl implements IStringX {
     return fString.toUpperCase(locale);
   }
 
-  /** @return */
+  /** @return  */
   public String trim() {
     return fString.trim();
   }

@@ -3205,9 +3205,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public boolean isBooleanResult() {
     return head().isPredicateFunctionSymbol() //
@@ -3605,11 +3603,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
       return forAll(/*new Predicate<IExpr>() {
 				@Override
 				public boolean test(IExpr x) {
-					return x.isNumericFunction() || //
+					return x.isNumericFunction(true) || //
 							(x.isList() && ((IAST) x).forAll(new Predicate<IExpr>() {
 								@Override
 								public boolean test(IExpr y) {
-									return y.isNumericFunction();
+									return y.isNumericFunction(true);
 								}
 							}));
 				}
@@ -4173,19 +4171,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isTimes() {
-    return head() == F.Times && 3 <= size();
+    return head() == S.Times && 3 <= size();
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isTimes2() {
-    return head() == F.Times && 3 == size();
+    return head() == S.Times && 3 == size();
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isTimes3() {
-    return head() == F.Times && 4 == size();
+    return head() == S.Times && 4 == size();
   }
 
   /** {@inheritDoc} */

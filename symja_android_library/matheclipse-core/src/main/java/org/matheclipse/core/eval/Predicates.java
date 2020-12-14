@@ -34,10 +34,10 @@ public class Predicates {
       return x.isConditionalExpression();
     }
   };
-  public static final Predicate<IExpr> isNumericFunction = new Predicate<IExpr>() {
+  public static final Predicate<IExpr> isNumericFunctionTrue = new Predicate<IExpr>() {
     @Override
     public boolean test(IExpr y) {
-      return y.isNumericFunction();
+      return y.isNumericFunction(true);
     }
   };
   public static final Predicate<IExpr> isNumericArgumentPredicate = new Predicate<IExpr>() {
@@ -51,7 +51,7 @@ public class Predicates {
     @Override
     public boolean test(IExpr x) {
       return x.isNumericFunction(true) || //
-          (x.isList() && ((IAST) x).forAll(isNumericFunction));
+          (x.isList() && ((IAST) x).forAll(isNumericFunctionTrue));
     }
   };
   public static final Predicate<IExpr> isFunctionOrListNumericArgumentPredicate2 = new Predicate<IExpr>() {

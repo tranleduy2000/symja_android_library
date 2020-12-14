@@ -1,8 +1,11 @@
 package org.matheclipse.core.expression;
 
 import com.duy.lambda.Function;
+import java.io.ObjectStreamException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.hipparchus.util.Pair;
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPattern;
@@ -10,7 +13,6 @@ import org.matheclipse.core.interfaces.IPatternImpl;
 import org.matheclipse.core.interfaces.IPatternObject;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
-import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMapStatic;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
@@ -19,11 +21,6 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 import org.matheclipse.parser.client.FEConfig;
-
-import java.io.ObjectStreamException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A &quot;blank pattern&quot; with no assigned &quot;pattern name&quot; (i.e. &quot;<code>_</code>
@@ -341,18 +338,7 @@ public class Blank extends IPatternImpl implements IPattern {
     return isConditionMatched(expr, patternMap);
   }
 
-  @Override
-  public String toMMA() {
-    final StringBuilder buffer = new StringBuilder();
-    buffer.append('_');
-    if (fHeadTest != null) {
-      buffer.append(fHeadTest.toMMA());
-    }
-    if (fDefault) {
-      buffer.append('.');
-    }
-    return buffer.toString();
-  }
+
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder();
