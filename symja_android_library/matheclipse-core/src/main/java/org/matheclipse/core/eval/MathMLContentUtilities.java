@@ -12,7 +12,7 @@ import java.io.Writer;
  * 
  */
 public class MathMLContentUtilities {
-	protected EvalEngine fEvalEngine;
+	protected final EvalEngine fEvalEngine;
 
 	protected MathMLContentFormFactory fMathMLFactory;
 

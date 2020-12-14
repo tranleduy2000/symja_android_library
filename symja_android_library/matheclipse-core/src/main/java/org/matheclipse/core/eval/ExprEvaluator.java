@@ -134,7 +134,7 @@ public class ExprEvaluator {
 
   // Quit() function may set a new engine,so "final" is not possible here
   // Android changed: make engine final
-  private EvalEngine fEngine;
+  private final EvalEngine fEngine;
 
   private IExpr fExpr;
 
@@ -333,7 +333,7 @@ public class ExprEvaluator {
     fExpr = expr;
     EvalEngine[] engineRef = new EvalEngine[] {fEngine};
     IExpr result = evalTopLevel(expr, engineRef);
-    fEngine = engineRef[0];
+    //fEngine = engineRef[0];
     return result;
   }
 

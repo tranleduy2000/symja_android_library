@@ -64,7 +64,6 @@ public final class FunctionDefinitions {
 
     private static void init() {
       ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
-      // F.Dataset.setEvaluator(new org.matheclipse.core.reflection.system.Dataset());
       D.setEvaluator(new org.matheclipse.core.reflection.system.D());
       Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
       DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
@@ -79,11 +78,11 @@ public final class FunctionDefinitions {
       FunctionExpand.setEvaluator(new org.matheclipse.core.reflection.system.FunctionExpand());
       HeavisideTheta.setEvaluator(new org.matheclipse.core.reflection.system.HeavisideTheta());
       Horner.setEvaluator(new org.matheclipse.core.reflection.system.Horner());
-			//In.setEvaluator(new org.matheclipse.core.reflection.system.In());
-			InterpolatingFunction
-          .setEvaluator(new org.matheclipse.core.reflection.system.InterpolatingFunction());
-      InterpolatingPolynomial
-          .setEvaluator(new org.matheclipse.core.reflection.system.InterpolatingPolynomial());
+      In.setEvaluator(new org.matheclipse.core.reflection.system.In());
+      InterpolatingFunction.setEvaluator(
+          new org.matheclipse.core.reflection.system.InterpolatingFunction());
+      InterpolatingPolynomial.setEvaluator(
+          new org.matheclipse.core.reflection.system.InterpolatingPolynomial());
       Interpolation.setEvaluator(new org.matheclipse.core.reflection.system.Interpolation());
       InverseFourier.setEvaluator(new org.matheclipse.core.reflection.system.InverseFourier());
       InverseFunction.setEvaluator(new org.matheclipse.core.reflection.system.InverseFunction());

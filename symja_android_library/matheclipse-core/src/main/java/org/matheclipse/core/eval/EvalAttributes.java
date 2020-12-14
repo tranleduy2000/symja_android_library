@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval;
 
+import com.duy.annotations.ObjcMemoryIssue;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import java.util.Arrays;
@@ -135,7 +136,7 @@ public class EvalAttributes {
    * @param head the head of the expression, which should be flattened.
    * @param ast the <code>sublist</code> which should be added to the <code>result</code> list.
    * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>
-   *     F#NIL</code>..
+   * F#NIL</code>..
    */
   public static IASTAppendable flattenDeep(final ISymbol head, final IAST ast) {
     // swift changed: memory issue
@@ -188,57 +189,64 @@ public class EvalAttributes {
    * @param head the head of the expression, which should be flattened.
    * @param ast the <code>sublist</code> which should be added to the <code>result</code> list.
    * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>
-   *     F#NIL</code>.
+   * F#NIL</code>.
    * @see #flattenDeep(ISymbol, IAST)
    */
+  @ObjcMemoryIssue
   public static IASTAppendable flatten(final ISymbol head, final IAST ast) {
-    final int[] newSize = new int[1];
-    newSize[0] = 0;
-    final boolean[] flattened = new boolean[] {false};
+    /*final*/
+    int/*[]*/ newSize /* = new int[1]*/;
+    newSize/*[0]*/ = 0;
+    /*final*/
+    boolean/*[]*/ flattened = /*new boolean[]{*/false/*}*/;
     // TODO: com.duy.annotations.ObjcMemoryIssue
-    ast.forEach(
-				new Consumer<IExpr>() {
-					@Override
-					public void accept(IExpr expr) {
-						if (expr.isAST(head)) {
-							flattened[0] = true;
-							int temp = ((IAST) expr).argSize(); // flattenAlloc(head, (IAST) expr);
-							newSize[0] += temp;
-						} else if (expr.isUnevaluated()
-								&& expr.first().head().equals(head)
-								&& expr.first().isAST()) {
-							flattened[0] = true;
-							int temp = ((IAST) expr).argSize();// flattenAlloc(head, (IAST) expr);
-							newSize[0] += temp;
-						} else {
-							newSize[0]++;
-						}
-					}
-				});
+    for (int i = 1; i < ast.size(); i++) {
+//    ast.forEach(
+//				new Consumer<IExpr>() {
+//					@Override
+//					public void accept(IExpr expr) {
+      IExpr expr = ast.get(i);
+      if (expr.isAST(head)) {
+        flattened/*[0]*/ = true;
+        int temp = ((IAST) expr).argSize(); // flattenAlloc(head, (IAST) expr);
+        newSize/*[0]*/ += temp;
+      } else if (expr.isUnevaluated()
+          && expr.first().head().equals(head)
+          && expr.first().isAST()) {
+        flattened/*[0]*/ = true;
+        int temp = ((IAST) expr).argSize();// flattenAlloc(head, (IAST) expr);
+        newSize/*[0]*/ += temp;
+      } else {
+        newSize/*[0]*/++;
+      }
+    }
+//    	});
 
-    if (flattened[0]) {
-      final IASTAppendable result = F.ast(ast.head(), newSize[0], false);
-      ast.forEach(
-					new Consumer<IExpr>() {
-						@Override
-						public void accept(IExpr expr) {
-							if (expr.isAST(head)) {
-								result.appendArgs((IAST) expr);// flatten(head, (IAST) expr).orElse((IAST) expr));
-							} else if (expr.isUnevaluated()
-									&& expr.first().head().equals(head)
-									&& expr.first().isAST()) {
-								IAST unevaluated = (IAST) expr.first();
-								result.appendArgs(unevaluated.map(head, new Function<IExpr, IExpr>() {
-									@Override
-									public IExpr apply(IExpr x) {
-										return F.Unevaluated(x);
-									}
-								}));
-							} else {
-								result.append(expr);
-							}
-						}
-					});
+    if (flattened/*[0]*/) {
+      final IASTAppendable result = F.ast(ast.head(), newSize/*[0]*/, false);
+      for (int i = 1; i < ast.size(); i++) {
+//      ast.forEach(
+//          new Consumer<IExpr>() {
+//            @Override
+//            public void accept(IExpr expr) {
+        IExpr expr = ast.get(i);
+        if (expr.isAST(head)) {
+          result.appendArgs((IAST) expr);// flatten(head, (IAST) expr).orElse((IAST) expr));
+        } else if (expr.isUnevaluated()
+            && expr.first().head().equals(head)
+            && expr.first().isAST()) {
+          IAST unevaluated = (IAST) expr.first();
+          result.appendArgs(unevaluated.map(head, new Function<IExpr, IExpr>() {
+            @Override
+            public IExpr apply(IExpr x) {
+              return F.Unevaluated(x);
+            }
+          }));
+        } else {
+          result.append(expr);
+        }
+      }
+//          });
       return result;
     }
     return F.NIL;
@@ -253,7 +261,7 @@ public class EvalAttributes {
    * @param ast the <code>sublist</code> which should be added to the <code>result</code> list.
    * @param positions the positions which should be flattened
    * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>
-   *     F#NIL</code>..
+   * F#NIL</code>..
    */
   public static IASTAppendable flattenAt(final ISymbol head, final IAST ast, int[] positions) {
     IExpr expr;
@@ -294,19 +302,23 @@ public class EvalAttributes {
     return false;
   }
 
+  @ObjcMemoryIssue
   private static int flattenAlloc(final ISymbol head, final IAST ast) {
-    final int[] newSize = new int[1];
-    ast.forEach(new Consumer<IExpr>() {
-      @Override
-      public void accept(IExpr expr) {
-        if (expr.isAST(head)) {
-          newSize[0] += flattenAlloc(head, (IAST) expr);
-        } else {
-          newSize[0]++;
-        }
+    /*final*/
+    int/*[]*/ newSize =/* new int[1]*/ 0;
+    for (int i = 1; i < ast.size(); i++) {
+//    ast.forEach(new Consumer<IExpr>() {
+//      @Override
+//      public void accept(IExpr expr) {
+      IExpr expr = ast.get(i);
+      if (expr.isAST(head)) {
+        newSize/*[0]*/ += flattenAlloc(head, (IAST) expr);
+      } else {
+        newSize/*[0]*/++;
       }
-    });
-    return newSize[0];
+    }
+//    });
+    return newSize/*[0]*/;
   }
 
   /**
@@ -317,7 +329,7 @@ public class EvalAttributes {
    * @param head the head of the expression, which should be flattened.
    * @param sublist the <code>sublist</code> which should be added to the <code>result</code> list.
    * @param result the <code>result</code> list, where all sublist elements with the same <code>head
-   *     </code> should be appended.
+   * </code> should be appended.
    * @param recursionCounter
    * @param level the recursion level up to which the list should be flattened
    * @return <code>true</code> if a sublist was flattened out into the <code>result</code> list.

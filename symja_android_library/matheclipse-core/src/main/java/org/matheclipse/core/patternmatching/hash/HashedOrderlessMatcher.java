@@ -1,5 +1,6 @@
 package org.matheclipse.core.patternmatching.hash;
 
+import com.duy.annotations.ObjcMemoryIssue;
 import com.duy.lambda.Predicate;
 import java.util.List;
 import org.matheclipse.core.eval.EvalEngine;
@@ -160,16 +161,18 @@ public class HashedOrderlessMatcher {
    * @param ast
    * @return
    */
+  @ObjcMemoryIssue
   protected static boolean exists2ASTArguments(IAST ast) {
-    // TODO: com.duy.annotations.ObjcMemoryIssue
-    final int[] counter = {0};
+    /*final*/ int/*[]*/ counter = /*{*/0/*}*/;
     // x -> x.isAST() &&
-    return ast.exists(new Predicate<IExpr>() {
-			@Override
-			public boolean test(IExpr x) {
-				return x.size() < MAX_AST_SIZE_ARGUMENT && ++counter[0] == 2;
-			}
-		});
+    final int size = ast.size();
+    for (int i = 1; i < size; i++) {
+      IExpr x = ast.get(i);
+      if (x.size() < MAX_AST_SIZE_ARGUMENT && ++counter/*[0]*/ == 2) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

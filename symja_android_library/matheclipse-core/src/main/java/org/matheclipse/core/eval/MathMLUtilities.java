@@ -19,7 +19,7 @@ import java.text.NumberFormat;
  */
 public class MathMLUtilities {
 
-  protected EvalEngine fEvalEngine;
+  protected final EvalEngine fEvalEngine;
 
   // protected MathMLFormFactory fMathMLFactory;
 

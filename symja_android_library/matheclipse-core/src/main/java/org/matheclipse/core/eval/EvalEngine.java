@@ -4,7 +4,6 @@ import com.duy.annotations.Nonnull;
 import com.duy.annotations.ObjcMemoryIssue;
 import com.duy.lambda.DoubleUnaryOperator;
 import com.duy.lambda.Function;
-import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 import com.duy.lang.DThreadLocal;
 import com.gx.common.cache.Cache;
@@ -629,6 +628,7 @@ public class EvalEngine implements Serializable {
    * @param attr
    * @return <code>F.NIL</code> is no evaluation was possible
    */
+  @ObjcMemoryIssue
   public IASTMutable evalArgs(final IAST ast, final int attr) {
     OperationSystem.checkInterrupt();
     final int astSize = ast.size();
@@ -682,19 +682,20 @@ public class EvalEngine implements Serializable {
           // the HoldRest attribute is disabled
           numericMode = fNumericMode;
           try {
-            // todo ObjcMemoryIssue
             selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-            ast.forEach(
-                2,
-                astSize,
-                new ObjIntConsumer<IExpr>() {
-                  @Override
-                  public void accept(IExpr arg, int i) {
-                    if (!arg.isUnevaluated()) {
-                      EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
-                    }
-                  }
-                });
+            for (int i = /*ast.forEach(*/
+                2;
+                i < astSize; i++)
+              /*new ObjIntConsumer<IExpr>()*/ {
+//                  @Override
+//                  public void accept(IExpr arg, int i) {
+              IExpr arg = ast.get(i);
+              if (!arg.isUnevaluated()) {
+                EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
+              }
+            }
+            /* })*/
+            ;
           } finally {
             if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
               fNumericMode = numericMode;
@@ -705,18 +706,19 @@ public class EvalEngine implements Serializable {
           numericMode = fNumericMode;
           try {
             selectNumericMode(attr, ISymbol.NHOLDREST, localNumericMode);
-            // todo ObjcMemoryIssue
-            ast.forEach(
-                2,
-                astSize,
-                new ObjIntConsumer<IExpr>() {
-                  @Override
-                  public void accept(IExpr arg, int i) {
-                    if (arg.isAST(F.Evaluate)) {
-                      EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
-                    }
-                  }
-                });
+            /*ast.forEach(*/
+            for (int i =
+                2;
+                i < astSize; i++) {
+//                new ObjIntConsumer<IExpr>() {
+//                  @Override
+//                  public void accept(IExpr arg, int i) {
+              IExpr arg = ast.get(i);
+              if (arg.isAST(F.Evaluate)) {
+                EvalEngine.this.evalArg(rlist, ast, arg, i, isNumericFunction);
+              }
+            }
+            /*});*/
           } finally {
             if ((ISymbol.NHOLDREST & attr) == ISymbol.NHOLDREST) {
               fNumericMode = numericMode;
@@ -1674,23 +1676,25 @@ public class EvalEngine implements Serializable {
     return evalASTBuiltinFunction(symbol, ast);
   }
 
+  @ObjcMemoryIssue
   public IExpr evalUpRules(final IAST ast) {
-    final IExpr[] result = new IExpr[1];
-    result[0] = F.NIL;
-    if (ast.exists(
-        new Predicate<IExpr>() {
-          @Override
-          public boolean test(IExpr x) {
-            if (!(x instanceof IPatternObject) && x.isPresent()) {
-              result[0] = x.topHead().evalUpRules(ast, EvalEngine.this);
-              if (result[0].isPresent()) {
-                return true;
-              }
-            }
-            return false;
-          }
-        })) {
-      return result[0];
+    /*final*/ IExpr/*[]*/ result /*= new IExpr[1]*/;
+    result/*[0]*/ = F.NIL;
+    boolean exist = false;
+    for (int i = 1; i < ast.size(); i++) {
+      IExpr x = ast.get(i);
+      if (!(x instanceof IPatternObject) && x.isPresent()) {
+        result/*[0]*/ = x.topHead().evalUpRules(ast, EvalEngine.this);
+        if (result/*[0]*/.isPresent()) {
+          exist = true;
+          break;
+//          return true;
+        }
+      }
+//      return false;
+    }
+    if (exist) {
+      return result/*[0]*/;
     }
 
     return F.NIL;

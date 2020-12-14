@@ -1,6 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import android.graphics.Path;
 import java.io.File;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;

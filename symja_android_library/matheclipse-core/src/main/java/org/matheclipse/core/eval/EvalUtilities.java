@@ -63,7 +63,7 @@ public class EvalUtilities extends MathMLUtilities {
         if (parsedExpression != null) {
           EvalEngine[] engineRef = new EvalEngine[] {fEvalEngine};
           IExpr result = ExprEvaluator.evalTryCatch(parsedExpression, engineRef);
-          fEvalEngine = engineRef[0];
+          //fEvalEngine = engineRef[0];
           return result;
           //                    IExpr temp;
           //                    try {
@@ -103,7 +103,7 @@ public class EvalUtilities extends MathMLUtilities {
         }
       } finally {
         // Quit may set a new engine
-        fEvalEngine = EvalEngine.get();
+        //fEvalEngine = EvalEngine.get();
       }
     }
     return F.NIL;
@@ -169,7 +169,7 @@ public class EvalUtilities extends MathMLUtilities {
         return temp;
       } finally {
         // Quit may set a new engine
-        fEvalEngine = EvalEngine.get();
+        //fEvalEngine = EvalEngine.get();
       }
     }
     return F.NIL;
