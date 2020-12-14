@@ -91,7 +91,8 @@ public final class NumStr extends Num {
 			long precision = fPrecision < engine.getNumericPrecision() ? engine.getNumericPrecision() : fPrecision;
 			// long precision = fPrecision;
 			// if (engine.isApfloat()) {
-			// precision = fPrecision < engine.getNumericPrecision() ? fPrecision : engine.getNumericPrecision();
+      // precision = fPrecision < engine.getNumericPrecision() ? fPrecision :
+      // engine.getNumericPrecision();
 			// }
 			// engine.setNumericPrecision(precision);
 			if (fExponent == 0) {

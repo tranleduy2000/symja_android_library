@@ -8,6 +8,7 @@ import org.hipparchus.linear.FieldVector;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.Predicates;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
@@ -45,91 +46,26 @@ public class PredicateQ {
       F.AntisymmetricMatrixQ.setEvaluator(new AntisymmetricMatrixQ());
       F.AntihermitianMatrixQ.setEvaluator(new AntihermitianMatrixQ());
       F.ArrayQ.setEvaluator(new ArrayQ());
-      F.AssociationQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isAssociation();
-        }
-      });
-      F.AtomQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isAtom();
-        }
-      });
-      F.BooleanQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isTrue() || x.isFalse();
-        }
-      });
-      F.ByteArrayQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return WXFFunctions.isByteArray(x);
-        }
-      });
+      F.AssociationQ.setPredicateQ(Predicates.isAssociation);
+      F.AtomQ.setPredicateQ(Predicates.isAtom);
+      F.BooleanQ.setPredicateQ(Predicates.isTrueOrFalse);
+      F.ByteArrayQ.setPredicateQ(Predicates.isByteArray);
       F.DigitQ.setEvaluator(new DigitQ());
       F.EvenQ.setEvaluator(new EvenQ());
-      F.ExactNumberQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isExactNumber();
-        }
-      });
+      F.ExactNumberQ.setPredicateQ(Predicates.isExactNumber);
       F.FreeQ.setEvaluator(new FreeQ());
       F.HermitianMatrixQ.setEvaluator(new HermitianMatrixQ());
-      F.InexactNumberQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isInexactNumber();
-        }
-      });
-      F.IntegerQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isInteger();
-        }
-      });
-      F.ListQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isList();
-        }
-      });
-      F.MachineNumberQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isMachineNumber();
-        }
-      });
+      F.InexactNumberQ.setPredicateQ(Predicates.isInexactNumber);
+      F.IntegerQ.setPredicateQ(Predicates.isInteger);
+      F.ListQ.setPredicateQ(Predicates.isList);
+      F.MachineNumberQ.setPredicateQ(Predicates.isMachineNumber);
       F.MatchQ.setEvaluator(new MatchQ());
       F.MatrixQ.setEvaluator(new MatrixQ());
       F.MemberQ.setEvaluator(new MemberQ());
-      F.MissingQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isAST(F.Missing, 2);
-        }
-      });
-      F.NotListQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return !x.isList();
-        }
-      });
-      F.NumberQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isNumber();
-        }
-      });
-      F.NumericQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isNumericFunction();
-        }
-      });
+      F.MissingQ.setPredicateQ(Predicates.isASTMissing2);
+      F.NotListQ.setPredicateQ(Predicates.isNotList);
+      F.NumberQ.setPredicateQ(Predicates.isNumber);
+      F.NumericQ.setPredicateQ(Predicates.isNumericFunctionFalse);
       F.OddQ.setEvaluator(new OddQ());
       F.OrthogonalMatrixQ.setEvaluator(new OrthogonalMatrixQ());
       F.PossibleZeroQ.setEvaluator(new PossibleZeroQ());
@@ -137,18 +73,8 @@ public class PredicateQ {
       F.QuantityQ.setEvaluator(new QuantityQ());
       F.RealNumberQ.setEvaluator(new RealNumberQ());
       F.SquareMatrixQ.setEvaluator(new SquareMatrixQ());
-      F.StringQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isString();
-        }
-      });
-      F.SymbolQ.setPredicateQ(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isSymbol();
-        }
-      });
+      F.StringQ.setPredicateQ(Predicates.isString);
+      F.SymbolQ.setPredicateQ(Predicates.isSymbol);
       F.SymmetricMatrixQ.setEvaluator(new SymmetricMatrixQ());
       F.SyntaxQ.setEvaluator(new SyntaxQ());
       F.ValueQ.setEvaluator(new ValueQ());
@@ -186,7 +112,7 @@ public class PredicateQ {
         }
         return false;
       }
-      return F.Equal.ofQ(engine, F.Times(F.CN1, F.Conjugate(expr1)), expr2);
+      return S.Equal.ofQ(engine, F.Times(F.CN1, F.Conjugate(expr1)), expr2);
     }
 
 
@@ -198,15 +124,16 @@ public class PredicateQ {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>m</code> is a anti symmetric matrix.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>m</code> is a anti symmetric matrix.
+   *
    * </blockquote>
-   * <p>
-   * See:<br />
-   * </p>
+   *
+   * <p>See:<br>
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Skew-symmetric_matrix">Wikipedia - Skew-symmetric matrix</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Skew-symmetric_matrix">Wikipedia - Skew-symmetric
+   *       matrix</a>
    * </ul>
    */
   private static final class AntisymmetricMatrixQ extends SymmetricMatrixQ {
@@ -362,12 +289,12 @@ public class PredicateQ {
           // Match the depth with the second argument
           final IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
           if (!matcher.test(F.ZZ(depth), engine)) {
-            return F.False;
+            return S.False;
           }
         }
-        return F.True;
+        return S.True;
       }
-      return F.False;
+      return S.False;
 
     }
 
@@ -383,10 +310,11 @@ public class PredicateQ {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>str</code> is a string which contains only digits.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>str</code> is a string which contains only digits.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -424,15 +352,18 @@ public class PredicateQ {
   }
 
   /**
+   *
+   *
    * <pre>
    * EvenQ(x)
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>x</code> is even, and <code>False</code> otherwise.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>x</code> is even, and <code>False</code> otherwise.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -454,7 +385,7 @@ public class PredicateQ {
 
     @Override
     public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, OptionArgs options) {
-      IExpr option = options.getOption(F.GaussianIntegers);
+      IExpr option = options.getOption(S.GaussianIntegers);
       if (!option.isTrue()) {
         return evalArg1Boole(arg1, engine);
       }
@@ -489,10 +420,11 @@ public class PredicateQ {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns 'True' if <code>expr</code> does not contain the expression <code>x</code>.
-   * </p>
+   *
+   * <p>returns 'True' if <code>expr</code> does not contain the expression <code>x</code>.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -571,7 +503,7 @@ public class PredicateQ {
           // special for FreeQ(), don't implemented in MemberQ()!
           if (arg1.isOrderlessAST() && arg2.isOrderlessAST() && arg1.head().equals(arg2.head())) {
             if (!isFreeOrderless((IAST) arg1, (IAST) arg1)) {
-              return F.False;
+              return S.False;
             }
           }
         }
@@ -591,15 +523,15 @@ public class PredicateQ {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>m</code> is a hermitian matrix.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>m</code> is a hermitian matrix.
+   *
    * </blockquote>
-   * <p>
-   * See:<br />
-   * </p>
+   *
+   * <p>See:<br>
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Hermitian_matrix">Wikipedia - Hermitian matrix</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Hermitian_matrix">Wikipedia - Hermitian matrix</a>
    * </ul>
    */
   private static final class HermitianMatrixQ extends SymmetricMatrixQ {
@@ -618,7 +550,7 @@ public class PredicateQ {
         }
         return false;
       }
-      return F.Equal.ofQ(engine, F.Conjugate(expr1), expr2);
+      return S.Equal.ofQ(engine, F.Conjugate(expr1), expr2);
     }
 
 
@@ -665,7 +597,7 @@ public class PredicateQ {
         IPatternMatcher matcher = engine.evalPatternMatcher(ast.arg2());
         IExpr arg1Evaled = engine.evaluate(arg1);
         if (matcher.test(arg1Evaled, engine)) {
-          return F.True;
+          return S.True;
         }
         if (arg1Evaled.isAST()) {
           return F.bool(matcher.test(arg1, engine));
@@ -728,11 +660,11 @@ public class PredicateQ {
       final IExpr arg1 = engine.evaluate(ast.arg1());
       int[] dims = arg1.isMatrix();
       if (dims == null) {
-        return F.False;
+        return S.False;
       }
 
       if (ast.isAST1()) {
-        return F.True;
+        return S.True;
       }
       if (ast.isAST2()) {
         final IExpr arg2 = engine.evaluate(ast.arg2());
@@ -753,10 +685,10 @@ public class PredicateQ {
                 return engine.evalTrue(temp);
               }
             })) {
-              return F.False;
+              return S.False;
             }
           }
-          return F.True;
+          return S.True;
         } else {
           FieldMatrix<IExpr> matrix = Convert.list2Matrix(arg1);
           if (matrix != null) {
@@ -765,15 +697,15 @@ public class PredicateQ {
                 IExpr expr = matrix.getEntry(i, j);
                 temp.set(1, expr);
                 if (!engine.evalTrue(temp)) {
-                  return F.False;
+                  return S.False;
                 }
               }
             }
-            return F.True;
+            return S.True;
           }
         }
       }
-      return F.False;
+      return S.False;
     }
 
     public int[] expectedArgSize(IAST ast) {
@@ -909,7 +841,7 @@ public class PredicateQ {
 
     @Override
     public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, OptionArgs options) {
-      IExpr option = options.getOption(F.GaussianIntegers);
+      IExpr option = options.getOption(S.GaussianIntegers);
       if (!option.isTrue()) {
         return evalArg1Boole(arg1, engine);
       }
@@ -970,25 +902,25 @@ public class PredicateQ {
       int[] dims = arg1.isMatrix();
       if (dims == null) {
         // no square matrix
-        return F.False;
+        return S.False;
       }
       IExpr identityMatrix = F.NIL;
       int[] identityMatrixDims = null;
       if (dims[0] >= dims[1]) {
-        identityMatrix = F.Dot.of(engine, F.Transpose(arg1), arg1);
+        identityMatrix = S.Dot.of(engine, F.Transpose(arg1), arg1);
         identityMatrixDims = identityMatrix.isMatrix();
         if (identityMatrixDims == null || //
             identityMatrixDims[0] != dims[1] || //
             identityMatrixDims[1] != dims[1]) {
-          return F.False;
+          return S.False;
         }
       } else {
-        identityMatrix = F.Dot.of(engine, arg1, F.Transpose(arg1));
+        identityMatrix = S.Dot.of(engine, arg1, F.Transpose(arg1));
         identityMatrixDims = identityMatrix.isMatrix();
         if (identityMatrixDims == null || //
             identityMatrixDims[0] != dims[0] || //
             identityMatrixDims[1] != dims[0]) {
-          return F.False;
+          return S.False;
         }
       }
       if (identityMatrix.isAST()) {
@@ -998,12 +930,12 @@ public class PredicateQ {
           for (int j = 1; j <= identityMatrixDims[1]; j++) {
             final IExpr expr = row.get(j);
             if (i == j) {
-              if (!F.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, expr))) {
-                return F.False;
+              if (!S.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, expr))) {
+                return S.False;
               }
             } else {
-              if (!F.PossibleZeroQ.ofQ(engine, expr)) {
-                return F.False;
+              if (!S.PossibleZeroQ.ofQ(engine, expr)) {
+                return S.False;
               }
             }
           }
@@ -1015,20 +947,20 @@ public class PredicateQ {
             for (int j = 1; j < dims[1]; j++) {
               final IExpr expr = matrix.getEntry(i, j);
               if (i == j) {
-                if (!F.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, expr))) {
-                  return F.False;
+                if (!S.PossibleZeroQ.ofQ(engine, F.Plus(F.CN1, expr))) {
+                  return S.False;
                 }
               } else {
-                if (!F.PossibleZeroQ.ofQ(engine, expr)) {
-                  return F.False;
+                if (!S.PossibleZeroQ.ofQ(engine, expr)) {
+                  return S.False;
                 }
               }
             }
           }
-          return F.True;
+          return S.True;
         }
       }
-      return F.True;
+      return S.True;
     }
 
     public int[] expectedArgSize(IAST ast) {
@@ -1049,6 +981,7 @@ public class PredicateQ {
    * otherwise.
    *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -1072,18 +1005,8 @@ public class PredicateQ {
         IExpr temp =
             ((IAST) expr)
                 .replace( //
-                    new Predicate<IExpr>() {
-                      @Override
-                      public boolean test(IExpr x) {
-                        return x.isNumericFunction(true);
-                      }
-                    }, //
-                    new Function<IExpr, IExpr>() {
-                      @Override
-                      public IExpr apply(IExpr x) {
-                        return x.evalNumber();
-                      }
-                    });
+                    Predicates.isNumericFunctionTrue, //
+                    Predicates.evalNumber);
         if (temp != null) {
           temp = engine.evaluate(temp);
           if (temp.isZero()) {
@@ -1123,9 +1046,9 @@ public class PredicateQ {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>n</code> is a integer prime number.<br />
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>n</code> is a integer prime number.<br>
+   *
    * </blockquote>
    *
    * <pre>
@@ -1137,18 +1060,18 @@ public class PredicateQ {
    * <p>returns <code>True</code> if <code>n</code> is a Gaussian prime number.<br>
    *
    * </blockquote>
-   * <p>
-   * For very large numbers, <code>PrimeQ</code> uses
-   * <a href="https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving">probabilistic
-   * prime testing</a>, so it might be wrong sometimes<br />
+   *
+   * <p>For very large numbers, <code>PrimeQ</code> uses <a
+   * href="https://en.wikipedia.org/wiki/Prime_number#Primality_testing_versus_primality_proving">probabilistic
+   * prime testing</a>, so it might be wrong sometimes<br>
    * (a number might be composite even though <code>PrimeQ</code> says it is prime).
-   * </p>
-   * <p>
-   * See:
-   * </p>
+   *
+   * <p>See:
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Prime_number">Wikipedia - Prime number</a></li>
-   * <li><a href="https://en.wikipedia.org/wiki/Gaussian_integer#Gaussian_primes">Wikipedia - Gaussian primes</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Prime_number">Wikipedia - Prime number</a>
+   *   <li><a href="https://en.wikipedia.org/wiki/Gaussian_integer#Gaussian_primes">Wikipedia -
+   *       Gaussian primes</a>
    * </ul>
    * <h3>Examples</h3>
    *
@@ -1166,9 +1089,8 @@ public class PredicateQ {
    * &gt;&gt; PrimeQ(2 ^ 255 - 1)
    * False
    * </pre>
-   * <p>
-   * All prime numbers between 1 and 100:
-   * </p>
+   *
+   * <p>All prime numbers between 1 and 100:
    *
    * <pre>
    * &gt;&gt; Select(Range(100), PrimeQ)
@@ -1257,6 +1179,7 @@ public class PredicateQ {
    * component.
    *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -1284,22 +1207,22 @@ public class PredicateQ {
       IExpr arg1 = engine.evaluate(ast.arg1());
       if (arg1.isNumber()) {
         if (arg1.isComplex() || arg1.isComplexNumeric()) {
-          return F.False;
+          return S.False;
         }
         return F.bool(arg1.isReal());
       }
       // CAUTION: the following can not be used because Rubi uses another definition
       // IExpr temp = engine.evaluate(arg1);
       // if (temp.isReal()) {
-      // return F.True;
+      // return S.True;
       // }
       // if (temp.isNumericFunction()) {
       // temp = engine.evalN(arg1);
       // if (temp.isReal()) {
-      // return F.True;
+      // return S.True;
       // }
       // }
-      return F.False;
+      return S.False;
     }
 
     public int[] expectedArgSize(IAST ast) {
@@ -1340,10 +1263,10 @@ public class PredicateQ {
       int[] dims = arg1.isMatrix();
       if (dims == null || dims[0] != dims[1]) {
         // no square matrix
-        return F.False;
+        return S.False;
       }
 
-      return F.True;
+      return S.True;
     }
 
 
@@ -1537,6 +1460,7 @@ public class PredicateQ {
    * True</code> for each element <code>x</code> of <code>v</code>.
    *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -1576,9 +1500,9 @@ public class PredicateQ {
               return engine.evalTrue(temp);
             }
           })) {
-            return F.False;
+            return S.False;
           }
-          return F.True;
+          return S.True;
         } else {
           FieldVector<IExpr> vector = Convert.list2Vector(arg1);
           if (vector != null) {
@@ -1586,10 +1510,10 @@ public class PredicateQ {
               IExpr expr = vector.getEntry(i);
               temp.set(1, expr);
               if (!engine.evalTrue(temp)) {
-                return F.False;
+                return S.False;
               }
             }
-            return F.True;
+            return S.True;
           }
         }
       }

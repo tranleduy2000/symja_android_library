@@ -11,7 +11,7 @@ public class FEConfig {
   public static boolean SHOW_STACKTRACE = false;
 
   /** Use <code>Num</code> objects for numeric calculations up to 16 digits precision. */
-  public static final long MACHINE_PRECISION = 16L;
+  public static long MACHINE_PRECISION = 16L;
 
   /**
    * If <code>true</code> the parser doesn't distinguish between lower- or uppercase symbols (i.e.

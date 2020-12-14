@@ -1791,11 +1791,6 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   }
 
   @Override
-  public boolean isListOrAssociation() {
-    return isList();
-  }
-
-  @Override
   public boolean isList1() {
     return isList() && size() == 2;
   }
@@ -1864,6 +1859,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   @Override
   public boolean isListOfRulesOrAssociation(boolean ignoreEmptyList) {
     return false;
+  }
+
+  @Override
+  public boolean isListOrAssociation() {
+    return isList();
   }
 
   @Override

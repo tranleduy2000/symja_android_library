@@ -17,6 +17,10 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
  */
 public class S {
 
+  public static final IBuiltInSymbol GaussianIntegers = F.GaussianIntegers;
+  public static final IBuiltInSymbol Missing = F.Missing;
+  public static final IBuiltInSymbol PossibleZeroQ = F.PossibleZeroQ;
+  public static final IBuiltInSymbol Dot = F.Dot;
   public static final IBuiltInSymbol Surd = F.Surd;
   public static final IBuiltInSymbol ComplexInfinity = F.ComplexInfinity;
   public static final IBuiltInSymbol Indeterminate = F.Indeterminate;

@@ -8,6 +8,7 @@ import org.matheclipse.core.basic.OperationSystem;
 import org.matheclipse.core.builtin.functions.GammaJS;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.ExprEvaluator;
+import org.matheclipse.core.expression.BigIntegerSym;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INum;
@@ -143,8 +144,10 @@ public class NumericTest extends TestCase {
               "N[Rationalize(7.632983698255881490491277878802104727687173409866438641630722914874999055316337727346395442234887161)"
               +
               "*10^N(29995651.0, 100), 100]]");
+      assertTrue(result instanceof BigIntegerSym);
+      assertEquals(((BigIntegerSym) result).bitLength(), 99643399);
       System.out.println("result.size = " + result.size());
-      fail();
+      fail(); // should throw out of memory
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -1,8 +1,10 @@
 package org.matheclipse.core.eval;
 
+import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
-
+import org.matheclipse.core.builtin.WXFFunctions;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
@@ -150,6 +152,91 @@ public class Predicates {
     @Override
     public boolean test(IExpr x) {
       return x.isNegativeInfinity();
+    }
+  };
+  public static Predicate<IExpr> isAtom = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isAtom();
+    }
+  };
+  public static Predicate<IExpr> isTrueOrFalse = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isTrue() || x.isFalse();
+    }
+  };
+  public static Predicate<IExpr> isString = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isString();
+    }
+  };
+  public static Predicate<IExpr> isSymbol = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isSymbol();
+    }
+  };
+  public static Predicate<IExpr> isNumber = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isNumber();
+    }
+  };
+  public static Predicate<IExpr> isMachineNumber = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isMachineNumber();
+    }
+  };
+  public static Predicate<IExpr> isExactNumber = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isExactNumber();
+    }
+  };
+
+  public static Predicate<IExpr> isInteger = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isInteger();
+    }
+  };
+  public static Predicate<IExpr> isList = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isList();
+    }
+  };
+  public static Predicate<IExpr> isASTMissing2 = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isAST(S.Missing, 2);
+    }
+  };
+  public static Predicate<IExpr> isNotList = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return !x.isList();
+    }
+  };
+  public static Predicate<IExpr> isByteArray = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return WXFFunctions.isByteArray(x);
+    }
+  };
+  public static Function<IExpr, IExpr> evalNumber = new Function<IExpr, IExpr>() {
+    @Override
+    public IExpr apply(IExpr x) {
+      return x.evalNumber();
+    }
+  };
+  public static Predicate<IExpr> isNumericFunctionFalse = new Predicate<IExpr>() {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isNumericFunction(false);
     }
   };
 }

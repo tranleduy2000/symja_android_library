@@ -1,5 +1,43 @@
 package org.matheclipse.core.builtin;
 
+import static org.matheclipse.core.expression.F.And;
+import static org.matheclipse.core.expression.F.ArcCos;
+import static org.matheclipse.core.expression.F.ArcCot;
+import static org.matheclipse.core.expression.F.ArcSin;
+import static org.matheclipse.core.expression.F.ArcTan;
+import static org.matheclipse.core.expression.F.Arg;
+import static org.matheclipse.core.expression.F.BernoulliB;
+import static org.matheclipse.core.expression.F.C0;
+import static org.matheclipse.core.expression.F.C1;
+import static org.matheclipse.core.expression.F.C1D2;
+import static org.matheclipse.core.expression.F.C2;
+import static org.matheclipse.core.expression.F.CN1;
+import static org.matheclipse.core.expression.F.Conjugate;
+import static org.matheclipse.core.expression.F.Cos;
+import static org.matheclipse.core.expression.F.E;
+import static org.matheclipse.core.expression.F.Equal;
+import static org.matheclipse.core.expression.F.Factorial;
+import static org.matheclipse.core.expression.F.Factorial2;
+import static org.matheclipse.core.expression.F.Im;
+import static org.matheclipse.core.expression.F.Log;
+import static org.matheclipse.core.expression.F.NIL;
+import static org.matheclipse.core.expression.F.Negate;
+import static org.matheclipse.core.expression.F.Pi;
+import static org.matheclipse.core.expression.F.Plus;
+import static org.matheclipse.core.expression.F.Positive;
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.QQ;
+import static org.matheclipse.core.expression.F.Re;
+import static org.matheclipse.core.expression.F.Sin;
+import static org.matheclipse.core.expression.F.Sqrt;
+import static org.matheclipse.core.expression.F.Subtract;
+import static org.matheclipse.core.expression.F.Times;
+import static org.matheclipse.core.expression.F.num;
+import static org.matheclipse.core.expression.F.x;
+import static org.matheclipse.core.expression.F.x_;
+import static org.matheclipse.core.expression.F.y;
+import static org.matheclipse.core.expression.F.y_;
+
 import com.duy.lambda.Consumer;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.DoubleUnaryOperator;
@@ -7,7 +45,6 @@ import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
 import com.duy.lang.DDouble;
-
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
@@ -77,49 +114,10 @@ import org.matheclipse.core.reflection.system.rules.AbsRules;
 import org.matheclipse.core.reflection.system.rules.ConjugateRules;
 import org.matheclipse.core.reflection.system.rules.GammaRules;
 import org.matheclipse.core.reflection.system.rules.PowerRules;
+import org.matheclipse.core.tensor.qty.IQuantity;
 import org.matheclipse.core.visit.VisitorExpr;
 import org.matheclipse.parser.client.FEConfig;
 import org.matheclipse.parser.client.math.MathException;
-
-import org.matheclipse.core.tensor.qty.IQuantity;
-
-import static org.matheclipse.core.expression.F.And;
-import static org.matheclipse.core.expression.F.ArcCos;
-import static org.matheclipse.core.expression.F.ArcCot;
-import static org.matheclipse.core.expression.F.ArcSin;
-import static org.matheclipse.core.expression.F.ArcTan;
-import static org.matheclipse.core.expression.F.Arg;
-import static org.matheclipse.core.expression.F.BernoulliB;
-import static org.matheclipse.core.expression.F.C0;
-import static org.matheclipse.core.expression.F.C1;
-import static org.matheclipse.core.expression.F.C1D2;
-import static org.matheclipse.core.expression.F.C2;
-import static org.matheclipse.core.expression.F.CN1;
-import static org.matheclipse.core.expression.F.Conjugate;
-import static org.matheclipse.core.expression.F.Cos;
-import static org.matheclipse.core.expression.F.E;
-import static org.matheclipse.core.expression.F.Equal;
-import static org.matheclipse.core.expression.F.Factorial;
-import static org.matheclipse.core.expression.F.Factorial2;
-import static org.matheclipse.core.expression.F.Im;
-import static org.matheclipse.core.expression.F.Log;
-import static org.matheclipse.core.expression.F.NIL;
-import static org.matheclipse.core.expression.F.Negate;
-import static org.matheclipse.core.expression.F.Pi;
-import static org.matheclipse.core.expression.F.Plus;
-import static org.matheclipse.core.expression.F.Positive;
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.QQ;
-import static org.matheclipse.core.expression.F.Re;
-import static org.matheclipse.core.expression.F.Sin;
-import static org.matheclipse.core.expression.F.Sqrt;
-import static org.matheclipse.core.expression.F.Subtract;
-import static org.matheclipse.core.expression.F.Times;
-import static org.matheclipse.core.expression.F.num;
-import static org.matheclipse.core.expression.F.x;
-import static org.matheclipse.core.expression.F.x_;
-import static org.matheclipse.core.expression.F.y;
-import static org.matheclipse.core.expression.F.y_;
 
 public final class Arithmetic {
 
@@ -881,8 +879,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Complex
    * </pre>
@@ -1060,8 +1056,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Conjugate(z)
    * </pre>
@@ -1220,8 +1214,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Decrement(x)
    *
@@ -1319,8 +1311,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Divide(a, b)
    *
@@ -1400,8 +1390,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * DivideBy(x, dx)
    *
@@ -1567,8 +1555,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Gamma(z)
    * </pre>
@@ -1764,8 +1750,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * GCD(n1, n2, ...)
    * </pre>
@@ -1847,8 +1831,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * <code>HarmonicNumber(n)
    * </code>
@@ -2044,11 +2026,10 @@ public final class Arithmetic {
      *
      * @param n the index, non-negative.
      * @return the H_1=1 for n=1, H_2=3/2 for n=2 etc. For values of n less than 1, zero is
-     *     returned.
+     * returned.
      */
     public static BigFraction harmonicNumber(int n) {
-      if (n < 1) return BigFraction.ZERO;
-      else {
+      if (n < 1) { return BigFraction.ZERO; } else {
         int iterationLimit = EvalEngine.get().getIterationLimit();
         if (iterationLimit >= 0 && iterationLimit <= n) {
           IterationLimitExceeded.throwIt(n, F.HarmonicNumber(F.ZZ(n)));
@@ -2076,8 +2057,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Im(z)
    * </pre>
@@ -2225,8 +2204,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Increment(x)
    *
@@ -2271,8 +2248,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * LCM(n1, n2, ...)
    * </pre>
@@ -2359,8 +2334,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Minus(expr)
    *
@@ -2413,8 +2386,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * N(expr)
    * </pre>
@@ -2522,8 +2493,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Piecewise({{expr1, cond1}, ...})
    * </pre>
@@ -2767,8 +2736,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Plus(a, b, ...)
    *
@@ -3064,8 +3031,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Pochhammer(a, n)
    * </pre>
@@ -3520,7 +3485,7 @@ public final class Arithmetic {
      * factor&quot;
      *
      * @return <code>{nth-root, rest factor}</code> or <code>null</code> if the root is not
-     *     available
+     * available
      */
 //		private static IInteger[] calculateRoot(IInteger a, IInteger root) {
 //			if (a.isOne() || a.isMinusOne()) {
@@ -3558,11 +3523,18 @@ public final class Arithmetic {
       }
       // Android changed: disable implementation
       // https://github.com/axkr/symja_android_library/issues/207
-      // if (exponent.sign() < 0) {
-      //     ApcomplexNum b = base.apcomplexNumValue(base.precision());
-      //     ApcomplexNum e = exponent.apcomplexNumValue(base.precision());
-      //     return b.pow(e);
-      // }
+      if (exponent.sign() < 0) {
+        ApcomplexNum b = base.apcomplexNumValue(base.precision());
+        ApcomplexNum e = exponent.apcomplexNumValue(base.precision());
+        IComplexNum res = b.pow(e);
+        if (res instanceof ApcomplexNum) {
+          Apcomplex apcomplexValue = ((ApcomplexNum) res).apcomplexValue();
+          if (apcomplexValue.imag().compareTo(Apcomplex.ZERO) == 0) {
+            return ApfloatNum.valueOf(apcomplexValue.real());
+          }
+        }
+        return res;
+      }
       return base.pow(exponent);
     }
 
@@ -4394,8 +4366,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * PreDecrement(x)
    *
@@ -4480,8 +4450,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Rational
    * </pre>
@@ -4525,58 +4493,58 @@ public final class Arithmetic {
         if (!ast.isAST2()) {
           return IOFunctions.printArgMessage(ast, ARGS_2_2, engine);
         }
-      try {
-        // try to convert into a fractional number
-        IExpr numeratorExpr = ast.arg1();
-        IExpr denominatorExpr = ast.arg2();
-        if (numeratorExpr.isInteger() && denominatorExpr.isInteger()) {
-          // already evaluated
-        } else {
-          numeratorExpr = engine.evaluate(numeratorExpr);
-          denominatorExpr = engine.evaluate(denominatorExpr);
-          if (!numeratorExpr.isInteger() || !denominatorExpr.isInteger()) {
-            return F.NIL;
+        try {
+          // try to convert into a fractional number
+          IExpr numeratorExpr = ast.arg1();
+          IExpr denominatorExpr = ast.arg2();
+          if (numeratorExpr.isInteger() && denominatorExpr.isInteger()) {
+            // already evaluated
+          } else {
+            numeratorExpr = engine.evaluate(numeratorExpr);
+            denominatorExpr = engine.evaluate(denominatorExpr);
+            if (!numeratorExpr.isInteger() || !denominatorExpr.isInteger()) {
+              return F.NIL;
+            }
           }
-        }
-        // symbolic mode
-        IInteger numerator = (IInteger) numeratorExpr;
-        IInteger denominator = (IInteger) denominatorExpr;
-        if (denominator.isZero()) {
-          engine.printMessage(
-              "Division by zero expression: " + numerator.toString() + "/" + denominator
-                  .toString());
+          // symbolic mode
+          IInteger numerator = (IInteger) numeratorExpr;
+          IInteger denominator = (IInteger) denominatorExpr;
+          if (denominator.isZero()) {
+            engine.printMessage(
+                "Division by zero expression: " + numerator.toString() + "/" + denominator
+                    .toString());
+            if (numerator.isZero()) {
+              // 0^0
+              return F.Indeterminate;
+            }
+            return F.CComplexInfinity;
+          }
           if (numerator.isZero()) {
-            // 0^0
-            return F.Indeterminate;
+            return F.C0;
           }
-          return F.CComplexInfinity;
+          return F.fraction(numerator, denominator);
+          // don't evaluate in numeric mode
+          // } else if (numeratorExpr instanceof INum && denominatorExpr instanceof INum) {
+          // INum numerator = (INum) numeratorExpr;
+          // INum denominator = (INum) denominatorExpr;
+          // if (denominator.isZero()) {
+          // engine.printMessage(
+          // "Division by zero expression: " + numerator.toString() + "/" + denominator.toString());
+          // if (numerator.isZero()) {
+          // // 0^0
+          // return F.Indeterminate;
+          // }
+          // return F.CComplexInfinity;
+          // }
+          // if (numerator.isZero()) {
+          // return F.C0;
+          // }
+          // return F.num(numerator.doubleValue() / denominator.doubleValue());
+        } catch (Exception e) {
+          if (FEConfig.SHOW_STACKTRACE) {
+            e.printStackTrace();
+          }
         }
-        if (numerator.isZero()) {
-          return F.C0;
-        }
-        return F.fraction(numerator, denominator);
-        // don't evaluate in numeric mode
-        // } else if (numeratorExpr instanceof INum && denominatorExpr instanceof INum) {
-        // INum numerator = (INum) numeratorExpr;
-        // INum denominator = (INum) denominatorExpr;
-        // if (denominator.isZero()) {
-        // engine.printMessage(
-        // "Division by zero expression: " + numerator.toString() + "/" + denominator.toString());
-        // if (numerator.isZero()) {
-        // // 0^0
-        // return F.Indeterminate;
-        // }
-        // return F.CComplexInfinity;
-        // }
-        // if (numerator.isZero()) {
-        // return F.C0;
-        // }
-        // return F.num(numerator.doubleValue() / denominator.doubleValue());
-      } catch (Exception e) {
-        if (FEConfig.SHOW_STACKTRACE) {
-          e.printStackTrace();
-        }
-      }
 
       }
       return F.NIL;
@@ -4588,8 +4556,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Re(z)
    * </pre>
@@ -4726,8 +4692,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Sign(x)
    * </pre>
@@ -4890,8 +4854,8 @@ public final class Arithmetic {
    * Gets the signum value of a complex number
    *
    * @return 0 for <code>this == 0</code>;<br/>
-   *         +1 for <code>real(this) &gt; 0 || ( real(this) == 0 &amp;&amp; imaginary(this) &gt; 0 )</code> ;<br/>
-   *         -1 for <code>real(this) &lt; 0 || ( real(this) == 0 &amp;&amp; imaginary(this) &lt; 0 )
+   * +1 for <code>real(this) &gt; 0 || ( real(this) == 0 &amp;&amp; imaginary(this) &gt; 0 )</code> ;<br/>
+   * -1 for <code>real(this) &lt; 0 || ( real(this) == 0 &amp;&amp; imaginary(this) &lt; 0 )
    */
   private static final class SignCmp extends AbstractEvaluator {
 
@@ -4919,8 +4883,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Sqrt(expr)
    * </pre>
@@ -4984,8 +4946,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Surd(expr, n)
    * </pre>
@@ -5139,8 +5099,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * SubtractFrom(x, dx)
    *
@@ -5229,8 +5187,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * Times(a, b, ...)
    *
@@ -5401,9 +5357,9 @@ public final class Arithmetic {
      *
      * @param noEvalExpression return this expression if no evaluation step was done
      * @param originalExpr the original expression which is used, if <code>
-     *     !noEvalExpression.isPresent()</code>
+     * !noEvalExpression.isPresent()</code>
      * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
-     *     integer factor isn't possible
+     * integer factor isn't possible
      */
     private static IExpr distributeLeadingFactor(IExpr noEvalExpression, IAST originalExpr) {
       IExpr expr = noEvalExpression;
@@ -5490,7 +5446,7 @@ public final class Arithmetic {
      * @param noEvalExpr return this expression if no evaluation step was done
      * @param times the <code>Times(...)</code> AST
      * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
-     *     integer factor isn't possible
+     * integer factor isn't possible
      */
     private static IExpr distributeLeadingFactorCN1(IExpr noEvalExpr, IAST times) {
       IASTAppendable result = F.NIL;
@@ -5993,9 +5949,9 @@ public final class Arithmetic {
       // ProductLog(x_)*E^ProductLog(x_) = x
       TIMES_ORDERLESS_MATCHER.defineHashRule(
           new HashedPatternRulesTimesPower( //
-          F.ProductLog(x_), //
-          F.Power(F.E, F.ProductLog(x_)), //
-          x));
+              F.ProductLog(x_), //
+              F.Power(F.E, F.ProductLog(x_)), //
+              x));
       TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
           F.Gamma(x_), //
           F.Gamma(F.Plus(F.C1, F.Times(F.CN1, x_))), //
@@ -6275,8 +6231,6 @@ public final class Arithmetic {
   }
 
   /**
-   *
-   *
    * <pre>
    * TimesBy(x, dx)
    *
@@ -6471,7 +6425,7 @@ public final class Arithmetic {
    *
    * @param function
    * @param domain if set to <code>F.Reals</code> a function like <code>Abs(x)</code> can be
-   *     rewritten.
+   * rewritten.
    * @return
    */
   public static IAST piecewiseExpand(final IAST function, IBuiltInSymbol domain) {

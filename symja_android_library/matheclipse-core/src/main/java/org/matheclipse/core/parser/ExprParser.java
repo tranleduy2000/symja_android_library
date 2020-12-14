@@ -71,7 +71,7 @@ public class ExprParser extends Scanner {
 
     @Override
     public IExpr visit(INum element) {
-      if (element instanceof NumStr) {
+      if (element instanceof NumStr && element.determinePrecision() < fPrecision) {
         Apfloat apfloatValue = new Apfloat(((NumStr) element).getFloatStr(), fPrecision);
         int exponent = ((NumStr) element).getExponent();
         if (exponent != 1) {

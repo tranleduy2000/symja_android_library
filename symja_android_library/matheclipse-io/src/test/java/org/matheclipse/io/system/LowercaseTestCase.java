@@ -1268,7 +1268,7 @@ public class LowercaseTestCase extends AbstractTestCase {
         "1.83463+I*(-0.191462)");
     // Android changed
     check("N(ArithmeticGeometricMean(1 - I, 2.5 + I), 30)", //
-        "1.83462883815328314796033737366+I*(-0.19146162519713766370088592339)");
+        "1.83462883815328396810218573046+I*(-0.191461625197137083440493535055)");
   }
 
   public void testAttributes() {
@@ -25563,9 +25563,11 @@ public class LowercaseTestCase extends AbstractTestCase {
         "f(\\text{$\\#$1},\\text{$\\#$3})\\&");
     check("TeXForm( f(#,#3)*2&  )", //
         "f(\\text{$\\#$1},\\text{$\\#$3})\\cdot 2\\&");
-    // Android changed
+    // Android changed https://www.wolframalpha.com/input/?i=1.1%2BPi*I
+    // 1.1 +
+    // 3.141592653589793238462643383279502884197169399375105820974944592... i
     check("TeXForm(N(1.1+Pi*I,30))", //
-        "1.10000000000000008881784197001 + 3.14159265358979311599796346854\\,i ");
+        "1.1 + 3.14159265358979323846264338327\\,i ");
     check("TeXForm(N(Pi,2))", //
         "3.1");
     check("TeXForm(N(Pi,30))", //

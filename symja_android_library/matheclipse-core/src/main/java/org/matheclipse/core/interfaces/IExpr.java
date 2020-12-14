@@ -1388,23 +1388,23 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   /**
    * Test if this expression is a list (i.e. an AST with head List)
    */
-  boolean isList();
+  boolean isList();/*{
+    return false;
+  }*/
 
-  boolean isList(Predicate<IExpr> pred);
+  boolean isList(Predicate<IExpr> pred); /*{
+    return false;
+  }*/
 
-  /**
-   * Test if this expression is a list (i.e. an AST with head List) or an Association
-   *
-   * @return
-   */
-  boolean isListOrAssociation();
 
   /**
    * Test if this expression is a list (i.e. an AST with head List) with exactly 2 arguments
    *
    * @return
    */
-  boolean isList1();
+  boolean isList1(); /*{
+    return isList() && size() == 2;
+  }*/
 
   /**
    * Test if this expression is a list (i.e. an AST with head List) with exactly 2 arguments
@@ -1480,6 +1480,16 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   boolean isListOfRules(boolean ignoreEmptyList);
 
   boolean isListOfRulesOrAssociation(boolean ignoreEmptyList);
+
+
+  /**
+   * Test if this expression is a list (i.e. an AST with head List) or an Association
+   *
+   * @return
+   */
+  boolean isListOrAssociation(); /*{
+    return isList();
+  }*/
 
   /**
    * Test if this expression is a list with at least one element (i.e. a list <code>{element,
