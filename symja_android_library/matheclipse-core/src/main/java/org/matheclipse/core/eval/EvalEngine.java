@@ -2225,7 +2225,9 @@ public class EvalEngine implements Serializable {
   }
 
   public void popOptionsStack() {
-    fOptionsStack.pop();
+    if (!fOptionsStack.isEmpty()) {
+      fOptionsStack.pop();
+    }
   }
 
   public Iterator<IdentityHashMap<ISymbol, IASTAppendable>> optionsStackIterator() {
