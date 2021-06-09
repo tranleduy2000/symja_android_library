@@ -2219,12 +2219,12 @@ public class EvalEngine implements Serializable {
     return fEvalHistory;
   }
 
-  public OptionsStack pushOptionsStack() {
+  public synchronized OptionsStack pushOptionsStack() {
     fOptionsStack.push();
     return fOptionsStack;
   }
 
-  public void popOptionsStack() {
+  public synchronized void popOptionsStack() {
     if (!fOptionsStack.isEmpty()) {
       fOptionsStack.pop();
     }
@@ -2356,16 +2356,16 @@ public class EvalEngine implements Serializable {
     rememberASTCache = null;
   }
 
-  public ArrayDeque<IExpr> stackBegin() {
+  public synchronized ArrayDeque<IExpr> stackBegin() {
     fStack = new ArrayDeque<IExpr>(256);
     return fStack;
   }
 
-  public void stackPush(IExpr expr) {
+  public synchronized void stackPush(IExpr expr) {
     fStack.push(expr);
   }
 
-  public IExpr stackPop() {
+  public synchronized IExpr stackPop() {
     if (fStack.isEmpty()) {
       return F.NIL;
     }
@@ -2591,7 +2591,7 @@ public class EvalEngine implements Serializable {
    *
    * <p><b>Note:</b> This method should be called before the parsing of a string expression.
    */
-  private void reset() {
+  private synchronized void reset() {
     stackBegin();
     fNumericPrecision = 15;
     fSignificantFigures = 6;
@@ -2797,7 +2797,7 @@ public class EvalEngine implements Serializable {
    *
    * @param stack
    */
-  public void setStack(ArrayDeque<IExpr> stack) {
+  public synchronized void setStack(ArrayDeque<IExpr> stack) {
     fStack = stack;
   }
 
