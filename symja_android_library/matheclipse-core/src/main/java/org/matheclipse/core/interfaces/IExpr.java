@@ -1751,6 +1751,18 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   /**
    * Test if this expression is a numeric function (i.e. a number, a symbolic constant or a function
    * (with attribute NumericFunction) where all arguments are also &quot;numeric functions&quot;)
+   * under the assumption, that the <code>variable</code> is also numeric.
+   *
+   * @param variable
+   * @return
+   */
+  boolean isNumericFunction(IExpr variable); /*{
+    return isNumericFunction(true) || variable.equals(this);
+  }*/
+
+  /**
+   * Test if this expression is a numeric function (i.e. a number, a symbolic constant or a function
+   * (with attribute NumericFunction) where all arguments are also &quot;numeric functions&quot;)
    * under the assumption, that all variables contained in <code>list</code> are also numeric.
    *
    * @param list a list of variable symbols

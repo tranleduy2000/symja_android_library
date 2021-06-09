@@ -2249,6 +2249,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   }
 
   @Override
+  public boolean isNumericFunction(IExpr variable) {
+    return isNumericFunction(true) || variable.equals(this);
+  }
+
+  @Override
   public boolean isNumericFunction(Function<IExpr, String> list) {
     return isNumericFunction(true) || list.apply(this) != null;
   }

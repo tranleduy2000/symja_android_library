@@ -8170,7 +8170,7 @@ public class LowercaseTestCase extends AbstractTestCase {
 
     check(
         "Fibonacci(0.2114411444411100011, 5)", //
-        "0.1598551917369153727");
+        "0.1598551917369153728");
     check(
         "Fibonacci(5.8)", //
         "7.26639");
