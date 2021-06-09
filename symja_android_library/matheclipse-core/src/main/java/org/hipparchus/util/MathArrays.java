@@ -31,7 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
+import org.hipparchus.FieldElement;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -420,7 +422,7 @@ public class MathArrays {
      * @param <T> the type of the field elements
      * @since 1.5
      */
-    public static <T extends RealFieldElement<T>> boolean checkEqualLength(final T[] a,
+    public static <T extends CalculusFieldElement<T>> boolean checkEqualLength(final T[] a,
                                                                            final T[] b,
                                            boolean abort) {
         if (a.length == b.length) {
@@ -443,7 +445,7 @@ public class MathArrays {
      * @param <T> the type of the field elements
      * @since 1.5
      */
-    public static <T extends RealFieldElement<T>> void checkEqualLength(final T[] a, final T[] b) {
+    public static <T extends CalculusFieldElement<T>> void checkEqualLength(final T[] a, final T[] b) {
         checkEqualLength(a, b, true);
     }
 
@@ -541,7 +543,7 @@ public class MathArrays {
 
         // Loop early exit means wrong ordering.
         if (abort) {
-            throw new MathIllegalArgumentException(dir == OrderDirection.INCREASING ?
+            throw new MathIllegalArgumentException(dir == MathArrays.OrderDirection.INCREASING ?
                                                     (strict ?
                                                      LocalizedCoreFormats.NOT_STRICTLY_INCREASING_SEQUENCE :
                                                      LocalizedCoreFormats.NOT_INCREASING_SEQUENCE) :
@@ -590,7 +592,7 @@ public class MathArrays {
      * @param <T> the type of the field elements
      * @since 1.5
      */
-    public static <T extends RealFieldElement<T>>boolean checkOrder(T[] val, OrderDirection dir,
+    public static <T extends CalculusFieldElement<T>>boolean checkOrder(T[] val, OrderDirection dir,
                                                                     boolean strict, boolean abort)
         throws MathIllegalArgumentException {
         double previous = val[0].getReal();
@@ -637,7 +639,7 @@ public class MathArrays {
 
         // Loop early exit means wrong ordering.
         if (abort) {
-            throw new MathIllegalArgumentException(dir == OrderDirection.INCREASING ?
+            throw new MathIllegalArgumentException(dir == MathArrays.OrderDirection.INCREASING ?
                                                     (strict ?
                                                      LocalizedCoreFormats.NOT_STRICTLY_INCREASING_SEQUENCE :
                                                      LocalizedCoreFormats.NOT_INCREASING_SEQUENCE) :
@@ -660,7 +662,7 @@ public class MathArrays {
      * @param <T> the type of the field elements
      * @since 1.5
      */
-    public static <T extends RealFieldElement<T>> void checkOrder(T[] val, OrderDirection dir,
+    public static <T extends CalculusFieldElement<T>> void checkOrder(T[] val, OrderDirection dir,
                                                                   boolean strict) throws MathIllegalArgumentException {
         checkOrder(val, dir, strict, true);
     }
@@ -673,7 +675,7 @@ public class MathArrays {
      * @param <T> the type of the field elements
      * @since 1.5
      */
-    public static <T extends RealFieldElement<T>> void checkOrder(T[] val) throws MathIllegalArgumentException {
+    public static <T extends CalculusFieldElement<T>> void checkOrder(T[] val) throws MathIllegalArgumentException {
         checkOrder(val, OrderDirection.INCREASING, true);
     }
 
@@ -971,7 +973,7 @@ public class MathArrays {
 
         // Create comparators for increasing and decreasing orders.
         final Comparator<PairDoubleInteger> comp =
-            dir == OrderDirection.INCREASING ?
+            dir == MathArrays.OrderDirection.INCREASING ?
             new Comparator<PairDoubleInteger>() {
                 /** {@inheritDoc} */
                 @Override
@@ -1627,7 +1629,7 @@ public class MathArrays {
      * @param length of the array
      * @return a new array
      */
-    public static <T> T[] buildArray(final Field<T> field, final int length) {
+    public static <T extends FieldElement<T>> T[] buildArray(final Field<T> field, final int length) {
         @SuppressWarnings("unchecked") // OK because field must be correct class
         T[] array = (T[]) Array.newInstance(field.getRuntimeClass(), length);
         Arrays.fill(array, field.getZero());
@@ -1646,7 +1648,7 @@ public class MathArrays {
      * @return a new array
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[][] buildArray(final Field<T> field, final int rows, final int columns) {
+    public static <T extends FieldElement<T>> T[][] buildArray(final Field<T> field, final int rows, final int columns) {
         final T[][] array;
         if (columns < 0) {
             T[] dummyRow = buildArray(field, 0);
@@ -1677,7 +1679,7 @@ public class MathArrays {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[][][] buildArray(final Field<T> field, final int l1, final int l2, final int l3) {
+    public static <T extends FieldElement<T>> T[][][] buildArray(final Field<T> field, final int l1, final int l2, final int l3) {
         final T[][][] array;
         if (l3 < 0) {
             T[] dummyRow = buildArray(field, 0);

@@ -1,8 +1,8 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
+ * Licensed to the Hipparchus project under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The Hipparchus project licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -14,20 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/*
- * This is not the original file distributed by the Apache Software Foundation
- * It has been modified by the Hipparchus project
- */
-
 package org.hipparchus.complex;
 
-import com.duy.lang.DDouble;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.CalculusFieldElementImpl;
+import org.hipparchus.Field;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.NullArgumentException;
@@ -37,8 +31,6 @@ import org.hipparchus.util.FieldSinhCosh;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.Precision;
-import org.hipparchus.util.SinCos;
-import org.hipparchus.util.SinhCosh;
 
 /**
  * Representation of a Complex number, i.e. a number which has both a
@@ -58,52 +50,28 @@ import org.hipparchus.util.SinhCosh;
  * Note that this contradicts the IEEE-754 standard for floating
  * point numbers (according to which the test {@code x == x} must fail if
  * {@code x} is {@code NaN}). The method
- * {@link org.hipparchus.util.Precision#equals(double, double, int)
+ * {@link org.hipparchus.util.Precision#equals(double,double,int)
  * equals for primitive double} in {@link org.hipparchus.util.Precision}
  * conforms with IEEE-754 while this class conforms with the standard behavior
  * for Java object types.
+ * @param <T> the type of the field elements
+ * @since 2.0
  */
-public class Complex extends CalculusFieldElementImpl<Complex>
-    implements CalculusFieldElement<Complex>, Serializable {
-
-    /** The square root of -1. A number representing "0.0 + 1.0i". */
-    public static final Complex I = new Complex(0.0, 1.0);
-    /**
-     * The square root of -1. A number representing "0.0 - 1.0i".
-     *
-     * @since 1.7
-     */
-    public static final Complex MINUS_I = new Complex(0.0, -1.0);
-    // CHECKSTYLE: stop ConstantName
-    /** A complex number representing "NaN + NaNi". */
-    public static final Complex NaN = new Complex(Double.NaN, Double.NaN);
-    // CHECKSTYLE: resume ConstantName
-    /** A complex number representing "+INF + INFi" */
-    public static final Complex INF = new Complex(Double.POSITIVE_INFINITY,
-        Double.POSITIVE_INFINITY);
-    /** A complex number representing "1.0 + 0.0i". */
-    public static final Complex ONE = new Complex(1.0, 0.0);
-    /**
-     * A complex number representing "-1.0 + 0.0i".
-     *
-     * @since 1.7
-     */
-    public static final Complex MINUS_ONE = new Complex(-1.0, 0.0);
-    /** A complex number representing "0.0 + 0.0i". */
-    public static final Complex ZERO = new Complex(0.0, 0.0);
+public class FieldComplex<T extends CalculusFieldElement<T>>  extends
+    CalculusFieldElementImpl<FieldComplex<T>> implements CalculusFieldElement<FieldComplex<T>>  {
 
     /** A real number representing log(10). */
     private static final double LOG10 = 2.302585092994045684;
 
-    /** Serializable version identifier */
-    private static final long serialVersionUID = 20160305L;
-
     /** The imaginary part. */
-    private final double imaginary;
+    private final T imaginary;
+
     /** The real part. */
-    private final double real;
+    private final T real;
+
     /** Record whether this complex number is equal to NaN. */
     private final transient boolean isNaN;
+
     /** Record whether this complex number is infinite. */
     private final transient boolean isInfinite;
 
@@ -112,8 +80,8 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *
      * @param real Real part.
      */
-    public Complex(double real) {
-        this(real, 0.0);
+    public FieldComplex(T real) {
+        this(real, real.getField().getZero());
     }
 
     /**
@@ -122,56 +90,111 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @param real Real part.
      * @param imaginary Imaginary part.
      */
-    public Complex(double real, double imaginary) {
+    public FieldComplex(T real, T imaginary) {
         this.real = real;
         this.imaginary = imaginary;
 
-        isNaN = Double.isNaN(real) || Double.isNaN(imaginary);
+        isNaN = real.isNaN() || imaginary.isNaN();
         isInfinite = !isNaN &&
-            (Double.isInfinite(real) || Double.isInfinite(imaginary));
+            (real.isInfinite() || imaginary.isInfinite());
+    }
+
+    /** Get the square root of -1.
+     * @param field field the complex components belong to
+     * @return number representing "0.0 + 1.0i"
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getI(final Field<T> field) {
+        return new FieldComplex<>(field.getZero(), field.getOne());
+    }
+
+    /** Get the square root of -1.
+     * @param field field the complex components belong to
+     * @return number representing "0.0 _ 1.0i"
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getMinusI(final Field<T> field) {
+        return new FieldComplex<>(field.getZero(), field.getOne().negate());
+    }
+
+    /** Get a complex number representing "NaN + NaNi".
+     * @return complex number representing "NaN + NaNi"
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getNaN(final Field<T> field) {
+        return new FieldComplex<>(field.getZero().add(Double.NaN), field.getZero().add(Double.NaN));
+    }
+
+    /** Get a complex number representing "+INF + INFi".
+     * @return complex number representing "+INF + INFi"
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getInf(final Field<T> field) {
+        return new FieldComplex<>(field.getZero().add(Double.POSITIVE_INFINITY), field.getZero().add(Double.POSITIVE_INFINITY));
+    }
+
+    /** Get a complex number representing "1.0 + 0.0i".
+     * @return complex number representing "1.0 + 0.0i"
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getOne(final Field<T> field) {
+        return new FieldComplex<>(field.getOne(), field.getZero());
+    }
+
+    /** Get a complex number representing "-1.0 + 0.0i".
+     * @return complex number representing "-1.0 + 0.0i"
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getMinusOne(final Field<T> field) {
+        return new FieldComplex<>(field.getOne().negate(), field.getZero());
+    }
+
+    /** Get a complex number representing "0.0 + 0.0i".
+     * @return complex number representing "0.0 + 0.0i
+     * @param <T> the type of the field elements
+     */
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T> getZero(final Field<T> field) {
+        return new FieldComplex<>(field.getZero(), field.getZero());
     }
 
     /**
-     * Return the norm of this complex number.
+     * Return the absolute value of this complex number.
      * Returns {@code NaN} if either real or imaginary part is {@code NaN}
      * and {@code Double.POSITIVE_INFINITY} if neither part is {@code NaN},
      * but at least one part is infinite.
      *
-     * @return the norm.
-     * @since 2.0
+     * @return the absolute value.
      */
-    @Override
-    public Complex abs() {
+    public FieldComplex<T> abs() {
         // we check NaN here because FastMath.hypot checks it after infinity
-        return isNaN ? NaN : createComplex(FastMath.hypot(real, imaginary), 0.0);
+        return isNaN ? getNaN(getPartsField()) : createComplex(FastMath.hypot(real, imaginary), getPartsField().getZero());
     }
-
 
     /**
      * Returns a {@code Complex} whose value is
      * {@code (this + addend)}.
      * Uses the definitional formula
      * <p>
-     * {@code (a + bi) + (c + di) = (a+c) + (b+d)i}
+     *   {@code (a + bi) + (c + di) = (a+c) + (b+d)i}
      * </p>
      * If either {@code this} or {@code addend} has a {@code NaN} value in
-     * either part, {@link #NaN} is returned; otherwise {@code Infinite}
+     * either part, {@link #getNaN(Field)} is returned; otherwise {@code Infinite}
      * and {@code NaN} values are returned in the parts of the result
      * according to the rules for {@link java.lang.Double} arithmetic.
      *
-     * @param addend Value to be added to this {@code Complex}.
+     * @param  addend Value to be added to this {@code Complex}.
      * @return {@code this + addend}.
      * @throws NullArgumentException if {@code addend} is {@code null}.
      */
     @Override
-    public Complex add(Complex addend) throws NullArgumentException {
+    public FieldComplex<T> add(FieldComplex<T> addend) throws NullArgumentException {
         MathUtils.checkNotNull(addend);
         if (isNaN || addend.isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        return createComplex(real + addend.getRealPart(),
-            imaginary + addend.getImaginaryPart());
+        return createComplex(real.add(addend.getRealPart()),
+                             imaginary.add(addend.getImaginaryPart()));
     }
 
     /**
@@ -180,22 +203,38 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *
      * @param addend Value to be added to this {@code Complex}.
      * @return {@code this + addend}.
-     * @see #add(Complex)
+     * @see #add(FieldComplex)
      */
-    @Override
-    public Complex add(double addend) {
-        if (isNaN || Double.isNaN(addend)) {
-            return NaN;
+    public FieldComplex<T> add(T addend) {
+        if (isNaN || addend.isNaN()) {
+            return getNaN(getPartsField());
         }
 
-        return createComplex(real + addend, imaginary);
+        return createComplex(real.add(addend), imaginary);
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is {@code (this + addend)},
+     * with {@code addend} interpreted as a real number.
+     *
+     * @param addend Value to be added to this {@code Complex}.
+     * @return {@code this + addend}.
+     * @see #add(FieldComplex)
+     */
+    @Override
+    public FieldComplex<T> add(double addend) {
+        if (isNaN || Double.isNaN(addend)) {
+            return getNaN(getPartsField());
+        }
+
+        return createComplex(real.add(addend), imaginary);
     }
 
     /**
      * Returns the conjugate of this complex number.
      * The conjugate of {@code a + bi} is {@code a - bi}.
      * <p>
-     * {@link #NaN} is returned if either the real or imaginary
+     * {@link #getNaN(Field)} is returned if either the real or imaginary
      * part of this Complex number equals {@code Double.NaN}.
      * </p><p>
      * If the imaginary part is infinite, and the real part is not
@@ -203,15 +242,14 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * of the opposite sign, e.g. the conjugate of
      * {@code 1 + POSITIVE_INFINITY i} is {@code 1 - NEGATIVE_INFINITY i}.
      * </p>
-     *
      * @return the conjugate of this Complex object.
      */
-    public Complex conjugate() {
+    public FieldComplex<T> conjugate() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        return createComplex(real, -imaginary);
+        return createComplex(real, imaginary.negate());
     }
 
     /**
@@ -234,16 +272,16 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * following rules, applied in the order presented:
      * <ul>
      *  <li>If either {@code this} or {@code divisor} has a {@code NaN} value
-     *   in either part, {@link #NaN} is returned.
+     *   in either part, {@link #getNaN(Field)} is returned.
      *  </li>
-     *  <li>If {@code divisor} equals {@link #ZERO}, {@link #NaN} is returned.
+     *  <li>If {@code divisor} equals {@link #getZero(Field)}, {@link #getNaN(Field)} is returned.
      *  </li>
      *  <li>If {@code this} and {@code divisor} are both infinite,
-     *   {@link #NaN} is returned.
+     *   {@link #getNaN(Field)} is returned.
      *  </li>
      *  <li>If {@code this} is finite (i.e., has no {@code Infinite} or
      *   {@code NaN} parts) and {@code divisor} is infinite (one or both parts
-     *   infinite), {@link #ZERO} is returned.
+     *   infinite), {@link #getZero(Field)} is returned.
      *  </li>
      *  <li>If {@code this} is infinite and {@code divisor} is finite,
      *   {@code NaN} values are returned in the parts of the result if the
@@ -257,33 +295,33 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @throws NullArgumentException if {@code divisor} is {@code null}.
      */
     @Override
-    public Complex divide(Complex divisor)
+    public FieldComplex<T> divide(FieldComplex<T> divisor)
         throws NullArgumentException {
         MathUtils.checkNotNull(divisor);
         if (isNaN || divisor.isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final double c = divisor.getRealPart();
-        final double d = divisor.getImaginaryPart();
-        if (c == 0.0 && d == 0.0) {
-            return NaN;
+        final T c = divisor.getRealPart();
+        final T d = divisor.getImaginaryPart();
+        if (c.isZero() && d.isZero()) {
+            return getNaN(getPartsField());
         }
 
         if (divisor.isInfinite() && !isInfinite()) {
-            return ZERO;
+            return getZero(getPartsField());
         }
 
-        if (FastMath.abs(c) < FastMath.abs(d)) {
-            double q = c / d;
-            double denominator = c * q + d;
-            return createComplex((real * q + imaginary) / denominator,
-                (imaginary * q - real) / denominator);
+        if (FastMath.abs(c).getReal() < FastMath.abs(d).getReal()) {
+            T q = c.divide(d);
+            T invDen = c.multiply(q).add(d).reciprocal();
+            return createComplex(real.multiply(q).add(imaginary).multiply(invDen),
+                                 imaginary.multiply(q).subtract(real).multiply(invDen));
         } else {
-            double q = d / c;
-            double denominator = d * q + c;
-            return createComplex((imaginary * q + real) / denominator,
-                (imaginary - real * q) / denominator);
+            T q = d.divide(c);
+            T invDen = d.multiply(q).add(c).reciprocal();
+            return createComplex(imaginary.multiply(q).add(real).multiply(invDen),
+                                 imaginary.subtract(real.multiply(q)).multiply(invDen));
         }
     }
 
@@ -291,48 +329,68 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * Returns a {@code Complex} whose value is {@code (this / divisor)},
      * with {@code divisor} interpreted as a real number.
      *
-     * @param divisor Value by which this {@code Complex} is to be divided.
+     * @param  divisor Value by which this {@code Complex} is to be divided.
      * @return {@code this / divisor}.
-     * @see #divide(Complex)
+     * @see #divide(FieldComplex)
+     */
+    public FieldComplex<T> divide(T divisor) {
+        if (isNaN || divisor.isNaN()) {
+            return getNaN(getPartsField());
+        }
+        if (divisor.isZero()) {
+            return getNaN(getPartsField());
+        }
+        if (divisor.isInfinite()) {
+            return !isInfinite() ? getZero(getPartsField()) : getNaN(getPartsField());
+        }
+        return createComplex(real.divide(divisor), imaginary.divide(divisor));
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is {@code (this / divisor)},
+     * with {@code divisor} interpreted as a real number.
+     *
+     * @param  divisor Value by which this {@code Complex} is to be divided.
+     * @return {@code this / divisor}.
+     * @see #divide(FieldComplex)
      */
     @Override
-    public Complex divide(double divisor) {
+    public FieldComplex<T> divide(double divisor) {
         if (isNaN || Double.isNaN(divisor)) {
-            return NaN;
+            return getNaN(getPartsField());
         }
-        if (divisor == 0d) {
-            return NaN;
+        if (divisor == 0.0) {
+            return getNaN(getPartsField());
         }
         if (Double.isInfinite(divisor)) {
-            return !isInfinite() ? ZERO : NaN;
+            return !isInfinite() ? getZero(getPartsField()) : getNaN(getPartsField());
         }
-        return createComplex(real / divisor,
-            imaginary / divisor);
+        return createComplex(real.divide(divisor), imaginary.divide(divisor));
     }
 
     /** {@inheritDoc} */
     @Override
-    public Complex reciprocal() {
+    public FieldComplex<T> reciprocal() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        if (real == 0.0 && imaginary == 0.0) {
-            return INF;
+        if (real.isZero() && imaginary.isZero()) {
+            return getInf(getPartsField());
         }
 
         if (isInfinite) {
-            return ZERO;
+            return getZero(getPartsField());
         }
 
-        if (FastMath.abs(real) < FastMath.abs(imaginary)) {
-            double q = real / imaginary;
-            double scale = 1. / (real * q + imaginary);
-            return createComplex(scale * q, -scale);
+        if (FastMath.abs(real).getReal() < FastMath.abs(imaginary).getReal()) {
+            T q = real.divide(imaginary);
+            T scale = real.multiply(q).add(imaginary).reciprocal();
+            return createComplex(scale.multiply(q), scale.negate());
         } else {
-            double q = imaginary / real;
-            double scale = 1. / (imaginary * q + real);
-            return createComplex(scale, -scale * q);
+            T q = imaginary.divide(real);
+            T scale = imaginary.multiply(q).add(real).reciprocal();
+            return createComplex(scale, scale.negate().multiply(q));
         }
     }
 
@@ -365,13 +423,13 @@ public class Complex extends CalculusFieldElementImpl<Complex>
         if (this == other) {
             return true;
         }
-        if (other instanceof Complex) {
-            Complex c = (Complex) other;
+        if (other instanceof FieldComplex){
+            @SuppressWarnings("unchecked")
+            FieldComplex<T> c = (FieldComplex<T>) other;
             if (c.isNaN) {
                 return isNaN;
             } else {
-                return MathUtils.equals(real, c.real) &&
-                    MathUtils.equals(imaginary, c.imaginary);
+                return real.equals(c.real) && imaginary.equals(c.imaginary);
             }
         }
         return false;
@@ -387,64 +445,72 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @param maxUlps {@code (maxUlps - 1)} is the number of floating point
      * values between the real (resp. imaginary) parts of {@code x} and
      * {@code y}.
+     * @param <T> the type of the field elements
      * @return {@code true} if there are fewer than {@code maxUlps} floating
      * point values between the real (resp. imaginary) parts of {@code x}
      * and {@code y}.
-     * @see Precision#equals(double, double, int)
+     *
+     * @see Precision#equals(double,double,int)
      */
-    public static boolean equals(Complex x, Complex y, int maxUlps) {
-        return Precision.equals(x.real, y.real, maxUlps) &&
-            Precision.equals(x.imaginary, y.imaginary, maxUlps);
+    public static <T extends CalculusFieldElement<T>>boolean equals(FieldComplex<T> x, FieldComplex<T> y, int maxUlps) {
+        return Precision.equals(x.real.getReal(), y.real.getReal(), maxUlps) &&
+               Precision.equals(x.imaginary.getReal(), y.imaginary.getReal(), maxUlps);
     }
 
     /**
      * Returns {@code true} iff the values are equal as defined by
-     * {@link #equals(Complex, Complex, int) equals(x, y, 1)}.
+     * {@link #equals(FieldComplex,FieldComplex,int) equals(x, y, 1)}.
      *
      * @param x First value (cannot be {@code null}).
      * @param y Second value (cannot be {@code null}).
+     * @param <T> the type of the field elements
      * @return {@code true} if the values are equal.
      */
-    public static boolean equals(Complex x, Complex y) {
+    public static <T extends CalculusFieldElement<T>>boolean equals(FieldComplex<T> x, FieldComplex<T> y) {
         return equals(x, y, 1);
     }
 
     /**
      * Returns {@code true} if, both for the real part and for the imaginary
-     * part, there is no double value strictly between the arguments or the
+     * part, there is no T value strictly between the arguments or the
      * difference between them is within the range of allowed error
      * (inclusive).  Returns {@code false} if either of the arguments is NaN.
      *
      * @param x First value (cannot be {@code null}).
      * @param y Second value (cannot be {@code null}).
      * @param eps Amount of allowed absolute error.
+     * @param <T> the type of the field elements
      * @return {@code true} if the values are two adjacent floating point
      * numbers or they are within range of each other.
-     * @see Precision#equals(double, double, double)
+     *
+     * @see Precision#equals(double,double,double)
      */
-    public static boolean equals(Complex x, Complex y, double eps) {
-        return Precision.equals(x.real, y.real, eps) &&
-            Precision.equals(x.imaginary, y.imaginary, eps);
+    public static <T extends CalculusFieldElement<T>>boolean equals(FieldComplex<T> x, FieldComplex<T> y,
+                                                                    double eps) {
+        return Precision.equals(x.real.getReal(), y.real.getReal(), eps) &&
+               Precision.equals(x.imaginary.getReal(), y.imaginary.getReal(), eps);
     }
 
     /**
      * Returns {@code true} if, both for the real part and for the imaginary
-     * part, there is no double value strictly between the arguments or the
+     * part, there is no T value strictly between the arguments or the
      * relative difference between them is smaller or equal to the given
      * tolerance. Returns {@code false} if either of the arguments is NaN.
      *
      * @param x First value (cannot be {@code null}).
      * @param y Second value (cannot be {@code null}).
      * @param eps Amount of allowed relative error.
+     * @param <T> the type of the field elements
      * @return {@code true} if the values are two adjacent floating point
      * numbers or they are within range of each other.
-     * @see Precision#equalsWithRelativeTolerance(double, double, double)
+     *
+     * @see Precision#equalsWithRelativeTolerance(double,double,double)
      */
-    public static boolean equalsWithRelativeTolerance(Complex x,
-        Complex y,
-        double eps) {
-        return Precision.equalsWithRelativeTolerance(x.real, y.real, eps) &&
-            Precision.equalsWithRelativeTolerance(x.imaginary, y.imaginary, eps);
+    public static <T extends CalculusFieldElement<T>>boolean equalsWithRelativeTolerance(FieldComplex<T> x,
+                                                                                         FieldComplex<T> y,
+                                                                                         double eps) {
+        return Precision.equalsWithRelativeTolerance(x.real.getReal(), y.real.getReal(), eps) &&
+               Precision.equalsWithRelativeTolerance(x.imaginary.getReal(), y.imaginary.getReal(), eps);
     }
 
     /**
@@ -459,29 +525,26 @@ public class Complex extends CalculusFieldElementImpl<Complex>
         if (isNaN) {
             return 7;
         }
-        return 37 * (17 * MathUtils.hash(imaginary) +
-            MathUtils.hash(real));
+        return 37 * (17 * imaginary.hashCode() + real.hashCode());
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * This implementation considers +0.0 and -0.0 to be equal for both
      * real and imaginary components.
      * </p>
-     *
-     * @since 1.8
      */
     @Override
     public boolean isZero() {
-        return real == 0.0 && imaginary == 0.0;
+        return real.isZero() && imaginary.isZero();
     }
+
     /**
      * Access the imaginary part.
      *
      * @return the imaginary part.
      */
-    public double getImaginary() {
+    public T getImaginary() {
         return imaginary;
     }
 
@@ -489,11 +552,11 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * Access the imaginary part.
      *
      * @return the imaginary part.
-     * @since 2.0
      */
-    public double getImaginaryPart() {
+    public T getImaginaryPart() {
         return imaginary;
     }
+
     /**
      * Access the real part.
      *
@@ -501,18 +564,18 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      */
     @Override
     public double getReal() {
-        return real;
+        return real.getReal();
     }
 
     /**
      * Access the real part.
      *
      * @return the real part.
-     * @since 2.0
      */
-    public double getRealPart() {
+    public T getRealPart() {
         return real;
     }
+
     /**
      * Checks whether either or both parts of this complex number is
      * {@code NaN}.
@@ -525,24 +588,18 @@ public class Complex extends CalculusFieldElementImpl<Complex>
         return isNaN;
     }
 
-    /**
-     * Check whether the instance is real (i.e. imaginary part is zero).
-     *
+    /** Check whether the instance is real (i.e. imaginary part is zero).
      * @return true if imaginary part is zero
-     * @since 1.7
-     */
+      */
     public boolean isReal() {
-        return imaginary == 0.0;
+        return imaginary.isZero();
     }
 
-    /**
-     * Check whether the instance is an integer (i.e. imaginary part is zero and real part has no fractional part).
-     *
+    /** Check whether the instance is an integer (i.e. imaginary part is zero and real part has no fractional part).
      * @return true if imaginary part is zero and real part has no fractional part
-     * @since 1.7
      */
     public boolean isMathematicalInteger() {
-        return isReal() && Precision.isMathematicalInteger(real);
+        return isReal() && Precision.isMathematicalInteger(real.getReal());
     }
 
     /**
@@ -564,12 +621,12 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * Implements preliminary checks for {@code NaN} and infinity followed by
      * the definitional formula:
      * <p>
-     * {@code (a + bi)(c + di) = (ac - bd) + (ad + bc)i}
+     *   {@code (a + bi)(c + di) = (ac - bd) + (ad + bc)i}
      * </p>
-     * Returns {@link #NaN} if either {@code this} or {@code factor} has one or
+     * Returns {@link #getNaN(Field)} if either {@code this} or {@code factor} has one or
      * more {@code NaN} parts.
      * <p>
-     * Returns {@link #INF} if neither {@code this} nor {@code factor} has one
+     * Returns {@link #getInf(Field)} if neither {@code this} nor {@code factor} has one
      * or more {@code NaN} parts and if either {@code this} or {@code factor}
      * has one or more infinite parts (same result is returned regardless of
      * the sign of the components).
@@ -577,69 +634,88 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * Returns finite values in components of the result per the definitional
      * formula in all remaining cases.</p>
      *
-     * @param factor value to be multiplied by this {@code Complex}.
+     * @param  factor value to be multiplied by this {@code Complex}.
      * @return {@code this * factor}.
      * @throws NullArgumentException if {@code factor} is {@code null}.
      */
     @Override
-    public Complex multiply(Complex factor)
+    public FieldComplex<T> multiply(FieldComplex<T> factor)
         throws NullArgumentException {
         MathUtils.checkNotNull(factor);
         if (isNaN || factor.isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
-        if (Double.isInfinite(real) ||
-            Double.isInfinite(imaginary) ||
-            Double.isInfinite(factor.real) ||
-            Double.isInfinite(factor.imaginary)) {
+        if (real.isInfinite() ||
+            imaginary.isInfinite() ||
+            factor.real.isInfinite() ||
+            factor.imaginary.isInfinite()) {
             // we don't use isInfinite() to avoid testing for NaN again
-            return INF;
+            return getInf(getPartsField());
         }
-        return createComplex(
-            MathArrays.linearCombination(real, factor.real, -imaginary, factor.imaginary),
-            MathArrays.linearCombination(real, factor.imaginary, imaginary, factor.real));
+        return createComplex(real.linearCombination(real, factor.real, imaginary.negate(), factor.imaginary),
+                             real.linearCombination(real, factor.imaginary, imaginary, factor.real));
     }
 
     /**
      * Returns a {@code Complex} whose value is {@code this * factor}, with {@code factor}
      * interpreted as a integer number.
      *
-     * @param factor value to be multiplied by this {@code Complex}.
+     * @param  factor value to be multiplied by this {@code Complex}.
      * @return {@code this * factor}.
-     * @see #multiply(Complex)
+     * @see #multiply(FieldComplex)
      */
     @Override
-    public Complex multiply(final int factor) {
+    public FieldComplex<T> multiply(final int factor) {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
-        if (Double.isInfinite(real) ||
-            Double.isInfinite(imaginary)) {
-            return INF;
+        if (real.isInfinite() || imaginary.isInfinite()) {
+            return getInf(getPartsField());
         }
-        return createComplex(real * factor, imaginary * factor);
+        return createComplex(real.multiply(factor), imaginary.multiply(factor));
     }
 
     /**
      * Returns a {@code Complex} whose value is {@code this * factor}, with {@code factor}
      * interpreted as a real number.
      *
-     * @param factor value to be multiplied by this {@code Complex}.
+     * @param  factor value to be multiplied by this {@code Complex}.
      * @return {@code this * factor}.
-     * @see #multiply(Complex)
+     * @see #multiply(FieldComplex)
      */
     @Override
-    public Complex multiply(double factor) {
+    public FieldComplex<T> multiply(double factor) {
         if (isNaN || Double.isNaN(factor)) {
-            return NaN;
+            return getNaN(getPartsField());
         }
-        if (Double.isInfinite(real) ||
-            Double.isInfinite(imaginary) ||
+        if (real.isInfinite() ||
+            imaginary.isInfinite() ||
             Double.isInfinite(factor)) {
             // we don't use isInfinite() to avoid testing for NaN again
-            return INF;
+            return getInf(getPartsField());
         }
-        return createComplex(real * factor, imaginary * factor);
+        return createComplex(real.multiply(factor), imaginary.multiply(factor));
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is {@code this * factor}, with {@code factor}
+     * interpreted as a real number.
+     *
+     * @param  factor value to be multiplied by this {@code Complex}.
+     * @return {@code this * factor}.
+     * @see #multiply(FieldComplex)
+     */
+    public FieldComplex<T> multiply(T factor) {
+        if (isNaN || factor.isNaN()) {
+            return getNaN(getPartsField());
+        }
+        if (real.isInfinite() ||
+            imaginary.isInfinite() ||
+            factor.isInfinite()) {
+            // we don't use isInfinite() to avoid testing for NaN again
+            return getInf(getPartsField());
+        }
+        return createComplex(real.multiply(factor), imaginary.multiply(factor));
     }
 
     /**
@@ -650,12 +726,12 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return {@code -this}.
      */
     @Override
-    public Complex negate() {
+    public FieldComplex<T> negate() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        return createComplex(-real, -imaginary);
+        return createComplex(real.negate(), imaginary.negate());
     }
 
     /**
@@ -663,43 +739,58 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@code (this - subtrahend)}.
      * Uses the definitional formula
      * <p>
-     * {@code (a + bi) - (c + di) = (a-c) + (b-d)i}
+     *  {@code (a + bi) - (c + di) = (a-c) + (b-d)i}
      * </p>
      * If either {@code this} or {@code subtrahend} has a {@code NaN]} value in either part,
-     * {@link #NaN} is returned; otherwise infinite and {@code NaN} values are
+     * {@link #getNaN(Field)} is returned; otherwise infinite and {@code NaN} values are
      * returned in the parts of the result according to the rules for
      * {@link java.lang.Double} arithmetic.
      *
-     * @param subtrahend value to be subtracted from this {@code Complex}.
+     * @param  subtrahend value to be subtracted from this {@code Complex}.
      * @return {@code this - subtrahend}.
      * @throws NullArgumentException if {@code subtrahend} is {@code null}.
      */
     @Override
-    public Complex subtract(Complex subtrahend)
+    public FieldComplex<T> subtract(FieldComplex<T> subtrahend)
         throws NullArgumentException {
         MathUtils.checkNotNull(subtrahend);
         if (isNaN || subtrahend.isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        return createComplex(real - subtrahend.getRealPart(),
-            imaginary - subtrahend.getImaginaryPart());
+        return createComplex(real.subtract(subtrahend.getRealPart()),
+                             imaginary.subtract(subtrahend.getImaginaryPart()));
     }
 
     /**
      * Returns a {@code Complex} whose value is
      * {@code (this - subtrahend)}.
      *
-     * @param subtrahend value to be subtracted from this {@code Complex}.
+     * @param  subtrahend value to be subtracted from this {@code Complex}.
      * @return {@code this - subtrahend}.
-     * @see #subtract(Complex)
+     * @see #subtract(FieldComplex)
      */
     @Override
-    public Complex subtract(double subtrahend) {
+    public FieldComplex<T> subtract(double subtrahend) {
         if (isNaN || Double.isNaN(subtrahend)) {
-            return NaN;
+            return getNaN(getPartsField());
         }
-        return createComplex(real - subtrahend, imaginary);
+        return createComplex(real.subtract(subtrahend), imaginary);
+    }
+
+    /**
+     * Returns a {@code Complex} whose value is
+     * {@code (this - subtrahend)}.
+     *
+     * @param  subtrahend value to be subtracted from this {@code Complex}.
+     * @return {@code this - subtrahend}.
+     * @see #subtract(FieldComplex)
+     */
+    public FieldComplex<T> subtract(T subtrahend) {
+        if (isNaN || subtrahend.isNaN()) {
+            return getNaN(getPartsField());
+        }
+        return createComplex(real.subtract(subtrahend), imaginary);
     }
 
     /**
@@ -708,17 +799,17 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * inverse cosine</a> of this complex number.
      * Implements the formula:
      * <p>
-     * {@code acos(z) = -i (log(z + i (sqrt(1 - z<sup>2</sup>))))}
+     *  {@code acos(z) = -i (log(z + i (sqrt(1 - z<sup>2</sup>))))}
      * </p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN} or infinite.
      *
      * @return the inverse cosine of this complex number.
      */
     @Override
-    public Complex acos() {
+    public FieldComplex<T> acos() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
         return this.add(this.sqrt1z().multIp()).log().multIm();
@@ -730,17 +821,17 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * inverse sine</a> of this complex number.
      * Implements the formula:
      * <p>
-     * {@code asin(z) = -i (log(sqrt(1 - z<sup>2</sup>) + iz))}
+     *  {@code asin(z) = -i (log(sqrt(1 - z<sup>2</sup>) + iz))}
      * </p><p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN} or infinite.</p>
      *
      * @return the inverse sine of this complex number.
      */
     @Override
-    public Complex asin() {
+    public FieldComplex<T> asin() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
         return sqrt1z().add(this.multIp()).log().multIm();
@@ -754,35 +845,38 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * <p>
      * {@code atan(z) = (i/2) log((1 - iz)/(1 + iz))}
      * </p><p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN} or infinite.</p>
      *
      * @return the inverse tangent of this complex number
      */
     @Override
-    public Complex atan() {
+    public FieldComplex<T> atan() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        if (real == 0.0) {
+        final T one = getPartsField().getOne();
+        if (real.isZero()) {
 
             // singularity at ±i
-            if (imaginary * imaginary - 1.0 == 0.0) {
-                return NaN;
+            if (imaginary.multiply(imaginary).subtract(one).isZero()) {
+                return getNaN(getPartsField());
             }
 
             // branch cut on imaginary axis
-            final Complex tmp = createComplex((1 + imaginary) / (1 - imaginary), 0.0).log().multIp()
-                .multiply(0.5);
+            final T zero = getPartsField().getZero();
+            final FieldComplex<T> tmp = createComplex(one.add(imaginary).divide(one.subtract(imaginary)), zero).
+                                        log().multIp().multiply(0.5);
             return createComplex(FastMath.copySign(tmp.real, real), tmp.imaginary);
 
         } else {
             // regular formula
-            final Complex n = createComplex(1 + imaginary, -real);
-            final Complex d = createComplex(1 - imaginary, real);
+            final FieldComplex<T> n = createComplex(one.add(imaginary), real.negate());
+            final FieldComplex<T> d = createComplex(one.subtract(imaginary),  real);
             return n.divide(d).log().multIp().multiply(0.5);
         }
+
     }
 
     /**
@@ -791,13 +885,13 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * cosine</a> of this complex number.
      * Implements the formula:
      * <p>
-     * {@code cos(a + bi) = cos(a)cosh(b) - sin(a)sinh(b)i}
+     *  {@code cos(a + bi) = cos(a)cosh(b) - sin(a)sinh(b)i}
      * </p><p>
      * where the (real) functions on the right-hand side are
      * {@link FastMath#sin}, {@link FastMath#cos},
      * {@link FastMath#cosh} and {@link FastMath#sinh}.
      * </p><p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p><p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -814,14 +908,14 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the cosine of this complex number.
      */
     @Override
-    public Complex cos() {
+    public FieldComplex<T> cos() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final SinCos scr = FastMath.sinCos(real);
-        final SinhCosh schi = FastMath.sinhCosh(imaginary);
-        return createComplex(scr.cos() * schi.cosh(), -scr.sin() * schi.sinh());
+        final FieldSinCos<T>   scr  = FastMath.sinCos(real);
+        final FieldSinhCosh<T> schi = FastMath.sinhCosh(imaginary);
+        return createComplex(scr.cos().multiply(schi.cosh()), scr.sin().negate().multiply(schi.sinh()));
     }
 
     /**
@@ -838,7 +932,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link FastMath#sin}, {@link FastMath#cos},
      * {@link FastMath#cosh} and {@link FastMath#sinh}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -855,14 +949,14 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the hyperbolic cosine of this complex number.
      */
     @Override
-    public Complex cosh() {
+    public FieldComplex<T> cosh() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final SinhCosh schr = FastMath.sinhCosh(real);
-        final SinCos sci = FastMath.sinCos(imaginary);
-        return createComplex(schr.cosh() * sci.cos(), schr.sinh() * sci.sin());
+        final FieldSinhCosh<T> schr = FastMath.sinhCosh(real);
+        final FieldSinCos<T>   sci  = FastMath.sinCos(imaginary);
+        return createComplex(schr.cosh().multiply(sci.cos()), schr.sinh().multiply(sci.sin()));
     }
 
     /**
@@ -879,7 +973,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link FastMath#exp(double)}, {@link FastMath#cos}, and
      * {@link FastMath#sin}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -897,30 +991,26 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return <code><i>e</i><sup>this</sup></code>.
      */
     @Override
-    public Complex exp() {
+    public FieldComplex<T> exp() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final double expReal = FastMath.exp(real);
-        final SinCos sc = FastMath.sinCos(imaginary);
-        return createComplex(expReal * sc.cos(), expReal * sc.sin());
+        final T              expReal = FastMath.exp(real);
+        final FieldSinCos<T> sc      = FastMath.sinCos(imaginary);
+        return createComplex(expReal.multiply(sc.cos()), expReal.multiply(sc.sin()));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex expm1() {
+    public FieldComplex<T> expm1() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final double expm1Real = FastMath.expm1(real);
-        final SinCos sc = FastMath.sinCos(imaginary);
-        return createComplex(expm1Real * sc.cos(), expm1Real * sc.sin());
+        final T              expm1Real = FastMath.expm1(real);
+        final FieldSinCos<T> sc        = FastMath.sinCos(imaginary);
+        return createComplex(expm1Real.multiply(sc.cos()), expm1Real.multiply(sc.sin()));
     }
 
     /**
@@ -934,10 +1024,10 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *  </code>
      * </pre>
      * where ln on the right hand side is {@link FastMath#log(CalculusFieldElement)},
-     * {@code |a + bi|} is the modulus, {@link Complex#abs},  and
+     * {@code |a + bi|} is the modulus, {@link #abs},  and
      * {@code arg(a + bi) = }{@link FastMath#atan2}(b, a).
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * Infinite (or critical) values in real or imaginary parts of the input may
@@ -958,32 +1048,24 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * of {@code this}.
      */
     @Override
-    public Complex log() {
+    public FieldComplex<T> log() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
         return createComplex(FastMath.log(FastMath.hypot(real, imaginary)),
-            FastMath.atan2(imaginary, real));
+                             FastMath.atan2(imaginary, real));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex log1p() {
+    public FieldComplex<T> log1p() {
         return add(1.0).log();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex log10() {
+    public FieldComplex<T> log10() {
         return log().divide(LOG10);
     }
 
@@ -998,26 +1080,26 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * In all other cases real cases, implements y<sup>x</sup> = exp(x&middot;log(y)).
      * </p>
      *
-     * @param x exponent to which this {@code Complex} is to be raised.
+     * @param  x exponent to which this {@code Complex} is to be raised.
      * @return <code> this<sup>x</sup></code>.
      * @throws NullArgumentException if x is {@code null}.
      */
     @Override
-    public Complex pow(Complex x)
+    public FieldComplex<T> pow(FieldComplex<T> x)
         throws NullArgumentException {
 
         MathUtils.checkNotNull(x);
 
-        if (x.imaginary == 0.0) {
-            final int nx = (int) FastMath.rint(x.real);
-            if (x.real == nx) {
+        if (x.imaginary.isZero()) {
+            final int nx = (int) FastMath.rint(x.real.getReal());
+            if (x.real.getReal() == nx) {
                 // integer power
                 return pow(nx);
-            } else if (this.imaginary == 0.0) {
+            } else if (this.imaginary.isZero()) {
                 // check real implementation that handles a bunch of special cases
-                final double realPow = FastMath.pow(this.real, x.real);
-                if (DDouble.isFinite(realPow)) {
-                    return createComplex(realPow, 0);
+                final T realPow = FastMath.pow(this.real, x.real);
+                if (realPow.isFinite()) {
+                    return createComplex(realPow, getPartsField().getZero());
                 }
             }
         }
@@ -1039,21 +1121,20 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * In all other cases real cases, implements y<sup>x</sup> = exp(x&middot;log(y)).
      * </p>
      *
-     * @param x exponent to which this {@code Complex} is to be raised.
+     * @param  x exponent to which this {@code Complex} is to be raised.
      * @return <code> this<sup>x</sup></code>.
      */
-    @Override
-    public Complex pow(double x) {
+    public FieldComplex<T> pow(T x) {
 
-        final int nx = (int) FastMath.rint(x);
-        if (x == nx) {
+        final int nx = (int) FastMath.rint(x.getReal());
+        if (x.getReal() == nx) {
             // integer power
             return pow(nx);
-        } else if (this.imaginary == 0.0) {
+        } else if (this.imaginary.isZero()) {
             // check real implementation that handles a bunch of special cases
-            final double realPow = FastMath.pow(this.real, x);
-            if (DDouble.isFinite(realPow)) {
-                return createComplex(realPow, 0);
+            final T realPow = FastMath.pow(this.real, x);
+            if (realPow.isFinite()) {
+                return createComplex(realPow, getPartsField().getZero());
             }
         }
 
@@ -1063,14 +1144,44 @@ public class Complex extends CalculusFieldElementImpl<Complex>
     }
 
     /**
-     * {@inheritDoc}
+     * Returns of value of this complex number raised to the power of {@code x}.
+     * <p>
+     * If {@code x} has an integer value, returns {@link #pow(int)},
+     * if {@code this} is real and {@link FastMath#pow(double, double)}
+     * with the corresponding real arguments would return a finite number (neither NaN
+     * nor infinite), then returns the same value converted to {@code Complex},
+     * with the same special cases.
+     * In all other cases real cases, implements y<sup>x</sup> = exp(x&middot;log(y)).
+     * </p>
      *
-     * @since 1.7
+     * @param  x exponent to which this {@code Complex} is to be raised.
+     * @return <code> this<sup>x</sup></code>.
      */
     @Override
-    public Complex pow(final int n) {
+    public FieldComplex<T> pow(double x) {
 
-        Complex result = ONE;
+        final int nx = (int) FastMath.rint(x);
+        if (x == nx) {
+            // integer power
+            return pow(nx);
+        } else if (this.imaginary.isZero()) {
+            // check real implementation that handles a bunch of special cases
+            final T realPow = FastMath.pow(this.real, x);
+            if (realPow.isFinite()) {
+                return createComplex(realPow, getPartsField().getZero());
+            }
+        }
+
+        // generic implementation
+        return this.log().multiply(x).exp();
+
+    }
+
+     /** {@inheritDoc} */
+    @Override
+    public FieldComplex<T> pow(final int n) {
+
+        FieldComplex<T> result = getField().getOne();
         final boolean invert;
         int p = n;
         if (p < 0) {
@@ -1081,7 +1192,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
         }
 
         // Exponentiate by successive squaring
-        Complex square = this;
+        FieldComplex<T> square = this;
         while (p > 0) {
             if ((p & 0x1) > 0) {
                 result = result.multiply(square);
@@ -1094,8 +1205,8 @@ public class Complex extends CalculusFieldElementImpl<Complex>
 
     }
 
-    /**
-     * Compute the
+     /**
+      * Compute the
      * <a href="http://mathworld.wolfram.com/Sine.html" TARGET="_top">
      * sine</a>
      * of this complex number.
@@ -1109,7 +1220,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link FastMath#sin}, {@link FastMath#cos},
      * {@link FastMath#cosh} and {@link FastMath#sinh}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p><p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -1126,44 +1237,39 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the sine of this complex number.
      */
     @Override
-    public Complex sin() {
+    public FieldComplex<T> sin() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final SinCos scr = FastMath.sinCos(real);
-        final SinhCosh schi = FastMath.sinhCosh(imaginary);
-        return createComplex(scr.sin() * schi.cosh(), scr.cos() * schi.sinh());
+        final FieldSinCos<T>   scr  = FastMath.sinCos(real);
+        final FieldSinhCosh<T> schi = FastMath.sinhCosh(imaginary);
+        return createComplex(scr.sin().multiply(schi.cosh()), scr.cos().multiply(schi.sinh()));
 
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      */
     @Override
-    public FieldSinCos<Complex> sinCos() {
+    public FieldSinCos<FieldComplex<T>> sinCos() {
         if (isNaN) {
-            return new FieldSinCos<>(NaN, NaN);
+            return new FieldSinCos<>(getNaN(getPartsField()), getNaN(getPartsField()));
         }
 
-        final SinCos scr = FastMath.sinCos(real);
-        final SinhCosh schi = FastMath.sinhCosh(imaginary);
-        return new FieldSinCos<>(createComplex(scr.sin() * schi.cosh(), scr.cos() * schi.sinh()),
-            createComplex(scr.cos() * schi.cosh(), -scr.sin() * schi.sinh()));
+        final FieldSinCos<T>   scr = FastMath.sinCos(real);
+        final FieldSinhCosh<T> schi = FastMath.sinhCosh(imaginary);
+        return new FieldSinCos<>(createComplex(scr.sin().multiply(schi.cosh()), scr.cos().multiply(schi.sinh())),
+                                 createComplex(scr.cos().multiply(schi.cosh()), scr.sin().negate().multiply(schi.sinh())));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex atan2(Complex x) {
+    public FieldComplex<T> atan2(FieldComplex<T> x) {
 
         // compute r = sqrt(x^2+y^2)
-        final Complex r = x.multiply(x).add(multiply(this)).sqrt();
+        final FieldComplex<T> r = x.multiply(x).add(multiply(this)).sqrt();
 
-        if (x.real >= 0) {
+        if (x.real.getReal() >= 0) {
             // compute atan2(y, x) = 2 atan(y / (r + x))
             return divide(r.add(x)).atan().multiply(2);
         } else {
@@ -1172,46 +1278,37 @@ public class Complex extends CalculusFieldElementImpl<Complex>
         }
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * Branch cuts are on the real axis, below +1.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex acosh() {
-        final Complex sqrtPlus = add(1).sqrt();
-        final Complex sqrtMinus = subtract(1).sqrt();
+    public FieldComplex<T> acosh() {
+        final FieldComplex<T> sqrtPlus  = add(1).sqrt();
+        final FieldComplex<T> sqrtMinus = subtract(1).sqrt();
         return add(sqrtPlus.multiply(sqrtMinus)).log();
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * Branch cuts are on the imaginary axis, above +i and below -i.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex asinh() {
+    public FieldComplex<T> asinh() {
         return add(multiply(this).add(1.0).sqrt()).log();
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * Branch cuts are on the real axis, above +1 and below -1.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex atanh() {
-        final Complex logPlus = add(1).log();
-        final Complex logMinus = createComplex(1 - real, -imaginary).log();
+    public FieldComplex<T> atanh() {
+        final FieldComplex<T> logPlus  = add(1).log();
+        final FieldComplex<T> logMinus = createComplex(getPartsField().getOne().subtract(real), imaginary.negate()).log();
         return logPlus.subtract(logMinus).multiply(0.5);
     }
 
@@ -1229,7 +1326,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link FastMath#sin}, {@link FastMath#cos},
      * {@link FastMath#cosh} and {@link FastMath#sinh}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p><p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -1246,29 +1343,28 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the hyperbolic sine of {@code this}.
      */
     @Override
-    public Complex sinh() {
+    public FieldComplex<T> sinh() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        final SinhCosh schr = FastMath.sinhCosh(real);
-        final SinCos sci = FastMath.sinCos(imaginary);
-        return createComplex(schr.sinh() * sci.cos(), schr.cosh() * sci.sin());
+        final FieldSinhCosh<T> schr = FastMath.sinhCosh(real);
+        final FieldSinCos<T>   sci  = FastMath.sinCos(imaginary);
+        return createComplex(schr.sinh().multiply(sci.cos()), schr.cosh().multiply(sci.sin()));
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      */
     @Override
-    public FieldSinhCosh<Complex> sinhCosh() {
+    public FieldSinhCosh<FieldComplex<T>> sinhCosh() {
         if (isNaN) {
-            return new FieldSinhCosh<>(NaN, NaN);
+            return new FieldSinhCosh<>(getNaN(getPartsField()), getNaN(getPartsField()));
         }
 
-        final SinhCosh schr = FastMath.sinhCosh(real);
-        final SinCos sci = FastMath.sinCos(imaginary);
-        return new FieldSinhCosh<>(createComplex(schr.sinh() * sci.cos(), schr.cosh() * sci.sin()),
-            createComplex(schr.cosh() * sci.cos(), schr.sinh() * sci.sin()));
+        final FieldSinhCosh<T> schr = FastMath.sinhCosh(real);
+        final FieldSinCos<T>   sci  = FastMath.sinCos(imaginary);
+        return new FieldSinhCosh<>(createComplex(schr.sinh().multiply(sci.cos()), schr.cosh().multiply(sci.sin())),
+                                   createComplex(schr.cosh().multiply(sci.cos()), schr.sinh().multiply(sci.sin())));
     }
 
     /**
@@ -1281,13 +1377,13 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *  else return {@code |b|/2t + sign(b)t i }</pre></li>
      * </ol>
      * where <ul>
-     * <li>{@code |a| = }{@link FastMath#abs(double) abs(a)}</li>
-     * <li>{@code |a + bi| = }{@link FastMath#hypot(double, double) hypot(a, b)}</li>
-     * <li>{@code sign(b) = }{@link FastMath#copySign(double, double) copySign(1, b)}
+     * <li>{@code |a| = }{@link FastMath#abs(CalculusFieldElement) abs(a)}</li>
+     * <li>{@code |a + bi| = }{@link FastMath#hypot(CalculusFieldElement, CalculusFieldElement) hypot(a, b)}</li>
+     * <li>{@code sign(b) = }{@link FastMath#copySign(CalculusFieldElement, CalculusFieldElement) copySign(1, b)}
      * </ul>
      * The real part is therefore always nonnegative.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field) NaN} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * <p>
@@ -1308,43 +1404,38 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the square root of {@code this} with nonnegative real part.
      */
     @Override
-    public Complex sqrt() {
+    public FieldComplex<T> sqrt() {
         if (isNaN) {
-            return NaN;
+            return getNaN(getPartsField());
         }
 
-        if (real == 0.0 && imaginary == 0.0) {
-            return ZERO;
+        if (isZero()) {
+            return getZero(getPartsField());
         }
 
-        double t = FastMath.sqrt((FastMath.abs(real) + FastMath.hypot(real, imaginary)) * 0.5);
-        if (real >= 0.0) {
-            return createComplex(t, imaginary / (2.0 * t));
+        T t = FastMath.sqrt((FastMath.abs(real).add(FastMath.hypot(real, imaginary))).multiply(0.5));
+        if (real.getReal() >= 0.0) {
+            return createComplex(t, imaginary.divide(t.multiply(2)));
         } else {
-            return createComplex(FastMath.abs(imaginary) / (2.0 * t),
-                FastMath.copySign(t, imaginary));
+            return createComplex(FastMath.abs(imaginary).divide(t.multiply(2)),
+                                 FastMath.copySign(t, imaginary));
         }
     }
 
-    /**
-     * Compute this * i.
-     *
+    /** Compute this * i.
      * @return this * i
-     * @since 2.0
      */
-    private Complex multIp() {
-        return createComplex(-imaginary, real);
+    private FieldComplex<T> multIp() {
+        return createComplex(imaginary.negate(), real);
     }
 
-    /**
-     * Compute this *- -i.
-     *
+    /** Compute this *- -i.
      * @return this * i
-     * @since 2.0
      */
-    private Complex multIm() {
-        return createComplex(imaginary, -real);
+    private FieldComplex<T> multIm() {
+        return createComplex(imaginary, real.negate());
     }
+
     /**
      * Compute the
      * <a href="http://mathworld.wolfram.com/SquareRoot.html" TARGET="_top">
@@ -1353,7 +1444,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * Computes the result directly as
      * {@code sqrt(ONE.subtract(z.multiply(z)))}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -1361,39 +1452,33 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *
      * @return the square root of <code>1 - this<sup>2</sup></code>.
      */
-    public Complex sqrt1z() {
-        final Complex t2 = this.multiply(this);
-        return createComplex(1 - t2.real, -t2.imaginary).sqrt();
+    public FieldComplex<T> sqrt1z() {
+        final FieldComplex<T> t2 = this.multiply(this);
+        return createComplex(getPartsField().getOne().subtract(t2.real), t2.imaginary.negate()).sqrt();
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * This implementation compute the principal cube root by using a branch cut along real negative axis.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex cbrt() {
-        final double magnitude = FastMath.cbrt(norm());
-        final SinCos sc = FastMath.sinCos(getArgument() / 3);
-        return createComplex(magnitude * sc.cos(), magnitude * sc.sin());
+    public FieldComplex<T> cbrt() {
+        final T              magnitude = FastMath.cbrt(abs().getRealPart());
+        final FieldSinCos<T> sc        = FastMath.sinCos(getArgument().divide(3));
+        return createComplex(magnitude.multiply(sc.cos()), magnitude.multiply(sc.sin()));
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * This implementation compute the principal n<sup>th</sup> root by using a branch cut along real negative axis.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex rootN(int n) {
-        final double magnitude = FastMath.pow(norm(), 1.0 / n);
-        final SinCos sc = FastMath.sinCos(getArgument() / n);
-        return createComplex(magnitude * sc.cos(), magnitude * sc.sin());
+    public FieldComplex<T> rootN(int n) {
+        final T              magnitude = FastMath.pow(abs().getRealPart(), 1.0 / n);
+        final FieldSinCos<T> sc        = FastMath.sinCos(getArgument().divide(n));
+        return createComplex(magnitude.multiply(sc.cos()), magnitude.multiply(sc.sin()));
     }
 
     /**
@@ -1410,7 +1495,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link FastMath#sin}, {@link FastMath#cos}, {@link FastMath#cosh} and
      * {@link FastMath#sinh}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * Infinite (or critical) values in real or imaginary parts of the input may
@@ -1428,22 +1513,22 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the tangent of {@code this}.
      */
     @Override
-    public Complex tan() {
-        if (isNaN || Double.isInfinite(real)) {
-            return NaN;
+    public FieldComplex<T> tan() {
+        if (isNaN || real.isInfinite()) {
+            return getNaN(getPartsField());
         }
-        if (imaginary > 20.0) {
-            return I;
+        if (imaginary.getReal() > 20.0) {
+            return getI(getPartsField());
         }
-        if (imaginary < -20.0) {
-            return MINUS_I;
+        if (imaginary.getReal() < -20.0) {
+            return getMinusI(getPartsField());
         }
 
-        final SinCos sc2r = FastMath.sinCos(2.0 * real);
-        double imaginary2 = 2.0 * imaginary;
-        double d = sc2r.cos() + FastMath.cosh(imaginary2);
+        final FieldSinCos<T> sc2r = FastMath.sinCos(real.multiply(2));
+        T imaginary2 = imaginary.multiply(2);
+        T d = sc2r.cos().add(FastMath.cosh(imaginary2));
 
-        return createComplex(sc2r.sin() / d, FastMath.sinh(imaginary2) / d);
+        return createComplex(sc2r.sin().divide(d), FastMath.sinh(imaginary2).divide(d));
 
     }
 
@@ -1461,7 +1546,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link FastMath#sin}, {@link FastMath#cos}, {@link FastMath#cosh} and
      * {@link FastMath#sinh}.
      * <p>
-     * Returns {@link Complex#NaN} if either real or imaginary part of the
+     * Returns {@link #getNaN(Field)} if either real or imaginary part of the
      * input argument is {@code NaN}.
      * </p>
      * Infinite values in real or imaginary parts of the input may result in
@@ -1479,22 +1564,23 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @return the hyperbolic tangent of {@code this}.
      */
     @Override
-    public Complex tanh() {
-        if (isNaN || Double.isInfinite(imaginary)) {
-            return NaN;
+    public FieldComplex<T> tanh() {
+        if (isNaN || imaginary.isInfinite()) {
+            return getNaN(getPartsField());
         }
-        if (real > 20.0) {
-            return ONE;
+        if (real.getReal() > 20.0) {
+            return getOne(getPartsField());
         }
-        if (real < -20.0) {
-            return MINUS_ONE;
+        if (real.getReal() < -20.0) {
+            return getMinusOne(getPartsField());
         }
-        double real2 = 2.0 * real;
-        final SinCos sc2i = FastMath.sinCos(2.0 * imaginary);
-        double d = FastMath.cosh(real2) + sc2i.cos();
+        T real2 = real.multiply(2);
+        final FieldSinCos<T> sc2i = FastMath.sinCos(imaginary.multiply(2));
+        T d = FastMath.cosh(real2).add(sc2i.cos());
 
-        return createComplex(FastMath.sinh(real2) / d, sc2i.sin() / d);
+        return createComplex(FastMath.sinh(real2).divide(d), sc2i.sin().divide(d));
     }
+
 
 
     /**
@@ -1514,7 +1600,7 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *
      * @return the argument of {@code this}.
      */
-    public double getArgument() {
+    public T getArgument() {
         return FastMath.atan2(getImaginaryPart(), getRealPart());
     }
 
@@ -1531,47 +1617,46 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * {@link #getArgument() argument} of this complex number.
      * <p>
      * If one or both parts of this complex number is NaN, a list with just
-     * one element, {@link #NaN} is returned.
+     * one element, {@link #getNaN(Field)} is returned.
      * if neither part is NaN, but at least one part is infinite, the result
-     * is a one-element list containing {@link #INF}.
+     * is a one-element list containing {@link #getInf(Field)}.
      *
      * @param n Degree of root.
      * @return a List of all {@code n}-th roots of {@code this}.
      * @throws MathIllegalArgumentException if {@code n <= 0}.
      */
-    public List<Complex> nthRoot(int n) throws MathIllegalArgumentException {
+    public List<FieldComplex<T>> nthRoot(int n) throws MathIllegalArgumentException {
 
         if (n <= 0) {
-            throw new MathIllegalArgumentException(
-                LocalizedCoreFormats.CANNOT_COMPUTE_NTH_ROOT_FOR_NEGATIVE_N,
-                n);
+            throw new MathIllegalArgumentException(LocalizedCoreFormats.CANNOT_COMPUTE_NTH_ROOT_FOR_NEGATIVE_N,
+                                                   n);
         }
 
-        final List<Complex> result = new ArrayList<>();
+        final List<FieldComplex<T>> result = new ArrayList<>();
 
         if (isNaN) {
-            result.add(NaN);
+            result.add(getNaN(getPartsField()));
             return result;
         }
         if (isInfinite()) {
-            result.add(INF);
+            result.add(getInf(getPartsField()));
             return result;
         }
 
         // nth root of abs -- faster / more accurate to use a solver here?
-        final double nthRootOfAbs = FastMath.pow(FastMath.hypot(real, imaginary), 1.0 / n);
+        final T nthRootOfAbs = FastMath.pow(FastMath.hypot(real, imaginary), 1.0 / n);
 
         // Compute nth roots of complex number with k = 0, 1, ... n-1
-        final double nthPhi = getArgument() / n;
+        final T nthPhi = getArgument().divide(n);
         final double slice = 2 * FastMath.PI / n;
-        double innerPart = nthPhi;
-        for (int k = 0; k < n; k++) {
+        T innerPart = nthPhi;
+        for (int k = 0; k < n ; k++) {
             // inner part
-            final SinCos scInner = FastMath.sinCos(innerPart);
-            final double realPart = nthRootOfAbs * scInner.cos();
-            final double imaginaryPart = nthRootOfAbs * scInner.sin();
+            final FieldSinCos<T> scInner = FastMath.sinCos(innerPart);
+            final T realPart = nthRootOfAbs.multiply(scInner.cos());
+            final T imaginaryPart = nthRootOfAbs.multiply(scInner.sin());
             result.add(createComplex(realPart, imaginaryPart));
-            innerPart += slice;
+            innerPart = innerPart.add(slice);
         }
 
         return result;
@@ -1583,11 +1668,11 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      * @param realPart Real part.
      * @param imaginaryPart Imaginary part.
      * @return a new complex number instance.
-     * @see #valueOf(double, double)
+     *
+     * @see #valueOf(CalculusFieldElement, CalculusFieldElement)
      */
-    protected Complex createComplex(double realPart,
-        double imaginaryPart) {
-        return new Complex(realPart, imaginaryPart);
+    protected FieldComplex<T> createComplex(final T realPart, final T imaginaryPart) {
+        return new FieldComplex<>(realPart, imaginaryPart);
     }
 
     /**
@@ -1595,51 +1680,49 @@ public class Complex extends CalculusFieldElementImpl<Complex>
      *
      * @param realPart Real part.
      * @param imaginaryPart Imaginary part.
+     * @param <T> the type of the field elements
      * @return a Complex instance.
      */
-    public static Complex valueOf(double realPart,
-        double imaginaryPart) {
-        if (Double.isNaN(realPart) ||
-            Double.isNaN(imaginaryPart)) {
-            return NaN;
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T>
+        valueOf(T realPart, T imaginaryPart) {
+        if (realPart.isNaN() || imaginaryPart.isNaN()) {
+            return getNaN(realPart.getField());
         }
-        return new Complex(realPart, imaginaryPart);
+        return new FieldComplex<>(realPart, imaginaryPart);
     }
 
     /**
      * Create a complex number given only the real part.
      *
      * @param realPart Real part.
+     * @param <T> the type of the field elements
      * @return a Complex instance.
      */
-    public static Complex valueOf(double realPart) {
-        if (Double.isNaN(realPart)) {
-            return NaN;
+    public static <T extends CalculusFieldElement<T>> FieldComplex<T>
+        valueOf(T realPart) {
+        if (realPart.isNaN()) {
+            return getNaN(realPart.getField());
         }
-        return new Complex(realPart);
+        return new FieldComplex<>(realPart);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Complex newInstance(double realPart) {
-        return valueOf(realPart);
+    public FieldComplex<T> newInstance(double realPart) {
+        return valueOf(getPartsField().getZero().newInstance(realPart));
     }
 
-    /**
-     * Resolve the transient fields in a deserialized Complex Object.
-     * Subclasses will need to override {@link #createComplex} to
-     * deserialize properly.
-     *
-     * @return A Complex instance with all fields resolved.
+    /** {@inheritDoc} */
+    @Override
+    public FieldComplexField<T> getField() {
+        return FieldComplexField.getField(getPartsField());
+    }
+
+    /** Get the {@link Field} the real and imaginary parts belong to.
+     * @return {@link Field} the real and imaginary parts belong to
      */
-    protected final Object readResolve() {
-        return createComplex(real, imaginary);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ComplexField getField() {
-        return ComplexField.getInstance();
+    public Field<T> getPartsField() {
+        return real.getField();
     }
 
     /** {@inheritDoc} */
@@ -1648,270 +1731,219 @@ public class Complex extends CalculusFieldElementImpl<Complex>
         return "(" + real + ", " + imaginary + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex scalb(int n) {
+    public FieldComplex<T> scalb(int n) {
         return createComplex(FastMath.scalb(real, n), FastMath.scalb(imaginary, n));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex ulp() {
+    public FieldComplex<T> ulp() {
         return createComplex(FastMath.ulp(real), FastMath.ulp(imaginary));
     }
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+
+    /** {@inheritDoc} */
     @Override
-    public Complex hypot(Complex y) {
+    public FieldComplex<T> hypot(FieldComplex<T> y) {
         if (isInfinite() || y.isInfinite()) {
-            return INF;
+            return getInf(getPartsField());
         } else if (isNaN() || y.isNaN()) {
-            return NaN;
+            return getNaN(getPartsField());
         } else {
             return multiply(this).add(y.multiply(y)).sqrt();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final Complex[] a, final Complex[] b)
+    public FieldComplex<T> linearCombination(final FieldComplex<T>[] a, final FieldComplex<T>[] b)
         throws MathIllegalArgumentException {
         final int n = 2 * a.length;
-        final double[] realA = new double[n];
-        final double[] realB = new double[n];
-        final double[] imaginaryA = new double[n];
-        final double[] imaginaryB = new double[n];
-        for (int i = 0; i < a.length; ++i) {
-            final Complex ai = a[i];
-            final Complex bi = b[i];
-            realA[2 * i] = +ai.real;
-            realA[2 * i + 1] = -ai.imaginary;
-            realB[2 * i] = +bi.real;
-            realB[2 * i + 1] = +bi.imaginary;
-            imaginaryA[2 * i] = +ai.real;
-            imaginaryA[2 * i + 1] = +ai.imaginary;
-            imaginaryB[2 * i] = +bi.imaginary;
-            imaginaryB[2 * i + 1] = +bi.real;
+        final T[] realA      = MathArrays.buildArray(getPartsField(), n);
+        final T[] realB      = MathArrays.buildArray(getPartsField(), n);
+        final T[] imaginaryA = MathArrays.buildArray(getPartsField(), n);
+        final T[] imaginaryB = MathArrays.buildArray(getPartsField(), n);
+        for (int i = 0; i < a.length; ++i)  {
+            final FieldComplex<T> ai = a[i];
+            final FieldComplex<T> bi = b[i];
+            realA[2 * i    ]      = ai.real;
+            realA[2 * i + 1]      = ai.imaginary.negate();
+            realB[2 * i    ]      = bi.real;
+            realB[2 * i + 1]      = bi.imaginary;
+            imaginaryA[2 * i    ] = ai.real;
+            imaginaryA[2 * i + 1] = ai.imaginary;
+            imaginaryB[2 * i    ] = bi.imaginary;
+            imaginaryB[2 * i + 1] = bi.real;
         }
-        return createComplex(MathArrays.linearCombination(realA, realB),
-            MathArrays.linearCombination(imaginaryA, imaginaryB));
+        return createComplex(real.linearCombination(realA,  realB),
+                             real.linearCombination(imaginaryA, imaginaryB));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final double[] a, final Complex[] b)
+    public FieldComplex<T> linearCombination(final double[] a, final FieldComplex<T>[] b)
         throws MathIllegalArgumentException {
         final int n = a.length;
-        final double[] realB = new double[n];
-        final double[] imaginaryB = new double[n];
-        for (int i = 0; i < a.length; ++i) {
-            final Complex bi = b[i];
-            realB[i] = +bi.real;
-            imaginaryB[i] = +bi.imaginary;
+        final T[] realB      = MathArrays.buildArray(getPartsField(), n);
+        final T[] imaginaryB = MathArrays.buildArray(getPartsField(), n);
+        for (int i = 0; i < a.length; ++i)  {
+            final FieldComplex<T> bi = b[i];
+            realB[i]      = bi.real;
+            imaginaryB[i] = bi.imaginary;
         }
-        return createComplex(MathArrays.linearCombination(a, realB),
-            MathArrays.linearCombination(a, imaginaryB));
+        return createComplex(real.linearCombination(a,  realB),
+                             real.linearCombination(a, imaginaryB));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final Complex a1, final Complex b1, final Complex a2,
-        final Complex b2) {
-        return createComplex(MathArrays.linearCombination(+a1.real, b1.real,
-            -a1.imaginary, b1.imaginary,
-            +a2.real, b2.real,
-            -a2.imaginary, b2.imaginary),
-            MathArrays.linearCombination(+a1.real, b1.imaginary,
-                +a1.imaginary, b1.real,
-                +a2.real, b2.imaginary,
-                +a2.imaginary, b2.real));
+    public FieldComplex<T> linearCombination(final FieldComplex<T> a1, final FieldComplex<T> b1, final FieldComplex<T> a2, final FieldComplex<T> b2) {
+        return createComplex(real.linearCombination(a1.real, b1.real,
+                                                    a1.imaginary.negate(), b1.imaginary,
+                                                    a2.real, b2.real,
+                                                    a2.imaginary.negate(), b2.imaginary),
+                             real.linearCombination(a1.real, b1.imaginary,
+                                                    a1.imaginary, b1.real,
+                                                    a2.real, b2.imaginary,
+                                                    a2.imaginary, b2.real));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final double a1, final Complex b1, final double a2,
-        final Complex b2) {
-        return createComplex(MathArrays.linearCombination(a1, b1.real,
-            a2, b2.real),
-            MathArrays.linearCombination(a1, b1.imaginary,
-                a2, b2.imaginary));
+    public FieldComplex<T> linearCombination(final double a1, final FieldComplex<T> b1, final double a2, final FieldComplex<T> b2) {
+        return createComplex(real.linearCombination(a1, b1.real,
+                                                    a2, b2.real),
+                             real.linearCombination(a1, b1.imaginary,
+                                                    a2, b2.imaginary));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final Complex a1, final Complex b1,
-        final Complex a2, final Complex b2,
-        final Complex a3, final Complex b3) {
-        return linearCombination(new Complex[]{a1, a2, a3},
-            new Complex[]{b1, b2, b3});
+    public FieldComplex<T> linearCombination(final FieldComplex<T> a1, final FieldComplex<T> b1,
+                                                final FieldComplex<T> a2, final FieldComplex<T> b2,
+                                                final FieldComplex<T> a3, final FieldComplex<T> b3) {
+        FieldComplex<T>[] a = MathArrays.buildArray(getField(), 3);
+        a[0] = a1;
+        a[1] = a2;
+        a[2] = a3;
+        FieldComplex<T>[] b = MathArrays.buildArray(getField(), 3);
+        b[0] = b1;
+        b[1] = b2;
+        b[2] = b3;
+        return linearCombination(a, b);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final double a1, final Complex b1,
-        final double a2, final Complex b2,
-        final double a3, final Complex b3) {
-        return linearCombination(new double[]{a1, a2, a3},
-            new Complex[]{b1, b2, b3});
+    public FieldComplex<T> linearCombination(final double a1, final FieldComplex<T> b1,
+                                                final double a2, final FieldComplex<T> b2,
+                                                final double a3, final FieldComplex<T> b3) {
+        FieldComplex<T>[] b = MathArrays.buildArray(getField(), 3);
+        b[0] = b1;
+        b[1] = b2;
+        b[2] = b3;
+        return linearCombination(new double[]  { a1, a2, a3 }, b);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final Complex a1, final Complex b1,
-        final Complex a2, final Complex b2,
-        final Complex a3, final Complex b3,
-        final Complex a4, final Complex b4) {
-        return linearCombination(new Complex[]{a1, a2, a3, a4},
-            new Complex[]{b1, b2, b3, b4});
+    public FieldComplex<T> linearCombination(final FieldComplex<T> a1, final FieldComplex<T> b1,
+                                                final FieldComplex<T> a2, final FieldComplex<T> b2,
+                                                final FieldComplex<T> a3, final FieldComplex<T> b3,
+                                                final FieldComplex<T> a4, final FieldComplex<T> b4) {
+        FieldComplex<T>[] a = MathArrays.buildArray(getField(), 4);
+        a[0] = a1;
+        a[1] = a2;
+        a[2] = a3;
+        a[3] = a4;
+        FieldComplex<T>[] b = MathArrays.buildArray(getField(), 4);
+        b[0] = b1;
+        b[1] = b2;
+        b[2] = b3;
+        b[3] = b4;
+        return linearCombination(a, b);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex linearCombination(final double a1, final Complex b1,
-        final double a2, final Complex b2,
-        final double a3, final Complex b3,
-        final double a4, final Complex b4) {
-        return linearCombination(new double[]{a1, a2, a3, a4},
-            new Complex[]{b1, b2, b3, b4});
+    public FieldComplex<T> linearCombination(final double a1, final FieldComplex<T> b1,
+                                                final double a2, final FieldComplex<T> b2,
+                                                final double a3, final FieldComplex<T> b3,
+                                                final double a4, final FieldComplex<T> b4) {
+        FieldComplex<T>[] b = MathArrays.buildArray(getField(), 4);
+        b[0] = b1;
+        b[1] = b2;
+        b[2] = b3;
+        b[3] = b4;
+        return linearCombination(new double[]  { a1, a2, a3, a4 }, b);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex ceil() {
+    public FieldComplex<T> ceil() {
         return createComplex(FastMath.ceil(getRealPart()), FastMath.ceil(getImaginaryPart()));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex floor() {
+    public FieldComplex<T> floor() {
         return createComplex(FastMath.floor(getRealPart()), FastMath.floor(getImaginaryPart()));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex rint() {
+    public FieldComplex<T> rint() {
         return createComplex(FastMath.rint(getRealPart()), FastMath.rint(getImaginaryPart()));
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * for complex numbers, the integer n corresponding to {@code this.subtract(remainder(a)).divide(a)}
      * is a <a href="https://en.wikipedia.org/wiki/Gaussian_integer">Wikipedia - Gaussian integer</a>.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex remainder(final double a) {
-        return createComplex(FastMath.IEEEremainder(getRealPart(), a),
-            FastMath.IEEEremainder(getImaginaryPart(), a));
+    public FieldComplex<T> remainder(final double a) {
+        return createComplex(FastMath.IEEEremainder(getRealPart(), a), FastMath.IEEEremainder(getImaginaryPart(), a));
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * for complex numbers, the integer n corresponding to {@code this.subtract(remainder(a)).divide(a)}
      * is a <a href="https://en.wikipedia.org/wiki/Gaussian_integer">Wikipedia - Gaussian integer</a>.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex remainder(final Complex a) {
-        final Complex complexQuotient = divide(a);
-        final double qRInt = FastMath.rint(complexQuotient.real);
-        final double qIInt = FastMath.rint(complexQuotient.imaginary);
-        return createComplex(real - qRInt * a.real + qIInt * a.imaginary,
-            imaginary - qRInt * a.imaginary - qIInt * a.real);
+    public FieldComplex<T> remainder(final FieldComplex<T> a) {
+        final FieldComplex<T> complexQuotient = divide(a);
+        final T  qRInt           = FastMath.rint(complexQuotient.real);
+        final T  qIInt           = FastMath.rint(complexQuotient.imaginary);
+        return createComplex(real.subtract(qRInt.multiply(a.real)).add(qIInt.multiply(a.imaginary)),
+                             imaginary.subtract(qRInt.multiply(a.imaginary)).subtract(qIInt.multiply(a.real)));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex signum() {
+    public FieldComplex<T> signum() {
         return createComplex(FastMath.signum(getRealPart()), FastMath.signum(getImaginaryPart()));
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      * <p>
      * The signs of real and imaginary parts are copied independently.
      * </p>
-     *
-     * @since 1.7
      */
     @Override
-    public Complex copySign(final Complex z) {
+    public FieldComplex<T> copySign(final FieldComplex<T> z) {
         return createComplex(FastMath.copySign(getRealPart(), z.getRealPart()),
-            FastMath.copySign(getImaginaryPart(), z.getImaginaryPart()));
+                             FastMath.copySign(getImaginaryPart(), z.getImaginaryPart()));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.7
-     */
+    /** {@inheritDoc} */
     @Override
-    public Complex copySign(double r) {
-        return createComplex(FastMath.copySign(getRealPart(), r),
-            FastMath.copySign(getImaginaryPart(), r));
+    public FieldComplex<T> copySign(double r) {
+        return createComplex(FastMath.copySign(getRealPart(), r), FastMath.copySign(getImaginaryPart(), r));
     }
 
 }

@@ -24,6 +24,7 @@ package org.hipparchus;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.FieldSinCos;
+import org.hipparchus.util.FieldSinhCosh;
 
 /**
  * Interface representing a <a href="http://mathworld.wolfram.com/Field.html">field</a>
@@ -33,40 +34,22 @@ import org.hipparchus.util.FieldSinCos;
  * @see FieldElement
  * @since 1.7
  */
-public interface CalculusFieldElement<T> extends FieldElement<T> {
+public interface CalculusFieldElement<T extends FieldElement<T>> extends FieldElement<T> {
 
-    /**
-     * Degrees to radians conversion factor.
-     */
+    /** Degrees to radians conversion factor. */
     double DEG_TO_RAD = FastMath.PI / 180.0;
 
-    /**
-     * Radians to degrees conversion factor.
-     */
+    /** Radians to degrees conversion factor. */
     double RAD_TO_DEG = 180.0 / FastMath.PI;
 
     /**
      * Create an instance corresponding to a constant real value.
-     * <p>
-     * The default implementation creates the instance by adding
-     * the value to {@code getField().getZero()}. This is not optimal
-     * and does not work when called with a negative zero as the
-     * sign of zero is lost with the addition. The default implementation
-     * should therefore be overridden in concrete classes. The default
-     * implementation will be removed at the next major version.
-     * </p>
      *
      * @param value constant real value
      * @return instance corresponding to a constant real value
      */
     T newInstance(final double value);
 
-    /**
-     * Get the real value of the number.
-     *
-     * @return real value
-     */
-    double getReal();
 
     /**
      * '+' operator.
@@ -109,7 +92,9 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      *
      * @return exponent for the instance, without bias
      */
-    int getExponent();
+    int getExponent(); /*{
+        return FastMath.getExponent(getReal());
+    }*/
 
     /**
      * Multiply the instance by a power of 2.
@@ -118,6 +103,14 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return this &times; 2<sup>n</sup>
      */
     T scalb(int n);
+
+    /**
+     * Compute least significant bit (Unit in Last Position) for a number.
+     *
+     * @return ulp(this)
+     * @since 2.0
+     */
+    T ulp();
 
     /**
      * Returns the hypotenuse of a triangle with sides {@code this} and {@code y}
@@ -134,11 +127,9 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @throws MathIllegalArgumentException if number of free parameters or orders are inconsistent
      */
     T hypot(T y)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     T reciprocal();
 
@@ -188,7 +179,7 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @throws MathIllegalArgumentException if number of free parameters or orders are inconsistent
      */
     T pow(T e)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
     /**
      * Exponential.
@@ -245,8 +236,7 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return [sin(this), cos(this)]
      * @since 1.4
      */
-    FieldSinCos<T> sinCos(); /* {
-    }*/
+    FieldSinCos<T> sinCos();
 
     /**
      * Tangent operation.
@@ -284,7 +274,7 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @throws MathIllegalArgumentException if number of free parameters or orders are inconsistent
      */
     T atan2(T x)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
     /**
      * Hyperbolic cosine operation.
@@ -299,6 +289,14 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return sinh(this)
      */
     T sinh();
+
+    /**
+     * Combined hyperbolic sine and sosine operation.
+     *
+     * @return [sinh(this), cosh(this)]
+     * @since 2.0
+     */
+    FieldSinhCosh<T> sinhCosh();
 
     /**
      * Hyperbolic tangent operation.
@@ -334,7 +332,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return instance converted into degrees
      */
     T toDegrees();/*{
-    }*/
+       return multiply(RAD_TO_DEG);
+ }*/
 
     /**
      * Convert degrees to radians, with error of less than 0.5 ULP
@@ -342,7 +341,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return instance converted into radians
      */
     T toRadians();/* {
-    }*/
+       return multiply(DEG_TO_RAD);
+ }*/
 
     /**
      * Compute a linear combination.
@@ -353,7 +353,7 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @throws MathIllegalArgumentException if arrays dimensions don't match
      */
     T linearCombination(T[] a, T[] b)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
     /**
      * Compute a linear combination.
@@ -364,7 +364,7 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @throws MathIllegalArgumentException if arrays dimensions don't match
      */
     T linearCombination(double[] a, T[] b)
-            throws MathIllegalArgumentException;
+        throws MathIllegalArgumentException;
 
     /**
      * Compute a linear combination.
@@ -375,8 +375,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @param b2 second factor of the second term
      * @return a<sub>1</sub>&times;b<sub>1</sub> +
      * a<sub>2</sub>&times;b<sub>2</sub>
-     * @see #linearCombination(Object, Object, Object, Object, Object, Object)
-     * @see #linearCombination(Object, Object, Object, Object, Object, Object, Object, Object)
+     * @see #linearCombination(FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement)
+     * @see #linearCombination(FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement)
      */
     T linearCombination(T a1, T b1, T a2, T b2);
 
@@ -389,8 +389,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @param b2 second factor of the second term
      * @return a<sub>1</sub>&times;b<sub>1</sub> +
      * a<sub>2</sub>&times;b<sub>2</sub>
-     * @see #linearCombination(double, Object, double, Object, double, Object)
-     * @see #linearCombination(double, Object, double, Object, double, Object, double, Object)
+     * @see #linearCombination(double, FieldElement, double, FieldElement, double, FieldElement)
+     * @see #linearCombination(double, FieldElement, double, FieldElement, double, FieldElement, double, FieldElement)
      */
     T linearCombination(double a1, T b1, double a2, T b2);
 
@@ -405,8 +405,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @param b3 second factor of the third term
      * @return a<sub>1</sub>&times;b<sub>1</sub> +
      * a<sub>2</sub>&times;b<sub>2</sub> + a<sub>3</sub>&times;b<sub>3</sub>
-     * @see #linearCombination(Object, Object, Object, Object)
-     * @see #linearCombination(Object, Object, Object, Object, Object, Object, Object, Object)
+     * @see #linearCombination(FieldElement, FieldElement, FieldElement, FieldElement)
+     * @see #linearCombination(FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement)
      */
     T linearCombination(T a1, T b1, T a2, T b2, T a3, T b3);
 
@@ -421,8 +421,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @param b3 second factor of the third term
      * @return a<sub>1</sub>&times;b<sub>1</sub> +
      * a<sub>2</sub>&times;b<sub>2</sub> + a<sub>3</sub>&times;b<sub>3</sub>
-     * @see #linearCombination(double, Object, double, Object)
-     * @see #linearCombination(double, Object, double, Object, double, Object, double, Object)
+     * @see #linearCombination(double, FieldElement, double, FieldElement)
+     * @see #linearCombination(double, FieldElement, double, FieldElement, double, FieldElement, double, FieldElement)
      */
     T linearCombination(double a1, T b1, double a2, T b2, double a3, T b3);
 
@@ -440,8 +440,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return a<sub>1</sub>&times;b<sub>1</sub> +
      * a<sub>2</sub>&times;b<sub>2</sub> + a<sub>3</sub>&times;b<sub>3</sub> +
      * a<sub>4</sub>&times;b<sub>4</sub>
-     * @see #linearCombination(Object, Object, Object, Object)
-     * @see #linearCombination(Object, Object, Object, Object, Object, Object)
+     * @see #linearCombination(FieldElement, FieldElement, FieldElement, FieldElement)
+     * @see #linearCombination(FieldElement, FieldElement, FieldElement, FieldElement, FieldElement, FieldElement)
      */
     T linearCombination(T a1, T b1, T a2, T b2, T a3, T b3, T a4, T b4);
 
@@ -459,8 +459,8 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      * @return a<sub>1</sub>&times;b<sub>1</sub> +
      * a<sub>2</sub>&times;b<sub>2</sub> + a<sub>3</sub>&times;b<sub>3</sub> +
      * a<sub>4</sub>&times;b<sub>4</sub>
-     * @see #linearCombination(double, Object, double, Object)
-     * @see #linearCombination(double, Object, double, Object, double, Object)
+     * @see #linearCombination(double, FieldElement, double, FieldElement)
+     * @see #linearCombination(double, FieldElement, double, FieldElement, double, FieldElement)
      */
     T linearCombination(double a1, T b1, double a2, T b2, double a3, T b3, double a4, T b4);
 
@@ -532,13 +532,57 @@ public interface CalculusFieldElement<T> extends FieldElement<T> {
      *
      * @return true if the instance is infinite
      */
-    boolean isInfinite();
+    boolean isInfinite(); /*{
+        return Double.isInfinite(getReal());
+    }*/
+
+
+    /**
+     * Check if the instance is finite (neither infinite nor NaN).
+     *
+     * @return true if the instance is finite (neither infinite nor NaN)
+     * @since 2.0
+     */
+    boolean isFinite(); /*{
+        return Double.isFinite(getReal());
+    }*/
 
     /**
      * Check if the instance is Not a Number.
      *
      * @return true if the instance is Not a Number
      */
-    boolean isNaN();
+    boolean isNaN(); /*{
+        return Double.isNaN(getReal());
+    }*/
+
+    /**
+     * norm.
+     *
+     * @return norm(this)
+     * @since 2.0
+     */
+    /*default*/ double norm(); /*{
+        return abs().getReal();
+    }*/
+
+    /**
+     * absolute value.
+     * <p>
+     * Just another name for {@link #norm()}
+     * </p>
+     *
+     * @return abs(this)
+     */
+    T abs();
+
+    /**
+     * Get the closest long to instance real value.
+     *
+     * @return closest long to {@link #getReal()}
+     */
+    /*default*/ long round(); /*{
+    return FastMath.round(getReal());
+  }*/
 
 }

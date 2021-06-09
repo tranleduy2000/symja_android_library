@@ -663,6 +663,17 @@ public class F {
   /***/
   public static final IBuiltInSymbol CancelButton = initFinalSymbol("CancelButton",
       ID.CancelButton);
+
+  public static final IBuiltInSymbol CarlsonRC = F.initFinalSymbol("CarlsonRC", ID.CarlsonRC);
+
+  public static final IBuiltInSymbol CarlsonRD = F.initFinalSymbol("CarlsonRD", ID.CarlsonRD);
+
+  public static final IBuiltInSymbol CarlsonRF = F.initFinalSymbol("CarlsonRF", ID.CarlsonRF);
+
+  public static final IBuiltInSymbol CarlsonRG = F.initFinalSymbol("CarlsonRG", ID.CarlsonRG);
+
+  public static final IBuiltInSymbol CarlsonRJ = F.initFinalSymbol("CarlsonRJ", ID.CarlsonRJ);
+
   /** CarmichaelLambda(n) - the Carmichael function of `n` */
   public static final IBuiltInSymbol CarmichaelLambda = initFinalSymbol("CarmichaelLambda",
       ID.CarmichaelLambda);
@@ -6105,6 +6116,21 @@ public class F {
     return new AST0(CancelButton);
   }
 
+  public static IAST CarlsonRC(final IExpr a0, final IExpr a1) {
+    return new AST2(CarlsonRC, a0, a1);
+  }
+
+  public static IAST CarlsonRD(final IExpr a0, final IExpr a1, final IExpr a2) {
+    return new AST3(CarlsonRD, a0, a1, a2);
+  }
+
+  public static IAST CarlsonRF(final IExpr a0, final IExpr a1, final IExpr a2) {
+    return new AST3(CarlsonRF, a0, a1, a2);
+  }
+
+  public static IAST CarlsonRG(final IExpr a0, final IExpr a1, final IExpr a2) {
+    return new AST3(CarlsonRG, a0, a1, a2);
+  }
   public static IAST CarmichaelLambda(final IExpr a0) {
     return new AST1(CarmichaelLambda, a0);
   }

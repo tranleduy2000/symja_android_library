@@ -1,14 +1,15 @@
 package org.hipparchus;
 
 import com.duy.lang.DDouble;
-
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.FieldSinCos;
 
-public abstract class CalculusFieldElementImpl<T> implements CalculusFieldElement<T> {
+public abstract class CalculusFieldElementImpl<T extends FieldElement<T>> implements CalculusFieldElement<T> {
+
     @Override
     public T newInstance(double value) {
-        @SuppressWarnings("unchecked") final CalculusFieldElement<T> zero = (CalculusFieldElement<T>) getField().getZero();
+        @SuppressWarnings("unchecked") final CalculusFieldElement<T> zero = (CalculusFieldElement<T>) getField()
+            .getZero();
         return zero.add(value);
     }
 
@@ -38,7 +39,22 @@ public abstract class CalculusFieldElementImpl<T> implements CalculusFieldElemen
     }
 
     @Override
+    public boolean isFinite() {
+        return DDouble.isFinite(getReal());
+    }
+
+    @Override
     public boolean isNaN() {
         return Double.isNaN(getReal());
+    }
+
+    @Override
+    public double norm() {
+        return abs().getReal();
+    }
+
+    @Override
+    public long round() {
+        return FastMath.round(getReal());
     }
 }

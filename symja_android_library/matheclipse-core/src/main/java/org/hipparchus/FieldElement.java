@@ -30,7 +30,12 @@ import org.hipparchus.exception.NullArgumentException;
  * @param <T> the type of the field elements
  * @see Field
  */
-public interface FieldElement<T> {
+public interface FieldElement<T extends FieldElement<T>> {
+
+    /** Get the real value of the number.
+     * @return real value
+     */
+    double getReal();
 
     /** Compute this + a.
      * @param a element to add
@@ -88,5 +93,24 @@ public interface FieldElement<T> {
      * @return {@link Field} to which the instance belongs
      */
     Field<T> getField();
+
+
+    /** Check if an element is semantically equal to zero.
+     * <p>
+     * The default implementation simply calls {@code equals(getField().getZero())}.
+     * However, this may need to be overridden in some cases as due to
+     * compatibility with {@code hashCode()} some classes implements
+     * {@code equals(Object)} in such a way that -0.0 and +0.0 are different,
+     * which may be a problem. It prevents for example identifying a diagonal
+     * element is zero and should be avoided when doing partial pivoting in
+     * LU decomposition.
+     * </p>
+     * @return true if the element is semantically equal to zero
+     * @since 1.8
+     */
+    /*default*/ boolean isZero(); /* {
+        return equals(getField().getZero());
+    }*/
+
 
 }

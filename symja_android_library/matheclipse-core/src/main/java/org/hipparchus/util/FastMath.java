@@ -21,6 +21,7 @@
  */
 package org.hipparchus.util;
 
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathRuntimeException;
@@ -503,10 +504,10 @@ public class FastMath {
           negate = true;
       }
 
+      double hiPrec[] = new double[2];
       double result;
 
       if (x > 0.25) {
-          double hiPrec[] = new double[2];
           exp(x, 0.0, hiPrec);
 
           double ya = hiPrec[0] + hiPrec[1];
@@ -530,7 +531,7 @@ public class FastMath {
           recipa = -recipa;
           recipb = -recipb;
 
-          // y = y + 1/y
+          // y = y - 1/y
           temp = ya + recipa;
           yb += -(temp - ya - recipa);
           ya = temp;
@@ -540,9 +541,7 @@ public class FastMath {
 
           result = ya + yb;
           result *= 0.5;
-      }
-      else {
-          double hiPrec[] = new double[2];
+      } else {
           expm1(x, hiPrec);
 
           double ya = hiPrec[0] + hiPrec[1];
@@ -586,6 +585,164 @@ public class FastMath {
       return result;
     }
 
+    /**
+     * Combined hyperbolic sine and hyperbolic cosine function.
+     *
+     * @param x Argument.
+     * @return [sinh(x), cosh(x)]
+     */
+    public static SinhCosh sinhCosh(double x) {
+      boolean negate = false;
+      if (Double.isNaN(x)) {
+          return new SinhCosh(x, x);
+      }
+
+      // sinh[z] = (exp(z) - exp(-z) / 2
+      // cosh[z] = (exp(z) + exp(-z))/2
+
+      // for values of z larger than about 20,
+      // exp(-z) can be ignored in comparison with exp(z)
+
+      if (x > 20) {
+          final double e;
+          if (x >= LOG_MAX_VALUE) {
+              // Avoid overflow (MATH-905).
+              final double t = exp(0.5 * x);
+              e = (0.5 * t) * t;
+          } else {
+              e = 0.5 * exp(x);
+          }
+          return new SinhCosh(e, e);
+      } else if (x < -20) {
+          final double e;
+          if (x <= -LOG_MAX_VALUE) {
+              // Avoid overflow (MATH-905).
+              final double t = exp(-0.5 * x);
+              e = (-0.5 * t) * t;
+          } else {
+              e = -0.5 * exp(-x);
+          }
+          return new SinhCosh(e, -e);
+      }
+
+      if (x == 0) {
+          return new SinhCosh(x, 1.0);
+      }
+
+      if (x < 0.0) {
+          x = -x;
+          negate = true;
+      }
+
+      double hiPrec[] = new double[2];
+      double resultM;
+      double resultP;
+
+      if (x > 0.25) {
+          exp(x, 0.0, hiPrec);
+
+          final double ya = hiPrec[0] + hiPrec[1];
+          final double yb = -(ya - hiPrec[0] - hiPrec[1]);
+
+          double temp = ya * HEX_40000000;
+          double yaa = ya + temp - temp;
+          double yab = ya - yaa;
+
+          // recip = 1/y
+          double recip = 1.0/ya;
+          temp = recip * HEX_40000000;
+          double recipa = recip + temp - temp;
+          double recipb = recip - recipa;
+
+          // Correct for rounding in division
+          recipb += (1.0 - yaa*recipa - yaa*recipb - yab*recipa - yab*recipb) * recip;
+          // Account for yb
+          recipb += -yb * recip * recip;
+
+          // y = y - 1/y
+          temp = ya - recipa;
+          double ybM = yb - (temp - ya + recipa);
+          double yaM = temp;
+          temp = yaM - recipb;
+          ybM += -(temp - yaM + recipb);
+          yaM = temp;
+          resultM = yaM + ybM;
+          resultM *= 0.5;
+
+          // y = y + 1/y
+          temp = ya + recipa;
+          double ybP = yb - (temp - ya - recipa);
+          double yaP = temp;
+          temp = yaP + recipb;
+          ybP += -(temp - yaP - recipb);
+          yaP = temp;
+          resultP = yaP + ybP;
+          resultP *= 0.5;
+
+      } else {
+          expm1(x, hiPrec);
+
+          final double ya = hiPrec[0] + hiPrec[1];
+          final double yb = -(ya - hiPrec[0] - hiPrec[1]);
+
+          /* Compute expm1(-x) = -expm1(x) / (expm1(x) + 1) */
+          double denom = 1.0 + ya;
+          double denomr = 1.0 / denom;
+          double denomb = -(denom - 1.0 - ya) + yb;
+          double ratio = ya * denomr;
+          double temp = ratio * HEX_40000000;
+          double ra = ratio + temp - temp;
+          double rb = ratio - ra;
+
+          temp = denom * HEX_40000000;
+          double za = denom + temp - temp;
+          double zb = denom - za;
+
+          rb += (ya - za*ra - za*rb - zb*ra - zb*rb) * denomr;
+
+          // Adjust for yb
+          rb += yb*denomr;                        // numerator
+          rb += -ya * denomb * denomr * denomr;   // denominator
+
+          // y = y - 1/y
+          temp = ya + ra;
+          double ybM = yb - (temp - ya - ra);
+          double yaM = temp;
+          temp = yaM + rb;
+          ybM += -(temp - yaM - rb);
+          yaM = temp;
+          resultM = yaM + ybM;
+          resultM *= 0.5;
+
+          // y = y + 1/y + 2
+          temp = ya - ra;
+          double ybP = yb - (temp - ya + ra);
+          double yaP = temp;
+          temp = yaP - rb;
+          ybP += -(temp - yaP + rb);
+          yaP = temp;
+          resultP = yaP + ybP + 2;
+          resultP *= 0.5;
+      }
+
+      if (negate) {
+          resultM = -resultM;
+      }
+
+      return new SinhCosh(resultM, resultP);
+
+    }
+
+    /**
+     * Combined hyperbolic sine and hyperbolic cosine function.
+     *
+     * @param x Argument.
+     * @param <T> the type of the field element
+     * @return [sinh(x), cosh(x)]
+     */
+    public static <T extends CalculusFieldElement<T>> FieldSinhCosh<T> sinhCosh(T x) {
+        return x.sinhCosh();
+    }
     /** Compute the hyperbolic tangent of a number.
      * @param x number on which evaluation is done
      * @return hyperbolic tangent of x
@@ -2494,7 +2651,7 @@ public class FastMath {
      * @return [sin(x), cos(x)]
      * @since 1.4
      */
-    public static <T extends RealFieldElement<T>> FieldSinCos<T> sinCos(T x) {
+    public static <T extends CalculusFieldElement<T>> FieldSinCos<T> sinCos(T x) {
         return x.sinCos();
     }
 
@@ -3151,7 +3308,32 @@ public class FastMath {
     /**
      * Absolute value.
      * @param x number from which absolute value is requested
+     * @return abs(x), or throws an exception for {@code Integer.MIN_VALUE}
+     */
+    public static int absExact(final int x) {
+        if (x == Integer.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return abs(x);
+    }
+
+    /**
+     * Absolute value.
+     * @param x number from which absolute value is requested
+     * @return abs(x), or throws an exception for {@code Long.MIN_VALUE}
+     * @since 2.0
+     */
+    public static long absExact(final long x) {
+        if (x == Long.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return abs(x);
+    }
+    /**
+     * Absolute value.
+     * @param x number from which absolute value is requested
      * @return abs(x)
+     * @since 2.0
      */
     public static float abs(final float x) {
         return Float.intBitsToFloat(MASK_NON_SIGN_INT & Float.floatToRawIntBits(x));
@@ -3166,6 +3348,31 @@ public class FastMath {
         return Double.longBitsToDouble(MASK_NON_SIGN_LONG & Double.doubleToRawLongBits(x));
     }
 
+    /**
+     * Negates the argument.
+     * @param x number from which opposite value is requested
+     * @return -x, or throws an exception for {@code Integer.MIN_VALUE}
+     * @since 2.0
+     */
+    public static int negateExact(final int x) {
+        if (x == Integer.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return -x;
+    }
+
+    /**
+     * Negates the argument.
+     * @param x number from which opposite value is requested
+     * @return -x, or throws an exception for {@code Long.MIN_VALUE}
+     * @since 2.0
+     */
+    public static long negateExact(final long x) {
+        if (x == Long.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return -x;
+    }
     /**
      * Compute least significant bit (Unit in Last Position) for a number.
      * @param x number from which ulp is requested
@@ -3187,7 +3394,7 @@ public class FastMath {
         if (Float.isInfinite(x)) {
             return Float.POSITIVE_INFINITY;
         }
-        return abs(x - Float.intBitsToFloat(Float.floatToIntBits(x) ^ 1));
+        return abs(x - Float.intBitsToFloat(Float.floatToRawIntBits(x) ^ 1));
     }
 
     /**
@@ -4337,7 +4544,7 @@ public class FastMath {
      * @return square root of a
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T sqrt(final T a) {
+    public static <T extends CalculusFieldElement<T>> T sqrt(final T a) {
         return a.sqrt();
     }
 
@@ -4347,7 +4554,7 @@ public class FastMath {
      * @return hyperbolic cosine of x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T cosh(final T x) {
+    public static <T extends CalculusFieldElement<T>> T cosh(final T x) {
         return x.cosh();
     }
 
@@ -4357,7 +4564,7 @@ public class FastMath {
      * @return hyperbolic sine of x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T sinh(final T x) {
+    public static <T extends CalculusFieldElement<T>> T sinh(final T x) {
         return x.sinh();
     }
 
@@ -4367,7 +4574,7 @@ public class FastMath {
      * @return hyperbolic tangent of x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T tanh(final T x) {
+    public static <T extends CalculusFieldElement<T>> T tanh(final T x) {
         return x.tanh();
     }
 
@@ -4377,7 +4584,7 @@ public class FastMath {
      * @return inverse hyperbolic cosine of a
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T acosh(final T a) {
+    public static <T extends CalculusFieldElement<T>> T acosh(final T a) {
         return a.acosh();
     }
 
@@ -4387,7 +4594,7 @@ public class FastMath {
      * @return inverse hyperbolic sine of a
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T asinh(final T a) {
+    public static <T extends CalculusFieldElement<T>> T asinh(final T a) {
         return a.asinh();
     }
 
@@ -4397,7 +4604,7 @@ public class FastMath {
      * @return inverse hyperbolic tangent of a
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T atanh(final T a) {
+    public static <T extends CalculusFieldElement<T>> T atanh(final T a) {
         return a.atanh();
     }
 
@@ -4408,7 +4615,7 @@ public class FastMath {
      * @return -1.0, -0.0, +0.0, +1.0 or NaN depending on sign of a
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T signum(final T a) {
+    public static <T extends CalculusFieldElement<T>> T signum(final T a) {
         return a.signum();
     }
 
@@ -4434,7 +4641,7 @@ public class FastMath {
      * @return double e<sup>x</sup>
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T exp(final T x) {
+    public static <T extends CalculusFieldElement<T>> T exp(final T x) {
         return x.exp();
     }
 
@@ -4444,7 +4651,7 @@ public class FastMath {
      * @return exp(x) - 1
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T expm1(final T x) {
+    public static <T extends CalculusFieldElement<T>> T expm1(final T x) {
         return x.expm1();
     }
 
@@ -4456,7 +4663,7 @@ public class FastMath {
      * @return log(x)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T log(final T x) {
+    public static <T extends CalculusFieldElement<T>> T log(final T x) {
         return x.log();
     }
 
@@ -4468,7 +4675,7 @@ public class FastMath {
      * @return {@code log(1 + x)}.
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T log1p(final T x) {
+    public static <T extends CalculusFieldElement<T>> T log1p(final T x) {
         return x.log1p();
     }
 
@@ -4478,7 +4685,7 @@ public class FastMath {
      * @return log10(x)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T log10(final T x) {
+    public static <T extends CalculusFieldElement<T>> T log10(final T x) {
         return x.log10();
     }
 
@@ -4491,7 +4698,7 @@ public class FastMath {
      * @return x<sup>y</sup>
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T pow(final T x, final T y) {
+    public static <T extends CalculusFieldElement<T>> T pow(final T x, final T y) {
         return x.pow(y);
     }
 
@@ -4504,7 +4711,7 @@ public class FastMath {
      * @return x<sup>y</sup>
      * @since 1.7
      */
-    public static <T extends RealFieldElement<T>> T pow(final T x, final double y) {
+    public static <T extends CalculusFieldElement<T>> T pow(final T x, final double y) {
         return x.pow(y);
     }
 
@@ -4517,7 +4724,7 @@ public class FastMath {
      * @return d<sup>e</sup>
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T pow(T d, int e) {
+    public static <T extends CalculusFieldElement<T>> T pow(T d, int e) {
         return d.pow(e);
     }
 
@@ -4529,7 +4736,7 @@ public class FastMath {
      * @return sin(x)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T sin(final T x) {
+    public static <T extends CalculusFieldElement<T>> T sin(final T x) {
         return x.sin();
     }
 
@@ -4541,7 +4748,7 @@ public class FastMath {
      * @return cos(x)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T cos(final T x) {
+    public static <T extends CalculusFieldElement<T>> T cos(final T x) {
         return x.cos();
     }
 
@@ -4553,7 +4760,7 @@ public class FastMath {
      * @return tan(x)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T tan(final T x) {
+    public static <T extends CalculusFieldElement<T>> T tan(final T x) {
         return x.tan();
     }
 
@@ -4564,7 +4771,7 @@ public class FastMath {
      *  @return atan(x)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T atan(final T x) {
+    public static <T extends CalculusFieldElement<T>> T atan(final T x) {
         return x.atan();
     }
 
@@ -4576,7 +4783,7 @@ public class FastMath {
      * @return phase angle of point (x,y) between {@code -PI} and {@code PI}
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T atan2(final T y, final T x) {
+    public static <T extends CalculusFieldElement<T>> T atan2(final T y, final T x) {
         return y.atan2(x);
     }
 
@@ -4586,7 +4793,7 @@ public class FastMath {
      * @return arc sine of x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T asin(final T x) {
+    public static <T extends CalculusFieldElement<T>> T asin(final T x) {
         return x.asin();
     }
 
@@ -4596,7 +4803,7 @@ public class FastMath {
      * @return arc cosine of x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T acos(final T x) {
+    public static <T extends CalculusFieldElement<T>> T acos(final T x) {
         return x.acos();
     }
 
@@ -4606,18 +4813,28 @@ public class FastMath {
      * @return cubic root of x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T cbrt(final T x) {
+    public static <T extends CalculusFieldElement<T>> T cbrt(final T x) {
         return x.cbrt();
     }
 
+    /**
+     * Norm.
+     * @param x number from which norm is requested
+     * @param <T> the type of the field element
+     * @return norm(x)
+     * @since 2.0
+     */
+    public static <T extends CalculusFieldElement<T>> double norm(final T x) {
+        return x.norm();
+    }
     /**
      * Absolute value.
      * @param x number from which absolute value is requested
      * @param <T> the type of the field element
      * @return abs(x)
-     * @since 1.3
+     * @since 2.0
      */
-    public static <T extends RealFieldElement<T>> T abs(final T x) {
+    public static <T extends CalculusFieldElement<T>> T abs(final T x) {
         return x.abs();
     }
 
@@ -4627,7 +4844,7 @@ public class FastMath {
      *  @param <T> the type of the field element
      *  @return x converted into radians
      */
-    public static <T extends RealFieldElement<T>> T toRadians(T x) {
+    public static <T extends CalculusFieldElement<T>> T toRadians(T x) {
         return x.toRadians();
     }
 
@@ -4637,7 +4854,7 @@ public class FastMath {
      *  @param <T> the type of the field element
      *  @return x converted into degrees
      */
-    public static <T extends RealFieldElement<T>> T toDegrees(T x) {
+    public static <T extends CalculusFieldElement<T>> T toDegrees(T x) {
         return x.toDegrees();
     }
 
@@ -4649,17 +4866,30 @@ public class FastMath {
      * @return d &times; 2<sup>n</sup>
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T scalb(final T d, final int n) {
+    public static <T extends CalculusFieldElement<T>> T scalb(final T d, final int n) {
         return d.scalb(n);
     }
 
+    /**
+     * Compute least significant bit (Unit in Last Position) for a number.
+     * @param x number from which ulp is requested
+     * @param <T> the type of the field element
+     * @return ulp(x)
+     * @since 2.0
+     */
+    public static <T extends CalculusFieldElement<T>> T ulp(final T x) {
+        if (Double.isInfinite(x.getReal())) {
+            return x.newInstance(Double.POSITIVE_INFINITY);
+        }
+        return x.ulp();
+    }
     /** Get the largest whole number smaller than x.
      * @param x number from which floor is requested
      * @param <T> the type of the field element
      * @return a double number f such that f is an integer f &lt;= x &lt; f + 1.0
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T floor(final T x) {
+    public static <T extends CalculusFieldElement<T>> T floor(final T x) {
         return x.floor();
     }
 
@@ -4669,7 +4899,7 @@ public class FastMath {
      * @return a double number c such that c is an integer c - 1.0 &lt; x &lt;= c
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T ceil(final T x) {
+    public static <T extends CalculusFieldElement<T>> T ceil(final T x) {
         return x.ceil();
     }
 
@@ -4679,7 +4909,7 @@ public class FastMath {
      * @return a double number r such that r is an integer r - 0.5 &lt;= x &lt;= r + 0.5
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T rint(final T x) {
+    public static <T extends CalculusFieldElement<T>> T rint(final T x) {
         return x.rint();
     }
 
@@ -4689,7 +4919,7 @@ public class FastMath {
      * @return closest long to x
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> long round(final T x) {
+    public static <T extends CalculusFieldElement<T>> long round(final T x) {
         return x.round();
     }
 
@@ -4700,13 +4930,51 @@ public class FastMath {
      * @return a if a is lesser or equal to b, b otherwise
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T min(final T a, final T b) {
+    public static <T extends CalculusFieldElement<T>> T min(final T a, final T b) {
         final double aR = a.getReal();
         final double bR = b.getReal();
         if (aR < bR) {
             return a;
         } else if (bR < aR) {
             return b;
+        } else {
+            // either the numbers are equal, or one of them is a NaN
+            return Double.isNaN(aR) ? a : b;
+        }
+    }
+
+    /** Compute the minimum of two values
+     * @param a first value
+     * @param b second value
+     * @param <T> the type of the field element
+     * @return a if a is lesser or equal to b, b otherwise
+     * @since 1.3
+     */
+    public static <T extends CalculusFieldElement<T>> T min(final T a, final double b) {
+        final double aR = a.getReal();
+        if (aR < b) {
+            return a;
+        } else if (b < aR) {
+            return a.getField().getZero().add(b);
+        } else {
+            // either the numbers are equal, or one of them is a NaN
+            return Double.isNaN(aR) ? a : a.getField().getZero().add(b);
+        }
+    }
+    /** Compute the maximum of two values
+     * @param a first value
+     * @param b second value
+     * @param <T> the type of the field element
+     * @return b if a is lesser or equal to b, a otherwise
+     * @since 1.3
+     */
+    public static <T extends CalculusFieldElement<T>> T max(final T a, final T b) {
+        final double aR = a.getReal();
+        final double bR = b.getReal();
+        if (aR < bR) {
+            return b;
+        } else if (bR < aR) {
+            return a;
         } else {
             // either the numbers are equal, or one of them is a NaN
             return Double.isNaN(aR) ? a : b;
@@ -4720,19 +4988,17 @@ public class FastMath {
      * @return b if a is lesser or equal to b, a otherwise
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T max(final T a, final T b) {
+    public static <T extends CalculusFieldElement<T>> T max(final T a, final double b) {
         final double aR = a.getReal();
-        final double bR = b.getReal();
-        if (aR < bR) {
-            return b;
-        } else if (bR < aR) {
+        if (aR < b) {
+            return a.getField().getZero().add(b);
+        } else if (b < aR) {
             return a;
         } else {
             // either the numbers are equal, or one of them is a NaN
-            return Double.isNaN(aR) ? a : b;
+            return Double.isNaN(aR) ? a : a.getField().getZero().add(b);
         }
     }
-
     /**
      * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
      * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)<br/>
@@ -4749,7 +5015,7 @@ public class FastMath {
      * @return sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T hypot(final T x, final T y) {
+    public static <T extends CalculusFieldElement<T>> T hypot(final T x, final T y) {
         return x.hypot(y);
     }
 
@@ -4774,7 +5040,7 @@ public class FastMath {
      * @return the remainder, rounded
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T IEEEremainder(final T dividend, final double divisor) {
+    public static <T extends CalculusFieldElement<T>> T IEEEremainder(final T dividend, final double divisor) {
         return dividend.remainder(divisor);
     }
 
@@ -4799,7 +5065,7 @@ public class FastMath {
      * @return the remainder, rounded
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T IEEEremainder(final T dividend, final T divisor) {
+    public static <T extends CalculusFieldElement<T>> T IEEEremainder(final T dividend, final T divisor) {
         return dividend.remainder(divisor);
     }
 
@@ -4813,7 +5079,7 @@ public class FastMath {
      * @return the magnitude with the same sign as the {@code sign} argument
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T copySign(T magnitude, T sign) {
+    public static <T extends CalculusFieldElement<T>> T copySign(T magnitude, T sign) {
         return magnitude.copySign(sign);
     }
 
@@ -4827,28 +5093,28 @@ public class FastMath {
      * @return the magnitude with the same sign as the {@code sign} argument
      * @since 1.3
      */
-    public static <T extends RealFieldElement<T>> T copySign(T magnitude, double sign) {
+    public static <T extends CalculusFieldElement<T>> T copySign(T magnitude, double sign) {
         return magnitude.copySign(sign);
     }
 
-    /**
-     * Print out contents of arrays, and check the length.
-     * <p>used to generate the preset arrays originally.</p>
-     * @param a unused
-     */
-    public static void main(String[] a) {
-        FastMathCalc.printarray(System.out, "EXP_INT_TABLE_A", EXP_INT_TABLE_LEN, ExpIntTable.EXP_INT_TABLE_A);
-        FastMathCalc.printarray(System.out, "EXP_INT_TABLE_B", EXP_INT_TABLE_LEN, ExpIntTable.EXP_INT_TABLE_B);
-        FastMathCalc.printarray(System.out, "EXP_FRAC_TABLE_A", EXP_FRAC_TABLE_LEN, ExpFracTable.EXP_FRAC_TABLE_A);
-        FastMathCalc.printarray(System.out, "EXP_FRAC_TABLE_B", EXP_FRAC_TABLE_LEN, ExpFracTable.EXP_FRAC_TABLE_B);
-        FastMathCalc.printarray(System.out, "LN_MANT",LN_MANT_LEN, lnMant.LN_MANT);
-        FastMathCalc.printarray(System.out, "SINE_TABLE_A", SINE_TABLE_LEN, SINE_TABLE_A);
-        FastMathCalc.printarray(System.out, "SINE_TABLE_B", SINE_TABLE_LEN, SINE_TABLE_B);
-        FastMathCalc.printarray(System.out, "COSINE_TABLE_A", SINE_TABLE_LEN, COSINE_TABLE_A);
-        FastMathCalc.printarray(System.out, "COSINE_TABLE_B", SINE_TABLE_LEN, COSINE_TABLE_B);
-        FastMathCalc.printarray(System.out, "TANGENT_TABLE_A", SINE_TABLE_LEN, TANGENT_TABLE_A);
-        FastMathCalc.printarray(System.out, "TANGENT_TABLE_B", SINE_TABLE_LEN, TANGENT_TABLE_B);
-    }
+//    /**
+//     * Print out contents of arrays, and check the length.
+//     * <p>used to generate the preset arrays originally.</p>
+//     * @param a unused
+//     */
+//    public static void main(String[] a) {
+//        FastMathCalc.printarray(System.out, "EXP_INT_TABLE_A", EXP_INT_TABLE_LEN, ExpIntTable.EXP_INT_TABLE_A);
+//        FastMathCalc.printarray(System.out, "EXP_INT_TABLE_B", EXP_INT_TABLE_LEN, ExpIntTable.EXP_INT_TABLE_B);
+//        FastMathCalc.printarray(System.out, "EXP_FRAC_TABLE_A", EXP_FRAC_TABLE_LEN, ExpFracTable.EXP_FRAC_TABLE_A);
+//        FastMathCalc.printarray(System.out, "EXP_FRAC_TABLE_B", EXP_FRAC_TABLE_LEN, ExpFracTable.EXP_FRAC_TABLE_B);
+//        FastMathCalc.printarray(System.out, "LN_MANT",LN_MANT_LEN, lnMant.LN_MANT);
+//        FastMathCalc.printarray(System.out, "SINE_TABLE_A", SINE_TABLE_LEN, SINE_TABLE_A);
+//        FastMathCalc.printarray(System.out, "SINE_TABLE_B", SINE_TABLE_LEN, SINE_TABLE_B);
+//        FastMathCalc.printarray(System.out, "COSINE_TABLE_A", SINE_TABLE_LEN, COSINE_TABLE_A);
+//        FastMathCalc.printarray(System.out, "COSINE_TABLE_B", SINE_TABLE_LEN, COSINE_TABLE_B);
+//        FastMathCalc.printarray(System.out, "TANGENT_TABLE_A", SINE_TABLE_LEN, TANGENT_TABLE_A);
+//        FastMathCalc.printarray(System.out, "TANGENT_TABLE_B", SINE_TABLE_LEN, TANGENT_TABLE_B);
+//    }
 
     /** Enclose large data table in nested static class so it's only loaded on first access. */
     private static class ExpIntTable {
